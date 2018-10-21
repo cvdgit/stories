@@ -17,6 +17,7 @@ use yii\web\IdentityInterface;
  * @property string $email
  * @property string $auth_key
  * @property integer $status
+ * @property integet $group
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $password write-only password
@@ -26,6 +27,8 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
 
+    const GROUP_ADMIN = 1;
+    const GROUP_AUTHOR = 2;
 
     /**
      * {@inheritdoc}
@@ -53,6 +56,7 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
+            ['group', 'in', 'range' => [self::GROUP_ADMIN, self::GROUP_AUTHOR]],
         ];
     }
 
@@ -186,4 +190,23 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $this->password_reset_token = null;
     }
+
+    /**
+     * Returns user role name according to RBAC
+     * @return string
+     */
+    public function getRoleName()
+    {
+        $roles = Yii::$app->authManager->getRolesByUser($this->id);
+        if (!$roles) {
+            return null;
+        }
+
+        reset($roles);
+        /* @var $role \yii\rbac\Role */
+        $role = current($roles);
+
+        return $role->name;
+    }
+    
 }

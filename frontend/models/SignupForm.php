@@ -22,17 +22,29 @@ class SignupForm extends Model
         return [
             ['username', 'trim'],
             ['username', 'required'],
-            ['username', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This username has already been taken.'],
+            ['username', 'unique', 'targetClass' => '\common\models\User', 'message' => 'Пользователь с таким именем уже существует.'],
             ['username', 'string', 'min' => 2, 'max' => 255],
 
             ['email', 'trim'],
             ['email', 'required'],
             ['email', 'email'],
             ['email', 'string', 'max' => 255],
-            ['email', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This email address has already been taken.'],
+            ['email', 'unique', 'targetClass' => '\common\models\User', 'message' => 'Пользователь с таким email уже существует.'],
 
             ['password', 'required'],
             ['password', 'string', 'min' => 6],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'username' => 'Имя пользователя',
+            'email' => 'Email',
+            'password' => 'Пароль',
         ];
     }
 
@@ -52,7 +64,15 @@ class SignupForm extends Model
         $user->email = $this->email;
         $user->setPassword($this->password);
         $user->generateAuthKey();
-        
-        return $user->save() ? $user : null;
+        if (!$user->save(false))
+        {
+            return null;
+        }
+
+        $auth = Yii::$app->authManager;
+        $authorRole = $auth->getRole('author');
+        $auth->assign($authorRole, $user->getId());
+
+        return $user;
     }
 }

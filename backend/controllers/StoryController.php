@@ -5,10 +5,29 @@ namespace backend\controllers;
 use Yii;
 use common\models\Story;
 use yii\data\ActiveDataProvider;
+use yii\filters\AccessControl;
 
 class StoryController extends \yii\web\Controller
 {
     
+    /**
+     * {@inheritdoc}
+     */
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['admin'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
     /**
      * Creates a new Story model.
      * If creation is successful, the browser will be redirected to the 'view' page.
