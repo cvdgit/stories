@@ -34,4 +34,4 @@ phpunit.phar
 # vagrant runtime
 /.vagrant
 
-/frontend/web/slides
+/public_html/slides
