@@ -11,6 +11,34 @@ class RbacController extends Controller
         $auth = Yii::$app->authManager;
         $auth->removeAll();
 
+        // Создать роли
+        $author = $auth->createRole('author');
+        $admin = $auth->createRole('admin');
+
+        // Create simple, based on action{$NAME} permissions
+        $createStory = $auth->createPermission('createStory');
+        $updateStory = $auth->createPermission('updateStory');
+        $deleteStory = $auth->createPermission('deleteStory');
+
+
+        // Add permissions in Yii::$app->authManager
+        $auth->add($createStory);
+        $auth->add($updateStory);
+        $auth->add($deleteStory);
+
+        // Add rule, based on UserExt->group === $user->group
+        $userGroupRule = new \common\rbac\UserGroupRule;
+        $auth->add($userGroupRule);
+
+        // Add rule "UserGroupRule" in roles
+        $author->ruleName = $userGroupRule->name;
+        $admin->ruleName  = $userGroupRule->name;
+
+        // Add roles in Yii::$app->authManager
+        $authManager->add($author);
+        $authManager->add($admin);
+
+/*
         // добавляем разрешение "createStory"
         $createStory = $auth->createPermission('createStory');
         $createStory->description = 'Создать историю';
@@ -78,5 +106,6 @@ class RbacController extends Controller
         // обычно реализуемый в модели User.
         $auth->assign($author, 1);
         $auth->assign($admin, 2);
+        */
     }
 }

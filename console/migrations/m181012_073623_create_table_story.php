@@ -22,6 +22,15 @@ class m181012_073623_create_table_story extends Migration
             'updated_at' => $this->integer()->notNull(),
             'user_id' => $this->integer()->notNull()
         ], $tableOptions);
+        $this->addForeignKey(
+            'fk_story_user_id',
+            '{{%story}}',
+            'user_id',
+            '{{%user}}',
+            'id',
+            'CASCADE',
+            'CASCADE'
+        );
     }
 
     /**
@@ -29,6 +38,8 @@ class m181012_073623_create_table_story extends Migration
      */
     public function safeDown()
     {
+        $this->truncateTable('{{%story}} CASCADE');
+        $this->dropForeignKey('fk_story_user_id', '{{%story}}');
         $this->dropTable('{{%story}}');
     }
 

@@ -1,6 +1,7 @@
 <?php
 return [
-    'language' => 'ru-RU',
+    'language' => 'ru',
+    'sourceLanguage' => 'en',
     'name' => 'Истории',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',

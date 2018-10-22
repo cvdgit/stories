@@ -5,9 +5,11 @@ namespace frontend\controllers;
 use Yii;
 use common\models\Story;
 use common\models\StorySearch;
+use yii\web\NotFoundHttpException;
 
 class StoryController extends \yii\web\Controller
 {
+
     public function actionIndex()
     {
     	$searchModel = new StorySearch();
@@ -21,14 +23,14 @@ class StoryController extends \yii\web\Controller
 
     /**
      * Displays a single Story model.
-     * @param integer $id
+     * @param string $alias
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
+    public function actionView($alias)
     {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $this->findModelByAlias($alias),
         ]);
     }
 
@@ -44,7 +46,15 @@ class StoryController extends \yii\web\Controller
         if (($model = Story::findOne($id)) !== null) {
             return $model;
         }
-        throw new NotFoundHttpException('The requested page does not exist.');
+        throw new NotFoundHttpException('Страница не найдена.');
+    }
+
+    protected function findModelByAlias($alias)
+    {
+        if (($model = Story::findOne(['alias' => $alias])) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('Страница не найдена.');
     }
 
 }

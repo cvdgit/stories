@@ -6,7 +6,7 @@ use Yii;
 use yii\filters\AccessControl;
 use common\models\User;
 
-class UserController extends \yii\web\Controller
+class ProfileController extends \yii\web\Controller
 {
 
 	public function behaviors()
@@ -24,10 +24,10 @@ class UserController extends \yii\web\Controller
 	    ];
 	}
 
-    public function actionProfile()
+    public function actionIndex()
     {
     	$model = $this->findModel(Yii::$app->user->id);
-        return $this->render('profile', ['model' => $model]);
+        return $this->render('index', ['model' => $model]);
     }
 
     /**
@@ -42,7 +42,7 @@ class UserController extends \yii\web\Controller
         if (($model = User::findOne($id)) !== null) {
             return $model;
         }
-        throw new NotFoundHttpException('The requested page does not exist.');
+        throw new NotFoundHttpException('Страница не найдена.');
     }
 
 }

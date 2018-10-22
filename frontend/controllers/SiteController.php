@@ -120,9 +120,9 @@ class SiteController extends Controller
         $model = new ContactForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
-                Yii::$app->session->setFlash('success', 'Thank you for contacting us. We will respond to you as soon as possible.');
+                Yii::$app->session->setFlash('success', 'Благодарим Вас за обращение к нам. Мы ответим вам как можно скорее.');
             } else {
-                Yii::$app->session->setFlash('error', 'There was an error sending your message.');
+                Yii::$app->session->setFlash('error', 'При отправке вашего сообщения произошла ошибка.');
             }
 
             return $this->refresh();
@@ -134,13 +134,13 @@ class SiteController extends Controller
     }
 
     /**
-     * Displays about page.
+     * Displays pricing page.
      *
      * @return mixed
      */
-    public function actionAbout()
+    public function actionPricing()
     {
-        return $this->render('about');
+        return $this->render('pricing');
     }
 
     /**
