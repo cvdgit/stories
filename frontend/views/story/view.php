@@ -5,5 +5,10 @@
 
 use frontend\widgets\RevealWidget;
 
-echo RevealWidget::widget(['data' => $model->body]);
 ?>
+<div class="row" style="height: 100%">
+	<div class="col-xs-12" style="height: 100%">
+		<h1><?= $model->title ?></h1>
+		<?= RevealWidget::widget(['data' => $model->body]) ?>
+	</div>
+</div>

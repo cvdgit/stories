@@ -37,6 +37,20 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
+        'urlManager' => [
+            'showScriptName' => false,
+        ],
+        'urlManagerFrontend' => [
+            'class' => 'yii\web\UrlManager',
+            'baseUrl' => '',
+            'enablePrettyUrl' => true,
+            'showScriptName' => false,
+            'enableStrictParsing' => true,
+            'rules' => [
+                '' => 'site/index',
+                'story/<alias:[\w\-]+>' => 'story/view',
+            ]
+        ],
     ],
     'params' => $params,
 ];
