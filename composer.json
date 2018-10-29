@@ -18,7 +18,11 @@
         "yiisoft/yii2": "~2.0.6",
         "yiisoft/yii2-bootstrap": "~2.0.0",
         "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
-        "bower-asset/reveal.js": "^3.7"
+        "bower-asset/reveal.js": "^3.7",
+        "creocoder/yii2-flysystem": "dev-master",
+        "srmklive/flysystem-dropbox-v2": "^1.0",
+        "spatie/flysystem-dropbox": "^1.0",
+        "electrolinux/phpquery": "^0.9.6"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

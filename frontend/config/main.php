@@ -49,7 +49,7 @@ return [
                 'logout' => 'site/logout',
                 'request-password-reset' => 'site/request-password-reset',
                 'profile' => 'profile/index',
-                'storyes' => 'story/index',
+                'stories' => 'story/index',
                 'story/<alias:[\w\-]+>' => 'story/view',
             ],
         ],

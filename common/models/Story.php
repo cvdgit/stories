@@ -15,6 +15,7 @@ use yii\behaviors\TimestampBehavior;
  * @property int $created_at
  * @property int $updated_at
  * @property int $user_id
+ * @property string $cover
  *
  * @property User $author
  */
@@ -45,7 +46,7 @@ class Story extends \yii\db\ActiveRecord
     {
         return [
             [['title', 'alias', 'user_id'], 'required'],
-            [['body'], 'string'],
+            [['body', 'cover'], 'string'],
             [['created_at', 'updated_at', 'user_id'], 'integer'],
             [['title', 'alias'], 'string', 'max' => 255],
             [['alias'], 'unique'],
@@ -76,4 +77,79 @@ class Story extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
+
+    public function initStory()
+    {
+        $localFolder = $this->getImagesFolderPath();
+        if (!file_exists($localFolder))
+        {
+            mkdir($localFolder, 0777);
+        }
+    }
+
+    public function getCoverPath()
+    {
+        return $this->getImagesFolderPath(true) . '/' . $this->cover;
+    }
+
+    public function exportSlideBodyFromDropBox()
+    {
+        $dropboxPath = Yii::$app->params['dropboxSlidesPath'] . $this->alias . '.html';
+        $html = Yii::$app->dropbox->read($dropboxPath);
+        $document = \phpQuery::newDocumentHTML($html);
+        $images = $document->find('img[data-src]');
+        foreach ($images as $image)
+        {
+            $src = pq($image)->attr('data-src');
+            pq($image)->attr('data-src', '/slides/' . $src);
+        }
+        return $document->find("div.reveal")->html();
+    }
+
+    public function exportSlideImagesFromDropBox()
+    {
+        $dropboxFolder = Yii::$app->params['dropboxSlidesPath'] . $this->alias;
+        $contents = Yii::$app->dropbox->listContents($dropboxFolder);
+        $localFolder = Yii::getAlias('@public') . '/slides/' . $this->alias . '/';
+        if (!file_exists($localFolder))
+        {
+            mkdir($localFolder, 0777);
+        }
+        else
+        {
+            array_map('unlink', glob($localFolder . "*.jpg"));
+        }
+        foreach ($contents as $content)
+        {
+            $data = Yii::$app->dropbox->read($content["path"]);
+            file_put_contents($localFolder . $content["basename"], $data);
+            $data = null;
+        }
+    }
+
+    public function exportSlideFromDropBox()
+    {
+        $this->body = $this->exportSlideBodyFromDropBox();
+        $this->exportSlideImagesFromDropBox();
+    }
+
+    public function getImagesFolderPath($web = false)
+    {
+        return ($web ? '' : Yii::getAlias('@public')) . '/slides/' . $this->alias;
+    }
+
+    public function getStoryImages()
+    {
+        $dir  = opendir($this->getImagesFolderPath());
+        $images = [];
+        while (false !== ($filename = readdir($dir)))
+        {
+            if (!in_array($filename, array('.', '..'))) 
+            {
+                $images[] = $this->getImagesFolderPath(true) . '/' . $filename;
+            }
+        }
+        return $images;
+    }
+
 }

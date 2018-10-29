@@ -48,8 +48,13 @@ return [
             'enableStrictParsing' => true,
             'rules' => [
                 '' => 'site/index',
-                'story/<alias:[\w\-]+>' => 'story/view',
+                'story/<alias:[\w\d\-]+>' => 'story/view',
             ]
+        ],
+        'dropbox' => [
+            'class' => 'creocoder\flysystem\DropboxFilesystem',
+            'token' => 'HWGl_co7zM0AAAAAAAAV2M32XjJzEEuO9ZlevhhPNS6S6PUyxAqod15bQvonlZfl',
+            'app' => 'cvd-slides-app',
         ],
     ],
     'params' => $params,

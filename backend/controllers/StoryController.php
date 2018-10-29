@@ -38,6 +38,7 @@ class StoryController extends \yii\web\Controller
         $model = new Story();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            $model->initStory();
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -69,7 +70,9 @@ class StoryController extends \yii\web\Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $model->alias]));
+            Yii::$app->session->setFlash('success', 'Изменения успешно сохранены');
+            //$this->refresh();
+            // return $this->redirect(Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $model->alias]));
         }
 
         return $this->render('update', [
@@ -103,7 +106,32 @@ class StoryController extends \yii\web\Controller
         if (($model = Story::findOne($id)) !== null) {
             return $model;
         }
-        throw new NotFoundHttpException('The requested page does not exist.');
+        throw new NotFoundHttpException('Страница не найдена.');
+    }
+
+    public function actionGetfromdropbox($id)
+    {
+        $story = $this->findModel($id);
+        $result = ['success' => '', 'error' => ''];
+        try {
+            $story->exportSlideFromDropBox();
+            $story->save();
+            $result['success'] = 'Успешно';
+        }
+        catch (Exception $ex) {
+            $result['error'] = $ex->getMessage();
+        }
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        return $this->asJson($result);
+    }
+
+    public function actionImages($id)
+    {
+        $model = $this->findModel($id);
+        return $this->render('images', [
+            'model' => $model,
+            'images' => $model->getStoryImages(),
+        ]);
     }
 
 }

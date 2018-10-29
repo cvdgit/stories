@@ -11,7 +11,7 @@ $this->title = 'CVD - Сказки';
     <div class="body-content">
         <div class="row">
             <div class="col-lg-4">
-            	<?php if (!Yii::$app->user->isGuest) var_dump(Yii::$app->user->can('createStory')); ?>
+                <p>Сказки</p>
             </div>
         </div>
     </div>
