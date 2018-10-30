@@ -155,9 +155,14 @@ class SiteController extends Controller
         {
             if ($user = $model->signup())
             {
-                $model->sentEmailConfirm($user);
-                Yii::$app->session->setFlash('success', 'Проверьте свой адрес электронной почты, чтобы подтвердить регистрацию.');
-                return $this->goHome();
+                $sent = $model->sentEmailConfirm($user);
+                if ($sent) {
+                    Yii::$app->session->setFlash('success', 'Проверьте свой адрес электронной почты, чтобы подтвердить регистрацию.');
+                    return $this->goHome();
+                }
+                else {
+                    Yii::$app->session->setFlash('error', 'Ошибка при отправке письма с подтверждением регистрации на сайте.');
+                }
             }
         }
         return $this->render('signup', [

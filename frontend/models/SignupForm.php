@@ -88,9 +88,7 @@ class SignupForm extends Model
             ->setFrom(Yii::$app->params['adminEmail'])
             ->setSubject('Подтверждение регистрации')
             ->send();
-        if (!$sent) {
-            throw new \RuntimeException('Ошибка при отправке письма с подтверждением регистрации на сайте.');
-        }
+        return $sent;
     }
 
     public function confirmation($token)
