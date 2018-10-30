@@ -11,7 +11,7 @@ use yii\widgets\Breadcrumbs;
 use common\widgets\Alert;
 use yii\helpers\Url;
 
-use frontend\widgets\RevealWidget;
+use common\widgets\RevealWidget;
 
 //AppAsset::register($this);
 //$this->registerCssFile('/css/site.css');

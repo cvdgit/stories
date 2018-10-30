@@ -6,6 +6,8 @@ use yii\widgets\ActiveForm;
 use common\models\User;
 use yii\helpers\Url;
 
+use common\widgets\RevealWidget;
+
 /* @var $this yii\web\View */
 /* @var $model common\models\Story */
 /* @var $form yii\widgets\ActiveForm */
@@ -52,7 +54,16 @@ $this->registerJs($script, yii\web\View::POS_READY);
     <?= $form->field($model, 'alias')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'user_id')->dropDownList(ArrayHelper::map(User::find()->all(), 'id', 'username'), ['prompt' => '--- select ---']) ?>
     <?php if (!$model->isNewRecord): ?>
-    <?= $form->field($model, 'body')->textarea(['readonly' => 'readonly', 'rows' => 10]); ?>
+    <?php // $form->field($model, 'body')->textarea(['readonly' => 'readonly', 'rows' => 10]); ?>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-8 col-xs-offset-2">
+                <div style="height: 300px">
+                    <iframe border="0" width="100%" height="100%" style="border: 0 none" src="/story/viewbyframe/<?= $model->id ?>"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
 	<?php endif ?>
     <div class="form-group">
         <?= Html::submitButton(($model->isNewRecord ? 'Создать историю' : 'Сохранить изменения'), ['class' => 'btn btn-success']) ?>
