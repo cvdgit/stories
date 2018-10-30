@@ -57,4 +57,9 @@ class StoryController extends \yii\web\Controller
         throw new NotFoundHttpException('Страница не найдена.');
     }
 
+    public function actionViewByFrame($id)
+    {
+        return $this->renderPartial('frame', ['model' => $this->findModel($id)]);
+    }
+
 }
