@@ -3,9 +3,9 @@
 use yii\db\Migration;
 
 /**
- * Class m181029_115702_sotry_add_cover_column
+ * Class m181029_115702_story_add_cover_column
  */
-class m181029_115702_sotry_add_cover_column extends Migration
+class m181029_115702_story_add_cover_column extends Migration
 {
     /**
      * {@inheritdoc}
@@ -20,7 +20,7 @@ class m181029_115702_sotry_add_cover_column extends Migration
      */
     public function safeDown()
     {
-        echo "m181029_115702_sotry_add_cover_column cannot be reverted.\n";
+        echo "m181029_115702_story_add_cover_column cannot be reverted.\n";
         $this->dropColumn('{{%story}}', 'cover');
         return false;
     }
@@ -34,7 +34,7 @@ class m181029_115702_sotry_add_cover_column extends Migration
 
     public function down()
     {
-        echo "m181029_115702_sotry_add_cover_column cannot be reverted.\n";
+        echo "m181029_115702_story_add_cover_column cannot be reverted.\n";
 
         return false;
     }

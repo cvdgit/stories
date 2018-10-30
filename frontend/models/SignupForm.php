@@ -63,10 +63,13 @@ class SignupForm extends Model
         $user = new User();
         $user->username = $this->username;
         $user->email = $this->email;
+        $user->status = User::STATUS_WAIT;
+        $user->group = User::GROUP_AUTHOR;
         $user->setPassword($this->password);
         $user->generateAuthKey();
-        if (!$user->save(false))
-        {
+        $user->generateEmailConfirmToken();
+        
+        if (!$user->save(false)) {
             return null;
         }
 
@@ -76,4 +79,40 @@ class SignupForm extends Model
 
         return $user;
     }
+
+    public function sentEmailConfirm(User $user)
+    {
+        $sent = Yii::$app->mailer
+            ->compose(['html' => 'userSignupComfirm-html', 'text' => 'userSignupComfirm-text'], ['user' => $user])
+            ->setTo($user->email)
+            ->setFrom(Yii::$app->params['adminEmail'])
+            ->setSubject('Подтверждение регистрации')
+            ->send();
+        if (!$sent) {
+            throw new \RuntimeException('Ошибка при отправке письма с подтверждением регистрации на сайте.');
+        }
+    }
+
+    public function confirmation($token)
+    {
+        if (empty($token)) {
+            throw new \DomainException('Empty confirm token.');
+        }
+
+        $user = User::findOne(['email_confirm_token' => $token]);
+        if (!$user) {
+            throw new \DomainException('User is not found.');
+        }
+
+        $user->email_confirm_token = null;
+        $user->status = User::STATUS_ACTIVE;
+        if (!$user->save()) {
+            throw new \RuntimeException('Saving error.');
+        }
+
+        if (!Yii::$app->getUser()->login($user)) {
+            throw new \RuntimeException('Error authentication.');
+        }
+    }
+
 }
