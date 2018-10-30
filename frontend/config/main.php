@@ -48,6 +48,7 @@ return [
                 'login' => 'site/login',
                 'logout' => 'site/logout',
                 'request-password-reset' => 'site/request-password-reset',
+                'signup-confirm' => 'site/signup-confirm',
                 'profile' => 'profile/index',
                 'stories' => 'story/index',
                 'story/<alias:[\w\-]+>' => 'story/view',
