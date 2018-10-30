@@ -71,6 +71,9 @@ AppAsset::register($this);
 <footer class="footer">
     <div class="container">
         <p class="pull-left">&copy; <?= Html::encode(Yii::$app->name) ?> <?= date('Y') ?></p>
+        <?php if (Yii::$app->user->can('admin')): ?>
+        <p class="pull-right"><?= Html::a('Панель управления', ['admin/index']) ?></p>
+        <?php endif ?>
     </div>
 </footer>
 <?php $this->endBody() ?>

@@ -57,6 +57,7 @@ class User extends ActiveRecord implements IdentityInterface
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
             ['group', 'in', 'range' => [self::GROUP_ADMIN, self::GROUP_AUTHOR]],
+            ['group', 'default', 'value' => self::GROUP_AUTHOR],
         ];
     }
 
