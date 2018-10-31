@@ -41,7 +41,7 @@ class StorySearch extends Story
      */
     public function search($params)
     {
-        $query = Story::find();
+        $query = Story::findStories();
 
         // add conditions that should always apply here
 
@@ -65,7 +65,7 @@ class StorySearch extends Story
         ]);
 
         $query->andFilterWhere(['like', 'title', $this->title])
-            ->andFilterWhere(['like', 'alias', $this->alias]);
+              ->andFilterWhere(['like', 'alias', $this->alias]);
 
         return $dataProvider;
     }

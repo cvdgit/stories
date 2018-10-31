@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 use common\models\User;
+use common\models\Story;
 use yii\helpers\Url;
 
 use common\widgets\RevealWidget;
@@ -54,7 +55,6 @@ $this->registerJs($script, yii\web\View::POS_READY);
     <?= $form->field($model, 'alias')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'user_id')->dropDownList(ArrayHelper::map(User::find()->all(), 'id', 'username'), ['prompt' => '--- select ---']) ?>
     <?php if (!$model->isNewRecord): ?>
-    <?php // $form->field($model, 'body')->textarea(['readonly' => 'readonly', 'rows' => 10]); ?>
     <div class="form-group">
         <div class="row">
             <div class="col-xs-8 col-xs-offset-2">
@@ -64,6 +64,7 @@ $this->registerJs($script, yii\web\View::POS_READY);
             </div>
         </div>
     </div>
+    <?= $form->field($model, 'status')->dropDownList([Story::STATUS_DRAFT => 'Черновик', Story::STATUS_PUBLISHED => 'Публикация'], ['prompt' => '--- select ---']) ?>
 	<?php endif ?>
     <div class="form-group">
         <?= Html::submitButton(($model->isNewRecord ? 'Создать историю' : 'Сохранить изменения'), ['class' => 'btn btn-success']) ?>

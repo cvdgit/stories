@@ -39,7 +39,7 @@ class StoryController extends \yii\web\Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $model->initStory();
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['update', 'id' => $model->id]);
         }
 
         return $this->render('create', [
