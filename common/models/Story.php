@@ -4,6 +4,7 @@ namespace common\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use dosamigos\taggable\Taggable;
 
 /**
  * This is the model class for table "story".
@@ -41,6 +42,9 @@ class Story extends \yii\db\ActiveRecord
     {
         return [
             TimestampBehavior::className(),
+            [
+                'class' => Taggable::className(),
+            ],
         ];
     }
 
@@ -73,7 +77,7 @@ class Story extends \yii\db\ActiveRecord
             'body' => 'Body',
             'created_at' => 'Дата создания',
             'updated_at' => 'Дата изменения',
-            'user_id' => 'User ID',
+            'user_id' => 'Автор',
             'status' => 'Статус',
         ];
     }

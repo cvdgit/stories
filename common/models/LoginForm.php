@@ -55,12 +55,12 @@ class LoginForm extends Model
         if (!$this->hasErrors()) {
             $user = $this->getUser();
             if (!$user || !$user->validatePassword($this->password)) {
-                $this->addError('password', 'Неверное имя пользователя или пароль123.');
+                $this->addError('password', 'Неверное имя пользователя или пароль.');
             }
-            elseif ($user && User::STATUS_DELETED) {
+            else if ($user && $user->status === User::STATUS_DELETED) {
                 $this->addError('username', 'Пользователь удален.');
             }
-            elseif ($user && User::STATUS_WAIT) {
+            else if ($user && $user->status === User::STATUS_WAIT) {
                 $this->addError('username', 'Ожидается подтверждение по email.');
             }
         }

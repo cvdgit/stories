@@ -22,7 +22,9 @@
         "creocoder/yii2-flysystem": "dev-master",
         "srmklive/flysystem-dropbox-v2": "^1.0",
         "spatie/flysystem-dropbox": "^1.0",
-        "electrolinux/phpquery": "^0.9.6"
+        "electrolinux/phpquery": "^0.9.6",
+        "2amigos/yii2-taggable-behavior": "~1.0",
+        "2amigos/yii2-selectize-widget": "~1.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",
