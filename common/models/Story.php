@@ -20,6 +20,7 @@ use dosamigos\taggable\Taggable;
  * @property int $status
  *
  * @property User $author
+ * @property Tags $tags
  */
 class Story extends \yii\db\ActiveRecord
 {
@@ -62,6 +63,7 @@ class Story extends \yii\db\ActiveRecord
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
             ['status', 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_PUBLISHED]],
             ['status', 'default', 'value' => self::STATUS_DRAFT],
+            [['tagNames'], 'safe'],
         ];
     }
 
@@ -79,6 +81,7 @@ class Story extends \yii\db\ActiveRecord
             'updated_at' => 'Дата изменения',
             'user_id' => 'Автор',
             'status' => 'Статус',
+            'tagNames' => 'Тэги',
         ];
     }
 
@@ -88,6 +91,14 @@ class Story extends \yii\db\ActiveRecord
     public function getAuthor()
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTags()
+    {
+        return $this->hasMany(Tag::className(), ['id' => 'tag_id'])->viaTable('{{%story_tag}}', ['story_id' => 'id']);
     }
 
     public function initStory()

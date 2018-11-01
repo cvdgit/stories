@@ -6,6 +6,7 @@ use yii\widgets\ActiveForm;
 use common\models\User;
 use common\models\Story;
 use yii\helpers\Url;
+use dosamigos\selectize\SelectizeTextInput;
 
 use common\widgets\RevealWidget;
 
@@ -66,6 +67,19 @@ $this->registerJs($script, yii\web\View::POS_READY);
     </div>
     <?= $form->field($model, 'status')->dropDownList([Story::STATUS_DRAFT => 'Черновик', Story::STATUS_PUBLISHED => 'Публикация'], ['prompt' => '--- select ---']) ?>
 	<?php endif ?>
+
+    <?= $form->field($model, 'tagNames')->widget(SelectizeTextInput::className(), [
+        'loadUrl' => ['tag/list'],
+        'options' => ['class' => 'form-control'],
+        'clientOptions' => [
+            'plugins' => ['remove_button'],
+            'valueField' => 'name',
+            'labelField' => 'name',
+            'searchField' => ['name'],
+            'create' => true,
+        ],
+    ])->hint('Используйте запятые для разделения тегов') ?>
+
     <div class="form-group">
         <?= Html::submitButton(($model->isNewRecord ? 'Создать историю' : 'Сохранить изменения'), ['class' => 'btn btn-success']) ?>
         <?php if (!$model->isNewRecord): ?>
