@@ -27,7 +27,7 @@ class m130524_201442_init extends Migration
 
         $this->batchInsert(
             '{{%user}}',
-            ['id', 'username', 'auth_key', 'password_hash', 'email', 'status', 'group', 'created_at'],
+            ['id', 'username', 'auth_key', 'password_hash', 'email', 'status', 'group', 'created_at', 'updated_at'],
             [
                 [
                     'id' => '1',
@@ -38,6 +38,7 @@ class m130524_201442_init extends Migration
                     'status' => '10',
                     'group' => '1',
                     'created_at' => '1539959113',
+                    'updated_at'  => '1539959113',
                 ],
             ]
         );
