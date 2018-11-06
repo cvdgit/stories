@@ -55,6 +55,7 @@ return [
                 'story/viewbyframe/<id:\d+>' => 'story/view-by-frame',
                 'rates' => 'rate/index',
                 'list_stories' => 'rate/list',
+                'payment' => 'rate/payment',
             ],
         ],
     ],

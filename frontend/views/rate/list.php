@@ -4,22 +4,21 @@
 	<title>Cinagro</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<meta name="author" content="ThemeStarz">
 	
 	<link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700|Varela+Round" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Fira+Sans|Noto+Sans|PT+Sans+Narrow|Source+Sans+Pro" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Fira+Sans|M+PLUS+Rounded+1c:700|Noto+Sans|PT+Sans+Narrow|Source+Sans+Pro" rel="stylesheet">
 	<!-- Framework Css -->
-	<link rel="stylesheet" type="text/css" href="/public_html/template/css/lib/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="<?= Yii::getAlias('@web') ?>/template/css/lib/bootstrap.min.css">
 
-	<link rel="stylesheet" type="text/css" href="/public_html/template/css/lib/bootstrap-grid.css">
+	<link rel="stylesheet" type="text/css" href="<?= Yii::getAlias('@web') ?>/template/css/lib/bootstrap-grid.css">
 
 	<!-- Font Awesome / Icon Fonts -->
-	<link rel="stylesheet" type="text/css" href="/public_html/template/fonts/font-awesome.css">
-	<link rel="stylesheet" type="text/css" href="/public_html/template/css/style.css">
+	<link rel="stylesheet" type="text/css" href="<?= Yii::getAlias('@web') ?>/template/fonts/font-awesome.css">
+	<link rel="stylesheet" type="text/css" href="<?= Yii::getAlias('@web') ?>/template/css/style.css">
 	<!-- TODO -->
-	<link rel="stylesheet" type="text/css" href="/public_html/template/css/responsive.css">
-	<title>Craigs - Easy Buy & Sell Listing HTML Template</title>
+	<link rel="stylesheet" type="text/css" href="<?= Yii::getAlias('@web') ?>/template/css/responsive.css">
+	<title>Истории</title>
 </head>
 <body>
 	<div class="wrapper">
@@ -44,7 +43,7 @@
 						<div style="text-align: center;"><p style="text-transform: uppercase; color: #1e1e1e; font-size: 20px; position: relative; margin-right: 100px;">Сказочки</p><p style="text-transform: uppercase; color: #1e1e1e; font-size: 20px; position: relative;">рассказочки</p></div>
 					</div-->
 					<div class="col-md-2 col-sm-3 col-xs-3">
-						<div class="logo"><a href="index.html"><img src="/public_html/template/img/logo.png" alt="logo"></a></div>
+						<div class="logo"><a href="index.html"><img src="<?= Yii::getAlias('@web') ?>/template/img/logo.png" alt="logo"></a></div>
 					</div>
 					<div class="col-md-8 col-sm-8 col-xs-8 text-left">
 						<ul class="menu cst-margin-none">
@@ -185,7 +184,7 @@
                 <!--============ End Hero Form ======================================================================-->
                 <div class="background">
                     <!-- <div class="background-image original-size"> -->
-                        <!-- <img src="/public_html/template/img/hero-background-icons.jpg" alt=""> -->
+                        <!-- <img src="<?= Yii::getAlias('@web') ?>/template/img/hero-background-icons.jpg" alt=""> -->
                     <!-- </div> -->
                     <!--end background-image-->
                 </div>
@@ -214,8 +213,8 @@
 									</div><!--button-group-->
 								</div><!--images-->
 								<div class="info-product">
-									<a href="single-product.html" class="title">Purity Organic</a>
-									<span class="price">$4.79</span>
+									<a href="single-product.html" class="title">Серый волк</a>
+									<span class="price">бесплатно</span>
 								</div><!--info-product-->
 							</div><!--product-->
 							<div class="product mask down grid-item grid-item-width1 grid-item-height-mini">
@@ -227,8 +226,8 @@
 									</div><!--button-group-->
 								</div><!--images-->
 								<div class="info-product">
-									<a href="single-product.html" class="title">Cold Pressed Juice</a>
-									<span class="price">$9.99</span>
+									<a href="single-product.html" class="title">Про кота</a>
+									<span class="price">бесплатно</span>
 								</div><!--info-product-->
 							</div><!--product-->
 							<div class="product mask down grid-item grid-item-width1 grid-item-height-mini">
@@ -240,8 +239,8 @@
 									</div><!--button-group-->
 								</div><!--images-->
 								<div class="info-product">
-									<a href="single-product.html" class="title">Organic Nutrition Shake</a>
-									<span class="price">$5.79</span>
+									<a href="single-product.html" class="title">Руссалочка</a>
+									<span class="price">подписка</span>
 								</div><!--info-product-->
 							</div><!--product-->
 							<div class="product mask down grid-item grid-item-width1 grid-item-height-mini">
@@ -253,8 +252,8 @@
 									</div><!--button-group-->
 								</div><!--images-->
 								<div class="info-product">
-									<a href="single-product.html" class="title">Fruit Punch</a>
-									<span class="price">$8.99</span>
+									<a href="single-product.html" class="title">Котопес</a>
+									<span class="price">бесплатно</span>
 								</div><!--info-product-->
 							</div><!--product-->
 						</div>
@@ -310,16 +309,16 @@
 					</div>
 				</div-->
 				<div class="copyright">
-					<p>Copyright &copy; 2018 cinagro. Theme by <a href="https://fruitfulcode.com/">fruitfulcode</a></p>
+					<p>Copyright &copy; 2018.</p>
 				</div>
 			</div>
 			<div id="back-to-top"><i class="fa fa-angle-up"></i></div>
 		</footer>
 		<!--================= End of Footer =====================-->
 	</div>
-	<script type="text/javascript" src="/public_html/template/js/lib/jquery-3.3.1.min.js"></script>
-	<script type="text/javascript" src="/public_html/template/js/lib/bootstrap.min.js"></script>
-	<script type="text/javascript" src="/public_html/template/js/lib/masonry.pkgd.min.js"></script>
-	<script type="text/javascript" src="/public_html/template/js/main.js"></script>
+	<script type="text/javascript" src="<?= Yii::getAlias('@web') ?>/template/js/lib/jquery-3.3.1.min.js"></script>
+	<script type="text/javascript" src="<?= Yii::getAlias('@web') ?>/template/js/lib/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<?= Yii::getAlias('@web') ?>/template/js/lib/masonry.pkgd.min.js"></script>
+	<script type="text/javascript" src="<?= Yii::getAlias('@web') ?>/template/js/main.js"></script>
 </body>
 </html>

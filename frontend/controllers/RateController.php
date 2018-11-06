@@ -22,5 +22,9 @@ class RateController extends \yii\web\Controller
         return $this->renderPartial('list');
     }
 
+    public function actionPayment()
+    {
+        // return $this->renderPartial('list');
+    }
 
 }

@@ -771,7 +771,7 @@ Headers:		'Varela Round', sans-serif;
     line-height: 1.1;
 }
 .hero:after {
-    background-image: url("../../assets/img/hero-overlay1.png");
+    background-image: url("../../template/img/hero-overlay1.png");
     background-size: contain;
     background-position: bottom center;
     background-repeat: no-repeat;
@@ -8076,4 +8076,7 @@ blockquote p {
 .inside-inside span {
     color: #1e1e1e;
     font-size: 16px;
+}
+.field-rate-id {
+    display: none;
 }

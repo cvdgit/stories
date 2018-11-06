@@ -1,25 +1,34 @@
+<?php
+
+/* @var $this yii\web\View */
+/* @var $form yii\bootstrap\ActiveForm */
+/* @var $model \frontend\models\ContactForm */
+
+use yii\helpers\Html;
+use yii\bootstrap\ActiveForm;
+
+?>
 <!doctype html>
 <html lang="en">
 <head>
 	<title>Cinagro</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<meta name="author" content="ThemeStarz">
 	
 	<link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700|Varela+Round" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Fira+Sans|Noto+Sans|PT+Sans+Narrow|Source+Sans+Pro" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Fira+Sans|M+PLUS+Rounded+1c:700|Noto+Sans|PT+Sans+Narrow|Source+Sans+Pro" rel="stylesheet">
-	<!-- Framework Css -->
-	<link rel="stylesheet" type="text/css" href="/public_html/template/css/lib/bootstrap.min.css">
+	<!-- Framework Css --> 
+	<link rel="stylesheet" type="text/css" href="<?= Yii::getAlias('@web') ?>/template/css/lib/bootstrap.min.css">
 
-	<link rel="stylesheet" type="text/css" href="/public_html/template/css/lib/bootstrap-grid.css">
+	<link rel="stylesheet" type="text/css" href="<?= Yii::getAlias('@web') ?>/template/css/lib/bootstrap-grid.css">
 
 	<!-- Font Awesome / Icon Fonts -->
-	<link rel="stylesheet" type="text/css" href="/public_html/template/fonts/font-awesome.css">
-	<link rel="stylesheet" type="text/css" href="/public_html/template/css/style.css">
+	<link rel="stylesheet" type="text/css" href="<?= Yii::getAlias('@web') ?>/template/fonts/font-awesome.css">
+	<link rel="stylesheet" type="text/css" href="<?= Yii::getAlias('@web') ?>/template/css/style.css">
 	<!-- TODO -->
-	<link rel="stylesheet" type="text/css" href="/public_html/template/css/responsive.css">
-	<title>Craigs - Easy Buy & Sell Listing HTML Template</title>
+	<link rel="stylesheet" type="text/css" href="<?= Yii::getAlias('@web') ?>/template/css/responsive.css">
+	<title>Истории</title>
 </head>
 <body>
 	<div class="wrapper">
@@ -39,12 +48,8 @@
 			</div><!--top-bar-->
 			<div class="container header">
 				<div class="row">
-					<!--div class="col-md-5 col-sm-4 col-xs-4">
-						< ! -- TODO -- >
-						<div style="text-align: center;"><p style="text-transform: uppercase; color: #1e1e1e; font-size: 20px; position: relative; margin-right: 100px;">Сказочки</p><p style="text-transform: uppercase; color: #1e1e1e; font-size: 20px; position: relative;">рассказочки</p></div>
-					</div-->
 					<div class="col-md-2 col-sm-3 col-xs-3">
-						<div class="logo"><a href="index.html"><img src="/public_html/template/img/logo.png" alt="logo"></a></div>
+						<div class="logo"><a href="index.html"><img src="<?= Yii::getAlias('@web') ?>/template/img/logo.png" alt="logo"></a></div>
 					</div>
 					<div class="col-md-8 col-sm-8 col-xs-8 text-left">
 						<ul class="menu cst-margin-none">
@@ -92,9 +97,13 @@
 						<div class="inside big-banner cst-sub">
 							<p class="cst-padding-none"><?= $rate->title ?></p>
 							<p class="cst-cost"><?= $rate->cost ?> ₽</p>
-							<div class="text">
-								<a href="https://cinagro-html.fruitfulcode.com/journal-blog" class="custom-btn text-center white">купить</a>
-							</div>
+							<?php $form = ActiveForm::begin(['id' => 'rate-form', 'action' => ['rate/payment'],]); ?>
+								<div class="form-group text">
+									<?= $form->field($rate, 'id') ?>
+									<?= Html::submitButton('Купить', ['class' => 'custom-btn text-center white', 'name' => 'rate-button']) ?>
+								</div>
+							<?php ActiveForm::end(); ?>
+
 							<div class="inside-inside">
 								<span><?= $rate->description ?></span>
 							</div>
@@ -109,16 +118,16 @@
 		<footer class="bg-yellow">
 			<div class="container">
 				<div class="copyright">
-					<p>Copyright &copy; 2018 cinagro. Theme by <a href="https://fruitfulcode.com/">fruitfulcode</a></p>
+					<p>Copyright &copy; 2018.</p>
 				</div>
 			</div>
 			<div id="back-to-top"><i class="fa fa-angle-up"></i></div>
 		</footer>
 		<!--================= End of Footer =====================-->
 	</div>
-	<script type="text/javascript" src="/public_html/template/js/lib/jquery-3.3.1.min.js"></script>
-	<script type="text/javascript" src="/public_html/template/js/lib/bootstrap.min.js"></script>
-	<script type="text/javascript" src="/public_html/template/js/lib/masonry.pkgd.min.js"></script>
-	<script type="text/javascript" src="/public_html/template/js/main.js"></script>
+	<script type="text/javascript" src="<?= Yii::getAlias('@web') ?>/template/js/lib/jquery-3.3.1.min.js"></script>
+	<script type="text/javascript" src="<?= Yii::getAlias('@web') ?>/template/js/lib/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<?= Yii::getAlias('@web') ?>/template/js/lib/masonry.pkgd.min.js"></script>
+	<script type="text/javascript" src="<?= Yii::getAlias('@web') ?>/template/js/main.js"></script>
 </body>
 </html>
