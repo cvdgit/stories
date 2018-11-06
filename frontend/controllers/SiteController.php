@@ -95,7 +95,12 @@ class SiteController extends Controller
             }
             else
             {
-                Yii::$app->session->setFlash('error', 'Неверное имя пользователя или пароль.');
+                $errors = $model->getErrors();
+                if (sizeof($errors) > 0) {
+                    foreach ($errors as $attribute) {
+                        Yii::$app->session->setFlash('error', $attribute[0]);
+                    }
+                }
                 return $this->refresh();
             }
         }

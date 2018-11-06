@@ -5,12 +5,12 @@ namespace common\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\Story;
+use common\models\Category;
 
 /**
- * StorySearch represents the model behind the search form of `common\models\Story`.
+ * CategorySearch represents the model behind the search form of `common\models\Category`.
  */
-class StorySearch extends Story
+class CategorySearch extends Category
 {
     /**
      * {@inheritdoc}
@@ -18,8 +18,8 @@ class StorySearch extends Story
     public function rules()
     {
         return [
-            [['id', 'user_id'], 'integer'],
-            [['title', 'alias', 'created_at'], 'safe'],
+            [['id', 'tree', 'lft', 'rgt', 'depth'], 'integer'],
+            [['name', 'alias', 'description'], 'safe'],
         ];
     }
 
@@ -41,7 +41,7 @@ class StorySearch extends Story
      */
     public function search($params)
     {
-        $query = Story::findStories();
+        $query = Category::find();
 
         // add conditions that should always apply here
 
@@ -60,12 +60,15 @@ class StorySearch extends Story
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'created_at' => $this->created_at,
-            'user_id' => $this->user_id,
+            'tree' => $this->tree,
+            'lft' => $this->lft,
+            'rgt' => $this->rgt,
+            'depth' => $this->depth,
         ]);
 
-        $query->andFilterWhere(['like', 'title', $this->title])
-              ->andFilterWhere(['like', 'alias', $this->alias]);
+        $query->andFilterWhere(['like', 'name', $this->name])
+            ->andFilterWhere(['like', 'alias', $this->alias])
+            ->andFilterWhere(['like', 'description', $this->description]);
 
         return $dataProvider;
     }

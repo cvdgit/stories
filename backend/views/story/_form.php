@@ -4,7 +4,11 @@ use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 use common\models\User;
+use common\models\Story;
 use yii\helpers\Url;
+use dosamigos\selectize\SelectizeTextInput;
+
+use common\widgets\RevealWidget;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Story */
@@ -52,8 +56,30 @@ $this->registerJs($script, yii\web\View::POS_READY);
     <?= $form->field($model, 'alias')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'user_id')->dropDownList(ArrayHelper::map(User::find()->all(), 'id', 'username'), ['prompt' => '--- select ---']) ?>
     <?php if (!$model->isNewRecord): ?>
-    <?= $form->field($model, 'body')->textarea(['readonly' => 'readonly', 'rows' => 10]); ?>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-8 col-xs-offset-2">
+                <div style="height: 300px">
+                    <iframe border="0" width="100%" height="100%" style="border: 0 none" src="/story/viewbyframe/<?= $model->id ?>"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?= $form->field($model, 'status')->dropDownList([Story::STATUS_DRAFT => 'Черновик', Story::STATUS_PUBLISHED => 'Публикация'], ['prompt' => '--- select ---']) ?>
 	<?php endif ?>
+
+    <?= $form->field($model, 'tagNames')->widget(SelectizeTextInput::className(), [
+        'loadUrl' => ['tag/list'],
+        'options' => ['class' => 'form-control'],
+        'clientOptions' => [
+            'plugins' => ['remove_button'],
+            'valueField' => 'name',
+            'labelField' => 'name',
+            'searchField' => ['name'],
+            'create' => true,
+        ],
+    ])->hint('Используйте запятые для разделения тегов') ?>
+
     <div class="form-group">
         <?= Html::submitButton(($model->isNewRecord ? 'Создать историю' : 'Сохранить изменения'), ['class' => 'btn btn-success']) ?>
         <?php if (!$model->isNewRecord): ?>

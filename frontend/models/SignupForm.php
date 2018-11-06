@@ -85,7 +85,7 @@ class SignupForm extends Model
         $sent = Yii::$app->mailer
             ->compose(['html' => 'userSignupComfirm-html', 'text' => 'userSignupComfirm-text'], ['user' => $user])
             ->setTo($user->email)
-            ->setFrom(Yii::$app->params['adminEmail'])
+            ->setFrom(Yii::$app->params['infoEmail'])
             ->setSubject('Подтверждение регистрации')
             ->send();
         return $sent;

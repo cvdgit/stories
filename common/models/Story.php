@@ -4,6 +4,7 @@ namespace common\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use dosamigos\taggable\Taggable;
 
 /**
  * This is the model class for table "story".
@@ -16,11 +17,17 @@ use yii\behaviors\TimestampBehavior;
  * @property int $updated_at
  * @property int $user_id
  * @property string $cover
+ * @property int $status
  *
  * @property User $author
+ * @property Tags $tags
  */
 class Story extends \yii\db\ActiveRecord
 {
+
+    const STATUS_DRAFT = 0;
+    const STATUS_PUBLISHED = 1;
+
     /**
      * {@inheritdoc}
      */
@@ -36,6 +43,9 @@ class Story extends \yii\db\ActiveRecord
     {
         return [
             TimestampBehavior::className(),
+            [
+                'class' => Taggable::className(),
+            ],
         ];
     }
 
@@ -51,6 +61,9 @@ class Story extends \yii\db\ActiveRecord
             [['title', 'alias'], 'string', 'max' => 255],
             [['alias'], 'unique'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
+            ['status', 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_PUBLISHED]],
+            ['status', 'default', 'value' => self::STATUS_DRAFT],
+            [['tagNames'], 'safe'],
         ];
     }
 
@@ -66,7 +79,9 @@ class Story extends \yii\db\ActiveRecord
             'body' => 'Body',
             'created_at' => 'Дата создания',
             'updated_at' => 'Дата изменения',
-            'user_id' => 'User ID',
+            'user_id' => 'Автор',
+            'status' => 'Статус',
+            'tagNames' => 'Тэги',
         ];
     }
 
@@ -76,6 +91,14 @@ class Story extends \yii\db\ActiveRecord
     public function getAuthor()
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTags()
+    {
+        return $this->hasMany(Tag::className(), ['id' => 'tag_id'])->viaTable('{{%story_tag}}', ['story_id' => 'id']);
     }
 
     public function initStory()
@@ -150,6 +173,11 @@ class Story extends \yii\db\ActiveRecord
             }
         }
         return $images;
+    }
+
+    public static function findStories()
+    {
+        return self::find()->where(['status' => self::STATUS_PUBLISHED]);
     }
 
 }
