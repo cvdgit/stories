@@ -4,6 +4,7 @@ namespace common\models;
 
 use Yii;
 use creocoder\nestedsets\NestedSetsBehavior;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "category".
@@ -34,10 +35,6 @@ class Category extends \yii\db\ActiveRecord
         return [
             'tree' => [
                 'class' => NestedSetsBehavior::className(),
-                // 'treeAttribute' => 'tree',
-                // 'leftAttribute' => 'lft',
-                // 'rightAttribute' => 'rgt',
-                // 'depthAttribute' => 'depth',
             ],
         ];
     }
@@ -76,12 +73,37 @@ class Category extends \yii\db\ActiveRecord
             'name' => 'Название',
             'alias' => 'Alias',
             'description' => 'Описание',
+            'parentNode' => 'Родительская категория',
         ];
     }
 
     public static function find()
     {
         return new CategoryQuery(get_called_class());
+    }
+
+    public static function getCategoryArray()
+    {
+        return ArrayHelper::map(self::find()->all(), 'id', 'name');
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStories()
+    {
+        return $this->hasMany(Story::className(), ['id' => 'category_id']);
+    }
+
+    /**
+     * @return ActiveDataProvider
+     */
+    public function getPublishedStories()
+    {
+        $dataProvider = new ActiveDataProvider([
+            'query' => $this->getStories()->published()
+        ]);
+        return $dataProvider;
     }
 
 }

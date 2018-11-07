@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\data\ActiveDataProvider;
 
 /**
  * This is the model class for table "tag".
@@ -63,4 +64,24 @@ class Tag extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Story::className(), ['id' => 'story_id'])->viaTable('story_tag', ['tag_id' => 'id']);
     }
+
+    /**
+     * @return ActiveDataProvider
+     */
+    public function getPublishedStories(): ActiveDataProvider
+    {
+        return new ActiveDataProvider([
+            'query' => $this->getStories()->published()
+        ]);
+    }
+
+    /**
+     * @param string $name
+     * @return Tag[]
+     */
+    public static function findAllByName($name)
+    {
+        return Tag::find()->where(['like', 'name', $name])->limit(50)->all();
+    }
+
 }

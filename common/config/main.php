@@ -32,5 +32,13 @@ return [
                  'encryption' => 'tls',
              ],
         ],
+        //'assetManager' => [
+        //    'bundles' => [
+        //        'yii\web\JqueryAsset' => [
+        //            'js' => [YII_DEBUG ? 'https://code.jquery.com/jquery-2.1.0.js' : 'https://code.jquery.com/jquery-2.1.0.min.js'],
+        //            'jsOptions' => ['type' => 'text/javascript'],
+        //        ],
+        //    ],
+        //],
     ],
 ];

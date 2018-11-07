@@ -41,7 +41,6 @@ AppAsset::register($this);
         $menuItems[] = ['label' => 'Вход', 'url' => ['/site/login']];
     } else {
         $menuItems[] = ['label' => 'Истории', 'url' => ['/story/index']];
-        $menuItems[] = ['label' => 'Создать историю', 'url' => ['/story/create']];
         $menuItems[] = ['label' => 'Категории', 'url' => ['/category/index']];
         $menuItems[] = '<li>'
             . Html::beginForm(['/site/logout'], 'post')
