@@ -19,6 +19,7 @@ class Rate extends ActiveRecord
 
     const ACTIVE = 'active';
     const ARCHIVE = 'archive';
+    private $dataPayment;
 
     /**
      * {@inheritdoc}
@@ -56,4 +57,15 @@ class Rate extends ActiveRecord
             'type' => 'Тип подписки',
         ];
     }
+
+    public function getDataPayment()
+    {
+        return $this->dataPayment;
+    }
+
+    public function setDataPayment($dataPayment)
+    {
+        $this->dataPayment = $dataPayment;
+    }
+
 }
