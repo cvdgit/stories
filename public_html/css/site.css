@@ -382,7 +382,7 @@ input:-moz-placeholder {
 }
 @font-face {
   font-family: 'BrandonBold';
-  src: url('/css/fonts/brandon/brandon_bld.eot') format('embedded-opentype'), url('/css/fonts/brandon/brandon_bld.otf') format('opentype'), url('/css/fonts/brandon/brandon_bld.ttf') format('truetype'), url('/css/fonts/brandon/brandon_bld.woff') format('woff');
+  src: url('/css/fonts/brandon/brandon_bld.eot') format('embedded-opentype'), url('/css/fonts/brandon/brandon_bld.otf') format('opentype'), url('/css/fonts/brandon/brandon_bld.ttf') format('truetype'), url('/css/fonts/brandon/randon_bld.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }

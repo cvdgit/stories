@@ -216,5 +216,13 @@ class User extends ActiveRecord implements IdentityInterface
 
         return $role->name;
     }
-    
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPayments()
+    {
+        return $this->hasMany(Payment::className(), ['user_id' => 'id']);
+    }
+
 }

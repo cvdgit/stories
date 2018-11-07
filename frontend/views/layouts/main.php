@@ -4,15 +4,12 @@
 /* @var $content string */
 
 use yii\helpers\Html;
-//use yii\bootstrap\Nav;
 use yii\widgets\Breadcrumbs;
 use frontend\assets\AppAsset;
-use frontend\assets\FontAwesomeAsset;
 use common\widgets\Alert;
 use common\components\StoryNav;
 
 AppAsset::register($this);
-//FontAwesomeAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
