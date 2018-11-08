@@ -18,8 +18,7 @@ class StorySearch extends Story
     public function rules()
     {
         return [
-            [['id', 'user_id'], 'integer'],
-            [['title', 'alias', 'created_at'], 'safe'],
+            [['title'], 'string'],
         ];
     }
 
@@ -42,31 +41,15 @@ class StorySearch extends Story
     public function search($params)
     {
         $query = Story::findStories();
-
-        // add conditions that should always apply here
-
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
-
         $this->load($params);
-
         if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
+            $query->where('0=1');
             return $dataProvider;
         }
-
-        // grid filtering conditions
-        $query->andFilterWhere([
-            'id' => $this->id,
-            'created_at' => $this->created_at,
-            'user_id' => $this->user_id,
-        ]);
-
-        $query->andFilterWhere(['like', 'title', $this->title])
-              ->andFilterWhere(['like', 'alias', $this->alias]);
-
+        $query->andFilterWhere(['like', 'title', $this->title]);
         return $dataProvider;
     }
 }

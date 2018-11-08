@@ -34,10 +34,6 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
             <div class="container-large">
                 <div class="row">
                     <div class="col-md-6 col-sm-6 col-xs-12 text-left">
-                        <ul>
-                            <li><a href="contact.html">Contact Us</a></li>
-                            <li><a href="contact.html">Support</a></li>
-                        </ul>
                     </div>
                     <div class="col-md-6 col-sm-6 col-xs-12 text-right">
                         <?php
@@ -49,10 +45,7 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
                             $menuItems[] = ['label' => 'Профиль', 'url' => ['/profile/index']];
                             $menuItems[] = '<li>'
                                 . Html::beginForm(['/site/logout'], 'post')
-                                . Html::submitButton(
-                                    'Выход (' . Yii::$app->user->identity->username . ')',
-                                    ['class' => 'btn btn-link logout']
-                                )
+                                . Html::submitButton('Выход (' . Yii::$app->user->identity->username . ')')
                                 . Html::endForm()
                                 . '</li>';
                         }
@@ -73,7 +66,7 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
                         ['label' => 'Главная', 'url' => ['/site/index']],
                         ['label' => 'Контакты', 'url' => ['/site/contact']],
                         ['label' => 'Истории', 'url' => ['/story/index']],
-                        ['label' => 'Подписки', 'url' => ['/site/pricing']],
+                        ['label' => 'Подписки', 'url' => ['/rate/index']],
                     ];
                     echo StoryNav::widget([
                         'options' => ['class' => 'menu'],
@@ -111,18 +104,18 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
     $default_controller = Yii::$app->defaultRoute;
     $isHomePage = (($controller->id === $default_controller) && ($controller->action->id === $controller->defaultAction));
     ?>
-    <?php if (!$isHomePage): ?>
+    <?php if (isset($this->params['breadcrumbs']) && sizeof($this->params['breadcrumbs']) > 0): ?>
     <div class="breadcrumb-top <?= ($isStoryViewPage ? '' : 'bg-yellow') ?>">
         <div class="container">
-            <h2 <?= ($isStoryViewPage ? 'class="title"' : '') ?>>H2</h2>
-        <?= Breadcrumbs::widget([
-            'tag' => 'ol',
-            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-        ]) ?>
-        <?= Alert::widget() ?>
+            <h2 <?= ($isStoryViewPage ? 'class="title"' : '') ?>><?= $this->title ?></h2>
+            <?= Breadcrumbs::widget([
+                'tag' => 'ol',
+                'links' => $this->params['breadcrumbs'],
+            ]) ?>
         </div>
     </div>
     <?php endif ?>
+    <?= Alert::widget() ?>
     <?= $content ?>
     <footer class="bg-yellow">
         <div class="container">

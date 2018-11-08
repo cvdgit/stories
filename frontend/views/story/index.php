@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\ListView;
+use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\StorySearch */
@@ -17,13 +18,11 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="col-md-3 col-sm-3 col-xs-12 col-3">
                 <aside class="sidebar-shop">
                     <div class="widget-search">
-                        <h3 class="widget-title">Search</h3>
-                        <form>
-                            <div class="form-group">
-                                <input type="text" placeholder="Search...">
-                                <button><i class="fa fa-search"></i></button>
-                            </div>
-                        </form>
+                        <h3 class="widget-title">Поиск</h3>
+                        <?php $form = ActiveForm::begin(['action' => ['index'], 'method' => 'get']); ?>
+                        <?= $form->field($searchModel, 'title')->textInput(['placeholder' => 'Поиск...'])->label(false) ?>
+                        <?= Html::submitButton('<i class="fa fa-search"></i>') ?>
+                        <?php ActiveForm::end(); ?>
                     </div>
                     <div class="widget-category">
                         <h3 class="widget-title">Category</h3>
@@ -44,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= ListView::widget([
                 'layout' => '<div class="filter-wrap">{summary}</div><div class="content-product three-column with-sidebar">{items}</div>{pager}',
                 'options' => ['class' => 'col-md-9 col-sm-9 col-xs-12 col-9'],
-                'summary' => '<p>Showing {begin}–{end} of {totalCount} results</p>',
+                'summary' => '<p>Показано {count} из {totalCount} историй</p>',
                 'dataProvider' => $dataProvider,
                 'itemOptions' => ['tag' => false],
                 'itemView' => '_storyitem',

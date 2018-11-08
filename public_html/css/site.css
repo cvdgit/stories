@@ -2866,7 +2866,7 @@ footer .widget-title {
    ==================================== */
 .error-page {
   padding: 410px 0 265px;
-  background: url(../../assets/images/bg-404.jpg) no-repeat center;
+  background: url(/images/bg-404.jpg) no-repeat center;
   background-size: cover;
 }
 .error-page h2 {
