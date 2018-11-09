@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3e0e926a4a894daf88177ae68b79d192",
+    "content-hash": "94745e8dc57c297400324574374ed32e",
     "packages": [
         {
             "name": "2amigos/yii2-selectize-widget",
@@ -244,25 +244,6 @@
             "license": [
                 "Apache License, Version 2.0"
             ]
-        },
-        {
-            "name": "bower-asset/original-owl-carousel",
-            "version": "2.3.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/OwlCarousel2/OwlCarousel2.git",
-                "reference": "af851f9b567630d115930abd5480ffebccc72372"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/OwlCarousel2/OwlCarousel2/zipball/af851f9b567630d115930abd5480ffebccc72372",
-                "reference": "af851f9b567630d115930abd5480ffebccc72372",
-                "shasum": null
-            },
-            "require": {
-                "bower-asset/jquery": ">=1.8.3"
-            },
-            "type": "bower-asset"
         },
         {
             "name": "bower-asset/punycode",
@@ -3823,42 +3804,6 @@
                 "validate"
             ],
             "time": "2018-01-29T19:49:41+00:00"
-        },
-        {
-            "name": "xj/yii2-holder-widget",
-            "version": "1.0.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/xjflyttp/yii2-holder-widget.git",
-                "reference": "be98f127d5cdf2fc4edc46dbc5a8810d6f5b4215"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/xjflyttp/yii2-holder-widget/zipball/be98f127d5cdf2fc4edc46dbc5a8810d6f5b4215",
-                "reference": "be98f127d5cdf2fc4edc46dbc5a8810d6f5b4215",
-                "shasum": ""
-            },
-            "require": {
-                "yiisoft/yii2": "*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "xj\\holder\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "xjflyttp",
-                    "email": "xjflyttp@gmail.com"
-                }
-            ],
-            "description": "holder.js",
-            "time": "2015-03-06T08:11:36+00:00"
         },
         {
             "name": "yiisoft/yii2-debug",

@@ -5,6 +5,7 @@ namespace common\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use dosamigos\taggable\Taggable;
+use yii\helpers\Html;
 
 /**
  * This is the model class for table "story".
@@ -195,6 +196,12 @@ class Story extends \yii\db\ActiveRecord
     public static function findStories()
     {
         return self::find()->published();
+    }
+
+    public function getCategoryLink()
+    {
+        $category = $this->getCategory()->one();
+        return Html::a($category->name, ['story/category', 'category' => $category->alias]);
     }
 
 }

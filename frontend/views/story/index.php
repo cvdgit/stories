@@ -3,6 +3,8 @@
 use yii\helpers\Html;
 use yii\widgets\ListView;
 use yii\widgets\ActiveForm;
+use common\models\Category;
+use common\components\StoryNav;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\StorySearch */
@@ -25,8 +27,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         <?php ActiveForm::end(); ?>
                     </div>
                     <div class="widget-category">
-                        <h3 class="widget-title">Category</h3>
-                        <ul>
+                        <h3 class="widget-title">Категории</h3>
+                        <?php
+                        echo StoryNav::widget([
+                            'items' => Category::getCategoriesForMenu(),
+                        ]);
+                        ?>
+                        <!--ul>
                             <li class="active widget-category-hover"><a href="#" class="text-black">All</a></li>
                             <li class="widget-category-hover"><a class="text-black" href="single-product.html">Fresh Fruit</a></li>
                             <li class="widget-category-hover"><a class="text-black" href="single-product.html">Herbs</a></li>
@@ -36,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <li class="widget-category-hover"><a class="text-black" href="single-product.html">Spices</a></li>
                             <li class="widget-category-hover"><a class="text-black" href="single-product.html">Vegetable</a></li>
                             <li class="widget-category-hover"><a class="text-black" href="single-product.html">Milk</a></li>
-                        </ul>
+                        </ul-->
                     </div>
                 </aside>
             </div>

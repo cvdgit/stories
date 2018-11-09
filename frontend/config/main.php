@@ -52,6 +52,7 @@ return [
                 'profile' => 'profile/index',
                 
                 'stories/tag/<tag:[\w]+>' => 'story/tag',
+                'stories/category/<category:[\w]+>' => 'story/category',
                 'stories' => 'story/index',
 
                 'story/<alias:[\w\-]+>' => 'story/view',

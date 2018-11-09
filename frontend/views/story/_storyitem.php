@@ -1,8 +1,9 @@
 <?php
 use yii\helpers\Html;
 use yii\helpers\HtmlPurifier;
-?>
 
+/* @var $model common\models\Story */
+?>
 <div class="product">
     <div class="images text-center">
         <?= Html::a(Html::img('http://via.placeholder.com/180x210'), ['view', 'alias' => $model->alias]) ?>

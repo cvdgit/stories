@@ -6,6 +6,7 @@ use Yii;
 use common\models\Story;
 use common\models\StorySearch;
 use common\models\Tag;
+use common\models\Category;
 use yii\web\NotFoundHttpException;
 
 class StoryController extends \yii\web\Controller
@@ -69,12 +70,10 @@ class StoryController extends \yii\web\Controller
         if ($model === null) {
             throw new NotFoundHttpException('Страница не найдена.');
         }
-
-        $dataProvider = $model->getPublishedStories();
-
+        $searchModel = new StorySearch();
         return $this->render('index', [
-            'searchModel' => null,
-            'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel,
+            'dataProvider' => $model->getPublishedStories(),
         ]);
     }
 
@@ -84,7 +83,9 @@ class StoryController extends \yii\web\Controller
         if ($model === null) {
             throw new NotFoundHttpException('Страница не найдена.');
         }
+        $searchModel = new StorySearch();
         return $this->render('index', [
+            'searchModel' => $searchModel,
             'dataProvider' => $model->getPublishedStories(),
         ]);
     }

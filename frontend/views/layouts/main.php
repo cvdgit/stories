@@ -51,7 +51,6 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
                         }
                         echo StoryNav::widget([
                             'items' => $menuItems,
-                            'id' => false,
                         ]);
                         ?>
                     </div>

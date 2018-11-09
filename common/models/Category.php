@@ -5,6 +5,7 @@ namespace common\models;
 use Yii;
 use creocoder\nestedsets\NestedSetsBehavior;
 use yii\helpers\ArrayHelper;
+use yii\data\ActiveDataProvider;
 
 /**
  * This is the model class for table "category".
@@ -92,7 +93,7 @@ class Category extends \yii\db\ActiveRecord
      */
     public function getStories()
     {
-        return $this->hasMany(Story::className(), ['id' => 'category_id']);
+        return $this->hasMany(Story::className(), ['category_id' => 'id']);
     }
 
     /**
@@ -104,6 +105,23 @@ class Category extends \yii\db\ActiveRecord
             'query' => $this->getStories()->published()
         ]);
         return $dataProvider;
+    }
+
+    public static function getCategoriesForMenu()
+    {
+        $categories = self::find()
+            ->andWhere(['depth' => 1])
+            ->addOrderBy('lft')
+            ->asArray()
+            ->all();
+        $menuItems = [
+            ['label' => 'Все категории', 'url' => ['/story/index'], 'options' => ['class' => 'widget-category-hover']],
+        ];
+        foreach ($categories as $category)
+        {
+            $menuItems[] = ['label' => $category['name'], 'url' => ['/story/category', 'category' => $category['alias']], 'options' => ['class' => 'widget-category-hover']];
+        }
+        return $menuItems;
     }
 
 }
