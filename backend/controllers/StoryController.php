@@ -71,8 +71,6 @@ class StoryController extends \yii\web\Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', 'Изменения успешно сохранены');
-            //$this->refresh();
-            // return $this->redirect(Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $model->alias]));
         }
 
         return $this->render('update', [

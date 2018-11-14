@@ -5,6 +5,8 @@ namespace frontend\controllers;
 use Yii;
 use common\models\Story;
 use common\models\StorySearch;
+use common\models\Tag;
+use common\models\Category;
 use yii\web\NotFoundHttpException;
 
 class StoryController extends \yii\web\Controller
@@ -14,7 +16,6 @@ class StoryController extends \yii\web\Controller
     {
     	$searchModel = new StorySearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -61,5 +62,33 @@ class StoryController extends \yii\web\Controller
     {
         return $this->renderPartial('frame', ['model' => $this->findModel($id)]);
     }
+
+
+    public function actionTag($tag)
+    {
+        $model = Tag::findOne(['name' => $tag]);
+        if ($model === null) {
+            throw new NotFoundHttpException('Страница не найдена.');
+        }
+        $searchModel = new StorySearch();
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $model->getPublishedStories(),
+        ]);
+    }
+
+    public function actionCategory($category)
+    {
+        $model = Category::findOne(['alias' => $category]);
+        if ($model === null) {
+            throw new NotFoundHttpException('Страница не найдена.');
+        }
+        $searchModel = new StorySearch();
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $model->getPublishedStories(),
+        ]);
+    }
+
 
 }

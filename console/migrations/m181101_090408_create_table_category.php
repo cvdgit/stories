@@ -12,16 +12,21 @@ class m181101_090408_create_table_category extends Migration
      */
     public function safeUp()
     {
+        $tableOptions = null;
+        if ($this->db->driverName === 'mysql') {
+            // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
+            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
+        }
         $this->createTable('{{%category}}', [
             'id' => $this->primaryKey(),
-            'tree' => $this->integer()->notNull(),
+            'tree' => $this->integer()->notNull()->defaultValue(0),
             'lft' => $this->integer()->notNull(),
             'rgt' => $this->integer()->notNull(),
             'depth' => $this->integer()->notNull(),
             'name' => $this->string(255)->notNull(),
             'alias' => $this->string(255)->notNull(),
             'description' => $this->text(),
-        ]);
+        ], $tableOptions);
     }
 
     /**

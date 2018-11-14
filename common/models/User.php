@@ -224,5 +224,4 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return $this->hasMany(Payment::className(), ['user_id' => 'id']);
     }
-    
 }

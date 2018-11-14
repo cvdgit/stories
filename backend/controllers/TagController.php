@@ -9,7 +9,7 @@ use common\models\Tag;
 /**
  * Site controller
  */
-class SiteController extends Controller
+class TagController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -45,14 +45,10 @@ class SiteController extends Controller
     {
         $models = Tag::findAllByName($query);
         $items = [];
-
         foreach ($models as $model) {
             $items[] = ['name' => $model->name];
         }
-        // We know we can use ContentNegotiator filter
-        // this way is easier to show you here :)
-        Yii::$app->response->format = Response::FORMAT_JSON;
-
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         return $items;
     }
 }

@@ -66,8 +66,19 @@ class CategoryController extends Controller
     {
         $model = new Category();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+
+            if ($model->parentNode == null) {
+                $model->makeRoot();
+            }
+            else {
+                $parent = Category::findOne($model->parentNode);
+                $model->appendTo($parent);
+            }
+
+            if ($model->save()) {
+                return $this->redirect(['update', 'id' => $model->id]);
+            }
         }
 
         return $this->render('create', [
@@ -85,6 +96,10 @@ class CategoryController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $parent = $model->parents(1)->one();
+        if ($parent !== null) {
+            $model->parentNode = $parent->id;
+        }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);

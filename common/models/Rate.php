@@ -5,14 +5,16 @@ use Yii;
 use yii\db\ActiveRecord;
 
 /**
- * Rate model
+ * This is the model class for table "rate".
  *
- * @property integer $id
+ * @property int $id
  * @property string $title
  * @property string $description
- * @property integer $cost
- * @property integer $mounth_count
+ * @property int $cost
+ * @property int $mounth_count
  * @property string $type
+ * 
+ * @property Payment[] $payments
  */
 class Rate extends ActiveRecord
 {
@@ -56,6 +58,14 @@ class Rate extends ActiveRecord
             'mounth_count' => 'Количество месяцев',
             'type' => 'Тип подписки',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPayments()
+    {
+        return $this->hasMany(Payment::className(), ['rate_id' => 'id']);
     }
 
     public function getDataPayment()

@@ -1,19 +1,18 @@
 <?php
 use yii\helpers\Html;
 use yii\helpers\HtmlPurifier;
-?>
 
-<div class="col-sm-6 col-md-4">
-<div class="thumbnail">
-	<?php if (empty($model->cover)): ?>
-	<img src="holder.js/240x200/" alt="...">
-	<?php else: ?>
-	<img src="<?= $model->getCoverPath() ?>" alt="...">
-	<?php endif ?>
-	<div class="caption">
-		<h3><?= Html::encode($model->title) ?></h3>
-		<p>Краткое описание истории</p>
-		<p><?= Html::a('Перейти к истории »', ['view', 'alias' => $model->alias], ['class' => 'btn btn-default']) ?></p>
-	</div>
-</div>
+/* @var $model common\models\Story */
+?>
+<div class="product">
+    <div class="images text-center">
+        <?= Html::a(Html::img('http://via.placeholder.com/180x210'), ['view', 'alias' => $model->alias]) ?>
+        <div class="button-group">
+            <a href="#" class="custom-btn pink"><i class="fa fa-shopping-bag"></i></a>
+            <a href="#" class="custom-btn pink"><i class="fa fa-search"></i></a>
+        </div>
+    </div>
+    <div class="info-product">
+        <?= Html::a($model->title, ['view', 'alias' => $model->alias], ['class' => 'title']) ?>
+    </div>
 </div>

@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use common\models\Category;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Category */
@@ -10,6 +11,7 @@ use yii\widgets\ActiveForm;
 
 <div class="category-form">
     <?php $form = ActiveForm::begin(); ?>
+    <?= $form->field($model, 'parentNode')->dropDownList(Category::getCategoryArray(), ['prompt' => '']) ?>
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'alias')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>

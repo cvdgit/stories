@@ -1,25 +1,27 @@
 <?php
+
 namespace common\models;
 
 use Yii;
-use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
 
 /**
- * Rate model
+ * This is the model class for table "payment".
  *
- * @property integer $id
- * @property datetime  $payment
- * @property datetime  $finish
+ * @property int $id
+ * @property string $payment
+ * @property string $finish
  * @property string $state
- * @property integer $user_id
- * @property integer  $rate_id
- * @property integer $created_at
- * @property integer  $updated_at
+ * @property int $user_id
+ * @property int $rate_id
+ * @property int $created_at
+ * @property int $updated_at
+ *
+ * @property Rate $rate
+ * @property User $user
  */
-class Payment extends ActiveRecord
+class Payment extends \yii\db\ActiveRecord
 {
-
     /**
      * {@inheritdoc}
      */
@@ -68,4 +70,19 @@ class Payment extends ActiveRecord
         ];
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRate()
+    {
+        return $this->hasOne(Rate::className(), ['id' => 'rate_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
 }
