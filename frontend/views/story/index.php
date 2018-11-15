@@ -3,8 +3,9 @@
 use yii\helpers\Html;
 use yii\widgets\ListView;
 use yii\widgets\ActiveForm;
+use yii\widgets\Menu;
 use common\models\Category;
-use common\components\StoryNav;
+use frontend\widgets\StoryLinkSorter;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\StorySearch */
@@ -29,31 +30,58 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="widget-category">
                         <h3 class="widget-title">Категории</h3>
                         <?php
-                        echo StoryNav::widget([
+                        echo Menu::widget([
                             'items' => Category::getCategoriesForMenu(),
                         ]);
                         ?>
-                        <!--ul>
-                            <li class="active widget-category-hover"><a href="#" class="text-black">All</a></li>
-                            <li class="widget-category-hover"><a class="text-black" href="single-product.html">Fresh Fruit</a></li>
-                            <li class="widget-category-hover"><a class="text-black" href="single-product.html">Herbs</a></li>
-                            <li class="widget-category-hover"><a class="text-black" href="single-product.html">Fresh Meat</a></li>
-                            <li class="widget-category-hover"><a class="text-black" href="single-product.html">Sea food</a></li>
-                            <li class="widget-category-hover"><a class="text-black" href="single-product.html">Seed</a></li>
-                            <li class="widget-category-hover"><a class="text-black" href="single-product.html">Spices</a></li>
-                            <li class="widget-category-hover"><a class="text-black" href="single-product.html">Vegetable</a></li>
-                            <li class="widget-category-hover"><a class="text-black" href="single-product.html">Milk</a></li>
-                        </ul-->
                     </div>
                 </aside>
             </div>
+            <?php
+            $css = <<< CSS
+.story-sorting-btn {
+    padding: 0 15px;
+    height: 45px;
+    line-height: normal;
+    border: none;
+    font-size: 18px;
+    color: #777;
+    background-color: transparent;
+    border-radius: 0;
+    font-family: 'BrandonRegular', serif;
+}
+CSS;
+            $this->registerCss($css);
+            ?>
             <?= ListView::widget([
-                'layout' => '<div class="filter-wrap">{summary}</div><div class="content-product three-column with-sidebar">{items}</div>{pager}',
+                'layout' => '<div class="filter-wrap">
+                               {summary}
+                               <div class="sorting">
+                                 <div class="dropdown">
+                                   <button class="btn btn-default dropdown-toggle story-sorting-btn" type="button" data-toggle="dropdown">Сортировать <span class="caret"></span></button>
+                                   {sorter}
+                                 </div>
+                               </div>
+                               <div class="switch">
+                            <span class="list active"><i class="fa fa-list"></i></span>
+                            <span class="grid-icon"><i class="fa fa-th"></i></span>
+                        </div>
+                             </div>
+                             <div class="content-product three-column with-sidebar">{items}</div>{pager}',
                 'options' => ['class' => 'col-md-9 col-sm-9 col-xs-12 col-9'],
                 'summary' => '<p>Показано {count} из {totalCount} историй</p>',
                 'dataProvider' => $dataProvider,
                 'itemOptions' => ['tag' => false],
                 'itemView' => '_storyitem',
+                'sorter' => [
+                   'options' => [
+                        'class' => 'dropdown-menu'
+                    ],
+                    'attributes' => [
+                        'title',
+                        'created_at',
+                    ]
+                ],
             ]) ?>
         </div>
     </div>

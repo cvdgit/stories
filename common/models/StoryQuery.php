@@ -8,6 +8,11 @@ class StoryQuery extends \yii\db\ActiveQuery
 {
     public function published()
     {
-        return $this->andWhere(['status' => Story::STATUS_PUBLISHED]);
+        return $this->andWhere(['{{%story}}.status' => Story::STATUS_PUBLISHED]);
+    }
+
+    public function bySubAccess()
+    {
+    	return $this->orderBy('{{%story}}.sub_access DESC');
     }
 }

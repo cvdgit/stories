@@ -5,7 +5,7 @@ namespace common\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use dosamigos\taggable\Taggable;
-use yii\helpers\Html;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "story".
@@ -20,6 +20,9 @@ use yii\helpers\Html;
  * @property string $cover
  * @property int $status
  * @property int $category_id
+ * @property int $sub_access
+ * @property int $dropbox_sync_date
+ * @property string $dropbox_story_filename
  *
  * @property User $author
  * @property Tags $tags
@@ -65,8 +68,8 @@ class Story extends \yii\db\ActiveRecord
         return [
             [['title', 'alias', 'user_id', 'category_id'], 'required'],
             [['body', 'cover'], 'string'],
-            [['created_at', 'updated_at', 'user_id', 'category_id'], 'integer'],
-            [['title', 'alias'], 'string', 'max' => 255],
+            [['created_at', 'updated_at', 'user_id', 'category_id', 'sub_access', 'dropbox_sync_date'], 'integer'],
+            [['title', 'alias', 'dropbox_story_filename'], 'string', 'max' => 255],
             [['alias'], 'unique'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::className(), 'targetAttribute' => ['category_id' => 'id']],
@@ -83,7 +86,7 @@ class Story extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ИД',
-            'title' => 'Заголовок',
+            'title' => 'Название истории',
             'alias' => 'Alias',
             'body' => 'Body',
             'created_at' => 'Дата создания',
@@ -92,6 +95,10 @@ class Story extends \yii\db\ActiveRecord
             'status' => 'Статус',
             'tagNames' => 'Тэги',
             'category_id' => 'Категория',
+            'sub_access' => 'По подписке',
+            'dropbox_sync_date' => 'Синхронизация с Dropbox',
+            'dropbox_story_filename' => 'Файл в Dropbox',
+            'cover' => 'Обложка',
         ];
     }
 
@@ -119,89 +126,52 @@ class Story extends \yii\db\ActiveRecord
         return $this->hasMany(Tag::className(), ['id' => 'tag_id'])->viaTable('{{%story_tag}}', ['story_id' => 'id']);
     }
 
-    public function initStory()
-    {
-        $localFolder = $this->getImagesFolderPath();
-        if (!file_exists($localFolder))
-        {
-            mkdir($localFolder, 0777);
-        }
-    }
-
-    public function getCoverPath()
-    {
-        return $this->getImagesFolderPath(true) . '/' . $this->cover;
-    }
-
-    public function exportSlideBodyFromDropBox()
-    {
-        $dropboxPath = Yii::$app->params['dropboxSlidesPath'] . $this->alias . '.html';
-        $html = Yii::$app->dropbox->read($dropboxPath);
-        $document = \phpQuery::newDocumentHTML($html);
-        $images = $document->find('img[data-src]');
-        foreach ($images as $image)
-        {
-            $src = pq($image)->attr('data-src');
-            pq($image)->attr('data-src', '/slides/' . $src);
-        }
-        return $document->find("div.reveal")->html();
-    }
-
-    public function exportSlideImagesFromDropBox()
-    {
-        $dropboxFolder = Yii::$app->params['dropboxSlidesPath'] . $this->alias;
-        $contents = Yii::$app->dropbox->listContents($dropboxFolder);
-        $localFolder = Yii::getAlias('@public') . '/slides/' . $this->alias . '/';
-        if (!file_exists($localFolder))
-        {
-            mkdir($localFolder, 0777);
-        }
-        else
-        {
-            array_map('unlink', glob($localFolder . "*.jpg"));
-        }
-        foreach ($contents as $content)
-        {
-            $data = Yii::$app->dropbox->read($content["path"]);
-            file_put_contents($localFolder . $content["basename"], $data);
-            $data = null;
-        }
-    }
-
-    public function exportSlideFromDropBox()
-    {
-        $this->body = $this->exportSlideBodyFromDropBox();
-        $this->exportSlideImagesFromDropBox();
-    }
-
-    public function getImagesFolderPath($web = false)
-    {
-        return ($web ? '' : Yii::getAlias('@public')) . '/slides/' . $this->alias;
-    }
-
-    public function getStoryImages()
-    {
-        $dir  = opendir($this->getImagesFolderPath());
-        $images = [];
-        while (false !== ($filename = readdir($dir)))
-        {
-            if (!in_array($filename, array('.', '..'))) 
-            {
-                $images[] = $this->getImagesFolderPath(true) . '/' . $filename;
-            }
-        }
-        return $images;
-    }
-
     public static function findStories()
     {
-        return self::find()->published();
+        return self::find();
     }
 
-    public function getCategoryLink()
+    public static function findPublishedStories()
     {
-        $category = $this->getCategory()->one();
-        return Html::a($category->name, ['story/category', 'category' => $category->alias]);
+        return self::find()->published()->bySubAccess();
     }
 
+    public static function getStatusArray()
+    {
+        return [
+            self::STATUS_DRAFT => 'Черновик',
+            self::STATUS_PUBLISHED => 'Опубликован',
+        ];
+    }
+
+    public function getStatusText()
+    {
+        $arr = self::getStatusArray();
+        return $arr[$this->status];
+    }
+
+    public static function getSubAccessArray()
+    {
+        return [
+            1 => 'Да',
+            0 => 'Нет',
+        ];
+    }    
+
+    public function getSubAccessText()
+    {
+        $arr = self::getSubAccessArray();
+        return $arr[$this->sub_access];
+    }
+
+    public function isDropboxSync()
+    {
+        return !empty($this->dropbox_sync_date);
+    }
+
+    public function syncWithDropbox($body)
+    {
+        $this->body = $body;
+        $this->dropbox_sync_date = time();
+    }
 }

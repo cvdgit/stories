@@ -6,7 +6,8 @@ use yii\helpers\HtmlPurifier;
 ?>
 <div class="product">
     <div class="images text-center">
-        <?= Html::a(Html::img('http://via.placeholder.com/180x210'), ['view', 'alias' => $model->alias]) ?>
+        <?php $img = empty($model->cover) ? 'http://via.placeholder.com/180x210' : $this->context->service->getCoverPath($model->cover, true); ?>
+        <?= Html::a(Html::img($img), ['view', 'alias' => $model->alias]) ?>
         <div class="button-group">
             <a href="#" class="custom-btn pink"><i class="fa fa-shopping-bag"></i></a>
             <a href="#" class="custom-btn pink"><i class="fa fa-search"></i></a>
