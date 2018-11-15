@@ -21,6 +21,16 @@ class StoryCoverUploadForm extends Model
         ];
     }
     
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'coverFile' => 'Обложка',
+        ];
+    }
+
     public function upload()
     {
         if ($this->validate()) {

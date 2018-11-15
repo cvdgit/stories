@@ -58,6 +58,9 @@ class StorySearch extends Story
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'pageSize' => 3,
+            ],
         ]);
         
         $sort = new Sort([

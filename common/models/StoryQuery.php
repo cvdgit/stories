@@ -13,6 +13,6 @@ class StoryQuery extends \yii\db\ActiveQuery
 
     public function bySubAccess()
     {
-    	return $this->orderBy('{{%story}}.sub_access DESC');
+    	return $this->orderBy(['{{%story}}.sub_access' => SORT_DESC]);
     }
 }

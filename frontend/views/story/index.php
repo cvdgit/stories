@@ -50,6 +50,9 @@ $this->params['breadcrumbs'][] = $this->title;
     border-radius: 0;
     font-family: 'BrandonRegular', serif;
 }
+.pagination li a {
+    border-radius: 100% !important;
+}
 CSS;
             $this->registerCss($css);
             ?>
@@ -81,6 +84,15 @@ CSS;
                         'title',
                         'created_at',
                     ]
+                ],
+                'pager' => [
+                    'options' => [
+                        'class' => 'pagination border-top border-color-gray',
+                    ],
+                    'disabledListItemSubTagOptions' => ['tag' => 'a', 'href' => '#'],
+                    'disabledPageCssClass' => 'no-pointer',
+                    'prevPageCssClass' => false,
+                    'nextPageCssClass' => false,
                 ],
             ]) ?>
         </div>
