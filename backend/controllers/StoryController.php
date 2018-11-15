@@ -156,7 +156,7 @@ class StoryController extends \yii\web\Controller
         $story = $this->findModel($id);
         
         $result = ['success' => '', 'error' => ''];
-        if (empty($model->dropbox_story_filename)) {
+        if (empty($story->dropbox_story_filename)) {
             $result['error'] = 'Необходимо указать имя файла в Dropbox';
             Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             return $this->asJson($result);
