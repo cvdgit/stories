@@ -114,7 +114,7 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
         </div>
     </div>
     <?php endif ?>
-    <?= Alert::widget() ?>
+    <!-- < ?= Alert::widget() ?> -->
     <?= $content ?>
     <footer class="bg-yellow">
         <div class="container">

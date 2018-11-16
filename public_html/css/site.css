@@ -1384,6 +1384,11 @@ body .cart-modal .custom-btn:hover {
   display: inline-block;
   font-size: 55px;
 }
+.form-container {
+  margin-top: -130px;
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
 /* 12. Owl Nav
    ==================================== */
 .owl-carousel {
@@ -2295,10 +2300,10 @@ footer .widget-title {
 /* 01. Widget Title
    ==================================== */
 .widget-title {
-  font-size: 22px;
+  font-size: 21px;
   color: #1e1e1e;
-  text-transform: uppercase;
-  margin-bottom: 35px;
+  /* text-transform: uppercase; */
+  margin-bottom: 20px;
   line-height: normal;
   font-family: 'BrandonBlack', serif;
 }
@@ -2307,7 +2312,7 @@ footer .widget-title {
 }
 /* 02. Widget Search
    ==================================== */
-.widget-search input {
+.widget-search input[type=text],[type=password] {
   width: 100%;
   padding: 0 32px 0 15px;
   height: 45px;
@@ -2315,40 +2320,49 @@ footer .widget-title {
   border: 1px solid #777;
   background-color: transparent;
 }
-.widget-search input::-webkit-input-placeholder {
+.widget-search input[type=text]::-webkit-input-placeholder,[type=password]::-webkit-input-placeholder {
   font-size: 18px;
   color: #777;
   font-family: 'BrandonRegular', serif;
 }
-.widget-search input::-moz-placeholder {
+.widget-search input[type=text]::-moz-placeholder,[type=password]::-moz-placeholder {
   font-size: 18px;
   color: #777;
   font-family: 'BrandonRegular', serif;
 }
-.widget-search input:-ms-input-placeholder {
+.widget-search input[type=text]:-ms-input-placeholde,[type=password]:-ms-input-placeholder {
   font-size: 18px;
   color: #777;
   font-family: 'BrandonRegular', serif;
 }
-.widget-search input:-moz-placeholder {
+.widget-search input[type=text]:-moz-placeholder,[type=password]:-moz-placeholder {
   font-size: 18px;
   color: #777;
   font-family: 'BrandonRegular', serif;
 }
-.widget-search input:focus {
+.widget-search input[type=text]:focus,[type=password]:focus {
   outline: none;
 }
 .widget-search form {
   position: relative;
 }
 .widget-search button {
-  padding: 0;
-  border: none;
-  top: 14px;
-  right: 15px;
-  position: absolute;
-  color: #878787;
-  background-color: transparent;
+    /* background-color: #f3f7f6;
+    text-align: center;
+    color: #1e1e1e;
+    border: none;
+    border-radius: 40px;
+    padding: 20px 56px;
+    transition: all .3s ease;
+    text-transform: uppercase;
+    letter-spacing: 2px; */
+}
+.widget-search button:hover {
+  /* background-color: #e20b50;
+  color: white; */
+}
+.widget-search .el-container {
+  margin-bottom: 35px;
 }
 /* 03. Widget Category
    ==================================== */
@@ -4232,3 +4246,14 @@ blockquote p {
 =            Font Family            =
 ===================================*/
 /*=====  End of Font Family  ======*/
+.info-text {
+  color:#999;
+  margin:1em 0;
+}
+.info-text a {
+  display: inline;
+}
+.form-btn {
+  margin-top: 30px;
+  box-shadow: 0 1px 4px 1px rgba(119, 119, 119, 0.16);
+}

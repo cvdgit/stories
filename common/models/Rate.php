@@ -2,7 +2,6 @@
 namespace common\models;
 
 use Yii;
-use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "rate".
@@ -16,7 +15,7 @@ use yii\db\ActiveRecord;
  * 
  * @property Payment[] $payments
  */
-class Rate extends ActiveRecord
+class Rate extends yii\db\ActiveRecord
 {
 
     const ACTIVE = 'active';

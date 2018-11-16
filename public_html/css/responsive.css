@@ -416,6 +416,11 @@
   .single-blog .breadcrumb-top {
     margin-bottom: 50px;
   }
+  .form-container {
+    margin-top: -50px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+  }
   .single-blog .breadcrumb-top h2 {
     font-size: 45px;
   }
@@ -501,6 +506,11 @@
   }
   .breadcrumb-top {
     margin-bottom: 60px;
+  }
+  .form-container {
+    margin-top: -60px;
+    padding-top: 60px;
+    padding-bottom: 60px;
   }
   .grid .grid-item.grid-item.grid-item-height2 {
     height: 350px;
