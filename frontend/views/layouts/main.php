@@ -45,7 +45,7 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
                             $menuItems[] = ['label' => 'Профиль', 'url' => ['/profile/index']];
                             $menuItems[] = '<li>'
                                 . Html::beginForm(['/site/logout'], 'post')
-                                . Html::submitButton('Выход (' . Yii::$app->user->identity->username . ')')
+                                . Html::submitButton('Выход (' . Yii::$app->user->identity->username . ')', ['class' => 'cst-btn-a'])
                                 . Html::endForm()
                                 . '</li>';
                         }
