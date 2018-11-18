@@ -2312,7 +2312,7 @@ footer .widget-title {
 }
 /* 02. Widget Search
    ==================================== */
-.widget-search input[type=text],[type=password] {
+.widget-search input[type=text], .widget-search input[type=password], .widget-search textarea {
   width: 100%;
   padding: 0 32px 0 15px;
   height: 45px;
@@ -2320,46 +2320,36 @@ footer .widget-title {
   border: 1px solid #777;
   background-color: transparent;
 }
-.widget-search input[type=text]::-webkit-input-placeholder,[type=password]::-webkit-input-placeholder {
+.widget-search input[type=text]::-webkit-input-placeholder, .widget-search input[type=password]::-webkit-input-placeholder, .widget-search textarea::-webkit-input-placeholder {
   font-size: 18px;
   color: #777;
   font-family: 'BrandonRegular', serif;
 }
-.widget-search input[type=text]::-moz-placeholder,[type=password]::-moz-placeholder {
+.widget-search input[type=text]::-moz-placeholder, .widget-search input[type=password]::-moz-placeholder, .widget-search textarea::-moz-placeholder {
   font-size: 18px;
   color: #777;
   font-family: 'BrandonRegular', serif;
 }
-.widget-search input[type=text]:-ms-input-placeholde,[type=password]:-ms-input-placeholder {
+.widget-search input[type=text]:-ms-input-placeholde, .widget-search input[type=password]:-ms-input-placeholder, .widget-search textarea:-ms-input-placeholder {
   font-size: 18px;
   color: #777;
   font-family: 'BrandonRegular', serif;
 }
-.widget-search input[type=text]:-moz-placeholder,[type=password]:-moz-placeholder {
+.widget-search input[type=text]:-moz-placeholder, .widget-search input[type=password]:-moz-placeholder, .widget-search textarea:-moz-placeholder {
   font-size: 18px;
   color: #777;
   font-family: 'BrandonRegular', serif;
 }
-.widget-search input[type=text]:focus,[type=password]:focus {
+.widget-search input[type=text]:focus, .widget-search input[type=password]:focus, .widget-search textarea:focus {
   outline: none;
 }
 .widget-search form {
   position: relative;
 }
-.widget-search button {
-    /* background-color: #f3f7f6;
-    text-align: center;
-    color: #1e1e1e;
-    border: none;
-    border-radius: 40px;
-    padding: 20px 56px;
-    transition: all .3s ease;
-    text-transform: uppercase;
-    letter-spacing: 2px; */
-}
-.widget-search button:hover {
-  /* background-color: #e20b50;
-  color: white; */
+.widget-search textarea {
+  height: auto !important;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 .widget-search .el-container {
   margin-bottom: 35px;
