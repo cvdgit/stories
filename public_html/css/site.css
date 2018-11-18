@@ -176,6 +176,24 @@ img {
 iframe {
   width: 100%;
 }
+
+@font-face {
+  font-family: CirceRegular;
+  src: url(fonts/circe-regular/Circe-Regular.ttf);
+}
+@font-face {
+  font-family: CirceBold;
+  src: url(fonts/circe-regular/Circe-Regular.ttf);
+}
+@font-face {
+  font-family: CirceBlack;
+  src: url(fonts/circe-bold/Circe-Bold.ttf);
+}
+@font-face {
+  font-family: CirceLight;
+  src: url(fonts/circe-light/Circe-Light.ttf);
+}
+
 /*=====  End of 02. Reset  ======*/
 /*======================================
 =            03. Base Style            =
@@ -195,7 +213,7 @@ iframe {
    ==================================== */
 body {
   font-weight: 400;
-  font-family: 'BrandonBold', serif;
+  font-family: 'CirceBold', serif;
 }
 h1,
 h2,
@@ -245,7 +263,7 @@ a:focus {
   text-decoration: none;
 }
 p {
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
   font-size: 18px;
   color: #1e1e1e;
 }
@@ -346,7 +364,8 @@ input:-moz-placeholder {
 .title-head p {
   font-size: 21px;
   color: #e20b50;
-  font-family: 'MinionProIt', serif;
+  font-family: 'CirceLight', serif;
+  font-style: italic;
 }
 .container-large {
   padding-right: 15px;
@@ -356,12 +375,12 @@ input:-moz-placeholder {
 }
 /* 06. Custom Fonts
    ==================================== */
-@font-face {
-  font-family: 'BrandonRegular';
+/* @font-face {
+  font-family: 'CirceRegular';
   src: url('/css/fonts/brandon/brandon_reg.eot') format('embedded-opentype'), url('/css/fonts/brandon/brandon_reg.otf') format('opentype'), url('/css/fonts/brandon/brandon_reg.ttf') format('truetype'), url('/css/fonts/brandon/brandon_reg.woff') format('woff');
   font-weight: normal;
   font-style: normal;
-}
+} */
 @font-face {
   font-family: 'BrandonMedium';
   src: url('/css/fonts/brandon/brandon_med.eot') format('embedded-opentype'), url('/css/fonts/brandon/brandon_med.otf') format('opentype'), url('/css/fonts/brandon/brandon_med.ttf') format('truetype'), url('/css/fonts/brandon/brandon_med.woff') format('woff');
@@ -374,18 +393,18 @@ input:-moz-placeholder {
   font-weight: normal;
   font-style: normal;
 }
-@font-face {
-  font-family: 'BrandonBlack';
+/* @font-face {
+  font-family: 'CirceBlack';
   src: url('/css/fonts/brandon/brandon_blk.eot') format('embedded-opentype'), url('/css/fonts/brandon/brandon_blk.otf') format('opentype'), url('/css/fonts/brandon/brandon_blk.ttf') format('truetype'), url('/css/fonts/brandon/brandon_blk.woff') format('woff');
   font-weight: normal;
   font-style: normal;
-}
-@font-face {
-  font-family: 'BrandonBold';
+} */
+/* @font-face {
+  font-family: 'CirceBold';
   src: url('/css/fonts/brandon/brandon_bld.eot') format('embedded-opentype'), url('/css/fonts/brandon/brandon_bld.otf') format('opentype'), url('/css/fonts/brandon/brandon_bld.ttf') format('truetype'), url('/css/fonts/brandon/randon_bld.woff') format('woff');
   font-weight: normal;
   font-style: normal;
-}
+} */
 @font-face {
   font-family: 'BrandonRegIt';
   src: url('/css/fonts/brandon/brandon_reg_it.eot') format('embedded-opentype'), url('/css/fonts/brandon/brandon_reg_it.otf') format('opentype'), url('/css/fonts/brandon/brandon_reg_it.ttf') format('truetype'), url('/css/fonts/brandon/brandon_reg_it.woff') format('woff');
@@ -584,7 +603,7 @@ header.fixed .header{
   margin-bottom: 0;
 }
 .header .menu .sub-menu li a {
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
   font-size: 18px;
   text-transform: none;
 }
@@ -623,7 +642,7 @@ header.fixed .header{
 }
 .header .mega-menu ul li a {
   font-size: 18px;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
   text-transform: none;
 }
 .header .mega-menu ul li.first {
@@ -722,7 +741,7 @@ header.fixed .header{
 .search input::-webkit-input-placeholder {
   font-size: 34px;
   color: rgba(119, 119, 119, 0.4);
-  font-family: 'BrandonBlack', serif;
+  font-family: 'CirceBlack', serif;
   position: relative;
   bottom: -5px;
 }
@@ -731,14 +750,14 @@ header.fixed .header{
   position: relative;
   bottom: -5px;
   color: rgba(119, 119, 119, 0.4);
-  font-family: 'BrandonBlack', serif;
+  font-family: 'CirceBlack', serif;
 }
 .search input:-ms-input-placeholder {
   font-size: 34px;
   position: relative;
   bottom: -5px;
   color: rgba(119, 119, 119, 0.4);
-  font-family: 'BrandonBlack', serif;
+  font-family: 'CirceBlack', serif;
 }
 .search .close {
   top: 53px;
@@ -977,7 +996,7 @@ body .cart-modal .custom-btn:hover {
   text-transform: uppercase;
   font-size: 16px;
   display: block;
-  font-family: 'BrandonBlack', serif;
+  font-family: 'CirceBlack', serif;
 }
 .category-product img {
   margin-bottom: 35px;
@@ -1119,7 +1138,7 @@ body .cart-modal .custom-btn:hover {
   line-height: 72px;
   margin-bottom: 3px;
   color: #fff;
-  font-family: 'BrandonBlack', serif;
+  font-family: 'CirceBlack', serif;
 }
 .big-banner .text p {
   font-size: 21px;
@@ -1153,7 +1172,7 @@ body .cart-modal .custom-btn:hover {
   font-size: 40px;
   line-height: 42px;
   margin-bottom: 25px;
-  font-family: 'BrandonBlack', serif;
+  font-family: 'CirceBlack', serif;
   text-transform: uppercase;
 }
 .banner-img .inside p {
@@ -1177,7 +1196,7 @@ body .cart-modal .custom-btn:hover {
   text-transform: uppercase;
   letter-spacing: 4px;
   margin-bottom: 5px;
-  font-family: 'BrandonBlack', serif;
+  font-family: 'CirceBlack', serif;
 }
 .banner-color .inside p {
   font-size: 16px;
@@ -1212,11 +1231,11 @@ body .cart-modal .custom-btn:hover {
   margin-bottom: 35px;
   letter-spacing: 4px;
   text-transform: uppercase;
-  font-family: 'BrandonBlack', serif;
+  font-family: 'CirceBlack', serif;
 }
 .schedule .tab-content li {
   font-size: 18px;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
   margin-bottom: 15px;
 }
 .schedule .tab-content li:last-child {
@@ -1302,7 +1321,7 @@ body .cart-modal .custom-btn:hover {
   line-height: 30px;
   color: #1e1e1e;
   text-transform: none;
-  font-family: 'BrandonBold', serif;
+  font-family: 'CirceBold', serif;
 }
 .posts .custom-btn {
   padding: 29px 41px;
@@ -1367,7 +1386,7 @@ body .cart-modal .custom-btn:hover {
   font-size: 18px;
   margin-bottom: 0;
   display: inline-block;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
 }
 .breadcrumb .active {
   color: #000;
@@ -1461,7 +1480,7 @@ body .cart-modal .custom-btn:hover {
   font-size: 26px;
   color: #e20b50;
   text-transform: capitalize;
-  font-family: 'BrandonBold', serif;
+  font-family: 'CirceBold', serif;
 }
 #countdown .double {
   font-size: 0;
@@ -1519,7 +1538,7 @@ body .cart-modal .custom-btn:hover {
 .simplefilter li {
   font-size: 18px;
   color: #1e1e1e;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
   display: inline-block;
   cursor: pointer;
   margin-right: 40px;
@@ -1658,7 +1677,7 @@ body .cart-modal .custom-btn:hover {
 }
 .base-slider #countdown {
   margin: 50px 0 40px;
-  font-family: 'BrandonBold', serif;
+  font-family: 'CirceBold', serif;
 }
 .base-slider #countdown div {
   width: 113px;
@@ -1712,19 +1731,19 @@ footer {
 footer .widget-page a {
   font-size: 18px;
   color: #1e1e1e;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
   margin-bottom: 25px;
 }
 footer .widget-page a:last-child {
   margin-bottom: 0;
 }
 footer .widget-contact address {
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
   line-height: 43px;
   margin-top: -12px;
 }
 footer .widget-title {
-  font-family: 'BrandonBlack', serif;
+  font-family: 'CirceBlack', serif;
   margin-bottom: 28px;
 }
 /* 02. Subscribe
@@ -1955,7 +1974,7 @@ footer .widget-title {
   color: #777;
   background-color: transparent;
   border-radius: 0;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
 }
 .filter-wrap .sorting i {
   top: 15px;
@@ -2009,7 +2028,7 @@ footer .widget-title {
   line-height: 45px;
   border-radius: 100%;
   background-color: #f3f7f6;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
 }
 .pagination li.active a {
   border-radius: 100%;
@@ -2305,7 +2324,7 @@ footer .widget-title {
   /* text-transform: uppercase; */
   margin-bottom: 20px;
   line-height: normal;
-  font-family: 'BrandonBlack', serif;
+  font-family: 'CirceBlack', serif;
 }
 .sidebar-shop > div {
   margin-bottom: 70px;
@@ -2316,29 +2335,29 @@ footer .widget-title {
   width: 100%;
   padding: 0 32px 0 15px;
   height: 45px;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
   border: 1px solid #777;
   background-color: transparent;
 }
 .widget-search input[type=text]::-webkit-input-placeholder, .widget-search input[type=password]::-webkit-input-placeholder, .widget-search textarea::-webkit-input-placeholder {
   font-size: 18px;
   color: #777;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
 }
 .widget-search input[type=text]::-moz-placeholder, .widget-search input[type=password]::-moz-placeholder, .widget-search textarea::-moz-placeholder {
   font-size: 18px;
   color: #777;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
 }
 .widget-search input[type=text]:-ms-input-placeholde, .widget-search input[type=password]:-ms-input-placeholder, .widget-search textarea:-ms-input-placeholder {
   font-size: 18px;
   color: #777;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
 }
 .widget-search input[type=text]:-moz-placeholder, .widget-search input[type=password]:-moz-placeholder, .widget-search textarea:-moz-placeholder {
   font-size: 18px;
   color: #777;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
 }
 .widget-search input[type=text]:focus, .widget-search input[type=password]:focus, .widget-search textarea:focus {
   outline: none;
@@ -2359,7 +2378,7 @@ footer .widget-title {
 .widget-category a {
   font-size: 18px;
   color: #1e1e1e;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
 }
 .widget-category li {
   margin-bottom: 25px;
@@ -2437,7 +2456,7 @@ footer .widget-title {
   font-size: 18px;
   color: #878787;
   line-height: normal;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
 }
 .widget-recent-product li {
   margin-bottom: 30px;
@@ -2770,13 +2789,13 @@ footer .widget-title {
 .single-product .sale-time h6 {
   font-size: 26px;
   color: #aaa;
-  font-family: 'BrandonBold', serif;
+  font-family: 'CirceBold', serif;
   margin-bottom: 7px;
 }
 .single-product .sale-time ul li {
   font-size: 18px;
   color: #1e1e1e;
-  font-family: 'BrandonBlack', serif;
+  font-family: 'CirceBlack', serif;
 }
 .single-product .sale-time ul li span {
   color: #777;
@@ -2836,11 +2855,11 @@ footer .widget-title {
   font-size: 18px;
   color: #1e1e1e;
   margin-bottom: 25px;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
 }
 .list li.first {
   margin-bottom: 34px;
-  font-family: 'BrandonBlack', serif;
+  font-family: 'CirceBlack', serif;
 }
 .list li i {
   color: #e20b50;
@@ -2878,7 +2897,7 @@ footer .widget-title {
   line-height: normal;
   text-transform: uppercase;
   margin-bottom: -18px;
-  font-family: 'BrandonBlack', serif;
+  font-family: 'CirceBlack', serif;
 }
 .error-page p {
   font-size: 38px;
@@ -3034,7 +3053,7 @@ footer .widget-title {
 }
 .checkout .sorting {
   margin-bottom: 20px;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
   position: relative;
 }
 .checkout .sorting select {
@@ -3112,7 +3131,7 @@ footer .widget-title {
   display: inline-block;
 }
 .checkout-form .shipping .price {
-  font-family: 'BrandonBlack', serif;
+  font-family: 'CirceBlack', serif;
 }
 .checkout-form .shipping ul {
   width: 45%;
@@ -3124,7 +3143,7 @@ footer .widget-title {
   padding-bottom: 19px;
 }
 .checkout-form .shipping ul span {
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
 }
 .checkout-form .total {
   margin-bottom: 37px;
@@ -3174,7 +3193,7 @@ footer .widget-title {
 .checkout-modal .modal-content p {
   font-size: 30px;
   color: #1e1e1e;
-  font-family: 'BrandonBold', serif;
+  font-family: 'CirceBold', serif;
 }
 .checkout-modal .btn {
   top: 12px;
@@ -3208,7 +3227,7 @@ footer .widget-title {
 .audio-player .player-controls p {
   font-size: 24px;
   color: #1e1e1e;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
 }
 .audio-player .player-controls span {
   font-size: 14px;
@@ -3248,7 +3267,7 @@ footer .widget-title {
 .audio-player #end-time {
   font-size: 12px;
   color: #1e1e1e;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
 }
 .audio-player #start-time {
   float: left;
@@ -3330,7 +3349,7 @@ footer .widget-title {
   line-height: 42px;
   color: #1e1e1e;
   text-transform: capitalize;
-  font-family: 'BrandonBold', serif;
+  font-family: 'CirceBold', serif;
 }
 .post .post-heading a:hover {
   color: #e20b50;
@@ -3491,7 +3510,7 @@ aside > div {
 #datepicker tbody a {
   font-size: 16px;
   color: #1e1e1e;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
 }
 #datepicker tbody td {
   padding: 8px 0;
@@ -3508,7 +3527,7 @@ aside > div {
 .widget-post a {
   display: -ms-flexbox;
   display: flex;
-  font-family: 'BrandonBold', serif;
+  font-family: 'CirceBold', serif;
 }
 .widget-post a:hover span {
   color: #e20b50;
@@ -3534,7 +3553,7 @@ aside > div {
 .widget-archive li a {
   font-size: 18px;
   color: #777;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
 }
 .widget-archive li a:hover {
   color: #e20b50;
@@ -3884,14 +3903,14 @@ aside > div {
   color: #777;
   font-size: 18px;
   font-weight: 400;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
 }
 .contact-us-input-one::-moz-placeholder,
 .contact-us-input-two::-moz-placeholder {
   color: #777;
   font-size: 18px;
   font-weight: 400;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
 }
 .contact-us-input-one {
   margin-right: 24px;
@@ -3912,20 +3931,20 @@ aside > div {
   color: #777;
   font-size: 18px;
   font-weight: 400;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
 }
 .contact-us-massage::-moz-placeholder {
   color: #777;
   font-size: 18px;
   font-weight: 400;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
 }
 .contact-us-descr-p {
   margin-bottom: 9px;
 }
 .contact-us-descr-p b {
   font-weight: 700;
-  font-family: 'BrandonBold', serif;
+  font-family: 'CirceBold', serif;
 }
 .contact-us-page .custom-btn {
   padding: 28px 50px;
@@ -3969,7 +3988,7 @@ aside > div {
 }
 .single-blog .breadcrumb-top h2 {
   max-width: 970px;
-  font-family: 'BrandonBold', serif;
+  font-family: 'CirceBold', serif;
 }
 .single-blog .breadcrumb-top .breadcrumb {
   margin: 7px 0 0;
@@ -4040,7 +4059,7 @@ aside > div {
 .single-blog .bottom-post .tags a {
   font-size: 18px;
   color: #777;
-  font-family: 'BrandonRegular', serif;
+  font-family: 'CirceRegular', serif;
   display: inline-block;
 }
 .single-blog .bottom-post .social-icon {
@@ -4102,7 +4121,7 @@ blockquote p {
 }
 .table td {
   padding: 17px 20px !important;
-  font-family: 'BrandonBold', serif;
+  font-family: 'CirceBold', serif;
   border-right: 1px solid #fff;
   border-bottom: 1px solid #fff;
 }
@@ -4163,7 +4182,7 @@ blockquote p {
 .next-post .content-article span {
   font-size: 18px;
   color: #777;
-  font-family: 'BrandonBold', serif;
+  font-family: 'CirceBold', serif;
   text-transform: uppercase;
   display: block;
   margin-bottom: 5px;
