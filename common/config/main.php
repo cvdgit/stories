@@ -25,12 +25,19 @@ return [
             'useFileTransport' => false,
             'transport' => [
                  'class' => 'Swift_SmtpTransport',
-                 'host' => 'smtp.yandex.ru',  // e.g. smtp.mandrillapp.com or smtp.gmail.com
+                 'host' => 'smtp.yandex.ru',
                  'username' => 'info@wikids.ru',
                  'password' => 'Directum2019',
-                 'port' => '587', // Port 25 is a very common port too
+                 'port' => '587',
                  'encryption' => 'tls',
              ],
+        ],
+        'formatter' => [
+            'dateFormat' => 'dd.M.Y',
+            'datetimeFormat' => 'dd.M.Y H:i:s',
+            'timeFormat' => 'H:i:s',
+            'locale' => 'ru-RU',
+            'defaultTimeZone' => 'Europe/Moscow',
         ],
     ],
 ];

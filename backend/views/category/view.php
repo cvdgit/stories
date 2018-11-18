@@ -11,7 +11,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Категории', 'url' => ['in
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="category-view">
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1 class="page-header"><?= Html::encode($this->title) ?></h1>
     <p>
         <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a('Удалить', ['delete', 'id' => $model->id], [

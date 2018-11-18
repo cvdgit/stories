@@ -31,17 +31,15 @@ AppAsset::register($this);
     NavBar::begin([
         'brandLabel' => 'Перейти к сайту',
         'brandUrl' => Yii::$app->urlManagerFrontend->createAbsoluteUrl('/site/index'),
+        'innerContainerOptions' => ['class' => 'container-fluid'],
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
-    $menuItems = [
-    ];
+    $menuItems = [];
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => 'Вход', 'url' => ['/site/login']];
     } else {
-        $menuItems[] = ['label' => 'Истории', 'url' => ['/story/index']];
-        $menuItems[] = ['label' => 'Категории', 'url' => ['/category/index']];
         $menuItems[] = '<li>'
             . Html::beginForm(['/site/logout'], 'post')
             . Html::submitButton(
@@ -57,19 +55,32 @@ AppAsset::register($this);
     ]);
     NavBar::end();
     ?>
-    <div class="container">
-        <?= Breadcrumbs::widget([
-            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-        ]) ?>
-        <?= Alert::widget() ?>
-        <?= $content ?>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-3 col-md-2 sidebar">
+                <?php if (isset($this->params['sidebarMenuItems']) && sizeof($this->params['sidebarMenuItems']) > 0): ?>
+                <?= Nav::widget([
+                    'options' => ['class' => 'nav-sidebar'],
+                    'items' => $this->params['sidebarMenuItems'],
+                ]) ?>
+                <?php endif ?>
+                <?= Nav::widget([
+                    'options' => ['class' => 'nav-sidebar'],
+                    'items' => [
+                        ['label' => 'Главная', 'url' => ['/site/index']],
+                        ['label' => 'Истории', 'url' => ['/story/index']],
+                        ['label' => 'Категории', 'url' => ['/category/index']],
+                        ['label' => 'Пользователи', 'url' => ['/user/index']],
+                    ],
+                ]) ?>
+            </div>
+            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                <?= Alert::widget() ?>
+                <?= $content ?>
+            </div>
+        </div>
     </div>
 </div>
-<footer class="footer">
-    <div class="container">
-        <p class="pull-left">&copy; <?= Html::encode(Yii::$app->name) ?> <?= date('Y') ?></p>
-    </div>
-</footer>
 <?php $this->endBody() ?>
 </body>
 </html>

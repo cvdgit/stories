@@ -37,41 +37,45 @@ $('#dropbox-get-data').on('click', function() {
                     elem = bAlert.success(data.success);
                 elem.appendTo('#alert_placeholder');
             }
-		});
+		})
+        .fail(function(data) {
+            console.log('fail');
+        });
 });
 JS;
 $this->registerJs($script, yii\web\View::POS_READY);
 ?>
-<div class="story-form">
-    <?php $form = ActiveForm::begin(); ?>
-    <?php if (!empty($model->cover)): ?>
-    <div class="row">
-        <div class="col-xs-6 col-md-3">
-            <a href="#" class="thumbnail"><img src="<?= $model->getCoverPath() ?>" alt="..."></a>
-        </div>
+<?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
+<?php if (!empty($model->cover)): ?>
+<div class="row">
+    <div class="col-xs-6 col-md-3">
+        <a href="#" class="thumbnail"><img src="<?= $this->context->service->getCoverPath($model->cover, true) ?>" alt="..."></a>
     </div>
-    <?php endif ?>
-    <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'alias')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'user_id')->dropDownList(ArrayHelper::map(User::find()->all(), 'id', 'username'), ['prompt' => '--- select ---']) ?>
-    <?= $form->field($model, 'category_id')->dropDownList(ArrayHelper::map(Category::find()->all(), 'id', 'name'), ['prompt' => '--- select ---']) ?>
-    <?= $form->field($model, 'status')->dropDownList([Story::STATUS_DRAFT => 'Черновик', Story::STATUS_PUBLISHED => 'Публикация'], ['prompt' => '--- select ---']) ?>
-    <?= $form->field($model, 'tagNames')->widget(SelectizeTextInput::className(), [
-        'loadUrl' => ['tag/list'],
-        'options' => ['class' => 'form-control'],
-        'clientOptions' => [
-            'plugins' => ['remove_button'],
-            'valueField' => 'name',
-            'labelField' => 'name',
-            'searchField' => ['name'],
-            'create' => true,
-        ],
-    ])->hint('Используйте запятые для разделения тегов') ?>
-    <div class="form-group">
-        <?= Html::submitButton(($model->isNewRecord ? 'Создать историю' : 'Сохранить изменения'), ['class' => 'btn btn-success']) ?>
-        <?php if (!$model->isNewRecord): ?>
-        <?= Html::button('Получить данные из Dropbox', ['class' => 'btn btn-primary', 'id' => 'dropbox-get-data']) ?>
-        <?php endif ?>
-    </div>
-    <?php ActiveForm::end(); ?>
 </div>
+<?php endif ?>
+<?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
+<?= $form->field($coverUploadForm, 'coverFile')->fileInput() ?>
+<?= $form->field($model, 'alias')->textInput(['maxlength' => true]) ?>
+<?= $form->field($model, 'dropbox_story_filename')->textInput(['maxlength' => true]) ?>
+<?= $form->field($model, 'user_id')->dropDownList(ArrayHelper::map(User::find()->all(), 'id', 'username'), ['prompt' => 'Выбрать']) ?>
+<?= $form->field($model, 'category_id')->dropDownList(ArrayHelper::map(Category::find()->all(), 'id', 'name'), ['prompt' => 'Выбрать']) ?>
+<?= $form->field($model, 'sub_access')->checkBox() ?>
+<?= $form->field($model, 'status')->dropDownList([Story::STATUS_DRAFT => 'Черновик', Story::STATUS_PUBLISHED => 'Публикация'], ['prompt' => 'Выбрать']) ?>
+<?= $form->field($model, 'tagNames')->widget(SelectizeTextInput::className(), [
+    'loadUrl' => ['tag/list'],
+    'options' => ['class' => 'form-control'],
+    'clientOptions' => [
+        'plugins' => ['remove_button'],
+        'valueField' => 'name',
+        'labelField' => 'name',
+        'searchField' => ['name'],
+        'create' => true,
+    ],
+])->hint('Используйте запятые для разделения тегов') ?>
+<div class="form-group">
+    <?= Html::submitButton(($model->isNewRecord ? 'Создать историю' : 'Сохранить изменения'), ['class' => 'btn btn-success']) ?>
+    <?php if (!$model->isNewRecord): ?>
+    <?= Html::button('Получить данные из Dropbox', ['class' => 'btn btn-primary', 'id' => 'dropbox-get-data']) ?>
+    <?php endif ?>
+</div>
+<?php ActiveForm::end(); ?>

@@ -5,9 +5,9 @@
 
 use yii\helpers\Html;
 use yii\widgets\Breadcrumbs;
+use yii\widgets\Menu;
 use frontend\assets\AppAsset;
 use common\widgets\Alert;
-use common\components\StoryNav;
 
 AppAsset::register($this);
 ?>
@@ -43,13 +43,14 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
                             $menuItems[] = ['label' => 'Регистрация', 'url' => ['/site/signup']];
                         } else {
                             $menuItems[] = ['label' => 'Профиль', 'url' => ['/profile/index']];
-                            $menuItems[] = '<li>'
+                            $menuItems[] = ['label' => '<li>'
                                 . Html::beginForm(['/site/logout'], 'post')
                                 . Html::submitButton('Выход (' . Yii::$app->user->identity->username . ')', ['class' => 'cst-btn-a'])
                                 . Html::endForm()
-                                . '</li>';
+                                . '</li>'];
                         }
-                        echo StoryNav::widget([
+                        echo Menu::widget([
+                            'encodeLabels' => false,
                             'items' => $menuItems,
                         ]);
                         ?>
@@ -67,7 +68,7 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
                         ['label' => 'Истории', 'url' => ['/story/index']],
                         ['label' => 'Подписки', 'url' => ['/rate/index']],
                     ];
-                    echo StoryNav::widget([
+                    echo Menu::widget([
                         'options' => ['class' => 'menu'],
                         'items' => $menuItems,
                     ]);

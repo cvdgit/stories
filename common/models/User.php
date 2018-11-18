@@ -6,6 +6,7 @@ use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
+use yii\helpers\ArrayHelper;
 
 /**
  * User model
@@ -22,6 +23,8 @@ use yii\web\IdentityInterface;
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $password write-only password
+ *
+ * @property Payment $payments
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -60,6 +63,19 @@ class User extends ActiveRecord implements IdentityInterface
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_WAIT, self::STATUS_DELETED]],
             ['group', 'in', 'range' => [self::GROUP_ADMIN, self::GROUP_AUTHOR]],
             ['group', 'default', 'value' => self::GROUP_AUTHOR],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ИД',
+            'username' => 'Имя пользователя',
+            'created_at' => 'Дата создания',
+            'updated_at' => 'Дата изменения',
         ];
     }
 
@@ -224,4 +240,10 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return $this->hasMany(Payment::className(), ['user_id' => 'id']);
     }
+
+    public static function getUserArray()
+    {
+        return ArrayHelper::map(self::find()->all(), 'id', 'username');
+    }
+
 }

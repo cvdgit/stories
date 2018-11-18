@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = $model->title;
 						<p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.</p>
 					</div>
 					<ul>
-						<li>Категория: <?= $model->getCategoryLink() ?></li>
+						<li>Категория: <?= Html::a($model->category->name, ['story/category', 'category' => $model->category->alias]) ?></li>
 						<li>Тэги:
 						<?php foreach($model->getTags()->all() as $tag): ?>
 							<?= Html::a($tag->name, ['tag', 'tag' => $tag->name]) ?>

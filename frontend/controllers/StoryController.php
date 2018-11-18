@@ -8,13 +8,23 @@ use common\models\StorySearch;
 use common\models\Tag;
 use common\models\Category;
 use yii\web\NotFoundHttpException;
+use common\services\StoryService;
 
 class StoryController extends \yii\web\Controller
 {
 
+    public $service;
+
+    public function __construct($id, $module, StoryService $service, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->service = $service;
+    }
+
     public function actionIndex()
     {
     	$searchModel = new StorySearch();
+        $searchModel->scenario = StorySearch::SCENARIO_FRONTEND;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('index', [
             'searchModel' => $searchModel,
