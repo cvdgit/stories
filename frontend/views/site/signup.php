@@ -6,23 +6,31 @@
 
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+use common\widgets\Alert;
 
 $this->title = 'Регистрация';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="site-signup">
-    <h1><?= Html::encode($this->title) ?></h1>
-    <p>Пожалуйста, заполните следующие поля для регистрации:</p>
-    <div class="row">
-        <div class="col-lg-5">
-            <?php $form = ActiveForm::begin(['id' => 'form-signup']); ?>
-                <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
-                <?= $form->field($model, 'email') ?>
-                <?= $form->field($model, 'password')->passwordInput() ?>
-                <div class="form-group">
-                    <?= Html::submitButton('Зарегистрироваться', ['class' => 'btn btn-primary', 'name' => 'signup-button']) ?>
+<div class="bg-grey form-container">
+    <div class="container">
+        <?= Alert::widget() ?>
+        <div class="site-signup">
+            <div class="row widget-search">
+                <div class="col-lg-6">
+                    <?php $form = ActiveForm::begin(['id' => 'login-form',
+                        'fieldConfig' => [
+                            'template' => '<div class="el-container">{label}{input}{error}</div>',
+                            'labelOptions' => ['class' => 'widget-title'],
+                            'inputOptions' => ['class'=> null]
+                        ]
+                    ]); ?>
+                        <?= $form->field($model, 'username', ['inputOptions' => ['placeholder' => 'Имя пользователя']])->textInput(['autofocus' => true]) ?>
+                        <?= $form->field($model, 'email', ['inputOptions' => ['placeholder' => 'Email пользователя']]) ?>
+                        <?= $form->field($model, 'password', ['inputOptions' => ['placeholder' => 'Пароль']])->passwordInput() ?>    
+                        <?= Html::submitButton('Зарегистрироваться', ['class' => 'custom-btn white form-btn', 'name' => 'signup-button']) ?>    
+                    <?php ActiveForm::end(); ?>
                 </div>
-            <?php ActiveForm::end(); ?>
+            </div>
         </div>
     </div>
 </div>

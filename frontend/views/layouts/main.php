@@ -45,7 +45,7 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
                             $menuItems[] = ['label' => 'Профиль', 'url' => ['/profile/index']];
                             $menuItems[] = ['label' => '<li>'
                                 . Html::beginForm(['/site/logout'], 'post')
-                                . Html::submitButton('Выход (' . Yii::$app->user->identity->username . ')')
+                                . Html::submitButton('Выход (' . Yii::$app->user->identity->username . ')', ['class' => 'cst-btn-a'])
                                 . Html::endForm()
                                 . '</li>'];
                         }
@@ -115,7 +115,7 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
         </div>
     </div>
     <?php endif ?>
-    <?= Alert::widget() ?>
+    <!-- < ?= Alert::widget() ?> -->
     <?= $content ?>
     <footer class="bg-yellow">
         <div class="container">

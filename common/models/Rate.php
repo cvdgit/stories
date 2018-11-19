@@ -1,5 +1,4 @@
 <?php
-
 namespace common\models;
 
 use Yii;
@@ -13,12 +12,11 @@ use Yii;
  * @property int $cost
  * @property int $mounth_count
  * @property string $type
- *
+ * 
  * @property Payment[] $payments
  */
-class Rate extends \yii\db\ActiveRecord
+class Rate extends yii\db\ActiveRecord
 {
-
 
     const ACTIVE = 'active';
     const ARCHIVE = 'archive';

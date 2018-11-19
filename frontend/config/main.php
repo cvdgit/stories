@@ -43,7 +43,7 @@ return [
             'rules' => [
                 '' => 'site/index',
                 'contacts' => 'site/contact',
-                'pricing' => 'site/pricing',
+                'pricing' => 'rate/index',
                 'signup' => 'site/signup',
                 'login' => 'site/login',
                 'logout' => 'site/logout',
@@ -58,8 +58,6 @@ return [
                 'story/<alias:[\w\-]+>' => 'story/view',
                 'story/viewbyframe/<id:\d+>' => 'story/view-by-frame',
 
-                'rates' => 'rate/index',
-                'list_stories' => 'rate/list',
                 'success' => 'rate/success',
                 'fail' => 'rate/fail',
             ],

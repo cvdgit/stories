@@ -30,7 +30,7 @@ class RateController extends \yii\web\Controller
         }
         $rates = Rate::find()->all();
         $rates = $this->addPaymentData($rates);
-        return $this->renderPartial('index', [
+        return $this->render('index', [
             'rates' => $rates,
             'count_date_rate' => $date_rate,
         ]);
@@ -50,15 +50,6 @@ class RateController extends \yii\web\Controller
     public function actionSuccess() 
     {
         $this->paymentService->success();
-    }
-
-    /**
-     * Отображение представления списка историй
-     * TODO: убарть
-     */ 
-    public function actionList()
-    {
-        return $this->renderPartial('list');
     }
 
     /**
