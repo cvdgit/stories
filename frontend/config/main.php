@@ -55,6 +55,7 @@ return [
                 'stories/category/<category:[\w]+>' => 'story/category',
                 'stories' => 'story/index',
 
+                'story/webhook' => 'story/webhook',
                 'story/<alias:[\w\-]+>' => 'story/view',
                 'story/viewbyframe/<id:\d+>' => 'story/view-by-frame',
 

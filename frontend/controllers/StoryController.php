@@ -100,5 +100,9 @@ class StoryController extends \yii\web\Controller
         ]);
     }
 
+    public function actionWebhook()
+    {
+        return 'ok';
+    }
 
 }
