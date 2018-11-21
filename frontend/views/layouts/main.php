@@ -83,13 +83,6 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
                 <div class="col-md-5 col-sm-5 col-xs-5 text-right">
                     <ul class="info-header">
                         <li><a href="#"><i class="fas fa-phone-volume"></i>+91-141-4007601</a></li>
-                        <li class="search-icon"><a href="#"><i class="fas fa-search"></i>search</a></li>
-                    </ul>
-                    <ul class="social-icon">
-                        <li class="facebook"><a href="#"><i class="fab fa-facebook"></i></a></li>
-                        <li class="google"><a href="#"><i class="fab fa-google-plus"></i></a></li>
-                        <li class="tumblr"><a href="#"><i class="fab fa-tumblr"></i></a></li>
-                        <li class="instagram"><a href="#"><i class="fab fa-instagram"></i></a></li>
                     </ul>
                 </div>
             </div>
