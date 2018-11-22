@@ -25,7 +25,7 @@ use common\services\StoryService;
             <div class="product">
                 <div class="images">
                     <?php $img = empty($model->cover) ? 'http://via.placeholder.com/180x210' : $storyService->getCoverPath($model->cover, true); ?>
-                    <?= Html::a(Html::img($img), ['view', 'alias' => $model->alias]) ?>
+                    <?= Html::a(Html::img($img), ['/story/view', 'alias' => $model->alias]) ?>
                     <div class="button-group">
                         <a href="cart.html" class="custom-btn pink"><i class="fa fa-shopping-bag"></i></a>
                         <a href="#" class="custom-btn pink"><i class="fa fa-search"></i></a>
