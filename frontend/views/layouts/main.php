@@ -82,7 +82,7 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
                 </div>
                 <div class="col-md-5 col-sm-5 col-xs-5 text-right">
                     <ul class="info-header">
-                        <li><a href="#"><i class="fas fa-phone-volume"></i>+91-141-4007601</a></li>
+                        <li><a href="#"><i class="fas fa-phone-volume"></i>+7(499)703-35-25</a></li>
                     </ul>
                 </div>
             </div>

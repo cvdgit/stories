@@ -174,4 +174,10 @@ class Story extends \yii\db\ActiveRecord
         $this->body = $body;
         $this->dropbox_sync_date = time();
     }
+
+    public static function findLastPublishedStories()
+    {
+        return self::find()->published()->lastStories();
+    }
+
 }

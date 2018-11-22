@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use frontend\widgets\StoryWidget;
 
 /* @var $this yii\web\View */
 
@@ -127,31 +128,7 @@ $this->registerCss($css);
     </div>
 </div>
 
+
 <div class="container-large">
-    <div class="product-slider">
-        <div class="title-head">
-            <h2 class="text-black">Доступные истории</h2>
-        </div>
-        <div class="slider-product owl-carousel owl-theme">
-            <div class="item">
-                <div class="product">
-                    <div class="images text-center">
-                        <a href="single-product.html"><img src="http://via.placeholder.com/160x230" alt="product4"></a>
-                        <div class="button-group">
-                            <a href="cart.html" class="custom-btn pink"><i class="fa fa-shopping-bag"></i></a>
-                            <a href="#" class="custom-btn pink"><i class="fa fa-search"></i></a>
-                        </div>
-                    </div>
-                    <div class="info-product">
-                        <a href="single-product.html" class="title">Over the Moo - Ice Cream</a>
-                        <span class="price">$7.99</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="text-center">
-            <!--a href="shop.html" class="custom-btn text-center green"><span>View the store</span></a-->
-            <?= Html::a(Html::tag('span', 'Посмотреть все истории'), ['/story/index'], ['class' => 'custom-btn text-center green']) ?>
-        </div>
-    </div>
+    <?= StoryWidget::widget() ?>
 </div>

@@ -15,4 +15,9 @@ class StoryQuery extends \yii\db\ActiveQuery
     {
     	return $this->orderBy(['{{%story}}.sub_access' => SORT_DESC]);
     }
+
+    public function lastStories()
+    {
+    	return $this->orderBy(['{{%story}}.created_at' => SORT_DESC])->limit(8);
+    }
 }
