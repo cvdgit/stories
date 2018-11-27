@@ -23,8 +23,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="widget-search">
                         <h3 class="widget-title">Поиск</h3>
                         <?php $form = ActiveForm::begin(['action' => ['index'], 'method' => 'get']); ?>
-                        <?= $form->field($searchModel, 'title')->textInput(['placeholder' => 'Поиск...'])->label(false) ?>
-                        <?= Html::submitButton('<i class="fa fa-search"></i>') ?>
+                        <?= $form->field($searchModel, 'title', ['inputOptions' => ['class' => null]])->textInput(['placeholder' => 'Поиск...'])->label(false) ?>
+                        <?= Html::submitButton('<i class="fa fa-search"></i>', ['class' => null]) ?>
                         <?php ActiveForm::end(); ?>
                     </div>
                     <div class="widget-category">

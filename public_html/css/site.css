@@ -4357,3 +4357,12 @@ blockquote p {
   text-transform: uppercase;
   font-size: 12px;
 }
+.widget-search button {
+  padding: 0;
+  border: none;
+  top: 14px;
+  right: 15px;
+  position: absolute;
+  color: #878787;
+  background-color: transparent;
+}
