@@ -100,5 +100,12 @@ class StoryController extends \yii\web\Controller
         ]);
     }
 
+    public function actionWebhook($challenge)
+    {
+        $headers = Yii::$app->response->headers;
+        $headers->set('Content-Type', 'text/plain');
+        $headers->set('X-Content-Type-Options', 'nosniff');
+        return $challenge;
+    }
 
 }
