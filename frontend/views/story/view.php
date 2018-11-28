@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $model->title;
 					</div> -->
 					<!-- <div class="price">$9.99</div> -->
 					<div class="description">
-						<p><?= Html::encode($model->body) ?></p>
+						<p>Описание истории</p>
 					</div>
 					<ul>
 						<li>Категория: <?= Html::a($model->category->name, ['story/category', 'category' => $model->category->alias]) ?></li>
