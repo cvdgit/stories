@@ -21,7 +21,7 @@ class RevealWidget extends Widget
     {
         $view = $this->getView();
         $asset = RevealAsset::register($view);
-        $view->registerCssFile('/css/offline-v2.css');
+		$view->registerCssFile('/css/offline-v2.css');
         $js = <<< JS
 Reveal.initialize({
 	width: 1024,
@@ -48,7 +48,21 @@ Reveal.initialize({
     //]
 });
 JS;
-        $view->registerJs($js);
+		$view->registerJs($js);
+		
+		$js = <<< JS
+		Reveal.addEventListener( 'ready', function( event ) {
+			let btnFullscreen = '<div class="cst-fullscreen" style="z-index: 11; cursor: pointer; bottom: 30px; right: 70px; position: absolute;"><i class="fas fa-arrows-alt"></i></div>';
+			$('.slides').after(btnFullscreen);
+		});
+		$( document ).ready(function() {
+    		$(".cst-fullscreen").on("click", function() {
+				Reveal.triggerKey(70);
+			});
+		});
+JS;
+		$view->registerJs($js);
+
     }
 
 }
