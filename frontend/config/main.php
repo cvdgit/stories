@@ -44,6 +44,7 @@ return [
                 '' => 'site/index',
                 'contacts' => 'site/contact',
                 'pricing' => 'rate/index',
+                'captcha' => 'site/captcha',
                 'signup' => 'site/signup',
                 'login' => 'site/login',
                 'logout' => 'site/logout',

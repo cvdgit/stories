@@ -1045,7 +1045,7 @@ body .cart-modal .custom-btn:hover {
 .product:hover .images img {
   opacity: 0.5;
 }
-.product:hover .button-group {
+.product:hover .button-group, .product:hover .cst-stories-type {
   opacity: 1;
   visibility: visible;
 }
@@ -1064,13 +1064,13 @@ body .cart-modal .custom-btn:hover {
   width: 70px;
   height: 70px;
   padding: 0;
-  line-height: 70px;
+  line-height: 76px;
 }
 .product .button-group .custom-btn:not(:last-child) {
   margin-right: 10px;
 }
 .product .button-group .custom-btn i {
-  margin-left: 3px;
+  margin-left: 8px;
   font-size: 20px;
 }
 .product .info-product {
@@ -2240,7 +2240,7 @@ footer .widget-title {
 .six-column .product .button-group .custom-btn {
   width: 60px;
   height: 60px;
-  line-height: 60px;
+  line-height: 76px;
 }
 /* 08. Full Width
    ==================================== */
@@ -4356,4 +4356,47 @@ blockquote p {
   border: none;
   text-transform: uppercase;
   font-size: 12px;
+}
+.cst-search button {
+  padding: 0;
+  border: none;
+  top: 14px;
+  right: 15px;
+  position: absolute;
+  color: #878787;
+  background-color: transparent;
+}
+.cst-stories-type {
+  margin: 0 auto;
+  width: 102px;
+  margin-top: 12px;
+  line-height: 20px;
+  color: #e20b50;
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.2s linear;
+}
+.cst-p-grey {
+  color: #848484;
+}
+.cst-padding-0 {
+  padding-top: 0px !important; 
+}
+.cst-nav li {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+.cst-upload {
+  border: none;
+  padding: 15px 0px;
+}
+.cst-padding-20 {
+  padding-bottom: 20px;
+}
+.cst-none {
+  border: none !important;
+}
+.cst-mrg-lft-rgh-15 {
+  margin-right: 15px;
+  margin-left: 15px;
 }

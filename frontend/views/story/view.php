@@ -18,9 +18,9 @@ $this->params['breadcrumbs'][] = $model->title;
 				<iframe border="0" width="100%" height="500" style="border: 0 none" src="/story/viewbyframe/<?= $model->id ?>"></iframe>
 			</div>
 			<div class="col-md-5">
-				<div class="inside-single">
+				<div class="inside-single cst-padding-0">
 					<h4 class="title"><?= Html::encode($model->title) ?></h4>
-					<div class="star">
+					<!-- <div class="star">
 						<span>
 							<i class="fa fa-star"></i>
 							<i class="fa fa-star"></i>
@@ -29,10 +29,10 @@ $this->params['breadcrumbs'][] = $model->title;
 							<i class="fa fa-star"></i>
 						</span>
 						<a href="#">(4 customer reviews)</a>
-					</div>
-					<div class="price">$9.99</div>
+					</div> -->
+					<!-- <div class="price">$9.99</div> -->
 					<div class="description">
-						<p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.</p>
+						<p><?= Html::encode($model->body) ?></p>
 					</div>
 					<ul>
 						<li>Категория: <?= Html::a($model->category->name, ['story/category', 'category' => $model->category->alias]) ?></li>
@@ -41,18 +41,19 @@ $this->params['breadcrumbs'][] = $model->title;
 							<?= Html::a($tag->name, ['tag', 'tag' => $tag->name]) ?>
 						<?php endforeach ?>
 						</li>
-						<li>Share:
+						<!-- <li>Share:
 							<ul class="social-icon">
 								<li class="facebook"><a href="#"><i class="fab fa-facebook"></i></a></li>
 								<li class="google"><a href="#"><i class="fab fa-google-plus"></i></a></li>
 								<li class="tumblr"><a href="#"><i class="fab fa-tumblr"></i></a></li>
 								<li class="instagram"><a href="#"><i class="fab fa-instagram"></i></a></li>
 							</ul>
-						</li>
+						</li> -->
+						<li>Тип: <a href="#">Бесплатно</a></li>
 					</ul>
 				</div>
 			</div>
-			<div class="col-md-12">
+			<!-- <div class="col-md-12">
 				<ul class="nav nav-tabs text-center">
 					<li class="active"><a href="#description" data-toggle="tab" aria-expanded="true">Description</a></li>
 					<li><a href="#additional-info" data-toggle="tab">Additional Info</a></li>
@@ -99,7 +100,7 @@ $this->params['breadcrumbs'][] = $model->title;
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> -->
 		</div>
 	</div>
 </div>
