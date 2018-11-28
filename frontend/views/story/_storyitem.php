@@ -9,11 +9,14 @@ use yii\helpers\HtmlPurifier;
         <?php $img = empty($model->cover) ? 'http://via.placeholder.com/180x210' : $this->context->service->getCoverPath($model->cover, true); ?>
         <?= Html::a(Html::img($img), ['view', 'alias' => $model->alias]) ?>
         <div class="button-group">
-            <a href="#" class="custom-btn pink"><i class="fa fa-shopping-bag"></i></a>
-            <a href="#" class="custom-btn pink"><i class="fa fa-search"></i></a>
+            <a href="#" class="custom-btn pink"><i class="fa fa-play"></i></a>
+            <p class="cst-stories-type">Смотреть по подписке</p>
+            <!-- <p class="cst-stories-type">Смотреть бесплатно</p> -->
         </div>
     </div>
     <div class="info-product">
         <?= Html::a($model->title, ['view', 'alias' => $model->alias], ['class' => 'title']) ?>
+        <p class="cst-p-grey">Подписка</p>
+        <!-- <p class="cst-p-grey">Бесплатно</p> -->
     </div>
 </div>

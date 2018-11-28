@@ -20,7 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="row">
             <div class="col-md-3 col-sm-3 col-xs-12 col-3">
                 <aside class="sidebar-shop">
-                    <div class="widget-search">
+                    <div class="widget-search cst-search">
                         <h3 class="widget-title">Поиск</h3>
                         <?php $form = ActiveForm::begin(['action' => ['index'], 'method' => 'get']); ?>
                         <?= $form->field($searchModel, 'title', ['inputOptions' => ['class' => null]])->textInput(['placeholder' => 'Поиск...'])->label(false) ?>

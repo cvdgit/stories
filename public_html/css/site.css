@@ -1045,7 +1045,7 @@ body .cart-modal .custom-btn:hover {
 .product:hover .images img {
   opacity: 0.5;
 }
-.product:hover .button-group {
+.product:hover .button-group, .product:hover .cst-stories-type {
   opacity: 1;
   visibility: visible;
 }
@@ -1064,13 +1064,13 @@ body .cart-modal .custom-btn:hover {
   width: 70px;
   height: 70px;
   padding: 0;
-  line-height: 70px;
+  line-height: 76px;
 }
 .product .button-group .custom-btn:not(:last-child) {
   margin-right: 10px;
 }
 .product .button-group .custom-btn i {
-  margin-left: 3px;
+  margin-left: 8px;
   font-size: 20px;
 }
 .product .info-product {
@@ -2240,7 +2240,7 @@ footer .widget-title {
 .six-column .product .button-group .custom-btn {
   width: 60px;
   height: 60px;
-  line-height: 60px;
+  line-height: 76px;
 }
 /* 08. Full Width
    ==================================== */
@@ -4357,7 +4357,7 @@ blockquote p {
   text-transform: uppercase;
   font-size: 12px;
 }
-.widget-search button {
+.cst-search button {
   padding: 0;
   border: none;
   top: 14px;
@@ -4365,4 +4365,17 @@ blockquote p {
   position: absolute;
   color: #878787;
   background-color: transparent;
+}
+.cst-stories-type {
+  margin: 0 auto;
+  width: 102px;
+  margin-top: 12px;
+  line-height: 20px;
+  color: #e20b50;
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.2s linear;
+}
+.cst-p-grey {
+  color: #848484;
 }
