@@ -4379,3 +4379,24 @@ blockquote p {
 .cst-p-grey {
   color: #848484;
 }
+.cst-padding-0 {
+  padding-top: 0px !important; 
+}
+.cst-nav li {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+.cst-upload {
+  border: none;
+  padding: 15px 0px;
+}
+.cst-padding-20 {
+  padding-bottom: 20px;
+}
+.cst-none {
+  border: none !important;
+}
+.cst-mrg-lft-rgh-15 {
+  margin-right: 15px;
+  margin-left: 15px;
+}
