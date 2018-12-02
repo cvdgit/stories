@@ -13,10 +13,10 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
     <div class="container bootstrap snippet">
     <div class="row">
-  		<div class="col-sm-10"><h2 class="cst-padding-20"><?= $model->username ?></h2></div>
+        <div class="col-sm-10"><h2 class="cst-padding-20"><?= $model->username ?></h2></div>
     </div>
     <div class="row">
-  		<div class="col-sm-3"><!--left col-->
+        <div class="col-sm-3"><!--left col-->
               
 
       <div class="text-center">
@@ -26,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
       </div>           
           
         </div><!--/col-3-->
-    	<div class="col-sm-9">
+        <div class="col-sm-9">
             <ul class="nav nav-tabs cst-nav">
                 <li class="active"><a data-toggle="tab" href="#home">Основная инфомация</a></li>
                 <li><a data-toggle="tab" href="#messages">Моя подписка</a></li>
@@ -77,7 +77,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
              </div><!--/tab-pane-->
              <div class="tab-pane" id="settings">
-                <hr class="cst-none">	
+                <hr class="cst-none">   
                 <div class="widget-search">
                     <?php $form = ActiveForm::begin(['id' => 'login-form',
                         'fieldConfig' => [
@@ -113,4 +113,3 @@ $this->params['breadcrumbs'][] = $this->title;
         </div><!--/col-9-->
     </div><!--/row-->
 <!-- </div> -->
-

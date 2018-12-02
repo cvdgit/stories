@@ -43,7 +43,7 @@ return [
             'rules' => [
                 '' => 'site/index',
                 'contacts' => 'site/contact',
-                'pricing' => 'rate/index', //'site/pricing',
+                'pricing' => 'rate/index',
                 'captcha' => 'site/captcha',
                 'signup' => 'site/signup',
                 'login' => 'site/login',
