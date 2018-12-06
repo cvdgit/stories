@@ -1,7 +1,7 @@
 <?php
 namespace common\service;
 
-use Application as AppService;
+use common\service\Application as AppService;
 use common\models\Payment;
 use common\models\Rate;
 
@@ -84,6 +84,48 @@ class CustomerPayment {
         $post->user_id = $this->user_id;
         $post->rate_id = $rate_id;
         $post->save();
+    }
+
+    /**
+     * Добавление к подпискам данные оплаты
+     */
+    public function addPaymentData($rates)
+    {
+        $ratesWithPayment = [];
+        foreach($rates as $rate) {
+            $rate->setDataPayment(
+                $this->getDataPayment($rate->id, $rate->cost)
+            );
+        }
+        return $rates;
+    }
+
+    public function getLastPaymentUser($user)
+    {
+        $finish = $user->getPayments()->max('finish');
+        return $payment = Payment::findOne([
+            'user_id' => $user->id,
+            'finish' => $finish,
+        ]); 
+    }
+
+    public function dateFinishPayment($user) 
+    {
+        $finish = $this->userRateFinish($user);
+        $date_rate = null;
+        if ($finish) {
+            $date_rate = AppService::getDayCount($finish);
+        }
+        return $date_rate;
+    }
+
+    /**
+     * Получить дату окончания подписки пользователя
+     * TODO: метод модели User
+     */
+    private function userRateFinish($user)
+    {
+        return $user->getPayments()->max('finish');
     }
 
 }

@@ -26,6 +26,7 @@ class AppAsset extends AssetBundle
         'js/slick.min.js',
         'js/jquery.counterup.min.js',
         'js/jquery.waypoints.min.js',
+        'js/jquery.upload.preview.js',
     ];
     public $depends = [
         'yii\bootstrap\BootstrapAsset',

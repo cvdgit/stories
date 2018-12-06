@@ -43,11 +43,9 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
                             $menuItems[] = ['label' => 'Регистрация', 'url' => ['/site/signup']];
                         } else {
                             $menuItems[] = ['label' => 'Профиль', 'url' => ['/profile/index']];
-                            $menuItems[] = ['label' => '<li>'
-                                . Html::beginForm(['/site/logout'], 'post')
+                            $menuItems[] = ['label' => Html::beginForm(['/site/logout'], 'post')
                                 . Html::submitButton('Выход (' . Yii::$app->user->identity->username . ')', ['class' => 'cst-btn-a'])
-                                . Html::endForm()
-                                . '</li>'];
+                                . Html::endForm() ];
                         }
                         echo Menu::widget([
                             'encodeLabels' => false,
@@ -67,9 +65,9 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
                     <?php
                     $menuItems = [
                         ['label' => 'Главная', 'url' => ['/site/index']],
-                        ['label' => 'Контакты', 'url' => ['/site/contact']],
                         ['label' => 'Истории', 'url' => ['/story/index']],
                         ['label' => 'Подписки', 'url' => ['/rate/index']],
+                        ['label' => 'Контакты', 'url' => ['/site/contact']],
                     ];
                     echo Menu::widget([
                         'options' => ['class' => 'menu'],
@@ -98,9 +96,9 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
     $isHomePage = (($controller->id === $default_controller) && ($controller->action->id === $controller->defaultAction));
     ?>
     <?php if (isset($this->params['breadcrumbs']) && sizeof($this->params['breadcrumbs']) > 0): ?>
-    <div class="breadcrumb-top bg-yellow">
+    <div class="breadcrumb-top <?= ($isStoryViewPage ? '' : 'bg-yellow') ?>">
         <div class="container">
-            <h2><?= $this->title ?></h2>
+            <h2 <?= ($isStoryViewPage ? 'class="title"' : '') ?>><?= $this->title ?></h2>
             <?= Breadcrumbs::widget([
                 'tag' => 'ol',
                 'links' => $this->params['breadcrumbs'],
@@ -113,50 +111,24 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
     <footer class="bg-yellow">
         <div class="container">
             <div class="row">
-                <div class="col-md-12">
-                    <div class="subscribe text-center">
-                        <h2>Join our secret society</h2>
-                        <form>
-                            <div class="form-group">
-                                <input type="text" placeholder="Enter your email...">
-                                <div class="custom-btn bg-black text-yellow">enter</div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6 col-xs-12">
-                    <div class="widget-page">
-                        <h4 class="widget-title">Customer Care</h4>
-                        <a href="404.html">Register</a>
-                        <a href="404.html">My Account</a>
-                        <a href="404.html">Track Order</a>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6 col-xs-12">
-                    <div class="widget-page">
-                        <h4 class="widget-title">FAQ</h4>
-                        <a href="404.html">Ordering Info</a>
-                        <a href="404.html">Shipping &amp; Delivery</a>
-                        <a href="404.html">Our Guarantee</a>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6 col-xs-12">
-                    <div class="widget-page">
-                        <h4 class="widget-title">Our company</h4>
-                        <a href="404.html">About</a>
-                        <a href="blog.html">Press</a>
-                        <a href="single-product.html">Products</a>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="col-md-9 col-sm-6 col-xs-12">
                     <div class="widget-contact">
-                        <h4 class="widget-title">contact usy</h4>
-                        <address>123 6th St. Melbourne, FL 32904<br>Phone: (125) 546-4478<br>Email: yesorganic.com</address>
+                        <h4 class="widget-title">Wikids</h4>
+                        <address>Телефон: (125) 546-4478</address>
                     </div>
                 </div>
             </div>
-            <div class="copyright">
-                <p>Copyright &copy; 2018</p>
+            <div class="row">
+                <div class="col-md-9 col-sm-6 col-xs-12">
+                    <div class="widget-contact">
+                        <address>Email: yesorganic.com</address>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="widget-contact cst-copyright">
+                        <span>Copyright &copy; 2018</span>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="back-to-top"><i class="fa fa-angle-up"></i></div>

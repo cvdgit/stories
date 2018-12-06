@@ -398,7 +398,7 @@
     padding: 25px 0;
   }
   footer {
-    padding: 100px 0 30px 0;
+    padding: 30px 0 30px 0; /* 100px 0 30px 0 */
   }
   footer .col-md-3:nth-child(2n) {
     clear: both;
@@ -407,7 +407,7 @@
     margin-bottom: 30px;
   }
   .copyright {
-    padding-top: 60px;
+    padding-top: 0px; /* 60px */
   }
   /*=====  End of Home Page  ======*/
   /*===================================
@@ -681,7 +681,7 @@
     line-height: 24px;
   }
   footer {
-    padding: 50px 0 30px 0;
+    padding: 30px 0 30px 0; /* 50px 0 30px 0 */
   }
   .subscribe h2 {
     font-size: 32px;

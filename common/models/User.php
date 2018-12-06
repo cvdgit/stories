@@ -279,4 +279,19 @@ class User extends ActiveRecord implements IdentityInterface
         return !empty($this->activePayment);
     }
 
+    /**
+     * Finds the User model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return User the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function findModel($id)
+    {
+        if (($model = User::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('Страница не найдена.');
+    }
+
 }
