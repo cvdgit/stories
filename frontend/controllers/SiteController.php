@@ -251,5 +251,10 @@ class SiteController extends Controller
         return $this->goHome();
     }
 
+    public function actionPolicy()
+    {
+        return $this->render('policy');
+    }
+
 
 }

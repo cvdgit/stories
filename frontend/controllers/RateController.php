@@ -3,16 +3,14 @@
 namespace frontend\controllers;
 
 use Yii;
-use yii\filters\AccessControl;
 use common\models\Rate;
 use common\models\User;
 use common\service\CustomerPayment as PaymentService;
-use common\service\Application as AppService;
 
 class RateController extends \yii\web\Controller
 {
     
-    private $user_id = 1;
+    private $userId = 2;
     private $paymentService = null;
 
     public function __construct($id, $module, $config = [])
@@ -23,13 +21,10 @@ class RateController extends \yii\web\Controller
 
     public function actionIndex()
     {
-        $finish = $this->userRateFinish();
-        $date_rate = null;
-        if ($finish) {
-            $date_rate = AppService::getDayCount($finish);
-        }
+        $user = User::findModel($this->userId);
+        $date_rate = $this->paymentService->dateFinishPayment($user);
         $rates = Rate::find()->all();
-        $rates = $this->addPaymentData($rates);
+        $rates = $this->paymentService->addPaymentData($rates);
         return $this->render('index', [
             'rates' => $rates,
             'count_date_rate' => $date_rate,
@@ -50,30 +45,6 @@ class RateController extends \yii\web\Controller
     public function actionSuccess() 
     {
         $this->paymentService->success();
-    }
-
-    /**
-     * Добавление к подпискам данные оплаты
-     */
-    private function addPaymentData($rates)
-    {
-        $ratesWithPayment = [];
-        foreach($rates as $rate) {
-            $rate->setDataPayment(
-                $this->paymentService->getDataPayment($rate->id, $rate->cost)
-            );
-        }
-        return $rates;
-    }
-
-    /**
-     * Получить дату окончания подписки пользователя
-     * TODO: метод модели User
-     */
-    private function userRateFinish()
-    {
-        $user = User::findOne($this->user_id);
-        return $user->getPayments()->max('finish');
     }
 
 }

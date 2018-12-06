@@ -51,15 +51,16 @@ JS;
 		$view->registerJs($js);
 		
 		$js = <<< JS
-		Reveal.addEventListener( 'ready', function( event ) {
-			let btnFullscreen = '<div class="cst-fullscreen" style="z-index: 11; cursor: pointer; bottom: 30px; right: 70px; position: absolute;"><i class="fas fa-arrows-alt"></i></div>';
-			$('.slides').after(btnFullscreen);
-		});
-		$( document ).ready(function() {
-    		$(".cst-fullscreen").on("click", function() {
-				Reveal.triggerKey(70);
-			});
-		});
+		// Fullscreen
+		// Reveal.addEventListener( 'ready', function( event ) {
+		// 	let btnFullscreen = '<div class="cst-fullscreen" style="z-index: 11; cursor: pointer; bottom: 30px; right: 70px; position: absolute;"><i class="fas fa-arrows-alt"></i></div>';
+		// 	$('.slides').after(btnFullscreen);
+		// });
+		// $( document ).ready(function() {
+    	// 	$(".cst-fullscreen").on("click", function() {
+		// 		Reveal.triggerKey(70);
+		// 	});
+		// });
 JS;
 		$view->registerJs($js);
 

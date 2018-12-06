@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use common\services\StoryService;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $models Story[] */
@@ -23,17 +24,24 @@ use common\services\StoryService;
     <?php endif; ?>
         <div class="col-md-3 col-sm-6 col-xs-12">
             <div class="product">
-                <div class="images">
-                    <?php $img = empty($model->cover) ? 'http://via.placeholder.com/180x210' : $storyService->getCoverPath($model->cover, true); ?>
-                    <?= Html::a(Html::img($img), ['/story/view', 'alias' => $model->alias]) ?>
-                    <div class="button-group">
-                        <a href="cart.html" class="custom-btn pink"><i class="fa fa-shopping-bag"></i></a>
-                        <a href="#" class="custom-btn pink"><i class="fa fa-search"></i></a>
+                <a href="<?= Url::toRoute(['view', 'alias' => $model->alias]) ?>">
+                    <div class="images text-center">
+                        <?php $img = empty($model->cover) ? 'http://via.placeholder.com/180x210' : $storyService->getCoverPath($model->cover, true); ?>
+                        <?= Html::img($img) ?>
+                        <div class="button-group">
+                            <span class="custom-btn pink"><i class="fa fa-play"></i></span>
+                            <p class="cst-stories-type">Смотреть по подписке</p>
+                            <!-- <p class="cst-stories-type">Смотреть бесплатно</p> -->
+                        </div>
                     </div>
-                </div>
-                <div class="info-product">
-                    <?= Html::a($model->title, ['/story/view', 'alias' => $model->alias], ['class' => 'title']) ?>
-                </div>
+                </a>
+                <a href="<?= Url::toRoute(['view', 'alias' => $model->alias]) ?>">
+                    <div class="info-product">
+                        <?= Html::tag('p', Html::encode($model->title), ['class' => 'title']) ?>
+                        <p class="cst-p-grey">Подписка</p>
+                        <!-- <p class="cst-p-grey">Бесплатно</p> -->
+                    </div>
+                </a> 
             </div>
         </div>
     <?php $i++; ?>

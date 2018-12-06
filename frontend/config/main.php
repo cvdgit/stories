@@ -48,9 +48,11 @@ return [
                 'signup' => 'site/signup',
                 'login' => 'site/login',
                 'logout' => 'site/logout',
+                'policy' => 'site/policy',
                 'request-password-reset' => 'site/request-password-reset',
                 'signup-confirm' => 'site/signup-confirm',
                 'profile' => 'profile/index',
+                'change-password' => 'profile/change-password',
                 
                 'stories/tag/<tag:[\w]+>' => 'story/tag',
                 'stories/category/<category:[\w]+>' => 'story/category',
@@ -61,6 +63,7 @@ return [
                 'story/viewbyframe/<id:\d+>' => 'story/view-by-frame',
                 'success' => 'rate/success',
                 'fail' => 'rate/fail',
+                'file-avatar' => 'upload/file-avatar'
             ],
         ],
     ],

@@ -475,6 +475,48 @@ $(function() {
 		time: 2500
 	});
 
+	$(document).ready( function() {
+    $(".file-upload input[type=file]").change(function(){
+         var filename = $(this).val().replace(/.*\\/, "");
+				 $("#filename").val(filename);
+    });
+});
+
+$(document).ready(function() {
+// 	$('form').submit(function(e){
+// 		var formData = new FormData($('#form-upload')[0]);        
+// 		console.log('formData', formData);
+// 		e.preventDefault();
+		 
+// 		return false;
+// });     
+  $.uploadPreview({
+    input_field: "#image-upload",   // По умолчанию: .image-upload
+    preview_box: "#image-preview",  // По умолчанию: .image-preview
+    label_field: "#image-label",    // По умолчанию: .image-label
+    label_default: "Choose File",   // По умолчанию: Choose File
+    label_selected: "Change File",  // По умолчанию: Change File
+    no_label: false,                // По умолчанию: false
+    success_callback: function() {
+				var formData = new FormData($('#form-upload')[0]);
+				// console.log('formData', formData);    
+				$.ajax({
+						type: 'post',
+						url:'/file-avatar',
+						data: formData,
+						cache: false,
+						contentType: false,
+						processData: false,
+						success: function(data) {
+								
+						}
+				})  
+				return false;
+ 
+		}
+  });
+});
+
 });
 
 
