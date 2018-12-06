@@ -7,6 +7,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 use yii\helpers\ArrayHelper;
+use yii\db\Expression;
 
 /**
  * User model
@@ -34,6 +35,8 @@ class User extends ActiveRecord implements IdentityInterface
 
     const GROUP_ADMIN = 1;
     const GROUP_AUTHOR = 2;
+
+    public $active_payment;
 
     /**
      * {@inheritdoc}
@@ -76,6 +79,8 @@ class User extends ActiveRecord implements IdentityInterface
             'username' => 'Имя пользователя',
             'created_at' => 'Дата создания',
             'updated_at' => 'Дата изменения',
+            'status' => 'Статус',
+            'active_payment' => 'Подписка',
         ];
     }
 
@@ -241,9 +246,37 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->hasMany(Payment::className(), ['user_id' => 'id']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getActivePayment()
+    {
+        return $this->hasOne(Payment::className(), ['user_id' => 'id'])->where(['between', new Expression('NOW()'), new Expression('payment'), new Expression('finish')]);
+    }
+
     public static function getUserArray()
     {
         return ArrayHelper::map(self::find()->all(), 'id', 'username');
+    }
+
+    public static function getStatusArray()
+    {
+        return [
+            self::STATUS_DELETED => 'Удален',
+            self::STATUS_WAIT => 'Ожидание подтверждения',
+            self::STATUS_ACTIVE => 'Активен',
+        ];
+    }
+
+    public function getStatusText()
+    {
+        $arr = self::getStatusArray();
+        return $arr[$this->status];
+    }
+
+    public function haveSubscription()
+    {
+        return !empty($this->activePayment);
     }
 
 }

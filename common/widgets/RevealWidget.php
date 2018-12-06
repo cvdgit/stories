@@ -24,18 +24,21 @@ class RevealWidget extends Widget
         $view->registerCssFile('/css/offline-v2.css');
         $js = <<< JS
 Reveal.initialize({
-	width: 1024,
-	height: 576,
-	margin: 0.05,
+	width: '100%',
+	height: '100%',
+	transition: "none",
+	backgroundTransition: "slide",
+	center: true,
 	controls: true,
-	progress: true,
+	controlsLayout: 'bottom-right',
+	controlsBackArrows: 'faded',
+	progress: false,
 	history: false,
 	mouseWheel: false,
 	showNotes: true,
 	slideNumber: false,
-	autoSlide: 0 || 0,
+	autoSlide: false,
 	autoSlideStoppable: true,
-	center: false,
 	shuffle: false,
 	loop: false,
 	rtl: false

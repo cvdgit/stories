@@ -29,7 +29,6 @@ $this->params['breadcrumbs'][] = $this->title;
             'filter' => User::getUserArray(),
         ],
         [
-
             'attribute' => 'category_id',
             'value' => 'category.name',
             'filter' => Category::getCategoryArray(),
