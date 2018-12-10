@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use common\models\User;
 
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -14,8 +15,23 @@ $this->title = 'Пользователи';
     'columns' => [
         'id',
         'username',
+        'email:email',
         'created_at:datetime',
         'updated_at:datetime',
-        ['class' => 'yii\grid\ActionColumn'],
+        [
+            'attribute' => 'status',
+            'value' => function($model) {
+                return $model->getStatusText();
+            },
+            'filter' => User::getStatusArray(),
+        ],
+        [
+            'attribute' => 'active_payment',
+            'value' => 'activePayment.rate.title',
+        ],
+        [
+        	'class' => 'yii\grid\ActionColumn',
+        	'template' => '{update} {delete}',
+        ],
     ],
 ]) ?>

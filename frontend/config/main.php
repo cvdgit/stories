@@ -63,7 +63,7 @@ return [
                 'story/viewbyframe/<id:\d+>' => 'story/view-by-frame',
                 'success' => 'rate/success',
                 'fail' => 'rate/fail',
-                'file-avatar' => 'upload/file-avatar'
+                'file-avatar' => 'upload/file-avatar',
             ],
         ],
     ],

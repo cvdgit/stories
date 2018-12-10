@@ -21,20 +21,20 @@ class ProfileController extends \yii\web\Controller
         parent::__construct($id, $module, $config);
     }
 
-	public function behaviors()
-	{
-	    return [
-	        'access' => [
-	            'class' => AccessControl::className(),
-	            'rules' => [
-	                [
-	                    'allow' => true,
-	                    'roles' => ['author'],
-	                ],
-	            ],
-	        ],
-	    ];
-	}
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['author'],
+                    ],
+                ],
+            ],
+        ];
+    }
 
     public function actionIndex()
     {

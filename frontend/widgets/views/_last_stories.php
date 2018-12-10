@@ -24,7 +24,7 @@ use yii\helpers\Url;
     <?php endif; ?>
         <div class="col-md-3 col-sm-6 col-xs-12">
             <div class="product">
-                <a href="<?= Url::toRoute(['view', 'alias' => $model->alias]) ?>">
+                <a href="<?= Url::toRoute(['/story/view', 'alias' => $model->alias]) ?>">
                     <div class="images text-center">
                         <?php $img = empty($model->cover) ? 'http://via.placeholder.com/180x210' : $storyService->getCoverPath($model->cover, true); ?>
                         <?= Html::img($img) ?>
@@ -35,7 +35,7 @@ use yii\helpers\Url;
                         </div>
                     </div>
                 </a>
-                <a href="<?= Url::toRoute(['view', 'alias' => $model->alias]) ?>">
+                <a href="<?= Url::toRoute(['/story/view', 'alias' => $model->alias]) ?>">
                     <div class="info-product">
                         <?= Html::tag('p', Html::encode($model->title), ['class' => 'title']) ?>
                         <p class="cst-p-grey">Подписка</p>

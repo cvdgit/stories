@@ -236,7 +236,7 @@ $(function() {
 		if(current < 0) {
 			current = count;
 		}
-		if(current > count) {
+		if(current > count) {
 			current = 0;
 		}
 
