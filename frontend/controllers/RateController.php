@@ -10,12 +10,13 @@ use common\service\CustomerPayment as PaymentService;
 class RateController extends \yii\web\Controller
 {
     
-    private $userId = 2;
+    private $userId;
     private $paymentService = null;
 
     public function __construct($id, $module, $config = [])
     {
         $this->paymentService = new PaymentService();
+        $this->userId = Yii::$app->user->id;
         parent::__construct($id, $module, $config);
     }
 
