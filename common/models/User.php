@@ -291,7 +291,7 @@ class User extends ActiveRecord implements IdentityInterface
         if (($model = User::findOne($id)) !== null) {
             return $model;
         }
-        throw new NotFoundHttpException('Страница не найдена.');
+        return null;
     }
 
 }
