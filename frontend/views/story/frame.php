@@ -28,9 +28,11 @@ use common\widgets\RevealWidget;
     <?php $this->head() ?>
 </head>
 <body class="reveal-viewport theme-font-montserrat">
-<?php $this->beginBody() ?>
-<?= RevealWidget::widget(['data' => $model->body]) ?>
-<?php $this->endBody() ?>
+<?php if ($model): ?>
+    <?php $this->beginBody() ?>
+        <?= RevealWidget::widget(['data' => $model->body]) ?>
+    <?php $this->endBody() ?>
+<?php endif ?>
 </body>
 </html>
 <?php $this->endPage() ?>

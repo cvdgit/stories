@@ -4360,6 +4360,10 @@ blockquote p {
   text-transform: lowercase;
   margin: 0 10px;
 }
+.customers a.cst-btn {
+  color: #333;
+  cursor: pointer;
+}
 .cst-btn-a {
   color: white;
   background: none;

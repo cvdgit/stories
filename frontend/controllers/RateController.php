@@ -30,6 +30,7 @@ class RateController extends \yii\web\Controller
         $rates = Rate::find()->all();
         $rates = $this->paymentService->addPaymentData($rates);
         return $this->render('index', [
+            'user' => $user,
             'rates' => $rates,
             'count_date_rate' => $date_rate,
         ]);

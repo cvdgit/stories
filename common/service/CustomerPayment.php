@@ -1,9 +1,11 @@
 <?php
 namespace common\service;
 
-use common\service\Application as AppService;
-use common\models\Payment;
+use Yii;
+use common\models\User;
 use common\models\Rate;
+use common\models\Payment;
+use common\service\Application as AppService;
 
 class CustomerPayment {
  
@@ -117,6 +119,20 @@ class CustomerPayment {
             $date_rate = AppService::getDayCount($finish);
         }
         return $date_rate;
+    }
+
+    public function availableRate($model)
+    {
+        if (!$model->sub_access) {
+            return true;
+        }
+        $user = User::findModel(Yii::$app->user->id);
+        $availableRate = false;
+        if (isset($user)) {
+            $dateFinish = $this->dateFinishPayment($user);
+            $availableRate = ($dateFinish >= 0 && !is_null($dateFinish));
+        }
+        return $availableRate;
     }
 
     /**
