@@ -15,7 +15,14 @@ $this->params['breadcrumbs'][] = $model->title;
 	<div class="container">
 		<div class="row">
 			<div class="col-md-7" style="height: 100%; min-height: 100%">
+			<?php if ($availableRate): ?>
 				<iframe border="0" width="100%" height="500" style="border: 0 none" src="/story/viewbyframe/<?= $model->id ?>"></iframe>
+			<?php else: ?>
+				<div class="info-title">
+					<p>Преобретите <?= Html::a('подписку', ['/pricing']) ?> 
+						для просмотра всех историй</p>
+				</div>
+			<?php endif ?>
 			</div>
 			<div class="col-md-5">
 				<div class="inside-single cst-padding-0">
@@ -49,7 +56,7 @@ $this->params['breadcrumbs'][] = $model->title;
 								<li class="instagram"><a href="#"><i class="fab fa-instagram"></i></a></li>
 							</ul>
 						</li> -->
-						<li>Тип: <a href="#">Бесплатно</a></li>
+						<li>Тип: <a href="#"><?= ($model->sub_access) ? 'Подписка' : 'Бесплатно' ?></a></li>
 					</ul>
 				</div>
 			</div>

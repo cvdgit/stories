@@ -30,16 +30,16 @@ use yii\helpers\Url;
                         <?= Html::img($img) ?>
                         <div class="button-group">
                             <span class="custom-btn pink"><i class="fa fa-play"></i></span>
-                            <p class="cst-stories-type">Смотреть по подписке</p>
-                            <!-- <p class="cst-stories-type">Смотреть бесплатно</p> -->
+                            <p class="cst-stories-type">
+                                <?= ($model->sub_access) ? 'Смотреть по подписке' : 'Смотреть бесплатно' ?>
+                            </p>
                         </div>
                     </div>
                 </a>
                 <a href="<?= Url::toRoute(['/story/view', 'alias' => $model->alias]) ?>">
                     <div class="info-product">
                         <?= Html::tag('p', Html::encode($model->title), ['class' => 'title']) ?>
-                        <p class="cst-p-grey">Подписка</p>
-                        <!-- <p class="cst-p-grey">Бесплатно</p> -->
+                        <p class="cst-p-grey"><?= ($model->sub_access) ? 'Подписка' : 'Бесплатно' ?></p>
                     </div>
                 </a> 
             </div>

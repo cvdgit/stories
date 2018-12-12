@@ -9,21 +9,24 @@ use common\models\Tag;
 use common\models\Category;
 use yii\web\NotFoundHttpException;
 use common\services\StoryService;
+use common\service\CustomerPayment as PaymentService;
 
 class StoryController extends \yii\web\Controller
 {
 
     public $service;
+    private $paymentService = null;
 
     public function __construct($id, $module, StoryService $service, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->service = $service;
+        $this->paymentService = new PaymentService();
     }
 
     public function actionIndex()
     {
-    	$searchModel = new StorySearch();
+        $searchModel = new StorySearch();
         $searchModel->scenario = StorySearch::SCENARIO_FRONTEND;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('index', [
@@ -40,8 +43,11 @@ class StoryController extends \yii\web\Controller
      */
     public function actionView($alias)
     {
+        $model = $this->findModelByAlias($alias);
+        $availableRate = $this->paymentService->availableRate($model);
         return $this->render('view', [
             'model' => $this->findModelByAlias($alias),
+            'availableRate' => $availableRate,
         ]);
     }
 
@@ -70,7 +76,8 @@ class StoryController extends \yii\web\Controller
 
     public function actionViewByFrame($id)
     {
-        return $this->renderPartial('frame', ['model' => $this->findModel($id)]);
+        $model = ($this->paymentService->availableRate($this->findModel($id))) ? $this->findModel($id) : null;
+        return $this->renderPartial('frame', ['model' => $model]);
     }
 
 

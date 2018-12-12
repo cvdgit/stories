@@ -31,7 +31,11 @@ $this->params['breadcrumbs'][] = $this->title;
                             <input type=hidden name=Shp_item value='<?= $rate->id ?>'>
                             <input type=hidden name=IncCurrLabel value='<?= $rate->dataPayment['IncCurrLabel'] ?>'>
                             <input type=hidden name=Culture value='<?= $rate->dataPayment['Culture'] ?>'>
-                            <input type=submit value='<?= isset($count_date_rate) ? "Продлить" : "Купить"?>' class="cst-btn text-center white">
+                            <?php if(isset($user)): ?>
+                                <input type=submit value='<?= isset($count_date_rate) ? "Продлить" : "Купить"?>' class="cst-btn text-center white">
+                            <?php else: ?>
+                                <?= Html::a('Купить', ['/signup'], ['class' => 'cst-btn']) ?>
+                            <?php endif ?>
                         </form>
 
                     <div class="inside-inside">

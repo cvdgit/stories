@@ -10,22 +10,27 @@ use common\service\CustomerPayment as PaymentService;
 class RateController extends \yii\web\Controller
 {
     
-    private $userId = 2;
+    private $userId;
     private $paymentService = null;
 
     public function __construct($id, $module, $config = [])
     {
         $this->paymentService = new PaymentService();
+        $this->userId = Yii::$app->user->id;
         parent::__construct($id, $module, $config);
     }
 
     public function actionIndex()
     {
+        $date_rate = null;
         $user = User::findModel($this->userId);
-        $date_rate = $this->paymentService->dateFinishPayment($user);
+        if (isset($user)) {
+            $date_rate = $this->paymentService->dateFinishPayment($user);
+        }
         $rates = Rate::find()->all();
         $rates = $this->paymentService->addPaymentData($rates);
         return $this->render('index', [
+            'user' => $user,
             'rates' => $rates,
             'count_date_rate' => $date_rate,
         ]);

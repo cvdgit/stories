@@ -104,8 +104,10 @@ $session->remove('password-message');
                 <div class="cst-margin-left-20">
                     <hr class="cst-none">   
                     <?php if (isset($passwordMessage)): ?>
-                        <div class="alert alert-primary cst-alert" role="alert">
-                            <?= $passwordMessage ?>
+                        <div class="row">
+                            <div class="alert alert-primary cst-alert col-xs-6" role="alert">
+                                <?= $passwordMessage ?>
+                            </div>
                         </div>
                     <?php endif ?>
 
@@ -118,16 +120,8 @@ $session->remove('password-message');
                             ]
                         ]); ?>
                             <div class="col-xs-6">
-                                <div class="el-container">
-                                    <label class="widget-title" for="user-password">Пароль</label>
-                                    <input type="password" id="user-password" name="password" placeholder="Пароль" autofocus="true">
-                                    <p class="help-block help-block-error"></p>
-                                </div>
-                                <div class="el-container">
-                                    <label class="widget-title" for="user-password-repeat">Повторить пароль</label>
-                                    <input type="password" id="user-password-repeat" name="password-repeat" placeholder="Повторить пароль">
-                                    <p class="help-block help-block-error"></p>
-                                </div>
+                                <?= $form->field($modelPassword, 'password', ['inputOptions' => ['placeholder' => 'Пароль']])->passwordInput(['autofocus' => true]) ?>
+                                <?= $form->field($modelPassword, 'passwordRepeat', ['inputOptions' => ['placeholder' => 'Повторить пароль']])->passwordInput() ?>
                             </div>
                             <div class="form-group col-xs-12">
                                 <?= Html::submitButton('Изменить', ['class' => 'custom-btn form-btn cst-btn-mini', 'name' => 'save-button']) ?>  
