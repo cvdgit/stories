@@ -34,6 +34,20 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
             <div class="container-large">
                 <div class="row">
                     <div class="col-md-6 col-sm-6 col-xs-12 text-left">
+                        <?php if ($isStoryViewPage): ?>
+                        <?php
+                        $menuItems = [
+                            ['label' => 'Главная', 'url' => ['/site/index']],
+                            ['label' => 'Истории', 'url' => ['/story/index']],
+                            ['label' => 'Подписки', 'url' => ['/rate/index']],
+                            ['label' => 'Контакты', 'url' => ['/site/contact']],
+                        ];
+                        echo Menu::widget([
+                            'encodeLabels' => false,
+                            'items' => $menuItems,
+                        ]);
+                        ?>
+                        <?php endif ?>
                     </div>
                     <div class="col-md-6 col-sm-6 col-xs-12 text-right">
                         <?php
@@ -56,6 +70,7 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
                 </div>
             </div>
         </div>
+        <?php if (!$isStoryViewPage): ?>
         <div class="container-large header">
             <div class="row">
                 <div class="col-md-2 col-sm-3 col-xs-3 text-center">
@@ -89,12 +104,14 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
                 <span class="close"><img src="/images/close2.png" alt="close"></span>
             </form>
         </div>
+        <?php endif ?>
     </header>
     <?php
     $controller = Yii::$app->controller;
     $default_controller = Yii::$app->defaultRoute;
     $isHomePage = (($controller->id === $default_controller) && ($controller->action->id === $controller->defaultAction));
     ?>
+    <?php if (!$isStoryViewPage): ?>
     <?php if (isset($this->params['breadcrumbs']) && sizeof($this->params['breadcrumbs']) > 0): ?>
     <div class="breadcrumb-top <?= ($isStoryViewPage ? '' : 'bg-yellow') ?>">
         <div class="container">
@@ -105,6 +122,7 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
             ]) ?>
         </div>
     </div>
+    <?php endif ?>
     <?php endif ?>
     <!-- < ?= Alert::widget() ?> -->
     <?= $content ?>
