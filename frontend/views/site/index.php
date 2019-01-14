@@ -93,13 +93,16 @@ $css = <<< CSS
     margin-bottom: 2em;
     font-size: 1em;
 }
+h2 {
+    text-transform: none !important;
+}
 CSS;
 
 $this->registerCss($css);
 ?>
 
 <div class="container-fluid">
-    <div class="big-banner" style="background: url(/images/wikids-main.jpg) no-repeat center">
+    <div class="big-banner" style="background: url(/images/wikids-main.jpg) no-repeat center;margin-bottom: 40px">
         <div class="row">
             <div class="col-md-6 col-sm-12" style="display: block">
                 <div class="text">
@@ -128,6 +131,32 @@ $this->registerCss($css);
     </div>
 </div>
 
+<div class="container-large">
+    <article class="post gallery-post" style="margin-bottom: 0px">
+        <div class="entry-content">
+            <div class="title-head">
+                <h2 class="text-black">О портале</h2>
+            </div>
+            <p>Чем лучше человек разговаривает, тем более он успешен в жизни.</p>
+            <p>Надо объяснить любимой девушке, что именно ты – самый лучший.<br>
+Надо донести до начальников, что именно тебе надо доверить самую сложную и дорогую работу.<br>
+Надо объяснить своим коллегам по работе, что они должны сделать, ради общего дела.<br>
+Надо найти добрые слова для своих друзей и быть желанным в любой компании.</p>
+            <p>Если нашёл слова – то у тебя девушка есть, высокая зарплата, интересная работа и друзья.</p>
+            <p>Подарите всё это своим детям. Научите их говорить.<br>
+Чем раньше начнёте – тем лучше.<br>
+Это может сделать только родитель.<br>
+Телевизору такое не под силу.</p>
+            <p>Наш портал – для достижения этого успеха.</p>
+            <p>Лучше сейчас уделить своему маленькому умнице час перед сном, чем потом тратить деньги на репетиторов.<br>
+Да и не помогут репетиторы. Сами знаете.
+</p>
+            <p>Заниматься с детьми можно в формате – сказка на ночь. Не с целью усыпить детей, а с целью научить их русской речи.<br>
+Скоро Вы заметите, как они начнут разговаривать теми словами, которые Вы донесли до них через сказки. И тогда Вы почувствуете, что реально открываете им дорогу в будущее.<br>
+Успехов Вам и Вашим детишкам!</p>
+        </div>
+    </article>
+</div>
 
 <div class="container-large">
     <?= StoryWidget::widget() ?>
