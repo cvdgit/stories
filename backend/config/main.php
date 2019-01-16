@@ -53,8 +53,8 @@ return [
         ],
         'dropbox' => [
             'class' => 'creocoder\flysystem\DropboxFilesystem',
-            'token' => 'HWGl_co7zM0AAAAAAAAV2M32XjJzEEuO9ZlevhhPNS6S6PUyxAqod15bQvonlZfl',
-            'app' => 'cvd-slides-app',
+            'token' => 'DSo_oETVRJAAAAAAAAAAD3wNjPsT23MVVpNW5gyOXj5m8WaQ_bihi0ODas2bXgYe',
+            'app' => 'cvd-slides-app2',
         ],
     ],
     'params' => $params,
