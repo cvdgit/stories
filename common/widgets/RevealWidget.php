@@ -24,9 +24,14 @@ class RevealWidget extends Widget
         $view->registerCssFile('/css/offline-v2.css');
         $js = <<< JS
 Reveal.initialize({
-	width: '100%',
-	height: '100%',
-	margin: 0.05,
+	width: 1920,
+	height: 1080,
+
+	// Bounds for smallest/largest possible scale to apply to content
+	//minScale: 1.0,
+	//maxScale: 0.6,
+
+	margin: 0,
 	transition: "none",
 	backgroundTransition: "slide",
 	center: true,
