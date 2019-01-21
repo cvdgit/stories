@@ -55,7 +55,7 @@ return [
                 'change-password' => 'profile/change-password',
                 
                 'stories/tag/<tag:[\w]+>' => 'story/tag',
-                'stories/category/<category:[\w]+>' => 'story/category',
+                'stories/category/<category:[\w\-]+>' => 'story/category',
                 'stories' => 'story/index',
 
                 'story/webhook' => 'story/webhook',
