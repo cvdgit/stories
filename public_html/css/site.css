@@ -2393,10 +2393,10 @@ footer .widget-title {
 .widget-category li {
   margin-bottom: 25px;
 }
-.widget-category li:hover a {
+.widget-category li a:hover {
   color: #e20b50;
 }
-.widget-category .active a {
+.widget-category .active > a {
   color: #e20b50;
 }
 .widget-category span {

@@ -32,6 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         <?php
                         echo Menu::widget([
                             'items' => Category::getCategoriesForMenu(),
+                            'submenuTemplate' => "\n<ul class=\"wk-submenu\">\n{items}\n</ul>\n",
                         ]);
                         ?>
                     </div>
@@ -52,6 +53,15 @@ $this->params['breadcrumbs'][] = $this->title;
 }
 .pagination li a {
     border-radius: 100% !important;
+}
+.widget-category li {
+    margin-bottom: 10px !important;
+}
+.wk-submenu {
+    margin-top: 10px;
+}
+.wk-submenu li {
+    padding-left: 20px;
 }
 CSS;
             $this->registerCss($css);

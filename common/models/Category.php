@@ -36,7 +36,11 @@ class Category extends \yii\db\ActiveRecord
         return [
             'tree' => [
                 'class' => NestedSetsBehavior::className(),
+                'treeAttribute' => 'tree',
             ],
+            //'htmlTree'=>[
+            //    'class' => \common\components\NestedSetsTreeBehavior::className()
+            //]
         ];
     }
 
@@ -109,19 +113,28 @@ class Category extends \yii\db\ActiveRecord
 
     public static function getCategoriesForMenu()
     {
+
         $categories = self::find()
             ->andWhere(['depth' => 1])
             ->addOrderBy('lft')
-            ->asArray()
             ->all();
         $menuItems = [
             ['label' => 'Все категории', 'url' => ['/story/index'], 'options' => ['class' => 'widget-category-hover']],
         ];
         foreach ($categories as $category)
         {
-            $menuItems[] = ['label' => $category['name'], 'url' => ['/story/category', 'category' => $category['alias']], 'options' => ['class' => 'widget-category-hover']];
+            $menuItem = ['label' => $category->name, 'url' => ['/story/category', 'category' => $category->alias], 'options' => ['class' => 'widget-category-hover']];
+            $subs = $category->children()->all();
+            $subMenuItems = [];
+            foreach ($subs as $sub) {
+                $subMenuItems[] = ['label' => $sub->name, 'url' => ['/story/category', 'category' => $sub->alias], 'options' => ['class' => 'widget-category-hover wk-sub-category']];
+            }
+            $menuItem['items'] = $subMenuItems;
+            $menuItems[] = $menuItem;
         }
         return $menuItems;
     }
+
+
 
 }
