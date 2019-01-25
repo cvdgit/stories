@@ -27,7 +27,8 @@
         "2amigos/yii2-selectize-widget": "~1.0",
         "creocoder/yii2-nested-sets": "^0.9.0",
         "bower-asset/font-awesome": "^5.5",
-        "2amigos/yii2-date-picker-widget": "~1.0"
+        "2amigos/yii2-date-picker-widget": "~1.0",
+        "phpoffice/phppresentation": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

@@ -5,6 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\Story */
 /* @var $coverUploadForm backend\models\StoryCoverUploadForm */
+/* @var $fileUploadForm backend\models\StoryFileUploadForm */
 
 $this->title = 'История: ' . $model->title;
 $this->params['breadcrumbs'][] = ['label' => 'Истории', 'url' => ['index']];
@@ -23,6 +24,7 @@ $this->params['sidebarMenuItems'] = [
 		<?= $this->render('_form', [
 		    'model' => $model,
 		    'coverUploadForm' => $coverUploadForm,
+		    'fileUploadForm' => $fileUploadForm,
 		]) ?>
 	</div>
 	<div class="col-xs-6"></div>

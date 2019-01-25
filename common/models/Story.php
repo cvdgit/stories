@@ -23,6 +23,7 @@ use yii\db\Expression;
  * @property int $sub_access
  * @property int $dropbox_sync_date
  * @property string $dropbox_story_filename
+ * @property string $story_file
  *
  * @property User $author
  * @property Tags $tags
@@ -67,7 +68,7 @@ class Story extends \yii\db\ActiveRecord
     {
         return [
             [['title', 'alias', 'user_id', 'category_id'], 'required'],
-            [['body', 'cover'], 'string'],
+            [['body', 'cover', 'story_file'], 'string'],
             [['created_at', 'updated_at', 'user_id', 'category_id', 'sub_access', 'dropbox_sync_date'], 'integer'],
             [['title', 'alias', 'dropbox_story_filename'], 'string', 'max' => 255],
             [['alias'], 'unique'],
@@ -99,6 +100,7 @@ class Story extends \yii\db\ActiveRecord
             'dropbox_sync_date' => 'Синхронизация с Dropbox',
             'dropbox_story_filename' => 'Файл в Dropbox',
             'cover' => 'Обложка',
+            'story_file' => 'Файл PowerPoint',
         ];
     }
 

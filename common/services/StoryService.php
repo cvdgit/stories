@@ -8,16 +8,23 @@ class StoryService
 {
 
 	protected $dropboxSerivce;
+    protected $powerPointService;
 
 	public function __construct()
 	{
 		$this->dropboxSerivce = new StoryDropboxService();
+        $this->powerPointService = new StoryPowerPointService();
 	}
 
 	public function getDropboxSerivce()
 	{
 		return $this->dropboxSerivce;
 	}
+
+    public function getPowerPointSerivce()
+    {
+        return $this->powerPointService;
+    }
 
     public function getCoverPath($cover, $web = false)
     {

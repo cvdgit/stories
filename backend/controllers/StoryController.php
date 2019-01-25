@@ -6,6 +6,7 @@ use Yii;
 use common\models\Story;
 use common\models\StorySearch;
 use backend\models\StoryCoverUploadForm;
+use backend\models\StoryFileUploadForm;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use common\services\StoryService;
@@ -50,6 +51,7 @@ class StoryController extends \yii\web\Controller
     {
         $model = new Story();
         $coverUploadForm = new StoryCoverUploadForm();
+        $fileUploadForm = new StoryFileUploadForm();
         
         if ($model->load(Yii::$app->request->post())) {
             
@@ -63,6 +65,16 @@ class StoryController extends \yii\web\Controller
                 }
             }
 
+            $fileUploadForm->storyFile = UploadedFile::getInstance($fileUploadForm, 'storyFile');
+            if ($fileUploadForm->storyFile !== null) {
+                if ($fileUploadForm->upload()) {
+                    $model->story_file = $fileUploadForm->storyFile;
+                }
+                else {
+                    print_r($fileUploadForm->getErrors());
+                }
+            }
+
             $model->save();
             return $this->redirect(['update', 'id' => $model->id]);
         }
@@ -70,6 +82,7 @@ class StoryController extends \yii\web\Controller
         return $this->render('create', [
             'model' => $model,
             'coverUploadForm' => $coverUploadForm,
+            'fileUploadForm' => $fileUploadForm,
         ]);
     }
 
@@ -95,10 +108,11 @@ class StoryController extends \yii\web\Controller
     {
         $model = $this->findModel($id);
         $coverUploadForm = new StoryCoverUploadForm();
+        $fileUploadForm = new StoryFileUploadForm();
 
-        if (!$model->isDropboxSync()) {
-            Yii::$app->session->setFlash('warning', 'Необходимо синхронизировать историю с dropbox');
-        }
+        //if (!$model->isDropboxSync()) {
+        //    Yii::$app->session->setFlash('warning', 'Необходимо синхронизировать историю с dropbox');
+        //}
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -112,6 +126,16 @@ class StoryController extends \yii\web\Controller
                 }
             }
 
+            $fileUploadForm->storyFile = UploadedFile::getInstance($fileUploadForm, 'storyFile');
+            if ($fileUploadForm->storyFile !== null) {
+                if ($fileUploadForm->upload()) {
+                    $model->story_file = $fileUploadForm->storyFile;
+                }
+                else {
+                    print_r($fileUploadForm->getErrors());
+                }
+            }
+
             $model->save();
             Yii::$app->session->setFlash('success', 'Изменения успешно сохранены');
         }
@@ -119,6 +143,7 @@ class StoryController extends \yii\web\Controller
         return $this->render('update', [
             'model' => $model,
             'coverUploadForm' => $coverUploadForm,
+            'fileUploadForm' => $fileUploadForm,
         ]);
     }
 
@@ -154,28 +179,22 @@ class StoryController extends \yii\web\Controller
     public function actionGetfromdropbox($id)
     {
         $story = $this->findModel($id);
-        
-        $result = ['success' => '', 'error' => ''];
+
         if (empty($story->dropbox_story_filename)) {
-            $result['error'] = 'Необходимо указать имя файла в Dropbox';
-            Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            return $this->asJson($result);
+            return $this->sendErrorResponse('Необходимо указать имя файла в Dropbox');
         }
         
+        $dropboxSerivce = $this->service->getDropboxSerivce();
         try {
-            $dropboxSerivce = $this->service->getDropboxSerivce();
             $dropboxSerivce->exportSlideImagesFromDropBox($story->dropbox_story_filename);
             $body = $dropboxSerivce->exportSlideBodyFromDropBox($story->dropbox_story_filename);
             $story->syncWithDropbox($body);
             $story->save(false, ['body', 'dropbox_sync_date']);
-            $result['success'] = 'Успешно';
+            return $this->sendSuccessResponse('Успешно');
         }
         catch (Exception $ex) {
-            $result['error'] = $ex->getMessage();
+            return $this->sendErrorResponse($ex->getMessage());
         }
-
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        return $this->asJson($result);
     }
 
     public function actionImages($id)
@@ -185,6 +204,42 @@ class StoryController extends \yii\web\Controller
             'model' => $model,
             'images' => $this->service->getStoryImages($model->dropbox_story_filename),
         ]);
+    }
+
+    public function actionCreatefrompowerpoint($id)
+    {
+        $story = $this->findModel($id);
+
+        if (empty($story->story_file)) {
+            return $this->sendErrorResponse('Необходимо загрузить файл PowerPoint');
+        }
+
+        $service = $this->service->getPowerPointSerivce();
+        try {
+            $body = $service->createStoryFromPowerPoint($story->story_file);
+            $story->body = $body;
+            $story->save(false, ['body']);
+            return $this->sendSuccessResponse('Успешно');
+        }
+        catch (Exception $ex) {
+            return $this->sendErrorResponse($ex->getMessage());
+        }
+    }
+
+    protected function jsonResponse($result)
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        return $this->asJson($result);
+    }
+
+    protected function sendSuccessResponse($response)
+    {
+        return $this->jsonResponse(['success' => $response, 'error' => '']);
+    }
+
+    protected function sendErrorResponse($response)
+    {
+        return $this->jsonResponse(['success' => '', 'error' => $response]);
     }
 
 }
