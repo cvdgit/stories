@@ -1,0 +1,40 @@
+.customcontrols {
+    position: fixed;
+    top: auto;
+    bottom: 12px;
+    right: 12px;
+    left: auto;
+    z-index: 9999;
+    pointer-events: none;
+    font-size: 10px;
+}
+
+.customcontrols button {
+    position: 1absolute;
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    outline: 0;
+    cursor: pointer;
+    color: white;
+    z-index: 99999;
+    pointer-events: auto;
+}
+
+.customcontrols .custom-navigate-left {
+
+}
+
+.customcontrols .custom-navigate-right {
+
+}
+
+.customcontrols .custom-controls-arrow {
+	position: relative;
+    width: 1.6em;
+    height: 1.6em;
+}
+
+.customcontrols .custom-navigate-right .custom-controls-arrow {
+
+}

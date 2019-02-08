@@ -2669,13 +2669,13 @@ footer .widget-title {
 .single-product .inside-single ul li {
   font-size: 18px;
   color: #1e1e1e;
-  font-family: 'BrandonMedium', serif;
+  /* font-family: 'BrandonMedium', serif; */
   margin-bottom: 16px;
 }
 .single-product .inside-single ul li a {
   color: #777;
   display: inline-block;
-  font-family: 'BrandonMedium', serif;
+  /* font-family: 'BrandonMedium', serif; */
   margin: 0 3px;
 }
 .single-product .inside-single ul li span {

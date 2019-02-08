@@ -20,44 +20,7 @@ class RevealWidget extends Widget
     public function registerClientScript()
     {
         $view = $this->getView();
-        $asset = RevealAsset::register($view);
-        $view->registerCssFile('/css/offline-v2.css');
-        $js = <<< JS
-Reveal.initialize({
-	width: 1920,
-	height: 1080,
-
-	// Bounds for smallest/largest possible scale to apply to content
-	//minScale: 1.0,
-	//maxScale: 0.6,
-
-	margin: 0,
-	transition: "none",
-	backgroundTransition: "slide",
-	center: true,
-	controls: true,
-	controlsLayout: 'bottom-right',
-	controlsBackArrows: 'faded',
-	progress: false,
-	history: false,
-	mouseWheel: false,
-	showNotes: true,
-	slideNumber: false,
-	autoSlide: false,
-	autoSlideStoppable: true,
-	shuffle: false,
-	loop: false,
-	rtl: false
-    //dependencies: [
-    //    { src: 'js/reveal-plugins/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-    //    { src: 'js/reveal-plugins/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-    //    { src: 'js/reveal-plugins/highlight/highlight.js', async: true, callback: function() { hljs.initHighlighting(); hljs.initHighlightingOnLoad(); } },
-    //    { src: 'js/reveal-plugins/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
-    //    { src: 'js/reveal-plugins/zoom/zoom.js', async: true }
-    //]
-});
-JS;
-        $view->registerJs($js);
+        RevealAsset::register($view);
     }
 
 }

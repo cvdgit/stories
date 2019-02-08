@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $model->title;
 		<div class="row" style="padding-top: 20px">
 			<div class="col-md-12" style="height: 100%; min-height: 100%">
 			<?php if ($availableRate): ?>
-				<iframe border="0" width="100%" height="720" style="border: 0 none" src="/story/viewbyframe/<?= $model->id ?>"></iframe>
+				<iframe border="0" width="100%" id="story-iframe" height="600" style="border: 0 none" src="/story/viewbyframe/<?= $model->id ?>"></iframe>
 			<?php else: ?>
 				<div class="info-title">
 					<p>Преобретите <?= Html::a('подписку', ['/pricing']) ?> для просмотра всех историй</p>
@@ -29,10 +29,10 @@ $this->params['breadcrumbs'][] = $model->title;
 				<div class="inside-single" style="padding-left:0">
 					<h4 class="title"><?= Html::encode($model->title) ?></h4>
 					<div class="description">
-						<p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.</p>
+						<p>Краткое описание истории</p>
 					</div>
 					<ul>
-						<li>Категория: <?= Html::a($model->category->name, ['story/category', 'category' => $model->category->alias]) ?></li>
+						<li>Категории: <?= Html::a($model->category->name, ['story/category', 'category' => $model->category->alias]) ?></li>
 						<?php $tags = $model->getTags()->all(); ?>
 						<?php if (count($tags) > 0): ?>
 						<li>Тэги:
