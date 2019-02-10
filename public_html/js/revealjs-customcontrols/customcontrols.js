@@ -3,7 +3,7 @@ var RevealCustomControls = window.RevealCustomControls || (function() {
 	//
 	var config = Reveal.getConfig().customcontrols;
 
-	var reveal = document.querySelector(".reveal");
+	//var reveal = document.querySelector(".reveal");
 
 	var $controls = $('<div/>');
 	$controls.addClass('customcontrols');
@@ -22,7 +22,7 @@ var RevealCustomControls = window.RevealCustomControls || (function() {
 		$controls.append($control);
 	}
 	
-	$('.reveal').append($controls);
+	$('.story-controls').append($controls);
 
 	Reveal.addEventListener('ready', function(event) {
 
