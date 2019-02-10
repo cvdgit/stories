@@ -11,6 +11,10 @@
 //use common\widgets\Alert;
 //use yii\helpers\Url;
 use common\widgets\RevealWidget;
+
+if (class_exists('yii\debug\Module')) {
+    $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 'renderToolbar']);
+}
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>

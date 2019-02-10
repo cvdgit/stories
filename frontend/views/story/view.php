@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $model->title;
 		<div class="row" style="padding-top: 20px">
 			<div class="col-md-12" style="height: 100%; min-height: 100%">
 			<?php if ($availableRate): ?>
-				<iframe border="0" width="100%" id="story-iframe" height="600" style="border: 0 none" src="/story/viewbyframe/<?= $model->id ?>"></iframe>
+				<iframe border="0" width="100%" id="story-iframe" height="600" style="border: 0 none" src="/story/viewbyframe/<?= $model->id ?>" allowfullscreen></iframe>
 			<?php else: ?>
 				<div class="info-title">
 					<p>Преобретите <?= Html::a('подписку', ['/pricing']) ?> для просмотра всех историй</p>
