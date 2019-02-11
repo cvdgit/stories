@@ -14,6 +14,7 @@ class AppAsset extends AssetBundle
     public $css = [
         'css/site.css',
         'css/responsive.css',
+        'css/story.css',
         'css/owl.carousel.min.css',
         'css/lazyYT.min.css',
         'css/slick.css',

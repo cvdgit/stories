@@ -24,6 +24,7 @@ use yii\db\Expression;
  * @property int $dropbox_sync_date
  * @property string $dropbox_story_filename
  * @property string $story_file
+ * @property string $description
  *
  * @property User $author
  * @property Tags $tags
@@ -77,6 +78,7 @@ class Story extends \yii\db\ActiveRecord
             ['status', 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_PUBLISHED]],
             ['status', 'default', 'value' => self::STATUS_DRAFT],
             [['tagNames'], 'safe'],
+            [['description'], 'string', 'max' => 1024],
         ];
     }
 
@@ -101,6 +103,7 @@ class Story extends \yii\db\ActiveRecord
             'dropbox_story_filename' => 'Файл в Dropbox',
             'cover' => 'Обложка',
             'story_file' => 'Файл PowerPoint',
+            'description' => 'Краткое описание',
         ];
     }
 

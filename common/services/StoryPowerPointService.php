@@ -36,11 +36,26 @@ class StoryPowerPointService
           </div>
           <div class="sl-block" data-block-type="text" style="height: auto; min-width: 30px; min-height: 30px; width: 446px; left: 1467px; top: 8px;" data-block-id="81787eb42185bcd23746e5195a2d6f6f">
             <div class="sl-block-content" data-placeholder-tag="p" data-placeholder-text="Text" style="z-index: 12;">
-              <p><span style="color:#FFFFFF">%2$s</span></p>
+              <p style="text-align:left"><span style="color:#FFFFFF;font-size:1.4em">%2$s</span></p>
             </div>
           </div>
         </section>', $args);
 	}
+
+  protected function getSlideHtmlFirstPage($args) {
+    return vsprintf('<section data-id="0255dfb727c7c71606fe1b6d67b0c098" data-background-color="#000000">
+          <div class="sl-block" data-block-type="text" style="width: 1774px; left: 73px; top: 814px; height: auto;" data-block-id="6e809638da9a6ad00b8c150ef8fbe827">
+            <div class="sl-block-content" data-placeholder-tag="h1" data-placeholder-text="Title Text" style="color: rgb(255, 255, 255); z-index: 11;" dir="ui">
+              <h1><strong><span style="font-size:2.5em">%1$s</span></strong></h1>
+            </div>
+          </div>
+          <div class="sl-block" data-block-type="image" style="min-width: 4px; min-height: 4px; width: 1146px; height: 848px; left: 388px; top: 0px;" data-block-id="5d002916098ba2191de37cea98890e2b">
+            <div class="sl-block-content" style="z-index: 12;">
+              <img style="" data-natural-width="1825" data-natural-height="1350" data-lazy-loaded="" data-src="%2$s">
+            </div>
+          </div>
+        </section>', $args);
+  }
 
 	public function createStoryFromPowerPoint($fileName)
 	{
@@ -57,8 +72,11 @@ class StoryPowerPointService
         $presentation = $reader->load(Yii::getAlias('@public') . '/slides_file/' . $fileName);
         
         $slides = $presentation->getAllSlides();
+        $slideIndex = 1;
         $html = '';
         foreach ($slides as $slide) {
+
+          $isFirstSlide = ($slideIndex == 1);
 
         	$shapes = $slide->getShapeCollection();
         	$slideImageFilePath = '';
@@ -75,8 +93,15 @@ class StoryPowerPointService
         		}
         	}
 
-        	$slideHtml = $this->getSlideHtml2([$slideImageFilePath, $slideText]);
+          if ($isFirstSlide) {
+            $slideHtml = $this->getSlideHtmlFirstPage([$slideText, $slideImageFilePath]);
+          }
+          else {
+        	  $slideHtml = $this->getSlideHtml2([$slideImageFilePath, $slideText]);
+          }
         	$html .= $slideHtml;
+
+          $slideIndex++;
         }
 
         return '<div class="slides">' . $html . '</div>';
