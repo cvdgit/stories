@@ -93,12 +93,12 @@ class StoryPowerPointService
         		}
         	}
 
-          if ($isFirstSlide) {
-            $slideHtml = $this->getSlideHtmlFirstPage([$slideText, $slideImageFilePath]);
-          }
-          else {
+          //if ($isFirstSlide) {
+          //  $slideHtml = $this->getSlideHtmlFirstPage([$slideText, $slideImageFilePath]);
+          //}
+          //else {
         	  $slideHtml = $this->getSlideHtml2([$slideImageFilePath, $slideText]);
-          }
+          //}
         	$html .= $slideHtml;
 
           $slideIndex++;
