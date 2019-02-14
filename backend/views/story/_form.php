@@ -13,58 +13,38 @@ use dosamigos\selectize\SelectizeTextInput;
 /* @var $model common\models\Story */
 /* @var $form yii\widgets\ActiveForm */
 
-$url = Url::to(['/story/getfromdropbox', 'id' => $model->id]);
-$powerPointUrl = Url::to(['/story/createfrompowerpoint', 'id' => $model->id]);
-$script = <<< JS
-function BootstrapAlert() {
-    this.htmlBegin = '<div class="alert fade in"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>';
-    this.htmlEnd = '</div>';
-}
-BootstrapAlert.prototype.success = function(message) {
-    return $(this.htmlBegin + message + this.htmlEnd).addClass('alert-success');
-}
-BootstrapAlert.prototype.error = function(message) {
-    return $(this.htmlBegin + message + this.htmlEnd).addClass('alert-danger');
-}
-var bAlert = new BootstrapAlert();
-var doneCallback = function(data) {
-    if (data) {
-        var elem;
-        if (data.error.length)
-            elem = bAlert.error(data.error);
-        else
-            elem = bAlert.success(data.success);
-        elem.appendTo('#alert_placeholder');
-    }
-};
-var failCallback = function(data) {
-    $('#alert_placeholder').append(bAlert.error(data));
-}
-
-function getData(btn, url) {
-    var that = $(btn);
-    that.button('loading');
-    $.get(url)
-        .done(doneCallback)
-        .fail(failCallback)
-        .always(function() {
-            that.button('reset');
-        });
-}
-
-$('#dropbox-get-data').on('click', function() {
-    getData(this, '$url');
+$id = Html::getInputId($model, 'source_id');
+$sourceDropBoxID = Html::getInputId($model, 'source_dropbox');
+$sourcePowerPointID = Html::getInputId($fileUploadForm, 'storyFile');
+$sourceDropBoxConst = Story::SOURCE_SLIDESCOM;
+$sourcePowerPointConst = Story::SOURCE_POWERPOINT;
+$sourceOnChange = <<< JS
+$(function() {
+  $('#$id').trigger('change');
 });
-$('#powerpoint').on('click', function() {
-    getData(this, '$powerPointUrl');
+$('#$id').on('change', function() {
+    var sourceDropBoxElem = $('#$sourceDropBoxID'),
+        sourcePowerPointElem = $('#$sourcePowerPointID');
+
+    sourceDropBoxElem.parent().hide();
+    sourcePowerPointElem.parent().hide();
+
+    if (this.value == $sourceDropBoxConst) {
+        sourceDropBoxElem.parent().show();
+    }
+
+    if (this.value == $sourcePowerPointConst) {
+        sourcePowerPointElem.parent().show();
+    }
 });
 JS;
-$this->registerJs($script, yii\web\View::POS_READY);
+$this->registerJs($sourceOnChange, yii\web\View::POS_READY);
 ?>
+
 <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
-<?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 <?= $form->field($model, 'alias')->textInput(['maxlength' => true]) ?>
+<?= $form->field($model, 'description')->textarea(['rows' => 3]) ?>
 <?= $form->field($coverUploadForm, 'coverFile')->fileInput() ?>
 <?php if (!empty($model->cover)): ?>
 <div class="row">
@@ -73,24 +53,9 @@ $this->registerJs($script, yii\web\View::POS_READY);
     </div>
 </div>
 <?php endif ?>
-
-<?php
-$dropBoxHint = '';
-if (!empty($model->dropbox_story_filename)) {
-    $dropBoxHint = Html::a('Получить данные из Dropbox', '#', ['id' => 'dropbox-get-data', 'class' => 'btn']);
-}
-?>
-<?= $form->field($model, 'dropbox_story_filename')->textInput(['maxlength' => true])->hint($dropBoxHint) ?>
-
-<?= $form->field($fileUploadForm, 'storyFile')->fileInput() ?>
-<?php
-$powerPointHint = '';
-if (!empty($model->story_file)) {
-    $powerPointHint = Html::a('Получить данные из PowerPoint', '#', ['id' => 'powerpoint', 'class' => 'btn']);
-}
-?>
-<?= $form->field($model, 'story_file')->textInput(['readonly' => true])->hint($powerPointHint) ?>
-
+<?= $form->field($model, 'source_id')->dropDownList(Story::getSourceList(), ['prompt' => 'Выбрать']) ?>
+<?= $form->field($model, 'source_dropbox', ['options' => ['style' => 'display: none']])->textInput(['maxlength' => true]) ?>
+<?= $form->field($fileUploadForm, 'storyFile', ['options' => ['style' => 'display: none']])->fileInput() ?>
 <?= $form->field($model, 'user_id')->dropDownList(ArrayHelper::map(User::find()->all(), 'id', 'username'), ['prompt' => 'Выбрать']) ?>
 <?= $form->field($model, 'category_id')->dropDownList(ArrayHelper::map(Category::find()->all(), 'id', 'name'), ['prompt' => 'Выбрать']) ?>
 <?= $form->field($model, 'sub_access')->checkBox() ?>

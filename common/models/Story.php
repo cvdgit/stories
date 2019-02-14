@@ -36,6 +36,12 @@ class Story extends \yii\db\ActiveRecord
     const STATUS_DRAFT = 0;
     const STATUS_PUBLISHED = 1;
 
+    const SOURCE_SLIDESCOM = 1;
+    const SOURCE_POWERPOINT = 2;
+
+    public $source_dropbox = '';
+    public $source_powerpoint = '';
+
     /**
      * {@inheritdoc}
      */
@@ -68,9 +74,9 @@ class Story extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'alias', 'user_id', 'category_id'], 'required'],
-            [['body', 'cover', 'story_file'], 'string'],
-            [['created_at', 'updated_at', 'user_id', 'category_id', 'sub_access', 'dropbox_sync_date'], 'integer'],
+            [['title', 'alias', 'user_id', 'category_id', 'source_id'], 'required'],
+            [['body', 'cover', 'story_file', 'source_dropbox', 'source_powerpoint'], 'string'],
+            [['created_at', 'updated_at', 'user_id', 'category_id', 'sub_access', 'dropbox_sync_date', 'source_id'], 'integer'],
             [['title', 'alias', 'dropbox_story_filename'], 'string', 'max' => 255],
             [['alias'], 'unique'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
@@ -104,6 +110,9 @@ class Story extends \yii\db\ActiveRecord
             'cover' => 'Обложка',
             'story_file' => 'Файл PowerPoint',
             'description' => 'Краткое описание',
+            'source_id' => 'Источник',
+            'source_dropbox' => 'Имя истории в Slides.com',
+            'source_powerpoint' => 'Файл PowerPoint (pptx)',
         ];
     }
 
@@ -174,15 +183,17 @@ class Story extends \yii\db\ActiveRecord
         return !empty($this->dropbox_sync_date);
     }
 
-    public function syncWithDropbox($body)
-    {
-        $this->body = $body;
-        $this->dropbox_sync_date = time();
-    }
-
     public static function findLastPublishedStories()
     {
         return self::find()->published()->lastStories();
+    }
+
+    public static function getSourceList()
+    {
+        return [
+            self::SOURCE_SLIDESCOM => 'Slides.com (Dropbox)',
+            self::SOURCE_POWERPOINT => 'Файл PowerPoint (PPTX)',
+        ];
     }
 
 }

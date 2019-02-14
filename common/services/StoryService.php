@@ -31,18 +31,18 @@ class StoryService
         return ($web ? '' : Yii::getAlias('@public')) . '/slides_cover/' . $cover;
     }
 
-    public function getImagesFolderPath($dropbox_story_filename, $web = false)
+    public function getImagesFolderPath($model, $web = false)
     {
-        return ($web ? '' : Yii::getAlias('@public')) . '/slides/' . $dropbox_story_filename;
+        return ($web ? '' : Yii::getAlias('@public')) . '/slides/' . $model->story_file;
     }
 
-    public function getStoryImages($dropbox_story_filename)
+    public function getStoryImages($model)
     {
-        $dir  = opendir($this->getImagesFolderPath($dropbox_story_filename));
+        $dir  = opendir($this->getImagesFolderPath($model));
         $images = [];
         while (false !== ($filename = readdir($dir))) {
             if (!in_array($filename, array('.', '..'))) {
-                $images[] = $this->getImagesFolderPath($dropbox_story_filename, true) . '/' . $filename;
+                $images[] = $this->getImagesFolderPath($model, true) . '/' . $filename;
             }
         }
         return $images;

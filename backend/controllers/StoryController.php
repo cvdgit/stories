@@ -7,6 +7,8 @@ use common\models\Story;
 use common\models\StorySearch;
 use backend\models\StoryCoverUploadForm;
 use backend\models\StoryFileUploadForm;
+use backend\models\SourcePowerPointForm;
+use backend\models\SourceDropboxForm;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use common\services\StoryService;
@@ -50,6 +52,7 @@ class StoryController extends \yii\web\Controller
     public function actionCreate()
     {
         $model = new Story();
+        
         $coverUploadForm = new StoryCoverUploadForm();
         $fileUploadForm = new StoryFileUploadForm();
         
@@ -65,13 +68,19 @@ class StoryController extends \yii\web\Controller
                 }
             }
 
-            $fileUploadForm->storyFile = UploadedFile::getInstance($fileUploadForm, 'storyFile');
-            if ($fileUploadForm->storyFile !== null) {
-                if ($fileUploadForm->upload()) {
-                    $model->story_file = $fileUploadForm->storyFile;
-                }
-                else {
-                    print_r($fileUploadForm->getErrors());
+            if ($model->source_id == Story::SOURCE_SLIDESCOM && !empty($model->source_dropbox)) {
+                $model->story_file = $model->source_dropbox;
+            }
+
+            if ($model->source_id == Story::SOURCE_POWERPOINT && !empty($model->source_powerpoint)) {
+                $fileUploadForm->storyFile = UploadedFile::getInstance($fileUploadForm, 'storyFile');
+                if ($fileUploadForm->storyFile !== null) {
+                    if ($fileUploadForm->upload()) {
+                        $model->story_file = $fileUploadForm->storyFile;
+                    }
+                    else {
+                        print_r($fileUploadForm->getErrors());
+                    }
                 }
             }
 
@@ -107,12 +116,24 @@ class StoryController extends \yii\web\Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+
+        if ($model->source_id == Story::SOURCE_SLIDESCOM) {
+            $model->source_dropbox = $model->story_file;
+        }
+        if ($model->source_id == Story::SOURCE_POWERPOINT) {
+            $model->source_powerpoint = $model->story_file;
+        }
+
         $coverUploadForm = new StoryCoverUploadForm();
         $fileUploadForm = new StoryFileUploadForm();
 
-        //if (!$model->isDropboxSync()) {
-        //    Yii::$app->session->setFlash('warning', 'Необходимо синхронизировать историю с dropbox');
-        //}
+        $powerPointForm = new SourcePowerPointForm();
+        $powerPointForm->storyId = $model->id;
+        $powerPointForm->storyFile = $model->story_file;
+
+        $dropboxForm = new SourceDropboxForm();
+        $dropboxForm->storyId = $model->id;
+        $dropboxForm->storyFile = $model->story_file;
 
         if ($model->load(Yii::$app->request->post())) {
 
@@ -126,24 +147,35 @@ class StoryController extends \yii\web\Controller
                 }
             }
 
-            $fileUploadForm->storyFile = UploadedFile::getInstance($fileUploadForm, 'storyFile');
-            if ($fileUploadForm->storyFile !== null) {
-                if ($fileUploadForm->upload()) {
-                    $model->story_file = $fileUploadForm->storyFile;
-                }
-                else {
-                    print_r($fileUploadForm->getErrors());
+            if ($model->source_id == Story::SOURCE_SLIDESCOM && !empty($model->source_dropbox)) {
+                $model->story_file = $model->source_dropbox;
+            }
+
+            if ($model->source_id == Story::SOURCE_POWERPOINT && !empty($model->source_powerpoint)) {
+                $fileUploadForm->storyFile = UploadedFile::getInstance($fileUploadForm, 'storyFile');
+                if ($fileUploadForm->storyFile !== null) {
+                    if ($fileUploadForm->upload()) {
+                        $model->story_file = $fileUploadForm->storyFile;
+                    }
+                    else {
+                        print_r($fileUploadForm->getErrors());
+                    }
                 }
             }
 
             $model->save();
             Yii::$app->session->setFlash('success', 'Изменения успешно сохранены');
+
+            $powerPointForm->storyFile = $model->story_file;
+            $dropboxForm->storyFile = $model->story_file;
         }
 
         return $this->render('update', [
             'model' => $model,
             'coverUploadForm' => $coverUploadForm,
             'fileUploadForm' => $fileUploadForm,
+            'powerPointForm' => $powerPointForm,
+            'dropboxForm' => $dropboxForm,
         ]);
     }
 
@@ -176,54 +208,43 @@ class StoryController extends \yii\web\Controller
         throw new NotFoundHttpException('Страница не найдена.');
     }
 
-    public function actionGetfromdropbox($id)
-    {
-        $story = $this->findModel($id);
-
-        if (empty($story->dropbox_story_filename)) {
-            return $this->sendErrorResponse('Необходимо указать имя файла в Dropbox');
-        }
-        
-        $dropboxSerivce = $this->service->getDropboxSerivce();
-        try {
-            $dropboxSerivce->exportSlideImagesFromDropBox($story->dropbox_story_filename);
-            $body = $dropboxSerivce->exportSlideBodyFromDropBox($story->dropbox_story_filename);
-            $story->syncWithDropbox($body);
-            $story->save(false, ['body', 'dropbox_sync_date']);
-            return $this->sendSuccessResponse('Успешно');
-        }
-        catch (Exception $ex) {
-            return $this->sendErrorResponse($ex->getMessage());
-        }
-    }
-
     public function actionImages($id)
     {
         $model = $this->findModel($id);
         return $this->render('images', [
             'model' => $model,
-            'images' => $this->service->getStoryImages($model->dropbox_story_filename),
+            'images' => $this->service->getStoryImages($model),
         ]);
     }
 
-    public function actionCreatefrompowerpoint($id)
+    public function actionImportFromPowerPoint()
     {
-        $story = $this->findModel($id);
-
-        if (empty($story->story_file)) {
-            return $this->sendErrorResponse('Необходимо загрузить файл PowerPoint');
-        }
-
+        $model = new SourcePowerPointForm();
         $service = $this->service->getPowerPointSerivce();
-        try {
-            $body = $service->createStoryFromPowerPoint($story->story_file);
-            $story->body = $body;
-            $story->save(false, ['body']);
+        return $this->importStory($model, $service);
+    }
+
+    public function actionImportFromDropBox()
+    {
+        $model = new SourceDropboxForm();
+        $serivce = $this->service->getDropboxSerivce();
+        return $this->importStory($model, $service);
+    }
+
+    protected function importStory($model, $service)
+    {
+        if ($model->load(Yii::$app->request->post())) {
+            $body = '';
+            try {
+                $body = $service->createStoryFromPowerPoint($model);
+            }
+            catch (Exception $ex) {
+                return $this->sendErrorResponse($ex->getMessage());
+            }
+            $model->saveSource($body);
             return $this->sendSuccessResponse('Успешно');
         }
-        catch (Exception $ex) {
-            return $this->sendErrorResponse($ex->getMessage());
-        }
+        return $this->sendErrorResponse($model->getErrors());
     }
 
     protected function jsonResponse($result)
