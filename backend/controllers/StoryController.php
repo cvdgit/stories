@@ -68,11 +68,11 @@ class StoryController extends \yii\web\Controller
                 }
             }
 
-            if ($model->source_id == Story::SOURCE_SLIDESCOM && !empty($model->source_dropbox)) {
+            if ($model->source_id == Story::SOURCE_SLIDESCOM) {
                 $model->story_file = $model->source_dropbox;
             }
 
-            if ($model->source_id == Story::SOURCE_POWERPOINT && !empty($model->source_powerpoint)) {
+            if ($model->source_id == Story::SOURCE_POWERPOINT) {
                 $fileUploadForm->storyFile = UploadedFile::getInstance($fileUploadForm, 'storyFile');
                 if ($fileUploadForm->storyFile !== null) {
                     if ($fileUploadForm->upload()) {
@@ -147,11 +147,11 @@ class StoryController extends \yii\web\Controller
                 }
             }
 
-            if ($model->source_id == Story::SOURCE_SLIDESCOM && !empty($model->source_dropbox)) {
+            if ($model->source_id == Story::SOURCE_SLIDESCOM) {
                 $model->story_file = $model->source_dropbox;
             }
 
-            if ($model->source_id == Story::SOURCE_POWERPOINT && !empty($model->source_powerpoint)) {
+            if ($model->source_id == Story::SOURCE_POWERPOINT) {
                 $fileUploadForm->storyFile = UploadedFile::getInstance($fileUploadForm, 'storyFile');
                 if ($fileUploadForm->storyFile !== null) {
                     if ($fileUploadForm->upload()) {
