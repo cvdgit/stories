@@ -11,6 +11,31 @@ function storyEnterFullscreen() {
 	}
 }
 
+function storyCloseFullscreen() {
+	var element = document;
+	var requestMethod = element.exitFullscreen ||
+	                    element.exitFullScreen ||
+						element.mozCancelFullScreen ||
+						element.webkitCancelFullscreen ||
+						element.webkitCancelFullScreen ||
+						element.msExitFullscreen;
+	if (requestMethod) {
+		requestMethod.apply(element);
+	}
+}
+
+function storyInFullscreen() {
+	return (window.screenTop && window.screenY);
+}
+
+function storyToggleFullscreen() {
+	if (storyInFullscreen()) {
+		storyCloseFullscreen();
+  	} else {
+  		storyEnterFullscreen();
+  	}
+}
+
 Reveal.initialize({
 	
 	width: 1920,
@@ -39,17 +64,27 @@ Reveal.initialize({
 		controls: [
 			{
 				icon: '<div class="custom-controls-arrow"><i class="fas fa-arrows-alt"></i></div>',
-				action: function() { storyEnterFullscreen(); },
+				action: function() {
+					storyToggleFullscreen();
+					$(this).find('i');
+					$el.removeClass('fa-arrows-alt')
+					   .removeClass('fa-expand-arrows-alt');
+					storyInFullscreen() ? $el.addClass('fa-arrows-alt') : $el.addClass('fa-expand-arrows-alt');
+				},
 				className: 'custom-fullscreen'
 			},
 			{
 				icon: '<div class="custom-controls-arrow"><i class="fas fa-chevron-left"></i></div>', 
-				action: function() { Reveal.prev(); },
+				action: function() {
+					Reveal.prev();
+				},
 				className: 'custom-navigate-left'
 			},
 			{
 				icon: '<div class="custom-controls-arrow"><i class="fas fa-chevron-right"></i></div>', 
-				action: function() { Reveal.next(); },
+				action: function() {
+					Reveal.next();
+				},
 				className: 'custom-navigate-right'
 			}
 		],
