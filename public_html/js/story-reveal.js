@@ -66,7 +66,7 @@ Reveal.initialize({
 				icon: '<div class="custom-controls-arrow"><i class="fas fa-arrows-alt"></i></div>',
 				action: function() {
 					storyToggleFullscreen();
-					$(this).find('i');
+					var $el = $(this).find('i');
 					$el.removeClass('fa-arrows-alt')
 					   .removeClass('fa-expand-arrows-alt');
 					storyInFullscreen() ? $el.addClass('fa-arrows-alt') : $el.addClass('fa-expand-arrows-alt');
