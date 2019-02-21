@@ -23,9 +23,9 @@ class StoryPowerPointService
 	protected function getSlideHtml($args)
 	{
 		return vsprintf('<section data-id="fc8f721ab30e503a6ec254abb08f859e" data-background-color="#000000">
-          <div class="sl-block" data-block-type="image" style="min-width: 4px; min-height: 4px; %4$s left: 0px; top: 0px;" data-block-id="ab9fb6dc12f73574405bfac74947da8f">
+          <div class="sl-block" data-block-type="image" style="min-width: 4px; min-height: 4px; width: %3$spx; height: %4$spx; left: 0px; top: 0px;" data-block-id="ab9fb6dc12f73574405bfac74947da8f">
             <div class="sl-block-content" style="z-index: 11;">
-              <img %3$s data-src="%1$s">
+              <img data-natural-width="1459" data-natural-height="1080" data-src="%1$s">
             </div>
           </div>
           <div class="sl-block" data-block-type="text" style="height: auto; min-width: 30px; min-height: 30px; width: 446px; left: 1467px; top: 8px;" data-block-id="81787eb42185bcd23746e5195a2d6f6f">
@@ -72,11 +72,17 @@ class StoryPowerPointService
     	$shapes = $slide->getShapeCollection();
     	$slideImageFilePath = '';
     	$slideText = '';
+      
+      $imageWidth = 0;
+      $imageHeight = 0;
+
     	foreach ($shapes as $shape) {
 
     		if (get_class($shape) == 'PhpOffice\PhpPresentation\Shape\Drawing\Gd') {
     			file_put_contents($localFolder . $shape->getIndexedFilename(), $shape->getContents());
     			$slideImageFilePath = '/slides/' . $model->storyFile . '/' . $shape->getIndexedFilename();
+          $imageWidth = $shape->getWidth();
+          $imageHeight = $shape->getHeight();
     		}
 
     		if (get_class($shape) == 'PhpOffice\PhpPresentation\Shape\RichText') {
@@ -91,9 +97,9 @@ class StoryPowerPointService
         $slideHtml = $this->getSlideHtmlFirstPage([$slideText, $slideImageFilePath]);
       }
       else {
-        $slideImageSize = $model->originalSizeImages ? '' : $this->getSlideImageSize();
-        $wrapperSlideImageSize = $model->originalSizeImages ? '' : $this->getWrapperSlideImageSize();
-    	  $slideHtml = $this->getSlideHtml([$slideImageFilePath, $slideText, $slideImageSize, $wrapperSlideImageSize]);
+        //$slideImageSize = $model->originalSizeImages ? '' : $this->getSlideImageSize();
+        //$wrapperSlideImageSize = $model->originalSizeImages ? '' : $this->getWrapperSlideImageSize();
+    	  $slideHtml = $this->getSlideHtml([$slideImageFilePath, $slideText, $imageWidth, $imageHeight]);
       }
     	$html .= $slideHtml;
 
