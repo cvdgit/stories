@@ -15,10 +15,15 @@ class StoryPowerPointService
     return 'data-natural-width="1459" data-natural-height="1080"';
   }
 
+  protected function getWrapperSlideImageSize()
+  {
+    return 'width: 1459px; height: 1080px;';
+  }
+
 	protected function getSlideHtml($args)
 	{
 		return vsprintf('<section data-id="fc8f721ab30e503a6ec254abb08f859e" data-background-color="#000000">
-          <div class="sl-block" data-block-type="image" style="min-width: 4px; min-height: 4px; width: 1459px; height: 1080px; left: 0px; top: 0px;" data-block-id="ab9fb6dc12f73574405bfac74947da8f">
+          <div class="sl-block" data-block-type="image" style="min-width: 4px; min-height: 4px; %4$s left: 0px; top: 0px;" data-block-id="ab9fb6dc12f73574405bfac74947da8f">
             <div class="sl-block-content" style="z-index: 11;">
               <img %3$s data-src="%1$s">
             </div>
@@ -87,7 +92,8 @@ class StoryPowerPointService
       }
       else {
         $slideImageSize = $model->originalSizeImages ? '' : $this->getSlideImageSize();
-    	  $slideHtml = $this->getSlideHtml([$slideImageFilePath, $slideText, $slideImageSize]);
+        $wrapperSlideImageSize = $model->originalSizeImages ? '' : $this->getWrapperSlideImageSize();
+    	  $slideHtml = $this->getSlideHtml([$slideImageFilePath, $slideText, $slideImageSize, $wrapperSlideImageSize]);
       }
     	$html .= $slideHtml;
 
