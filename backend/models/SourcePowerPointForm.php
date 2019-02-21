@@ -11,13 +11,14 @@ class SourcePowerPointForm extends yii\base\Model
     public $storyFile;
     public $firstSlideTemplate = 1;
     public $lastSlideTemplate = 1;
+    public $originalSizeImages;
     public $storyId;
 
     public function rules()
     {
         return [
             [['storyFile'], 'string'],
-            [['firstSlideTemplate', 'lastSlideTemplate'], 'safe'],
+            [['firstSlideTemplate', 'lastSlideTemplate', 'originalSizeImages'], 'safe'],
             [['storyId'], 'integer'],
             [['storyId'], 'storyExists'],
         ];
@@ -29,6 +30,7 @@ class SourcePowerPointForm extends yii\base\Model
             'storyFile' => 'Файл PowerPoint',
             'firstSlideTemplate' => 'Особый шаблон первого слайда',
             'lastSlideTemplate' => 'Особый шаблон последнего слайда',
+            'originalSizeImages' => 'Исходный размер изображений',
         ];
     }
 

@@ -49,7 +49,8 @@ class StorySearch extends Story
      */
     public function search($params)
     {
-        if ($this->scenario == StorySearch::SCENARIO_BACKEND) {
+        $isBackend = ($this->scenario == StorySearch::SCENARIO_BACKEND);
+        if ($isBackend) {
             $query = Story::findStories()->joinWith(['author', 'category']);
         }
         else {
@@ -63,7 +64,7 @@ class StorySearch extends Story
             ],
         ]);
         
-        $sort = new Sort([
+        $sortParams = [
             'defaultOrder' => ['sub_access' => SORT_DESC, 'title' => SORT_ASC],
             'attributes' => [
                 'title' => [
@@ -89,7 +90,11 @@ class StorySearch extends Story
                 'sub_access',
                 'views_number',
             ],
-        ]);
+        ];
+        if ($isBackend) {
+            $sortParams['defaultOrder'] = ['updated_at' => SORT_DESC];
+        }
+        $sort = new Sort($sortParams);
         $dataProvider->setSort($sort);
 
         if (!($this->load($params) && $this->validate())) {
