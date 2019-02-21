@@ -55,12 +55,12 @@ Reveal.initialize({
 	history: false,
 	mouseWheel: false,
 	showNotes: true,
-	slideNumber: false,
+	slideNumber: true,
 	autoSlide: false,
 	autoSlideStoppable: true,
 	shuffle: false,
 	loop: false,
-	customcontrols: { 
+	customcontrols: {
 		controls: [
 			{
 				icon: '<div class="custom-controls-arrow"><i class="fas fa-arrows-alt"></i></div>',
@@ -102,6 +102,12 @@ Reveal.initialize({
     //    { src: 'js/reveal-plugins/highlight/highlight.js', async: true, callback: function() { hljs.initHighlighting(); hljs.initHighlightingOnLoad(); } },
     //    { src: 'js/reveal-plugins/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
     //    { src: 'js/reveal-plugins/zoom/zoom.js', async: true }
-        {src: '/js/revealjs-customcontrols/customcontrols.js'}
+        {src: '/js/revealjs-customcontrols/customcontrols.js'},
+        {src: '/js/story-reveal-statistics.js'}
     ]
 });
+
+function onSlideMouseDown(e) {
+	Reveal.next();
+}
+Reveal.addEventListener("mousedown", onSlideMouseDown, false);

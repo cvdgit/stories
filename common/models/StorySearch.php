@@ -87,6 +87,7 @@ class StorySearch extends Story
                     'desc' => ['updated_at' => SORT_DESC],
                 ],
                 'sub_access',
+                'views_number',
             ],
         ]);
         $dataProvider->setSort($sort);

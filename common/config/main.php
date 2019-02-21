@@ -33,9 +33,9 @@ return [
              ],
         ],
         'formatter' => [
-            'dateFormat' => 'dd.M.Y',
-            'datetimeFormat' => 'dd.M.Y H:i:s',
-            'timeFormat' => 'H:i:s',
+            'dateFormat' => 'dd.MM.yyyy',
+            'datetimeFormat' => 'dd.MM.yyyy HH:mm:ss',
+            'timeFormat' => 'HH:mm:ss',
             'locale' => 'ru-RU',
             'defaultTimeZone' => 'Europe/Moscow',
         ],

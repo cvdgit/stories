@@ -44,6 +44,7 @@ class StoryController extends \yii\web\Controller
     public function actionView($alias)
     {
         $model = $this->findModelByAlias($alias);
+        $model->updateCounters(array('views_number' => 1));
         $availableRate = $this->paymentService->availableRate($model);
         return $this->render('view', [
             'model' => $this->findModelByAlias($alias),

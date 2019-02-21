@@ -13,8 +13,10 @@ $this->params['breadcrumbs'][] = ['label' => 'Истории', 'url' => ['index'
 $this->params['breadcrumbs'][] = ['label' => $model->title, 'url' => Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $model->alias])];
 $this->params['breadcrumbs'][] = 'Изменить';
 $this->params['sidebarMenuItems'] = [
+	['label' => 'Истории', 'url' => ['story/index']],
 	['label' => $model->title, 'url' => ['story/update', 'id' => $model->id]],
-	['label' => 'Изображения', 'url' => ['story/images', 'id' => $model->id]],
+	['label' => 'Статистика', 'url' => ['statistics/list', 'id' => $model->id]],
+	// ['label' => 'Изображения', 'url' => ['story/images', 'id' => $model->id]],
 ];
 ?>
 <div class="row">

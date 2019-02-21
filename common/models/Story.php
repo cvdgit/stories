@@ -25,6 +25,8 @@ use yii\db\Expression;
  * @property string $dropbox_story_filename
  * @property string $story_file
  * @property string $description
+ * @property int $source_id
+ * @property int $views_number
  *
  * @property User $author
  * @property Tags $tags
@@ -76,7 +78,7 @@ class Story extends \yii\db\ActiveRecord
         return [
             [['title', 'alias', 'user_id', 'category_id', 'source_id'], 'required'],
             [['body', 'cover', 'story_file', 'source_dropbox', 'source_powerpoint'], 'string'],
-            [['created_at', 'updated_at', 'user_id', 'category_id', 'sub_access', 'dropbox_sync_date', 'source_id'], 'integer'],
+            [['created_at', 'updated_at', 'user_id', 'category_id', 'sub_access', 'dropbox_sync_date', 'source_id', 'views_number'], 'integer'],
             [['title', 'alias', 'dropbox_story_filename'], 'string', 'max' => 255],
             [['alias'], 'unique'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
@@ -113,6 +115,7 @@ class Story extends \yii\db\ActiveRecord
             'source_id' => 'Источник',
             'source_dropbox' => 'Имя истории в Slides.com',
             'source_powerpoint' => 'Файл PowerPoint (pptx)',
+            'views_number' => 'Просмотров',
         ];
     }
 

@@ -43,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'language' => 'ru',
                 'clientOptions' => [
                     'autoclose' => true,
-                    'format' => 'dd.m.yyyy'
+                    'format' => 'dd.mm.yyyy'
                 ]
             ]),
         ],
@@ -57,7 +57,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'language' => 'ru',
                 'clientOptions' => [
                     'autoclose' => true,
-                    'format' => 'dd.m.yyyy'
+                    'format' => 'dd.mm.yyyy'
                 ]
             ]),
         ],
@@ -75,6 +75,7 @@ $this->params['breadcrumbs'][] = $this->title;
             },
             'filter' => Story::getSubAccessArray(),
         ],
+        'views_number',
         [
             'class' => 'yii\grid\ActionColumn',
             'buttons' => [

@@ -65,6 +65,8 @@ return [
                 'success' => 'rate/success',
                 'fail' => 'rate/fail',
                 'file-avatar' => 'upload/file-avatar',
+
+                'statistics/write/<id:\d+>' => 'statistics/write',
             ],
         ],
     ],
