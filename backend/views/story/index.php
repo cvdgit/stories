@@ -80,7 +80,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'class' => 'yii\grid\ActionColumn',
             'buttons' => [
                 'view' => function($url, $model) {
-                    return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $model->alias]));
+                    return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $model->alias]), ['target' => '_blank']);
                 }
             ],
         ],
