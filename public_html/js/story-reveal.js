@@ -52,14 +52,17 @@ Reveal.initialize({
 	controlsLayout: 'bottom-right', // edges
 	controlsBackArrows: 'faded',
 	progress: true,
-	history: false,
+	//history: true,
 	mouseWheel: false,
 	showNotes: true,
 	slideNumber: true,
 	autoSlide: false,
 	autoSlideStoppable: true,
+	//fragments: true,
+	//embedded: true,
 	shuffle: false,
 	loop: false,
+	//hash: true,
 	customcontrols: {
 		controls: [
 			{

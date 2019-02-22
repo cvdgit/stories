@@ -199,4 +199,10 @@ class Story extends \yii\db\ActiveRecord
         ];
     }
 
+    public function saveBody($body)
+    {
+        $this->body = $body;
+        return $this->save(false, ['body']);
+    }
+
 }
