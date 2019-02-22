@@ -3,6 +3,7 @@
 namespace common\services;
 
 use yii;
+use yii\helpers\Url;
 
 class StoryService
 {
@@ -28,7 +29,7 @@ class StoryService
 
     public function getCoverPath($cover, $web = false)
     {
-        return ($web ? '' : Yii::getAlias('@public')) . '/slides_cover/' . $cover;
+        return ($web ? Url::base(true) : Yii::getAlias('@public')) . '/slides_cover/' . $cover;
     }
 
     public function getImagesFolderPath($model, $web = false)
