@@ -52,17 +52,16 @@ Reveal.initialize({
 	controlsLayout: 'bottom-right', // edges
 	controlsBackArrows: 'faded',
 	progress: true,
-	//history: true,
+	history: true,
 	mouseWheel: false,
 	showNotes: true,
 	slideNumber: true,
 	autoSlide: false,
 	autoSlideStoppable: true,
-	//fragments: true,
-	//embedded: true,
 	shuffle: false,
 	loop: false,
-	//hash: true,
+	hash: true,
+	hashOneBasedIndex: true,
 	customcontrols: {
 		controls: [
 			{
@@ -114,3 +113,11 @@ function onSlideMouseDown(e) {
 	Reveal.next();
 }
 Reveal.addEventListener("mousedown", onSlideMouseDown, false);
+
+Reveal.addEventListener('ready', function(event) {
+	console.log(Reveal.getQueryHash());
+});
+
+Reveal.addEventListener('slidechanged', function(event) {
+console.log(window.location.hash);
+});
