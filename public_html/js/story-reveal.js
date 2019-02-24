@@ -36,32 +36,7 @@ function storyToggleFullscreen() {
   	}
 }
 
-Reveal.initialize({
-	
-	width: 1920,
-	height: 1080,
-
-	//minScale: 1.0,
-	//maxScale: 0.6,
-	//margin: 0.1,
-
-	transition: "none",
-	backgroundTransition: "slide",
-	center: true,
-	controls: false,
-	controlsLayout: 'bottom-right', // edges
-	controlsBackArrows: 'faded',
-	progress: true,
-	history: true,
-	mouseWheel: false,
-	showNotes: true,
-	slideNumber: true,
-	autoSlide: false,
-	autoSlideStoppable: true,
-	shuffle: false,
-	loop: false,
-	hash: true,
-	hashOneBasedIndex: true,
+var RevealConfig = {
 	customcontrols: {
 		controls: [
 			{
@@ -97,7 +72,6 @@ Reveal.initialize({
 			Reveal.getProgress() === 1 ? $right.attr('disabled', 'disabled') : $right.removeAttr('disabled');
 		}
 	},
-	rtl: false,
     dependencies: [
     //    { src: 'js/reveal-plugins/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
     //    { src: 'js/reveal-plugins/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
@@ -107,17 +81,14 @@ Reveal.initialize({
         {src: '/js/revealjs-customcontrols/customcontrols.js'},
         {src: '/js/story-reveal-statistics.js'}
     ]
-});
+};
+
+$.extend(StoryRevealConfig, RevealConfig);
+
+
+Reveal.initialize(StoryRevealConfig);
 
 function onSlideMouseDown(e) {
 	Reveal.next();
 }
 Reveal.addEventListener("mousedown", onSlideMouseDown, false);
-
-Reveal.addEventListener('ready', function(event) {
-	console.log(Reveal.getQueryHash());
-});
-
-Reveal.addEventListener('slidechanged', function(event) {
-console.log(window.location.hash);
-});
