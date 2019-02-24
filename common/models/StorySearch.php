@@ -92,7 +92,7 @@ class StorySearch extends Story
             ],
         ];
         if ($isBackend) {
-            $sortParams['defaultOrder'] = ['updated_at' => SORT_DESC];
+            $sortParams['defaultOrder'] = ['created_at' => SORT_DESC];
         }
         $sort = new Sort($sortParams);
         $dataProvider->setSort($sort);
