@@ -72,4 +72,34 @@ class StoryStatisticsSearch extends StoryStatistics
         ];
     }
 
+    public function getChartData2($story_id)
+    {
+        $query = new \yii\db\Query();
+        $rows = $query->select(['slide_number', 'ROUND(AVG(end_time - begin_time)) AS time'])
+                      ->from('story_statistics')
+                      ->where('story_id = :storyid', [':storyid' => $story_id])
+                      ->groupBy('slide_number')
+                      ->indexBy('slide_number')
+                      ->all();
+        return [
+            'labels' => array_keys($rows),
+            'data' => array_map(function($elem) { return $elem['time']; }, $rows),
+        ];
+    }
+
+    public function getChartData3($story_id)
+    {
+        $query = new \yii\db\Query();
+        $rows = $query->select(['slide_number', 'ROUND(AVG(end_time - begin_time) / MAX(chars), 1) AS time'])
+                      ->from('story_statistics')
+                      ->where('story_id = :storyid', [':storyid' => $story_id])
+                      ->groupBy('slide_number')
+                      ->indexBy('slide_number')
+                      ->all();
+        return [
+            'labels' => array_keys($rows),
+            'data' => array_map(function($elem) { return $elem['time']; }, $rows),
+        ];
+    }
+
 }
