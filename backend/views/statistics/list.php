@@ -9,7 +9,7 @@ use dosamigos\chartjs\ChartJs;
 /* @var $searchModel common\models\CategorySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Статистика';
+$this->title = 'Статистика: ' . $model->title;
 $this->params['breadcrumbs'][] = ['label' => 'Истории', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->title, 'url' => ['update', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = $this->title;
@@ -21,7 +21,7 @@ $this->params['sidebarMenuItems'] = [
 ?>
 <div class="category-index">
     <h1 class="page-header"><?= Html::encode($this->title) ?></h1>
-    
+    <p>Всего просмотров: <?= $model->views_number ?></p>
     <div class="row">
         <div class="col-xs-12">
         <?= ChartJs::widget([
