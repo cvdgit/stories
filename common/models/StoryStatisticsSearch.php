@@ -56,4 +56,20 @@ class StoryStatisticsSearch extends StoryStatistics
 
         return $dataProvider;
     }
+
+    public function getChartData($story_id)
+    {
+        $query = new \yii\db\Query();
+        $rows = $query->select(['slide_number', 'COUNT(id) AS views'])
+                      ->from('story_statistics')
+                      ->where('story_id = :storyid', [':storyid' => $story_id])
+                      ->groupBy('slide_number')
+                      ->indexBy('slide_number')
+                      ->all();
+        return [
+            'labels' => array_keys($rows),
+            'data' => array_map(function($elem) { return $elem['views']; }, $rows),
+        ];
+    }
+
 }

@@ -29,12 +29,20 @@ class StatisticsController extends \yii\web\Controller
 	{
 		$model = Story::findOne($id);
 		$searchModel = new StoryStatisticsSearch();
-		$dataProvider = $searchModel->search($id, Yii::$app->request->queryParams);
+		//$dataProvider = $searchModel->search($id, Yii::$app->request->queryParams);
+        $chartData = $searchModel->getChartData($id);
 		return $this->render('list', [
 			'model' => $model,
-			'searchModel' => $searchModel,
-			'dataProvider' => $dataProvider,
+            'chartData' => $chartData,
+			//'searchModel' => $searchModel,
+			//'dataProvider' => $dataProvider,
 		]);
 	}
+
+    public function actionView($id)
+    {
+
+        return $this->render('view', []);
+    }
 
 }

@@ -3,6 +3,8 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 
+use dosamigos\chartjs\ChartJs;
+
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\CategorySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -19,7 +21,45 @@ $this->params['sidebarMenuItems'] = [
 ?>
 <div class="category-index">
     <h1 class="page-header"><?= Html::encode($this->title) ?></h1>
-    <?= GridView::widget([
+
+    <div class="row">
+        <div class="col-xs-12">
+        <?= ChartJs::widget([
+            'type' => 'bar',
+            'options' => [
+                'height' => 80,
+            ],
+            'clientOptions' => [
+                'scales' => [
+                    'yAxes' => [
+                        ['ticks' => [
+                            'beginAtZero' => true,
+                        ]]
+                    ],
+                ],
+            ],
+            'data' => [
+                'labels' => $chartData['labels'],
+                'datasets' => [
+                    [
+                        'label' => "Просмотр сладов истории",
+                        'backgroundColor' => "rgba(54, 162, 235, 0.2)",
+                        'borderColor' => "rgb(54, 162, 235)",
+                        'borderWidth' => 1,
+                        'pointBackgroundColor' => "rgba(179,181,198,1)",
+                        'pointBorderColor' => "#fff",
+                        'pointHoverBackgroundColor' => "#fff",
+                        'pointHoverBorderColor' => "rgba(179,181,198,1)",
+                        'data' => $chartData['data'],
+                    ],
+                ]
+            ]
+        ]);
+        ?>
+        </div>
+    </div>
+
+    <?php /* GridView::widget([
         'dataProvider' => $dataProvider,
         // 'filterModel' => $searchModel,
         'columns' => [
@@ -38,5 +78,5 @@ $this->params['sidebarMenuItems'] = [
                 'format' => 'datetime',
             ]
         ],
-    ]); ?>
+    ]); */ ?>
 </div>

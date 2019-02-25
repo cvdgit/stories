@@ -21,8 +21,6 @@ use yii\db\Expression;
  * @property int $status
  * @property int $category_id
  * @property int $sub_access
- * @property int $dropbox_sync_date
- * @property string $dropbox_story_filename
  * @property string $story_file
  * @property string $description
  * @property int $source_id
@@ -78,8 +76,8 @@ class Story extends \yii\db\ActiveRecord
         return [
             [['title', 'alias', 'user_id', 'category_id', 'source_id'], 'required'],
             [['body', 'cover', 'story_file', 'source_dropbox', 'source_powerpoint'], 'string'],
-            [['created_at', 'updated_at', 'user_id', 'category_id', 'sub_access', 'dropbox_sync_date', 'source_id', 'views_number'], 'integer'],
-            [['title', 'alias', 'dropbox_story_filename'], 'string', 'max' => 255],
+            [['created_at', 'updated_at', 'user_id', 'category_id', 'sub_access', 'source_id', 'views_number'], 'integer'],
+            [['title', 'alias'], 'string', 'max' => 255],
             [['alias'], 'unique'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::className(), 'targetAttribute' => ['category_id' => 'id']],
@@ -107,8 +105,6 @@ class Story extends \yii\db\ActiveRecord
             'tagNames' => 'Тэги',
             'category_id' => 'Категория',
             'sub_access' => 'По подписке',
-            'dropbox_sync_date' => 'Синхронизация с Dropbox',
-            'dropbox_story_filename' => 'Файл в Dropbox',
             'cover' => 'Обложка',
             'story_file' => 'Файл PowerPoint',
             'description' => 'Краткое описание',
@@ -179,11 +175,6 @@ class Story extends \yii\db\ActiveRecord
     {
         $arr = self::getSubAccessArray();
         return $arr[$this->sub_access];
-    }
-
-    public function isDropboxSync()
-    {
-        return !empty($this->dropbox_sync_date);
     }
 
     public static function findLastPublishedStories()

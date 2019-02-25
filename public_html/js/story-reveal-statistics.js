@@ -38,7 +38,7 @@ var StoryRevealStatistics = window.StoryRevealStatistics || (function() {
 			slide_number: event.indexh,
 			begin_time: tsA,
 			end_time: tsB,
-			chars: event.currentSlide.innerText.length,
+			chars: event.currentSlide.innerText.split(' ').length,
 			session: session
 		};
 		send(data);
