@@ -49,15 +49,15 @@ class StoryPowerPointService
 
   protected function getSlideHtml($args)
   {
-    return vsprintf('<section data-id="373b64b98ac710935dfbdcbab5e10ae3" data-background-color="#000000">
-                       <div class="sl-block" data-block-type="image" style="min-width: 4px; min-height: 4px; %3$s left: 0px; top: 0px;" data-block-id="65b8a7e6d1bddee449a0ecfd80a09c55">
+    return vsprintf('<section data-background-color="#000000">
+                       <div class="sl-block" data-block-type="image" style="min-width: 4px; min-height: 4px; %3$s left: 0px; top: 0px;">
                          <div class="sl-block-content" style="z-index: 11;">
                            <img data-natural-width="1459" data-natural-height="1080" data-src="%1$s">
                          </div>
                        </div>
-                       <div class="sl-block" data-block-type="text" style="height: auto; min-width: 30px; min-height: 30px; width: 290px; left: 983px; top: 9px;" data-block-id="25fdd2cdf70f9ce9756d1d164a9cd02f">
-                         <div class="sl-block-content" data-placeholder-tag="p" data-placeholder-text="Text" style="z-index: 12;">
-                           <p><span style="color:#FFFFFF;font-size:0.8em">%2$s</span></p>
+                       <div class="sl-block" data-block-type="text" style="height: auto; min-width: 30px; min-height: 30px; width: 290px; left: 983px; top: 9px;">
+                         <div class="sl-block-content" data-placeholder-tag="p" data-placeholder-text="Text" style="z-index: 12;text-align: left">
+                           %2$s
                          </div>
                        </div>
                      </section>', $args);
@@ -111,7 +111,12 @@ class StoryPowerPointService
     		}
 
     		if (get_class($shape) == 'PhpOffice\PhpPresentation\Shape\RichText') {
-    			$slideText = $shape->getPlainText();
+          foreach ($shape->getParagraphs() as $paragraph) {
+            $text = $paragraph->getPlainText();
+            if (strlen($text) > 0) {
+              $slideText .= '<p><span style="color:#FFFFFF;font-size:0.8em">' . $text . '</span></p>';
+            }
+          }
     		}
     	}
 
