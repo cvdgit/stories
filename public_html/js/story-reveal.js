@@ -79,7 +79,8 @@ var RevealConfig = {
     //    { src: 'js/reveal-plugins/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
     //    { src: 'js/reveal-plugins/zoom/zoom.js', async: true }
         {src: '/js/revealjs-customcontrols/customcontrols.js'},
-        {src: '/js/story-reveal-statistics.js'}
+        {src: '/js/story-reveal-statistics.js'},
+        {src: '/js/story-reveal-feedback.js'}
     ]
 };
 

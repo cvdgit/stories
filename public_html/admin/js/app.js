@@ -10,6 +10,29 @@ BootstrapAlert.prototype.error = function(message) {
     return $(this.htmlBegin + message + this.htmlEnd).addClass('alert-danger');
 }
 
+var StoryAlert = (function() {
+
+    var $elem = $('<div class="alert fade in"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button></div>');
+    var $placeholder = $('#alert_placeholder');
+
+    function show($el) {
+        return $el.appendTo($placeholder);
+    }
+
+    function success(message) {
+        show($elem.text(message).addClass('alert-success'));
+    }
+
+    function error(message) {
+        show($elem.text(message).addClass('alert-danger'));
+    }
+
+    return {
+        success: success,
+        error: error
+    };
+})();
+
 window.storyAlert = new BootstrapAlert();
 
 var doneCallback = function(data) {

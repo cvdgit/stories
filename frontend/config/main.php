@@ -67,6 +67,7 @@ return [
                 'file-avatar' => 'upload/file-avatar',
 
                 'statistics/write/<id:\d+>' => 'statistics/write',
+                'feedback/create/<id:\d+>' => 'feedback/create',
             ],
         ],
     ],

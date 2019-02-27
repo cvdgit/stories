@@ -2,6 +2,7 @@
 .story-controls {
     height: 50px;
     background-color: #000;
+    position: relative;
 }
 
 .customcontrols {

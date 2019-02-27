@@ -66,16 +66,27 @@ class RevealWidget extends Widget
         RevealAsset::register($view);
 
         $this->registerStatistics();
+
+        $this->registerFeedback();
     }
 
     public function registerStatistics()
     {
     	$config = [
     		'action' => Url::to(['statistics/write', 'id' => $this->story_id]),
-    		'modelName' => 'StoryStatistics',
     	];
     	$configJson = Json::htmlEncode($config);
         $js = "Reveal.configure({statisticsConfig: $configJson});";
+        $this->getView()->registerJs($js);
+    }
+
+    public function registerFeedback()
+    {
+        $config = [
+            'action' => Url::to(['feedback/create', 'id' => $this->story_id]),
+        ];
+        $configJson = Json::htmlEncode($config);
+        $js = "Reveal.configure({feedbackConfig: $configJson});";
         $this->getView()->registerJs($js);
     }
 
