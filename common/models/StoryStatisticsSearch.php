@@ -68,7 +68,7 @@ class StoryStatisticsSearch extends StoryStatistics
                       ->all();
         return [
             'labels' => array_keys($rows),
-            'data' => array_map(function($elem) { return $elem['views']; }, $rows),
+            'data' => array_values(array_map(function($elem) { return $elem['views']; }, $rows)),
         ];
     }
 
@@ -83,7 +83,7 @@ class StoryStatisticsSearch extends StoryStatistics
                       ->all();
         return [
             'labels' => array_keys($rows),
-            'data' => array_map(function($elem) { return $elem['time']; }, $rows),
+            'data' => array_values(array_map(function($elem) { return $elem['time']; }, $rows)),
         ];
     }
 
@@ -98,7 +98,7 @@ class StoryStatisticsSearch extends StoryStatistics
                       ->all();
         return [
             'labels' => array_keys($rows),
-            'data' => array_map(function($elem) { return $elem['time']; }, $rows),
+            'data' => array_values(array_map(function($elem) { return $elem['time']; }, $rows)),
         ];
     }
 
