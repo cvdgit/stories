@@ -7,29 +7,23 @@ use yii;
 class SlideEditorForm extends yii\base\Model
 {
 
-    public $slides = [];
+    public $text;
+    public $story_id;
+    public $slide_index;
 
     public function rules()
     {
         return [
-            [['slides'], 'safe'],
+            [['text'], 'string'],
+            [['story_id', 'slide_index'], 'integer'],
         ];
     }
 
     public function attributeLabels()
     {
         return [
-            'slides' => 'Слайд',
+            'text' => 'Текст слайда',
         ];
-    }
-
-    public function loadSlidesFromBody($body)
-    {
-        $document = \phpQuery::newDocumentHTML($body);
-        $slides = $document->find('section');
-        foreach ($slides as $slide) {
-            $this->slides[] = pq($slide)->htmlOuter();
-        }
     }
 
 }

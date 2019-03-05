@@ -236,7 +236,14 @@ class StoryController extends \yii\web\Controller
         if ($model->load(Yii::$app->request->post())) {
             $body = '';
             try {
-                $body = $service->createStoryFromPowerPoint($model);
+
+                $story = $service->loadStory($model);
+
+                $storyEditor = new \backend\components\StoryEditor($story);
+                $html = $storyEditor->getStoryMarkup();
+
+                $body = '<div class="slides">' . $html . '</div>';
+                $html = '';
             }
             catch (Exception $ex) {
                 return $this->sendErrorResponse($ex->getMessage());

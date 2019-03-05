@@ -5,20 +5,15 @@ namespace backend\controllers;
 use Yii;
 use yii\filters\AccessControl;
 use yii\base\Model;
+use yii\helpers\Html;
+
 use common\models\Story;
-use common\services\RevealService;
+use backend\components\StoryHtmlReader;
+use backend\components\StoryEditor;
 use backend\models\SlideEditorForm;
 
 class EditorController extends \yii\web\Controller
 {
-
-    public $service;
-
-    public function __construct($id, $module, RevealService $service, $config = [])
-    {
-        parent::__construct($id, $module, $config);
-        $this->service = $service;
-    }
 
     public function behaviors()
     {
@@ -38,20 +33,60 @@ class EditorController extends \yii\web\Controller
 	public function actionEdit($id)
 	{
 
-        $story = Story::findOne($id);
+        $reader = new StoryHtmlReader();
 
-        $model = new SlideEditorForm();
-        $model->loadSlidesFromBody($story->body);
+        $model = Story::findOne($id);
+        $story = $reader->loadStoryFromHtml($model->body);
 
-        if ($model->load(Yii::$app->request->post())) {
-            $body = $this->service->wrapSlides(implode('', $model->slides));
-            $story->saveBody($body);
-            Yii::$app->session->setFlash('success', 'Изменения успешно сохранены');
-        }
+        $editorModel = new SlideEditorForm();
+        $editorModel->story_id = $model->id;
 
 		return $this->render('edit', [
             'model' => $model,
+            'story' => $story,
+            'editorModel' => $editorModel,
 		]);
 	}
+
+    public function actionGetSlideByIndex($story_id, $slide_index)
+    {
+
+        $reader = new StoryHtmlReader();
+
+        $model = Story::findOne($story_id);
+        $story = $reader->loadStoryFromHtml($model->body);
+
+        $editor = new StoryEditor($story);
+        $response['html'] = $editor->getSlideMarkup($slide_index);
+        $response['story'] = $editor->getSlideValues($slide_index);
+
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        return $response;
+    }
+
+    public function actionSetSlideText()
+    {
+
+        $editorModel = new SlideEditorForm();
+        $success = false;
+
+        if ($editorModel->load(Yii::$app->request->post()) && $editorModel->validate()) {
+
+            $reader = new StoryHtmlReader();
+
+            $model = Story::findOne($editorModel->story_id);
+            $story = $reader->loadStoryFromHtml($model->body);
+
+            $editor = new StoryEditor($story);
+            $editor->setSlideText($editorModel->slide_index, $editorModel->text);
+
+            $body = '<div class="slides">' . $editor->getStoryMarkup() . '</div>';
+            $model->saveBody($body);
+            $success = true;
+        }
+
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        return ['success' => $success];
+    }
 
 }
