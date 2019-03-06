@@ -26,16 +26,12 @@ $this->params['sidebarMenuItems'] = [
 <div class="row">
 	<div class="col-xs-3">
 		<div id ="preview-container" style="overflow: auto">
-	<?php foreach ($story->getSlides() as $slide): ?>
+		<?php foreach ($story->getSlides() as $slide): ?>
 		<?php $slideIndex = $slide->getSlideNumber() - 1; ?>
-		<div class="img-thumbnail" style="height: 164px; width: 218px; margin-bottom: 10px" data-slide-index="<?= $slideIndex ?>">
-		<?php foreach ($slide->getBlocks() as $block): ?>
-			<?php if (get_class($block) == 'backend\components\SlideBlockImage'): ?>
-			<?= Html::a(Html::img($block->getSrc(), ['height' => 154]), '#', ['onclick' => 'StoryEditor.loadSlide(' . $slideIndex . '); return false']) ?>
-			<?php endif ?>
+			<div class="img-thumbnail preview-container-item" style="height: 164px; width: 218px; margin-bottom: 10px" data-slide-index="<?= $slideIndex ?>">
+			<?= Html::a("Слайд {$slide->getSlideNumber()}", '#', ['class' => '', 'onclick' => 'StoryEditor.loadSlide(' . $slideIndex . '); return false']) ?>
+			</div>
 		<?php endforeach ?>
-		</div>
-	<?php endforeach ?>
 		</div>
 	</div>
 	<div class="col-xs-9" style="height: 484px">
