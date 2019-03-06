@@ -29,7 +29,7 @@ $this->params['sidebarMenuItems'] = [
 		<?php foreach ($story->getSlides() as $slide): ?>
 		<?php $slideIndex = $slide->getSlideNumber() - 1; ?>
 			<div class="img-thumbnail preview-container-item" style="height: 164px; width: 218px; margin-bottom: 10px" data-slide-index="<?= $slideIndex ?>">
-			<?= Html::a("Слайд {$slide->getSlideNumber()}", '#', ['class' => '', 'onclick' => 'StoryEditor.loadSlide(' . $slideIndex . '); return false']) ?>
+			<?= Html::a("Слайд {$slideIndex}", '#', ['class' => '', 'onclick' => 'StoryEditor.loadSlide(' . $slideIndex . '); return false']) ?>
 			</div>
 		<?php endforeach ?>
 		</div>

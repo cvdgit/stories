@@ -2,6 +2,8 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\web\JsExpression;
+use yii\helpers\Url;
 
 use dosamigos\chartjs\ChartJs;
 
@@ -16,8 +18,17 @@ $this->params['breadcrumbs'][] = $this->title;
 
 $this->params['sidebarMenuItems'] = [
     ['label' => 'История', 'url' => ['story/update', 'id' => $model->id]],
+    ['label' => 'Редактор', 'url' => ['editor/edit', 'id' => $model->id]],
     ['label' => 'Статистика', 'url' => ['statistics/list', 'id' => $model->id]],
 ];
+
+$url = Url::to(['/editor/edit', 'id' => $model->id]);
+$js = <<< JS
+function onClickCallback(event, item) {
+    window.open('$url' + '#/' + item[0]._index);
+}
+JS;
+$this->registerJs($js);
 ?>
 <div class="category-index">
     <h1 class="page-header"><?= Html::encode($this->title) ?></h1>
@@ -44,6 +55,7 @@ $this->params['sidebarMenuItems'] = [
                         ]]
                     ],
                 ],
+                'onClick' => new JsExpression('onClickCallback'),
             ],
             'data' => [
                 'labels' => $chartData2['labels'],
@@ -88,6 +100,7 @@ $this->params['sidebarMenuItems'] = [
                         ]]
                     ],
                 ],
+                'onClick' => new JsExpression('onClickCallback'),
             ],
             'data' => [
                 'labels' => $chartData3['labels'],
@@ -132,6 +145,7 @@ $this->params['sidebarMenuItems'] = [
                         ]]
                     ],
                 ],
+                'onClick' => new JsExpression('onClickCallback'),
             ],
             'data' => [
                 'labels' => $chartData['labels'],
