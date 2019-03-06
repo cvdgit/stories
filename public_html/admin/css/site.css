@@ -261,3 +261,8 @@ body {
 .bs-callout-info h4 {
     color: #5bc0de;
 }
+
+
+#preview-container .active {
+    background-color: #428bca;
+}

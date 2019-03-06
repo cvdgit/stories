@@ -73,7 +73,15 @@ $this->registerJs($js, yii\web\View::POS_END);
                 'attribute' => 'created_at',
                 'value' => 'created_at',
                 'format' => 'datetime',
-            ]
+            ],
+            [
+                'format' => 'raw',
+                'value' => function($model) {
+                    return Html::a('Слайд', 
+                                   ['/editor/edit', 'id' => $model->story_id, '#' => '/' . $model->slide_number],
+                                   ['class' => 'btn btn-primary btn-xs', 'target' => '_blank', 'data-pjax' => 0]);
+                }
+            ],
         ],
     ]) ?>
     <?php yii\widgets\Pjax::end() ?>

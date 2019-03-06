@@ -2,13 +2,14 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use backend\assets\RevealAsset;
+use backend\assets\StoryEditorAsset;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\CategorySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-RevealAsset::register($this);
+//RevealAsset::register($this);
+StoryEditorAsset::register($this);
 
 $this->title = 'Редактор историй' . $model->title;
 $this->params['breadcrumbs'][] = ['label' => 'Истории', 'url' => ['index']];
@@ -24,15 +25,18 @@ $this->params['sidebarMenuItems'] = [
 
 <div class="row">
 	<div class="col-xs-3">
+		<div id ="preview-container" style="overflow: auto">
 	<?php foreach ($story->getSlides() as $slide): ?>
-		<div class="img-thumbnail" style="height: 164px; width: 218px; margin-bottom: 10px">
+		<?php $slideIndex = $slide->getSlideNumber() - 1; ?>
+		<div class="img-thumbnail" style="height: 164px; width: 218px; margin-bottom: 10px" data-slide-index="<?= $slideIndex ?>">
 		<?php foreach ($slide->getBlocks() as $block): ?>
 			<?php if (get_class($block) == 'backend\components\SlideBlockImage'): ?>
-			<?= Html::a(Html::img($block->getSrc(), ['height' => 154]), '#', ['onclick' => 'StoryEditor.loadSlide(' . ($slide->getSlideNumber() - 1) . '); return false']) ?>
+			<?= Html::a(Html::img($block->getSrc(), ['height' => 154]), '#', ['onclick' => 'StoryEditor.loadSlide(' . $slideIndex . '); return false']) ?>
 			<?php endif ?>
 		<?php endforeach ?>
 		</div>
 	<?php endforeach ?>
+		</div>
 	</div>
 	<div class="col-xs-9" style="height: 484px">
 		<div class="reveal" id="story-editor">
@@ -65,7 +69,9 @@ $js = <<< JS
     	storyID: {$model->id},
     	textFieldID: '$textFieldId'
     });
-	StoryEditor.loadSlide(0);
+    var slideIndex = StoryEditor.readUrl();
+    slideIndex = slideIndex || 0;
+	StoryEditor.loadSlide(slideIndex);
 JS;
 $this->registerJs($js);
 ?>
