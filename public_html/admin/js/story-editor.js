@@ -19,7 +19,7 @@ var StoryEditor = (function() {
     		'slide_index=' + index
     	];
         return $.ajax({
-            url: config.getSlideAction + part.join('&'),
+            url: config.getSlideAction + '&' + part.join('&'),
             type: 'GET',
             dataType: 'json'
         });
