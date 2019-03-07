@@ -25,7 +25,7 @@ use yii\db\Expression;
  * @property string $description
  * @property int $source_id
  * @property int $views_number
- * @property int $slide_number
+ * @property int $slides_number
  *
  * @property User $author
  * @property Tags $tags
@@ -77,7 +77,7 @@ class Story extends \yii\db\ActiveRecord
         return [
             [['title', 'alias', 'user_id', 'category_id', 'source_id'], 'required'],
             [['body', 'cover', 'story_file', 'source_dropbox', 'source_powerpoint'], 'string'],
-            [['created_at', 'updated_at', 'user_id', 'category_id', 'sub_access', 'source_id', 'views_number', 'slide_number'], 'integer'],
+            [['created_at', 'updated_at', 'user_id', 'category_id', 'sub_access', 'source_id', 'views_number', 'slides_number'], 'integer'],
             [['title', 'alias'], 'string', 'max' => 255],
             [['alias'], 'unique'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
