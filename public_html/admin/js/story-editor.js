@@ -16,11 +16,10 @@ var StoryEditor = (function() {
 
     function send(index) {
     	var part = [
-    		'story_id=' + config.storyID,
     		'slide_index=' + index
     	];
         return $.ajax({
-            url: '/admin/index.php?r=editor/get-slide-by-index&' + part.join('&'),
+            url: config.getSlideAction + part.join('&'),
             type: 'GET',
             dataType: 'json'
         });

@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use backend\assets\StoryEditorAsset;
 
@@ -8,7 +9,6 @@ use backend\assets\StoryEditorAsset;
 /* @var $searchModel common\models\CategorySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-//RevealAsset::register($this);
 StoryEditorAsset::register($this);
 
 $this->title = 'Редактор историй' . $model->title;
@@ -59,10 +59,12 @@ $('#{$form->getId()}')
 JS;
 
 $textFieldId = Html::getInputId($editorModel, 'text');
+$action = Url::to(['/editor/get-slide-by-index', 'story_id' => $model->id]);
 $this->registerJs($js);
 $js = <<< JS
     StoryEditor.initialize({
     	storyID: {$model->id},
+    	getSlideAction: '$action',
     	textFieldID: '$textFieldId'
     });
     var slideIndex = StoryEditor.readUrl();
