@@ -25,7 +25,7 @@ $this->params['sidebarMenuItems'] = [
 $url = Url::to(['/editor/edit', 'id' => $model->id]);
 $js = <<< JS
 function onClickCallback(event, item) {
-    window.open('$url' + '#/' + (1 + item[0]._index));
+    window.open('$url' + '#/' + item[0]._index);
 }
 JS;
 $this->registerJs($js);

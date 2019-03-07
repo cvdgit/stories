@@ -188,7 +188,10 @@ class StoryController extends \yii\web\Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        
+        $this->service->deleteStoryFiles($model);
+        $model->delete();
 
         return $this->redirect(['index']);
     }

@@ -49,4 +49,51 @@ class StoryService
         return $images;
     }
 
+    public static function getStoryFilePath($storyFile)
+    {
+        return Yii::getAlias('@public') . '/slides_file/' . $storyFile;
+    }
+
+    protected function getStoryFiles($story)
+    {
+        $files = [];
+        if (!empty($story->cover)) {
+            $files[] = $this->getCoverPath($story->cover);
+        }
+        if (!empty($story->story_file)) {
+            $files[] = self::getStoryFilePath($story->story_file);
+            $imagesFolder = Yii::getAlias('@public') . '/slides/' . $story->story_file . '/';
+            if (file_exists($imagesFolder)) {
+                $dir = new \DirectoryIterator($imagesFolder);
+                foreach ($dir as $file) {
+                    if ($file->isFile()) {
+                        $files[] = $file->getPathname();
+                    }
+                }
+                $files[] = $imagesFolder;
+            }
+        }
+        return $files;
+    }
+
+    private function _deleteFile($file)
+    {
+        if (file_exists($file)) {
+            if (is_dir($file)) {
+                rmdir($file);
+            }
+            else {
+                unlink($file);
+            }
+        }
+    }
+
+    public function deleteStoryFiles($story)
+    {
+        $files = $this->getStoryFiles($story);
+        foreach ($files as $fileName) {
+            $this->_deleteFile($fileName);
+        }
+    }
+
 }
