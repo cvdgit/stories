@@ -78,7 +78,7 @@
     margin-right: 0;
   }
   .info-header a {
-    font-size: 12px;
+    font-size: 14px; /* 12 */
   }
   .cart-modal {
     left: auto;
@@ -101,7 +101,7 @@
     margin-right: 16px;
   }
   .header .menu li a {
-    font-size: 11px;
+    font-size: 14px; /* 11 */
   }
   .header .menu .mega-menu-top:before,
   .header .menu .children:before {

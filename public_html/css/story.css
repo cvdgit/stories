@@ -3,7 +3,7 @@
 }
 .demo {
     position: relative;
-    display: inline-block;
+    /* display: inline-block; */
     margin: 0 auto;
     font-size: 10px;
     color: #f5f5f5;
@@ -86,4 +86,13 @@
 }
 h2 {
     text-transform: none !important;
+}
+
+
+footer address a {
+    display: inline;
+}
+
+footer address a:hover {
+    color: black;
 }

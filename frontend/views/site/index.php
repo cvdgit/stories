@@ -8,7 +8,7 @@ use frontend\widgets\StoryWidget;
 $this->title = 'Сервис ускоренного развития речи ребёнка | wikids.ru';
 ?>
 
-<div class="container-fluid">
+<div class="container-fluid" style1="padding-left: 0; padding-right: 0">
     <div class="big-banner" style="background: url(/images/wikids-main.jpg) no-repeat center;margin-bottom: 40px">
         <div class="row">
             <div class="col-md-6 col-sm-12" style="display: block">

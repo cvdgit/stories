@@ -132,19 +132,19 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
                 <div class="col-md-9 col-sm-6 col-xs-12">
                     <div class="widget-contact">
                         <h4 class="widget-title">Wikids</h4>
-                        <address>Телефон: (125) 546-4478</address>
+                        <address>Телефон: +7(499)703-35-25</address>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-9 col-sm-6 col-xs-12">
                     <div class="widget-contact">
-                        <address>Email: yesorganic.com</address>
+                        <address>Email: <a href="mailto://info@wikids.ru">info@wikids.ru</a></address>
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-6 col-xs-12">
                     <div class="widget-contact cst-copyright">
-                        <span>Copyright &copy; 2018</span>
+                        <span>Wikids &copy; 2019</span>
                     </div>
                 </div>
             </div>

@@ -130,6 +130,7 @@ class StoryController extends \yii\web\Controller
         $powerPointForm = new SourcePowerPointForm();
         $powerPointForm->storyId = $model->id;
         $powerPointForm->storyFile = $model->story_file;
+        $powerPointForm->slidesNumber = $model->slides_number;
 
         $dropboxForm = new SourceDropboxForm();
         $dropboxForm->storyId = $model->id;
