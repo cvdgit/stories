@@ -42,11 +42,12 @@ class SourcePowerPointForm extends yii\base\Model
         }
     }
 
-    public function saveSource($body)
+    public function saveSource($body, $slidesNumber)
     {
         $story = Story::findOne($this->storyId);
         $story->body = $body;
-        $story->save(false, ['body']);
+        $story->slides_number = $slidesNumber;
+        $story->save(false, ['body', 'slides_number']);
     }
 
 }

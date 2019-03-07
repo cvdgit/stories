@@ -238,9 +238,11 @@ class StoryController extends \yii\web\Controller
     {
         if ($model->load(Yii::$app->request->post())) {
             $body = '';
+            $slidesNumber = 0;
             try {
 
                 $story = $service->loadStory($model);
+                $slidesNumber = $story->getSlideCount();
 
                 $storyEditor = new \backend\components\StoryEditor($story);
                 $html = $storyEditor->getStoryMarkup();
@@ -251,7 +253,7 @@ class StoryController extends \yii\web\Controller
             catch (Exception $ex) {
                 return $this->sendErrorResponse($ex->getMessage());
             }
-            $model->saveSource($body);
+            $model->saveSource($body, $slidesNumber);
             return $this->sendSuccessResponse('Успешно');
         }
         return $this->sendErrorResponse($model->getErrors());

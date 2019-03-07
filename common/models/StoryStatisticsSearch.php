@@ -5,8 +5,11 @@ namespace common\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\data\ArrayDataProvider;
 use yii\data\Sort;
+
 use common\models\StoryStatistics;
+
 
 /**
  * StoryStatisticsSearch represents the model behind the search form of `common\models\StoryStatistics`.
@@ -100,6 +103,28 @@ class StoryStatisticsSearch extends StoryStatistics
             'labels' => array_keys($rows),
             'data' => array_values(array_map(function($elem) { return $elem['time']; }, $rows)),
         ];
+    }
+
+    public function getChartData4()
+    {
+
+        $subQuery = (new \yii\db\Query())->select(['ROUND(COUNT(stat.story_id) * 100 / stry.views_number)'])
+                                         ->from('story_statistics stat')
+                                         ->where('stat.story_id = stry.id AND stat.slide_number = stry.slides_number - 1');
+
+        $rows = (new \yii\db\Query())->select(['stry.id', 'stry.title', 'stry.views_number', 'story_done' => $subQuery])
+                                     ->from('story stry')
+                                     ->where('stry.views_number > 0')
+                                     ->orderBy(['stry.views_number' => SORT_DESC])
+                                     ->limit(10)
+                                     ->indexBy('id')
+                                     ->all();
+
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => $rows,
+        ]);
+
+        return $dataProvider;
     }
 
 }

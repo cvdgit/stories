@@ -5,7 +5,9 @@ use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+
 use common\models\LoginForm;
+use common\models\StoryStatisticsSearch;
 
 /**
  * Site controller
@@ -64,7 +66,11 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $statisticsModel = new StoryStatisticsSearch();
+        $dataProvider = $statisticsModel->getChartData4();
+        return $this->render('index', [
+            'dataProvider' => $dataProvider,
+        ]);
     }
 
     /**
