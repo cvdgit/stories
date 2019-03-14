@@ -11,7 +11,7 @@ use common\widgets\Alert;
 $this->title = 'Регистрация';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="bg-grey form-container">
+<div class="form-container">
     <div class="container">
         <?= Alert::widget() ?>
         <div class="site-signup">
@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         <?= $form->field($model, 'email', ['inputOptions' => ['placeholder' => 'Email пользователя']]) ?>
                         <?= $form->field($model, 'password', ['inputOptions' => ['placeholder' => 'Пароль']])->passwordInput() ?>    
                         <p class="info-text" align="justify">Указывая свои данные, вы даете полное согласие на обработку персональных данных в соответствии с <?= Html::a('политикой конфиденциальности', ['/policy']) ?>.</p>
-                        <?= Html::submitButton('Зарегистрироваться', ['class' => 'custom-btn white form-btn', 'name' => 'signup-button']) ?>    
+                        <?= Html::submitButton('Зарегистрироваться', ['class' => 'custom-btn form-btn', 'name' => 'signup-button']) ?>    
                     <?php ActiveForm::end(); ?>
                 </div>
             </div>

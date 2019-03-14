@@ -37,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'options' => ['class'=> null, 'placeholder' => 'Код подтверждения'],
                         ]) ?>                         
                         <p class="info-text" align="justify">Указывая свои данные, вы даете полное согласие на обработку персональных данных в соответствии с <?= Html::a('политикой конфиденциальности', ['/policy']) ?>.</p> 
-                        <?= Html::submitButton('Отправить', ['class' => 'custom-btn white form-btn']) ?>    
+                        <?= Html::submitButton('Отправить', ['class' => 'custom-btn form-btn']) ?>    
                     <?php ActiveForm::end(); ?>
                 </div>
             </div>

@@ -167,16 +167,15 @@ class SiteController extends Controller
     public function actionSignup()
     {
         $model = new SignupForm();
-        if ($model->load(Yii::$app->request->post()) && $model->validate())
-        {
-            if ($user = $model->signup())
-            {
-                $sent = $model->sentEmailConfirm($user);
-                if ($sent) {
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            if ($user = $model->signup()) {
+                try {
+                    $model->sentEmailConfirm($user);
                     Yii::$app->session->setFlash('success', 'Проверьте свой адрес электронной почты, чтобы подтвердить регистрацию.');
                     return $this->goHome();
                 }
-                else {
+                catch (\Exception $ex) {
+                    Yii::$app->errorHandler->logException($ex);
                     Yii::$app->session->setFlash('error', 'Ошибка при отправке письма с подтверждением регистрации на сайте.');
                 }
             }

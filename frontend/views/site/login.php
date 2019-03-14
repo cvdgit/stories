@@ -11,7 +11,7 @@ use common\widgets\Alert;
 $this->title = 'Вход';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="bg-grey form-container"> 
+<div class="form-container"> 
 <div class="container">
     <?= Alert::widget() ?>
     <div class="row widget-search">
@@ -30,7 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     Если вы забыли свой пароль, вы можете <?= Html::a('сбросить его', ['site/request-password-reset']) ?>.
                 </div>
                 <div class="form-group">
-                    <?= Html::submitButton('Войти', ['class' => 'custom-btn white form-btn', 'name' => 'login-button']) ?>  
+                    <?= Html::submitButton('Войти', ['class' => 'custom-btn form-btn', 'name' => 'login-button']) ?>  
                 </div>
             <?php ActiveForm::end(); ?>
         </div>
