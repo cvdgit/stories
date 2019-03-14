@@ -7,8 +7,12 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
-$this->title = 'Сброс пароля';
-$this->params['breadcrumbs'][] = $this->title;
+$title = 'Сброс пароля';
+$this->setMetaTags($title,
+                   $title,
+                   '',
+                   $title);
+$this->params['breadcrumbs'][] = $title;
 ?>
 <div class="site-reset-password">
     <h1><?= Html::encode($this->title) ?></h1>

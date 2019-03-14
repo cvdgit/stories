@@ -9,8 +9,12 @@ use yii\bootstrap\ActiveForm;
 use yii\captcha\Captcha;
 use common\widgets\Alert;
 
-$this->title = 'Контакты';
-$this->params['breadcrumbs'][] = $this->title;
+$title = 'Контакты';
+$this->setMetaTags($title,
+                   $title,
+                   'wikids, контакты',
+                   $title);
+$this->params['breadcrumbs'][] = $title;
 ?>
 <div class="form-container">
     <div class="container">

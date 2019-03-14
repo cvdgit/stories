@@ -7,15 +7,18 @@
 
 use yii\helpers\Html;
 
-$this->title = $name;
+$title = $name;
+$this->setMetaTags($title,
+                   $title,
+                   '',
+                   $title);
 ?>
-
 <div class="error-page">
     <div class="container-large">
         <div class="inside text-center">
-            <h2><?= Html::encode($this->title) ?></h2>
+            <h2><?= Html::encode($title) ?></h2>
             <p><?= nl2br(Html::encode($message)) ?></p>
-            <?= Html::a('back to home page', ['/site/index'], ['class' => 'custom-btn green']) ?>
+            <?= Html::a('На главную', ['/site/index'], ['class' => 'custom-btn green']) ?>
         </div>
     </div>
 </div>

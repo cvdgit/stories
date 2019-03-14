@@ -70,6 +70,11 @@ return [
                 'feedback/create/<id:\d+>' => 'feedback/create',
             ],
         ],
+        'view' => [
+            'as seo' => [
+                'class' => 'frontend\components\SeoViewBehavior',
+            ],
+        ],
     ],
     'params' => $params,
 ];

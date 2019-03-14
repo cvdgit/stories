@@ -105,7 +105,7 @@ class CustomerPayment {
     public function getLastPaymentUser($user)
     {
         $finish = $user->getPayments()->max('finish');
-        return $payment = Payment::findOne([
+        return Payment::findOne([
             'user_id' => $user->id,
             'finish' => $finish,
         ]); 

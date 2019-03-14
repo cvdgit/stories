@@ -5,7 +5,9 @@ use frontend\widgets\StoryWidget;
 
 /* @var $this yii\web\View */
 
-$this->title = 'Сервис ускоренного развития речи ребёнка | wikids.ru';
+$this->setMetaTags('Сервис ускоренного развития речи ребёнка',
+                   'Сервис ускоренного развития речи ребёнка',
+                   'wikids, сказки, истории');
 ?>
 
 <div class="container-fluid" style1="padding-left: 0; padding-right: 0">

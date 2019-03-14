@@ -9,8 +9,12 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $model common\models\User */
 
-$this->title = 'Профиль пользователя';
-$this->params['breadcrumbs'][] = $this->title;
+$title = 'Профиль пользователя';
+$this->setMetaTags($title,
+                   $title,
+                   '',
+                   $title);
+$this->params['breadcrumbs'][] = $title;
 
 $session = Yii::$app->session;
 $passwordMessage = $session->get('password-message');

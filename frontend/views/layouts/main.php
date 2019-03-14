@@ -74,7 +74,7 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
         <div class="container-large header">
             <div class="row">
                 <div class="col-md-2 col-sm-3 col-xs-3 text-center">
-                    <div class="logo"><?= Html::a(Html::img('/images/logo.png', ['alt' => 'logo']), ['/site/index']) ?></div>
+                    <div class="logo"><?= Html::a(Html::img('/images/logo.png', ['alt' => 'wikids', 'title' => 'wikids']), ['/site/index']) ?></div>
                 </div>
                 <div class="col-md-5 col-sm-4 col-xs-4">
                     <?php
@@ -115,7 +115,7 @@ $isStoryViewPage = ($controller->id === 'story' && $controller->action->id === '
     <?php if (isset($this->params['breadcrumbs']) && sizeof($this->params['breadcrumbs']) > 0): ?>
     <div class="breadcrumb-top <?= ($isStoryViewPage ? '' : 'bg-yellow') ?>">
         <div class="container">
-            <h2 <?= ($isStoryViewPage ? 'class="title"' : '') ?>><?= $this->title ?></h2>
+            <h2 <?= ($isStoryViewPage ? 'class="title"' : '') ?>><?= $this->getHeader() ?></h2>
             <?= Breadcrumbs::widget([
                 'tag' => 'ol',
                 'links' => $this->params['breadcrumbs'],

@@ -6,9 +6,13 @@ use yii\helpers\HtmlPurifier;
 /* @var $this yii\web\View */
 /* @var $model common\models\Story */
 
-$this->title = $model->title . ' | wikids.ru';
+$title = $model->title;
+$this->setMetaTags($title,
+                   $model->description,
+                   'wikids, сказки, истории, просмотр истории',
+                   $title);
 $this->params['breadcrumbs'][] = ['label' => 'Каталог историй', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $model->title;
+$this->params['breadcrumbs'][] = $title;
 ?>
 
 <div class="vertical-slider">

@@ -8,8 +8,12 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use common\widgets\Alert;
 
-$this->title = 'Регистрация';
-$this->params['breadcrumbs'][] = $this->title;
+$title = 'Регистрация';
+$this->setMetaTags($title,
+                   $title,
+                   '',
+                   $title);
+$this->params['breadcrumbs'][] = $title;
 ?>
 <div class="form-container">
     <div class="container">

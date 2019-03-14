@@ -30,7 +30,7 @@ class ProfileController extends \yii\web\Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['author'],
+                        'roles' => ['user'],
                     ],
                 ],
             ],
@@ -47,7 +47,7 @@ class ProfileController extends \yii\web\Controller
         return $this->render('index', [
             'modelPassword' => $modelPassword,
             'model' => $user,
-            'rate' => $payment->rate,
+            'rate' => ($payment !== null ? $payment->rate : null),
             'count_date_rate' => $date_rate,
         ]);
     }

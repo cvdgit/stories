@@ -2,7 +2,7 @@
 return [
     'language' => 'ru',
     'sourceLanguage' => 'en',
-    'name' => 'Истории',
+    'name' => 'wikids.ru',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',

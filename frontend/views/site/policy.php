@@ -4,8 +4,12 @@
 
 use yii\helpers\Html;
 
-$this->title = 'Политика конфиденциальности';
-$this->params['breadcrumbs'][] = $this->title;
+$title = 'Политика конфиденциальности';
+$this->setMetaTags($title,
+                   $title,
+                   '',
+                   $title);
+$this->params['breadcrumbs'][] = $title;
 ?>
 <div class="container">
     <p align="justify">Настоящая Политика конфиденциальности персональных данных 

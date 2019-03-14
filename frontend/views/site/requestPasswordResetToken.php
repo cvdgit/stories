@@ -8,8 +8,12 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use common\widgets\Alert;
 
-$this->title = 'Запросить сброс пароля';
-$this->params['breadcrumbs'][] = $this->title;
+$title = 'Запросить сброс пароля';
+$this->setMetaTags($title,
+                   $title,
+                   '',
+                   $title);
+$this->params['breadcrumbs'][] = $title;
 ?>
 <div class="bg-grey form-container">
     <div class="container">
@@ -26,7 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ]
                     ]); ?>                        
                         <?= $form->field($model, 'email', ['inputOptions' => ['placeholder' => 'Email пользователя']])->textInput(['autofocus' => true]) ?>    
-                        <?= Html::submitButton('Отправить', ['class' => 'custom-btn white form-btn']) ?>    
+                        <?= Html::submitButton('Отправить', ['class' => 'custom-btn form-btn']) ?>    
                     <?php ActiveForm::end(); ?>
                 </div>
             </div>

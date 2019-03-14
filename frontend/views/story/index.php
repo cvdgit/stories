@@ -11,8 +11,12 @@ use frontend\widgets\StoryLinkSorter;
 /* @var $searchModel common\models\StorySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Каталог историй';
-$this->params['breadcrumbs'][] = $this->title;
+$title = 'Каталог историй';
+$this->setMetaTags($title,
+                   $title,
+                   'wikids, сказки, истории, каталог историй',
+                   $title);
+$this->params['breadcrumbs'][] = $title;
 ?>
 
 <div class="content-shop">

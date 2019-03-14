@@ -4,8 +4,12 @@
 
 use yii\helpers\Html;
 
-$this->title = 'Подписки';
-$this->params['breadcrumbs'][] = $this->title;
+$title = 'Подписки';
+$this->setMetaTags($title,
+                   $title,
+                   '',
+                   $title);
+$this->params['breadcrumbs'][] = $title;
 ?>
 <div class="site-about">
     <h1><?= Html::encode($this->title) ?></h1>

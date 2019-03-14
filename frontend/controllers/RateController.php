@@ -23,8 +23,8 @@ class RateController extends \yii\web\Controller
     public function actionIndex()
     {
         $date_rate = null;
-        $user = User::findModel($this->userId);
-        if (isset($user)) {
+        $user = User::findOne($this->userId);
+        if ($user !== null) {
             $date_rate = $this->paymentService->dateFinishPayment($user);
         }
         $rates = Rate::find()->all();
