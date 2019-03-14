@@ -133,12 +133,14 @@ class SiteController extends Controller
     {
         $model = new ContactForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
+            try {
+                $model->sendEmail(Yii::$app->params['adminEmail']);
                 Yii::$app->session->setFlash('success', 'Благодарим Вас за обращение к нам. Мы ответим вам как можно скорее.');
-            } else {
+            }
+            catch(\Exception $ex) {
+                Yii::$app->errorHandler->logException($ex);
                 Yii::$app->session->setFlash('error', 'При отправке вашего сообщения произошла ошибка.');
             }
-
             return $this->refresh();
         } else {
             return $this->render('contact', [

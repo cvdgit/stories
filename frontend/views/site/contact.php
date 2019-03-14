@@ -7,12 +7,14 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use yii\captcha\Captcha;
+use common\widgets\Alert;
 
 $this->title = 'Контакты';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="bg-grey form-container">
+<div class="form-container">
     <div class="container">
+        <?= Alert::widget() ?>
         <div class="site-contact">
             <div class="info-text">
                 Если у вас есть деловые вопросы или другие вопросы, пожалуйста, заполните следующую форму, чтобы связаться с нами. Спасибо.
