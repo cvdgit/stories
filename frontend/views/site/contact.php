@@ -33,8 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         <?= $form->field($model, 'verifyCode', ['inputOptions' => ['class'=> null, 'placeholder' => 'Код подтверждения']])->widget(Captcha::className(), [
                             'template' => '<div class="row"><div class="col-lg-3">{image}</div><div class="col-lg-9">{input}</div></div>',
                             'options' => ['class'=> null, 'placeholder' => 'Код подтверждения'],
-                        ]) ?>                        
-                        <?= $form->field($model, 'email', ['inputOptions' => ['placeholder' => 'Email пользователя']])->textInput(['autofocus' => true]) ?>    
+                        ]) ?>                         
                         <p class="info-text" align="justify">Указывая свои данные, вы даете полное согласие на обработку персональных данных в соответствии с <?= Html::a('политикой конфиденциальности', ['/policy']) ?>.</p> 
                         <?= Html::submitButton('Отправить', ['class' => 'custom-btn white form-btn']) ?>    
                     <?php ActiveForm::end(); ?>
