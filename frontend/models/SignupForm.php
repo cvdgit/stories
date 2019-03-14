@@ -74,7 +74,7 @@ class SignupForm extends Model
         }
 
         $auth = Yii::$app->authManager;
-        $authorRole = $auth->getRole('author');
+        $authorRole = $auth->getRole('user');
         $auth->assign($authorRole, $user->getId());
 
         return $user;

@@ -11,32 +11,31 @@ class RbacController extends Controller
         $auth = Yii::$app->authManager;
         $auth->removeAll();
 
-        // Создать роли
-        $author = $auth->createRole('author');
+        $user = $auth->createRole('user');
+        $moderator = $auth->createRole('moderator');
         $admin = $auth->createRole('admin');
 
-        // Create simple, based on action{$NAME} permissions
-        $createStory = $auth->createPermission('createStory');
-        $updateStory = $auth->createPermission('updateStory');
-        $deleteStory = $auth->createPermission('deleteStory');
+        // $createStory = $auth->createPermission('createStory');
+        // $updateStory = $auth->createPermission('updateStory');
+        // $deleteStory = $auth->createPermission('deleteStory');
+        //$manageStories = $auth->createPermission('manageStories');
+        //$auth->add($manageStories);
 
+        //$userGroupRule = new \common\rbac\UserGroupRule;
+        //$auth->add($userGroupRule);
+        //$author->ruleName = $userGroupRule->name;
+        //$admin->ruleName  = $userGroupRule->name;
 
-        // Add permissions in Yii::$app->authManager
-        $auth->add($createStory);
-        $auth->add($updateStory);
-        $auth->add($deleteStory);
+        $auth->add($user);
+        $auth->add($moderator);
+        $auth->add($admin);
 
-        // Add rule, based on UserExt->group === $user->group
-        $userGroupRule = new \common\rbac\UserGroupRule;
-        $auth->add($userGroupRule);
+        $auth->addChild($moderator, $user);
+        $auth->addChild($admin, $moderator);
 
-        // Add rule "UserGroupRule" in roles
-        $author->ruleName = $userGroupRule->name;
-        $admin->ruleName  = $userGroupRule->name;
+        $auth->assign($moderator, 4);
+        $auth->assign($admin, 1);
 
-        // Add roles in Yii::$app->authManager
-        $authManager->add($author);
-        $authManager->add($admin);
 
 /*
         // добавляем разрешение "createStory"

@@ -2,32 +2,13 @@
 namespace backend\controllers;
 
 use Yii;
-use yii\web\Controller;
-use yii\filters\AccessControl;
 use common\models\Tag;
 
 /**
  * Site controller
  */
-class TagController extends Controller
+class TagController extends \backend\components\AdminController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'roles' => ['admin'],
-                    ],
-                ],
-            ],
-        ];
-    }
 
     /**
      * {@inheritdoc}

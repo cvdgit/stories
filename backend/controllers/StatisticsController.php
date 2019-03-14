@@ -7,23 +7,8 @@ use yii\filters\AccessControl;
 use common\models\Story;
 use common\models\StoryStatisticsSearch;
 
-class StatisticsController extends \yii\web\Controller
+class StatisticsController extends \backend\components\AdminController
 {
-
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'roles' => ['admin'],
-                    ],
-                ],
-            ],
-        ];
-    }
 
 	public function actionList($id)
 	{

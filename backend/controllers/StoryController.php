@@ -3,19 +3,20 @@
 namespace backend\controllers;
 
 use Yii;
+use yii\data\ActiveDataProvider;
+use yii\web\UploadedFile;
+use yii\web\HttpException;
+use yii\filters\AccessControl;
+
 use common\models\Story;
 use common\models\StorySearch;
+use common\services\StoryService;
 use backend\models\StoryCoverUploadForm;
 use backend\models\StoryFileUploadForm;
 use backend\models\SourcePowerPointForm;
 use backend\models\SourceDropboxForm;
-use yii\data\ActiveDataProvider;
-use yii\filters\AccessControl;
-use common\services\StoryService;
-use yii\web\UploadedFile;
-use yii\web\HttpException;
 
-class StoryController extends \yii\web\Controller
+class StoryController extends \backend\components\AdminController
 {
     
     public $service;
@@ -26,9 +27,6 @@ class StoryController extends \yii\web\Controller
         $this->service = $service;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function behaviors()
     {
         return [
@@ -37,7 +35,7 @@ class StoryController extends \yii\web\Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['admin'],
+                        'roles' => ['moderator'],
                     ],
                 ],
             ],

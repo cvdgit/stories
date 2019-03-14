@@ -12,7 +12,7 @@ use backend\components\StoryHtmlReader;
 use backend\components\StoryEditor;
 use backend\models\SlideEditorForm;
 
-class EditorController extends \yii\web\Controller
+class EditorController extends \backend\components\AdminController
 {
 
     public function behaviors()
@@ -23,7 +23,7 @@ class EditorController extends \yii\web\Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['admin'],
+                        'roles' => ['moderator'],
                     ],
                 ],
             ],

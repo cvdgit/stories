@@ -7,7 +7,7 @@ use yii\filters\AccessControl;
 use common\models\StoryFeedback;
 use common\models\StoryFeedbackSearch;
 
-class FeedbackController extends \yii\web\Controller
+class FeedbackController extends \backend\components\AdminController
 {
 
     public function behaviors()
@@ -18,7 +18,7 @@ class FeedbackController extends \yii\web\Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['admin'],
+                        'roles' => ['moderator'],
                     ],
                 ],
             ],

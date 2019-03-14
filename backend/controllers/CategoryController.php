@@ -5,31 +5,20 @@ namespace backend\controllers;
 use Yii;
 use common\models\Category;
 use common\models\CategorySearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\filters\AccessControl;
 
 /**
  * CategoryController implements the CRUD actions for Category model.
  */
-class CategoryController extends Controller
+class CategoryController extends \backend\components\AdminController
 {
     /**
      * {@inheritdoc}
      */
     public function behaviors()
     {
-        return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'roles' => ['admin'],
-                    ],
-                ],
-            ],
+        $behaviors = [
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -37,6 +26,7 @@ class CategoryController extends Controller
                 ],
             ],
         ];
+        return array_merge(parent::behaviors(), $behaviors);
     }
 
     /**
