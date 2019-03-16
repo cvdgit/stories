@@ -6,14 +6,27 @@ use Yii;
 use yii\filters\AccessControl;
 use yii\base\Model;
 use yii\helpers\Html;
+use yii\web\UploadedFile;
 
 use common\models\Story;
+use common\services\StoryService;
+use backend\services\StoryEditorService;
 use backend\components\StoryHtmlReader;
 use backend\components\StoryEditor;
 use backend\models\SlideEditorForm;
 
 class EditorController extends \backend\components\AdminController
 {
+
+    protected $service;
+    protected $editor;
+
+    public function __construct($id, $module, StoryService $service, StoryEditorService $editor, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->service = $service;
+        $this->editor = $editor;
+    }
 
     public function behaviors()
     {
@@ -87,6 +100,23 @@ class EditorController extends \backend\components\AdminController
 
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         return ['success' => $success];
+    }
+
+    public function actionUpdateSlide()
+    {
+
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        
+        $editorModel = new SlideEditorForm();
+        if ($editorModel->load(Yii::$app->request->post()) && $editorModel->validate()) {    
+            
+            $this->editor->updateSlide($editorModel);
+            return ['success' => true];
+        }
+        else {
+            return $editorModel->getErrors();
+        }
+        return 'no';
     }
 
 }

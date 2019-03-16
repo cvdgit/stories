@@ -21,6 +21,46 @@ $this->params['sidebarMenuItems'] = [
     ['label' => 'Редактор', 'url' => ['editor/edit', 'id' => $model->id]],
     ['label' => 'Статистика', 'url' => ['statistics/list', 'id' => $model->id]],
 ];
+
+$css = <<< CSS
+.reveal {
+	font-size: 30px;
+}
+.reveal .sl-block {
+	display: block;
+	position: absolute;
+	z-index: auto
+}
+
+.reveal .sl-block .sl-block-content {
+	display: block;
+	position: relative;
+	width: 100%;
+	height: 100%;
+	max-width: none;
+	max-height: none;
+	margin: 0;
+	outline: 0;
+	word-wrap: break-word
+}
+
+.reveal .sl-block .sl-block-content>:first-child {
+	margin-top: 0
+}
+
+.reveal .sl-block .sl-block-content>:last-child {
+	margin-bottom: 0
+}
+.reveal .sl-block[data-block-type="image"] .sl-block-content img {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	vertical-align: top
+}
+CSS;
+$this->registerCss($css);
 ?>
 
 <div class="row">
@@ -43,8 +83,10 @@ $this->params['sidebarMenuItems'] = [
 			<div class="col-xs-12">
 <?php
 $form = ActiveForm::begin([
-	'action' => ['/editor/set-slide-text'],
+	'action' => ['/editor/update-slide'],
+	'options' => ['enctype' => 'multipart/form-data'],
 ]);
+echo $form->field($editorModel, 'image')->fileInput();
 echo $form->field($editorModel, 'text')->textArea(['rows' => 6]);
 echo $form->field($editorModel, 'story_id')->hiddenInput()->label(false);
 echo Html::submitButton('Сохранить', ['class' => 'btn btn-primary']);
@@ -59,13 +101,15 @@ $('#{$form->getId()}')
 JS;
 
 $textFieldId = Html::getInputId($editorModel, 'text');
+$fileFieldId = Html::getInputId($editorModel, 'image');
 $action = Url::to(['/editor/get-slide-by-index', 'story_id' => $model->id]);
 $this->registerJs($js);
 $js = <<< JS
     StoryEditor.initialize({
     	storyID: {$model->id},
     	getSlideAction: '$action',
-    	textFieldID: '$textFieldId'
+    	textFieldID: '$textFieldId',
+    	fileFieldID: '$fileFieldId'
     });
     var slideIndex = StoryEditor.readUrl();
     slideIndex = slideIndex || 0;

@@ -47,6 +47,9 @@ var StoryEditor = (function() {
 		$('[data-slide-index=' + index + ']', $previewContainer).addClass('active');
 
 		var $el = $('#' + config.textFieldID);
+
+		$('#' + config.fileFieldID).val('');
+
 		send(index)
 			.done(function(data) {
 				
@@ -77,12 +80,13 @@ var StoryEditor = (function() {
 
 	    button.button('loading');
 
-	    var formData = $form.serialize();
-	    
 	    $.ajax({
 	        url: $form.attr("action"),
 	        type: $form.attr("method"),
-	        data: formData,
+	        data: new FormData($form[0]),
+	        cache: false,
+			contentType: false,
+			processData: false,
 	        success: function(data) {
 	        	loadSlide(currentSlideIndex);
 	        },

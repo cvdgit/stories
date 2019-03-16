@@ -42,6 +42,17 @@ class StoryEditor
         }
 	}
 
+	public function setSlideImage($slideIndex, $imagePath)
+	{
+        $slide = $this->story->getSlide($slideIndex);
+        foreach ($slide->getBlocks() as $block) {
+            if (get_class($block) == 'backend\components\SlideBlockImage') {
+                $block->setSrc($imagePath);
+                $block->getMarkup()->setImage($imagePath);
+            }
+        }
+	}
+
 	public function getSlideValues($slideIndex)
 	{
 		$slide = $this->story->getSlide($slideIndex);
@@ -116,6 +127,15 @@ class StoryEditor
 	public function getStory()
 	{
 		return $this->story;
+	}
+
+
+	public function updateSlide($slideIndex, $slideText, $slideImage = '')
+	{
+		$this->setSlideText($slideIndex, $slideText);
+		if (!empty($slideImage)) {
+			$this->setSlideImage($slideIndex, $slideImage);
+		}
 	}
 
 }

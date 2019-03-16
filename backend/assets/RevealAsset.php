@@ -8,8 +8,8 @@ class RevealAsset extends AssetBundle
 {
     public $sourcePath = '@bower/reveal.js';
     public $css = [
-        '/css/offline-v2.css',
-        //'css/reveal.css',
+        //'/css/offline-v2.css',
+        'css/reveal.css',
     ];
     public $js = [
         'js/reveal.js',
