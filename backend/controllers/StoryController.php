@@ -50,6 +50,8 @@ class StoryController extends \backend\components\AdminController
     public function actionCreate()
     {
         $model = new Story();
+        $model->loadDefaultValues();
+        $model->source_id = Story::SOURCE_POWERPOINT;
         
         $coverUploadForm = new StoryCoverUploadForm();
         $fileUploadForm = new StoryFileUploadForm();

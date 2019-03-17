@@ -7,6 +7,8 @@ use yii\behaviors\TimestampBehavior;
 use dosamigos\taggable\Taggable;
 use yii\db\Expression;
 
+use common\helpers\Translit;
+
 /**
  * This is the model class for table "story".
  *
@@ -86,6 +88,7 @@ class Story extends \yii\db\ActiveRecord
             ['status', 'default', 'value' => self::STATUS_DRAFT],
             [['tagNames'], 'safe'],
             [['description'], 'string', 'max' => 1024],
+            ['source_id', 'default', 'value' => self::SOURCE_POWERPOINT],
         ];
     }
 
@@ -195,6 +198,17 @@ class Story extends \yii\db\ActiveRecord
     {
         $this->body = $body;
         return $this->save(false, ['body']);
+    }
+
+    public function beforeValidate()
+    {
+        if (parent::beforeValidate()) {
+            if (empty($this->alias)) {
+                $this->alias = Translit::translit($this->title);
+            }
+            return true;
+        }
+        return false;
     }
 
 }
