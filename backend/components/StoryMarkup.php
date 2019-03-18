@@ -7,27 +7,33 @@ use yii\helpers\Html;
 class StoryMarkup
 {
 
+	protected $block;
+
 	protected $tagName;
 	protected $attributes;
 	protected $content;
 
-	protected $contentMarkup;
+	protected $elements = [];
 
 	protected $style = [];
 
-	public function __construct($tagName, $attributes, $content = '')
+	public function __construct($block, $tagName, $attributes, $content = '')
 	{
+		$this->block = $block;
+
 		$this->tagName = $tagName;
 		$this->attributes = $attributes;
 		$this->content = $content;
 	}
 
-	public function init(StoryMarkup $markup)
+	public function setBlock($block)
 	{
-		$this->tagName = $markup->tagName;
-		$this->attributes = $markup->attributes;
-		$this->content = $markup->content;
-		$this->contentMarkup  = $markup->getContentMarkup();
+		$this->block = $block;
+	}
+
+	public function getBlock()
+	{
+		return $this->block;
 	}
 
 	public function getTagName()
@@ -40,24 +46,42 @@ class StoryMarkup
 		return $this->attributes;
 	}
 
+	public function setAttributes($attributes): void
+	{
+		$this->attributes = $attributes;
+	}
+
+	public function setAttribute($name, $value)
+	{
+		if (isset($this->attributes[$name])) {
+			$this->attributes[$name] = $value;
+		}
+	}
+
+	public function getAttribute($name): string
+	{
+		if (isset($this->attributes[$name])) {
+			return $this->attributes[$name];
+		}
+		return '';
+	}
+
 	public function getContent()
 	{
 		return $this->content;
 	}
 
+	public function setContent($content)
+	{
+		$this->content = $content;
+	}
+
 	public function getTag($content = '')
 	{
+		if (empty($content)) {
+			$content = $this->content;
+		}
 		return Html::tag($this->tagName, $content, $this->attributes);
-	}
-
-	public function setContentMarkup($markup)
-	{
-		$this->contentMarkup = $markup;
-	}
-
-	public function getContentMarkup()
-	{
-		return $this->contentMarkup;
 	}
 
 	public function getWidth()
@@ -120,7 +144,7 @@ class StoryMarkup
 		}
 	}
 
-	public function getStyleValue($param)
+	public function getStyleValue($param): string
 	{
 		$value = '';
 		if (isset($this->attributes['style'])) {
@@ -128,6 +152,16 @@ class StoryMarkup
 			$value = isset($styleArray[$param]) ? $styleArray[$param] : '';
 		}
 		return $value;
+	}
+
+	public function addElement(StoryMarkup $element)
+	{
+		$this->elements[] = $element;
+	}
+
+	public function getElements(): array
+	{
+		return $this->elements;
 	}
 
 }

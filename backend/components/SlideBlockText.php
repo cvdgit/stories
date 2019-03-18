@@ -18,14 +18,45 @@ class SlideBlockText extends SlideBlock
 
 	public function getText()
 	{
-		return $this->text;
+		$markup = $this->markup;
+		while ($elements = $markup->getElements()) {
+			$element = $elements[0];
+			$markup = $element;
+		}
+		return $element->getContent();
 	}
 
 	public function setText($text)
 	{
-		$this->text = $text;
+		$markup = $this->markup;
+		while ($elements = $markup->getElements()) {
+			$element = $elements[0];
+			$markup = $element;
+		}
+		$element->setContent($text);
 	}
 
+	public function getTextSize()
+	{
+		$markup = $this->markup;
+		while ($elements = $markup->getElements()) {
+			$element = $elements[0];
+			$markup = $element;
+		}
+		return $element->getStyleValue('font-size');
+	}
+
+	public function setTextSize($textSize)
+	{
+		$markup = $this->markup;
+		while ($elements = $markup->getElements()) {
+			$element = $elements[0];
+			$markup = $element;
+		}
+		$element->setStyleValue('font-size', $textSize);
+	}
+
+	/*
 	public function createBlockTextMarkup($new = false)
 	{
 		$markup = new BlockTextMarkup($this, $new);
@@ -39,5 +70,6 @@ class SlideBlockText extends SlideBlock
 		$this->setMarkup($markup);
 		return $markup;
 	}
+	*/
 
 }

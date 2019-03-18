@@ -4,14 +4,13 @@ namespace backend\components\markup;
 
 use backend\components\StoryMarkup;
 
-class SlideMarkup extends StoryMarkup implements \backend\components\StoryRenderableInterface
+class ParagraphMarkup extends StoryMarkup implements \backend\components\StoryRenderableInterface
 {
 
 	protected $defaultMarkup = [
-		'tagName' => 'section',
+		'tagName' => 'p',
 		'attributes' => [
-			'data-id' => '',
-			'data-background-color' => '#000000',
+			'style' => 'color: #FFFFFF; font-size: 0.8em;',
 		],
 	];
 
@@ -22,18 +21,23 @@ class SlideMarkup extends StoryMarkup implements \backend\components\StoryRender
 		}
 		if (count($attributes) == 0) {
 			$attributes = $this->defaultMarkup['attributes'];
-			$attributes['data-id'] = $owner->getId();
 		}
 		parent::__construct($owner, $tagName, $attributes, $content);
 	}
 
+	public function getTextSize()
+	{
+		return $this->text->getStyleValue('font-size');
+	}
+
+	public function setTextSize($textSize)
+	{
+		$this->text->setStyleValue('font-size', $textSize);
+	}
+
 	public function render(): string
 	{
-		$html = '';
-		foreach ($this->elements as $element) {
-			$html .= $element->getTag();
-		}
-		return $this->getTag($html);
+		return $this->getTag();
 	}
 
 }

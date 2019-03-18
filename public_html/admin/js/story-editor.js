@@ -30,8 +30,6 @@ var StoryEditor = (function() {
 			width: 1280,
 			height: 720,
 			margin: 0.01,
-			//minScale: 1,
-			//maxScale: 0.6,
 			center: true
     	});
     }
@@ -54,7 +52,9 @@ var StoryEditor = (function() {
 			.done(function(data) {
 				
 				$('.slides', $editor).empty().append(data.html);
+				
 				$el.val(data.story.text);
+				$('#' + config.textSizeFieldID).val(data.story.text_size);
 				
 				Reveal.sync();
 				Reveal.slide(0);

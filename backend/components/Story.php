@@ -2,7 +2,7 @@
 
 namespace backend\components;
 
-class Story
+class Story implements StoryRenderableInterface
 {
 
 	protected $slides = [];
@@ -42,6 +42,18 @@ class Story
 	public function getSlide($index)
 	{
 		return $this->slides[$index];
+	}
+
+	public function getElements(): array {}
+
+	public function render(): string
+	{
+		$html = '<div class="slides">';
+		foreach ($this->slides as $slide) {
+            $html .= $slide->render();
+        }
+		$html .= '</div>';
+		return $html;
 	}
 
 }

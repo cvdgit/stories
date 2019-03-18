@@ -15,29 +15,17 @@ class StoryEditor
 	public function getSlideMarkup($slideIndex)
 	{
         $slide = $this->story->getSlide($slideIndex);
-        $html = '';
-        foreach ($slide->getBlocks() as $block) {
-            $content = '';
-            if (get_class($block) == 'backend\components\SlideBlockText') {
-                $content = $block->getMarkup()->getContent();
-            }
-            if (get_class($block) == 'backend\components\SlideBlockImage') {
-                $content = $block->getImg();
-            }
-            $markup = $block->getMarkup();
-            $contentMarkup = $markup->getContentMarkup();
-            $html .= $markup->getTag($contentMarkup->getTag($content));
-        }
-        return $slide->getMarkup()->getTag($html);
+        $html = $slide->render();
+        return $html;
 	}
 
-	public function setSlideText($slideIndex, $text)
+	public function setSlideText($slideIndex, $text, $textSize)
 	{
         $slide = $this->story->getSlide($slideIndex);
         foreach ($slide->getBlocks() as $block) {
             if (get_class($block) == 'backend\components\SlideBlockText') {
                 $block->setText($text);
-                $block->getMarkup()->setText($text);
+                $block->setTextSize($textSize);
             }
         }
 	}
@@ -47,8 +35,7 @@ class StoryEditor
         $slide = $this->story->getSlide($slideIndex);
         foreach ($slide->getBlocks() as $block) {
             if (get_class($block) == 'backend\components\SlideBlockImage') {
-                $block->setSrc($imagePath);
-                $block->getMarkup()->setImage($imagePath);
+                $block->setImagePath($imagePath);
             }
         }
 	}
@@ -60,9 +47,10 @@ class StoryEditor
         foreach ($slide->getBlocks() as $block) {
             if (get_class($block) == 'backend\components\SlideBlockText') {
                 $values['text'] = $block->getText();
+                $values['text_size'] = $block->getTextSize();
             }
             if (get_class($block) == 'backend\components\SlideBlockImage') {
-                $values['image'] = $block->getImg();
+                $values['image'] = $block->getImagePath();
             }
         }
         return $values;
@@ -70,53 +58,8 @@ class StoryEditor
 
 	public function getStoryMarkup()
 	{
-
-/*
-            $html = '';
-            foreach ($slide->getBlocks() as $block) {
-                $content = '';
-                if (get_class($block) == 'backend\components\SlideBlockText') {
-                    $content = $block->getText();
-                }
-                if (get_class($block) == 'backend\components\SlideBlockImage') {
-                    $content = $block->getImg();
-                }
-                $markup = $block->getMarkup();
-                $contentMarkup = $markup->getContentMarkup();
-
-                $html .= $markup->getTag($contentMarkup->getTag($content));
-            }
-
-            $response = $slide->getMarkup()->getTag($html);
-*/
-
-
-		$html = '';
-		$slides = $this->story->getSlides();
-		
-		foreach ($slides as $slide) {
-
-	        $blocksMarkup = '';
-	        foreach ($slide->getBlocks() as $block) {
-	            
-	            $markup = $block->getMarkup();
-	            $contentMarkup = $markup->getContentMarkup();
-
-	            if (get_class($block) == 'backend\components\SlideBlockText') {
-	                $content = $markup->getText()->getTag($markup->getText()->getContent());
-	            }
-
-	            if (get_class($block) == 'backend\components\SlideBlockImage') {
-	                $content = $markup->getImage()->getTag();
-	            }
-
-	            $blocksMarkup .= $markup->getTag($contentMarkup->getTag($content));
-	        }
-
-	        $html .= $slide->getMarkup()->getTag($blocksMarkup);
-	    }
-
-	    return $html;
+        $html = $this->story->render();
+        return $html;
 	}
 
 	public function getSlides()
@@ -130,9 +73,9 @@ class StoryEditor
 	}
 
 
-	public function updateSlide($slideIndex, $slideText, $slideImage = '')
+	public function updateSlide($slideIndex, $slideText, $slideTextSize, $slideImage = '')
 	{
-		$this->setSlideText($slideIndex, $slideText);
+		$this->setSlideText($slideIndex, $slideText, $slideTextSize);
 		if (!empty($slideImage)) {
 			$this->setSlideImage($slideIndex, $slideImage);
 		}

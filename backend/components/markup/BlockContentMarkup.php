@@ -4,14 +4,16 @@ namespace backend\components\markup;
 
 use backend\components\StoryMarkup;
 
-class SlideMarkup extends StoryMarkup implements \backend\components\StoryRenderableInterface
+class BlockContentMarkup extends StoryMarkup implements \backend\components\StoryRenderableInterface
 {
 
 	protected $defaultMarkup = [
-		'tagName' => 'section',
+		'tagName' => 'div',
 		'attributes' => [
-			'data-id' => '',
-			'data-background-color' => '#000000',
+			'class' => 'sl-block-content',
+			'data-placeholder-tag' => 'p',
+			'data-placeholder-text' => 'Text',
+			'style' => 'z-index: 12; text-align: left;',
 		],
 	];
 
@@ -22,7 +24,6 @@ class SlideMarkup extends StoryMarkup implements \backend\components\StoryRender
 		}
 		if (count($attributes) == 0) {
 			$attributes = $this->defaultMarkup['attributes'];
-			$attributes['data-id'] = $owner->getId();
 		}
 		parent::__construct($owner, $tagName, $attributes, $content);
 	}
@@ -31,7 +32,7 @@ class SlideMarkup extends StoryMarkup implements \backend\components\StoryRender
 	{
 		$html = '';
 		foreach ($this->elements as $element) {
-			$html .= $element->getTag();
+			$html .= $element->render();
 		}
 		return $this->getTag($html);
 	}

@@ -34,7 +34,10 @@ class StoryHtmlReader
 		
 		$slide = $this->story->createSlide();
 		$slide->setLayout($onlyTextLayout);
-		$slide->setMarkup($this->getMarkup($htmlSlide));
+		
+		$element = pq($htmlSlide);
+		$slideMarkup = new \backend\components\markup\SlideMarkup($slide, $element->get(0)->tagName, $element->attr('*'));
+		$slide->setMarkup($slideMarkup);
 		
 		$slide->setSlideNumber($number);
 
@@ -61,49 +64,51 @@ class StoryHtmlReader
 	protected function loadBlockText($htmlBlock, $slide)
 	{
 		$block = $slide->createBlockText();
+        
         if ($slide->getLayout()) {
-            $blockMarkup = $block->createBlockHeaderMarkup();
+        	$element = pq($htmlBlock);
+            $blockMarkup = new \backend\components\markup\BlockHeaderMarkup($block, $element->get(0)->tagName, $element->attr('*'));
+
+			$element = pq($htmlBlock)->find('div.sl-block-content');
+			$blockContentMarkup = new \backend\components\markup\BlockHeaderContentMarkup($block, $element->get(0)->tagName, $element->attr('*'));
+
+			$element = pq($htmlBlock)->find('h1');
+			$paragraphMarkup = new \backend\components\markup\HeaderMarkup($block, $element->get(0)->tagName, $element->attr('*'), $element->text());
         }
         else {
-            $blockMarkup = $block->createBlockTextMarkup();
+        	$element = pq($htmlBlock);
+            $blockMarkup = new \backend\components\markup\BlockMarkup($block, $element->get(0)->tagName, $element->attr('*'));
+		
+			$element = pq($htmlBlock)->find('div.sl-block-content');
+			$blockContentMarkup = new \backend\components\markup\BlockContentMarkup($block, $element->get(0)->tagName, $element->attr('*'));
+
+			$element = pq($htmlBlock)->find('p');
+			$paragraphMarkup = new \backend\components\markup\ParagraphMarkup($block, $element->get(0)->tagName, $element->attr('*'), $element->text());
         }
 
-		$textElement = pq($htmlBlock)->find('div.sl-block-content');
-		$block->setText($textElement->text());
+		$blockContentMarkup->addElement($paragraphMarkup);
+		$blockMarkup->addElement($blockContentMarkup);
 
-		$markup = $this->getMarkup($htmlBlock, $textElement->html());
-		$markup->setContentMarkup($this->getMarkup(pq($htmlBlock)->find('div.sl-block-content')->htmlOuter()));
-		
-		$blockMarkup->init($markup);
-		$blockMarkup->setText($textElement->text());
+		$block->setMarkup($blockMarkup);
 	}
 
 	protected function loadBlockImage($htmlBlock, $slide)
 	{
 		$block = $slide->createBlockImage();
-		$blockMarkup = $block->createBlockImageMarkup();
-
-		$markup = $this->getMarkup($htmlBlock);
-		$markup->setContentMarkup($this->getMarkup(pq($htmlBlock)->find('div.sl-block-content')->htmlOuter()));
 		
-		$img = pq($htmlBlock)->find('img')->htmlOuter();
-		$src = pq($htmlBlock)->find('img')->attr('data-src');
-		
-		$block->setImg($img);
-		$block->setSrc($src);
+        $element = pq($htmlBlock);
+		$blockMarkup = new \backend\components\markup\BlockImageMarkup($block, $element->get(0)->tagName, $element->attr('*'));
 
-		$blockMarkup->init($markup);
-		$blockMarkup->setImage($src);
-	}
+		$element = pq($htmlBlock)->find('div.sl-block-content');
+		$blockContentMarkup = new \backend\components\markup\BlockImageContentMarkup($block, $element->get(0)->tagName, $element->attr('*'));
 
-	protected function getMarkup($html, $content = '')
-	{
-		$element = pq($html);
-		return new StoryMarkup(
-			$element->get(0)->tagName,
-			$element->attr('*'),
-			$content
-		);
+		$element = pq($htmlBlock)->find('img');
+		$imageMarkup = new \backend\components\markup\ImageMarkup($block, $element->get(0)->tagName, $element->attr('*'), $element->attr('data-src'));
+
+		$blockContentMarkup->addElement($imageMarkup);
+		$blockMarkup->addElement($blockContentMarkup);
+
+		$block->setMarkup($blockMarkup);
 	}
 
 }

@@ -212,29 +212,27 @@ class StoryController extends \backend\components\AdminController
         throw new NotFoundHttpException('Страница не найдена.');
     }
 
-    public function actionImages($id)
-    {
-        $model = $this->findModel($id);
-        return $this->render('images', [
-            'model' => $model,
-            'images' => $this->service->getStoryImages($model),
-        ]);
-    }
-
     public function actionImportFromPowerPoint()
     {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $model = new SourcePowerPointForm();
-        $service = $this->service->getPowerPointSerivce();
-        return $this->importStory($model, $service);
+        if ($model->load(Yii::$app->request->post())) {
+            $this->service->importStoryFromPowerPoint($model);
+        }
+        return ['success' => true];
     }
 
     public function actionImportFromDropBox()
     {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $model = new SourceDropboxForm();
-        $serivce = $this->service->getDropboxSerivce();
-        return $this->importStory($model, $service);
+        if ($model->load(Yii::$app->request->post())) {
+            $this->service->importStoryFromDropbox($model);
+        }
+        return ['success' => true];
     }
 
+    /*
     protected function importStory($model, $service)
     {
         if ($model->load(Yii::$app->request->post())) {
@@ -275,5 +273,6 @@ class StoryController extends \backend\components\AdminController
     {
         return $this->jsonResponse(['success' => '', 'error' => $response]);
     }
+    */
 
 }

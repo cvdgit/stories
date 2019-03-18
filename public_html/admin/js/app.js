@@ -38,16 +38,18 @@ window.storyAlert = new BootstrapAlert();
 var doneCallback = function(data) {
     if (data) {
         var elem;
-        if (data.error.length)
-            elem = storyAlert.error(data.error);
-        else
-            elem = storyAlert.success(data.success);
+        if (data.success) {
+            elem = storyAlert.success('Операция выполнена успешно');
+        }
+        else {
+            elem = storyAlert.error('Произошла ошибка при выполнении операции');
+        }
         elem.appendTo('#alert_placeholder');
     }
 };
 
 var failCallback = function(data) {
-    $('#alert_placeholder').append(storyAlert.error(data));
+    $('#alert_placeholder').append(storyAlert.error(data.responseText));
 }
 
 function storyOnBeforeSubmit(e) {

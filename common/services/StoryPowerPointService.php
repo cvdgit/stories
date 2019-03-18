@@ -5,9 +5,7 @@ namespace common\services;
 use yii;
 
 use backend\models\SourcePowerPointForm;
-
 use backend\components\Story;
-use backend\components\markup\BlockImageMarkup;
 
 use PhpOffice\PhpPresentation\IOFactory;
 use PhpOffice\PhpPresentation\Slide;
@@ -66,7 +64,9 @@ class StoryPowerPointService
     {
         $slide = $this->story->createSlide();
         $slide->setLayout($onlyTextLayout);
-        $slide->setSlideMarkup();
+
+        $slideMarkup = new \backend\components\markup\SlideMarkup($slide);
+        $slide->setMarkup($slideMarkup);
 
         $pptxShapes = $pptxSlide->getShapeCollection();
         $this->loadSlideShapes($slide, $pptxShapes);
@@ -78,35 +78,46 @@ class StoryPowerPointService
         file_put_contents($shapeImageFilePath, $pptxShape->getContents());
 
         $block = $slide->createBlockImage();
-        $markup = $block->createBlockImageMarkup(true);
-        
-        $src = $this->getImagesFolder(true) . $pptxShape->getIndexedFilename();
-        $markup->setImage($src);
-        
+
+        $blockMarkup = new \backend\components\markup\BlockImageMarkup($block);
+        $blockContentMarkup = new \backend\components\markup\BlockImageContentMarkup($block);
+        $imageMarkup = new \backend\components\markup\ImageMarkup($block);
+
+        $imagePath = $this->getImagesFolder(true) . $pptxShape->getIndexedFilename();
+        $imageMarkup->setImagePath($imagePath);
+
         $width = $pptxShape->getWidth();
-        if ($width > BlockImageMarkup::DEFAULT_IMAGE_WIDTH) {
-            $width = BlockImageMarkup::DEFAULT_IMAGE_WIDTH;
+        if ($width > \backend\components\markup\ImageMarkup::DEFAULT_IMAGE_WIDTH) {
+            $width = \backend\components\markup\ImageMarkup::DEFAULT_IMAGE_WIDTH;
         }
+        $imageMarkup->setWidth($width . 'px');
 
         $height = $pptxShape->getHeight();
-        if ($height > BlockImageMarkup::DEFAULT_IMAGE_HEIGHT) {
-            $height = BlockImageMarkup::DEFAULT_IMAGE_HEIGHT;
+        if ($height > \backend\components\markup\ImageMarkup::DEFAULT_IMAGE_HEIGHT) {
+            $height = \backend\components\markup\ImageMarkup::DEFAULT_IMAGE_HEIGHT;
         }
+        $imageMarkup->setHeight($height . 'px');
 
-        $markup->setWidth($width . 'px');
-        $markup->setHeight($height . 'px');
+        $blockContentMarkup->addElement($imageMarkup);
+        $blockMarkup->addElement($blockContentMarkup);
 
-        $block->setSrc($src);
+        $block->setMarkup($blockMarkup);
     }
 
     protected function loadShapeText($pptxShape, $slide)
     {
+        
         $block = $slide->createBlockText();
+
         if ($slide->getLayout()) {
-            $markup = $block->createBlockHeaderMarkup(true);
+            $blockMarkup = new \backend\components\markup\BlockHeaderMarkup($block);
+            $blockContentMarkup = new \backend\components\markup\BlockHeaderContentMarkup($block);
+            $paragraphMarkup = new \backend\components\markup\HeaderMarkup($block);
         }
         else {
-            $markup = $block->createBlockTextMarkup(true);
+            $blockMarkup = new \backend\components\markup\BlockMarkup($block);
+            $blockContentMarkup = new \backend\components\markup\BlockContentMarkup($block);
+            $paragraphMarkup = new \backend\components\markup\ParagraphMarkup($block);
         }
 
         $paragraphText = [];
@@ -116,8 +127,12 @@ class StoryPowerPointService
                 $paragraphText[] = $text;
             }
         }
+        $paragraphMarkup->setContent(implode('<br/>', $paragraphText));
 
-        $markup->setText(implode('<br/>', $paragraphText));
+        $blockContentMarkup->addElement($paragraphMarkup);
+        $blockMarkup->addElement($blockContentMarkup);
+
+        $block->setMarkup($blockMarkup);
         
         /*
         $markup->setWidth($pptxShape->getWidth() . 'px');
@@ -125,8 +140,6 @@ class StoryPowerPointService
         $markup->setLeft($pptxShape->getOffsetX() . 'px');
         $markup->setTop($pptxShape->getOffsetY() . 'px');
         */
-
-        $block->setText(implode("\r\n", $paragraphText));
     }
 
     protected function loadSlideShapes($slide, $pptxShapes)

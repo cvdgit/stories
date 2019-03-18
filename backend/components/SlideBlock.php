@@ -4,7 +4,7 @@ namespace backend\components;
 
 use Yii;
 
-abstract class SlideBlock
+abstract class SlideBlock implements StoryRenderableInterface
 {
 
 	protected $id;
@@ -52,6 +52,13 @@ abstract class SlideBlock
 	public function getMarkup()
 	{
 		return $this->markup;
+	}
+
+	public function getElements(): array {}
+
+	public function render(): string
+	{
+		return $this->markup->render();
 	}
 
 }

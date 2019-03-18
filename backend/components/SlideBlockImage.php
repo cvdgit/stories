@@ -7,41 +7,31 @@ use backend\components\markup\BlockImageMarkup;
 class SlideBlockImage extends SlideBlock
 {
 
-	protected $img;
-	protected $src;
+	protected $imagePath = '';
 
-	public function __construct($img = '', $src = '')
+	public function __construct()
 	{
 		parent::__construct();
-		$this->img = $img;
-		$this->src = $src;
 	}
 
-	public function getImg()
+	public function getImagePath()
 	{
-		return $this->img;
+		$markup = $this->markup;
+		while ($elements = $markup->getElements()) {
+			$element = $elements[0];
+			$markup = $element;
+		}
+		return $element->getImagePath();
 	}
 
-	public function setImg($img)
+	public function setImagePath($imagePath)
 	{
-		$this->img = $img;
-	}
-
-	public function getSrc()
-	{
-		return $this->src;
-	}
-
-	public function setSrc($src)
-	{
-		$this->src = $src;
-	}
-
-	public function createBlockImageMarkup($new = false)
-	{
-		$markup = new BlockImageMarkup($this, $new);
-		$this->setMarkup($markup);
-		return $markup;
+		$markup = $this->markup;
+		while ($elements = $markup->getElements()) {
+			$element = $elements[0];
+			$markup = $element;
+		}
+		$element->setImagePath($imagePath);
 	}
 
 }

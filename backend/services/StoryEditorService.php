@@ -36,12 +36,10 @@ class StoryEditorService
         $story = $reader->loadStoryFromHtml($storyModel->body);
 
         $editor = new StoryEditor($story);
-        $editor->updateSlide($form->slide_index, $form->text, $imagePath);
+        $editor->updateSlide($form->slide_index, $form->text, $form->text_size, $imagePath);
 
-        //$editor->setSlideText($editorModel->slide_index, $editorModel->text);
-        $body = '<div class="slides">' . $editor->getStoryMarkup() . '</div>';
+        $body = $editor->getStoryMarkup();
         $storyModel->saveBody($body);
-        //$success = true;
 	}
 
 }

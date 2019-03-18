@@ -4,16 +4,20 @@ namespace backend\components\markup;
 
 use backend\components\StoryMarkup;
 
-class SlideMarkup extends StoryMarkup implements \backend\components\StoryRenderableInterface
+class ImageMarkup extends StoryMarkup implements \backend\components\StoryRenderableInterface
 {
 
 	protected $defaultMarkup = [
-		'tagName' => 'section',
+		'tagName' => 'img',
 		'attributes' => [
-			'data-id' => '',
-			'data-background-color' => '#000000',
+			'data-src' => '',
+			'data-natural-width' => 1459,
+			'data-natural-height' => 1080,
 		],
 	];
+
+	const DEFAULT_IMAGE_WIDTH = 973;
+	const DEFAULT_IMAGE_HEIGHT = 720;
 
 	public function __construct($owner, $tagName = '', $attributes = [], $content = '')
 	{
@@ -22,18 +26,24 @@ class SlideMarkup extends StoryMarkup implements \backend\components\StoryRender
 		}
 		if (count($attributes) == 0) {
 			$attributes = $this->defaultMarkup['attributes'];
-			$attributes['data-id'] = $owner->getId();
 		}
 		parent::__construct($owner, $tagName, $attributes, $content);
 	}
 
+	public function setImagePath($imagePath)
+	{
+		$this->setAttribute('data-src', $imagePath);
+	}
+
+	public function getImagePath()
+	{
+		return $this->getAttribute('data-src');
+	}
+
 	public function render(): string
 	{
-		$html = '';
-		foreach ($this->elements as $element) {
-			$html .= $element->getTag();
-		}
-		return $this->getTag($html);
+		return $this->getTag();
 	}
+
 
 }

@@ -18,14 +18,14 @@ use backend\models\SlideEditorForm;
 class EditorController extends \backend\components\AdminController
 {
 
-    protected $service;
-    protected $editor;
+    protected $storyService;
+    protected $editorService;
 
-    public function __construct($id, $module, StoryService $service, StoryEditorService $editor, $config = [])
+    public function __construct($id, $module, StoryService $storyService, StoryEditorService $editorService, $config = [])
     {
         parent::__construct($id, $module, $config);
-        $this->service = $service;
-        $this->editor = $editor;
+        $this->storyService = $storyService;
+        $this->editorService = $editorService;
     }
 
     public function behaviors()
@@ -77,40 +77,12 @@ class EditorController extends \backend\components\AdminController
         return $response;
     }
 
-    public function actionSetSlideText()
-    {
-
-        $editorModel = new SlideEditorForm();
-        $success = false;
-
-        if ($editorModel->load(Yii::$app->request->post()) && $editorModel->validate()) {
-
-            $reader = new StoryHtmlReader();
-
-            $model = Story::findOne($editorModel->story_id);
-            $story = $reader->loadStoryFromHtml($model->body);
-
-            $editor = new StoryEditor($story);
-            $editor->setSlideText($editorModel->slide_index, $editorModel->text);
-
-            $body = '<div class="slides">' . $editor->getStoryMarkup() . '</div>';
-            $model->saveBody($body);
-            $success = true;
-        }
-
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        return ['success' => $success];
-    }
-
     public function actionUpdateSlide()
     {
-
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        
         $editorModel = new SlideEditorForm();
         if ($editorModel->load(Yii::$app->request->post()) && $editorModel->validate()) {    
-            
-            $this->editor->updateSlide($editorModel);
+            $this->editorService->updateSlide($editorModel);
             return ['success' => true];
         }
         else {

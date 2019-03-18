@@ -87,6 +87,7 @@ $form = ActiveForm::begin([
 	'options' => ['enctype' => 'multipart/form-data'],
 ]);
 echo $form->field($editorModel, 'image')->fileInput();
+echo $form->field($editorModel, 'text_size')->textInput();
 echo $form->field($editorModel, 'text')->textArea(['rows' => 6]);
 echo $form->field($editorModel, 'story_id')->hiddenInput()->label(false);
 echo Html::submitButton('Сохранить', ['class' => 'btn btn-primary']);
@@ -101,6 +102,7 @@ $('#{$form->getId()}')
 JS;
 
 $textFieldId = Html::getInputId($editorModel, 'text');
+$textSizeFieldId = Html::getInputId($editorModel, 'text_size');
 $fileFieldId = Html::getInputId($editorModel, 'image');
 $action = Url::to(['/editor/get-slide-by-index', 'story_id' => $model->id]);
 $this->registerJs($js);
@@ -109,6 +111,7 @@ $js = <<< JS
     	storyID: {$model->id},
     	getSlideAction: '$action',
     	textFieldID: '$textFieldId',
+    	textSizeFieldID: '$textSizeFieldId',
     	fileFieldID: '$fileFieldId'
     });
     var slideIndex = StoryEditor.readUrl();

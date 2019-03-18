@@ -27,6 +27,22 @@ class StoryService
         return $this->powerPointService;
     }
 
+    public function importStoryFromPowerPoint($form)
+    {
+        $story = $this->powerPointService->loadStory($form);
+        $slidesNumber = $story->getSlideCount();
+
+        $storyEditor = new \backend\components\StoryEditor($story);
+        $body = $storyEditor->getStoryMarkup();
+
+        $form->saveSource($body, $slidesNumber);
+    }
+
+    public function importStoryFromDropbox()
+    {
+
+    }
+
     public function getCoverPath($cover, $web = false)
     {
         return ($web ? Url::base(true) : Yii::getAlias('@public')) . '/slides_cover/' . $cover;

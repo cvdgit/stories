@@ -5,7 +5,7 @@ namespace backend\components;
 use Yii;
 use backend\components\markup\SlideMarkup;
 
-class StorySlide
+class StorySlide implements StoryRenderableInterface
 {
 
 	protected $slideNumber;
@@ -86,6 +86,17 @@ class StorySlide
 	public function getLayout()
 	{
 		return $this->layout;
+	}
+
+	public function getElements(): array {}
+
+	public function render(): string
+	{
+		$html = '';
+		foreach ($this->blocks as $block) {
+			$html .= $block->render();
+		}
+		return $this->markup->getTag($html);
 	}
 
 }
