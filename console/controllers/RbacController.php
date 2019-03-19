@@ -3,6 +3,7 @@ namespace console\controllers;
 
 use Yii;
 use yii\console\Controller;
+use common\rbac\UserRoles;
 
 class RbacController extends Controller
 {
@@ -11,30 +12,66 @@ class RbacController extends Controller
         $auth = Yii::$app->authManager;
         $auth->removeAll();
 
-        $user = $auth->createRole('user');
-        $moderator = $auth->createRole('moderator');
-        $admin = $auth->createRole('admin');
+        $userRole = $auth->createRole('user');
+        $moderatorRole = $auth->createRole('moderator');
+        $adminRole = $auth->createRole('admin');
+
 
         // $createStory = $auth->createPermission('createStory');
         // $updateStory = $auth->createPermission('updateStory');
         // $deleteStory = $auth->createPermission('deleteStory');
-        //$manageStories = $auth->createPermission('manageStories');
-        //$auth->add($manageStories);
+        
+        $adminPanelPermission = $auth->createPermission(UserRoles::PERMISSION_ADMIN_PANEL);
+        $adminPanelPermission->description = 'Доступ к панели администрирования';
+        $auth->add($adminPanelPermission);
+
+        $manageStoriesPermission = $auth->createPermission(UserRoles::PERMISSION_MANAGE_STORIES);
+        $manageStoriesPermission->description = 'Управление историями';
+        $auth->add($manageStoriesPermission);
+
+        $manageCategoriesPermission = $auth->createPermission(UserRoles::PERMISSION_MANAGE_CATEGORIES);
+        $manageCategoriesPermission->description = 'Управление категориями';
+        $auth->add($manageCategoriesPermission);
+
+        $accessEditorPermission = $auth->createPermission(UserRoles::PERMISSION_EDITOR_ACCESS);
+        $accessEditorPermission->description = 'Доступ к редактору историй';
+        $auth->add($accessEditorPermission);
+
+        $accessFeedbackPermission = $auth->createPermission(UserRoles::PERMISSION_FEEDBACK_ACCESS);
+        $accessFeedbackPermission->description = 'Доступ к опечаткам';
+        $auth->add($accessFeedbackPermission);
+
+        $accessStatisticsPermission = $auth->createPermission(UserRoles::PERMISSION_STATISTICS_ACCESS);
+        $accessStatisticsPermission->description = 'Доступ к статистике';
+        $auth->add($accessStatisticsPermission);
+
+        $manageUsersPermission = $auth->createPermission(UserRoles::PERMISSION_MANAGE_USERS);
+        $manageUsersPermission->description = 'Управление пользователями';
+        $auth->add($manageUsersPermission);
 
         //$userGroupRule = new \common\rbac\UserGroupRule;
         //$auth->add($userGroupRule);
         //$author->ruleName = $userGroupRule->name;
         //$admin->ruleName  = $userGroupRule->name;
 
-        $auth->add($user);
-        $auth->add($moderator);
-        $auth->add($admin);
+        $auth->add($userRole);
+        $auth->add($moderatorRole);
+        $auth->add($adminRole);
 
-        $auth->addChild($moderator, $user);
-        $auth->addChild($admin, $moderator);
+        $auth->addChild($moderatorRole, $adminPanelPermission);
+        $auth->addChild($moderatorRole, $manageStoriesPermission);
+        $auth->addChild($moderatorRole, $accessEditorPermission);
+        $auth->addChild($moderatorRole, $accessFeedbackPermission);
+        $auth->addChild($moderatorRole, $accessStatisticsPermission);
 
-        $auth->assign($moderator, 4);
-        $auth->assign($admin, 1);
+        $auth->addChild($adminRole, $manageCategoriesPermission);
+        $auth->addChild($adminRole, $manageUsersPermission);
+
+        $auth->addChild($moderatorRole, $userRole);
+        $auth->addChild($adminRole, $moderatorRole);
+
+        $auth->assign($moderatorRole, 4);
+        $auth->assign($adminRole, 1);
 
 
 /*

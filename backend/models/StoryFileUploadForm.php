@@ -17,7 +17,7 @@ class StoryFileUploadForm extends Model
     public function rules()
     {
         return [
-            [['storyFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'pptx', 'maxSize' => 50 * 1024 * 1024],
+            [['storyFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'pptx', 'maxSize' => 100 * 1024 * 1024],
         ];
     }
     

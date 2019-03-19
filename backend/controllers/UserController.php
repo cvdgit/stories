@@ -3,11 +3,28 @@
 namespace backend\controllers;
 
 use Yii;
-use common\models\User;
 use yii\data\ActiveDataProvider;
+use yii\filters\AccessControl;
+use common\models\User;
+use common\rbac\UserRoles;
 
-class UserController extends \backend\components\AdminController
+class UserController extends \yii\web\Controller
 {
+
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => [UserRoles::PERMISSION_MANAGE_USERS],
+                    ],
+                ],
+            ],
+        ];
+    }
 
     public function actionIndex()
     {

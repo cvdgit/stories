@@ -6,9 +6,25 @@ use Yii;
 use yii\filters\AccessControl;
 use common\models\Story;
 use common\models\StoryStatisticsSearch;
+use common\rbac\UserRoles;
 
-class StatisticsController extends \backend\components\AdminController
+class StatisticsController extends \yii\web\Controller
 {
+
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => [UserRoles::PERMISSION_STATISTICS_ACCESS],
+                    ],
+                ],
+            ],
+        ];
+    }
 
 	public function actionList($id)
 	{

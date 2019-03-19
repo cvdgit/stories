@@ -11,12 +11,13 @@ use yii\filters\AccessControl;
 use common\models\Story;
 use common\models\StorySearch;
 use common\services\StoryService;
+use common\rbac\UserRoles;
 use backend\models\StoryCoverUploadForm;
 use backend\models\StoryFileUploadForm;
 use backend\models\SourcePowerPointForm;
 use backend\models\SourceDropboxForm;
 
-class StoryController extends \backend\components\AdminController
+class StoryController extends \yii\web\Controller
 {
     
     public $service;
@@ -35,7 +36,7 @@ class StoryController extends \backend\components\AdminController
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['moderator'],
+                        'roles' => [UserRoles::PERMISSION_MANAGE_STORIES],
                     ],
                 ],
             ],

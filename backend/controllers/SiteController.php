@@ -2,17 +2,17 @@
 namespace backend\controllers;
 
 use Yii;
-use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 
 use common\models\LoginForm;
 use common\models\StoryStatisticsSearch;
+use common\rbac\UserRoles;
 
 /**
  * Site controller
  */
-class SiteController extends Controller
+class SiteController extends \yii\web\Controller
 {
     /**
      * {@inheritdoc}
@@ -34,7 +34,7 @@ class SiteController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'roles' => ['admin'],
+                        'roles' => [UserRoles::PERMISSION_ADMIN_PANEL],
                     ],
                 ],
             ],

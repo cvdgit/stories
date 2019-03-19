@@ -10,12 +10,13 @@ use yii\web\UploadedFile;
 
 use common\models\Story;
 use common\services\StoryService;
+use common\rbac\UserRoles;
 use backend\services\StoryEditorService;
 use backend\components\StoryHtmlReader;
 use backend\components\StoryEditor;
 use backend\models\SlideEditorForm;
 
-class EditorController extends \backend\components\AdminController
+class EditorController extends \yii\web\Controller
 {
 
     protected $storyService;
@@ -36,7 +37,7 @@ class EditorController extends \backend\components\AdminController
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['moderator'],
+                        'roles' => [UserRoles::PERMISSION_EDITOR_ACCESS],
                     ],
                 ],
             ],
