@@ -1,74 +1,4 @@
 
-function storyEnterFullscreen() {
-	
-	var element = $('.reveal-container')[0];
-	
-	var requestMethod = element.requestFullscreen ||
-						element.webkitRequestFullscreen ||
-						element.webkitRequestFullScreen ||
-						element.mozRequestFullScreen ||
-						element.msRequestFullscreen;
-	if (requestMethod) {
-		requestMethod.apply(element);
-	}
-}
-
-function storyCloseFullscreen() {
-	var element = document;
-	var requestMethod = element.exitFullscreen ||
-	                    element.exitFullScreen ||
-						element.mozCancelFullScreen ||
-						element.webkitCancelFullscreen ||
-						element.webkitCancelFullScreen ||
-						element.msExitFullscreen;
-	if (requestMethod) {
-		requestMethod.apply(element);
-	}
-}
-
-function storyInFullscreen() {
-	return (window.screenTop && window.screenY);
-}
-
-function storyToggleFullscreen() {
-	if (storyInFullscreen()) {
-		storyCloseFullscreen();
-  	} else {
-  		storyEnterFullscreen();
-  	}
-}
-
-
-var WikidsStoryFeedback = (function() {
-
-	var config = StoryRevealConfig.feedbackConfig;
-
-    function send(data) {
-        return $.ajax({
-			url: config.action,
-			type: 'POST',
-			dataType: 'json',
-			data: data
-        });
-    }
-
-	function sendFeedback() {
-		var data = {
-			'slide_number': (Reveal.getIndices().h + 1)
-		}
-		send(data)
-		  	.done(function(response) {
-				if (response.success) {
-					alert('Спасибо!');
-				}
-			});
-	}
-
-	return {
-		sendFeedback: sendFeedback
-	}
-})();
-
 var RevealConfig = {
 	customcontrols: {
 		controls: [
@@ -85,11 +15,11 @@ var RevealConfig = {
 				className: 'custom-fullscreen',
 				title: 'Полноэкранный режим',
 				action: function() {
-					storyToggleFullscreen();
+					WikidsPlayer.toggleFullscreen();
 					var $el = $(this).find('i');
 					$el.removeClass('fa-arrows-alt')
 					   .removeClass('fa-expand-arrows-alt');
-					storyInFullscreen() ? $el.addClass('fa-arrows-alt') : $el.addClass('fa-expand-arrows-alt');
+					WikidsPlayer.inFullscreen() ? $el.addClass('fa-arrows-alt') : $el.addClass('fa-expand-arrows-alt');
 				}
 			},
 			{
@@ -115,22 +45,10 @@ var RevealConfig = {
 			var $right = $('.custom-navigate-right', $('.reveal'));
 			Reveal.getProgress() === 1 ? $right.attr('disabled', 'disabled') : $right.removeAttr('disabled');
 		}
-	},
-    dependencies: [
-    //    { src: 'js/reveal-plugins/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-    //    { src: 'js/reveal-plugins/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-    //    { src: 'js/reveal-plugins/highlight/highlight.js', async: true, callback: function() { hljs.initHighlighting(); hljs.initHighlightingOnLoad(); } },
-    //    { src: 'js/reveal-plugins/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
-    //    { src: 'js/reveal-plugins/zoom/zoom.js', async: true }
-        {src: '/js/revealjs-customcontrols/customcontrols.js'},
-        {src: '/js/revealjs-customcontrols/customcontrols.css'},
-        {src: '/js/story-reveal-statistics.js'}
-        // {src: '/js/story-reveal-feedback.js'}
-    ]
+	}
 };
 
 $.extend(StoryRevealConfig, RevealConfig);
-
 
 Reveal.initialize(StoryRevealConfig);
 
@@ -146,6 +64,10 @@ Reveal.addEventListener("mouseover", function() {
 */
 
 
+
+
+
+/*
 function changeRevealContainerHeight() {
 	var $container = $('.reveal-container');
 	if (storyInFullscreen()) {
@@ -153,7 +75,7 @@ function changeRevealContainerHeight() {
 	}
 	else {
 		var containerWidth = $container[0].offsetWidth;
-		$container .css('height', (containerWidth * 0.5) + 'px');
+		$container.css('height', (containerWidth * 0.5) + 'px');
 	}
 }
 
@@ -162,3 +84,4 @@ window.onresize = changeRevealContainerHeight;
 $(function() {
 	$(window).resize();
 })
+*/

@@ -26,12 +26,7 @@ var StoryEditor = (function() {
     }
 
     function init() {
-    	Reveal.initialize({
-			width: 1280,
-			height: 720,
-			margin: 0.01,
-			center: true
-    	});
+    	Reveal.initialize(StoryRevealConfig);
     }
 
 	function loadSlide(index) {

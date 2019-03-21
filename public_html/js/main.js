@@ -30,80 +30,6 @@ $(function() {
 	"use strict";
 
 	// **********************************************************************//
-	// ! 01. Carousel
-	// **********************************************************************//
-/*
-	$('.base-slider').owlCarousel({
-		loop: true,
-		margin: 0,
-		nav: false,
-		dots: true,
-		lazyLoad:true,
-		item: 1,
-		responsive:{
-			0:{
-				items:1
-			},
-			600:{
-				items:1
-			},
-			1000:{
-				items:1
-			}
-		}
-	});
-*/
-
-	$('.gallery').owlCarousel({
-		loop: true,
-		margin: 0,
-		nav: true,
-		dots: false,
-		lazyLoad:true,
-		item: 1,
-		responsive:{
-			0:{
-				items:1
-			},
-			600:{
-				items:1
-			},
-			1000:{
-				items:1
-			}
-		}
-	});
-	$('.slider-product, .similar-products').owlCarousel({
-		loop: true,
-		margin: 30,
-		nav: false,
-		dots: true,
-		lazyLoad:true,
-		item: 4,
-		responsive:{
-			0:{
-				items:1
-			},
-			600:{
-				items:2
-			},
-			1000:{
-				items:4
-			}
-		}
-	});
-
-	// **********************************************************************//
-	// ! 02. Calendar
-	// **********************************************************************//
-	/*
-	$( "#datepicker" ).datepicker({
-		dayNamesMin: [ "mon", "tue", "wed", "thu", "fri", "sat", "sun" ]
-	});
-	*/
-
-
-	// **********************************************************************//
 	// ! 03. Back to top
 	// **********************************************************************//
 	var back_to_top = $('#back-to-top');
@@ -129,7 +55,6 @@ $(function() {
 			}, 700);
 		});
 	}
-
 
 	// **********************************************************************//
 	// ! 04. Mobile Menu
@@ -159,12 +84,6 @@ $(function() {
 
 
 	// **********************************************************************//
-	// ! 06. lazyYT
-	// **********************************************************************//
-	$('.lazyYT').lazyYT();
-
-
-	// **********************************************************************//
 	// ! 07. List And Grid Product
 	// **********************************************************************//
 	$('.switch span').click(function(){
@@ -173,103 +92,6 @@ $(function() {
 		$('.content-product.grid').toggleClass('list-product-top');
 		$(".filtr-container").toggleClass('list-product-width');
 	});
-
-
-	// **********************************************************************//
-	// ! 08. Slider Range
-	// **********************************************************************//
-	/*
-	var range =  $('#slider-range');
-
-	range.slider({
-		range: true,
-		min: 0,
-		max: 500,
-		values: [ 75, 300 ],
-		slide: function( event, ui ) {
-			$( "#amount" ).val( "$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ] );
-		}
-	});
-	$( "#amount" ).val( "$" + range.slider( "values", 0 ) + " - $" + range.slider( "values", 1 ) );
-	*/
-
-	// **********************************************************************//
-	// ! 09. Thumbnail Slider
-	// **********************************************************************//
-	var sync1 = $(".product-slider-shop");
-	var sync2 = $(".thumbnail");
-	var slidesPerPage = 4;	//globaly define number of elements per page
-	var syncedSecondary = true;
-
-	sync1.owlCarousel({
-		items : 1,
-		slideSpeed : 2000,
-		nav: false,
-		autoplay: true,
-		dots: false,
-		loop: true,
-		responsiveRefreshRate : 200
-	}).on('changed.owl.carousel', syncPosition);
-
-	sync2
-	.on('initialized.owl.carousel', function () {
-		sync2.find(".owl-item").eq(0).addClass("current");
-	})
-	.owlCarousel({
-		items : slidesPerPage,
-		dots: false,
-		nav: false,
-		margin: 10,
-		smartSpeed: 200,
-		slideSpeed : 500,
-		slideBy: slidesPerPage, //alternatively you can slide by 1, this way the active slide will stick to the first item in the second carousel
-		responsiveRefreshRate : 100
-	}).on('changed.owl.carousel', syncPosition2);
-
-	function syncPosition(el) {
-		//if you set loop to false, you have to restore this next line
-		//var current = el.item.index;
-
-		//if you disable loop you have to comment this block
-		var count = el.item.count-1;
-		var current = Math.round(el.item.index - (el.item.count/2) - .5);
-		if(current < 0) {
-			current = count;
-		}
-		if(current > count) {
-			current = 0;
-		}
-
-		//end block
-
-		sync2
-			.find(".owl-item")
-			.removeClass("current")
-			.eq(current)
-			.addClass("current");
-		var onscreen = sync2.find('.owl-item.active').length - 1;
-		var start = sync2.find('.owl-item.active').first().index();
-		var end = sync2.find('.owl-item.active').last().index();
-
-		if (current > end) {
-			sync2.data('owl.carousel').to(current, 100, true);
-		}
-		if (current < start) {
-			sync2.data('owl.carousel').to(current - onscreen, 100, true);
-		}
-	}
-	function syncPosition2(el) {
-		if(syncedSecondary) {
-			var number = el.item.index;
-			sync1.data('owl.carousel').to(number, 100, true);
-		}
-	}
-	sync2.on("click", ".owl-item", function(e){
-		e.preventDefault();
-		var number = $(this).index();
-		sync1.data('owl.carousel').to(number, 300, true);
-	});
-
 
 	// **********************************************************************//
 	// ! 10. Quantity product
@@ -289,50 +111,6 @@ $(function() {
 		$input.val(parseInt($input.val(),10) + 1);
 		$input.change();
 		return false;
-	});
-
-	// **********************************************************************//
-	// ! 11. Grid Product
-	// **********************************************************************//
-	$('.grid').masonry({
-		itemSelector: '.grid-item'
-	});
-
-	// **********************************************************************//
-	// ! 12.Filte/Sortable Product
-	// **********************************************************************//
-	function filtr_product(){
-		$('.filtr-container').filterizr();
-	}
-	if ( document.getElementById('filtr_product') ) {
-		filtr_product();
-	}
-	//Simple filter controls
-	var simplefilter = $('.simplefilter li')
-	simplefilter.click(function() {
-		simplefilter.removeClass('active');
-		$(this).addClass('active');
-	});
-
-	// **********************************************************************//
-	// ! 13. Vertival Slider
-	// **********************************************************************//
-	$('.slider-for').slick({
-		slidesToShow: 1,
-		slidesToScroll: 1,
-		arrows: false,
-		fade: true,
-		asNavFor: '.slider-nav'
-	});
-	$('.slider-nav').slick({
-		slidesToShow: 3,
-		slidesToScroll: 1,
-		vertical: true,
-		asNavFor: '.slider-for',
-		dots: false,
-		arrows: false,
-		centerMode: false,
-		focusOnSelect: true
 	});
 
 	// **********************************************************************//
@@ -470,10 +248,6 @@ $(function() {
 		}
 	});
 
-	$('.counter').counterUp({
-		delay: 30,
-		time: 2500
-	});
 
 	$(document).ready( function() {
     $(".file-upload input[type=file]").change(function(){

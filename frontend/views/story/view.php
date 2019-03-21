@@ -21,7 +21,18 @@ $this->params['breadcrumbs'][] = $title;
 		<div class="row" style="padding-top: 10px">
 			<div class="col-md-12">
 				<div class="reveal-container">
-				    <?= RevealWidget::widget(['story_id' => $model->id, 'data' => $model->body]) ?>
+				    <?= RevealWidget::widget([
+				    		'storyId' => $model->id,
+				    		'data' => $model->body,
+				    		'initScript' => '/js/story-reveal.js',
+				    		'options' => [
+				    			'dependencies' => [
+					                ["src" => "/js/revealjs-customcontrols/customcontrols.js"],
+					                ["src" => "/js/revealjs-customcontrols/customcontrols.css"],
+					                ["src" => "/js/story-reveal-statistics.js"],
+				    			],
+				    		],
+				    	]) ?>
 				</div>
 			</div>
 		</div>

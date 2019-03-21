@@ -4,6 +4,7 @@ namespace common\widgets;
 
 use yii\base\Widget;
 use yii\web\View;
+use yii\web\JsExpression;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
@@ -12,13 +13,18 @@ use frontend\assets\RevealAsset;
 class RevealWidget extends Widget
 {
 
+    public $id;
 	public $data;
-	public $story_id;
+	public $storyId;
+    public $initScript;
     public $options = [];
 
 	public function run()
 	{
-	    echo Html::tag('div', $this->data, ['class'=>'reveal']);
+        if (empty($this->data)) {
+            $this->data = '<div class="slides"></div>';
+        }
+	    echo Html::tag('div', $this->data, ['class'=>'reveal', 'id' => $this->id]);
 	    $this->registerClientScript();
 	}
 
@@ -45,6 +51,13 @@ class RevealWidget extends Widget
             "hash" => true,
             "hashOneBasedIndex" => true,
             "rtl" => false,
+            "dependencies" => [
+                // ["src" => "js/reveal-plugins/markdown/marked.js", "condition" => new JsExpression("function() { return !!document.querySelector( '[data-markdown]' ); }")],
+                // ["src" => "js/reveal-plugins/markdown/markdown.js", "condition" => new JsExpression("function() { return !!document.querySelector( '[data-markdown]' ); }")],
+                // ["src" => "js/reveal-plugins/highlight/highlight.js", "async" => true, "callback" => new JsExpression("function() { hljs.initHighlighting(); hljs.initHighlightingOnLoad(); }")],
+                // ["src" => "js/reveal-plugins/notes/notes.js", "async" => true, "condition" => new JsExpression("function() { return !!document.body.classList; }")],
+                // ["src" => "js/reveal-plugins/zoom/zoom.js", "async" => true],
+            ],
         ];
 
         $options = $this->options;
@@ -53,6 +66,9 @@ class RevealWidget extends Widget
         }
         if (isset($options['height']) && $options['height'] > 0) {
             $config['height'] = $options['height'];
+        }
+        if (isset($options["dependencies"]) && is_array($options["dependencies"])) {
+            $config["dependencies"] = array_merge($config["dependencies"], $options["dependencies"]);
         }
 
         $config = array_merge($config,
@@ -67,15 +83,17 @@ class RevealWidget extends Widget
 
         RevealAsset::register($view);
 
-        $view->registerJsFile('/js/story-reveal.js', ['depends' => ['yii\web\JqueryAsset']]);
-        $view->registerCssFile('/css/wikids-reveal.css', ['depends' => 'frontend\assets\RevealAsset']);
+        if (!empty($this->initScript)){
+            $view->registerJsFile($this->initScript, ['depends' => ['yii\web\JqueryAsset', 'frontend\assets\RevealAsset']]);
+        }
+        $view->registerCssFile('/css/wikids-reveal.css', ['depends' => ['frontend\assets\RevealAsset']]);
     }
 
     protected function getStatisticsConfig()
     {
     	return [
             'statisticsConfig' => [
-    	        'action' => Url::to(['statistics/write', 'id' => $this->story_id])
+    	        'action' => Url::to(['statistics/write', 'id' => $this->storyId])
             ],
     	];
     }
@@ -84,7 +102,7 @@ class RevealWidget extends Widget
     {
         return [
             'feedbackConfig' => [
-                'action' => Url::to(['feedback/create', 'id' => $this->story_id])
+                'action' => Url::to(['feedback/create', 'id' => $this->storyId])
             ],
         ];
     }

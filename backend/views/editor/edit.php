@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use backend\assets\StoryEditorAsset;
+use common\widgets\RevealWidget;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\CategorySearch */
@@ -21,46 +22,6 @@ $this->params['sidebarMenuItems'] = [
     ['label' => 'Редактор', 'url' => ['editor/edit', 'id' => $model->id]],
     ['label' => 'Статистика', 'url' => ['statistics/list', 'id' => $model->id]],
 ];
-
-$css = <<< CSS
-.reveal {
-	font-size: 30px;
-}
-.reveal .sl-block {
-	display: block;
-	position: absolute;
-	z-index: auto
-}
-
-.reveal .sl-block .sl-block-content {
-	display: block;
-	position: relative;
-	width: 100%;
-	height: 100%;
-	max-width: none;
-	max-height: none;
-	margin: 0;
-	outline: 0;
-	word-wrap: break-word
-}
-
-.reveal .sl-block .sl-block-content>:first-child {
-	margin-top: 0
-}
-
-.reveal .sl-block .sl-block-content>:last-child {
-	margin-bottom: 0
-}
-.reveal .sl-block[data-block-type="image"] .sl-block-content img {
-	width: 100%;
-	height: 100%;
-	margin: 0;
-	padding: 0;
-	border: 0;
-	vertical-align: top
-}
-CSS;
-$this->registerCss($css);
 ?>
 
 <div class="row">
@@ -75,8 +36,13 @@ $this->registerCss($css);
 		</div>
 	</div>
 	<div class="col-xs-9" style="height: 484px">
-		<div class="reveal" id="story-editor">
+		<!--div class="reveal" id="story-editor">
 			<div class="slides"></div>
+		</div-->
+		<div class="reveal-container">
+		    <?= RevealWidget::widget([
+		    		'id' => 'story-editor',
+		    	]) ?>
 		</div>
 		<div class="row"><div class="col-xs-12">&nbsp;</div></div>
 		<div class="row">
