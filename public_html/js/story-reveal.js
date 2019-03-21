@@ -1,6 +1,8 @@
 
 function storyEnterFullscreen() {
-	var element = document.documentElement;
+	
+	var element = $('.reveal-container')[0];
+	
 	var requestMethod = element.requestFullscreen ||
 						element.webkitRequestFullscreen ||
 						element.webkitRequestFullScreen ||
@@ -36,33 +38,75 @@ function storyToggleFullscreen() {
   	}
 }
 
+
+var WikidsStoryFeedback = (function() {
+
+	var config = StoryRevealConfig.feedbackConfig;
+
+    function send(data) {
+        return $.ajax({
+			url: config.action,
+			type: 'POST',
+			dataType: 'json',
+			data: data
+        });
+    }
+
+	function sendFeedback() {
+		var data = {
+			'slide_number': (Reveal.getIndices().h + 1)
+		}
+		send(data)
+		  	.done(function(response) {
+				if (response.success) {
+					alert('Спасибо!');
+				}
+			});
+	}
+
+	return {
+		sendFeedback: sendFeedback
+	}
+})();
+
 var RevealConfig = {
 	customcontrols: {
 		controls: [
 			{
-				icon: '<div class="custom-controls-arrow"><i class="fas fa-arrows-alt"></i></div>',
+				icon: 'far fa-comment',
+				className: 'custom-feedback',
+				title: 'Сообщить об опечатке на слайде',
+				action: function() {
+					WikidsStoryFeedback.sendFeedback();
+				}
+			},
+			{
+				icon: 'fas fa-arrows-alt',
+				className: 'custom-fullscreen',
+				title: 'Полноэкранный режим',
 				action: function() {
 					storyToggleFullscreen();
 					var $el = $(this).find('i');
 					$el.removeClass('fa-arrows-alt')
 					   .removeClass('fa-expand-arrows-alt');
 					storyInFullscreen() ? $el.addClass('fa-arrows-alt') : $el.addClass('fa-expand-arrows-alt');
-				},
-				className: 'custom-fullscreen'
+				}
 			},
 			{
-				icon: '<div class="custom-controls-arrow"><i class="fas fa-chevron-left"></i></div>', 
+				icon: 'fas fa-chevron-left', 
+				className: 'custom-navigate-left',
+				title: 'Назад',
 				action: function() {
 					Reveal.prev();
-				},
-				className: 'custom-navigate-left'
+				}
 			},
 			{
-				icon: '<div class="custom-controls-arrow"><i class="fas fa-chevron-right"></i></div>', 
+				icon: 'fas fa-chevron-right', 
+				className: 'custom-navigate-right',
+				title: 'Вперед',
 				action: function() {
 					Reveal.next();
-				},
-				className: 'custom-navigate-right'
+				}
 			}
 		],
 		controlsCallback: function(ev) {
@@ -79,8 +123,9 @@ var RevealConfig = {
     //    { src: 'js/reveal-plugins/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
     //    { src: 'js/reveal-plugins/zoom/zoom.js', async: true }
         {src: '/js/revealjs-customcontrols/customcontrols.js'},
-        {src: '/js/story-reveal-statistics.js'},
-        {src: '/js/story-reveal-feedback.js'}
+        {src: '/js/revealjs-customcontrols/customcontrols.css'},
+        {src: '/js/story-reveal-statistics.js'}
+        // {src: '/js/story-reveal-feedback.js'}
     ]
 };
 
@@ -89,7 +134,31 @@ $.extend(StoryRevealConfig, RevealConfig);
 
 Reveal.initialize(StoryRevealConfig);
 
-function onSlideMouseDown(e) {
-	Reveal.next();
+//function onSlideMouseDown(e) {
+//	Reveal.next();
+//}
+//Reveal.addEventListener("mousedown", onSlideMouseDown, false);
+
+/*
+Reveal.addEventListener("mouseover", function() {
+	console.log('123');
+}, false);
+*/
+
+
+function changeRevealContainerHeight() {
+	var $container = $('.reveal-container');
+	if (storyInFullscreen()) {
+		$container.css('height', '100%');
+	}
+	else {
+		var containerWidth = $container[0].offsetWidth;
+		$container .css('height', (containerWidth * 0.5) + 'px');
+	}
 }
-Reveal.addEventListener("mousedown", onSlideMouseDown, false);
+
+window.onresize = changeRevealContainerHeight;
+
+$(function() {
+	$(window).resize();
+})

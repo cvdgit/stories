@@ -1,0 +1,45 @@
+.reveal {
+	font-size: 30px;
+}
+.reveal p {
+	font-size: inherit !important;
+}
+.reveal h1 {
+	color: white;
+}
+.reveal .sl-block {
+	display: block;
+	position: absolute;
+	z-index: auto
+}
+
+.reveal .sl-block .sl-block-content {
+	display: block;
+	position: relative;
+	width: 100%;
+	height: 100%;
+	max-width: none;
+	max-height: none;
+	margin: 0;
+	outline: 0;
+	word-wrap: break-word
+}
+
+.reveal .sl-block .sl-block-content>:first-child {
+	margin-top: 0
+}
+
+.reveal .sl-block .sl-block-content>:last-child {
+	margin-bottom: 0
+}
+.reveal .sl-block[data-block-type="image"] .sl-block-content img {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	vertical-align: top
+}
+.reveal-container {
+	height: 585px;
+}

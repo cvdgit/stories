@@ -27,9 +27,6 @@ class RevealWidget extends Widget
         $config = [
             "width" => 1280,
             "height" => 720,
-            //"minScale" => 1.0,
-            //"maxScale" => 0.6,
-            //"margin" => 0,
             "transition" => "none",
             "backgroundTransition" => "slide",
             "center" => true,
@@ -58,36 +55,38 @@ class RevealWidget extends Widget
             $config['height'] = $options['height'];
         }
 
+        $config = array_merge($config,
+                              $this->getStatisticsConfig(),
+                              $this->getFeedbackConfig());
+
         $configJson = Json::htmlEncode($config);
         $js = "window.StoryRevealConfig = $configJson;";
-        $this->getView()->registerJs($js, View::POS_HEAD);
 
         $view = $this->getView();
+        $view->registerJs($js, View::POS_HEAD);
+
         RevealAsset::register($view);
 
-        $this->registerStatistics();
-
-        $this->registerFeedback();
+        $view->registerJsFile('/js/story-reveal.js', ['depends' => ['yii\web\JqueryAsset']]);
+        $view->registerCssFile('/css/wikids-reveal.css', ['depends' => 'frontend\assets\RevealAsset']);
     }
 
-    public function registerStatistics()
+    protected function getStatisticsConfig()
     {
-    	$config = [
-    		'action' => Url::to(['statistics/write', 'id' => $this->story_id]),
+    	return [
+            'statisticsConfig' => [
+    	        'action' => Url::to(['statistics/write', 'id' => $this->story_id])
+            ],
     	];
-    	$configJson = Json::htmlEncode($config);
-        $js = "Reveal.configure({statisticsConfig: $configJson});";
-        $this->getView()->registerJs($js);
     }
 
-    public function registerFeedback()
+    protected function getFeedbackConfig()
     {
-        $config = [
-            'action' => Url::to(['feedback/create', 'id' => $this->story_id]),
+        return [
+            'feedbackConfig' => [
+                'action' => Url::to(['feedback/create', 'id' => $this->story_id])
+            ],
         ];
-        $configJson = Json::htmlEncode($config);
-        $js = "Reveal.configure({feedbackConfig: $configJson});";
-        $this->getView()->registerJs($js);
     }
 
 }

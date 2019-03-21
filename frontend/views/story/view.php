@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\helpers\HtmlPurifier;
+use common\widgets\RevealWidget;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Story */
@@ -18,14 +19,10 @@ $this->params['breadcrumbs'][] = $title;
 <div class="vertical-slider">
 	<div class="container">
 		<div class="row" style="padding-top: 10px">
-			<div class="col-md-12" style="height: 100%; min-height: 100%">
-			<?php if ($availableRate): ?>
-				<iframe border="0" width="100%" id="story-iframe" height="700" style="border: 0 none" src="/story/viewbyframe/<?= $model->id ?>" allowfullscreen></iframe>
-			<?php else: ?>
-				<div class="info-title">
-					<p>Преобретите <?= Html::a('подписку', ['/pricing']) ?> для просмотра всех историй</p>
+			<div class="col-md-12">
+				<div class="reveal-container">
+				    <?= RevealWidget::widget(['story_id' => $model->id, 'data' => $model->body]) ?>
 				</div>
-			<?php endif ?>
 			</div>
 		</div>
 		<div class="row">

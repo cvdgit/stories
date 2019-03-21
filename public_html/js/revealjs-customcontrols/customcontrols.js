@@ -7,30 +7,32 @@ var RevealCustomControls = window.RevealCustomControls || (function() {
 
 	var $controls = $('<div/>');
 	$controls.addClass('customcontrols');
-	
-	for (var $control, $icon, elem, i = 0; i < config.controls.length; i++ ) {
 
-		elem = config.controls[i];
-		$control = $('<button/>');
-		if (elem.className && elem.className.length) {
-			$control.addClass(elem.className);
-		}
-		$control.addClass('enabled');
-		$control.append(elem.icon);
-		$control.on('click', elem.action);
+	$.each(config.controls, function(i, control) {
+		var $button = $('<button/>'),
+			$icon = $('<i/>').addClass(control.icon);
+		$button
+		    .addClass('enabled')
+		    .addClass(control.className)
+		    .attr('title', control.title)
+		    .on('click', control.action)
+		    .append($icon.wrap('<div class="controls-arrow"></div>'))
+		    .appendTo($controls);
+	});
 
-		$controls.append($control);
-	}
-	
 	$('.story-controls').append($controls);
 
-	Reveal.addEventListener('ready', function(event) {
+	var $controlsWrapper = $('<div/>');
+	$controlsWrapper.addClass('story-controls');
 
+	$controlsWrapper.append($controls);
+	$controlsWrapper.appendTo('.reveal');
+
+	Reveal.addEventListener('ready', function(event) {
 		Reveal.getConfig().customcontrols.controlsCallback(event);
 	});
 
 	Reveal.addEventListener('slidechanged', function(event) {
-
 		Reveal.getConfig().customcontrols.controlsCallback(event);
 	});
 

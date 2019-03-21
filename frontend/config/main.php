@@ -75,6 +75,9 @@ return [
                 'class' => 'frontend\components\SeoViewBehavior',
             ],
         ],
+        'assetManager' => [
+            'appendTimestamp' => true,
+        ],
     ],
     'params' => $params,
 ];
