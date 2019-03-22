@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\helpers\HtmlPurifier;
+use yii\web\JsExpression;
 use common\widgets\RevealWidget;
 
 /* @var $this yii\web\View */
@@ -24,7 +25,6 @@ $this->params['breadcrumbs'][] = $title;
 				    <?= RevealWidget::widget([
 				    		'storyId' => $model->id,
 				    		'data' => $model->body,
-				    		'initScript' => '/js/story-reveal.js',
 				    		'options' => [
 				    			'dependencies' => [
 					                ["src" => "/js/revealjs-customcontrols/customcontrols.js"],
@@ -32,6 +32,20 @@ $this->params['breadcrumbs'][] = $title;
 					                ["src" => "/js/story-reveal-statistics.js"],
 				    			],
 				    		],
+				    		'controls' => [
+				    			new \common\widgets\RevealButtons\FeedbackButton(),
+				    			new \common\widgets\RevealButtons\FullscreenButton(),
+				    			new \common\widgets\RevealButtons\LeftButton(),
+				    			new \common\widgets\RevealButtons\RightButton(),
+							],
+				    		'controlsCallback' => new JsExpression("
+function(ev) {
+	var left = $('.custom-navigate-left', $('.reveal'));
+	Reveal.getProgress() === 0 ? left.attr('disabled', 'disabled') : left.removeAttr('disabled');
+	var right = $('.custom-navigate-right', $('.reveal'));
+	Reveal.getProgress() === 1 ? right.attr('disabled', 'disabled') : right.removeAttr('disabled');
+}
+							"),
 				    	]) ?>
 				</div>
 			</div>

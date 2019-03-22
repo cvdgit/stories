@@ -28,13 +28,11 @@ var RevealCustomControls = window.RevealCustomControls || (function() {
 	$controlsWrapper.append($controls);
 	$controlsWrapper.appendTo('.reveal');
 
-	Reveal.addEventListener('ready', function(event) {
-		Reveal.getConfig().customcontrols.controlsCallback(event);
-	});
-
-	Reveal.addEventListener('slidechanged', function(event) {
-		Reveal.getConfig().customcontrols.controlsCallback(event);
-	});
+	var callback = Reveal.getConfig().customcontrols;
+	if (typeof callback === 'function') {
+		Reveal.addEventListener('ready', callback);
+		Reveal.addEventListener('slidechanged', callback);
+	}
 
 	return this;
 

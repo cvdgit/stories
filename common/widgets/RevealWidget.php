@@ -16,8 +16,40 @@ class RevealWidget extends Widget
     public $id;
 	public $data;
 	public $storyId;
-    public $initScript;
     public $options = [];
+    public $initializeReveal = true;
+    public $controls = [];
+    public $controlsCallback = '';
+
+    protected $config = [
+        "width" => 1280,
+        "height" => 720,
+        "transition" => "none",
+        "backgroundTransition" => "slide",
+        "center" => true,
+        "controls" => false,
+        "controlsLayout" => "bottom-right",
+        "controlsBackArrows" => "faded",
+        "progress" => true,
+        "history" => true,
+        "mouseWheel" => false,
+        "showNotes" => true,
+        "slideNumber" => true,
+        "autoSlide" => false,
+        "autoSlideStoppable" => true,
+        "shuffle" => false,
+        "loop" => false,
+        "hash" => true,
+        "hashOneBasedIndex" => true,
+        "rtl" => false,
+        "dependencies" => [
+            // ["src" => "js/reveal-plugins/markdown/marked.js", "condition" => new JsExpression("function() { return !!document.querySelector( '[data-markdown]' ); }")],
+            // ["src" => "js/reveal-plugins/markdown/markdown.js", "condition" => new JsExpression("function() { return !!document.querySelector( '[data-markdown]' ); }")],
+            // ["src" => "js/reveal-plugins/highlight/highlight.js", "async" => true, "callback" => new JsExpression("function() { hljs.initHighlighting(); hljs.initHighlightingOnLoad(); }")],
+            // ["src" => "js/reveal-plugins/notes/notes.js", "async" => true, "condition" => new JsExpression("function() { return !!document.body.classList; }")],
+            // ["src" => "js/reveal-plugins/zoom/zoom.js", "async" => true],
+        ],
+    ];
 
 	public function run()
 	{
@@ -30,63 +62,39 @@ class RevealWidget extends Widget
 
     public function registerClientScript()
     {
-        $config = [
-            "width" => 1280,
-            "height" => 720,
-            "transition" => "none",
-            "backgroundTransition" => "slide",
-            "center" => true,
-            "controls" => false,
-            "controlsLayout" => "bottom-right",
-            "controlsBackArrows" => "faded",
-            "progress" => true,
-            "history" => true,
-            "mouseWheel" => false,
-            "showNotes" => true,
-            "slideNumber" => true,
-            "autoSlide" => false,
-            "autoSlideStoppable" => true,
-            "shuffle" => false,
-            "loop" => false,
-            "hash" => true,
-            "hashOneBasedIndex" => true,
-            "rtl" => false,
-            "dependencies" => [
-                // ["src" => "js/reveal-plugins/markdown/marked.js", "condition" => new JsExpression("function() { return !!document.querySelector( '[data-markdown]' ); }")],
-                // ["src" => "js/reveal-plugins/markdown/markdown.js", "condition" => new JsExpression("function() { return !!document.querySelector( '[data-markdown]' ); }")],
-                // ["src" => "js/reveal-plugins/highlight/highlight.js", "async" => true, "callback" => new JsExpression("function() { hljs.initHighlighting(); hljs.initHighlightingOnLoad(); }")],
-                // ["src" => "js/reveal-plugins/notes/notes.js", "async" => true, "condition" => new JsExpression("function() { return !!document.body.classList; }")],
-                // ["src" => "js/reveal-plugins/zoom/zoom.js", "async" => true],
-            ],
-        ];
 
         $options = $this->options;
         if (isset($options['width']) && $options['width'] > 0) {
-            $config['width'] = $options['width'];
+            $this->config['width'] = $options['width'];
         }
         if (isset($options['height']) && $options['height'] > 0) {
-            $config['height'] = $options['height'];
+            $this->config['height'] = $options['height'];
         }
         if (isset($options["dependencies"]) && is_array($options["dependencies"])) {
-            $config["dependencies"] = array_merge($config["dependencies"], $options["dependencies"]);
+            $this->config["dependencies"] = array_merge($this->config["dependencies"], $options["dependencies"]);
         }
 
-        $config = array_merge($config,
-                              $this->getStatisticsConfig(),
-                              $this->getFeedbackConfig());
+        $this->config = array_merge($this->config,
+                                    $this->getStatisticsConfig(),
+                                    $this->getFeedbackConfig(),
+                                    $this->getCustomControlsConfig());
 
-        $configJson = Json::htmlEncode($config);
+        $configJson = Json::htmlEncode($this->config);
         $js = "window.StoryRevealConfig = $configJson;";
 
         $view = $this->getView();
-        $view->registerJs($js, View::POS_HEAD);
-
         RevealAsset::register($view);
+        $view->registerJs($js, View::POS_HEAD);
+        $view->registerCssFile('/css/wikids-reveal.css', ['depends' => ['frontend\assets\RevealAsset']]);
+
+        if ($this->initializeReveal) {
+            $js = "Reveal.initialize(StoryRevealConfig);";
+            $view->registerJs($js, View::POS_END);
+        }
 
         if (!empty($this->initScript)){
             $view->registerJsFile($this->initScript, ['depends' => ['yii\web\JqueryAsset', 'frontend\assets\RevealAsset']]);
         }
-        $view->registerCssFile('/css/wikids-reveal.css', ['depends' => ['frontend\assets\RevealAsset']]);
     }
 
     protected function getStatisticsConfig()
@@ -103,6 +111,16 @@ class RevealWidget extends Widget
         return [
             'feedbackConfig' => [
                 'action' => Url::to(['feedback/create', 'id' => $this->storyId])
+            ],
+        ];
+    }
+
+    protected function getCustomControlsConfig()
+    {
+        return [
+            'customcontrols' => [
+                'controls' => $this->controls,
+                'controlsCallback' => $this->controlsCallback,
             ],
         ];
     }

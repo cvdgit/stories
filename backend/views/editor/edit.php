@@ -36,12 +36,19 @@ $this->params['sidebarMenuItems'] = [
 		</div>
 	</div>
 	<div class="col-xs-9" style="height: 484px">
-		<!--div class="reveal" id="story-editor">
-			<div class="slides"></div>
-		</div-->
 		<div class="reveal-container">
 		    <?= RevealWidget::widget([
 		    		'id' => 'story-editor',
+		    		'initializeReveal' => false,
+		    		'options' => [
+		    			'dependencies' => [
+			                ["src" => "/js/revealjs-customcontrols/customcontrols.js"],
+			                ["src" => "/js/revealjs-customcontrols/customcontrols.css"],
+		    			],
+		    		],
+		    		'controls' => [
+		    			new \common\widgets\RevealButtons\FullscreenButton(),
+					],
 		    	]) ?>
 		</div>
 		<div class="row"><div class="col-xs-12">&nbsp;</div></div>
