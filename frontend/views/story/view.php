@@ -44,6 +44,7 @@ $this->registerCss($css);
 $js = <<< JS
 function onSlideMouseDown(e) {
 	e = e || window.event;
+	if ($(e.target).parents('.story-controls').length) return;
 	switch (e.which) {
 		case 1: Reveal.next(); break;
 		// case 2: alert('middle'); break;
