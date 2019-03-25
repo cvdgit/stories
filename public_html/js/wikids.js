@@ -89,6 +89,7 @@ var WikidsPlayer = (function() {
 	  	}
 	}
 
+	/*
 	function changePlayerContainerHeight()
 	{
 		if (inFullscreen()) {
@@ -103,7 +104,8 @@ var WikidsPlayer = (function() {
 	window.onresize = changePlayerContainerHeight;
 	$(function() {
 		$(window).resize();
-	})
+	});
+	*/
 
 	return {
 		toggleFullscreen: toggleFullscreen,

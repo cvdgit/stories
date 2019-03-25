@@ -22,6 +22,25 @@ $this->params['sidebarMenuItems'] = [
     ['label' => 'Редактор', 'url' => ['editor/edit', 'id' => $model->id]],
     ['label' => 'Статистика', 'url' => ['statistics/list', 'id' => $model->id]],
 ];
+$css = <<< CSS
+.reveal-container {
+	position: relative;
+}
+.reveal-container::before {
+    content: "";
+    display: block;
+    padding-bottom: calc(100% / (16/9));
+    width: 100%;
+}
+.reveal-container-inner {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+}
+CSS;
+$this->registerCss($css);
 ?>
 
 <div class="row">
@@ -35,12 +54,15 @@ $this->params['sidebarMenuItems'] = [
 		<?php endforeach ?>
 		</div>
 	</div>
-	<div class="col-xs-9" style="height: 484px">
+	<div class="col-xs-9">
 		<div class="reveal-container">
+			<div class="reveal-container-inner">
 		    <?= RevealWidget::widget([
 		    		'id' => 'story-editor',
 		    		'initializeReveal' => false,
 		    		'options' => [
+		    			'hash' => false,
+		    			'history' => false,
 		    			'dependencies' => [
 			                ["src" => "/js/revealjs-customcontrols/customcontrols.js"],
 			                ["src" => "/js/revealjs-customcontrols/customcontrols.css"],
@@ -50,6 +72,7 @@ $this->params['sidebarMenuItems'] = [
 		    			new \common\widgets\RevealButtons\FullscreenButton(),
 					],
 		    	]) ?>
+		    </div>
 		</div>
 		<div class="row"><div class="col-xs-12">&nbsp;</div></div>
 		<div class="row">

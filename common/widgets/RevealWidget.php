@@ -62,18 +62,16 @@ class RevealWidget extends Widget
 
     public function registerClientScript()
     {
-
-        $options = $this->options;
-        if (isset($options['width']) && $options['width'] > 0) {
-            $this->config['width'] = $options['width'];
+        foreach ($this->options as $optionName => $optionValue) {
+            if (isset($this->config[$optionName])) {
+                if (is_array($this->config[$optionName]) && is_array($optionValue)) {
+                    $this->config[$optionName] = array_merge($this->config[$optionName], $optionValue);
+                }
+                else {
+                    $this->config[$optionName] = $optionValue;
+                }
+            }
         }
-        if (isset($options['height']) && $options['height'] > 0) {
-            $this->config['height'] = $options['height'];
-        }
-        if (isset($options["dependencies"]) && is_array($options["dependencies"])) {
-            $this->config["dependencies"] = array_merge($this->config["dependencies"], $options["dependencies"]);
-        }
-
         $this->config = array_merge($this->config,
                                     $this->getStatisticsConfig(),
                                     $this->getFeedbackConfig(),

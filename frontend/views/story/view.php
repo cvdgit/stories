@@ -15,28 +15,39 @@ $this->setMetaTags($title,
                    $title);
 $this->params['breadcrumbs'][] = ['label' => 'Каталог историй', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $title;
-
 $css = <<< CSS
-@supports (--custom:property) {
-  [style*="--aspect-ratio"] {
-    position: relative;
-  }
-  [style*="--aspect-ratio"]::before {
+.reveal-container {
+	position: relative;
+}
+.reveal-container::before {
     content: "";
     display: block;
-    padding-bottom: calc(100% / (var(--aspect-ratio)));
-  }  
-
+    padding-bottom: calc(100% / (16/9));
+    width: 100%;
+}
+.reveal-container-inner {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+}
+.reveal-no-subscription {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: black;
+	height: 100%;
 }
 CSS;
 $this->registerCss($css);
 ?>
-
 <div class="vertical-slider">
 	<div class="container">
 		<div class="row" style="padding-top: 10px">
 			<div class="col-md-12">
 				<div class="reveal-container">
+					<div class="reveal-container-inner">
 					<?php if ($userCanViewStory): ?>
 				    <?= RevealWidget::widget([
 				    		'storyId' => $model->id,
@@ -64,10 +75,11 @@ function(ev) {
 							"),
 				    	]) ?>
 				    <?php else: ?>
-				    <div style="--aspect-ratio:16/9;display:flex;align-items: center;justify-content: center;background-color:black">
+				    <div class="reveal-no-subscription">
 				    	<?= Html::a('Смотреть по подписке', ['/pricing'], ['class' => 'custom-btn text-center']) ?>
 				    </div>
 				    <?php endif ?>
+					</div>
 				</div>
 			</div>
 		</div>
