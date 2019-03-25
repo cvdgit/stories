@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
-use common\models\User;
+use common\helpers\UserHelper;
 use common\models\Category;
 use common\models\Story;
 use dosamigos\datepicker\DatePicker;
@@ -26,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
         [
             'attribute' => 'user_id',
             'value' => 'author.username',
-            'filter' => User::getUserArray(),
+            'filter' => UserHelper::getUserArray(),
         ],
         [
             'attribute' => 'category_id',

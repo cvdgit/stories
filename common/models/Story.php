@@ -211,4 +211,9 @@ class Story extends \yii\db\ActiveRecord
         return false;
     }
 
+    public function bySubscription()
+    {
+        return !empty($this->sub_access);
+    }
+
 }

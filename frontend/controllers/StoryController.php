@@ -14,13 +14,13 @@ use common\service\CustomerPayment as PaymentService;
 class StoryController extends \yii\web\Controller
 {
 
-    public $service;
+    public $storyService;
     private $paymentService = null;
 
-    public function __construct($id, $module, StoryService $service, $config = [])
+    public function __construct($id, $module, StoryService $storyService, $config = [])
     {
         parent::__construct($id, $module, $config);
-        $this->service = $service;
+        $this->storyService = $storyService;
         $this->paymentService = new PaymentService();
     }
 
@@ -45,10 +45,12 @@ class StoryController extends \yii\web\Controller
     {
         $model = $this->findModelByAlias($alias);
         $model->updateCounters(array('views_number' => 1));
-        $availableRate = $this->paymentService->availableRate($model);
         return $this->render('view', [
-            'model' => $this->findModelByAlias($alias),
-            'availableRate' => $availableRate,
+            'model' => $model,
+            'userCanViewStory' => $this->storyService->userCanViewStory(
+                $model,
+                (Yii::$app->user->isGuest ? null : \common\models\User::findOne(Yii::$app->user->identity->id))
+            ),
         ]);
     }
 
@@ -106,14 +108,6 @@ class StoryController extends \yii\web\Controller
             'searchModel' => $searchModel,
             'dataProvider' => $model->getPublishedStories(),
         ]);
-    }
-
-    public function actionWebhook($challenge)
-    {
-        $headers = Yii::$app->response->headers;
-        $headers->set('Content-Type', 'text/plain');
-        $headers->set('X-Content-Type-Options', 'nosniff');
-        return $challenge;
     }
 
 }

@@ -15,6 +15,21 @@ $this->setMetaTags($title,
                    $title);
 $this->params['breadcrumbs'][] = ['label' => 'Каталог историй', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $title;
+
+$css = <<< CSS
+@supports (--custom:property) {
+  [style*="--aspect-ratio"] {
+    position: relative;
+  }
+  [style*="--aspect-ratio"]::before {
+    content: "";
+    display: block;
+    padding-bottom: calc(100% / (var(--aspect-ratio)));
+  }  
+
+}
+CSS;
+$this->registerCss($css);
 ?>
 
 <div class="vertical-slider">
@@ -22,6 +37,7 @@ $this->params['breadcrumbs'][] = $title;
 		<div class="row" style="padding-top: 10px">
 			<div class="col-md-12">
 				<div class="reveal-container">
+					<?php if ($userCanViewStory): ?>
 				    <?= RevealWidget::widget([
 				    		'storyId' => $model->id,
 				    		'data' => $model->body,
@@ -47,6 +63,11 @@ function(ev) {
 }
 							"),
 				    	]) ?>
+				    <?php else: ?>
+				    <div style="--aspect-ratio:16/9;display:flex;align-items: center;justify-content: center;background-color:black">
+				    	<?= Html::a('Смотреть по подписке', ['/pricing'], ['class' => 'custom-btn text-center']) ?>
+				    </div>
+				    <?php endif ?>
 				</div>
 			</div>
 		</div>

@@ -2,13 +2,9 @@
 namespace common\models;
 
 use Yii;
-use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
-use yii\web\NotFoundHttpException;
-use yii\helpers\ArrayHelper;
-use yii\db\Expression;
 
 /**
  * User model
@@ -222,24 +218,6 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Returns user role name according to RBAC
-     * @return string
-     */
-    public function getRoleName()
-    {
-        $roles = Yii::$app->authManager->getRolesByUser($this->id);
-        if (!$roles) {
-            return null;
-        }
-
-        reset($roles);
-        /* @var $role \yii\rbac\Role */
-        $role = current($roles);
-
-        return $role->name;
-    }
-
-    /**
      * @return \yii\db\ActiveQuery
      */
     public function getPayments()
@@ -252,47 +230,12 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function getActivePayment()
     {
-        return $this->hasOne(Payment::className(), ['user_id' => 'id'])->where(['between', new Expression('NOW()'), new Expression('payment'), new Expression('finish')]);
+        return $this->hasOne(Payment::className(), ['user_id' => 'id'])->validPayments();
     }
 
-    public static function getUserArray()
-    {
-        return ArrayHelper::map(self::find()->all(), 'id', 'username');
-    }
-
-    public static function getStatusArray()
-    {
-        return [
-            self::STATUS_DELETED => 'Удален',
-            self::STATUS_WAIT => 'Ожидание подтверждения',
-            self::STATUS_ACTIVE => 'Активен',
-        ];
-    }
-
-    public function getStatusText()
-    {
-        $arr = self::getStatusArray();
-        return $arr[$this->status];
-    }
-
-    public function haveSubscription()
+    public function hasSubscription()
     {
         return !empty($this->activePayment);
-    }
-
-    /**
-     * Finds the User model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return User the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function findModel($id)
-    {
-        if (($model = User::findOne($id)) !== null) {
-            return $model;
-        }
-        throw new NotFoundHttpException('Страница не найдена.');
     }
 
 }

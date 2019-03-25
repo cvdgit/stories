@@ -22,6 +22,11 @@ use yii\behaviors\TimestampBehavior;
  */
 class Payment extends \yii\db\ActiveRecord
 {
+
+    const STATUS_NEW = 0;
+    const STATUS_VALID = 1;
+    const STATUS_INVALID = 2;
+
     /**
      * {@inheritdoc}
      */
@@ -38,6 +43,11 @@ class Payment extends \yii\db\ActiveRecord
         return [
             TimestampBehavior::className(),
         ];
+    }
+
+    public static function find()
+    {
+        return new PaymentQuery(get_called_class());
     }
 
     /**
@@ -85,4 +95,21 @@ class Payment extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
+
+    public static function create($userID, $rateID, $dateStart, $dateFinish, $state = self::STATUS_NEW)
+    {
+        $payment = new static();
+        $payment->user_id = $userID;
+        $payment->rate_id = $rateID;
+        $payment->payment = $dateStart;
+        $payment->finish = $dateFinish;
+        $payment->state = $state;
+        return $payment;
+    }
+
+    public static function getUserPaymentHistory($userID)
+    {
+        return self::find()->paymentsByUser($userID);
+    }
+
 }

@@ -1,8 +1,22 @@
 
 
+var Wikids = (function() {
+
+	"use strict"
+
+	function getRevealConfig()
+	{
+		return StoryRevealConfig;
+	}
+
+	return {
+		getRevealConfig: getRevealConfig
+	};
+})()
+
 var WikidsStoryFeedback = (function() {
 
-	var config = StoryRevealConfig.feedbackConfig;
+	var config = Wikids.getRevealConfig().feedbackConfig;
 
     function send(data) {
         return $.ajax({

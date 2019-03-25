@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
-use common\models\User;
+use common\helpers\UserHelper;
 
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -21,9 +21,9 @@ $this->title = 'Пользователи';
         [
             'attribute' => 'status',
             'value' => function($model) {
-                return $model->getStatusText();
+                return UserHelper::getStatusText($model->status);
             },
-            'filter' => User::getStatusArray(),
+            'filter' => UserHelper::getStatusArray(),
         ],
         [
             'attribute' => 'active_payment',

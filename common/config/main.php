@@ -14,10 +14,6 @@ return [
         ],
          'authManager' => [
             'class' => 'yii\rbac\DbManager',
-            //'defaultRoles' => ['admin', 'author'],
-            //'itemFile' => '@common/rbac/items.php',
-            //'assignmentFile' => '@common/rbac/assignments.php',
-            //'ruleFile' => '@common/rbac/rules.php'
         ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',

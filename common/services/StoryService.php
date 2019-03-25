@@ -112,4 +112,9 @@ class StoryService
         }
     }
 
+    public function userCanViewStory(\common\models\Story $story, $user = null): bool
+    {
+        return !$story->bySubscription() || ($story->bySubscription() && $user && $user->hasSubscription());
+    }
+
 }

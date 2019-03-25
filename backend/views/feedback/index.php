@@ -29,7 +29,6 @@ var StoryFeedback = (function() {
         send(keys)
             .done(function(data) {
                 if (data.success) {
-                    //$("#w0").yiiGridView("applyFilter");
                     $.pjax.reload({container: "#pjax-feedback"});
                     StoryAlert.success('Успешно');
                 }
