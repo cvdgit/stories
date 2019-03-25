@@ -41,6 +41,18 @@ $css = <<< CSS
 }
 CSS;
 $this->registerCss($css);
+$js = <<< JS
+function onSlideMouseDown(e) {
+	e = e || window.event;
+	switch (e.which) {
+		case 1: Reveal.next(); break;
+		// case 2: alert('middle'); break;
+		case 3: Reveal.prev(); break; 
+	}
+}
+Reveal.addEventListener("mousedown", onSlideMouseDown, false);
+JS;
+$this->registerJs($js);
 ?>
 <div class="vertical-slider">
 	<div class="container">
