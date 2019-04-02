@@ -233,6 +233,16 @@ class StoryController extends \yii\web\Controller
         return ['success' => true];
     }
 
+    public function actionDownload($id)
+    {
+        $model = $this->findModel($id);
+        // TODO: перенести определение пути до файла в сервис
+        $file = Yii::getAlias('@public') . '/slides_file/' . $model->story_file;
+        if (file_exists($file)) {
+            Yii::$app->response->sendFile($file);
+        }
+    }
+
     /*
     protected function importStory($model, $service)
     {
