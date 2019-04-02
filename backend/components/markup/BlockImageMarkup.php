@@ -27,8 +27,8 @@ class BlockImageMarkup extends BlockMarkup
 			$imageHeight = ImageMarkup::DEFAULT_IMAGE_HEIGHT;
 		}
 		else {
-			$imageWidth = ImageMarkup::DEFAULT_IMAGE_WIDTH / $ratio;
-			$imageHeight = ImageMarkup::DEFAULT_IMAGE_WIDTH;
+			$imageHeight = ImageMarkup::DEFAULT_IMAGE_WIDTH / $ratio;
+			$imageWidth = ImageMarkup::DEFAULT_IMAGE_WIDTH;
 		}
 
 		$this->setWidth("{$imageWidth}px");
