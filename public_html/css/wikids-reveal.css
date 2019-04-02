@@ -2,7 +2,8 @@
 	font-size: 30px;
 }
 .reveal p {
-	font-size: inherit !important;
+	font-weight: normal;
+	line-height: 1em;
 }
 .reveal h1 {
 	color: white;
