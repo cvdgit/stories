@@ -2,8 +2,6 @@
 
 namespace backend\components;
 
-use backend\components\markup\BlockImageMarkup;
-
 class SlideBlockImage extends SlideBlock
 {
 
@@ -32,6 +30,11 @@ class SlideBlockImage extends SlideBlock
 			$markup = $element;
 		}
 		$element->setImagePath($imagePath);
+	}
+
+	public function setImageSize($imagePath)
+	{
+		$this->markup->setImageSize($imagePath);
 	}
 
 }

@@ -82,21 +82,10 @@ class StoryPowerPointService
         $blockMarkup = new \backend\components\markup\BlockImageMarkup($block);
         $blockContentMarkup = new \backend\components\markup\BlockImageContentMarkup($block);
         $imageMarkup = new \backend\components\markup\ImageMarkup($block);
-
+        
         $imagePath = $this->getImagesFolder(true) . $pptxShape->getIndexedFilename();
         $imageMarkup->setImagePath($imagePath);
-
-        $width = $pptxShape->getWidth();
-        if ($width > \backend\components\markup\ImageMarkup::DEFAULT_IMAGE_WIDTH) {
-            $width = \backend\components\markup\ImageMarkup::DEFAULT_IMAGE_WIDTH;
-        }
-        $imageMarkup->setWidth($width . 'px');
-
-        $height = $pptxShape->getHeight();
-        if ($height > \backend\components\markup\ImageMarkup::DEFAULT_IMAGE_HEIGHT) {
-            $height = \backend\components\markup\ImageMarkup::DEFAULT_IMAGE_HEIGHT;
-        }
-        $imageMarkup->setHeight($height . 'px');
+        $blockMarkup->setImageSize($imagePath, $pptxShape->getWidth(), $pptxShape->getHeight());
 
         $blockContentMarkup->addElement($imageMarkup);
         $blockMarkup->addElement($blockContentMarkup);
@@ -127,19 +116,12 @@ class StoryPowerPointService
                 $paragraphText[] = $text;
             }
         }
-        $paragraphMarkup->setContent(implode('<br/>', $paragraphText));
+        $paragraphMarkup->setContent(implode('<br>', $paragraphText));
 
         $blockContentMarkup->addElement($paragraphMarkup);
         $blockMarkup->addElement($blockContentMarkup);
 
         $block->setMarkup($blockMarkup);
-        
-        /*
-        $markup->setWidth($pptxShape->getWidth() . 'px');
-        $markup->setHeight($pptxShape->getHeight() . 'px');
-        $markup->setLeft($pptxShape->getOffsetX() . 'px');
-        $markup->setTop($pptxShape->getOffsetY() . 'px');
-        */
     }
 
     protected function loadSlideShapes($slide, $pptxShapes)

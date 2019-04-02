@@ -24,7 +24,7 @@ class StoryEditor
         $slide = $this->story->getSlide($slideIndex);
         foreach ($slide->getBlocks() as $block) {
             if (get_class($block) == 'backend\components\SlideBlockText') {
-                $block->setText($text);
+                $block->setText(nl2br($text));
                 $block->setTextSize($textSize);
             }
         }
@@ -35,6 +35,7 @@ class StoryEditor
         $slide = $this->story->getSlide($slideIndex);
         foreach ($slide->getBlocks() as $block) {
             if (get_class($block) == 'backend\components\SlideBlockImage') {
+            	$block->setImageSize($imagePath);
                 $block->setImagePath($imagePath);
             }
         }
@@ -46,7 +47,7 @@ class StoryEditor
 		$values = ['text' => '', 'image' => ''];
         foreach ($slide->getBlocks() as $block) {
             if (get_class($block) == 'backend\components\SlideBlockText') {
-                $values['text'] = $block->getText();
+                $values['text'] = preg_replace('/\<br(\s*)?\/?\>/i', PHP_EOL, $block->getText());
                 $values['text_size'] = $block->getTextSize();
             }
             if (get_class($block) == 'backend\components\SlideBlockImage') {

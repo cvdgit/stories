@@ -73,7 +73,7 @@ class StoryHtmlReader
 			$blockContentMarkup = new \backend\components\markup\BlockHeaderContentMarkup($block, $element->get(0)->tagName, $element->attr('*'));
 
 			$element = pq($htmlBlock)->find('h1');
-			$paragraphMarkup = new \backend\components\markup\HeaderMarkup($block, $element->get(0)->tagName, $element->attr('*'), $element->text());
+			$paragraphMarkup = new \backend\components\markup\HeaderMarkup($block, $element->get(0)->tagName, $element->attr('*'), $element->html());
         }
         else {
         	$element = pq($htmlBlock);
@@ -83,7 +83,7 @@ class StoryHtmlReader
 			$blockContentMarkup = new \backend\components\markup\BlockContentMarkup($block, $element->get(0)->tagName, $element->attr('*'));
 
 			$element = pq($htmlBlock)->find('p');
-			$paragraphMarkup = new \backend\components\markup\ParagraphMarkup($block, $element->get(0)->tagName, $element->attr('*'), $element->text());
+			$paragraphMarkup = new \backend\components\markup\ParagraphMarkup($block, $element->get(0)->tagName, $element->attr('*'), $element->html());
         }
 
 		$blockContentMarkup->addElement($paragraphMarkup);

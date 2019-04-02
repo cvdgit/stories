@@ -15,4 +15,24 @@ class BlockImageMarkup extends BlockMarkup
 		],
 	];
 
+	public function setImageSize($imagePath, $imageWidth = 0, $imageHeight = 0)
+	{
+		if ($imageWidth == 0 && $imageHeight == 0) {
+			list($imageWidth, $imageHeight) = getimagesize(\Yii::getAlias('@public') . $imagePath);
+		}
+
+		$ratio = $imageWidth / $imageHeight;
+		if (ImageMarkup::DEFAULT_IMAGE_WIDTH / ImageMarkup::DEFAULT_IMAGE_HEIGHT > $ratio) {
+			$imageWidth = ImageMarkup::DEFAULT_IMAGE_HEIGHT * $ratio;
+			$imageHeight = ImageMarkup::DEFAULT_IMAGE_HEIGHT;
+		}
+		else {
+			$imageWidth = ImageMarkup::DEFAULT_IMAGE_WIDTH / $ratio;
+			$imageHeight = ImageMarkup::DEFAULT_IMAGE_WIDTH;
+		}
+
+		$this->setWidth("{$imageWidth}px");
+		$this->setHeight("{$imageHeight}px");
+	}
+
 }
