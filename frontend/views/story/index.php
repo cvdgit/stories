@@ -44,14 +44,15 @@ $this->params['breadcrumbs'][] = $title;
                        {summary}
                        <div class="pull-right">
                          <span style="margin-right: 6px">Сортировать по:</span>
-            <div class="dropdown pull-right" style="cursor: pointer">
-              <div id="story-sort-dropdown" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">сначала новые <span class="caret"></span></div>
+                         <div class="dropdown pull-right" style="cursor: pointer">
+                           <div id="story-sort-dropdown" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">сначала новые <span class="caret"></span></div>
                            {sorter}
                            </div>
                          </div>
                        </div>
                      </div>
-                     <div class="story-list"><div class="flex-row row">{items}</div></div>{pager}',
+                     <div class="story-list"><div class="flex-row row">{items}</div></div>
+                     <div class="story-pagination">{pager}</div>',
         'summary' => '<span>Показано {count} из {totalCount} историй</span>',
         'dataProvider' => $dataProvider,
         'itemOptions' => ['tag' => false],
@@ -66,9 +67,6 @@ $this->params['breadcrumbs'][] = $title;
             ]
         ],
         'pager' => [
-            'options' => [
-                'class' => 'story-pagination',
-            ],
             'disabledListItemSubTagOptions' => ['tag' => 'a', 'href' => '#'],
             'disabledPageCssClass' => 'no-pointer',
             'prevPageCssClass' => false,
