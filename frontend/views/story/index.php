@@ -67,6 +67,9 @@ $this->params['breadcrumbs'][] = $title;
             ]
         ],
         'pager' => [
+          'options' => [
+            'class' => false,
+          ],
             'disabledListItemSubTagOptions' => ['tag' => 'a', 'href' => '#'],
             'disabledPageCssClass' => 'no-pointer',
             'prevPageCssClass' => false,
