@@ -168,6 +168,7 @@ section h2 span {
 
 .site-phone-number {
   float: right;
+  clear: both;
   color: #99cd50;
   font-size: 1.3em;
   margin-top: 6px;
