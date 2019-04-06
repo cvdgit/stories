@@ -83,33 +83,22 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
-        if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
-
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()))
-        {
-            if ($model->login())
-            {
-                return $this->goBack();
-            }
-            else
-            {
-                $errors = $model->getErrors();
-                if (sizeof($errors) > 0) {
-                    foreach ($errors as $attribute) {
-                        Yii::$app->session->setFlash('error', $attribute[0]);
-                    }
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        if (Yii::$app->request->isAjax) {
+            $model = new LoginForm();
+            if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+                if ($model->login()) {
+                    return ['success' => true, 'message' => ''];
                 }
-                return $this->refresh();
+                else {
+                    return ['success' => false, 'message' => ['']];
+                }
+            }
+            else {
+                return ['success' => false, 'message' => $model->errors];
             }
         }
-            
-        $model->password = '';
-        return $this->render('login', [
-            'model' => $model,
-        ]);
+        return ['success' => false, 'message' => ['']];
     }
 
     /**
@@ -131,6 +120,7 @@ class SiteController extends Controller
      */
     public function actionContact()
     {
+        /*
         $model = new ContactForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             try {
@@ -147,6 +137,25 @@ class SiteController extends Controller
                 'model' => $model,
             ]);
         }
+        */
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        if (Yii::$app->request->isAjax) {
+            $model = new ContactForm();
+            if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+                try {
+                    $model->sendEmail(Yii::$app->params['adminEmail']);
+                    return ['success' => true, 'message' => 'Благодарим Вас за обращение к нам. Мы ответим вам как можно скорее'];
+                }
+                catch (\Exception $ex) {
+                    Yii::$app->errorHandler->logException($ex);
+                    return ['success' => false, 'message' => ['При отправке вашего сообщения произошла ошибка']];
+                }
+            }
+            else {
+                return ['success' => false, 'message' => $model->errors];
+            }
+        }
+        return ['success' => false, 'message' => ['']];
     }
 
     /**
@@ -166,23 +175,31 @@ class SiteController extends Controller
      */
     public function actionSignup()
     {
-        $model = new SignupForm();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            if ($user = $model->signup()) {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        if (Yii::$app->request->isAjax) {
+            $model = new SignupForm();
+            if ($model->load(Yii::$app->request->post()) && $model->validate()) {
                 try {
-                    $model->sentEmailConfirm($user);
-                    Yii::$app->session->setFlash('success', 'Проверьте свой адрес электронной почты, чтобы подтвердить регистрацию.');
-                    return $this->goHome();
+                    $user = $model->signup();
+                    try {
+                        $model->sentEmailConfirm($user);
+                        return ['success' => true, 'message' => 'Проверьте свой адрес электронной почты, чтобы подтвердить регистрацию'];
+                    }
+                    catch (\Exception $ex) {
+                        Yii::$app->errorHandler->logException($ex);
+                        return ['success' => false, 'message' => ['Ошибка при отправке письма с подтверждением регистрации на сайте']];
+                    }
                 }
                 catch (\Exception $ex) {
                     Yii::$app->errorHandler->logException($ex);
-                    Yii::$app->session->setFlash('error', 'Ошибка при отправке письма с подтверждением регистрации на сайте.');
+                    return ['success' => false, 'message' => ['Произошла ошибка при регистрации пользователя']];
                 }
             }
+            else {
+                return ['success' => false, 'message' => $model->errors];
+            }
         }
-        return $this->render('signup', [
-            'model' => $model,
-        ]);
+        return ['success' => false, 'message' => ['']];
     }
 
     /**

@@ -1,7 +1,6 @@
 <?php
 
 use yii\helpers\Html;
-use frontend\widgets\StoryWidget;
 
 /* @var $this yii\web\View */
 
@@ -9,64 +8,172 @@ $this->setMetaTags('Сервис ускоренного развития реч�
                    'Сервис ускоренного развития речи ребёнка',
                    'wikids, сказки, истории');
 ?>
-
-<div class="container-fluid" style1="padding-left: 0; padding-right: 0">
-    <div class="big-banner" style="background: url(/images/wikids-main.jpg) no-repeat center;margin-bottom: 40px">
-        <div class="row">
-            <div class="col-md-6 col-sm-12" style="display: block">
-                <div class="text">
-                    <h2>Сервис ускоренного развития<br>речи ребёнка - wikids.ru</h2>
-                    <h3 class="description-subtitle">Посмотри короткий ролик о сервисе или зарегистрируйся</h3>
-                    <?php if (Yii::$app->user->isGuest): ?>
-                    <?= Html::a('Регистрация', ['/site/signup'], ['class' => 'custom-btn text-center white']) ?>
-                    <?php else: ?>
-                    <?= Html::a('Каталог историй', ['/story/index'], ['class' => 'custom-btn text-center white']) ?>
-                    <?php endif ?>
-                </div>
-            </div>
-            <div class="col-md-6 col-sm-12 demo">
-                <div class="demo-content">
-                    <div class="browser">
-                        <div class="browser-header">
-                            <div class="browser-header-dot"></div>
-                            <div class="browser-header-dot"></div>
-                            <div class="browser-header-dot"></div>
-                        </div>
-                        <div class="browser-content"></div>
-                    </div>
-                </div>
-            </div>
+  <section class="site-about">
+    <h2 class="container"><span>О</span> портале</h2>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-5 col-md-5 col-sm-2">
+          <span class="about-tree-number pull-right">01</span>
         </div>
+        <div class="col-lg-2 col-md-2 col-sm-0">
+          <div class="about-tree-element-top"></div>
+          <div class="about-tree-element-sep"></div>
+        </div>
+        <div class="col-lg-5 col-md-5 col-sm-10">
+          <div class="about-note-block about-note-block-right">
+            <div class="about-note-block-content">
+              <h4><span>Формат</span> материала</h4>
+              <p>Электронная библиотека для родителей<br>Похоже на диафильм или книгу с иллюстрациями</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-5 col-md-5 col-sm-10">
+          <div class="about-note-block about-note-block-left">
+            <div class="about-note-block-content">
+              <h4><span>Цель</span> сервиса</h4>
+              <p>Ускоренная наработка словарного запаса ребёнка<br>Построение коммуникации с ребёнком</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-2 col-sm-0">
+          <div class="about-tree-element"></div>
+          <div class="about-tree-element-sep"></div>
+        </div>
+        <div class="col-lg-5 col-md-5 col-sm-2">
+          <span class="about-tree-number pull-left">02</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-5 col-md-5 col-sm-2">
+          <span class="about-tree-number pull-right">03</span>
+        </div>
+        <div class="col-lg-2 col-md-2 col-sm-0">
+          <div class="about-tree-element"></div>
+          <div class="about-tree-element-sep"></div>
+        </div>
+        <div class="col-lg-5 col-md-5 col-sm-10">
+          <div class="about-note-block about-note-block-right">
+            <div class="about-note-block-content">
+              <h4>Достигаемый <span>результат</span></h4>
+              <p>Ребёнок начнёт говорить<br>Развитая русская речь у Ваших детей</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-5 col-md-5 col-sm-10">
+          <div class="about-note-block about-note-block-left">
+            <div class="about-note-block-content">
+              <h4>Наша <span>методика</span></h4>
+              <p>Пополнение словарного запаса самым доступным способом<br />Сказка перед сном ежедневно</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-2 col-sm-0">
+          <div class="about-tree-element"></div>
+          <div class="about-tree-element-sep"></div>
+        </div>
+        <div class="col-lg-5 col-md-5 col-sm-2">
+          <span class="about-tree-number pull-left">04</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-5 col-md-5 col-sm-2">
+          <span class="about-tree-number pull-right">05</span>
+        </div>
+        <div class="col-lg-2 col-md-2 col-sm-0">
+          <div class="about-tree-element"></div>
+          <div class="about-tree-element-sep"></div>
+        </div>
+        <div class="col-lg-5 col-md-5 col-sm-10">
+          <div class="about-note-block about-note-block-right">
+            <div class="about-note-block-content">
+              <h4><span>Возраст</span> начала занятий</h4>
+              <p>В 1,5 года дети уже будут нормально слушать Вас<br />Но можно и раньше</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-5 col-md-5 col-sm-10">
+          <div class="about-note-block about-note-block-left">
+            <div class="about-note-block-content">
+              <h4><span>Роль</span> родителя</h4>
+              <p>Активная роль. Вы - источник знаний и авторитет<br />Вы читаете текст и объясняете, если что-то непонятно</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-2 col-sm-0">
+          <div class="about-tree-element-bottom"></div>
+        </div>
+        <div class="col-lg-5 col-md-5 col-sm-2">
+          <span class="about-tree-number pull-left">06</span>
+        </div>
+      </div>
     </div>
-</div>
+  </section>
 
-<div class="container-large">
-    <article class="post gallery-post" style="margin-bottom: 0px">
-        <div class="entry-content">
-            <div class="title-head">
-                <h2 class="text-black">О портале</h2>
-            </div>
-            <p>Чем лучше человек разговаривает, тем более он успешен в жизни.</p>
-            <p>Надо объяснить любимой девушке, что именно ты – самый лучший.<br>
-Надо донести до начальников, что именно тебе надо доверить самую сложную и дорогую работу.<br>
-Надо объяснить своим коллегам по работе, что они должны сделать, ради общего дела.<br>
-Надо найти добрые слова для своих друзей и быть желанным в любой компании.</p>
-            <p>Если нашёл слова – то у тебя девушка есть, высокая зарплата, интересная работа и друзья.</p>
-            <p>Подарите всё это своим детям. Научите их говорить.<br>
-Чем раньше начнёте – тем лучше.<br>
-Это может сделать только родитель.<br>
-Телевизору такое не под силу.</p>
-            <p>Наш портал – для достижения этого успеха.</p>
-            <p>Лучше сейчас уделить своему маленькому умнице час перед сном, чем потом тратить деньги на репетиторов.<br>
-Да и не помогут репетиторы. Сами знаете.
-</p>
-            <p>Заниматься с детьми можно в формате – сказка на ночь. Не с целью усыпить детей, а с целью научить их русской речи.<br>
-Скоро Вы заметите, как они начнут разговаривать теми словами, которые Вы донесли до них через сказки. И тогда Вы почувствуете, что реально открываете им дорогу в будущее.<br>
-Успехов Вам и Вашим детишкам!</p>
+  <section class="site-stories">
+    <h2 class="container"><span>Новые</span> истории</h2>
+    <div class="container">
+        <?= \frontend\widgets\StoryWidget::widget() ?>
+    </div>
+    <div class="container site-stories-controls">
+      <?= Html::a('Посмотреть все истории', ['/story/index'], ['class' => 'btn']) ?>
+    </div>
+  </section>
+
+  <section class="site-questions">
+    <h2 class="container">Часто задаваемые <span>вопросы</span></h2>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-5 col-md-offset-1">
+          <div class="question-block">
+            <h4>В чем особенность современных детей?</h4>
+            <p>Нарушение речевого развития у каждого четвёртого к первому классу. Остальные плохо говорят, плохо понимают и тянут назад весь класс.</p>
+          </div>
         </div>
-    </article>
-</div>
+        <div class="col-md-5">
+          <div class="question-block">
+            <h4>Не повредит ли это моему ребенку?</h4>
+            <p>Всё опробовал на своих детях. Занимаюсь ежедневно. Дети развитые и хорошо разговаривают.</p>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-5 col-md-offset-1">
+          <div class="question-block">
+            <h4>Проблемы с дисциплиной, что посоветуете?</h4>
+            <p>Если не слушает, безобразничает - прекращайте занятие и укладывайте спать. Между спать и сказкой ребёнок будет выбирать сказку и стараться успокоиться.</p>
+          </div>
+        </div>
+        <div class="col-md-5">
+          <div class="question-block">
+            <h4>А может просто мультик показать?</h4>
+            <p>Ценность мультфильмов невелика. Дети перенимают речь от другого человека. В основном, лично от Вас. От телевизора не могут. Почему - науке пока не известно.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<div class="container-large">
-    <?= StoryWidget::widget() ?>
-</div>
+  <section class="site-ask-question">
+    <div class="container">
+      <div class="row row-no-gutters ask-question-wrapper">
+        <div class="col-md-3">
+          <img src="./img/ask-icon.png" alt="">
+          <span class="ask-text-1">Нужна консультация?</span>
+        </div>
+        <div class="col-md-7">
+          <span class="ask-text-2">Подробно расскажем о нашей методике, приведем примеры, поможем подобрать сказки</span>
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-white pull-right" data-toggle="modal" data-target="#wikids-feedback-modal">Задать вопрос</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <?= \frontend\widgets\ContactWidget::widget() ?>

@@ -16,31 +16,10 @@ $this->setMetaTags($title,
 $this->params['breadcrumbs'][] = ['label' => 'Каталог историй', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $title;
 $css = <<< CSS
-.reveal-container {
-	position: relative;
-}
-.reveal-container::before {
-    content: "";
-    display: block;
-    padding-bottom: calc(100% / (16/9));
-    width: 100%;
-}
-.reveal-container-inner {
-	position: absolute;
-	left: 0;
-	right: 0;
-	top: 0;
-	bottom: 0;
-}
-.reveal-no-subscription {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	background-color: black;
-	height: 100%;
-}
+
+
 CSS;
-$this->registerCss($css);
+//$this->registerCss($css);
 $js = <<< JS
 function onSlideMouseDown(e) {
 	e = e || window.event;
@@ -55,70 +34,102 @@ Reveal.addEventListener("mousedown", onSlideMouseDown, false);
 JS;
 $this->registerJs($js);
 ?>
-<div class="vertical-slider">
-	<div class="container">
-		<div class="row" style="padding-top: 10px">
-			<div class="col-md-12">
-				<div class="reveal-container">
-					<div class="reveal-container-inner">
-					<?php if ($userCanViewStory): ?>
-				    <?= RevealWidget::widget([
-				    		'storyId' => $model->id,
-				    		'data' => $model->body,
-				    		'options' => [
-				    			'dependencies' => [
-					                ["src" => "/js/revealjs-customcontrols/customcontrols.js"],
-					                ["src" => "/js/revealjs-customcontrols/customcontrols.css"],
-					                ["src" => "/js/story-reveal-statistics.js"],
-				    			],
-				    		],
-				    		'controls' => [
-				    			new \common\widgets\RevealButtons\FeedbackButton(),
-				    			new \common\widgets\RevealButtons\FullscreenButton(),
-				    			new \common\widgets\RevealButtons\LeftButton(),
-				    			new \common\widgets\RevealButtons\RightButton(),
-							],
-				    		'controlsCallback' => new JsExpression("
-function(ev) {
+<div class="container">
+	<main class="site-story-main">
+	  <div class="story-container">
+	    <div class="story-container-inner">
+			<?php if ($userCanViewStory): ?>
+		    <?= RevealWidget::widget([
+	    		'storyId' => $model->id,
+	    		'data' => $model->body,
+	    		'options' => [
+	    			'dependencies' => [
+	            ["src" => "/js/revealjs-customcontrols/customcontrols.js"],
+	            ["src" => "/js/revealjs-customcontrols/customcontrols.css"],
+	            ["src" => "/js/story-reveal-statistics.js"],
+	    			],
+	    		],
+	    		'controls' => [
+	    			new \common\widgets\RevealButtons\FeedbackButton(),
+	    			new \common\widgets\RevealButtons\FullscreenButton(),
+	    			new \common\widgets\RevealButtons\LeftButton(),
+	    			new \common\widgets\RevealButtons\RightButton(),
+					],
+	    		'controlsCallback' => new JsExpression("
+	function(ev) {
 	var left = $('.custom-navigate-left', $('.reveal'));
 	Reveal.getProgress() === 0 ? left.attr('disabled', 'disabled') : left.removeAttr('disabled');
 	var right = $('.custom-navigate-right', $('.reveal'));
 	Reveal.getProgress() === 1 ? right.attr('disabled', 'disabled') : right.removeAttr('disabled');
-}
-							"),
-				    	]) ?>
-				    <?php else: ?>
-				    <div class="reveal-no-subscription">
-				    	<?= Html::a('Смотреть по подписке', ['/pricing'], ['class' => 'custom-btn text-center']) ?>
-				    </div>
-				    <?php endif ?>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-12">
-				<div class="inside-single" style="padding-left:0">
-					<h4 class="title"><?= Html::encode($model->title) ?></h4>
-					<div class="description">
-						<?php if (!empty($model->description)): ?>
-						<p><?= Html::encode($model->description) ?></p>
-						<?php endif ?>
-					</div>
-					<ul>
-						<li>Категории: <?= Html::a($model->category->name, ['story/category', 'category' => $model->category->alias]) ?></li>
-						<?php $tags = $model->getTags()->all(); ?>
-						<?php if (count($tags) > 0): ?>
-						<li>Тэги:
-						<?php foreach($tags as $tag): ?>
-							<?= Html::a($tag->name, ['tag', 'tag' => $tag->name]) ?>
-						<?php endforeach ?>
-						</li>
-						<?php endif ?>
-						<li>Тип: <a href="#"><?= ($model->sub_access) ? 'Подписка' : 'Бесплатно' ?></a></li>
-					</ul>
-				</div>
-			</div>
-		</div>
-	</div>
+	}
+					"),
+		    ]) ?>
+		  <?php else: ?>
+		    <div class="story-no-subscription">
+		    	<?= Html::a('Смотреть по подписке', ['/pricing'], ['class' => 'btn']) ?>
+		    </div>
+		  <?php endif ?>
+	    </div>
+	  </div>
+	  <div class="story-description">
+	    <h1><?= Html::encode($model->title) ?></h1>
+	    <?php if (!empty($model->description)): ?>
+	    <div class="story-text"><?= Html::encode($model->description) ?></div>
+	  	<?php endif ?>
+	    <div class="story-categories">Категория: <?= Html::a($model->category->name, ['story/category', 'category' => $model->category->alias]) ?></div>
+	    <?php $tags = $model->getTags()->all(); ?>
+			<?php if (count($tags) > 0): ?>
+	    <div class="story-tags">Тэги:
+	    	<?php foreach($tags as $tag): ?>
+				<?= Html::a($tag->name, ['tag', 'tag' => $tag->name]) ?>
+				<?php endforeach ?>
+	    </div>
+	    <?php endif ?>
+	    <div class="story-pay">Тип: <?= $model->bySubscription() ? 'По подписке' : 'Беслпатно' ?></div>
+	  </div>
+	  <div class="comments">
+	    <div class="comment-form">
+	      <div class="comment-form-wrapper">
+	        <div class="comment-logo">
+	          <img src="/img/avatar.png" alt="">
+	        </div>
+	        <div class="add-comment-wrapper">
+	          <div class="add-comment-placeholder">
+	            <textarea placeholder="Оставить комментарий..."></textarea>
+	          </div>
+	          <div class="add-comment-controls">
+	            <a class="add-comment-close" href="#!">Отмена</a>
+	            <button class="btn">Оставить комментарий</button>
+	          </div>
+	        </div>
+	      </div>
+	    </div>
+	    <div class="comment-list">
+	      <div class="comment-list-item">
+	        <div class="comment-logo">
+	          <img src="/img/avatar.png" alt="">
+	        </div>
+	        <div class="comment">
+	          <div class="comment-header">
+	            <a href="#!">Пётр</a>
+	            <span>5 часов назад</span>
+	          </div>
+	          <div class="comment-body">Моему ребенку очень понравилось, есть что-то похожее?</div>
+	        </div>
+	      </div>
+	      <div class="comment-list-item">
+	        <div class="comment-logo">
+	          <img src="/img/avatar.png" alt="">
+	        </div>
+	        <div class="comment">
+	          <div class="comment-header">
+	            <a href="#!">Иванов Иван Иванович</a>
+	            <span>5 часов назад</span>
+	          </div>
+	          <div class="comment-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloribus quas accusantium laborum laudantium natus quae, quibusdam, blanditiis temporibus totam tempore praesentium, dolor facilis illum voluptates! Harum, eum accusantium autem expedita!</div>
+	        </div>
+	      </div>
+	    </div>
+	  </div>
+	</main>
 </div>

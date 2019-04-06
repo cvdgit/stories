@@ -12,7 +12,6 @@ class StoryWidget extends Widget
 	public function init()
 	{
 		parent::init();
-
 	}
 
 	public function run()

@@ -57,7 +57,7 @@ class SignupForm extends Model
     public function signup()
     {
         if (!$this->validate()) {
-            return null;
+            throw new \DomainException('Signup model is not valid');
         }
         
         $user = new User();
@@ -68,9 +68,9 @@ class SignupForm extends Model
         $user->setPassword($this->password);
         $user->generateAuthKey();
         $user->generateEmailConfirmToken();
-        
+
         if (!$user->save(false)) {
-            return null;
+            throw new \DomainException('Signup user save error');
         }
 
         $auth = Yii::$app->authManager;
