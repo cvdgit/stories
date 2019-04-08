@@ -67,7 +67,7 @@ class StorySearch extends Story
         ]);
         
         $sortParams = [
-            'defaultOrder' => ['sub_access' => SORT_DESC, 'title' => SORT_ASC],
+            'defaultOrder' => ['sub_access' => SORT_DESC, 'created_at' => SORT_DESC],
             'attributes' => [
                 'title' => [
                     'asc' => ['title' => SORT_ASC],
