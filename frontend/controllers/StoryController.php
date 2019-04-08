@@ -29,6 +29,7 @@ class StoryController extends \yii\web\Controller
         $searchModel = new StorySearch();
         $searchModel->scenario = StorySearch::SCENARIO_FRONTEND;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,

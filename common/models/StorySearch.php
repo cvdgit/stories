@@ -5,7 +5,7 @@ namespace common\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use yii\data\Sort;
+use frontend\components\StorySorter as Sort;
 use common\models\Story;
 
 /**
@@ -70,6 +70,7 @@ class StorySearch extends Story
                 'title' => [
                     'asc' => ['title' => SORT_ASC],
                     'desc' => ['title' => SORT_DESC],
+                    'label' => 'названию истории',
                 ],
                 'user_id' => [
                     'asc' => ['user.username' => SORT_ASC],
@@ -82,6 +83,7 @@ class StorySearch extends Story
                 'created_at' => [
                     'asc' => ['created_at' => SORT_ASC],
                     'desc' => ['created_at' => SORT_DESC],
+                    'label' => 'дате создания',
                 ],
                 'updated_at' => [
                     'asc' => ['updated_at' => SORT_ASC],

@@ -41,7 +41,7 @@ use common\helpers\Url;
               <?php
               $menuItems = [
                   ['label' => 'Главная', 'url' => ['/site/index']],
-                  ['label' => 'Истории', 'url' => ['/story/index']],
+                  ['label' => 'Истории', 'url' => ['/story/index'], 'active' => (Yii::$app->controller->id == 'story')],
                   ['label' => 'Подписки', 'url' => ['/rate/index']],
                   ['label' => 'Контакты', 'url' => ['/site/contact']],
               ];

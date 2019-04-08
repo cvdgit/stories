@@ -15,8 +15,10 @@ body {
   line-height: 1;
 }
 
-a {
+a,
+a:focus {
   color: #38405d;
+  text-decoration: none;
 }
 
 a:hover {
@@ -993,7 +995,9 @@ section h2 span {
   border-width: 2px;
   padding-right: 36px;
 }
-
+.story-form .story-search-control:focus {
+  border-color: rgba(136, 140, 158, 0.6);
+}
 
 .site-story-main {}
 

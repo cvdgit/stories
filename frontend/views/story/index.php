@@ -27,7 +27,9 @@ $this->params['breadcrumbs'][] = $title;
       'options' => ['class' => 'story-form'],
     ]); ?>
     <div>
-      <?= $form->field($searchModel, 'title', ['inputOptions' => ['class' => 'form-control story-search-control']])->textInput(['placeholder' => 'Поиск...'])->label(false) ?>
+      <?= $form->field($searchModel, 'title', ['inputOptions' => ['class' => 'form-control story-search-control']])
+               ->textInput(['placeholder' => 'Поиск...', 'autocomplete' => 'off'])
+               ->label(false) ?>
       <span class="icon icon-search"></span>
     </div>
     <?php ActiveForm::end(); ?>
@@ -39,13 +41,14 @@ $this->params['breadcrumbs'][] = $title;
     ]) ?>
   </nav>
   <main class="col-sm-8 col-md-9 site-main">
+    <?php $order = $dataProvider->getSort()->getCurrentOrderName(); ?>
     <?= ListView::widget([
         'layout' => '<div class="story-list-filter clearfix">
                        {summary}
                        <div class="pull-right">
                          <span style="margin-right: 6px">Сортировать по:</span>
                          <div class="dropdown pull-right" style="cursor: pointer">
-                           <div id="story-sort-dropdown" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">сначала новые <span class="caret"></span></div>
+                           <div id="story-sort-dropdown" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$order.' <span class="caret"></span></div>
                            {sorter}
                            </div>
                          </div>
