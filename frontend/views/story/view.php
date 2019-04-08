@@ -15,11 +15,7 @@ $this->setMetaTags($title,
                    $title);
 $this->params['breadcrumbs'][] = ['label' => 'Каталог историй', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $title;
-$css = <<< CSS
 
-
-CSS;
-//$this->registerCss($css);
 $js = <<< JS
 function onSlideMouseDown(e) {
 	e = e || window.event;
@@ -88,6 +84,7 @@ $this->registerJs($js);
 	    <div class="story-pay">Тип: <?= $model->bySubscription() ? 'По подписке' : 'Беслпатно' ?></div>
 	  </div>
 	  <div class="comments">
+	  	<?php if (!Yii::$app->user->isGuest): ?>
 	    <div class="comment-form">
 	      <div class="comment-form-wrapper">
 	        <div class="comment-logo">
@@ -104,31 +101,9 @@ $this->registerJs($js);
 	        </div>
 	      </div>
 	    </div>
+		<?php endif ?>
 	    <div class="comment-list">
-	      <div class="comment-list-item">
-	        <div class="comment-logo">
-	          <img src="/img/avatar.png" alt="">
-	        </div>
-	        <div class="comment">
-	          <div class="comment-header">
-	            <a href="#!">Пётр</a>
-	            <span>5 часов назад</span>
-	          </div>
-	          <div class="comment-body">Моему ребенку очень понравилось, есть что-то похожее?</div>
-	        </div>
-	      </div>
-	      <div class="comment-list-item">
-	        <div class="comment-logo">
-	          <img src="/img/avatar.png" alt="">
-	        </div>
-	        <div class="comment">
-	          <div class="comment-header">
-	            <a href="#!">Иванов Иван Иванович</a>
-	            <span>5 часов назад</span>
-	          </div>
-	          <div class="comment-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloribus quas accusantium laborum laudantium natus quae, quibusdam, blanditiis temporibus totam tempore praesentium, dolor facilis illum voluptates! Harum, eum accusantium autem expedita!</div>
-	        </div>
-	      </div>
+	    	<h4>Комменатриев пока нет</h4>
 	    </div>
 	  </div>
 	</main>

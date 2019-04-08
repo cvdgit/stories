@@ -1034,6 +1034,10 @@ section h2 span {
   font-size: 1.6rem;
 }
 
+.comment-list h4 {
+  text-align: center;
+}
+
 .comment {
   margin-bottom: 30px;
   margin-left: 56px;
