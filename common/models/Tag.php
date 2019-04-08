@@ -66,16 +66,6 @@ class Tag extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return ActiveDataProvider
-     */
-    public function getPublishedStories(): ActiveDataProvider
-    {
-        return new ActiveDataProvider([
-            'query' => $this->getStories()->published()
-        ]);
-    }
-
-    /**
      * @param string $name
      * @return Tag[]
      */

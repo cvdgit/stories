@@ -6,6 +6,7 @@ use Yii;
 
 class StoryQuery extends \yii\db\ActiveQuery
 {
+
     public function published()
     {
         return $this->andWhere(['{{%story}}.status' => Story::STATUS_PUBLISHED]);
@@ -20,4 +21,5 @@ class StoryQuery extends \yii\db\ActiveQuery
     {
     	return $this->orderBy(['{{%story}}.created_at' => SORT_DESC])->limit(8);
     }
+
 }

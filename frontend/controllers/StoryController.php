@@ -29,7 +29,6 @@ class StoryController extends \yii\web\Controller
         $searchModel = new StorySearch();
         $searchModel->scenario = StorySearch::SCENARIO_FRONTEND;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -55,35 +54,13 @@ class StoryController extends \yii\web\Controller
         ]);
     }
 
-    /**
-     * Finds the Story model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return Story the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = Story::findOne($id)) !== null) {
-            return $model;
-        }
-        throw new NotFoundHttpException('Страница не найдена.');
-    }
-
     protected function findModelByAlias($alias)
     {
-        if (($model = Story::findOne(['alias' => $alias])) !== null) {
+        if (($model = Story::findStory(['alias' => $alias])) !== null) {
             return $model;
         }
         throw new NotFoundHttpException('Страница не найдена.');
     }
-
-    public function actionViewByFrame($id)
-    {
-        $model = ($this->paymentService->availableRate($this->findModel($id))) ? $this->findModel($id) : null;
-        return $this->renderPartial('frame', ['model' => $model]);
-    }
-
 
     public function actionTag($tag)
     {
@@ -92,9 +69,11 @@ class StoryController extends \yii\web\Controller
             throw new NotFoundHttpException('Страница не найдена.');
         }
         $searchModel = new StorySearch();
+        $searchModel->scenario = StorySearch::SCENARIO_FRONTEND;
+        $dataProvider = $searchModel->search(['StorySearch' => ['tag_id' => $model->id]]);
         return $this->render('index', [
             'searchModel' => $searchModel,
-            'dataProvider' => $model->getPublishedStories(),
+            'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -105,9 +84,11 @@ class StoryController extends \yii\web\Controller
             throw new NotFoundHttpException('Страница не найдена.');
         }
         $searchModel = new StorySearch();
+        $searchModel->scenario = StorySearch::SCENARIO_FRONTEND;
+        $dataProvider = $searchModel->search(['StorySearch' => ['category_id' => $model->id]]);
         return $this->render('index', [
             'searchModel' => $searchModel,
-            'dataProvider' => $model->getPublishedStories(),
+            'dataProvider' => $dataProvider,
         ]);
     }
 

@@ -17,6 +17,8 @@ class StorySearch extends Story
     const SCENARIO_FRONTEND = 'frontend';
     const SCENARIO_BACKEND = 'backend';
 
+    public $tag_id;
+
     /**
      * {@inheritdoc}
      */
@@ -24,7 +26,7 @@ class StorySearch extends Story
     {
         return [
             [['title'], 'string'],
-            [['user_id', 'category_id', 'status', 'sub_access'], 'integer'],
+            [['user_id', 'category_id', 'tag_id', 'status', 'sub_access'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
         ];
     }
@@ -35,8 +37,8 @@ class StorySearch extends Story
     public function scenarios()
     {
         return [
-            self::SCENARIO_FRONTEND => ['title'],
-            self::SCENARIO_BACKEND => ['title', 'user_id', 'category_id', 'created_at', 'updated_at', 'status', 'sub_access'],
+            self::SCENARIO_FRONTEND => ['title', 'category_id', 'tag_id'],
+            self::SCENARIO_BACKEND => ['title', 'user_id', 'category_id', 'tag_id', 'created_at', 'updated_at', 'status', 'sub_access'],
         ];
     }
 
@@ -51,10 +53,10 @@ class StorySearch extends Story
     {
         $isBackend = ($this->scenario == StorySearch::SCENARIO_BACKEND);
         if ($isBackend) {
-            $query = Story::findStories()->joinWith(['author', 'category']);
+            $query = Story::findStories()->joinWith(['author', 'category', 'tags']);
         }
         else {
-            $query = Story::findPublishedStories();
+            $query = Story::findPublishedStories()->joinWith(['category', 'tags']);
         }
 
         $dataProvider = new ActiveDataProvider([
@@ -111,6 +113,7 @@ class StorySearch extends Story
             "DATE_FORMAT(FROM_UNIXTIME(story.updated_at), '%d.%m.%Y')" => $this->updated_at,
             'story.status' => $this->status,
             'story.sub_access' => $this->sub_access,
+            'tag.id' => $this->tag_id,
         ]);
         
         return $dataProvider;

@@ -100,17 +100,6 @@ class Category extends \yii\db\ActiveRecord
         return $this->hasMany(Story::className(), ['category_id' => 'id']);
     }
 
-    /**
-     * @return ActiveDataProvider
-     */
-    public function getPublishedStories()
-    {
-        $dataProvider = new ActiveDataProvider([
-            'query' => $this->getStories()->published()
-        ]);
-        return $dataProvider;
-    }
-
     public static function getCategoriesForMenu()
     {
 

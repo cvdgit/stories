@@ -216,4 +216,9 @@ class Story extends \yii\db\ActiveRecord
         return !empty($this->sub_access);
     }
 
+    public static function findStory($condition)
+    {
+        return static::findByCondition($condition)->published()->one();
+    }
+
 }
