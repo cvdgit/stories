@@ -22,4 +22,9 @@ class StoryQuery extends \yii\db\ActiveQuery
     	return $this->orderBy(['{{%story}}.created_at' => SORT_DESC])->limit(8);
     }
 
+    public function withCover()
+    {
+        return $this->andWhere(['not', ['{{%story}}.cover' => null]]);
+    }
+
 }

@@ -183,7 +183,7 @@ class Story extends \yii\db\ActiveRecord
 
     public static function findLastPublishedStories()
     {
-        return self::find()->published()->lastStories();
+        return self::find()->published()->lastStories()->all();
     }
 
     public static function getSourceList()
@@ -219,6 +219,11 @@ class Story extends \yii\db\ActiveRecord
     public static function findStory($condition)
     {
         return static::findByCondition($condition)->published()->one();
+    }
+
+    public static function forSlider()
+    {
+        return static::find()->published()->withCover()->all();
     }
 
 }

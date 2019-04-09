@@ -5,4 +5,7 @@ return [
     'infoEmail' => 'info@wikids.ru',
     'user.passwordResetTokenExpire' => 3600,
     'dropboxSlidesPath' => 'Приложения\Slides App\\',
+    'coverFolder' => 'slides_cover',
+    'storyImagesFolder' => 'slides',
+    'storyFilesFolder' => 'slides_file',
 ];

@@ -34,9 +34,13 @@ class StoryCoverUploadForm extends Model
     public function upload()
     {
         if ($this->validate()) {
-        	$fileName = Yii::$app->security->generateRandomString() . '.' . $this->coverFile->extension;
+        	
+            $fileName = Yii::$app->security->generateRandomString() . '.' . $this->coverFile->extension;
         	$saveAsPath = Yii::getAlias('@public') . '/slides_cover/' . $fileName;
             $this->coverFile->saveAs($saveAsPath);
+            
+            \common\components\StoryCover::create($saveAsPath);
+            
             $this->coverFile = $fileName;
             return true;
         } else {

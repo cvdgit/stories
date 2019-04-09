@@ -1,7 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-use common\services\StoryService;
+use common\components\StoryCover;
 use yii\helpers\Url;
 
 /* @var $this yii\web\View */
@@ -9,7 +9,6 @@ use yii\helpers\Url;
 
 ?>
 <div class="flex-row row story-list">
-    <?php $storyService = new StoryService; ?>
     <?php foreach ($models as $model): ?>
     <div class="col-lg-3 col-md-4 col-sm-6">
       <div class="story-item">
@@ -18,7 +17,7 @@ use yii\helpers\Url;
             <div class="story-item-image-overlay">
               <span></span>
             </div>
-            <?php $img = empty($model->cover) ? './img/story-1.jpg' : $storyService->getCoverPath($model->cover, true); ?>
+            <?php $img = empty($model->cover) ? '/img/story-1.jpg' : StoryCover::getListThumbPath($model->cover); ?>
             <?= Html::img($img) ?>
           </div>
           <div class="story-item-caption">

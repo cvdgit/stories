@@ -90,44 +90,7 @@ use common\helpers\Url;
           <?php endif ?>
         </div>
         <div class="col-md-12 col-lg-6 site-slider">
-          <div id="wikids-carousel" class="carousel slide" data-ride="carousel" data-interval="false">
-            <div class="carousel-inner" role="listbox">
-              <div class="item active">
-                <a href="#!">
-                  <div class="carousel-item-image">
-                    <div class="carousel-item-image-overlay">
-                      <span></span>
-                    </div>
-                    <img src="./img/pic.jpg" alt="...">
-                  </div>
-                  <div class="carousel-caption">
-                    <h3>Ару-Мёндюр. Алтайская народная сказка</h3>
-                  </div>
-                </a>
-              </div>
-              <div class="item">
-                <a href="#!">
-                  <div class="carousel-item-image">
-                    <div class="carousel-item-image-overlay">
-                      <span></span>
-                    </div>
-                    <img src="./img/pic.jpg" alt="...">
-                  </div>
-                  <div class="carousel-caption">
-                    <h3>Ару-Мёндюр. Алтайская народная сказка - 2</h3>
-                  </div>
-                </a>
-              </div>
-            </div>
-            <a class="left carousel-control" href="#wikids-carousel" role="button" data-slide="prev">
-              <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-              <span class="sr-only">Previous</span>
-            </a>
-            <a class="right carousel-control" href="#wikids-carousel" role="button" data-slide="next">
-              <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-              <span class="sr-only">Next</span>
-            </a>
-          </div>
+          <?= \frontend\widgets\StorySlider::widget() ?>
         </div>
       </div>
     </div>

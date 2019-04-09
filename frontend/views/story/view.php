@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\helpers\HtmlPurifier;
 use yii\web\JsExpression;
 use common\widgets\RevealWidget;
+use common\components\StoryCover;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Story */
@@ -61,7 +62,7 @@ $this->registerJs($js);
 					"),
 		    ]) ?>
 		  <?php else: ?>
-		    <div class="story-no-subscription">
+		    <div class="story-no-subscription" style="background-image: url('<?= StoryCover::getStoryThumbPath($model->cover); ?>'); background-position: center center; background-repeat: no-repeat; background-attachment: scroll">
 		    	<?= Html::a('Смотреть по подписке', ['/pricing'], ['class' => 'btn']) ?>
 		    </div>
 		  <?php endif ?>

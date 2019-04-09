@@ -30,7 +30,8 @@
         "2amigos/yii2-date-picker-widget": "~1.0",
         "phpoffice/phppresentation": "dev-master",
         "2amigos/yii2-chartjs-widget": "~2.0",
-        "bower-asset/toastr": "^2.1"
+        "bower-asset/toastr": "^2.1",
+        "yiisoft/yii2-imagine": "^2.1"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",
