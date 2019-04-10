@@ -61,12 +61,7 @@ class StoryController extends \yii\web\Controller
             
             $coverUploadForm->coverFile = UploadedFile::getInstance($coverUploadForm, 'coverFile');
             if ($coverUploadForm->coverFile !== null) {
-                if ($coverUploadForm->upload()) {
-                    $model->cover = $coverUploadForm->coverFile;
-                }
-                else {
-                    print_r($coverUploadForm->getErrors());
-                }
+                $model->cover = $coverUploadForm->upload($model->cover);
             }
 
             if ($model->source_id == Story::SOURCE_SLIDESCOM) {
@@ -141,12 +136,7 @@ class StoryController extends \yii\web\Controller
 
             $coverUploadForm->coverFile = UploadedFile::getInstance($coverUploadForm, 'coverFile');
             if ($coverUploadForm->coverFile !== null) {
-                if ($coverUploadForm->upload()) {
-                    $model->cover = $coverUploadForm->coverFile;
-                }
-                else {
-                    print_r($coverUploadForm->getErrors());
-                }
+                $model->cover = $coverUploadForm->upload($model->cover);
             }
 
             if ($model->source_id == Story::SOURCE_SLIDESCOM) {

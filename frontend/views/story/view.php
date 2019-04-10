@@ -42,7 +42,6 @@ $this->registerJs($js);
 	    		'options' => [
 	    			'dependencies' => [
 	            ["src" => "/js/revealjs-customcontrols/customcontrols.js"],
-	            ["src" => "/js/revealjs-customcontrols/customcontrols.css"],
 	            ["src" => "/js/story-reveal-statistics.js"],
 	    			],
 	    		],
@@ -62,7 +61,7 @@ $this->registerJs($js);
 					"),
 		    ]) ?>
 		  <?php else: ?>
-		    <div class="story-no-subscription" style="background-image: url('<?= StoryCover::getStoryThumbPath($model->cover); ?>'); background-position: center center; background-repeat: no-repeat; background-attachment: scroll">
+		    <div class="story-no-subscription">
 		    	<?= Html::a('Смотреть по подписке', ['/pricing'], ['class' => 'btn']) ?>
 		    </div>
 		  <?php endif ?>

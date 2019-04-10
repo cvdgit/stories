@@ -221,9 +221,9 @@ class Story extends \yii\db\ActiveRecord
         return static::findByCondition($condition)->published()->one();
     }
 
-    public static function forSlider()
+    public static function forSlider($number = 4)
     {
-        return static::find()->published()->withCover()->all();
+        return static::find()->published()->withCover()->byRand()->limit($number)->all();
     }
 
 }

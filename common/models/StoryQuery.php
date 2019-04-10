@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\db\Expression;
 
 class StoryQuery extends \yii\db\ActiveQuery
 {
@@ -25,6 +26,11 @@ class StoryQuery extends \yii\db\ActiveQuery
     public function withCover()
     {
         return $this->andWhere(['not', ['{{%story}}.cover' => null]]);
+    }
+
+    public function byRand()
+    {
+        return $this->orderBy(new Expression('rand()'));
     }
 
 }

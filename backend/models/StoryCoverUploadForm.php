@@ -4,7 +4,7 @@ namespace backend\models;
 
 use yii;
 use yii\base\Model;
-use yii\web\UploadedFile;
+use common\components\StoryCover;
 
 class StoryCoverUploadForm extends Model
 {
@@ -31,20 +31,22 @@ class StoryCoverUploadForm extends Model
         ];
     }
 
-    public function upload()
+    public function upload($existsCover)
     {
-        if ($this->validate()) {
-        	
-            $fileName = Yii::$app->security->generateRandomString() . '.' . $this->coverFile->extension;
-        	$saveAsPath = Yii::getAlias('@public') . '/slides_cover/' . $fileName;
-            $this->coverFile->saveAs($saveAsPath);
-            
-            \common\components\StoryCover::create($saveAsPath);
-            
-            $this->coverFile = $fileName;
-            return true;
-        } else {
-            return false;
+        if (!$this->validate()) {
+            throw new \DomainException('Cover is not valid');
         }
+
+        $fileName = Yii::$app->security->generateRandomString() . '.' . $this->coverFile->extension;
+        $saveAsPath = StoryCover::getCoverFolderPath(true) . '/' . $fileName;
+        $this->coverFile->saveAs($saveAsPath);
+
+        if (!empty($existsCover)) {
+            StoryCover::delete($existsCover);
+        }
+        StoryCover::create($saveAsPath);
+
+        return $fileName;
+
     }
 }

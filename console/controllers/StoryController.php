@@ -16,10 +16,15 @@ class StoryController extends Controller
 		$this->stdout('Всего историй - ' . count($models) . PHP_EOL);
 		foreach ($models as $model) {
 			$this->stdout($model->title . PHP_EOL);
-			$path = StoryCover::createListThumbnail($model->cover);
+			
+			$coverPath = StoryCover::getSourceFilePath($model->cover, true);
+
+			$path = StoryCover::createListThumbnail($coverPath);
 			$this->stdout('[+] ' . $path . PHP_EOL);
-			$path = StoryCover::createStoryThumbnail($model->cover);
+			
+			$path = StoryCover::createStoryThumbnail($coverPath);
 			$this->stdout('[+] ' . $path . PHP_EOL);
+			
 			$this->stdout('' . PHP_EOL);
 		}
 		$this->stdout('Done!' . PHP_EOL);
