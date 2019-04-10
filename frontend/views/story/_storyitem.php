@@ -1,8 +1,7 @@
 <?php
 use yii\helpers\Html;
-use yii\helpers\HtmlPurifier;
 use yii\helpers\Url;
-use common\services\StoryService;
+use common\components\StoryCover;
 
 /* @var $model common\models\Story */
 ?>
@@ -13,7 +12,7 @@ use common\services\StoryService;
         <div class="story-item-image-overlay">
           <span></span>
         </div>
-        <?php $img = empty($model->cover) ? '/img/story-1.jpg' : $this->context->storyService->getCoverPath($model->cover, true); ?>
+        <?php $img = empty($model->cover) ? '/img/story-1.jpg' : StoryCover::getListThumbPath($model->cover); ?>
         <?= Html::img($img) ?>
       </div>
       <div class="story-item-caption">
