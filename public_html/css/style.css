@@ -1266,3 +1266,50 @@ section h2 span {
   content: "\f0e5";
 }
 
+
+.site-pricing > h1 {
+  font-weight: bold;
+  font-size: 3rem;
+  text-align: center;
+  margin-bottom: 50px;
+}
+.site-pricing h1 > span {
+  color: #99cd50;
+}
+
+.site-pricing {
+  margin-bottom: 80px;
+}
+
+.site-pricing .price {
+  text-align: center;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  padding: 35px 50px;
+}
+.site-pricing .price-image {
+  height: 30rem;
+  line-height: 30rem;
+}
+.site-pricing .price-name {
+  font-size: 2.4rem;
+}
+.site-pricing .price-description {
+  font-weight: 300;
+}
+.site-pricing .price-amount {
+  margin-bottom: 20px;
+}
+.site-pricing .price-name,
+.site-pricing .price-description,
+.site-pricing .price-amount {
+  line-height: 3.6rem;
+}
+
+.site-pricing .price button {
+  padding: 1.5rem 9rem;
+  font-size: 1.6rem;
+}

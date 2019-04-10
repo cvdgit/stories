@@ -9,45 +9,42 @@ $this->setMetaTags($title,
                    $title,
                    $title,
                    $title);
-$this->params['breadcrumbs'][] = $title;
 ?>
-<div class="container">
-    <div class="customers">
-        <div class="title-head">
-            <p>Улучши возможность просмотра историй</p>
-        <?php if (isset($count_date_rate)): ?>
-            <p>Подписк : <?= $count_date_rate ?></p>
-        <?php endif ?>
+  <div class="container">
+    <main class="site-pricing">
+      <h1><span>Улучши возможность</span> просмотра историй</h1>
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+      <div class="row">
+        <div class="col-md-4 col-sm-4">
+          <div class="price">
+            <div class="price-image"><img src="/img/price-3month.png" alt=""></div>
+            <div class="price-name">3 месяца</div>
+            <div class="price-description">Доступ ко всем историям на 3 месяца</div>
+            <div class="price-amount">299 ₽</div>
+            <button class="btn">Купить</button>
+          </div>
         </div>
-        <div class="row">
-            <?php foreach($rates as $rate) {  ?>
-            <div class="col-md-4">
-                <div class="inside cst-sub">
-                    <p class="cst-padding-none"><?= $rate->title ?></p>
-                    <p class="cst-cost"><?= $rate->cost ?> ₽</p>
-                    
-                        <form action='<?= $rate->dataPayment['url'] ?>' method=POST>
-                            <input type=hidden name=MrchLogin value='<?= $rate->dataPayment['MrchLogin'] ?>'>
-                            <input type=hidden name=OutSum value='<?= $rate->cost ?>'>
-                            <input type=hidden name=InvId value='<?= $rate->dataPayment['InvId'] ?>'>
-                            <input type=hidden name=Desc value='<?= $rate->dataPayment['Desc'] ?>'>
-                            <input type=hidden name=SignatureValue value='<?= $rate->dataPayment['SignatureValue'] ?>'>
-                            <input type=hidden name=Shp_item value='<?= $rate->id ?>'>
-                            <input type=hidden name=IncCurrLabel value='<?= $rate->dataPayment['IncCurrLabel'] ?>'>
-                            <input type=hidden name=Culture value='<?= $rate->dataPayment['Culture'] ?>'>
-                            <?php if(isset($user)): ?>
-                                <input type=submit value='<?= isset($count_date_rate) ? "Продлить" : "Купить"?>' class="cst-btn text-center white">
-                            <?php else: ?>
-                                <?= Html::a('Купить', ['/signup'], ['class' => 'cst-btn']) ?>
-                            <?php endif ?>
-                        </form>
-
-                    <div class="inside-inside">
-                        <span><?= $rate->description ?></span>
-                    </div>
-                </div>
-            </div>
-            <?php } ?>
+        <div class="col-md-4 col-sm-4">
+          <div class="price">
+            <div class="price-image"><img src="/img/price-1year.png" alt=""></div>
+            <div class="price-name">1 год</div>
+            <div class="price-description">Доступ ко всем историям на 1 год</div>
+            <div class="price-amount">699 ₽</div>
+            <button class="btn">Купить</button>
+          </div>
         </div>
-    </div>
-</div>
+        <div class="col-md-4 col-sm-4">
+          <div class="price">
+            <div class="price-image"><img src="/img/price-1month.png" alt=""></div>
+            <div class="price-name">1 месяц</div>
+            <div class="price-description">Доступ ко всем историям на 1 месяц</div>
+            <div class="price-amount">149 ₽</div>
+            <button class="btn">Купить</button>
+          </div>
+        </div>
+      </div>
+        </div>
+      </div>
+    </main>
+  </div>

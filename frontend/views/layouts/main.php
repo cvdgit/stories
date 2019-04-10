@@ -43,7 +43,7 @@ use common\helpers\Url;
                   ['label' => 'Главная', 'url' => ['/site/index']],
                   ['label' => 'Истории', 'url' => ['/story/index'], 'active' => (Yii::$app->controller->id == 'story')],
                   ['label' => 'Подписки', 'url' => ['/rate/index']],
-                  ['label' => 'Контакты', 'url' => ['/site/contact']],
+                  ['label' => 'Контакты', 'url' => '#', 'template'=> '<a href="{url}" data-toggle="modal" data-target="#wikids-feedback-modal">{label}</a>'],
               ];
               echo Menu::widget([
                   'encodeLabels' => false,
@@ -119,6 +119,7 @@ use common\helpers\Url;
   <?= \frontend\widgets\LoginWidget::widget() ?>
   <?= \frontend\widgets\SignupWidget::widget() ?>
   <?php endif ?>
+  <?= \frontend\widgets\ContactWidget::widget() ?>
 <?php $this->endBody() ?>
 </body>
 </html>

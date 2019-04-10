@@ -175,5 +175,3 @@ $this->setMetaTags('Сервис ускоренного развития реч�
       </div>
     </div>
   </section>
-
-  <?= \frontend\widgets\ContactWidget::widget() ?>
