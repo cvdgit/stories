@@ -6,6 +6,7 @@
 
 html {
   font-size: 10px;
+  overflow: auto;
 }
 
 body {
@@ -13,6 +14,7 @@ body {
   color: #38405d;
   font-family: 'Roboto', Arial, sans-serif;
   line-height: 1;
+  overflow: auto;
 }
 
 a,
@@ -1263,3 +1265,4 @@ section h2 span {
 .icomoon-comment-o:before {
   content: "\f0e5";
 }
+
