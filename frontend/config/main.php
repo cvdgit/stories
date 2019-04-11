@@ -51,6 +51,8 @@ return [
                 'policy' => 'site/policy',
                 'request-password-reset' => 'site/request-password-reset',
                 'signup-confirm' => 'site/signup-confirm',
+                // 'reset-password' => 'site/reset-password',
+
                 'profile' => 'profile/index',
                 'change-password' => 'profile/change-password',
                 

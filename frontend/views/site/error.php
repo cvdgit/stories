@@ -13,12 +13,10 @@ $this->setMetaTags($title,
                    '',
                    $title);
 ?>
-<div class="error-page">
-    <div class="container-large">
-        <div class="inside text-center">
-            <h2><?= Html::encode($title) ?></h2>
-            <p><?= nl2br(Html::encode($message)) ?></p>
-            <?= Html::a('На главную', ['/site/index'], ['class' => 'custom-btn green']) ?>
-        </div>
+<div class="container">
+    <div class="site-error text-center">
+        <h2><?= Html::encode($title) ?></h2>
+        <p><?= nl2br(Html::encode($message)) ?></p>
+        <?= Html::a('На главную', ['/site/index'], ['class' => 'btn']) ?>
     </div>
 </div>

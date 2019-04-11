@@ -238,4 +238,9 @@ class User extends ActiveRecord implements IdentityInterface
         return !empty($this->activePayment);
     }
 
+    public static function findModel($id)
+    {
+        return static::findOne(['id' => $id]);
+    }
+
 }

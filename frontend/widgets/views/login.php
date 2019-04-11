@@ -41,7 +41,7 @@ use yii\bootstrap\ActiveForm;
         ActiveForm::end();
         ?>
         <div class="password-request">
-          <a href="#!">Забыли логин или пароль?</a>
+          <?= Html::a('Забыли логин или пароль?', ['/site/request-password-reset']) ?>
         </div>
         <div class="social-signup">
           Авторизуйтесь через соцсети:

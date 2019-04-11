@@ -25,6 +25,7 @@ class SiteController extends Controller
     public function behaviors()
     {
         return [
+            /*
             'access' => [
                 'class' => AccessControl::className(),
                 'only' => ['logout', 'signup'],
@@ -41,6 +42,7 @@ class SiteController extends Controller
                     ],
                 ],
             ],
+            */
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -83,6 +85,9 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
+        if (!Yii::$app->user->isGuest && !Yii::$app->request->isAjax) {
+            return $this->goHome();
+        }
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         if (Yii::$app->request->isAjax) {
             $model = new LoginForm();
@@ -108,8 +113,10 @@ class SiteController extends Controller
      */
     public function actionLogout()
     {
+        if (Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
         Yii::$app->user->logout();
-
         return $this->goHome();
     }
 
@@ -156,16 +163,6 @@ class SiteController extends Controller
             }
         }
         return ['success' => false, 'message' => ['']];
-    }
-
-    /**
-     * Displays pricing page.
-     *
-     * @return mixed
-     */
-    public function actionPricing()
-    {
-        return $this->render('pricing');
     }
 
     /**
@@ -219,7 +216,6 @@ class SiteController extends Controller
                 Yii::$app->session->setFlash('error', 'Sorry, we are unable to reset password for the provided email address.');
             }
         }
-
         return $this->render('requestPasswordResetToken', [
             'model' => $model,
         ]);
@@ -239,13 +235,10 @@ class SiteController extends Controller
         } catch (InvalidParamException $e) {
             throw new BadRequestHttpException($e->getMessage());
         }
-
         if ($model->load(Yii::$app->request->post()) && $model->validate() && $model->resetPassword()) {
             Yii::$app->session->setFlash('success', 'New password saved.');
-
             return $this->goHome();
         }
-
         return $this->render('resetPassword', [
             'model' => $model,
         ]);
@@ -254,18 +247,14 @@ class SiteController extends Controller
     public function actionSignupConfirm($token)
     {
         $model = new SignupForm();
-
-        try
-        {
+        try {
             $model->confirmation($token);
             Yii::$app->session->setFlash('success', 'You have successfully confirmed your registration.');
         }
-        catch (\Exception $e)
-        {
+        catch (\Exception $e) {
             Yii::$app->errorHandler->logException($e);
             Yii::$app->session->setFlash('error', $e->getMessage());
         }
-
         return $this->goHome();
     }
 

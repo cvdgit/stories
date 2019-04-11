@@ -1313,3 +1313,32 @@ section h2 span {
   padding: 1.5rem 9rem;
   font-size: 1.6rem;
 }
+
+.site-request-password-reset {
+  padding: 20px 0 40px 0;
+}
+.site-request-password-reset .story-form {
+  text-align: center;
+}
+.site-request-password-reset .story-form .btn {
+  margin-top: 20px;
+}
+.info-text {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.site-error {
+  margin: 50px 0;
+}
+.site-error h2 {
+  margin: 20px 0;
+}
+.site-error p {
+  line-height: 4rem;
+}
+.site-error a {
+  margin-top: 20px;
+}
