@@ -65,7 +65,6 @@ $this->registerCss($css);
 		    			'history' => false,
 		    			'dependencies' => [
 			                ["src" => "/js/revealjs-customcontrols/customcontrols.js"],
-			                ["src" => "/js/revealjs-customcontrols/customcontrols.css"],
 		    			],
 		    		],
 		    		'controls' => [

@@ -81,7 +81,7 @@ $this->registerJs($js);
 				<?php endforeach ?>
 	    </div>
 	    <?php endif ?>
-	    <div class="story-pay">Тип: <?= $model->bySubscription() ? 'По подписке' : 'Беслпатно' ?></div>
+	    <div class="story-pay">Тип: <?= $model->bySubscription() ? 'По подписке' : 'Бесплатно' ?></div>
 	  </div>
 	  <div class="comments">
 	  	<?php if (!Yii::$app->user->isGuest): ?>

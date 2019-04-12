@@ -24,7 +24,7 @@ use yii\helpers\Url;
             <p class="flex-text"></p>
             <p>
               <span class="story-item-name"><?= Html::encode($model->title) ?></span>
-              <span class="story-item-pay"><?= $model->bySubscription() ? 'По подписке' : 'Беслпатно' ?></span>
+              <span class="story-item-pay"><?= $model->bySubscription() ? 'По подписке' : 'Бесплатно' ?></span>
             </p>
           </div>
         </a>

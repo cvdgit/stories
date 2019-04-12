@@ -56,6 +56,9 @@ return [
             'token' => 'DSo_oETVRJAAAAAAAAAAD3wNjPsT23MVVpNW5gyOXj5m8WaQ_bihi0ODas2bXgYe',
             'app' => 'cvd-slides-app2',
         ],
+        'assetManager' => [
+            'appendTimestamp' => true,
+        ],
     ],
     'params' => $params,
 ];
