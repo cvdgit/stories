@@ -5,5 +5,7 @@
 use yii\helpers\Html;
 
 ?>
-<p><?= Html::encode($model->username) ?></p>
-<p><?= Html::encode($model->email) ?></p>
+<div class="profile-tab-content">
+    <p><strong>Имя пользователя:</strong> <?= Html::encode($model->username) ?></p>
+    <p><strong>Email:</strong> <?= Html::encode($model->email) ?></p>
+</div>

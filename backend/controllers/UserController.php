@@ -6,13 +6,14 @@ use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\helpers\Json;
-use backend\services\UserPaymentService;
+use yii\web\Controller;
+use common\services\UserPaymentService;
 use common\models\User;
 use common\models\PaymentSearch;
-use backend\models\SubscriptionForm;
 use common\rbac\UserRoles;
+use backend\models\SubscriptionForm;
 
-class UserController extends \yii\web\Controller
+class UserController extends Controller
 {
 
     public $paymentService;
@@ -27,7 +28,7 @@ class UserController extends \yii\web\Controller
     {
         return [
             'access' => [
-                'class' => AccessControl::className(),
+                'class' => AccessControl::class,
                 'rules' => [
                     [
                         'allow' => true,

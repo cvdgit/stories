@@ -1,10 +1,13 @@
 <?php
+
 namespace common\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
+use yii\db\ActiveQuery;
 use yii\web\IdentityInterface;
+use yii\web\NotFoundHttpException;
 
 /**
  * User model
@@ -218,19 +221,19 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getPayments()
+    public function getPayments(): ActiveQuery
     {
-        return $this->hasMany(Payment::className(), ['user_id' => 'id']);
+        return $this->hasMany(Payment::class, ['user_id' => 'id']);
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getActivePayment()
+    public function getActivePayment(): ActiveQuery
     {
-        return $this->hasOne(Payment::className(), ['user_id' => 'id'])->validPayments();
+        return $this->hasOne(Payment::class, ['user_id' => 'id'])->validPayments();
     }
 
     public function hasSubscription()
@@ -240,7 +243,10 @@ class User extends ActiveRecord implements IdentityInterface
 
     public static function findModel($id)
     {
-        return static::findOne(['id' => $id]);
+        if (($model = self::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('Пользователь не найден.');
     }
 
 }

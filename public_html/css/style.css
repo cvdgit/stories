@@ -1309,7 +1309,7 @@ section h2 span {
   line-height: 3.6rem;
 }
 
-.site-pricing .price button {
+.site-pricing .price .btn {
   padding: 1.5rem 9rem;
   font-size: 1.6rem;
 }
@@ -1341,4 +1341,90 @@ section h2 span {
 }
 .site-error a {
   margin-top: 20px;
+}
+
+
+
+.file-upload {
+  background-color: #f5f9f8;
+  box-shadow: 0 1px 4px 1px rgba(119, 119, 119, 0.16);
+  font-size: 14px;
+  text-transform: uppercase;
+  display: inline-block;
+  transition: all .3s ease;
+  border: none;
+  text-align: center;
+  padding: 18px 88px;
+  border-radius: 40px;
+  color: black;
+  position: relative;
+  overflow: hidden;
+  margin: 10px 0px;
+}
+.file-upload:hover {
+  background: #bdbdbd;
+}
+.file-upload input[type="file"]{
+  display: none;
+}
+.file-upload label {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+.file-upload span {
+  line-height: 36px;
+}
+.filename {
+  background: #fff;
+  border: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+.cst-image-div {
+  display: inline-block;
+  max-width: 100%;
+  line-height: 1.42857143;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-transition: all .2s ease-in-out;
+  -o-transition: all .2s ease-in-out;
+  transition: all .2s ease-in-out;
+  border-radius: 50%;
+  width: 100%;
+  background-size: cover;
+  background-position: center center;
+  padding-top: 100%;
+}
+.cst-box-image {
+  padding: 0 30px 30px 30px;
+}
+
+
+.profile-tab-content {
+  padding: 30px 0;
+}
+.profile-tab-content p {
+  line-height: 3rem;
+}
+
+.site-user-profile > h1 {
+  font-weight: bold;
+  font-size: 3rem;
+  text-align: center;
+  margin-bottom: 50px;
+}
+.site-user-profile h1 > span {
+  color: #99cd50;
+}
+
+.site-user-profile .payment-tab a {
+  text-decoration: underline;
+  font-weight: bold;
 }

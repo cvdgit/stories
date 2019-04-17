@@ -23,6 +23,6 @@ class AppAsset extends AssetBundle
         'yii\bootstrap\BootstrapAsset',
         'yii\web\YiiAsset',
         'yii\bootstrap\BootstrapPluginAsset',
-        'backend\assets\ToastrAsset',
+       // 'backend\assets\ToastrAsset',
     ];
 }

@@ -2,9 +2,10 @@
 
 namespace common\models;
 
+use yii\db\ActiveQuery;
 use yii\db\Expression;
 
-class PaymentQuery extends \yii\db\ActiveQuery
+class PaymentQuery extends ActiveQuery
 {
 	
 	public function paymentsByUser($userID)

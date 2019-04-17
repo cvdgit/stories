@@ -120,6 +120,7 @@ use common\helpers\Url;
   <?= \frontend\widgets\SignupWidget::widget() ?>
   <?php endif ?>
   <?= \frontend\widgets\ContactWidget::widget() ?>
+  <?= \common\widgets\ToastrFlash::widget() ?>
 <?php $this->endBody() ?>
 </body>
 </html>

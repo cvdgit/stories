@@ -4,15 +4,16 @@ namespace frontend\controllers;
 
 use Yii;
 use yii\filters\AccessControl;
+use yii\web\Controller;
 use common\models\User;
 use common\models\Payment;
 use common\service\CustomerPayment as PaymentService;
 use frontend\models\ChangePasswordForm;
 
-class ProfileController extends \yii\web\Controller
+class ProfileController extends Controller
 {
 
-    private $paymentService = null;
+    private $paymentService;
     private $userId;
 
     public function __construct($id, $module, $config = [])
@@ -22,11 +23,11 @@ class ProfileController extends \yii\web\Controller
         parent::__construct($id, $module, $config);
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
-                'class' => AccessControl::className(),
+                'class' => AccessControl::class,
                 'rules' => [
                     [
                         'allow' => true,
@@ -37,8 +38,14 @@ class ProfileController extends \yii\web\Controller
         ];
     }
 
-    public function actionIndex()
+    /**
+     * @return string
+     * @throws \yii\web\NotFoundHttpException
+     */
+    public function actionIndex(): string
     {
+        $user = User::findModel(Yii::$app->user->id);
+        /*
         $user = User::findModel($this->userId);
         $date_rate = $this->paymentService->dateFinishPayment($user);
         $payment = $this->paymentService->getLastPaymentUser($user);
@@ -49,6 +56,12 @@ class ProfileController extends \yii\web\Controller
             'model' => $user,
             'rate' => ($payment !== null ? $payment->rate : null),
             'count_date_rate' => $date_rate,
+        ]);
+        */
+
+        return $this->render('index', [
+            'model' => $user,
+            'activePayment' => $user->getActivePayment()->one(),
         ]);
     }
 

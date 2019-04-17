@@ -20,7 +20,7 @@ $this->title = 'Пользователи';
         'updated_at:datetime',
         [
             'attribute' => 'status',
-            'value' => function($model) {
+            'value' => static function($model) {
                 return UserHelper::getStatusText($model->status);
             },
             'filter' => UserHelper::getStatusArray(),
