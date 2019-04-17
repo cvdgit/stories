@@ -13,7 +13,6 @@ class SlideMarkup extends StoryMarkup implements StoryRenderableInterface
 		'attributes' => [
 			'data-id' => '',
 			'data-background-color' => '#000000',
-            'class' => 'stack',
 		],
 	];
 
