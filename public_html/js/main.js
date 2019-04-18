@@ -7,18 +7,6 @@ $(function() {
 	    });
 	});
 
-  const addCommentFocusClassName = 'add-comment-focus';
-  $('.add-comment-placeholder textarea').on('focus', function() {
-    var $element = $(this).parent().parent();
-    if (!$element.hasClass(addCommentFocusClassName)) {
-      $element.addClass(addCommentFocusClassName);
-    }
-  });
-  $('.add-comment-close').on('click', function(e) {
-    e.preventDefault();
-    $(this).parent().parent().removeClass(addCommentFocusClassName).find('textarea').val('');
-  });
-
 });
 
 

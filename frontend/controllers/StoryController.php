@@ -3,27 +3,52 @@
 namespace frontend\controllers;
 
 use Yii;
+use yii\filters\AccessControl;
+use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 use common\models\Story;
 use common\models\StorySearch;
 use common\models\Tag;
 use common\models\Category;
-use yii\web\NotFoundHttpException;
+use common\models\User;
+use common\models\Comment;
 use common\services\StoryService;
-use common\service\CustomerPayment as PaymentService;
+use frontend\models\CommentForm;
 
-class StoryController extends \yii\web\Controller
+class StoryController extends Controller
 {
 
-    public $storyService;
-    private $paymentService = null;
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'only' => ['add-comment', 'comment-list'],
+                'rules' => [
+                    [
+                        'actions' => ['add-comment', 'comment-list'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    protected $storyService;
 
     public function __construct($id, $module, StoryService $storyService, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->storyService = $storyService;
-        $this->paymentService = new PaymentService();
     }
 
+    /**
+     * @return string
+     */
     public function actionIndex()
     {
         $searchModel = new StorySearch();
@@ -44,13 +69,26 @@ class StoryController extends \yii\web\Controller
     public function actionView($alias)
     {
         $model = $this->findModelByAlias($alias);
-        $model->updateCounters(array('views_number' => 1));
+
+        $dataProvider = Comment::getStoryComments($model->id);
+
+        if (Yii::$app->request->isPjax) {
+            return $this->renderAjax('_comment_list', ['dataProvider' => $dataProvider]);
+        }
+
+        $model->updateCounters(['views_number' => 1]);
+
+        $commentForm = new CommentForm();
+        $commentForm->story_id = $model->id;
+
         return $this->render('view', [
             'model' => $model,
             'userCanViewStory' => $this->storyService->userCanViewStory(
                 $model,
-                (Yii::$app->user->isGuest ? null : \common\models\User::findOne(Yii::$app->user->identity->id))
+                (Yii::$app->user->isGuest ? null : User::findOne(Yii::$app->user->id))
             ),
+            'commentForm' => $commentForm,
+            'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -62,7 +100,12 @@ class StoryController extends \yii\web\Controller
         throw new NotFoundHttpException('Страница не найдена.');
     }
 
-    public function actionTag($tag)
+    /**
+     * @param $tag
+     * @return string
+     * @throws NotFoundHttpException
+     */
+    public function actionTag($tag): string
     {
         $model = Tag::findOne(['name' => $tag]);
         if ($model === null) {
@@ -90,6 +133,22 @@ class StoryController extends \yii\web\Controller
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+    }
+
+    public function actionAddComment($id): string
+    {
+        if (Yii::$app->request->isPjax) {
+            $commentForm = new CommentForm();
+            $commentForm->story_id = $id;
+            if ($commentForm->load(Yii::$app->request->post()) && $commentForm->validate()) {
+                $commentForm->createComment(Yii::$app->user->id);
+                $commentForm->body = '';
+            }
+            return $this->renderAjax('_comment_form', ['commentForm' => $commentForm]);
+        }
+        else {
+            return $this->goHome();
+        }
     }
 
 }

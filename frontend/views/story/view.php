@@ -1,13 +1,15 @@
 <?php
 
 use yii\helpers\Html;
-use yii\helpers\HtmlPurifier;
 use yii\web\JsExpression;
+use yii\widgets\Pjax;
 use common\widgets\RevealWidget;
-use common\components\StoryCover;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Story */
+/* @var $userCanViewStory bool */
+/* @var $commentForm frontend\models\CommentForm */
+/* @var $dataProvider yii\data\ActiveDataProvider */
 
 $title = $model->title;
 $this->setMetaTags($title,
@@ -28,6 +30,11 @@ function onSlideMouseDown(e) {
 	}
 }
 Reveal.addEventListener("mousedown", onSlideMouseDown, false);
+
+$('#comment-form-pjax').on('pjax:success', function() {
+    $.pjax.reload({container: '#comment-list-pjax'});
+});
+
 JS;
 $this->registerJs($js);
 ?>
@@ -41,8 +48,8 @@ $this->registerJs($js);
 	    		'data' => $model->body,
 	    		'options' => [
 	    			'dependencies' => [
-	            ["src" => "/js/revealjs-customcontrols/customcontrols.js"],
-	            ["src" => "/js/story-reveal-statistics.js"],
+	            ['src' => '/js/revealjs-customcontrols/customcontrols.js'],
+	            ['src' => '/js/story-reveal-statistics.js'],
 	    			],
 	    		],
 	    		'controls' => [
@@ -85,25 +92,10 @@ $this->registerJs($js);
 	  </div>
 	  <div class="comments">
 	  	<?php if (!Yii::$app->user->isGuest): ?>
-	    <div class="comment-form">
-	      <div class="comment-form-wrapper">
-	        <div class="comment-logo">
-	          <img src="/img/avatar.png" alt="">
-	        </div>
-	        <div class="add-comment-wrapper">
-	          <div class="add-comment-placeholder">
-	            <textarea placeholder="Оставить комментарий..."></textarea>
-	          </div>
-	          <div class="add-comment-controls">
-	            <a class="add-comment-close" href="#!">Отмена</a>
-	            <button class="btn">Оставить комментарий</button>
-	          </div>
-	        </div>
-	      </div>
-	    </div>
-		<?php endif ?>
+            <?= $this->render('_comment_form', ['commentForm' => $commentForm]) ?>
+        <?php endif ?>
 	    <div class="comment-list">
-	    	<h4>Комменатриев пока нет</h4>
+            <?= $this->render('_comment_list', ['dataProvider' => $dataProvider]) ?>
 	    </div>
 	  </div>
 	</main>

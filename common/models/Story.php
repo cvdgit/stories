@@ -2,11 +2,9 @@
 
 namespace common\models;
 
-use Yii;
+use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
 use dosamigos\taggable\Taggable;
-use yii\db\Expression;
-
 use common\helpers\Translit;
 
 /**
@@ -32,8 +30,10 @@ use common\helpers\Translit;
  * @property User $author
  * @property Tags $tags
  * @property Category $category
+ * @property Comments $comments
  */
-class Story extends \yii\db\ActiveRecord
+
+class Story extends ActiveRecord
 {
 
     const STATUS_DRAFT = 0;
@@ -64,9 +64,9 @@ class Story extends \yii\db\ActiveRecord
     public function behaviors()
     {
         return [
-            TimestampBehavior::className(),
+            TimestampBehavior::class,
             [
-                'class' => Taggable::className(),
+                'class' => Taggable::class,
             ],
         ];
     }
@@ -132,7 +132,7 @@ class Story extends \yii\db\ActiveRecord
      */
     public function getCategory()
     {
-        return $this->hasOne(Category::className(), ['id' => 'category_id']);
+        return $this->hasOne(Category::class, ['id' => 'category_id']);
     }
 
     /**
@@ -140,7 +140,12 @@ class Story extends \yii\db\ActiveRecord
      */
     public function getTags()
     {
-        return $this->hasMany(Tag::className(), ['id' => 'tag_id'])->viaTable('{{%story_tag}}', ['story_id' => 'id']);
+        return $this->hasMany(Tag::class, ['id' => 'tag_id'])->viaTable('{{%story_tag}}', ['story_id' => 'id']);
+    }
+
+    public function getComments()
+    {
+        return $this->hasMany(Comment::class, ['story_id' => 'id']);
     }
 
     public static function findStories()

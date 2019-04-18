@@ -61,8 +61,8 @@ return [
                 'stories' => 'story/index',
 
                 'story/webhook' => 'story/webhook',
+                'story/addcomment' => 'story/add-comment',
                 'story/<alias:[\w\-]+>' => 'story/view',
-                'story/viewbyframe/<id:\d+>' => 'story/view-by-frame',
 
                 'success' => 'rate/success',
                 'fail' => 'rate/fail',
