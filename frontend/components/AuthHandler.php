@@ -27,10 +27,12 @@ class AuthHandler
     public function handle()
     {
         $attributes = $this->client->getUserAttributes();
-        die(print_r($attributes));
         $email = ArrayHelper::getValue($attributes, 'email');
         $id = ArrayHelper::getValue($attributes, 'id');
         $nickname = ArrayHelper::getValue($attributes, 'login');
+        if (empty($nickname)) {
+            $nickname = ArrayHelper::getValue($attributes, 'screen_name');
+        }
 
         /* @var Auth $auth */
         $auth = Auth::find()->where([
