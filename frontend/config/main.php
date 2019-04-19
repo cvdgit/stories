@@ -99,7 +99,7 @@ return [
                     'clientId' => '6952047',
                     'clientSecret' => '5v4urGJMSy3BF992dIVd',
                     'scope' => 'email',
-                    'returnUrl' => 'https://wikids.ru/auth',
+                    //'returnUrl' => 'https://wikids.ru/auth',
                 ],
             ],
         ],
