@@ -88,6 +88,7 @@ return [
                     'class' => 'yii\authclient\clients\Google',
                     'clientId' => '813911241795-5qqi7na2ml3u3pukntutb0gjhohc450d.apps.googleusercontent.com',
                     'clientSecret' => 'EhyviTgonF7Xc9cW1m6Y2gUZ',
+                    'returnUrl' => 'https://wikids.ru/auth?authclient=google',
                 ],
                 'facebook' => [
                     'class' => 'yii\authclient\clients\Facebook',
@@ -99,7 +100,6 @@ return [
                     'clientId' => '6952047',
                     'clientSecret' => '5v4urGJMSy3BF992dIVd',
                     'scope' => 'email',
-                    //'returnUrl' => 'https://wikids.ru/auth',
                 ],
             ],
         ],
