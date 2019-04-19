@@ -48,7 +48,7 @@ use yii\bootstrap\ActiveForm;
             <?= yii\authclient\widgets\AuthChoice::widget([
                 'options' => ['class' => 'social-network'],
                 'baseAuthUrl' => ['/site/auth'],
-                'popupMode' => false,
+                'popupMode' => true,
             ]) ?>
         </div>
       </div>
