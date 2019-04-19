@@ -47,8 +47,8 @@ use yii\bootstrap\ActiveForm;
           Авторизуйтесь через соцсети:
             <?= yii\authclient\widgets\AuthChoice::widget([
                 'options' => ['class' => 'social-network'],
-                'baseAuthUrl' => ['site/auth'],
-                'popupMode' => true,
+                'baseAuthUrl' => ['/site/auth'],
+                'popupMode' => false,
             ]) ?>
         </div>
       </div>
