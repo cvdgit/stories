@@ -86,8 +86,8 @@ return [
             'clients' => [
                 'google' => [
                     'class' => 'yii\authclient\clients\Google',
-                    'clientId' => '813911241795-5qqi7na2ml3u3pukntutb0gjhohc450d.apps.googleusercontent.com',
-                    'clientSecret' => 'EhyviTgonF7Xc9cW1m6Y2gUZ',
+                    'clientId' => $params['googleClientId'],
+                    'clientSecret' => $params['googleClientSecret'],
                     'returnUrl' => 'https://wikids.ru/auth?authclient=google',
                 ],
                 'facebook' => [
@@ -97,8 +97,8 @@ return [
                 ],
                 'vkontakte' => [
                     'class' => 'yii\authclient\clients\VKontakte',
-                    'clientId' => '6952047',
-                    'clientSecret' => '5v4urGJMSy3BF992dIVd',
+                    'clientId' => $params['vkClientId'],
+                    'clientSecret' => $params['vkClientSecret'],
                     'scope' => 'email',
                     'returnUrl' => 'https://wikids.ru/auth?authclient=vkontakte',
                 ],
