@@ -86,8 +86,8 @@ return [
             'clients' => [
                 'google' => [
                     'class' => 'yii\authclient\clients\Google',
-                    'clientId' => 'google_client_id',
-                    'clientSecret' => 'google_client_secret',
+                    'clientId' => '813911241795-5qqi7na2ml3u3pukntutb0gjhohc450d.apps.googleusercontent.com',
+                    'clientSecret' => 'EhyviTgonF7Xc9cW1m6Y2gUZ',
                 ],
                 'facebook' => [
                     'class' => 'yii\authclient\clients\Facebook',
