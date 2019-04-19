@@ -99,6 +99,7 @@ return [
                     'clientId' => '6952047',
                     'clientSecret' => '5v4urGJMSy3BF992dIVd',
                     'scope' => 'email',
+                    'returnUrl' => ['/site/auth'],
                 ],
             ],
         ],
