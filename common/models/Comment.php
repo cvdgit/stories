@@ -59,12 +59,12 @@ class Comment extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'user_id' => 'User ID',
-            'story_id' => 'Story ID',
-            'body' => 'Body',
-            'status' => 'Status',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'user_id' => 'Автор',
+            'story_id' => 'История',
+            'body' => 'Комментарий',
+            'status' => 'Статус',
+            'created_at' => 'Дата создания',
+            'updated_at' => 'Дата редактирования',
         ];
     }
 

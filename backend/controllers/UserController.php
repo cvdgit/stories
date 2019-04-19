@@ -41,11 +41,14 @@ class UserController extends Controller
 
     public function actionIndex()
     {
-        
         $dataProvider = new ActiveDataProvider([
             'query' => User::find(),
+            'sort' => [
+                'defaultOrder' => [
+                    'created_at' => SORT_DESC,
+                ],
+            ],
         ]);
-
         return $this->render('index', [
             'dataProvider' => $dataProvider,
         ]);

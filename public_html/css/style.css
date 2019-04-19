@@ -1428,3 +1428,12 @@ section h2 span {
   text-decoration: underline;
   font-weight: bold;
 }
+
+.auth-clients {
+  overflow: hidden !important;
+  padding-left: 0;
+}
+.auth-clients li {
+  float: none !important;
+  display: inline-block !important;
+}

@@ -47,6 +47,7 @@ return [
                 'captcha' => 'site/captcha',
                 'signup' => 'site/signup',
                 'login' => 'site/login',
+                'auth' => 'site/auth',
                 'logout' => 'site/logout',
                 'policy' => 'site/policy',
                 'request-password-reset' => 'site/request-password-reset',
@@ -79,6 +80,26 @@ return [
         ],
         'assetManager' => [
             'appendTimestamp' => true,
+        ],
+        'authClientCollection' => [
+            'class' => 'yii\authclient\Collection',
+            'clients' => [
+                'google' => [
+                    'class' => 'yii\authclient\clients\Google',
+                    'clientId' => 'google_client_id',
+                    'clientSecret' => 'google_client_secret',
+                ],
+                'facebook' => [
+                    'class' => 'yii\authclient\clients\Facebook',
+                    'clientId' => 'facebook_client_id',
+                    'clientSecret' => 'facebook_client_secret',
+                ],
+                'vkontakte' => [
+                    'class' => 'yii\authclient\clients\VKontakte',
+                    'clientId' => '6952047',
+                    'clientSecret' => '5v4urGJMSy3BF992dIVd',
+                ],
+            ],
         ],
     ],
     'params' => $params,
