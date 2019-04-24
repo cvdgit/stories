@@ -15,19 +15,6 @@ return [
          'authManager' => [
             'class' => 'yii\rbac\DbManager',
         ],
-        'mailer' => [
-            'class' => 'yii\swiftmailer\Mailer',
-            'viewPath' => '@common/mail',
-            'useFileTransport' => false,
-            'transport' => [
-                 'class' => 'Swift_SmtpTransport',
-                 'host' => 'smtp.yandex.ru',
-                 'username' => 'info@wikids.ru',
-                 'password' => 'Directum2019',
-                 'port' => '587',
-                 'encryption' => 'tls',
-             ],
-        ],
         'formatter' => [
             'dateFormat' => 'dd.MM.yyyy',
             'datetimeFormat' => 'dd.MM.yyyy HH:mm:ss',
