@@ -99,7 +99,6 @@ return [
                     'clientId' => $params['fbClientId'],
                     'clientSecret' => $params['fbClientSecret'],
                     'returnUrl' => 'https://wikids.ru/auth?authclient=facebook',
-                    'scope' => 'user_link',
                 ],
                 'vkontakte' => [
                     'class' => 'yii\authclient\clients\VKontakte',
