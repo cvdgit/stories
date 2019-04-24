@@ -48,9 +48,10 @@ class AuthHandler
         if (empty($username)) {
             $username = ArrayHelper::getValue($attributes, 'name');
         }
+
         $username = Translit::translit($username);
         $username = mb_strtolower($username);
-        $username = strtr($username, [' ' => '_']);
+        $username = strtr($username, ['-' => '_']);
 
         /* @var Auth $auth */
         $auth = Auth::find()->where([
