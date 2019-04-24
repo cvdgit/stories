@@ -44,6 +44,9 @@ class AuthHandler
         if (empty($username)) {
             $username = ArrayHelper::getValue($attributes, 'screen_name');
         }
+        if (empty($username)) {
+            $username = ArrayHelper::getValue($attributes, 'name');
+        }
 
         /* @var Auth $auth */
         $auth = Auth::find()->where([
