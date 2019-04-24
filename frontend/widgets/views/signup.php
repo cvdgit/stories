@@ -14,7 +14,7 @@ use yii\bootstrap\ActiveForm;
       <div class="modal-body">
         <?php 
         $form = ActiveForm::begin([
-          'action' => ['/site/signup'],
+          'action' => ['/signup/request'],
           'enableClientValidation' => true,
           'options' => [
               'id' => 'signup-form',

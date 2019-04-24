@@ -2,9 +2,9 @@
 
 use yii\helpers\Html;
 
-/* @var $user \common\models\User */
+/* @var $user common\models\User */
 
-$confirmLink = Yii::$app->urlManager->createAbsoluteUrl(['site/signup-confirm', 'token' => $user->email_confirm_token]);
+$confirmLink = Yii::$app->urlManager->createAbsoluteUrl(['/signup/signup-confirm', 'token' => $user->email_confirm_token]);
 ?>
 <div class="password-reset">
     <p>Привет <?= Html::encode($user->username) ?>,</p>

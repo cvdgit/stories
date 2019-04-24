@@ -1,8 +1,8 @@
 <?php
 
-/* @var $user \common\models\User */
+/* @var $user common\models\User */
 
-$confirmLink = Yii::$app->urlManager->createAbsoluteUrl(['site/signup-confirm', 'token' => $user->email_confirm_token]);
+$confirmLink = Yii::$app->urlManager->createAbsoluteUrl(['/signup/signup-confirm', 'token' => $user->email_confirm_token]);
 ?>
 Привет <?= $user->username ?>,
 

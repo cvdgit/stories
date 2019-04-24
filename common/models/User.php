@@ -249,4 +249,27 @@ class User extends ActiveRecord implements IdentityInterface
         throw new NotFoundHttpException('Пользователь не найден.');
     }
 
+    public function isActive(): bool
+    {
+        return $this->status === self::STATUS_ACTIVE;
+    }
+
+    public static function createSignup(string $username, string $email, string $password)
+    {
+        $user = new self();
+        $user->username = $username;
+        $user->email = $email;
+        $user->status = self::STATUS_WAIT;
+        $user->group = self::GROUP_AUTHOR;
+        $user->setPassword($password);
+        $user->generateAuthKey();
+        $user->generateEmailConfirmToken();
+        return $user;
+    }
+
+    public static function findByUsernameOrEmail($value)
+    {
+        return self::find()->andWhere(['or', ['username' => $value], ['email' => $value]])->one();
+    }
+
 }

@@ -41,7 +41,7 @@ use common\helpers\Url;
               <?php
               $menuItems = [
                   ['label' => 'Главная', 'url' => ['/site/index']],
-                  ['label' => 'Истории', 'url' => ['/story/index'], 'active' => (Yii::$app->controller->id == 'story')],
+                  ['label' => 'Истории', 'url' => ['/story/index'], 'active' => (Yii::$app->controller->id === 'story')],
                   ['label' => 'Подписки', 'url' => ['/rate/index']],
                   ['label' => 'Контакты', 'url' => '#', 'template'=> '<a href="{url}" data-toggle="modal" data-target="#wikids-feedback-modal">{label}</a>'],
               ];
@@ -64,7 +64,7 @@ use common\helpers\Url;
               else {
                 echo Html::a(Yii::$app->user->identity->username, ['/profile/index']) .
                      Html::tag('span') .
-                     Html::beginForm(['/site/logout'], 'post') . 
+                     Html::beginForm(['/auth/logout'], 'post') .
                      Html::submitButton('Выход', ['class' => 'login-item logout-btn-a']) . 
                      Html::endForm();
               }

@@ -8,6 +8,10 @@ use yii\authclient\ClientInterface;
 use yii\helpers\ArrayHelper;
 use common\models\Auth;
 use common\models\User;
+use common\services\auth\AuthService;
+use common\services\auth\SignupService;
+use common\services\TransactionManager;
+
 
 /**
  * AuthHandler handles successful authentication via Yii auth component
@@ -19,19 +23,26 @@ class AuthHandler
      */
     private $client;
 
+    private $authService;
+    private $transactionManager;
+    private $signupService;
+
     public function __construct(ClientInterface $client)
     {
         $this->client = $client;
+        $this->authService = new AuthService();
+        $this->transactionManager = new TransactionManager();
+        $this->signupService = new SignupService(new TransactionManager());
     }
 
-    public function handle()
+    public function handle(): void
     {
         $attributes = $this->client->getUserAttributes();
         $email = ArrayHelper::getValue($attributes, 'email');
         $id = ArrayHelper::getValue($attributes, 'id');
-        $nickname = ArrayHelper::getValue($attributes, 'login');
-        if (empty($nickname)) {
-            $nickname = ArrayHelper::getValue($attributes, 'screen_name');
+        $username = ArrayHelper::getValue($attributes, 'login');
+        if (empty($username)) {
+            $username = ArrayHelper::getValue($attributes, 'screen_name');
         }
 
         /* @var Auth $auth */
@@ -44,7 +55,7 @@ class AuthHandler
             if ($auth) { // login
                 /* @var User $user */
                 $user = $auth->user;
-                $this->updateUserInfo($user);
+                // $this->updateUserInfo($user);
                 Yii::$app->user->login($user, Yii::$app->params['user.rememberMeDuration']);
             } else { // signup
                 if ($email !== null && User::find()->where(['email' => $email])->exists()) {
@@ -52,25 +63,19 @@ class AuthHandler
                         Yii::t('app', "Пользователь, с указанным в аккаунте {client} email уже существует.", ['client' => $this->client->getTitle()]),
                     ]);
                 } else {
+
                     $password = Yii::$app->security->generateRandomString(6);
-                    $user = new User([
-                        'username' => $nickname,
-                        'email' => $email,
-                        'password' => $password,
-                    ]);
-                    $user->generateAuthKey();
-                    $user->generatePasswordResetToken();
+                    $this->signupService->signup($username, $email, $password);
 
-                    $transaction = User::getDb()->beginTransaction();
+                    $user = User::findByUsername($username);
 
-                    if ($user->save()) {
+                    $this->transactionManager->wrap(function() use ($user, $id) {
                         $auth = new Auth([
                             'user_id' => $user->id,
                             'source' => $this->client->getId(),
                             'source_id' => (string)$id,
                         ]);
                         if ($auth->save()) {
-                            $transaction->commit();
                             Yii::$app->user->login($user, Yii::$app->params['user.rememberMeDuration']);
                         } else {
                             Yii::$app->getSession()->setFlash('error', [
@@ -80,14 +85,7 @@ class AuthHandler
                                 ]),
                             ]);
                         }
-                    } else {
-                        Yii::$app->getSession()->setFlash('error', [
-                            Yii::t('app', 'Unable to save user: {errors}', [
-                                'client' => $this->client->getTitle(),
-                                'errors' => json_encode($user->getErrors()),
-                            ]),
-                        ]);
-                    }
+                    });
                 }
             }
         } else { // user already logged in
@@ -100,7 +98,7 @@ class AuthHandler
                 if ($auth->save()) {
                     /** @var User $user */
                     $user = $auth->user;
-                    $this->updateUserInfo($user);
+                    //$this->updateUserInfo($user);
                     Yii::$app->getSession()->setFlash('success', [
                         Yii::t('app', 'Linked {client} account.', [
                             'client' => $this->client->getTitle()

@@ -14,7 +14,7 @@ use yii\bootstrap\ActiveForm;
       <div class="modal-body">
         <?php 
         $form = ActiveForm::begin([
-          'action' => ['/site/login'],
+          'action' => ['/auth/login'],
           'enableClientValidation' => true,
           'options' => [
               'id' => 'login-form',
@@ -47,7 +47,7 @@ use yii\bootstrap\ActiveForm;
           Авторизуйтесь через соцсети:
             <?= yii\authclient\widgets\AuthChoice::widget([
                 'options' => ['class' => 'social-network'],
-                'baseAuthUrl' => ['/site/auth'],
+                'baseAuthUrl' => ['/auth/auth'],
                 'popupMode' => true,
             ]) ?>
         </div>
