@@ -43,15 +43,19 @@ return [
             'rules' => [
                 '' => 'site/index',
                 'contacts' => 'site/contact',
-                'pricing' => 'rate/index',
                 'captcha' => 'site/captcha',
-                'signup' => 'signup/request',
+                'policy' => 'site/policy',
+                'request-password-reset' => 'site/request-password-reset',
+
+                'pricing' => 'rate/index',
+
                 'login' => 'auth/login',
                 'auth' => 'auth/auth',
                 'logout' => 'auth/logout',
-                'policy' => 'site/policy',
-                'request-password-reset' => 'site/request-password-reset',
-                'signup-confirm' => 'site/signup-confirm',
+
+                'signup' => 'signup/request',
+                'signup-confirm' => 'signup/signup-confirm',
+
                 // 'reset-password' => 'site/reset-password',
 
                 'profile' => 'profile/index',
