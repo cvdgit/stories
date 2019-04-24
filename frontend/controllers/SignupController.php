@@ -66,7 +66,7 @@ class SignupController extends Controller
         $model = new SignupForm();
         try {
             $model->confirmation($token);
-            Yii::$app->session->setFlash('success', 'You have successfully confirmed your registration.');
+            Yii::$app->session->setFlash('success', 'Вы успешно подтвердили свою регистрацию');
         }
         catch (Exception $e) {
             Yii::$app->errorHandler->logException($e);
