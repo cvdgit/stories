@@ -3,6 +3,7 @@
 
 namespace frontend\components;
 
+use common\helpers\Translit;
 use Yii;
 use yii\authclient\ClientInterface;
 use yii\helpers\ArrayHelper;
@@ -38,7 +39,6 @@ class AuthHandler
     public function handle(): void
     {
         $attributes = $this->client->getUserAttributes();
-        die(print_r($attributes));
         $email = ArrayHelper::getValue($attributes, 'email');
         $id = ArrayHelper::getValue($attributes, 'id');
         $username = ArrayHelper::getValue($attributes, 'login');
@@ -46,8 +46,11 @@ class AuthHandler
             $username = ArrayHelper::getValue($attributes, 'screen_name');
         }
         if (empty($username)) {
-            $username = ArrayHelper::getValue($attributes, 'short_name');
+            $username = ArrayHelper::getValue($attributes, 'name');
         }
+        $username = Translit::translit($username);
+        $username = mb_strtolower($username);
+        $username = strtr($username, [' ' => '_']);
 
         /* @var Auth $auth */
         $auth = Auth::find()->where([
