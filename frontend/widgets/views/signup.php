@@ -1,5 +1,6 @@
 <?php
 
+use yii\authclient\widgets\AuthChoice;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
@@ -51,11 +52,11 @@ use yii\bootstrap\ActiveForm;
         </div>
         <div class="social-signup">
           Авторизуйтесь через соцсети:
-          <div class="social-network">
-            <a href="#!"><img src="/img/vk-icon.png" alt=""></a>
-            <a href="#!"><img src="/img/facebook-icon.png" alt=""></a>
-            <a href="#!"><img src="/img/google-plus-icon.png" alt=""></a>
-          </div>
+            <?= AuthChoice::widget([
+                'options' => ['class' => 'social-network'],
+                'baseAuthUrl' => ['/auth/auth'],
+                'popupMode' => true,
+            ]) ?>
         </div>
       </div>
       <div class="modal-footer">

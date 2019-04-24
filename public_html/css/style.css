@@ -1437,3 +1437,6 @@ section h2 span {
   float: none !important;
   display: inline-block !important;
 }
+.auth-clients li:last-child {
+  margin-right: 0;
+}
