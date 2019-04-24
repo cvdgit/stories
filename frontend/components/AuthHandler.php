@@ -45,7 +45,7 @@ class AuthHandler
             $username = ArrayHelper::getValue($attributes, 'screen_name');
         }
         if (empty($username)) {
-            $username = ArrayHelper::getValue($attributes, 'name');
+            $username = ArrayHelper::getValue($attributes, 'short_name');
         }
 
         /* @var Auth $auth */
@@ -70,7 +70,10 @@ class AuthHandler
                     $password = Yii::$app->security->generateRandomString(6);
                     $this->signupService->signup($username, $email, $password);
 
+                    /** @var User $user */
                     $user = User::findByUsername($username);
+                    $user->status = User::STATUS_ACTIVE;
+                    $user->save(false, ['status']);
 
                     $this->transactionManager->wrap(function() use ($user, $id) {
                         $auth = new Auth([
