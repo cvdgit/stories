@@ -10,8 +10,8 @@ use yii\db\ActiveRecord;
  * @property string $title
  * @property string $description
  * @property int $cost
- * @property int $mounth_count
  * @property string $type
+ * @property integer $days
  * 
  * @property Payment[] $payments
  */
@@ -20,7 +20,6 @@ class Rate extends ActiveRecord
 
     const ACTIVE = 'active';
     const ARCHIVE = 'archive';
-    private $dataPayment;
 
     /**
      * {@inheritdoc}
@@ -36,8 +35,8 @@ class Rate extends ActiveRecord
     public function rules()
     {
         return [
-            [['cost', 'mounth_count'], 'required'],
-            [['cost', 'mounth_count'], 'integer'],
+            [['cost', 'days'], 'required'],
+            [['cost', 'days'], 'integer'],
             ['type', 'in', 'range' => [self::ACTIVE, self::ARCHIVE]],
             ['type', 'default', 'value' => self::ACTIVE],
             [['description', 'title'], 'string', 'max' => 255],
@@ -54,7 +53,7 @@ class Rate extends ActiveRecord
             'title' => 'Название',
             'description' => 'Описание',
             'cost' => 'Стоимость',
-            'mounth_count' => 'Количество месяцев',
+            'days' => 'Количество дней',
             'type' => 'Тип подписки',
         ];
     }
@@ -64,17 +63,7 @@ class Rate extends ActiveRecord
      */
     public function getPayments()
     {
-        return $this->hasMany(Payment::className(), ['rate_id' => 'id']);
-    }
-
-    public function getDataPayment()
-    {
-        return $this->dataPayment;
-    }
-
-    public function setDataPayment($dataPayment)
-    {
-        $this->dataPayment = $dataPayment;
+        return $this->hasMany(Payment::class, ['rate_id' => 'id']);
     }
 
 }

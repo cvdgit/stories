@@ -18,6 +18,13 @@ $this->setMetaTags($title,
     <main class="site-pricing">
         <h1><span>Улучши возможность</span> просмотра историй</h1>
         <div class="row">
+            <div class="col-md-10 col-md-offset-1 text-center">
+                <div style="padding: 10px 10px 40px 10px">
+                    <button class="btn btn-red">Попробовать бесплатно</button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-md-10 col-md-offset-1">
                 <div class="row">
                 <?php $images = ['/img/price-3month.png', '/img/price-1year.png', '/img/price-1month.png']; ?>

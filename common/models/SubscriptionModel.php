@@ -46,16 +46,16 @@ class SubscriptionModel extends Model
         ];
     }
 
-    public function calculateSubscriptionDates($monthCount): void
+    protected function calculateSubscriptionDates(): void
     {
+        $rate = Rate::findOne($this->subscription_id);
         $this->date_start = date('Y-m-d H:i:s');
-        $this->date_finish = $this->getSubscriptionFinishDate($monthCount);
+        $this->date_finish = $this->getSubscriptionFinishDate($rate->days);
         $this->state = Payment::STATUS_VALID;
     }
 
-    protected function getSubscriptionFinishDate($monthCount): string
+    protected function getSubscriptionFinishDate($days): string
     {
-        $days = $monthCount * 30;
         $date = new DateTime($this->date_start);
         return $date->add(new DateInterval("P{$days}D"))->format('Y-m-d H:i:s');
     }

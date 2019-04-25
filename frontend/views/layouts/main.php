@@ -102,15 +102,18 @@ use common\helpers\Url;
       <div class="row">
         <div class="col-md-3">
           <a class="footer-link" href="#!">Wikids</a>
-          Телефон: +7 (499) 703-3525
         </div>
       </div>
       <div class="row">
         <div class="col-md-3 footer-email">
-          Email: <a href="mailto:info@centrvd.ru">info@centrvd.ru</a>
+            Телефон: +7 (499) 703-3525<br>
+            Email: <a href="mailto:info@centrvd.ru">info@centrvd.ru</a>
         </div>
         <div class="col-md-3 col-md-offset-6">
-          <div class="footer-copyright pull-right">Wikids © 2019</div>
+          <div class="footer-copyright pull-right text-right">
+              Wikids © 2019<br>
+              ИП Муталов Артур Сагадеевич
+          </div>
         </div>
       </div>
     </div>
