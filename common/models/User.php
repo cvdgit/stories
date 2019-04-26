@@ -20,7 +20,7 @@ use yii\web\NotFoundHttpException;
  * @property string $email_confirm_token
  * @property string $auth_key
  * @property integer $status
- * @property integet $group
+ * @property integer $group
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $password write-only password
@@ -52,7 +52,7 @@ class User extends ActiveRecord implements IdentityInterface
     public function behaviors()
     {
         return [
-            TimestampBehavior::className(),
+            TimestampBehavior::class,
         ];
     }
 

@@ -12,6 +12,7 @@ use yii\db\ActiveRecord;
  * @property int $cost
  * @property string $type
  * @property integer $days
+ * @property string $code
  * 
  * @property Payment[] $payments
  */
@@ -35,8 +36,9 @@ class Rate extends ActiveRecord
     public function rules()
     {
         return [
-            [['cost', 'days'], 'required'],
+            [['cost', 'days', 'code'], 'required'],
             [['cost', 'days'], 'integer'],
+            ['code', 'string', 'max' => 50],
             ['type', 'in', 'range' => [self::ACTIVE, self::ARCHIVE]],
             ['type', 'default', 'value' => self::ACTIVE],
             [['description', 'title'], 'string', 'max' => 255],
@@ -55,6 +57,7 @@ class Rate extends ActiveRecord
             'cost' => 'Стоимость',
             'days' => 'Количество дней',
             'type' => 'Тип подписки',
+            'code' => 'Код',
         ];
     }
 
@@ -64,6 +67,16 @@ class Rate extends ActiveRecord
     public function getPayments()
     {
         return $this->hasMany(Payment::class, ['rate_id' => 'id']);
+    }
+
+    public static function findRateByCode($code)
+    {
+        return self::findOne(['code' => $code]);
+    }
+
+    public function isFreeSubscription(): bool
+    {
+        return ($this->code === 'free');
     }
 
 }

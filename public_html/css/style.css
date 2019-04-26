@@ -236,6 +236,8 @@ section h2 span {
   color: #fff;
   background-color: #d9534f;
   border-color: #d43f3a;
+  -webkit-box-shadow: 0 0.5rem 2rem 0.5rem rgba(217, 83, 79, 0.35);
+  box-shadow: 0 0.5rem 2rem 0.5rem rgba(217, 83, 79, 0.35);
 }
 
 .site-about {

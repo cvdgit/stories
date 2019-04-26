@@ -59,6 +59,7 @@ use yii\helpers\Url;
                         ['label' => 'Пользователи', 'url' => ['/user/index']],
                         ['label' => 'Опечатки', 'url' => ['/feedback/index']],
                         ['label' => 'Комментарии', 'url' => ['/comment/index']],
+                        ['label' => 'Подписки', 'url' => ['/rate/index']],
                     ],
                 ]) ?>
             </div>

@@ -21,4 +21,14 @@ class PaymentQuery extends ActiveQuery
 		            	                   new Expression('finish')]);
 	}
 
+	public function isValid()
+    {
+        return $this->andWhere('state = :state', [':state' => Payment::STATUS_VALID]);
+    }
+
+	public function freeSubscription()
+    {
+        return $this->joinWith('rate')->andWhere('{{%rate}}.code = :code', [':code' => 'free']);
+    }
+
 }
