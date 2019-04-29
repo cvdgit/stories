@@ -96,6 +96,19 @@ class UserPaymentService
         }
     }
 
+    protected function sendEmailCancel(User $user, Rate $rate): void
+    {
+        $sent = Yii::$app->mailer
+            ->compose(['html' => 'userCancelSub-html', 'text' => 'userCancelSub-text'], ['user' => $user, 'rate' => $rate])
+            ->setTo($user->email)
+            ->setFrom(Yii::$app->params['infoEmail'])
+            ->setSubject('Активирована подписка на wikids.ru')
+            ->send();
+        if (!$sent) {
+            throw new RuntimeException('Ошибка при отправке email об активации подписки');
+        }
+    }
+
     public function generateToken($args): string
     {
         if (isset($args['Token'])) {
@@ -119,17 +132,12 @@ class UserPaymentService
         return !($expectedToken === null || strcasecmp($actualToken, $expectedToken) !== 0);
     }
 
-    /*
 	public function cancelSubscription($subscriptionID): void
 	{
-        $subscription = Payment::findOne($subscriptionID);
-        if ($subscription === null) {
-			throw new DomainException('Подписка не найдена.');
-        }
-        $subscription->state = Payment::STATUS_INVALID;
-        $subscription->save(false, ['state']);
+        $payment = $this->findPaymentByID($subscriptionID);
+        $payment->state = Payment::STATUS_INVALID;
+        $payment->save(false, ['state']);
 	}
-	*/
 
     /**
      * @param $id
@@ -152,7 +160,7 @@ class UserPaymentService
         $status = ($args['Status'] === 'CONFIRMED' ? Payment::STATUS_VALID : Payment::STATUS_INVALID);
         $payment->state = $status;
         $payment->data = Json::encode($args);
-        $payment->save();
+        $payment->save(false);
     }
 
 }
