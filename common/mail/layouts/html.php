@@ -16,6 +16,7 @@ use yii\helpers\Html;
 <body>
     <?php $this->beginBody() ?>
     <?= $content ?>
+    <p>wikids.ru</p>
     <?php $this->endBody() ?>
 </body>
 </html>

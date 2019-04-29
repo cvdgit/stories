@@ -28,14 +28,7 @@ class UserPaymentService
         return Rate::find()->all();
     }
 
-    /*
-    public function getStartDate()
-    {
-        return date('Y-m-d H:i:s');
-    }
-    */
-
-    public function createPayment($userID, SubscriptionForm $model)
+    public function createPayment($userID, SubscriptionForm $model): int
     {
         $payment = Payment::create(
             $userID,
@@ -45,36 +38,12 @@ class UserPaymentService
             Payment::STATUS_NEW
         );
         $payment->save();
+
+        //$user = $this->userService->findUserByID($userID);
+        //$this->sendEmailActivate($user, $rate);
+
         return $payment->id;
     }
-
-    /*
-    public function getFinishDate($subscriptionID, $startDate): string
-    {
-        $rate = Rate::findOne($subscriptionID);
-        $date = new DateTime($startDate);
-        return $date->add(new DateInterval("P{$rate->days}D"))->format('Y-m-d H:i:s');
-    }
-
-	public function activateSubscription($userID, $subscriptionID): void
-	{
-        $rate = Rate::findOne($subscriptionID);
-	    $this->freeSubscriptionCheck($userID, $rate);
-	    $startDate = $this->getStartDate();
-	    $finishDate = $this->getFinishDate($subscriptionID, $startDate);
-		$payment = Payment::create(
-			$userID,
-            $subscriptionID,
-            $startDate,
-            $finishDate,
-            Payment::STATUS_VALID
-		);
-		$payment->save(false);
-
-		$user = $this->userService->findUserByID($userID);
-		$this->sendEmailActivate($user, $rate);
-	}
-    */
 
 	protected function freeSubscriptionCheck($userID, Rate $rate): void
     {
@@ -102,10 +71,10 @@ class UserPaymentService
             ->compose(['html' => 'userCancelSub-html', 'text' => 'userCancelSub-text'], ['user' => $user, 'rate' => $rate])
             ->setTo($user->email)
             ->setFrom(Yii::$app->params['infoEmail'])
-            ->setSubject('Активирована подписка на wikids.ru')
+            ->setSubject('Закончилась подписка на wikids.ru')
             ->send();
         if (!$sent) {
-            throw new RuntimeException('Ошибка при отправке email об активации подписки');
+            throw new RuntimeException('Ошибка при отправке email об отмене подписки');
         }
     }
 
@@ -137,13 +106,16 @@ class UserPaymentService
         $payment = $this->findPaymentByID($subscriptionID);
         $payment->state = Payment::STATUS_INVALID;
         $payment->save(false, ['state']);
+
+        //$user = $this->userService->findUserByID($userID);
+        //$this->sendEmailCancel($user, $rate);
 	}
 
     /**
      * @param $id
-     * @return Payment|null
+     * @return Payment
      */
-    public function findPaymentByID($id): ?Payment
+    public function findPaymentByID($id): Payment
     {
         if (($payment = Payment::findOne($id)) !== null) {
             return $payment;
@@ -154,9 +126,7 @@ class UserPaymentService
     public function processPaymentNotify($args): void
     {
         $paymentID = $args['OrderId'];
-        /** @var $payment Payment */
         $payment = $this->findPaymentByID($paymentID);
-
         $status = ($args['Status'] === 'CONFIRMED' ? Payment::STATUS_VALID : Payment::STATUS_INVALID);
         $payment->state = $status;
         $payment->data = Json::encode($args);

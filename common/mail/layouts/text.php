@@ -10,5 +10,6 @@ use yii\helpers\Html;
 <?php $this->beginPage() ?>
 <?php $this->beginBody() ?>
 <?= $content ?>
+wikids.ru
 <?php $this->endBody() ?>
 <?php $this->endPage() ?>
