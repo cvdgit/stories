@@ -8,8 +8,10 @@ use DateInterval;
 use DateTime;
 use DomainException;
 use common\models\Payment;
+use frontend\models\SubscriptionForm;
 use RuntimeException;
 use Yii;
+use yii\helpers\Json;
 
 class UserPaymentService
 {
@@ -26,11 +28,27 @@ class UserPaymentService
         return Rate::find()->all();
     }
 
+    /*
     public function getStartDate()
     {
         return date('Y-m-d H:i:s');
     }
+    */
 
+    public function createPayment($userID, SubscriptionForm $model)
+    {
+        $payment = Payment::create(
+            $userID,
+            $model->subscription_id,
+            $model->start_date,
+            $model->finish_date,
+            Payment::STATUS_NEW
+        );
+        $payment->save();
+        return $payment->id;
+    }
+
+    /*
     public function getFinishDate($subscriptionID, $startDate): string
     {
         $rate = Rate::findOne($subscriptionID);
@@ -56,6 +74,7 @@ class UserPaymentService
 		$user = $this->userService->findUserByID($userID);
 		$this->sendEmailActivate($user, $rate);
 	}
+    */
 
 	protected function freeSubscriptionCheck($userID, Rate $rate): void
     {
@@ -77,6 +96,30 @@ class UserPaymentService
         }
     }
 
+    public function generateToken($args): string
+    {
+        if (isset($args['Token'])) {
+            unset($args['Token']);
+        }
+        $args['Password'] = Yii::$app->params['terminalPassword'];
+        ksort($args);
+        $token = '';
+        foreach ($args as $arg) {
+            if (!is_array($arg)) {
+                $token .= $arg;
+            }
+        }
+        $token = hash('sha256', $token);
+        return $token;
+    }
+
+    public function checkToken($args, $expectedToken): bool
+    {
+        $actualToken = $args['Token'];
+        return !($expectedToken === null || strcasecmp($actualToken, $expectedToken) !== 0);
+    }
+
+    /*
 	public function cancelSubscription($subscriptionID): void
 	{
         $subscription = Payment::findOne($subscriptionID);
@@ -86,5 +129,30 @@ class UserPaymentService
         $subscription->state = Payment::STATUS_INVALID;
         $subscription->save(false, ['state']);
 	}
+	*/
+
+    /**
+     * @param $id
+     * @return Payment|null
+     */
+    public function findPaymentByID($id): ?Payment
+    {
+        if (($payment = Payment::findOne($id)) !== null) {
+            return $payment;
+        }
+        throw new DomainException('Данные об оплате не найдены.');
+    }
+
+    public function processPaymentNotify($args): void
+    {
+        $paymentID = $args['OrderId'];
+        /** @var $payment Payment */
+        $payment = $this->findPaymentByID($paymentID);
+
+        $status = ($args['Status'] === 'CONFIRMED' ? Payment::STATUS_VALID : Payment::STATUS_INVALID);
+        $payment->state = $status;
+        $payment->data = Json::encode($args);
+        $payment->save();
+    }
 
 }

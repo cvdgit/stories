@@ -79,4 +79,9 @@ class Rate extends ActiveRecord
         return ($this->code === 'free');
     }
 
+    public function isArchive(): bool
+    {
+        return $this->type === self::ARCHIVE;
+    }
+
 }

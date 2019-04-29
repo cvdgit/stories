@@ -31,6 +31,12 @@ return [
                     'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning'],
                 ],
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'categories' => ['payment_fail'],
+                    'logFile' => '@runtime/logs/pay.log',
+                    'logVars' => [],
+                ],
             ],
         ],
         'errorHandler' => [
@@ -57,6 +63,9 @@ return [
                 'signup-confirm' => 'signup/signup-confirm',
 
                 // 'reset-password' => 'site/reset-password',
+
+                'payment' => 'payment/create',
+                'payment/notify' => 'payment/notify',
 
                 'profile' => 'profile/index',
                 'change-password' => 'profile/change-password',

@@ -16,6 +16,7 @@ use yii\behaviors\TimestampBehavior;
  * @property int $rate_id
  * @property int $created_at
  * @property int $updated_at
+ * @property string $data
  *
  * @property Rate $rate
  * @property User $user
@@ -41,7 +42,7 @@ class Payment extends \yii\db\ActiveRecord
     public function behaviors()
     {
         return [
-            TimestampBehavior::className(),
+            TimestampBehavior::class,
         ];
     }
 
@@ -58,7 +59,7 @@ class Payment extends \yii\db\ActiveRecord
         return [
             [['payment', 'finish', 'user_id', 'rate_id'], 'required'],
             [['created_at', 'updated_at', 'user_id', 'rate_id'], 'integer'],
-            [['state'], 'string', 'max' => 255],
+            [['state', 'data'], 'safe'],
             [['payment', 'finish'], 'date', 'format' => 'yyyy-M-d H:m:s'],
         ];
     }
@@ -93,7 +94,7 @@ class Payment extends \yii\db\ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(User::className(), ['id' => 'user_id']);
+        return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
     public static function create($userID, $rateID, $dateStart, $dateFinish, $state = self::STATUS_NEW)

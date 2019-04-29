@@ -47,7 +47,7 @@ class SignupController extends Controller
                 if ($user !== null) {
                     try {
                         $this->service->sentEmailConfirm($user);
-                        return ['success' => true, 'message' => 'Проверьте свой адрес электронной почты, чтобы подтвердить регистрацию'];
+                        return ['success' => true, 'message' => ['Проверьте свой адрес электронной почты, чтобы подтвердить регистрацию']];
                     } catch (Exception $ex) {
                         Yii::$app->errorHandler->logException($ex);
                         return ['success' => false, 'message' => ['Ошибка при отправке письма с подтверждением регистрации на сайте']];

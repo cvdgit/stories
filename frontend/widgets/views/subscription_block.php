@@ -19,7 +19,7 @@ use yii\helpers\Html;
             <a href="#" class="btn" data-toggle="modal" data-target="#wikids-login-modal">Купить</a>
         <?php else: ?>
             <?php if (!$hasSubscription): ?>
-                <?php $form = ActiveForm::begin(); ?>
+                <?php $form = ActiveForm::begin(['action' => ['/payment/create'], 'options' => ['class' => 'payment-form']]); ?>
                 <?= $form->field($model, 'subscription_id', ['template' => '{input}', 'options' => ['tag' => false]])->hiddenInput(['value' => $rate->id])->label(false) ?>
                 <?= Html::submitButton('Купить', ['class' => 'btn']) ?>
                 <?php ActiveForm::end(); ?>
