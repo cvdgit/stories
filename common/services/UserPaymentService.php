@@ -88,9 +88,10 @@ class UserPaymentService
         $token = '';
         foreach ($args as $arg) {
             if (!is_array($arg)) {
-                $token .= $arg;
+                $token .= var_export($arg, true);
             }
         }
+        $token = str_replace("'", '', $token);
         $token = hash('sha256', $token);
         return $token;
     }
