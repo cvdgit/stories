@@ -1,6 +1,7 @@
 <?php
 namespace common\models;
 
+use DomainException;
 use yii\db\ActiveRecord;
 
 /**
@@ -82,6 +83,14 @@ class Rate extends ActiveRecord
     public function isArchive(): bool
     {
         return $this->type === self::ARCHIVE;
+    }
+
+    public static function findModel($id): self
+    {
+        if (($model = self::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new DomainException('Подписка не найдена.');
     }
 
 }

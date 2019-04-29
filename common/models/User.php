@@ -2,12 +2,12 @@
 
 namespace common\models;
 
+use DomainException;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\ActiveQuery;
 use yii\web\IdentityInterface;
-use yii\web\NotFoundHttpException;
 
 /**
  * User model
@@ -241,12 +241,12 @@ class User extends ActiveRecord implements IdentityInterface
         return !empty($this->activePayment);
     }
 
-    public static function findModel($id)
+    public static function findModel($id): self
     {
         if (($model = self::findOne($id)) !== null) {
             return $model;
         }
-        throw new NotFoundHttpException('Пользователь не найден.');
+        throw new DomainException('Пользователь не найден.');
     }
 
     public function isActive(): bool

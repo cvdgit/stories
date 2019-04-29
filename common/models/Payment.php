@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use DomainException;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 
@@ -111,6 +112,14 @@ class Payment extends \yii\db\ActiveRecord
     public static function getUserPaymentHistory($userID)
     {
         return self::find()->paymentsByUser($userID);
+    }
+
+    public static function findModel($id): self
+    {
+        if (($model = self::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new DomainException('Платеж не найден.');
     }
 
 }

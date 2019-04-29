@@ -33,6 +33,12 @@ return [
                 ],
                 [
                     'class' => 'yii\log\FileTarget',
+                    'categories' => ['yii\web\HttpException:404'],
+                    'levels' => ['error', 'warning'],
+                    'logFile' => '@runtime/logs/404.log',
+                ],
+                [
+                    'class' => 'yii\log\FileTarget',
                     'categories' => ['payment_fail'],
                     'logFile' => '@runtime/logs/pay.log',
                     'logVars' => [],

@@ -30,17 +30,26 @@ class UserPaymentService
 
     public function createPayment($userID, SubscriptionForm $model): int
     {
+        $user = User::findModel($userID);
+        if (!$user->isActive()) {
+            throw new DomainException('Создание платежа для не активного пользователя');
+        }
+
+        $subscription = Rate::findModel($model->subscription_id);
+        if (!$subscription->isArchive()) {
+            throw new DomainException('Создание платежа для архивной подписки');
+        }
+
         $payment = Payment::create(
-            $userID,
-            $model->subscription_id,
+            $user->id,
+            $subscription->id,
             $model->start_date,
             $model->finish_date,
             Payment::STATUS_NEW
         );
         $payment->save();
 
-        //$user = $this->userService->findUserByID($userID);
-        //$this->sendEmailActivate($user, $rate);
+        $this->sendEmailActivate($user, $subscription);
 
         return $payment->id;
     }
@@ -65,10 +74,12 @@ class UserPaymentService
         }
     }
 
-    protected function sendEmailCancel(User $user, Rate $rate): void
+    protected function sendEmailCancel(Payment $payment): void
     {
+        /** @var $user User */
+        $user = $payment->getUser()->one();
         $sent = Yii::$app->mailer
-            ->compose(['html' => 'userCancelSub-html', 'text' => 'userCancelSub-text'], ['user' => $user, 'rate' => $rate])
+            ->compose(['html' => 'userCancelSub-html', 'text' => 'userCancelSub-text'], ['user' => $user, 'rate' => $payment->getRate()->one()])
             ->setTo($user->email)
             ->setFrom(Yii::$app->params['infoEmail'])
             ->setSubject('Закончилась подписка на wikids.ru')
@@ -102,32 +113,19 @@ class UserPaymentService
         return !($expectedToken === null || strcasecmp($actualToken, $expectedToken) !== 0);
     }
 
-	public function cancelSubscription($subscriptionID): void
+	public function cancelSubscription($paymentID): void
 	{
-        $payment = $this->findPaymentByID($subscriptionID);
+        $payment = Payment::findModel($paymentID);
         $payment->state = Payment::STATUS_INVALID;
         $payment->save(false, ['state']);
 
-        //$user = $this->userService->findUserByID($userID);
-        //$this->sendEmailCancel($user, $rate);
+        $this->sendEmailCancel($payment);
 	}
-
-    /**
-     * @param $id
-     * @return Payment
-     */
-    public function findPaymentByID($id): Payment
-    {
-        if (($payment = Payment::findOne($id)) !== null) {
-            return $payment;
-        }
-        throw new DomainException('Данные об оплате не найдены.');
-    }
 
     public function processPaymentNotify($args): void
     {
         $paymentID = $args['OrderId'];
-        $payment = $this->findPaymentByID($paymentID);
+        $payment = Payment::findModel($paymentID);
         $status = ($args['Status'] === 'CONFIRMED' ? Payment::STATUS_VALID : Payment::STATUS_INVALID);
         $payment->state = $status;
         $payment->data = Json::encode($args);
