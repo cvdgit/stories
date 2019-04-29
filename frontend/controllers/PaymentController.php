@@ -98,7 +98,7 @@ class PaymentController extends Controller
                     return ['success' => true, 'html' => $serializer->serialize($html)];
                 } catch (Exception $ex) {
                     Yii::$app->errorHandler->logException($ex);
-                    return ['success' => false, 'message' => 'При создании платежа произошла ошибка'];
+                    return ['success' => false, 'message' => $ex->getMessage()];
                 }
             }
         }
