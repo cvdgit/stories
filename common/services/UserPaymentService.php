@@ -36,7 +36,7 @@ class UserPaymentService
         }
 
         $subscription = Rate::findModel($model->subscription_id);
-        if (!$subscription->isArchive()) {
+        if ($subscription->isArchive()) {
             throw new DomainException('Создание платежа для архивной подписки');
         }
 
