@@ -1,27 +1,39 @@
 <?php
 namespace backend\controllers;
 
+use common\services\auth\AuthService;
+use DomainException;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
-
 use common\models\LoginForm;
 use common\models\StoryStatisticsSearch;
 use common\rbac\UserRoles;
+use yii\web\Controller;
+use yii\web\ErrorAction;
 
 /**
  * Site controller
  */
-class SiteController extends \yii\web\Controller
+class SiteController extends Controller
 {
+
+    protected $service;
+
+    public function __construct($id, $module, AuthService $service, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->service = $service;
+    }
+
     /**
-     * {@inheritdoc}
+     * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
-                'class' => AccessControl::className(),
+                'class' => AccessControl::class,
                 'rules' => [
                     [
                         'actions' => ['login', 'error'],
@@ -39,7 +51,7 @@ class SiteController extends \yii\web\Controller
                 ],
             ],
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'logout' => ['post'],
                 ],
@@ -54,7 +66,7 @@ class SiteController extends \yii\web\Controller
     {
         return [
             'error' => [
-                'class' => 'yii\web\ErrorAction',
+                'class' => ErrorAction::class,
             ],
         ];
     }
@@ -64,7 +76,7 @@ class SiteController extends \yii\web\Controller
      *
      * @return string
      */
-    public function actionIndex()
+    public function actionIndex(): string
     {
         $statisticsModel = new StoryStatisticsSearch();
         $dataProvider = $statisticsModel->getChartData4();
@@ -78,7 +90,7 @@ class SiteController extends \yii\web\Controller
      *
      * @return string
      */
-    public function actionLogin()
+    public function actionLogin(): string
     {
         $this->layout = 'login';
 
@@ -87,19 +99,18 @@ class SiteController extends \yii\web\Controller
         }
 
         $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()))
-        {
-            if ($model->login())
-            {
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            try {
+                $user = $this->service->auth($model);
+                Yii::$app->user->login($user, Yii::$app->params['user.rememberMeDuration']);
                 return $this->goBack();
-            }
-            else
-            {
+            } catch (DomainException $ex) {
+                Yii::$app->errorHandler->logException($ex);
                 Yii::$app->session->setFlash('error', 'Неверное имя пользователя или пароль.');
                 return $this->refresh();
             }
         }
-            
+
         $model->password = '';
         return $this->render('login', [
             'model' => $model,
@@ -111,10 +122,9 @@ class SiteController extends \yii\web\Controller
      *
      * @return string
      */
-    public function actionLogout()
+    public function actionLogout(): string
     {
         Yii::$app->user->logout();
-
         return $this->goHome();
     }
 }

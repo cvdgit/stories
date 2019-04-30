@@ -4,8 +4,6 @@ namespace common\services;
 
 use common\models\Rate;
 use common\models\User;
-use DateInterval;
-use DateTime;
 use DomainException;
 use common\models\Payment;
 use frontend\models\SubscriptionForm;

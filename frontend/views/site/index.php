@@ -163,7 +163,7 @@ $this->setMetaTags('Сервис ускоренного развития реч�
     <div class="container">
       <div class="row row-no-gutters ask-question-wrapper">
         <div class="col-md-3">
-          <img src="./img/ask-icon.png" alt="">
+          <img src="/img/ask-icon.png" alt="">
           <span class="ask-text-1">Нужна консультация?</span>
         </div>
         <div class="col-md-7">

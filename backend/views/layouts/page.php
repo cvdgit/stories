@@ -1,9 +1,10 @@
 <?php
 
-/* @var $this \yii\web\View */
-/* @var $content string */
+/** @var $this yii\web\View */
+/** @var $content string */
 
 use backend\assets\AppAsset;
+use common\widgets\ToastrFlash;
 use yii\helpers\Html;
 
 AppAsset::register($this);
@@ -22,6 +23,7 @@ AppAsset::register($this);
 <body>
 <?php $this->beginBody() ?>
 <?= $content ?>
+<?= ToastrFlash::widget() ?>
 <?php $this->endBody() ?>
 </body>
 </html>
