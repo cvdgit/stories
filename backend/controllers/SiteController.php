@@ -71,12 +71,7 @@ class SiteController extends Controller
         ];
     }
 
-    /**
-     * Displays homepage.
-     *
-     * @return string
-     */
-    public function actionIndex(): string
+    public function actionIndex()
     {
         $statisticsModel = new StoryStatisticsSearch();
         $dataProvider = $statisticsModel->getChartData4();
@@ -85,12 +80,7 @@ class SiteController extends Controller
         ]);
     }
 
-    /**
-     * Login action.
-     *
-     * @return string
-     */
-    public function actionLogin(): string
+    public function actionLogin()
     {
         $this->layout = 'login';
 
@@ -117,12 +107,7 @@ class SiteController extends Controller
         ]);
     }
 
-    /**
-     * Logout action.
-     *
-     * @return string
-     */
-    public function actionLogout(): string
+    public function actionLogout()
     {
         Yii::$app->user->logout();
         return $this->goHome();
