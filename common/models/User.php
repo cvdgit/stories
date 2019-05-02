@@ -272,4 +272,22 @@ class User extends ActiveRecord implements IdentityInterface
         return self::find()->andWhere(['or', ['username' => $value], ['email' => $value]])->one();
     }
 
+    /**
+     * @param string $username
+     * @param string $email
+     * @param string $password
+     * @return User
+     * @throws yii\base\Exception
+     */
+    public static function create(string $username, string $email, string $password): User
+    {
+        $user = new self();
+        $user->username = $username;
+        $user->email = $email;
+        $user->setPassword(!empty($password) ? $password : Yii::$app->security->generateRandomString());
+        $user->generateAuthKey();
+        $user->status = self::STATUS_ACTIVE;
+        return $user;
+    }
+
 }

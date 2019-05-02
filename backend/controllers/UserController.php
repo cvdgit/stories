@@ -2,6 +2,9 @@
 
 namespace backend\controllers;
 
+use backend\models\UserCreateForm;
+use common\services\UserService;
+use DomainException;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -11,17 +14,18 @@ use common\services\UserPaymentService;
 use common\models\User;
 use common\models\PaymentSearch;
 use common\rbac\UserRoles;
-use backend\models\SubscriptionForm;
 
 class UserController extends Controller
 {
 
-    public $paymentService;
+    protected $paymentService;
+    protected $userService;
 
-    public function __construct($id, $module, UserPaymentService $paymentService, $config = [])
+    public function __construct($id, $module, UserPaymentService $paymentService, UserService $userService, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->paymentService = $paymentService;
+        $this->userService = $userService;
     }
 
     public function behaviors()
@@ -51,6 +55,23 @@ class UserController extends Controller
         ]);
         return $this->render('index', [
             'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    public function actionCreate()
+    {
+        $form = new UserCreateForm();
+        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+            try {
+                $user = $this->userService->create($form);
+                return $this->redirect(['view', 'id' => $user->id]);
+            } catch (DomainException $ex) {
+                Yii::$app->errorHandler->logException($ex);
+                Yii::$app->session->setFlash('error', $ex->getMessage());
+            }
+        }
+        return $this->render('create', [
+            'model' => $form,
         ]);
     }
 
@@ -100,19 +121,11 @@ class UserController extends Controller
         return ['success' => true];
     }
 
-    /**
-     * Finds the User model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return User the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
+    public function actionView($id)
     {
-        if (($model = User::findOne($id)) !== null) {
-            return $model;
-        }
-        throw new NotFoundHttpException('Пользователь не найден.');
+        return $this->render('view', [
+            'model' => User::findModel($id),
+        ]);
     }
 
 }

@@ -22,7 +22,7 @@ class CommentController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => [UserRoles::PERMISSION_MANAGE_USERS],
+                        'roles' => [UserRoles::PERMISSION_MANAGE_COMMENTS],
                     ],
                 ],
             ],

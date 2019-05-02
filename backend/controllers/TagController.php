@@ -1,14 +1,31 @@
 <?php
 namespace backend\controllers;
 
+use common\rbac\UserRoles;
 use Yii;
 use common\models\Tag;
+use yii\filters\AccessControl;
 
 /**
  * Site controller
  */
 class TagController extends \backend\components\AdminController
 {
+
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => [UserRoles::PERMISSION_TAGS_ACCESS],
+                    ],
+                ],
+            ],
+        ];
+    }
 
     /**
      * {@inheritdoc}

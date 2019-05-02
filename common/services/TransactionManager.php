@@ -4,18 +4,24 @@
 namespace common\services;
 
 
+use Exception;
+
 class TransactionManager
 {
 
-    public function wrap(callable $function)
+    /**
+     * @param callable $function
+     * @throws Exception
+     */
+    public function wrap(callable $function): void
     {
         $transaction = \Yii::$app->db->beginTransaction();
         try {
             $function();
             $transaction->commit();
-        } catch (\Exception $e) {
+        } catch (Exception $ex) {
             $transaction->rollBack();
-            throw $e;
+            throw $ex;
         }
     }
 

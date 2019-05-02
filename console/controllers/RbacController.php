@@ -10,11 +10,38 @@ class RbacController extends Controller
     public function actionInit()
     {
         $auth = Yii::$app->authManager;
+
+        $moderatorRole = $auth->getRole('moderator');
+
+        $manageTagsPermission = $auth->createPermission(UserRoles::PERMISSION_TAGS_ACCESS);
+        $manageTagsPermission->description = 'Управление тэгами';
+        $auth->add($manageTagsPermission);
+
+        $auth->addChild($moderatorRole, $manageTagsPermission);
+
+        $adminRole = $auth->getRole('admin');
+
+        $manageRolesPermission = $auth->createPermission(UserRoles::PERMISSION_MANAGE_RATES);
+        $manageRolesPermission->description = 'Управление подписками';
+        $auth->add($manageRolesPermission);
+
+        $auth->addChild($adminRole, $manageRolesPermission);
+
+        $manageCommentsPermission = $auth->createPermission(UserRoles::PERMISSION_MANAGE_COMMENTS);
+        $manageCommentsPermission->description = 'Управление комментариями';
+        $auth->add($manageCommentsPermission);
+
+        $auth->addChild($adminRole, $manageCommentsPermission);
+
+        /*
         $auth->removeAll();
 
         $userRole = $auth->createRole('user');
+        $userRole->description = 'Пользователь';
         $moderatorRole = $auth->createRole('moderator');
+        $moderatorRole->description = 'Управление историями';
         $adminRole = $auth->createRole('admin');
+        $adminRole->description = 'Администратор сайта';
 
 
         // $createStory = $auth->createPermission('createStory');
@@ -72,6 +99,8 @@ class RbacController extends Controller
 
         $auth->assign($moderatorRole, 4);
         $auth->assign($adminRole, 1);
+        */
+
 
 
 /*

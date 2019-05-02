@@ -1,8 +1,10 @@
 <?php
 
+use yii\grid\ActionColumn;
 use yii\helpers\Html;
 use yii\grid\GridView;
 use common\helpers\UserHelper;
+use backend\widgets\grid\RoleColumn;
 
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -10,6 +12,9 @@ use common\helpers\UserHelper;
 $this->title = 'Пользователи';
 ?>
 <h1 class="page-header"><?= Html::encode($this->title) ?></h1>
+<p>
+    <?= Html::a('Создать пользователя', ['create'], ['class' => 'btn btn-success']) ?>
+</p>
 <?= GridView::widget([
     'dataProvider' => $dataProvider,
     'columns' => [
@@ -30,7 +35,12 @@ $this->title = 'Пользователи';
             'value' => 'activePayment.rate.title',
         ],
         [
-        	'class' => 'yii\grid\ActionColumn',
+            'attribute' => 'role',
+            'label' => 'Роль',
+            'class' => RoleColumn::class,
+        ],
+        [
+        	'class' => ActionColumn::class,
         	'template' => '{update} {delete}',
         ],
     ],

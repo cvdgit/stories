@@ -3,12 +3,22 @@
 
 namespace common\services;
 
+use backend\models\UserCreateForm;
 use common\models\User;
 use yii\web\NotFoundHttpException;
 use common\models\PaymentQuery;
 
 class UserService
 {
+
+    protected $transaction;
+    protected $roleManager;
+
+    public function __construct(TransactionManager $transaction, RoleManager $roleManager)
+    {
+        $this->transaction = $transaction;
+        $this->roleManager = $roleManager;
+    }
 
     /**
      * @param $id
@@ -61,6 +71,20 @@ class UserService
         /* @var $payments PaymentQuery */
         $payments = $user->getPayments();
         return $payments->freeSubscription()->isValid()->exists();
+    }
+
+    public function create(UserCreateForm $form): User
+    {
+        $user = User::create(
+            $form->username,
+            $form->email,
+            $form->password
+        );
+        $this->transaction->wrap(function () use ($user, $form) {
+            $user->save();
+            $this->roleManager->assign($user->id, $form->role);
+        });
+        return $user;
     }
 
 }
