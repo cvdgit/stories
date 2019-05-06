@@ -3,13 +3,11 @@
 namespace backend\controllers;
 
 use Yii;
-use yii\data\ActiveDataProvider;
+use yii\web\Controller;
 use yii\web\UploadedFile;
-use yii\web\HttpException;
 use yii\filters\AccessControl;
-
 use common\models\Story;
-use common\models\StorySearch;
+use backend\models\StorySearch;
 use common\services\StoryService;
 use common\rbac\UserRoles;
 use backend\models\StoryCoverUploadForm;
@@ -17,7 +15,7 @@ use backend\models\StoryFileUploadForm;
 use backend\models\SourcePowerPointForm;
 use backend\models\SourceDropboxForm;
 
-class StoryController extends \yii\web\Controller
+class StoryController extends Controller
 {
     
     public $service;
@@ -32,7 +30,7 @@ class StoryController extends \yii\web\Controller
     {
         return [
             'access' => [
-                'class' => AccessControl::className(),
+                'class' => AccessControl::class,
                 'rules' => [
                     [
                         'allow' => true,
@@ -94,7 +92,6 @@ class StoryController extends \yii\web\Controller
     public function actionIndex()
     {
         $searchModel = new StorySearch();
-        $searchModel->scenario = StorySearch::SCENARIO_BACKEND;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('index', [
             'searchModel' => $searchModel,

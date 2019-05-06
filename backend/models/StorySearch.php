@@ -1,78 +1,50 @@
 <?php
 
-namespace common\models;
 
-use Yii;
+namespace backend\models;
+
+
+use common\models\Story;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use frontend\components\StorySorter as Sort;
-use common\models\Story;
+use yii\data\Sort;
 
-/**
- * StorySearch represents the model behind the search form of `common\models\Story`.
- */
-class StorySearch extends Story
+class StorySearch extends Model
 {
 
-    const SCENARIO_FRONTEND = 'frontend';
-    const SCENARIO_BACKEND = 'backend';
+    public $title;
+    public $user_id;
+    public $category_id;
+    public $created_at;
+    public $updated_at;
+    public $status;
+    public $sub_access;
 
-    public $tag_id;
-
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
             [['title'], 'string'],
-            [['user_id', 'category_id', 'tag_id', 'status', 'sub_access'], 'integer'],
+            [['user_id', 'category_id', 'status', 'sub_access'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function scenarios()
+    public function search($params): ActiveDataProvider
     {
-        return [
-            self::SCENARIO_FRONTEND => ['title', 'category_id', 'tag_id'],
-            self::SCENARIO_BACKEND => ['title', 'user_id', 'category_id', 'tag_id', 'created_at', 'updated_at', 'status', 'sub_access'],
-        ];
-    }
-
-    /**
-     * Creates data provider instance with search query applied
-     *
-     * @param array $params
-     *
-     * @return ActiveDataProvider
-     */
-    public function search($params)
-    {
-        $isBackend = ($this->scenario === self::SCENARIO_BACKEND);
-        if ($isBackend) {
-            $query = Story::findStories()->joinWith(['author', 'category', 'tags']);
-        }
-        else {
-            $query = Story::findPublishedStories()->joinWith(['category', 'tags']);
-        }
-
+        $query = Story::findStories()->joinWith(['author', 'category', 'tags']);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => 20,
+                'pageSize' => 50,
             ],
         ]);
-        
+
         $sortParams = [
-            'defaultOrder' => ['sub_access' => SORT_DESC, 'created_at' => SORT_DESC],
+            'defaultOrder' => ['created_at' => SORT_DESC],
             'attributes' => [
                 'title' => [
                     'asc' => ['title' => SORT_ASC],
                     'desc' => ['title' => SORT_DESC],
-                    'label' => 'названию истории',
                 ],
                 'user_id' => [
                     'asc' => ['user.username' => SORT_ASC],
@@ -85,26 +57,23 @@ class StorySearch extends Story
                 'created_at' => [
                     'asc' => ['created_at' => SORT_ASC],
                     'desc' => ['created_at' => SORT_DESC],
-                    'label' => 'дате создания',
                 ],
                 'updated_at' => [
                     'asc' => ['updated_at' => SORT_ASC],
                     'desc' => ['updated_at' => SORT_DESC],
                 ],
+                'status',
                 'sub_access',
                 'views_number',
             ],
         ];
-        if ($isBackend) {
-            $sortParams['defaultOrder'] = ['created_at' => SORT_DESC];
-        }
         $sort = new Sort($sortParams);
         $dataProvider->setSort($sort);
 
         if (!($this->load($params) && $this->validate())) {
             return $dataProvider;
         }
-        
+
         $query->andFilterWhere(['like', 'title', $this->title]);
         $query->andFilterWhere([
             'user.id' => $this->user_id,
@@ -113,9 +82,9 @@ class StorySearch extends Story
             "DATE_FORMAT(FROM_UNIXTIME(story.updated_at), '%d.%m.%Y')" => $this->updated_at,
             'story.status' => $this->status,
             'story.sub_access' => $this->sub_access,
-            'tag.id' => $this->tag_id,
         ]);
-        
+
         return $dataProvider;
     }
+
 }
