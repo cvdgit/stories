@@ -3,12 +3,30 @@
 /* @var $this yii\web\View */
 /* @var $content string */
 
+use backend\assets\AppAsset;
+use common\rbac\UserRoles;
+use common\widgets\ToastrFlash;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use common\widgets\Alert;
+use yii\helpers\Html;
+
+AppAsset::register($this);
 
 ?>
-<?php $this->beginContent('@backend/views/layouts/page.php'); ?>
+<?php $this->beginPage() ?>
+<!DOCTYPE html>
+<html lang="<?= Yii::$app->language ?>">
+<head>
+    <meta charset="<?= Yii::$app->charset ?>">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <?= Html::csrfMetaTags() ?>
+    <title><?= Html::encode($this->title) ?></title>
+    <?php $this->head() ?>
+</head>
+<body>
+<?php $this->beginBody() ?>
 <div class="wrap">
     <?php
     NavBar::begin([
@@ -30,6 +48,7 @@ use common\widgets\Alert;
                     'items' => $this->params['sidebarMenuItems'],
                 ]) ?>
                 <?php endif ?>
+                <?php if (Yii::$app->user->can(UserRoles::PERMISSION_ADMIN_PANEL)): ?>
                 <?= Nav::widget([
                     'options' => ['class' => 'nav-sidebar'],
                     'items' => [
@@ -42,6 +61,7 @@ use common\widgets\Alert;
                         ['label' => 'Подписки', 'url' => ['/rate/index']],
                     ],
                 ]) ?>
+                <?php endif ?>
             </div>
             <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
                 <?= Alert::widget() ?>
@@ -50,4 +70,8 @@ use common\widgets\Alert;
         </div>
     </div>
 </div>
-<?php $this->endContent(); ?>
+<?= ToastrFlash::widget() ?>
+<?php $this->endBody() ?>
+</body>
+</html>
+<?php $this->endPage() ?>
