@@ -51,6 +51,12 @@ class ProfileImage extends ActiveRecord
         return $photo;
     }
 
+    public function beforeSave($insert)
+    {
+        $this->updateCounters(['version' => 1]);
+        return parent::beforeSave($insert);
+    }
+
     /**
      * @return ActiveQuery
      */

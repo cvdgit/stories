@@ -30,6 +30,7 @@ $this->setMetaTags($title,
                         $profilePhoto = $model->profile->profilePhoto;
                         if ($profilePhoto !== null) {
                             $background = $profilePhoto->getThumbFileUrl('file', 'profile', '/img/no_avatar.png');
+                            $background .= '?v=' . $profilePhoto->version;
                         }
                     }
                     ?>
