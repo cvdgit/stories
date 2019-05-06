@@ -129,7 +129,6 @@ class Profile extends ActiveRecord
     {
         if ($this->profilePhoto === null) {
             $model = ProfileImage::create($photo);
-            $model->profile_id = $this->id;
         }
         else {
             $model = $this->profilePhoto;

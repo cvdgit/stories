@@ -16,7 +16,9 @@ class ProfileService
             $form->first_name,
             $form->last_name
         );
-        $profile->addProfilePhoto($form->photoForm->file);
+        if ($form->photoForm->file !== null) {
+            $profile->addProfilePhoto($form->photoForm->file);
+        }
         $profile->save();
     }
 
