@@ -217,7 +217,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function getPayments(): ActiveQuery
     {
-        return $this->hasMany(Payment::class, ['user_id' => 'id']);
+        return $this->hasMany(Payment::class, ['user_id' => 'id'])->with('rate')->orderBy(['created_at' => SORT_DESC]);
     }
 
     /**

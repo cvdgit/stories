@@ -45,8 +45,8 @@ $this->setMetaTags($title,
                         ['label' => 'Основная информация',
                          'content' => $this->render('_tab_general', ['model' => $model, 'activePayment' => $activePayment]),
                          'active' => true],
-                        ['label' => 'Платежи',
-                            'content' => $this->render('_tab_payments', ['model' => $model])],
+                        ['label' => 'История подписок',
+                            'content' => $this->render('_tab_payments', ['payments' => $model->payments])],
                     ],
                 ]) ?>
             </div>
