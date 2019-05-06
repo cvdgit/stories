@@ -1,14 +1,11 @@
 <?php
 
-/* @var $this \yii\web\View */
+/* @var $this yii\web\View */
 /* @var $content string */
 
-use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
-use yii\widgets\Breadcrumbs;
 use common\widgets\Alert;
-use yii\helpers\Url;
 
 ?>
 <?php $this->beginContent('@backend/views/layouts/page.php'); ?>
@@ -22,29 +19,12 @@ use yii\helpers\Url;
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
-    $menuItems = [];
-    if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => 'Вход', 'url' => ['/site/login']];
-    } else {
-        $menuItems[] = '<li>'
-            . Html::beginForm(['/site/logout'], 'post')
-            . Html::submitButton(
-                'Выход (' . Yii::$app->user->identity->username . ')',
-                ['class' => 'btn btn-link logout']
-            )
-            . Html::endForm()
-            . '</li>';
-    }
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav navbar-right'],
-        'items' => $menuItems,
-    ]);
     NavBar::end();
     ?>
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-3 col-md-2 sidebar">
-                <?php if (isset($this->params['sidebarMenuItems']) && sizeof($this->params['sidebarMenuItems']) > 0): ?>
+                <?php if (isset($this->params['sidebarMenuItems']) && count($this->params['sidebarMenuItems']) > 0): ?>
                 <?= Nav::widget([
                     'options' => ['class' => 'nav-sidebar'],
                     'items' => $this->params['sidebarMenuItems'],

@@ -78,8 +78,7 @@ class StoryController extends Controller
 
         $model->updateCounters(['views_number' => 1]);
 
-        $commentForm = new CommentForm();
-        $commentForm->story_id = $model->id;
+        $commentForm = new CommentForm($model->id);
 
         return $this->render('view', [
             'model' => $model,
@@ -138,8 +137,7 @@ class StoryController extends Controller
     public function actionAddComment($id): string
     {
         if (Yii::$app->request->isPjax) {
-            $commentForm = new CommentForm();
-            $commentForm->story_id = $id;
+            $commentForm = new CommentForm($id);
             if ($commentForm->load(Yii::$app->request->post()) && $commentForm->validate()) {
                 $commentForm->createComment(Yii::$app->user->id);
                 $commentForm->body = '';

@@ -16,16 +16,25 @@ return [
     'controllerNamespace' => 'frontend\controllers',
     'components' => [
         'request' => [
-            'csrfParam' => '_csrf-frontend',
+            'csrfParam' => '_csrf-wikids',
+            'cookieValidationKey' => $params['cookieValidationKey'],
         ],
         'user' => [
             'identityClass' => 'common\models\User',
             'enableAutoLogin' => true,
-            'identityCookie' => ['name' => '_identity-frontend', 'httpOnly' => true],
+            'identityCookie' => [
+                'name' => '_identity',
+                'httpOnly' => true,
+                'domain' => $params['cookieDomain'],
+            ],
+            'loginUrl' => ['/'],
         ],
         'session' => [
-            // this is the name of the session cookie used for login on the frontend
-            'name' => 'advanced-frontend',
+            'name' => 'wikids',
+            'cookieParams' =>[
+                'httpOnly' => true,
+                'domain' => $params['cookieDomain'],
+            ],
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
@@ -77,6 +86,7 @@ return [
                 'payment/notify' => 'payment/notify',
 
                 'profile' => 'profile/index',
+                'profile/edit' => 'profile/update',
                 'change-password' => 'profile/change-password',
                 
                 'stories/tag/<tag:[\w]+>' => 'story/tag',

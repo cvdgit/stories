@@ -4,17 +4,18 @@
 /* @var $commentForm frontend\models\CommentForm */
 
 use yii\bootstrap\ActiveForm;
+use yii\helpers\Html;
 use yii\widgets\Pjax;
 
 $js = <<< JS
 const addCommentFocusClassName = 'add-comment-focus';
-$('.add-comment-placeholder textarea').on('focus', function() {
+$('.comments').on('focus', '.add-comment-placeholder textarea', function() {
     let element = $(this).parent().parent();
     if (!element.hasClass(addCommentFocusClassName)) {
         element.addClass(addCommentFocusClassName);
     }
 });
-$('.add-comment-close').on('click', function(e) {
+$('.comments').on('click', '.add-comment-close', function(e) {
     e.preventDefault();
     $(this).parent().parent().removeClass(addCommentFocusClassName).find('textarea').val('');
 });
@@ -25,7 +26,7 @@ $this->registerJs($js);
 <div class="comment-form">
     <div class="comment-form-wrapper">
         <div class="comment-logo">
-            <img src="/img/avatar.png" alt="">
+            <?= Html::img($commentForm->getCurrentUserProfilePhotoPath()) ?>
         </div>
         <div class="add-comment-wrapper">
             <?php $form = ActiveForm::begin([

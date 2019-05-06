@@ -248,8 +248,7 @@ section h2 span {
 .site-about h4 {
   font-size: 1.333em;
   font-weight: 600;
-  margin: 0;
-  margin-bottom: 10px;
+  margin: 0 0 10px;
 }
 
 .site-about h4 span {
@@ -593,7 +592,7 @@ section h2 span {
 }
 
 .carousel-control {
-  width: 0%;
+  width: 0;
 }
 
 .glyphicon-chevron-left,
@@ -751,9 +750,7 @@ section h2 span {
 .story-form .input-group-addon {
   background-color: #f0f4f9;
   border: 1px #f0f4f9 solid;
-  border-radius: 3rem;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
+  border-radius: 3rem 0 0 3rem;
   width: 40px;
 }
 
@@ -809,7 +806,7 @@ section h2 span {
   margin-right: 10px;
 }
 
-.site-dialog btn {
+.site-dialog .btn {
   margin-top: 10px;
 }
 
@@ -1364,7 +1361,7 @@ section h2 span {
   color: black;
   position: relative;
   overflow: hidden;
-  margin: 10px 0px;
+  margin: 10px 0;
 }
 .file-upload:hover {
   background: #bdbdbd;
@@ -1429,10 +1426,12 @@ section h2 span {
   color: #99cd50;
 }
 
+/*
 .site-user-profile .payment-tab a {
   text-decoration: underline;
   font-weight: bold;
 }
+*/
 
 .auth-clients {
   overflow: hidden !important;

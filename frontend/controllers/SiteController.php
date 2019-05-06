@@ -74,7 +74,6 @@ class SiteController extends Controller
      *
      * @return mixed
      */
-    /*
     public function actionRequestPasswordReset()
     {
         $model = new PasswordResetRequestForm();
@@ -90,7 +89,6 @@ class SiteController extends Controller
             'model' => $model,
         ]);
     }
-    */
 
     /**
      * Resets password.

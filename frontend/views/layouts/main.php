@@ -62,7 +62,7 @@ use common\helpers\Url;
                      Html::a('Войти', '#', ['class' => 'login-item', 'data-toggle' => 'modal', 'data-target' => '#wikids-login-modal']);
               }
               else {
-                echo Html::a(Yii::$app->user->identity->username, ['/profile/index']) .
+                echo Html::a(Yii::$app->user->identity->getProfileName(), ['/profile/index']) .
                      Html::tag('span') .
                      Html::beginForm(['/auth/logout'], 'post') .
                      Html::submitButton('Выход', ['class' => 'login-item logout-btn-a']) . 

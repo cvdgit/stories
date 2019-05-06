@@ -2,23 +2,23 @@
 
 namespace frontend\controllers;
 
+use common\services\ProfileService;
+use Exception;
+use frontend\models\ProfileEditForm;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use common\models\User;
-use common\service\CustomerPayment as PaymentService;
-use frontend\models\ChangePasswordForm;
+use common\services\UserPaymentService;
 
 class ProfileController extends Controller
 {
 
-    private $paymentService;
-    private $userId;
+    protected $profileService;
 
-    public function __construct($id, $module, $config = [])
+    public function __construct($id, $module, ProfileService $profileService, $config = [])
     {
-        $this->paymentService = new PaymentService();
-        $this->userId = Yii::$app->user->id;
+        $this->profileService = $profileService;
         parent::__construct($id, $module, $config);
     }
 
@@ -37,34 +37,38 @@ class ProfileController extends Controller
         ];
     }
 
-    /**
-     * @return string
-     * @throws \yii\web\NotFoundHttpException
-     */
-    public function actionIndex(): string
+    public function actionIndex()
     {
         $user = User::findModel(Yii::$app->user->id);
-        /*
-        $user = User::findModel($this->userId);
-        $date_rate = $this->paymentService->dateFinishPayment($user);
-        $payment = $this->paymentService->getLastPaymentUser($user);
-        $modelPassword = new ChangePasswordForm();
-
-        return $this->render('index', [
-            'modelPassword' => $modelPassword,
-            'model' => $user,
-            'rate' => ($payment !== null ? $payment->rate : null),
-            'count_date_rate' => $date_rate,
-        ]);
-        */
-
         return $this->render('index', [
             'model' => $user,
             'activePayment' => $user->getActivePayment()->one(),
         ]);
     }
 
-    public function actionChangePassword()
+    public function actionUpdate()
+    {
+        $user = User::findModel(Yii::$app->user->id);
+        $form = new ProfileEditForm($user->profile);
+        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+            $form->photoForm->load(Yii::$app->request->post());
+            $form->photoForm->validate();
+            try {
+                $this->profileService->update($user, $form);
+                Yii::$app->session->setFlash('success', 'Профиль успешно обновлен');
+                return $this->redirect(['/profile']);
+            }
+            catch (Exception $e) {
+                Yii::$app->errorHandler->logException($e);
+                Yii::$app->session->setFlash('error', 'При редактировании профиля возникла ошибка');
+            }
+        }
+        return $this->render('update', [
+            'model' => $form,
+        ]);
+    }
+
+/*    public function actionChangePassword()
     {
         try {
             $model = new ChangePasswordForm();
@@ -79,6 +83,6 @@ class ProfileController extends Controller
             Yii::$app->session->setFlash('password-message', 'Ошибка! Пароль не изменен!');
         }
         return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
-    }
+    }*/
 
 }

@@ -24,11 +24,16 @@ use yii\web\IdentityInterface;
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $password write-only password
+ * @property string $image
  *
- * @property Payment $payments
+ * @property Comment[] $comments
+ * @property Payment[] $payments
+ * @property Profile $profile
+ * @property Story[] $stories
  */
 class User extends ActiveRecord implements IdentityInterface
 {
+
     const STATUS_DELETED = 0;
     const STATUS_WAIT = 5;
     const STATUS_ACTIVE = 10;
@@ -53,19 +58,6 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             TimestampBehavior::class,
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
-    {
-        return [
-            ['status', 'default', 'value' => self::STATUS_WAIT],
-            ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_WAIT, self::STATUS_DELETED]],
-            ['group', 'in', 'range' => [self::GROUP_ADMIN, self::GROUP_AUTHOR]],
-            ['group', 'default', 'value' => self::GROUP_AUTHOR],
         ];
     }
 
@@ -288,6 +280,49 @@ class User extends ActiveRecord implements IdentityInterface
         $user->generateAuthKey();
         $user->status = self::STATUS_ACTIVE;
         return $user;
+    }
+
+    /**
+     * @return yii\db\ActiveQuery
+     */
+    public function getProfile()
+    {
+        return $this->hasOne(Profile::class, ['user_id' => 'id']);
+    }
+
+    /**
+     * @return yii\db\ActiveQuery
+     */
+    public function getComments()
+    {
+        return $this->hasMany(Comment::class, ['user_id' => 'id']);
+    }
+
+    /**
+     * @return yii\db\ActiveQuery
+     */
+    public function getStories()
+    {
+        return $this->hasMany(Story::class, ['user_id' => 'id']);
+    }
+
+    public function getProfileName()
+    {
+        if ($this->profile !== null) {
+            return $this->profile->getFullName();
+        }
+        return $this->username;
+    }
+
+    public function updateProfile(string $firstName, string $lastName)
+    {
+        $profile = $this->profile;
+        if ($profile === null) {
+            $profile = Profile::createProfile($this->id);
+        }
+        $profile->first_name = $firstName;
+        $profile->last_name = $lastName;
+        return $profile;
     }
 
 }

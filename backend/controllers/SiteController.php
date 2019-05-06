@@ -36,14 +36,15 @@ class SiteController extends Controller
                 'class' => AccessControl::class,
                 'rules' => [
                     [
-                        'actions' => ['login', 'error'],
+                        'actions' => ['error'],
                         'allow' => true,
                     ],
+                    /*
                     [
                         'actions' => ['logout'],
                         'allow' => true,
                         'roles' => ['@'],
-                    ],
+                    ],*/
                     [
                         'allow' => true,
                         'roles' => [UserRoles::PERMISSION_ADMIN_PANEL],
@@ -80,6 +81,7 @@ class SiteController extends Controller
         ]);
     }
 
+    /*
     public function actionLogin()
     {
         $this->layout = 'login';
@@ -112,4 +114,6 @@ class SiteController extends Controller
         Yii::$app->user->logout();
         return $this->goHome();
     }
+    */
+
 }

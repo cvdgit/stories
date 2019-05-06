@@ -2,7 +2,6 @@
 
 use yii\helpers\Html;
 use yii\web\JsExpression;
-use yii\widgets\Pjax;
 use common\widgets\RevealWidget;
 
 /* @var $this yii\web\View */
@@ -30,11 +29,9 @@ function onSlideMouseDown(e) {
 	}
 }
 Reveal.addEventListener("mousedown", onSlideMouseDown, false);
-
 $('#comment-form-pjax').on('pjax:success', function() {
     $.pjax.reload({container: '#comment-list-pjax'});
 });
-
 JS;
 $this->registerJs($js);
 ?>

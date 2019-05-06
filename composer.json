@@ -31,7 +31,9 @@
         "2amigos/yii2-chartjs-widget": "~2.0",
         "bower-asset/toastr": "^2.1",
         "yiisoft/yii2-imagine": "^2.1",
-        "yiisoft/yii2-authclient": "^2.2"
+        "yiisoft/yii2-authclient": "^2.2",
+        "yii-dream-team/yii2-upload-behavior": "*",
+        "la-haute-societe/yii2-save-relations-behavior": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

@@ -8,7 +8,17 @@ use common\helpers\SmartDate;
 ?>
 <div class="comment-list-item">
     <div class="comment-logo">
-        <img src="/img/avatar.png" alt="">
+        <?php
+        $image = '/img/avatar.png';
+        $profile = $model->user->profile;
+        if ($profile !== null) {
+            $profilePhoto = $profile->profilePhoto;
+            if ($profilePhoto !== null) {
+                $image = $profilePhoto->getThumbFileUrl('file', 'list', '/img/avatar.png');
+            }
+        }
+        ?>
+        <?= Html::img($image) ?>
     </div>
     <div class="comment">
         <div class="comment-header">

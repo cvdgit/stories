@@ -95,7 +95,7 @@ class Comment extends \yii\db\ActiveRecord
 
     public static function getStoryComments($storyID): ActiveDataProvider
     {
-        $query = self::find()->joinWith(['user']);
+        $query = self::find()->joinWith(['user.profile.profilePhoto']);
         $query->andFilterWhere(['story_id' => $storyID]);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

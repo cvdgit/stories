@@ -2,6 +2,8 @@
 
 namespace common\widgets\RevealButtons;
 
+use yii\web\JsExpression;
+
 class FeedbackButton extends Button
 {
 
@@ -10,7 +12,7 @@ class FeedbackButton extends Button
 		$this->icon = 'icomoon-comment-o';
 		$this->className = 'custom-feedback';
 		$this->title = 'Сообщить об опечатке на слайде';
-		$this->action = new \yii\web\JsExpression('function() { WikidsStoryFeedback.sendFeedback(); }');
+		$this->action = new JsExpression('function() { WikidsStoryFeedback.sendFeedback(); }');
 	}
 
 }
