@@ -3,7 +3,6 @@
 /** @var $payments[] common\models\Payment */
 
 use common\helpers\PaymentHelper;
-use yii\helpers\Html;
 
 ?>
 <div class="profile-tab-content payment-tab">

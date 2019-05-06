@@ -77,7 +77,7 @@ class UserController extends Controller
 
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $model = User::findModel($id);
         return $this->render('update', [
             'model' => $model,
         ]);
@@ -85,7 +85,7 @@ class UserController extends Controller
 
     public function actionSubscriptions($id)
     {
-        $userModel = $this->findModel($id);
+        $userModel = User::findModel($id);
         $paymentSearch = New PaymentSearch();
         $dataProvider = $paymentSearch->search(Yii::$app->request->queryParams, $userModel->id);
         return $this->render('subscriptions', [
@@ -96,7 +96,7 @@ class UserController extends Controller
 
     public function actionActivateSubscription($user_id)
     {
-        $userModel = $this->findModel($user_id);
+        $userModel = User::findModel($user_id);
         $subscriptionModel = new SubscriptionForm();
         if (Yii::$app->request->isAjax) {
             if ($subscriptionModel->load(Yii::$app->request->post()) && $subscriptionModel->validate()) {

@@ -7,7 +7,7 @@ use common\models\Payment;
 class PaymentHelper
 {
 
-	public static function getStatusArray()
+	public static function getStatusArray(): array
     {
         return [
             Payment::STATUS_NEW => 'Новый',
@@ -19,7 +19,7 @@ class PaymentHelper
     public static function getStatusText($status)
     {
         $arr = static::getStatusArray();
-        return isset($arr[$status]) ? $arr[$status] : '';
+        return $arr[$status] ?? '';
     }
 
 }
