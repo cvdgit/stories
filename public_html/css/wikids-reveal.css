@@ -41,3 +41,7 @@
 	border: 0;
 	vertical-align: top
 }
+
+.reveal .progress {
+	margin-bottom: 0;
+}
