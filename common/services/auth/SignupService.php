@@ -48,7 +48,7 @@ class SignupService
         $sent = Yii::$app->mailer
             ->compose(['html' => 'userSignupComfirm-html', 'text' => 'userSignupComfirm-text'], ['user' => $user])
             ->setTo($user->email)
-            ->setFrom(Yii::$app->params['infoEmail'])
+            ->setFrom([Yii::$app->params['infoEmail'] => Yii::$app->name])
             ->setSubject('Подтверждение регистрации')
             ->send();
         if (!$sent) {

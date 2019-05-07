@@ -69,7 +69,7 @@ class UserPaymentService
         $sent = Yii::$app->mailer
             ->compose(['html' => 'userActivateSub-html', 'text' => 'userActivateSub-text'], ['user' => $user, 'rate' => $rate])
             ->setTo($user->email)
-            ->setFrom([Yii::$app->params['infoEmail'] => 'Wikids'])
+            ->setFrom([Yii::$app->params['infoEmail'] => Yii::$app->name])
             ->setSubject('Активирована подписка на wikids.ru')
             ->send();
         if (!$sent) {
@@ -84,7 +84,7 @@ class UserPaymentService
         $sent = Yii::$app->mailer
             ->compose(['html' => 'userCancelSub-html', 'text' => 'userCancelSub-text'], ['user' => $user, 'rate' => $payment->rate])
             ->setTo($user->email)
-            ->setFrom([Yii::$app->params['infoEmail'] => 'Wikids'])
+            ->setFrom([Yii::$app->params['infoEmail'] => Yii::$app->name])
             ->setSubject('Закончилась подписка на wikids.ru')
             ->send();
         if (!$sent) {
