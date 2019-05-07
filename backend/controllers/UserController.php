@@ -88,8 +88,8 @@ class UserController extends Controller
     public function actionDelete($id)
     {
         $model = User::findModel($id);
-        if ($model->getStories() !== null) {
-            throw new HttpException(403, 'Невозможно удалить пользователь т.к. у него есть истории');
+        if (count($model->stories) > 0) {
+            throw new DomainException('Невозможно удалить пользователь т.к. у него есть истории');
         }
         $model->delete();
         return $this->redirect(['index']);
