@@ -1,25 +1,32 @@
 <?php
 
-/* @var $this \yii\web\View */
+/* @var $this yii\web\View */
 /* @var $content string */
 
+use common\widgets\ToastrFlash;
+use frontend\assets\AppAsset;
+use frontend\widgets\ContactWidget;
+use frontend\widgets\LoginWidget;
+use frontend\widgets\SignupWidget;
+use frontend\widgets\StorySlider;
 use yii\helpers\Html;
 use yii\widgets\Menu;
 use common\helpers\Url;
 
-\frontend\assets\AppAsset::register($this);
+AppAsset::register($this);
 
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>">
 <head>
-  <meta charset="<?= Yii::$app->charset ?>">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <?= Html::csrfMetaTags() ?>
-  <title><?= Html::encode($this->title) ?></title>
-  <?php $this->head() ?>
+    <meta charset="<?= Yii::$app->charset ?>">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <?= Html::csrfMetaTags() ?>
+    <title><?= Html::encode($this->title) ?></title>
+    <?= Yii::$app->params['metrica'] ?>
+    <?php $this->head() ?>
 </head>
 <body>
 <?php $this->beginBody() ?>
@@ -90,7 +97,7 @@ use common\helpers\Url;
           <?php endif ?>
         </div>
         <div class="col-md-12 col-lg-6 site-slider">
-          <?= \frontend\widgets\StorySlider::widget() ?>
+          <?= StorySlider::widget() ?>
         </div>
       </div>
     </div>
@@ -101,7 +108,7 @@ use common\helpers\Url;
     <div class="container">
       <div class="row">
         <div class="col-md-3">
-          <a class="footer-link" href="#!">Wikids</a>
+          <a class="footer-link" href="#">Wikids</a>
         </div>
       </div>
       <div class="row">
@@ -119,11 +126,11 @@ use common\helpers\Url;
     </div>
   </footer>
   <?php if (Yii::$app->user->isGuest): ?>
-  <?= \frontend\widgets\LoginWidget::widget() ?>
-  <?= \frontend\widgets\SignupWidget::widget() ?>
+  <?= LoginWidget::widget() ?>
+  <?= SignupWidget::widget() ?>
   <?php endif ?>
-  <?= \frontend\widgets\ContactWidget::widget() ?>
-  <?= \common\widgets\ToastrFlash::widget() ?>
+  <?= ContactWidget::widget() ?>
+  <?= ToastrFlash::widget() ?>
 <?php $this->endBody() ?>
 </body>
 </html>
