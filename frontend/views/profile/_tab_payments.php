@@ -4,9 +4,10 @@
 
 use common\helpers\PaymentHelper;
 
+$formatter = Yii::$app->formatter;
 ?>
 <div class="profile-tab-content payment-tab">
-    <?php if ($payments !== null): ?>
+    <?php if (count($payments) > 0): ?>
     <table class="table table-bordered table-striped table-hover">
         <thead>
             <tr>
@@ -21,14 +22,15 @@ use common\helpers\PaymentHelper;
             <?php foreach ($payments as $payment): ?>
                 <tr>
                     <td><?= $payment->rate->title ?></td>
-                    <td><?= Yii::$app->formatter->asDate($payment->payment) ?></td>
-                    <td><?= Yii::$app->formatter->asDate($payment->finish) ?></td>
+                    <td><?= $formatter->asDate($payment->payment) ?></td>
+                    <td><?= $formatter->asDate($payment->finish) ?></td>
                     <td><?= PaymentHelper::getStatusText($payment->state) ?></td>
-                    <td><?= Yii::$app->formatter->asDate($payment->created_at) ?></td>
+                    <td><?= $formatter->asDate($payment->created_at) ?></td>
                 </tr>
             <?php endforeach ?>
         </tbody>
     </table>
     <?php else: ?>
+    <p>Подписки не найдены</p>
     <?php endif ?>
 </div>

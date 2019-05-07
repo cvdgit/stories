@@ -7,6 +7,7 @@ use common\services\UserService;
 use DomainException;
 use Yii;
 use yii\data\ActiveDataProvider;
+use yii\db\Exception;
 use yii\filters\AccessControl;
 use yii\helpers\Json;
 use yii\web\Controller;
@@ -14,6 +15,7 @@ use common\services\UserPaymentService;
 use common\models\User;
 use common\models\PaymentSearch;
 use common\rbac\UserRoles;
+use yii\web\HttpException;
 
 class UserController extends Controller
 {
@@ -81,6 +83,16 @@ class UserController extends Controller
         return $this->render('update', [
             'model' => $model,
         ]);
+    }
+
+    public function actionDelete($id)
+    {
+        $model = User::findModel($id);
+        if ($model->getStories() !== null) {
+            throw new HttpException(403, 'Невозможно удалить пользователь т.к. у него есть истории');
+        }
+        $model->delete();
+        return $this->redirect(['index']);
     }
 
     public function actionSubscriptions($id)

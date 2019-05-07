@@ -5,6 +5,8 @@ namespace common\models;
 use DomainException;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "payment".
@@ -22,7 +24,7 @@ use yii\behaviors\TimestampBehavior;
  * @property Rate $rate
  * @property User $user
  */
-class Payment extends \yii\db\ActiveRecord
+class Payment extends ActiveRecord
 {
 
     const STATUS_NEW = 0;
@@ -83,15 +85,15 @@ class Payment extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getRate()
     {
-        return $this->hasOne(Rate::className(), ['id' => 'rate_id']);
+        return $this->hasOne(Rate::class, ['id' => 'rate_id']);
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getUser()
     {
@@ -120,6 +122,11 @@ class Payment extends \yii\db\ActiveRecord
             return $model;
         }
         throw new DomainException('Платеж не найден.');
+    }
+
+    public function isValid(): bool
+    {
+        return $this->state === self::STATUS_VALID;
     }
 
 }

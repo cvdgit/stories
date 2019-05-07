@@ -27,7 +27,7 @@ class RateController extends Controller
         $model = new SubscriptionForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             try {
-                $this->paymentService->activateSubscription(Yii::$app->user->id, $model->subscription_id);
+                $this->paymentService->activateSubscription(Yii::$app->user->id, $model);
                 Yii::$app->session->setFlash('success', 'Подписка успешно активирована');
             }
             catch (Exception $ex) {

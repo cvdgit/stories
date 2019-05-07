@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use Yii;
 use yii\web\Controller;
+use yii\web\Response;
 use yii\web\UploadedFile;
 use yii\filters\AccessControl;
 use common\models\Story;
@@ -49,6 +50,7 @@ class StoryController extends Controller
     public function actionCreate()
     {
         $model = new Story();
+        $model->user_id = Yii::$app->user->getId();
         $model->loadDefaultValues();
         $model->source_id = Story::SOURCE_POWERPOINT;
         
@@ -202,20 +204,10 @@ class StoryController extends Controller
 
     public function actionImportFromPowerPoint()
     {
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        Yii::$app->response->format = Response::FORMAT_JSON;
         $model = new SourcePowerPointForm();
         if ($model->load(Yii::$app->request->post())) {
             $this->service->importStoryFromPowerPoint($model);
-        }
-        return ['success' => true];
-    }
-
-    public function actionImportFromDropBox()
-    {
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $model = new SourceDropboxForm();
-        if ($model->load(Yii::$app->request->post())) {
-            $this->service->importStoryFromDropbox($model);
         }
         return ['success' => true];
     }
@@ -229,48 +221,5 @@ class StoryController extends Controller
             Yii::$app->response->sendFile($file);
         }
     }
-
-    /*
-    protected function importStory($model, $service)
-    {
-        if ($model->load(Yii::$app->request->post())) {
-            $body = '';
-            $slidesNumber = 0;
-            try {
-
-                $story = $service->loadStory($model);
-                $slidesNumber = $story->getSlideCount();
-
-                $storyEditor = new \backend\components\StoryEditor($story);
-                $html = $storyEditor->getStoryMarkup();
-
-                $body = '<div class="slides">' . $html . '</div>';
-                $html = '';
-            }
-            catch (Exception $ex) {
-                return $this->sendErrorResponse($ex->getMessage());
-            }
-            $model->saveSource($body, $slidesNumber);
-            return $this->sendSuccessResponse('Успешно');
-        }
-        return $this->sendErrorResponse($model->getErrors());
-    }
-
-    protected function jsonResponse($result)
-    {
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        return $this->asJson($result);
-    }
-
-    protected function sendSuccessResponse($response)
-    {
-        return $this->jsonResponse(['success' => $response, 'error' => '']);
-    }
-
-    protected function sendErrorResponse($response)
-    {
-        return $this->jsonResponse(['success' => '', 'error' => $response]);
-    }
-    */
 
 }

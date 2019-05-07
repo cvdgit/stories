@@ -26,7 +26,7 @@ class UserPaymentService
         return Rate::find()->all();
     }
 
-    public function createPayment($userID, SubscriptionForm $model): int
+    public function activateSubscription($userID, SubscriptionForm $model): int
     {
         $user = User::findModel($userID);
         if (!$user->isActive()) {
@@ -45,10 +45,15 @@ class UserPaymentService
             $model->finish_date,
             Payment::STATUS_NEW
         );
-        $payment->save();
 
-        $this->sendEmailActivate($user, $subscription);
-
+        if ($subscription->isFreeSubscription()) {
+            $payment->state = Payment::STATUS_VALID;
+            $payment->save();
+            $this->sendEmailActivate($user, $subscription);
+        }
+        else {
+            $payment->save();
+        }
         return $payment->id;
     }
 
@@ -64,7 +69,7 @@ class UserPaymentService
         $sent = Yii::$app->mailer
             ->compose(['html' => 'userActivateSub-html', 'text' => 'userActivateSub-text'], ['user' => $user, 'rate' => $rate])
             ->setTo($user->email)
-            ->setFrom(Yii::$app->params['infoEmail'])
+            ->setFrom([Yii::$app->params['infoEmail'] => 'Wikids'])
             ->setSubject('Активирована подписка на wikids.ru')
             ->send();
         if (!$sent) {
@@ -75,11 +80,11 @@ class UserPaymentService
     protected function sendEmailCancel(Payment $payment): void
     {
         /** @var $user User */
-        $user = $payment->getUser()->one();
+        $user = $payment->user;
         $sent = Yii::$app->mailer
-            ->compose(['html' => 'userCancelSub-html', 'text' => 'userCancelSub-text'], ['user' => $user, 'rate' => $payment->getRate()->one()])
+            ->compose(['html' => 'userCancelSub-html', 'text' => 'userCancelSub-text'], ['user' => $user, 'rate' => $payment->rate])
             ->setTo($user->email)
-            ->setFrom(Yii::$app->params['infoEmail'])
+            ->setFrom([Yii::$app->params['infoEmail'] => 'Wikids'])
             ->setSubject('Закончилась подписка на wikids.ru')
             ->send();
         if (!$sent) {
@@ -116,7 +121,6 @@ class UserPaymentService
         $payment = Payment::findModel($paymentID);
         $payment->state = Payment::STATUS_INVALID;
         $payment->save(false, ['state']);
-
         $this->sendEmailCancel($payment);
 	}
 
@@ -128,6 +132,9 @@ class UserPaymentService
         $payment->state = $status;
         $payment->data = Json::encode($args);
         $payment->save(false);
+        if ($payment->isValid()) {
+            $this->sendEmailActivate($payment->user, $payment->rate);
+        }
     }
 
 }

@@ -16,6 +16,7 @@ use yii\helpers\Json;
 use yii\rest\Serializer;
 use yii\web\Controller;
 use yii\web\Response;
+use common\models\User;
 
 class PaymentController extends Controller
 {
@@ -79,22 +80,21 @@ class PaymentController extends Controller
             if ($model->load(Yii::$app->request->post()) && $model->validate()) {
                 try {
 
-                    $paymentID = $this->paymentService->createPayment(Yii::$app->user->getId(), $model);
+                    $paymentID = $this->paymentService->activateSubscription(Yii::$app->user->getId(), $model);
 
                     $paymentForm = new PaymentForm();
                     $paymentForm->terminalkey = Yii::$app->params['terminalkey'];
 
-                    $user = $this->userService->findUserByID(Yii::$app->user->getId());
+                    $user = User::findModel(Yii::$app->user->getId());
                     $paymentForm->email = $user->email;
 
                     /** @var $rate Rate */
                     $rate = $model->getRate();
                     $paymentForm->amount = $rate->cost;
-
                     $paymentForm->order = $paymentID;
 
-                    $serializer = new Serializer();
                     $html = $this->renderPartial('_payment_form', ['model' => $paymentForm]);
+                    $serializer = new Serializer();
                     return ['success' => true, 'html' => $serializer->serialize($html)];
                 } catch (Exception $ex) {
                     Yii::$app->errorHandler->logException($ex);

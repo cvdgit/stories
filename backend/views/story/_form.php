@@ -58,7 +58,8 @@ $this->registerJs($sourceOnChange, yii\web\View::POS_READY);
 <?= $form->field($model, 'source_id')->dropDownList(Story::getSourceList(), ['prompt' => 'Выбрать']) ?>
 <?= $form->field($model, 'source_dropbox', ['options' => ['style' => 'display: none']])->textInput(['maxlength' => true]) ?>
 <?= $form->field($fileUploadForm, 'storyFile', ['options' => ['style' => 'display: none']])->fileInput() ?>
-<?= $form->field($model, 'user_id')->dropDownList(ArrayHelper::map(User::find()->all(), 'id', 'username'), ['prompt' => 'Выбрать']) ?>
+<?= $form->field($model, 'user_id')->dropDownList(ArrayHelper::map(User::find()->all(), 'id', 'profileName'),
+                                                          ['prompt' => 'Выбрать', 'readonly' => !Yii::$app->user->can('admin')]) ?>
 <?= $form->field($model, 'category_id')->dropDownList(ArrayHelper::map(Category::find()->all(), 'id', 'name'), ['prompt' => 'Выбрать']) ?>
 <?= $form->field($model, 'sub_access')->checkBox() ?>
 <?= $form->field($model, 'status')->dropDownList([Story::STATUS_DRAFT => 'Черновик', Story::STATUS_PUBLISHED => 'Публикация'], ['prompt' => 'Выбрать']) ?>
