@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\helpers\Translit;
 use creocoder\nestedsets\NestedSetsBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -57,7 +58,7 @@ class Category extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['name', 'alias'], 'required'],
+            [['name'], 'required'],
             [['tree', 'lft', 'rgt', 'depth', 'parentNode'], 'integer'],
             [['description'], 'string'],
             [['name', 'alias'], 'string', 'max' => 255],
@@ -98,6 +99,17 @@ class Category extends ActiveRecord
     public function getStories()
     {
         return $this->hasMany(Story::class, ['category_id' => 'id']);
+    }
+
+    public function beforeValidate()
+    {
+        if (parent::beforeValidate()) {
+            if (empty($this->alias)) {
+                $this->alias = Translit::translit($this->title);
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
