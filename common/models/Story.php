@@ -156,7 +156,7 @@ class Story extends ActiveRecord
 
     public static function findPublishedStories()
     {
-        return self::find()->published()->bySubAccess();
+        return self::find()->published();
     }
 
     public static function getStatusArray()
@@ -240,4 +240,11 @@ class Story extends ActiveRecord
         throw new DomainException('История не найдена');
     }
 
+    public static function findModelByAlias($alias): self
+    {
+        if (($model = self::findOne(['alias' => $alias])) !== null) {
+            return $model;
+        }
+        throw new DomainException('История не найдена');
+    }
 }

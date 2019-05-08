@@ -1,15 +1,15 @@
 <?php
 
-use yii\helpers\Html;
 use yii\widgets\ListView;
 use yii\widgets\ActiveForm;
 use yii\widgets\Menu;
 use common\models\Category;
-use frontend\widgets\StoryLinkSorter;
 
-/* @var $this yii\web\View */
-/* @var $searchModel common\models\StorySearch */
-/* @var $dataProvider yii\data\ActiveDataProvider */
+/** @var $this yii\web\View */
+/** @var $searchModel common\models\StorySearch */
+/** @var $dataProvider yii\data\ActiveDataProvider */
+/** @var $h1 string */
+/** @var $action array */
 
 $title = 'Каталог историй';
 $this->setMetaTags($title,
@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $title;
 <div class="row">
   <nav class="col-sm-4 col-md-3 site-sidebar">
     <?php $form = ActiveForm::begin([
-      'action' => ['/story/index'],
+      'action' => $action,
       'method' => 'GET', 
       'options' => ['class' => 'story-form'],
     ]); ?>
@@ -40,7 +40,10 @@ $this->params['breadcrumbs'][] = $title;
       'options' => ['class' => 'story-category-list'],
     ]) ?>
   </nav>
-  <main class="col-sm-8 col-md-9 site-main">
+  <main class="col-sm-8 col-md-9 site-main" style="margin-top: 0">
+      <?php if (!empty($h1)): ?>
+      <h1 style="margin-top: 6px; margin-bottom: 33px"><?= $h1 ?></h1>
+      <?php endif ?>
     <?php $order = $dataProvider->getSort()->getCurrentOrderName(); ?>
     <?= ListView::widget([
         'layout' => '<div class="story-list-filter clearfix">
@@ -60,6 +63,7 @@ $this->params['breadcrumbs'][] = $title;
         'dataProvider' => $dataProvider,
         'itemOptions' => ['tag' => false],
         'itemView' => '_storyitem',
+        'emptyText' => 'Список историй пуст',
         'sorter' => [
            'options' => [
                 'class' => 'dropdown-menu'

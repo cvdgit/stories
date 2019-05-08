@@ -10,7 +10,7 @@ use yii\helpers\Html;
     <p><strong>Пользователь:</strong> <?= Html::encode($model->username) ?></p>
     <p><strong>Подписка:</strong>
     <?php if ($activePayment === null): ?>
-    преобретите <?= Html::a('подписку', ['/pricing']) ?> для просмотра всех историй
+    приобретите <?= Html::a('подписку', ['/pricing']) ?> для просмотра всех историй
     <?php else: ?>
     <?= $activePayment->rate->title ?> с <?= Yii::$app->formatter->asDate($activePayment->payment) ?> по <?= Yii::$app->formatter->asDate($activePayment->finish) ?>
     <?php endif ?>

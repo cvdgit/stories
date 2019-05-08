@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use DomainException;
 use Yii;
 use yii\data\ActiveDataProvider;
 
@@ -72,6 +73,14 @@ class Tag extends \yii\db\ActiveRecord
     public static function findAllByName($name)
     {
         return Tag::find()->where(['like', 'name', $name])->limit(50)->all();
+    }
+
+    public static function findModelByName($name): self
+    {
+        if (($model = self::findOne(['name' => $name])) !== null) {
+            return $model;
+        }
+        throw new DomainException('Тэг не найден');
     }
 
 }

@@ -4,6 +4,7 @@ namespace common\models;
 
 use common\helpers\Translit;
 use creocoder\nestedsets\NestedSetsBehavior;
+use DomainException;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -171,6 +172,22 @@ class Category extends ActiveRecord
         });
         $items = array_merge($rootItem, $items);
         return $items;
+    }
+
+    public static function findModel($id): self
+    {
+        if (($model = self::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new DomainException('Категория не найдена');
+    }
+
+    public static function findModelByAlias($alias): self
+    {
+        if (($model = self::findOne(['alias' => $alias])) !== null) {
+            return $model;
+        }
+        throw new DomainException('Категория не найдена');
     }
 
 }

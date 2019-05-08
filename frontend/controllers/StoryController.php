@@ -7,7 +7,7 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use common\models\Story;
-use common\models\StorySearch;
+use frontend\models\StorySearch;
 use common\models\Tag;
 use common\models\Category;
 use common\models\User;
@@ -52,11 +52,12 @@ class StoryController extends Controller
     public function actionIndex()
     {
         $searchModel = new StorySearch();
-        $searchModel->scenario = StorySearch::SCENARIO_FRONTEND;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'h1' => 'Каталог историй',
+            'action' => ['/story/index'],
         ]);
     }
 
@@ -64,22 +65,16 @@ class StoryController extends Controller
      * Displays a single Story model.
      * @param string $alias
      * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionView($alias)
     {
-        $model = $this->findModelByAlias($alias);
-
+        $model = Story::findModelByAlias($alias);
         $dataProvider = Comment::getStoryComments($model->id);
-
         if (Yii::$app->request->isPjax) {
             return $this->renderAjax('_comment_list', ['dataProvider' => $dataProvider]);
         }
-
         $model->updateCounters(['views_number' => 1]);
-
         $commentForm = new CommentForm($model->id);
-
         return $this->render('view', [
             'model' => $model,
             'userCanViewStory' => $this->storyService->userCanViewStory(
@@ -91,50 +86,39 @@ class StoryController extends Controller
         ]);
     }
 
-    protected function findModelByAlias($alias)
-    {
-        if (($model = Story::findStory(['alias' => $alias])) !== null) {
-            return $model;
-        }
-        throw new NotFoundHttpException('Страница не найдена.');
-    }
-
     /**
      * @param $tag
      * @return string
-     * @throws NotFoundHttpException
      */
-    public function actionTag($tag): string
+    public function actionTag($tag)
     {
-        $model = Tag::findOne(['name' => $tag]);
-        if ($model === null) {
-            throw new NotFoundHttpException('Страница не найдена.');
-        }
+        $model = Tag::findModelByName($tag);
         $searchModel = new StorySearch();
-        $searchModel->scenario = StorySearch::SCENARIO_FRONTEND;
-        $dataProvider = $searchModel->search(['StorySearch' => ['tag_id' => $model->id]]);
+        $searchModel->tag_id = $model->id;
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'h1' => $model->name,
+            'action' => ['/story/tag', 'tag' => $model->name],
         ]);
     }
 
     public function actionCategory($category)
     {
-        $model = Category::findOne(['alias' => $category]);
-        if ($model === null) {
-            throw new NotFoundHttpException('Страница не найдена.');
-        }
+        $model = Category::findModelByAlias($category);
         $searchModel = new StorySearch();
-        $searchModel->scenario = StorySearch::SCENARIO_FRONTEND;
-        $dataProvider = $searchModel->search(['StorySearch' => ['category_id' => $model->id]]);
+        $searchModel->category_id = $model->id;
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'h1' => $model->name,
+            'action' => ['/story/category', 'category' => $model->alias],
         ]);
     }
 
-    public function actionAddComment($id): string
+    public function actionAddComment($id)
     {
         if (Yii::$app->request->isPjax) {
             $commentForm = new CommentForm($id);
