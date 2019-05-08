@@ -15,7 +15,7 @@ class CategorySearch extends Category
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['id', 'tree', 'lft', 'rgt', 'depth'], 'integer'],
