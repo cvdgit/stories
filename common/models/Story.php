@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use DomainException;
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
 use dosamigos\taggable\Taggable;
@@ -229,6 +230,14 @@ class Story extends ActiveRecord
     public static function forSlider($number = 4)
     {
         return static::find()->published()->withCover()->byRand()->limit($number)->all();
+    }
+
+    public static function findModel($id): self
+    {
+        if (($model = self::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new DomainException('История не найдена');
     }
 
 }

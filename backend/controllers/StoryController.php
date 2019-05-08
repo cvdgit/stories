@@ -2,7 +2,10 @@
 
 namespace backend\controllers;
 
+use backend\models\StoryBatchCommandForm;
 use Yii;
+use yii\db\PdoValue;
+use yii\db\Query;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\web\UploadedFile;
@@ -95,9 +98,11 @@ class StoryController extends Controller
     {
         $searchModel = new StorySearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $batchForm = new StoryBatchCommandForm();
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'batchForm' => $batchForm,
         ]);
     }
 
@@ -220,6 +225,31 @@ class StoryController extends Controller
         if (file_exists($file)) {
             Yii::$app->response->sendFile($file);
         }
+    }
+
+    public function actionBatch()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $model = new StoryBatchCommandForm();
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+
+            if ($model->command === 'AccessBySubscription') {
+                Yii::$app->db
+                    ->createCommand()
+                    ->update('{{%story}}', ['sub_access' => 1],'id IN (' . $model->story_ids . ')')
+                    ->execute();
+            }
+
+            if ($model->command === 'AccessFree') {
+                Yii::$app->db
+                    ->createCommand()
+                    ->update('{{%story}}', ['sub_access' => 0],'id IN (' . $model->story_ids . ')')
+                    ->execute();
+            }
+
+            return ['success' => true];
+        }
+        return ['success' => false];
     }
 
 }
