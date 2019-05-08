@@ -22,7 +22,7 @@ use common\helpers\SmartDate;
     </div>
     <div class="comment">
         <div class="comment-header">
-            <strong><?= $model->user->username ?></strong>
+            <strong><?= $model->user->getProfileName() ?></strong>
             <span><?= SmartDate::dateSmart($model->created_at, true) ?></span>
         </div>
         <div class="comment-body"><?= Html::encode($model->body) ?></div>

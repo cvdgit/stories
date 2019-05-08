@@ -2,10 +2,10 @@
 
 namespace common\models;
 
-use Yii;
 use creocoder\nestedsets\NestedSetsBehavior;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
-use yii\data\ActiveDataProvider;
 
 /**
  * This is the model class for table "category".
@@ -18,8 +18,10 @@ use yii\data\ActiveDataProvider;
  * @property string $name
  * @property string $alias
  * @property string $description
+ *
+ * @property ActiveQuery[] $stories
  */
-class Category extends \yii\db\ActiveRecord
+class Category extends ActiveRecord
 {
 
     public $parentNode;
@@ -27,24 +29,22 @@ class Category extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'category';
     }
 
-    public function behaviors() {
+    public function behaviors(): array
+    {
         return [
             'tree' => [
-                'class' => NestedSetsBehavior::className(),
+                'class' => NestedSetsBehavior::class,
                 'treeAttribute' => 'tree',
             ],
-            //'htmlTree'=>[
-            //    'class' => \common\components\NestedSetsTreeBehavior::className()
-            //]
         ];
     }
 
-    public function transactions()
+    public function transactions(): array
     {
         return [
             self::SCENARIO_DEFAULT => self::OP_ALL,
@@ -54,7 +54,7 @@ class Category extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['name', 'alias'], 'required'],
@@ -65,9 +65,9 @@ class Category extends \yii\db\ActiveRecord
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -93,37 +93,72 @@ class Category extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getStories()
     {
-        return $this->hasMany(Story::className(), ['category_id' => 'id']);
+        return $this->hasMany(Story::class, ['category_id' => 'id']);
+    }
+
+    /**
+     * Convert a tree into nested arrays. If you use the default function parameters you get
+     * a set compatible with Yii2 Menu widget.
+     *
+     * @param int $depth
+     * @param string $itemsKey
+     * @param callable|null $getDataCallback
+     * @return array
+     */
+    public function toNestedArray($depth = null, $itemsKey = 'items', $getDataCallback = null)
+    {
+        /** @var Category $nodes */
+        $nodes = $this->children($depth)->all();
+        $exportedAttributes = array_diff(array_keys($this->attributes), ['lft', 'rgt']);
+        $trees = [];
+        $stack = [];
+        foreach ($nodes as $node) {
+            if ($getDataCallback) {
+                $item = call_user_func($getDataCallback, $node);
+            } else {
+                $item = $node->toArray($exportedAttributes);
+                $item['url'] = ['/story/category', 'category' => $item['alias']];
+            }
+            $item[$itemsKey] = [];
+            $l = count($stack);
+            while ($l > 0 && $stack[$l - 1]['depth'] >= $item['depth']) {
+                array_pop($stack);
+                $l--;
+            }
+            if ($l === 0) {
+                // Assign root node
+                $i = count($trees);
+                $trees[$i] = $item;
+                $stack[] = &$trees[$i];
+            } else {
+                // Add node to parent
+                $i = count($stack[$l - 1][$itemsKey]);
+                $stack[$l - 1][$itemsKey][$i] = $item;
+                $stack[] = &$stack[$l - 1][$itemsKey][$i];
+            }
+        }
+        return $trees;
     }
 
     public static function getCategoriesForMenu()
     {
-
-        $categories = self::find()
-            ->andWhere(['depth' => 1])
-            ->addOrderBy('lft')
-            ->all();
-        $menuItems = [
+        $root = self::findOne(1);
+        $rootItem = [
             ['label' => 'Все категории', 'url' => ['/story/index'], 'options' => ['class' => 'widget-category-hover']],
         ];
-        foreach ($categories as $category)
-        {
-            $menuItem = ['label' => $category->name, 'url' => ['/story/category', 'category' => $category->alias], 'options' => ['class' => 'widget-category-hover']];
-            $subs = $category->children()->all();
-            $subMenuItems = [];
-            foreach ($subs as $sub) {
-                $subMenuItems[] = ['label' => $sub->name, 'url' => ['/story/category', 'category' => $sub->alias], 'options' => ['class' => 'widget-category-hover wk-sub-category']];
-            }
-            $menuItem['items'] = $subMenuItems;
-            $menuItems[] = $menuItem;
-        }
-        return $menuItems;
+        $items = $root->toNestedArray(null, 'items', function($node) {
+            return [
+                'label' => $node->name,
+                'url' => ['/story/category', 'category' => $node->alias],
+                'depth' => $node->depth
+            ];
+        });
+        $items = array_merge($rootItem, $items);
+        return $items;
     }
-
-
 
 }
