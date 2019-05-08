@@ -282,6 +282,13 @@ class User extends ActiveRecord implements IdentityInterface
         return $user;
     }
 
+    public function edit(string $username, string $email, int $status): void
+    {
+        $this->username = $username;
+        $this->email = $email;
+        $this->status = $status;
+    }
+
     /**
      * @return yii\db\ActiveQuery
      */

@@ -4,6 +4,7 @@
 namespace common\services;
 
 use backend\models\UserCreateForm;
+use backend\models\UserUpdateForm;
 use common\models\User;
 use yii\web\NotFoundHttpException;
 use common\models\PaymentQuery;
@@ -85,6 +86,20 @@ class UserService
             $this->roleManager->assign($user->id, $form->role);
         });
         return $user;
+    }
+
+    public function edit(int $userID, UserUpdateForm $form)
+    {
+        $user = User::findModel($userID);
+        $user->edit(
+            $form->username,
+            $form->email,
+            $form->status
+        );
+        $this->transaction->wrap(function () use ($user, $form) {
+            $user->save();
+            $this->roleManager->assign($user->id, $form->role);
+        });
     }
 
 }

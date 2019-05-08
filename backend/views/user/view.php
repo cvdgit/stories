@@ -8,6 +8,11 @@ use common\helpers\UserHelper;
 /** @var $this yii\web\View */
 /** @var $model common\models\User */
 
+$this->title = 'Пользователь: ' . $model->username;
+$this->params['sidebarMenuItems'] = [
+    ['label' => $model->username, 'url' => ['/user/update', 'id' => $model->id]],
+    ['label' => 'Подписка', 'url' => ['/user/subscriptions', 'id' => $model->id]],
+];
 ?>
 <div class="user-view">
     <p>

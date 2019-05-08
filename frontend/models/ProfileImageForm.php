@@ -21,6 +21,13 @@ class ProfileImageForm extends Model
         ];
     }
 
+    public function attributeLabels()
+    {
+        return [
+            'file' => 'Фото профиля',
+        ];
+    }
+
     public function beforeValidate(): bool
     {
         if (parent::beforeValidate()) {

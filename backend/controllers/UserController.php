@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use backend\models\UserCreateForm;
+use backend\models\UserUpdateForm;
 use common\services\UserService;
 use DomainException;
 use Yii;
@@ -79,9 +80,19 @@ class UserController extends Controller
 
     public function actionUpdate($id)
     {
-        $model = User::findModel($id);
+        $user = User::findModel($id);
+        $form = new UserUpdateForm($user);
+        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+            try {
+                $this->userService->edit($user->id, $form);
+                return $this->redirect(['view', 'id' => $user->id]);
+            } catch (DomainException $e) {
+                Yii::$app->errorHandler->logException($e);
+                Yii::$app->session->setFlash('error', $e->getMessage());
+            }
+        }
         return $this->render('update', [
-            'model' => $model,
+            'model' => $form,
         ]);
     }
 
