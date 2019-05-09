@@ -2,13 +2,13 @@
 
 namespace backend\controllers;
 
+use backend\models\ChangePasswordForm;
 use backend\models\UserCreateForm;
 use backend\models\UserUpdateForm;
 use common\services\UserService;
 use DomainException;
 use Yii;
 use yii\data\ActiveDataProvider;
-use yii\db\Exception;
 use yii\filters\AccessControl;
 use yii\helpers\Json;
 use yii\web\Controller;
@@ -16,7 +16,6 @@ use common\services\UserPaymentService;
 use common\models\User;
 use common\models\PaymentSearch;
 use common\rbac\UserRoles;
-use yii\web\HttpException;
 
 class UserController extends Controller
 {
@@ -148,6 +147,21 @@ class UserController extends Controller
     {
         return $this->render('view', [
             'model' => User::findModel($id),
+        ]);
+    }
+
+    public function actionChangePassword($id)
+    {
+        $user = User::findModel($id);
+        $form = new ChangePasswordForm();
+        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+            $user->setPassword($form->password);
+            $user->save();
+            Yii::$app->session->setFlash('success', 'Пароль успешно изменен');
+            return $this->refresh();
+        }
+        return $this->render('password', [
+            'model' => $form,
         ]);
     }
 
