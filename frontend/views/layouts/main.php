@@ -108,13 +108,17 @@ AppAsset::register($this);
     <div class="container">
       <div class="row">
         <div class="col-md-3">
-          <a class="footer-link" href="#">Wikids</a>
+            <?php if (Url::isHome()): ?>
+            <span class="footer-link">Wikids</span>
+            <?php else: ?>
+            <a class="footer-link" href="/">Wikids</a>
+            <?php endif ?>
         </div>
       </div>
       <div class="row">
         <div class="col-md-3 footer-email">
             Телефон: +7 (499) 703-3525<br>
-            Email: <a href="mailto:info@centrvd.ru">info@centrvd.ru</a>
+            Email: <a href="mailto:info@centrvd.ru">info@wikids.ru</a>
         </div>
         <div class="col-md-3 col-md-offset-6">
           <div class="footer-copyright pull-right text-right">

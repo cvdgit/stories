@@ -92,7 +92,10 @@ $this->title = 'Управление историями';
             'class' => ActionColumn::class,
             'buttons' => [
                 'view' => function($url, $model) {
-                    return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $model->alias]), ['target' => '_blank']);
+                    return Html::a(
+                            '<span class="glyphicon glyphicon-eye-open"></span>',
+                            Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $model->alias]),
+                            ['target' => '_blank', 'data-pjax' => 0]);
                 }
             ],
         ],

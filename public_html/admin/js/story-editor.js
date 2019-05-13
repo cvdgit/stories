@@ -26,7 +26,7 @@ var StoryEditor = (function() {
     }
 
     function init() {
-    	Reveal.initialize(StoryRevealConfig);
+    	Reveal.initialize(WikidsRevealConfig);
     }
 
 	function loadSlide(index) {

@@ -1,7 +1,7 @@
 
 var RevealCustomControls = window.RevealCustomControls || (function() {
 	//
-	var config = Reveal.getConfig().customcontrols;
+	var config = Reveal.getConfig().customControls;
 
 	//var reveal = document.querySelector(".reveal");
 
@@ -34,6 +34,19 @@ var RevealCustomControls = window.RevealCustomControls || (function() {
 		Reveal.addEventListener('slidechanged', callback);
 	}
 
-	return this;
+	var timer;
+	Reveal.addEventListener("mousemove", function(e) {
+		e = e || window.event;
+		$('.story-controls').fadeIn().addClass('show');
+		try {
+			clearTimeout(timer);
+		} catch (e) {}
+		timer = setTimeout(function () {
+			if (!$(e.target).hasClass('story-controls') && !$(e.target).parents('.story-controls').length) {
+				$('.story-controls').fadeOut().removeClass('show');
+			}
+		}, 3000);
+	}, false);
 
+	return this;
 })();

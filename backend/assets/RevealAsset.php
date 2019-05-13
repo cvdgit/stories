@@ -8,13 +8,12 @@ class RevealAsset extends AssetBundle
 {
     public $sourcePath = '@bower/reveal.js';
     public $css = [
-        'css/reveal.css',
-        '/js/revealjs-customcontrols/customcontrols.css',
+        //'css/reveal.css',
     ];
     public $js = [
         'js/reveal.js',
     ];
     public $depends = [
-        'yii\web\JqueryAsset',
+        AppAsset::class,
     ];
 }

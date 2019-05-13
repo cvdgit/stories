@@ -29,8 +29,11 @@ class Story implements StoryRenderableInterface
 		return count($this->slides);
 	}
 
-	public function getSlides()
-	{
+    /**
+     * @return StorySlide[]
+     */
+    public function getSlides(): array
+    {
 		return $this->slides;
 	}
 

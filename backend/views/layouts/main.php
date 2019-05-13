@@ -31,7 +31,7 @@ AppAsset::register($this);
     <?php
     NavBar::begin([
         'brandLabel' => 'Перейти к сайту',
-        'brandUrl' => Yii::$app->urlManagerFrontend->createAbsoluteUrl('/site/index'),
+        'brandUrl' => '/',
         'innerContainerOptions' => ['class' => 'container-fluid'],
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',

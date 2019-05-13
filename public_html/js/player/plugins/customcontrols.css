@@ -1,17 +1,19 @@
 
 .story-controls {
-    height: 50px;
-    background-color: #000;
+    height: 38px;
+    background: transparent;
     position: absolute;
     left: 0;
-    bottom: 25px;
+    bottom: 2px;
     width: 100%;
+    z-index: 1;
+    display: none;
 }
 
 .customcontrols {
     position: absolute;
-    top: 14px;
-    right: 10px;
+    top: 0;
+    right: 40px;
     z-index: 9999;
     pointer-events: none;
     font-size: 10px !important;
@@ -32,7 +34,7 @@
 }
 
 .customcontrols button i {
-    font-size: 2.5em;
+    font-size: 2.5rem;
 }
 
 .customcontrols .custom-navigate-left {

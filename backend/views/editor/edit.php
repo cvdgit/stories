@@ -1,48 +1,26 @@
 <?php
 
+use backend\models\SlideEditorForm;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use backend\assets\StoryEditorAsset;
 use common\widgets\RevealWidget;
 
-/* @var $this yii\web\View */
-/* @var $searchModel common\models\CategorySearch */
-/* @var $dataProvider yii\data\ActiveDataProvider */
+/** @var $this yii\web\View */
+/** @var $model common\models\Story */
+/** @var $story backend\components\Story */
+/** @var $editorModel SlideEditorForm */
 
 StoryEditorAsset::register($this);
 
 $this->title = 'Редактор историй' . $model->title;
-$this->params['breadcrumbs'][] = ['label' => 'Истории', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->title, 'url' => ['update', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = $this->title;
-
 $this->params['sidebarMenuItems'] = [
     ['label' => 'История', 'url' => ['story/update', 'id' => $model->id]],
     ['label' => 'Редактор', 'url' => ['editor/edit', 'id' => $model->id]],
     ['label' => 'Статистика', 'url' => ['statistics/list', 'id' => $model->id]],
 ];
-$css = <<< CSS
-.reveal-container {
-	position: relative;
-}
-.reveal-container::before {
-    content: "";
-    display: block;
-    padding-bottom: calc(100% / (16/9));
-    width: 100%;
-}
-.reveal-container-inner {
-	position: absolute;
-	left: 0;
-	right: 0;
-	top: 0;
-	bottom: 0;
-}
-CSS;
-$this->registerCss($css);
 ?>
-
 <div class="row">
 	<div class="col-xs-3">
 		<div id ="preview-container" style="overflow: auto">
@@ -55,20 +33,27 @@ $this->registerCss($css);
 		</div>
 	</div>
 	<div class="col-xs-9">
-		<div class="reveal-container">
-			<div class="reveal-container-inner">
+		<div class="story-container">
+			<div class="story-container-inner">
 		    <?= RevealWidget::widget([
 		    		'id' => 'story-editor',
 		    		'initializeReveal' => false,
+		    		'canViewStory' => true,
 		    		'options' => [
 		    			'hash' => false,
 		    			'history' => false,
-		    			'dependencies' => [
-			                ["src" => "/js/revealjs-customcontrols/customcontrols.js"],
-		    			],
 		    		],
-		    		'controls' => [
-		    			new \common\widgets\RevealButtons\FullscreenButton(),
+                    'assets' => [
+                        \backend\assets\RevealAsset::class,
+                        \backend\assets\WikidsRevealAsset::class,
+                    ],
+		    		'plugins' => [
+                        [
+                            'class' => \common\widgets\Reveal\Plugins\CustomControls::class,
+                            'buttons' => [
+                                new \common\widgets\RevealButtons\FullscreenButton(),
+                            ],
+                        ],
 					],
 		    	]) ?>
 		    </div>

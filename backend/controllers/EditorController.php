@@ -4,10 +4,6 @@ namespace backend\controllers;
 
 use Yii;
 use yii\filters\AccessControl;
-use yii\base\Model;
-use yii\helpers\Html;
-use yii\web\UploadedFile;
-
 use common\models\Story;
 use common\services\StoryService;
 use common\rbac\UserRoles;
@@ -15,8 +11,10 @@ use backend\services\StoryEditorService;
 use backend\components\StoryHtmlReader;
 use backend\components\StoryEditor;
 use backend\models\SlideEditorForm;
+use yii\web\Controller;
+use yii\web\Response;
 
-class EditorController extends \yii\web\Controller
+class EditorController extends Controller
 {
 
     protected $storyService;
@@ -29,11 +27,14 @@ class EditorController extends \yii\web\Controller
         $this->editorService = $editorService;
     }
 
-    public function behaviors()
+    /**
+     * @return array
+     */
+    public function behaviors(): array
     {
         return [
             'access' => [
-                'class' => AccessControl::className(),
+                'class' => AccessControl::class,
                 'rules' => [
                     [
                         'allow' => true,
@@ -46,15 +47,11 @@ class EditorController extends \yii\web\Controller
 
 	public function actionEdit($id)
 	{
-
         $reader = new StoryHtmlReader();
-
-        $model = Story::findOne($id);
+        $model = Story::findModel($id);
         $story = $reader->loadStoryFromHtml($model->body);
-
         $editorModel = new SlideEditorForm();
         $editorModel->story_id = $model->id;
-
 		return $this->render('edit', [
             'model' => $model,
             'story' => $story,
@@ -62,25 +59,21 @@ class EditorController extends \yii\web\Controller
 		]);
 	}
 
-    public function actionGetSlideByIndex($story_id, $slide_index)
+    public function actionGetSlideByIndex(int $story_id, int $slide_index)
     {
-
+        Yii::$app->response->format = Response::FORMAT_JSON;
         $reader = new StoryHtmlReader();
-
-        $model = Story::findOne($story_id);
+        $model = Story::findModel($story_id);
         $story = $reader->loadStoryFromHtml($model->body);
-
         $editor = new StoryEditor($story);
         $response['html'] = $editor->getSlideMarkup($slide_index);
         $response['story'] = $editor->getSlideValues($slide_index);
-
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         return $response;
     }
 
     public function actionUpdateSlide()
     {
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        Yii::$app->response->format = Response::FORMAT_JSON;
         $editorModel = new SlideEditorForm();
         if ($editorModel->load(Yii::$app->request->post()) && $editorModel->validate()) {    
             $this->editorService->updateSlide($editorModel);

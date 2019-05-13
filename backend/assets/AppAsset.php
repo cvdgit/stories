@@ -3,6 +3,9 @@
 namespace backend\assets;
 
 use yii\web\AssetBundle;
+use yii\web\YiiAsset;
+use yii\bootstrap\BootstrapAsset;
+use backend\assets\ToastrAsset;
 
 /**
  * Main backend application asset bundle.
@@ -16,11 +19,10 @@ class AppAsset extends AssetBundle
     ];
     public $js = [
         'js/app.js',
-        '/js/wikids.js',
     ];
     public $depends = [
-        'yii\web\YiiAsset',
-        'yii\bootstrap\BootstrapAsset',
-        'backend\assets\ToastrAsset',
+        YiiAsset::class,
+        BootstrapAsset::class,
+        ToastrAsset::class,
     ];
 }

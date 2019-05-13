@@ -1,7 +1,6 @@
 <?php
 
 use yii\helpers\Html;
-use yii\web\JsExpression;
 use common\widgets\RevealWidget;
 
 /* @var $this yii\web\View */
@@ -19,16 +18,6 @@ $this->params['breadcrumbs'][] = ['label' => 'Каталог историй', 'u
 $this->params['breadcrumbs'][] = $title;
 
 $js = <<< JS
-function onSlideMouseDown(e) {
-	e = e || window.event;
-	if ($(e.target).parents('.story-controls').length) return;
-	switch (e.which) {
-		case 1: Reveal.next(); break;
-		// case 2: alert('middle'); break;
-		case 3: Reveal.prev(); break; 
-	}
-}
-Reveal.addEventListener("mousedown", onSlideMouseDown, false);
 $('#comment-form-pjax').on('pjax:success', function() {
     $.pjax.reload({container: '#comment-list-pjax'});
 });
@@ -39,36 +28,28 @@ $this->registerJs($js);
 	<main class="site-story-main">
 	  <div class="story-container">
 	    <div class="story-container-inner">
-			<?php if ($userCanViewStory): ?>
 		    <?= RevealWidget::widget([
 	    		'storyId' => $model->id,
 	    		'data' => $model->body,
-	    		'options' => [
-	    			'dependencies' => [
-	            ['src' => '/js/revealjs-customcontrols/customcontrols.js'],
-	            ['src' => '/js/story-reveal-statistics.js'],
-	    			],
-	    		],
-	    		'controls' => [
-	    			new \common\widgets\RevealButtons\FeedbackButton(),
-	    			new \common\widgets\RevealButtons\FullscreenButton(),
-	    			new \common\widgets\RevealButtons\LeftButton(),
-	    			new \common\widgets\RevealButtons\RightButton(),
-					],
-	    		'controlsCallback' => new JsExpression("
-	function(ev) {
-	var left = $('.custom-navigate-left', $('.reveal'));
-	Reveal.getProgress() === 0 ? left.attr('disabled', 'disabled') : left.removeAttr('disabled');
-	var right = $('.custom-navigate-right', $('.reveal'));
-	Reveal.getProgress() === 1 ? right.attr('disabled', 'disabled') : right.removeAttr('disabled');
-	}
-					"),
+                'canViewStory' => $userCanViewStory,
+                'assets' => [
+                    \frontend\assets\RevealAsset::class,
+                    \frontend\assets\WikidsRevealAsset::class,
+                ],
+                'plugins' => [
+                    [
+                        'class' => \common\widgets\Reveal\Plugins\CustomControls::class,
+                        'buttons' => [
+                            new \common\widgets\RevealButtons\FeedbackButton(),
+                            new \common\widgets\RevealButtons\FullscreenButton(),
+                            new \common\widgets\RevealButtons\LeftButton(),
+                            new \common\widgets\RevealButtons\RightButton(),
+                        ],
+                    ],
+                    ['class' => \common\widgets\Reveal\Plugins\Feedback::class, 'storyID' => $model->id],
+                    ['class' => \common\widgets\Reveal\Plugins\Statistics::class, 'storyID' => $model->id],
+                ],
 		    ]) ?>
-		  <?php else: ?>
-		    <div class="story-no-subscription">
-		    	<?= Html::a('Смотреть по подписке', ['/pricing'], ['class' => 'btn']) ?>
-		    </div>
-		  <?php endif ?>
 	    </div>
 	  </div>
 	  <div class="story-description">
