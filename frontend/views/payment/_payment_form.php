@@ -22,4 +22,5 @@ use yii\web\JsExpression;
 <?= $form->field($model, 'name', $fieldOptions)->hiddenInput()->label(false) ?>
 <?= $form->field($model, 'email', $fieldOptions)->hiddenInput()->label(false) ?>
 <?= $form->field($model, 'phone', $fieldOptions)->hiddenInput()->label(false) ?>
+<?= $form->field($model, 'receipt', $fieldOptions)->hiddenInput()->label(false) ?>
 <?php ActiveForm::end(); ?>

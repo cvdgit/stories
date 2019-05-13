@@ -93,6 +93,8 @@ class PaymentController extends Controller
                     $paymentForm->amount = $rate->cost;
                     $paymentForm->order = $paymentID;
 
+                    $paymentForm->receipt = Json::encode($paymentForm->makeReceipt($rate));
+
                     $html = $this->renderPartial('_payment_form', ['model' => $paymentForm]);
                     $serializer = new Serializer();
                     return ['success' => true, 'html' => $serializer->serialize($html)];

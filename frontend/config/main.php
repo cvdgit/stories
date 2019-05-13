@@ -66,6 +66,9 @@ return [
             'enableStrictParsing' => true,
             'rules' => [
                 '' => 'site/index',
+
+                'sitemap.xml' => 'sitemap/index',
+
                 'contacts' => 'site/contact',
                 'captcha' => 'site/captcha',
                 'policy' => 'site/policy',
