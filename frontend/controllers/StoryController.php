@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\rbac\UserPermissions;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -77,10 +78,7 @@ class StoryController extends Controller
         $commentForm = new CommentForm($model->id);
         return $this->render('view', [
             'model' => $model,
-            'userCanViewStory' => $this->storyService->userCanViewStory(
-                $model,
-                (Yii::$app->user->isGuest ? null : User::findOne(Yii::$app->user->id))
-            ),
+            'userCanViewStory' => UserPermissions::canViewStory($model),
             'commentForm' => $commentForm,
             'dataProvider' => $dataProvider,
         ]);

@@ -2,6 +2,8 @@
 
 namespace common\services;
 
+use common\models\Story;
+use common\models\User;
 use yii;
 use yii\helpers\Url;
 
@@ -110,11 +112,6 @@ class StoryService
         foreach ($files as $fileName) {
             $this->_deleteFile($fileName);
         }
-    }
-
-    public function userCanViewStory(\common\models\Story $story, $user = null): bool
-    {
-        return !$story->bySubscription() || ($story->bySubscription() && $user && $user->hasSubscription());
     }
 
 }
