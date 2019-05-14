@@ -36,14 +36,18 @@ class SitemapController extends Controller
             ->where(['tree' => 0])
             ->orderBy('name');
         foreach ($query->each() as $category) {
-            $sitemap->addItem($urlManager->createAbsoluteUrl(['story/category', 'category' => $category['alias']]), null, Sitemap::WEEKLY, 0.9);
+            $lastModified = (new Query())->from('{{%story}}')->where(['category_id' => $category['id']])->max('created_at');
+            if ($lastModified === null) {
+                $lastModified = time();
+            }
+            $sitemap->addItem($urlManager->createAbsoluteUrl(['story/category', 'category' => $category['alias']]), $lastModified, Sitemap::WEEKLY, 0.9);
         }
 
         $query = (new Query())
             ->from('{{%tag}}')
             ->orderBy(['frequency' => SORT_DESC]);
         foreach ($query->each() as $tag) {
-            $sitemap->addItem($urlManager->createAbsoluteUrl(['story/tag', 'tag' => $tag['name']]), null, Sitemap::WEEKLY, 0.9);
+            $sitemap->addItem($urlManager->createAbsoluteUrl(['story/tag', 'tag' => $tag['name']]), time(), Sitemap::WEEKLY, 0.9);
         }
 
         $sitemap->write();
