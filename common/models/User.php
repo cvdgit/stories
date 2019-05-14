@@ -321,6 +321,18 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->username;
     }
 
+    public function getProfilePhoto()
+    {
+        $noAvatar = '/img/avatar.png';
+        if ($this->profile !== null) {
+            $profilePhoto = $this->profile->profilePhoto;
+            if ($profilePhoto !== null) {
+                return $profilePhoto->getThumbFileUrl('file', 'list', $noAvatar);
+            }
+        }
+        return $noAvatar;
+    }
+
     public function updateProfile(string $firstName, string $lastName)
     {
         $profile = $this->profile;

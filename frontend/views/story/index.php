@@ -11,12 +11,6 @@ use common\models\Category;
 /** @var $h1 string */
 /** @var $action array */
 
-$title = 'Каталог историй';
-$this->setMetaTags($title,
-                   $title,
-                   'wikids, сказки, истории, каталог историй',
-                   $title);
-$this->params['breadcrumbs'][] = $title;
 ?>
 <div class="container">
 <div class="row">

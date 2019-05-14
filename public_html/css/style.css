@@ -61,26 +61,68 @@ section h2 span {
   display: inline-block;
 }
 
+.user-menu-wrapper .profile-photo {
+  width: 44px;
+  height: 44px;
+  margin-top: 2px;
+}
+.user-menu-wrapper .profile-photo img {
+  border-radius: 50%;
+}
+
+.user-menu-wrapper .dropdown {
+  padding-right: 60px;
+}
+
 .site-header .user-menu-wrapper,
 .site-header-mini .user-menu-wrapper {
   height: 47px;
   float: right;
 }
 
-.site-header .user-menu-wrapper a,
-.site-header-mini .user-menu-wrapper a,
-.site-header .user-menu-wrapper button,
-.site-header-mini .user-menu-wrapper button {
+.site-header-main .user-menu-inner a,
+.site-header-main .user-menu-inner button {
   line-height: 47px;
   font-size: .83em;
   padding: 0;
 }
 
-.site-header .user-menu-wrapper span,
-.site-header-mini .user-menu-wrapper span {
+.site-header-main .user-menu-wrapper span {
   border-left: 1px #d8dbde solid;
   padding: 7px 0;
   margin: 0 10px;
+}
+
+.site-header-main .dropdown-toggle {
+  margin-top: 16px;
+  display: block;
+  font-size: .83em;
+}
+
+.site-header-main .dropdown-menu form {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.site-header-main .dropdown-menu button {
+  text-transform: none;
+  font-weight: normal;
+  font-size: 14px;
+  color: #333333;
+  padding: 3px 20px;
+  display: block;
+  clear: both;
+  width: 100%;
+  text-align: left;
+}
+
+.site-header-main .dropdown-menu .dropdown-header {
+  padding: 0;
+}
+
+.site-header-main .dropdown-menu button:hover {
+  background-color: #f5f5f5;
 }
 
 .site-header .login-item,

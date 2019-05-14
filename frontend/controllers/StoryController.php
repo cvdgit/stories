@@ -52,6 +52,12 @@ class StoryController extends Controller
      */
     public function actionIndex()
     {
+        $this->getView()->setMetaTags(
+            'Каталог историй',
+            'Каталог историй',
+            'wikids, сказки, истории, каталог историй',
+            'Каталог историй'
+        );
         $searchModel = new StorySearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('index', [
@@ -94,6 +100,14 @@ class StoryController extends Controller
         $searchModel = new StorySearch();
         $searchModel->tag_id = $model->id;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        $this->getView()->setMetaTags(
+            $model->name . ' - каталог историй',
+            $model->name,
+            'wikids, сказки, истории, каталог историй',
+            $model->name
+        );
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -108,6 +122,14 @@ class StoryController extends Controller
         $searchModel = new StorySearch();
         $searchModel->category_id = $model->id;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        $this->getView()->setMetaTags(
+            $model->name . ' - каталог историй',
+            $model->name,
+            'wikids, сказки, истории, каталог историй',
+            $model->name
+        );
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
