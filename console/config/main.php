@@ -6,6 +6,8 @@ $params = array_merge(
     require __DIR__ . '/params-local.php'
 );
 
+$frontendUrlManager = require __DIR__ . '/../../frontend/config/urlManager.php';
+
 return [
     'id' => 'app-console',
     'basePath' => dirname(__DIR__),
@@ -30,6 +32,9 @@ return [
                 ],
             ],
         ],
+        'urlManager' => array_merge($frontendUrlManager, [
+            'hostInfo' => 'https://wikids.ru',
+        ])
     ],
     'params' => $params,
 ];

@@ -6,6 +6,8 @@ $params = array_merge(
     require __DIR__ . '/params-local.php'
 );
 
+$urlManager = require __DIR__ . '/urlManager.php';
+
 return [
     'id' => 'app-frontend',
     'basePath' => dirname(__DIR__),
@@ -60,54 +62,7 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        'urlManager' => [
-            'enablePrettyUrl' => true,
-            'showScriptName' => false,
-            'enableStrictParsing' => true,
-            'rules' => [
-                '' => 'site/index',
-
-                'sitemap.xml' => 'sitemap/index',
-
-                'contacts' => 'site/contact',
-                'captcha' => 'site/captcha',
-                'policy' => 'site/policy',
-                'request-password-reset' => 'site/request-password-reset',
-
-                'pricing' => 'rate/index',
-
-                'login' => 'auth/login',
-                'auth' => 'auth/auth',
-                'logout' => 'auth/logout',
-
-                'signup' => 'signup/request',
-                'signup-confirm' => 'signup/signup-confirm',
-
-                // 'reset-password' => 'site/reset-password',
-
-                'payment' => 'payment/create',
-                'payment/notify' => 'payment/notify',
-
-                'profile' => 'profile/index',
-                'profile/edit' => 'profile/update',
-                'change-password' => 'profile/change-password',
-                
-                'stories/tag/<tag:[\w]+>' => 'story/tag',
-                'stories/category/<category:[\w\-]+>' => 'story/category',
-                'stories' => 'story/index',
-
-                'story/webhook' => 'story/webhook',
-                'story/addcomment' => 'story/add-comment',
-                'story/<alias:[\w\-]+>' => 'story/view',
-
-                'success' => 'rate/success',
-                'fail' => 'rate/fail',
-                'file-avatar' => 'upload/file-avatar',
-
-                'statistics/write/<id:\d+>' => 'statistics/write',
-                'feedback/create/<id:\d+>' => 'feedback/create',
-            ],
-        ],
+        'urlManager' => $urlManager,
         'view' => [
             'as seo' => [
                 'class' => 'frontend\components\SeoViewBehavior',
