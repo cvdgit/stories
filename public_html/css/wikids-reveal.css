@@ -1673,6 +1673,8 @@
 
 .story-container {
 	position: relative;
+	padding: 0 50px;
+	background-color: #000;
 }
 
 .story-container::before {

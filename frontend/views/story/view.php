@@ -53,12 +53,9 @@ $this->registerJs($js);
             </div>
         </div>
         <div class="story-description">
-            <h1><?= Html::encode($model->title) ?></h1>
-            <div class="story-info clearfix">
-                <div class="story-share-block">
+            <h1><?= Html::encode($model->title) ?>                <div class="story-share-block">
                     <button class="btn" data-toggle="modal" data-target="#wikids-share-modal">Поделиться</button>
-                </div>
-            </div>
+                </div></h1>
             <?php if (!empty($model->description)): ?>
             <div class="story-text"><?= Html::encode($model->description) ?></div>
 	  	    <?php endif ?>
