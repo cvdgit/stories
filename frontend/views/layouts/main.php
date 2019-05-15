@@ -129,7 +129,7 @@ AppAsset::register($this);
       <div class="row">
         <div class="col-md-3 footer-email">
             Телефон: +7 (499) 703-3525<br>
-            Email: <a href="mailto:info@centrvd.ru">info@wikids.ru</a>
+            Email: <a href="mailto:info@wikids.ru">info@wikids.ru</a>
         </div>
         <div class="col-md-3 col-md-offset-6">
           <div class="footer-copyright pull-right text-right">
