@@ -1431,3 +1431,8 @@ section h2 span {
 .auth-clients li:last-child {
   margin-right: 0;
 }
+
+
+.story-share-block {
+  float: right;
+}

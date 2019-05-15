@@ -26,11 +26,11 @@ $this->registerJs($js);
 ?>
 <div class="container">
 	<main class="site-story-main">
-	  <div class="story-container">
-	    <div class="story-container-inner">
-		    <?= RevealWidget::widget([
-	    		'storyId' => $model->id,
-	    		'data' => $model->body,
+        <div class="story-container">
+            <div class="story-container-inner">
+            <?= RevealWidget::widget([
+                'storyId' => $model->id,
+                'data' => $model->body,
                 'canViewStory' => $userCanViewStory,
                 'assets' => [
                     \frontend\assets\RevealAsset::class,
@@ -49,32 +49,40 @@ $this->registerJs($js);
                     ['class' => \common\widgets\Reveal\Plugins\Feedback::class, 'storyID' => $model->id],
                     ['class' => \common\widgets\Reveal\Plugins\Statistics::class, 'storyID' => $model->id],
                 ],
-		    ]) ?>
-	    </div>
-	  </div>
-	  <div class="story-description">
-	    <h1><?= Html::encode($model->title) ?></h1>
-	    <?php if (!empty($model->description)): ?>
-	    <div class="story-text"><?= Html::encode($model->description) ?></div>
-	  	<?php endif ?>
-	    <div class="story-categories">Категория: <?= Html::a($model->category->name, ['story/category', 'category' => $model->category->alias]) ?></div>
-	    <?php $tags = $model->getTags()->all(); ?>
+            ]) ?>
+            </div>
+        </div>
+        <div class="story-description">
+            <h1><?= Html::encode($model->title) ?></h1>
+            <div class="story-info clearfix">
+                <div class="story-share-block">
+                    <button class="btn" data-toggle="modal" data-target="#wikids-share-modal">Поделиться</button>
+                </div>
+            </div>
+            <?php if (!empty($model->description)): ?>
+            <div class="story-text"><?= Html::encode($model->description) ?></div>
+	  	    <?php endif ?>
+	        <div class="story-categories">Категория: <?= Html::a($model->category->name, ['story/category', 'category' => $model->category->alias]) ?></div>
+	        <?php $tags = $model->getTags()->all(); ?>
 			<?php if (count($tags) > 0): ?>
-	    <div class="story-tags">Тэги:
+	        <div class="story-tags">Тэги:
 	    	<?php foreach($tags as $tag): ?>
 				<?= Html::a($tag->name, ['tag', 'tag' => $tag->name]) ?>
-				<?php endforeach ?>
+            <?php endforeach ?>
+	        </div>
+	        <?php endif ?>
+	        <div class="story-pay">Тип: <?= $model->bySubscription() ? 'По подписке' : 'Бесплатно' ?></div>
 	    </div>
-	    <?php endif ?>
-	    <div class="story-pay">Тип: <?= $model->bySubscription() ? 'По подписке' : 'Бесплатно' ?></div>
-	  </div>
-	  <div class="comments">
+	    <div class="comments">
 	  	<?php if (!Yii::$app->user->isGuest): ?>
             <?= $this->render('_comment_form', ['commentForm' => $commentForm]) ?>
         <?php endif ?>
-	    <div class="comment-list">
-            <?= $this->render('_comment_list', ['dataProvider' => $dataProvider]) ?>
+	        <div class="comment-list">
+                <?= $this->render('_comment_list', ['dataProvider' => $dataProvider]) ?>
+	        </div>
 	    </div>
-	  </div>
 	</main>
 </div>
+
+<?= \frontend\widgets\Share::widget(['story' => $model]) ?>
+

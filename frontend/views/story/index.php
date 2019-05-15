@@ -8,7 +8,6 @@ use common\models\Category;
 /** @var $this yii\web\View */
 /** @var $searchModel common\models\StorySearch */
 /** @var $dataProvider yii\data\ActiveDataProvider */
-/** @var $h1 string */
 /** @var $action array */
 
 ?>
@@ -35,9 +34,7 @@ use common\models\Category;
     ]) ?>
   </nav>
   <main class="col-sm-8 col-md-9 site-main" style="margin-top: 0">
-      <?php if (!empty($h1)): ?>
-      <h1 style="margin-top: 6px; margin-bottom: 33px"><?= $h1 ?></h1>
-      <?php endif ?>
+      <h1 style="margin-top: 6px; margin-bottom: 33px"><?= $this->getHeader() ?></h1>
     <?php $order = $dataProvider->getSort()->getCurrentOrderName(); ?>
     <?= ListView::widget([
         'layout' => '<div class="story-list-filter clearfix">
