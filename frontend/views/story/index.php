@@ -28,7 +28,7 @@ use common\models\Category;
                 <span class="icon icon-search"></span>
             </div>
             <?php ActiveForm::end(); ?>
-            <h4>Каталог историй</h4>
+            <h4>Категории</h4>
             <?= Menu::widget([
               'items' => Category::getCategoriesForMenu(),
               'submenuTemplate' => "\n<ul class=\"story-category-list story-sub-category-list\">\n{items}\n</ul>\n",
