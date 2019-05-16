@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4266f30f04b9bb5fd4c4858a030a7578",
+    "content-hash": "92ee94730e8c9d23b7c064f52e92a4ff",
     "packages": [
         {
             "name": "2amigos/yii2-chartjs-widget",
@@ -246,6 +246,51 @@
                 "yii2"
             ],
             "time": "2016-12-09T12:23:25+00:00"
+        },
+        {
+            "name": "alexander-suter/yii2-tag-cloud",
+            "version": "2.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/alexsuter/yii2-tag-cloud.git",
+                "reference": "5c3b9c3a8c4d8c33985c275e80c669e89443c103"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/alexsuter/yii2-tag-cloud/zipball/5c3b9c3a8c4d8c33985c275e80c669e89443c103",
+                "reference": "5c3b9c3a8c4d8c33985c275e80c669e89443c103",
+                "shasum": ""
+            },
+            "require": {
+                "yiisoft/yii2": "2.0.*"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "asu\\tagcloud\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Antonio Ramirez",
+                    "email": "amigo.cobos@gmail.com"
+                },
+                {
+                    "name": "Alexander Suter",
+                    "email": "alexander.suter.ch@gmail.com"
+                }
+            ],
+            "description": "Tagcloud for Yii2",
+            "homepage": "https://github.com/alexander-suter/yii2-tag-cloud",
+            "keywords": [
+                "tagcloud",
+                "yii2"
+            ],
+            "time": "2016-03-02T09:30:49+00:00"
         },
         {
             "name": "bower-asset/bootstrap",

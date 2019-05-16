@@ -1436,3 +1436,9 @@ section h2 span {
 .story-share-block {
   float: right;
 }
+
+.story-date,
+.story-categories,
+.story-pay {
+  font-size: 1.6rem;
+}

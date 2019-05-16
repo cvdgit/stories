@@ -5,6 +5,8 @@ namespace common\models;
 use DomainException;
 use Yii;
 use yii\data\ActiveDataProvider;
+use yii\db\Expression;
+use yii\db\Query;
 
 /**
  * This is the model class for table "tag".
@@ -81,6 +83,20 @@ class Tag extends \yii\db\ActiveRecord
             return $model;
         }
         throw new DomainException('Тэг не найден');
+    }
+
+    public static function getPopularTags()
+    {
+        return (new Query())
+            ->select([
+                'name',
+                new Expression("CONCAT('/stories/tag/', `name`) AS url"),
+                'frequency AS weight'
+            ])
+            ->from(self::tableName())
+            ->where('frequency > 0')
+            ->indexBy('name')
+            ->all();
     }
 
 }

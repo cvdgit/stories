@@ -34,7 +34,8 @@
         "yiisoft/yii2-authclient": "^2.2",
         "yii-dream-team/yii2-upload-behavior": "*",
         "la-haute-societe/yii2-save-relations-behavior": "*",
-        "samdark/sitemap": "^2.2"
+        "samdark/sitemap": "^2.2",
+        "alexander-suter/yii2-tag-cloud": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

@@ -53,22 +53,23 @@ $this->registerJs($js);
             </div>
         </div>
         <div class="story-description">
-            <h1><?= Html::encode($model->title) ?>                <div class="story-share-block">
+            <div class="story-tags" style="margin-top: 10px; font-size: 1.4rem">
+                <?php foreach($model->tags as $tag): ?>
+                    <?= '#' . Html::a($tag->name, ['tag', 'tag' => $tag->name]) ?>
+                <?php endforeach ?>
+            </div>
+            <h1 style="margin-top: 0; padding-top: 0;">
+                <?= Html::encode($model->title) ?>
+                <div class="story-share-block">
                     <button class="btn" data-toggle="modal" data-target="#wikids-share-modal">Поделиться</button>
-                </div></h1>
+                </div>
+            </h1>
+            <div class="story-date"><span>Опубликована:</span> <?= \common\helpers\SmartDate::dateSmart($model->created_at, true) ?></div>
             <?php if (!empty($model->description)): ?>
             <div class="story-text"><?= Html::encode($model->description) ?></div>
 	  	    <?php endif ?>
-	        <div class="story-categories">Категория: <?= Html::a($model->category->name, ['story/category', 'category' => $model->category->alias]) ?></div>
-	        <?php $tags = $model->getTags()->all(); ?>
-			<?php if (count($tags) > 0): ?>
-	        <div class="story-tags">Тэги:
-	    	<?php foreach($tags as $tag): ?>
-				<?= Html::a($tag->name, ['tag', 'tag' => $tag->name]) ?>
-            <?php endforeach ?>
-	        </div>
-	        <?php endif ?>
-	        <div class="story-pay">Тип: <?= $model->bySubscription() ? 'По подписке' : 'Бесплатно' ?></div>
+	        <div class="story-categories"><span>Категория:</span> <?= Html::a($model->category->name, ['story/category', 'category' => $model->category->alias]) ?></div>
+	        <div class="story-pay"><span>Тип:</span> <?= $model->bySubscription() ? 'По подписке' : 'Бесплатно' ?></div>
 	    </div>
 	    <div class="comments">
 	  	<?php if (!Yii::$app->user->isGuest): ?>

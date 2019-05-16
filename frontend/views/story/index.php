@@ -1,5 +1,7 @@
 <?php
 
+use asu\tagcloud\TagCloud;
+use common\models\Tag;
 use yii\widgets\ListView;
 use yii\widgets\ActiveForm;
 use yii\widgets\Menu;
@@ -12,68 +14,78 @@ use common\models\Category;
 
 ?>
 <div class="container">
-<div class="row">
-  <nav class="col-sm-4 col-md-3 site-sidebar">
-    <?php $form = ActiveForm::begin([
-      'action' => $action,
-      'method' => 'GET', 
-      'options' => ['class' => 'story-form'],
-    ]); ?>
-    <div>
-      <?= $form->field($searchModel, 'title', ['inputOptions' => ['class' => 'form-control story-search-control']])
-               ->textInput(['placeholder' => 'Поиск...', 'autocomplete' => 'off'])
-               ->label(false) ?>
-      <span class="icon icon-search"></span>
+    <div class="row">
+        <nav class="col-sm-4 col-md-3 site-sidebar">
+            <?php $form = ActiveForm::begin([
+              'action' => $action,
+              'method' => 'GET',
+              'options' => ['class' => 'story-form'],
+            ]); ?>
+            <div>
+                <?= $form->field($searchModel, 'title', ['inputOptions' => ['class' => 'form-control story-search-control']])
+                         ->textInput(['placeholder' => 'Поиск...', 'autocomplete' => 'off'])
+                         ->label(false) ?>
+                <span class="icon icon-search"></span>
+            </div>
+            <?php ActiveForm::end(); ?>
+            <h4>Каталог историй</h4>
+            <?= Menu::widget([
+              'items' => Category::getCategoriesForMenu(),
+              'submenuTemplate' => "\n<ul class=\"story-category-list story-sub-category-list\">\n{items}\n</ul>\n",
+              'options' => ['class' => 'story-category-list'],
+            ]) ?>
+            <h4>Облако тегов</h4>
+            <?= TagCloud::widget([
+                'beginColor' => '38405d',
+                'endColor' => '000000',
+                'minFontSize' => 8,
+                'maxFontSize' => 15,
+                'displayWeight' => false,
+                'tags' => Tag::getPopularTags(),
+                'options' => ['style' => 'word-wrap: break-word;']
+            ]) ?>
+        </nav>
+        <main class="col-sm-8 col-md-9 site-main" style="margin-top: 0">
+            <h1 style="margin-top: 6px; margin-bottom: 33px"><?= $this->getHeader() ?></h1>
+            <?php $order = $dataProvider->getSort()->getCurrentOrderName(); ?>
+            <?= ListView::widget([
+                'layout' => '<div class="story-list-filter clearfix">
+                               {summary}
+                               <div class="pull-right">
+                                 <span style="margin-right: 6px">Сортировать по:</span>
+                                 <div class="dropdown pull-right" style="cursor: pointer">
+                                   <div id="story-sort-dropdown" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$order.' <span class="caret"></span></div>
+                                   {sorter}
+                                   </div>
+                                 </div>
+                               </div>
+                             </div>
+                             <div class="story-list"><div class="flex-row row">{items}</div></div>
+                             <div class="story-pagination">{pager}</div>',
+                'summary' => '<span>Показано {count} из {totalCount} историй</span>',
+                'dataProvider' => $dataProvider,
+                'itemOptions' => ['tag' => false],
+                'itemView' => '_storyitem',
+                'emptyText' => 'Список историй пуст',
+                'sorter' => [
+                   'options' => [
+                        'class' => 'dropdown-menu'
+                    ],
+                    'attributes' => [
+                        'title',
+                        'created_at',
+                    ]
+                ],
+                'pager' => [
+                  'options' => [
+                    'class' => false,
+                  ],
+                    'disabledListItemSubTagOptions' => ['tag' => 'a', 'href' => '#'],
+                    'disabledPageCssClass' => 'no-pointer',
+                    'prevPageCssClass' => false,
+                    'nextPageCssClass' => false,
+                ],
+            ]) ?>
+        </main>
     </div>
-    <?php ActiveForm::end(); ?>
-    <h4>Каталог историй</h4>
-    <?= Menu::widget([
-      'items' => Category::getCategoriesForMenu(),
-      'submenuTemplate' => "\n<ul class=\"story-category-list story-sub-category-list\">\n{items}\n</ul>\n",
-      'options' => ['class' => 'story-category-list'],
-    ]) ?>
-  </nav>
-  <main class="col-sm-8 col-md-9 site-main" style="margin-top: 0">
-      <h1 style="margin-top: 6px; margin-bottom: 33px"><?= $this->getHeader() ?></h1>
-    <?php $order = $dataProvider->getSort()->getCurrentOrderName(); ?>
-    <?= ListView::widget([
-        'layout' => '<div class="story-list-filter clearfix">
-                       {summary}
-                       <div class="pull-right">
-                         <span style="margin-right: 6px">Сортировать по:</span>
-                         <div class="dropdown pull-right" style="cursor: pointer">
-                           <div id="story-sort-dropdown" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$order.' <span class="caret"></span></div>
-                           {sorter}
-                           </div>
-                         </div>
-                       </div>
-                     </div>
-                     <div class="story-list"><div class="flex-row row">{items}</div></div>
-                     <div class="story-pagination">{pager}</div>',
-        'summary' => '<span>Показано {count} из {totalCount} историй</span>',
-        'dataProvider' => $dataProvider,
-        'itemOptions' => ['tag' => false],
-        'itemView' => '_storyitem',
-        'emptyText' => 'Список историй пуст',
-        'sorter' => [
-           'options' => [
-                'class' => 'dropdown-menu'
-            ],
-            'attributes' => [
-                'title',
-                'created_at',
-            ]
-        ],
-        'pager' => [
-          'options' => [
-            'class' => false,
-          ],
-            'disabledListItemSubTagOptions' => ['tag' => 'a', 'href' => '#'],
-            'disabledPageCssClass' => 'no-pointer',
-            'prevPageCssClass' => false,
-            'nextPageCssClass' => false,
-        ],
-    ]) ?>
-  </main>
-</div>
 </div>
