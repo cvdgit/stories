@@ -154,6 +154,9 @@ class Story extends ActiveRecord
         return self::find();
     }
 
+    /**
+     * @return StoryQuery
+     */
     public static function findPublishedStories()
     {
         return self::find()->published();

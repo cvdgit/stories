@@ -13,13 +13,14 @@ class StorySearch extends Model
 {
 
     public $title;
+    public $description;
     public $category_id;
     public $tag_id;
 
     public function rules()
     {
         return [
-            [['title'], 'string'],
+            [['title', 'description'], 'string'],
             [['category_id', 'tag_id'], 'integer'],
         ];
     }
@@ -77,7 +78,10 @@ class StorySearch extends Model
             $query->joinWith(['tags']);
         }
 
-        $query->andFilterWhere(['like', 'title', $this->title]);
+        $query->andFilterWhere(['or',
+            ['like', '{{%story}}.title', $this->title],
+            ['like', '{{%story}}.description', $this->title],
+        ]);
         $query->andFilterWhere([
             'category.id' => $this->category_id,
             'tag.id' => $this->tag_id,
