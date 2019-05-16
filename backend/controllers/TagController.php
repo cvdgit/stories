@@ -5,11 +5,12 @@ use common\rbac\UserRoles;
 use Yii;
 use common\models\Tag;
 use yii\filters\AccessControl;
+use yii\web\Controller;
 
 /**
  * Site controller
  */
-class TagController extends \backend\components\AdminController
+class TagController extends Controller
 {
 
     public function behaviors()
