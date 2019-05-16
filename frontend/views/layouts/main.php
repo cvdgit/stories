@@ -27,8 +27,8 @@ AppAsset::register($this);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
-    <?= Yii::$app->params['metrica'] ?>
     <?php $this->head() ?>
+    <?= Yii::$app->params['metrica'] ?>
 </head>
 <body>
 <?php $this->beginBody() ?>
