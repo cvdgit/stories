@@ -42,7 +42,9 @@ use common\models\Category;
                 'maxFontSize' => 15,
                 'displayWeight' => false,
                 'tags' => Tag::getPopularTags(),
-                'options' => ['style' => 'word-wrap: break-word;']
+                'options' => [
+                    'style' => 'word-wrap: break-word;'
+                ],
             ]) ?>
         </nav>
         <main class="col-sm-8 col-md-9 site-main" style="margin-top: 0">

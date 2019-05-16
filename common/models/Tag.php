@@ -87,16 +87,18 @@ class Tag extends \yii\db\ActiveRecord
 
     public static function getPopularTags()
     {
-        return (new Query())
+        $tags = (new Query())
             ->select([
                 'name',
                 new Expression("CONCAT('/stories/tag/', `name`) AS url"),
-                'frequency AS weight'
+                'frequency AS weight',
             ])
             ->from(self::tableName())
             ->where('frequency > 0')
             ->indexBy('name')
             ->all();
+        $tags = array_map(function($elem) { $elem['options']['target'] = '_self'; return $elem; }, $tags);
+        return $tags;
     }
 
 }
