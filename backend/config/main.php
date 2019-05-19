@@ -42,7 +42,25 @@ return [
             'targets' => [
                 [
                     'class' => 'yii\log\FileTarget',
+                    'except' =>
+                        [
+                            'yii\web\HttpException:404',
+                            'yii\web\HttpException:403',
+                        ],
                     'levels' => ['error', 'warning'],
+                ],
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'categories' => ['yii\web\HttpException:404'],
+                    'levels' => ['error', 'warning'],
+                    'logFile' => '@runtime/logs/404.log',
+                    'logVars' => [],
+                ],
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'categories' => ['yii\web\HttpException:403'],
+                    'levels' => ['error', 'warning'],
+                    'logFile' => '@runtime/logs/403.log',
                 ],
             ],
         ],
