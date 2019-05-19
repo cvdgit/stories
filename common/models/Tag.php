@@ -7,6 +7,7 @@ use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
 use yii\db\Query;
+use yii\web\NotFoundHttpException;
 
 /**
  * This is the model class for table "tag".
@@ -82,7 +83,7 @@ class Tag extends \yii\db\ActiveRecord
         if (($model = self::findOne(['name' => $name])) !== null) {
             return $model;
         }
-        throw new DomainException('Тэг не найден');
+        throw new NotFoundHttpException('Тег не найден');
     }
 
     public static function getPopularTags()

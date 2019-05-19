@@ -7,6 +7,7 @@ use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
 use dosamigos\taggable\Taggable;
 use common\helpers\Translit;
+use yii\web\NotFoundHttpException;
 
 /**
  * This is the model class for table "story".
@@ -248,6 +249,6 @@ class Story extends ActiveRecord
         if (($model = self::findOne(['alias' => $alias])) !== null) {
             return $model;
         }
-        throw new DomainException('История не найдена');
+        throw new NotFoundHttpException('История не найдена');
     }
 }

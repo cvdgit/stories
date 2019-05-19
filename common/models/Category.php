@@ -8,6 +8,7 @@ use DomainException;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\web\NotFoundHttpException;
 
 /**
  * This is the model class for table "category".
@@ -179,7 +180,7 @@ class Category extends ActiveRecord
         if (($model = self::findOne($id)) !== null) {
             return $model;
         }
-        throw new DomainException('Категория не найдена');
+        throw new NotFoundHttpException('Категория не найдена');
     }
 
     public static function findModelByAlias($alias): self
@@ -187,7 +188,7 @@ class Category extends ActiveRecord
         if (($model = self::findOne(['alias' => $alias])) !== null) {
             return $model;
         }
-        throw new DomainException('Категория не найдена');
+        throw new NotFoundHttpException('Категория не найдена');
     }
 
 }

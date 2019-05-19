@@ -7,6 +7,7 @@ use Yii;
 use yii\db\PdoValue;
 use yii\db\Query;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\UploadedFile;
 use yii\filters\AccessControl;
