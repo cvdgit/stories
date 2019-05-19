@@ -3,6 +3,7 @@ return [
     'adminEmail' => 'admin@wikids.ru',
     'supportEmail' => 'support@wikids.ru',
     'infoEmail' => 'info@wikids.ru',
+    'contactEmail' => 'contact@wikids.ru',
     'user.passwordResetTokenExpire' => 3600,
     'user.rememberMeDuration' => 3600 * 24 * 30,
     'dropboxSlidesPath' => 'Приложения\Slides App\\',

@@ -54,7 +54,7 @@ class SiteController extends Controller
             $model = new ContactForm();
             if ($model->load(Yii::$app->request->post()) && $model->validate()) {
                 try {
-                    $model->sendEmail(Yii::$app->params['adminEmail']);
+                    $model->sendEmail(Yii::$app->params['contactEmail']);
                     return ['success' => true, 'message' => 'Благодарим Вас за обращение к нам. Мы ответим вам как можно скорее'];
                 }
                 catch (\Exception $ex) {

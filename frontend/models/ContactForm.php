@@ -56,9 +56,9 @@ class ContactForm extends Model
         if (!Yii::$app->mailer
             ->compose()
             ->setTo($email)
-            ->setFrom([$this->email => $this->name])
-            ->setSubject($this->subject)
-            ->setTextBody($this->body)
+            ->setFrom(Yii::$app->params['infoEmail'])
+            ->setSubject('Сообщение с формы контакты от ' . $this->email)
+            ->setTextBody($this->email . "\n" . $this->name . "\n" . $this->subject . "\n" . $this->body)
             ->send()) {
             throw new \RuntimeException('Email not sent (contact)');
         }
