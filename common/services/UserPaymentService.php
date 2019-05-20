@@ -128,9 +128,15 @@ class UserPaymentService
     {
         $paymentID = $args['OrderId'];
         $payment = Payment::findModel($paymentID);
-        $status = ($args['Status'] === 'CONFIRMED' ? Payment::STATUS_VALID : Payment::STATUS_INVALID);
-        $payment->state = $status;
-        $payment->data = Json::encode($args);
+        if ($args['Status'] === 'CONFIRMED') {
+            $payment->state = Payment::STATUS_VALID;
+        }
+        if (empty($payment->data)) {
+            $payment->data = Json::encode($args);
+        }
+        else {
+            $payment->data = $payment->data . "\n\n" . Json::encode($args);
+        }
         $payment->save(false);
         if ($payment->isValid()) {
             $this->sendEmailActivate($payment->user, $payment->rate);
