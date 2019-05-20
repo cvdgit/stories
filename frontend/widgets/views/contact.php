@@ -5,7 +5,7 @@ use yii\bootstrap\ActiveForm;
 use yii\captcha\Captcha;
 
 ?>
-<div class="modal fade site-dialog feedback-dialog" id="wikids-feedback-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade site-dialog feedback-dialog" id="wikids-feedback-modal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
