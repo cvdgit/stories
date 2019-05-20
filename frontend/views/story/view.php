@@ -54,9 +54,11 @@ $this->registerJs($js);
         </div>
         <div class="story-description">
             <div class="story-tags" style="margin-top: 10px; font-size: 1.4rem">
+                <!--noindex-->
                 <?php foreach($model->tags as $tag): ?>
-                    <?= '#' . Html::a($tag->name, ['tag', 'tag' => $tag->name]) ?>
+                    <?= '#' . Html::a($tag->name, ['tag', 'tag' => $tag->name], ['rel' => 'nofollow']) ?>
                 <?php endforeach ?>
+                <!--/noindex-->
             </div>
             <h1 style="margin-top: 0; padding-top: 0;">
                 <?= Html::encode($model->title) ?>

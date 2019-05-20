@@ -98,7 +98,11 @@ class Tag extends \yii\db\ActiveRecord
             ->where('frequency > 0')
             ->indexBy('name')
             ->all();
-        $tags = array_map(function($elem) { $elem['options']['target'] = '_self'; return $elem; }, $tags);
+        $tags = array_map(function($elem) {
+            $elem['options']['target'] = '_self';
+            $elem['options']['rel'] = 'nofollow';
+            return $elem;
+            }, $tags);
         return $tags;
     }
 

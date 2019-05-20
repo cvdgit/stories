@@ -35,6 +35,7 @@ use common\models\Category;
               'options' => ['class' => 'story-category-list'],
             ]) ?>
             <h4>Облако тегов</h4>
+            <!--noindex-->
             <?= TagCloud::widget([
                 'beginColor' => '38405d',
                 'endColor' => '000000',
@@ -46,6 +47,7 @@ use common\models\Category;
                     'style' => 'word-wrap: break-word;'
                 ],
             ]) ?>
+            <!--/noindex-->
         </nav>
         <main class="col-sm-8 col-md-9 site-main" style="margin-top: 0">
             <h1 style="margin-top: 6px; margin-bottom: 33px"><?= $this->getHeader() ?></h1>
