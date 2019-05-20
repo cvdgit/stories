@@ -9,7 +9,7 @@ use common\components\StoryCover; ?>
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel" style="margin-bottom: 20px">Поделиться <span>историей</span></h4>
+                <h4 class="modal-title" style="margin-bottom: 20px">Поделиться <span>историей</span></h4>
             </div>
             <div class="modal-body">
                 <p>Отправить ссылку</p>

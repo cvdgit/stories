@@ -10,7 +10,7 @@ use yii\captcha\Captcha;
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Остались <span>вопросы?</span></h4>
+        <h4 class="modal-title">Остались <span>вопросы?</span></h4>
         <p>Если у вас есть деловые вопросы или другие вопросы, пожалуйста, заполните следующую форму, чтобы связаться с нами. Спасибо.</p>
       </div>
       <div class="modal-body">
