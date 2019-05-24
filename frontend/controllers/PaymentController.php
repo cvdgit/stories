@@ -9,7 +9,7 @@ use common\services\UserService;
 use Exception;
 use frontend\models\PaymentForm;
 use Yii;
-use frontend\models\SubscriptionForm;
+use common\models\SubscriptionForm;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\Json;
@@ -80,7 +80,7 @@ class PaymentController extends Controller
             if ($model->load(Yii::$app->request->post()) && $model->validate()) {
                 try {
 
-                    $paymentID = $this->paymentService->activateSubscription(Yii::$app->user->getId(), $model);
+                    $paymentID = $this->paymentService->createSubscription(Yii::$app->user->getId(), $model);
 
                     $paymentForm = new PaymentForm();
                     $paymentForm->terminalkey = Yii::$app->params['terminalkey'];

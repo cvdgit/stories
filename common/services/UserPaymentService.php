@@ -6,7 +6,7 @@ use common\models\Rate;
 use common\models\User;
 use DomainException;
 use common\models\Payment;
-use frontend\models\SubscriptionForm;
+use common\models\SubscriptionForm;
 use RuntimeException;
 use Yii;
 use yii\helpers\Json;
@@ -26,7 +26,7 @@ class UserPaymentService
         return Rate::find()->all();
     }
 
-    public function activateSubscription($userID, SubscriptionForm $model): int
+    public function createSubscription($userID, SubscriptionForm $model): int
     {
         $user = User::findModel($userID);
         if (!$user->isActive()) {
@@ -55,6 +55,22 @@ class UserPaymentService
             $payment->save();
         }
         return $payment->id;
+    }
+
+    /**
+     * @param int $paymentID
+     * @param int $userID
+     */
+    public function activateSubscription(int $paymentID): void
+    {
+        $payment = Payment::findModel($paymentID);
+        if (!$payment->isNew()) {
+            throw new DomainException('Активировать можно только платеж со статусом Новый');
+        }
+        $payment->state = Payment::STATUS_VALID;
+        if ($payment->save(false)) {
+            $this->sendEmailActivate($payment->user, $payment->rate);
+        }
     }
 
 	protected function freeSubscriptionCheck($userID, Rate $rate): void

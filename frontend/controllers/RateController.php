@@ -7,7 +7,7 @@ use Exception;
 use Yii;
 use yii\web\Controller;
 use common\services\UserPaymentService;
-use frontend\models\SubscriptionForm;
+use common\models\SubscriptionForm;
 
 class RateController extends Controller
 {
@@ -27,11 +27,12 @@ class RateController extends Controller
         $model = new SubscriptionForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             try {
-                $this->paymentService->activateSubscription(Yii::$app->user->id, $model);
+                $this->paymentService->createSubscription(Yii::$app->user->id, $model);
                 Yii::$app->session->setFlash('success', 'Подписка успешно активирована');
             }
-            catch (Exception $ex) {
-                Yii::$app->session->setFlash('info', $ex->getMessage());
+            catch (Exception $e) {
+                Yii::$app->errorHandler->logException($e);
+                Yii::$app->session->setFlash('error', 'При активации подписки произошла ошибка');
             }
             return $this->redirect(['/profile']);
         }

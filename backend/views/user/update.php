@@ -1,29 +1,32 @@
 <?php
 
+use yii\bootstrap\Tabs;
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
-use common\helpers\UserHelper;
 
 /** @var $this yii\web\View */
 /** @var $model common\models\User */
+/** @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Пользователь: ' . $model->username;
 $this->params['sidebarMenuItems'] = [
 	['label' => $model->username, 'url' => ['/user/update', 'id' => $model->id]],
-	['label' => 'Подписка', 'url' => ['/user/subscriptions', 'id' => $model->id]],
 ];
 ?>
 <div class="row">
-	<div class="col-xs-6">
+	<div class="col-xs-12">
 		<h2 class="page-header"><?= Html::encode($this->title) ?></h2>
-		<?php $form = ActiveForm::begin(); ?>
-		<?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
-		<?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
-		<?= $form->field($model, 'status')->dropDownList(UserHelper::getStatusArray(), ['prompt' => 'Выбрать']) ?>
-        <?= $form->field($model, 'role')->dropDownList($model->rolesList(), ['prompt' => 'Выбрать']) ?>
-		<div class="form-group">
-		    <?= Html::submitButton('Сохранить изменения', ['class' => 'btn btn-success']) ?>
-		</div>
-		<?php ActiveForm::end(); ?>
+        <?= Tabs::widget([
+            'items' => [
+                [
+                    'label' => 'Пользователь',
+                    'content' => $this->render('_update_tab', ['model' => $model]),
+                    'active' => true,
+                ],
+                [
+                    'label' => 'Подписки',
+                    'content' => $this->render('_subscriptions_tab', ['model' => $model, 'dataProvider' => $dataProvider]),
+                ],
+            ],
+        ]) ?>
 	</div>
 </div>

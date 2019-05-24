@@ -1,8 +1,12 @@
 <?php
+
 use yii\helpers\Html;
+use yii\web\View;
 use yii\widgets\ActiveForm;
 use common\helpers\SubscriptionHelper;
-use dosamigos\datepicker\DatePicker;
+
+/** @var $model common\models\SubscriptionForm */
+
 ?>
 <?php $form = ActiveForm::begin([
     'enableClientValidation' => true,
@@ -15,22 +19,7 @@ use dosamigos\datepicker\DatePicker;
     <h4 class="modal-title">Активировать подписку</h4>
 </div>
 <div class="modal-body">
-<?= $form->field($subscription, 'subscription_id')->dropDownList(SubscriptionHelper::getSubscriptionArray(), ['prompt' => 'Выбрать']) ?>
-<?= $form->field($subscription, 'date_start')->widget(DatePicker::class, [
-    'language' => 'ru',
-    'clientOptions' => [
-        'autoclose' => true,
-        'format' => 'yyyy.mm.dd'
-    ]
-]) ?>
-<?= $form->field($subscription, 'date_finish')->widget(DatePicker::class, [
-    'language' => 'ru',
-    'clientOptions' => [
-        'autoclose' => true,
-        'format' => 'yyyy.mm.dd'
-    ]
-]) ?>
-<?= $form->field($subscription, 'state')->dropDownList(\common\helpers\PaymentHelper::getStatusArray(), ['prompt' => 'Выбрать']) ?>
+<?= $form->field($model, 'subscription_id')->dropDownList(SubscriptionHelper::getSubscriptionArray(), ['prompt' => 'Выбрать']) ?>
 </div>
 <div class="modal-footer">
     <?= Html::submitButton('Активировать подписку', ['class' => 'btn btn-primary']) ?>
@@ -74,5 +63,5 @@ $('#activate-subscription-form')
       e.preventDefault();
   });
 JS;
-$this->registerJs($js, \yii\web\View::POS_READY);
+$this->registerJs($js, View::POS_READY);
 ?>

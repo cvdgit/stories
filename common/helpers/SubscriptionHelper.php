@@ -8,7 +8,7 @@ use common\models\Rate;
 class SubscriptionHelper
 {
 
-    public static function getSubscriptionArray()
+    public static function getSubscriptionArray(): array
     {
         return ArrayHelper::map(Rate::find()->all(), 'id', 'title');
     }

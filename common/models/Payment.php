@@ -124,6 +124,11 @@ class Payment extends ActiveRecord
         throw new DomainException('Платеж не найден.');
     }
 
+    public function isNew(): bool
+    {
+        return (int)$this->state === self::STATUS_NEW;
+    }
+
     public function isValid(): bool
     {
         return $this->state === self::STATUS_VALID;

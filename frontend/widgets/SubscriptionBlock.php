@@ -5,7 +5,7 @@ namespace frontend\widgets;
 
 
 use common\models\Rate;
-use frontend\models\SubscriptionForm;
+use common\models\SubscriptionForm;
 use yii\base\Widget;
 
 class SubscriptionBlock extends Widget

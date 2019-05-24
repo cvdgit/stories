@@ -5,8 +5,10 @@ namespace backend\controllers;
 use backend\models\ChangePasswordForm;
 use backend\models\UserCreateForm;
 use backend\models\UserUpdateForm;
+use common\models\SubscriptionForm;
 use common\services\UserService;
 use DomainException;
+use Exception;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -16,6 +18,7 @@ use common\services\UserPaymentService;
 use common\models\User;
 use common\models\PaymentSearch;
 use common\rbac\UserRoles;
+use yii\web\Response;
 
 class UserController extends Controller
 {
@@ -81,6 +84,7 @@ class UserController extends Controller
     {
         $user = User::findModel($id);
         $form = new UserUpdateForm($user);
+
         if ($form->load(Yii::$app->request->post()) && $form->validate()) {
             try {
                 $this->userService->edit($user->id, $form);
@@ -90,8 +94,13 @@ class UserController extends Controller
                 Yii::$app->session->setFlash('error', $e->getMessage());
             }
         }
+
+        $paymentSearch = new PaymentSearch();
+        $dataProvider = $paymentSearch->search(Yii::$app->request->queryParams, $user->id);
+
         return $this->render('update', [
             'model' => $form,
+            'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -105,40 +114,36 @@ class UserController extends Controller
         return $this->redirect(['index']);
     }
 
-    public function actionSubscriptions($id)
+    public function actionCreateSubscription($user_id)
     {
-        $userModel = User::findModel($id);
-        $paymentSearch = New PaymentSearch();
-        $dataProvider = $paymentSearch->search(Yii::$app->request->queryParams, $userModel->id);
-        return $this->render('subscriptions', [
-            'model' => $userModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
-
-    public function actionActivateSubscription($user_id)
-    {
-        $userModel = User::findModel($user_id);
-        $subscriptionModel = new SubscriptionForm();
-        if (Yii::$app->request->isAjax) {
-            if ($subscriptionModel->load(Yii::$app->request->post()) && $subscriptionModel->validate()) {
-                try {
-                    $this->paymentService->activateSubscription($userModel->id, $subscriptionModel);
-                    return Json::encode(['success' => true]);
-                }
-                catch (\Exception $ex) {
-                    return Json::encode(['success' => false, 'error' => $ex->getMessage()]);
-                }
+        $user = User::findModel($user_id);
+        $subscriptionForm = new SubscriptionForm();
+        if (Yii::$app->request->isAjax && $subscriptionForm->load(Yii::$app->request->post()) && $subscriptionForm->validate()) {
+            try {
+                $paymentID = $this->paymentService->createSubscription($user->id, $subscriptionForm);
+                $this->paymentService->activateSubscription($paymentID);
+                return Json::encode(['success' => true]);
+            }
+            catch (Exception $e) {
+                Yii::$app->errorHandler->logException($e);
+                return Json::encode(['success' => false, 'error' => $e->getMessage()]);
             }
         }
         return $this->renderAjax('_activate_subscription', [
-            'subscription' => $subscriptionModel,
+            'model' => $subscriptionForm,
         ]);
+    }
+
+    public function actionActivateSubscription($id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $this->paymentService->activateSubscription($id);
+        return ['success' => true];
     }
 
     public function actionCancelSubscription($id)
     {
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        Yii::$app->response->format = Response::FORMAT_JSON;
         $this->paymentService->cancelSubscription($id);
         return ['success' => true];
     }

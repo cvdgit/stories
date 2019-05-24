@@ -1,10 +1,9 @@
 <?php
 
 
-namespace frontend\models;
+namespace common\models;
 
 
-use common\models\Rate;
 use DateInterval;
 use DateTime;
 use yii\base\Model;
@@ -29,6 +28,16 @@ class SubscriptionForm extends Model
     }
 
     /**
+     * @return array
+     */
+    public function attributeLabels(): array
+    {
+        return [
+            'subscription_id' => 'Подписка',
+        ];
+    }
+
+    /**
      * @param string $attribute the attribute currently being validated
      * @param mixed $params the value of the "params" given in the rule
      * @param \yii\validators\InlineValidator $validator related InlineValidator instance.
@@ -48,7 +57,7 @@ class SubscriptionForm extends Model
         $this->finish_date = $this->calculateFinishDate();
     }
 
-    protected function calculateFinishDate()
+    protected function calculateFinishDate(): string
     {
         $rate = $this->getRate();
         $date = new DateTime($this->start_date);
