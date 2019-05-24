@@ -5,10 +5,12 @@
 /** @var $hasFreeSubscription bool */
 
 use frontend\widgets\SubscriptionBlock;
+use yii\helpers\Url;
 use yii\web\View;
 
 $title = 'Подписки';
 $this->setMetaTags($title, 'Подписка wikids', 'подписка, wikids, истории, сказки', $title);
+$this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 ?>
 <div class="container">
     <main class="site-pricing">

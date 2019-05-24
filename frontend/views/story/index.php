@@ -2,6 +2,7 @@
 
 use asu\tagcloud\TagCloud;
 use common\models\Tag;
+use yii\helpers\Url;
 use yii\widgets\ListView;
 use yii\widgets\ActiveForm;
 use yii\widgets\Menu;
@@ -12,6 +13,7 @@ use common\models\Category;
 /** @var $dataProvider yii\data\ActiveDataProvider */
 /** @var $action array */
 
+$this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 ?>
 <div class="container">
     <div class="row">

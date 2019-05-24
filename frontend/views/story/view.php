@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use common\widgets\RevealWidget;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Story */
@@ -14,8 +15,8 @@ $this->setMetaTags($title,
                    $model->description,
                    'wikids, сказки, истории, просмотр истории',
                    $title);
-$this->params['breadcrumbs'][] = ['label' => 'Каталог историй', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $title;
+
+$this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 
 $js = <<< JS
 $('#comment-form-pjax').on('pjax:success', function() {

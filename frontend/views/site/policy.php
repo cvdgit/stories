@@ -2,14 +2,14 @@
 
 /* @var $this yii\web\View */
 
-use yii\helpers\Html;
+use yii\helpers\Url;
 
 $title = 'Политика конфиденциальности';
 $this->setMetaTags($title,
                    $title,
                    '',
                    $title);
-$this->params['breadcrumbs'][] = $title;
+$this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 ?>
 <div class="container">
     <p align="justify">Настоящая Политика конфиденциальности персональных данных 
