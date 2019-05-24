@@ -40,8 +40,8 @@ $this->params['sidebarMenuItems'] = [
 		    		'initializeReveal' => false,
 		    		'canViewStory' => true,
 		    		'options' => [
-		    			'hash' => false,
-		    			'history' => false,
+		    			'hash' => true,
+		    			'history' => true,
 		    		],
                     'assets' => [
                         \backend\assets\RevealAsset::class,
@@ -61,45 +61,7 @@ $this->params['sidebarMenuItems'] = [
 		<div class="row"><div class="col-xs-12">&nbsp;</div></div>
 		<div class="row">
 			<div class="col-xs-12">
-<?php
-$form = ActiveForm::begin([
-	'action' => ['/editor/update-slide'],
-	'options' => ['enctype' => 'multipart/form-data'],
-]);
-echo $form->field($editorModel, 'image')->fileInput();
-echo $form->field($editorModel, 'text_size')->textInput();
-echo $form->field($editorModel, 'text')->textArea(['rows' => 6]);
-echo $form->field($editorModel, 'story_id')->hiddenInput()->label(false);
-echo Html::submitButton('Сохранить', ['class' => 'btn btn-primary']);
-ActiveForm::end();
-
-$js = <<< JS
-$('#{$form->getId()}')
-  .on('beforeSubmit', StoryEditor.onBeforeSubmit)
-  .on('submit', function(e) {
-    e.preventDefault();
-  });
-JS;
-
-$textFieldId = Html::getInputId($editorModel, 'text');
-$textSizeFieldId = Html::getInputId($editorModel, 'text_size');
-$fileFieldId = Html::getInputId($editorModel, 'image');
-$action = Url::to(['/editor/get-slide-by-index', 'story_id' => $model->id]);
-$this->registerJs($js);
-$js = <<< JS
-    StoryEditor.initialize({
-    	storyID: {$model->id},
-    	getSlideAction: '$action',
-    	textFieldID: '$textFieldId',
-    	textSizeFieldID: '$textSizeFieldId',
-    	fileFieldID: '$fileFieldId'
-    });
-    var slideIndex = StoryEditor.readUrl();
-    slideIndex = slideIndex || 0;
-	StoryEditor.loadSlide(slideIndex);
-JS;
-$this->registerJs($js);
-?>
+            <?= $this->render('_form', ['model' => $editorModel]) ?>
 			</div>
 		</div>
 	</div>

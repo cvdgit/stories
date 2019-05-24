@@ -41,7 +41,7 @@ JS;
 $this->registerJs($sourceOnChange, yii\web\View::POS_READY);
 ?>
 
-<?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
+<?php $form = ActiveForm::begin(); ?>
 <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 <?php if (!$model->isNewRecord): ?>
 <?= $form->field($model, 'alias')->textInput(['maxlength' => true]) ?>

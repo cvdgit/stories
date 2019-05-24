@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\components\story\reader\HTMLReader;
 use Yii;
 use yii\filters\AccessControl;
 use common\models\Story;
@@ -50,21 +51,25 @@ class EditorController extends Controller
         $reader = new StoryHtmlReader();
         $model = Story::findModel($id);
         $story = $reader->loadStoryFromHtml($model->body);
+
         $editorModel = new SlideEditorForm();
         $editorModel->story_id = $model->id;
-		return $this->render('edit', [
+
+        return $this->render('edit', [
             'model' => $model,
             'story' => $story,
-            'editorModel' => $editorModel,
+            'editorModel' => $editorModel
 		]);
 	}
 
     public function actionGetSlideByIndex(int $story_id, int $slide_index)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $reader = new StoryHtmlReader();
+
         $model = Story::findModel($story_id);
-        $story = $reader->loadStoryFromHtml($model->body);
+        $reader = new HTMLReader($model->body);
+        $story = $reader->load();
+
         $editor = new StoryEditor($story);
         $response['html'] = $editor->getSlideMarkup($slide_index);
         $response['story'] = $editor->getSlideValues($slide_index);
@@ -83,6 +88,11 @@ class EditorController extends Controller
             return $editorModel->getErrors();
         }
         return 'no';
+    }
+
+    public function actionLink()
+    {
+        return 'ok';
     }
 
 }

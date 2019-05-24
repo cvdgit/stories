@@ -93,6 +93,40 @@ var StoryEditor = (function() {
 	    });
 	}
 
+	function linkFormSubmit() {
+
+		var $form = $(this),
+			button = $('button[type=submit]', $form);
+
+		var $input = $('input#form_slide_index', $form);
+		if (!$input.length) {
+			$input = $('<input/>').attr({type: 'hidden', id: 'form_slide_index', name: 'LinkForm[slide_index]'});
+		}
+
+		$input
+			.val(currentSlideIndex)
+			.appendTo($form);
+
+		button.button('loading');
+
+		$.ajax({
+			url: $form.attr("action"),
+			type: $form.attr("method"),
+			data: new FormData($form[0]),
+			cache: false,
+			contentType: false,
+			processData: false,
+			success: function(data) {
+				loadSlide(currentSlideIndex);
+			},
+			error: function(data) {
+				console.log(data);
+			}
+		}).always(function() {
+			button.button('reset');
+		});
+	}
+
 	init();
 
 	function previewContainerSetHeight() {
@@ -131,6 +165,7 @@ var StoryEditor = (function() {
 		initialize: initialize,
 		loadSlide: loadSlide,
 		onBeforeSubmit: onBeforeSubmit,
+		linkFormSubmit: linkFormSubmit,
 		getCurrentSlideIndex: function() {
 			return currentSlideIndex;
 		},

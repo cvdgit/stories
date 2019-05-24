@@ -2,11 +2,12 @@
 
 namespace backend\services;
 
+use backend\components\story\reader\HTMLReader;
+use backend\models\SlideEditorForm;
 use yii;
 use yii\web\UploadedFile;
 use common\models\Story;
 use common\services\StoryService;
-use backend\components\StoryHtmlReader;
 use backend\components\StoryEditor;
 
 class StoryEditorService
@@ -27,16 +28,17 @@ class StoryEditorService
         return '';
 	}
 
-	public function updateSlide($form)
+	public function updateSlide(SlideEditorForm $form)
 	{
-        $storyModel = Story::findOne($form->story_id);
+        $storyModel = Story::findModel($form->story_id);
+
         $imagePath = $this->uploadImage($form, $storyModel);
 
-        $reader = new StoryHtmlReader();
-        $story = $reader->loadStoryFromHtml($storyModel->body);
+        $reader = new HTMLReader($storyModel->body);
+        $story = $reader->load();
 
         $editor = new StoryEditor($story);
-        $editor->updateSlide($form->slide_index, $form->text, $form->text_size, $imagePath);
+        $editor->updateSlide($form->slide_index, $form->text, $form->text_size, $imagePath, $form->button);
 
         $body = $editor->getStoryMarkup();
         $storyModel->saveBody($body);
