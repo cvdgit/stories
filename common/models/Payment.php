@@ -131,7 +131,7 @@ class Payment extends ActiveRecord
 
     public function isValid(): bool
     {
-        return $this->state === self::STATUS_VALID;
+        return (int)$this->state === self::STATUS_VALID;
     }
 
 }
