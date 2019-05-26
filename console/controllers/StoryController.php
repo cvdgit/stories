@@ -25,8 +25,6 @@ class StoryController extends Controller
 			
 			$path = StoryCover::createStoryThumbnail($coverPath);
 			$this->stdout('[+] ' . $path . PHP_EOL);
-			
-			$this->stdout('' . PHP_EOL);
 		}
 		$this->stdout('Done!' . PHP_EOL);
 	}
@@ -39,7 +37,10 @@ class StoryController extends Controller
         if ($handle = opendir($path)) {
             while (false !== ($entry = readdir($handle))) {
                 if ($entry !== '.' && $entry !== '..') {
-                    $existFiles[] = $entry;
+                    $pathParts = pathinfo($path . $entry);
+                    if ($pathParts['extension'] === 'pptx') {
+                        $existFiles[] = $entry;
+                    }
                 }
             }
             closedir($handle);
@@ -56,8 +57,19 @@ class StoryController extends Controller
 
         $files = array_diff($existFiles, $storyFiles);
         foreach ($files as $fileName) {
+
             $this->stdout($fileName . PHP_EOL);
+
+            $imagesPath = Yii::getAlias('@public/slides/' . $fileName . '/');
+            if (file_exists($imagesPath)) {
+                array_map('unlink', glob($imagesPath . '*.*'));
+            }
+
+            $filePath = $path . $fileName;
+            unlink($filePath);
         }
+
+        $this->stdout('Done!' . PHP_EOL);
     }
 
 }
