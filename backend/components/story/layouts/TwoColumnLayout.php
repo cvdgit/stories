@@ -4,6 +4,7 @@
 namespace backend\components\story\layouts;
 
 
+use backend\components\story\AbstractBlock;
 use backend\components\story\AbstractLayout;
 use backend\components\story\ImageBlock;
 use backend\components\story\TextBlock;
@@ -14,6 +15,7 @@ class TwoColumnLayout extends AbstractLayout
     {
 
         $block = new ImageBlock();
+        $block->setType(AbstractBlock::TYPE_IMAGE);
         $block->setWidth('973px');
         $block->setHeight('720px');
         $block->setLeft(0);
@@ -21,6 +23,7 @@ class TwoColumnLayout extends AbstractLayout
         $this->addBlock($block);
 
         $block = new TextBlock();
+        $block->setType(AbstractBlock::TYPE_TEXT);
         $block->setWidth('290px');
         $block->setHeight('auto');
         $block->setLeft('983px');

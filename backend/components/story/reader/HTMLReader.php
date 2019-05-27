@@ -4,6 +4,7 @@
 namespace backend\components\story\reader;
 
 
+use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
 use backend\components\story\layouts\OneColumnLayout;
 use backend\components\story\layouts\TwoColumnLayout;
@@ -132,6 +133,7 @@ class HTMLReader extends AbstractReader implements ReaderInterface
     protected function loadBlockButton($htmlBlock, Slide $slide): void
     {
         $buttonBlock = new ButtonBlock();
+        $buttonBlock->setType(AbstractBlock::TYPE_BUTTON);
         $buttonBlock->setWidth('290px');
         $buttonBlock->setHeight('50px');
         $buttonBlock->setTop('500px');

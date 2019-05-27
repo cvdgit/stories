@@ -7,10 +7,16 @@ namespace backend\components\story;
 abstract class AbstractBlock
 {
 
+    const TYPE_TEXT = 'text';
+    const TYPE_IMAGE = 'image';
+    const TYPE_BUTTON = 'button';
+
     protected $width;
     protected $height;
     protected $left;
     protected $top;
+
+    protected $type;
 
     /**
      * @return mixed
@@ -74,6 +80,22 @@ abstract class AbstractBlock
     public function setTop($top): void
     {
         $this->top = $top;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param mixed $type
+     */
+    public function setType($type): void
+    {
+        $this->type = $type;
     }
 
 }

@@ -4,7 +4,7 @@
 namespace backend\components\story;
 
 
-class ButtonBlock extends AbstractBlock
+class ButtonBlock extends TextBlock
 {
 
     /** @var string */

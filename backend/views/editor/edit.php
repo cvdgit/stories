@@ -1,16 +1,13 @@
 <?php
 
-use backend\models\SlideEditorForm;
 use yii\helpers\Html;
-use yii\helpers\Url;
-use yii\widgets\ActiveForm;
 use backend\assets\StoryEditorAsset;
 use common\widgets\RevealWidget;
+use yii\helpers\Url;
 
 /** @var $this yii\web\View */
 /** @var $model common\models\Story */
-/** @var $story backend\components\Story */
-/** @var $editorModel SlideEditorForm */
+/** @var $story backend\components\story\Story */
 
 StoryEditorAsset::register($this);
 
@@ -20,6 +17,27 @@ $this->params['sidebarMenuItems'] = [
     ['label' => 'Редактор', 'url' => ['editor/edit', 'id' => $model->id]],
     ['label' => 'Статистика', 'url' => ['statistics/list', 'id' => $model->id]],
 ];
+
+$action = Url::to(['/editor/get-slide-by-index', 'story_id' => $model->id]);
+$blocksAction = Url::to(['/editor/get-slide-blocks', 'story_id' => $model->id]);
+$formAction = Url::to(['/editor/form', 'story_id' => $model->id]);
+$js = <<< JS
+    StoryEditor.initialize({
+        "getSlideAction": "$action",
+        "getSlideBlocksAction": "$blocksAction",
+        "getBlockFormAction": "$formAction"
+    });
+    let slideIndex = StoryEditor.readUrl() || 0;
+	StoryEditor.loadSlide(slideIndex, true);
+	
+	$("#form-container")
+	    .on("beforeSubmit", "form", StoryEditor.onBeforeSubmit)
+	    .on("submit", "form", function(e) {
+	        e.preventDefault();
+	        return false;
+	    });
+JS;
+$this->registerJs($js);
 ?>
 <div class="row">
 	<div class="col-xs-3">
@@ -27,7 +45,7 @@ $this->params['sidebarMenuItems'] = [
 		<?php foreach ($story->getSlides() as $slide): ?>
 		<?php $slideIndex = $slide->getSlideNumber() - 1; ?>
 			<div class="img-thumbnail preview-container-item" style="height: 164px; width: 218px; margin-bottom: 10px" data-slide-index="<?= $slideIndex ?>">
-			<?= Html::a("Слайд {$slideIndex}", '#', ['class' => '', 'onclick' => 'StoryEditor.loadSlide(' . $slideIndex . '); return false']) ?>
+			<?= Html::a("Слайд {$slideIndex}", '#', ['class' => '', 'onclick' => 'StoryEditor.loadSlide(' . $slideIndex . ', true); return false']) ?>
 			</div>
 		<?php endforeach ?>
 		</div>
@@ -58,11 +76,13 @@ $this->params['sidebarMenuItems'] = [
 		    	]) ?>
 		    </div>
 		</div>
-		<div class="row"><div class="col-xs-12">&nbsp;</div></div>
-		<div class="row">
-			<div class="col-xs-12">
-            <?= $this->render('_form', ['model' => $editorModel]) ?>
-			</div>
-		</div>
 	</div>
+</div>
+<div class="row">
+    <div class="col-xs-3">
+        <?= $this->render('_blocks') ?>
+    </div>
+    <div class="col-xs-9">
+        <div id="form-container"></div>
+    </div>
 </div>

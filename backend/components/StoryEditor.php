@@ -2,6 +2,7 @@
 
 namespace backend\components;
 
+use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
 use backend\components\story\ImageBlock;
 use backend\components\story\TextBlock;
@@ -103,5 +104,15 @@ class StoryEditor
 		    $this->setSlideButton($slideIndex, $slideButton);
         }
 	}
+
+	public function getSlideBlocksArray(int $slideIndex): array
+    {
+        $slide = $this->story->getSlide($slideIndex);
+        return array_map(function(AbstractBlock $block) {
+            return [
+                'type' => $block->getType(),
+            ];
+        }, $slide->getBlocks());
+    }
 
 }
