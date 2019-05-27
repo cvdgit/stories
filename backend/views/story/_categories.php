@@ -5,7 +5,6 @@ use yii\bootstrap\Modal;
 use yii\widgets\Menu;
 
 /** @var $this yii\web\View */
-/** @var $selectInputName string */
 /** @var $selectInputID string */
 
 Modal::begin([

@@ -29,9 +29,9 @@ use dosamigos\selectize\SelectizeTextInput;
     </div>
 </div>
 <?php endif ?>
-<?= $form->field($model, 'source_id')->dropDownList(Story::getSourceList(), ['prompt' => 'Выбрать']) ?>
+<?= $form->field($model, 'source_id')->dropDownList(Story::getSourceList(), ['prompt' => 'Выбрать', 'readonly' => true]) ?>
 <?= $form->field($model, 'source_dropbox', ['options' => ['style' => 'display: none']])->textInput(['maxlength' => true]) ?>
-<?= $form->field($fileUploadForm, 'storyFile', ['options' => ['style' => 'display: none']])->fileInput() ?>
+<?= $form->field($fileUploadForm, 'storyFile')->fileInput() ?>
 <?= $form->field($model, 'user_id')->dropDownList(ArrayHelper::map(User::find()->all(), 'id', 'profileName'),
                                                           ['prompt' => 'Выбрать', 'readonly' => !Yii::$app->user->can('admin')]) ?>
 
@@ -46,7 +46,6 @@ $values = implode("\n", $values);
 <?= $form->field($model, 'story_categories', ['template' => "{label}\n{$input}\n{input}\n{hint}\n{error}"])
     ->hiddenInput()
     ->hint($this->render('_categories', [
-        'selectInputName' => Html::getInputName($model, 'story_categories'),
         'selectInputID' => Html::getInputId($model, 'story_categories')
     ])) ?>
 
