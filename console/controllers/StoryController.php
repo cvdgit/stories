@@ -72,4 +72,12 @@ class StoryController extends Controller
         $this->stdout('Done!' . PHP_EOL);
     }
 
+    public function actionChangeCategories(): void
+    {
+        $query = 'INSERT INTO {{%story_category}} (story_id, category_id) SELECT t.id, t.category_id FROM {{%story}} AS t WHERE t.category_id IS NOT NULL';
+        $command = Yii::$app->db->createCommand($query);
+        $command->execute();
+        $this->stdout('Done!' . PHP_EOL);
+    }
+
 }
