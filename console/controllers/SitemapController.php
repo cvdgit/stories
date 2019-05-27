@@ -12,7 +12,7 @@ use yii\db\Query;
 class SitemapController extends Controller
 {
 
-    public function actionCreate()
+    public function actionCreate(): void
     {
         $sitemap = new Sitemap(Yii::getAlias('@public/sitemap.xml'));
         $urlManager = Yii::$app->urlManager;
@@ -34,6 +34,7 @@ class SitemapController extends Controller
         $query = (new Query())
             ->from('{{%category}}')
             ->where(['tree' => 0])
+            ->andWhere('depth > 0')
             ->orderBy('name');
         foreach ($query->each() as $category) {
             $lastModified = (new Query())->from('{{%story}}')->where(['category_id' => $category['id']])->max('created_at');
@@ -42,13 +43,6 @@ class SitemapController extends Controller
             }
             $sitemap->addItem($urlManager->createAbsoluteUrl(['story/category', 'category' => $category['alias']]), $lastModified, Sitemap::WEEKLY, 0.9);
         }
-
-/*        $query = (new Query())
-            ->from('{{%tag}}')
-            ->orderBy(['frequency' => SORT_DESC]);
-        foreach ($query->each() as $tag) {
-            $sitemap->addItem($urlManager->createAbsoluteUrl(['story/tag', 'tag' => $tag['name']]), time(), Sitemap::WEEKLY, 0.9);
-        }*/
 
         $sitemap->write();
     }
