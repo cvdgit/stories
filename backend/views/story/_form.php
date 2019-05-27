@@ -5,40 +5,14 @@ use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 use common\models\User;
 use common\models\Story;
-use common\models\Category;
-use yii\helpers\Url;
 use dosamigos\selectize\SelectizeTextInput;
 
-/* @var $this yii\web\View */
-/* @var $model common\models\Story */
-/* @var $form yii\widgets\ActiveForm */
+/** @var $this yii\web\View */
+/** @var $model common\models\Story */
+/** @var $form yii\widgets\ActiveForm */
+/** @var $fileUploadForm backend\models\StoryFileUploadForm */
+/** @var $coverUploadForm backend\models\StoryCoverUploadForm */
 
-$id = Html::getInputId($model, 'source_id');
-$sourceDropBoxID = Html::getInputId($model, 'source_dropbox');
-$sourcePowerPointID = Html::getInputId($fileUploadForm, 'storyFile');
-$sourceDropBoxConst = Story::SOURCE_SLIDESCOM;
-$sourcePowerPointConst = Story::SOURCE_POWERPOINT;
-$sourceOnChange = <<< JS
-$(function() {
-  $('#$id').trigger('change');
-});
-$('#$id').on('change', function() {
-    var sourceDropBoxElem = $('#$sourceDropBoxID'),
-        sourcePowerPointElem = $('#$sourcePowerPointID');
-
-    sourceDropBoxElem.parent().hide();
-    sourcePowerPointElem.parent().hide();
-
-    if (this.value == $sourceDropBoxConst) {
-        sourceDropBoxElem.parent().show();
-    }
-
-    if (this.value == $sourcePowerPointConst) {
-        sourcePowerPointElem.parent().show();
-    }
-});
-JS;
-$this->registerJs($sourceOnChange, yii\web\View::POS_READY);
 ?>
 
 <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
@@ -60,10 +34,25 @@ $this->registerJs($sourceOnChange, yii\web\View::POS_READY);
 <?= $form->field($fileUploadForm, 'storyFile', ['options' => ['style' => 'display: none']])->fileInput() ?>
 <?= $form->field($model, 'user_id')->dropDownList(ArrayHelper::map(User::find()->all(), 'id', 'profileName'),
                                                           ['prompt' => 'Выбрать', 'readonly' => !Yii::$app->user->can('admin')]) ?>
-<?= $form->field($model, 'category_id')->dropDownList(ArrayHelper::map(Category::find()->all(), 'id', 'name'), ['prompt' => 'Выбрать']) ?>
+
+<?php
+$values = [];
+foreach ($model->categories as $category) {
+    $values[] = '<span class="label label-default">' . $category->name . '</span>';
+}
+$values = implode("\n", $values);
+?>
+<?php $input = '<div id="selected-category-list" style="margin: 10px 0">' . $values . '</div>'; ?>
+<?= $form->field($model, 'story_categories', ['template' => "{label}\n{$input}\n{input}\n{hint}\n{error}"])
+    ->hiddenInput()
+    ->hint($this->render('_categories', [
+        'selectInputName' => Html::getInputName($model, 'story_categories'),
+        'selectInputID' => Html::getInputId($model, 'story_categories')
+    ])) ?>
+
 <?= $form->field($model, 'sub_access')->checkBox() ?>
 <?= $form->field($model, 'status')->dropDownList([Story::STATUS_DRAFT => 'Черновик', Story::STATUS_PUBLISHED => 'Публикация'], ['prompt' => 'Выбрать']) ?>
-<?= $form->field($model, 'tagNames')->widget(SelectizeTextInput::className(), [
+<?= $form->field($model, 'tagNames')->widget(SelectizeTextInput::class, [
     'loadUrl' => ['tag/list'],
     'options' => ['class' => 'form-control'],
     'clientOptions' => [

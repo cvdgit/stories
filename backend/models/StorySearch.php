@@ -24,14 +24,14 @@ class StorySearch extends Model
     {
         return [
             [['title'], 'string'],
-            [['user_id', 'category_id', 'status', 'sub_access'], 'integer'],
+            [['user_id', 'status', 'sub_access'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
         ];
     }
 
     public function search($params): ActiveDataProvider
     {
-        $query = Story::findStories()->joinWith(['author', 'category', 'tags']);
+        $query = Story::findStories()->joinWith(['author', 'tags', 'categories']);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
@@ -49,10 +49,6 @@ class StorySearch extends Model
                 'user_id' => [
                     'asc' => ['user.username' => SORT_ASC],
                     'desc' => ['user.username' => SORT_DESC],
-                ],
-                'category_id' => [
-                    'asc' => ['category.name' => SORT_ASC],
-                    'desc' => ['category.name' => SORT_DESC],
                 ],
                 'created_at' => [
                     'asc' => ['created_at' => SORT_ASC],
@@ -77,7 +73,7 @@ class StorySearch extends Model
         $query->andFilterWhere(['like', 'title', $this->title]);
         $query->andFilterWhere([
             'user.id' => $this->user_id,
-            'category.id' => $this->category_id,
+            'story_category.category_id' => $this->category_id,
             "DATE_FORMAT(FROM_UNIXTIME(story.created_at), '%d.%m.%Y')" => $this->created_at,
             "DATE_FORMAT(FROM_UNIXTIME(story.updated_at), '%d.%m.%Y')" => $this->updated_at,
             'story.status' => $this->status,

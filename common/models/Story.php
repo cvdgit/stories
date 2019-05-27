@@ -3,10 +3,12 @@
 namespace common\models;
 
 use DomainException;
+use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
 use dosamigos\taggable\Taggable;
 use common\helpers\Translit;
+use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -30,9 +32,9 @@ use yii\web\NotFoundHttpException;
  * @property int $slides_number
  *
  * @property User $author
- * @property Tags $tags
- * @property Category $category
- * @property Comments $comments
+ * @property Tag[] $tags
+ * @property Category[] $categories
+ * @property Comment[] $comments
  */
 
 class Story extends ActiveRecord
@@ -47,6 +49,8 @@ class Story extends ActiveRecord
     public $source_dropbox = '';
     public $source_powerpoint = '';
 
+    public $story_categories;
+
     /**
      * {@inheritdoc}
      */
@@ -57,7 +61,7 @@ class Story extends ActiveRecord
 
     public static function find()
     {
-        return new StoryQuery(get_called_class());
+        return new StoryQuery(static::class);
     }
 
     /**
@@ -70,6 +74,12 @@ class Story extends ActiveRecord
             [
                 'class' => Taggable::class,
             ],
+            'saveRelations' => [
+                'class' => SaveRelationsBehavior::class,
+                'relations' => [
+                    'categories',
+                ],
+            ],
         ];
     }
 
@@ -79,13 +89,13 @@ class Story extends ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'alias', 'user_id', 'category_id', 'source_id'], 'required'],
+            [['title', 'alias', 'user_id', 'story_categories', 'source_id'], 'required'],
             [['body', 'cover', 'story_file', 'source_dropbox', 'source_powerpoint'], 'string'],
-            [['created_at', 'updated_at', 'user_id', 'category_id', 'sub_access', 'source_id', 'views_number', 'slides_number'], 'integer'],
+            [['created_at', 'updated_at', 'user_id', 'sub_access', 'source_id', 'views_number', 'slides_number'], 'integer'],
             [['title', 'alias'], 'string', 'max' => 255],
             [['alias'], 'unique'],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::className(), 'targetAttribute' => ['category_id' => 'id']],
+            // ['story_categories', 'each', 'rule' => ['integer']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
             ['status', 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_PUBLISHED]],
             ['status', 'default', 'value' => self::STATUS_DRAFT],
             [['tagNames'], 'safe'],
@@ -109,7 +119,7 @@ class Story extends ActiveRecord
             'user_id' => 'Автор',
             'status' => 'Статус',
             'tagNames' => 'Тэги',
-            'category_id' => 'Категория',
+            'story_categories' => 'Категории',
             'sub_access' => 'По подписке',
             'cover' => 'Обложка',
             'story_file' => 'Файл PowerPoint',
@@ -126,19 +136,21 @@ class Story extends ActiveRecord
      */
     public function getAuthor()
     {
-        return $this->hasOne(User::className(), ['id' => 'user_id']);
+        return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
+     * @throws \yii\base\InvalidConfigException
      */
-    public function getCategory()
+    public function getCategories()
     {
-        return $this->hasOne(Category::class, ['id' => 'category_id']);
+        return $this->hasMany(Category::class, ['id' => 'category_id'])->viaTable('story_category', ['story_id' => 'id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
+     * @throws \yii\base\InvalidConfigException
      */
     public function getTags()
     {
@@ -210,17 +222,6 @@ class Story extends ActiveRecord
         return $this->save(false, ['body']);
     }
 
-    public function beforeValidate()
-    {
-        if (parent::beforeValidate()) {
-            if (empty($this->alias)) {
-                $this->alias = Translit::translit($this->title);
-            }
-            return true;
-        }
-        return false;
-    }
-
     public function bySubscription()
     {
         return !empty($this->sub_access);
@@ -244,6 +245,11 @@ class Story extends ActiveRecord
         throw new DomainException('История не найдена');
     }
 
+    /**
+     * @param $alias
+     * @return Story
+     * @throws NotFoundHttpException
+     */
     public static function findModelByAlias($alias): self
     {
         if (($model = self::findOne(['alias' => $alias])) !== null) {
@@ -251,4 +257,35 @@ class Story extends ActiveRecord
         }
         throw new NotFoundHttpException('История не найдена');
     }
+
+/*    public function afterFind()
+    {
+        parent::afterFind();
+        $categories = [];
+        foreach ($this->categories as $category) {
+            $categories[] = $category->id;
+        }
+        $this->story_categories = implode(',', $categories);
+    }*/
+
+    public function fillStoryCategories(): void
+    {
+        $categories = [];
+        foreach ($this->categories as $category) {
+            $categories[] = $category->id;
+        }
+        $this->story_categories = implode(',', $categories);
+    }
+
+    public function beforeValidate()
+    {
+        if (parent::beforeValidate()) {
+            if (empty($this->alias)) {
+                $this->alias = Translit::translit($this->title);
+            }
+            return true;
+        }
+        return false;
+    }
+
 }

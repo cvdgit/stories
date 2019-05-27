@@ -71,7 +71,7 @@ class StorySearch extends Model
         }
 
         if (!empty($this->category_id)) {
-            $query->joinWith(['category']);
+            $query->joinWith(['categories']);
         }
 
         if (!empty($this->tag_id)) {

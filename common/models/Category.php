@@ -175,6 +175,24 @@ class Category extends ActiveRecord
         return $items;
     }
 
+    public static function categoryArray()
+    {
+        $root = self::findOne(1);
+        $items = $root->toNestedArray(null, 'items', function($node) {
+            return [
+                'label' => $node->name,
+                'url' => $node->id,
+                'depth' => $node->depth
+            ];
+        });
+        return $items;
+    }
+
+    /**
+     * @param $id
+     * @return Category
+     * @throws NotFoundHttpException
+     */
     public static function findModel($id): self
     {
         if (($model = self::findOne($id)) !== null) {
@@ -183,6 +201,11 @@ class Category extends ActiveRecord
         throw new NotFoundHttpException('Категория не найдена');
     }
 
+    /**
+     * @param $alias
+     * @return Category
+     * @throws NotFoundHttpException
+     */
     public static function findModelByAlias($alias): self
     {
         if (($model = self::findOne(['alias' => $alias])) !== null) {

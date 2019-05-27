@@ -10,6 +10,7 @@ use yii\web\NotFoundHttpException;
 use common\models\Category;
 use common\models\CategorySearch;
 use common\rbac\UserRoles;
+use yii\web\Response;
 
 /**
  * CategoryController implements the CRUD actions for Category model.
@@ -147,4 +148,18 @@ class CategoryController extends \yii\web\Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
+    public function actionList($query)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $models = Category::findAllByName($query);
+        $items = [];
+        foreach ($models as $model) {
+            $items[] = ['name' => $model->name];
+        }
+
+        return $items;
+    }
+
 }

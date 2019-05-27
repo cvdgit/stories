@@ -71,7 +71,12 @@ $this->registerJs($js);
             <?php if (!empty($model->description)): ?>
             <div class="story-text"><?= Html::encode($model->description) ?></div>
 	  	    <?php endif ?>
-	        <div class="story-categories"><span>Категория:</span> <?= Html::a($model->category->name, ['story/category', 'category' => $model->category->alias]) ?></div>
+	        <div class="story-categories">
+                <span>Категории:</span>
+                <?php foreach ($model->categories as $category): ?>
+                <?= Html::a($category->name, ['story/category', 'category' => $category->alias]) ?>
+                <?php endforeach ?>
+            </div>
 	        <div class="story-pay"><span>Тип:</span> <?= $model->bySubscription() ? 'По подписке' : 'Бесплатно' ?></div>
 	    </div>
 	    <div class="comments">

@@ -57,11 +57,12 @@ class StoryController extends Controller
         $model->user_id = Yii::$app->user->getId();
         $model->loadDefaultValues();
         $model->source_id = Story::SOURCE_POWERPOINT;
+        $model->category_id = 1;
         
         $coverUploadForm = new StoryCoverUploadForm();
         $fileUploadForm = new StoryFileUploadForm();
         
-        if ($model->load(Yii::$app->request->post())) {
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             
             $coverUploadForm->coverFile = UploadedFile::getInstance($coverUploadForm, 'coverFile');
             if ($coverUploadForm->coverFile !== null) {
@@ -84,10 +85,16 @@ class StoryController extends Controller
                 }
             }
 
-            $model->save();
+            $model->categories = explode(',', $model->story_categories);
+
+            $model->save(false);
             return $this->redirect(['update', 'id' => $model->id]);
         }
-        
+
+        foreach ($model->getErrors() as $error) {
+            Yii::$app->session->setFlash('error', $error);
+        }
+
         return $this->render('create', [
             'model' => $model,
             'coverUploadForm' => $coverUploadForm,
@@ -117,6 +124,7 @@ class StoryController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $model->fillStoryCategories();
 
         if ($model->source_id == Story::SOURCE_SLIDESCOM) {
             $model->source_dropbox = $model->story_file;
@@ -137,7 +145,7 @@ class StoryController extends Controller
         $dropboxForm->storyId = $model->id;
         $dropboxForm->storyFile = $model->story_file;
 
-        if ($model->load(Yii::$app->request->post())) {
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 
             $coverUploadForm->coverFile = UploadedFile::getInstance($coverUploadForm, 'coverFile');
             if ($coverUploadForm->coverFile !== null) {
@@ -160,7 +168,9 @@ class StoryController extends Controller
                 }
             }
 
-            $model->save();
+            $model->categories = explode(',', $model->story_categories);
+
+            $model->save(false);
             Yii::$app->session->setFlash('success', 'Изменения успешно сохранены');
 
             $powerPointForm->storyFile = $model->story_file;

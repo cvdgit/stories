@@ -41,9 +41,12 @@ $this->title = 'Управление историями';
             'filter' => UserHelper::getUserArray(),
         ],
         [
-            'attribute' => 'category_id',
-            'value' => 'category.name',
-            'filter' => Category::getCategoryArray(),
+            'attribute' => 'story_categories',
+            'value' => function($model) {
+                return implode(', ', array_map(function($item){
+                    return $item->name;
+                }, $model->categories));
+            }
         ],
         [
             'attribute' => 'created_at',
