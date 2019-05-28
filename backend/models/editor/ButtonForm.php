@@ -4,17 +4,17 @@
 namespace backend\models\editor;
 
 
-class ImageForm extends BaseForm
+class ButtonForm extends TextForm
 {
 
-    public $image;
+    public $url;
 
     public function rules(): array
     {
         $rules = parent::rules();
         $rules = array_merge($rules, [
-            // ['image', 'required'],
-            ['image', 'image', 'maxSize' => 50 * 1024 * 1024],
+            [['url'], 'required'],
+            [['url'], 'url'],
         ]);
         return $rules;
     }
@@ -23,7 +23,7 @@ class ImageForm extends BaseForm
     {
         $labels = parent::attributeLabels();
         $labels = array_merge($labels, [
-            'image' => 'Изображение на слайде',
+            'url' => 'URL',
         ]);
         return $labels;
     }

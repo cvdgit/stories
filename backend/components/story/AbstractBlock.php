@@ -16,7 +16,16 @@ abstract class AbstractBlock
     protected $left;
     protected $top;
 
+    /** @var string */
     protected $type;
+
+    /** @var string */
+    protected $id;
+
+    public function __construct()
+    {
+        $this->id = bin2hex(random_bytes(10));
+    }
 
     /**
      * @return mixed
@@ -96,6 +105,22 @@ abstract class AbstractBlock
     public function setType($type): void
     {
         $this->type = $type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param string $id
+     */
+    public function setId(string $id): void
+    {
+        $this->id = $id;
     }
 
 }

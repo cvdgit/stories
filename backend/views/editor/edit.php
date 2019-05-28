@@ -21,11 +21,16 @@ $this->params['sidebarMenuItems'] = [
 $action = Url::to(['/editor/get-slide-by-index', 'story_id' => $model->id]);
 $blocksAction = Url::to(['/editor/get-slide-blocks', 'story_id' => $model->id]);
 $formAction = Url::to(['/editor/form', 'story_id' => $model->id]);
+$createBlockAction = Url::to(['/editor/create-block', 'story_id' => $model->id]);
+$deleteBlockAction = Url::to(['/editor/delete-block', 'story_id' => $model->id]);
 $js = <<< JS
+    
     StoryEditor.initialize({
         "getSlideAction": "$action",
         "getSlideBlocksAction": "$blocksAction",
-        "getBlockFormAction": "$formAction"
+        "getBlockFormAction": "$formAction",
+        "createBlockAction": "$createBlockAction",
+        "deleteBlockAction": "$deleteBlockAction"
     });
     let slideIndex = StoryEditor.readUrl() || 0;
 	StoryEditor.loadSlide(slideIndex, true);
@@ -41,10 +46,11 @@ $this->registerJs($js);
 ?>
 <div class="row">
 	<div class="col-xs-3">
+        <h4>Слайды</h4>
 		<div id ="preview-container" style="overflow: auto">
 		<?php foreach ($story->getSlides() as $slide): ?>
 		<?php $slideIndex = $slide->getSlideNumber() - 1; ?>
-			<div class="img-thumbnail preview-container-item" style="height: 164px; width: 218px; margin-bottom: 10px" data-slide-index="<?= $slideIndex ?>">
+			<div class="img-thumbnail preview-container-item" style="height: 80px; width: 80px; margin-bottom: 10px;" data-slide-index="<?= $slideIndex ?>">
 			<?= Html::a("Слайд {$slideIndex}", '#', ['class' => '', 'onclick' => 'StoryEditor.loadSlide(' . $slideIndex . ', true); return false']) ?>
 			</div>
 		<?php endforeach ?>
@@ -57,10 +63,6 @@ $this->registerJs($js);
 		    		'id' => 'story-editor',
 		    		'initializeReveal' => false,
 		    		'canViewStory' => true,
-		    		'options' => [
-		    			'hash' => true,
-		    			'history' => true,
-		    		],
                     'assets' => [
                         \backend\assets\RevealAsset::class,
                         \backend\assets\WikidsRevealAsset::class,
@@ -83,6 +85,7 @@ $this->registerJs($js);
         <?= $this->render('_blocks') ?>
     </div>
     <div class="col-xs-9">
+        <h4>Параметры блока</h4>
         <div id="form-container"></div>
     </div>
 </div>

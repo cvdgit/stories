@@ -3,6 +3,7 @@
 namespace common\services;
 
 use backend\components\story\reader\PowerPointReader;
+use backend\components\story\writer\HTMLWriter;
 use backend\components\StoryEditor;
 use backend\models\SourcePowerPointForm;
 use yii;
@@ -32,23 +33,13 @@ class StoryService
 
     public function importStoryFromPowerPoint(SourcePowerPointForm $form): void
     {
-
         $fileName = Yii::getAlias('@public') . '/slides_file/' . $form->storyFile;
         $imagesFolder = '/slides/' . $form->storyFile;
         $reader = new PowerPointReader($fileName, Yii::getAlias('@public') . $imagesFolder, $imagesFolder);
         $story = $reader->load();
-
-        $slidesNumber = $story->getSlideCount();
-
-        $storyEditor = new StoryEditor($story);
-        $body = $storyEditor->getStoryMarkup();
-
-        $form->saveSource($body, $slidesNumber);
-    }
-
-    public function importStoryFromDropbox()
-    {
-
+        $writer = new HTMLWriter();
+        $body = $writer->renderStory($story);
+        $form->saveSource($body, $story->getSlideCount());
     }
 
     public function getCoverPath($cover, $web = false)

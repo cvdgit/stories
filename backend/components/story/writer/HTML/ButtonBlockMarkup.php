@@ -20,7 +20,10 @@ class ButtonBlockMarkup extends AbstractMarkup
     private function getElementMarkup(ButtonBlock $block): string
     {
         $element = $this->getElement();
-        return Html::tag($element->getTagName(), $block->getTitle(), $element->getAttributes());
+        $elementAttributes = $element->getAttributes();
+        $elementAttributes['style'] = $this->setStyleValue($elementAttributes['style'], 'font-size', $block->getFontSize());
+        $elementAttributes['href'] = $block->getUrl();
+        return Html::tag($element->getTagName(), $block->getText(), $elementAttributes);
     }
 
     public function markup(): string
@@ -37,7 +40,7 @@ class ButtonBlockMarkup extends AbstractMarkup
         ]);
         return Html::tag('div', $contentBlockTag, [
             'class' => 'sl-block',
-            'data-block-id' => '',
+            'data-block-id' => $block->getId(),
             'data-block-type' => 'button',
             'style' => $this->arrayToStyle([
                 'min-width' => '4px',

@@ -7,7 +7,9 @@ var StoryEditor = (function() {
 	var config = {
 		storyID: "",
 		getSlideBlocksAction: "",
-		getBlockFormAction: ""
+		getBlockFormAction: "",
+		createBlockAction: "",
+		deleteBlockAction: ""
 	};
 
 	var currentSlideIndex;
@@ -47,7 +49,7 @@ var StoryEditor = (function() {
 					.attr("href", "#")
 					.addClass("list-group-item")
 					.text(block.type)
-					.data("type", block.type);
+					.data("block-id", block.id);
 				elem.on("click", function(e) {
 					e.preventDefault();
 					setActiveBlock(elem);
@@ -61,18 +63,40 @@ var StoryEditor = (function() {
 	function setActiveBlock(elem) {
 		$("a", $list).removeClass("active");
 		$(elem).addClass("active");
-		loadBlockForm($(elem).data("type"));
+		loadBlockForm($(elem).data("block-id"));
 	}
 
-	function loadBlockForm(blockType) {
+	function loadBlockForm(blockID) {
 		var promise = $.ajax({
-			"url": config.getBlockFormAction + "&slide_index=" + currentSlideIndex + "&block_type=" + blockType,
+			"url": config.getBlockFormAction + "&slide_index=" + currentSlideIndex + "&block_id=" + blockID,
 			"type": "GET",
 			"dataType": "json"
 		});
 		var $formContainer = $("#form-container");
 		promise.done(function(data) {
 			$formContainer.html(data);
+		});
+	}
+
+	function createBlock(type) {
+		var promise = $.ajax({
+			"url": config.createBlockAction + "&slide_index=" + currentSlideIndex + "&block_type=" + type,
+			"type": "GET",
+			"dataType": "json"
+		});
+		promise.done(function() {
+			loadSlide(currentSlideIndex, true);
+		});
+	}
+
+	function deleteBlock(blockID) {
+		var promise = $.ajax({
+			"url": config.deleteBlockAction + "&slide_index=" + currentSlideIndex + "&block_id=" + blockID,
+			"type": "GET",
+			"dataType": "json"
+		});
+		promise.done(function() {
+			loadSlide(currentSlideIndex, true);
 		});
 	}
 
@@ -164,8 +188,8 @@ var StoryEditor = (function() {
 	init();
 
 	function previewContainerSetHeight() {
-		var height = $('.story-container').css('height');
-		$previewContainer.css('height', height);
+		var height = parseInt($('.story-container').css('height')) - 40;
+		$previewContainer.css('height', height + 'px');
 	}
 
 	previewContainerSetHeight();
@@ -202,6 +226,8 @@ var StoryEditor = (function() {
 		"getCurrentSlideIndex": function() {
 			return currentSlideIndex;
 		},
-		"readUrl": readUrl
+		"readUrl": readUrl,
+		"createBlock": createBlock,
+		"deleteBlock": deleteBlock
 	};
 })();

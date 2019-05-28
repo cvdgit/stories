@@ -3,7 +3,9 @@
 namespace backend\controllers;
 
 use backend\components\story\AbstractBlock;
+use backend\components\story\ButtonBlock;
 use backend\components\story\reader\HTMLReader;
+use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
 use backend\models\editor\TextForm;
 use DomainException;
@@ -15,7 +17,6 @@ use common\rbac\UserRoles;
 use backend\services\StoryEditorService;
 use backend\components\StoryHtmlReader;
 use backend\components\StoryEditor;
-use backend\models\SlideEditorForm;
 use yii\web\Controller;
 use yii\web\Response;
 
@@ -64,106 +65,129 @@ class EditorController extends Controller
     public function actionGetSlideByIndex(int $story_id, int $slide_index)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-
         $model = Story::findModel($story_id);
-        $reader = new HTMLReader($model->body);
-        $story = $reader->load();
-
-        $editor = new StoryEditor($story);
+        $editor = new StoryEditor($model->body);
         $response['html'] = $editor->getSlideMarkup($slide_index);
-        $response['story'] = $editor->getSlideValues($slide_index);
         return $response;
     }
 
     public function actionGetSlideBlocks(int $story_id, int $slide_index)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-
         $model = Story::findModel($story_id);
-        $reader = new HTMLReader($model->body);
-        $story = $reader->load();
-
-        $editor = new StoryEditor($story);
+        $editor = new StoryEditor($model->body);
         return $editor->getSlideBlocksArray($slide_index);
     }
 
     public function actionUpdateText()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $editorModel = new SlideEditorForm();
-        if ($editorModel->load(Yii::$app->request->post()) && $editorModel->validate()) {    
-            $this->editorService->updateSlide($editorModel);
+        $form = new TextForm();
+        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+            $this->editorService->updateSlideText($form);
             return ['success' => true];
         }
-        else {
-            return $editorModel->getErrors();
-        }
-        return 'no';
+        return $form->getErrors();
     }
 
     public function actionUpdateImage()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $editorModel = new SlideEditorForm();
-        if ($editorModel->load(Yii::$app->request->post()) && $editorModel->validate()) {
-            $this->editorService->updateSlide($editorModel);
+        $form = new ImageForm();
+        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+            $this->editorService->updateSlideImage($form);
             return ['success' => true];
         }
-        else {
-            return $editorModel->getErrors();
-        }
-        return 'no';
+        return $form->getErrors();
     }
 
-    public function actionLink()
+    public function actionUpdateButton()
     {
-        return 'ok';
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $form = new ButtonForm();
+        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+            $this->editorService->updateSlideButton($form);
+            return ['success' => true];
+        }
+        return $form->getErrors();
     }
 
-    public function actionForm(int $story_id, int $slide_index, string $block_type)
+    /**
+     * @param int $story_id
+     * @param int $slide_index
+     * @param string $block_id
+     * @return string
+     * @throws yii\base\InvalidConfigException
+     */
+    public function actionForm(int $story_id, int $slide_index, string $block_id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $model = Story::findModel($story_id);
+        $editor = new StoryEditor($model->body);
+        $block = $editor->findBlockByID($slide_index, $block_id);
+        $block_type = $block->getType();
+
+        $types = [
+            AbstractBlock::TYPE_TEXT => [
+                'class' => TextForm::class,
+                'view' => '_text_form',
+            ],
+            AbstractBlock::TYPE_IMAGE => [
+                'class' => ImageForm::class,
+                'view' => '_image_form',
+            ],
+            AbstractBlock::TYPE_BUTTON => [
+                'class' => ButtonForm::class,
+                'view' => '_button_form',
+            ],
+        ];
+        if (!isset($types[$block_type])) {
+            throw new DomainException('Unknown block type');
+        }
+
+        $form = Yii::createObject($types[$block_type]);
+        $form->story_id = $model->id;
+        $form->slide_index = $slide_index;
+        $form->block_id = $block_id;
+
+        $values = $editor->getBlockValues($block);
+
+        $form->load($values, '');
+
+        return $this->renderAjax($form->view, [
+            'model' => $form,
+        ]);
+    }
+
+    public function actionCreateBlock(int $story_id, int $slide_index, string $block_type)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
         $types = [
-            AbstractBlock::TYPE_TEXT => TextForm::class,
-            AbstractBlock::TYPE_IMAGE => ImageForm::class,
+            AbstractBlock::TYPE_BUTTON => ButtonBlock::class,
         ];
-
         if (!isset($types[$block_type])) {
             throw new DomainException('Unknown block type');
         }
 
         $model = Story::findModel($story_id);
+        $editor = new StoryEditor($model->body);
 
-        $form = new $types[$block_type];
-        $form->story_id = $model->id;
-        $form->slide_index = $slide_index;
+        $block = Yii::createObject($types[$block_type]);
+        $editor->createButtonBlock($slide_index, $block);
 
-        $view = '';
-        if ($block_type === 'text') {
-            $view = '_text_form';
-        }
-        else if ($block_type === 'image') {
-            $view = '_image_form';
-        }
-        if ($view === '') {
-            throw new DomainException('View not found');
-        }
+        $body = $editor->getStoryMarkup();
+        $model->saveBody($body);
 
-        $reader = new HTMLReader($model->body);
-        $story = $reader->load();
+        return ['success' => true];
+    }
 
-        $editor = new StoryEditor($story);
-        $response['story'] = $editor->getSlideValues($slide_index);
-
-
-        $form->text = $response['story']['text'];
-        $form->text_size = $response['story']['text_size'];
-        $form->image = $response['story']['image'];
-
-        return $this->renderAjax($view, [
-            'model' => $form,
-        ]);
+    public function actionDeleteBlock(int $story_id, int $slide_index, string $block_id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $this->editorService->deleteBlock($story_id, $slide_index, $block_id);
+        return ['success' => true];
     }
 
 }

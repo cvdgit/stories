@@ -31,6 +31,14 @@ class Slide
         $this->blocks[] = $block;
     }
 
+    public function deleteBlock(string $targetBlockID)
+    {
+        $blocks = array_filter($this->blocks, function(AbstractBlock $block) use ($targetBlockID) {
+            return ($block->getId() !== $targetBlockID);
+        });
+        $this->blocks = $blocks;
+    }
+
     public function setLayout(AbstractLayout $layout): void
     {
         $this->layout = $layout;

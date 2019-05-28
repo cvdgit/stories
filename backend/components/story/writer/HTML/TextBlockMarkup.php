@@ -11,7 +11,7 @@ class TextBlockMarkup extends AbstractMarkup
     {
         return [
             'class' => 'sl-block',
-            'data-block-id' => '',
+            'data-block-id' => $this->block->getId(),
             'data-block-type' => 'text',
         ];
     }

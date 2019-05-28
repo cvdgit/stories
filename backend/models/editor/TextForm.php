@@ -20,12 +20,14 @@ class TextForm extends BaseForm
         return $rules;
     }
 
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
-        return [
+        $labels = parent::attributeLabels();
+        $labels = array_merge($labels, [
             'text' => 'Текст слайда',
             'text_size' => 'Размер шрифта',
-        ];
+        ]);
+        return $labels;
     }
 
 }

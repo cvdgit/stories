@@ -41,7 +41,7 @@ class ImageBlockMarkup extends AbstractMarkup
         ]);
         return Html::tag('div', $contentBlockTag, [
             'class' => 'sl-block',
-            'data-block-id' => '',
+            'data-block-id' => $block->getId(),
             'data-block-type' => 'image',
             'style' => $this->arrayToStyle([
                 'min-width' => '4px',

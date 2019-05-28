@@ -7,6 +7,8 @@ namespace backend\components\story;
 class TextBlock extends AbstractBlock
 {
 
+    protected $type = AbstractBlock::TYPE_TEXT;
+
     protected $text;
     protected $fontSize;
 

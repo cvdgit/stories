@@ -8,22 +8,24 @@ class ButtonBlock extends TextBlock
 {
 
     /** @var string */
-    protected $title;
+    protected $url;
+
+    protected $type = AbstractBlock::TYPE_BUTTON;
 
     /**
      * @return string
      */
-    public function getTitle(): string
+    public function getUrl(): string
     {
-        return $this->title;
+        return $this->url;
     }
 
     /**
-     * @param string $title
+     * @param string $url
      */
-    public function setTitle(string $title): void
+    public function setUrl(string $url): void
     {
-        $this->title = $title;
+        $this->url = $url;
     }
 
 }

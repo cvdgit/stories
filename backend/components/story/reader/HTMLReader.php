@@ -105,6 +105,7 @@ class HTMLReader extends AbstractReader implements ReaderInterface
 
         $element = pq($htmlBlock)->find('img');
         $block->setFilePath($element->attr('data-src'));
+        $block->setId(pq($htmlBlock)->attr('data-block-id'));
 
         $style = pq($htmlBlock)->attr('style');
         $width = preg_replace('/[\D]+/', '', $this->getStyleValue($style, 'width'));
@@ -121,24 +122,33 @@ class HTMLReader extends AbstractReader implements ReaderInterface
             $style = pq($htmlBlock)->find('h1')->attr('style');
             $block->setFontSize($this->getStyleValue($style, 'font-size'));
             $block->setText(pq($htmlBlock)->find('h1')->html());
+            $block->setId(pq($htmlBlock)->attr('data-block-id'));
         }
         else {
             $block = $blocks[1];
             $style = pq($htmlBlock)->find('p')->attr('style');
             $block->setFontSize($this->getStyleValue($style, 'font-size'));
             $block->setText(pq($htmlBlock)->find('p')->html());
+            $block->setId(pq($htmlBlock)->attr('data-block-id'));
         }
     }
 
     protected function loadBlockButton($htmlBlock, Slide $slide): void
     {
         $buttonBlock = new ButtonBlock();
-        $buttonBlock->setType(AbstractBlock::TYPE_BUTTON);
-        $buttonBlock->setWidth('290px');
-        $buttonBlock->setHeight('50px');
-        $buttonBlock->setTop('500px');
-        $buttonBlock->setLeft('990px');
-        $buttonBlock->setTitle(pq($htmlBlock)->find('button')->html());
+
+        $style = pq($htmlBlock)->attr('style');
+        $buttonBlock->setWidth($this->getStyleValue($style, 'width'));
+        $buttonBlock->setHeight($this->getStyleValue($style, 'height'));
+        $buttonBlock->setTop($this->getStyleValue($style, 'top'));
+        $buttonBlock->setLeft($this->getStyleValue($style, 'left'));
+
+        $buttonBlock->setText(pq($htmlBlock)->find('a')->html());
+        $buttonBlock->setId(pq($htmlBlock)->attr('data-block-id'));
+
+        $style = pq($htmlBlock)->find('a')->attr('style');
+        $buttonBlock->setFontSize($this->getStyleValue($style, 'font-size'));
+        $buttonBlock->setUrl(pq($htmlBlock)->find('a')->attr('href'));
         $slide->addBlock($buttonBlock);
     }
 
