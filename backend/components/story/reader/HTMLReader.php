@@ -108,8 +108,8 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         $block->setId(pq($htmlBlock)->attr('data-block-id'));
 
         $style = pq($htmlBlock)->attr('style');
-        $width = preg_replace('/[\D]+/', '', $this->getStyleValue($style, 'width'));
-        $height = preg_replace('/[\D]+/', '', $this->getStyleValue($style, 'height'));
+        $width = str_replace('px', '', $this->getStyleValue($style, 'width'));
+        $height = str_replace('px', '', $this->getStyleValue($style, 'height'));
         $block->setImageSize($element->attr('data-src'), $width, $height);
         $block->setNaturalImageSize($element->attr('data-natural-width'), $element->attr('data-natural-height'));
     }
