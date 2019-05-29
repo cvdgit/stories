@@ -5,8 +5,12 @@ var StoryEditor = (function() {
 	var $previewContainer = $('#preview-container');
 	
 	var config = {
-		storyID: ''
-	}
+		storyID: "",
+		getSlideBlocksAction: "",
+		getBlockFormAction: "",
+		createBlockAction: "",
+		deleteBlockAction: ""
+	};
 
 	var currentSlideIndex;
 
@@ -29,30 +33,95 @@ var StoryEditor = (function() {
     	Reveal.initialize(WikidsRevealConfig);
     }
 
-	function loadSlide(index) {
+
+	var $list = $("#slide-block-list");
+
+	function loadSlideBlocks() {
+		var promise = $.ajax({
+			"url": config.getSlideBlocksAction + "&slide_index=" + currentSlideIndex,
+			"type": "GET",
+			"dataType": "json"
+		});
+		promise.done(function(data) {
+			$list.empty();
+			data.forEach(function(block) {
+				var elem = $("<a>")
+					.attr("href", "#")
+					.addClass("list-group-item")
+					.text(block.type)
+					.data("block-id", block.id);
+				elem.on("click", function(e) {
+					e.preventDefault();
+					setActiveBlock(elem);
+				});
+				elem.appendTo($list);
+			});
+			setActiveBlock($list.find("a").get(0));
+		});
+	}
+
+	function setActiveBlock(elem) {
+		$("a", $list).removeClass("active");
+		$(elem).addClass("active");
+		loadBlockForm($(elem).data("block-id"));
+	}
+
+	function loadBlockForm(blockID) {
+		var promise = $.ajax({
+			"url": config.getBlockFormAction + "&slide_index=" + currentSlideIndex + "&block_id=" + blockID,
+			"type": "GET",
+			"dataType": "json"
+		});
+		var $formContainer = $("#form-container");
+		promise.done(function(data) {
+			$formContainer.html(data);
+		});
+	}
+
+	function createBlock(type) {
+		var promise = $.ajax({
+			"url": config.createBlockAction + "&slide_index=" + currentSlideIndex + "&block_type=" + type,
+			"type": "GET",
+			"dataType": "json"
+		});
+		promise.done(function() {
+			loadSlide(currentSlideIndex, true);
+		});
+	}
+
+	function deleteBlock(blockID) {
+		var promise = $.ajax({
+			"url": config.deleteBlockAction + "&slide_index=" + currentSlideIndex + "&block_id=" + blockID,
+			"type": "GET",
+			"dataType": "json"
+		});
+		promise.done(function() {
+			loadSlide(currentSlideIndex, true);
+		});
+	}
+
+	function loadSlide(index, loadBlocks) {
+
+		loadBlocks = loadBlocks || false;
 
 		currentSlideIndex = index;
 		window.location.hash = locationHash();
 
-		$('[data-slide-index]', $previewContainer).each(function() {
-			$(this).removeClass('active');
+		$("[data-slide-index]", $previewContainer).each(function() {
+			$(this).removeClass("active");
 		});
-		$('[data-slide-index=' + index + ']', $previewContainer).addClass('active');
-
-		var $el = $('#' + config.textFieldID);
-
-		$('#' + config.fileFieldID).val('');
+		$("[data-slide-index=" + index + "]", $previewContainer).addClass("active");
 
 		send(index)
 			.done(function(data) {
-				
-				$('.slides', $editor).empty().append(data.html);
-				
-				$el.val(data.story.text);
-				$('#' + config.textSizeFieldID).val(data.story.text_size);
-				
+
+				$(".slides", $editor).empty().append(data.html);
 				Reveal.sync();
 				Reveal.slide(0);
+
+				if (loadBlocks) {
+					loadSlideBlocks();
+				}
 			})
 			.fail(function(data) {
 				$editor.text(data);
@@ -62,19 +131,8 @@ var StoryEditor = (function() {
 	function onBeforeSubmit() {
 		
 		var $form = $(this),
-	        button = $('button[type=submit]', $form);
-	    
-	    var $input = $('input#form_slide_index', $form);
-	    if (!$input.length) {
-	    	$input = $('<input/>').attr({type: 'hidden', id: 'form_slide_index', name: 'SlideEditorForm[slide_index]'});
-	    }
-
-	    $input
-	      .val(currentSlideIndex)
-	      .appendTo($form);
-
-	    button.button('loading');
-
+	        button = $("button[type=submit]", $form);
+	    button.button("loading");
 	    $.ajax({
 	        url: $form.attr("action"),
 	        type: $form.attr("method"),
@@ -89,19 +147,52 @@ var StoryEditor = (function() {
 	        	console.log(data);
 	        }
 	    }).always(function() {
-	    	button.button('reset');
+	    	button.button("reset");
 	    });
+	}
+
+	function linkFormSubmit() {
+
+		var $form = $(this),
+			button = $('button[type=submit]', $form);
+
+		var $input = $('input#form_slide_index', $form);
+		if (!$input.length) {
+			$input = $('<input/>').attr({type: 'hidden', id: 'form_slide_index', name: 'LinkForm[slide_index]'});
+		}
+
+		$input
+			.val(currentSlideIndex)
+			.appendTo($form);
+
+		button.button('loading');
+
+		$.ajax({
+			url: $form.attr("action"),
+			type: $form.attr("method"),
+			data: new FormData($form[0]),
+			cache: false,
+			contentType: false,
+			processData: false,
+			success: function(data) {
+				loadSlide(currentSlideIndex);
+			},
+			error: function(data) {
+				console.log(data);
+			}
+		}).always(function() {
+			button.button('reset');
+		});
 	}
 
 	init();
 
 	function previewContainerSetHeight() {
-		var height = (window.innerHeight - 100) + 'px';
-		$previewContainer.css('height', height);
+		var height = parseInt($('.story-container').css('height')) - 40;
+		$previewContainer.css('height', height + 'px');
 	}
 
 	previewContainerSetHeight();
-
 	window.addEventListener('resize', previewContainerSetHeight);
 
 	function getQueryHash() {
@@ -128,12 +219,15 @@ var StoryEditor = (function() {
 	}
 
 	return {
-		initialize: initialize,
-		loadSlide: loadSlide,
-		onBeforeSubmit: onBeforeSubmit,
-		getCurrentSlideIndex: function() {
+		"initialize": initialize,
+		"loadSlide": loadSlide,
+		"onBeforeSubmit": onBeforeSubmit,
+		"linkFormSubmit": linkFormSubmit,
+		"getCurrentSlideIndex": function() {
 			return currentSlideIndex;
 		},
-		readUrl: readUrl
-	}
+		"readUrl": readUrl,
+		"createBlock": createBlock,
+		"deleteBlock": deleteBlock
+	};
 })();

@@ -114,7 +114,11 @@ var WikidsPlayer = (function() {
 
 function onSlideMouseDown(e) {
     e = e || window.event;
-    if ($(e.target).hasClass('story-controls') || $(e.target).parents('.story-controls').length) return;
+    if ($(e.target).hasClass("story-controls")
+        || $(e.target).parents(".story-controls").length
+        || $(e.target).hasClass("btn"))  {
+        return;
+    }
     switch (e.which) {
         case 1: Reveal.next(); break;
         case 3: Reveal.prev(); break;

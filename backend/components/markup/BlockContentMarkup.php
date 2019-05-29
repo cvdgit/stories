@@ -3,6 +3,7 @@
 namespace backend\components\markup;
 
 use backend\components\StoryMarkup;
+use yii\helpers\Html;
 
 class BlockContentMarkup extends StoryMarkup implements \backend\components\StoryRenderableInterface
 {

@@ -2,8 +2,8 @@
 
 namespace backend\components;
 
-use backend\components\markup\BlockTextMarkup;
-use backend\components\markup\BlockHeaderMarkup;
+
+use backend\components\markup\ButtonMarkup;
 
 class SlideBlockText extends SlideBlock
 {
@@ -56,20 +56,13 @@ class SlideBlockText extends SlideBlock
 		$element->setStyleValue('font-size', $textSize);
 	}
 
-	/*
-	public function createBlockTextMarkup($new = false)
-	{
-		$markup = new BlockTextMarkup($this, $new);
-		$this->setMarkup($markup);
-		return $markup;
-	}
-
-	public function createBlockHeaderMarkup($new = false)
-	{
-		$markup = new BlockHeaderMarkup($this, $new);
-		$this->setMarkup($markup);
-		return $markup;
-	}
-	*/
+	public function setButton($slideButton)
+    {
+        $elements = $this->markup->getElements();
+        $element = $elements[0];
+        $buttonMarkup = new ButtonMarkup($element->getBlock());
+        $buttonMarkup->setContent('KNOPKA');
+        $element->addElement($buttonMarkup);
+    }
 
 }

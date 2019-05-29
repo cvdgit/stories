@@ -2,6 +2,9 @@
 
 namespace backend\components;
 
+use backend\components\markup\ButtonMarkup;
+use common\widgets\RevealButtons\Button;
+
 class StoryHtmlReader
 {
 
@@ -64,7 +67,9 @@ class StoryHtmlReader
 	protected function loadBlockText($htmlBlock, $slide)
 	{
 		$block = $slide->createBlockText();
-        
+
+		$buttonMarkup = null;
+
         if ($slide->getLayout()) {
         	$element = pq($htmlBlock);
             $blockMarkup = new \backend\components\markup\BlockHeaderMarkup($block, $element->get(0)->tagName, $element->attr('*'));
@@ -84,9 +89,17 @@ class StoryHtmlReader
 
 			$element = pq($htmlBlock)->find('p');
 			$paragraphMarkup = new \backend\components\markup\ParagraphMarkup($block, $element->get(0)->tagName, $element->attr('*'), $element->html());
+
+            $element = pq($htmlBlock)->find('button');
+            if ($element->get(0) !== null) {
+                $buttonMarkup = new ButtonMarkup($block, $element->get(0)->tagName, $element->attr('*'), $element->html());
+            }
         }
 
 		$blockContentMarkup->addElement($paragraphMarkup);
+        if ($buttonMarkup !== null) {
+            $blockContentMarkup->addElement($buttonMarkup);
+        }
 		$blockMarkup->addElement($blockContentMarkup);
 
 		$block->setMarkup($blockMarkup);

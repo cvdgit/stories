@@ -13,6 +13,7 @@ class StoryMarkup
 	protected $attributes;
 	protected $content;
 
+	/** @var StoryMarkup[] */
 	protected $elements = [];
 
 	protected $style = [];

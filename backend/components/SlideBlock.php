@@ -12,6 +12,7 @@ abstract class SlideBlock implements StoryRenderableInterface
 	protected $width;
 	protected $height;
 
+	/** @var StoryMarkup */
 	protected $markup;
 
 	public function __construct()
