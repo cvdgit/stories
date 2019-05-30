@@ -71,7 +71,7 @@ class StoryController extends Controller
 
         $model = Category::findModelByAlias($category);
         $searchModel = new StorySearch();
-        $searchModel->category_id = $model->id;
+        $searchModel->category_id = $model->subCategories();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         $this->getView()->setMetaTags(

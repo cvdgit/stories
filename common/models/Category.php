@@ -214,4 +214,12 @@ class Category extends ActiveRecord
         throw new NotFoundHttpException('Категория не найдена');
     }
 
+    public function subCategories()
+    {
+        $categories = $this->children()->all();
+        return array_merge(array_map(function(Category $category) {
+            return $category->id;
+        }, $categories), [$this->id]);
+    }
+
 }

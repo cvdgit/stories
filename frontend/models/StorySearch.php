@@ -21,7 +21,8 @@ class StorySearch extends Model
     {
         return [
             [['title', 'description'], 'string'],
-            [['category_id', 'tag_id'], 'integer'],
+            ['tag_id', 'integer'],
+            ['category_id', 'each', 'rule' => ['integer']],
         ];
     }
 
@@ -82,10 +83,8 @@ class StorySearch extends Model
             ['like', '{{%story}}.title', $this->title],
             ['like', '{{%story}}.description', $this->title],
         ]);
-        $query->andFilterWhere([
-            'category.id' => $this->category_id,
-            'tag.id' => $this->tag_id,
-        ]);
+        $query->andFilterWhere(['tag.id' => $this->tag_id]);
+        $query->andFilterWhere(['in', 'category.id', $this->category_id]);
 
         return $dataProvider;
     }
