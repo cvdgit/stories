@@ -2,6 +2,8 @@
 
 namespace common\widgets\RevealButtons;
 
+use yii\web\JsExpression;
+
 class LeftButton extends Button
 {
 
@@ -10,7 +12,14 @@ class LeftButton extends Button
 		$this->icon = 'icomoon-chevron-left';
 		$this->className = 'custom-navigate-left';
 		$this->title = 'Назад';
-		$this->action = new \yii\web\JsExpression('function() { Reveal.prev(); }');
+		$this->action = new JsExpression('function() { 
+            if (Reveal.isFirstSlide()) {
+                TransitionSlide.backToStory();
+            }
+            else {
+                Reveal.prev();
+            }
+		}');
 	}
 
 }

@@ -5,6 +5,7 @@ namespace backend\services;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
 use backend\models\editor\TextForm;
+use backend\models\editor\TransitionForm;
 use yii;
 use yii\web\UploadedFile;
 use common\models\Story;
@@ -53,6 +54,15 @@ class StoryEditorService
         $model = Story::findModel($form->story_id);
         $editor = new StoryEditor($model->body);
         $editor->setSlideButton($form);
+        $body = $editor->getStoryMarkup();
+        $model->saveBody($body);
+    }
+
+    public function updateSlideTransition(TransitionForm $form): void
+    {
+        $model = Story::findModel($form->story_id);
+        $editor = new StoryEditor($model->body);
+        $editor->setSlideTransition($form);
         $body = $editor->getStoryMarkup();
         $model->saveBody($body);
     }

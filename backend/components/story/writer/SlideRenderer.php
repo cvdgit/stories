@@ -8,11 +8,13 @@ use backend\components\story\ButtonBlock;
 use backend\components\story\ImageBlock;
 use backend\components\story\layouts\OneColumnLayout;
 use backend\components\story\TextBlock;
+use backend\components\story\TransitionBlock;
 use backend\components\story\writer\HTML\ButtonBlockMarkup;
 use backend\components\story\writer\HTML\HeaderBlockMarkup;
 use backend\components\story\writer\HTML\ImageBlockMarkup;
 use backend\components\story\Slide;
 use backend\components\story\writer\HTML\ParagraphBlockMarkup;
+use backend\components\story\writer\HTML\TransitionBlockMarkup;
 
 class SlideRenderer
 {
@@ -39,6 +41,9 @@ class SlideRenderer
             }
             if (get_class($block) === ButtonBlock::class) {
                 $html .= (new ButtonBlockMarkup($block))->markup();
+            }
+            if (get_class($block) === TransitionBlock::class) {
+                $html .= (new TransitionBlockMarkup($block))->markup();
             }
             if (get_class($block) === ImageBlock::class) {
                 $html .= (new ImageBlockMarkup($block))->markup();
