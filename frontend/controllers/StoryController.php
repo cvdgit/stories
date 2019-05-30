@@ -13,6 +13,7 @@ use common\models\Category;
 use common\models\Comment;
 use common\services\StoryService;
 use frontend\models\CommentForm;
+use yii\web\Response;
 
 class StoryController extends Controller
 {
@@ -143,6 +144,44 @@ class StoryController extends Controller
         else {
             return $this->goHome();
         }
+    }
+
+    protected function slideFilterArray($filter)
+    {
+        $slides = [];
+        foreach (explode(',', $filter) as $value) {
+            if (strpos($value, '-') !== false) {
+                [$a, $b] = explode('-', $value);
+                for ($i = $a; $i <= $b; $i++) {
+                    $slides[] = $i;
+                }
+            }
+            else {
+                $slides[] = $value;
+            }
+        }
+        return $slides;
+    }
+
+    public function actionGetStoryBody($id, $filter = '')
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $model = Story::findModel($id);
+
+        $html = $model->body;
+        if (!empty($filter)) {
+            $document = \phpQuery::newDocumentHTML($model->body);
+            $sections = $document->find('section')->elements;
+            $slides = [];
+            $slideFilter = $this->slideFilterArray($filter);
+            foreach ($slideFilter as $slideIndex) {
+                if (isset($sections[$slideIndex])) {
+                    $slides[] = pq($sections[$slideIndex])->htmlOuter();
+                }
+            }
+            $html = implode("\n", $slides);
+        }
+        return ['html' => $html];
     }
 
 }

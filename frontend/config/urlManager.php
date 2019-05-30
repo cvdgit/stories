@@ -36,6 +36,7 @@ return [
 
         'story/webhook' => 'story/webhook',
         'story/addcomment' => 'story/add-comment',
+        'story/get-story-body/<id:\d+>' => 'story/get-story-body',
         'story/<alias:[\w\-]+>' => 'story/view',
 
         'success' => 'rate/success',

@@ -10,6 +10,7 @@ use backend\components\story\layouts\OneColumnLayout;
 use backend\components\story\layouts\TwoColumnLayout;
 use backend\components\story\Slide;
 use backend\components\story\Story;
+use backend\components\story\TransitionBlock;
 
 class HTMLReader extends AbstractReader implements ReaderInterface
 {
@@ -62,14 +63,17 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         foreach ($htmlBlocks as $htmlBlock) {
             $blockType = pq($htmlBlock)->attr('data-block-type');
             switch ($blockType) {
-                case 'text':
+                case AbstractBlock::TYPE_TEXT:
                     $this->loadBlockText($htmlBlock, $slide);
                     break;
-                case 'image':
+                case AbstractBlock::TYPE_IMAGE:
                     $this->loadBlockImage($htmlBlock, $slide);
                     break;
-                case 'button':
+                case AbstractBlock::TYPE_BUTTON:
                     $this->loadBlockButton($htmlBlock, $slide);
+                    break;
+                case AbstractBlock::TYPE_TRANSITION:
+                    $this->loadBlockTransition($htmlBlock, $slide);
                     break;
                 default:
             }
@@ -108,8 +112,8 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         $block->setId(pq($htmlBlock)->attr('data-block-id'));
 
         $style = pq($htmlBlock)->attr('style');
-        $width = preg_replace('/[\D]+/', '', $this->getStyleValue($style, 'width'));
-        $height = preg_replace('/[\D]+/', '', $this->getStyleValue($style, 'height'));
+        $width = str_replace('px', '', $this->getStyleValue($style, 'width'));
+        $height = str_replace('px', '', $this->getStyleValue($style, 'height'));
         $block->setImageSize($element->attr('data-src'), $width, $height);
         $block->setNaturalImageSize($element->attr('data-natural-width'), $element->attr('data-natural-height'));
     }
@@ -150,6 +154,26 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         $buttonBlock->setFontSize($this->getStyleValue($style, 'font-size'));
         $buttonBlock->setUrl(pq($htmlBlock)->find('a')->attr('href'));
         $slide->addBlock($buttonBlock);
+    }
+
+    protected function loadBlockTransition($htmlBlock, Slide $slide): void
+    {
+        $block = new TransitionBlock();
+
+        $style = pq($htmlBlock)->attr('style');
+        $block->setWidth($this->getStyleValue($style, 'width'));
+        $block->setHeight($this->getStyleValue($style, 'height'));
+        $block->setTop($this->getStyleValue($style, 'top'));
+        $block->setLeft($this->getStyleValue($style, 'left'));
+
+        $block->setText(pq($htmlBlock)->find('button')->html());
+        $block->setId(pq($htmlBlock)->attr('data-block-id'));
+
+        $style = pq($htmlBlock)->find('button')->attr('style');
+        $block->setFontSize($this->getStyleValue($style, 'font-size'));
+        $block->setTransitionStoryId(pq($htmlBlock)->find('button')->attr('data-story-id'));
+        $block->setSlides(pq($htmlBlock)->find('button')->attr('data-slides'));
+        $slide->addBlock($block);
     }
 
 }

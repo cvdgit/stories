@@ -21,6 +21,11 @@ use yii\bootstrap\ButtonDropdown;
                     'url' => '#',
                     'linkOptions' => ['onclick' => "StoryEditor.createBlock('button'); return false;"],
                 ],
+                [
+                    'label' => 'Переход к истории',
+                    'url' => '#',
+                    'linkOptions' => ['onclick' => "StoryEditor.createBlock('transition'); return false;"],
+                ],
             ],
         ]
     ]; ?>

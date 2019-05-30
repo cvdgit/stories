@@ -7,10 +7,12 @@ use backend\components\story\ButtonBlock;
 use backend\components\story\ImageBlock;
 use backend\components\story\reader\HTMLReader;
 use backend\components\story\TextBlock;
+use backend\components\story\TransitionBlock;
 use backend\components\story\writer\HTMLWriter;
 use backend\components\story\Story;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\TextForm;
+use backend\models\editor\TransitionForm;
 use Yii;
 
 class StoryEditor
@@ -59,6 +61,20 @@ class StoryEditor
         $block->setUrl($form->url);
     }
 
+    public function setSlideTransition(TransitionForm $form): void
+    {
+        /** @var TransitionBlock $block */
+        $block = $this->findBlockByID($form->slide_index, $form->block_id);
+        $block->setLeft($form->left);
+        $block->setTop($form->top);
+        $block->setWidth($form->width);
+        $block->setHeight($form->height);
+        $block->setText($form->text);
+        $block->setFontSize($form->text_size);
+        $block->setTransitionStoryId($form->transition_story_id);
+        $block->setSlides($form->slides);
+    }
+
 	public function setSlideImage($slideIndex, $imagePath)
 	{
         $slide = $this->story->getSlide($slideIndex);
@@ -91,6 +107,12 @@ class StoryEditor
                 $values['text_size'] = $block->getFontSize();
                 $values['url'] = $block->getUrl();
                 break;
+            case TransitionBlock::class:
+                $values['text'] = $block->getText();
+                $values['text_size'] = $block->getFontSize();
+                $values['transition_story_id'] = $block->getTransitionStoryId();
+                $values['slides'] = $block->getSlides();
+                break;
         }
         return $values;
     }
@@ -121,9 +143,9 @@ class StoryEditor
         }, $slide->getBlocks());
     }
 
-    public function createButtonBlock(int $slideIndex, ButtonBlock $block): void
+    protected function createButtonBlock(): ButtonBlock
     {
-        $slide = $this->story->getSlide($slideIndex);
+        $block = new ButtonBlock();
         $block->setWidth('290px');
         $block->setHeight('50px');
         $block->setTop('500px');
@@ -131,6 +153,32 @@ class StoryEditor
         $block->setText('Название');
         $block->setFontSize('1em');
         $block->setUrl('#');
+        return $block;
+    }
+
+    protected function createTransitionBlock(): TransitionBlock
+    {
+        $block = new TransitionBlock();
+        $block->setWidth('290px');
+        $block->setHeight('50px');
+        $block->setTop('600px');
+        $block->setLeft('990px');
+        $block->setText('Название');
+        $block->setFontSize('1em');
+        $block->setUrl('#');
+        return $block;
+    }
+
+    public function createBlock(int $slideIndex, string $blockType): void
+    {
+        $slide = $this->story->getSlide($slideIndex);
+        $block = null;
+        if ($blockType === AbstractBlock::TYPE_BUTTON) {
+            $block = $this->createButtonBlock();
+        }
+        if ($blockType === AbstractBlock::TYPE_TRANSITION) {
+            $block = $this->createTransitionBlock();
+        }
         $slide->addBlock($block);
     }
 

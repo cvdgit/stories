@@ -5,9 +5,11 @@ namespace backend\controllers;
 use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
 use backend\components\story\reader\HTMLReader;
+use backend\components\story\TransitionBlock;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
 use backend\models\editor\TextForm;
+use backend\models\editor\TransitionForm;
 use DomainException;
 use Yii;
 use yii\filters\AccessControl;
@@ -112,6 +114,17 @@ class EditorController extends Controller
         return $form->getErrors();
     }
 
+    public function actionUpdateTransition()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $form = new TransitionForm();
+        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+            $this->editorService->updateSlideTransition($form);
+            return ['success' => true];
+        }
+        return $form->getErrors();
+    }
+
     /**
      * @param int $story_id
      * @param int $slide_index
@@ -141,6 +154,10 @@ class EditorController extends Controller
                 'class' => ButtonForm::class,
                 'view' => '_button_form',
             ],
+            AbstractBlock::TYPE_TRANSITION => [
+                'class' => TransitionForm::class,
+                'view' => '_transition_form',
+            ],
         ];
         if (!isset($types[$block_type])) {
             throw new DomainException('Unknown block type');
@@ -165,17 +182,17 @@ class EditorController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
 
         $types = [
-            AbstractBlock::TYPE_BUTTON => ButtonBlock::class,
+            AbstractBlock::TYPE_BUTTON,
+            AbstractBlock::TYPE_TRANSITION,
         ];
-        if (!isset($types[$block_type])) {
+        if (!in_array($block_type, $types, true)) {
             throw new DomainException('Unknown block type');
         }
 
         $model = Story::findModel($story_id);
         $editor = new StoryEditor($model->body);
 
-        $block = Yii::createObject($types[$block_type]);
-        $editor->createButtonBlock($slide_index, $block);
+        $editor->createBlock($slide_index, $block_type);
 
         $body = $editor->getStoryMarkup();
         $model->saveBody($body);
