@@ -415,7 +415,7 @@ section h2 span {
 
 
 .story-list .story-item {
-  margin-bottom: 50px;
+  margin-bottom: 20px;
 }
 
 .story-list .story-item a {
@@ -427,7 +427,7 @@ section h2 span {
 }
 
 .story-list .story-item .story-item-image {
-  margin-bottom: 28px;
+  margin-bottom: 14px;
   position: relative;
 }
 
