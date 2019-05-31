@@ -258,16 +258,6 @@ class Story extends ActiveRecord
         throw new NotFoundHttpException('История не найдена');
     }
 
-/*    public function afterFind()
-    {
-        parent::afterFind();
-        $categories = [];
-        foreach ($this->categories as $category) {
-            $categories[] = $category->id;
-        }
-        $this->story_categories = implode(',', $categories);
-    }*/
-
     public function fillStoryCategories(): void
     {
         $categories = [];

@@ -33,7 +33,6 @@ var StoryEditor = (function() {
         Reveal.initialize(WikidsRevealConfig);
     }
 
-
     var $list = $("#slide-block-list");
 
     function loadSlideBlocks() {
@@ -103,9 +102,7 @@ var StoryEditor = (function() {
     function loadSlide(index, loadBlocks) {
 
         loadBlocks = loadBlocks || false;
-
         currentSlideIndex = index;
-        window.location.hash = locationHash();
 
         $("[data-slide-index]", $previewContainer).each(function() {
             $(this).removeClass("active");
@@ -122,6 +119,8 @@ var StoryEditor = (function() {
                 if (loadBlocks) {
                     loadSlideBlocks();
                 }
+
+                setSlideUrl();
             })
             .fail(function(data) {
                 $editor.text(data);
@@ -148,40 +147,6 @@ var StoryEditor = (function() {
             }
         }).always(function() {
             button.button("reset");
-        });
-    }
-
-    function linkFormSubmit() {
-
-        var $form = $(this),
-            button = $('button[type=submit]', $form);
-
-        var $input = $('input#form_slide_index', $form);
-        if (!$input.length) {
-            $input = $('<input/>').attr({type: 'hidden', id: 'form_slide_index', name: 'LinkForm[slide_index]'});
-        }
-
-        $input
-            .val(currentSlideIndex)
-            .appendTo($form);
-
-        button.button('loading');
-
-        $.ajax({
-            url: $form.attr("action"),
-            type: $form.attr("method"),
-            data: new FormData($form[0]),
-            cache: false,
-            contentType: false,
-            processData: false,
-            success: function(data) {
-                loadSlide(currentSlideIndex);
-            },
-            error: function(data) {
-                console.log(data);
-            }
-        }).always(function() {
-            button.button('reset');
         });
     }
 
@@ -215,18 +180,22 @@ var StoryEditor = (function() {
     }
 
     function locationHash() {
-        return '/' + currentSlideIndex;
+        return "/" + currentSlideIndex;
+    }
+
+    function setSlideUrl() {
+        window.location.hash = locationHash();
     }
 
     return {
         "initialize": initialize,
         "loadSlide": loadSlide,
         "onBeforeSubmit": onBeforeSubmit,
-        "linkFormSubmit": linkFormSubmit,
         "getCurrentSlideIndex": function() {
             return currentSlideIndex;
         },
         "readUrl": readUrl,
+        "setSlideUrl": setSlideUrl,
         "createBlock": createBlock,
         "deleteBlock": deleteBlock
     };

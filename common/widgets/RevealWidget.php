@@ -31,10 +31,11 @@ class RevealWidget extends Widget
         'controls' => false,
         'controlsLayout' => 'bottom-right',
         'controlsBackArrows' => 'faded',
+        'controlsTutorial' => false,
         'progress' => true,
         'history' => true,
         'mouseWheel' => false,
-        'showNotes' => true,
+        'showNotes' => false,
         'slideNumber' => true,
         'autoSlide' => false,
         'autoSlideStoppable' => true,
@@ -43,6 +44,7 @@ class RevealWidget extends Widget
         'hash' => true,
         'hashOneBasedIndex' => true,
         'rtl' => false,
+        'help' => false,
         'dependencies' => [],
     ];
 

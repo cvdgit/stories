@@ -1,5 +1,6 @@
 <?php
 
+use common\helpers\StoryHelper;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 
@@ -23,8 +24,8 @@ $form = ActiveForm::begin([
     <div class="col-xs-6"><?= $form->field($model, 'text_size')->textInput() ?></div>
 </div>
 <div class="row">
-    <div class="col-xs-6"><?= $form->field($model, 'transition_story_id')->textInput() ?></div>
-    <div class="col-xs-6"><?= $form->field($model, 'slides')->textInput() ?></div>
+    <div class="col-xs-6"><?= $form->field($model, 'transition_story_id')->dropDownList(StoryHelper::getStoryArray()) ?></div>
+    <div class="col-xs-6"><?= $form->field($model, 'slides')->textInput()->hint('Пример: 1,2,3-10,12,15') ?></div>
 </div>
 <?php
 echo $form->field($model, 'story_id')->hiddenInput()->label(false);

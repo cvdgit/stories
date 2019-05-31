@@ -63,6 +63,12 @@ $this->registerJs($js);
 		    		'id' => 'story-editor',
 		    		'initializeReveal' => false,
 		    		'canViewStory' => true,
+                    'options' => [
+                        'history' => false,
+                        'hash' => false,
+                        'progress' => false,
+                        'slideNumber' => false,
+                    ],
                     'assets' => [
                         \backend\assets\RevealAsset::class,
                         \backend\assets\WikidsRevealAsset::class,

@@ -106,8 +106,24 @@ var WikidsPlayer = (function() {
     // });
 
     return {
-        toggleFullscreen: toggleFullscreen,
-        inFullscreen: inFullscreen
+        "toggleFullscreen": toggleFullscreen,
+        "inFullscreen": inFullscreen,
+        "left": function() {
+            if (Reveal.isFirstSlide()) {
+                TransitionSlide.backToStory();
+            }
+            else {
+                Reveal.prev();
+            }
+        },
+        "right": function() {
+            if (Reveal.isLastSlide()) {
+                TransitionSlide.backToStory();
+            }
+            else {
+                Reveal.next();
+            }
+        }
     };
 })();
 
@@ -120,8 +136,8 @@ function onSlideMouseDown(e) {
         return;
     }
     switch (e.which) {
-        case 1: Reveal.next(); break;
-        case 3: Reveal.prev(); break;
+        case 1: WikidsPlayer.right(); break;
+        case 3: WikidsPlayer.left(); break;
     }
 }
 Reveal.addEventListener("mousedown", onSlideMouseDown, false);

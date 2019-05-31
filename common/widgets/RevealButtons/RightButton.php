@@ -12,14 +12,7 @@ class RightButton extends Button
 		$this->icon = 'icomoon-chevron-right';
 		$this->className = 'custom-navigate-right';
 		$this->title = 'Вперед';
-		$this->action = new JsExpression('function() { 
-		    if (Reveal.isLastSlide()) {
-		        TransitionSlide.backToStory();
-		    }
-		    else {
-		        Reveal.next();
-		    }
-		}');
+		$this->action = new JsExpression('function() { WikidsPlayer.right(); }');
 	}
 
 }
