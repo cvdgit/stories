@@ -278,4 +278,9 @@ class Story extends ActiveRecord
         return false;
     }
 
+    public function isPublished(): bool
+    {
+        return ($this->status === self::STATUS_PUBLISHED);
+    }
+
 }

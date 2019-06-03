@@ -10,7 +10,7 @@ use yii\widgets\Menu;
 Modal::begin([
     'id' => 'select-categories-modal',
     'header' => '<h2>Категории</h2>',
-    'toggleButton' => ['label' => 'Выбрать категории', 'class' => 'btn'],
+    'toggleButton' => ['label' => 'Выбрать категории', 'class' => 'btn btn-default'],
 ]);
 ?>
 

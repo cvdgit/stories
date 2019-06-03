@@ -4,8 +4,9 @@ namespace common\services;
 
 use backend\components\story\reader\PowerPointReader;
 use backend\components\story\writer\HTMLWriter;
-use backend\components\StoryEditor;
 use backend\models\SourcePowerPointForm;
+use common\models\Story;
+use DomainException;
 use yii;
 use yii\helpers\Url;
 
@@ -109,6 +110,27 @@ class StoryService
         foreach ($files as $fileName) {
             $this->_deleteFile($fileName);
         }
+    }
+
+    public function publishStory(Story $model): void
+    {
+        if (empty($model->cover)) {
+            throw new DomainException('Не установлена обложка');
+        }
+        if (empty($model->story_file)) {
+            throw new DomainException('Не найден файл PowerPoint');
+        }
+        if ((int)$model->slides_number === 0) {
+            throw new DomainException('В истории отсутствуют слайды');
+        }
+        $model->status = Story::STATUS_PUBLISHED;
+        $model->save(false, ['status']);
+    }
+
+    public function unPublishStory(Story $model): void
+    {
+        $model->status = Story::STATUS_DRAFT;
+        $model->save(false, ['status']);
     }
 
 }

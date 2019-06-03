@@ -2,11 +2,11 @@
 
 use yii\helpers\Html;
 
-/* @var $this yii\web\View */
-/* @var $model common\models\Story */
-/* @var $coverUploadForm backend\models\StoryCoverUploadForm */
-/* @var $fileUploadForm backend\models\StoryFileUploadForm */
-/* @var $powerPointForm backend\models\StoryPowerPointForm */
+/** @var $this yii\web\View */
+/** @var $model common\models\Story */
+/** @var $coverUploadForm backend\models\StoryCoverUploadForm */
+/** @var $fileUploadForm backend\models\StoryFileUploadForm */
+/** @var $powerPointForm backend\models\SourcePowerPointForm */
 
 $this->title = 'История: ' . $model->title;
 $this->params['breadcrumbs'][] = ['label' => 'Истории', 'url' => ['index']];
@@ -21,21 +21,33 @@ $this->params['sidebarMenuItems'] = [
 ?>
 <div class="row">
 	<div class="col-xs-6">
+        <?php if ($model->isPublished()): ?>
+            <div class="alert alert-success">
+                <div class="clearfix">
+                    <div class="pull-left" style="line-height: 34px">История опубликована</div>
+                    <div class="pull-right">
+                        <?= Html::beginForm(['/story/unpublish', 'id' => $model->id]) . Html::submitButton('Снять с публикации', ['class' => 'btn btn-primary']) . Html::endForm() ?>
+                    </div>
+                </div>
+            </div>
+        <?php else: ?>
+            <div class="alert alert-warning">
+                <div class="clearfix">
+                    <div class="pull-left" style="line-height: 34px">История не опубликована</div>
+                    <div class="pull-right">
+                        <?= Html::beginForm(['/story/publish', 'id' => $model->id]) . Html::submitButton('Опубликовать', ['class' => 'btn btn-primary']) . Html::endForm() ?>
+                    </div>
+                </div>
+            </div>
+        <?php endif ?>
 		<div id="alert_placeholder"></div>
-		<h1 class="page-header"><?= Html::encode($this->title) ?></h1>
 		<?= $this->render('_form', [
 		    'model' => $model,
 		    'coverUploadForm' => $coverUploadForm,
 		    'fileUploadForm' => $fileUploadForm,
-		    'powerPointForm' => $powerPointForm,
 		]) ?>
 	</div>
 	<div class="col-xs-6" style="padding-top: 69px">
-		<?php if ($model->source_id == common\models\Story::SOURCE_SLIDESCOM): ?>
-		<?= $this->render('_form_dropbox', ['story' => $model, 'source' => $dropboxForm]) ?>
-		<?php endif ?>
-		<?php if ($model->source_id == common\models\Story::SOURCE_POWERPOINT): ?>
 		<?= $this->render('_form_powerpoint', ['story' => $model, 'source' => $powerPointForm]) ?>
-		<?php endif ?>
 	</div>
 </div>

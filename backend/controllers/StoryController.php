@@ -3,9 +3,8 @@
 namespace backend\controllers;
 
 use backend\models\StoryBatchCommandForm;
+use Exception;
 use Yii;
-use yii\db\PdoValue;
-use yii\db\Query;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -261,6 +260,27 @@ class StoryController extends Controller
             return ['success' => true];
         }
         return ['success' => false];
+    }
+
+    public function actionPublish($id)
+    {
+        $model = Story::findModel($id);
+        try {
+            $this->service->publishStory($model);
+            Yii::$app->session->setFlash('success', 'История опубликована');
+        }
+        catch (Exception $e) {
+            Yii::$app->session->setFlash('error', 'Ошибка публикации: ' . $e->getMessage());
+        }
+        return $this->redirect(['update', 'id' => $model->id]);
+    }
+
+    public function actionUnpublish($id)
+    {
+        $model = Story::findModel($id);
+        $this->service->unPublishStory($model);
+        Yii::$app->session->setFlash('success', 'История снята с публикации');
+        return $this->redirect(['update', 'id' => $model->id]);
     }
 
 }

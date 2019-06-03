@@ -29,12 +29,9 @@ use dosamigos\selectize\SelectizeTextInput;
     </div>
 </div>
 <?php endif ?>
-<?= $form->field($model, 'source_id')->dropDownList(Story::getSourceList(), ['prompt' => 'Выбрать', 'readonly' => true]) ?>
-<?= $form->field($model, 'source_dropbox', ['options' => ['style' => 'display: none']])->textInput(['maxlength' => true]) ?>
 <?= $form->field($fileUploadForm, 'storyFile')->fileInput() ?>
 <?= $form->field($model, 'user_id')->dropDownList(ArrayHelper::map(User::find()->all(), 'id', 'profileName'),
                                                           ['prompt' => 'Выбрать', 'readonly' => !Yii::$app->user->can('admin')]) ?>
-
 <?php
 $values = [];
 foreach ($model->categories as $category) {
@@ -47,10 +44,9 @@ $values = implode("\n", $values);
     ->hiddenInput()
     ->hint($this->render('_categories', [
         'selectInputID' => Html::getInputId($model, 'story_categories')
-    ])) ?>
+    ]), ['class' => false]) ?>
 
 <?= $form->field($model, 'sub_access')->checkBox() ?>
-<?= $form->field($model, 'status')->dropDownList([Story::STATUS_DRAFT => 'Черновик', Story::STATUS_PUBLISHED => 'Публикация'], ['prompt' => 'Выбрать']) ?>
 <?= $form->field($model, 'tagNames')->widget(SelectizeTextInput::class, [
     'loadUrl' => ['tag/list'],
     'options' => ['class' => 'form-control'],
@@ -63,6 +59,8 @@ $values = implode("\n", $values);
     ],
 ])->hint('Используйте запятые для разделения тегов') ?>
 <div class="form-group">
-    <?= Html::submitButton(($model->isNewRecord ? 'Создать историю' : 'Сохранить изменения'), ['class' => 'btn btn-success']) ?>
+<?php
+echo Html::submitButton(($model->isNewRecord ? 'Создать историю' : 'Сохранить изменения'), ['class' => 'btn btn-success', 'style' => 'margin-right: 20px']);
+?>
 </div>
 <?php ActiveForm::end(); ?>
