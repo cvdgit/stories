@@ -2,6 +2,7 @@
 
 namespace common\services;
 
+use backend\components\queue\PublishStoryJob;
 use backend\components\story\reader\PowerPointReader;
 use backend\components\story\writer\HTMLWriter;
 use backend\models\SourcePowerPointForm;
@@ -116,6 +117,9 @@ class StoryService
 
     public function publishStory(Story $model): void
     {
+        if ($model->isPublished()) {
+            throw new DomainException('История уже опубликована');
+        }
         if (empty($model->cover)) {
             throw new DomainException('Не установлена обложка');
         }
@@ -125,27 +129,13 @@ class StoryService
         if ((int)$model->slides_number === 0) {
             throw new DomainException('В истории отсутствуют слайды');
         }
+
         $model->status = Story::STATUS_PUBLISHED;
-
-        $view = Yii::createObject(View::class);
-
-        /** @var UniSender $unisender */
-        $unisender = Yii::$app->unisender;
-        $api = $unisender->getApi();
-        $result = $api->createEmailMessage([
-            'sender_name' => 'Wikids',
-            'sender_email' => 'info@wikids.ru',
-            'subject' => 'Новая история на Wikids',
-            'body' => $view->render('@common/mail/newStory-html', ['story' => $model]),
-            'list_id' => 17823821,
-        ]);
-        $messageID = $result['result']['message_id'];
-
-        $result = $api->createCampaign([
-            'message_id' => $messageID,
-        ]);
-
         $model->save(false, ['status']);
+
+        Yii::$app->queue->push(new PublishStoryJob([
+            'storyID' => $model->id,
+        ]));
     }
 
     public function unPublishStory(Story $model): void

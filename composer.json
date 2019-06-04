@@ -36,7 +36,8 @@
         "la-haute-societe/yii2-save-relations-behavior": "*",
         "samdark/sitemap": "^2.2",
         "alexander-suter/yii2-tag-cloud": "*",
-        "matperez/yii2unisender": "~1.0"
+        "matperez/yii2unisender": "~1.0",
+        "yiisoft/yii2-queue": "^2.2"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

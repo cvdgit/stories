@@ -14,17 +14,24 @@ return [
     'bootstrap' => [
         'log',
         'common\bootstrap\Bootstrap',
+        'queue',
     ],
     'controllerNamespace' => 'console\controllers',
+    'controllerMap' => [
+        'fixture' => [
+            'class' => \yii\console\controllers\FixtureController::class,
+            'namespace' => 'common\fixtures',
+        ],
+        'migrate' => [
+            'class' => \yii\console\controllers\MigrateController::class,
+            'migrationNamespaces' => [
+                'yii\queue\db\migrations',
+            ],
+        ],
+    ],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
-    ],
-    'controllerMap' => [
-        'fixture' => [
-            'class' => 'yii\console\controllers\FixtureController',
-            'namespace' => 'common\fixtures',
-          ],
     ],
     'components' => [
         'log' => [
@@ -37,7 +44,15 @@ return [
         ],
         'urlManager' => array_merge($frontendUrlManager, [
             'hostInfo' => 'https://wikids.ru',
-        ])
+        ]),
+        'urlManagerFrontend' => $params['components.urlManagerFrontend'],
+        'unisender' => [
+            'class' => \matperez\yii2unisender\UniSender::class,
+            'apiConfig' => [
+                'apiKey' => $params['unisenderKey'],
+            ],
+        ],
+        'queue' => $params['components.queue'],
     ],
     'params' => $params,
 ];

@@ -10,4 +10,29 @@ return [
     'coverFolder' => 'slides_cover',
     'storyImagesFolder' => 'slides',
     'storyFilesFolder' => 'slides_file',
+
+    'components.queue' => [
+        'class' => \yii\queue\db\Queue::class,
+        'db' => 'db',
+        'ttr' => 5 * 60,
+        'attempts' => 3,
+        'tableName' => '{{%queue}}',
+        'mutex' => \yii\mutex\MysqlMutex::class,
+        'channel' => 'default',
+        'as log' => \yii\queue\LogBehavior::class,
+    ],
+
+    'components.urlManagerFrontend' => [
+        'class' => 'yii\web\UrlManager',
+        'baseUrl' => 'https://wikids.ru',
+        'hostInfo' => 'https://wikids.ru',
+        'enablePrettyUrl' => true,
+        'showScriptName' => false,
+        'enableStrictParsing' => true,
+        'rules' => [
+            '' => 'site/index',
+            'story/<alias:[\w\d\-]+>' => 'story/view',
+        ],
+    ],
+
 ];

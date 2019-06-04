@@ -40,7 +40,6 @@ $this->params['sidebarMenuItems'] = [
                 </div>
             </div>
         <?php endif ?>
-		<div id="alert_placeholder"></div>
 		<?= $this->render('_form', [
 		    'model' => $model,
 		    'coverUploadForm' => $coverUploadForm,

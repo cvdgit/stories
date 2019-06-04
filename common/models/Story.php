@@ -2,8 +2,10 @@
 
 namespace common\models;
 
+use backend\components\queue\PublishStoryJob;
 use DomainException;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
+use Yii;
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
 use dosamigos\taggable\Taggable;
@@ -280,7 +282,7 @@ class Story extends ActiveRecord
 
     public function isPublished(): bool
     {
-        return ($this->status === self::STATUS_PUBLISHED);
+        return ((int)$this->status === self::STATUS_PUBLISHED);
     }
 
 }

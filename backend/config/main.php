@@ -70,17 +70,7 @@ return [
         'urlManager' => [
             'showScriptName' => false,
         ],
-        'urlManagerFrontend' => [
-            'class' => 'yii\web\UrlManager',
-            'baseUrl' => 'https://wikids.ru',
-            'enablePrettyUrl' => true,
-            'showScriptName' => false,
-            'enableStrictParsing' => true,
-            'rules' => [
-                '' => 'site/index',
-                'story/<alias:[\w\d\-]+>' => 'story/view',
-            ]
-        ],
+        'urlManagerFrontend' => $params['components.urlManagerFrontend'],
         'assetManager' => [
             'appendTimestamp' => true,
         ],
@@ -89,7 +79,8 @@ return [
             'apiConfig' => [
                 'apiKey' => $params['unisenderKey'],
             ],
-        ]
+        ],
+        'queue' => $params['components.queue'],
     ],
     'params' => $params,
 ];
