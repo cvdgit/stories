@@ -8,10 +8,8 @@ use backend\components\story\writer\HTMLWriter;
 use backend\models\SourcePowerPointForm;
 use common\models\Story;
 use DomainException;
-use matperez\yii2unisender\UniSender;
 use yii;
 use yii\helpers\Url;
-use yii\web\View;
 
 class StoryService
 {

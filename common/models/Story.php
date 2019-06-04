@@ -2,15 +2,12 @@
 
 namespace common\models;
 
-use backend\components\queue\PublishStoryJob;
 use DomainException;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
-use Yii;
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
 use dosamigos\taggable\Taggable;
 use common\helpers\Translit;
-use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 
 /**
