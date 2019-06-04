@@ -15,10 +15,11 @@ use yii\helpers\Html;
                 <td>
                     <?= Html::img(Yii::$app->urlManagerFrontend->baseUrl . StoryCover::getListThumbPath($story->cover)) ?>
                 </td>
-                <td>
+                <td valign="top">
                     <?= $story->description ?>
                 </td>
             </tr>
         </tbody>
     </table>
+    <p><a href="https://wikids.ru">Wikids</a></p>
 </div>
