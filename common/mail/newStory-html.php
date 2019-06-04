@@ -8,7 +8,7 @@ use yii\helpers\Html;
 ?>
 <div>
     <p>Здравствуйте, {{Name}}</p>
-    <p>На Wikids добавлена новая история - <?= Html::a($story->title, Yii::$app->urlManagerFrontend->createAbsoluteUrl(['/story/view', 'alias' => $story->alias])) ?></p>
+    <p>На Wikids добавлена новая история - <?= Html::a($story->title, Yii::$app->urlManagerFrontend->createAbsoluteUrl(['/story/view', 'alias' => $story->alias]), 'https') ?></p>
     <table>
         <tbody>
             <tr>
