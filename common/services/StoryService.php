@@ -7,8 +7,10 @@ use backend\components\story\writer\HTMLWriter;
 use backend\models\SourcePowerPointForm;
 use common\models\Story;
 use DomainException;
+use matperez\yii2unisender\UniSender;
 use yii;
 use yii\helpers\Url;
+use yii\web\View;
 
 class StoryService
 {
@@ -124,6 +126,25 @@ class StoryService
             throw new DomainException('В истории отсутствуют слайды');
         }
         $model->status = Story::STATUS_PUBLISHED;
+
+        $view = Yii::createObject(View::class);
+
+        /** @var UniSender $unisender */
+        $unisender = Yii::$app->unisender;
+        $api = $unisender->getApi();
+        $result = $api->createEmailMessage([
+            'sender_name' => 'Wikids',
+            'sender_email' => 'info@wikids.ru',
+            'subject' => 'Новая история на Wikids',
+            'body' => $view->render('@common/mail/newStory-html', ['story' => $model]),
+            'list_id' => 17823821,
+        ]);
+        $messageID = $result['result']['message_id'];
+
+        $result = $api->createCampaign([
+            'message_id' => $messageID,
+        ]);
+
         $model->save(false, ['status']);
     }
 

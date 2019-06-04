@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "92ee94730e8c9d23b7c064f52e92a4ff",
+    "content-hash": "5f68f499326e2e1895ee3abd6485fe06",
     "packages": [
         {
             "name": "2amigos/yii2-chartjs-widget",
@@ -1310,6 +1310,90 @@
                 "rotate"
             ],
             "time": "2015-09-08T22:55:44+00:00"
+        },
+        {
+            "name": "matperez/yii2unisender",
+            "version": "1.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/matperez/yii2-unisender.git",
+                "reference": "60f0eaebac059db5fe7819a30bade85079f3f599"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/matperez/yii2-unisender/zipball/60f0eaebac059db5fe7819a30bade85079f3f599",
+                "reference": "60f0eaebac059db5fe7819a30bade85079f3f599",
+                "shasum": ""
+            },
+            "require": {
+                "omgdef/unisender-wrapper": "1.0.1",
+                "yiisoft/yii2": "~2.0"
+            },
+            "require-dev": {
+                "fzaninotto/faker": "~1.5",
+                "mockery/mockery": "~0.9",
+                "phpunit/phpunit": "~4.8"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "matperez\\yii2unisender\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD"
+            ],
+            "authors": [
+                {
+                    "name": "Andrey Golovin",
+                    "email": "matperez@mail.ru"
+                }
+            ],
+            "description": "yii2 unisender extension",
+            "keywords": [
+                "extension",
+                "yii2"
+            ],
+            "time": "2017-01-31T06:50:59+00:00"
+        },
+        {
+            "name": "omgdef/unisender-wrapper",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/OmgDef/unisender-wrapper.git",
+                "reference": "8ef6ae23f7f79de35e6d9b2082c86885fdd3abff"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/OmgDef/unisender-wrapper/zipball/8ef6ae23f7f79de35e6d9b2082c86885fdd3abff",
+                "reference": "8ef6ae23f7f79de35e6d9b2082c86885fdd3abff",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "omgdef\\unisender\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-4-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "OmgDef",
+                    "email": "omgdef@gmail.com"
+                }
+            ],
+            "description": "Unisender API wrapper",
+            "keywords": [
+                "api",
+                "extension",
+                "unisender"
+            ],
+            "time": "2015-05-20T14:51:53+00:00"
         },
         {
             "name": "pclzip/pclzip",

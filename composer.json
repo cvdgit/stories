@@ -35,7 +35,8 @@
         "yii-dream-team/yii2-upload-behavior": "*",
         "la-haute-societe/yii2-save-relations-behavior": "*",
         "samdark/sitemap": "^2.2",
-        "alexander-suter/yii2-tag-cloud": "*"
+        "alexander-suter/yii2-tag-cloud": "*",
+        "matperez/yii2unisender": "~1.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",
