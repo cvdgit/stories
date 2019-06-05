@@ -11,16 +11,17 @@ $this->title = 'Панель управления';
 <div class="site-index">
     <div class="body-content">
         <div class="row">
-            <div class="col-xs-3">
+            <div class="col-xs-6">
                 <h4>Сегодня</h4>
                 <ul class="list-group">
-                    <li class="list-group-item">Активировано подписок <span class="badge"><?= SummaryHelper::activatedSubscriptions() ?></span></li>
-                    <li class="list-group-item">Опубликовано историй <span class="badge"><?= SummaryHelper::publishedStories() ?></span></li>
-                    <li class="list-group-item">Зарегистрировано пользователей <span class="badge"><?= SummaryHelper::registeredUsers() ?></span></li>
-                    <li class="list-group-item">Написано комментариев <span class="badge"><?= SummaryHelper::commentsWritten() ?></span></li>
+                    <li class="list-group-item"><span class="badge"><?= SummaryHelper::activatedSubscriptions() ?></span> Активировано подписок</li>
+                    <li class="list-group-item"><span class="badge"><?= SummaryHelper::publishedStories() ?></span> Опубликовано историй</li>
+                    <li class="list-group-item"><span class="badge"><?= SummaryHelper::registeredUsers() ?></span> Зарегистрировано пользователей</li>
+                    <li class="list-group-item"><span class="badge"><?= SummaryHelper::commentsWritten() ?></span> Написано комментариев</li>
+                    <li class="list-group-item"><span class="badge"><?= SummaryHelper::viewedStories() ?></span> Просмотрено историй</li>
                 </ul>
             </div>
-        	<div class="col-xs-6 col-xs-offset-3">
+        	<div class="col-xs-6">
         		<h4>Количество просмотров историй с % завершения</h4>
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,

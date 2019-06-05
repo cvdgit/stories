@@ -44,4 +44,14 @@ class SummaryHelper
             ->count('id');
     }
 
+    public static function viewedStories()
+    {
+        $query = (new Query())
+            ->select(new Expression('COUNT(DISTINCT story_id) AS cnt'))
+            ->from('{{%story_statistics}}')
+            ->where(new Expression('`created_at` >= UNIX_TIMESTAMP(CURDATE())'))
+            ->groupBy(['story_id', 'session']);
+        return (new Query())->from($query)->count('cnt');
+    }
+
 }
