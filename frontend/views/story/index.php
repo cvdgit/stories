@@ -30,6 +30,15 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 <span class="icon icon-search"></span>
             </div>
             <?php ActiveForm::end(); ?>
+            <?php if (!Yii::$app->user->isGuest): ?>
+            <h4>Личное</h4>
+            <?= Menu::widget([
+                'items' => [
+                        ['label' => 'История просмотра', 'url' => ['/story/history']],
+                ],
+                'options' => ['class' => 'story-category-list'],
+            ]) ?>
+            <?php endif ?>
             <h4>Категории</h4>
             <?= Menu::widget([
               'items' => Category::getCategoriesForMenu(),
@@ -77,10 +86,6 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                    'options' => [
                         'class' => 'dropdown-menu'
                     ],
-                    'attributes' => [
-                        'title',
-                        'created_at',
-                    ]
                 ],
                 'pager' => [
                   'options' => [

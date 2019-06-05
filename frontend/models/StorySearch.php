@@ -21,7 +21,7 @@ class StorySearch extends Model
     {
         return [
             [['title', 'description'], 'string'],
-            ['tag_id', 'integer'],
+            [['tag_id'], 'integer'],
             ['category_id', 'each', 'rule' => ['integer']],
         ];
     }
@@ -33,7 +33,7 @@ class StorySearch extends Model
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params): ActiveDataProvider
     {
         $query = Story::findPublishedStories();
 
@@ -47,19 +47,15 @@ class StorySearch extends Model
         $sortParams = [
             'defaultOrder' => ['created_at' => SORT_DESC],
             'attributes' => [
-                'title' => [
-                    'asc' => ['title' => SORT_ASC],
-                    'desc' => ['title' => SORT_DESC],
-                    'label' => 'названию истории',
-                ],
                 'created_at' => [
                     'asc' => ['created_at' => SORT_ASC],
                     'desc' => ['created_at' => SORT_DESC],
                     'label' => 'дате создания',
                 ],
-                'updated_at' => [
-                    'asc' => ['updated_at' => SORT_ASC],
-                    'desc' => ['updated_at' => SORT_DESC],
+                'title' => [
+                    'asc' => ['title' => SORT_ASC],
+                    'desc' => ['title' => SORT_DESC],
+                    'label' => 'названию истории',
                 ],
             ],
         ];
@@ -88,4 +84,5 @@ class StorySearch extends Model
 
         return $dataProvider;
     }
+
 }

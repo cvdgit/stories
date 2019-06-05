@@ -3,6 +3,8 @@
 namespace frontend\controllers;
 
 use common\rbac\UserPermissions;
+use common\services\story\CountersService;
+use frontend\models\UserStorySearch;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -26,10 +28,10 @@ class StoryController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['add-comment', 'comment-list'],
+                'only' => ['add-comment', 'comment-list', 'history'],
                 'rules' => [
                     [
-                        'actions' => ['add-comment', 'comment-list'],
+                        'actions' => ['add-comment', 'comment-list', 'history'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -39,11 +41,13 @@ class StoryController extends Controller
     }
 
     protected $storyService;
+    protected $countersService;
 
-    public function __construct($id, $module, StoryService $storyService, $config = [])
+    public function __construct($id, $module, StoryService $storyService, CountersService $countersService, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->storyService = $storyService;
+        $this->countersService = $countersService;
     }
 
     public function actionIndex()
@@ -113,15 +117,19 @@ class StoryController extends Controller
      * Displays a single Story model.
      * @param string $alias
      * @return mixed
+     * @throws yii\web\NotFoundHttpException
      */
     public function actionView($alias)
     {
         $model = Story::findModelByAlias($alias);
+
         $dataProvider = Comment::getStoryComments($model->id);
         if (Yii::$app->request->isPjax) {
             return $this->renderAjax('_comment_list', ['dataProvider' => $dataProvider]);
         }
-        $model->updateCounters(['views_number' => 1]);
+
+        $this->countersService->updateCounters($model);
+
         $commentForm = new CommentForm($model->id);
         return $this->render('view', [
             'model' => $model,
@@ -182,6 +190,20 @@ class StoryController extends Controller
             $html = implode("\n", $slides);
         }
         return ['html' => $html];
+    }
+
+    public function actionHistory()
+    {
+        $this->getView()->setMetaTags('История просмотра', 'История просмотра', 'История просмотра', 'История просмотра');
+
+        $searchModel = new UserStorySearch(Yii::$app->user->id);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'action' => ['/story/history'],
+        ]);
     }
 
 }

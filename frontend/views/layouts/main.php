@@ -78,6 +78,7 @@ AppAsset::register($this);
                     <div style="cursor: pointer" data-toggle="dropdown" class="dropdown-toggle"><b class="caret"></b> <?= Yii::$app->user->identity->getProfileName() ?></div>
                     <?= Dropdown::widget(['items' => [
                             ['label' => 'Профиль', 'url' => ['/profile/index']],
+                            ['label' => 'История просмотра', 'url' => ['/story/history']],
                             ['label' => 'Панель управления', 'url' => '/admin', 'visible' => Yii::$app->user->can(UserRoles::PERMISSION_ADMIN_PANEL)],
                             ['label' => Html::beginForm(['/auth/logout']) .
                      Html::submitButton('Выход', ['class' => 'login-item logout-btn-a']) .

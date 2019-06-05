@@ -282,4 +282,12 @@ class Story extends ActiveRecord
         return ((int)$this->status === self::STATUS_PUBLISHED);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getHistoryUser()
+    {
+        return $this->hasMany(User::class, ['id' => 'user_id'])->viaTable('user_story_history', ['story_id' => 'id']);
+    }
+
 }

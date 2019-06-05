@@ -344,4 +344,13 @@ class User extends ActiveRecord implements IdentityInterface
         return $profile;
     }
 
+    /**
+     * @return yii\db\ActiveQuery
+     * @throws yii\base\InvalidConfigException
+     */
+    public function getStoryHistory(): ActiveQuery
+    {
+        return $this->hasMany(Story::class, ['id' => 'story_id'])->viaTable('user_story_history', ['user_id' => 'id']);
+    }
+
 }
