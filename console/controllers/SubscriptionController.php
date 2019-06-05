@@ -31,7 +31,8 @@ class SubscriptionController extends Controller
             ->where(['<=','finish', new Expression('NOW()')])
             ->andWhere('state = :valid', [':valid' => Payment::STATUS_VALID]);
         foreach ($query->each() as $payment) {
-            $this->paymentService->cancelSubscription($payment['id']);
+            echo $payment['id'] . ' - ' . $payment['payment'] . ' - ' . $payment['finish'] . PHP_EOL;
+            // $this->paymentService->cancelSubscription($payment['id']);
         }
     }
 
