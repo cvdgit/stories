@@ -49,10 +49,10 @@ use yii\helpers\Html;
                                                 <tbody>
                                                 <tr style="border:0">
                                                     <td style="border:0;color:#444444;padding:0 20px 5px 20px">
-                                                        <table border="0" cellpadding="0" cellspacing="0" style="border:0;border-collapse:collapse;border-spacing:0;font-family:&quot;Roboto&quot;,Arial,Helvetica Neue,Helvetica,sans-serif;font-size:16px;font-weight:400;line-height:21px" width="100%">
+                                                        <table border="0" cellpadding="0" cellspacing="0" style="border:0;border-collapse:collapse;border-spacing:0;font-family:Roboto,Arial,Helvetica Neue,Helvetica,sans-serif;font-size:16px;font-weight:400;line-height:21px" width="100%">
                                                             <tbody>
                                                             <tr>
-                                                                <td style="margin:0;padding-top:0;padding0;text-align:center" bgcolor="#ffffff">
+                                                                <td style="margin:0;padding:0;text-align:center" bgcolor="#ffffff">
                                                                     <?= Html::img(Yii::$app->urlManagerFrontend->baseUrl . StoryCover::getListThumbPath($story->cover)) ?>
                                                                 </td>
                                                             </tr>
