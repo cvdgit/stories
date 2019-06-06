@@ -20,24 +20,6 @@ use yii\helpers\Html;
                                     <tbody>
                                     <tr>
                                         <td>
-                                            <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" style="border:0;border-collapse:collapse;border-spacing:0;font-family:Roboto,Arial,Helvetica Neue,Helvetica,sans-serif;font-size:21px;font-weight:400;width:474px!important;line-height:21px" width="474">
-                                                <tbody>
-                                                <tr style="border:0">
-                                                    <td style="border:0;color:#444444;padding:0 20px 5px 20px">
-                                                        <table cellspaceing="0" cellpadding="0" border="0" width="474" style="border-width:0;border-collapse:collapse;border-spacing:0;font-family:Roboto,Arial,Helvetica Neue,Helvetica,sans-serif;font-size:18px;font-weight:400;line-height:normal;color:#444444;width:474px!important">
-                                                            <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    <p style="color:#444444;font-size:18px;font-family:Roboto,Arial,Helvetica Neue,Helvetica,sans-serif;line-height:24px;margin:10px 0 18px 0;padding:0">Здравствуйте, {{Name}}</p>
-                                                                    <p style="color:#444444;font-size:18px;font-family:Roboto,Arial,Helvetica Neue,Helvetica,sans-serif;line-height:24px;margin:10px 0 18px 0;padding:0">На Wikids добавлена новая история</p>
-                                                                </td>
-                                                            </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </td>
-                                                </tr>
-                                                </tbody>
-                                            </table>
                                             <table cellpadding="0" cellspacing="0" border="0" width="100%" align="center" style="border-width:0;border-collapse:collapse;border-spacing:0;font-family:Roboto,Arial,Helvetica Neue,Helvetica,sans-serif;font-size:12px;font-weight:400;line-height:normal;background-color:#ffffff;background-image:none;background-repeat:repeat;background-position:top left;color:#ffffff;direction:LTR" dir="LTR">
                                                 <tbody>
                                                 <tr style="border-width:0">
