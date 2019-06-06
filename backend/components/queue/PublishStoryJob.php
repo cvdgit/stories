@@ -35,7 +35,7 @@ class PublishStoryJob extends BaseObject implements JobInterface
         $result = $api->createEmailMessage([
             'sender_name' => 'Wikids',
             'sender_email' => 'info@wikids.ru',
-            'subject' => 'Новая история на Wikids',
+            'subject' => 'Новая история на Wikids - ' . $story->title,
             'body' => $view->render('@common/mail/newStory-html', ['story' => $story]),
             'list_id' => 17823821,
         ]);
