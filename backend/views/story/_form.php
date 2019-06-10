@@ -1,10 +1,10 @@
 <?php
 
+use common\components\StoryCover;
 use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 use common\models\User;
-use common\models\Story;
 use dosamigos\selectize\SelectizeTextInput;
 
 /** @var $this yii\web\View */
@@ -25,7 +25,7 @@ use dosamigos\selectize\SelectizeTextInput;
 <?php if (!empty($model->cover)): ?>
 <div class="row">
     <div class="col-xs-6 col-md-3">
-        <a href="#" class="thumbnail"><img src="<?= $this->context->service->getCoverPath($model->cover, true) ?>" alt="..."></a>
+        <a href="#" class="thumbnail"><img src="<?= StoryCover::getListThumbPath($model->cover) ?>" alt="..."></a>
     </div>
 </div>
 <?php endif ?>

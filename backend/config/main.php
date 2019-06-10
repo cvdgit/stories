@@ -46,6 +46,7 @@ return [
                         [
                             'yii\web\HttpException:404',
                             'yii\web\HttpException:403',
+                            'yii\validators\FileValidator::getSizeLimit'
                         ],
                     'levels' => ['error', 'warning'],
                 ],
