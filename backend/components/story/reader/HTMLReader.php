@@ -116,6 +116,8 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         $height = str_replace('px', '', $this->getStyleValue($style, 'height'));
         $block->setImageSize($element->attr('data-src'), $width, $height);
         $block->setNaturalImageSize($element->attr('data-natural-width'), $element->attr('data-natural-height'));
+
+        $this->loadBlockProperties($block, $style);
     }
 
     protected function loadBlockText($htmlBlock, Slide $slide): void
@@ -135,6 +137,7 @@ class HTMLReader extends AbstractReader implements ReaderInterface
             $block->setText(pq($htmlBlock)->find('p')->html());
             $block->setId(pq($htmlBlock)->attr('data-block-id'));
         }
+        $this->loadBlockProperties($block, pq($htmlBlock)->attr('style'));
     }
 
     protected function loadBlockButton($htmlBlock, Slide $slide): void
@@ -142,10 +145,7 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         $buttonBlock = new ButtonBlock();
 
         $style = pq($htmlBlock)->attr('style');
-        $buttonBlock->setWidth($this->getStyleValue($style, 'width'));
-        $buttonBlock->setHeight($this->getStyleValue($style, 'height'));
-        $buttonBlock->setTop($this->getStyleValue($style, 'top'));
-        $buttonBlock->setLeft($this->getStyleValue($style, 'left'));
+        $this->loadBlockProperties($buttonBlock, $style);
 
         $buttonBlock->setText(pq($htmlBlock)->find('a')->html());
         $buttonBlock->setId(pq($htmlBlock)->attr('data-block-id'));
@@ -160,11 +160,9 @@ class HTMLReader extends AbstractReader implements ReaderInterface
     {
         $block = new TransitionBlock();
 
-        $style = pq($htmlBlock)->attr('style');
-        $block->setWidth($this->getStyleValue($style, 'width'));
-        $block->setHeight($this->getStyleValue($style, 'height'));
-        $block->setTop($this->getStyleValue($style, 'top'));
-        $block->setLeft($this->getStyleValue($style, 'left'));
+        $element = pq($htmlBlock);
+
+        $this->loadBlockProperties($block, $element->attr('style'));
 
         $block->setText(pq($htmlBlock)->find('button')->html());
         $block->setId(pq($htmlBlock)->attr('data-block-id'));
@@ -174,6 +172,14 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         $block->setTransitionStoryId(pq($htmlBlock)->find('button')->attr('data-story-id'));
         $block->setSlides(pq($htmlBlock)->find('button')->attr('data-slides'));
         $slide->addBlock($block);
+    }
+
+    protected function loadBlockProperties(AbstractBlock $block, $style)
+    {
+        $block->setWidth($this->getStyleValue($style, 'width'));
+        $block->setHeight($this->getStyleValue($style, 'height'));
+        $block->setTop($this->getStyleValue($style, 'top'));
+        $block->setLeft($this->getStyleValue($style, 'left'));
     }
 
 }

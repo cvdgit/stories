@@ -33,7 +33,7 @@ class BaseForm extends Model
     {
         return [
             'left' => 'Левый отступ',
-            'top' => 'Правый отступ',
+            'top' => 'Верхний отступ',
             'width' => 'Ширина',
             'height' => 'Высота',
         ];

@@ -11,6 +11,7 @@ use backend\components\story\TransitionBlock;
 use backend\components\story\writer\HTMLWriter;
 use backend\components\story\Story;
 use backend\models\editor\ButtonForm;
+use backend\models\editor\ImageForm;
 use backend\models\editor\TextForm;
 use backend\models\editor\TransitionForm;
 use Yii;
@@ -44,6 +45,7 @@ class StoryEditor
     {
         /** @var TextBlock $block */
         $block = $this->findBlockByID($form->slide_index, $form->block_id);
+        $block->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
         $block->setText(nl2br($form->text));
         $block->setFontSize($form->text_size);
 	}
@@ -52,10 +54,7 @@ class StoryEditor
     {
         /** @var ButtonBlock $block */
         $block = $this->findBlockByID($form->slide_index, $form->block_id);
-        $block->setLeft($form->left);
-        $block->setTop($form->top);
-        $block->setWidth($form->width);
-        $block->setHeight($form->height);
+        $block->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
         $block->setText($form->text);
         $block->setFontSize($form->text_size);
         $block->setUrl($form->url);
@@ -65,24 +64,23 @@ class StoryEditor
     {
         /** @var TransitionBlock $block */
         $block = $this->findBlockByID($form->slide_index, $form->block_id);
-        $block->setLeft($form->left);
-        $block->setTop($form->top);
-        $block->setWidth($form->width);
-        $block->setHeight($form->height);
+        $block->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
         $block->setText($form->text);
         $block->setFontSize($form->text_size);
         $block->setTransitionStoryId($form->transition_story_id);
         $block->setSlides($form->slides);
     }
 
-	public function setSlideImage($slideIndex, $imagePath)
-	{
-        $slide = $this->story->getSlide($slideIndex);
-        foreach ($slide->getBlocks() as $block) {
-            if (get_class($block) === ImageBlock::class) {
-            	$block->setImageSize(Yii::getAlias('@public') . $imagePath, 0, 0);
-                $block->setFilePath($imagePath);
-            }
+	public function setSlideImage(ImageForm $form): void
+    {
+        /** @var ImageBlock $block */
+        $block = $this->findBlockByID($form->slide_index, $form->block_id);
+        $block->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
+        if (!empty($form->fullImagePath)) {
+            $block->setImageSize($form->fullImagePath);
+        }
+        if (!empty($form->imagePath)) {
+            $block->setFilePath($form->imagePath);
         }
 	}
 

@@ -24,6 +24,7 @@ class ButtonForm extends TextForm
         $labels = parent::attributeLabels();
         $labels = array_merge($labels, [
             'url' => 'URL',
+            'text' => 'Заголовок',
         ]);
         return $labels;
     }

@@ -9,6 +9,9 @@ class ImageForm extends BaseForm
 
     public $image;
 
+    public $imagePath;
+    public $fullImagePath;
+
     public function rules(): array
     {
         $rules = parent::rules();

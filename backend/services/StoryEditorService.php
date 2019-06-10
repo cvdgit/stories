@@ -15,7 +15,7 @@ use backend\components\StoryEditor;
 class StoryEditorService
 {
 
-	protected function uploadImage($form, $model): string
+	protected function uploadImage(ImageForm $form, $model): string
     {
         $imageFile = UploadedFile::getInstance($form, 'image');
         if ($imageFile) {
@@ -24,6 +24,8 @@ class StoryEditorService
             $slideImageFileName = Yii::$app->security->generateRandomString() . '.' . $imageFile->extension;
             $imagePath = "{$storyImagesPath}/$slideImageFileName";
             if ($imageFile->saveAs($imagePath)) {
+                $form->imagePath = $storyService->getImagesFolderPath($model, true) . '/' . $slideImageFileName;
+                $form->fullImagePath = Yii::getAlias('@public') . $form->imagePath;
             	return $storyService->getImagesFolderPath($model, true) . '/' . $slideImageFileName;
         	}
         }
@@ -42,9 +44,12 @@ class StoryEditorService
     public function updateSlideImage(ImageForm $form): void
     {
         $model = Story::findModel($form->story_id);
-        $imagePath = $this->uploadImage($form, $model);
+
         $editor = new StoryEditor($model->body);
-        $editor->setSlideImage($form->slide_index, $imagePath);
+
+        $this->uploadImage($form, $model);
+        $editor->setSlideImage($form);
+
         $body = $editor->getStoryMarkup();
         $model->saveBody($body);
     }

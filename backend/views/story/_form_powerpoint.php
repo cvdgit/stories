@@ -3,6 +3,9 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
+/** @var $story common\models\Story */
+/** @var $source backend\models\SourcePowerPointForm */
+
 $form = ActiveForm::begin([
 	'action' => ['/story/import-from-power-point'],
 ]);

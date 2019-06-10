@@ -24,7 +24,7 @@ class TransitionForm extends TextForm
     {
         $labels = parent::attributeLabels();
         $labels = array_merge($labels, [
-            'text' => 'Заголовок кнопки',
+            'text' => 'Заголовок',
             'transition_story_id' => 'Перейти к истории',
             'slides' => 'Слайды',
         ]);

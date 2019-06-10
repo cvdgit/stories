@@ -124,4 +124,12 @@ abstract class AbstractBlock
         $this->id = $id;
     }
 
+    public function setSizeAndPosition($width, $height, $left, $top): void
+    {
+        $this->width = $width;
+        $this->height = $height;
+        $this->left = $left;
+        $this->top = $top;
+    }
+
 }
