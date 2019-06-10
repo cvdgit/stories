@@ -30,7 +30,7 @@ return [
         'profile/edit' => 'profile/update',
         'change-password' => 'profile/change-password',
 
-        'storyes/history' => 'story/history',
+        'stories/history' => 'story/history',
         'stories/tag/<tag:[\w\s\-]+>' => 'story/tag',
         'stories/category/<category:[\w\-]+>' => 'story/category',
         'stories' => 'story/index',

@@ -62,9 +62,15 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
         </nav>
         <main class="col-sm-8 col-md-9 site-main" style="margin-top: 0">
             <h1 style="margin-top: 6px; margin-bottom: 33px"><?= $this->getHeader() ?></h1>
-            <?php $order = $dataProvider->getSort()->getCurrentOrderName(); ?>
-            <?= ListView::widget([
-                'layout' => '<div class="story-list-filter clearfix">
+            <?php
+            $layout = '<div class="story-list-filter clearfix">
+                         {summary}
+                       </div>
+                       <div class="story-list"><div class="flex-row row">{items}</div></div>
+                             <div class="story-pagination">{pager}</div>';
+            if (get_class($dataProvider->getSort()) === \frontend\components\StorySorter::class) {
+                $order = $dataProvider->getSort()->getCurrentOrderName();
+                $layout = '<div class="story-list-filter clearfix">
                                {summary}
                                <div class="pull-right">
                                  <span style="margin-right: 6px">Сортировать по:</span>
@@ -76,11 +82,15 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                                </div>
                              </div>
                              <div class="story-list"><div class="flex-row row">{items}</div></div>
-                             <div class="story-pagination">{pager}</div>',
+                             <div class="story-pagination">{pager}</div>';
+            }
+            ?>
+            <?= ListView::widget([
+                'layout' => $layout,
                 'summary' => '<span>Показано {count} из {totalCount} историй</span>',
                 'dataProvider' => $dataProvider,
                 'itemOptions' => ['tag' => false],
-                'itemView' => '_storyitem',
+                'itemView' => '_storyitem_array',
                 'emptyText' => 'Список историй пуст',
                 'sorter' => [
                    'options' => [
