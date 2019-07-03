@@ -82,7 +82,8 @@ class NewsController extends Controller
     {
         $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect($model->getUrl());
+            Yii::$app->session->setFlash('success', 'Публикация успешно обновлена');
+            return $this->refresh();
         }
         return $this->render('update', [
             'model' => $model,
