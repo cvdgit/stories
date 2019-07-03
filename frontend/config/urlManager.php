@@ -46,5 +46,8 @@ return [
 
         'statistics/write/<id:\d+>' => 'statistics/write',
         'feedback/create/<id:\d+>' => 'feedback/create',
+
+        'blog' => 'news/index',
+        'blog/<slug:[\w\-]+>' => 'news/view',
     ],
 ];

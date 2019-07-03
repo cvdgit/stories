@@ -9,7 +9,7 @@ use yii\widgets\Menu;
 use common\models\Category;
 
 /** @var $this yii\web\View */
-/** @var $searchModel common\models\StorySearch */
+/** @var $searchModel frontend\models\StorySearch */
 /** @var $dataProvider yii\data\ActiveDataProvider */
 /** @var $action array */
 

@@ -14,4 +14,5 @@ class UserRoles
 	const PERMISSION_MANAGE_USERS = 'manageUsers';
 	const PERMISSION_MANAGE_RATES = 'manageRates';
     const PERMISSION_MANAGE_COMMENTS = 'manageComments';
+    const PERMISSION_MANAGE_NEWS = 'manageNews';
 }

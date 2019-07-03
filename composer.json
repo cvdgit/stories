@@ -37,7 +37,9 @@
         "samdark/sitemap": "^2.2",
         "alexander-suter/yii2-tag-cloud": "*",
         "matperez/yii2unisender": "~1.0",
-        "yiisoft/yii2-queue": "^2.2"
+        "yiisoft/yii2-queue": "^2.2",
+        "cebe/yii2-gravatar": "^1.0",
+        "vova07/yii2-imperavi-widget": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

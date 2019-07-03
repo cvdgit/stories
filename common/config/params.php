@@ -32,6 +32,7 @@ return [
         'rules' => [
             '' => 'site/index',
             'story/<alias:[\w\d\-]+>' => 'story/view',
+            'blog/<slug:[\w\d\-]+>' => 'news/view',
         ],
     ],
 

@@ -1442,3 +1442,52 @@ section h2 span {
 .story-pay {
   font-size: 1.6rem;
 }
+
+
+
+.post {
+  margin-bottom: 44px;
+}
+
+.post h1, .post h2 {
+  color: #38405d;
+  font-size: 22px;
+  font-weight: bold;
+  margin: 0 0 2rem 0;
+}
+
+.post .read-more {
+  font-size: 14px;
+  color: #1d7aa2;
+}
+
+.post .info .time {
+  font-size: 14px;
+  margin-bottom: 14px;
+  color: #777;
+}
+
+.post .info .status {
+  font-size: 12px;
+  color: #777;
+}
+
+.post .info .author {
+  margin-bottom: 8px;
+}
+
+.post .info .author img {
+  width: 48px;
+  height: 48px;
+  border-radius: 100%;
+}
+
+.news-view {
+  margin-bottom: 30px;
+}
+
+.author img {
+  width: 48px;
+  height: 48px;
+  border-radius: 100%;
+}

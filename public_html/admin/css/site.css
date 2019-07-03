@@ -275,3 +275,132 @@ body {
     text-align: center;
     line-height: 70px;
 }
+
+
+.post {
+    margin-bottom: 44px;
+}
+
+.post h2 {
+    color: #1d7aa2;
+    font-size: 22px;
+    font-weight: bold;
+    margin: 0 0 2rem 0;
+}
+
+.post .read-more {
+    font-size: 14px;
+    color: #1d7aa2;
+}
+
+.post .info .time {
+    font-family: Arimo;
+    font-size: 14px;
+    margin-bottom: 14px;
+    color: #777;
+}
+
+.post .info .status {
+    font-size: 12px;
+    color: #777;
+}
+
+.post .info .author {
+    margin-bottom: 8px;
+}
+
+.post .info .author img {
+    width: 48px;
+    height: 48px;
+    border-radius: 100%;
+}
+
+.news-view {
+    margin-bottom: 30px;
+}
+
+@media (max-width: 767px) {
+    .navbar .navbar-btn {
+        width: 100%;
+    }
+    .navbar .navbar-form {
+        margin: 0;
+    }
+    .navbar .navbar-nav {
+        margin-top: 0px;
+    }
+    .news-index .info {
+        min-height: 48px;
+        margin-bottom: 20px;
+    }
+    .news-index .info .time {
+        float: right;
+        padding-top: 10px;
+    }
+    .news-index .info .status {
+        font-size: 12px;
+        color: #777;
+    }
+    .news-index .info .author {
+        float: left;
+        margin-right: 20px;
+    }
+    .news-index .info .twitter-handle {
+        padding-top: 10px;
+    }
+    .news-index .comment {
+        padding-bottom: 20px;
+        display: table;
+        margin: 0px;
+        width: 100%;
+    }
+    .news-index .comment .info {
+        display: table-header-group;
+    }
+    .news-index .comment .details {
+        display: table-row-group;
+        margin: 0 10px;
+    }
+    .news-index .comment .text {
+        margin-top: 20px;
+        display: table-footer-group;
+    }
+    .post .info {
+        min-height: 48px;
+        margin-bottom: 20px;
+    }
+    .post .info .time {
+        float: right;
+        padding-top: 10px;
+    }
+    .post .info .status {
+        font-size: 12px;
+        color: #777;
+    }
+    .post .info .author {
+        float: left;
+        margin-right: 20px;
+    }
+    .post .info .twitter-handle {
+        padding-top: 10px;
+    }
+    .center-pagination {
+        text-align: center;
+    }
+    .center-pagination .pagination a, .center-pagination .pagination span {
+        padding: 1rem 1.5rem;
+        font-size: 1.5rem;
+        line-height: 1;
+    }
+    .github-background {
+        display: none;
+    }
+    .site-login, .site-signup {
+        margin: 20px;
+    }
+    footer p {
+        width: 100%;
+        float: initial !important;
+        text-align: center;
+    }
+}

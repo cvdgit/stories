@@ -50,7 +50,8 @@ AppAsset::register($this);
               <?php
               $menuItems = [
                   ['label' => 'Главная', 'url' => ['/site/index']],
-                  ['label' => 'Истории', 'url' => ['/story/index'], 'active' => (Yii::$app->controller->id === 'story')],
+                  ['label' => 'Истории', 'url' => ['/story/index'], 'active' => Yii::$app->controller->id === 'story'],
+                  ['label' => 'Блог', 'url' => ['news/index'], 'active' => Yii::$app->controller->id === 'news'],
                   ['label' => 'Подписки', 'url' => ['/rate/index']],
                   ['label' => 'Контакты', 'url' => '#', 'template'=> '<a href="{url}" data-toggle="modal" data-target="#wikids-feedback-modal">{label}</a>'],
               ];
