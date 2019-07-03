@@ -1491,3 +1491,79 @@ section h2 span {
   height: 48px;
   border-radius: 100%;
 }
+
+.navbar-toggle {
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  padding: 9px 13px;
+  margin: 17px 0;
+  background-color: #99cd50;
+  border: none;
+  display: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.navbar-toggle .icon-bar {
+  display: block;
+  width: 22px;
+  height: 2px;
+  border-radius: 1px;
+  background-color: #fff;
+}
+
+@media (max-width: 992px) {
+
+  .site-header img.site-logo {
+    margin-top: 10px;
+  }
+
+  .site-header .menu-wrapper {
+    margin-top: 10px;
+  }
+
+  .site-main-menu {
+    width: 100%;
+    display: none;
+  }
+
+  .site-main-menu li {
+    display: block;
+    margin-left: 0;
+    text-align: center;
+  }
+
+  .site-header .site-nav {
+    margin-bottom: 10px;
+  }
+
+  .navbar-toggle {
+    display: block;
+    float: right;
+  }
+
+  .site-header .user-menu-wrapper, .site-header-mini .user-menu-wrapper {
+    clear: right;
+  }
+
+  .site-phone-number {
+    float: left;
+    clear: none;
+  }
+
+  .site-offer h1 {
+    margin-top: 10px;
+    font-size: 3rem;
+  }
+
+}

@@ -44,6 +44,12 @@ AppAsset::register($this);
             else
               echo Html::a(Html::img('/img/wikids-mini.png', $options), ['/site/index']);
             ?>
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".site-main-menu">
+                  <span class="sr-only">Toggle navigation</span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+              </button>
           </div>
           <div class="col-sm-5 col-md-6">
             <div class="menu-wrapper">
