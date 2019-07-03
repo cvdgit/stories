@@ -59,7 +59,7 @@ AppAsset::register($this);
                         ['label' => 'Опечатки', 'url' => ['/feedback/index']],
                         ['label' => 'Комментарии', 'url' => ['/comment/index']],
                         ['label' => 'Подписки', 'url' => ['/rate/index']],
-                        ['label' => 'Новости', 'url' => ['/news/admin', 'status' => \common\models\News::STATUS_PROPOSED]],
+                        ['label' => 'Блог', 'url' => ['/news/admin', 'status' => \common\models\News::STATUS_PROPOSED], 'active' => Yii::$app->controller->id === 'news'],
                     ],
                 ]) ?>
                 <?php endif ?>

@@ -10,11 +10,11 @@ use yii\helpers\Html;
 /** @var $this yii\web\View */
 /** @var $status integer */
 
-$this->title = 'Управление новостями';
+$this->title = 'Управление публикациями';
 ?>
 <h1 class="page-header"><?= Html::encode($this->title) ?></h1>
 <p>
-    <?= Html::a('Создать новость', ['create'], ['class' => 'btn btn-success']) ?>
+    <?= Html::a('Создать запись', ['create'], ['class' => 'btn btn-success']) ?>
 </p>
 <div class="row news-index">
     <div class="col-xs-12">

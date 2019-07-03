@@ -62,7 +62,7 @@ class NewsController extends Controller
         ]);
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success');
-            return $this->redirect(['admin']);
+            return $this->redirect(['admin', 'status' => News::STATUS_PROPOSED]);
         }
         else {
             $message = '';
@@ -88,6 +88,12 @@ class NewsController extends Controller
         return $this->render('update', [
             'model' => $model,
         ]);
+    }
+
+    public function actionDelete($id)
+    {
+        $this->findModel($id)->delete();
+        return $this->redirect(['admin', 'status' => 1]);
     }
 
     /**
