@@ -940,7 +940,7 @@ section h2 span {
 
 @media (max-width: 1200px) {
   body {
-    font-size: 16px;
+    /*font-size: 16px;*/
   }
 
   .site-main-menu {
@@ -1541,6 +1541,14 @@ section h2 span {
     display: block;
     margin-left: 0;
     text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .site-main-menu li a {
+    line-height: 45px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    display: block;
   }
 
   .site-header .site-nav {

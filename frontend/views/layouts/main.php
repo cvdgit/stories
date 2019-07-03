@@ -32,74 +32,74 @@ AppAsset::register($this);
 </head>
 <body>
 <?php $this->beginBody() ?>
-  <header class="site-header-main <?= Url::isHome() ? 'site-header' : 'site-header-mini' ?>">
-    <nav class="site-nav">
-      <div class="container">
-        <div class="row">
-          <div class="col-sm-4 col-md-3">
-            <?php 
-            $options = ['class' => 'site-logo', 'alt' => 'wikids', 'title' => 'wikids'];
-            if (Url::isHome())
-              echo Html::img('/img/wikids.png', $options);
-            else
-              echo Html::a(Html::img('/img/wikids-mini.png', $options), ['/site/index']);
-            ?>
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".site-main-menu">
-                  <span class="sr-only">Toggle navigation</span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-              </button>
-          </div>
-          <div class="col-sm-5 col-md-6">
-            <div class="menu-wrapper">
-              <?php
-              $menuItems = [
-                  ['label' => 'Главная', 'url' => ['/site/index']],
-                  ['label' => 'Истории', 'url' => ['/story/index'], 'active' => Yii::$app->controller->id === 'story'],
-                  ['label' => 'Блог', 'url' => ['news/index'], 'active' => Yii::$app->controller->id === 'news'],
-                  ['label' => 'Подписки', 'url' => ['/rate/index']],
-                  ['label' => 'Контакты', 'url' => '#', 'template'=> '<a href="{url}" data-toggle="modal" data-target="#wikids-feedback-modal">{label}</a>'],
-              ];
-              echo Menu::widget([
-                  'encodeLabels' => false,
-                  'items' => $menuItems,
-                  'options' => ['class' => 'site-menu site-main-menu horizontal-nav'],
-              ]);
-              ?>
-            </div>
-          </div>
-          <div class="col-sm-3 col-md-3">
-            <div class="user-menu-wrapper">
-              <?php if (Yii::$app->user->isGuest): ?>
-                    <div class="user-menu-inner">
-                  <?= Html::a('Регистрация', '#', ['data-toggle' => 'modal', 'data-target' => '#wikids-signup-modal']) ?>
-                  <span></span>
-                  <?= Html::a('Войти', '#', ['class' => 'login-item', 'data-toggle' => 'modal', 'data-target' => '#wikids-login-modal']) ?>
-                    </div>
-              <?php else: ?>
-                  <div class="profile-photo pull-right">
-                      <?= Html::img(Yii::$app->user->identity->getProfilePhoto()) ?>
-                  </div>
-                <div class="dropdown">
-                    <div style="cursor: pointer" data-toggle="dropdown" class="dropdown-toggle"><b class="caret"></b> <?= Yii::$app->user->identity->getProfileName() ?></div>
-                    <?= Dropdown::widget(['items' => [
-                            ['label' => 'Профиль', 'url' => ['/profile/index']],
-                            ['label' => 'История просмотра', 'url' => ['/story/history']],
-                            ['label' => 'Панель управления', 'url' => '/admin', 'visible' => Yii::$app->user->can(UserRoles::PERMISSION_ADMIN_PANEL)],
-                            ['label' => Html::beginForm(['/auth/logout']) .
-                     Html::submitButton('Выход', ['class' => 'login-item logout-btn-a']) .
-                     Html::endForm(),
-                                'encode' => false,
-                            ],
-                    ], 'options' => ['class' => 'dropdown-menu-right']]) ?>
+    <header class="site-header-main <?= Url::isHome() ? 'site-header' : 'site-header-mini' ?>">
+        <nav class="site-nav">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+                    <?php
+                    $options = ['class' => 'site-logo', 'alt' => 'wikids', 'title' => 'wikids'];
+                    if (Url::isHome())
+                      echo Html::img('/img/wikids.png', $options);
+                    else
+                      echo Html::a(Html::img('/img/wikids-mini.png', $options), ['/site/index']);
+                    ?>
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".site-main-menu">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
                 </div>
-              <?php endif ?>
-            </div>
-            <?php if (Url::isHome()): ?>
-            <span class="site-phone-number">+7 (499) 703-35-25</span>
-            <?php endif ?>
-          </div>
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                    <div class="menu-wrapper">
+                    <?php
+                    $menuItems = [
+                      ['label' => 'Главная', 'url' => ['/site/index']],
+                      ['label' => 'Истории', 'url' => ['/story/index'], 'active' => Yii::$app->controller->id === 'story'],
+                      ['label' => 'Блог', 'url' => ['news/index'], 'active' => Yii::$app->controller->id === 'news'],
+                      ['label' => 'Подписки', 'url' => ['/rate/index']],
+                      ['label' => 'Контакты', 'url' => '#', 'template'=> '<a href="{url}" data-toggle="modal" data-target="#wikids-feedback-modal">{label}</a>'],
+                    ];
+                    echo Menu::widget([
+                      'encodeLabels' => false,
+                      'items' => $menuItems,
+                      'options' => ['class' => 'site-menu site-main-menu horizontal-nav collapse'],
+                    ]);
+                    ?>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+                    <div class="user-menu-wrapper">
+                    <?php if (Yii::$app->user->isGuest): ?>
+                        <div class="user-menu-inner">
+                            <?= Html::a('Регистрация', '#', ['data-toggle' => 'modal', 'data-target' => '#wikids-signup-modal']) ?>
+                            <span></span>
+                            <?= Html::a('Войти', '#', ['class' => 'login-item', 'data-toggle' => 'modal', 'data-target' => '#wikids-login-modal']) ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="profile-photo pull-right">
+                            <?= Html::img(Yii::$app->user->identity->getProfilePhoto()) ?>
+                        </div>
+                        <div class="dropdown">
+                            <div style="cursor: pointer" data-toggle="dropdown" class="dropdown-toggle"><b class="caret"></b> <?= Yii::$app->user->identity->getProfileName() ?></div>
+                            <?= Dropdown::widget(['items' => [
+                                    ['label' => 'Профиль', 'url' => ['/profile/index']],
+                                    ['label' => 'История просмотра', 'url' => ['/story/history']],
+                                    ['label' => 'Панель управления', 'url' => '/admin', 'visible' => Yii::$app->user->can(UserRoles::PERMISSION_ADMIN_PANEL)],
+                                    ['label' => Html::beginForm(['/auth/logout']) .
+                             Html::submitButton('Выход', ['class' => 'login-item logout-btn-a']) .
+                             Html::endForm(),
+                                        'encode' => false,
+                                    ],
+                            ], 'options' => ['class' => 'dropdown-menu-right']]) ?>
+                        </div>
+                    <?php endif ?>
+                    </div>
+                    <?php if (Url::isHome()): ?>
+                    <span class="site-phone-number">+7 (499) 703-35-25</span>
+                    <?php endif ?>
+                </div>
         </div>
       </div>
     </nav>
