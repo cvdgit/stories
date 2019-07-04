@@ -164,14 +164,14 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
   <section class="site-ask-question">
     <div class="container">
       <div class="row row-no-gutters ask-question-wrapper">
-        <div class="col-md-3">
+        <div class="col-xs-12 col-sm-12 col-md-3">
           <img src="/img/ask-icon.png" alt="">
           <span class="ask-text-1">Нужна консультация?</span>
         </div>
-        <div class="col-md-7">
+        <div class="col-xs-12 col-sm-12 col-md-7">
           <span class="ask-text-2">Подробно расскажем о нашей методике, приведем примеры, поможем подобрать сказки</span>
         </div>
-        <div class="col-md-2">
+        <div class="col-xs-12 col-sm-12 col-md-2">
           <button class="btn btn-white pull-right" data-toggle="modal" data-target="#wikids-feedback-modal">Задать вопрос</button>
         </div>
       </div>

@@ -1496,11 +1496,38 @@ section h2 span {
   width: 50px;
   height: 50px;
   border-radius: 25px;
-  padding: 9px 13px;
-  margin: 17px 0;
   background-color: #99cd50;
   border: none;
   display: none;
+  padding: 9px 13px;
+}
+
+.site-header .navbar-main-menu {
+  margin: 18px 60px 18px 0;
+}
+.site-header .navbar-user {
+  margin: 18px 0 18px 0;
+}
+
+.site-header-mini .navbar-main-menu {
+  margin: 12px 60px 12px 0;
+}
+.site-header-mini .navbar-user {
+  margin: 12px 0 12px 0;
+}
+
+.navbar-user {
+  position: absolute;
+  right: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  background-color: #99cd50;
+  background-image: url(../img/ico_key.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 24px;
+  transition: all 0.1s ease;
 }
 
 .sr-only {
@@ -1528,13 +1555,24 @@ section h2 span {
     margin-top: 10px;
   }
 
+  .site-header-mini img.site-logo {
+    margin-top: 10px;
+  }
+
   .site-header .menu-wrapper {
     margin-top: 10px;
   }
 
+  .menu-wrapper {
+    display: none;
+  }
+
+  .user-menu-wrapper {
+    display: none;
+  }
+
   .site-main-menu {
     width: 100%;
-    display: none;
   }
 
   .site-main-menu li {
@@ -1555,6 +1593,10 @@ section h2 span {
     margin-bottom: 10px;
   }
 
+  .site-header {
+    background-image: none;
+  }
+
   .navbar-toggle {
     display: block;
     float: right;
@@ -1572,6 +1614,29 @@ section h2 span {
   .site-offer h1 {
     margin-top: 10px;
     font-size: 3rem;
+  }
+
+  .ask-question-wrapper {
+    display: block;
+    text-align: center;
+  }
+
+  .ask-question-wrapper button {
+    float: none !important;
+  }
+
+  .site-ask-question .ask-text-2 {
+    display: block;
+    padding: 10px 0;
+  }
+
+  .story-head-container {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .story-container {
+    padding: 0 !important;
   }
 
 }

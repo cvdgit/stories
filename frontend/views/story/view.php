@@ -25,7 +25,7 @@ $('#comment-form-pjax').on('pjax:success', function() {
 JS;
 $this->registerJs($js);
 ?>
-<div class="container">
+<div class="container story-head-container">
 	<main class="site-story-main">
         <div class="story-container">
             <div class="story-container-inner">
@@ -54,6 +54,10 @@ $this->registerJs($js);
             ]) ?>
             </div>
         </div>
+    </main>
+</div>
+<div class="container">
+    <main class="site-story-main">
         <div class="story-description">
             <div class="story-tags" style="margin-top: 10px; font-size: 1.4rem">
                 <!--noindex-->
@@ -90,6 +94,4 @@ $this->registerJs($js);
 	    </div>
 	</main>
 </div>
-
 <?= \frontend\widgets\Share::widget(['story' => $model]) ?>
-
