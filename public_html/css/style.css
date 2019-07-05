@@ -1676,7 +1676,7 @@ section h2 span {
   }
 
   .site-about p {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
   }
 
   .about-tree-number {
@@ -1691,7 +1691,7 @@ section h2 span {
   .about-note-block-left .about-note-block-content,
   .about-note-block-right .about-note-block-content{
     text-align: left;
-    padding: 20px 0 0 25px;
+    padding: 10px 10px 0 15px;
   }
 
   .about-note-block {
@@ -1713,12 +1713,12 @@ section h2 span {
   }
 
   .site-questions .question-block h4 {
-    font-size: 2.2rem;
+    font-size: 2rem;
     margin-bottom: 10px;
   }
 
   .site-questions .question-block p {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
   }
 
   .site-questions {
@@ -1733,5 +1733,9 @@ section h2 span {
     float: none !important;
     text-align: center;
   }
-  
+
+  .carousel-caption h3 {
+    font-size: 2rem;
+  }
+
 }
