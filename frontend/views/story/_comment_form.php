@@ -39,7 +39,7 @@ $this->registerJs($js);
             </div>
             <div class="add-comment-controls">
                 <a class="add-comment-close" href="#!">Отмена</a>
-                <button type="submit" class="btn">Оставить комментарий</button>
+                <button type="submit" class="btn">Комментировать</button>
             </div>
             <?php ActiveForm::end(); ?>
         </div>

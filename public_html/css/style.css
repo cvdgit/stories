@@ -1561,6 +1561,10 @@ section h2 span {
   color: #fff;
 }
 
+.story-filter-btn-wrapper {
+  display: none;
+}
+
 @media (max-width: 992px) {
 
   .site-header img.site-logo {
@@ -1759,6 +1763,14 @@ section h2 span {
 
   .story-date, .story-categories, .story-pay {
     font-size: 1.5rem;
+  }
+
+  .story-filter-btn-wrapper {
+    display: block;
+  }
+
+  .site-sidebar-wrapper {
+    display: none;
   }
 
 }

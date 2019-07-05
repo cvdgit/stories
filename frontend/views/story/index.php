@@ -18,47 +18,52 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 <div class="container">
     <div class="row">
         <nav class="col-sm-4 col-md-3 site-sidebar">
-            <?php $form = ActiveForm::begin([
-              'action' => $action,
-              'method' => 'GET',
-              'options' => ['class' => 'story-form'],
-            ]); ?>
-            <div>
-                <?= $form->field($searchModel, 'title', ['inputOptions' => ['class' => 'form-control story-search-control']])
-                         ->textInput(['placeholder' => 'Поиск...', 'autocomplete' => 'off'])
-                         ->label(false) ?>
-                <span class="icon icon-search"></span>
+            <div class="story-filter-btn-wrapper text-center" style="margin-bottom: 20px">
+                <button class="btn story-filter-btn" data-toggle="collapse" data-target=".site-sidebar-wrapper">Категории и поиск</button>
             </div>
-            <?php ActiveForm::end(); ?>
-            <?php if (!Yii::$app->user->isGuest): ?>
-            <h4>Личное</h4>
-            <?= Menu::widget([
-                'items' => [
-                        ['label' => 'История просмотра', 'url' => ['/story/history']],
-                ],
-                'options' => ['class' => 'story-category-list'],
-            ]) ?>
-            <?php endif ?>
-            <h4>Категории</h4>
-            <?= Menu::widget([
-              'items' => Category::getCategoriesForMenu(),
-              'submenuTemplate' => "\n<ul class=\"story-category-list story-sub-category-list\">\n{items}\n</ul>\n",
-              'options' => ['class' => 'story-category-list'],
-            ]) ?>
-            <h4>Облако тегов</h4>
-            <!--noindex-->
-            <?= TagCloud::widget([
-                'beginColor' => '38405d',
-                'endColor' => '000000',
-                'minFontSize' => 8,
-                'maxFontSize' => 15,
-                'displayWeight' => false,
-                'tags' => Tag::getPopularTags(),
-                'options' => [
-                    'style' => 'word-wrap: break-word;'
-                ],
-            ]) ?>
-            <!--/noindex-->
+            <div class="site-sidebar-wrapper">
+                <?php $form = ActiveForm::begin([
+                  'action' => $action,
+                  'method' => 'GET',
+                  'options' => ['class' => 'story-form'],
+                ]); ?>
+                <div style="position: relative">
+                    <?= $form->field($searchModel, 'title', ['inputOptions' => ['class' => 'form-control story-search-control']])
+                             ->textInput(['placeholder' => 'Поиск...', 'autocomplete' => 'off'])
+                             ->label(false) ?>
+                    <span class="icon icon-search"></span>
+                </div>
+                <?php ActiveForm::end(); ?>
+                <?php if (!Yii::$app->user->isGuest): ?>
+                <h4>Личное</h4>
+                <?= Menu::widget([
+                    'items' => [
+                            ['label' => 'История просмотра', 'url' => ['/story/history']],
+                    ],
+                    'options' => ['class' => 'story-category-list'],
+                ]) ?>
+                <?php endif ?>
+                <h4>Категории</h4>
+                <?= Menu::widget([
+                  'items' => Category::getCategoriesForMenu(),
+                  'submenuTemplate' => "\n<ul class=\"story-category-list story-sub-category-list\">\n{items}\n</ul>\n",
+                  'options' => ['class' => 'story-category-list'],
+                ]) ?>
+                <h4>Облако тегов</h4>
+                <!--noindex-->
+                <?= TagCloud::widget([
+                    'beginColor' => '38405d',
+                    'endColor' => '000000',
+                    'minFontSize' => 8,
+                    'maxFontSize' => 15,
+                    'displayWeight' => false,
+                    'tags' => Tag::getPopularTags(),
+                    'options' => [
+                        'style' => 'word-wrap: break-word;'
+                    ],
+                ]) ?>
+                <!--/noindex-->
+            </div>
         </nav>
         <main class="col-sm-8 col-md-9 site-main" style="margin-top: 0">
             <h1 style="margin-top: 6px; margin-bottom: 33px"><?= $this->getHeader() ?></h1>
