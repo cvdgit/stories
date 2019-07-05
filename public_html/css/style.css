@@ -1450,12 +1450,25 @@ section h2 span {
   margin-bottom: 44px;
 }
 
+.post h2 a:hover {
+  text-decoration: underline;
+}
+
 .post h1, .post h2 {
   color: #38405d;
   font-size: 22px;
   font-weight: bold;
   margin: 0 0 2rem 0;
 }
+
+.post h1 {
+  font-size: 3rem;
+}
+
+.post h2 {
+  font-size: 3rem;
+}
+
 
 .post .read-more {
   font-size: 14px;
@@ -1481,6 +1494,14 @@ section h2 span {
   width: 48px;
   height: 48px;
   border-radius: 100%;
+}
+
+.post .content {
+  line-height: 1.4;
+}
+
+.post .content a {
+  text-decoration: underline;
 }
 
 .news-view {

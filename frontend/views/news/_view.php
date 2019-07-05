@@ -33,10 +33,7 @@ $displayModeratorButtons = isset($displayModeratorButtons) ? $displayModeratorBu
     <div class="col-lg-7 col-md-9 col-sm-9 clearfix">
         <h2><?= Html::a(Html::encode($model->title), ['news/view', 'slug' => $model->slug]) ?></h2>
         <div class="content">
-            <?= HtmlPurifier::process(Markdown::process($model->text, 'gfm'), [
-                'HTML.SafeIframe' => true,
-                'URI.SafeIframeRegexp' => '%^(https?:)?//(www\.youtube(?:-nocookie)?\.com/embed/|player\.vimeo\.com/video/)%',
-            ]) ?>
+            <?= HtmlPurifier::process($model->text) ?>
         </div>
     </div>
 </div>
