@@ -602,6 +602,20 @@ section h2 span {
   line-height: 2rem;
 }
 
+.site-footer .footer-links {
+  line-height: 2rem;
+  margin-top: 10px;
+}
+
+.site-footer .footer-links a {
+  display: block;
+}
+
+.site-footer .footer-links a:hover {
+  text-decoration: none;
+  color: #99cd50;
+}
+
 
 
 

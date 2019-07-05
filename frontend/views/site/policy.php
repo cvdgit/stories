@@ -12,6 +12,8 @@ $this->setMetaTags($title,
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 ?>
 <div class="container">
+    <h1><?= $title ?></h1>
+    <br>
     <p align="justify">Настоящая Политика конфиденциальности персональных данных 
     (далее – Политика конфиденциальности) действует в отношении 
     всей информации, которую данный сайт, на котором размещен текст 

@@ -115,8 +115,14 @@ class SiteController extends Controller
     }
     */
 
-    public function actionPolicy(): string
+    public function actionPolicy()
     {
         return $this->render('policy');
     }
+
+    public function actionCopyright()
+    {
+        return $this->render('copyright');
+    }
+
 }

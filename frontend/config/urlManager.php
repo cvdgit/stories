@@ -10,6 +10,7 @@ return [
         'contacts' => 'site/contact',
         'captcha' => 'site/captcha',
         'policy' => 'site/policy',
+        'copyright' => 'site/copyright',
         'request-password-reset' => 'site/request-password-reset',
 
         'pricing' => 'rate/index',

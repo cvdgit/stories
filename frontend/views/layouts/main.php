@@ -124,31 +124,29 @@ AppAsset::register($this);
     <?php endif ?>
   </header>
   <?= $content ?>
-  <footer class="site-footer">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-3">
-            <?php if (Url::isHome()): ?>
-            <span class="footer-link">Wikids</span>
-            <?php else: ?>
-            <a class="footer-link" href="/">Wikids</a>
-            <?php endif ?>
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                <?php if (Url::isHome()): ?>
+                <span class="footer-link">Wikids</span>
+                <?php else: ?>
+                <a class="footer-link" href="/">Wikids</a>
+                <?php endif ?>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 col-md-3 footer-email">Телефон: +7 (499) 703-3525<br>Email: <a href="mailto:info@wikids.ru">info@wikids.ru</a></div>
+                <div class="col-sm-12 col-md-6 footer-links">
+                    <?= Html::a('Политика конфиденциальности', ['site/policy']) ?>
+                    <?= Html::a('Правообладателям', ['site/copyright']) ?>
+                </div>
+                <div class="col-sm-12 col-md-3">
+                    <div class="footer-copyright pull-right text-right">Wikids © 2019<br>ИП Муталов Артур Сагадеевич</div>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-sm-12 col-md-3 footer-email">
-            Телефон: +7 (499) 703-3525<br>
-            Email: <a href="mailto:info@wikids.ru">info@wikids.ru</a>
-        </div>
-        <div class="col-sm-12 col-md-3 col-md-offset-6">
-          <div class="footer-copyright pull-right text-right">
-              Wikids © 2019<br>
-              ИП Муталов Артур Сагадеевич
-          </div>
-        </div>
-      </div>
-    </div>
-  </footer>
+    </footer>
   <?php if (Yii::$app->user->isGuest): ?>
   <?= LoginWidget::widget() ?>
   <?= SignupWidget::widget() ?>
