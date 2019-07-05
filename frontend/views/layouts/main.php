@@ -135,11 +135,11 @@ AppAsset::register($this);
         </div>
       </div>
       <div class="row">
-        <div class="col-md-3 footer-email">
+        <div class="col-sm-12 col-md-3 footer-email">
             Телефон: +7 (499) 703-3525<br>
             Email: <a href="mailto:info@wikids.ru">info@wikids.ru</a>
         </div>
-        <div class="col-md-3 col-md-offset-6">
+        <div class="col-sm-12 col-md-3 col-md-offset-6">
           <div class="footer-copyright pull-right text-right">
               Wikids © 2019<br>
               ИП Муталов Артур Сагадеевич

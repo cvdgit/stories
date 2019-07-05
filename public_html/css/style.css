@@ -300,6 +300,7 @@ section h2 span {
 .site-about p {
   font-size: .889em;
   line-height: 1.333em;
+  margin: 0;
 }
 
 .about-tree-number {
@@ -1552,7 +1553,7 @@ section h2 span {
 @media (max-width: 992px) {
 
   .site-header img.site-logo {
-    margin-top: 10px;
+    margin-top: 6px;
   }
 
   .site-header-mini img.site-logo {
@@ -1595,6 +1596,7 @@ section h2 span {
 
   .site-header {
     background-image: none;
+    padding-bottom: 50px;
   }
 
   .navbar-toggle {
@@ -1639,4 +1641,97 @@ section h2 span {
     padding: 0 !important;
   }
 
+  .site-offer {
+    margin-bottom: 30px;
+  }
+
+  .site-offer p {
+    margin-bottom: 20px;
+  }
+
+  .btn {
+    padding: 1.5rem 3rem;
+    -webkit-box-shadow: 0 0.5rem 1rem 0.5rem rgba(153, 205, 80, 0.35);
+    box-shadow: 0 0.5rem 1rem 0.5rem rgba(153, 205, 80, 0.35);
+  }
+
+  .carousel-inner {
+    -webkit-box-shadow: 0 1.3rem 2.3rem 0.6rem rgba(51, 51, 102, 0.31);
+    box-shadow: 0 1.3rem 2.3rem 0.6rem rgba(51, 51, 102, 0.31);
+    -webkit-border-radius: 1.5rem;
+    border-radius: 1.5rem;
+  }
+
+  section {
+    padding: 30px 0;
+  }
+
+  section h2 {
+    margin-bottom: 10px;
+    font-size: 3rem;
+  }
+
+  .site-about h4 {
+    font-size: 2rem;
+  }
+
+  .site-about p {
+    font-size: 1.4rem;
+  }
+
+  .about-tree-number {
+    display: none;
+  }
+
+  .about-note-block-left:before,
+  .about-note-block-right:before {
+    display: none;
+  }
+
+  .about-note-block-left .about-note-block-content,
+  .about-note-block-right .about-note-block-content{
+    text-align: left;
+    padding: 20px 0 0 25px;
+  }
+
+  .about-note-block {
+    margin-bottom: 16px;
+  }
+
+  .site-stories h2 {
+    padding-bottom: 20px;
+  }
+
+  .site-questions h2 {
+    padding-top: 10px;
+    padding-bottom: 20px;
+  }
+
+  .site-questions .question-block {
+    padding: 26px 16px 0 30px;
+    margin-bottom: 20px;
+  }
+
+  .site-questions .question-block h4 {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+  }
+
+  .site-questions .question-block p {
+    font-size: 1.6rem;
+  }
+
+  .site-questions {
+    padding-bottom: 20px;
+  }
+
+  .site-footer {
+    text-align: center;
+  }
+
+  .site-footer .footer-copyright {
+    float: none !important;
+    text-align: center;
+  }
+  
 }
