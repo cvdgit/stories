@@ -1550,6 +1550,17 @@ section h2 span {
   background-color: #fff;
 }
 
+.btn-share {
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  background-color: #99cd50;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: #fff;
+}
+
 @media (max-width: 992px) {
 
   .site-header img.site-logo {
@@ -1736,6 +1747,18 @@ section h2 span {
 
   .carousel-caption h3 {
     font-size: 2rem;
+  }
+
+  .site-header-mini .site-nav.story-view {
+    margin-bottom: 0;
+  }
+
+  .story-description h1 {
+    font-size: 3rem;
+  }
+
+  .story-date, .story-categories, .story-pay {
+    font-size: 1.5rem;
   }
 
 }

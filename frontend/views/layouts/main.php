@@ -33,7 +33,8 @@ AppAsset::register($this);
 <body>
 <?php $this->beginBody() ?>
     <header class="site-header-main <?= Url::isHome() ? 'site-header' : 'site-header-mini' ?>">
-        <nav class="site-nav">
+        <?php $isStoryViewPage = Yii::$app->controller->id === 'story' && Yii::$app->controller->action->id === 'view'; ?>
+        <nav class="site-nav  <?= $isStoryViewPage ? 'story-view' : '' ?>">
             <div class="container">
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">

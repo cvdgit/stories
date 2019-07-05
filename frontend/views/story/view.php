@@ -66,12 +66,10 @@ $this->registerJs($js);
                 <?php endforeach ?>
                 <!--/noindex-->
             </div>
-            <h1 style="margin-top: 0; padding-top: 0;">
-                <?= Html::encode($model->title) ?>
-                <div class="story-share-block">
-                    <button class="btn" data-toggle="modal" data-target="#wikids-share-modal">Поделиться</button>
-                </div>
-            </h1>
+            <div class="story-share-block">
+                <button class="btn-share" title="Поделиться" data-toggle="modal" data-target="#wikids-share-modal"><i class="glyphicon glyphicon-share"></i></button>
+            </div>
+            <h1 style="margin-top: 0; padding-top: 0;"><?= Html::encode($model->title) ?></h1>
             <div class="story-date"><span>Опубликована:</span> <?= \common\helpers\SmartDate::dateSmart($model->created_at, true) ?></div>
             <?php if (!empty($model->description)): ?>
             <div class="story-text"><?= Html::encode($model->description) ?></div>
