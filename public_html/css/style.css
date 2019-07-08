@@ -1449,7 +1449,7 @@ section h2 span {
 
 
 .story-share-block {
-  float: right;
+  text-align: right;
 }
 
 .story-date,
@@ -1592,8 +1592,39 @@ section h2 span {
   background-color: #99cd50;
   border: none;
   padding: 0;
+  margin: 0 0 0 30px;
+  color: #fff;
+}
+
+.btn-like {
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  background-color: #99cd50;
+  border: none;
+  padding: 0;
   margin: 0;
   color: #fff;
+}
+
+.btn-dislike {
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  background-color: #99cd50;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: #fff;
+}
+
+.story-share-block .user-select {
+  border: 3px #808080 solid;
+  color: #808080;
+}
+
+.like-counter, .dislike-counter {
+  margin: 0 10px 0 10px;
 }
 
 .story-filter-btn-wrapper {
@@ -1808,4 +1839,21 @@ section h2 span {
     display: none;
   }
 
+  .story-share-block {
+    text-align: center;
+  }
+
+}
+
+
+.comment-guest-info {
+  color: #38405d;
+}
+
+.comment-guest-info a {
+  font-weight: bold;
+}
+
+button:focus {
+  outline: 0;
 }

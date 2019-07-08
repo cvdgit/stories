@@ -4,8 +4,10 @@ namespace frontend\controllers;
 
 use common\rbac\UserPermissions;
 use common\services\story\CountersService;
+use frontend\models\StoryLikeForm;
 use frontend\models\UserStorySearch;
 use Yii;
+use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use common\models\Story;
@@ -204,6 +206,33 @@ class StoryController extends Controller
             'dataProvider' => $dataProvider,
             'action' => ['/story/history'],
         ]);
+    }
+
+    public function actionLike()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $model = new StoryLikeForm();
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            $command = Yii::$app->db->createCommand();
+            $exists = (new Query())->from('{{%story_like}}')->where('story_id = :story AND user_id = :user', [':story' => $model->story_id, ':user' => Yii::$app->user->id])->exists();
+            if ($exists) {
+                $command->update('{{%story_like}}', ['action' => $model->like], 'story_id = :story AND user_id = :user', [':story' => $model->story_id, ':user' => Yii::$app->user->id]);
+            }
+            else {
+                $command->insert('{{%story_like}}', [
+                    'story_id' => $model->story_id,
+                    'user_id' => Yii::$app->user->id,
+                    'action' => $model->like,
+                ]);
+            }
+            $command->execute();
+            return [
+                'success' => true,
+                'like' => (new Query())->from('{{%story_like}}')->where('story_id = :id AND action = 1', [':id' => $model->story_id])->count(),
+                'dislike' => (new Query())->from('{{%story_like}}')->where('story_id = :id AND action = 0', [':id' => $model->story_id])->count(),
+            ];
+        }
+        return ['success' => false];
     }
 
 }

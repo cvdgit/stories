@@ -1,5 +1,6 @@
 <?php
 
+use frontend\widgets\StoryLikeWidget;
 use yii\helpers\Html;
 use common\widgets\RevealWidget;
 use yii\helpers\Url;
@@ -66,10 +67,11 @@ $this->registerJs($js);
                 <?php endforeach ?>
                 <!--/noindex-->
             </div>
+            <h1 style="margin-top: 0; padding-top: 0;"><?= Html::encode($model->title) ?></h1>
             <div class="story-share-block">
+                <?= StoryLikeWidget::widget(['storyId' => $model->id]) ?>
                 <button class="btn-share" title="Поделиться" data-toggle="modal" data-target="#wikids-share-modal"><i class="glyphicon glyphicon-share"></i></button>
             </div>
-            <h1 style="margin-top: 0; padding-top: 0;"><?= Html::encode($model->title) ?></h1>
             <div class="story-date"><span>Опубликована:</span> <?= \common\helpers\SmartDate::dateSmart($model->created_at, true) ?></div>
             <?php if (!empty($model->description)): ?>
             <div class="story-text"><?= Html::encode($model->description) ?></div>
@@ -83,9 +85,13 @@ $this->registerJs($js);
 	        <div class="story-pay"><span>Тип:</span> <?= $model->bySubscription() ? 'По подписке' : 'Бесплатно' ?></div>
 	    </div>
 	    <div class="comments">
-	  	<?php if (!Yii::$app->user->isGuest): ?>
+	  	    <?php if (!Yii::$app->user->isGuest): ?>
             <?= $this->render('_comment_form', ['commentForm' => $commentForm]) ?>
-        <?php endif ?>
+            <?php else: ?>
+            <div class="alert alert-info text-center comment-guest-info">
+                Чтобы оставить комментарий <a href="#" data-toggle="modal" data-target="#wikids-signup-modal">зарегистрируйтесь</a> или <a href="#" data-toggle="modal" data-target="#wikids-login-modal">войдите</a> в аккаунт
+            </div>
+            <?php endif ?>
 	        <div class="comment-list">
                 <?= $this->render('_comment_list', ['dataProvider' => $dataProvider]) ?>
 	        </div>

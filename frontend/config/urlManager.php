@@ -36,7 +36,7 @@ return [
         'stories/category/<category:[\w\-]+>' => 'story/category',
         'stories' => 'story/index',
 
-        'story/webhook' => 'story/webhook',
+        'story/like' => 'story/like',
         'story/addcomment' => 'story/add-comment',
         'story/get-story-body/<id:\d+>' => 'story/get-story-body',
         'story/<alias:[\w\-]+>' => 'story/view',
