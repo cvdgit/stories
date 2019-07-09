@@ -44,6 +44,16 @@ class SitemapController extends Controller
             $sitemap->addItem($urlManager->createAbsoluteUrl(['story/category', 'category' => $category['alias']]), $lastModified, Sitemap::WEEKLY, 0.9);
         }
 
+        $lastModified = (new Query())->from('{{%news}}')->max('created_at');
+        $sitemap->addItem($urlManager->createAbsoluteUrl(['news/index']), $lastModified, Sitemap::DAILY, 1);
+        $query = (new Query())
+            ->from('{{%news}}')
+            ->where(['status' => 2])
+            ->orderBy('created_at');
+        foreach ($query->each() as $news) {
+            $sitemap->addItem($urlManager->createAbsoluteUrl(['news/view', 'slug' => $news['slug']]), $news['updated_at'], Sitemap::MONTHLY, 0.9);
+        }
+
         $sitemap->write();
     }
 
