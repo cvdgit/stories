@@ -23,7 +23,7 @@ $displayModeratorButtons = isset($displayModeratorButtons) ? $displayModeratorBu
                 <?= \frontend\widgets\Avatar::widget(['user' => $model->user, 'size' => 48]) ?>
             </p>
             <p class="twitter-handle">
-                <?= Html::encode($model->user->username) ?>
+                <?= Html::encode($model->user->getProfileName()) ?>
             </p>
         <?php endif ?>
         <?php if ($displayModeratorButtons): ?>
