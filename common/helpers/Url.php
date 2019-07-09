@@ -6,8 +6,10 @@ use Yii;
 
 class Url extends \yii\helpers\Url
 {
-    public static function isHome()
+    public static function isHome(): bool
     {
-        return (self::home() == Yii::$app->request->url);
+        $controller = Yii::$app->controller;
+        $default_controller = Yii::$app->defaultRoute;
+        return (($controller->id === $default_controller) && ($controller->action->id === $controller->defaultAction));
     }
 }
