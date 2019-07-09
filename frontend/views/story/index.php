@@ -39,6 +39,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 <?= Menu::widget([
                     'items' => [
                             ['label' => 'История просмотра', 'url' => ['/story/history']],
+                        ['label' => 'Понравившиеся', 'url' => ['/story/liked']],
                     ],
                     'options' => ['class' => 'story-category-list'],
                 ]) ?>

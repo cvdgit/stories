@@ -4,7 +4,9 @@ namespace frontend\controllers;
 
 use common\rbac\UserPermissions;
 use common\services\story\CountersService;
+use common\services\StoryLikeService;
 use frontend\models\StoryLikeForm;
+use frontend\models\StoryLikeSearch;
 use frontend\models\UserStorySearch;
 use Yii;
 use yii\db\Query;
@@ -44,12 +46,14 @@ class StoryController extends Controller
 
     protected $storyService;
     protected $countersService;
+    protected $likeService;
 
-    public function __construct($id, $module, StoryService $storyService, CountersService $countersService, $config = [])
+    public function __construct($id, $module, StoryService $storyService, CountersService $countersService, StoryLikeService $likeService, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->storyService = $storyService;
         $this->countersService = $countersService;
+        $this->likeService = $likeService;
     }
 
     public function actionIndex()
@@ -208,28 +212,30 @@ class StoryController extends Controller
         ]);
     }
 
+    public function actionLiked()
+    {
+        $this->getView()->setMetaTags('Понравившиеся истории', 'Понравившиеся истории', 'Понравившиеся истории', 'Понравившиеся истории');
+
+        $searchModel = new StoryLikeSearch(Yii::$app->user->id);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'action' => ['/story/liked'],
+        ]);
+    }
+
     public function actionLike()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $model = new StoryLikeForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $command = Yii::$app->db->createCommand();
-            $exists = (new Query())->from('{{%story_like}}')->where('story_id = :story AND user_id = :user', [':story' => $model->story_id, ':user' => Yii::$app->user->id])->exists();
-            if ($exists) {
-                $command->update('{{%story_like}}', ['action' => $model->like], 'story_id = :story AND user_id = :user', [':story' => $model->story_id, ':user' => Yii::$app->user->id]);
-            }
-            else {
-                $command->insert('{{%story_like}}', [
-                    'story_id' => $model->story_id,
-                    'user_id' => Yii::$app->user->id,
-                    'action' => $model->like,
-                ]);
-            }
-            $command->execute();
+            $this->likeService->rate($model->story_id, Yii::$app->user->id, $model->like);
             return [
                 'success' => true,
-                'like' => (new Query())->from('{{%story_like}}')->where('story_id = :id AND action = 1', [':id' => $model->story_id])->count(),
-                'dislike' => (new Query())->from('{{%story_like}}')->where('story_id = :id AND action = 0', [':id' => $model->story_id])->count(),
+                'like' => $this->likeService->getLikeCount($model->story_id),
+                'dislike' => $this->likeService->getDislikeCount($model->story_id),
             ];
         }
         return ['success' => false];

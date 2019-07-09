@@ -4,15 +4,23 @@
 namespace frontend\widgets;
 
 
+use common\services\StoryLikeService;
 use frontend\models\StoryLikeForm;
 use yii\base\Widget;
-use yii\db\Query;
 use Yii;
 
 class StoryLikeWidget extends Widget
 {
 
     public $storyId;
+
+    protected $likeService;
+
+    public function __construct(StoryLikeService $likeService, $config = [])
+    {
+        $this->likeService = $likeService;
+        parent::__construct($config);
+    }
 
     public function init()
     {
@@ -21,8 +29,9 @@ class StoryLikeWidget extends Widget
 
     public function run()
     {
-        $likeNumber = (new Query())->from('{{%story_like}}')->where('story_id = :id AND action = 1', [':id' => $this->storyId])->count();
-        $dislikeNumber = (new Query())->from('{{%story_like}}')->where('story_id = :id AND action = 0', [':id' => $this->storyId])->count();
+
+        $likeNumber = $this->likeService->getLikeCount($this->storyId);
+        $dislikeNumber = $this->likeService->getDislikeCount($this->storyId);
 
         $form = new StoryLikeForm();
         $form->story_id = $this->storyId;
@@ -30,14 +39,7 @@ class StoryLikeWidget extends Widget
         $like = false;
         $dislike = false;
         if (!Yii::$app->user->isGuest) {
-            $action = (new Query())
-                ->select('action')
-                ->from('{{%story_like}}')
-                ->where('story_id = :story AND user_id = :user', [
-                    ':story' => $this->storyId,
-                    ':user' => Yii::$app->user->id,
-                ])
-                ->scalar();
+            $action = $this->likeService->getUserStoryAction($this->storyId, Yii::$app->user->id);
             $like = ($action === '1');
             $dislike = ($action === '0');
         }

@@ -32,6 +32,7 @@ return [
         'change-password' => 'profile/change-password',
 
         'stories/history' => 'story/history',
+        'stories/liked' => 'story/liked',
         'stories/tag/<tag:[\w\s\-]+>' => 'story/tag',
         'stories/category/<category:[\w\-]+>' => 'story/category',
         'stories' => 'story/index',
