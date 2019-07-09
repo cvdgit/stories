@@ -34,7 +34,7 @@ var RevealCustomControls = window.RevealCustomControls || (function() {
 		Reveal.addEventListener('slidechanged', callback);
 	}
 
-	var timer;
+	/*var timer;
 	Reveal.addEventListener("mousemove", function(e) {
 		e = e || window.event;
 		$('.story-controls').fadeIn().addClass('show');
@@ -46,7 +46,7 @@ var RevealCustomControls = window.RevealCustomControls || (function() {
 				$('.story-controls').fadeOut().removeClass('show');
 			}
 		}, 3000);
-	}, false);
+	}, false);*/
 
 	return this;
 })();

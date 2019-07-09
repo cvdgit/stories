@@ -18,7 +18,7 @@ $this->setMetaTags($title,
         <h1><span>Редактировать</span> профиль</h1>
         <div class="site-request-password-reset">
             <div class="row">
-                <div class="col-md-4 col-md-offset-4">
+                <div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4 col-lg-4 col-lg-offset-4">
                     <?php $form = ActiveForm::begin(['options' => [
                         'class' => 'story-form',
                     ]]); ?>

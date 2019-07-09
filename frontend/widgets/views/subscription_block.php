@@ -9,7 +9,7 @@ use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 
 ?>
-<div class="col-md-4 col-sm-4">
+<div class="col-xs-8 col-xs-offset-2 col-sm-4 col-sm-offset-0 col-md-4 col-md-offset-0 col-lg-4 col-lg-offset-0">
     <div class="price">
         <div class="price-image"><img src="<?= $image ?>" alt=""></div>
         <div class="price-name"><?= $rate->title ?></div>

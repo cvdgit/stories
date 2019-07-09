@@ -396,8 +396,12 @@ section h2 span {
   }
 
   .about-tree-number {}
-}
 
+  .site-pricing .price .btn {
+    padding: 1.5rem 6rem;
+    font-size: 1.6rem;
+  }
+}
 
 .site-stories {
   background-image: url('../img/section-bg.png');
@@ -1843,6 +1847,15 @@ section h2 span {
     text-align: center;
   }
 
+  .site-pricing .price .btn {
+    padding: 1.5rem 3rem;
+    font-size: 1.6rem;
+  }
+
+  .site-pricing .price {
+    margin-bottom: 30px;
+  }
+
 }
 
 
@@ -1856,4 +1869,20 @@ section h2 span {
 
 button:focus {
   outline: 0;
+}
+
+
+
+@media (max-width: 1470px) {
+  .site-pricing .price .btn {
+    padding: 1.5rem 6rem;
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 1200px) {
+  .site-pricing .price .btn {
+    padding: 1.5rem 4rem;
+    font-size: 1.6rem;
+  }
 }

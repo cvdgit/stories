@@ -1,10 +1,5 @@
 <?php
 
-use yii\widgets\DetailView;
-use yii\helpers\Html;
-use yii\bootstrap\ActiveForm;
-use common\widgets\Alert;
-use yii\helpers\Url;
 use yii\bootstrap\Tabs;
 
 /* @var $this yii\web\View */
@@ -21,7 +16,7 @@ $this->setMetaTags($title,
     <main class="site-user-profile">
         <h1><span>Профиль</span> пользователя</h1>
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-xs-6 col-xs-offset-3 col-sm-6 col-sm-offset-3 col-md-3 col-md-offset-0 col-lg-3 col-lg-offset-0">
                 <div class="text-center">
                     <h3 style="margin-top: 12px"><?= $model->getProfileName() ?></h3>
                     <?php
@@ -34,12 +29,12 @@ $this->setMetaTags($title,
                         }
                     }
                     ?>
-                    <div class="cst-box-image">
+                    <div class="cst-box-image text-center">
                         <div class="cst-image-div" id="image-preview" style="background-image: url(<?= $background  ?>)"></div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-9">
+            <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
                 <?= Tabs::widget([
                     'class' => 'profile-tabs',
                     'items' => [
