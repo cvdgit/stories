@@ -2,6 +2,7 @@
 
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
+use yii\web\JsExpression;
 
 /** @var $readOnly bool */
 /** @var $model frontend\models\StoryLikeForm */
@@ -12,12 +13,7 @@ $form = ActiveForm::begin([
     'options' => ['style' => 'display: inline-block'],
 ]);
 
-$likeButtonOptions = ['class' => 'btn-like', 'title' => 'Понравилась', 'onclick' => new \yii\web\JsExpression('WikidsStory.storyLike(this)')];
-if ($readOnly) {
-    $likeButtonOptions['disabled'] = 'disabled';
-    $likeButtonOptions['title'] = 'Что бы оценить историю необходимо авторизоваться';
-    $likeButtonOptions['class'] .= ' disabled';
-}
+$likeButtonOptions = ['class' => 'btn-like', 'title' => 'Мне понравилось', 'onclick' => new JsExpression('WikidsStory.storyLike(this)')];
 /** @var $like string */
 if ($like !== false) {
     $likeButtonOptions['class'] .= ' user-select';
@@ -25,12 +21,8 @@ if ($like !== false) {
 echo Html::button('<i class="glyphicon glyphicon-thumbs-up"></i>', $likeButtonOptions);
 /** @var $likeNumber int */
 echo Html::tag('span', $likeNumber, ['class' => 'like-counter']);
-$dislikeButtonOptions = ['class' => 'btn-dislike', 'title' => 'Не понравилась', 'onclick' => 'WikidsStory.storyDislike(this)'];
-if ($readOnly) {
-    $dislikeButtonOptions['disabled'] = 'disabled';
-    $dislikeButtonOptions['title'] = 'Что бы оценить историю необходимо авторизоваться';
-    $dislikeButtonOptions['class'] .= ' disabled';
-}
+
+$dislikeButtonOptions = ['class' => 'btn-dislike', 'title' => 'Мне не понравилось', 'onclick' => new JsExpression('WikidsStory.storyDislike(this)')];
 /** @var $dislike string */
 if ($dislike !== false) {
     $dislikeButtonOptions['class'] .= ' user-select';
@@ -43,13 +35,22 @@ echo $form->field($model, 'story_id')->hiddenInput()->label(false);
 echo $form->field($model, 'like')->hiddenInput()->label(false);
 ActiveForm::end();
 
-if (!$readOnly) {
-    $elementId = Html::getInputId($model, 'like');
-    $js = <<< JS
+
+$elementId = Html::getInputId($model, 'like');
+$needLogin = var_export($readOnly, true);
+$js = <<< JS
 WikidsStory = (function() {
 
     var form = $("#story-like-form");
 
+    function checkUserLogin() {
+        var needLogin = $needLogin;
+        if (needLogin) {
+            $("#wikids-login-modal").modal("show");
+        }
+        return !needLogin;
+    }
+    
     function selectButton() {
         $('.btn-like').removeClass('user-select');
         $('.btn-dislike').removeClass('user-select');
@@ -60,6 +61,7 @@ WikidsStory = (function() {
     var currentButton;
     
     function storyLike(obj) {
+        if (!checkUserLogin()) return false;
         $('#$elementId').val('1');
         form.submit();
         currentButton = $(obj);
@@ -67,6 +69,7 @@ WikidsStory = (function() {
     }
     
     function storyDislike(obj) {
+        if (!checkUserLogin()) return false;
         $('#$elementId').val('0');
         form.submit();
         currentButton = $(obj);
@@ -127,6 +130,5 @@ WikidsStory = (function() {
     };
 })();
 JS;
-    /** @var $this yii\web\View */
-    $this->registerJs($js);
-}
+/** @var $this yii\web\View */
+$this->registerJs($js);

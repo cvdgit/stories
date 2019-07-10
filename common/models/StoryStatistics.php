@@ -4,6 +4,7 @@ namespace common\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "story_statistics".
@@ -19,7 +20,7 @@ use yii\behaviors\TimestampBehavior;
  *
  * @property Story $story
  */
-class StoryStatistics extends \yii\db\ActiveRecord
+class StoryStatistics extends ActiveRecord
 {
 
     public $slide_time = 0;
@@ -36,7 +37,7 @@ class StoryStatistics extends \yii\db\ActiveRecord
     {
         return [
             [
-                'class' => TimestampBehavior::className(),
+                'class' => TimestampBehavior::class,
                 'createdAtAttribute' => 'created_at',
                 'updatedAtAttribute' => null,
             ],
@@ -52,7 +53,7 @@ class StoryStatistics extends \yii\db\ActiveRecord
             [['story_id', 'slide_number', 'begin_time', 'end_time', 'chars', 'session'], 'required'],
             [['story_id', 'slide_number', 'begin_time', 'end_time', 'chars', 'created_at'], 'integer'],
             [['session'], 'string', 'max' => 50],
-            [['story_id'], 'exist', 'skipOnError' => true, 'targetClass' => Story::className(), 'targetAttribute' => ['story_id' => 'id']],
+            // [['story_id'], 'exist', 'skipOnError' => true, 'targetClass' => Story::className(), 'targetAttribute' => ['story_id' => 'id']],
         ];
     }
 
@@ -75,11 +76,11 @@ class StoryStatistics extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return yii\db\ActiveQuery
      */
     public function getStory()
     {
-        return $this->hasOne(Story::className(), ['id' => 'story_id']);
+        return $this->hasOne(Story::class, ['id' => 'story_id']);
     }
 
     public static function findStoryStatistics($story_id)

@@ -5,8 +5,9 @@ namespace frontend\controllers;
 use Yii;
 use common\models\Story;
 use common\models\StoryStatistics;
+use yii\web\Controller;
 
-class StatisticsController extends \yii\web\Controller
+class StatisticsController extends Controller
 {
 
 	public function actionWrite($id)
