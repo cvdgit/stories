@@ -285,6 +285,11 @@ section h2 span {
 .site-about {
   background-color: #f0f4f9;
   line-height: 1;
+  padding: 20px 0 60px 0;
+}
+
+.site-about h2 {
+  margin-bottom: 30px;
 }
 
 .site-about h4 {
@@ -1896,4 +1901,37 @@ button:focus {
     padding: 1.5rem 4rem;
     font-size: 1.6rem;
   }
+}
+
+.site-categories {
+  background-image: url('../img/section-bg.png');
+  background-position: bottom center;
+  background-repeat: no-repeat;
+}
+
+.site-categories h2 {
+  padding: 30px 0 40px 0;
+}
+
+.category-item {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.category-item a {
+  display: block;
+}
+
+.category-item h4 {
+  font-size: 1em;
+  color: #38405d;
+  margin-top: 14px;
+}
+
+.category-item-image-wrapper {
+
+}
+
+.category-item-image-wrapper img {
+  width: 100%;
 }

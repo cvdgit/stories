@@ -10,8 +10,60 @@ $this->setMetaTags('Сервис ускоренного развития реч�
                    'wikids, сказки, истории');
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 ?>
+
+<section class="site-categories">
+    <h2 class="container"><span>Популярные</span> категории</h2>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-offset-3 col-xs-6 col-sm-offset-0 col-sm-6 col-md-offset-0 col-md-6 col-lg-offset-0 col-lg-3">
+                <div class="category-item">
+                    <a href="<?= Url::toRoute(['/story/category', 'category' => 'russkie-skazki-i-byliny']) ?>">
+                        <div class="category-item-image-wrapper">
+                            <img src="/img/category_1_mini.jpg" alt="">
+                        </div>
+                        <h4>Русские сказки и былины</h4>
+                    </a>
+                </div>
+            </div>
+            <div class="col-xs-offset-3 col-xs-6 col-sm-offset-0 col-sm-6 col-md-offset-0 col-md-6 col-lg-offset-0 col-lg-3">
+                <div class="category-item">
+                    <a href="<?= Url::toRoute(['/story/category', 'category' => 'drevnegrecheskie-mify']) ?>">
+                        <div class="category-item-image-wrapper">
+                            <img src="/img/category_2_mini.jpg" alt="">
+                        </div>
+                        <h4>Древнегреческие мифы</h4>
+                    </a>
+                </div>
+            </div>
+            <div class="col-xs-offset-3 col-xs-6 col-sm-offset-0 col-sm-6 col-md-offset-0 col-md-6 col-lg-offset-0 col-lg-3">
+                <div class="category-item">
+                    <a href="<?= Url::toRoute(['/story/category', 'category' => 'poznavatelnye']) ?>">
+                        <div class="category-item-image-wrapper">
+                            <img src="/img/category_3_mini.jpg" alt="">
+                        </div>
+                        <h4>Познавательные</h4>
+                    </a>
+                </div>
+            </div>
+            <div class="col-xs-offset-3 col-xs-6 col-sm-offset-0 col-sm-6 col-md-offset-0 col-md-6 col-lg-offset-0 col-lg-3">
+                <div class="category-item">
+                    <a href="<?= Url::toRoute(['/story/category', 'category' => 'altayskie-narodnye-skazki']) ?>">
+                        <div class="category-item-image-wrapper">
+                            <img src="/img/category_4_mini.jpg" alt="">
+                        </div>
+                        <h4>Алтайские народные сказки</h4>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container site-stories-controls">
+        <?= Html::a('Все категории', ['/story/index'], ['class' => 'btn']) ?>
+    </div>
+</section>
+
   <section class="site-about">
-    <h2 class="container"><span>О</span> портале</h2>
+    <h2 class="container">О <span>портале</span></h2>
     <div class="container">
       <div class="row">
         <div class="col-lg-5 col-md-5 col-sm-2">
