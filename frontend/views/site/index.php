@@ -17,21 +17,21 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
         <div class="row">
             <div class="col-xs-offset-3 col-xs-6 col-sm-offset-0 col-sm-6 col-md-offset-0 col-md-6 col-lg-offset-0 col-lg-3">
                 <div class="category-item">
-                    <a href="<?= Url::toRoute(['/story/category', 'category' => 'russkie-skazki-i-byliny']) ?>">
-                        <div class="category-item-image-wrapper">
-                            <img src="/img/category_1_mini.jpg" alt="">
-                        </div>
-                        <h4>Русские сказки и былины</h4>
-                    </a>
-                </div>
-            </div>
-            <div class="col-xs-offset-3 col-xs-6 col-sm-offset-0 col-sm-6 col-md-offset-0 col-md-6 col-lg-offset-0 col-lg-3">
-                <div class="category-item">
                     <a href="<?= Url::toRoute(['/story/category', 'category' => 'drevnegrecheskie-mify']) ?>">
                         <div class="category-item-image-wrapper">
                             <img src="/img/category_2_mini.jpg" alt="">
                         </div>
                         <h4>Древнегреческие мифы</h4>
+                    </a>
+                </div>
+            </div>
+            <div class="col-xs-offset-3 col-xs-6 col-sm-offset-0 col-sm-6 col-md-offset-0 col-md-6 col-lg-offset-0 col-lg-3">
+                <div class="category-item">
+                    <a href="<?= Url::toRoute(['/story/category', 'category' => 'russkie-skazki-i-byliny']) ?>">
+                        <div class="category-item-image-wrapper">
+                            <img src="/img/category_1_mini.jpg" alt="">
+                        </div>
+                        <h4>Русские сказки и былины</h4>
                     </a>
                 </div>
             </div>

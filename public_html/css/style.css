@@ -48,7 +48,7 @@ section h2 span {
   background-position: top center;
   background-repeat: no-repeat;
   background-attachment: scroll;
-  padding-bottom: 94px;
+  padding-bottom: 40px;
 }
 
 .site-header-mini {}
@@ -1907,6 +1907,7 @@ button:focus {
   background-image: url('../img/section-bg.png');
   background-position: bottom center;
   background-repeat: no-repeat;
+  padding-top: 0 !important;
 }
 
 .site-categories h2 {
