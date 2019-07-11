@@ -1600,6 +1600,17 @@ section h2 span {
   color: #fff;
 }
 
+.btn-favorites {
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  background-color: #99cd50;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: #fff;
+}
+
 .btn-like {
   width: 50px;
   height: 50px;

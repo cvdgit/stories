@@ -1,5 +1,6 @@
 <?php
 
+use frontend\widgets\StoryFavorites;
 use frontend\widgets\StoryLikeWidget;
 use yii\helpers\Html;
 use common\widgets\RevealWidget;
@@ -71,6 +72,7 @@ $this->registerJs($js);
             <div class="story-share-block">
                 <?= StoryLikeWidget::widget(['storyId' => $model->id]) ?>
                 <button class="btn-share" title="Поделиться" data-toggle="modal" data-target="#wikids-share-modal"><i class="glyphicon glyphicon-share"></i></button>
+                <?= StoryFavorites::widget(['storyId' => $model->id]) ?>
             </div>
             <div class="story-date"><span>Опубликована:</span> <?= \common\helpers\SmartDate::dateSmart($model->created_at, true) ?></div>
             <?php if (!empty($model->description)): ?>

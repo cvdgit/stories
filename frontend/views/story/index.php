@@ -12,6 +12,7 @@ use common\models\Category;
 /** @var $searchModel frontend\models\StorySearch */
 /** @var $dataProvider yii\data\ActiveDataProvider */
 /** @var $action array */
+/** @var $emptyText string */
 
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 ?>
@@ -40,6 +41,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                     'items' => [
                             ['label' => 'История просмотра', 'url' => ['/story/history']],
                         ['label' => 'Понравившиеся', 'url' => ['/story/liked']],
+                        ['label' => 'Избранное', 'url' => ['/story/favorites']],
                     ],
                     'options' => ['class' => 'story-category-list'],
                 ]) ?>
@@ -97,7 +99,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 'dataProvider' => $dataProvider,
                 'itemOptions' => ['tag' => false],
                 'itemView' => '_storyitem_array',
-                'emptyText' => 'Список историй пуст',
+                'emptyText' => $emptyText,
                 'sorter' => [
                    'options' => [
                         'class' => 'dropdown-menu'

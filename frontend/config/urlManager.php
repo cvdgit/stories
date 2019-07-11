@@ -33,6 +33,10 @@ return [
 
         'stories/history' => 'story/history',
         'stories/liked' => 'story/liked',
+
+        'stories/favorites' => 'story/favorites',
+        'favorites/add/<story_id:\d+>' => 'story/add-favorites',
+
         'stories/tag/<tag:[\w\s\-]+>' => 'story/tag',
         'stories/category/<category:[\w\-]+>' => 'story/category',
         'stories' => 'story/index',

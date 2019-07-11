@@ -8,6 +8,9 @@ RewriteCond %{HTTP:X-Forwarded-Proto} !https
 RewriteCond %{REQUEST_URI} !robots.txt
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)/$ https://%{HTTP_HOST}/$1 [L,R=301]
+
 # if a directory or a file exists, use it directly
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

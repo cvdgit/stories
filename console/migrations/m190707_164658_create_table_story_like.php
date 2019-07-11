@@ -38,8 +38,6 @@ class m190707_164658_create_table_story_like extends Migration
             'id',
             'CASCADE'
         );
-
-
     }
 
     /**
