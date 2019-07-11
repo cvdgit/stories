@@ -15,7 +15,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
     <h2 class="container"><span>Популярные</span> категории</h2>
     <div class="container">
         <div class="row">
-            <div class="col-xs-offset-3 col-xs-6 col-sm-offset-0 col-sm-6 col-md-offset-0 col-md-6 col-lg-offset-0 col-lg-3">
+            <div class="col-xs-offset-1 col-xs-10 col-sm-offset-0 col-sm-6 col-md-offset-0 col-md-6 col-lg-offset-0 col-lg-3">
                 <div class="category-item">
                     <a href="<?= Url::toRoute(['/story/category', 'category' => 'drevnegrecheskie-mify']) ?>">
                         <div class="category-item-image-wrapper">
@@ -25,7 +25,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                     </a>
                 </div>
             </div>
-            <div class="col-xs-offset-3 col-xs-6 col-sm-offset-0 col-sm-6 col-md-offset-0 col-md-6 col-lg-offset-0 col-lg-3">
+            <div class="col-xs-offset-1 col-xs-10 col-sm-offset-0 col-sm-6 col-md-offset-0 col-md-6 col-lg-offset-0 col-lg-3">
                 <div class="category-item">
                     <a href="<?= Url::toRoute(['/story/category', 'category' => 'russkie-skazki-i-byliny']) ?>">
                         <div class="category-item-image-wrapper">
@@ -35,7 +35,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                     </a>
                 </div>
             </div>
-            <div class="col-xs-offset-3 col-xs-6 col-sm-offset-0 col-sm-6 col-md-offset-0 col-md-6 col-lg-offset-0 col-lg-3">
+            <div class="col-xs-offset-1 col-xs-10 col-sm-offset-0 col-sm-6 col-md-offset-0 col-md-6 col-lg-offset-0 col-lg-3">
                 <div class="category-item">
                     <a href="<?= Url::toRoute(['/story/category', 'category' => 'poznavatelnye']) ?>">
                         <div class="category-item-image-wrapper">
@@ -45,7 +45,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                     </a>
                 </div>
             </div>
-            <div class="col-xs-offset-3 col-xs-6 col-sm-offset-0 col-sm-6 col-md-offset-0 col-md-6 col-lg-offset-0 col-lg-3">
+            <div class="col-xs-offset-1 col-xs-10 col-sm-offset-0 col-sm-6 col-md-offset-0 col-md-6 col-lg-offset-0 col-lg-3">
                 <div class="category-item">
                     <a href="<?= Url::toRoute(['/story/category', 'category' => 'altayskie-narodnye-skazki']) ?>">
                         <div class="category-item-image-wrapper">
