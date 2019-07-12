@@ -18,7 +18,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 ?>
 <div class="container">
     <div class="row">
-        <nav class="col-sm-4 col-md-3 site-sidebar">
+        <nav class="col-xs-12 col-sm-12 col-md-12 col-lg-3 site-sidebar">
             <div class="story-filter-btn-wrapper text-center" style="margin-bottom: 20px">
                 <button class="btn story-filter-btn" data-toggle="collapse" data-target=".site-sidebar-wrapper">Категории и поиск</button>
             </div>
@@ -68,7 +68,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 <!--/noindex-->
             </div>
         </nav>
-        <main class="col-sm-8 col-md-9 site-main" style="margin-top: 0">
+        <main class="col-xs-12 col-sm-12 col-md-12 col-lg-9 site-main" style="margin-top: 0">
             <h1 style="margin-top: 6px; margin-bottom: 33px"><?= $this->getHeader() ?></h1>
             <?php
             $layout = '<div class="story-list-filter clearfix">
