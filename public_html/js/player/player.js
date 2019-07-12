@@ -76,7 +76,8 @@ var WikidsPlayer = (function(document, $) {
 
     function inFullscreen()
     {
-        return (window.screenTop && window.screenY);
+        //return (window.screenTop && window.screenY);
+        return ($(":fullscreen").length > 0);
     }
 
     function toggleFullscreen()
