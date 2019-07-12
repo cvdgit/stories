@@ -141,3 +141,9 @@ function onSlideMouseDown(e) {
     }
 }
 Reveal.addEventListener("mousedown", onSlideMouseDown, false);
+
+window.addEventListener("orientationchange", function() {
+    if (window.orientation === 90) {
+        WikidsPlayer.toggleFullscreen();
+    }
+}, false);
