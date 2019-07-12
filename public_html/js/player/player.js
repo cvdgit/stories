@@ -44,7 +44,7 @@ var WikidsStoryFeedback = (function() {
 })();
 
 var WikidsPlayer = (function(document, $) {
-"use strict"
+
     var $playerContainer = $('.story-container');
 
     function enterFullscreen()
