@@ -30,6 +30,7 @@ $this->title = 'Управление историями';
 <?= GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
+    'options' => ['class' => 'table-responsive'],
     'columns' => [
         [
             'class' => CheckboxColumn::class,
