@@ -97,6 +97,7 @@ return [
                 ],
             ],
         ],
+        'queue' => $params['components.queue'],
     ],
     'params' => $params,
 ];
