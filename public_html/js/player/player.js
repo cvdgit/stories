@@ -43,9 +43,9 @@ var WikidsStoryFeedback = (function() {
     }
 })();
 
-var WikidsPlayer = (function() {
+var WikidsPlayer = (function(doc, jQuery) {
 
-    var $playerContainer = $('.story-container');
+    var $playerContainer = jQuery('.story-container');
 
     function enterFullscreen()
     {
@@ -62,11 +62,11 @@ var WikidsPlayer = (function() {
 
     function closeFullscreen()
     {
-        var element = document;
+        var element = doc;
         var requestMethod = element.exitFullscreen ||
             element.exitFullScreen ||
             element.mozCancelFullScreen ||
-            element.webkitCancelFullscreen ||
+            element.webkitExitFullscreen ||
             element.webkitCancelFullScreen ||
             element.msExitFullscreen;
         if (requestMethod) {
@@ -88,23 +88,6 @@ var WikidsPlayer = (function() {
         }
     }
 
-
-    // function changePlayerContainerHeight()
-    // {
-    // 	if (inFullscreen()) {
-    // 		$playerContainer.css('height', '100%');
-    // 	}
-    // 	else {
-    // 		var containerWidth = $playerContainer[0].offsetWidth;
-    // 		$playerContainer.css('height', (containerWidth * 0.5) + 'px');
-    // 	}
-    // }
-    //
-    // window.onresize = changePlayerContainerHeight;
-    // $(function() {
-    // 	$(window).resize();
-    // });
-
     return {
         "toggleFullscreen": toggleFullscreen,
         "inFullscreen": inFullscreen,
@@ -125,7 +108,7 @@ var WikidsPlayer = (function() {
             }
         }
     };
-})();
+})(document, $);
 
 
 function onSlideMouseDown(e) {
