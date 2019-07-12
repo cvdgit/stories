@@ -46,6 +46,7 @@ class RevealWidget extends Widget
         'rtl' => false,
         'help' => false,
         'dependencies' => [],
+        'touch' => false,
     ];
 
 	public function run()
