@@ -51,7 +51,7 @@ use yii\bootstrap\ActiveForm;
           Я принимаю <?= Html::a('пользовательское соглашение', ['/policy'], ['target' => '_blank']) ?>
         </div>
         <div class="social-signup">
-          Авторизуйтесь через соцсети:
+            <p>Авторизуйтесь через соцсети:</p>
             <?= AuthChoice::widget([
                 'options' => ['class' => 'social-network'],
                 'baseAuthUrl' => ['/auth/auth'],

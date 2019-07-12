@@ -37,7 +37,7 @@ AppAsset::register($this);
         <nav class="site-nav  <?= $isStoryViewPage ? 'story-view' : '' ?>">
             <div class="container">
                 <div class="row">
-                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-3">
                     <?php
                     $options = ['class' => 'site-logo', 'alt' => 'wikids', 'title' => 'wikids'];
                     if (Url::isHome())
@@ -55,7 +55,7 @@ AppAsset::register($this);
                             </button>
                         </div>
                     </div>
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
                         <div class="menu-wrapper">
                         <?php
                         $menuItems = [
@@ -73,7 +73,7 @@ AppAsset::register($this);
                         ?>
                         </div>
                     </div>
-                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-3">
                         <div class="user-menu-wrapper">
                         <?php if (Yii::$app->user->isGuest): ?>
                             <div class="user-menu-inner">
