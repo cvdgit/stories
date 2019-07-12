@@ -4,6 +4,7 @@
 namespace frontend\components;
 
 use common\helpers\Translit;
+use Exception;
 use Yii;
 use yii\authclient\ClientInterface;
 use yii\helpers\ArrayHelper;
@@ -97,6 +98,14 @@ class AuthHandler
                             ]);
                         }
                     });
+
+                    try {
+                        $this->signupService->sendWelcomeEmail($user);
+                    }
+                    catch (Exception $e) {
+                        Yii::$app->errorHandler->logException($e);
+                    }
+                    $this->signupService->addJob($user->id);
                 }
             }
         } else { // user already logged in

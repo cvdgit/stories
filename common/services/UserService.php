@@ -6,6 +6,9 @@ namespace common\services;
 use backend\models\UserCreateForm;
 use backend\models\UserUpdateForm;
 use common\models\User;
+use common\services\auth\SignupService;
+use Exception;
+use Yii;
 use yii\web\NotFoundHttpException;
 use common\models\PaymentQuery;
 
@@ -14,11 +17,15 @@ class UserService
 
     protected $transaction;
     protected $roleManager;
+    protected $signupService;
 
-    public function __construct(TransactionManager $transaction, RoleManager $roleManager)
+    public function __construct(TransactionManager $transaction,
+                                RoleManager $roleManager,
+                                SignupService $signupService)
     {
         $this->transaction = $transaction;
         $this->roleManager = $roleManager;
+        $this->signupService = $signupService;
     }
 
     /**
@@ -85,6 +92,15 @@ class UserService
             $user->save();
             $this->roleManager->assign($user->id, $form->role);
         });
+
+        try {
+            $this->signupService->sendWelcomeEmail($user);
+        }
+        catch (Exception $e) {
+            Yii::$app->errorHandler->logException($e);
+        }
+        $this->signupService->addJob($user->id);
+
         return $user;
     }
 

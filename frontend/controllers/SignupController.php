@@ -6,7 +6,6 @@ namespace frontend\controllers;
 
 use common\models\User;
 use Exception;
-use RuntimeException;
 use Yii;
 use yii\web\Controller;
 use yii\web\Response;
@@ -64,13 +63,23 @@ class SignupController extends Controller
     public function actionSignupConfirm($token)
     {
         $model = new SignupForm();
+        $user = null;
         try {
-            $model->confirmation($token);
+            $user = $model->confirmation($token);
             Yii::$app->session->setFlash('success', 'Вы успешно подтвердили свою регистрацию');
         }
         catch (Exception $e) {
             Yii::$app->errorHandler->logException($e);
             Yii::$app->session->setFlash('error', $e->getMessage());
+        }
+        if ($user !== null) {
+            try {
+                $this->service->sendWelcomeEmail($user);
+            }
+            catch (Exception $e) {
+                Yii::$app->errorHandler->logException($e);
+            }
+            $this->service->addJob($user->id);
         }
         return $this->goHome();
     }

@@ -72,7 +72,7 @@ class AuthController extends Controller
                 }
             }
             else {
-                return ['success' => false, 'message' => $model->errors];
+                return ['success' => false, 'message' => $form->errors];
             }
         }
         return ['success' => false, 'message' => ['']];

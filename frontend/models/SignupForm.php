@@ -1,6 +1,8 @@
 <?php
 namespace frontend\models;
 
+use DomainException;
+use RuntimeException;
 use Yii;
 use yii\base\Model;
 use common\models\User;
@@ -58,7 +60,7 @@ class SignupForm extends Model
     public function signup()
     {
         if (!$this->validate()) {
-            throw new \DomainException('Signup model is not valid');
+            throw new DomainException('Signup model is not valid');
         }
         
         $user = new User();
@@ -71,7 +73,7 @@ class SignupForm extends Model
         $user->generateEmailConfirmToken();
 
         if (!$user->save(false)) {
-            throw new \DomainException('Signup user save error');
+            throw new DomainException('Signup user save error');
         }
 
         $auth = Yii::$app->authManager;
@@ -90,30 +92,36 @@ class SignupForm extends Model
             ->setSubject('Подтверждение регистрации')
             ->send();
         if (!$sent) {
-            throw new \RuntimeException('Confirm email sent error');
+            throw new RuntimeException('Confirm email sent error');
         }
     }
 
+    /**
+     * @param $token
+     * @return User|null
+     */
     public function confirmation($token)
     {
         if (empty($token)) {
-            throw new \DomainException('Empty confirm token.');
+            throw new DomainException('Empty confirm token.');
         }
 
         $user = User::findOne(['email_confirm_token' => $token]);
         if (!$user) {
-            throw new \DomainException('User is not found.');
+            throw new DomainException('User is not found.');
         }
 
         $user->email_confirm_token = null;
         $user->status = User::STATUS_ACTIVE;
         if (!$user->save()) {
-            throw new \RuntimeException('Saving error.');
+            throw new RuntimeException('Saving error.');
         }
 
         if (!Yii::$app->getUser()->login($user)) {
-            throw new \RuntimeException('Error authentication.');
+            throw new RuntimeException('Error authentication.');
         }
+
+        return $user;
     }
 
 }
