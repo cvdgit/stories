@@ -29,7 +29,7 @@ class UnisenderAddJob extends BaseObject implements JobInterface
         $unisender = Yii::$app->unisender;
 
         $sub  = new Subscriber($user->getProfileName(), $user->email);
-        $response = $unisender->subscribe($sub, [18159709]);
+        $response = $unisender->subscribe($sub, [Yii::$app->params['unisender.listID']]);
         if ($response->isSuccess()) {
             // $personId = $response->getResult()['person_id'];
         }

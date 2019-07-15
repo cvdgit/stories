@@ -37,7 +37,7 @@ class PublishStoryJob extends BaseObject implements JobInterface
             'sender_email' => 'info@wikids.ru',
             'subject' => 'Новая история на Wikids - ' . $story->title,
             'body' => $view->render('@common/mail/newStory-html', ['story' => $story]),
-            'list_id' => 17823821,
+            'list_id' => Yii::$app->params['unisender.listID'],
         ]);
         $messageID = $result['result']['message_id'];
 
