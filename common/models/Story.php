@@ -207,6 +207,11 @@ class Story extends ActiveRecord
         return self::find()->published()->lastStories()->all();
     }
 
+    public static function followingStories(array $categoryIDs)
+    {
+        return self::find()->published()->byCategories($categoryIDs)->byRand()->all();
+    }
+
     public static function getSourceList()
     {
         return [

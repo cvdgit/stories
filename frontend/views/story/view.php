@@ -87,16 +87,27 @@ $this->registerJs($js);
 	        <div class="story-pay"><span>Тип:</span> <?= $model->bySubscription() ? 'По подписке' : 'Бесплатно' ?></div>
 	    </div>
 	    <div class="comments">
-	  	    <?php if (!Yii::$app->user->isGuest): ?>
-            <?= $this->render('_comment_form', ['commentForm' => $commentForm]) ?>
-            <?php else: ?>
-            <div class="alert alert-info text-center comment-guest-info">
-                Чтобы оставить комментарий <a href="#" data-toggle="modal" data-target="#wikids-signup-modal">зарегистрируйтесь</a> или <a href="#" data-toggle="modal" data-target="#wikids-login-modal">войдите</a> в аккаунт
+            <div class="row">
+                <div class="col-md-9">
+                    <?php if (!Yii::$app->user->isGuest): ?>
+                        <?= $this->render('_comment_form', ['commentForm' => $commentForm]) ?>
+                    <?php else: ?>
+                        <div class="alert alert-info text-center comment-guest-info">
+                            Чтобы оставить комментарий <a href="#" data-toggle="modal" data-target="#wikids-signup-modal">зарегистрируйтесь</a> или <a href="#" data-toggle="modal" data-target="#wikids-login-modal">войдите</a> в аккаунт
+                        </div>
+                    <?php endif ?>
+                    <div class="comment-list">
+                        <?= $this->render('_comment_list', ['dataProvider' => $dataProvider]) ?>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="following-stories">
+                        <h3>Смотрите также:</h3>
+                        <?= \frontend\widgets\FollowingStories::widget(['storyID' => $model->id]) ?>
+                    </div>
+                </div>
             </div>
-            <?php endif ?>
-	        <div class="comment-list">
-                <?= $this->render('_comment_list', ['dataProvider' => $dataProvider]) ?>
-	        </div>
+
 	    </div>
 	</main>
 </div>

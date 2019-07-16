@@ -33,4 +33,9 @@ class StoryQuery extends ActiveQuery
         return $this->orderBy(new Expression('rand()'));
     }
 
+    public function byCategories($ids)
+    {
+        return $this->innerJoinWith('categories')->andWhere(['in', 'category.id', $ids])->limit(4);
+    }
+
 }
