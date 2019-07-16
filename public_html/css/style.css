@@ -1948,3 +1948,7 @@ button:focus {
 .following-stories h3 {
   margin-top: 0;
 }
+
+.random-story {
+  padding: 30px 0;
+}

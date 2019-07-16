@@ -11,6 +11,21 @@ $this->setMetaTags('Сервис ускоренного развития реч�
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 ?>
 
+<section class="random-story">
+    <div class="container">
+        <div class="text-center">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3"><h3>Не знаете какую историю показать ребенку?</h3></div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3">
+                    <?= Html::a('Случайная история', ['story/random'], ['class' => 'btn btn-red']) ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <section class="site-categories">
     <h2 class="container"><span>Популярные</span> категории</h2>
     <div class="container">

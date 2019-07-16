@@ -271,4 +271,10 @@ class StoryController extends Controller
         ]);
     }
 
+    public function actionRandom()
+    {
+        $model = Story::oneRandomStory();
+        return $this->redirect(['story/view', 'alias' => $model->alias]);
+    }
+
 }

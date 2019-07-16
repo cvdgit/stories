@@ -41,6 +41,7 @@ return [
         'stories/category/<category:[\w\-]+>' => 'story/category',
         'stories' => 'story/index',
 
+        'story/random' => 'story/random',
         'story/like' => 'story/like',
         'story/addcomment' => 'story/add-comment',
         'story/get-story-body/<id:\d+>' => 'story/get-story-body',

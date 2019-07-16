@@ -212,6 +212,11 @@ class Story extends ActiveRecord
         return self::find()->published()->byCategories($categoryIDs)->byRand()->all();
     }
 
+    public static function oneRandomStory()
+    {
+        return self::find()->published()->byRand()->limit(1)->one();
+    }
+
     public static function getSourceList()
     {
         return [
