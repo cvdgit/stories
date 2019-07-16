@@ -7,6 +7,7 @@ use creocoder\nestedsets\NestedSetsBehavior;
 use DomainException;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Query;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 
@@ -164,13 +165,39 @@ class Category extends ActiveRecord
         $rootItem = [
             ['label' => 'Все категории', 'url' => ['/story/index'], 'options' => ['class' => 'widget-category-hover']],
         ];
-        $items = $root->toNestedArray(null, 'items', function($node) {
-            return [
-                'label' => $node->name,
-                'url' => ['/story/category', 'category' => $node->alias],
-                'depth' => $node->depth
-            ];
+
+        $storyNumbers = (new Query())
+            ->select('COUNT({{%story_category}}.story_id) AS stories_in_category, {{%story_category}}.category_id')
+            ->from(self::tableName())
+            ->leftJoin('{{%story_category}}', '{{%story_category}}.category_id = {{%category}}.id')
+            ->leftJoin('{{%story}}', '{{%story_category}}.story_id = {{%story}}.id')
+            ->where('tree = :tree', [':tree' => $root->tree])
+            ->andWhere('{{%story}}.status = :story_stat', [':story_stat' => Story::STATUS_PUBLISHED])
+            ->groupBy(['{{%story_category}}.category_id'])
+            ->indexBy('category_id')
+            ->all();
+
+        $items = $root->toNestedArray(null, 'items', function($node) use ($storyNumbers) {
+            $storiesInCategory = 0;
+            if (isset($storyNumbers[$node->id])) {
+                $storiesInCategory = (int)$storyNumbers[$node->id]['stories_in_category'];
+            }
+            if ($storiesInCategory > 0) {
+                $item = [
+                    'label' => $node->name . ' (' . $storiesInCategory . ')',
+                    'url' => ['/story/category', 'category' => $node->alias],
+                    'depth' => $node->depth,
+                ];
+            }
+            else {
+                $item = [
+                    'label' => $node->name,
+                    'depth' => $node->depth,
+                ];
+            }
+            return $item;
         });
+
         $items = array_merge($rootItem, $items);
         return $items;
     }
