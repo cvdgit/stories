@@ -8,6 +8,7 @@ use backend\components\story\reader\HTMLReader;
 use backend\components\story\TransitionBlock;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
+use backend\models\editor\SlidePropsForm;
 use backend\models\editor\TextForm;
 use backend\models\editor\TransitionForm;
 use DomainException;
@@ -55,12 +56,9 @@ class EditorController extends Controller
 
 	public function actionEdit($id)
 	{
-        $reader = new StoryHtmlReader();
         $model = Story::findModel($id);
-        $story = $reader->loadStoryFromHtml($model->body);
         return $this->render('edit', [
             'model' => $model,
-            'story' => $story,
 		]);
 	}
 
@@ -142,6 +140,10 @@ class EditorController extends Controller
         $block_type = $block->getType();
 
         $types = [
+            AbstractBlock::TYPE_HEADER => [
+                'class' => TextForm::class,
+                'view' => '_text_form',
+            ],
             AbstractBlock::TYPE_TEXT => [
                 'class' => TextForm::class,
                 'view' => '_text_form',
@@ -160,7 +162,7 @@ class EditorController extends Controller
             ],
         ];
         if (!isset($types[$block_type])) {
-            throw new DomainException('Unknown block type');
+            throw new DomainException($block_type . ' - Unknown block type');
         }
 
         $form = Yii::createObject($types[$block_type]);
@@ -205,6 +207,25 @@ class EditorController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
         $this->editorService->deleteBlock($story_id, $slide_index, $block_id);
         return ['success' => true];
+    }
+
+    public function actionDeleteSlide(int $story_id, int $slide_index)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $model = Story::findModel($story_id);
+        $editor = new StoryEditor($model->body);
+        $editor->deleteSlide($slide_index);
+        $body = $editor->getStoryMarkup();
+        $model->saveBody($body);
+        return ['success' => true];
+    }
+
+    public function actionSlides(int $story_id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $model = Story::findModel($story_id);
+        $editor = new StoryEditor($model->body);
+        return $editor->getSlides();
     }
 
 }

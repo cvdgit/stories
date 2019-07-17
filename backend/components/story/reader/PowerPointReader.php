@@ -4,11 +4,11 @@
 namespace backend\components\story\reader;
 
 
+use backend\components\story\AbstractBlock;
 use backend\components\story\ImageBlock;
-use backend\components\story\layouts\OneColumnLayout;
-use backend\components\story\layouts\TwoColumnLayout;
 use backend\components\story\Slide;
 use backend\components\story\Story;
+use backend\components\story\TextBlock;
 use Exception;
 use PhpOffice\PhpPresentation\IOFactory;
 use PhpOffice\PhpPresentation\PhpPresentation;
@@ -25,6 +25,9 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
     protected $relativeImagesFolder;
 
     protected $reader;
+
+    protected $currentSlideIndex = 0;
+    protected $currentSlideBlockNumber = 0;
 
     public function __construct($fileName, $imagesFolder, $relativeImagesFolder)
     {
@@ -62,26 +65,17 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
     protected function loadSlides(PhpPresentation $presentation): void
     {
         $slides = $presentation->getAllSlides();
-        $slidesCount = count($slides);
         foreach ($slides as $i => $slide) {
-
-            if ($i === 0 || $i === $slidesCount - 1) {
-                $layout = new OneColumnLayout();
-            }
-            else {
-                $layout = new TwoColumnLayout();
-            }
-
-            $this->loadSlide($slide, $layout);
+            $this->loadSlide($slide);
+            $this->currentSlideIndex++;
         }
     }
 
-    protected function loadSlide(AbstractSlide $powerPointSlide, $layout): void
+    protected function loadSlide(AbstractSlide $powerPointSlide): void
     {
         $slide = $this->story->createSlide();
-        $slide->setLayout($layout);
-
         $shapes = $powerPointSlide->getShapeCollection();
+        $this->currentSlideBlockNumber = count($shapes);
         $this->loadSlideShapes($shapes, $slide);
     }
 
@@ -105,26 +99,39 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
         $shapeImageFilePath = $this->imagesFolder . '/' . $powerPointShape->getIndexedFilename();
         file_put_contents($shapeImageFilePath, $powerPointShape->getContents());
 
-        $blocks = $slide->getBlocks();
-
-        /** @var ImageBlock $block */
-        $block = $blocks[0];
+        $block = new ImageBlock();
+        $block->setType(AbstractBlock::TYPE_IMAGE);
+        $block->setWidth('973px');
+        $block->setHeight('720px');
+        $block->setLeft(0);
+        $block->setTop(0);
 
         $imagePath = $this->relativeImagesFolder . '/' . $powerPointShape->getIndexedFilename();
         $block->setFilePath($imagePath);
         $block->setImageSize($shapeImageFilePath, $powerPointShape->getWidth(), $powerPointShape->getHeight());
         $block->setNaturalImageSizeFromFile($shapeImageFilePath);
+
+        $slide->addBlock($block);
     }
 
     protected function loadShapeText(RichText $powerPointShape, Slide $slide): void
     {
-
-        $blocks = $slide->getBlocks();
-        if (get_class($slide->getLayout()) === OneColumnLayout::class) {
-            $block = $blocks[0];
+        $block = new TextBlock();
+        if ($this->currentSlideBlockNumber === 1) {
+            $block->setType(AbstractBlock::TYPE_HEADER);
+            $block->setWidth('1200px');
+            $block->setHeight('auto');
+            $block->setLeft('14px');
+            $block->setTop('294px');
+            $block->setFontSize('3em');
         }
         else {
-            $block = $blocks[1];
+            $block->setType(AbstractBlock::TYPE_TEXT);
+            $block->setWidth('290px');
+            $block->setHeight('auto');
+            $block->setLeft('983px');
+            $block->setTop('9px');
+            $block->setFontSize('0.8em');
         }
 
         $paragraphText = [];
@@ -136,6 +143,7 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
         }
 
         $block->setText(implode('<br>', $paragraphText));
+        $slide->addBlock($block);
     }
 
 }

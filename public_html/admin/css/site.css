@@ -263,9 +263,23 @@ body {
     color: #5bc0de;
 }
 
+#preview-container {
+    overflow: auto;
+}
 
 #preview-container .active {
     background-color: #428bca;
+}
+
+#preview-container .active a {
+    color: white;
+}
+
+.preview-container-item {
+    position: relative;
+    height: 80px;
+    width: 80px;
+    margin-bottom: 10px;
 }
 
 .preview-container-item a {
@@ -274,6 +288,21 @@ body {
     height: 100%;
     text-align: center;
     line-height: 70px;
+}
+
+.preview-container-item a.remove-slide {
+    position: absolute;
+    right: 4px;
+    top: 0;
+    line-height: normal;
+    width: auto;
+    height: auto;
+    color: red !important;
+    font-weight: bold;
+    font-size: 2rem;
+}
+.preview-container-item a.remove-slide:hover {
+    text-decoration: none;
 }
 
 

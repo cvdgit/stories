@@ -1,16 +1,13 @@
 <?php
 
-use yii\helpers\Html;
 use backend\assets\StoryEditorAsset;
 use common\widgets\RevealWidget;
 use yii\helpers\Url;
 
 /** @var $this yii\web\View */
-/** @var $model common\models\Story */
-/** @var $story backend\components\story\Story */
-
 StoryEditorAsset::register($this);
 
+/** @var $model common\models\Story */
 $this->title = 'Редактор историй' . $model->title;
 $this->params['sidebarMenuItems'] = [
     ['label' => 'История', 'url' => ['story/update', 'id' => $model->id]],
@@ -23,6 +20,8 @@ $blocksAction = Url::to(['/editor/get-slide-blocks', 'story_id' => $model->id]);
 $formAction = Url::to(['/editor/form', 'story_id' => $model->id]);
 $createBlockAction = Url::to(['/editor/create-block', 'story_id' => $model->id]);
 $deleteBlockAction = Url::to(['/editor/delete-block', 'story_id' => $model->id]);
+$deleteSlideAction = Url::to(['editor/delete-slide', 'story_id' => $model->id]);
+$slidesAction = Url::to(['editor/slides', 'story_id' => $model->id]);
 $js = <<< JS
     
     StoryEditor.initialize({
@@ -30,33 +29,32 @@ $js = <<< JS
         "getSlideBlocksAction": "$blocksAction",
         "getBlockFormAction": "$formAction",
         "createBlockAction": "$createBlockAction",
-        "deleteBlockAction": "$deleteBlockAction"
+        "deleteBlockAction": "$deleteBlockAction",
+        "deleteSlideAction": "$deleteSlideAction",
+        "slidesAction": "$slidesAction"
     });
-    let slideIndex = StoryEditor.readUrl() || 0;
-	StoryEditor.loadSlide(slideIndex, true);
-	
+
 	$("#form-container")
 	    .on("beforeSubmit", "form", StoryEditor.onBeforeSubmit)
 	    .on("submit", "form", function(e) {
 	        e.preventDefault();
 	        return false;
 	    });
+	
+	$("#preview-container").on("click", "a.remove-slide", function(e) {
+	    e.preventDefault();
+	    let slideIndex = $(this).parent().data("slideIndex");
+	    StoryEditor.deleteSlide(slideIndex);
+	});
 JS;
 $this->registerJs($js);
 ?>
 <div class="row">
-	<div class="col-xs-3">
+	<div class="col-lg-3">
         <h4>Слайды</h4>
-		<div id ="preview-container" style="overflow: auto">
-		<?php foreach ($story->getSlides() as $slide): ?>
-		<?php $slideIndex = $slide->getSlideNumber() - 1; ?>
-			<div class="img-thumbnail preview-container-item" style="height: 80px; width: 80px; margin-bottom: 10px;" data-slide-index="<?= $slideIndex ?>">
-			<?= Html::a("Слайд {$slideIndex}", '#', ['class' => '', 'onclick' => 'StoryEditor.loadSlide(' . $slideIndex . ', true); return false']) ?>
-			</div>
-		<?php endforeach ?>
-		</div>
+		<div id="preview-container"></div>
 	</div>
-	<div class="col-xs-9">
+	<div class="col-lg-9">
 		<div class="story-container">
 			<div class="story-container-inner">
 		    <?= RevealWidget::widget([
@@ -87,10 +85,10 @@ $this->registerJs($js);
 	</div>
 </div>
 <div class="row">
-    <div class="col-xs-3">
+    <div class="col-lg-3">
         <?= $this->render('_blocks') ?>
     </div>
-    <div class="col-xs-9">
+    <div class="col-lg-9">
         <h4>Параметры блока</h4>
         <div id="form-container"></div>
     </div>

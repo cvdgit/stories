@@ -40,4 +40,9 @@ class Story
         return $this->slides[$index];
     }
 
+    public function deleteSlide(int $index): void
+    {
+        unset($this->slides[$index]);
+    }
+
 }

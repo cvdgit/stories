@@ -200,4 +200,9 @@ class StoryEditor
         $slide->deleteBlock($blockID);
     }
 
+    public function deleteSlide(int $slideIndex)
+    {
+        $this->story->deleteSlide($slideIndex);
+    }
+
 }

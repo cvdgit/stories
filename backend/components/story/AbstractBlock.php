@@ -8,6 +8,7 @@ abstract class AbstractBlock
 {
 
     const TYPE_TEXT = 'text';
+    const TYPE_HEADER = 'header';
     const TYPE_IMAGE = 'image';
     const TYPE_BUTTON = 'button';
     const TYPE_TRANSITION = 'transition';

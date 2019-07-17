@@ -6,10 +6,10 @@ namespace backend\components\story\reader;
 
 use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
-use backend\components\story\layouts\OneColumnLayout;
-use backend\components\story\layouts\TwoColumnLayout;
+use backend\components\story\ImageBlock;
 use backend\components\story\Slide;
 use backend\components\story\Story;
+use backend\components\story\TextBlock;
 use backend\components\story\TransitionBlock;
 
 class HTMLReader extends AbstractReader implements ReaderInterface
@@ -34,26 +34,16 @@ class HTMLReader extends AbstractReader implements ReaderInterface
     protected function loadSlides($document): void
     {
         $sections = $document->find('section');
-        $slidesCount = count($sections);
         foreach ($sections as $i => $section) {
-
-            if ($i === 0 || $i === $slidesCount - 1) {
-                $layout = new OneColumnLayout();
-            }
-            else {
-                $layout = new TwoColumnLayout();
-            }
-
             $htmlSlide = pq($section)->htmlOuter();
-            $this->loadSlide($htmlSlide, $layout);
+            $this->loadSlide($htmlSlide, $i);
         }
     }
 
-    protected function loadSlide($htmlSlide, $layout): void
+    protected function loadSlide($htmlSlide, int $slideIndex): void
     {
         $slide = $this->story->createSlide();
-        $slide->setLayout($layout);
-
+        $slide->setSlideNumber($slideIndex);
         $blocks = pq($htmlSlide)->find('div.sl-block');
         $this->loadSlideBlocks($blocks, $slide);
     }
@@ -104,8 +94,8 @@ class HTMLReader extends AbstractReader implements ReaderInterface
 
     protected function loadBlockImage($htmlBlock, Slide $slide): void
     {
-        $blocks = $slide->getBlocks();
-        $block = $blocks[0];
+        $block = new ImageBlock();
+        $block->setType(AbstractBlock::TYPE_IMAGE);
 
         $element = pq($htmlBlock)->find('img');
         $block->setFilePath($element->attr('data-src'));
@@ -118,31 +108,36 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         $block->setNaturalImageSize($element->attr('data-natural-width'), $element->attr('data-natural-height'));
 
         $this->loadBlockProperties($block, $style);
+
+        $slide->addBlock($block);
     }
 
     protected function loadBlockText($htmlBlock, Slide $slide): void
     {
-        $blocks = $slide->getBlocks();
-        if (get_class($slide->getLayout()) === OneColumnLayout::class) {
-            $block = $blocks[0];
+        $block = new TextBlock();
+        $block->setId(pq($htmlBlock)->attr('data-block-id'));
+        if (pq($htmlBlock)->find('h1')->length > 0) {
+            $block->setType(AbstractBlock::TYPE_HEADER);
             $style = pq($htmlBlock)->find('h1')->attr('style');
-            $block->setFontSize($this->getStyleValue($style, 'font-size'));
-            $block->setText(pq($htmlBlock)->find('h1')->html());
-            $block->setId(pq($htmlBlock)->attr('data-block-id'));
+            $text = pq($htmlBlock)->find('h1')->html();
         }
         else {
-            $block = $blocks[1];
+            $block->setType(AbstractBlock::TYPE_TEXT);
             $style = pq($htmlBlock)->find('p')->attr('style');
-            $block->setFontSize($this->getStyleValue($style, 'font-size'));
-            $block->setText(pq($htmlBlock)->find('p')->html());
-            $block->setId(pq($htmlBlock)->attr('data-block-id'));
+            $text = pq($htmlBlock)->find('p')->html();
         }
+        $block->setFontSize($this->getStyleValue($style, 'font-size'));
+        $block->setText($text);
+
         $this->loadBlockProperties($block, pq($htmlBlock)->attr('style'));
+
+        $slide->addBlock($block);
     }
 
     protected function loadBlockButton($htmlBlock, Slide $slide): void
     {
         $buttonBlock = new ButtonBlock();
+        $buttonBlock->setType(AbstractBlock::TYPE_BUTTON);
 
         $style = pq($htmlBlock)->attr('style');
         $this->loadBlockProperties($buttonBlock, $style);
@@ -159,6 +154,7 @@ class HTMLReader extends AbstractReader implements ReaderInterface
     protected function loadBlockTransition($htmlBlock, Slide $slide): void
     {
         $block = new TransitionBlock();
+        $block->setType(AbstractBlock::TYPE_TRANSITION);
 
         $element = pq($htmlBlock);
 

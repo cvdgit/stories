@@ -8,8 +8,8 @@ use backend\components\markup\SlideMarkup;
 class StorySlide implements StoryRenderableInterface
 {
 
-	protected $slideNumber;
-	protected $id;
+	public $slideNumber;
+	public $id;
 
 	protected $blocks = [];
 

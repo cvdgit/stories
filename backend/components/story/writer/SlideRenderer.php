@@ -4,9 +4,9 @@
 namespace backend\components\story\writer;
 
 
+use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
 use backend\components\story\ImageBlock;
-use backend\components\story\layouts\OneColumnLayout;
 use backend\components\story\TextBlock;
 use backend\components\story\TransitionBlock;
 use backend\components\story\writer\HTML\ButtonBlockMarkup;
@@ -29,10 +29,9 @@ class SlideRenderer
     public function render(): string
     {
         $html = '<section data-id="" data-background-color="#000000">';
-        $layout = $this->slide->getLayout();
         foreach ($this->slide->getBlocks() as $block) {
             if (get_class($block) === TextBlock::class) {
-                if (get_class($layout) === OneColumnLayout::class) {
+                if ($block->getType() === AbstractBlock::TYPE_HEADER) {
                     $html .= (new HeaderBlockMarkup($block))->markup();
                 }
                 else {

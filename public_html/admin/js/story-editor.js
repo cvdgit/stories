@@ -1,5 +1,5 @@
 
-var StoryEditor = (function() {
+StoryEditor = (function() {
 
     var $editor = $('#story-editor');
     var $previewContainer = $('#preview-container');
@@ -9,13 +9,16 @@ var StoryEditor = (function() {
         getSlideBlocksAction: "",
         getBlockFormAction: "",
         createBlockAction: "",
-        deleteBlockAction: ""
+        deleteBlockAction: "",
+        deleteSlideAction: "",
+        slidesAction: ""
     };
 
     var currentSlideIndex;
 
     function initialize(params) {
         config = params;
+        loadSlides(readUrl() || 0);
     }
 
     function send(index) {
@@ -127,6 +130,60 @@ var StoryEditor = (function() {
             });
     }
 
+    function deleteSlide(index) {
+        if (!confirm("Удалить слайд?")) {
+            return;
+        }
+        var promise = $.ajax({
+            "url": config.deleteSlideAction + "&slide_index=" + index,
+            "type": "GET",
+            "dataType": "json"
+        });
+        promise.done(function(data) {
+            if (data && data.success) {
+                var slideIndex = currentSlideIndex;
+                if (index === currentSlideIndex) {
+                    slideIndex = readUrl() || 0;
+                }
+                loadSlides(slideIndex);
+            }
+        });
+    }
+
+    function loadSlides(activeSlideIndex) {
+        var $container = $("#preview-container");
+        $container.empty();
+        var promise = $.ajax({
+            "url": config.slidesAction,
+            "type": "GET",
+            "dataType": "json"
+        });
+        promise.done(function(data) {
+            data.forEach(function(slide) {
+                var elem = $("<div/>");
+                var slideIndex = slide.slideNumber;
+                elem.addClass("img-thumbnail preview-container-item");
+                elem.attr("data-slide-index", slideIndex);
+                $("<a/>")
+                    .attr("href", "#")
+                    .text("Слайд " + slideIndex)
+                    .on("click", function() {
+                        loadSlide(slideIndex, true);
+                        return false;
+                    })
+                    .appendTo(elem);
+                $("<a/>")
+                    .attr("href", "#")
+                    .attr("title", "Удалить слайд")
+                    .html("&times;")
+                    .addClass("remove-slide")
+                    .appendTo(elem);
+                elem.appendTo($container);
+            });
+            loadSlide(activeSlideIndex, true);
+        });
+    }
+
     function onBeforeSubmit() {
 
         var $form = $(this),
@@ -189,6 +246,7 @@ var StoryEditor = (function() {
 
     return {
         "initialize": initialize,
+        "loadSlides": loadSlides,
         "loadSlide": loadSlide,
         "onBeforeSubmit": onBeforeSubmit,
         "getCurrentSlideIndex": function() {
@@ -197,6 +255,7 @@ var StoryEditor = (function() {
         "readUrl": readUrl,
         "setSlideUrl": setSlideUrl,
         "createBlock": createBlock,
-        "deleteBlock": deleteBlock
+        "deleteBlock": deleteBlock,
+        "deleteSlide": deleteSlide
     };
 })();

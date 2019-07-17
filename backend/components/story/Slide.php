@@ -7,8 +7,8 @@ namespace backend\components\story;
 class Slide
 {
 
-    /** @var AbstractLayout */
-    protected $layout;
+    public $id;
+    public $slideNumber;
 
     /** @var AbstractBlock[] */
     protected $blocks = [];
@@ -39,15 +39,12 @@ class Slide
         $this->blocks = $blocks;
     }
 
-    public function setLayout(AbstractLayout $layout): void
+    /**
+     * @param mixed $slideNumber
+     */
+    public function setSlideNumber($slideNumber): void
     {
-        $this->layout = $layout;
-        $this->blocks = $layout->getBlocks();
-    }
-
-    public function getLayout(): AbstractLayout
-    {
-        return $this->layout;
+        $this->slideNumber = $slideNumber;
     }
 
 }
