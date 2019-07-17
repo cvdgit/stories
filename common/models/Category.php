@@ -182,18 +182,12 @@ class Category extends ActiveRecord
             if (isset($storyNumbers[$node->id])) {
                 $storiesInCategory = (int)$storyNumbers[$node->id]['stories_in_category'];
             }
+            $item = [
+                'label' => $node->name,
+                'depth' => $node->depth,
+            ];
             if ($storiesInCategory > 0) {
-                $item = [
-                    'label' => $node->name . ' (' . $storiesInCategory . ')',
-                    'url' => ['/story/category', 'category' => $node->alias],
-                    'depth' => $node->depth,
-                ];
-            }
-            else {
-                $item = [
-                    'label' => $node->name,
-                    'depth' => $node->depth,
-                ];
+                $item['url'] = ['/story/category', 'category' => $node->alias];
             }
             return $item;
         });
