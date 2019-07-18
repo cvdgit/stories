@@ -4,6 +4,8 @@ namespace common\rbac;
 
 class UserRoles
 {
+    const ROLE_USER = 'user';
+
 	const PERMISSION_ADMIN_PANEL = 'adminPanel';
 	const PERMISSION_MANAGE_CATEGORIES = 'manageCategories';
 	const PERMISSION_EDITOR_ACCESS = 'accessEditor';

@@ -5,6 +5,7 @@ namespace common\services\story;
 
 
 use common\models\Story;
+use common\rbac\UserRoles;
 use Yii;
 use yii\db\Query;
 
@@ -31,7 +32,11 @@ class CountersService
     public function updateCounters(Story $story): void
     {
         if (!Yii::$app->user->isGuest) {
-            $this->updateUserStoryHistory(Yii::$app->user->id, $story->id);
+/*            $role = Yii::$app->authManager->getRolesByUser(Yii::$app->user->id);
+            $role = array_shift($role);
+            if ($role->name === UserRoles::ROLE_USER) {*/
+                $this->updateUserStoryHistory(Yii::$app->user->id, $story->id);
+/*            }*/
         }
         $story->updateCounters(['views_number' => 1]);
     }
