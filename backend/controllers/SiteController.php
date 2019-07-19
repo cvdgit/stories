@@ -53,6 +53,7 @@ class SiteController extends Controller
         $dataProvider = $statisticsModel->getChartData4();
         return $this->render('index', [
             'dataProvider' => $dataProvider,
+            'storyViewsData' => $statisticsModel->chartStoryViews(),
         ]);
     }
 

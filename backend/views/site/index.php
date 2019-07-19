@@ -1,7 +1,9 @@
 <?php
 
 use backend\helpers\SummaryHelper;
+use dosamigos\chartjs\ChartJs;
 use yii\grid\GridView;
+use yii\web\JsExpression;
 
 /** @var $this yii\web\View */
 /** @var $dataProvider yii\data\ActiveDataProvider */
@@ -42,6 +44,45 @@ $this->title = 'Панель управления';
                     ],
                 ]) ?>
         	</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <?= ChartJs::widget([
+                    'type' => 'line',
+                    'options' => [
+                    ],
+                    'clientOptions' => [
+                        'title' => [
+                            'display' => true,
+                            'text' => 'Количество просмотров историй по дням',
+                        ],
+                        'legend' => [
+                            'display' => false,
+                        ],
+                        'scales' => [
+                            'yAxes' => [
+                                ['ticks' => [
+                                    'beginAtZero' => true,
+                                    'stepSize' => 1,
+                                ]]
+                            ],
+                        ],
+                    ],
+                    'data' => [
+                        'labels' => $storyViewsData['labels'],
+                        'datasets' => [
+                            [
+                                'label' => "Количество просмотров",
+                                'fill' => false,
+                                'borderColor' => 'rgb(75, 192, 192)',
+                                'lineTension' => 0.1,
+                                'data' => $storyViewsData['data'],
+                            ],
+                        ]
+                    ]
+                ]);
+                ?>
+            </div>
         </div>
     </div>
 </div>

@@ -9,6 +9,8 @@ use yii\data\ArrayDataProvider;
 use yii\data\Sort;
 
 use common\models\StoryStatistics;
+use yii\db\Expression;
+use yii\db\Query;
 
 
 /**
@@ -125,6 +127,22 @@ class StoryStatisticsSearch extends StoryStatistics
         ]);
 
         return $dataProvider;
+    }
+
+    public function chartStoryViews()
+    {
+        $data = (new Query())
+            ->select(['DATE_FORMAT(FROM_UNIXTIME(`created_at`),\'%d-%m-%Y\') AS date', 'COUNT(DISTINCT `story_id`) AS views'])
+            ->from('{{%story_statistics}}')
+            ->where(new Expression('`created_at` >= UNIX_TIMESTAMP(CURDATE() - 12)'))
+            ->andWhere(new Expression('`created_at` <= UNIX_TIMESTAMP(CURDATE() + 1)'))
+            ->groupBy(new Expression('DATE_FORMAT(FROM_UNIXTIME(`created_at`),\'%d-%m-%Y\')'))
+            ->indexBy('date')
+            ->all();
+        return [
+            'labels' => array_keys($data),
+            'data' => array_values(array_map(function($elem) { return $elem['views']; }, $data)),
+        ];
     }
 
 }
