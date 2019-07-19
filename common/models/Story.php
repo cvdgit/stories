@@ -314,7 +314,7 @@ class Story extends ActiveRecord
 
     public function slidesData()
     {
-/*        $slides = (new Query())->from('{{%story_slide}}')
+        $slides = (new Query())->from('{{%story_slide}}')
             ->select('data')
             ->where('story_id = :story', [':story' => $this->id])
             ->andWhere('status = 1')
@@ -324,8 +324,7 @@ class Story extends ActiveRecord
         foreach ($slides as $slide) {
             $data .= $slide['data'];
         }
-        return '<div class="slides">' . $data . '</div>';*/
-        return $this->body;
+        return '<div class="slides">' . $data . '</div>';
     }
 
 }
