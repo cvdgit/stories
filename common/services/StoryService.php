@@ -54,6 +54,10 @@ class StoryService
                 'updated_at' => time(),
             ])->execute();
         }
+
+        $storyModel = Story::findModel($form->storyId);
+        $storyModel->slides_number = count($slides);
+        $storyModel->save(false, ['slides_number']);
     }
 
     public function getCoverPath($cover, $web = false)
