@@ -5,6 +5,7 @@ namespace console\controllers;
 use backend\components\story\reader\HTMLReader;
 use backend\components\story\writer\HTMLWriter;
 use common\models\StorySlide;
+use http\Exception\RuntimeException;
 use yii\console\Controller;
 use common\models\Story;
 use common\components\StoryCover;
@@ -89,8 +90,15 @@ class StoryController extends Controller
         $command = Yii::$app->db->createCommand();
         $writer = new HTMLWriter();
         foreach ($query->each() as $row) {
-            $reader = new HTMLReader($row['body']);
-            $story = $reader->load();
+
+            try {
+                $reader = new HTMLReader($row['body']);
+                $story = $reader->load();
+            }
+            catch (\Exception $e) {
+                throw new RuntimeException('Error on story ' . $row['id']);
+            }
+
             $slides = $story->getSlides();
             foreach ($slides as $slide) {
                 $data = $writer->renderSlide($slide);
