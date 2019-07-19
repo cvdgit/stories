@@ -96,7 +96,7 @@ class StoryController extends Controller
                 $story = $reader->load();
             }
             catch (\Error $e) {
-                throw new RuntimeException('Error on story ' . $row['id']);
+                throw new \RuntimeException('Error on story ' . $row['id']);
             }
 
             $slides = $story->getSlides();
