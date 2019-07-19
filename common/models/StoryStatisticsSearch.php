@@ -132,9 +132,9 @@ class StoryStatisticsSearch extends StoryStatistics
     public function chartStoryViews()
     {
         $data = (new Query())
-            ->select(['DATE_FORMAT(FROM_UNIXTIME(`created_at`),\'%d-%m-%Y\') AS date', 'COUNT(DISTINCT `story_id`) AS views'])
+            ->select(['DATE_FORMAT(FROM_UNIXTIME(`created_at`),\'%d-%m-%Y\') AS date', 'COUNT(DISTINCT `session`) AS views'])
             ->from('{{%story_statistics}}')
-            ->where(new Expression('`created_at` >= UNIX_TIMESTAMP(CURDATE() - 12)'))
+            ->where(new Expression('`created_at` >= UNIX_TIMESTAMP(CURDATE() - 9)'))
             ->andWhere(new Expression('`created_at` <= UNIX_TIMESTAMP(CURDATE() + 1)'))
             ->groupBy(new Expression('DATE_FORMAT(FROM_UNIXTIME(`created_at`),\'%d-%m-%Y\')'))
             ->indexBy('date')
