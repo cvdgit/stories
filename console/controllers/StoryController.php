@@ -95,7 +95,7 @@ class StoryController extends Controller
                 $reader = new HTMLReader($row['body']);
                 $story = $reader->load();
             }
-            catch (\Exception $e) {
+            catch (\Error $e) {
                 throw new RuntimeException('Error on story ' . $row['id']);
             }
 
