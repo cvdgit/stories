@@ -4,6 +4,7 @@
 namespace backend\components\story;
 
 
+use backend\models\editor\ImageForm;
 use Yii;
 
 class ImageBlock extends AbstractBlock
@@ -78,6 +79,27 @@ class ImageBlock extends AbstractBlock
     public function getNaturalHeight(): float
     {
         return $this->naturalHeight;
+    }
+
+    public function getValues(): array
+    {
+        return array_merge([
+            'image' => $this->filePath,
+        ], parent::getValues());
+    }
+
+    /**
+     * @param ImageForm $form
+     */
+    public function update($form)
+    {
+        $this->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
+        if (!empty($form->fullImagePath)) {
+            $this->setImageSize($form->fullImagePath);
+        }
+        if (!empty($form->imagePath)) {
+            $this->setFilePath($form->imagePath);
+        }
     }
 
 }

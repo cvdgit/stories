@@ -84,7 +84,12 @@ class StoryEditor
         }
 	}
 
-	public function getBlockValues(AbstractBlock $block): array
+    /**
+     * @param AbstractBlock $block
+     * @return array
+     * @deprecated
+     */
+    public function getBlockValues(AbstractBlock $block): array
     {
         $values = [
             'left' => $block->getLeft(),
@@ -184,6 +189,7 @@ class StoryEditor
      * @param int $slideIndex
      * @param string $blockID
      * @return AbstractBlock
+     * @deprecated
      */
     public function findBlockByID(int $slideIndex, string $blockID): AbstractBlock
     {

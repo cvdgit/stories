@@ -11,14 +11,15 @@ StoryEditor = (function() {
         createBlockAction: "",
         deleteBlockAction: "",
         deleteSlideAction: "",
-        slidesAction: ""
+        slidesAction: "",
+        slideVisibleAction: ""
     };
 
     var currentSlideIndex;
 
     function initialize(params) {
         config = params;
-        loadSlides(readUrl() || 0);
+        loadSlides(readUrl() || -1);
     }
 
     function send(index) {
@@ -102,28 +103,28 @@ StoryEditor = (function() {
         });
     }
 
-    function loadSlide(index, loadBlocks) {
-
-        loadBlocks = loadBlocks || false;
-        currentSlideIndex = index;
-
+    function setActiveSlide(number) {
+        currentSlideIndex = number;
         $("[data-slide-index]", $previewContainer).each(function() {
             $(this).removeClass("active");
         });
-        $("[data-slide-index=" + index + "]", $previewContainer).addClass("active");
+        $("[data-slide-index=" + number + "]", $previewContainer).addClass("active");
+        setSlideUrl();
+    }
 
+    function loadSlide(index, loadBlocks) {
+        loadBlocks = loadBlocks || false;
+        currentSlideIndex = index;
         send(index)
             .done(function(data) {
-
-                $(".slides", $editor).empty().append(data.html);
+                setActiveSlide(data.number);
+                changeSlideVisibleIcon(data.status);
+                $(".slides", $editor).empty().append(data.data);
                 Reveal.sync();
                 Reveal.slide(0);
-
                 if (loadBlocks) {
                     loadSlideBlocks();
                 }
-
-                setSlideUrl();
             })
             .fail(function(data) {
                 $editor.text(data);
@@ -141,11 +142,7 @@ StoryEditor = (function() {
         });
         promise.done(function(data) {
             if (data && data.success) {
-                var slideIndex = currentSlideIndex;
-                if (index === currentSlideIndex) {
-                    slideIndex = readUrl() || 0;
-                }
-                loadSlides(slideIndex);
+                loadSlides(index === currentSlideIndex ? -1 : currentSlideIndex);
             }
         });
     }
@@ -244,6 +241,33 @@ StoryEditor = (function() {
         window.location.hash = locationHash();
     }
 
+    function toggleSlideVisible() {
+        var promise = $.ajax({
+            "url": config.slideVisibleAction + "&slide_index=" + currentSlideIndex,
+            "type": "GET",
+            "dataType": "json"
+        });
+        promise.done(function(data) {
+            if (data && data.success) {
+                changeSlideVisibleIcon(data.status);
+            }
+        });
+    }
+
+    var $slideVisibleControl = $("#slide-visible");
+    function changeSlideVisibleIcon(status) {
+        var $icon = $("i", $slideVisibleControl);
+        $icon
+            .removeClass("glyphicon-eye-open")
+            .removeClass("glyphicon-eye-close");
+        if (status === 1) {
+            $icon.addClass("glyphicon-eye-open");
+        }
+        else {
+            $icon.addClass("glyphicon-eye-close");
+        }
+    }
+
     return {
         "initialize": initialize,
         "loadSlides": loadSlides,
@@ -256,6 +280,7 @@ StoryEditor = (function() {
         "setSlideUrl": setSlideUrl,
         "createBlock": createBlock,
         "deleteBlock": deleteBlock,
-        "deleteSlide": deleteSlide
+        "deleteSlide": deleteSlide,
+        "toggleSlideVisible": toggleSlideVisible
     };
 })();

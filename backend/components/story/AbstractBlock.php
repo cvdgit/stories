@@ -4,6 +4,8 @@
 namespace backend\components\story;
 
 
+use backend\models\editor\BaseForm;
+
 abstract class AbstractBlock
 {
 
@@ -132,5 +134,17 @@ abstract class AbstractBlock
         $this->left = $left;
         $this->top = $top;
     }
+
+    public function getValues(): array
+    {
+        return [
+            'left' => $this->left,
+            'top' => $this->top,
+            'width' => $this->width,
+            'height' => $this->height,
+        ];
+    }
+
+    abstract public function update($form);
 
 }

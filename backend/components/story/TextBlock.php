@@ -3,6 +3,7 @@
 
 namespace backend\components\story;
 
+use backend\models\editor\TextForm;
 
 class TextBlock extends AbstractBlock
 {
@@ -42,6 +43,24 @@ class TextBlock extends AbstractBlock
     public function setFontSize($fontSize): void
     {
         $this->fontSize = $fontSize;
+    }
+
+    public function getValues(): array
+    {
+        return array_merge([
+            'text' => preg_replace('/\<br(\s*)?\/?\>/i', PHP_EOL, $this->text),
+            'text_size' => $this->fontSize,
+        ], parent::getValues());
+    }
+
+    /**
+     * @param TextForm $form
+     */
+    public function update($form)
+    {
+        $this->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
+        $this->text = nl2br($form->text);
+        $this->fontSize = $form->text_size;
     }
 
 }

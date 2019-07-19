@@ -2,6 +2,9 @@
 
 namespace console\controllers;
 
+use backend\components\story\reader\HTMLReader;
+use backend\components\story\writer\HTMLWriter;
+use common\models\StorySlide;
 use yii\console\Controller;
 use common\models\Story;
 use common\components\StoryCover;
@@ -77,6 +80,42 @@ class StoryController extends Controller
         $query = 'INSERT INTO {{%story_category}} (story_id, category_id) SELECT t.id, t.category_id FROM {{%story}} AS t WHERE t.category_id IS NOT NULL';
         $command = Yii::$app->db->createCommand($query);
         $command->execute();
+        $this->stdout('Done!' . PHP_EOL);
+    }
+
+    public function actionCreateSlides()
+    {
+        $query = (new Query())->from('{{%story}}')->where('body IS NOT NULL');
+        $command = Yii::$app->db->createCommand();
+        $writer = new HTMLWriter();
+        foreach ($query->each() as $row) {
+            $reader = new HTMLReader($row['body']);
+            $story = $reader->load();
+            $slides = $story->getSlides();
+            foreach ($slides as $slide) {
+                $data = $writer->renderSlide($slide);
+                $command->insert('{{%story_slide}}', [
+                    'story_id' => $row['id'],
+                    'data' => $data,
+                    'number' => $slide->getSlideNumber(),
+                    'created_at' => time(),
+                    'updated_at' => time(),
+                ])->execute();
+            }
+            $this->stdout(count($slides) . PHP_EOL);
+        }
+        $this->stdout('Done!' . PHP_EOL);
+    }
+
+    public function actionHideFirstSlide()
+    {
+        $query = (new Query())->from('{{%story}}')->where('body IS NOT NULL');
+        foreach ($query->each() as $row) {
+            $model = StorySlide::findFirstSlide($row['id']);
+            $model->status = StorySlide::STATUS_HIDDEN;
+            $save = $model->save(false, ['status']);
+            $this->stdout($row['id'] . ' - ' . $save . PHP_EOL);
+        }
         $this->stdout('Done!' . PHP_EOL);
     }
 

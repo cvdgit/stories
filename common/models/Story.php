@@ -4,11 +4,14 @@ namespace common\models;
 
 use DomainException;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
+use yii\base\InvalidConfigException;
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
 use dosamigos\taggable\Taggable;
 use common\helpers\Translit;
+use yii\db\Query;
 use yii\web\NotFoundHttpException;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "story".
@@ -131,7 +134,7 @@ class Story extends ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getAuthor()
     {
@@ -139,8 +142,8 @@ class Story extends ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
-     * @throws \yii\base\InvalidConfigException
+     * @return ActiveQuery
+     * @throws InvalidConfigException
      */
     public function getCategories()
     {
@@ -148,8 +151,8 @@ class Story extends ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
-     * @throws \yii\base\InvalidConfigException
+     * @return ActiveQuery
+     * @throws InvalidConfigException
      */
     public function getTags()
     {
@@ -293,11 +296,36 @@ class Story extends ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
+     * @throws InvalidConfigException
      */
     public function getHistoryUser()
     {
         return $this->hasMany(User::class, ['id' => 'user_id'])->viaTable('user_story_history', ['story_id' => 'id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getStorySlides()
+    {
+        return $this->hasMany(StorySlide::class, ['story_id' => 'id'])->orderBy(['number' => SORT_ASC]);
+    }
+
+    public function slidesData()
+    {
+/*        $slides = (new Query())->from('{{%story_slide}}')
+            ->select('data')
+            ->where('story_id = :story', [':story' => $this->id])
+            ->andWhere('status = 1')
+            ->orderBy(['number' => SORT_ASC])
+            ->all();
+        $data = '';
+        foreach ($slides as $slide) {
+            $data .= $slide['data'];
+        }
+        return '<div class="slides">' . $data . '</div>';*/
+        return $this->body;
     }
 
 }

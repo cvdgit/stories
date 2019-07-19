@@ -39,9 +39,21 @@ class StoryService
         $imagesFolder = '/slides/' . $form->storyFile;
         $reader = new PowerPointReader($fileName, Yii::getAlias('@public') . $imagesFolder, $imagesFolder);
         $story = $reader->load();
+
         $writer = new HTMLWriter();
-        $body = $writer->renderStory($story);
-        $form->saveSource($body, $story->getSlideCount());
+        $slides = $story->getSlides();
+        $command = Yii::$app->db->createCommand();
+        $command->delete('{{%story_slide}}', 'story_id = :story', [':story' => $form->storyId])->execute();
+        foreach ($slides as $slide) {
+            $data = $writer->renderSlide($slide);
+            $command->insert('{{%story_slide}}', [
+                'story_id' => $form->storyId,
+                'data' => $data,
+                'number' => $slide->getSlideNumber(),
+                'created_at' => time(),
+                'updated_at' => time(),
+            ])->execute();
+        }
     }
 
     public function getCoverPath($cover, $web = false)

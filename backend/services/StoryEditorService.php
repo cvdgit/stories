@@ -2,10 +2,15 @@
 
 namespace backend\services;
 
+use backend\components\story\AbstractBlock;
+use backend\components\story\reader\HTMLReader;
+use backend\components\story\reader\HtmlSlideReader;
+use backend\components\story\writer\HTMLWriter;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
 use backend\models\editor\TextForm;
 use backend\models\editor\TransitionForm;
+use common\models\StorySlide;
 use yii;
 use yii\web\UploadedFile;
 use common\models\Story;
@@ -72,13 +77,38 @@ class StoryEditorService
         $model->saveBody($body);
     }
 
-    public function deleteBlock(int $story_id, int $slide_index, string $block_id): void
+    public function deleteBlock(int $storyID, int $slideNumber, string $blockID)
     {
-        $model = Story::findModel($story_id);
-        $editor = new StoryEditor($model->body);
-        $editor->deleteBlock($slide_index, $block_id);
-        $body = $editor->getStoryMarkup();
-        $model->saveBody($body);
+        $model = StorySlide::findSlide($storyID, $slideNumber);
+        $reader = new HtmlSlideReader($model->data);
+        $slide = $reader->load();
+        $slide->deleteBlock($blockID);
+        $writer = new HTMLWriter();
+        $html = $writer->renderSlide($slide);
+        $model->data = $html;
+        return $model->save(false, ['data']);
+    }
+
+    public function deleteSlide(int $storyID, int $slideNumber)
+    {
+        StorySlide::deleteSlide($storyID, $slideNumber);
+    }
+
+    public function updateBlock($form)
+    {
+        $model = StorySlide::findSlide($form->story_id, $form->slide_index);
+        $reader = new HtmlSlideReader($model->data);
+        $slide = $reader->load();
+        $block = $slide->findBlockByID($form->block_id);
+        if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
+            $storyModel = Story::findModel($model->story_id);
+            $this->uploadImage($form, $storyModel);
+        }
+        $block->update($form);
+        $writer = new HTMLWriter();
+        $html = $writer->renderSlide($slide);
+        $model->data = $html;
+        return $model->save(false, ['data']);
     }
 
 }

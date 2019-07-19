@@ -4,13 +4,14 @@ namespace backend\controllers;
 
 use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
-use backend\components\story\reader\HTMLReader;
+use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\TransitionBlock;
+use backend\components\story\writer\HTMLWriter;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
-use backend\models\editor\SlidePropsForm;
 use backend\models\editor\TextForm;
 use backend\models\editor\TransitionForm;
+use common\models\StorySlide;
 use DomainException;
 use Yii;
 use yii\filters\AccessControl;
@@ -18,7 +19,6 @@ use common\models\Story;
 use common\services\StoryService;
 use common\rbac\UserRoles;
 use backend\services\StoryEditorService;
-use backend\components\StoryHtmlReader;
 use backend\components\StoryEditor;
 use yii\web\Controller;
 use yii\web\Response;
@@ -62,21 +62,25 @@ class EditorController extends Controller
 		]);
 	}
 
-    public function actionGetSlideByIndex(int $story_id, int $slide_index)
+    public function actionGetSlideByIndex(int $story_id, int $slide_index = -1)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $model = Story::findModel($story_id);
-        $editor = new StoryEditor($model->body);
-        $response['html'] = $editor->getSlideMarkup($slide_index);
-        return $response;
+        if ($slide_index === -1) {
+            $model = StorySlide::findFirstSlide($story_id);
+        }
+        else {
+            $model = StorySlide::findSlide($story_id, $slide_index);
+        }
+        return $model;
     }
 
     public function actionGetSlideBlocks(int $story_id, int $slide_index)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $model = Story::findModel($story_id);
-        $editor = new StoryEditor($model->body);
-        return $editor->getSlideBlocksArray($slide_index);
+        $model = StorySlide::findSlide($story_id, $slide_index);
+        $reader = new HtmlSlideReader($model->data);
+        $slide = $reader->load();
+        return $slide->getBlocksArray();
     }
 
     public function actionUpdateText()
@@ -84,7 +88,7 @@ class EditorController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
         $form = new TextForm();
         if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-            $this->editorService->updateSlideText($form);
+            $this->editorService->updateBlock($form);
             return ['success' => true];
         }
         return $form->getErrors();
@@ -95,7 +99,7 @@ class EditorController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
         $form = new ImageForm();
         if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-            $this->editorService->updateSlideImage($form);
+            $this->editorService->updateBlock($form);
             return ['success' => true];
         }
         return $form->getErrors();
@@ -106,7 +110,7 @@ class EditorController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
         $form = new ButtonForm();
         if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-            $this->editorService->updateSlideButton($form);
+            $this->editorService->updateBlock($form);
             return ['success' => true];
         }
         return $form->getErrors();
@@ -117,7 +121,7 @@ class EditorController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
         $form = new TransitionForm();
         if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-            $this->editorService->updateSlideTransition($form);
+            $this->editorService->updateBlock($form);
             return ['success' => true];
         }
         return $form->getErrors();
@@ -134,9 +138,10 @@ class EditorController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        $model = Story::findModel($story_id);
-        $editor = new StoryEditor($model->body);
-        $block = $editor->findBlockByID($slide_index, $block_id);
+        $model = StorySlide::findSlide($story_id, $slide_index);
+        $reader = new HtmlSlideReader($model->data);
+        $slide = $reader->load();
+        $block = $slide->findBlockByID($block_id);
         $block_type = $block->getType();
 
         $types = [
@@ -166,12 +171,10 @@ class EditorController extends Controller
         }
 
         $form = Yii::createObject($types[$block_type]);
-        $form->story_id = $model->id;
+        $form->story_id = $model->story_id;
         $form->slide_index = $slide_index;
         $form->block_id = $block_id;
-
-        $values = $editor->getBlockValues($block);
-
+        $values = $block->getValues();
         $form->load($values, '');
 
         return $this->renderAjax($form->view, [
@@ -184,20 +187,29 @@ class EditorController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
 
         $types = [
-            AbstractBlock::TYPE_BUTTON,
-            AbstractBlock::TYPE_TRANSITION,
+            AbstractBlock::TYPE_BUTTON => [
+                'class' => ButtonBlock::class,
+            ],
+            AbstractBlock::TYPE_TRANSITION => [
+                'class' => TransitionBlock::class,
+            ],
         ];
-        if (!in_array($block_type, $types, true)) {
-            throw new DomainException('Unknown block type');
+        if (!isset($types[$block_type])) {
+            throw new DomainException($block_type . ' - Unknown block type');
         }
 
-        $model = Story::findModel($story_id);
-        $editor = new StoryEditor($model->body);
+        $model = StorySlide::findSlide($story_id, $slide_index);
+        $reader = new HtmlSlideReader($model->data);
+        $slide = $reader->load();
 
-        $editor->createBlock($slide_index, $block_type);
+        $block = $slide->createBlock($types[$block_type]);
+        $slide->addBlock($block);
 
-        $body = $editor->getStoryMarkup();
-        $model->saveBody($body);
+        $writer = new HTMLWriter();
+        $html = $writer->renderSlide($slide);
+
+        $model->data = $html;
+        $model->save(false, ['data']);
 
         return ['success' => true];
     }
@@ -212,11 +224,7 @@ class EditorController extends Controller
     public function actionDeleteSlide(int $story_id, int $slide_index)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $model = Story::findModel($story_id);
-        $editor = new StoryEditor($model->body);
-        $editor->deleteSlide($slide_index);
-        $body = $editor->getStoryMarkup();
-        $model->saveBody($body);
+        $this->editorService->deleteSlide($story_id, $slide_index);
         return ['success' => true];
     }
 
@@ -224,8 +232,26 @@ class EditorController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $model = Story::findModel($story_id);
-        $editor = new StoryEditor($model->body);
-        return $editor->getSlides();
+        return array_map(function(StorySlide $slide) {
+            return [
+                'id' => $slide->id,
+                'slideNumber' => $slide->number,
+            ];
+        }, $model->storySlides);
+    }
+
+    public function actionSlideVisible(int $story_id, int $slide_index)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $model = StorySlide::findSlide($story_id, $slide_index);
+        if ($model->status === StorySlide::STATUS_VISIBLE) {
+            $model->status = StorySlide::STATUS_HIDDEN;
+        }
+        else {
+            $model->status = StorySlide::STATUS_VISIBLE;
+        }
+        $model->save(false, ['status']);
+        return ['success' => true, 'status' => $model->status];
     }
 
 }

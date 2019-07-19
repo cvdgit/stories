@@ -33,7 +33,7 @@ $this->registerJs($js);
             <div class="story-container-inner">
             <?= RevealWidget::widget([
                 'storyId' => $model->id,
-                'data' => $model->body,
+                'data' => $model->slidesData(),
                 'canViewStory' => $userCanViewStory,
                 'assets' => [
                     \frontend\assets\RevealAsset::class,

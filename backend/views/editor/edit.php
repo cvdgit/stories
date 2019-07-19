@@ -15,6 +15,7 @@ $this->params['sidebarMenuItems'] = [
     ['label' => 'Статистика', 'url' => ['statistics/list', 'id' => $model->id]],
 ];
 
+$storyID = $model->id;
 $action = Url::to(['/editor/get-slide-by-index', 'story_id' => $model->id]);
 $blocksAction = Url::to(['/editor/get-slide-blocks', 'story_id' => $model->id]);
 $formAction = Url::to(['/editor/form', 'story_id' => $model->id]);
@@ -22,16 +23,19 @@ $createBlockAction = Url::to(['/editor/create-block', 'story_id' => $model->id])
 $deleteBlockAction = Url::to(['/editor/delete-block', 'story_id' => $model->id]);
 $deleteSlideAction = Url::to(['editor/delete-slide', 'story_id' => $model->id]);
 $slidesAction = Url::to(['editor/slides', 'story_id' => $model->id]);
+$slideVisibleAction = Url::to(['editor/slide-visible', 'story_id' => $storyID]);
 $js = <<< JS
     
     StoryEditor.initialize({
+        "storyID": "$storyID",
         "getSlideAction": "$action",
         "getSlideBlocksAction": "$blocksAction",
         "getBlockFormAction": "$formAction",
         "createBlockAction": "$createBlockAction",
         "deleteBlockAction": "$deleteBlockAction",
         "deleteSlideAction": "$deleteSlideAction",
-        "slidesAction": "$slidesAction"
+        "slidesAction": "$slidesAction",
+        "slideVisibleAction": "$slideVisibleAction"
     });
 
 	$("#form-container")
@@ -45,6 +49,11 @@ $js = <<< JS
 	    e.preventDefault();
 	    let slideIndex = $(this).parent().data("slideIndex");
 	    StoryEditor.deleteSlide(slideIndex);
+	});
+	
+	$("#slide-visible").on("click", function(e) {
+	    e.preventDefault();
+	    StoryEditor.toggleSlideVisible();
 	});
 JS;
 $this->registerJs($js);
@@ -82,6 +91,11 @@ $this->registerJs($js);
 		    	]) ?>
 		    </div>
 		</div>
+        <div class="clearfix">
+            <div class="pull-right" style="margin: 10px">
+                <a href="#" id="slide-visible" title="Скрыть слайд"><i style="font-size: 32px" class="glyphicon"></i></a>
+            </div>
+        </div>
 	</div>
 </div>
 <div class="row">

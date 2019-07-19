@@ -26,7 +26,7 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
 
     protected $reader;
 
-    protected $currentSlideIndex = 0;
+    protected $currentSlideNumber = 0;
     protected $currentSlideBlockNumber = 0;
 
     public function __construct($fileName, $imagesFolder, $relativeImagesFolder)
@@ -65,15 +65,18 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
     protected function loadSlides(PhpPresentation $presentation): void
     {
         $slides = $presentation->getAllSlides();
-        foreach ($slides as $i => $slide) {
-            $this->loadSlide($slide);
-            $this->currentSlideIndex++;
+        $slideNumber = 1;
+        foreach ($slides as $slide) {
+            $this->loadSlide($slide, $slideNumber);
+            $this->currentSlideNumber++;
+            $slideNumber++;
         }
     }
 
-    protected function loadSlide(AbstractSlide $powerPointSlide): void
+    protected function loadSlide(AbstractSlide $powerPointSlide, $slideNumber): void
     {
         $slide = $this->story->createSlide();
+        $slide->setSlideNumber($slideNumber);
         $shapes = $powerPointSlide->getShapeCollection();
         $this->currentSlideBlockNumber = count($shapes);
         $this->loadSlideShapes($shapes, $slide);
