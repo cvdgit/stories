@@ -63,7 +63,6 @@ $this->title = 'Панель управления';
                             'yAxes' => [
                                 ['ticks' => [
                                     'beginAtZero' => true,
-                                    'stepSize' => 1,
                                 ]]
                             ],
                         ],
