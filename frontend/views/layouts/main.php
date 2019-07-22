@@ -111,7 +111,7 @@ AppAsset::register($this);
       <div class="row">
         <div class="col-md-12 col-lg-6 site-offer">
           <h1>Сервис ускоренного развития речи ребенка</h1>
-          <p>Посмотрите короткий ролик о сервисе или зарегистрируйтесь</p>
+          <p>Зарегистрируйтесь, чтобы получить доступ ко всем историям</p>
           <?php if (Yii::$app->user->isGuest): ?>
           <?= Html::a('Регистрация', '#', ['class' => 'btn', 'data-toggle' => 'modal', 'data-target' => '#wikids-signup-modal']) ?>
           <?php else: ?>
