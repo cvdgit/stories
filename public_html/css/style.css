@@ -1751,8 +1751,6 @@ section h2 span {
 
   .btn {
     padding: 1.5rem 3rem;
-    -webkit-box-shadow: 0 0.5rem 1rem 0.5rem rgba(153, 205, 80, 0.35);
-    box-shadow: 0 0.5rem 1rem 0.5rem rgba(153, 205, 80, 0.35);
   }
 
   .carousel-inner {
