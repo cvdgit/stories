@@ -174,7 +174,7 @@ class Story extends ActiveRecord
      */
     public static function findPublishedStories()
     {
-        return self::find()->published();
+        return self::find()->published()->with('categories');
     }
 
     public static function getStatusArray()
@@ -207,7 +207,7 @@ class Story extends ActiveRecord
 
     public static function findLastPublishedStories()
     {
-        return self::find()->published()->lastStories()->all();
+        return self::find()->published()->lastStories()->with('categories')->all();
     }
 
     public static function followingStories(array $categoryIDs)

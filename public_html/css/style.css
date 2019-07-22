@@ -507,6 +507,12 @@ section h2 span {
 .story-list .story-item .story-item-pay {
   font-size: .778em;
   color: #8a8fa3;
+  margin-top: 4px;
+}
+
+.story-list .story-item .story-item-category {
+  font-size: .778em;
+  color: #38405d;
 }
 
 .site-stories-controls {
@@ -1234,6 +1240,7 @@ section h2 span {
 /* Flex Grow Text Container */
 .flex-row .story-item-caption p.flex-text {
   flex-grow: 1;
+  margin: 0;
 }
 
 /* Flex Responsive Image */

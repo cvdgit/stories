@@ -98,7 +98,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 'summary' => '<span>Показано {count} из {totalCount} историй</span>',
                 'dataProvider' => $dataProvider,
                 'itemOptions' => ['tag' => false],
-                'itemView' => '_storyitem_array',
+                'itemView' => get_class($dataProvider) === \yii\data\ActiveDataProvider::class ? '_storyitem' : '_storyitem_array',
                 'emptyText' => $emptyText,
                 'sorter' => [
                    'options' => [

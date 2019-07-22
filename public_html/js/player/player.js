@@ -1,8 +1,6 @@
 
 var Wikids = (function() {
 
-    "use strict"
-
     function getRevealConfig()
     {
         return WikidsRevealConfig;

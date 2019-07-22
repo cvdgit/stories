@@ -19,7 +19,9 @@ use common\components\StoryCover;
                 <p class="flex-text"></p>
                 <p>
                     <span class="story-item-name"><?= Html::encode($model['title']) ?></span>
-                    <span class="story-item-pay"><?= ((int)$model['sub_access'] === 1) ? 'По подписке' : 'Бесплатно' ?></span>
+                    <?php if ((int)$model['sub_access'] === 1): ?>
+                    <span class="story-item-pay">По подписке</span>
+                    <?php endif ?>
                 </p>
             </div>
         </a>
