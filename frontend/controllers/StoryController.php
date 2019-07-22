@@ -277,4 +277,22 @@ class StoryController extends Controller
         return $this->redirect(['story/view', 'alias' => $model->alias]);
     }
 
+    public function actionBedtimeStories()
+    {
+        $this->getView()->setMetaTags(
+            'Сказки на ночь для детей',
+            'Сказки на ночь для детей',
+            'wikids, сказки, истории, каталог историй, сказки на ночь для детей',
+            'Сказки на ночь для детей'
+        );
+        $searchModel = new StorySearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'action' => ['/story/index'],
+            'emptyText' => 'Список историй пуст',
+        ]);
+    }
+
 }

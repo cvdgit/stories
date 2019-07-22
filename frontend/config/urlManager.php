@@ -37,6 +37,8 @@ return [
         'stories/favorites' => 'story/favorites',
         'favorites/add/<story_id:\d+>' => 'story/add-favorites',
 
+        'stories/skazki-na-noch' => 'story/bedtime-stories',
+
         'stories/tag/<tag:[\w\s\-]+>' => 'story/tag',
         'stories/category/<category:[\w\-]+>' => 'story/category',
         'stories' => 'story/index',

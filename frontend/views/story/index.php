@@ -48,6 +48,12 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 <?php endif ?>
                 <h4>Категории</h4>
                 <?= Menu::widget([
+                    'items' => [
+                        ['label' => 'Сказки на ночь', 'url' => ['/story/bedtime-stories']],
+                    ],
+                    'options' => ['class' => 'story-category-list'],
+                ]) ?>
+                <?= Menu::widget([
                   'items' => Category::getCategoriesForMenu(),
                   'submenuTemplate' => "\n<ul class=\"story-category-list story-sub-category-list\">\n{items}\n</ul>\n",
                   'options' => ['class' => 'story-category-list'],
