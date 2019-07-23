@@ -22,7 +22,7 @@ return [
         'signup' => 'signup/request',
         'signup-confirm' => 'signup/signup-confirm',
 
-        // 'reset-password' => 'site/reset-password',
+        'reset-password' => 'site/reset-password',
 
         'payment' => 'payment/create',
         'payment/notify' => 'payment/notify',
