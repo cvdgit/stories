@@ -17,12 +17,12 @@ $this->title = 'Пользователи';
 </p>
 <?= GridView::widget([
     'dataProvider' => $dataProvider,
+    'options' => ['class' => 'table-responsive'],
     'columns' => [
         'id',
         'username',
         'email:email',
         'created_at:datetime',
-        'updated_at:datetime',
         [
             'attribute' => 'status',
             'value' => static function($model) {
@@ -34,6 +34,7 @@ $this->title = 'Пользователи';
             'attribute' => 'active_payment',
             'value' => 'activePayment.rate.title',
         ],
+        'auth.source',
         [
             'attribute' => 'role',
             'label' => 'Роль',

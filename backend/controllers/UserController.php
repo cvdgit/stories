@@ -57,6 +57,9 @@ class UserController extends Controller
                     'created_at' => SORT_DESC,
                 ],
             ],
+            'pagination' => [
+                'pageSize' => 50,
+            ],
         ]);
         return $this->render('index', [
             'dataProvider' => $dataProvider,

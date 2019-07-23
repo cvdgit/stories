@@ -1,7 +1,7 @@
 <?php
 return [
     'adminEmail' => 'admin@wikids.ru',
-    'supportEmail' => 'support@wikids.ru',
+    'supportEmail' => 'info@wikids.ru',
     'infoEmail' => 'info@wikids.ru',
     'contactEmail' => 'contact@wikids.ru',
     'user.passwordResetTokenExpire' => 3600,
