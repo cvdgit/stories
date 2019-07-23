@@ -25,7 +25,7 @@ $this->setMetaTags($title,
                         'class' => 'story-form',
                     ],
                 ]); ?>
-                <?= $form->field($model, 'password', ['inputOptions' => ['placeholder' => 'Новый пароль']])->label(false) ?>
+                <?= $form->field($model, 'password', ['inputOptions' => ['placeholder' => 'Новый пароль']])->passwordInput()->label(false) ?>
                         <?= Html::submitButton('Сохранить', ['class' => 'btn']) ?>
                 <?php ActiveForm::end(); ?>
             </div>
