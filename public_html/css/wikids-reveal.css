@@ -444,8 +444,9 @@
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
-	-ms-touch-action: auto;
-	touch-action: auto; }
+/*	-ms-touch-action: none;
+	touch-action: none;*/
+}
 
 .reveal .slides {
 	position: absolute;
