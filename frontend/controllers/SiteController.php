@@ -97,7 +97,6 @@ class SiteController extends Controller
      * @return mixed
      * @throws BadRequestHttpException
      */
-    /*
     public function actionResetPassword($token)
     {
         try {
@@ -113,7 +112,6 @@ class SiteController extends Controller
             'model' => $model,
         ]);
     }
-    */
 
     public function actionPolicy()
     {
