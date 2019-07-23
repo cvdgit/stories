@@ -124,9 +124,9 @@ function onSlideMouseDown(e) {
     }
 }
 
-if (!$.browser.mobile) {
+//if (!$.browser.mobile) {
     Reveal.addEventListener("mousedown", onSlideMouseDown, false);
-}
+//}
 
 window.addEventListener("orientationchange", function() {
     if (window.orientation === 90) {
