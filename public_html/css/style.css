@@ -1969,6 +1969,7 @@ button:focus {
   padding: 30px 0;
 }
 
+/*
 @media screen and (orientation: landscape) {
   .story-view-header {
     display: none;
@@ -1978,4 +1979,4 @@ button:focus {
   .story-view-header {
     display: block;
   }
-}
+}*/
