@@ -1342,6 +1342,17 @@ section h2 span {
 .site-request-password-reset .story-form .btn {
   margin-top: 20px;
 }
+
+.site-reset-password {
+  padding: 20px 0 40px 0;
+}
+.site-reset-password .story-form {
+  text-align: center;
+}
+.site-reset-password .story-form .btn {
+  margin-top: 20px;
+}
+
 .info-text {
   font-size: 1.5rem;
   line-height: 2rem;
