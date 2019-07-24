@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\models\StorySlide;
 use common\rbac\UserPermissions;
 use common\services\story\CountersService;
 use common\services\StoryFavoritesService;
@@ -187,18 +188,17 @@ class StoryController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $model = Story::findModel($id);
-
-        $html = $model->body;
+        $html = $model->slidesData();
         if (!empty($filter)) {
-            $document = \phpQuery::newDocumentHTML($model->body);
-            $sections = $document->find('section')->elements;
             $slides = [];
             $slideFilter = $this->slideFilterArray($filter);
             foreach ($slideFilter as $slideIndex) {
-                if (isset($sections[$slideIndex])) {
-                    $slides[] = pq($sections[$slideIndex])->htmlOuter();
+                $slide = StorySlide::findSlide($model->id, $slideIndex);
+                if ($slide !== null && $slide->status === StorySlide::STATUS_VISIBLE) {
+                    $slides[] = $slide->data;
                 }
             }
+
             $html = implode("\n", $slides);
         }
         return ['html' => $html];

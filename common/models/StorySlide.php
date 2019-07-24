@@ -65,7 +65,7 @@ class StorySlide extends \yii\db\ActiveRecord
      */
     public function getStory()
     {
-        return $this->hasOne(Story::className(), ['id' => 'story_id']);
+        return $this->hasOne(Story::class, ['id' => 'story_id']);
     }
 
     public static function findSlide(int $storyID, int $slideNumber)
