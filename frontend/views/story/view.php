@@ -21,9 +21,35 @@ $this->setMetaTags($title,
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 
 $js = <<< JS
+
 $('#comment-form-pjax').on('pjax:success', function() {
     $.pjax.reload({container: '#comment-list-pjax'});
 });
+
+if (Wikids2.showSwipeHelp()) {
+    toastr.options = {
+      "closeButton": true,
+      "debug": false,
+      "newestOnTop": false,
+      "progressBar": false,
+      "positionClass": "toast-top-center",
+      "preventDuplicates": false,
+      "onclick": function() {
+          Wikids2.hideSwipeHelp();
+      },
+      "showDuration": "300",
+      "hideDuration": "1000",
+      "timeOut": 0,
+      "extendedTimeOut": 0,
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut",
+      "tapToDismiss": false
+    };
+    toastr["info"]("Чтобы перейти к следующему слайду проведите пальцем справа-налево");
+}
+
 JS;
 $this->registerJs($js);
 ?>
