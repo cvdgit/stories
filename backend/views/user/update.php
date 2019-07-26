@@ -6,6 +6,7 @@ use yii\helpers\Html;
 /** @var $this yii\web\View */
 /** @var $model common\models\User */
 /** @var $dataProvider yii\data\ActiveDataProvider */
+/** @var $historyDataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Пользователь: ' . $model->username;
 $this->params['sidebarMenuItems'] = [
@@ -25,6 +26,10 @@ $this->params['sidebarMenuItems'] = [
                 [
                     'label' => 'Подписки',
                     'content' => $this->render('_subscriptions_tab', ['model' => $model, 'dataProvider' => $dataProvider]),
+                ],
+                [
+                    'label' => 'Просмотры историй',
+                    'content' => $this->render('_story_history', ['model' => $model, 'dataProvider' => $historyDataProvider]),
                 ],
             ],
         ]) ?>

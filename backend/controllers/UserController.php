@@ -9,6 +9,7 @@ use common\models\SubscriptionForm;
 use common\services\UserService;
 use DomainException;
 use Exception;
+use frontend\models\UserStorySearch;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -101,9 +102,12 @@ class UserController extends Controller
         $paymentSearch = new PaymentSearch();
         $dataProvider = $paymentSearch->search(Yii::$app->request->queryParams, $user->id);
 
+        $searchModel = new UserStorySearch($user->id);
+
         return $this->render('update', [
             'model' => $form,
             'dataProvider' => $dataProvider,
+            'historyDataProvider' => $searchModel->search(Yii::$app->request->queryParams),
         ]);
     }
 

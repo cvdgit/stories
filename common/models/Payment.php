@@ -113,7 +113,7 @@ class Payment extends ActiveRecord
 
     public static function getUserPaymentHistory($userID)
     {
-        return self::find()->paymentsByUser($userID);
+        return self::find()->paymentsByUser($userID)->with('rate');
     }
 
     public static function findModel($id): self
