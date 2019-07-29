@@ -610,6 +610,15 @@ section h2 span {
   margin-bottom: 16px;
 }
 
+.site-footer .footer-link-share {
+  display: inline-block;
+}
+.site-footer .footer-link-share img {
+  width: 36px;
+  height: 36px;
+  margin-top: 5px;
+}
+
 .site-footer .footer-email,
 .site-footer .footer-copyright {
   margin-top: 10px;

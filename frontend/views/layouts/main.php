@@ -136,6 +136,9 @@ AppAsset::register($this);
                 <a class="footer-link" href="/">Wikids</a>
                 <?php endif ?>
                 </div>
+                <div class="col-md-6">
+                    <a href="https://zen.yandex.ru/id/5c975a093bbd5d00b3568680" class="footer-link-share" target="_blank">123<img width="36" height="36" src="/img/zen-icon.png" alt="zen"></a>
+                </div>
             </div>
             <div class="row">
                 <div class="col-sm-12 col-md-3 footer-email">Телефон: +7 (499) 703-3525<br>Email: <a href="mailto:info@wikids.ru">info@wikids.ru</a></div>
