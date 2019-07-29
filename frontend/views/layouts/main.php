@@ -137,7 +137,7 @@ AppAsset::register($this);
                 <?php endif ?>
                 </div>
                 <div class="col-md-6">
-                    <a href="https://zen.yandex.ru/id/5c975a093bbd5d00b3568680" class="footer-link-share" target="_blank">123<img width="36" height="36" src="/img/zen-icon.png" alt="zen"></a>
+                    <a href="https://zen.yandex.ru/id/5c975a093bbd5d00b3568680" class="footer-link-share" target="_blank"><img width="36" height="36" src="/img/zen-icon.png" alt="zen"></a>
                 </div>
             </div>
             <div class="row">
