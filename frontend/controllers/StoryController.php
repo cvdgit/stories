@@ -205,8 +205,13 @@ class StoryController extends Controller
 
     public function actionInitStoryPlayer(int $id, int $num)
     {
-        if (Yii::$app->user->isGuest && $num > 2) {
-            $model = Story::findModel(Yii::$app->params['story.needSignup.id']);
+        if (Yii::$app->user->isGuest) {
+            if ($num >= 2) {
+                $model = Story::findModel(Yii::$app->params['story.needSignup.id']);
+            }
+            else {
+                $model = Story::findModel($id);
+            }
         }
         else {
             $model = Story::findModel($id);
