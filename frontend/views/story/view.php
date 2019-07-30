@@ -20,7 +20,10 @@ $this->setMetaTags($title,
 
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 
+$action = Url::to(['story/init-story-player', 'id' => $model->id]);
 $js = <<< JS
+
+Wikids2.loadStory("$action");
 
 $('#comment-form-pjax').on('pjax:success', function() {
     $.pjax.reload({container: '#comment-list-pjax'});
@@ -49,37 +52,14 @@ if (Wikids2.showSwipeHelp()) {
     };
     toastr["info"]("Чтобы перейти к следующему слайду проведите пальцем справа-налево");
 }
-
 JS;
 $this->registerJs($js);
 ?>
 <div class="container story-head-container">
 	<main class="site-story-main">
         <div class="story-container">
-            <div class="story-container-inner">
-            <?= RevealWidget::widget([
-                'storyId' => $model->id,
-                'data' => $model->slidesData(),
-                'canViewStory' => $userCanViewStory,
-                'assets' => [
-                    \frontend\assets\RevealAsset::class,
-                    \frontend\assets\WikidsRevealAsset::class,
-                ],
-                'plugins' => [
-                    [
-                        'class' => \common\widgets\Reveal\Plugins\CustomControls::class,
-                        'buttons' => [
-                            new \common\widgets\RevealButtons\FeedbackButton(),
-                            new \common\widgets\RevealButtons\FullscreenButton(),
-                            new \common\widgets\RevealButtons\LeftButton(),
-                            new \common\widgets\RevealButtons\RightButton(),
-                        ],
-                    ],
-                    ['class' => \common\widgets\Reveal\Plugins\Feedback::class, 'storyID' => $model->id],
-                    ['class' => \common\widgets\Reveal\Plugins\Statistics::class, 'storyID' => $model->id],
-                    ['class' => \common\widgets\Reveal\Plugins\Transition::class, 'storyID' => $model->id],
-                ],
-            ]) ?>
+            <div class="story-container-inner" id="story-container">
+                <div class="story-no-subscription"><span class="story-loader">Загрузка истории...</span></div>
             </div>
         </div>
     </main>

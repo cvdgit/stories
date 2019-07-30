@@ -198,10 +198,27 @@ class StoryController extends Controller
                     $slides[] = $slide->data;
                 }
             }
-
             $html = implode("\n", $slides);
         }
         return ['html' => $html];
+    }
+
+    public function actionInitStoryPlayer(int $id, int $num)
+    {
+        if (Yii::$app->user->isGuest && $num >= 2) {
+            $model = Story::findModel(Yii::$app->params['story.needSignup.id']);
+        }
+        else {
+            $model = Story::findModel($id);
+            $userCanViewStory = UserPermissions::canViewStory($model);
+            if (!$userCanViewStory) {
+                $model = Story::findModel(Yii::$app->params['story.bySubscription.id']);
+            }
+        }
+        return $this->renderAjax('_player', [
+            'model' => $model,
+            'userCanViewStory' => true,
+        ]);
     }
 
     public function actionHistory()
