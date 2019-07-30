@@ -89,6 +89,18 @@ class StoryEditorService
         return $model->save(false, ['data']);
     }
 
+    public function createSlide(int $storyID)
+    {
+        $reader = new HtmlSlideReader('');
+        $slide = $reader->load();
+        $writer = new HTMLWriter();
+        $html = $writer->renderSlide($slide);
+        $model = StorySlide::createSlide($storyID);
+        $model->data = $html;
+        $model->save();
+        return $model->number;
+    }
+
     public function deleteSlide(int $storyID, int $slideNumber)
     {
         StorySlide::deleteSlide($storyID, $slideNumber);

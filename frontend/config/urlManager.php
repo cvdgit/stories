@@ -47,6 +47,7 @@ return [
         'story/like' => 'story/like',
         'story/addcomment' => 'story/add-comment',
         'story/get-story-body/<id:\d+>' => 'story/get-story-body',
+        'story/init-story-player' => 'story/init-story-player',
         'story/<alias:[\w\-]+>' => 'story/view',
 
         'success' => 'rate/success',

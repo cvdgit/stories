@@ -5,10 +5,12 @@ namespace backend\controllers;
 use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
 use backend\components\story\reader\HtmlSlideReader;
+use backend\components\story\TextBlock;
 use backend\components\story\TransitionBlock;
 use backend\components\story\writer\HTMLWriter;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
+use backend\models\editor\SlideSourceForm;
 use backend\models\editor\TextForm;
 use backend\models\editor\TransitionForm;
 use common\models\StorySlide;
@@ -193,6 +195,9 @@ class EditorController extends Controller
             AbstractBlock::TYPE_TRANSITION => [
                 'class' => TransitionBlock::class,
             ],
+            AbstractBlock::TYPE_TEXT => [
+                'class' => TextBlock::class,
+            ],
         ];
         if (!isset($types[$block_type])) {
             throw new DomainException($block_type . ' - Unknown block type');
@@ -212,6 +217,13 @@ class EditorController extends Controller
         $model->save(false, ['data']);
 
         return ['success' => true];
+    }
+
+    public function actionCreateSlide(int $story_id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $slideNumber = $this->editorService->createSlide($story_id);
+        return ['success' => true, 'slideNumber' => $slideNumber];
     }
 
     public function actionDeleteBlock(int $story_id, int $slide_index, string $block_id)
@@ -252,6 +264,18 @@ class EditorController extends Controller
         }
         $model->save(false, ['status']);
         return ['success' => true, 'status' => $model->status];
+    }
+
+    public function actionSlideSource(int $story_id, int $slide_index)
+    {
+        $model = new SlideSourceForm($story_id, $slide_index);
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            $model->saveSlideSource();
+        }
+        else {
+            $model->loadSlideSource();
+        }
+        return $this->renderAjax('_slide_source', ['model' => $model]);
     }
 
 }

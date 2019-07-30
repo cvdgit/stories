@@ -2,6 +2,7 @@
 
 use backend\assets\StoryEditorAsset;
 use common\widgets\RevealWidget;
+use yii\bootstrap\ButtonDropdown;
 use yii\helpers\Url;
 
 /** @var $this yii\web\View */
@@ -24,6 +25,8 @@ $deleteBlockAction = Url::to(['/editor/delete-block', 'story_id' => $model->id])
 $deleteSlideAction = Url::to(['editor/delete-slide', 'story_id' => $model->id]);
 $slidesAction = Url::to(['editor/slides', 'story_id' => $model->id]);
 $slideVisibleAction = Url::to(['editor/slide-visible', 'story_id' => $storyID]);
+$createSlideAction = Url::to(['editor/create-slide', 'story_id' => $storyID]);
+$slideSourceAction = Url::to(['editor/slide-source', 'story_id' => $storyID]);
 $js = <<< JS
     
     StoryEditor.initialize({
@@ -35,7 +38,8 @@ $js = <<< JS
         "deleteBlockAction": "$deleteBlockAction",
         "deleteSlideAction": "$deleteSlideAction",
         "slidesAction": "$slidesAction",
-        "slideVisibleAction": "$slideVisibleAction"
+        "slideVisibleAction": "$slideVisibleAction",
+        "createSlideAction": "$createSlideAction"
     });
 
 	$("#form-container")
@@ -55,13 +59,37 @@ $js = <<< JS
 	    e.preventDefault();
 	    StoryEditor.toggleSlideVisible();
 	});
+	
+	$("#slide-source").on("click", function(e) {
+	    e.preventDefault();
+	    StoryEditor.slideSourceModal("$slideSourceAction");
+	});
 JS;
 $this->registerJs($js);
+
+$options = [
+    'encodeLabel' => false,
+    'label' => '<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>',
+    'options' => [
+        'class' => 'btn-sm btn-default',
+        'title' => 'Добавить слайд',
+    ],
+    'dropdown' => [
+        'items' => [
+            [
+                'label' => 'Новый слайд',
+                'url' => '#',
+                'linkOptions' => ['onclick' => 'StoryEditor.createSlide(); return false;'],
+            ],
+        ],
+    ]
+];
+
 ?>
 <div class="row">
 	<div class="col-lg-3">
-        <h4>Слайды</h4>
-		<div id="preview-container"></div>
+        <h4>Слайды <div class="pull-right"><?= ButtonDropdown::widget($options) ?></div></h4>
+        <div id="preview-container" style="margin-top: 20px"></div>
 	</div>
 	<div class="col-lg-9">
 		<div class="story-container">
@@ -93,6 +121,7 @@ $this->registerJs($js);
 		</div>
         <div class="clearfix">
             <div class="pull-right" style="margin: 10px">
+                <a href="#" id="slide-source" title="Код слайда" style="margin-right: 10px"><i style="font-size: 32px" class="glyphicon glyphicon-fire"></i></a>
                 <a href="#" id="slide-visible" title="Скрыть слайд"><i style="font-size: 32px" class="glyphicon"></i></a>
             </div>
         </div>
@@ -100,10 +129,20 @@ $this->registerJs($js);
 </div>
 <div class="row">
     <div class="col-lg-3">
-        <?= $this->render('_blocks') ?>
+        <div id="slide-blocks">
+            <?= $this->render('_blocks') ?>
+        </div>
     </div>
     <div class="col-lg-9">
-        <h4>Параметры блока</h4>
-        <div id="form-container"></div>
+        <div id="slide-block-params">
+            <h4>Параметры блока</h4>
+            <div id="form-container"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal remote fade" id="slide-source-modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content loader-lg"></div>
     </div>
 </div>

@@ -12,7 +12,8 @@ StoryEditor = (function() {
         deleteBlockAction: "",
         deleteSlideAction: "",
         slidesAction: "",
-        slideVisibleAction: ""
+        slideVisibleAction: "",
+        createSlideAction: ""
     };
 
     var currentSlideIndex;
@@ -45,21 +46,27 @@ StoryEditor = (function() {
             "type": "GET",
             "dataType": "json"
         });
+        $("#slide-blocks").show();
         promise.done(function(data) {
             $list.empty();
-            data.forEach(function(block) {
-                var elem = $("<a>")
-                    .attr("href", "#")
-                    .addClass("list-group-item")
-                    .text(block.type)
-                    .data("block-id", block.id);
-                elem.on("click", function(e) {
-                    e.preventDefault();
-                    setActiveBlock(elem);
+            if (data.length > 0) {
+                data.forEach(function (block) {
+                    var elem = $("<a>")
+                        .attr("href", "#")
+                        .addClass("list-group-item")
+                        .text(block.type)
+                        .data("block-id", block.id);
+                    elem.on("click", function (e) {
+                        e.preventDefault();
+                        setActiveBlock(elem);
+                    });
+                    elem.appendTo($list);
                 });
-                elem.appendTo($list);
-            });
-            setActiveBlock($list.find("a").get(0));
+                setActiveBlock($list.find("a").get(0));
+            }
+            else {
+                $("#slide-block-params").hide();
+            }
         });
     }
 
@@ -76,6 +83,7 @@ StoryEditor = (function() {
             "dataType": "json"
         });
         var $formContainer = $("#form-container");
+        $("#slide-block-params").show();
         promise.done(function(data) {
             $formContainer.html(data);
         });
@@ -89,6 +97,17 @@ StoryEditor = (function() {
         });
         promise.done(function() {
             loadSlide(currentSlideIndex, true);
+        });
+    }
+
+    function createSlide() {
+        var promise = $.ajax({
+            "url": config.createSlideAction,
+            "type": "GET",
+            "dataType": "json"
+        });
+        promise.done(function(data) {
+            loadSlides(data.slideNumber);
         });
     }
 
@@ -156,28 +175,35 @@ StoryEditor = (function() {
             "dataType": "json"
         });
         promise.done(function(data) {
-            data.forEach(function(slide) {
-                var elem = $("<div/>");
-                var slideIndex = slide.slideNumber;
-                elem.addClass("img-thumbnail preview-container-item");
-                elem.attr("data-slide-index", slideIndex);
-                $("<a/>")
-                    .attr("href", "#")
-                    .text("Слайд " + slideIndex)
-                    .on("click", function() {
-                        loadSlide(slideIndex, true);
-                        return false;
-                    })
-                    .appendTo(elem);
-                $("<a/>")
-                    .attr("href", "#")
-                    .attr("title", "Удалить слайд")
-                    .html("&times;")
-                    .addClass("remove-slide")
-                    .appendTo(elem);
-                elem.appendTo($container);
-            });
-            loadSlide(activeSlideIndex, true);
+            if (data.length > 0) {
+                data.forEach(function (slide) {
+                    var elem = $("<div/>");
+                    var slideIndex = slide.slideNumber;
+                    elem.addClass("img-thumbnail preview-container-item");
+                    elem.attr("data-slide-index", slideIndex);
+                    $("<a/>")
+                        .attr("href", "#")
+                        .text("Слайд " + slideIndex)
+                        .on("click", function () {
+                            loadSlide(slideIndex, true);
+                            return false;
+                        })
+                        .appendTo(elem);
+                    $("<a/>")
+                        .attr("href", "#")
+                        .attr("title", "Удалить слайд")
+                        .html("&times;")
+                        .addClass("remove-slide")
+                        .appendTo(elem);
+                    elem.appendTo($container);
+                });
+                loadSlide(activeSlideIndex, true);
+            }
+            else {
+                $("<span/>").text("Нет слайдов").appendTo($container);
+                $("#slide-blocks").hide();
+                $("#slide-block-params").hide();
+            }
         });
     }
 
@@ -268,6 +294,10 @@ StoryEditor = (function() {
         }
     }
 
+    function slideSourceModal(url) {
+        $("#slide-source-modal").modal({"remote": url + "&slide_index=" + currentSlideIndex});
+    }
+
     return {
         "initialize": initialize,
         "loadSlides": loadSlides,
@@ -281,6 +311,8 @@ StoryEditor = (function() {
         "createBlock": createBlock,
         "deleteBlock": deleteBlock,
         "deleteSlide": deleteSlide,
-        "toggleSlideVisible": toggleSlideVisible
+        "toggleSlideVisible": toggleSlideVisible,
+        "createSlide": createSlide,
+        "slideSourceModal": slideSourceModal
     };
 })();

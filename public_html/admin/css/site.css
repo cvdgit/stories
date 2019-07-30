@@ -433,3 +433,24 @@ body {
         text-align: center;
     }
 }
+
+.story-container {
+    position: relative;
+    padding: 0 50px;
+    background-color: #000;
+}
+
+.story-container::before {
+    content: '';
+    display: block;
+    padding-bottom: calc(100% / (16 / 9));
+    width: 100%;
+}
+
+.story-container-inner {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}

@@ -3,6 +3,8 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Query;
 
 /**
  * This is the model class for table "story_slide".
@@ -31,16 +33,23 @@ class StorySlide extends \yii\db\ActiveRecord
         return 'story_slide';
     }
 
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::class,
+        ];
+    }
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['story_id', 'data', 'number', 'created_at', 'updated_at'], 'required'],
+            [['story_id', 'data', 'number'], 'required'],
             [['story_id', 'number', 'status', 'created_at', 'updated_at'], 'integer'],
             [['data'], 'string'],
-            [['story_id'], 'exist', 'skipOnError' => true, 'targetClass' => Story::className(), 'targetAttribute' => ['story_id' => 'id']],
+            [['story_id'], 'exist', 'skipOnError' => true, 'targetClass' => Story::class, 'targetAttribute' => ['story_id' => 'id']],
         ];
     }
 
@@ -74,6 +83,14 @@ class StorySlide extends \yii\db\ActiveRecord
             ->where('story_id = :story', [':story' => $storyID])
             ->andWhere('number = :number', [':number' => $slideNumber])
             ->one();
+    }
+
+    public static function createSlide(int $storyID)
+    {
+        $slide = new self();
+        $slide->story_id = $storyID;
+        $slide->number = (new Query())->from(self::tableName())->where('story_id = :story', [':story' => $storyID])->max('number') + 1;
+        return $slide;
     }
 
     public static function deleteSlide(int $storyID, int $slideNumber)

@@ -63,4 +63,16 @@ class TextBlock extends AbstractBlock
         $this->fontSize = $form->text_size;
     }
 
+    public function create()
+    {
+        $block = new self();
+        $block->setWidth('290px');
+        $block->setHeight('auto');
+        $block->setLeft('983px');
+        $block->setTop('9px');
+        $block->setFontSize('0.8em');
+        $block->setText('Текст');
+        return $block;
+    }
+
 }
