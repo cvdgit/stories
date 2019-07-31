@@ -6,6 +6,25 @@ use common\widgets\RevealWidget;
 /* @var $model common\models\Story */
 /* @var $userCanViewStory bool */
 
+$plugins = [
+    [
+        'class' => \common\widgets\Reveal\Plugins\CustomControls::class,
+        'buttons' => [
+            new \common\widgets\RevealButtons\FeedbackButton(),
+            new \common\widgets\RevealButtons\FullscreenButton(),
+            new \common\widgets\RevealButtons\LeftButton(),
+            new \common\widgets\RevealButtons\RightButton(),
+        ],
+    ],
+    ['class' => \common\widgets\Reveal\Plugins\Feedback::class, 'storyID' => $model->id],
+    ['class' => \common\widgets\Reveal\Plugins\Statistics::class, 'storyID' => $model->id],
+    ['class' => \common\widgets\Reveal\Plugins\Transition::class, 'storyID' => $model->id],
+];
+
+if ($model->isAudioStory()) {
+    $plugins[] = ['class' => \common\widgets\Reveal\Plugins\Audio::class, 'storyID' => $model->id];
+}
+
 echo RevealWidget::widget([
     'storyId' => $model->id,
     'data' => $model->slidesData(),
@@ -14,18 +33,5 @@ echo RevealWidget::widget([
         \frontend\assets\RevealAsset::class,
         \frontend\assets\WikidsRevealAsset::class,
     ],
-    'plugins' => [
-        [
-            'class' => \common\widgets\Reveal\Plugins\CustomControls::class,
-            'buttons' => [
-                new \common\widgets\RevealButtons\FeedbackButton(),
-                new \common\widgets\RevealButtons\FullscreenButton(),
-                new \common\widgets\RevealButtons\LeftButton(),
-                new \common\widgets\RevealButtons\RightButton(),
-            ],
-        ],
-        ['class' => \common\widgets\Reveal\Plugins\Feedback::class, 'storyID' => $model->id],
-        ['class' => \common\widgets\Reveal\Plugins\Statistics::class, 'storyID' => $model->id],
-        ['class' => \common\widgets\Reveal\Plugins\Transition::class, 'storyID' => $model->id],
-    ],
+    'plugins' => $plugins,
 ]);

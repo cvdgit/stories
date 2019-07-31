@@ -58,6 +58,7 @@ $values = implode("\n", $values);
         'create' => true,
     ],
 ])->hint('Используйте запятые для разделения тегов') ?>
+<?= $form->field($model, 'audio')->checkBox() ?>
 <div class="form-group">
 <?php
 echo Html::submitButton(($model->isNewRecord ? 'Создать историю' : 'Сохранить изменения'), ['class' => 'btn btn-success', 'style' => 'margin-right: 20px']);
