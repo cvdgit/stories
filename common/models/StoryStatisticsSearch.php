@@ -134,8 +134,8 @@ class StoryStatisticsSearch extends StoryStatistics
         $data = (new Query())
             ->select(['DATE_FORMAT(FROM_UNIXTIME(`created_at`),\'%d-%m-%Y\') AS date', 'COUNT(DISTINCT `session`) AS views'])
             ->from('{{%story_statistics}}')
-            ->where(new Expression('`created_at` >= UNIX_TIMESTAMP(CURDATE() - 9)'))
-            ->andWhere(new Expression('`created_at` <= UNIX_TIMESTAMP(CURDATE() + 1)'))
+            ->where(new Expression('`created_at` >= UNIX_TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL -10 DAY))'))
+            ->andWhere(new Expression('`created_at` <= UNIX_TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 1 DAY))'))
             ->groupBy(new Expression('DATE_FORMAT(FROM_UNIXTIME(`created_at`),\'%d-%m-%Y\')'))
             ->indexBy('date')
             ->all();
