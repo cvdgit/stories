@@ -131,6 +131,7 @@ class Story extends ActiveRecord
             'source_dropbox' => 'Имя истории в Slides.com',
             'source_powerpoint' => 'Файл PowerPoint (pptx)',
             'views_number' => 'Просмотров',
+            'audio' => 'История с озвучкой',
         ];
     }
 

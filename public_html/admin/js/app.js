@@ -32,3 +32,15 @@ function storyOnBeforeSubmit(e) {
         button.button("reset");
     });
 }
+
+var StoryAudio = function() {
+    "use strict";
+
+    function deleteFile(fileName) {
+
+    }
+
+    return {
+
+    };
+}();

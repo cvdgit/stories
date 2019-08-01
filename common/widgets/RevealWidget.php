@@ -37,8 +37,6 @@ class RevealWidget extends Widget
         'mouseWheel' => false,
         'showNotes' => false,
         'slideNumber' => true,
-
-        // 'autoSlideStoppable' => true,
         'shuffle' => false,
         'loop' => false,
         'hash' => true,
