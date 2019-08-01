@@ -21,6 +21,9 @@ $("#audio-file-list").on("click", "[data-audio-file]", function() {
             toastr.success("Файл озвучки удален");
             elem.parent().remove();
         }
+        else {
+            toastr.error("Ошибка при удалении файла");
+        }
     });
 });
 CODE;
@@ -31,6 +34,6 @@ $this->registerJs($js);
 ?>
 <ul class="list-group" id="audio-file-list">
     <?php foreach ($audioUploadForm->audioFileList() as $file): ?>
-        <li class="list-group-item"><span data-audio-file="<?= $file ?>" class="badge">Удалить</span><?= $file ?></li>
+        <li class="list-group-item"><span data-audio-file="<?= $file ?>" class="badge" style="cursor: pointer">Удалить</span><?= $file ?></li>
     <?php endforeach ?>
 </ul>

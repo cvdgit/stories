@@ -68,10 +68,13 @@ class AudioUploadForm extends Model
 
     public function deleteAudioFile($file)
     {
+        $file = preg_replace('/[^A-Za-z0-9 _ .-]/', '', $file);
         $fileName = $this->audioFilePath() . '/' . $file;
         if (file_exists($fileName)) {
             unlink($fileName);
+            return true;
         }
+        return false;
     }
 
 }

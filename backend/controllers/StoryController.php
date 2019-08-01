@@ -296,8 +296,7 @@ class StoryController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $form = new AudioUploadForm($id);
-        $form->deleteAudioFile($file);
-        return ['success' => true];
+        return ['success' => $form->deleteAudioFile($file)];
     }
 
 }
