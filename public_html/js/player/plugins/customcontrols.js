@@ -22,11 +22,29 @@ var RevealCustomControls = window.RevealCustomControls || (function() {
 
 	$('.story-controls').append($controls);
 
+	var $rightControls = $("<div/>");
+	$rightControls.addClass("customcontrols");
+	$rightControls.addClass("customcontrols-right");
+
+	$.each(config.rightControls, function(i, control) {
+		var $button = $('<button/>'),
+			$icon = $('<i/>').addClass(control.icon);
+		$button
+			.addClass('enabled')
+			.addClass(control.className)
+			.attr('title', control.title)
+			.on('click', control.action)
+			.append($icon.wrap('<div class="controls-arrow"></div>'))
+			.appendTo($rightControls);
+	});
+
 	var $controlsWrapper = $('<div/>');
 	$controlsWrapper.addClass('story-controls');
 
 	$controlsWrapper.append($controls);
-	$controlsWrapper.appendTo('.reveal');
+	$controlsWrapper.appendTo('#story-container');
+
+	$controlsWrapper.append($rightControls);
 
 	var callback = Reveal.getConfig().customcontrols;
 	if (typeof callback === 'function') {

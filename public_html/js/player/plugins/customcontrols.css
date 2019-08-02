@@ -1,21 +1,24 @@
 
 .story-controls {
     height: 38px;
-    background: transparent;
-    position: absolute;
-    left: 0;
-    bottom: 2px;
+    position: relative;
+/*    background: transparent;
+    position: absolute;*/
+/*    left: 0;
+    bottom: 2px;*/
     width: 100%;
     z-index: 1;
+    text-align: center;
 }
 
 .customcontrols {
-    position: absolute;
-    top: 0;
-    right: 40px;
+    /*position: absolute;*/
+    /*top: 0;
+    right: 40px;*/
     z-index: 9999;
     pointer-events: none;
     font-size: 10px !important;
+    display: inline-block;
 }
 
 .customcontrols button {
@@ -27,7 +30,7 @@
     border: 0;
     outline: 0;
     cursor: pointer;
-    color: white;
+    color: #000000;
     z-index: 99999;
     pointer-events: auto;
 }
@@ -52,4 +55,11 @@
 
 .customcontrols .custom-navigate-right .custom-controls-arrow {
 
+}
+
+
+.customcontrols-right {
+    position: absolute;
+    right: 30px;
+    top: 0;
 }

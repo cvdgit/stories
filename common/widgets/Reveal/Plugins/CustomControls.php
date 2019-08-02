@@ -12,12 +12,14 @@ class CustomControls extends AbstractPlugin implements PluginInterface
 
     public $configName = 'customControls';
     public $buttons = [];
+    public $rightButtons = [];
 
     public function pluginConfig(): array
     {
         return [
             $this->configName => [
                 'controls' => $this->buttons,
+                'rightControls' => $this->rightButtons,
                 'controlsCallback' => new JsExpression("
 	function(ev) {
 	var left = $('.custom-navigate-left', $('.reveal'));

@@ -9,7 +9,7 @@ class FeedbackButton extends Button
 
 	public function __construct()
 	{
-		$this->icon = 'icomoon-comment-o';
+		$this->icon = 'glyphicon glyphicon-bullhorn';
 		$this->className = 'custom-feedback';
 		$this->title = 'Сообщить об опечатке на слайде';
 		$this->action = new JsExpression('function() { WikidsStoryFeedback.sendFeedback(); }');

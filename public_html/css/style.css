@@ -1993,8 +1993,8 @@ button:focus {
 
 .story-container {
   position: relative;
-  padding: 0 50px;
-  background-color: #000;
+  padding: 0;
+  background-color: #f0f4f9;
 }
 .story-container::before {
   content: '';
@@ -2007,7 +2007,7 @@ button:focus {
   left: 0;
   right: 0;
   top: 0;
-  bottom: 0;
+  bottom: 38px;
 }
 .story-loader {
   color: white;

@@ -11,12 +11,14 @@ $plugins = [
     [
         'class' => \common\widgets\Reveal\Plugins\CustomControls::class,
         'buttons' => [
-            new BackgroundButton(),
-            new \common\widgets\RevealButtons\FeedbackButton(),
-            new \common\widgets\RevealButtons\FullscreenButton(),
             new \common\widgets\RevealButtons\LeftButton(),
+            new \common\widgets\RevealButtons\FullscreenButton(),
             new \common\widgets\RevealButtons\RightButton(),
         ],
+        'rightButtons' => [
+            new BackgroundButton(),
+            new \common\widgets\RevealButtons\FeedbackButton(),
+        ]
     ],
     ['class' => \common\widgets\Reveal\Plugins\Feedback::class, 'storyID' => $model->id],
     ['class' => \common\widgets\Reveal\Plugins\Statistics::class, 'storyID' => $model->id],
