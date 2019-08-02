@@ -1670,3 +1670,21 @@
 .reveal .progress {
 	margin-bottom: 0;
 }
+
+.reveal.has-light-background section p,
+.reveal.has-light-background section h1 {
+	color: #000000 !important;
+}
+
+.reveal.has-dark-background section p,
+.reveal.has-dark-background section h1 {
+	color: #ffffff !important;
+}
+
+.reveal.has-dark-background .customcontrols button {
+	color: #ffffff;
+}
+
+.reveal.has-light-background .customcontrols button {
+	color: #000000;
+}

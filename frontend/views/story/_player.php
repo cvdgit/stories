@@ -1,5 +1,6 @@
 <?php
 
+use common\widgets\RevealButtons\BackgroundButton;
 use common\widgets\RevealWidget;
 
 /* @var $this yii\web\View */
@@ -10,6 +11,7 @@ $plugins = [
     [
         'class' => \common\widgets\Reveal\Plugins\CustomControls::class,
         'buttons' => [
+            new BackgroundButton(),
             new \common\widgets\RevealButtons\FeedbackButton(),
             new \common\widgets\RevealButtons\FullscreenButton(),
             new \common\widgets\RevealButtons\LeftButton(),
@@ -19,6 +21,7 @@ $plugins = [
     ['class' => \common\widgets\Reveal\Plugins\Feedback::class, 'storyID' => $model->id],
     ['class' => \common\widgets\Reveal\Plugins\Statistics::class, 'storyID' => $model->id],
     ['class' => \common\widgets\Reveal\Plugins\Transition::class, 'storyID' => $model->id],
+    ['class' => \common\widgets\Reveal\Plugins\Background::class],
 ];
 
 if ($model->isAudioStory()) {

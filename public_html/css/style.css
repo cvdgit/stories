@@ -1092,7 +1092,7 @@ section h2 span {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: black;
+  background-color: #000000;
   height: 100%;
 }
 
