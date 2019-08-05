@@ -56,11 +56,13 @@ class AudioUploadForm extends Model
 
     public function audioFileList(): array
     {
-        $dir = opendir($this->audioFilePath());
         $files = [];
-        while (false !== ($filename = readdir($dir))) {
-            if (!in_array($filename, array('.', '..'))) {
-                $files[] = $filename;
+        if (file_exists($this->audioFilePath())) {
+            $dir = opendir($this->audioFilePath());
+            while (false !== ($filename = readdir($dir))) {
+                if (!in_array($filename, array('.', '..'))) {
+                    $files[] = $filename;
+                }
             }
         }
         return $files;
