@@ -1689,3 +1689,7 @@
 .reveal.has-light-background .customcontrols button {
 	color: #000000;
 }*/
+
+.reveal .sl-block .sl-block-content a.btn {
+	padding: 2rem 2rem;
+}
