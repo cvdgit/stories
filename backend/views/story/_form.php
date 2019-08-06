@@ -60,8 +60,10 @@ $values = implode("\n", $values);
     ],
 ])->hint('Используйте запятые для разделения тегов') ?>
 <?= $form->field($model, 'audio')->checkBox() ?>
+<?php if (!$model->isNewRecord): ?>
 <?= $form->field($audioUploadForm, 'audioFiles[]')->fileInput(['multiple' => true, 'accept' => '.mp3,audio/*']) ?>
 <?= $this->render('_audio_files', ['audioUploadForm' => $audioUploadForm, 'model' => $model]) ?>
+<?php endif ?>
 <div class="form-group">
 <?php
 echo Html::submitButton(($model->isNewRecord ? 'Создать историю' : 'Сохранить изменения'), ['class' => 'btn btn-success', 'style' => 'margin-right: 20px']);
