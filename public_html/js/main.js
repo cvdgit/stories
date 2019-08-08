@@ -1,6 +1,8 @@
 
 $(function() {
 
+	$(".lazy").Lazy();
+
 	$('.modal').on('show.bs.modal', function () {
 	    $('.modal').not($(this)).each(function () {
 	        $(this).modal('hide');

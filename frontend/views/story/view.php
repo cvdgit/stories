@@ -84,8 +84,6 @@ if (Wikids2.showSwipeHelp()) {
     toastr["info"]("Чтобы перейти к следующему слайду проведите пальцем справа-налево");
 }*/
 
-$(".lazy").Lazy();
-
 JS;
 $this->registerJs($js);
 
