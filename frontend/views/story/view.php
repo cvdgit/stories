@@ -16,7 +16,7 @@ use yii\helpers\Url;
 $title = $model->title;
 $this->setMetaTags($title,
                    $model->description,
-                   'wikids, сказки, истории, просмотр истории',
+                   $model->title . ', ' . $model->title . ' сказка на ночь',
                    $title);
 
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
