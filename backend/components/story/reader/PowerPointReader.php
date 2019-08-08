@@ -104,10 +104,10 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
 
         $block = new ImageBlock();
         $block->setType(AbstractBlock::TYPE_IMAGE);
-        $block->setWidth('973px');
-        $block->setHeight('720px');
-        $block->setLeft(0);
-        $block->setTop(0);
+        $block->setWidth($powerPointShape->isResizeProportional() . 'px');
+        $block->setHeight($powerPointShape->getHeight() . 'px');
+        $block->setLeft($powerPointShape->getOffsetX() . 'px');
+        $block->setTop($powerPointShape->getOffsetY() . 'px');
 
         $imagePath = $this->relativeImagesFolder . '/' . $powerPointShape->getIndexedFilename();
         $block->setFilePath($imagePath);
@@ -130,10 +130,10 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
         }
         else {
             $block->setType(AbstractBlock::TYPE_TEXT);
-            $block->setWidth('290px');
+            $block->setWidth($powerPointShape->getWidth() . 'px');
             $block->setHeight('auto');
-            $block->setLeft('983px');
-            $block->setTop('9px');
+            $block->setLeft($powerPointShape->getOffsetX() . 'px');
+            $block->setTop($powerPointShape->getOffsetY() . 'px');
             $block->setFontSize('0.8em');
         }
 

@@ -40,14 +40,14 @@ class ImageBlock extends AbstractBlock
 
         if ($imageHeight > 0) {
 
-            $ratio = $imageWidth / $imageHeight;
+/*            $ratio = $imageWidth / $imageHeight;
             if (self::DEFAULT_IMAGE_WIDTH / self::DEFAULT_IMAGE_HEIGHT > $ratio) {
                 $imageWidth = self::DEFAULT_IMAGE_HEIGHT * $ratio;
                 $imageHeight = self::DEFAULT_IMAGE_HEIGHT;
             } else {
                 $imageHeight = self::DEFAULT_IMAGE_WIDTH / $ratio;
                 $imageWidth = self::DEFAULT_IMAGE_WIDTH;
-            }
+            }*/
 
             $this->width = $imageWidth . 'px';
             $this->height = $imageHeight . 'px';
