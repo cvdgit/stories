@@ -34,8 +34,9 @@ class CustomControls extends AbstractPlugin implements PluginInterface
 
     public function pluginCssFiles(): array
     {
+        $dep = new Dependency('/js/player/plugins/customcontrols.css');
         return [
-            '/js/player/plugins/customcontrols.css',
+            $dep->src,
         ];
     }
 

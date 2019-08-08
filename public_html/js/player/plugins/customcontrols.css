@@ -12,9 +12,6 @@
 }
 
 .customcontrols {
-/*    position: absolute;
-    top: 0;
-    right: 40px;*/
     z-index: 9999;
     pointer-events: none;
     font-size: 1rem !important;
