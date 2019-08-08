@@ -25,10 +25,11 @@ $action = Url::to(['story/init-story-player', 'id' => $model->id]);
 /** @var $storyDefaultView string */
 $js = <<< JS
 
-$(".lazy").Lazy({
+var lazy = $(".lazy").Lazy({
     scrollDirection: "vertical",
     effect: "fadeIn",
     visibleOnly: true,
+    chainable: false
 });
 
 var defaultView = "$storyDefaultView";
@@ -47,6 +48,7 @@ function switchStoryView(view) {
     else if (view === "book") {
         $(".slides-readonly").show();
         $("#story_wrapper").hide();
+        lazy.update(false);
     }
     else {
 
