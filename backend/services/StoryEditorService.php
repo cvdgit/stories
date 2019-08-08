@@ -142,7 +142,7 @@ class StoryEditorService
             }
             $content = '';
             if ($text !== '' && $image !== '') {
-                $content = Html::tag('div', Html::img('{IMAGE}', ['width' => '100%', 'height' => '100%']), ['class' => 'col-lg-6']);
+                $content = Html::tag('div', Html::img(null, ['data-src' => '{IMAGE}', 'width' => '100%', 'height' => '100%', 'class' => 'lazy']), ['class' => 'col-lg-6']);
                 $content .= Html::tag('div', Html::tag('p', '{TEXT}'), ['class' => 'col-lg-6']);
                 $content = strtr($content, [
                     '{IMAGE}' => $image,

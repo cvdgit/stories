@@ -40,7 +40,8 @@
         "yiisoft/yii2-queue": "^2.2",
         "cebe/yii2-gravatar": "^1.0",
         "vova07/yii2-imperavi-widget": "*",
-        "alexandernst/yii2-device-detect": "^0.0.12"
+        "alexandernst/yii2-device-detect": "^0.0.12",
+        "bower-asset/jquery-lazy": "^1.7"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

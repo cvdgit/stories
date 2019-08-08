@@ -11,6 +11,8 @@ use yii\helpers\Url;
 /* @var $commentForm frontend\models\CommentForm */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+\frontend\assets\LazyAsset::register($this);
+
 $title = $model->title;
 $this->setMetaTags($title,
                    $model->description,
@@ -81,6 +83,8 @@ if (Wikids2.showSwipeHelp()) {
     };
     toastr["info"]("Чтобы перейти к следующему слайду проведите пальцем справа-налево");
 }*/
+
+$(".lazy").Lazy();
 
 JS;
 $this->registerJs($js);
