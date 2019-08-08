@@ -25,6 +25,12 @@ $action = Url::to(['story/init-story-player', 'id' => $model->id]);
 /** @var $storyDefaultView string */
 $js = <<< JS
 
+$(".lazy").Lazy({
+    scrollDirection: "vertical",
+    effect: "fadeIn",
+    visibleOnly: true,
+});
+
 var defaultView = "$storyDefaultView";
 if ($("#story_wrapper").is(":visible")) {
     Wikids2.loadStory("$action");
