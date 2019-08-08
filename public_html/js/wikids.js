@@ -5,13 +5,23 @@ var Wikids2 = function($, storage) {
 
     "use strict";
 
+    var loaded = false;
+
     function loadStory(url) {
+        if (loaded) {
+            return;
+        }
         var num = parseInt(storage.getItem("user_story_views_number") || 0);
         $.get(url, {"num": num}).done(function(data) {
             $("#story-container").html(data);
             num += 1;
             storage.setItem("user_story_views_number", num);
+            loaded = true;
         });
+    }
+
+    function switchStoryView(view) {
+
     }
 
     return {

@@ -12,10 +12,20 @@ $form = ActiveForm::begin([
 echo $form->field($source, 'storyFile')->textInput(['readonly' => true]);
 echo $form->field($source, 'slidesNumber')->textInput(['readonly' => true]);
 echo $form->field($source, 'storyId')->hiddenInput()->label(false);
-echo Html::submitButton('Получить данные из PowerPoint', ['class' => 'btn btn-primary']);
-echo Html::a('Выгрузить файл', ['/story/download', 'id' => $story->id], ['class' => 'btn', 'style' => 'margin-left: 20px']);
+?>
+<div class="row">
+    <div class="col-lg-4 col-md-12">
+        <?= Html::submitButton('Получить данные', ['class' => 'btn btn-primary']) ?>
+    </div>
+    <div class="col-lg-4 col-md-12">
+        <?= Html::a('Выгрузить файл', ['/story/download', 'id' => $story->id], ['class' => 'btn']) ?>
+    </div>
+    <div class="col-lg-4 col-md-12">
+        <?= Html::a('Read only история', ['/story/readonly', 'id' => $story->id], ['class' => 'btn']) ?>
+    </div>
+</div>
+<?php
 ActiveForm::end();
-
 $js = <<< JS
 $('#{$form->getId()}')
   .on('beforeSubmit', storyOnBeforeSubmit)

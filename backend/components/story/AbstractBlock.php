@@ -1,10 +1,6 @@
 <?php
 
-
 namespace backend\components\story;
-
-
-use backend\models\editor\BaseForm;
 
 abstract class AbstractBlock
 {

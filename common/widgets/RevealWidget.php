@@ -25,6 +25,7 @@ class RevealWidget extends Widget
     protected $config = [
         'width' => 1280,
         'height' => 720,
+        'margin' => 0.01,
         'transition' => 'none',
         'backgroundTransition' => 'slide',
         'center' => false,
@@ -36,7 +37,7 @@ class RevealWidget extends Widget
         'history' => true,
         'mouseWheel' => false,
         'showNotes' => false,
-        'slideNumber' => true,
+        'slideNumber' => false,
         'shuffle' => false,
         'loop' => false,
         'hash' => true,

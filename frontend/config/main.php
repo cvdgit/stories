@@ -14,6 +14,7 @@ return [
     'bootstrap' => [
         'log',
         'common\bootstrap\Bootstrap',
+        'devicedetect',
     ],
     'controllerNamespace' => 'frontend\controllers',
     'components' => [
@@ -98,6 +99,9 @@ return [
             ],
         ],
         'queue' => $params['components.queue'],
+        'devicedetect' => [
+            'class' => 'alexandernst\devicedetect\DeviceDetect',
+        ],
     ],
     'params' => $params,
 ];

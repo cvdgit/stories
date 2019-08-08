@@ -1088,6 +1088,11 @@ section h2 span {
 
 .site-story-main {}
 
+.site-story-main h1 {
+  margin-top: 0;
+  padding-top: 0;
+}
+
 .story-no-subscription {
   display: flex;
   align-items: center;
@@ -1112,7 +1117,7 @@ section h2 span {
 }
 
 .story-description {
-  margin-bottom: 30px;
+  margin-bottom: 0;
   line-height: 2.4rem;
 }
 
@@ -1125,8 +1130,11 @@ section h2 span {
 }
 
 .story-description .story-text {
-  margin-top: 23px;
-  margin-bottom: 21px;
+  margin: 10px 0;
+}
+
+.story-tags {
+  font-size: 1.4rem;
 }
 
 .comment-logo {
@@ -1900,6 +1908,14 @@ section h2 span {
     margin: 0 40px;
   }
 
+/*  .story-description {
+    text-align: center;
+  }*/
+
+  .site-story-main h1 {
+    text-align: center;
+  }
+  
 }
 
 @media (max-width: 768px) {
@@ -1994,7 +2010,6 @@ button:focus {
 .story-container {
   position: relative;
   padding: 0;
-  background-color: #f0f4f9;
 }
 .story-container::before {
   content: '';
@@ -2007,9 +2022,39 @@ button:focus {
   left: 0;
   right: 0;
   top: 0;
-  bottom: 38px;
+  bottom: 0;
 }
+
 .story-loader {
   color: white;
   font-size: 3rem;
+}
+
+
+.slides-readonly {
+  line-height: 3rem;
+  font-size: 2rem;
+  padding: 0 15px;
+}
+
+.slides-readonly section {
+  padding: 10px 0;
+}
+
+.comments {
+  margin-top: 10px;
+}
+
+.story-view-mode {
+  font-size: 4rem;
+  text-align: center;
+}
+
+.story-view-mode a {
+  margin: 0 10px;
+}
+
+.story-view-mode a.active {
+  font-weight: bold;
+  color: #99cd50;
 }

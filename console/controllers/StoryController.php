@@ -4,8 +4,8 @@ namespace console\controllers;
 
 use backend\components\story\reader\HTMLReader;
 use backend\components\story\writer\HTMLWriter;
+use backend\services\StoryEditorService;
 use common\models\StorySlide;
-use http\Exception\RuntimeException;
 use yii\console\Controller;
 use common\models\Story;
 use common\components\StoryCover;
@@ -15,7 +15,15 @@ use yii\db\Query;
 class StoryController extends Controller
 {
 
-	public function actionMakeCovers()
+    protected $editorService;
+
+    public function __construct($id, $module, StoryEditorService $editorService, $config = [])
+    {
+        $this->editorService = $editorService;
+        parent::__construct($id, $module, $config);
+    }
+
+    public function actionMakeCovers()
 	{
 		$models = Story::find()->where('cover is not null')->all();
 		$this->stdout('Всего историй - ' . count($models) . PHP_EOL);
@@ -123,6 +131,18 @@ class StoryController extends Controller
             $model->status = StorySlide::STATUS_HIDDEN;
             $save = $model->save(false, ['status']);
             $this->stdout($row['id'] . ' - ' . $save . PHP_EOL);
+        }
+        $this->stdout('Done!' . PHP_EOL);
+    }
+
+    public function actionGenerateBookStoryHtml()
+    {
+        $models = Story::find()->published()->all();
+        foreach ($models as $model) {
+            $html = $this->editorService->generateBookStoryHtml($model);
+            $model->body = $html;
+            $model->save(false, ['body']);
+            $this->stdout($model->title . PHP_EOL);
         }
         $this->stdout('Done!' . PHP_EOL);
     }

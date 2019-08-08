@@ -146,7 +146,7 @@ class StoryController extends Controller
         $commentForm = new CommentForm($model->id);
         return $this->render('view', [
             'model' => $model,
-            'userCanViewStory' => UserPermissions::canViewStory($model),
+            'storyDefaultView' => $this->storyService->getDefaultStoryView(),
             'commentForm' => $commentForm,
             'dataProvider' => $dataProvider,
         ]);

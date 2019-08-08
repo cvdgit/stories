@@ -42,9 +42,9 @@ var RevealCustomControls = window.RevealCustomControls || (function() {
 	$controlsWrapper.addClass('story-controls');
 
 	$controlsWrapper.append($controls);
-	$controlsWrapper.appendTo('#story-container');
+	$controlsWrapper.appendTo('.reveal');
 
-	$controlsWrapper.append($rightControls);
+	//$controlsWrapper.append($rightControls);
 
 	var callback = Reveal.getConfig().customcontrols;
 	if (typeof callback === 'function') {

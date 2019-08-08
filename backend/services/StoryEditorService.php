@@ -12,6 +12,7 @@ use backend\models\editor\TextForm;
 use backend\models\editor\TransitionForm;
 use common\models\StorySlide;
 use yii;
+use yii\helpers\Html;
 use yii\web\UploadedFile;
 use common\models\Story;
 use common\services\StoryService;
@@ -121,6 +122,38 @@ class StoryEditorService
         $html = $writer->renderSlide($slide);
         $model->data = $html;
         return $model->save(false, ['data']);
+    }
+
+    public function generateBookStoryHtml(Story $model)
+    {
+        $reader = new HTMLReader($model->slidesData());
+        $story = $reader->load();
+        $html = '';
+        foreach ($story->getSlides() as $slide) {
+            $text = '';
+            $image = '';
+            foreach ($slide->getBlocks() as $block) {
+                if ($block->getType() === AbstractBlock::TYPE_TEXT) {
+                    $text = $block->getText();
+                }
+                if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
+                    $image = $block->getFilePath();
+                }
+            }
+            $content = '';
+            if ($text !== '' && $image !== '') {
+                $content = Html::tag('div', Html::img('{IMAGE}', ['width' => '100%', 'height' => '100%']), ['class' => 'col-lg-6']);
+                $content .= Html::tag('div', Html::tag('p', '{TEXT}'), ['class' => 'col-lg-6']);
+                $content = strtr($content, [
+                    '{IMAGE}' => $image,
+                    '{TEXT}' => $text,
+                ]);
+            }
+            if ($content !== '') {
+                $html .= Html::tag('section', Html::tag('div', $content, ['class' => 'row']));
+            }
+        }
+        return $html;
     }
 
 }

@@ -39,7 +39,8 @@
         "matperez/yii2unisender": "~1.0",
         "yiisoft/yii2-queue": "^2.2",
         "cebe/yii2-gravatar": "^1.0",
-        "vova07/yii2-imperavi-widget": "*"
+        "vova07/yii2-imperavi-widget": "*",
+        "alexandernst/yii2-device-detect": "^0.0.12"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

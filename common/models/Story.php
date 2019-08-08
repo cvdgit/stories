@@ -2,8 +2,10 @@
 
 namespace common\models;
 
+use backend\components\queue\GenerateBookStoryJob;
 use DomainException;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
+use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;

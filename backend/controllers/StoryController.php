@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use backend\models\AudioUploadForm;
 use backend\models\StoryBatchCommandForm;
+use backend\services\StoryEditorService;
 use Exception;
 use Yii;
 use yii\web\Controller;
@@ -24,11 +25,13 @@ class StoryController extends Controller
 {
     
     public $service;
+    protected $editorService;
 
-    public function __construct($id, $module, StoryService $service, $config = [])
+    public function __construct($id, $module, StoryService $service, StoryEditorService $editorService, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->service = $service;
+        $this->editorService = $editorService;
     }
 
     public function behaviors()
@@ -297,6 +300,16 @@ class StoryController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
         $form = new AudioUploadForm($id);
         return ['success' => $form->deleteAudioFile($file)];
+    }
+
+    public function actionReadonly(int $id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $model = Story::findModel($id);
+        $html = $this->editorService->generateBookStoryHtml($model);
+        $model->body = $html;
+        $model->save(false, ['body']);
+        return ['success' => true];
     }
 
 }

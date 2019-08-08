@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use backend\components\queue\GenerateBookStoryJob;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Query;
@@ -106,6 +107,16 @@ class StorySlide extends \yii\db\ActiveRecord
             ->orderBy(['number' => SORT_ASC])
             ->limit(1)
             ->one();
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        if (isset($changedAttributes['data']) && $changedAttributes['data'] !== $this->data) {
+            Yii::$app->queue->push(new GenerateBookStoryJob([
+                'storyID' => $this->story_id,
+            ]));
+        }
+        parent::afterSave($insert, $changedAttributes);
     }
 
 }

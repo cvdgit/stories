@@ -1,42 +1,42 @@
 
 .story-controls {
-    height: 38px;
-    position: relative;
-/*    background: transparent;
-    position: absolute;*/
-/*    left: 0;
-    bottom: 2px;*/
-    width: 100%;
+    height: 40px;
+    position: absolute;
     z-index: 1;
     text-align: center;
+    display: block;
+    right: 30px;
+    bottom: 12px;
+    left: auto;
+    top: auto;
 }
 
 .customcontrols {
-    /*position: absolute;*/
-    /*top: 0;
+/*    position: absolute;
+    top: 0;
     right: 40px;*/
     z-index: 9999;
     pointer-events: none;
-    font-size: 10px !important;
+    font-size: 1rem !important;
     display: inline-block;
 }
 
 .customcontrols button {
     position: relative;
-    width: 3.6em;
-    height: 3.6em;
+    width: 4em;
+    height: 4em;
     padding: 0;
     background-color: transparent;
     border: 0;
     outline: 0;
     cursor: pointer;
-    color: #000000;
+    color: #ffffff;
     z-index: 99999;
     pointer-events: auto;
 }
 
 .customcontrols button i {
-    font-size: 2.5rem;
+    font-size: 3rem;
 }
 
 .customcontrols .custom-navigate-left {
@@ -62,4 +62,23 @@
     position: absolute;
     right: 30px;
     top: 0;
+}
+
+
+@media (max-width: 768px) {
+
+    .story-controls {
+        height: 36px;
+    }
+
+    .customcontrols button {
+        position: relative;
+        width: 2.5em;
+        height: 3.5em;
+    }
+
+    .customcontrols button i {
+        font-size: 2.5rem;
+        line-height: 2.5rem;
+    }
 }
