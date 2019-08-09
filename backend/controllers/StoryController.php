@@ -312,4 +312,12 @@ class StoryController extends Controller
         return ['success' => true];
     }
 
+    public function actionText(int $id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $model = Story::findModel($id);
+        $text = $this->editorService->textFromStory($model);
+        Yii::$app->response->sendContentAsFile($text, $model->alias. '.txt');
+    }
+
 }

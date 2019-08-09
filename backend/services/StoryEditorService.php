@@ -156,4 +156,22 @@ class StoryEditorService
         return $html;
     }
 
+    public function textFromStory(Story $model)
+    {
+        $reader = new HTMLReader($model->slidesData());
+        $story = $reader->load();
+        $text = [];
+        foreach ($story->getSlides() as $slide) {
+            foreach ($slide->getBlocks() as $block) {
+                if ($block->getType() === AbstractBlock::TYPE_TEXT) {
+                    $text[] = $block->getText();
+                }
+                if ($block->getType() === AbstractBlock::TYPE_HEADER) {
+                    $text[] = $block->getText();
+                }
+            }
+        }
+        return implode(PHP_EOL, $text);
+    }
+
 }

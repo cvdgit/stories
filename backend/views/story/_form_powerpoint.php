@@ -1,5 +1,6 @@
 <?php
 
+use yii\bootstrap\Dropdown;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -17,11 +18,19 @@ echo $form->field($source, 'storyId')->hiddenInput()->label(false);
     <div class="col-lg-4 col-md-12">
         <?= Html::submitButton('Получить данные', ['class' => 'btn btn-primary']) ?>
     </div>
-    <div class="col-lg-4 col-md-12">
-        <?= Html::a('Выгрузить файл', ['/story/download', 'id' => $story->id], ['class' => 'btn']) ?>
-    </div>
-    <div class="col-lg-4 col-md-12">
-        <?= Html::a('Read only история', ['/story/readonly', 'id' => $story->id], ['class' => 'btn']) ?>
+    <div class="col-lg-8 col-md-12">
+        <div class="dropdown">
+            <a href="#" data-toggle="dropdown" class="dropdown-toggle btn">Действия <b class="caret"></b></a>
+            <?php
+            echo Dropdown::widget([
+                'items' => [
+                    ['label' => 'Выгрузить файл', 'url' => ['/story/download', 'id' => $story->id]],
+                    ['label' => 'Read only история', 'url' => ['/story/readonly', 'id' => $story->id], 'linkOptions' => ['id' => 'readonly-story']],
+                    ['label' => 'Текст истории', 'url' => ['/story/text', 'id' => $story->id]],
+                ],
+            ]);
+            ?>
+        </div>
     </div>
 </div>
 <?php
@@ -32,5 +41,17 @@ $('#{$form->getId()}')
   .on('submit', function(e) {
     e.preventDefault();
   });
+
+$("#readonly-story").on("click", function(e) {
+    e.preventDefault();
+    $.get($(this).attr("href")).done(function(data) {
+        if (data && data.success) {
+            toastr.success("Успешно");
+        }
+        else {
+            toastr.error("Ошибка");
+        }
+    });
+});
 JS;
 $this->registerJs($js);
