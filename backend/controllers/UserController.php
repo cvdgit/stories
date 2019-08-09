@@ -55,7 +55,7 @@ class UserController extends Controller
             'query' => User::find(),
             'sort' => [
                 'defaultOrder' => [
-                    'created_at' => SORT_DESC,
+                    'last_activity' => SORT_DESC,
                 ],
             ],
             'pagination' => [

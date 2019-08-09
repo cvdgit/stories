@@ -20,7 +20,7 @@ $this->title = 'Пользователи';
     'options' => ['class' => 'table-responsive'],
     'columns' => [
         'id',
-        'username',
+        'last_activity:datetime',
         'email:email',
         'created_at:datetime',
         [

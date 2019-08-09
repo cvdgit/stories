@@ -25,6 +25,7 @@ use yii\web\IdentityInterface;
  * @property integer $updated_at
  * @property string $password write-only password
  * @property string $image
+ * @property integer last_activity
  *
  * @property Comment[] $comments
  * @property Payment[] $payments
@@ -350,6 +351,13 @@ class User extends ActiveRecord implements IdentityInterface
         $profile->first_name = $firstName;
         $profile->last_name = $lastName;
         return $profile;
+    }
+
+    public static function updateLastActivity()
+    {
+        if (!Yii::$app->user->isGuest) {
+            self::updateAll(['last_activity' => time()], 'id = :id', [':id' => Yii::$app->user->id]);
+        }
     }
 
 }

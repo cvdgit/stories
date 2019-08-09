@@ -17,6 +17,9 @@ return [
         'devicedetect',
     ],
     'controllerNamespace' => 'frontend\controllers',
+    'on beforeAction' => function($event) {
+        \common\models\User::updateLastActivity();
+    },
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-wikids',
