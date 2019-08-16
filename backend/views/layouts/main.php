@@ -60,6 +60,7 @@ AppAsset::register($this);
                         ['label' => 'Комментарии', 'url' => ['/comment/index']],
                         ['label' => 'Подписки', 'url' => ['/rate/index']],
                         ['label' => 'Блог', 'url' => ['/news/admin', 'status' => \common\models\News::STATUS_PROPOSED], 'active' => Yii::$app->controller->id === 'news'],
+                        ['label' => 'Тесты', 'url' => ['/test/index']],
                     ],
                 ]) ?>
                 <?php endif ?>

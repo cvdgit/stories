@@ -1692,3 +1692,53 @@
 .reveal .sl-block .sl-block-content a.btn {
 	padding: 2rem 2rem;
 }
+
+.wikids-test {
+
+}
+
+.wikids-test-header {
+
+}
+
+.wikids-test-header h3 {
+	font-size: 4rem;
+}
+
+.wikids-test-header p {
+	font-size: 2rem;
+}
+
+.wikids-test-questions {
+	margin-top: 20px;
+	margin-left: 20%;
+	margin-right: 20%;
+	text-align: left;
+}
+
+.wikids-test-answers {
+	margin-top: 10px;
+}
+
+.wikids-test-answer {
+	padding: 10px;
+	cursor: pointer;
+}
+
+.wikids-test-answer:hover {
+	background-color: #eeeeee;
+}
+
+.wikids-test-answer label,
+.wikids-test-answer img {
+	margin-left: 20px;
+	margin-bottom: 0;
+}
+
+.wikids-test-answer input {
+	float: left;
+}
+
+.wikids-test-results p {
+	margin: 100px 0;
+}

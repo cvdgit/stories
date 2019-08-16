@@ -3,16 +3,18 @@
 namespace frontend\controllers;
 
 use common\models\StorySlide;
+use common\models\StoryTest;
+use common\models\StoryTestResult;
 use common\rbac\UserPermissions;
 use common\services\story\CountersService;
 use common\services\StoryFavoritesService;
 use common\services\StoryLikeService;
+use common\services\StoryTestService;
 use frontend\models\StoryFavoritesSearch;
 use frontend\models\StoryLikeForm;
 use frontend\models\StoryLikeSearch;
 use frontend\models\UserStorySearch;
 use Yii;
-use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use common\models\Story;
@@ -52,6 +54,7 @@ class StoryController extends Controller
     protected $countersService;
     protected $likeService;
     protected $favoritesService;
+    protected $testService;
 
     public function __construct($id,
                                 $module,
@@ -59,13 +62,15 @@ class StoryController extends Controller
                                 CountersService $countersService,
                                 StoryLikeService $likeService,
                                 StoryFavoritesService $favoritesService,
+                                StoryTestService $testService,
                                 $config = [])
     {
-        parent::__construct($id, $module, $config);
         $this->storyService = $storyService;
         $this->countersService = $countersService;
         $this->likeService = $likeService;
         $this->favoritesService = $favoritesService;
+        $this->testService = $testService;
+        parent::__construct($id, $module, $config);
     }
 
     public function actionIndex()
@@ -201,6 +206,25 @@ class StoryController extends Controller
             $html = implode("\n", $slides);
         }
         return ['html' => $html];
+    }
+
+    public function actionGetStoryTest(int $id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return ['json' => StoryTest::find()->where('id = :id', [':id' => $id])->with('storyTestQuestions.storyTestAnswers')->asArray()->all()];
+    }
+
+    public function actionStoreTestResult(int $test_id, int $correct_answers)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        if (!Yii::$app->user->isGuest) {
+            $model = new StoryTestResult();
+            $model->story_test_id = $test_id;
+            $model->user_id = Yii::$app->user->id;
+            $model->correct_answer = $correct_answers;
+            $model->save();
+        }
+        return ['success' => true];
     }
 
     public function actionInitStoryPlayer(int $id, int $num)

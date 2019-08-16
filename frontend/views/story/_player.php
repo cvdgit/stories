@@ -22,6 +22,7 @@ $plugins = [
     ['class' => \common\widgets\Reveal\Plugins\Feedback::class, 'storyID' => $model->id],
     ['class' => \common\widgets\Reveal\Plugins\Statistics::class, 'storyID' => $model->id],
     ['class' => \common\widgets\Reveal\Plugins\Transition::class, 'storyID' => $model->id],
+    ['class' => \common\widgets\Reveal\Plugins\Test::class, 'storyID' => $model->id],
     ['class' => \common\widgets\Reveal\Plugins\Background::class],
 ];
 

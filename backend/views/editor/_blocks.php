@@ -26,6 +26,11 @@ $options = [
                 'url' => '#',
                 'linkOptions' => ['onclick' => "StoryEditor.createBlock('text'); return false;"],
             ],
+            [
+                'label' => 'Тест',
+                'url' => '#',
+                'linkOptions' => ['onclick' => "StoryEditor.createBlock('test'); return false;"],
+            ],
         ],
     ]
 ];

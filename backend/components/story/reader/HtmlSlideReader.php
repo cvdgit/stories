@@ -8,6 +8,7 @@ use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
 use backend\components\story\ImageBlock;
 use backend\components\story\Slide;
+use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
 use backend\components\story\TransitionBlock;
 
@@ -52,6 +53,9 @@ class HtmlSlideReader implements ReaderInterface
                     break;
                 case AbstractBlock::TYPE_TRANSITION:
                     $this->loadBlockTransition($htmlBlock);
+                    break;
+                case AbstractBlock::TYPE_TEST:
+                    $this->loadBlockTest($htmlBlock);
                     break;
                 default:
             }
@@ -155,6 +159,24 @@ class HtmlSlideReader implements ReaderInterface
         $block->setFontSize($this->getStyleValue($style, 'font-size'));
         $block->setTransitionStoryId(pq($htmlBlock)->find('button')->attr('data-story-id'));
         $block->setSlides(pq($htmlBlock)->find('button')->attr('data-slides'));
+        $this->slide->addBlock($block);
+    }
+
+    protected function loadBlockTest($htmlBlock): void
+    {
+        $block = new TestBlock();
+        $block->setType(AbstractBlock::TYPE_TEST);
+
+        $element = pq($htmlBlock);
+
+        $this->loadBlockProperties($block, $element->attr('style'));
+
+        $block->setText(pq($htmlBlock)->find('button')->html());
+        $block->setId(pq($htmlBlock)->attr('data-block-id'));
+
+        $style = pq($htmlBlock)->find('button')->attr('style');
+        $block->setFontSize($this->getStyleValue($style, 'font-size'));
+        $block->setTestId(pq($htmlBlock)->find('button')->attr('data-test-id'));
         $this->slide->addBlock($block);
     }
 

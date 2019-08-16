@@ -15,6 +15,7 @@ class WikidsRevealAsset extends AssetBundle
     ];
     public $js = [
         'js/player/player.js',
+        'js/wikids-story-test.js',
     ];
     public $depends = [
         RevealAsset::class

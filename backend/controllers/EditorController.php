@@ -5,12 +5,14 @@ namespace backend\controllers;
 use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
 use backend\components\story\reader\HtmlSlideReader;
+use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
 use backend\components\story\TransitionBlock;
 use backend\components\story\writer\HTMLWriter;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
 use backend\models\editor\SlideSourceForm;
+use backend\models\editor\TestForm;
 use backend\models\editor\TextForm;
 use backend\models\editor\TransitionForm;
 use common\models\StorySlide;
@@ -21,7 +23,6 @@ use common\models\Story;
 use common\services\StoryService;
 use common\rbac\UserRoles;
 use backend\services\StoryEditorService;
-use backend\components\StoryEditor;
 use yii\web\Controller;
 use yii\web\Response;
 
@@ -129,6 +130,17 @@ class EditorController extends Controller
         return $form->getErrors();
     }
 
+    public function actionUpdateTest()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $form = new TestForm();
+        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+            $this->editorService->updateBlock($form);
+            return ['success' => true];
+        }
+        return $form->getErrors();
+    }
+
     /**
      * @param int $story_id
      * @param int $slide_index
@@ -167,6 +179,10 @@ class EditorController extends Controller
                 'class' => TransitionForm::class,
                 'view' => '_transition_form',
             ],
+            AbstractBlock::TYPE_TEST => [
+                'class' => TestForm::class,
+                'view' => '_test_form',
+            ],
         ];
         if (!isset($types[$block_type])) {
             throw new DomainException($block_type . ' - Unknown block type');
@@ -197,6 +213,9 @@ class EditorController extends Controller
             ],
             AbstractBlock::TYPE_TEXT => [
                 'class' => TextBlock::class,
+            ],
+            AbstractBlock::TYPE_TEST => [
+                'class' => TestBlock::class,
             ],
         ];
         if (!isset($types[$block_type])) {
