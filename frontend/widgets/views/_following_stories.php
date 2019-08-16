@@ -23,7 +23,7 @@ use yii\helpers\Url;
                     <div class="story-item-caption">
                         <p class="flex-text"></p>
                         <p>
-                            <span class="story-item-name"><?= Html::encode($model->title) ?></span>
+                            <h3 class="story-item-name"><?= Html::encode($model->title) ?><?= $model->isAudioStory() ? '<i class="glyphicon glyphicon-volume-up"></i>' : '' ?></h3>
                             <?php if (!Yii::$app->user->isGuest): ?>
                             <span class="story-item-pay"><?= $model->bySubscription() ? 'По подписке' : 'Бесплатно' ?></span>
                             <?php endif ?>

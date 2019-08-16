@@ -15,7 +15,9 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
     <div class="container">
         <div class="text-center">
             <div class="row">
-                <div class="col-md-6 col-md-offset-3"><h3>Не знаете какую историю показать ребенку?</h3></div>
+                <div class="col-md-6 col-md-offset-3">
+                    <p class="random-story-text">Не знаете какую историю показать ребенку?</p>
+                </div>
             </div>
             <!--div class="row">
                 <div class="col-lg-12">
@@ -41,7 +43,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                         <div class="category-item-image-wrapper">
                             <img src="/img/category_2_mini.jpg" alt="">
                         </div>
-                        <h4>Древнегреческие мифы</h4>
+                        <h3>Древнегреческие мифы</h3>
                     </a>
                 </div>
             </div>
@@ -51,7 +53,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                         <div class="category-item-image-wrapper">
                             <img src="/img/category_1_mini.jpg" alt="">
                         </div>
-                        <h4>Русские сказки и былины</h4>
+                        <h3>Русские сказки и былины</h3>
                     </a>
                 </div>
             </div>
@@ -61,7 +63,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                         <div class="category-item-image-wrapper">
                             <img src="/img/category_3_mini.jpg" alt="">
                         </div>
-                        <h4>Познавательные</h4>
+                        <h3>Познавательные</h3>
                     </a>
                 </div>
             </div>
@@ -71,7 +73,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                         <div class="category-item-image-wrapper">
                             <img src="/img/category_4_mini.jpg" alt="">
                         </div>
-                        <h4>Алтайские народные сказки</h4>
+                        <h3>Алтайские народные сказки</h3>
                     </a>
                 </div>
             </div>

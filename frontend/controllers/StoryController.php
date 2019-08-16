@@ -76,10 +76,10 @@ class StoryController extends Controller
     public function actionIndex()
     {
         $this->getView()->setMetaTags(
-            'Каталог историй',
-            'Каталог историй',
-            'wikids, сказки, истории, каталог историй',
-            'Каталог историй'
+            'Истории для детей',
+            'Истории для детей',
+            'Истории для детей, wikids, сказки, истории',
+            'Истории для детей'
         );
         $searchModel = new StorySearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);

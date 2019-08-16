@@ -172,7 +172,7 @@ $isBookView = $storyDefaultView === 'book';
                 </div>
                 <div class="col-md-3">
                     <div class="following-stories">
-                        <h3>Смотрите также:</h3>
+                        <h2>Смотрите также:</h2>
                         <?= \frontend\widgets\FollowingStories::widget(['storyID' => $model->id]) ?>
                     </div>
                 </div>

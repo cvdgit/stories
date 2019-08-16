@@ -165,7 +165,7 @@ section h2 span {
 
 .site-main-menu {
   display: inline-block;
-  font-size: .83em;
+  font-size: 1em;
 }
 
 .site-main-menu li {
@@ -493,7 +493,9 @@ section h2 span {
   height: auto;
 }
 
-.story-list .story-item span {
+.story-list .story-item span,
+.story-list .story-item h2,
+.story-list .story-item h3 {
   display: block;
   text-align: center;
 }
@@ -502,6 +504,9 @@ section h2 span {
   font-size: 1em;
   color: #38405d;
   margin-bottom: 6px;
+  margin-top: 0;
+  line-height: 1;
+  font-weight: normal;
 }
 
 .story-list .story-item .story-item-pay {
@@ -1685,6 +1690,10 @@ section h2 span {
   display: none;
 }
 
+.site-sidebar-wrapper h2 {
+  font-size: 2rem;
+}
+
 @media (max-width: 1200px) {
 
   .site-header img.site-logo {
@@ -1986,12 +1995,18 @@ button:focus {
   width: 100%;
 }
 
-.following-stories h3 {
+.following-stories h2 {
   margin-top: 0;
 }
 
 .random-story {
   padding: 30px 0;
+}
+
+.random-story-text {
+  font-size: 3rem;
+  font-weight: 500;
+  line-height: 2;
 }
 
 /*

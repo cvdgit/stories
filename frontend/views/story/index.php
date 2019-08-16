@@ -36,7 +36,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 </div>
                 <?php ActiveForm::end(); ?>
                 <?php if (!Yii::$app->user->isGuest): ?>
-                <h4>Личное</h4>
+                <h2>Личное</h2>
                 <?= Menu::widget([
                     'items' => [
                             ['label' => 'История просмотра', 'url' => ['/story/history']],
@@ -46,7 +46,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                     'options' => ['class' => 'story-category-list'],
                 ]) ?>
                 <?php endif ?>
-                <h4>Категории</h4>
+                <h2>Категории</h2>
                 <?= Menu::widget([
                     'items' => [
                         ['label' => 'Сказки на ночь', 'url' => ['/story/bedtime-stories']],
@@ -58,7 +58,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                   'submenuTemplate' => "\n<ul class=\"story-category-list story-sub-category-list\">\n{items}\n</ul>\n",
                   'options' => ['class' => 'story-category-list'],
                 ]) ?>
-                <h4>Облако тегов</h4>
+                <h2>Облако тегов</h2>
                 <!--noindex-->
                 <?= TagCloud::widget([
                     'beginColor' => '38405d',
