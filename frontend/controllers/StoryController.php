@@ -341,4 +341,23 @@ class StoryController extends Controller
         ]);
     }
 
+    public function actionAudioStories()
+    {
+        $this->getView()->setMetaTags(
+            'Аудио истории для детей',
+            'Аудио истории для детей',
+            'Аудио истории для детей, сказки, истории, wikids',
+            'Аудио истории для детей'
+        );
+        $searchModel = new StorySearch();
+        $searchModel->audio = 1;
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'action' => ['/story/index'],
+            'emptyText' => 'Список историй пуст',
+        ]);
+    }
+
 }

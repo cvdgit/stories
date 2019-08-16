@@ -192,7 +192,6 @@ class Category extends ActiveRecord
             return $item;
         });
 
-        $items = array_merge($rootItem, $items);
         return $items;
     }
 

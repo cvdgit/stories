@@ -2073,3 +2073,15 @@ button:focus {
   font-weight: bold;
   color: #99cd50;
 }
+
+.story-popular-categories {
+  margin: 20px 0;
+}
+
+.story-popular-categories a {
+  font-weight: 500;
+}
+
+.story-popular-categories li.active a {
+  color: #99cd50;
+}

@@ -39,7 +39,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 <h2>Личное</h2>
                 <?= Menu::widget([
                     'items' => [
-                            ['label' => 'История просмотра', 'url' => ['/story/history']],
+                        ['label' => 'История просмотра', 'url' => ['/story/history']],
                         ['label' => 'Понравившиеся', 'url' => ['/story/liked']],
                         ['label' => 'Избранное', 'url' => ['/story/favorites']],
                     ],
@@ -48,15 +48,9 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 <?php endif ?>
                 <h2>Категории</h2>
                 <?= Menu::widget([
-                    'items' => [
-                        ['label' => 'Сказки на ночь', 'url' => ['/story/bedtime-stories']],
-                    ],
+                    'items' => Category::getCategoriesForMenu(),
+                    'submenuTemplate' => "\n<ul class=\"story-category-list story-sub-category-list\">\n{items}\n</ul>\n",
                     'options' => ['class' => 'story-category-list'],
-                ]) ?>
-                <?= Menu::widget([
-                  'items' => Category::getCategoriesForMenu(),
-                  'submenuTemplate' => "\n<ul class=\"story-category-list story-sub-category-list\">\n{items}\n</ul>\n",
-                  'options' => ['class' => 'story-category-list'],
                 ]) ?>
                 <h2>Облако тегов</h2>
                 <!--noindex-->
@@ -75,7 +69,17 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
             </div>
         </nav>
         <main class="col-xs-12 col-sm-12 col-md-12 col-lg-9 site-main" style="margin-top: 0">
-            <h1 style="margin-top: 6px; margin-bottom: 33px"><?= $this->getHeader() ?></h1>
+            <h1 style="margin-top: 6px; margin-bottom: 20px"><?= $this->getHeader() ?></h1>
+            <div class="story-popular-categories">
+                <?= Menu::widget([
+                    'items' => [
+                        ['label' => '#ИсторииДляДетей', 'url' => ['/story/index']],
+                        ['label' => '#АудиоИстории', 'url' => ['/story/audio-stories'], 'active' => Yii::$app->controller->id === 'story' && Yii::$app->controller->action->id === 'audio-stories'],
+                        ['label' => '#СказкиНаНочь', 'url' => ['/story/bedtime-stories'], 'active' => Yii::$app->controller->id === 'story' && Yii::$app->controller->action->id === 'bedtime-stories'],
+                    ],
+                    'options' => ['class' => 'list-inline'],
+                ]) ?>
+            </div>
             <?php
             $layout = '<div class="story-list-filter clearfix">
                          {summary}

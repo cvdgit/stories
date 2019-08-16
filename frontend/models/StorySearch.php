@@ -16,12 +16,13 @@ class StorySearch extends Model
     public $description;
     public $category_id;
     public $tag_id;
+    public $audio;
 
     public function rules()
     {
         return [
             [['title', 'description'], 'string'],
-            [['tag_id'], 'integer'],
+            [['tag_id', 'audio'], 'integer'],
             ['category_id', 'each', 'rule' => ['integer']],
         ];
     }
@@ -81,6 +82,7 @@ class StorySearch extends Model
         ]);
         $query->andFilterWhere(['tag.id' => $this->tag_id]);
         $query->andFilterWhere(['in', 'category.id', $this->category_id]);
+        $query->andFilterWhere(['audio' => $this->audio]);
 
         return $dataProvider;
     }
