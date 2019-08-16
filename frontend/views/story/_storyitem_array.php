@@ -18,7 +18,7 @@ use common\components\StoryCover;
             <div class="story-item-caption">
                 <p class="flex-text"></p>
                 <p>
-                    <h3 class="story-item-name"><?= Html::encode($model['title']) ?><?= (int)$model['audio'] === 1 ? '<i class="glyphicon glyphicon-volume-up"></i>' : '' ?></h3>
+                    <h3 class="story-item-name"><?= Html::encode($model['title']) ?><?= (int)$model['audio'] === 1 ? ' <i title="В истории доступна озвучка" class="glyphicon glyphicon-volume-up"></i>' : '' ?></h3>
                     <?php if ((int)$model['sub_access'] === 1): ?>
                     <span class="story-item-pay">По подписке</span>
                     <?php endif ?>
