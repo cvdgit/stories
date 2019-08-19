@@ -1742,3 +1742,7 @@
 .wikids-test-results p {
 	margin: 100px 0;
 }
+
+.sl-block[data-block-type=text] p {
+	padding: 0 10px;
+}
