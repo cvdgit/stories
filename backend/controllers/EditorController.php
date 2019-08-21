@@ -65,22 +65,26 @@ class EditorController extends Controller
 		]);
 	}
 
-    public function actionGetSlideByIndex(int $story_id, int $slide_index = -1)
+    public function actionLoadSlide(int $story_id, int $slide_id = -1)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        if ($slide_index === -1) {
+        if ($slide_id === -1) {
             $model = StorySlide::findFirstSlide($story_id);
         }
         else {
-            $model = StorySlide::findSlide($story_id, $slide_index);
+            $model = StorySlide::findSlide($slide_id);
+        }
+        if ($model->isLink()) {
+            $linkSlide = StorySlide::findSlideByID($model->link_slide_id);
+            $model->data = $linkSlide->data;
         }
         return $model;
     }
 
-    public function actionGetSlideBlocks(int $story_id, int $slide_index)
+    public function actionSlideBlocks(int $slide_id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $model = StorySlide::findSlide($story_id, $slide_index);
+        $model = StorySlide::findSlide($slide_id);
         $reader = new HtmlSlideReader($model->data);
         $slide = $reader->load();
         return $slide->getBlocksArray();
@@ -141,18 +145,11 @@ class EditorController extends Controller
         return $form->getErrors();
     }
 
-    /**
-     * @param int $story_id
-     * @param int $slide_index
-     * @param string $block_id
-     * @return string
-     * @throws yii\base\InvalidConfigException
-     */
-    public function actionForm(int $story_id, int $slide_index, string $block_id)
+    public function actionForm(int $slide_id, string $block_id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        $model = StorySlide::findSlide($story_id, $slide_index);
+        $model = StorySlide::findSlide($slide_id);
         $reader = new HtmlSlideReader($model->data);
         $slide = $reader->load();
         $block = $slide->findBlockByID($block_id);
@@ -189,8 +186,7 @@ class EditorController extends Controller
         }
 
         $form = Yii::createObject($types[$block_type]);
-        $form->story_id = $model->story_id;
-        $form->slide_index = $slide_index;
+        $form->slide_id = $model->id;
         $form->block_id = $block_id;
         $values = $block->getValues();
         $form->load($values, '');
@@ -200,7 +196,7 @@ class EditorController extends Controller
         ]);
     }
 
-    public function actionCreateBlock(int $story_id, int $slide_index, string $block_type)
+    public function actionCreateBlock(int $slide_id, string $block_type)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
@@ -222,7 +218,7 @@ class EditorController extends Controller
             throw new DomainException($block_type . ' - Unknown block type');
         }
 
-        $model = StorySlide::findSlide($story_id, $slide_index);
+        $model = StorySlide::findSlide($slide_id);
         $reader = new HtmlSlideReader($model->data);
         $slide = $reader->load();
 
@@ -238,24 +234,36 @@ class EditorController extends Controller
         return ['success' => true];
     }
 
-    public function actionCreateSlide(int $story_id)
+    public function actionCreateSlide(int $story_id, int $current_slide_id = -1)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $slideNumber = $this->editorService->createSlide($story_id);
-        return ['success' => true, 'slideNumber' => $slideNumber];
+        $slideNumber = $this->editorService->createSlide($story_id, $current_slide_id);
+        return ['success' => true, 'id' => $slideNumber];
     }
 
-    public function actionDeleteBlock(int $story_id, int $slide_index, string $block_id)
+    public function actionCreateSlideLink(int $story_id, int $link_slide_id, int $current_slide_id = -1)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $this->editorService->deleteBlock($story_id, $slide_index, $block_id);
+        try {
+            $linkSlideID = $this->editorService->createSlideLink($story_id, $link_slide_id, $current_slide_id);
+        }
+        catch (\Exception $ex) {
+            return ['success' => false, 'error' => $ex->getMessage()];
+        }
+        return ['success' => true, 'id' => $linkSlideID];
+    }
+
+    public function actionDeleteBlock(int $slide_id, string $block_id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $this->editorService->deleteBlock($slide_id, $block_id);
         return ['success' => true];
     }
 
-    public function actionDeleteSlide(int $story_id, int $slide_index)
+    public function actionDeleteSlide(int $slide_id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $this->editorService->deleteSlide($story_id, $slide_index);
+        $this->editorService->deleteSlide($slide_id);
         return ['success' => true];
     }
 
@@ -267,14 +275,16 @@ class EditorController extends Controller
             return [
                 'id' => $slide->id,
                 'slideNumber' => $slide->number,
+                'isLink' => $slide->is_link,
+                'linkSlideID' => $slide->link_slide_id,
             ];
         }, $model->storySlides);
     }
 
-    public function actionSlideVisible(int $story_id, int $slide_index)
+    public function actionSlideVisible(int $slide_id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $model = StorySlide::findSlide($story_id, $slide_index);
+        $model = StorySlide::findSlide($slide_id);
         if ($model->status === StorySlide::STATUS_VISIBLE) {
             $model->status = StorySlide::STATUS_HIDDEN;
         }
@@ -285,9 +295,9 @@ class EditorController extends Controller
         return ['success' => true, 'status' => $model->status];
     }
 
-    public function actionSlideSource(int $story_id, int $slide_index)
+    public function actionSlideSource(int $slide_id)
     {
-        $model = new SlideSourceForm($story_id, $slide_index);
+        $model = new SlideSourceForm($slide_id);
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             $model->saveSlideSource();
         }

@@ -3,6 +3,7 @@
 namespace common\models;
 
 use backend\components\queue\GenerateBookStoryJob;
+use DomainException;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Query;
@@ -17,6 +18,8 @@ use yii\db\Query;
  * @property int $status
  * @property int $created_at
  * @property int $updated_at
+ * @property int $is_link
+ * @property int $link_slide_id
  *
  * @property Story $story
  */
@@ -25,6 +28,8 @@ class StorySlide extends \yii\db\ActiveRecord
 
     const STATUS_VISIBLE = 1;
     const STATUS_HIDDEN = 2;
+
+    const IS_LINK = 1;
 
     /**
      * {@inheritdoc}
@@ -48,7 +53,7 @@ class StorySlide extends \yii\db\ActiveRecord
     {
         return [
             [['story_id', 'data', 'number'], 'required'],
-            [['story_id', 'number', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['story_id', 'number', 'status', 'created_at', 'updated_at', 'is_link', 'link_slide_id'], 'integer'],
             [['data'], 'string'],
             [['story_id'], 'exist', 'skipOnError' => true, 'targetClass' => Story::class, 'targetAttribute' => ['story_id' => 'id']],
         ];
@@ -78,14 +83,6 @@ class StorySlide extends \yii\db\ActiveRecord
         return $this->hasOne(Story::class, ['id' => 'story_id']);
     }
 
-    public static function findSlide(int $storyID, int $slideNumber)
-    {
-        return self::find()
-            ->where('story_id = :story', [':story' => $storyID])
-            ->andWhere('number = :number', [':number' => $slideNumber])
-            ->one();
-    }
-
     public static function createSlide(int $storyID)
     {
         $slide = new self();
@@ -94,10 +91,33 @@ class StorySlide extends \yii\db\ActiveRecord
         return $slide;
     }
 
-    public static function deleteSlide(int $storyID, int $slideNumber)
+    public static function createSlideLink(int $storyID, int $linkSlideID)
     {
-        $slide = self::findSlide($storyID, $slideNumber);
+        $slide = new self();
+        $slide->story_id = $storyID;
+        $slide->is_link = self::IS_LINK;
+        $slide->number = (new Query())->from(self::tableName())->where('story_id = :story', [':story' => $storyID])->max('number') + 1;
+        $slide->link_slide_id = $linkSlideID;
+        return $slide;
+    }
+
+    public static function deleteSlide(int $slideID)
+    {
+        $slide = self::findSlide($slideID);
         return $slide->delete();
+    }
+
+    public static function findSlideByID(int $slideID)
+    {
+        return self::findOne($slideID);
+    }
+
+    public static function findSlide(int $id)
+    {
+        if (($model = self::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new DomainException('Слайд не найден.');
     }
 
     public static function findFirstSlide(int $storyID)
@@ -117,6 +137,11 @@ class StorySlide extends \yii\db\ActiveRecord
             ]));
         }
         parent::afterSave($insert, $changedAttributes);
+    }
+
+    public function isLink()
+    {
+        return (int)$this->is_link === self::IS_LINK;
     }
 
 }

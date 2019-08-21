@@ -21,8 +21,7 @@ $form = ActiveForm::begin([
     </div>
 <?php
 echo $form->field($model, 'image')->fileInput();
-echo $form->field($model, 'story_id')->hiddenInput()->label(false);
-echo $form->field($model, 'slide_index')->hiddenInput()->label(false);
+echo $form->field($model, 'slide_id')->hiddenInput()->label(false);
 echo $form->field($model, 'block_id')->hiddenInput()->label(false);
 echo Html::submitButton('Сохранить', ['class' => 'btn btn-primary']);
 ActiveForm::end();

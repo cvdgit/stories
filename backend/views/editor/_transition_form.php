@@ -28,8 +28,7 @@ $form = ActiveForm::begin([
     <div class="col-xs-6"><?= $form->field($model, 'slides')->textInput()->hint('Пример: 1,2,3-10,12,15') ?></div>
 </div>
 <?php
-echo $form->field($model, 'story_id')->hiddenInput()->label(false);
-echo $form->field($model, 'slide_index')->hiddenInput()->label(false);
+echo $form->field($model, 'slide_id')->hiddenInput()->label(false);
 echo $form->field($model, 'block_id')->hiddenInput()->label(false);
 echo Html::submitButton('Сохранить', ['class' => 'btn btn-primary', 'style' => 'margin-right: 20px']);
 echo Html::a('Удалить блок', '#', ['class' => 'btn btn-danger', 'onclick' => "StoryEditor.deleteBlock('" . $model->block_id . "')"]);

@@ -3,6 +3,8 @@
 use backend\assets\StoryEditorAsset;
 use common\widgets\RevealWidget;
 use yii\bootstrap\ButtonDropdown;
+use yii\helpers\Html;
+use yii\helpers\Json;
 use yii\helpers\Url;
 
 /** @var $this yii\web\View */
@@ -17,30 +19,27 @@ $this->params['sidebarMenuItems'] = [
 ];
 
 $storyID = $model->id;
-$action = Url::to(['/editor/get-slide-by-index', 'story_id' => $model->id]);
-$blocksAction = Url::to(['/editor/get-slide-blocks', 'story_id' => $model->id]);
-$formAction = Url::to(['/editor/form', 'story_id' => $model->id]);
-$createBlockAction = Url::to(['/editor/create-block', 'story_id' => $model->id]);
-$deleteBlockAction = Url::to(['/editor/delete-block', 'story_id' => $model->id]);
-$deleteSlideAction = Url::to(['editor/delete-slide', 'story_id' => $model->id]);
-$slidesAction = Url::to(['editor/slides', 'story_id' => $model->id]);
-$slideVisibleAction = Url::to(['editor/slide-visible', 'story_id' => $storyID]);
-$createSlideAction = Url::to(['editor/create-slide', 'story_id' => $storyID]);
-$slideSourceAction = Url::to(['editor/slide-source', 'story_id' => $storyID]);
+$config = [
+    'storyID' => $storyID,
+    'getSlideAction' => Url::to(['/editor/load-slide', 'story_id' => $storyID]),
+    'getSlideBlocksAction' => Url::to(['/editor/slide-blocks']),
+    'getBlockFormAction' => Url::to(['/editor/form']),
+    'createBlockAction' => Url::to(['/editor/create-block']),
+    'deleteBlockAction' => Url::to(['/editor/delete-block']),
+    'deleteSlideAction' => Url::to(['editor/delete-slide']),
+    'currentSlidesAction' => Url::to(['editor/slides', 'story_id' => $storyID]),
+    'slideVisibleAction' => Url::to(['editor/slide-visible']),
+    'createSlideAction' =>  Url::to(['editor/create-slide', 'story_id' => $storyID]),
+    'createSlideLinkAction' => Url::to(['editor/create-slide-link', 'story_id' => $storyID]),
+    'slidesAction' => Url::to(['editor/slides']),
+];
+$configJSON = Json::htmlEncode($config);
+
+$slideSourceAction = Url::to(['editor/slide-source']);
+
 $js = <<< JS
     
-    StoryEditor.initialize({
-        "storyID": "$storyID",
-        "getSlideAction": "$action",
-        "getSlideBlocksAction": "$blocksAction",
-        "getBlockFormAction": "$formAction",
-        "createBlockAction": "$createBlockAction",
-        "deleteBlockAction": "$deleteBlockAction",
-        "deleteSlideAction": "$deleteSlideAction",
-        "slidesAction": "$slidesAction",
-        "slideVisibleAction": "$slideVisibleAction",
-        "createSlideAction": "$createSlideAction"
-    });
+    StoryEditor.initialize($configJSON);
 
 	$("#form-container")
 	    .on("beforeSubmit", "form", StoryEditor.onBeforeSubmit)
@@ -51,8 +50,8 @@ $js = <<< JS
 	
 	$("#preview-container").on("click", "a.remove-slide", function(e) {
 	    e.preventDefault();
-	    let slideIndex = $(this).parent().data("slideIndex");
-	    StoryEditor.deleteSlide(slideIndex);
+	    let slideID = $(this).parent().data("slideId");
+	    StoryEditor.deleteSlide(slideID);
 	});
 	
 	$("#slide-visible").on("click", function(e) {
@@ -80,6 +79,11 @@ $options = [
                 'label' => 'Новый слайд',
                 'url' => '#',
                 'linkOptions' => ['onclick' => 'StoryEditor.createSlide(); return false;'],
+            ],
+            [
+                'label' => 'Ссылка на слайд',
+                'url' => '#',
+                'linkOptions' => ['onclick' => 'StoryEditor.createSlideLink(); return false;'],
             ],
         ],
     ]
@@ -141,8 +145,21 @@ $options = [
     </div>
 </div>
 
-<div class="modal remote fade" id="slide-source-modal">
+<div class="modal fade" id="slide-link-modal">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content loader-lg"></div>
+        <div class="modal-content loader-lg">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Создать ссылку на слайд</h4>
+            </div>
+            <div class="modal-body">
+                <?= Html::dropDownList('linkStories', null, \common\helpers\StoryHelper::getStoryArray(), ['prompt' => 'Выбрать историю', 'onchange' => 'StoryEditor.changeStory(this)']) ?>
+                <?= Html::dropDownList('linkStorySlides', null, [], ['pormpt' => 'Выбрать слайд', 'id' => 'story-link-slides']) ?>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="StoryEditor.link()">Создать ссылку</button>
+                <button class="btn btn-default" data-dismiss="modal">Отмена</button>
+            </div>
+        </div>
     </div>
 </div>

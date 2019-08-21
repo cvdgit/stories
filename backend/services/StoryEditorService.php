@@ -11,7 +11,9 @@ use backend\models\editor\ImageForm;
 use backend\models\editor\TextForm;
 use backend\models\editor\TransitionForm;
 use common\models\StorySlide;
+use DomainException;
 use yii;
+use yii\db\Query;
 use yii\helpers\Html;
 use yii\web\UploadedFile;
 use common\models\Story;
@@ -78,9 +80,9 @@ class StoryEditorService
         $model->saveBody($body);
     }
 
-    public function deleteBlock(int $storyID, int $slideNumber, string $blockID)
+    public function deleteBlock(int $slideID, string $blockID)
     {
-        $model = StorySlide::findSlide($storyID, $slideNumber);
+        $model = StorySlide::findSlide($slideID);
         $reader = new HtmlSlideReader($model->data);
         $slide = $reader->load();
         $slide->deleteBlock($blockID);
@@ -90,26 +92,72 @@ class StoryEditorService
         return $model->save(false, ['data']);
     }
 
-    public function createSlide(int $storyID)
+    protected function updateSlideNumbers(int $storyID, int $targetSlideNumber)
+    {
+        $slides = (new Query())->from('{{%story_slide}}')
+            ->select(['id', 'number'])
+            ->where('story_id = :story', [':story' => $storyID])
+            ->orderBy(['number' => SORT_ASC])
+            ->indexBy('id')
+            ->all();
+        $command = Yii::$app->db->createCommand();
+        foreach ($slides as $slideID => $slide) {
+            if ($slide['number'] > $targetSlideNumber) {
+                $slides[$slideID]['number']++;
+                $command->update('{{%story_slide}}', ['number' => $slides[$slideID]['number']], 'id = :id', [':id' => $slideID]);
+                $command->execute();
+            }
+        }
+    }
+
+    public function createSlide(int $storyID, int $currentSlideID = -1)
     {
         $reader = new HtmlSlideReader('');
         $slide = $reader->load();
         $writer = new HTMLWriter();
         $html = $writer->renderSlide($slide);
+
         $model = StorySlide::createSlide($storyID);
         $model->data = $html;
+
+        if ($currentSlideID !== -1) {
+            $currentSlide = StorySlide::findSlideByID($currentSlideID);
+            $this->updateSlideNumbers($storyID, $currentSlide->number);
+            $model->number = $currentSlide->number + 1;
+        }
+
         $model->save();
-        return $model->number;
+
+        return $model->id;
     }
 
-    public function deleteSlide(int $storyID, int $slideNumber)
+    public function createSlideLink(int $storyID, int $linkSlideID, int $currentSlideID = -1): int
     {
-        StorySlide::deleteSlide($storyID, $slideNumber);
+        $model = StorySlide::createSlide($storyID);
+        $model->is_link = StorySlide::IS_LINK;
+        $model->link_slide_id = $linkSlideID;
+        $model->data = 'link';
+
+        if ($currentSlideID !== -1) {
+            $currentSlide = StorySlide::findSlideByID($currentSlideID);
+            $this->updateSlideNumbers($storyID, $currentSlide->number);
+            $model->number = $currentSlide->number + 1;
+        }
+
+        if (!$model->save()) {
+            throw new DomainException(implode('<br>', $model->firstErrors));
+        }
+        return $model->id;
+    }
+
+    public function deleteSlide(int $slideID)
+    {
+        StorySlide::deleteSlide($slideID);
     }
 
     public function updateBlock($form)
     {
-        $model = StorySlide::findSlide($form->story_id, $form->slide_index);
+        $model = StorySlide::findSlide($form->slide_id);
         $reader = new HtmlSlideReader($model->data);
         $slide = $reader->load();
         $block = $slide->findBlockByID($form->block_id);

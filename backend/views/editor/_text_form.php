@@ -21,8 +21,7 @@ $form = ActiveForm::begin([
 <?php
 echo $form->field($model, 'text_size')->textInput();
 echo $form->field($model, 'text')->textArea(['rows' => 4]);
-echo $form->field($model, 'story_id')->hiddenInput()->label(false);
-echo $form->field($model, 'slide_index')->hiddenInput()->label(false);
+echo $form->field($model, 'slide_id')->hiddenInput()->label(false);
 echo $form->field($model, 'block_id')->hiddenInput()->label(false);
 echo Html::submitButton('Сохранить', ['class' => 'btn btn-primary']);
 ActiveForm::end();

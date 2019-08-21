@@ -11,14 +11,11 @@ class SlideSourceForm extends Model
 {
 
     public $source;
+    public $slideID;
 
-    public $storyID;
-    public $slideNumber;
-
-    public function __construct(int $storyID, int $slideNumber, $config = [])
+    public function __construct(int $slideID, $config = [])
     {
-        $this->storyID = $storyID;
-        $this->slideNumber = $slideNumber;
+        $this->slideID = $slideID;
         parent::__construct($config);
     }
 

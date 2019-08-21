@@ -318,15 +318,16 @@ class Story extends ActiveRecord
 
     public function slidesData()
     {
-        $slides = (new Query())->from('{{%story_slide}}')
-            ->select('data')
-            ->where('story_id = :story', [':story' => $this->id])
-            ->andWhere('status = 1')
-            ->orderBy(['number' => SORT_ASC])
+        $slides = (new Query())->from('{{%story_slide}} AS t1')
+            ->select(['t1.data', 't2.data AS link_data'])
+            ->leftJoin('{{%story_slide}} t2', 't2.id = t1.link_slide_id')
+            ->where('t1.`story_id` = :story', [':story' => $this->id])
+            ->andWhere('t1.`status` = :status', [':status' => 1])
+            ->orderBy(['t1.number' => SORT_ASC])
             ->all();
         $data = '';
         foreach ($slides as $slide) {
-            $data .= $slide['data'];
+            $data .= $slide['link_data'] ?? $slide['data'];
         }
         return '<div class="slides">' . $data . '</div>';
     }

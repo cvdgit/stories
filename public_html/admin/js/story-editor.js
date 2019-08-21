@@ -1,31 +1,35 @@
 
-StoryEditor = (function() {
+var StoryEditor = (function() {
+    "use strict";
 
     var $editor = $('#story-editor');
     var $previewContainer = $('#preview-container');
 
     var config = {
         storyID: "",
+        getSlideAction: "",
         getSlideBlocksAction: "",
         getBlockFormAction: "",
         createBlockAction: "",
         deleteBlockAction: "",
         deleteSlideAction: "",
-        slidesAction: "",
+        currentSlidesAction: "",
         slideVisibleAction: "",
-        createSlideAction: ""
+        createSlideAction: "",
+        slidesAction: ""
     };
 
-    var currentSlideIndex;
+    var currentSlideIndex,
+        currentSlideID;
 
     function initialize(params) {
         config = params;
         loadSlides(readUrl() || -1);
     }
 
-    function send(index) {
+    function send(slideID) {
         var part = [
-            'slide_index=' + index
+            'slide_id=' + slideID
         ];
         return $.ajax({
             url: config.getSlideAction + '&' + part.join('&'),
@@ -42,7 +46,7 @@ StoryEditor = (function() {
 
     function loadSlideBlocks() {
         var promise = $.ajax({
-            "url": config.getSlideBlocksAction + "&slide_index=" + currentSlideIndex,
+            "url": config.getSlideBlocksAction + "&slide_id=" + currentSlideID,
             "type": "GET",
             "dataType": "json"
         });
@@ -78,7 +82,7 @@ StoryEditor = (function() {
 
     function loadBlockForm(blockID) {
         var promise = $.ajax({
-            "url": config.getBlockFormAction + "&slide_index=" + currentSlideIndex + "&block_id=" + blockID,
+            "url": config.getBlockFormAction + "&slide_id=" + currentSlideID + "&block_id=" + blockID,
             "type": "GET",
             "dataType": "json"
         });
@@ -91,52 +95,52 @@ StoryEditor = (function() {
 
     function createBlock(type) {
         var promise = $.ajax({
-            "url": config.createBlockAction + "&slide_index=" + currentSlideIndex + "&block_type=" + type,
+            "url": config.createBlockAction + "&slide_id=" + currentSlideID + "&block_type=" + type,
             "type": "GET",
             "dataType": "json"
         });
         promise.done(function() {
-            loadSlide(currentSlideIndex, true);
+            loadSlide(currentSlideID, true);
         });
     }
 
     function createSlide() {
         var promise = $.ajax({
-            "url": config.createSlideAction,
+            "url": config.createSlideAction + '&current_slide_id=' + currentSlideID,
             "type": "GET",
             "dataType": "json"
         });
         promise.done(function(data) {
-            loadSlides(data.slideNumber);
+            loadSlides(data.id);
         });
     }
 
     function deleteBlock(blockID) {
         var promise = $.ajax({
-            "url": config.deleteBlockAction + "&slide_index=" + currentSlideIndex + "&block_id=" + blockID,
+            "url": config.deleteBlockAction + "&slide_id=" + currentSlideID + "&block_id=" + blockID,
             "type": "GET",
             "dataType": "json"
         });
         promise.done(function() {
-            loadSlide(currentSlideIndex, true);
+            loadSlide(currentSlideID, true);
         });
     }
 
-    function setActiveSlide(number) {
-        currentSlideIndex = number;
-        $("[data-slide-index]", $previewContainer).each(function() {
+    function setActiveSlide(slideID) {
+        currentSlideID = slideID;
+        $("[data-slide-id]", $previewContainer).each(function() {
             $(this).removeClass("active");
         });
-        $("[data-slide-index=" + number + "]", $previewContainer).addClass("active");
+        $("[data-slide-id=" + slideID + "]", $previewContainer).addClass("active");
         setSlideUrl();
     }
 
-    function loadSlide(index, loadBlocks) {
+    function loadSlide(slideID, loadBlocks) {
         loadBlocks = loadBlocks || false;
-        currentSlideIndex = index;
-        send(index)
+        currentSlideID = slideID;
+        send(slideID)
             .done(function(data) {
-                setActiveSlide(data.number);
+                setActiveSlide(data.id);
                 changeSlideVisibleIcon(data.status);
                 $(".slides", $editor).empty().append(data.data);
                 Reveal.sync();
@@ -150,42 +154,42 @@ StoryEditor = (function() {
             });
     }
 
-    function deleteSlide(index) {
+    function deleteSlide(slideID) {
         if (!confirm("Удалить слайд?")) {
             return;
         }
         var promise = $.ajax({
-            "url": config.deleteSlideAction + "&slide_index=" + index,
+            "url": config.deleteSlideAction + "&slide_id=" + slideID,
             "type": "GET",
             "dataType": "json"
         });
         promise.done(function(data) {
             if (data && data.success) {
-                loadSlides(index === currentSlideIndex ? -1 : currentSlideIndex);
+                loadSlides(slideID === currentSlideID ? -1 : currentSlideID);
             }
         });
     }
 
-    function loadSlides(activeSlideIndex) {
+    function loadSlides(activeSlideID) {
         var $container = $("#preview-container");
         $container.empty();
         var promise = $.ajax({
-            "url": config.slidesAction,
+            "url": config.currentSlidesAction,
             "type": "GET",
             "dataType": "json"
         });
         promise.done(function(data) {
             if (data.length > 0) {
                 data.forEach(function (slide) {
-                    var elem = $("<div/>");
-                    var slideIndex = slide.slideNumber;
-                    elem.addClass("img-thumbnail preview-container-item");
-                    elem.attr("data-slide-index", slideIndex);
+                    var elem = $("<div/>")
+                        .addClass("img-thumbnail preview-container-item")
+                        .attr("data-slide-id", slide.id)
+                        .attr("data-link-slide-id", slide.linkSlideID);
                     $("<a/>")
                         .attr("href", "#")
-                        .text("Слайд " + slideIndex)
+                        .html((slide.isLink ? "<i class='glyphicon glyphicon-link'></i> " : "") + "# " + slide.slideNumber)
                         .on("click", function () {
-                            loadSlide(slideIndex, true);
+                            loadSlide(slide.id, true);
                             return false;
                         })
                         .appendTo(elem);
@@ -197,7 +201,7 @@ StoryEditor = (function() {
                         .appendTo(elem);
                     elem.appendTo($container);
                 });
-                loadSlide(activeSlideIndex, true);
+                loadSlide(activeSlideID, true);
             }
             else {
                 $("<span/>").text("Нет слайдов").appendTo($container);
@@ -208,7 +212,6 @@ StoryEditor = (function() {
     }
 
     function onBeforeSubmit() {
-
         var $form = $(this),
             button = $("button[type=submit]", $form);
         button.button("loading");
@@ -220,7 +223,7 @@ StoryEditor = (function() {
             contentType: false,
             processData: false,
             success: function(data) {
-                loadSlide(currentSlideIndex);
+                loadSlide(currentSlideID);
             },
             error: function(data) {
                 console.log(data);
@@ -260,7 +263,7 @@ StoryEditor = (function() {
     }
 
     function locationHash() {
-        return "/" + currentSlideIndex;
+        return "/" + currentSlideID;
     }
 
     function setSlideUrl() {
@@ -269,7 +272,7 @@ StoryEditor = (function() {
 
     function toggleSlideVisible() {
         var promise = $.ajax({
-            "url": config.slideVisibleAction + "&slide_index=" + currentSlideIndex,
+            "url": config.slideVisibleAction + "&slide_id=" + currentSlideID,
             "type": "GET",
             "dataType": "json"
         });
@@ -295,7 +298,7 @@ StoryEditor = (function() {
     }
 
     function slideSourceModal(url) {
-        $("#slide-source-modal").modal({"remote": url + "&slide_index=" + currentSlideIndex});
+        $("#slide-source-modal").modal({"remote": url + "&slide_id=" + currentSlideID});
     }
 
     return {
@@ -306,6 +309,9 @@ StoryEditor = (function() {
         "getCurrentSlideIndex": function() {
             return currentSlideIndex;
         },
+        "getCurrentSlideID": function() {
+            return currentSlideID;
+        },
         "readUrl": readUrl,
         "setSlideUrl": setSlideUrl,
         "createBlock": createBlock,
@@ -313,6 +319,54 @@ StoryEditor = (function() {
         "deleteSlide": deleteSlide,
         "toggleSlideVisible": toggleSlideVisible,
         "createSlide": createSlide,
-        "slideSourceModal": slideSourceModal
+        "slideSourceModal": slideSourceModal,
+        "getConfigValue": function(value) {
+            return config[value];
+        }
     };
 })();
+
+
+(function(editor, $, console) {
+    "use strict";
+
+    editor.createSlideLink = function() {
+        $("#slide-link-modal").modal("show");
+    };
+
+    editor.changeStory = function(obj) {
+        var $slides = $("#story-link-slides");
+        $slides.empty();
+        var promise = $.ajax({
+            "url": editor.getConfigValue("slidesAction") + "&story_id=" + $(obj).val(),
+            "type": "GET",
+            "dataType": "json"
+        });
+        promise.done(function(data) {
+            data.forEach(function(slide) {
+                $("<option />")
+                    .val(slide.id)
+                    .text("Слайд" + slide.slideNumber)
+                    .appendTo($slides);
+            });
+        });
+    };
+
+    editor.link = function() {
+        var promise = $.ajax({
+            "url": editor.getConfigValue("createSlideLinkAction") + "&link_slide_id=" + $("#story-link-slides").val() + '&current_slide_id=' + editor.getCurrentSlideID(),
+            "type": "GET",
+            "dataType": "json"
+        });
+        promise.done(function(data) {
+            if (data.success) {
+                editor.loadSlides(data.id);
+            }
+            else {
+                toastr.error(data.error);
+            }
+            $("#slide-link-modal").modal("hide");
+        });
+    };
+
+})(StoryEditor, jQuery, console);
