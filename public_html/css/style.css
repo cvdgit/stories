@@ -2085,3 +2085,12 @@ button:focus {
 .story-popular-categories li.active a {
   color: #99cd50;
 }
+
+img.lazy {
+  display: block;
+
+  /* optional way, set loading as background */
+  background-image: url('/img/loading.gif');
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+}
