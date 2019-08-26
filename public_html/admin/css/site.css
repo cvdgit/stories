@@ -454,3 +454,12 @@ body {
     top: 0;
     bottom: 0;
 }
+
+.editor-slide-actions {
+    margin: 10px;
+}
+
+.editor-slide-actions a {
+    margin-right: 10px;
+    font-size: 28px;
+}

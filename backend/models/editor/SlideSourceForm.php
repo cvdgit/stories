@@ -28,13 +28,13 @@ class SlideSourceForm extends Model
 
     public function loadSlideSource()
     {
-        $slide = StorySlide::findSlide($this->storyID, $this->slideNumber);
+        $slide = StorySlide::findSlide($this->slideID);
         $this->source = $slide->data;
     }
 
     public function saveSlideSource()
     {
-        $slide = StorySlide::findSlide($this->storyID, $this->slideNumber);
+        $slide = StorySlide::findSlide($this->slideID);
         $slide->data = $this->source;
         return $slide->save(false, ['data']);
     }

@@ -11,6 +11,7 @@ use backend\components\story\TransitionBlock;
 use backend\components\story\writer\HTMLWriter;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
+use backend\models\editor\QuestionForm;
 use backend\models\editor\SlideSourceForm;
 use backend\models\editor\TestForm;
 use backend\models\editor\TextForm;
@@ -180,6 +181,10 @@ class EditorController extends Controller
                 'class' => TestForm::class,
                 'view' => '_test_form',
             ],
+            AbstractBlock::TYPE_HTML => [
+                'class' => QuestionForm::class,
+                'view' => '_html_form',
+            ],
         ];
         if (!isset($types[$block_type])) {
             throw new DomainException($block_type . ' - Unknown block type');
@@ -237,8 +242,8 @@ class EditorController extends Controller
     public function actionCreateSlide(int $story_id, int $current_slide_id = -1)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $slideNumber = $this->editorService->createSlide($story_id, $current_slide_id);
-        return ['success' => true, 'id' => $slideNumber];
+        $slideID = $this->editorService->createSlide($story_id, $current_slide_id);
+        return ['success' => true, 'id' => $slideID];
     }
 
     public function actionCreateSlideLink(int $story_id, int $link_slide_id, int $current_slide_id = -1)
@@ -251,6 +256,18 @@ class EditorController extends Controller
             return ['success' => false, 'error' => $ex->getMessage()];
         }
         return ['success' => true, 'id' => $linkSlideID];
+    }
+
+    public function actionCreateSlideQuestion(int $story_id, int $question_id, int $current_slide_id = -1)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        try {
+            $slideID = $this->editorService->createSlideQuestion($story_id, $question_id, $current_slide_id);
+        }
+        catch (\Exception $ex) {
+            return ['success' => false, 'error' => $ex->getMessage()];
+        }
+        return ['success' => true, 'id' => $slideID];
     }
 
     public function actionDeleteBlock(int $slide_id, string $block_id)
@@ -275,7 +292,8 @@ class EditorController extends Controller
             return [
                 'id' => $slide->id,
                 'slideNumber' => $slide->number,
-                'isLink' => $slide->is_link,
+                'isLink' => $slide->isLink(),
+                'isQuestion' => $slide->isQuestion(),
                 'linkSlideID' => $slide->link_slide_id,
             ];
         }, $model->storySlides);

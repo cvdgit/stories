@@ -316,15 +316,18 @@ class Story extends ActiveRecord
         return $this->hasMany(StorySlide::class, ['story_id' => 'id'])->orderBy(['number' => SORT_ASC]);
     }
 
-    public function slidesData()
+    public function slidesData(bool $withoutQuestions = false): string
     {
         $slides = (new Query())->from('{{%story_slide}} AS t1')
             ->select(['t1.data', 't2.data AS link_data'])
             ->leftJoin('{{%story_slide}} t2', 't2.id = t1.link_slide_id')
             ->where('t1.`story_id` = :story', [':story' => $this->id])
             ->andWhere('t1.`status` = :status', [':status' => 1])
-            ->orderBy(['t1.number' => SORT_ASC])
-            ->all();
+            ->orderBy(['t1.number' => SORT_ASC]);
+        if ($withoutQuestions) {
+            $slides->andWhere('t1.`kind` <> :kind', [':kind' => StorySlide::KIND_QUESTION]);
+        }
+        $slides = $slides->all();
         $data = '';
         foreach ($slides as $slide) {
             $data .= $slide['link_data'] ?? $slide['data'];
@@ -332,7 +335,7 @@ class Story extends ActiveRecord
         return '<div class="slides">' . $data . '</div>';
     }
 
-    public function isAudioStory()
+    public function isAudioStory(): bool
     {
         return (int)$this->audio === 1;
     }

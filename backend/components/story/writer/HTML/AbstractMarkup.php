@@ -19,6 +19,8 @@ class AbstractMarkup
         $this->element = $element;
     }
 
+    //abstract public function markup(): string;
+
     public function styleToArray($style): array
     {
         $styleArray = [];

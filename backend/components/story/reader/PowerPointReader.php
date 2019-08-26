@@ -77,6 +77,7 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
     {
         $slide = $this->story->createSlide();
         $slide->setSlideNumber($slideNumber);
+        $slide->setView(Slide::VIEW_SLIDE);
         $shapes = $powerPointSlide->getShapeCollection();
         $this->currentSlideBlockNumber = count($shapes);
         $this->loadSlideShapes($shapes, $slide);

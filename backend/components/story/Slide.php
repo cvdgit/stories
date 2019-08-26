@@ -9,11 +9,17 @@ use Yii;
 class Slide
 {
 
+    const VIEW_SLIDE = 'slide';
+    const VIEW_QUESTION = 'question';
+
     public $id;
     public $slideNumber;
 
     /** @var AbstractBlock[] */
     protected $blocks = [];
+
+    /** @var string */
+    protected $view;
 
     /**
      * @return AbstractBlock[]
@@ -83,6 +89,22 @@ class Slide
     public function getSlideNumber()
     {
         return $this->slideNumber;
+    }
+
+    /**
+     * @return string
+     */
+    public function getView(): string
+    {
+        return $this->view;
+    }
+
+    /**
+     * @param string $view
+     */
+    public function setView(string $view): void
+    {
+        $this->view = $view;
     }
 
 }

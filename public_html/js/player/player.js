@@ -49,6 +49,7 @@ var WikidsStoryFeedback = (function() {
 })();
 
 var WikidsPlayer = (function(document, $) {
+    "use strict";
 
     var $playerContainer = $(".story-container");
     var fullScreenMode = false;
@@ -108,6 +109,9 @@ var WikidsPlayer = (function(document, $) {
             }
         },
         "right": function() {
+            //if (TestSlide.isQuestionSlide()) {
+            //    return false;
+            //}
             if (Reveal.isLastSlide()) {
                 TransitionSlide.backToStory();
             }
@@ -122,7 +126,8 @@ function onSlideMouseDown(e) {
     e = e || window.event;
     if ($(e.target).hasClass("story-controls")
         || $(e.target).parents(".story-controls").length
-        || $(e.target).hasClass("btn"))  {
+        || $(e.target).hasClass("btn")
+    || $(e.target).parents("section[data-slide-view=question]").length)  {
         return;
     }
     switch (e.which) {

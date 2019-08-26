@@ -6,6 +6,7 @@ namespace backend\components\story\reader;
 
 use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
+use backend\components\story\HTMLBLock;
 use backend\components\story\ImageBlock;
 use backend\components\story\Slide;
 use backend\components\story\Story;
@@ -70,6 +71,9 @@ class HTMLReader extends AbstractReader implements ReaderInterface
                     break;
                 case AbstractBlock::TYPE_TEST:
                     $this->loadBlockTest($htmlBlock, $slide);
+                    break;
+                case AbstractBlock::TYPE_HTML:
+                    $this->loadBlockHtml($htmlBlock, $slide);
                     break;
                 default:
             }
@@ -191,6 +195,20 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         $style = pq($htmlBlock)->find('button')->attr('style');
         $block->setFontSize($this->getStyleValue($style, 'font-size'));
         $block->setTestID(pq($htmlBlock)->find('button')->attr('data-test-id'));
+        $slide->addBlock($block);
+    }
+
+    protected function loadBlockHtml($htmlBlock, Slide $slide): void
+    {
+        $block = new HtmlBlock();
+        $block->setType(AbstractBlock::TYPE_HTML);
+
+        $element = pq($htmlBlock);
+
+        $this->loadBlockProperties($block, $element->attr('style'));
+        $block->setId(pq($htmlBlock)->attr('data-block-id'));
+        $block->setContent(pq($htmlBlock)->html());
+
         $slide->addBlock($block);
     }
 

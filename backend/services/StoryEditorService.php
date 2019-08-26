@@ -2,7 +2,9 @@
 
 namespace backend\services;
 
+use backend\components\QuestionHTML;
 use backend\components\story\AbstractBlock;
+use backend\components\story\HTMLBLock;
 use backend\components\story\reader\HTMLReader;
 use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\writer\HTMLWriter;
@@ -11,6 +13,7 @@ use backend\models\editor\ImageForm;
 use backend\models\editor\TextForm;
 use backend\models\editor\TransitionForm;
 use common\models\StorySlide;
+use common\models\StoryTestQuestion;
 use DomainException;
 use yii;
 use yii\db\Query;
@@ -110,7 +113,7 @@ class StoryEditorService
         }
     }
 
-    public function createSlide(int $storyID, int $currentSlideID = -1)
+    public function createSlide(int $storyID, int $currentSlideID = -1): int
     {
         $reader = new HtmlSlideReader('');
         $slide = $reader->load();
@@ -134,7 +137,7 @@ class StoryEditorService
     public function createSlideLink(int $storyID, int $linkSlideID, int $currentSlideID = -1): int
     {
         $model = StorySlide::createSlide($storyID);
-        $model->is_link = StorySlide::IS_LINK;
+        $model->kind = StorySlide::KIND_LINK;
         $model->link_slide_id = $linkSlideID;
         $model->data = 'link';
 
@@ -147,6 +150,38 @@ class StoryEditorService
         if (!$model->save()) {
             throw new DomainException(implode('<br>', $model->firstErrors));
         }
+        return $model->id;
+    }
+
+    public function createSlideQuestion(int $storyID, int $questionID, int $currentSlideID = -1)
+    {
+
+        $reader = new HtmlSlideReader('');
+        $slide = $reader->load();
+        $slide->setView('question');
+
+        /** @var HTMLBLock $block */
+        $block = $slide->createBlock(HTMLBLock::class);
+        $question = StoryTestQuestion::findModel($questionID);
+        $content = (new QuestionHTML($question))->loadHTML();
+        $block->setContent($content);
+        $slide->addBlock($block);
+
+        $writer = new HTMLWriter();
+        $html = $writer->renderSlide($slide);
+
+        $model = StorySlide::createSlide($storyID);
+        $model->kind = StorySlide::KIND_QUESTION;
+        $model->data = $html;
+
+        if ($currentSlideID !== -1) {
+            $currentSlide = StorySlide::findSlideByID($currentSlideID);
+            $this->updateSlideNumbers($storyID, $currentSlide->number);
+            $model->number = $currentSlide->number + 1;
+        }
+
+        $model->save();
+
         return $model->id;
     }
 
@@ -174,7 +209,7 @@ class StoryEditorService
 
     public function generateBookStoryHtml(Story $model)
     {
-        $reader = new HTMLReader($model->slidesData());
+        $reader = new HTMLReader($model->slidesData(true));
         $story = $reader->load();
         $html = '';
         foreach ($story->getSlides() as $slide) {

@@ -105,14 +105,10 @@ var StoryEditor = (function() {
     }
 
     function createSlide() {
-        var promise = $.ajax({
-            "url": config.createSlideAction + '&current_slide_id=' + currentSlideID,
-            "type": "GET",
-            "dataType": "json"
-        });
-        promise.done(function(data) {
-            loadSlides(data.id);
-        });
+        $.getJSON(config.createSlideAction, {"current_slide_id": currentSlideID})
+            .done(function(data) {
+                loadSlides(data.id);
+            });
     }
 
     function deleteBlock(blockID) {
@@ -154,20 +150,24 @@ var StoryEditor = (function() {
             });
     }
 
-    function deleteSlide(slideID) {
+    function deleteSlide() {
         if (!confirm("Удалить слайд?")) {
             return;
         }
         var promise = $.ajax({
-            "url": config.deleteSlideAction + "&slide_id=" + slideID,
+            "url": config.deleteSlideAction + "&slide_id=" + currentSlideID,
             "type": "GET",
             "dataType": "json"
         });
         promise.done(function(data) {
             if (data && data.success) {
-                loadSlides(slideID === currentSlideID ? -1 : currentSlideID);
+                loadSlides(-1);
             }
         });
+    }
+
+    function slideIcon(slide) {
+        return slide.isLink ? '<i class="glyphicon glyphicon-link"></i>' : slide.isQuestion ? '<i class="glyphicon glyphicon-question-sign"></i>' : '#';
     }
 
     function loadSlides(activeSlideID) {
@@ -181,25 +181,17 @@ var StoryEditor = (function() {
         promise.done(function(data) {
             if (data.length > 0) {
                 data.forEach(function (slide) {
-                    var elem = $("<div/>")
-                        .addClass("img-thumbnail preview-container-item")
-                        .attr("data-slide-id", slide.id)
-                        .attr("data-link-slide-id", slide.linkSlideID);
                     $("<a/>")
                         .attr("href", "#")
-                        .html((slide.isLink ? "<i class='glyphicon glyphicon-link'></i> " : "") + "# " + slide.slideNumber)
+                        .addClass("list-group-item")
+                        .attr("data-slide-id", slide.id)
+                        .attr("data-link-slide-id", slide.linkSlideID)
+                        .html(slideIcon(slide) + " слайд " + slide.slideNumber)
                         .on("click", function () {
                             loadSlide(slide.id, true);
                             return false;
                         })
-                        .appendTo(elem);
-                    $("<a/>")
-                        .attr("href", "#")
-                        .attr("title", "Удалить слайд")
-                        .html("&times;")
-                        .addClass("remove-slide")
-                        .appendTo(elem);
-                    elem.appendTo($container);
+                        .appendTo($container);
                 });
                 loadSlide(activeSlideID, true);
             }
@@ -367,6 +359,33 @@ var StoryEditor = (function() {
             }
             $("#slide-link-modal").modal("hide");
         });
+    };
+
+})(StoryEditor, jQuery, console);
+
+
+(function(editor, $, console) {
+    "use strict";
+
+    var $modal = $("#slide-question-modal");
+
+    editor.createSlideQuestion = function() {
+        $modal.modal("show");
+    };
+
+    editor.addQuestion = function() {
+        var questionID = $("#story-question-list").val();
+        if (!questionID) {
+            $modal.modal("hide");
+            return;
+        }
+        $.getJSON(editor.getConfigValue("createSlideQuestionAction"), {
+            "question_id": questionID,
+            "current_slide_id": editor.getCurrentSlideID()
+        }).done(function(data) {
+            editor.loadSlides(data.id);
+        });
+        $modal.modal("hide");
     };
 
 })(StoryEditor, jQuery, console);

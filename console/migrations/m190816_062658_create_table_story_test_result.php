@@ -15,15 +15,17 @@ class m190816_062658_create_table_story_test_result extends Migration
     {
         $this->createTable($this->tableName, [
             'id' => $this->primaryKey(),
-            'story_test_id' => $this->integer()->notNull(),
+            'question_id' => $this->integer()->notNull(),
             'user_id' => $this->integer()->notNull(),
-            'correct_answer' => $this->smallInteger()->notNull(),
+            'story_id' => $this->integer()->notNull(),
+            'answer_is_correct' => $this->tinyInteger()->notNull(),
+            'created_at' => $this->integer()->notNull(),
         ], $this->tableOptions);
         $this->addForeignKey(
-            'fk_story_test_result-story_test_id',
+            'fk_story_test_result-question_id',
             $this->tableName,
-            'story_test_id',
-            '{{%story_test}}',
+            'question_id',
+            '{{%story_test_question}}',
             'id',
             'CASCADE',
             'CASCADE'
@@ -33,6 +35,15 @@ class m190816_062658_create_table_story_test_result extends Migration
             $this->tableName,
             'user_id',
             '{{%user}}',
+            'id',
+            'CASCADE',
+            'CASCADE'
+        );
+        $this->addForeignKey(
+            'fk_story_test_result-story_id',
+            $this->tableName,
+            'story_id',
+            '{{%story}}',
             'id',
             'CASCADE',
             'CASCADE'

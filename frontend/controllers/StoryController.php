@@ -9,7 +9,7 @@ use common\rbac\UserPermissions;
 use common\services\story\CountersService;
 use common\services\StoryFavoritesService;
 use common\services\StoryLikeService;
-use common\services\StoryTestService;
+use common\services\QuestionsService;
 use frontend\models\StoryFavoritesSearch;
 use frontend\models\StoryLikeForm;
 use frontend\models\StoryLikeSearch;
@@ -54,7 +54,7 @@ class StoryController extends Controller
     protected $countersService;
     protected $likeService;
     protected $favoritesService;
-    protected $testService;
+    protected $questionsService;
 
     public function __construct($id,
                                 $module,
@@ -62,14 +62,14 @@ class StoryController extends Controller
                                 CountersService $countersService,
                                 StoryLikeService $likeService,
                                 StoryFavoritesService $favoritesService,
-                                StoryTestService $testService,
+                                QuestionsService $questionsService,
                                 $config = [])
     {
         $this->storyService = $storyService;
         $this->countersService = $countersService;
         $this->likeService = $likeService;
         $this->favoritesService = $favoritesService;
-        $this->testService = $testService;
+        $this->questionsService = $questionsService;
         parent::__construct($id, $module, $config);
     }
 
@@ -214,17 +214,14 @@ class StoryController extends Controller
         return ['json' => StoryTest::find()->where('id = :id', [':id' => $id])->with('storyTestQuestions.storyTestAnswers')->asArray()->all()];
     }
 
-    public function actionStoreTestResult(int $test_id, int $correct_answers)
+    public function actionStoreTestResult(int $story_id, int $question_id, string $answers)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
+        $correctAnswer = $this->questionsService->checkAnswer($question_id, $answers);
         if (!Yii::$app->user->isGuest) {
-            $model = new StoryTestResult();
-            $model->story_test_id = $test_id;
-            $model->user_id = Yii::$app->user->id;
-            $model->correct_answer = $correct_answers;
-            $model->save();
+            $this->questionsService->storeQuestionResult($story_id, $question_id, $correctAnswer);
         }
-        return ['success' => true];
+        return ['success' => true, 'correctAnswer' => $correctAnswer];
     }
 
     public function actionInitStoryPlayer(int $id, int $num)

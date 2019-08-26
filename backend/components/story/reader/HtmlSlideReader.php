@@ -6,6 +6,7 @@ namespace backend\components\story\reader;
 
 use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
+use backend\components\story\HTMLBLock;
 use backend\components\story\ImageBlock;
 use backend\components\story\Slide;
 use backend\components\story\TestBlock;
@@ -33,6 +34,7 @@ class HtmlSlideReader implements ReaderInterface
 
     protected function loadSlide($htmlSlide)
     {
+        $this->slide->setView(pq($htmlSlide)->attr('data-slide-view') ?? '');
         $blocks = pq($htmlSlide)->find('div.sl-block');
         $this->loadSlideBlocks($blocks);
     }
@@ -56,6 +58,9 @@ class HtmlSlideReader implements ReaderInterface
                     break;
                 case AbstractBlock::TYPE_TEST:
                     $this->loadBlockTest($htmlBlock);
+                    break;
+                case AbstractBlock::TYPE_HTML:
+                    $this->loadBlockHtml($htmlBlock);
                     break;
                 default:
             }
@@ -177,6 +182,20 @@ class HtmlSlideReader implements ReaderInterface
         $style = pq($htmlBlock)->find('button')->attr('style');
         $block->setFontSize($this->getStyleValue($style, 'font-size'));
         $block->setTestId(pq($htmlBlock)->find('button')->attr('data-test-id'));
+        $this->slide->addBlock($block);
+    }
+
+    protected function loadBlockHtml($htmlBlock): void
+    {
+        $block = new HtmlBlock();
+        $block->setType(AbstractBlock::TYPE_HTML);
+
+        $element = pq($htmlBlock);
+
+        $this->loadBlockProperties($block, $element->attr('style'));
+        $block->setId(pq($htmlBlock)->attr('data-block-id'));
+        $block->setContent(pq($htmlBlock)->html());
+
         $this->slide->addBlock($block);
     }
 

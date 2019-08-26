@@ -19,6 +19,9 @@ use Yii;
  */
 class StoryTestAnswer extends \yii\db\ActiveRecord
 {
+
+    const CORRECT_ANSWER = 1;
+
     /**
      * {@inheritdoc}
      */
@@ -69,6 +72,11 @@ class StoryTestAnswer extends \yii\db\ActiveRecord
             return $model;
         }
         throw new DomainException('Ответ не найден');
+    }
+
+    public function answerIsCorrect()
+    {
+        return (int)$this->is_correct === self::CORRECT_ANSWER;
     }
 
 }

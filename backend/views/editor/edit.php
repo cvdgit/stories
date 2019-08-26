@@ -32,6 +32,7 @@ $config = [
     'createSlideAction' =>  Url::to(['editor/create-slide', 'story_id' => $storyID]),
     'createSlideLinkAction' => Url::to(['editor/create-slide-link', 'story_id' => $storyID]),
     'slidesAction' => Url::to(['editor/slides']),
+    'createSlideQuestionAction' => Url::to(['editor/create-slide-question', 'story_id' => $storyID]),
 ];
 $configJSON = Json::htmlEncode($config);
 
@@ -48,10 +49,9 @@ $js = <<< JS
 	        return false;
 	    });
 	
-	$("#preview-container").on("click", "a.remove-slide", function(e) {
+	$("#slide-delete").on("click", function(e) {
 	    e.preventDefault();
-	    let slideID = $(this).parent().data("slideId");
-	    StoryEditor.deleteSlide(slideID);
+	    StoryEditor.deleteSlide();
 	});
 	
 	$("#slide-visible").on("click", function(e) {
@@ -85,6 +85,11 @@ $options = [
                 'url' => '#',
                 'linkOptions' => ['onclick' => 'StoryEditor.createSlideLink(); return false;'],
             ],
+            [
+                'label' => 'Новый вопрос',
+                'url' => '#',
+                'linkOptions' => ['onclick' => 'StoryEditor.createSlideQuestion(); return false;'],
+            ],
         ],
     ]
 ];
@@ -93,7 +98,7 @@ $options = [
 <div class="row">
 	<div class="col-lg-3">
         <h4>Слайды <div class="pull-right"><?= ButtonDropdown::widget($options) ?></div></h4>
-        <div id="preview-container" style="margin-top: 20px"></div>
+        <div class="list-group" id="preview-container" style="margin-top: 20px"></div>
 	</div>
 	<div class="col-lg-9">
 		<div class="story-container">
@@ -124,9 +129,10 @@ $options = [
 		    </div>
 		</div>
         <div class="clearfix">
-            <div class="pull-right" style="margin: 10px">
-                <a href="#" id="slide-source" title="Код слайда" style="margin-right: 10px"><i style="font-size: 32px" class="glyphicon glyphicon-fire"></i></a>
-                <a href="#" id="slide-visible" title="Скрыть слайд"><i style="font-size: 32px" class="glyphicon"></i></a>
+            <div class="editor-slide-actions pull-right">
+                <a href="#" class="remove-slide" id="slide-delete" title="Удалить слайд"><i class="glyphicon glyphicon-trash"></i></a>
+                <a href="#" id="slide-source" title="Код слайда"><i class="glyphicon glyphicon-fire"></i></a>
+                <a href="#" id="slide-visible" title="Скрыть слайд"><i class="glyphicon"></i></a>
             </div>
         </div>
 	</div>
@@ -145,19 +151,53 @@ $options = [
     </div>
 </div>
 
-<div class="modal fade" id="slide-link-modal">
+<div class="modal remote fade" id="slide-source-modal">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content loader-lg">
+        <div class="modal-content loader-lg"></div>
+    </div>
+</div>
+
+<div class="modal fade" id="slide-link-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title">Создать ссылку на слайд</h4>
             </div>
             <div class="modal-body">
-                <?= Html::dropDownList('linkStories', null, \common\helpers\StoryHelper::getStoryArray(), ['prompt' => 'Выбрать историю', 'onchange' => 'StoryEditor.changeStory(this)']) ?>
-                <?= Html::dropDownList('linkStorySlides', null, [], ['pormpt' => 'Выбрать слайд', 'id' => 'story-link-slides']) ?>
+                <?= Html::dropDownList('linkStories',
+                    null,
+                    \common\helpers\StoryHelper::getStoryArray(),
+                    ['prompt' => 'Выбрать историю', 'onchange' => 'StoryEditor.changeStory(this)', 'class' => 'form-control']) ?>
+                <br>
+                <?= Html::dropDownList('linkStorySlides',
+                    null,
+                    [],
+                    ['prompt' => 'Выбрать слайд', 'id' => 'story-link-slides', 'class' => 'form-control']) ?>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary" onclick="StoryEditor.link()">Создать ссылку</button>
+                <button class="btn btn-default" data-dismiss="modal">Отмена</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="slide-question-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Выберите вопрос</h4>
+            </div>
+            <div class="modal-body">
+                <?= Html::dropDownList('storyQuestionList',
+                    null,
+                    \common\models\StoryTestQuestion::questionArray(),
+                    ['prompt' => 'Выбрать вопрос', 'class' => 'form-control', 'id' => 'story-question-list']) ?>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="StoryEditor.addQuestion()">Добавить вопрос</button>
                 <button class="btn btn-default" data-dismiss="modal">Отмена</button>
             </div>
         </div>

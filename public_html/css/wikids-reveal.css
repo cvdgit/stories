@@ -1716,6 +1716,10 @@
 	text-align: left;
 }
 
+.wikids-test-questions p {
+	font-weight: bold;
+}
+
 .wikids-test-answers {
 	margin-top: 10px;
 }
@@ -1729,18 +1733,49 @@
 	background-color: #eeeeee;
 }
 
+.reveal.has-light-background .wikids-test-answer:hover {
+	background-color: #eeeeee;
+}
+
+.reveal.has-dark-background .wikids-test-answer:hover {
+	background-color: #38405d;
+}
+
 .wikids-test-answer label,
 .wikids-test-answer img {
 	margin-left: 20px;
 	margin-bottom: 0;
 }
 
+.reveal.has-light-background .wikids-test-answer label,
+.reveal.has-light-background .wikids-test-question p {
+	color: #38405d;
+}
+
+.reveal.has-dark-background .wikids-test-answer label,
+.reveal.has-light-background .wikids-test-question p {
+	color: #ffffff;
+}
+
 .wikids-test-answer input {
 	float: left;
 }
 
+.wikids-test-answer input[type=checkbox],
+.wikids-test-answer input[type=radio] {
+	-ms-transform: scale(1.5);
+	-moz-transform: scale(1.5);
+	-webkit-transform: scale(1.5);
+	-o-transform: scale(1.5);
+	transform: scale(1.5);
+}
+
 .wikids-test-results p {
 	margin: 100px 0;
+}
+
+.wikids-test-buttons {
+	padding: 20px;
 }
 
 .sl-block[data-block-type=text] p {

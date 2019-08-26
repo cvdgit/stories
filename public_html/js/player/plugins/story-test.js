@@ -24,8 +24,6 @@ var TestSlide = (function() {
             "dataType": "json"
         });
 
-
-
         promise.done(function(data) {
 
             $(".reveal .slides").empty();
@@ -61,6 +59,11 @@ var TestSlide = (function() {
 
     $(".reveal > .slides").on("click", "button[data-test-id]", action);
 
+    $(".reveal > .slides").on("click", ".wikids-test-answer", function() {
+        var $input = $(this).find("input");
+        $input.prop("checked", !$input.prop("checked"));
+    });
+
     function syncReveal(data, slide_index) {
         $(".reveal .slides").empty().append(data);
         Reveal.sync();
@@ -78,7 +81,58 @@ var TestSlide = (function() {
         }
     }
 
+    $(".reveal > .slides").on("click", "button[data-answer-question]", answerQuestion);
+
+    function getQuestionAnswers() {
+        var answer = [];
+        $(Reveal.getCurrentSlide()).find(".wikids-test-answer input:checked").each(function(i, elem) {
+            answer.push($(elem).val());
+        });
+        return answer;
+    }
+
+    function answerQuestion() {
+
+        var answers = getQuestionAnswers();
+        if (!answers.length) {
+            return;
+        }
+
+        var questionID = $(this).attr("data-answer-question"),
+            $slide = $(Reveal.getCurrentSlide());
+
+        $(".wikids-test-answers", $slide)
+            .hide()
+            .find("input").prop("checked", false);
+        $(".wikids-test-controls", $slide).hide();
+
+        $.getJSON(config.storeAction, {
+            "question_id": questionID,
+            "answers": answers.join(',')
+        }).done(function(data) {
+            if (data && data.success) {
+                $(".wikids-test-results", $slide)
+                    .show()
+                    .find('p')
+                    .text("Вы ответили " + (data.correctAnswer ? "правильно" : "неправильно"))
+                    .end()
+                    .find('button')
+                    .off("click")
+                    .on("click", function() {
+                        Reveal.next();
+                        $(".wikids-test-answers", $slide).show();
+                        $(".wikids-test-controls", $slide).show();
+                        $(".wikids-test-results", $slide).hide();
+                    });
+            }
+        });
+    }
+
     return {
-        "backToStory": backToStory
+        "backToStory": backToStory,
+        "isQuestionSlide": function() {
+            console.log(Reveal.getCurrentSlide());
+            return true;
+        }
     };
 })();

@@ -15,11 +15,11 @@ use yii\bootstrap\ActiveForm;
     <h4 class="modal-title">Исходный код слайда</h4>
 </div>
 <div class="modal-body">
-    <?php echo $form->field($model, 'source')->textArea(['rows' => 20]) ?>
+    <?php echo $form->field($model, 'source')->textArea(['rows' => 20])->label(false) ?>
 </div>
 <div class="modal-footer">
     <?php echo Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
-    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
 </div>
 <?php ActiveForm::end(); ?>
 

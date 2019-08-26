@@ -3,6 +3,7 @@
 namespace common\models;
 
 use DomainException;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "story_test_question".
@@ -87,6 +88,21 @@ class StoryTestQuestion extends \yii\db\ActiveRecord
             self::QUESTION_TYPE_RADIO => 'Один ответ',
             self::QUESTION_TYPE_CHECKBOX => 'Множественный выбор',
         ];
+    }
+
+    public static function questionArray(): array
+    {
+        return ArrayHelper::map(self::find()->orderBy(['name' => SORT_ASC])->all(), 'id', 'name');
+    }
+
+    public function correctAnswersArray()
+    {
+        $correctAnswers = array_filter($this->storyTestAnswers, function(StoryTestAnswer $item) {
+            return $item->answerIsCorrect();
+        });
+        return array_values(array_map(function(StoryTestAnswer $item) {
+            return $item->id;
+        }, $correctAnswers));
     }
 
 }

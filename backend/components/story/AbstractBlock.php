@@ -11,6 +11,7 @@ abstract class AbstractBlock
     const TYPE_BUTTON = 'button';
     const TYPE_TRANSITION = 'transition';
     const TYPE_TEST = 'test';
+    const TYPE_HTML = 'html';
 
     protected $width;
     protected $height;

@@ -6,12 +6,14 @@ namespace backend\components\story\writer;
 
 use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
+use backend\components\story\HTMLBLock;
 use backend\components\story\ImageBlock;
 use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
 use backend\components\story\TransitionBlock;
 use backend\components\story\writer\HTML\ButtonBlockMarkup;
 use backend\components\story\writer\HTML\HeaderBlockMarkup;
+use backend\components\story\writer\HTML\HTMLBlockMarkup;
 use backend\components\story\writer\HTML\ImageBlockMarkup;
 use backend\components\story\Slide;
 use backend\components\story\writer\HTML\ParagraphBlockMarkup;
@@ -30,7 +32,7 @@ class SlideRenderer
 
     public function render(): string
     {
-        $html = '<section data-id="" data-background-color="#000000">';
+        $html = '<section data-id="" data-background-color="#000000" data-slide-view="' . $this->slide->getView() . '">';
         foreach ($this->slide->getBlocks() as $block) {
             if (get_class($block) === TextBlock::class) {
                 if ($block->getType() === AbstractBlock::TYPE_HEADER) {
@@ -51,6 +53,9 @@ class SlideRenderer
             }
             if (get_class($block) === ImageBlock::class) {
                 $html .= (new ImageBlockMarkup($block))->markup();
+            }
+            if (get_class($block) === HTMLBLock::class) {
+                $html .= (new HTMLBlockMarkup($block))->markup();
             }
         }
         $html .= '</section>';

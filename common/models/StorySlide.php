@@ -18,7 +18,7 @@ use yii\db\Query;
  * @property int $status
  * @property int $created_at
  * @property int $updated_at
- * @property int $is_link
+ * @property int $kind
  * @property int $link_slide_id
  *
  * @property Story $story
@@ -29,7 +29,8 @@ class StorySlide extends \yii\db\ActiveRecord
     const STATUS_VISIBLE = 1;
     const STATUS_HIDDEN = 2;
 
-    const IS_LINK = 1;
+    const KIND_LINK = 1;
+    const KIND_QUESTION = 2;
 
     /**
      * {@inheritdoc}
@@ -53,7 +54,7 @@ class StorySlide extends \yii\db\ActiveRecord
     {
         return [
             [['story_id', 'data', 'number'], 'required'],
-            [['story_id', 'number', 'status', 'created_at', 'updated_at', 'is_link', 'link_slide_id'], 'integer'],
+            [['story_id', 'number', 'status', 'created_at', 'updated_at', 'kind', 'link_slide_id'], 'integer'],
             [['data'], 'string'],
             [['story_id'], 'exist', 'skipOnError' => true, 'targetClass' => Story::class, 'targetAttribute' => ['story_id' => 'id']],
         ];
@@ -72,6 +73,7 @@ class StorySlide extends \yii\db\ActiveRecord
             'status' => 'Status',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+            'kind' => 'Kind',
         ];
     }
 
@@ -95,7 +97,7 @@ class StorySlide extends \yii\db\ActiveRecord
     {
         $slide = new self();
         $slide->story_id = $storyID;
-        $slide->is_link = self::IS_LINK;
+        $slide->kind = self::IS_LINK;
         $slide->number = (new Query())->from(self::tableName())->where('story_id = :story', [':story' => $storyID])->max('number') + 1;
         $slide->link_slide_id = $linkSlideID;
         return $slide;
@@ -129,19 +131,34 @@ class StorySlide extends \yii\db\ActiveRecord
             ->one();
     }
 
+    protected function addJob(int $storyID) {
+        Yii::$app->queue->push(new GenerateBookStoryJob([
+            'storyID' => $storyID,
+        ]));
+    }
+
     public function afterSave($insert, $changedAttributes)
     {
         if (isset($changedAttributes['data']) && $changedAttributes['data'] !== $this->data) {
-            Yii::$app->queue->push(new GenerateBookStoryJob([
-                'storyID' => $this->story_id,
-            ]));
+            $this->addJob($this->story_id);
         }
         parent::afterSave($insert, $changedAttributes);
     }
 
-    public function isLink()
+    public function afterDelete()
     {
-        return (int)$this->is_link === self::IS_LINK;
+        $this->addJob($this->story_id);
+        parent::afterDelete();
+    }
+
+    public function isLink(): bool
+    {
+        return (int)$this->kind === self::KIND_LINK;
+    }
+
+    public function isQuestion(): bool
+    {
+        return (int)$this->kind === self::KIND_QUESTION;
     }
 
 }

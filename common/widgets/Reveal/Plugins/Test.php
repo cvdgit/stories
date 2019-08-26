@@ -15,7 +15,7 @@ class Test extends AbstractPlugin implements PluginInterface
         return [
             $this->configName => [
                 'action' => Url::to(['story/get-story-test']),
-                'storeAction' => Url::to(['story/store-test-result']),
+                'storeAction' => Url::to(['story/store-test-result', 'story_id' => $this->storyID]),
                 'storyBodyAction' => Url::to(['story/get-story-body']),
                 'story_id' => $this->storyID,
             ],
