@@ -185,6 +185,24 @@ class StoryEditorService
         return $model->id;
     }
 
+    public function copySlide(int $slideID): int
+    {
+        $slide = StorySlide::findSlide($slideID);
+        $data = $slide->data;
+        if ($slide->isLink()) {
+            $linkSlide = StorySlide::findSlide($slide->link_slide_id);
+            $data = $linkSlide->data;
+        }
+        $newSlide = StorySlide::createSlide($slide->story_id);
+        $newSlide->data = $data;
+
+        $this->updateSlideNumbers($slide->story_id, $slide->number);
+        $newSlide->number = $slide->number + 1;
+
+        $newSlide->save();
+        return $newSlide->id;
+    }
+
     public function deleteSlide(int $slideID)
     {
         StorySlide::deleteSlide($slideID);

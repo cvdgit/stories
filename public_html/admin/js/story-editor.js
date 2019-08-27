@@ -389,3 +389,17 @@ var StoryEditor = (function() {
     };
 
 })(StoryEditor, jQuery, console);
+
+
+(function(editor, $, console) {
+    "use strict";
+
+    editor.copySlide = function() {
+        $.getJSON(editor.getConfigValue("copySlideAction"), {
+            "slide_id": editor.getCurrentSlideID()
+        }).done(function(data) {
+            editor.loadSlides(data.id);
+        });
+    };
+
+})(StoryEditor, jQuery, console);

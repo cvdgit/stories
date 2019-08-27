@@ -33,6 +33,7 @@ $config = [
     'createSlideLinkAction' => Url::to(['editor/create-slide-link', 'story_id' => $storyID]),
     'slidesAction' => Url::to(['editor/slides']),
     'createSlideQuestionAction' => Url::to(['editor/create-slide-question', 'story_id' => $storyID]),
+    'copySlideAction' => Url::to(['editor/copy-slide']),
 ];
 $configJSON = Json::htmlEncode($config);
 
@@ -62,6 +63,11 @@ $js = <<< JS
 	$("#slide-source").on("click", function(e) {
 	    e.preventDefault();
 	    StoryEditor.slideSourceModal("$slideSourceAction");
+	});
+	
+	$("#slide-copy").on("click", function(e) {
+	    e.preventDefault();
+	    StoryEditor.copySlide();
 	});
 JS;
 $this->registerJs($js);
@@ -130,6 +136,7 @@ $options = [
 		</div>
         <div class="clearfix">
             <div class="editor-slide-actions pull-right">
+                <a href="#" id="slide-copy" title="Копировать слайд"><i class="glyphicon glyphicon-copy"></i></a>
                 <a href="#" class="remove-slide" id="slide-delete" title="Удалить слайд"><i class="glyphicon glyphicon-trash"></i></a>
                 <a href="#" id="slide-source" title="Код слайда"><i class="glyphicon glyphicon-fire"></i></a>
                 <a href="#" id="slide-visible" title="Скрыть слайд"><i class="glyphicon"></i></a>

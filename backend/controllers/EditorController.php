@@ -270,6 +270,18 @@ class EditorController extends Controller
         return ['success' => true, 'id' => $slideID];
     }
 
+    public function actionCopySlide(int $slide_id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        try {
+            $slideID = $this->editorService->copySlide($slide_id);
+        }
+        catch (\Exception $ex) {
+            return ['success' => false, 'error' => $ex->getMessage()];
+        }
+        return ['success' => true, 'id' => $slideID];
+    }
+
     public function actionDeleteBlock(int $slide_id, string $block_id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
