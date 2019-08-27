@@ -8,6 +8,7 @@ use backend\models\AnswerImageUploadForm;
 use common\models\StoryTest;
 use common\models\StoryTestAnswer;
 use common\models\StoryTestQuestion;
+use common\models\StoryTestResult;
 use common\rbac\UserRoles;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -174,6 +175,24 @@ class TestController extends Controller
         return $this->render('update_answer', [
             'model' => $model,
             'answerImageModel' => $answerImageModel,
+        ]);
+    }
+
+    public function actionResults()
+    {
+        $dataProvider = new ActiveDataProvider([
+            'query' => StoryTestResult::find()->with(['question', 'user', 'story']),
+            'sort' => [
+                'defaultOrder' => [
+                    'created_at' => SORT_DESC,
+                ],
+            ],
+            'pagination' => [
+                'pageSize' => 50,
+            ],
+        ]);
+        return $this->render('results', [
+            'dataProvider' => $dataProvider,
         ]);
     }
 

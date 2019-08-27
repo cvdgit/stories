@@ -63,8 +63,8 @@ class StoryTestResult extends \yii\db\ActiveRecord
             'question_id' => 'Question ID',
             'user_id' => 'User ID',
             'story_id' => 'Story ID',
-            'answer_is_correct' => 'Answer Is Correct',
-            'created_at' => 'Created At',
+            'answer_is_correct' => 'Ответ верный?',
+            'created_at' => 'Дата создания',
         ];
     }
 
@@ -91,4 +91,10 @@ class StoryTestResult extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
+
+    public function isCorrect()
+    {
+        return (int)$this->answer_is_correct === 1;
+    }
+
 }

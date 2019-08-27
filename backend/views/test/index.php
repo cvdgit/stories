@@ -7,6 +7,9 @@ use yii\grid\GridView;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Тесты';
+$this->params['sidebarMenuItems'] = [
+    ['label' => 'Результаты тестов', 'url' => ['test/results']],
+];
 ?>
 <h1 class="page-header"><?= Html::encode($this->title) ?></h1>
 <p>
