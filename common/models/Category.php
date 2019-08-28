@@ -156,6 +156,7 @@ class Category extends ActiveRecord
             } else {
                 // Add node to parent
                 $i = count($stack[$l - 1][$itemsKey]);
+                $stack[$l - 1]['folder'] = true;
                 $stack[$l - 1][$itemsKey][$i] = $item;
                 $stack[] = &$stack[$l - 1][$itemsKey][$i];
             }

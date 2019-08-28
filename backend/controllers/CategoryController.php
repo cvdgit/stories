@@ -38,22 +38,14 @@ class CategoryController extends \yii\web\Controller
         ];
     }
 
-    /**
-     * Lists all Category models.
-     * @return mixed
-     */
-    public function actionIndex()
+    public function actionIndex($id = 1)
     {
-        $searchModel = new CategorySearch();
+/*        $searchModel = new CategorySearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-        ]);
-    }
-
-    public function actionTree($id = 1)
-    {
+        ]);*/
         return $this->render('tree', [
             'data' => Category::findModel($id)->categoryArray2(),
         ]);

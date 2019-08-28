@@ -1,17 +1,21 @@
 <?php
 
 use common\helpers\Url;
+use yii\helpers\Html;
 use yii\web\JsExpression;
 
+$this->title = 'Категории';
+$this->params['breadcrumbs'][] = $this->title;
 ?>
-
-<div>
+<div class="category-index">
+    <h1 class="page-header"><?= Html::encode($this->title) ?></h1>
     <div class="row">
         <div class="col-md-6">
             <?= \wbraganca\fancytree\FancytreeWidget::widget([
                 'options' =>[
                     'source' => $data,
                     'extensions' => ['dnd'],
+                    'minExpandLevel' => 1,
                     'dnd' => [
                         'preventVoidMoves' => true,
                         'preventRecursiveMoves' => true,
