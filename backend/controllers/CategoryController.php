@@ -55,7 +55,7 @@ class CategoryController extends \yii\web\Controller
     public function actionTree($id = 1)
     {
         return $this->render('tree', [
-            'data' => Category::findModel($id)->tree(),
+            'data' => Category::findModel($id)->categoryArray2(),
         ]);
     }
 

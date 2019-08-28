@@ -204,7 +204,20 @@ class Category extends ActiveRecord
         $root = self::findOne(1);
         $items = $root->toNestedArray(null, 'items', function($node) {
             return [
-                'label' => $node->name,
+                'name' => $node->name,
+                'url' => $node->id,
+                'depth' => $node->depth
+            ];
+        });
+        return $items;
+    }
+
+    public static function categoryArray2()
+    {
+        $root = self::findOne(1);
+        $items = $root->toNestedArray(null, 'children', function($node) {
+            return [
+                'title' => $node->name,
                 'url' => $node->id,
                 'depth' => $node->depth
             ];
