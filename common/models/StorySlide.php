@@ -122,6 +122,14 @@ class StorySlide extends \yii\db\ActiveRecord
         throw new DomainException('Слайд не найден.');
     }
 
+    public static function findSlideByNumber(int $storyID, int $number)
+    {
+        return self::find()
+            ->where('story_id = :story', [':story' => $storyID])
+            ->andWhere('number = :number', [':number' => $number])
+            ->one();
+    }
+
     public static function findFirstSlide(int $storyID)
     {
         return self::find()
