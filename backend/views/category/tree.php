@@ -9,6 +9,9 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="category-index">
     <h1 class="page-header"><?= Html::encode($this->title) ?></h1>
+    <p>
+        <?= Html::a('Создать категорию', ['create'], ['class' => 'btn btn-success']) ?>
+    </p>
     <div class="row">
         <div class="col-md-6">
             <?= \wbraganca\fancytree\FancytreeWidget::widget([
@@ -27,15 +30,15 @@ $this->params['breadcrumbs'][] = $this->title;
 				            return true;
 			            }'),
                         'dragDrop' => new JsExpression('function(node, data) {
-                            $.get("' . Url::to(['category/move']) . '", {item: data.otherNode.key.substr(1), action: data.hitMode, second: data.node.key.substr(1)}, function() {
+                            $.get("' . Url::to(['category/move']) . '", {item: data.otherNode.data.url, action: data.hitMode, second: data.node.data.url}, function() {
                                 data.otherNode.moveTo(node, data.hitMode);
                             });
 			            }'),
                     ],
                     'activate' => new JsExpression('function(event, data) {
                         var title = data.node.title;
-                        var id = data.node.key.substr(1);
-                        $.get("' . Url::to(['category/update-ajax']) . '", {"id": id}, function(data) {
+                        var id = data.node.data.url;
+                        $.get("' . Url::to(['category/update-ajax']) . '", {id: id}, function(data) {
                             $("#form-container").html(data);
                         });
                     }'),

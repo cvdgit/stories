@@ -10,7 +10,7 @@ use common\models\Category;
 ?>
 
 <div class="category-form">
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(['action' => $model->isNewRecord ? ['create'] : ['update', 'id' => $model->id]]); ?>
     <?= $form->field($model, 'parentNode')->dropDownList(Category::getCategoryArray(), ['prompt' => '']) ?>
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'alias')->textInput(['maxlength' => true]) ?>
