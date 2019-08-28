@@ -22,8 +22,11 @@ use yii\web\NotFoundHttpException;
  * @property string $name
  * @property string $alias
  * @property string $description
+ * @property string $sort_field
+ * @property int $sort_order
  *
- * @property ActiveQuery[] $stories
+ * @property StoryCategory[] $storyCategories
+ * @property Story[] $stories
  */
 class Category extends ActiveRecord
 {
@@ -45,10 +48,6 @@ class Category extends ActiveRecord
                 'class' => NestedSetsBehavior::class,
                 'treeAttribute' => 'tree',
             ],
-            'htmlTree'=>[
-                'class' => NestedSetsTreeBehavior::class,
-                'multipleTree' => true,
-            ]
         ];
     }
 
@@ -66,9 +65,10 @@ class Category extends ActiveRecord
     {
         return [
             [['name'], 'required'],
-            [['tree', 'lft', 'rgt', 'depth', 'parentNode'], 'integer'],
+            [['tree', 'lft', 'rgt', 'depth', 'parentNode', 'sort_order'], 'integer'],
             [['description'], 'string'],
             [['name', 'alias'], 'string', 'max' => 255],
+            [['sort_field'], 'string', 'max' => 50],
         ];
     }
 
@@ -87,6 +87,8 @@ class Category extends ActiveRecord
             'alias' => 'Alias',
             'description' => 'Описание',
             'parentNode' => 'Родительская категория',
+            'sort_field' => 'Сортировка',
+            'sort_order' => 'Направление сортировки',
         ];
     }
 
@@ -101,11 +103,19 @@ class Category extends ActiveRecord
     }
 
     /**
-     * @return ActiveQuery
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStoryCategories()
+    {
+        return $this->hasMany(StoryCategory::class, ['category_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
      */
     public function getStories()
     {
-        return $this->hasMany(Story::class, ['category_id' => 'id']);
+        return $this->hasMany(Story::class, ['id' => 'story_id'])->viaTable('story_category', ['category_id' => 'id']);
     }
 
     public function beforeValidate()

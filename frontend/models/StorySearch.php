@@ -18,6 +18,9 @@ class StorySearch extends Model
     public $tag_id;
     public $audio;
 
+    public $defaultSortField;
+    public $defaultSortOrder;
+
     public function rules()
     {
         return [
@@ -45,8 +48,12 @@ class StorySearch extends Model
             ],
         ]);
 
+        $defaultOrder = ['created_at' => SORT_DESC];
+        if ($this->defaultSortField !== null) {
+            $defaultOrder = [$this->defaultSortField => $this->defaultSortOrder];
+        }
         $sortParams = [
-            'defaultOrder' => ['created_at' => SORT_DESC],
+            'defaultOrder' => $defaultOrder,
             'attributes' => [
                 'created_at' => [
                     'asc' => ['created_at' => SORT_ASC],

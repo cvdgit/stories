@@ -95,6 +95,10 @@ class StoryController extends Controller
     {
         $model = Category::findModelByAlias($category);
         $searchModel = new StorySearch();
+        if ($model->sort_field !== null) {
+            $searchModel->defaultSortField = $model->sort_field;
+            $searchModel->defaultSortOrder = $model->sort_order ?? SORT_ASC;
+        }
         $searchModel->category_id = $model->subCategories();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $this->getView()->setMetaTags(
