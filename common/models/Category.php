@@ -46,7 +46,8 @@ class Category extends ActiveRecord
                 'treeAttribute' => 'tree',
             ],
             'htmlTree'=>[
-                'class' => NestedSetsTreeBehavior::class
+                'class' => NestedSetsTreeBehavior::class,
+                'multipleTree' => true,
             ]
         ];
     }
