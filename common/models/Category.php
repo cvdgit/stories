@@ -4,7 +4,7 @@ namespace common\models;
 
 use common\helpers\Translit;
 use creocoder\nestedsets\NestedSetsBehavior;
-use DomainException;
+use wokster\treebehavior\NestedSetsTreeBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Query;
@@ -45,6 +45,9 @@ class Category extends ActiveRecord
                 'class' => NestedSetsBehavior::class,
                 'treeAttribute' => 'tree',
             ],
+            'htmlTree'=>[
+                'class' => NestedSetsTreeBehavior::class
+            ]
         ];
     }
 

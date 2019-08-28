@@ -6,7 +6,6 @@ use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\NotFoundHttpException;
-
 use common\models\Category;
 use common\models\CategorySearch;
 use common\rbac\UserRoles;
@@ -22,7 +21,7 @@ class CategoryController extends \yii\web\Controller
     {
         return [
             'access' => [
-                'class' => AccessControl::className(),
+                'class' => AccessControl::class,
                 'rules' => [
                     [
                         'allow' => true,
@@ -31,7 +30,7 @@ class CategoryController extends \yii\web\Controller
                 ],
             ],
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -50,6 +49,13 @@ class CategoryController extends \yii\web\Controller
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    public function actionTree($id = 1)
+    {
+        return $this->render('tree', [
+            'data' => Category::findModel($id)->tree(),
         ]);
     }
 
@@ -77,7 +83,7 @@ class CategoryController extends \yii\web\Controller
 
         if ($model->load(Yii::$app->request->post())) {
 
-            if ($model->parentNode == null) {
+            if ($model->parentNode === null) {
                 $model->makeRoot();
             }
             else {
@@ -117,6 +123,36 @@ class CategoryController extends \yii\web\Controller
         return $this->render('update', [
             'model' => $model,
         ]);
+    }
+
+    public function actionUpdateAjax($id)
+    {
+        $model = Category::findModel($id);
+        $parent = $model->parents(1)->one();
+        if ($parent !== null) {
+            $model->parentNode = $parent->id;
+        }
+        return $this->renderAjax('_form', [
+            'model' => $model,
+        ]);
+    }
+
+    public function actionMove($item, $action, $second)
+    {
+        $itemModel = Category::findModel($item);
+        $secondModel = Category::findModel($second);
+        switch ($action) {
+            case 'after':
+                $itemModel->insertAfter($secondModel);
+                break;
+            case 'before':
+                $itemModel->insertBefore($secondModel);
+                break;
+            case 'over':
+                $itemModel->appendTo($secondModel);
+                break;
+        }
+        return $itemModel->save();
     }
 
     /**
