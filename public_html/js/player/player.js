@@ -126,6 +126,7 @@ function onSlideMouseDown(e) {
     e = e || window.event;
     if ($(e.target).hasClass("story-controls")
         || $(e.target).parents(".story-controls").length
+        || $(e.target).parents(".wikids-slide-links").length
         || $(e.target).hasClass("btn")
     || $(e.target).parents("section[data-slide-view=question]").length)  {
         return;

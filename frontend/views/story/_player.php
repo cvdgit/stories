@@ -1,7 +1,9 @@
 <?php
 
+use common\widgets\Reveal\Plugins\SlideLinks;
 use common\widgets\RevealButtons\BackgroundButton;
 use common\widgets\RevealWidget;
+use yii\helpers\Json;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Story */
@@ -24,6 +26,7 @@ $plugins = [
     ['class' => \common\widgets\Reveal\Plugins\Transition::class, 'storyID' => $model->id],
     ['class' => \common\widgets\Reveal\Plugins\Test::class, 'storyID' => $model->id],
     ['class' => \common\widgets\Reveal\Plugins\Background::class],
+    ['class' => SlideLinks::class, 'storyID' => $model->id, 'links' => $model->slideBlocksData()],
 ];
 
 if ($model->isAudioStory()) {

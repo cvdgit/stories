@@ -11,6 +11,7 @@ var StoryEditor = (function() {
         getSlideBlocksAction: "",
         getBlockFormAction: "",
         createBlockAction: "",
+        newCreateBlockAction: "",
         deleteBlockAction: "",
         deleteSlideAction: "",
         currentSlidesAction: "",
@@ -131,6 +132,10 @@ var StoryEditor = (function() {
         setSlideUrl();
     }
 
+    function updateLinkCounter(count) {
+        $("#slide-links").text("Ссылки" + (count > 0 ? " (" + count + ")" : ""));
+    }
+
     function loadSlide(slideID, loadBlocks) {
         loadBlocks = loadBlocks || false;
         currentSlideID = slideID;
@@ -138,6 +143,7 @@ var StoryEditor = (function() {
             .done(function(data) {
                 setActiveSlide(data.id);
                 changeSlideVisibleIcon(data.status);
+                updateLinkCounter(data.blockNumber);
                 $(".slides", $editor).empty().append(data.data);
                 Reveal.sync();
                 Reveal.slide(0);
@@ -399,6 +405,21 @@ var StoryEditor = (function() {
             "slide_id": editor.getCurrentSlideID()
         }).done(function(data) {
             editor.loadSlides(data.id);
+        });
+    };
+
+})(StoryEditor, jQuery, console);
+
+/** Blocks */
+(function(editor, $, console) {
+    "use strict";
+
+    editor.newCreateBlock = function() {
+        $.getJSON(editor.getConfigValue("newCreateBlockAction"), {
+            "slide_id": editor.getCurrentSlideID()
+        }).done(function(data) {
+            console.log(data);
+            //editor.loadSlide(editor.getCurrentSlideID(), true);
         });
     };
 

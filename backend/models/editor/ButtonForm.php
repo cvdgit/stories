@@ -13,8 +13,7 @@ class ButtonForm extends TextForm
     {
         $rules = parent::rules();
         $rules = array_merge($rules, [
-            [['url'], 'required'],
-            // [['url'], 'url'],
+            [['url'], 'url'],
         ]);
         return $rules;
     }

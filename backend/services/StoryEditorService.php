@@ -13,6 +13,7 @@ use backend\models\editor\ImageForm;
 use backend\models\editor\TextForm;
 use backend\models\editor\TransitionForm;
 use common\models\StorySlide;
+use common\models\StorySlideBlock;
 use common\models\StoryTestQuestion;
 use DomainException;
 use yii;
@@ -225,6 +226,14 @@ class StoryEditorService
         return $model->save(false, ['data']);
     }
 
+    public function newUpdateBlock($form)
+    {
+        $model = StorySlideBlock::findBlock($form->block_id);
+        $model->title = $form->text;
+        $model->href = $form->url;
+        return $model->save();
+    }
+
     public function generateBookStoryHtml(Story $model)
     {
         $reader = new HTMLReader($model->slidesData(true));
@@ -242,14 +251,29 @@ class StoryEditorService
                 }
             }
             $content = '';
-            if ($text !== '' && $image !== '') {
-                $content = Html::tag('div', Html::img(null, ['data-src' => '{IMAGE}', 'width' => '100%', 'height' => '100%', 'class' => 'lazy']), ['class' => 'col-lg-6']);
-                $content .= Html::tag('div', Html::tag('p', '{TEXT}'), ['class' => 'col-lg-6']);
+
+            if ($text !== '') {
+                $content .= Html::tag('div', Html::tag('p', '{TEXT}'), ['class' => '{CLASS}']);
                 $content = strtr($content, [
-                    '{IMAGE}' => $image,
                     '{TEXT}' => $text,
                 ]);
             }
+
+            if ($image !== '') {
+                $content .= Html::tag('div', Html::img(null, ['data-src' => '{IMAGE}', 'width' => '100%', 'height' => '100%', 'class' => 'lazy']), ['class' => 'CLASS']);
+                $content = strtr($content, [
+                    '{IMAGE}' => $image,
+                ]);
+            }
+
+            $colClass = 'col-lg-6';
+            if (($text !== '' && $image === '') || ($text === '' && $image !== '')) {
+                $colClass = 'col-lg-12';
+            }
+            $content = strtr($content, [
+                '{CLASS}' => $colClass,
+            ]);
+
             if ($content !== '') {
                 $html .= Html::tag('section', Html::tag('div', $content, ['class' => 'row']));
             }

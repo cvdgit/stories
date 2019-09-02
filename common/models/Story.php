@@ -319,7 +319,7 @@ class Story extends ActiveRecord
     public function slidesData(bool $withoutQuestions = false): string
     {
         $slides = (new Query())->from('{{%story_slide}} AS t1')
-            ->select(['t1.data', 't2.data AS link_data'])
+            ->select(['t1.data', 't2.data AS link_data', 't1.id'])
             ->leftJoin('{{%story_slide}} t2', 't2.id = t1.link_slide_id')
             ->where('t1.`story_id` = :story', [':story' => $this->id])
             ->andWhere('t1.`status` = :status', [':status' => 1])
@@ -331,6 +331,7 @@ class Story extends ActiveRecord
         $data = '';
         foreach ($slides as $slide) {
             $data .= $slide['link_data'] ?? $slide['data'];
+            $data = str_replace('data-id=""', 'data-id="' . $slide['id'] . '"', $data);
         }
         return '<div class="slides">' . $data . '</div>';
     }
@@ -338,6 +339,19 @@ class Story extends ActiveRecord
     public function isAudioStory(): bool
     {
         return (int)$this->audio === 1;
+    }
+
+    public function slideBlocksData()
+    {
+        return (new Query())
+            ->select('t1.id AS slideID, t2.title, t2.href')
+            ->from('{{%story_slide}} AS t1')
+            ->innerJoin('{{%story_slide_block}} t2', 't1.id = t2.slide_id')
+            ->where('t1.story_id = :story', [':story' => $this->id])
+            ->andWhere('t1.status = :status', [':status' => 1])
+            ->andWhere('t2.type = :block_type', [':block_type' => StorySlideBlock::TYPE_BUTTON])
+            //->indexBy('slideID')
+            ->all();
     }
 
 }

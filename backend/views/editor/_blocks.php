@@ -14,7 +14,7 @@ $options = [
             [
                 'label' => 'Кнопка',
                 'url' => '#',
-                'linkOptions' => ['onclick' => "StoryEditor.createBlock('button'); return false;"],
+                'linkOptions' => ['onclick' => 'StoryEditor.newCreateBlock(); return false;'],
             ],
             [
                 'label' => 'Переход к истории',
@@ -35,11 +35,7 @@ $options = [
     ]
 ];
 ?>
-
 <div>
-    <h4>Блоки</h4>
-    <div class="list-group" id="slide-block-list"></div>
-    <div class="clearfix" style="margin: 10px 0">
-        <div class="pull-right"><?= ButtonDropdown::widget($options) ?></div>
-    </div>
+    <h4>Блоки <div class="pull-right"><?= ButtonDropdown::widget($options) ?></div></h4>
+    <div class="list-group" id="slide-block-list" style="margin-top: 20px"></div>
 </div>

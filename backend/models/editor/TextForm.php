@@ -14,7 +14,7 @@ class TextForm extends BaseForm
     {
         $rules = parent::rules();
         $rules = array_merge($rules, [
-            [['text', 'text_size'], 'required'],
+            //[['text', 'text_size'], 'required'],
             [['text', 'text_size'], 'string'],
         ]);
         return $rules;

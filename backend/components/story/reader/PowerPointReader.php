@@ -26,6 +26,7 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
 
     protected $reader;
 
+    protected $slideNumber;
     protected $currentSlideNumber = 0;
     protected $currentSlideBlockNumber = 0;
 
@@ -65,6 +66,7 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
     protected function loadSlides(PhpPresentation $presentation): void
     {
         $slides = $presentation->getAllSlides();
+        $this->slideNumber = count($slides);
         $slideNumber = 1;
         foreach ($slides as $slide) {
             $this->loadSlide($slide, $slideNumber);
@@ -121,7 +123,7 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
     protected function loadShapeText(RichText $powerPointShape, Slide $slide): void
     {
         $block = new TextBlock();
-        if ($this->currentSlideBlockNumber === 1) {
+        if ($this->currentSlideBlockNumber === 1 && ($this->currentSlideNumber === 0 || $this->currentSlideNumber === $this->slideNumber - 1)) {
             $block->setType(AbstractBlock::TYPE_HEADER);
             $block->setWidth('1200px');
             $block->setHeight('auto');

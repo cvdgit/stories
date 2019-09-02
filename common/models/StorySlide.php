@@ -22,6 +22,7 @@ use yii\db\Query;
  * @property int $link_slide_id
  *
  * @property Story $story
+ * @property StorySlideBlock[] $storySlideBlocks
  */
 class StorySlide extends \yii\db\ActiveRecord
 {
@@ -83,6 +84,14 @@ class StorySlide extends \yii\db\ActiveRecord
     public function getStory()
     {
         return $this->hasOne(Story::class, ['id' => 'story_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStorySlideBlocks()
+    {
+        return $this->hasMany(StorySlideBlock::class, ['slide_id' => 'id']);
     }
 
     public static function createSlide(int $storyID)
@@ -167,6 +176,17 @@ class StorySlide extends \yii\db\ActiveRecord
     public function isQuestion(): bool
     {
         return (int)$this->kind === self::KIND_QUESTION;
+    }
+
+    public function blockArray()
+    {
+        return array_map(function(StorySlideBlock $block) {
+            return [
+                'id' => $block->id,
+                'type' => 'button',
+                'title' => $block->title,
+            ];
+        }, $this->storySlideBlocks);
     }
 
 }

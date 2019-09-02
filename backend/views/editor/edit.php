@@ -25,6 +25,7 @@ $config = [
     'getSlideBlocksAction' => Url::to(['/editor/slide-blocks']),
     'getBlockFormAction' => Url::to(['/editor/form']),
     'createBlockAction' => Url::to(['/editor/create-block']),
+    'newCreateBlockAction' => Url::to(['editor/block/create']),
     'deleteBlockAction' => Url::to(['/editor/delete-block']),
     'deleteSlideAction' => Url::to(['editor/delete-slide']),
     'currentSlidesAction' => Url::to(['editor/slides', 'story_id' => $storyID]),
@@ -38,6 +39,7 @@ $config = [
 $configJSON = Json::htmlEncode($config);
 
 $slideSourceAction = Url::to(['editor/slide-source']);
+$slideLinksAction = Url::to(['editor/links/index']);
 
 $js = <<< JS
     
@@ -68,6 +70,11 @@ $js = <<< JS
 	$("#slide-copy").on("click", function(e) {
 	    e.preventDefault();
 	    StoryEditor.copySlide();
+	});
+	
+	$("#slide-links").on("click", function(e) {
+	    e.preventDefault();
+	    location.href = "$slideLinksAction&slide_id=" + StoryEditor.getCurrentSlideID();
 	});
 JS;
 $this->registerJs($js);
@@ -135,6 +142,9 @@ $options = [
 		    </div>
 		</div>
         <div class="clearfix">
+            <div class="editor-slide-actions pull-left">
+                <?= Html::a('Ссылки', '#', ['id' => 'slide-links', 'style' => 'font-size: 18px']) ?>
+            </div>
             <div class="editor-slide-actions pull-right">
                 <a href="#" id="slide-copy" title="Копировать слайд"><i class="glyphicon glyphicon-copy"></i></a>
                 <a href="#" class="remove-slide" id="slide-delete" title="Удалить слайд"><i class="glyphicon glyphicon-trash"></i></a>

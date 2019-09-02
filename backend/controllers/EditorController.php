@@ -17,6 +17,7 @@ use backend\models\editor\TestForm;
 use backend\models\editor\TextForm;
 use backend\models\editor\TransitionForm;
 use common\models\StorySlide;
+use common\models\StorySlideBlock;
 use DomainException;
 use Yii;
 use yii\filters\AccessControl;
@@ -79,7 +80,12 @@ class EditorController extends Controller
             $linkSlide = StorySlide::findSlideByID($model->link_slide_id);
             $model->data = $linkSlide->data;
         }
-        return $model;
+        return [
+            'id' => $model->id,
+            'status' => $model->status,
+            'data' => $model->data,
+            'blockNumber' => count($model->storySlideBlocks),
+        ];
     }
 
     public function actionSlideBlocks(int $slide_id)
@@ -88,7 +94,8 @@ class EditorController extends Controller
         $model = StorySlide::findSlide($slide_id);
         $reader = new HtmlSlideReader($model->data);
         $slide = $reader->load();
-        return $slide->getBlocksArray();
+        $blocks = $slide->getBlocksArray();
+        return array_merge($blocks, $model->blockArray());
     }
 
     public function actionUpdateText()
@@ -155,6 +162,7 @@ class EditorController extends Controller
         $slide = $reader->load();
         $block = $slide->findBlockByID($block_id);
         $block_type = $block->getType();
+        $values = $block->getValues();
 
         $types = [
             AbstractBlock::TYPE_HEADER => [
@@ -193,7 +201,7 @@ class EditorController extends Controller
         $form = Yii::createObject($types[$block_type]);
         $form->slide_id = $model->id;
         $form->block_id = $block_id;
-        $values = $block->getValues();
+
         $form->load($values, '');
 
         return $this->renderAjax($form->view, [

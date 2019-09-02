@@ -1781,3 +1781,41 @@
 .sl-block[data-block-type=text] p {
 	padding: 0 10px;
 }
+
+.wikids-slide-links {
+	width: 307px;
+	position: absolute;
+	z-index: 1;
+	text-align: center;
+	display: block;
+	left: 973px;
+	top: 400px;
+	height: auto;
+}
+
+.wikids-slide-links-mini {
+	top: 630px;
+}
+
+.wikids-slide-links h4 {
+	color: white;
+	cursor: pointer;
+}
+
+.wikids-slide-links a {
+	color: white;
+	text-decoration: underline;
+	font-size: 2.2rem;
+	display: table;
+	margin: 6px auto;
+}
+
+.reveal.has-light-background .wikids-slide-links h4,
+.reveal.has-light-background .wikids-slide-links a {
+	color: #38405d !important;
+}
+
+.reveal.has-dark-background .wikids-slide-links h4,
+.reveal.has-light-background .wikids-slide-links a {
+	color: #ffffff;
+}
