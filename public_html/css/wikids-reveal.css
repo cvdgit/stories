@@ -1789,7 +1789,7 @@
 	text-align: center;
 	display: block;
 	left: 973px;
-	top: 400px;
+	top: 486px;
 	height: auto;
 }
 
@@ -1798,8 +1798,9 @@
 }
 
 .wikids-slide-links h4 {
-	color: white;
+	color: #99cd50;
 	cursor: pointer;
+	font-size: 2.5rem;
 }
 
 .wikids-slide-links a {
@@ -1810,12 +1811,10 @@
 	margin: 6px auto;
 }
 
-.reveal.has-light-background .wikids-slide-links h4,
 .reveal.has-light-background .wikids-slide-links a {
 	color: #38405d !important;
 }
 
-.reveal.has-dark-background .wikids-slide-links h4,
 .reveal.has-light-background .wikids-slide-links a {
 	color: #ffffff;
 }

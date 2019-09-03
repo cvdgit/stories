@@ -2,10 +2,14 @@
 
 namespace console\controllers;
 
+use backend\components\story\AbstractBlock;
 use backend\components\story\reader\HTMLReader;
+use backend\components\story\reader\HtmlSlideReader;
+use backend\components\story\Slide;
 use backend\components\story\writer\HTMLWriter;
 use backend\services\StoryEditorService;
 use common\models\StorySlide;
+use common\models\StorySlideBlock;
 use yii\console\Controller;
 use common\models\Story;
 use common\components\StoryCover;
@@ -143,6 +147,39 @@ class StoryController extends Controller
             $model->body = $html;
             $model->save(false, ['body']);
             $this->stdout($model->title . PHP_EOL);
+        }
+        $this->stdout('Done!' . PHP_EOL);
+    }
+
+    public function actionCreateLinksBlock()
+    {
+        $models = Story::find()->published()->all();
+        foreach ($models as $model) {
+            $this->stdout('Story: ' . $model->title . PHP_EOL);
+            foreach ($model->storySlides as $slideModel) {
+
+                /** @var StorySlide $slideModel */
+
+                $reader = new HtmlSlideReader($slideModel->data);
+                $slide = $reader->load();
+
+                foreach ($slide->getBlocks() as $block) {
+                    if ($block->getType() === AbstractBlock::TYPE_BUTTON) {
+
+                        $blockModel = StorySlideBlock::create($slideModel->id, $block->getText(), $block->getUrl());
+                        $blockModel->save();
+
+                        $slide->deleteBlock($block->getId());
+
+                        $this->stdout('Button: ' . $block->getText() . PHP_EOL);
+                    }
+                }
+
+                $writer = new HTMLWriter();
+                $html = $writer->renderSlide($slide);
+                $slideModel->data = $html;
+                $slideModel->save(false, ['data']);
+            }
         }
         $this->stdout('Done!' . PHP_EOL);
     }

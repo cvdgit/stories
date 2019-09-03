@@ -85,6 +85,7 @@ class EditorController extends Controller
             'status' => $model->status,
             'data' => $model->data,
             'blockNumber' => count($model->storySlideBlocks),
+            'number' => $model->number,
         ];
     }
 
@@ -94,8 +95,7 @@ class EditorController extends Controller
         $model = StorySlide::findSlide($slide_id);
         $reader = new HtmlSlideReader($model->data);
         $slide = $reader->load();
-        $blocks = $slide->getBlocksArray();
-        return array_merge($blocks, $model->blockArray());
+        return $slide->getBlocksArray();
     }
 
     public function actionUpdateText()

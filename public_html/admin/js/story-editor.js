@@ -20,7 +20,7 @@ var StoryEditor = (function() {
         slidesAction: ""
     };
 
-    var currentSlideIndex,
+    var currentSlideIndex = 0,
         currentSlideID;
 
     function initialize(params) {
@@ -123,12 +123,13 @@ var StoryEditor = (function() {
         });
     }
 
-    function setActiveSlide(slideID) {
-        currentSlideID = slideID;
+    function setActiveSlide(slide) {
+        currentSlideID = slide.id;
+        currentSlideIndex = slide.number - 1;
         $("[data-slide-id]", $previewContainer).each(function() {
             $(this).removeClass("active");
         });
-        $("[data-slide-id=" + slideID + "]", $previewContainer).addClass("active");
+        $("[data-slide-id=" + slide.id + "]", $previewContainer).addClass("active");
         setSlideUrl();
     }
 
@@ -141,7 +142,7 @@ var StoryEditor = (function() {
         currentSlideID = slideID;
         send(slideID)
             .done(function(data) {
-                setActiveSlide(data.id);
+                setActiveSlide(data);
                 changeSlideVisibleIcon(data.status);
                 updateLinkCounter(data.blockNumber);
                 $(".slides", $editor).empty().append(data.data);
@@ -261,7 +262,7 @@ var StoryEditor = (function() {
     }
 
     function locationHash() {
-        return "/" + currentSlideID;
+        return "#slide=" + currentSlideIndex;
     }
 
     function setSlideUrl() {
