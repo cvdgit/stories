@@ -5,10 +5,37 @@ var WikidsLinks = window.WikidsLinks || (function() {
     var loaded = false,
         config = Reveal.getConfig().linksConfig;
 
+    var root,
+        links = [];
 
+    function getCurrentSlide() {
+        return Reveal.getCurrentSlide();
+    }
 
     function getCurrentSlideID() {
-        return $(Reveal.getCurrentSlide()).attr("data-id");
+        return $(getCurrentSlide()).attr("data-id");
+    }
+
+    function initRootElement() {
+        if (root && $(root, getCurrentSlide()).length) {
+            $(root, getCurrentSlide()).remove();
+        }
+        root = $("<div/>")
+            .addClass("wikids-slide-links");
+        $("<h4/>")
+            .text("Интересные ссылки")
+            .appendTo(root);
+        $("<div/>")
+            .addClass("wikids-slide-links-links")
+            .appendTo(root);
+        $("<a/>")
+            .addClass("hide")
+            .attr("href", "#")
+            .addClass("wikids-slide-links-more")
+            .text("показать еще")
+            .on("click", showMoreLinks)
+            .appendTo(root);
+        root.appendTo(getCurrentSlide());
     }
 
     function showLinks() {
@@ -17,10 +44,11 @@ var WikidsLinks = window.WikidsLinks || (function() {
         }
         loaded = true;
         var currentSlideID = getCurrentSlideID();
-        var links = config.links.filter(function(link) {
+        links = config.links.filter(function(link) {
             return link.slideID === currentSlideID;
         });
         if (links.length) {
+            initRootElement();
             drawLinks(links);
         }
     }
@@ -31,25 +59,43 @@ var WikidsLinks = window.WikidsLinks || (function() {
         block.find("a").toggleClass("hide");
     }
 
-    function drawLinks(links) {
-        if ($(".wikids-slide-links", Reveal.getCurrentSlide()).length) {
-            $(".wikids-slide-links", Reveal.getCurrentSlide()).remove();
+    function showMoreLinks() {
+        var block = $(this).parent();
+        block.find("a").removeClass("hide");
+        block.toggleClass("wikids-slide-links-more-on");
+        if (block.hasClass("wikids-slide-links-more-on")) {
+            $(this).text("скрыть");
         }
-        var root = $("<div/>")
-            .addClass("wikids-slide-links");
-        $("<h4/>")
-            .text("Интересные ссылки")
-            .attr("title", "Свернуть")
-            .on("click", toggleLinksBlock)
-            .appendTo(root);
+        else {
+            drawLinks(links);
+        }
+        return false;
+    }
+
+    function drawLinks(links) {
+        var container = $(".wikids-slide-links-links", root).empty(),
+            linkNumber = 0,
+            showMoreLink;
         links.forEach(function(link) {
             var button = $("<a/>")
                 .attr("href", link.href)
                 .attr("target", "_blank")
+                .addClass("wikids-slide-links-link")
                 .text(link.title)
-                .appendTo(root);
+                .appendTo(container);
+            if (linkNumber >= 3) {
+                showMoreLink = true;
+                button.addClass("hide");
+            }
+            else {
+                linkNumber++;
+            }
         });
-        root.appendTo(Reveal.getCurrentSlide());
+        if (showMoreLink) {
+            $(".wikids-slide-links-more", root)
+                .removeClass("hide")
+                .text("показать еще (" + (links.length - linkNumber) + ")");
+        }
     }
 
     Reveal.addEventListener("ready", function(event) {
