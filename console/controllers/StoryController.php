@@ -159,26 +159,27 @@ class StoryController extends Controller
             foreach ($model->storySlides as $slideModel) {
 
                 /** @var StorySlide $slideModel */
-
                 $reader = new HtmlSlideReader($slideModel->data);
                 $slide = $reader->load();
 
+                $haveButtons = false;
                 foreach ($slide->getBlocks() as $block) {
                     if ($block->getType() === AbstractBlock::TYPE_BUTTON) {
-
-/*                        $blockModel = StorySlideBlock::create($slideModel->id, $block->getText(), $block->getUrl());
+                        $blockModel = StorySlideBlock::create($slideModel->id, $block->getText(), $block->getUrl());
                         $blockModel->save();
-
-                        $slide->deleteBlock($block->getId());*/
-
+                        $slide->deleteBlock($block->getId());
+                        $haveButtons = true;
                         $this->stdout('Button: ' . $block->getText() . PHP_EOL);
                     }
                 }
 
-/*                $writer = new HTMLWriter();
-                $html = $writer->renderSlide($slide);
-                $slideModel->data = $html;
-                $slideModel->save(false, ['data']);*/
+                if ($haveButtons) {
+                    $writer = new HTMLWriter();
+                    $html = $writer->renderSlide($slide);
+                    $slideModel->data = $html;
+                    $slideModel->save(false, ['data']);
+                    $this->stdout('OK' . PHP_EOL);
+                }
             }
         }
         $this->stdout('Done!' . PHP_EOL);
