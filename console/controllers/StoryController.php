@@ -155,7 +155,7 @@ class StoryController extends Controller
     {
         $models = Story::find()->published()->all();
         foreach ($models as $model) {
-            $this->stdout('Story: ' . $model->title . PHP_EOL);
+            //$this->stdout('Story: ' . $model->title . PHP_EOL);
             foreach ($model->storySlides as $slideModel) {
 
                 /** @var StorySlide $slideModel */
@@ -166,19 +166,19 @@ class StoryController extends Controller
                 foreach ($slide->getBlocks() as $block) {
                     if ($block->getType() === AbstractBlock::TYPE_BUTTON) {
 
-                        $blockModel = StorySlideBlock::create($slideModel->id, $block->getText(), $block->getUrl());
+/*                        $blockModel = StorySlideBlock::create($slideModel->id, $block->getText(), $block->getUrl());
                         $blockModel->save();
 
-                        $slide->deleteBlock($block->getId());
+                        $slide->deleteBlock($block->getId());*/
 
                         $this->stdout('Button: ' . $block->getText() . PHP_EOL);
                     }
                 }
 
-                $writer = new HTMLWriter();
+/*                $writer = new HTMLWriter();
                 $html = $writer->renderSlide($slide);
                 $slideModel->data = $html;
-                $slideModel->save(false, ['data']);
+                $slideModel->save(false, ['data']);*/
             }
         }
         $this->stdout('Done!' . PHP_EOL);
