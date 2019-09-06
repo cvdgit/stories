@@ -26,7 +26,12 @@ abstract class AbstractBlock
 
     public function __construct()
     {
-        $this->id = bin2hex(random_bytes(10));
+        $this->id = $this->generateID();
+    }
+
+    public function generateID()
+    {
+        return bin2hex(random_bytes(10));
     }
 
     /**

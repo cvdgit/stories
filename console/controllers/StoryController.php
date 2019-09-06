@@ -216,4 +216,31 @@ class StoryController extends Controller
         $this->stdout('Done!' . PHP_EOL);
     }
 
+    public function actionGenerateBlockIds()
+    {
+        $models = Story::find()->published()->all();
+        foreach ($models as $model) {
+            $this->stdout('Story: ' . $model->title . PHP_EOL);
+            foreach ($model->storySlides as $slideModel) {
+                $reader = new HtmlSlideReader($slideModel->data);
+                $slide = $reader->load();
+                $IDset = false;
+                foreach ($slide->getBlocks() as $block) {
+                    $blockID = $block->getId();
+                    if (empty($blockID)) {
+                        $block->setId($block->generateID());
+                        $IDset = true;
+                    }
+                }
+                if ($IDset) {
+                    $writer = new HTMLWriter();
+                    $slideModel->data = $writer->renderSlide($slide);
+                    $slideModel->save(false, ['data']);
+                    $this->stdout('OK' . PHP_EOL);
+                }
+            }
+        }
+        $this->stdout('Done!' . PHP_EOL);
+    }
+
 }
