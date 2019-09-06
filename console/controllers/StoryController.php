@@ -10,6 +10,7 @@ use backend\components\story\writer\HTMLWriter;
 use backend\services\StoryEditorService;
 use common\models\StorySlide;
 use common\models\StorySlideBlock;
+use yii\imagine\Image;
 use yii\console\Controller;
 use common\models\Story;
 use common\components\StoryCover;
@@ -27,7 +28,7 @@ class StoryController extends Controller
         parent::__construct($id, $module, $config);
     }
 
-    public function actionMakeCovers()
+/*    public function actionMakeCovers()
 	{
 		$models = Story::find()->where('cover is not null')->all();
 		$this->stdout('Всего историй - ' . count($models) . PHP_EOL);
@@ -43,7 +44,7 @@ class StoryController extends Controller
 			$this->stdout('[+] ' . $path . PHP_EOL);
 		}
 		$this->stdout('Done!' . PHP_EOL);
-	}
+	}*/
 
 	public function actionClearStoryFiles()
     {
@@ -88,21 +89,20 @@ class StoryController extends Controller
         $this->stdout('Done!' . PHP_EOL);
     }
 
-    public function actionChangeCategories(): void
+/*    public function actionChangeCategories(): void
     {
         $query = 'INSERT INTO {{%story_category}} (story_id, category_id) SELECT t.id, t.category_id FROM {{%story}} AS t WHERE t.category_id IS NOT NULL';
         $command = Yii::$app->db->createCommand($query);
         $command->execute();
         $this->stdout('Done!' . PHP_EOL);
-    }
+    }*/
 
-    public function actionCreateSlides()
+/*    public function actionCreateSlides()
     {
         $query = (new Query())->from('{{%story}}')->where('body IS NOT NULL');
         $command = Yii::$app->db->createCommand();
         $writer = new HTMLWriter();
         foreach ($query->each() as $row) {
-
             try {
                 $reader = new HTMLReader($row['body']);
                 $story = $reader->load();
@@ -110,7 +110,6 @@ class StoryController extends Controller
             catch (\Error $e) {
                 throw new \RuntimeException('Error on story ' . $row['id']);
             }
-
             $slides = $story->getSlides();
             foreach ($slides as $slide) {
                 $data = $writer->renderSlide($slide);
@@ -125,9 +124,9 @@ class StoryController extends Controller
             $this->stdout(count($slides) . PHP_EOL);
         }
         $this->stdout('Done!' . PHP_EOL);
-    }
+    }*/
 
-    public function actionHideFirstSlide()
+/*    public function actionHideFirstSlide()
     {
         $query = (new Query())->from('{{%story}}')->where('body IS NOT NULL');
         foreach ($query->each() as $row) {
@@ -137,9 +136,9 @@ class StoryController extends Controller
             $this->stdout($row['id'] . ' - ' . $save . PHP_EOL);
         }
         $this->stdout('Done!' . PHP_EOL);
-    }
+    }*/
 
-    public function actionGenerateBookStoryHtml()
+/*    public function actionGenerateBookStoryHtml()
     {
         $models = Story::find()->published()->all();
         foreach ($models as $model) {
@@ -149,19 +148,15 @@ class StoryController extends Controller
             $this->stdout($model->title . PHP_EOL);
         }
         $this->stdout('Done!' . PHP_EOL);
-    }
+    }*/
 
-    public function actionCreateLinksBlock()
+/*    public function actionCreateLinksBlock()
     {
         $models = Story::find()->published()->all();
         foreach ($models as $model) {
-            //$this->stdout('Story: ' . $model->title . PHP_EOL);
             foreach ($model->storySlides as $slideModel) {
-
-                /** @var StorySlide $slideModel */
                 $reader = new HtmlSlideReader($slideModel->data);
                 $slide = $reader->load();
-
                 $haveButtons = false;
                 foreach ($slide->getBlocks() as $block) {
                     if ($block->getType() === AbstractBlock::TYPE_BUTTON) {
@@ -172,11 +167,47 @@ class StoryController extends Controller
                         $this->stdout('Button: ' . $block->getText() . PHP_EOL);
                     }
                 }
-
                 if ($haveButtons) {
                     $writer = new HTMLWriter();
                     $html = $writer->renderSlide($slide);
                     $slideModel->data = $html;
+                    $slideModel->save(false, ['data']);
+                    $this->stdout('OK' . PHP_EOL);
+                }
+            }
+        }
+        $this->stdout('Done!' . PHP_EOL);
+    }*/
+
+    public function actionConvertImages()
+    {
+        $models = Story::find()->published()->all();
+        foreach ($models as $model) {
+            $this->stdout('Story: ' . $model->title . PHP_EOL);
+            foreach ($model->storySlides as $slideModel) {
+                $reader = new HtmlSlideReader($slideModel->data);
+                $slide = $reader->load();
+                $imageConverted = false;
+                foreach ($slide->getBlocks() as $block) {
+                    if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
+                        $oldFilePath = $block->getFilePath();
+                        if (!file_exists(Yii::getAlias('@public') . $oldFilePath)) {
+                            continue;
+                        }
+                        [$imageWidth, $imageHeight, $type] = getimagesize(Yii::getAlias('@public') . $oldFilePath);
+                        if ((int)$type === IMAGETYPE_PNG) {
+                            $newFilePath = str_replace('.png', '.jpg', $oldFilePath);
+                            Image::resize(Yii::getAlias('@public') . $oldFilePath, $imageWidth, $imageHeight)->save(Yii::getAlias('@public') . $newFilePath, ['jpeg_quality' => 80]);
+                            $block->setFilePath($newFilePath);
+                            unlink(Yii::getAlias('@public') . $oldFilePath);
+                            $imageConverted = true;
+                            $this->stdout('Image: ' . $block->getFilePath() . PHP_EOL);
+                        }
+                    }
+                }
+                if ($imageConverted) {
+                    $writer = new HTMLWriter();
+                    $slideModel->data = $writer->renderSlide($slide);
                     $slideModel->save(false, ['data']);
                     $this->stdout('OK' . PHP_EOL);
                 }
