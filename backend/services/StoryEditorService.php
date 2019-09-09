@@ -252,17 +252,17 @@ class StoryEditorService
             }
             $content = '';
 
-            if ($text !== '') {
-                $content .= Html::tag('div', Html::tag('p', '{TEXT}'), ['class' => '{CLASS}']);
-                $content = strtr($content, [
-                    '{TEXT}' => $text,
-                ]);
-            }
-
             if ($image !== '') {
                 $content .= Html::tag('div', Html::img(null, ['data-src' => '{IMAGE}', 'width' => '100%', 'height' => '100%', 'class' => 'lazy']), ['class' => '{CLASS}']);
                 $content = strtr($content, [
                     '{IMAGE}' => $image,
+                ]);
+            }
+
+            if ($text !== '') {
+                $content .= Html::tag('div', Html::tag('p', '{TEXT}'), ['class' => '{CLASS}']);
+                $content = strtr($content, [
+                    '{TEXT}' => $text,
                 ]);
             }
 

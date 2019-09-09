@@ -138,7 +138,7 @@ class StoryController extends Controller
         $this->stdout('Done!' . PHP_EOL);
     }*/
 
-/*    public function actionGenerateBookStoryHtml()
+    public function actionGenerateBookStoryHtml()
     {
         $models = Story::find()->published()->all();
         foreach ($models as $model) {
@@ -148,7 +148,7 @@ class StoryController extends Controller
             $this->stdout($model->title . PHP_EOL);
         }
         $this->stdout('Done!' . PHP_EOL);
-    }*/
+    }
 
 /*    public function actionCreateLinksBlock()
     {

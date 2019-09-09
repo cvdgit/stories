@@ -12,6 +12,16 @@ use yii\db\Query;
 class CountersService
 {
 
+    public function needUpdateCounters()
+    {
+        if (Yii::$app->user->isGuest) {
+            return true;
+        }
+        $role = Yii::$app->authManager->getRolesByUser(Yii::$app->user->id);
+        $role = array_shift($role);
+        return $role->name === UserRoles::ROLE_USER;
+    }
+
     public function updateUserStoryHistory(int $userID, int $storyID)
     {
         $exists = (new Query())->from('{{%user_story_history}}')->where('user_id = :user AND story_id = :story', ['user' => $userID, 'story' => $storyID])->exists();
@@ -31,14 +41,14 @@ class CountersService
 
     public function updateCounters(Story $story): void
     {
+        $updateCounters = true;
         if (!Yii::$app->user->isGuest) {
-/*            $role = Yii::$app->authManager->getRolesByUser(Yii::$app->user->id);
-            $role = array_shift($role);
-            if ($role->name === UserRoles::ROLE_USER) {*/
-                $this->updateUserStoryHistory(Yii::$app->user->id, $story->id);
-/*            }*/
+            $this->updateUserStoryHistory(Yii::$app->user->id, $story->id);
+            $updateCounters = $this->needUpdateCounters();
         }
-        $story->updateCounters(['views_number' => 1]);
+        if ($updateCounters) {
+            $story->updateCounters(['views_number' => 1]);
+        }
     }
 
 }
