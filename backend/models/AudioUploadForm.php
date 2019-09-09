@@ -4,6 +4,7 @@
 namespace backend\models;
 
 
+use http\Exception\RuntimeException;
 use Yii;
 use yii\base\Model;
 use yii\web\UploadedFile;
@@ -46,8 +47,14 @@ class AudioUploadForm extends Model
     public function upload()
     {
         if ($this->validate()) {
+            $audioFolder = $this->audioFilePath();
+            if (!file_exists($audioFolder)) {
+                if (!mkdir($concurrentDirectory = $audioFolder) && !is_dir($concurrentDirectory)) {
+                    throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+                }
+            }
             foreach ($this->audioFiles as $file) {
-                $file->saveAs($this->audioFilePath() . '/' . $file->baseName . '.' . $file->extension);
+                $file->saveAs($audioFolder . '/' . $file->baseName . '.' . $file->extension);
             }
             return true;
         }
