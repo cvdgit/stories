@@ -62,4 +62,12 @@ class VideoBlock extends AbstractBlock
         $this->seek_to = $seek_to;
     }
 
+    public function getValues(): array
+    {
+        return array_merge([
+            'video_id' => $this->video_id,
+            'seek_to' => $this->seek_to,
+        ], parent::getValues());
+    }
+
 }

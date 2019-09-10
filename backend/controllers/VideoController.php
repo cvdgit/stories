@@ -5,6 +5,7 @@ namespace backend\controllers;
 
 
 use backend\models\video\CreateVideoForm;
+use backend\models\video\UpdateVideoForm;
 use common\models\SlideVideo;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -35,6 +36,19 @@ class VideoController extends Controller
             return $this->redirect(['index']);
         }
         return $this->render('create', [
+            'model' => $model,
+        ]);
+    }
+
+    public function actionUpdate(int $id)
+    {
+        $model = new UpdateVideoForm($id);
+        $model->loadModel();
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            $model->saveVideo();
+            return $this->refresh();
+        }
+        return $this->render('update', [
             'model' => $model,
         ]);
     }

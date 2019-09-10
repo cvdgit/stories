@@ -20,7 +20,7 @@ $form = ActiveForm::begin([
     <div class="col-xs-6"><?= $form->field($model, 'left') ?></div>
 </div>
 <div class="row">
-    <div class="col-xs-6"><?= $form->field($model, 'video_id')->dropDownList(SlideVideo::videoArray()) ?></div>
+    <div class="col-xs-6"><?= $form->field($model, 'video_id')->dropDownList(SlideVideo::videoArray(), ['prompt' => 'Выбрать видео']) ?></div>
     <div class="col-xs-6"><?= $form->field($model, 'seek_to')->textInput() ?></div>
 </div>
 <?php

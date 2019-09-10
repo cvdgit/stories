@@ -208,6 +208,11 @@ class HtmlSlideReader implements ReaderInterface
         $block = new VideoBlock();
         $block->setType(AbstractBlock::TYPE_VIDEO);
         $block->setId(pq($htmlBlock)->attr('data-block-id'));
+
+        $element = pq($htmlBlock)->find('div.wikids-video-player');
+        $block->setVideoId(pq($element)->attr('data-video-id'));
+        $block->setSeekTo(pq($element)->attr('data-seek-to'));
+
         $style = pq($htmlBlock)->attr('style');
         $this->loadBlockProperties($block, $style);
         $this->slide->addBlock($block);

@@ -6,6 +6,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\web\NotFoundHttpException;
 
 /**
  * This is the model class for table "slide_video".
@@ -69,6 +70,14 @@ class SlideVideo extends ActiveRecord
         $model->title = $title;
         $model->video_id = $video_id;
         return $model;
+    }
+
+    public static function findModel($id)
+    {
+        if (($model = self::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('Видео не найдено.');
     }
 
 }
