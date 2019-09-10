@@ -11,6 +11,7 @@ use backend\components\story\ImageBlock;
 use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
 use backend\components\story\TransitionBlock;
+use backend\components\story\VideoBlock;
 use backend\components\story\writer\HTML\ButtonBlockMarkup;
 use backend\components\story\writer\HTML\HeaderBlockMarkup;
 use backend\components\story\writer\HTML\HTMLBlockMarkup;
@@ -19,6 +20,7 @@ use backend\components\story\Slide;
 use backend\components\story\writer\HTML\ParagraphBlockMarkup;
 use backend\components\story\writer\HTML\TestBlockMarkup;
 use backend\components\story\writer\HTML\TransitionBlockMarkup;
+use backend\components\story\writer\HTML\VideoBlockMarkup;
 
 class SlideRenderer
 {
@@ -56,6 +58,9 @@ class SlideRenderer
             }
             if (get_class($block) === HTMLBLock::class) {
                 $html .= (new HTMLBlockMarkup($block))->markup();
+            }
+            if (get_class($block) === VideoBlock::class) {
+                $html .= (new VideoBlockMarkup($block))->markup();
             }
         }
         $html .= '</section>';

@@ -1,6 +1,7 @@
 <?php
 
 use backend\assets\StoryEditorAsset;
+use common\widgets\Reveal\Plugins\Video;
 use common\widgets\RevealWidget;
 use yii\bootstrap\ButtonDropdown;
 use yii\helpers\Html;
@@ -137,6 +138,7 @@ $options = [
                                 new \common\widgets\RevealButtons\FullscreenButton(),
                             ],
                         ],
+                        ['class' => Video::class],
 					],
 		    	]) ?>
 		    </div>

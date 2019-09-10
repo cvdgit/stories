@@ -12,6 +12,7 @@ use backend\components\story\Slide;
 use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
 use backend\components\story\TransitionBlock;
+use backend\components\story\VideoBlock;
 
 class HtmlSlideReader implements ReaderInterface
 {
@@ -61,6 +62,9 @@ class HtmlSlideReader implements ReaderInterface
                     break;
                 case AbstractBlock::TYPE_HTML:
                     $this->loadBlockHtml($htmlBlock);
+                    break;
+                case AbstractBlock::TYPE_VIDEO:
+                    $this->loadBlockVideo($htmlBlock);
                     break;
                 default:
             }
@@ -196,6 +200,16 @@ class HtmlSlideReader implements ReaderInterface
         $block->setId(pq($htmlBlock)->attr('data-block-id'));
         $block->setContent(pq($htmlBlock)->html());
 
+        $this->slide->addBlock($block);
+    }
+
+    protected function loadBlockVideo($htmlBlock): void
+    {
+        $block = new VideoBlock();
+        $block->setType(AbstractBlock::TYPE_VIDEO);
+        $block->setId(pq($htmlBlock)->attr('data-block-id'));
+        $style = pq($htmlBlock)->attr('style');
+        $this->loadBlockProperties($block, $style);
         $this->slide->addBlock($block);
     }
 

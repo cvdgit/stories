@@ -12,11 +12,6 @@ $options = [
     'dropdown' => [
         'items' => [
             [
-                'label' => 'Кнопка',
-                'url' => '#',
-                'linkOptions' => ['onclick' => 'StoryEditor.newCreateBlock(); return false;'],
-            ],
-            [
                 'label' => 'Переход к истории',
                 'url' => '#',
                 'linkOptions' => ['onclick' => "StoryEditor.createBlock('transition'); return false;"],
@@ -30,6 +25,11 @@ $options = [
                 'label' => 'Тест',
                 'url' => '#',
                 'linkOptions' => ['onclick' => "StoryEditor.createBlock('test'); return false;"],
+            ],
+            [
+                'label' => 'Youtube',
+                'url' => '#',
+                'linkOptions' => ['onclick' => "StoryEditor.createBlock('video'); return false;"],
             ],
         ],
     ]

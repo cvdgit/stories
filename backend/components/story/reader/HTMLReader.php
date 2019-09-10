@@ -13,6 +13,7 @@ use backend\components\story\Story;
 use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
 use backend\components\story\TransitionBlock;
+use backend\components\story\VideoBlock;
 
 class HTMLReader extends AbstractReader implements ReaderInterface
 {
@@ -74,6 +75,9 @@ class HTMLReader extends AbstractReader implements ReaderInterface
                     break;
                 case AbstractBlock::TYPE_HTML:
                     $this->loadBlockHtml($htmlBlock, $slide);
+                    break;
+                case AbstractBlock::TYPE_VIDEO:
+                    $this->loadBlockVideo($htmlBlock);
                     break;
                 default:
             }
@@ -209,6 +213,16 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         $block->setId(pq($htmlBlock)->attr('data-block-id'));
         $block->setContent(pq($htmlBlock)->html());
 
+        $slide->addBlock($block);
+    }
+
+    protected function loadBlockVideo($htmlBlock, Slide $slide): void
+    {
+        $block = new VideoBlock();
+        $block->setType(AbstractBlock::TYPE_VIDEO);
+        $block->setId(pq($htmlBlock)->attr('data-block-id'));
+        $style = pq($htmlBlock)->attr('style');
+        $this->loadBlockProperties($block, $style);
         $slide->addBlock($block);
     }
 

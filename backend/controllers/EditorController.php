@@ -8,6 +8,7 @@ use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
 use backend\components\story\TransitionBlock;
+use backend\components\story\VideoBlock;
 use backend\components\story\writer\HTMLWriter;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
@@ -16,8 +17,8 @@ use backend\models\editor\SlideSourceForm;
 use backend\models\editor\TestForm;
 use backend\models\editor\TextForm;
 use backend\models\editor\TransitionForm;
+use backend\models\editor\VideoForm;
 use common\models\StorySlide;
-use common\models\StorySlideBlock;
 use DomainException;
 use Yii;
 use yii\filters\AccessControl;
@@ -153,6 +154,17 @@ class EditorController extends Controller
         return $form->getErrors();
     }
 
+    public function actionUpdateVideo()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $form = new VideoForm();
+        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+            $this->editorService->updateBlock($form);
+            return ['success' => true];
+        }
+        return $form->getErrors();
+    }
+
     public function actionForm(int $slide_id, string $block_id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
@@ -193,6 +205,10 @@ class EditorController extends Controller
                 'class' => QuestionForm::class,
                 'view' => '_html_form',
             ],
+            AbstractBlock::TYPE_VIDEO => [
+                'class' => VideoForm::class,
+                'view' => '_video_form',
+            ],
         ];
         if (!isset($types[$block_type])) {
             throw new DomainException($block_type . ' - Unknown block type');
@@ -225,6 +241,9 @@ class EditorController extends Controller
             ],
             AbstractBlock::TYPE_TEST => [
                 'class' => TestBlock::class,
+            ],
+            AbstractBlock::TYPE_VIDEO => [
+                'class' => VideoBlock::class,
             ],
         ];
         if (!isset($types[$block_type])) {

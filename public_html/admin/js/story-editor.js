@@ -425,3 +425,19 @@ var StoryEditor = (function() {
     };
 
 })(StoryEditor, jQuery, console);
+
+/** Youtube block */
+(function(editor, $, console) {
+    "use strict";
+
+    editor.createVideoBlock = function() {
+        alert("youtube");
+/*        $.getJSON(editor.getConfigValue("newCreateBlockAction"), {
+            "slide_id": editor.getCurrentSlideID()
+        }).done(function(data) {
+            console.log(data);
+            //editor.loadSlide(editor.getCurrentSlideID(), true);
+        });*/
+    };
+
+})(StoryEditor, jQuery, console);

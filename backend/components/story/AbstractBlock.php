@@ -12,6 +12,7 @@ abstract class AbstractBlock
     const TYPE_TRANSITION = 'transition';
     const TYPE_TEST = 'test';
     const TYPE_HTML = 'html';
+    const TYPE_VIDEO = 'video';
 
     protected $width;
     protected $height;
