@@ -414,7 +414,7 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 	 			xhr.onload = function() {
 	   				if (xhr.readyState === 4 && xhr.status >= 200 && xhr.status < 300) {
 						var audioSource = document.createElement( 'source' );
-						audioSource.src = prefix + indices + suffix;
+						audioSource.src = prefix + indices + suffix + '?' + ts;
 						audioElement.insertBefore(audioSource, audioElement.firstChild);
 						audioExists = true;
 					}
