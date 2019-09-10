@@ -53,4 +53,11 @@ class VideoController extends Controller
         ]);
     }
 
+    public function actionDelete(int $id)
+    {
+        $model = SlideVideo::findModel($id);
+        $model->delete();
+        return $this->redirect(['index']);
+    }
+
 }

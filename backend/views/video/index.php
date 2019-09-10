@@ -21,7 +21,17 @@ $this->title = 'Видео';
             ['class' => SerialColumn::class],
             'title',
             'video_id',
-            ['class' => ActionColumn::class],
+            [
+                'class' => ActionColumn::class,
+                'buttons' => [
+                    'view' => function($url, $model) {
+                        return Html::a(
+                            '<span class="glyphicon glyphicon-eye-open"></span>',
+                            'https://www.youtube.com/watch?v=' . $model->video_id,
+                            ['target' => '_blank']);
+                    }
+                ],
+            ],
         ],
     ]) ?>
 </div>
