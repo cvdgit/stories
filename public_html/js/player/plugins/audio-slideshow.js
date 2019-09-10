@@ -409,7 +409,8 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 			try {
 				// check if audio file exists 
 				var xhr = new XMLHttpRequest();
-				xhr.open('HEAD', prefix + indices + suffix, true);
+				var ts = new Date().getTime();
+				xhr.open('HEAD', prefix + indices + suffix + '?' + ts, true);
 	 			xhr.onload = function() {
 	   				if (xhr.readyState === 4 && xhr.status >= 200 && xhr.status < 300) {
 						var audioSource = document.createElement( 'source' );
