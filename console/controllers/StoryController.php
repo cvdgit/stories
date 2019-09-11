@@ -196,27 +196,28 @@ class StoryController extends Controller
                         }
                         [$imageWidth, $imageHeight, $type] = getimagesize(Yii::getAlias('@public') . $oldFilePath);
                         if ((int)$type === IMAGETYPE_PNG) {
-                            $newFilePath = str_replace('.png', '.jpg', $oldFilePath);
+/*                            $newFilePath = str_replace('.png', '.jpg', $oldFilePath);
                             Image::resize(Yii::getAlias('@public') . $oldFilePath, $imageWidth, $imageHeight)->save(Yii::getAlias('@public') . $newFilePath, ['jpeg_quality' => 80]);
                             $block->setFilePath($newFilePath);
                             unlink(Yii::getAlias('@public') . $oldFilePath);
                             $imageConverted = true;
+                            $this->stdout('Image: ' . $block->getFilePath() . PHP_EOL);*/
                             $this->stdout('Image: ' . $block->getFilePath() . PHP_EOL);
                         }
                     }
                 }
-                if ($imageConverted) {
+/*                if ($imageConverted) {
                     $writer = new HTMLWriter();
                     $slideModel->data = $writer->renderSlide($slide);
                     $slideModel->save(false, ['data']);
                     $this->stdout('OK' . PHP_EOL);
-                }
+                }*/
             }
         }
         $this->stdout('Done!' . PHP_EOL);
     }
 
-    public function actionGenerateBlockIds()
+/*    public function actionGenerateBlockIds()
     {
         $models = Story::find()->published()->all();
         foreach ($models as $model) {
@@ -241,6 +242,6 @@ class StoryController extends Controller
             }
         }
         $this->stdout('Done!' . PHP_EOL);
-    }
+    }*/
 
 }
