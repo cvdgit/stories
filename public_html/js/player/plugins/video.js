@@ -7,11 +7,40 @@ function onYouTubeIframeAPIReady() {
     WikidsVideo.createPlayer();
 }
 
-var WikidsVideo = window.WikidsVideo || (function() {
+function WikidsVideoPlayer(elemID, videoID, seekTo, duration) {
     "use strict";
 
-    var loaded = false,
-        player;
+    seekTo = seekTo || 0;
+    duration = duration || 0;
+
+    var player,
+        done = false;
+    player = new YT.Player(elemID, {
+        height: '100%',
+        width: '100%',
+        videoId: videoID,
+        events: {
+            'onReady': function(event) {
+                if (seekTo > 0) {
+                    event.target.seekTo(seekTo);
+                }
+            },
+            'onStateChange': function(event) {
+                if (event.data === YT.PlayerState.PLAYING && !done) {
+                    setTimeout(pauseVideo, duration * 1000);
+                    done = true;
+                }
+            }
+        }
+    });
+
+    function pauseVideo() {
+        player.pauseVideo();
+    }
+}
+
+var WikidsVideo = window.WikidsVideo || (function() {
+    "use strict";
 
     function getCurrentSlide() {
         return Reveal.getCurrentSlide();
@@ -23,59 +52,24 @@ var WikidsVideo = window.WikidsVideo || (function() {
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
     function createPlayer() {
-        if (loaded) {
-            return;
-        }
-        loaded = true;
-
-        var elem = $(".wikids-video-player", getCurrentSlide());
+        var elem = $("div.wikids-video-player", getCurrentSlide());
         var elemID = "video" + new Date().getTime();
         elem.attr("id", elemID);
-
         if (elem.length) {
             var videoID = elem.attr("data-video-id"),
-                seekTo = elem.attr("data-seek-to");
-            player = new YT.Player(elemID, {
-                height: '100%',
-                width: '100%',
-                videoId: videoID,
-                playerVars: {
-/*                    'controls': 0,
-                    'disablekb': 1,
-                    'iv_load_policy': 3,
-                    'modestbranding': 1,
-                    'rel': 0,
-                    'showinfo': 0*/
-                },
-                events: {
-                    'onReady': function(event) {
-                        if (seekTo) {
-                            event.target.seekTo(seekTo);
-                        }
-                    },
-                    'onStateChange': function(event) {
-                        if (event.data === YT.PlayerState.PLAYING) {
-                            event.target.pauseVideo();
-                        }
-                    }
-                }
-            });
-
+                seekTo = elem.attr("data-seek-to"),
+                duration = elem.attr("data-video-duration");
+            WikidsVideoPlayer(elemID, videoID, seekTo, duration);
         }
     }
 
-    Reveal.addEventListener("ready", function(event) {
-        //createPlayer();
-    });
-
     Reveal.addEventListener("slidechanged", function(event) {
         if (loadedYT) {
-            loaded = false;
             createPlayer();
-        }
+       }
     });
 
     return {
         "createPlayer": createPlayer
-    }
+    };
 })();

@@ -13,11 +13,15 @@ class VideoBlock extends AbstractBlock
     /** @var int */
     protected $seek_to;
 
+    /** @var int */
+    protected $duration;
+
     public function update($form)
     {
         $this->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
         $this->video_id = $form->video_id;
         $this->seek_to = $form->seek_to;
+        $this->duration = $form->duration;
     }
 
     public function create()
@@ -41,7 +45,7 @@ class VideoBlock extends AbstractBlock
     /**
      * @param string $video_id
      */
-    public function setVideoId(string $video_id): void
+    public function setVideoId($video_id): void
     {
         $this->video_id = $video_id;
     }
@@ -57,7 +61,7 @@ class VideoBlock extends AbstractBlock
     /**
      * @param int $seek_to
      */
-    public function setSeekTo(int $seek_to): void
+    public function setSeekTo($seek_to): void
     {
         $this->seek_to = $seek_to;
     }
@@ -67,7 +71,24 @@ class VideoBlock extends AbstractBlock
         return array_merge([
             'video_id' => $this->video_id,
             'seek_to' => $this->seek_to,
+            'duration' => $this->duration,
         ], parent::getValues());
+    }
+
+    /**
+     * @return int
+     */
+    public function getDuration()
+    {
+        return $this->duration;
+    }
+
+    /**
+     * @param int $duration
+     */
+    public function setDuration($duration): void
+    {
+        $this->duration = $duration;
     }
 
 }

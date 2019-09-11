@@ -11,6 +11,7 @@ class VideoElement extends AbstractElement
     protected $attributes = [
         'data-video-id' => '',
         'data-seek-to' => '',
+        'data-video-duration' => '',
     ];
 
 }

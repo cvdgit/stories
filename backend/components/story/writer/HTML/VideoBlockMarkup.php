@@ -24,6 +24,7 @@ class VideoBlockMarkup extends AbstractMarkup
             'class' => 'wikids-video-player',
             'data-video-id' => $block->getVideoId(),
             'data-seek-to' => $block->getSeekTo(),
+            'data-video-duration' => $block->getDuration(),
         ]);
     }
 

@@ -212,6 +212,7 @@ class HtmlSlideReader implements ReaderInterface
         $element = pq($htmlBlock)->find('div.wikids-video-player');
         $block->setVideoId(pq($element)->attr('data-video-id'));
         $block->setSeekTo(pq($element)->attr('data-seek-to'));
+        $block->setDuration(pq($element)->attr('data-video-duration'));
 
         $style = pq($htmlBlock)->attr('style');
         $this->loadBlockProperties($block, $style);

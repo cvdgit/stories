@@ -23,6 +23,10 @@ $form = ActiveForm::begin([
     <div class="col-xs-6"><?= $form->field($model, 'video_id')->dropDownList(SlideVideo::videoArray(), ['prompt' => 'Выбрать видео']) ?></div>
     <div class="col-xs-6"><?= $form->field($model, 'seek_to')->textInput() ?></div>
 </div>
+    <div class="row">
+        <div class="col-xs-6"></div>
+        <div class="col-xs-6"><?= $form->field($model, 'duration')->textInput() ?></div>
+    </div>
 <?php
 echo $form->field($model, 'slide_id')->hiddenInput()->label(false);
 echo $form->field($model, 'block_id')->hiddenInput()->label(false);
