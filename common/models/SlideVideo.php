@@ -52,9 +52,9 @@ class SlideVideo extends ActiveRecord
     {
         return [
             'id' => 'ID',
-            'video_id' => 'Video ID',
-            'title' => 'Title',
-            'created_at' => 'Created At',
+            'video_id' => 'ИД видео Youtube',
+            'title' => 'Название',
+            'created_at' => 'Дата добавления',
             'updated_at' => 'Updated At',
         ];
     }

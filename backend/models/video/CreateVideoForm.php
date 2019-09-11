@@ -21,6 +21,14 @@ class CreateVideoForm extends Model
         ];
     }
 
+    public function attributeLabels()
+    {
+        return [
+            'title' => 'Название',
+            'video_id' => 'ИД видео Youtube',
+        ];
+    }
+
     public function createVideo()
     {
         $model = SlideVideo::create($this->title, $this->video_id);

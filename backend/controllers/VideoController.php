@@ -22,6 +22,9 @@ class VideoController extends Controller
             'pagination' => [
                 'pageSize' => 50,
             ],
+            'sort' => [
+                'defaultOrder' => ['created_at' => SORT_DESC],
+            ]
         ]);
         return $this->render('index', [
             'dataProvider' => $dataProvider,

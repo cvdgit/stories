@@ -21,6 +21,7 @@ $this->title = 'Видео';
             ['class' => SerialColumn::class],
             'title',
             'video_id',
+            'created_at:datetime',
             [
                 'class' => ActionColumn::class,
                 'buttons' => [

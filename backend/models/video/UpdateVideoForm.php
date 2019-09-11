@@ -23,6 +23,14 @@ class UpdateVideoForm extends Model
         parent::__construct($config);
     }
 
+    public function attributeLabels()
+    {
+        return [
+            'title' => 'Название',
+            'video_id' => 'ИД видео Youtube',
+        ];
+    }
+
     public function rules()
     {
         return [
