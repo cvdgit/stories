@@ -16,12 +16,16 @@ class VideoBlock extends AbstractBlock
     /** @var int */
     protected $duration;
 
+    /** @var bool */
+    protected $mute;
+
     public function update($form)
     {
         $this->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
         $this->video_id = $form->video_id;
         $this->seek_to = $form->seek_to;
         $this->duration = $form->duration;
+        $this->mute = $form->mute;
     }
 
     public function create()
@@ -72,6 +76,7 @@ class VideoBlock extends AbstractBlock
             'video_id' => $this->video_id,
             'seek_to' => $this->seek_to,
             'duration' => $this->duration,
+            'mute' => $this->mute,
         ], parent::getValues());
     }
 
@@ -89,6 +94,22 @@ class VideoBlock extends AbstractBlock
     public function setDuration($duration): void
     {
         $this->duration = $duration;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMute()
+    {
+        return $this->mute;
+    }
+
+    /**
+     * @param bool $mute
+     */
+    public function setMute($mute): void
+    {
+        $this->mute = $mute;
     }
 
 }

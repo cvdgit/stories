@@ -24,7 +24,7 @@ $form = ActiveForm::begin([
     <div class="col-xs-6"><?= $form->field($model, 'seek_to')->textInput() ?></div>
 </div>
     <div class="row">
-        <div class="col-xs-6"></div>
+        <div class="col-xs-6"><?= $form->field($model, 'mute')->checkbox() ?></div>
         <div class="col-xs-6"><?= $form->field($model, 'duration')->textInput() ?></div>
     </div>
 <?php

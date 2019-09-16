@@ -226,6 +226,7 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         $block->setVideoId(pq($element)->attr('data-video-id'));
         $block->setSeekTo(pq($element)->attr('data-seek-to'));
         $block->setDuration(pq($element)->attr('data-video-duration'));
+        $block->setMute(pq($element)->attr('data-mute'));
 
         $style = pq($htmlBlock)->attr('style');
         $this->loadBlockProperties($block, $style);

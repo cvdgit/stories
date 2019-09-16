@@ -12,6 +12,7 @@ class VideoElement extends AbstractElement
         'data-video-id' => '',
         'data-seek-to' => '',
         'data-video-duration' => '',
+        'data-mute' => '',
     ];
 
 }

@@ -10,13 +10,14 @@ class VideoForm extends BaseForm
     public $video_id;
     public $seek_to;
     public $duration;
+    public $mute;
 
     public function rules(): array
     {
         $rules = parent::rules();
         $rules = array_merge($rules, [
             ['video_id', 'string'],
-            [['seek_to', 'duration'], 'integer'],
+            [['seek_to', 'duration', 'mute'], 'integer'],
         ]);
         return $rules;
     }
@@ -28,6 +29,7 @@ class VideoForm extends BaseForm
             'video_id' => 'Видео',
             'seek_to' => 'Начать с (сек)',
             'duration' => 'Продолжительность (сек)',
+            'mute' => 'Отключить звук',
         ]);
         return $labels;
     }
