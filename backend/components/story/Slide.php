@@ -21,6 +21,9 @@ class Slide
     /** @var string */
     protected $view;
 
+    /** @var string */
+    protected $audioFile;
+
     /**
      * @return AbstractBlock[]
      */
@@ -105,6 +108,22 @@ class Slide
     public function setView(string $view): void
     {
         $this->view = $view;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAudioFile()
+    {
+        return $this->audioFile;
+    }
+
+    /**
+     * @param string $audioFile
+     */
+    public function setAudioFile(string $audioFile): void
+    {
+        $this->audioFile = $audioFile;
     }
 
 }

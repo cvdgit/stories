@@ -16,7 +16,7 @@ class VideoBlock extends AbstractBlock
     /** @var int */
     protected $duration;
 
-    /** @var bool */
+    /** @var int */
     protected $mute;
 
     public function update($form)
@@ -110,6 +110,11 @@ class VideoBlock extends AbstractBlock
     public function setMute($mute): void
     {
         $this->mute = $mute;
+    }
+
+    public function getMute()
+    {
+        return $this->mute;
     }
 
 }

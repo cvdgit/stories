@@ -34,7 +34,7 @@ class SlideRenderer
 
     public function render(): string
     {
-        $html = '<section data-id="" data-background-color="#000000" data-slide-view="' . $this->slide->getView() . '">';
+        $html = '<section data-id="" data-background-color="#000000" data-slide-view="' . $this->slide->getView() . '" data-audio-src="' . $this->slide->getAudioFile() . '">';
         foreach ($this->slide->getBlocks() as $block) {
             if (get_class($block) === TextBlock::class) {
                 if ($block->getType() === AbstractBlock::TYPE_HEADER) {
