@@ -5,10 +5,20 @@ use common\widgets\Reveal\Plugins\Video;
 use common\widgets\RevealButtons\BackgroundButton;
 use common\widgets\RevealWidget;
 use yii\helpers\Json;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Story */
 /* @var $userCanViewStory bool */
+
+$config = [
+    'setSlideAudioAction' => Url::to(['player/set-slide-audio']),
+];
+$configJSON = Json::htmlEncode($config);
+$js = <<< JS
+    WikidsPlayer.initialize($configJSON);
+JS;
+$this->registerJs($js);
 
 $plugins = [
     [
@@ -32,7 +42,7 @@ $plugins = [
 ];
 
 if ($model->isAudioStory()) {
-    $plugins[] = ['class' => \common\widgets\Reveal\Plugins\Audio::class, 'storyID' => $model->id];
+    $plugins[] = ['class' => \common\widgets\Reveal\Plugins\Audio::class, 'storyID' => $model->id, 'defaultAudios' => !$model->isUserAudioStory()];
 }
 
 echo RevealWidget::widget([

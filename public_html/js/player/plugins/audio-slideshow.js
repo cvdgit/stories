@@ -325,7 +325,7 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 			}
 		}
 		audioElement.addEventListener( 'ended', function( event ) {
-			if ( typeof Recorder == 'undefined' || !Recorder.isRecording ) {
+			//if ( typeof Recorder == 'undefined' || !Recorder.isRecording ) {
 				// determine whether and when slideshow advances with next slide
 				var advanceNow = advance;
 				var slide = Reveal.getCurrentSlide();
@@ -354,7 +354,7 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 						timer = null;
 					}, advanceNow );   
 				}
-			}
+			//}
 		} );
 		audioElement.addEventListener( 'play', function( event ) {
 			var evt = new CustomEvent('startplayback');

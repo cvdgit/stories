@@ -4,11 +4,15 @@ namespace common\services;
 
 use backend\components\queue\GenerateBookStoryJob;
 use backend\components\queue\PublishStoryJob;
+use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\reader\PowerPointReader;
 use backend\components\story\writer\HTMLWriter;
 use backend\models\SourcePowerPointForm;
 use common\models\Story;
+use common\models\StorySlide;
 use DomainException;
+use frontend\models\SlideAudio;
+use http\Exception\RuntimeException;
 use yii;
 use yii\helpers\Url;
 
@@ -170,6 +174,24 @@ class StoryService
             $view = 'slides';
         }
         return $view;
+    }
+
+    public function setSlideAudio(SlideAudio $model)
+    {
+        $slideModel = StorySlide::findSlide($model->slide_id);
+        $reader = new HtmlSlideReader($slideModel->data);
+        $slide = $reader->load();
+        $audioFileName = '/user_audio/' . $slideModel->id . '/' . $model->slide_audio_file->baseName . '.mp3';
+        $slide->setAudioFile($audioFileName);
+        $writer = new HTMLWriter();
+        $html = $writer->renderSlide($slide);
+        $slideModel->data = $html;
+        $slideModel->save(false, ['data']);
+
+        $storyModel = Story::findModel($slideModel->story_id);
+        $storyModel->audio = 1;
+        $storyModel->user_audio = 1;
+        $storyModel->save(false, ['audio', 'user_audio']);
     }
 
 }

@@ -130,6 +130,9 @@ $isBookView = $storyDefaultView === 'book';
                     <div class="story-no-subscription"><span class="story-loader">Загрузка истории...</span></div>
                 </div>
             </div>
+            <?php if (Yii::$app->user->can('moderator')): ?>
+            <?= $this->render('_recorder') ?>
+            <?php endif ?>
         </div>
     </main>
 </div>

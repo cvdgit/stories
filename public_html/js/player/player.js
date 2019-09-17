@@ -51,8 +51,22 @@ var WikidsStoryFeedback = (function() {
 var WikidsPlayer = (function(document, $) {
     "use strict";
 
+    var config = {};
+
+    function initialize(params) {
+        config = params;
+    }
+
     var $playerContainer = $(".story-container");
     var fullScreenMode = false;
+
+    function getCurrentSlide() {
+        return Reveal.getCurrentSlide();
+    }
+
+    function getCurrentSlideID() {
+        return $(getCurrentSlide()).attr("data-id");
+    }
 
     function enterFullscreen()
     {
@@ -97,7 +111,30 @@ var WikidsPlayer = (function(document, $) {
         }
     }
 
+    function setSlideAudio(blob) {
+
+        var formData = new FormData();
+        var filename = new Date().getTime();
+        formData.append("SlideAudio[slide_audio_file]", blob, filename);
+        formData.append("SlideAudio[slide_id]", getCurrentSlideID());
+
+        var promise = $.ajax({
+            "url": config.setSlideAudioAction,
+            "type": "POST",
+            "data": formData,
+            "cache": false,
+            "contentType": false,
+            "processData": false,
+        });
+        promise.done(function(data) {
+            if (data && data.success) {
+                location.reload();
+            }
+        });
+    }
+
     return {
+        "initialize": initialize,
         "toggleFullscreen": toggleFullscreen,
         "inFullscreen": inFullscreen,
         "left": function() {
@@ -118,7 +155,9 @@ var WikidsPlayer = (function(document, $) {
             else {
                 Reveal.next();
             }
-        }
+        },
+        "setSlideAudio": setSlideAudio,
+        "getCurrentSlideID": getCurrentSlideID
     };
 })(document, jQuery);
 
