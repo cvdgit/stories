@@ -123,60 +123,49 @@ function stopRecording() {
 
 function createDownloadLink(blob) {
 
-    var url = URL.createObjectURL(blob);
-    var au = document.createElement('audio');
     var li = document.createElement('li');
-    var link = document.createElement('a');
 
-    //name of .wav file to use during upload and download (without extendion)
-    var filename = new Date().toISOString();
-
-    //add controls to the <audio> element
+    var au = document.createElement('audio');
     au.controls = true;
+    var url = URL.createObjectURL(blob);
     au.src = url;
+    li.appendChild(au);
 
-    //save to disk link
-/*    link.href = url;
-    link.download = filename + ".wav"; //download forces the browser to donwload the file using the  filename
-    link.innerHTML = "Сохранить";*/
-
+    var link = document.createElement('a');
     link.href = "#";
     link.innerHTML = "Применить";
     link.onclick = function(e) {
         e.preventDefault();
         WikidsPlayer.setSlideAudio(blob);
     };
-
-    //add the new audio element to li
-    li.appendChild(au);
-
-    //add the filename to the li
-    //li.appendChild(document.createTextNode(filename+".wav "))
-
-    //add the save to disk link to li
     li.appendChild(link);
 
-    //upload link
-    /*
-    var upload = document.createElement('a');
-    upload.href="#";
-    upload.innerHTML = "Upload";
-    upload.addEventListener("click", function(event){
-        var xhr=new XMLHttpRequest();
-        xhr.onload=function(e) {
-            if(this.readyState === 4) {
-                console.log("Server returned: ",e.target.responseText);
-            }
-        };
-        var fd=new FormData();
-        fd.append("audio_data",blob, filename);
-        xhr.open("POST","upload.php",true);
-        xhr.send(fd);
-    })
-    li.appendChild(document.createTextNode (" ")); //add a space in between
-    li.appendChild(upload); //add the upload link to li
-    */
+    var deleteLink = document.createElement("a");
+    deleteLink.href = "#";
+    deleteLink.innerText = "Удалить";
+    deleteLink.onclick = function(e) {
+        e.preventDefault();
+        WikidsPlayer.removeAudioData(url);
+        URL.revokeObjectURL(url);
+        li.remove();
+        mergeButtonVisible();
+    };
+    li.appendChild(deleteLink);
 
-    //add the li element to the ol
-    recordingsList.appendChild(li);
+    var list = document.getElementById("recordingsList");
+    list.appendChild(li);
+
+    mergeButtonVisible();
+    WikidsPlayer.addAudioData(url, blob);
+}
+
+function mergeButtonVisible() {
+    var list = document.getElementById("recordingsList"),
+        button = document.getElementById("mergeAllSlideAudio");
+    if (list.childNodes.length >= 2) {
+        button.style.display = "inline-block";
+    }
+    else {
+        button.style.display = "none";
+    }
 }

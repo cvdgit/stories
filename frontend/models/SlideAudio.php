@@ -15,14 +15,16 @@ class SlideAudio extends Model
     /** @var int */
     public $slide_id;
 
-    /** @var UploadedFile */
-    public $slide_audio_file;
+    /** @var UploadedFile[] */
+    public $slide_audio_files;
+
+    protected $files = [];
 
     public function rules()
     {
         return [
             ['slide_id', 'integer'],
-            ['slide_audio_file', 'file'],
+            ['slide_audio_files', 'file', 'skipOnEmpty' => true, 'maxFiles' => 50],
         ];
     }
 
@@ -40,15 +42,24 @@ class SlideAudio extends Model
 
     public function upload()
     {
-        if ($this->validate() && $this->slide_audio_file !== null) {
+        if ($this->validate() && $this->slide_audio_files !== null) {
             $slideAudioFolder = $this->slideAudioFilePath();
             if (!file_exists($slideAudioFolder)) {
                 $this->createFolder($slideAudioFolder);
             }
-            $this->slide_audio_file->saveAs($slideAudioFolder . '/' . $this->slide_audio_file->baseName . '.mp3');
+            foreach ($this->slide_audio_files as $file) {
+                $fileName = $slideAudioFolder . '/' . microtime() . '.wav';
+                $file->saveAs($fileName);
+                $this->files[] = $fileName;
+            }
             return true;
         }
         return false;
+    }
+
+    public function getFiles()
+    {
+        return $this->files;
     }
 
 }

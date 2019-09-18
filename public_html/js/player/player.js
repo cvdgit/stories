@@ -111,12 +111,54 @@ var WikidsPlayer = (function(document, $) {
         }
     }
 
+    var audioData = {};
+
     function setSlideAudio(blob) {
 
         var formData = new FormData();
         var filename = new Date().getTime();
-        formData.append("SlideAudio[slide_audio_file]", blob, filename);
+        formData.append("SlideAudio[slide_audio_files][]", blob, filename);
         formData.append("SlideAudio[slide_id]", getCurrentSlideID());
+
+        var promise = $.ajax({
+            "url": config.setSlideAudioAction,
+            "type": "POST",
+            "data": formData,
+            "cache": false,
+            "contentType": false,
+            "processData": false,
+        });
+        promise.done(function(data) {
+            if (data && data.success) {
+                location.reload();
+            }
+        });
+    }
+
+    function addAudioData(key, value) {
+        audioData[key] = value;
+    }
+
+    function removeAudioData(key) {
+        delete(audioData[key]);
+    }
+
+    function mergeAllAndSetSlideAudio() {
+
+        if (!audioData) {
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append("SlideAudio[slide_id]", getCurrentSlideID());
+
+        var i = 0;
+        for (var name in audioData) {
+            if (audioData.hasOwnProperty(name)) {
+                formData.append("SlideAudio[slide_audio_files][" + i + "]", audioData[name]);
+                i++;
+            }
+        }
 
         var promise = $.ajax({
             "url": config.setSlideAudioAction,
@@ -157,7 +199,10 @@ var WikidsPlayer = (function(document, $) {
             }
         },
         "setSlideAudio": setSlideAudio,
-        "getCurrentSlideID": getCurrentSlideID
+        "getCurrentSlideID": getCurrentSlideID,
+        "addAudioData": addAudioData,
+        "removeAudioData": removeAudioData,
+        "mergeAllAndSetSlideAudio": mergeAllAndSetSlideAudio
     };
 })(document, jQuery);
 

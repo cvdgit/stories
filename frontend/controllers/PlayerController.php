@@ -29,12 +29,15 @@ class PlayerController extends Controller
         $model = new SlideAudio();
         $result = ['success' => false, 'message' => ''];
         if ($model->load(Yii::$app->request->post())) {
-            $model->slide_audio_file = UploadedFile::getInstance($model, 'slide_audio_file');
+            $model->slide_audio_files = UploadedFile::getInstances($model, 'slide_audio_files');
             try {
                 $result['success'] = $model->upload();
             }
             catch (Exception $ex) {
                 $result['message'] = $ex->getMessage();
+            }
+            if ($model->hasErrors()) {
+                die(print_r($model->errors));
             }
             if ($result['success']) {
                 $this->storyService->setSlideAudio($model);

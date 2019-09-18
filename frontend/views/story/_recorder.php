@@ -6,6 +6,9 @@ use frontend\assets\RecorderAsset;
 RecorderAsset::register($this);
 
 $css = <<<CSS
+.recorder-audio {
+    text-align: center;
+}
 .recorder-audio li {
     display: table;
 }
@@ -28,6 +31,7 @@ $this->registerCss($css);
     </div>
     <div class="col-md-6">
         <div class="recorder-audio" style="padding: 20px">
+            <button id="mergeAllSlideAudio" style="display: none; margin: 0 10px 10px 10px" onclick="WikidsPlayer.mergeAllAndSetSlideAudio()">Объединить все и применить</button>
             <ol class="list-unstyled" id="recordingsList"></ol>
         </div>
     </div>
