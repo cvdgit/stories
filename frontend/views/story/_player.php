@@ -42,7 +42,11 @@ $plugins = [
 ];
 
 if ($model->isAudioStory()) {
-    $plugins[] = ['class' => \common\widgets\Reveal\Plugins\Audio::class, 'storyID' => $model->id, 'defaultAudios' => !$model->isUserAudioStory()];
+    $defaultAudios = true;
+    if (Yii::$app->user->can('moderator')) {
+        $defaultAudios = !$model->isUserAudioStory();
+    }
+    $plugins[] = ['class' => \common\widgets\Reveal\Plugins\Audio::class, 'storyID' => $model->id, 'defaultAudios' => $defaultAudios];
 }
 
 echo RevealWidget::widget([
