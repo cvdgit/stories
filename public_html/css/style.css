@@ -2061,12 +2061,20 @@ button:focus {
 }
 
 .story-view-mode {
-  font-size: 4rem;
   text-align: center;
 }
 
 .story-view-mode a {
   margin: 0 10px;
+  display: inline-block;
+}
+
+.story-view-mode a i {
+  font-size: 4rem;
+}
+
+.story-view-mode a span {
+
 }
 
 .story-view-mode a.active {

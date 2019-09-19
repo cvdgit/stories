@@ -1,5 +1,6 @@
 <?php
 
+use frontend\widgets\StoryAudio;
 use frontend\widgets\StoryFavorites;
 use frontend\widgets\StoryLikeWidget;
 use yii\helpers\Html;
@@ -113,11 +114,20 @@ $isBookView = $storyDefaultView === 'book';
                 <?php endif ?>
             </div>
             <div class="story-view-mode clearfix">
-                <a class="active" href="#" data-story-view="book" title="Просмотр в режиме чтения"><i class="glyphicon glyphicon-book"></i></a>
-                <a href="#" data-story-view="slides" title="Просмотр в режиме обучения"><i class="glyphicon glyphicon-education"></i></a>
+                <a class="active" href="#" data-story-view="book" title="Просмотр в режиме чтения">
+                    <i class="glyphicon glyphicon-book"></i>
+                    <span>Режим чтения</span>
+                </a>
+                <a href="#" data-story-view="slides" title="Просмотр в режиме обучения">
+                    <i class="glyphicon glyphicon-education"></i>
+                    <span>Режим обучения</span>
+                </a>
             </div>
         </div>
         <div class="slides-readonly" style="<?= $isBookView ? '' : 'display: none' ?>">
+            <?php if ($model->isAudioStory()): ?>
+            <?= StoryAudio::widget(['storyID' => $model->id]) ?>
+            <?php endif ?>
             <?php if (!empty($model->body)): ?>
             <?= $model->body ?>
             <?php else: ?>

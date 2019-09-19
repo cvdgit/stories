@@ -44,6 +44,11 @@ class AudioUploadForm extends Model
         return Yii::getAlias('@public') . '/audio/' . $this->storyID;
     }
 
+    public function audioFileRelativePath()
+    {
+        return '/audio/' . $this->storyID;
+    }
+
     public function upload()
     {
         if ($this->validate()) {
