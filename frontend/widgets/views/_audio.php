@@ -28,9 +28,14 @@ JS;
 /** @var $this yii\web\View */
 $this->registerJs($js);
 ?>
-<div class="row">
-    <div class="col-md-12">
-        <div class="text-center" style="padding: 20px">
+<div class="row wikids-story-audio" style="margin: 10px auto">
+    <div class="col-xs-12 col-sm-6 col-md-6">
+        <div class="text-right wikids-story-audio-text">
+            <span style="height: 50px; line-height: 50px">Воспроизвести аудио:</span>
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-6">
+        <div class="wikids-story-audio-player">
             <audio id="story-audio-player" controls></audio>
         </div>
     </div>

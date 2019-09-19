@@ -1924,12 +1924,38 @@ section h2 span {
   .site-story-main h1 {
     text-align: center;
   }
-  
+}
+
+.wikids-story-view-book {
+  text-align: left;
+}
+
+.wikids-story-view-slides {
+  text-align: right;
 }
 
 @media (max-width: 768px) {
+
   .site-dialog .modal-body {
     margin: 0 20px;
+  }
+
+  .wikids-story-audio-text {
+    text-align: center;
+  }
+
+  .wikids-story-audio-player audio {
+    width: 100%;
+  }
+
+  .wikids-story-view-book {
+    text-align: center;
+    margin: 10px;
+  }
+
+  .wikids-story-view-slides {
+    text-align: center;
+    margin: 10px;
   }
 }
 
@@ -2062,6 +2088,7 @@ button:focus {
 
 .story-view-mode {
   text-align: center;
+  padding: 10px 0;
 }
 
 .story-view-mode a {

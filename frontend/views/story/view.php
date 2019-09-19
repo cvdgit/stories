@@ -58,7 +58,7 @@ function switchStoryView(view) {
 
 $("[data-story-view]").on("click", function(e) {
     e.preventDefault();
-    $(this).siblings().removeClass("active");
+    $(this).parent().parent().find("a[data-story-view]").removeClass("active");
     $(this).addClass("active");
     var view = $(this).attr("data-story-view");
     switchStoryView(view);
@@ -114,14 +114,20 @@ $isBookView = $storyDefaultView === 'book';
                 <?php endif ?>
             </div>
             <div class="story-view-mode clearfix">
-                <a class="active" href="#" data-story-view="book" title="Просмотр в режиме чтения">
-                    <i class="glyphicon glyphicon-book"></i>
-                    <span>Режим чтения</span>
-                </a>
-                <a href="#" data-story-view="slides" title="Просмотр в режиме обучения">
-                    <i class="glyphicon glyphicon-education"></i>
-                    <span>Режим обучения</span>
-                </a>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6 col-md-6 wikids-story-view-slides">
+                        <a href="#" data-story-view="slides" title="Просмотр в режиме обучения">
+                            <i class="glyphicon glyphicon-education"></i>
+                            <span>Режим обучения</span>
+                        </a>
+                    </div>
+                    <div class="col-xs-12 col-sm-6 col-md-6 wikids-story-view-book">
+                        <a class="active" href="#" data-story-view="book" title="Просмотр в режиме чтения">
+                            <i class="glyphicon glyphicon-book"></i>
+                            <span>Режим чтения</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="slides-readonly" style="<?= $isBookView ? '' : 'display: none' ?>">
