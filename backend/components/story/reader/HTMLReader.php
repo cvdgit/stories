@@ -77,7 +77,7 @@ class HTMLReader extends AbstractReader implements ReaderInterface
                     $this->loadBlockHtml($htmlBlock, $slide);
                     break;
                 case AbstractBlock::TYPE_VIDEO:
-                    $this->loadBlockVideo($htmlBlock);
+                    $this->loadBlockVideo($htmlBlock, $slide);
                     break;
                 default:
             }
