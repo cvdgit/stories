@@ -208,7 +208,8 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 	function setupAllAudioElements( container, h, v, slide ) {
 		var textContainer =  document.createElement( 'div' );
 		var text = null;
-		if ( !slide.hasAttribute( 'data-audio-src' ) ) {
+
+		if ( !slide.hasAttribute( 'data-audio-src' )) {
 			// determine text for TTS
 			if ( slide.hasAttribute( 'data-audio-text' ) ) {
 				text = slide.getAttribute( 'data-audio-text' );
@@ -396,7 +397,7 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 			if ( timer ) { clearTimeout( timer ); timer = null; }
 		} );
 
-		if ( audioFile != null ) {
+		if ( audioFile != null && audioFile !== '') {
 			// Support comma separated lists of audio sources
 			audioFile.split( ',' ).forEach( function( source ) {						
 				var audioSource = document.createElement( 'source' );
