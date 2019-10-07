@@ -50,6 +50,7 @@ return [
             'class' => \matperez\yii2unisender\UniSender::class,
             'apiConfig' => [
                 'apiKey' => $params['unisenderKey'],
+                'retryCount' => 3,
             ],
         ],
         'queue' => $params['components.queue'],

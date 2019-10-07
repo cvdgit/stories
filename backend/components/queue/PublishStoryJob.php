@@ -43,6 +43,8 @@ class PublishStoryJob extends BaseObject implements JobInterface
 
         $api->createCampaign([
             'message_id' => $messageID,
+            'track_read' => 1,
+            'track_links' => 1,
         ]);
     }
 }
