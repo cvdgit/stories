@@ -35,6 +35,7 @@ $this->title = 'Управление историями';
         [
             'class' => CheckboxColumn::class,
         ],
+        'id',
         'title',
         [
             'attribute' => 'user_id',
