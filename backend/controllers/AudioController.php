@@ -131,7 +131,8 @@ class AudioController extends Controller
     public function actionDeleteFile(int $story_id, int $track_id, string $file)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $form = new AudioUploadForm($story_id, $track_id);
+        $form = new AudioUploadForm($story_id);
+        $form->audioTrackID = $track_id;
         return ['success' => $form->deleteAudioFile($file)];
     }
 
