@@ -69,8 +69,9 @@ class AudioController extends Controller
 
             $trackID = $form->createAudio();
 
+            $audioUploadForm->audioTrackID = $trackID;
             $audioUploadForm->audioFiles = UploadedFile::getInstances($audioUploadForm, 'audioFiles');
-            if ($audioUploadForm->upload($trackID)) {
+            if ($audioUploadForm->upload()) {
 
             }
 
@@ -90,14 +91,15 @@ class AudioController extends Controller
 
         $model = Story::findModel($form->story_id);
 
-        $audioUploadForm = new AudioUploadForm($form->story_id, $form->model_id);
+        $audioUploadForm = new AudioUploadForm($form->story_id);
+        $audioUploadForm->audioTrackID = $form->model_id;
 
         if ($form->load(Yii::$app->request->post()) && $form->validate()) {
 
             $form->saveAudio();
 
             $audioUploadForm->audioFiles = UploadedFile::getInstances($audioUploadForm, 'audioFiles');
-            if ($audioUploadForm->upload($form->model_id)) {
+            if ($audioUploadForm->upload()) {
 
             }
 

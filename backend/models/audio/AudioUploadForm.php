@@ -23,10 +23,10 @@ class AudioUploadForm extends Model
     /** @var int */
     public $audioTrackID;
 
-    public function __construct(int $storyID, int $trackID, $config = [])
+    public function __construct(int $storyID, $config = [])
     {
         $this->storyID = $storyID;
-        $this->audioTrackID = $trackID;
+        // $this->audioTrackID = $trackID;
         parent::__construct($config);
     }
 
@@ -54,11 +54,8 @@ class AudioUploadForm extends Model
         return '/audio/' . $this->storyID . DIRECTORY_SEPARATOR . $this->audioTrackID;
     }
 
-    public function upload(int $trackID)
+    public function upload()
     {
-
-        $this->audioTrackID = $trackID;
-
         if ($this->validate()) {
             $audioFolder = $this->audioFilePath();
             if (!file_exists($audioFolder)) {

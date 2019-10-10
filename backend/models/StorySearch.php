@@ -12,6 +12,7 @@ use yii\data\Sort;
 class StorySearch extends Model
 {
 
+    public $id;
     public $title;
     public $user_id;
     public $category_id;
@@ -24,7 +25,7 @@ class StorySearch extends Model
     {
         return [
             [['title'], 'string'],
-            [['user_id', 'status', 'sub_access'], 'integer'],
+            [['id', 'user_id', 'status', 'sub_access'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
         ];
     }
@@ -42,6 +43,10 @@ class StorySearch extends Model
         $sortParams = [
             'defaultOrder' => ['created_at' => SORT_DESC],
             'attributes' => [
+                'id' => [
+                    'asc' => ['id' => SORT_ASC],
+                    'desc' => ['id' => SORT_DESC],
+                ],
                 'title' => [
                     'asc' => ['title' => SORT_ASC],
                     'desc' => ['title' => SORT_DESC],
@@ -72,6 +77,7 @@ class StorySearch extends Model
 
         $query->andFilterWhere(['like', 'title', $this->title]);
         $query->andFilterWhere([
+            'story.id' => $this->id,
             'user.id' => $this->user_id,
             'story_category.category_id' => $this->category_id,
             "DATE_FORMAT(FROM_UNIXTIME(story.created_at), '%d.%m.%Y')" => $this->created_at,
