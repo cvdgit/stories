@@ -59,7 +59,7 @@ class AudioUploadForm extends Model
         if ($this->validate()) {
             $audioFolder = $this->audioFilePath();
             if (!file_exists($audioFolder)) {
-                if (!mkdir($concurrentDirectory = $audioFolder) && !is_dir($concurrentDirectory)) {
+                if (!mkdir($concurrentDirectory = $audioFolder, 0755, true) && !is_dir($concurrentDirectory)) {
                     throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
                 }
             }
