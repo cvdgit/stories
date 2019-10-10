@@ -62,5 +62,7 @@ return [
 
         'blog' => 'news/index',
         'blog/<slug:[\w\-]+>' => 'news/view',
+
+        'player/create-audio-track' => 'player/create-audio-track',
     ],
 ];

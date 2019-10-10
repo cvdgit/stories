@@ -79,10 +79,13 @@ class StoryAudioService
 
     public function getStoryTrack(Story $story, $trackID = null)
     {
+        $currentUserID = Yii::$app->user->id;
         if ($trackID === null) {
-            $track = array_filter($story->storyAudioTracks, function(StoryAudioTrack $model) {
-                return $model->isDefault();
+
+            $track = array_filter($story->storyAudioTracks, function(StoryAudioTrack $model) use ($currentUserID) {
+                return ($model->isOriginal() && $model->isDefault()) || ($model->isUserTrack($currentUserID));
             });
+
             if (count($track) > 0) {
                 $track = $track[0];
             }
@@ -92,6 +95,9 @@ class StoryAudioService
         }
         else {
             $track = StoryAudioTrack::findModel($trackID);
+            if (!$track->isOriginal() && !$track->isUserTrack($currentUserID)) {
+                $track = null;
+            }
         }
         return $track;
     }

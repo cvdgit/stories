@@ -369,4 +369,11 @@ class Story extends ActiveRecord
         return $this->hasMany(StoryAudioTrack::class, ['story_id' => 'id']);
     }
 
+    public function checkAudioTracks()
+    {
+        $audio = $this->storyAudioTracks ? 1 : 0;
+        $this->audio = $audio;
+        $this->save(false);
+    }
+
 }

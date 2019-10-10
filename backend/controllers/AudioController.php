@@ -10,6 +10,7 @@ use backend\models\audio\UpdateAudioForm;
 use common\models\Story;
 use common\models\StoryAudioTrack;
 use common\rbac\UserRoles;
+use common\services\StoryAudioService;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -19,6 +20,14 @@ use yii\web\UploadedFile;
 
 class AudioController extends Controller
 {
+
+    protected $audioService;
+
+    public function __construct($id, $module, StoryAudioService $audioService, $config = [])
+    {
+        $this->audioService = $audioService;
+        parent::__construct($id, $module, $config);
+    }
 
     public function behaviors()
     {
@@ -67,7 +76,13 @@ class AudioController extends Controller
 
         if ($form->load(Yii::$app->request->post()) && $form->validate()) {
 
-            $trackID = $form->createAudio();
+            $trackID = $this->audioService->createTrack(
+                $form->name,
+                $form->story_id,
+                $form->user_id,
+                $form->type,
+                $form->default
+            );
 
             $audioUploadForm->audioTrackID = $trackID;
             $audioUploadForm->audioFiles = UploadedFile::getInstances($audioUploadForm, 'audioFiles');

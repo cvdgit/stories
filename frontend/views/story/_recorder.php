@@ -27,13 +27,17 @@ $this->registerCss($css);
 /** @var $model common\models\Story */
 $createTrackAction = Url::to(['player/create-audio-track', 'story_id' => $model->id]);
 $getTrackAction = Url::to(['player/get-track']);
+
+/** @var $currentTrack common\models\StoryAudioTrack */
+$track = \yii\helpers\Json::htmlEncode($currentTrack);
+
 $js = <<<JS
+
 $("#create-audio-track").on("click", function(e) {
     e.preventDefault();
     var promise = $.get("$createTrackAction");
     promise.done(function(data) {
         if (data && data.success) {
-            WikidsPlayer.setCurrentTrack(data.track);
             $("<option/>")
                 .val(data.track.id)
                 .text(data.track.name)
@@ -72,8 +76,6 @@ $("#audio-track-list").on("change", function() {
 });
 JS;
 $this->registerJs($js);
-
-/** @var $currentTrack common\models\StoryAudioTrack */
 ?>
 <div class="row">
     <div class="col-md-3">

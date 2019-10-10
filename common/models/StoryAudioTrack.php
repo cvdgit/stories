@@ -3,6 +3,7 @@
 namespace common\models;
 
 use backend\models\audio\AudioUploadForm;
+use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\web\NotFoundHttpException;
 
@@ -125,14 +126,37 @@ class StoryAudioTrack extends \yii\db\ActiveRecord
 
     public function afterDelete()
     {
-        $form = new AudioUploadForm($this->story_id, $this->id);
+        $form = new AudioUploadForm($this->story_id);
+        $form->audioTrackID = $this->id;
         $form->deleteFiles();
+
+        if ($this->isOriginal() && $this->isDefault()) {
+            $command = Yii::$app->db->createCommand();
+            $command->update('{{%story}}', ['audio' => 0], 'id = :storyID', [':storyID' => $this->story_id]);
+            $command->execute();
+        }
+
         parent::afterDelete();
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        if ($this->isOriginal() && $this->isDefault()) {
+            $command = Yii::$app->db->createCommand();
+            $command->update('{{%story}}', ['audio' => 1], 'id = :storyID', [':storyID' => $this->story_id]);
+            $command->execute();
+        }
+        parent::afterSave($insert, $changedAttributes);
     }
 
     public function isOriginal()
     {
         return (int)$this->type === self::TYPE_ORIGINAL;
+    }
+
+    public function isUserTrack($userID)
+    {
+        return (int)$this->type === self::TYPE_USER && $this->user_id === $userID;
     }
 
 }
