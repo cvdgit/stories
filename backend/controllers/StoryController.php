@@ -148,8 +148,6 @@ class StoryController extends Controller
         $dropboxForm->storyId = $model->id;
         $dropboxForm->storyFile = $model->story_file;
 
-        $audioUploadForm = new AudioUploadForm($model->id);
-
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 
             $coverUploadForm->coverFile = UploadedFile::getInstance($coverUploadForm, 'coverFile');
@@ -173,11 +171,6 @@ class StoryController extends Controller
                 }
             }
 
-            $audioUploadForm->audioFiles = UploadedFile::getInstances($audioUploadForm, 'audioFiles');
-            if ($audioUploadForm->upload()) {
-
-            }
-
             $model->categories = explode(',', $model->story_categories);
 
             $model->save(false);
@@ -193,7 +186,6 @@ class StoryController extends Controller
             'fileUploadForm' => $fileUploadForm,
             'powerPointForm' => $powerPointForm,
             'dropboxForm' => $dropboxForm,
-            'audioUploadForm' => $audioUploadForm,
         ]);
     }
 
@@ -293,13 +285,6 @@ class StoryController extends Controller
         $this->service->unPublishStory($model);
         Yii::$app->session->setFlash('success', 'История снята с публикации');
         return $this->redirect(['update', 'id' => $model->id]);
-    }
-
-    public function actionDeleteAudioFile(int $id, string $file)
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $form = new AudioUploadForm($id);
-        return ['success' => $form->deleteAudioFile($file)];
     }
 
     public function actionReadonly(int $id)

@@ -3,7 +3,8 @@
 use yii\helpers\Url;
 
 /** @var $model common\models\Story */
-$action = Url::to(['story/delete-audio-file', 'id' => $model->id]);
+/** @var $trackModel common\models\StoryAudioTrack */
+$action = Url::to(['audio/delete-file', 'story_id' => $model->id, 'track_id' => $trackModel->id]);
 $js = <<< CODE
 $("#audio-file-list").on("click", "[data-audio-file]", function() {
     var elem = $(this);
@@ -30,8 +31,9 @@ CODE;
 /** @var $this yii\web\View */
 $this->registerJs($js);
 
-/** @var $audioUploadForm backend\models\AudioUploadForm */
+/** @var $audioUploadForm backend\models\audio\AudioUploadForm */
 ?>
+<h4 class="page-header" style="margin-top: 45px">Аудио файлы</h4>
 <ul class="list-group" id="audio-file-list">
     <?php foreach ($audioUploadForm->audioFileList() as $file): ?>
         <li class="list-group-item"><span data-audio-file="<?= $file ?>" class="badge" style="cursor: pointer">Удалить</span><?= $file ?></li>

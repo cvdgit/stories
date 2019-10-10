@@ -17,6 +17,7 @@ $this->params['sidebarMenuItems'] = [
     ['label' => 'История', 'url' => ['story/update', 'id' => $model->id]],
     ['label' => 'Редактор', 'url' => ['editor/edit', 'id' => $model->id]],
     ['label' => 'Статистика', 'url' => ['statistics/list', 'id' => $model->id]],
+    ['label' => 'Озвучка', 'url' => ['audio/index', 'story_id' => $model->id]],
 ];
 
 $storyID = $model->id;

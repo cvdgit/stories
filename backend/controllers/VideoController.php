@@ -7,12 +7,29 @@ namespace backend\controllers;
 use backend\models\video\CreateVideoForm;
 use backend\models\video\UpdateVideoForm;
 use common\models\SlideVideo;
+use common\rbac\UserRoles;
 use Yii;
 use yii\data\ActiveDataProvider;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 
 class VideoController extends Controller
 {
+
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => [UserRoles::PERMISSION_MANAGE_STORIES],
+                    ],
+                ],
+            ],
+        ];
+    }
 
     public function actionIndex()
     {

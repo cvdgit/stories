@@ -41,6 +41,7 @@ use yii\db\ActiveQuery;
  * @property Tag[] $tags
  * @property Category[] $categories
  * @property Comment[] $comments
+ * @property StoryAudioTrack[] $storyAudioTracks
  */
 
 class Story extends ActiveRecord
@@ -358,6 +359,14 @@ class Story extends ActiveRecord
             ->andWhere('t2.type = :block_type', [':block_type' => StorySlideBlock::TYPE_BUTTON])
             //->indexBy('slideID')
             ->all();
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStoryAudioTracks()
+    {
+        return $this->hasMany(StoryAudioTrack::class, ['story_id' => 'id']);
     }
 
 }

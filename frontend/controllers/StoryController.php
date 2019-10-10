@@ -7,6 +7,7 @@ use common\models\StoryTest;
 use common\models\StoryTestResult;
 use common\rbac\UserPermissions;
 use common\services\story\CountersService;
+use common\services\StoryAudioService;
 use common\services\StoryFavoritesService;
 use common\services\StoryLikeService;
 use common\services\QuestionsService;
@@ -55,6 +56,7 @@ class StoryController extends Controller
     protected $likeService;
     protected $favoritesService;
     protected $questionsService;
+    protected $audioService;
 
     public function __construct($id,
                                 $module,
@@ -63,6 +65,7 @@ class StoryController extends Controller
                                 StoryLikeService $likeService,
                                 StoryFavoritesService $favoritesService,
                                 QuestionsService $questionsService,
+                                StoryAudioService $audioService,
                                 $config = [])
     {
         $this->storyService = $storyService;
@@ -70,6 +73,7 @@ class StoryController extends Controller
         $this->likeService = $likeService;
         $this->favoritesService = $favoritesService;
         $this->questionsService = $questionsService;
+        $this->audioService = $audioService;
         parent::__construct($id, $module, $config);
     }
 
@@ -138,10 +142,11 @@ class StoryController extends Controller
     /**
      * Displays a single Story model.
      * @param string $alias
+     * @param null $track_id
      * @return mixed
-     * @throws yii\web\NotFoundHttpException
+     * @throws \yii\web\NotFoundHttpException
      */
-    public function actionView($alias)
+    public function actionView($alias, $track_id = null)
     {
         $model = Story::findModelByAlias($alias);
 
@@ -153,11 +158,13 @@ class StoryController extends Controller
         $this->countersService->updateCounters($model);
 
         $commentForm = new CommentForm($model->id);
+
         return $this->render('view', [
             'model' => $model,
             'storyDefaultView' => $this->storyService->getDefaultStoryView(),
             'commentForm' => $commentForm,
             'dataProvider' => $dataProvider,
+            'currentTrack' => $this->audioService->getStoryTrack($model, $track_id),
         ]);
     }
 
@@ -228,7 +235,7 @@ class StoryController extends Controller
         return ['success' => true, 'correctAnswer' => $correctAnswer];
     }
 
-    public function actionInitStoryPlayer(int $id, int $num)
+    public function actionInitStoryPlayer(int $id, int $num, $track = null)
     {
         if (Yii::$app->user->isGuest) {
             if ($num >= 2) {
@@ -245,9 +252,14 @@ class StoryController extends Controller
                 $model = Story::findModel(Yii::$app->params['story.bySubscription.id']);
             }
         }
+        $audioTrackPath = '';
+        if ($model->isAudioStory() && $track !== null) {
+            $audioTrackPath = $this->audioService->getStoryTrackPath($model->id, $track);
+        }
         return $this->renderAjax('_player', [
             'model' => $model,
             'userCanViewStory' => true,
+            'audioTrackPath' => $audioTrackPath,
         ]);
     }
 

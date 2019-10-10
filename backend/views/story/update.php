@@ -18,6 +18,7 @@ $this->params['sidebarMenuItems'] = [
 	['label' => $model->title, 'url' => ['story/update', 'id' => $model->id]],
 	['label' => 'Редактор', 'url' => ['editor/edit', 'id' => $model->id]],
 	['label' => 'Статистика', 'url' => ['statistics/list', 'id' => $model->id]],
+    ['label' => 'Озвучка', 'url' => ['audio/index', 'story_id' => $model->id]],
 ];
 ?>
 <div class="row">
@@ -45,7 +46,6 @@ $this->params['sidebarMenuItems'] = [
 		    'model' => $model,
 		    'coverUploadForm' => $coverUploadForm,
 		    'fileUploadForm' => $fileUploadForm,
-            'audioUploadForm' => $audioUploadForm,
 		]) ?>
 	</div>
 	<div class="col-xs-6" style="padding-top: 69px">

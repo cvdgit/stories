@@ -13,12 +13,13 @@ class Audio extends AbstractPlugin implements PluginInterface
     public $storyID;
 
     public $defaultAudios = true;
+    public $prefix;
 
     public function pluginConfig()
     {
         return [
             $this->configName => [
-                'prefix' => '/audio/' . $this->storyID . '/', 	// audio files are stored in the "audio" folder
+                'prefix' => $this->prefix, 	// audio files are stored in the "audio" folder
 		        'suffix' => '.mp3',		// audio files have the ".ogg" ending
 		        'textToSpeechURL' => null,  // the URL to the text to speech converter
 		        'defaultNotes' => false, 	// use slide notes as default for the text to speech converter
@@ -42,7 +43,6 @@ class Audio extends AbstractPlugin implements PluginInterface
     public function dependencies()
     {
         return [
-            //new Dependency('/js/player/plugins/slideshow-recorder.js'),
             new Dependency('/js/player/plugins/audio-slideshow.js'),
         ];
     }

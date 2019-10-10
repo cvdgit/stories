@@ -1,7 +1,7 @@
 <?php
 
 
-namespace backend\models;
+namespace backend\models\audio;
 
 
 use http\Exception\RuntimeException;
@@ -17,11 +17,16 @@ class AudioUploadForm extends Model
      */
     public $audioFiles;
 
+    /** @var int */
     public $storyID;
 
-    public function __construct(int $storyID, $config = [])
+    /** @var int */
+    public $audioTrackID;
+
+    public function __construct(int $storyID, int $trackID, $config = [])
     {
         $this->storyID = $storyID;
+        $this->audioTrackID = $trackID;
         parent::__construct($config);
     }
 
@@ -41,16 +46,19 @@ class AudioUploadForm extends Model
 
     public function audioFilePath()
     {
-        return Yii::getAlias('@public') . '/audio/' . $this->storyID;
+        return Yii::getAlias('@public') . '/audio/' . $this->storyID . DIRECTORY_SEPARATOR . $this->audioTrackID;
     }
 
     public function audioFileRelativePath()
     {
-        return '/audio/' . $this->storyID;
+        return '/audio/' . $this->storyID . DIRECTORY_SEPARATOR . $this->audioTrackID;
     }
 
-    public function upload()
+    public function upload(int $trackID)
     {
+
+        $this->audioTrackID = $trackID;
+
         if ($this->validate()) {
             $audioFolder = $this->audioFilePath();
             if (!file_exists($audioFolder)) {
@@ -89,6 +97,15 @@ class AudioUploadForm extends Model
             return true;
         }
         return false;
+    }
+
+    public function deleteFiles()
+    {
+        $audioFolder = $this->audioFilePath();
+        if (file_exists($audioFolder)) {
+            array_map('unlink', glob($audioFolder . DIRECTORY_SEPARATOR . '*.*'));
+            rmdir($audioFolder);
+        }
     }
 
 }

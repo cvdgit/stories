@@ -12,8 +12,6 @@ use dosamigos\selectize\SelectizeTextInput;
 /** @var $form yii\widgets\ActiveForm */
 /** @var $fileUploadForm backend\models\StoryFileUploadForm */
 /** @var $coverUploadForm backend\models\StoryCoverUploadForm */
-/** @var $audioUploadForm backend\models\AudioUploadForm */
-
 ?>
 
 <?php $form = ActiveForm::begin(); ?>
@@ -59,14 +57,7 @@ $values = implode("\n", $values);
         'create' => true,
     ],
 ])->hint('Используйте запятые для разделения тегов') ?>
-<?= $form->field($model, 'audio')->checkBox() ?>
-<?php if (!$model->isNewRecord): ?>
-<?= $form->field($audioUploadForm, 'audioFiles[]')->fileInput(['multiple' => true, 'accept' => '.mp3,audio/*']) ?>
-<?= $this->render('_audio_files', ['audioUploadForm' => $audioUploadForm, 'model' => $model]) ?>
-<?php endif ?>
 <div class="form-group">
-<?php
-echo Html::submitButton(($model->isNewRecord ? 'Создать историю' : 'Сохранить изменения'), ['class' => 'btn btn-success', 'style' => 'margin-right: 20px']);
-?>
+<?= Html::submitButton(($model->isNewRecord ? 'Создать историю' : 'Сохранить изменения'), ['class' => 'btn btn-success', 'style' => 'margin-right: 20px']) ?>
 </div>
 <?php ActiveForm::end(); ?>

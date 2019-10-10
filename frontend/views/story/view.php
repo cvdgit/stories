@@ -22,7 +22,9 @@ $this->setMetaTags($title,
 
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 
-$action = Url::to(['story/init-story-player', 'id' => $model->id]);
+/** @var $currentTrack common\models\StoryAudioTrack */
+$action = Url::to(['story/init-story-player', 'id' => $model->id, 'track' => $currentTrack->id]);
+
 /** @var $storyDefaultView string */
 $js = <<< JS
 
@@ -147,7 +149,7 @@ $isBookView = $storyDefaultView === 'book';
                 </div>
             </div>
             <?php if (Yii::$app->user->can('moderator')): ?>
-            <?= $this->render('_recorder') ?>
+            <?= $this->render('_recorder', ['model' => $model, 'currentTrack' => $currentTrack]) ?>
             <?php endif ?>
         </div>
     </main>

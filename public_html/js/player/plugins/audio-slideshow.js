@@ -54,7 +54,6 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 //console.debug( "ready ");
 		selectAudio();
 		document.dispatchEvent( new CustomEvent('stopplayback') );
-
 	} );
 
 	Reveal.addEventListener( 'slidechanged', function( event ) {
@@ -438,8 +437,16 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 		}
 	}
 
+	function sync() {
+		setup();
+		//console.debug("sync");
+		selectAudio();
+		document.dispatchEvent(new CustomEvent('stopplayback'));
+	}
 
-
+	return {
+		"sync": sync
+	};
 })();
 
 /*****************************************************************

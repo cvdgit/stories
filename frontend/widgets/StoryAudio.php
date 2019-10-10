@@ -14,12 +14,12 @@ class StoryAudio extends Widget
 
     public function run()
     {
-        $model = new AudioUploadForm($this->storyID);
+/*        $model = new AudioUploadForm($this->storyID);
         $path = $model->audioFileRelativePath() . '/';
         return $this->render('_audio', [
             'path' => $path,
             'files' => $model->audioFileList(),
-        ]);
+        ]);*/
     }
 
 }

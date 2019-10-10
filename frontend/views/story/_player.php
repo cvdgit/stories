@@ -13,6 +13,7 @@ use yii\helpers\Url;
 
 $config = [
     'setSlideAudioAction' => Url::to(['player/set-slide-audio']),
+    'loadStoryAction' => Url::to(['story/init-story-player', 'id' => $model->id]),
 ];
 $configJSON = Json::htmlEncode($config);
 $js = <<< JS
@@ -42,11 +43,12 @@ $plugins = [
 ];
 
 if ($model->isAudioStory()) {
-    $defaultAudios = true;
-    if (Yii::$app->user->can('moderator')) {
-        $defaultAudios = !$model->isUserAudioStory();
-    }
-    $plugins[] = ['class' => \common\widgets\Reveal\Plugins\Audio::class, 'storyID' => $model->id, 'defaultAudios' => $defaultAudios];
+    /** @var $audioTrackPath string */
+    $plugins[] = [
+        'class' => \common\widgets\Reveal\Plugins\Audio::class,
+        'storyID' => $model->id,
+        'prefix' => $audioTrackPath . DIRECTORY_SEPARATOR,
+    ];
 }
 
 echo RevealWidget::widget([

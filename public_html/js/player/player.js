@@ -119,6 +119,7 @@ var WikidsPlayer = (function(document, $) {
         var filename = new Date().getTime();
         formData.append("SlideAudio[slide_audio_files][]", blob, filename);
         formData.append("SlideAudio[slide_id]", getCurrentSlideID());
+        formData.append("SlideAudio[track_id]", getCurrentTrack().id);
 
         var promise = $.ajax({
             "url": config.setSlideAudioAction,
@@ -151,6 +152,7 @@ var WikidsPlayer = (function(document, $) {
 
         var formData = new FormData();
         formData.append("SlideAudio[slide_id]", getCurrentSlideID());
+        formData.append("SlideAudio[track_id]", getCurrentTrack().id);
 
         var i = 0;
         for (var name in audioData) {
@@ -173,6 +175,16 @@ var WikidsPlayer = (function(document, $) {
                 location.reload();
             }
         });
+    }
+
+    var currentTrack;
+
+    function setCurrentTrack(track) {
+        currentTrack = track;
+    }
+
+    function getCurrentTrack() {
+        return currentTrack;
     }
 
     return {
@@ -202,7 +214,9 @@ var WikidsPlayer = (function(document, $) {
         "getCurrentSlideID": getCurrentSlideID,
         "addAudioData": addAudioData,
         "removeAudioData": removeAudioData,
-        "mergeAllAndSetSlideAudio": mergeAllAndSetSlideAudio
+        "mergeAllAndSetSlideAudio": mergeAllAndSetSlideAudio,
+        "setCurrentTrack": setCurrentTrack,
+        "getCurrentTrack": getCurrentTrack
     };
 })(document, jQuery);
 
