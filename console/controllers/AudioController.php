@@ -21,6 +21,7 @@ class AudioController extends Controller
         parent::__construct($id, $module, $config);
     }
 
+    /*
     public function actionCreateOriginalTrack()
     {
         $query = (new Query())
@@ -53,5 +54,6 @@ class AudioController extends Controller
 
         $this->stdout('Done!' . PHP_EOL);
     }
+    */
 
 }

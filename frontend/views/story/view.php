@@ -149,7 +149,7 @@ $isBookView = $storyDefaultView === 'book';
                 </div>
             </div>
             <?php if (Yii::$app->user->can('moderator')): ?>
-            <?php // $this->render('_recorder', ['model' => $model, 'currentTrack' => $currentTrack]) ?>
+            <?= $this->render('_recorder', ['model' => $model, 'currentTrack' => $currentTrack]) ?>
             <?php endif ?>
         </div>
     </main>
