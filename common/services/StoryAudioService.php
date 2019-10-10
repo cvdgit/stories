@@ -40,6 +40,21 @@ class StoryAudioService
         }
     }
 
+    public function trackFileList(int $storyID, int $trackID): array
+    {
+        $files = [];
+        $path = $this->getTrackPath($storyID, $trackID);
+        if (file_exists($path)) {
+            $dir = opendir($path);
+            while (false !== ($filename = readdir($dir))) {
+                if (!in_array($filename, array('.', '..'))) {
+                    $files[] = $filename;
+                }
+            }
+        }
+        return $files;
+    }
+
     public function joinWavs($wavs)
     {
         $fields = implode('/', ['H8ChunkID', 'VChunkSize', 'H8Format', 'H8Subchunk1ID', 'VSubchunk1Size', 'vAudioFormat', 'vNumChannels', 'VSampleRate', 'VByteRate', 'vBlockAlign', 'vBitsPerSample']);

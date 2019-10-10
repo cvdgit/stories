@@ -10,7 +10,6 @@ $js = <<<JS
         path = "$path";
     var customSort = function (a, b) {
         return (Number(a.match(/(\d+)/g)[0]) - Number((b.match(/(\d+)/g)[0])));
-    
     };
     audioFiles.sort(customSort);
     var audioPlayer = document.getElementById("story-audio-player");
