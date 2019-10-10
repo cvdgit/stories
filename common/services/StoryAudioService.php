@@ -86,6 +86,9 @@ class StoryAudioService
             if (count($track) > 0) {
                 $track = $track[0];
             }
+            else {
+                $track = null;
+            }
         }
         else {
             $track = StoryAudioTrack::findModel($trackID);

@@ -23,7 +23,11 @@ $this->setMetaTags($title,
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 
 /** @var $currentTrack common\models\StoryAudioTrack */
-$action = Url::to(['story/init-story-player', 'id' => $model->id, 'track' => $currentTrack->id]);
+$route = ['story/init-story-player', 'id' => $model->id];
+if ($currentTrack) {
+    $route['track'] = $currentTrack->id;
+}
+$action = Url::to($route);
 
 /** @var $storyDefaultView string */
 $js = <<< JS

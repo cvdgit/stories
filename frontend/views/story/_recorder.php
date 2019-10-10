@@ -78,12 +78,12 @@ $this->registerJs($js);
 <div class="row">
     <div class="col-md-3">
         <div style="padding: 20px; text-align: center">
-            <?= Html::dropDownList('audio_track', $currentTrack->id, StoryHelper::getStoryAudioTrackArray($model), ['id' => 'audio-track-list']) ?>
+            <?= Html::dropDownList('audio_track', ($currentTrack !== null ? $currentTrack->id : ''), StoryHelper::getStoryAudioTrackArray($model), ['id' => 'audio-track-list']) ?>
             <?= Html::a('Новая дорожка', '#', ['id' => 'create-audio-track', 'style' => 'font-weight: bold; margin-top: 10px; display: block']) ?>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="recorder-controls" style="padding: 20px; display: <?= $currentTrack->isOriginal() ? 'none' : 'block' ?>">
+        <div class="recorder-controls" style="padding: 20px; display: <?= $currentTrack && $currentTrack->isOriginal() ? 'none' : 'block' ?>">
             <button id="audioRecord">Записать</button>
             <button id="audioPause">Пауза</button>
             <button id="audioStop">Стоп</button>
