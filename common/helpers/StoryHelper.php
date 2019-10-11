@@ -22,6 +22,7 @@ class StoryHelper
         $tracks = array_filter($model->storyAudioTracks, function(StoryAudioTrack $track) {
             return $track->isOriginal() || $track->isUserTrack(Yii::$app->user->id);
         });
+
         return ArrayHelper::map($tracks, 'id', 'name');
     }
 
