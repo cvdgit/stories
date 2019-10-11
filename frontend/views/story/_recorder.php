@@ -85,7 +85,7 @@ $this->registerJs($js);
         </div>
     </div>
     <div class="col-md-4">
-        <div class="recorder-controls" style="padding: 20px; display: <?= $currentTrack && $currentTrack->isOriginal() ? 'none' : 'block' ?>">
+        <div class="recorder-controls" style="padding: 20px; display: <?= $currentTrack && $currentTrack->isUser() ? 'block' : 'none' ?>">
             <button id="audioRecord">Записать</button>
             <button id="audioPause">Пауза</button>
             <button id="audioStop">Стоп</button>
