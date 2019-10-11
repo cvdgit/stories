@@ -44,7 +44,6 @@ if ($("#story_wrapper").is(":visible")) {
     Wikids2.loadStory("$action");
     $("[data-story-view]").removeClass("active");
     $("[data-story-view=" + defaultView + "]").addClass("active");
-    ym(53566996, 'reachGoal', 'transition_to_training');
 }
 
 function switchStoryView(view) {
@@ -52,7 +51,7 @@ function switchStoryView(view) {
         $(".slides-readonly").hide();
         $("#story_wrapper").show();
         Wikids2.loadStory("$action");
-        
+        ym(53566996, 'reachGoal', 'transition_to_training');
     }
     else if (view === "book") {
         $(".slides-readonly").show();
