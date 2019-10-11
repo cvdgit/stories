@@ -5,6 +5,8 @@ namespace common\helpers;
 
 
 use common\models\Story;
+use common\models\StoryAudioTrack;
+use Yii;
 use yii\helpers\ArrayHelper;
 
 class StoryHelper
@@ -17,7 +19,10 @@ class StoryHelper
 
     public static function getStoryAudioTrackArray(Story $model)
     {
-        return ArrayHelper::map($model->storyAudioTracks, 'id', 'name');
+        $tracks = array_filter($model->storyAudioTracks, function(StoryAudioTrack $track) {
+            return $track->isOriginal() || $track->isUserTrack(Yii::$app->user->id);
+        });
+        return ArrayHelper::map($tracks, 'id', 'name');
     }
 
 }
