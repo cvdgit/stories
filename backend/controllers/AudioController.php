@@ -117,6 +117,9 @@ class AudioController extends Controller
             if ($audioUploadForm->upload()) {
 
             }
+            else {
+                die(print_r($audioUploadForm->errors));
+            }
 
             return $this->refresh();
         }

@@ -77,7 +77,7 @@ AppAsset::register($this);
                         <div class="user-menu-wrapper">
                         <?php if (Yii::$app->user->isGuest): ?>
                             <div class="user-menu-inner">
-                                <?= Html::a('Регистрация', '#', ['data-toggle' => 'modal', 'data-target' => '#wikids-signup-modal']) ?>
+                                <?= Html::a('Регистрация', '#', ['data-toggle' => 'modal', 'data-target' => '#wikids-signup-modal', 'onclick' => "ym(53566996, 'reachGoal', 'show_registration_form'); return true;"]) ?>
                                 <span></span>
                                 <?= Html::a('Войти', '#', ['class' => 'login-item', 'data-toggle' => 'modal', 'data-target' => '#wikids-login-modal']) ?>
                             </div>
