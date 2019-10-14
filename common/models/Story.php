@@ -392,7 +392,7 @@ class Story extends ActiveRecord
         return current($trackArray);
     }
 
-    public function getStoryTrack(int $userID)
+    public function getStoryTrack($userID)
     {
         $track = $this->getOriginalTrack();
         if ($track === null) {
@@ -401,7 +401,7 @@ class Story extends ActiveRecord
         return $track;
     }
 
-    public function getUserAudioTracks(int $userID)
+    public function getUserAudioTracks($userID)
     {
         return array_filter($this->storyAudioTracks, function(StoryAudioTrack $track) use ($userID) {
             return $track->isOriginal() || $track->isUserTrack($userID);
