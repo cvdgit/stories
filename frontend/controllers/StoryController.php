@@ -4,7 +4,6 @@ namespace frontend\controllers;
 
 use common\models\StorySlide;
 use common\models\StoryTest;
-use common\models\StoryTestResult;
 use common\rbac\UserPermissions;
 use common\services\story\CountersService;
 use common\services\StoryAudioService;
@@ -14,6 +13,7 @@ use common\services\QuestionsService;
 use frontend\models\StoryFavoritesSearch;
 use frontend\models\StoryLikeForm;
 use frontend\models\StoryLikeSearch;
+use frontend\models\StoryTrackModel;
 use frontend\models\UserStorySearch;
 use Yii;
 use yii\filters\AccessControl;
@@ -149,22 +149,18 @@ class StoryController extends Controller
     public function actionView($alias, $track_id = null)
     {
         $model = Story::findModelByAlias($alias);
-
         $dataProvider = Comment::getStoryComments($model->id);
         if (Yii::$app->request->isPjax) {
             return $this->renderAjax('_comment_list', ['dataProvider' => $dataProvider]);
         }
-
         $this->countersService->updateCounters($model);
-
         $commentForm = new CommentForm($model->id);
-
         return $this->render('view', [
             'model' => $model,
             'storyDefaultView' => $this->storyService->getDefaultStoryView(),
             'commentForm' => $commentForm,
             'dataProvider' => $dataProvider,
-            'currentTrack' => $this->audioService->getStoryTrack($model, $track_id),
+            'trackID' => $track_id,
         ]);
     }
 
@@ -235,7 +231,7 @@ class StoryController extends Controller
         return ['success' => true, 'correctAnswer' => $correctAnswer];
     }
 
-    public function actionInitStoryPlayer(int $id, int $num, $track = null)
+    public function actionInitStoryPlayer(int $id, int $num, $track_id = null)
     {
         if (Yii::$app->user->isGuest) {
             if ($num >= 2) {
@@ -252,10 +248,15 @@ class StoryController extends Controller
                 $model = Story::findModel(Yii::$app->params['story.bySubscription.id']);
             }
         }
+
         $audioTrackPath = '';
-        if ($model->isAudioStory() && $track !== null) {
-            $audioTrackPath = $this->audioService->getStoryTrackPath($model->id, $track);
+        if ($model->isAudioStory()) {
+            $track = $this->audioService->getStoryTrack($model, $track_id, Yii::$app->user->id);
+            if ($track !== null) {
+                $audioTrackPath = StoryTrackModel::getTrackRelativePath($model->id, $track->id);
+            }
         }
+
         return $this->renderAjax('_player', [
             'model' => $model,
             'userCanViewStory' => true,

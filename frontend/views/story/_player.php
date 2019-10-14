@@ -42,8 +42,8 @@ $plugins = [
     ['class' => Video::class],
 ];
 
-if ($model->isAudioStory()) {
-    /** @var $audioTrackPath string */
+/** @var $audioTrackPath string */
+if ($model->isAudioStory() && $audioTrackPath !== '') {
     $plugins[] = [
         'class' => \common\widgets\Reveal\Plugins\Audio::class,
         'storyID' => $model->id,

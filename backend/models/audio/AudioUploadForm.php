@@ -26,7 +26,6 @@ class AudioUploadForm extends Model
     public function __construct(int $storyID, $config = [])
     {
         $this->storyID = $storyID;
-        // $this->audioTrackID = $trackID;
         parent::__construct($config);
     }
 
@@ -82,6 +81,7 @@ class AudioUploadForm extends Model
                 }
             }
         }
+        sort($files, SORT_NUMERIC);
         return $files;
     }
 

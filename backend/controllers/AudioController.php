@@ -67,67 +67,32 @@ class AudioController extends Controller
     public function actionCreate(int $story_id)
     {
         $model = Story::findModel($story_id);
-
-        $form = new CreateAudioForm();
-        $form->story_id = $model->id;
-        $form->user_id = Yii::$app->user->id;
-
-        $audioUploadForm = new AudioUploadForm($model->id);
-
-        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-
-            $trackID = $this->audioService->createTrack(
-                $form->name,
-                $form->story_id,
-                $form->user_id,
-                $form->type,
-                $form->default
-            );
-
-            $audioUploadForm->audioTrackID = $trackID;
-            $audioUploadForm->audioFiles = UploadedFile::getInstances($audioUploadForm, 'audioFiles');
-            if ($audioUploadForm->upload()) {
-
-            }
-
+        $form = new CreateAudioForm($model->id, Yii::$app->user->id);
+        if ($form->load(Yii::$app->request->post()) && $form->validate() && $form->audioUploadForm->validate()) {
+            $trackID = $form->createTrack();
+            $form->audioUploadForm->audioFiles = UploadedFile::getInstances($form->audioUploadForm, 'audioFiles');
+            $form->uploadTrackFiles($trackID);
             return $this->redirect(['index', 'story_id' => $model->id]);
         }
 
         return $this->render('create', [
             'model' => $form,
-            'audioUploadForm' => $audioUploadForm,
         ]);
     }
 
     public function actionUpdate(int $id)
     {
         $form = new UpdateAudioForm($id);
-        $form->loadModel();
-
         $model = Story::findModel($form->story_id);
-
-        $audioUploadForm = new AudioUploadForm($form->story_id);
-        $audioUploadForm->audioTrackID = $form->model_id;
-
-        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-
-            $form->saveAudio();
-
-            $audioUploadForm->audioFiles = UploadedFile::getInstances($audioUploadForm, 'audioFiles');
-            if ($audioUploadForm->upload()) {
-
-            }
-            else {
-                die(print_r($audioUploadForm->errors));
-            }
-
+        if ($form->load(Yii::$app->request->post()) && $form->validate() && $form->audioUploadForm->validate()) {
+            $form->updateTrack();
+            $form->audioUploadForm->audioFiles = UploadedFile::getInstances($form->audioUploadForm, 'audioFiles');
+            $form->uploadTrackFiles();
             return $this->refresh();
         }
         return $this->render('update', [
             'model' => $form,
             'storyModel' => $model,
-            'trackModel' => $form->getModel(),
-            'audioUploadForm' => $audioUploadForm,
         ]);
     }
 

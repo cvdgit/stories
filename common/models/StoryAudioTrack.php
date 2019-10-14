@@ -164,4 +164,14 @@ class StoryAudioTrack extends \yii\db\ActiveRecord
         return (int)$this->type === self::TYPE_USER && $this->user_id === $userID;
     }
 
+    public function isTrackOwner(int $userID)
+    {
+        return $this->user_id === $userID;
+    }
+
+    public function canAccessTrack(int $userID): bool
+    {
+        return $this->isOriginal() || $this->isUserTrack($userID);
+    }
+
 }

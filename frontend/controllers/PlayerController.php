@@ -10,6 +10,7 @@ use common\services\StoryAudioService;
 use common\services\StoryService;
 use Exception;
 use frontend\models\SlideAudio;
+use frontend\models\StoryTrackModel;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -69,8 +70,8 @@ class PlayerController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $model = Story::findModel($story_id);
-        $trackID = $this->audioService->createTrack('Пользовательская', $model->id, Yii::$app->user->id, StoryAudioTrack::TYPE_USER, 0);
-        return ['success' => true, 'track' => StoryAudioTrack::findModel($trackID)];
+        $track = StoryTrackModel::createTrack('Пользовательская', $model->id, Yii::$app->user->id, StoryAudioTrack::TYPE_USER, 0);
+        return ['success' => true, 'track' => $track];
     }
 
     public function actionGetTrack(int $track_id)

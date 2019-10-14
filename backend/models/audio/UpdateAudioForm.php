@@ -1,28 +1,26 @@
 <?php
 
-
 namespace backend\models\audio;
 
-
+use common\models\BaseAudioTrackModel;
 use common\models\StoryAudioTrack;
-use yii\base\Model;
 
-class UpdateAudioForm extends Model
+class UpdateAudioForm extends BaseAudioTrackModel
 {
 
-    public $name;
-    public $type;
-    public $default;
+    /** @var AudioUploadForm */
+    public $audioUploadForm;
 
-    public $story_id;
-    public $user_id;
+    public $trackID;
 
-    public $model_id;
-    private $_model;
+    private $_track;
 
-    public function __construct(int $model_id, $config = [])
+    public function __construct(int $trackID, $config = [])
     {
-        $this->model_id = $model_id;
+        $this->trackID = $trackID;
+        $this->loadTrack();
+        $this->audioUploadForm = new AudioUploadForm($this->story_id);
+        $this->audioUploadForm->audioTrackID = $this->trackID;
         parent::__construct($config);
     }
 
@@ -35,26 +33,17 @@ class UpdateAudioForm extends Model
         ];
     }
 
-    public function attributeLabels()
+    public function getTrack()
     {
-        return [
-            'type' => 'Тип',
-            'default' => 'По умолчанию',
-            'name' => 'Заголовок',
-        ];
-    }
-
-    public function getModel()
-    {
-        if ($this->_model === null) {
-            $this->_model = StoryAudioTrack::findModel($this->model_id);
+        if ($this->_track === null) {
+            $this->_track = StoryAudioTrack::findModel($this->trackID);
         }
-        return $this->_model;
+        return $this->_track;
     }
 
-    public function loadModel()
+    public function loadTrack()
     {
-        $model = $this->getModel();
+        $model = $this->getTrack();
         $this->story_id = $model->story_id;
         $this->user_id = $model->user_id;
         $this->name = $model->name;
@@ -62,13 +51,18 @@ class UpdateAudioForm extends Model
         $this->default = $model->default;
     }
 
-    public function saveAudio()
+    public function updateTrack()
     {
-        $model = $this->getModel();
+        $model = $this->getTrack();
         $model->name = $this->name;
         $model->type = $this->type;
         $model->default = $this->default;
         return $model->save();
+    }
+
+    public function uploadTrackFiles()
+    {
+        return $this->audioUploadForm->upload();
     }
 
 }

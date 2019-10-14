@@ -1,59 +1,16 @@
 <?php
 
-
 namespace common\services;
-
 
 use common\models\Story;
 use common\models\StoryAudioTrack;
 use common\models\StorySlide;
 use frontend\models\SlideAudio;
-use http\Exception\RuntimeException;
+use frontend\models\StoryTrackModel;
 use Yii;
 
 class StoryAudioService
 {
-
-    public function createTrack(string $name, int $storyID, int $userID, int $type, int $default)
-    {
-        $model = StoryAudioTrack::create($name, $storyID, $userID, $type, $default);
-        $model->save();
-        return $model->id;
-    }
-
-    public function getTrackRelativePath(int $storyID, int $trackID)
-    {
-        return '/audio/' . $storyID . DIRECTORY_SEPARATOR . $trackID;
-    }
-
-    public function getTrackPath(int $storyID, int $trackID)
-    {
-        return Yii::getAlias('@public') . $this->getTrackRelativePath($storyID, $trackID);
-    }
-
-    public function createTrackFolder(string $folder)
-    {
-        if (!file_exists($folder)) {
-            if (!mkdir($concurrentDirectory = $folder) && !is_dir($concurrentDirectory)) {
-                throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
-            }
-        }
-    }
-
-    public function trackFileList(int $storyID, int $trackID): array
-    {
-        $files = [];
-        $path = $this->getTrackPath($storyID, $trackID);
-        if (file_exists($path)) {
-            $dir = opendir($path);
-            while (false !== ($filename = readdir($dir))) {
-                if (!in_array($filename, array('.', '..'))) {
-                    $files[] = $filename;
-                }
-            }
-        }
-        return $files;
-    }
 
     public function joinWavs($wavs)
     {
@@ -75,13 +32,22 @@ class StoryAudioService
         return $header . pack('V', strlen($data)) . $data;
     }
 
+    public function createTrackFolder(string $folder)
+    {
+        if (!file_exists($folder)) {
+            if (!mkdir($concurrentDirectory = $folder, 0755, true) && !is_dir($concurrentDirectory)) {
+                throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+            }
+        }
+    }
+
     public function setSlideAudio(SlideAudio $model)
     {
         $slideModel = StorySlide::findSlide($model->slide_id);
 
         $data = $this->joinWavs($model->getFiles());
 
-        $audioFileName = $this->getTrackPath($slideModel->story_id, $model->track_id);
+        $audioFileName = StoryTrackModel::getTrackPath($slideModel->story_id, $model->track_id);
         $this->createTrackFolder($audioFileName);
         file_put_contents($audioFileName . DIRECTORY_SEPARATOR . ($slideModel->number - 1) . '.0.mp3', $data);
 
@@ -92,34 +58,19 @@ class StoryAudioService
         }
     }
 
-    public function getStoryTrack(Story $story, $trackID = null)
+    public function getStoryTrack(Story $story, $trackID, $userID)
     {
-        $currentUserID = Yii::$app->user->id;
-        if ($trackID === null) {
-
-            $track = array_filter($story->storyAudioTracks, function(StoryAudioTrack $model) use ($currentUserID) {
-                return ($model->isOriginal() && $model->isDefault()) || ($model->isUserTrack($currentUserID));
-            });
-
-            if (count($track) > 0) {
-                $track = $track[0];
-            }
-            else {
+        $track = null;
+        if ($trackID !== null) {
+            $track = StoryAudioTrack::findModel((int)$trackID);
+            if (!$track->canAccessTrack(Yii::$app->user->id)) {
                 $track = null;
             }
         }
         else {
-            $track = StoryAudioTrack::findModel($trackID);
-            if (!$track->isOriginal() && !$track->isUserTrack($currentUserID)) {
-                $track = null;
-            }
+            $track = $story->getStoryTrack($userID);
         }
         return $track;
-    }
-
-    public function getStoryTrackPath(int $storyID, int $trackID): string
-    {
-        return $this->getTrackRelativePath($storyID, $trackID);
     }
 
 }

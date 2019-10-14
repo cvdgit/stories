@@ -376,4 +376,36 @@ class Story extends ActiveRecord
         $this->save(false);
     }
 
+    public function getOriginalTrack()
+    {
+        $trackArray = array_filter($this->storyAudioTracks, function(StoryAudioTrack $model) {
+            return ($model->isOriginal() && $model->isDefault());
+        });
+        return current($trackArray);
+    }
+
+    public function getUserTrack(int $userID)
+    {
+        $trackArray = array_filter($this->storyAudioTracks, function(StoryAudioTrack $model) use ($userID) {
+            return $model->isUserTrack($userID);
+        });
+        return current($trackArray);
+    }
+
+    public function getStoryTrack(int $userID)
+    {
+        $track = $this->getOriginalTrack();
+        if ($track === null) {
+            $track = $this->getUserTrack($userID);
+        }
+        return $track;
+    }
+
+    public function getUserAudioTracks(int $userID)
+    {
+        return array_filter($this->storyAudioTracks, function(StoryAudioTrack $track) use ($userID) {
+            return $track->isOriginal() || $track->isUserTrack($userID);
+        });
+    }
+
 }
