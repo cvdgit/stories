@@ -1834,3 +1834,19 @@
 	top: 0;
 	height: 720px;
 }
+
+.wikids-video-player {
+	width: 100%;
+	height: 100%;
+}
+
+.plyr {
+	width: 100%;
+	height: 100%;
+}
+
+.plyr__video-embed iframe {
+	top: -50% !important;
+	height: 200% !important;
+	width: 100%;
+}

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6d72122b20f06d6428cd8cbd80ff169a",
+    "content-hash": "5a2506de417628a60813a7760235f3ee",
     "packages": [
         {
             "name": "2amigos/yii2-chartjs-widget",
@@ -521,6 +521,21 @@
             "license": [
                 "Apache License, Version 2.0"
             ]
+        },
+        {
+            "name": "bower-asset/plyr",
+            "version": "v3.5.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sampotts/plyr.git",
+                "reference": "7c442c93571fb5d75f96bff710e310d00e1289e9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sampotts/plyr/zipball/7c442c93571fb5d75f96bff710e310d00e1289e9",
+                "reference": "7c442c93571fb5d75f96bff710e310d00e1289e9"
+            },
+            "type": "bower-asset"
         },
         {
             "name": "bower-asset/punycode",

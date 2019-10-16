@@ -1,4 +1,5 @@
 
+/*
 var loadedYT = false;
 function onYouTubeIframeAPIReady() {
     "use strict";
@@ -6,6 +7,7 @@ function onYouTubeIframeAPIReady() {
     loadedYT = true;
     WikidsVideo.createPlayer();
 }
+*/
 
 function WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute) {
     "use strict";
@@ -15,32 +17,35 @@ function WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute) {
 
     var player,
         done = false;
-    player = new YT.Player(elemID, {
-        height: '100%',
-        width: '100%',
-        videoId: videoID,
-        events: {
-            'onReady': function(event) {
-                if (mute) {
-                    event.target.mute();
-                }
-                if (seekTo > 0) {
-                    event.target.seekTo(seekTo);
-                }
-            },
-            'onStateChange': function(event) {
-                if (event.data === YT.PlayerState.PLAYING && !done) {
-                    setTimeout(pauseVideo, duration * 1000);
-                    done = true;
-                }
-            }
+
+    player = new Plyr('#' + elemID, {
+        controls: []
+    });
+
+    player.on("ready", function(event) {
+        player.play();
+        player.currentTime = parseInt(seekTo);
+        if (mute) {
+            player.volume = 0;
+        }
+        else {
+            player.volume = 0.8;
+        }
+    });
+
+    player.on("statechange", function(event) {
+        if (event.detail.code === 1 && !done) {
+            setTimeout(pauseVideo, duration * 1000);
+            done = true;
         }
     });
 
     function pauseVideo() {
-        player.pauseVideo();
+        player.pause();
     }
+
 }
+
 
 var WikidsVideo = window.WikidsVideo || (function() {
     "use strict";
@@ -63,14 +68,17 @@ var WikidsVideo = window.WikidsVideo || (function() {
                 seekTo = elem.attr("data-seek-to"),
                 duration = elem.attr("data-video-duration"),
                 mute = elem.attr("data-mute") === "true";
+
+            elem.addClass("plyr__video-embed");
+            elem.attr("data-plyr-provider", "youtube");
+            elem.attr("data-plyr-embed-id", videoID);
+
             WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute);
         }
     }
 
     Reveal.addEventListener("slidechanged", function(event) {
-        if (loadedYT) {
-            createPlayer();
-        }
+        createPlayer();
     });
 
     return {

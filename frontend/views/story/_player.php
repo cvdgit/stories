@@ -4,6 +4,7 @@ use common\widgets\Reveal\Plugins\SlideLinks;
 use common\widgets\Reveal\Plugins\Video;
 use common\widgets\RevealButtons\BackgroundButton;
 use common\widgets\RevealWidget;
+use frontend\assets\PlyrAsset;
 use yii\helpers\Json;
 use yii\helpers\Url;
 
@@ -58,6 +59,7 @@ echo RevealWidget::widget([
     'assets' => [
         \frontend\assets\RevealAsset::class,
         \frontend\assets\WikidsRevealAsset::class,
+        PlyrAsset::class,
     ],
     'plugins' => $plugins,
 ]);
