@@ -44,14 +44,11 @@ var WikidsVideo = window.WikidsVideo || (function() {
         return Reveal.getCurrentSlide();
     }
 
-    var tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
     var loaded = false;
 
     function createPlayer() {
+        console.log("createPlayer");
+        loaded = false;
         var elem = $("div.wikids-video-player", getCurrentSlide());
         var elemID = "video" + new Date().getTime();
         elem.attr("id", elemID);
@@ -67,13 +64,11 @@ var WikidsVideo = window.WikidsVideo || (function() {
 
             WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute);
         }
-        loaded = false;
     }
 
     Reveal.addEventListener("slidechanged", function(event) {
         console.log("slidechanged");
         if (!loaded) {
-            console.log("createPlayer");
             loaded = true;
             createPlayer();
         }
@@ -82,13 +77,12 @@ var WikidsVideo = window.WikidsVideo || (function() {
     Reveal.addEventListener("ready", function(event) {
         console.log("ready");
         if (!loaded) {
-            console.log("createPlayer");
             loaded = true;
             createPlayer();
         }
     });
 
-    return {
-        "createPlayer": createPlayer
-    };
+    //return {
+    //    "createPlayer": createPlayer
+    //};
 })();
