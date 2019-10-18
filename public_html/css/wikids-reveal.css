@@ -1850,3 +1850,7 @@
 	height: 200% !important;
 	width: 100%;
 }
+
+.wikids-active-block {
+	border: 6px #0b58a2 solid;
+}

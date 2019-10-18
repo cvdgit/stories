@@ -24,6 +24,9 @@ class ImageBlockMarkup extends AbstractMarkup
             'data-src' => $block->getFilePath(),
             'data-natural-width' => $block->getNaturalWidth(),
             'data-natural-height' => $block->getNaturalHeight(),
+            'data-action' => $block->getAction(),
+            'data-action-story' => $block->getActionStoryID(),
+            'data-action-slide' => $block->getActionSlideID(),
         ]);
     }
 

@@ -6,8 +6,8 @@ namespace frontend\controllers;
 
 use common\models\Story;
 use common\models\StoryAudioTrack;
+use common\models\StorySlide;
 use common\services\StoryAudioService;
-use common\services\StoryService;
 use Exception;
 use frontend\models\SlideAudio;
 use frontend\models\StoryTrackModel;
@@ -78,6 +78,14 @@ class PlayerController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return ['success' => true, 'track' => StoryAudioTrack::findModel($track_id)];
+    }
+
+    public function actionGetSlide(int $story_id, int $slide_id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $model = StorySlide::findSlide($slide_id);
+        $html = $model->data;
+        return ['html' => $html];
     }
 
 }

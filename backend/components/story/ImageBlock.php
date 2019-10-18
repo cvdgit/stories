@@ -18,21 +18,28 @@ class ImageBlock extends AbstractBlock
     /** @var float */
     protected $naturalHeight;
 
+    protected $action;
+    protected $actionStoryID;
+    protected $actionSlideID;
+
     const DEFAULT_IMAGE_WIDTH = 973;
     const DEFAULT_IMAGE_HEIGHT = 720;
 
-    public function setFilePath(string $filePath): void
+    public function setFilePath($filePath): void
     {
         $this->filePath = $filePath;
     }
 
-    public function getFilePath(): string
+    public function getFilePath()
     {
         return $this->filePath;
     }
 
-    public function setImageSize(string $imagePath, float $imageWidth = 0, float $imageHeight = 0): void
+    public function setImageSize($imagePath, float $imageWidth = 0, float $imageHeight = 0): void
     {
+        if ($imagePath === null) {
+            return;
+        }
 
         if ($imageWidth === 0 || $imageHeight === 0) {
             [$imageWidth, $imageHeight] = getimagesize($imagePath);
@@ -59,7 +66,7 @@ class ImageBlock extends AbstractBlock
         [$this->naturalWidth, $this->naturalHeight] = getimagesize($imagePath);
     }
 
-    public function setNaturalImageSize(float $imageWidth, float $imageHeight): void
+    public function setNaturalImageSize($imageWidth, $imageHeight): void
     {
         $this->naturalWidth = $imageWidth;
         $this->naturalHeight = $imageHeight;
@@ -68,7 +75,7 @@ class ImageBlock extends AbstractBlock
     /**
      * @return float
      */
-    public function getNaturalWidth(): float
+    public function getNaturalWidth()
     {
         return $this->naturalWidth;
     }
@@ -76,7 +83,7 @@ class ImageBlock extends AbstractBlock
     /**
      * @return float
      */
-    public function getNaturalHeight(): float
+    public function getNaturalHeight()
     {
         return $this->naturalHeight;
     }
@@ -85,6 +92,9 @@ class ImageBlock extends AbstractBlock
     {
         return array_merge([
             'image' => $this->filePath,
+            'action' => $this->action,
+            'actionStoryID' => $this->actionStoryID,
+            'actionSlideID' => $this->actionSlideID,
         ], parent::getValues());
     }
 
@@ -100,6 +110,67 @@ class ImageBlock extends AbstractBlock
         if (!empty($form->imagePath)) {
             $this->setFilePath($form->imagePath);
         }
+        $this->setAction($form->action);
+        $this->setActionStoryID($form->actionStoryID);
+        $this->setActionSlideID($form->actionSlideID);
+    }
+
+    public function create()
+    {
+        $block = new self();
+        $block->setWidth('150px');
+        $block->setHeight('150px');
+        $block->setLeft('50px');
+        $block->setTop('50px');
+        return $block;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAction()
+    {
+        return $this->action;
+    }
+
+    /**
+     * @param mixed $action
+     */
+    public function setAction($action): void
+    {
+        $this->action = $action;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getActionStoryID()
+    {
+        return $this->actionStoryID;
+    }
+
+    /**
+     * @param mixed $actionStoryID
+     */
+    public function setActionStoryID($actionStoryID): void
+    {
+        $this->actionStoryID = $actionStoryID;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getActionSlideID()
+    {
+        return $this->actionSlideID;
+    }
+
+    /**
+     * @param mixed $actionSlideID
+     */
+    public function setActionSlideID($actionSlideID): void
+    {
+        $this->actionSlideID = $actionSlideID;
     }
 
 }

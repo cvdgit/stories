@@ -35,6 +35,27 @@ var TransitionSlide = (function() {
         });
     }
 
+    function goToSlide(storyID, slideID) {
+        console.log("goToSlide");
+
+        var slide_index = Reveal.getIndices().h;
+
+        var promise = $.ajax({
+            "url": config.getSlideAction + "?story_id=" + storyID + "&slide_id=" + slideID,
+            "type": "GET",
+            "dataType": "json"
+        });
+        promise.done(function(data) {
+
+            $(".reveal .slides").empty().append(data.html);
+            Reveal.sync();
+            Reveal.slide(0);
+
+            stack.unshift({"story_id": currentStoryID, "slide_index": slide_index});
+            currentStoryID = storyID;
+        });
+    }
+
     $(".reveal > .slides").on("click", "button[data-story-id]", action);
 
     function syncReveal(data, slide_index) {
@@ -55,6 +76,7 @@ var TransitionSlide = (function() {
     }
 
     return {
-        "backToStory": backToStory
+        "backToStory": backToStory,
+        "goToSlide": goToSlide
     };
 })();

@@ -37,15 +37,22 @@ $config = [
     'slidesAction' => Url::to(['editor/slides']),
     'createSlideQuestionAction' => Url::to(['editor/create-slide-question', 'story_id' => $storyID]),
     'copySlideAction' => Url::to(['editor/copy-slide']),
+    'storyImagesAction' => Url::to(['editor/image/list']),
 ];
 $configJSON = Json::htmlEncode($config);
 
 $slideSourceAction = Url::to(['editor/slide-source']);
 $slideLinksAction = Url::to(['editor/links/index']);
 
+$imagesConfigJSON = Json::htmlEncode([
+    'addImagesAction' => Url::to(['editor/image/create']),
+]);
+
 $js = <<< JS
     
     StoryEditor.initialize($configJSON);
+
+    StoryEditor.initImagesModule($imagesConfigJSON);
 
 	$("#form-container")
 	    .on("beforeSubmit", "form", StoryEditor.onBeforeSubmit)
@@ -78,6 +85,18 @@ $js = <<< JS
 	    e.preventDefault();
 	    location.href = "$slideLinksAction&slide_id=" + StoryEditor.getCurrentSlideID();
 	});
+	
+	$("#slide-images").on("click", function(e) {
+	    e.preventDefault();
+	    StoryEditor.slideImagesModal("$slideSourceAction");
+	});
+	
+	$("#story-images-list").on("click", "a.thumbnail", function(e) {
+	    e.preventDefault();
+	    var imageSrc = $("img", this).attr("src");
+	    StoryEditor.addImages(imageSrc);
+	});
+	
 JS;
 $this->registerJs($js);
 
@@ -147,6 +166,7 @@ $options = [
         <div class="clearfix">
             <div class="editor-slide-actions pull-left">
                 <?= Html::a('Ссылки', '#', ['id' => 'slide-links', 'style' => 'font-size: 18px']) ?>
+                <?= Html::a('Изображения', '#', ['id' => 'slide-images', 'style' => 'font-size: 18px']) ?>
             </div>
             <div class="editor-slide-actions pull-right">
                 <a href="#" id="slide-copy" title="Копировать слайд"><i class="glyphicon glyphicon-copy"></i></a>
@@ -188,7 +208,7 @@ $options = [
                 <?= Html::dropDownList('linkStories',
                     null,
                     \common\helpers\StoryHelper::getStoryArray(),
-                    ['prompt' => 'Выбрать историю', 'onchange' => 'StoryEditor.changeStory(this)', 'class' => 'form-control']) ?>
+                    ['prompt' => 'Выбрать историю', 'onchange' => 'StoryEditor.changeStory(this, "story-link-slides")', 'class' => 'form-control']) ?>
                 <br>
                 <?= Html::dropDownList('linkStorySlides',
                     null,
@@ -219,6 +239,28 @@ $options = [
             <div class="modal-footer">
                 <button class="btn btn-primary" onclick="StoryEditor.addQuestion()">Добавить вопрос</button>
                 <button class="btn btn-default" data-dismiss="modal">Отмена</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="slide-images-modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Изображения</h4>
+            </div>
+            <div class="modal-body">
+                <?= Html::dropDownList('imagesStories',
+                    null,
+                    \common\helpers\StoryHelper::getStoryArray(),
+                    ['prompt' => 'Выбрать историю', 'onchange' => 'StoryEditor.changeImageStory(this)', 'class' => 'form-control']) ?>
+                <div id="story-images-list" class="row" style="margin-top: 20px"></div>
+            </div>
+            <div class="modal-footer">
+                <!--button class="btn btn-primary" onclick="StoryEditor.addImages()">Добавить изображения</button>
+                <button-- class="btn btn-default" data-dismiss="modal">Отмена</button-->
             </div>
         </div>
     </div>

@@ -17,7 +17,8 @@ var StoryEditor = (function() {
         currentSlidesAction: "",
         slideVisibleAction: "",
         createSlideAction: "",
-        slidesAction: ""
+        slidesAction: "",
+        storyImagesAction: ""
     };
 
     var currentSlideIndex = 0,
@@ -75,9 +76,15 @@ var StoryEditor = (function() {
         });
     }
 
+    function selectActiveBlock(blockID) {
+        $(".reveal .slides div[data-block-id]").removeClass("wikids-active-block");
+        $(".reveal .slides").find("div[data-block-id=" + blockID + "]").addClass("wikids-active-block");
+    }
+
     function setActiveBlock(elem) {
         $("a", $list).removeClass("active");
         $(elem).addClass("active");
+        selectActiveBlock($(elem).data("block-id"));
         loadBlockForm($(elem).data("block-id"));
     }
 
@@ -333,22 +340,28 @@ var StoryEditor = (function() {
         $("#slide-link-modal").modal("show");
     };
 
-    editor.changeStory = function(obj) {
-        var $slides = $("#story-link-slides");
+    editor.changeStory = function(obj, listID, defaultValue) {
+        var $slides = $("#" + listID);
         $slides.empty();
-        var promise = $.ajax({
-            "url": editor.getConfigValue("slidesAction") + "&story_id=" + $(obj).val(),
-            "type": "GET",
-            "dataType": "json"
-        });
-        promise.done(function(data) {
-            data.forEach(function(slide) {
-                $("<option />")
-                    .val(slide.id)
-                    .text("Слайд" + slide.slideNumber)
-                    .appendTo($slides);
+        var storyID = $(obj).val();
+        if (storyID) {
+            var promise = $.ajax({
+                "url": editor.getConfigValue("slidesAction") + "&story_id=" + storyID,
+                "type": "GET",
+                "dataType": "json"
             });
-        });
+            promise.done(function (data) {
+                data.forEach(function (slide) {
+                    var $option = $("<option />")
+                        .val(slide.id)
+                        .text("Слайд" + slide.slideNumber);
+                    if (slide.id === defaultValue) {
+                        $option.attr("selected", "selected");
+                    }
+                    $option.appendTo($slides);
+                });
+            });
+        }
     };
 
     editor.link = function() {
@@ -431,13 +444,63 @@ var StoryEditor = (function() {
     "use strict";
 
     editor.createVideoBlock = function() {
-        alert("youtube");
-/*        $.getJSON(editor.getConfigValue("newCreateBlockAction"), {
-            "slide_id": editor.getCurrentSlideID()
-        }).done(function(data) {
-            console.log(data);
-            //editor.loadSlide(editor.getCurrentSlideID(), true);
-        });*/
+
+    };
+
+})(StoryEditor, jQuery, console);
+
+
+/** Images */
+(function(editor, $, console) {
+    "use strict";
+
+    var config = {
+        addImagesAction: ""
+    };
+
+    var $modal = $("#slide-images-modal");
+
+    editor.initImagesModule = function(params) {
+        config = params;
+    };
+
+    editor.slideImagesModal = function() {
+        $modal.modal("show");
+    };
+
+    editor.changeImageStory = function(obj) {
+        var $images = $("#story-images-list");
+        $images.empty();
+        var promise = $.ajax({
+            "url": editor.getConfigValue("storyImagesAction") + "&story_id=" + $(obj).val(),
+            "type": "GET",
+            "dataType": "json"
+        });
+        promise.done(function(data) {
+            if (data && data.length) {
+                data.forEach(function (image) {
+                    var img = $("<img/>").attr("src", image);
+                    $images.append('<div class="col-xs-6 col-md-3"><a href="#" class="thumbnail">' + img.prop("outerHTML") + '</a></div>');
+                });
+            }
+            else {
+                $images.append('<div class="col-md-12">Изображения в итории не найдены</div>');
+            }
+        });
+    };
+
+    editor.addImages = function(image) {
+        var promise = $.ajax({
+            "url": config.addImagesAction + "&slide_id=" + editor.getCurrentSlideID() + "&image=" + image,
+            "type": "GET",
+            "dataType": "json"
+        });
+        promise.done(function(data) {
+            if (data && data.success) {
+                $modal.modal("hide");
+                editor.loadSlide(editor.getCurrentSlideID(), true);
+            }
+        });
     };
 
 })(StoryEditor, jQuery, console);

@@ -8,6 +8,7 @@ use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
 use backend\components\story\HTMLBLock;
 use backend\components\story\ImageBlock;
+use backend\components\story\PictureBlock;
 use backend\components\story\Slide;
 use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
@@ -100,6 +101,11 @@ class HtmlSlideReader implements ReaderInterface
 
         $element = pq($htmlBlock)->find('img');
         $block->setFilePath($element->attr('data-src'));
+
+        $block->setAction($element->attr('data-action'));
+        $block->setActionStoryID($element->attr('data-action-story'));
+        $block->setActionSlideID($element->attr('data-action-slide'));
+
         $block->setId(pq($htmlBlock)->attr('data-block-id'));
 
         $style = pq($htmlBlock)->attr('style');

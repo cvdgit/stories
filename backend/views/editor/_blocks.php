@@ -31,6 +31,11 @@ $options = [
                 'url' => '#',
                 'linkOptions' => ['onclick' => "StoryEditor.createBlock('video'); return false;"],
             ],
+            [
+                'label' => 'Изображение',
+                'url' => '#',
+                'linkOptions' => ['onclick' => "StoryEditor.createBlock('image'); return false;"],
+            ],
         ],
     ]
 ];

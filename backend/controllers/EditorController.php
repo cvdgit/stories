@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
+use backend\components\story\ImageBlock;
 use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
@@ -244,6 +245,9 @@ class EditorController extends Controller
             ],
             AbstractBlock::TYPE_VIDEO => [
                 'class' => VideoBlock::class,
+            ],
+            AbstractBlock::TYPE_IMAGE => [
+                'class' => ImageBlock::class,
             ],
         ];
         if (!isset($types[$block_type])) {

@@ -12,12 +12,16 @@ class ImageForm extends BaseForm
     public $imagePath;
     public $fullImagePath;
 
+    public $action;
+    public $actionStoryID;
+    public $actionSlideID;
+
     public function rules(): array
     {
         $rules = parent::rules();
         $rules = array_merge($rules, [
-            // ['image', 'required'],
             ['image', 'image', 'maxSize' => 50 * 1024 * 1024],
+            [['action', 'actionSlideID', 'actionStoryID'], 'integer'],
         ]);
         return $rules;
     }
@@ -27,6 +31,9 @@ class ImageForm extends BaseForm
         $labels = parent::attributeLabels();
         $labels = array_merge($labels, [
             'image' => 'Изображение на слайде',
+            'action' => 'Выполнить действие',
+            'actionStoryID' => 'История',
+            'actionSlideID' => 'Слайд',
         ]);
         return $labels;
     }

@@ -214,12 +214,8 @@ var WikidsPlayer = (function(document, $) {
 
 function onSlideMouseDown(e) {
     e = e || window.event;
-    if ($(e.target).hasClass("story-controls")
-        || $(e.target)[0].tagName === "AUDIO"
-        || $(e.target).parents(".story-controls").length
-        || $(e.target).parents(".wikids-slide-links").length
-        || $(e.target).hasClass("btn")
-        || $(e.target).parents("section[data-slide-view=question]").length)  {
+    var $target = $(e.target);
+    if ($target.parents("section[data-slide-view=question]").length || ($target[0].tagName === "IMG" && $target.attr("data-action") === "1") || $target.hasClass("btn") || $target.parents(".wikids-slide-links").length || $target.parents(".story-controls").length || $target[0].tagName === "AUDIO" || $target.hasClass("story-controls"))  {
         return;
     }
     switch (e.which) {

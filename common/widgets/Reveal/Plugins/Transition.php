@@ -17,6 +17,7 @@ class Transition extends AbstractPlugin implements PluginInterface
         return [
             $this->configName => [
                 'action' => Url::to(['story/get-story-body']),
+                'getSlideAction' => Url::to(['player/get-slide']),
                 'story_id' => $this->storyID,
             ],
         ];
