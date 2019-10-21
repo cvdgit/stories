@@ -186,7 +186,7 @@ var WikidsPlayer = (function(document, $) {
         "toggleFullscreen": toggleFullscreen,
         "inFullscreen": inFullscreen,
         "left": function() {
-            if (Reveal.isFirstSlide()) {
+            if (Reveal.isFirstSlide() && window["TransitionSlide"]) {
                 TransitionSlide.backToStory();
             }
             else {
@@ -194,10 +194,7 @@ var WikidsPlayer = (function(document, $) {
             }
         },
         "right": function() {
-            //if (TestSlide.isQuestionSlide()) {
-            //    return false;
-            //}
-            if (Reveal.isLastSlide()) {
+            if (Reveal.isLastSlide() && window["TransitionSlide"]) {
                 TransitionSlide.backToStory();
             }
             else {

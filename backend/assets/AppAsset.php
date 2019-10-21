@@ -5,7 +5,6 @@ namespace backend\assets;
 use yii\web\AssetBundle;
 use yii\web\YiiAsset;
 use yii\bootstrap\BootstrapAsset;
-use backend\assets\ToastrAsset;
 
 /**
  * Main backend application asset bundle.

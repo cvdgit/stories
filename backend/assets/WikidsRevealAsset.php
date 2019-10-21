@@ -8,7 +8,7 @@ use yii\web\AssetBundle;
 
 class WikidsRevealAsset extends AssetBundle
 {
-    public $basePath = '@webroot';
+    public $basePath = '@public';
     public $baseUrl = '/';
     public $css = [
         'css/wikids-reveal.css',

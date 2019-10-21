@@ -221,7 +221,7 @@ class EditorController extends Controller
 
         $form->load($values, '');
 
-        return $this->renderAjax($form->view, [
+        return $this->renderAjax('_form', [
             'model' => $form,
         ]);
     }

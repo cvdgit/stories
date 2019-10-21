@@ -17,7 +17,7 @@ class Dependency
 
     protected function appendTimestamp($src)
     {
-        $basePath = Yii::getAlias('@webroot');
+        $basePath = Yii::getAlias('@public');
         if (($timestamp = @filemtime("$basePath/$src")) > 0) {
             return "$src?v=$timestamp";
         }

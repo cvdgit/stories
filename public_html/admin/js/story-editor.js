@@ -61,14 +61,14 @@ var StoryEditor = (function() {
                         .attr("href", "#")
                         .addClass("list-group-item")
                         .text(block.type)
-                        .data("block-id", block.id);
+                        .attr("data-block-id", block.id);
                     elem.on("click", function (e) {
                         e.preventDefault();
-                        setActiveBlock(elem);
+                        setActiveBlock(block.id);
                     });
                     elem.appendTo($list);
                 });
-                setActiveBlock($list.find("a").get(0));
+                setActiveBlock($list.find("a").attr("data-block-id"));
             }
             else {
                 $("#slide-block-params").hide();
@@ -81,11 +81,11 @@ var StoryEditor = (function() {
         $(".reveal .slides").find("div[data-block-id=" + blockID + "]").addClass("wikids-active-block");
     }
 
-    function setActiveBlock(elem) {
+    function setActiveBlock(blockID) {
         $("a", $list).removeClass("active");
-        $(elem).addClass("active");
-        selectActiveBlock($(elem).data("block-id"));
-        loadBlockForm($(elem).data("block-id"));
+        $("a[data-block-id=" + blockID + "]", $list).addClass("active");
+        selectActiveBlock(blockID);
+        loadBlockForm(blockID);
     }
 
     function loadBlockForm(blockID) {
@@ -145,8 +145,15 @@ var StoryEditor = (function() {
     }
 
     function loadSlide(slideID, loadBlocks) {
+
         loadBlocks = loadBlocks || false;
         currentSlideID = slideID;
+
+        var click = {
+            x: 0,
+            y: 0
+        };
+
         send(slideID)
             .done(function(data) {
                 setActiveSlide(data);
@@ -155,6 +162,23 @@ var StoryEditor = (function() {
                 $(".slides", $editor).empty().append(data.data);
                 Reveal.sync();
                 Reveal.slide(0);
+                $(".sl-block", ".reveal").draggable({
+                    start: function(event) {
+                        setActiveBlock($(event.target).attr("data-block-id"));
+                        click.x = event.clientX;
+                        click.y = event.clientY;
+                    },
+                    drag: function(event, ui) {
+                        var zoom = Reveal.getScale();
+                        var original = ui.originalPosition;
+                        ui.position = {
+                            left: (event.clientX - click.x + original.left) / zoom,
+                            top:  (event.clientY - click.y + original.top ) / zoom
+                        };
+                        $("input.editor-top").val(Math.round(ui.position.top) + "px");
+                        $("input.editor-left").val(Math.round(ui.position.left) + "px");
+                    }
+                });
                 if (loadBlocks) {
                     loadSlideBlocks();
                 }
