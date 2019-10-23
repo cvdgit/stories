@@ -206,7 +206,8 @@ class StoryController extends Controller
             $slideFilter = $this->slideFilterArray($filter);
             foreach ($slideFilter as $slideIndex) {
                 $slide = StorySlide::findSlideByNumber($model->id, $slideIndex);
-                if ($slide !== null && $slide->status === StorySlide::STATUS_VISIBLE) {
+                /**  && $slide->status === StorySlide::STATUS_VISIBLE */
+                if ($slide !== null) {
                     $slides[] = $slide->data;
                 }
             }

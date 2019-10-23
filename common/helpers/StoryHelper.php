@@ -12,7 +12,7 @@ class StoryHelper
 
     public static function getStoryArray(): array
     {
-        return ArrayHelper::map(Story::find()->published()->orderBy(['title' => SORT_ASC])->all(), 'id', 'title');
+        return ArrayHelper::map(Story::find()->orderBy(['title' => SORT_ASC])->all(), 'id', 'title');
     }
 
 }
