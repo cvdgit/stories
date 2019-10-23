@@ -13,7 +13,7 @@ $form = ActiveForm::begin([
     'options' => ['style' => 'display: inline-block'],
 ]);
 
-$likeButtonOptions = ['class' => 'btn-like', 'title' => 'Мне понравилось', 'onclick' => new JsExpression('WikidsStory.storyLike(this)')];
+$likeButtonOptions = ['class' => 'btn-like', 'title' => 'Мне понравилось', 'onclick' => new JsExpression('WikidsStoryLike.storyLike(this)')];
 /** @var $like string */
 if ($like !== false) {
     $likeButtonOptions['class'] .= ' user-select';
@@ -22,7 +22,7 @@ echo Html::button('<i class="glyphicon glyphicon-thumbs-up"></i>', $likeButtonOp
 /** @var $likeNumber int */
 echo Html::tag('span', $likeNumber, ['class' => 'like-counter']);
 
-$dislikeButtonOptions = ['class' => 'btn-dislike', 'title' => 'Мне не понравилось', 'onclick' => new JsExpression('WikidsStory.storyDislike(this)')];
+$dislikeButtonOptions = ['class' => 'btn-dislike', 'title' => 'Мне не понравилось', 'onclick' => new JsExpression('WikidsStoryLike.storyDislike(this)')];
 /** @var $dislike string */
 if ($dislike !== false) {
     $dislikeButtonOptions['class'] .= ' user-select';
@@ -39,7 +39,7 @@ ActiveForm::end();
 $elementId = Html::getInputId($model, 'like');
 $needLogin = var_export($readOnly, true);
 $js = <<< JS
-WikidsStory = (function() {
+WikidsStoryLike = (function() {
 
     var form = $("#story-like-form");
 

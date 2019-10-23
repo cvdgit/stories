@@ -232,15 +232,10 @@ class StoryController extends Controller
         return ['success' => true, 'correctAnswer' => $correctAnswer];
     }
 
-    public function actionInitStoryPlayer(int $id, int $num, $track_id = null)
+    public function actionInitStoryPlayer(int $id, $track_id = null)
     {
         if (Yii::$app->user->isGuest) {
-            if ($num >= 2) {
-                $model = Story::findModel(Yii::$app->params['story.needSignup.id']);
-            }
-            else {
-                $model = Story::findModel($id);
-            }
+            $model = Story::findModel(Yii::$app->params['story.needSignup.id']);
         }
         else {
             $model = Story::findModel($id);

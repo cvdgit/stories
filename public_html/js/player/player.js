@@ -45,7 +45,7 @@ var WikidsStoryFeedback = (function() {
 
     return {
         sendFeedback: sendFeedback
-    }
+    };
 })();
 
 var WikidsPlayer = (function(document, $) {
@@ -68,8 +68,7 @@ var WikidsPlayer = (function(document, $) {
         return $(getCurrentSlide()).attr("data-id");
     }
 
-    function enterFullscreen()
-    {
+    function enterFullscreen() {
         var element = $playerContainer[0];
         var requestMethod = element.requestFullscreen ||
             element.webkitRequestFullscreen ||
@@ -82,8 +81,7 @@ var WikidsPlayer = (function(document, $) {
         }
     }
 
-    function closeFullscreen()
-    {
+    function closeFullscreen() {
         var element = document;
         var requestMethod = element.exitFullscreen ||
             element.exitFullScreen ||
@@ -97,13 +95,11 @@ var WikidsPlayer = (function(document, $) {
         }
     }
 
-    function inFullscreen()
-    {
+    function inFullscreen() {
         return $(":fullscreen").length > 0;
     }
 
-    function toggleFullscreen()
-    {
+    function toggleFullscreen() {
         if (inFullscreen()) {
             closeFullscreen();
         } else {

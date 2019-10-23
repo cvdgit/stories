@@ -37,7 +37,7 @@ var lazy = $(".lazy").Lazy({
 
 var defaultView = "$storyDefaultView";
 if ($("#story_wrapper").is(":visible")) {
-    Wikids2.loadStory("$action");
+    WikidsStory.loadStory("$action");
     $("[data-story-view]").removeClass("active");
     $("[data-story-view=" + defaultView + "]").addClass("active");
 }
@@ -46,7 +46,7 @@ function switchStoryView(view) {
     if (view === "slides") {
         $(".slides-readonly").hide();
         $("#story_wrapper").show();
-        Wikids2.loadStory("$action");
+        WikidsStory.loadStory("$action");
         ym(53566996, 'reachGoal', 'transition_to_training');
     }
     else if (view === "book") {
