@@ -139,6 +139,13 @@ class TestController extends Controller
         ]);
     }
 
+    public function actionDeleteQuestion(int $question_id)
+    {
+        $model = StoryTestQuestion::findModel($question_id);
+        $model->delete();
+        return $this->redirect(['update', 'id' => $model->story_test_id]);
+    }
+
     public function actionCreateAnswer(int $question_id)
     {
         $questionModel = StoryTestQuestion::findModel($question_id);
