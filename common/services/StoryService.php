@@ -146,9 +146,6 @@ class StoryService
         if (empty($model->cover)) {
             throw new DomainException('Не установлена обложка');
         }
-        if (empty($model->story_file)) {
-            throw new DomainException('Не найден файл PowerPoint');
-        }
         if ((int)$model->slides_number === 0) {
             throw new DomainException('В истории отсутствуют слайды');
         }

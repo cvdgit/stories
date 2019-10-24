@@ -408,4 +408,15 @@ class Story extends ActiveRecord
         });
     }
 
+    public static function updateSlideNumber(int $storyID)
+    {
+        $model = self::findModel($storyID);
+        $slideNumber = (new Query())
+            ->from('{{%story_slide}}')
+            ->where('story_id = :story', [':story' => $model->id])
+            ->count();
+        $model->slides_number = $slideNumber;
+        $model->save(false, ['slides_number']);
+    }
+
 }

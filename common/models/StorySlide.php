@@ -159,12 +159,16 @@ class StorySlide extends \yii\db\ActiveRecord
         if (isset($changedAttributes['data']) && $changedAttributes['data'] !== $this->data) {
             $this->addJob($this->story_id);
         }
+        if ($insert) {
+            Story::updateSlideNumber($this->story_id);
+        }
         parent::afterSave($insert, $changedAttributes);
     }
 
     public function afterDelete()
     {
         $this->addJob($this->story_id);
+        Story::updateSlideNumber($this->story_id);
         parent::afterDelete();
     }
 
