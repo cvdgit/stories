@@ -185,6 +185,13 @@ class TestController extends Controller
         ]);
     }
 
+    public function actionDeleteAnswer(int $answer_id)
+    {
+        $model = StoryTestAnswer::findModel($answer_id);
+        $model->delete();
+        return $this->redirect(['update-question', 'question_id' => $model->story_question_id]);
+    }
+
     public function actionResults()
     {
         $dataProvider = new ActiveDataProvider([
