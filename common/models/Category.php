@@ -177,6 +177,10 @@ class Category extends ActiveRecord
     public static function getCategoriesForMenu()
     {
         $root = self::findOne(1);
+        if ($root === null) {
+            return [];
+        }
+        
         $rootItem = [
             ['label' => 'Все категории', 'url' => ['/story/index'], 'options' => ['class' => 'widget-category-hover']],
         ];
