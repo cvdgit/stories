@@ -58,6 +58,9 @@ var TransitionSlide = (function() {
                 .done(function(data) {
                     syncReveal(data.html, state.slide_index);
                     currentStoryID = state.story_id;
+                    if (state.slide_index === 0 && window["WikidsVideo"]) {
+                        WikidsVideo.createPlayer();
+                    }
                 });
         }
     }
