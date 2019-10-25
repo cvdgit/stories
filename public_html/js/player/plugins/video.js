@@ -82,7 +82,7 @@ var WikidsVideo = window.WikidsVideo || (function() {
         }
     });
 
-    //return {
-    //    "createPlayer": createPlayer
-    //};
+    return {
+        "createPlayer": createPlayer
+    };
 })();

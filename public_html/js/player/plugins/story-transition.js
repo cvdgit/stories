@@ -14,36 +14,14 @@ var TransitionSlide = (function() {
     }
 
     function action() {
-
         var story_id = $(this).data("storyId"),
             slide_id = $(this).data("slides"),
             slide_index = Reveal.getIndices().h;
-
         goToSlide(story_id, slide_id);
-
-        /*
-        var promise = $.ajax({
-            "url": config.action + "/" + story_id + "?filter=" + filter,
-            "type": "GET",
-            "dataType": "json"
-        });
-        promise.done(function(data) {
-
-            $(".reveal .slides").empty().append(data.html);
-            Reveal.sync();
-            Reveal.slide(0);
-
-            stack.unshift({"story_id": currentStoryID, "slide_index": slide_index});
-            currentStoryID = story_id;
-        });
-        */
     }
 
     function goToSlide(storyID, slideID) {
-        console.log("goToSlide");
-
         var slide_index = Reveal.getIndices().h;
-
         var promise = $.ajax({
             "url": config.getSlideAction + "?story_id=" + storyID + "&slide_id=" + slideID,
             "type": "GET",
@@ -54,6 +32,11 @@ var TransitionSlide = (function() {
             $(".reveal .slides").empty().append(data.html);
             Reveal.sync();
             Reveal.slide(0);
+
+            if (slide_index === 0 && window["WikidsVideo"]) {
+                // Если переход происходит с первого (0) слайда, то событие slidechanged не генерится
+                WikidsVideo.createPlayer();
+            }
 
             stack.unshift({"story_id": currentStoryID, "slide_index": slide_index, "slide_id": slideID});
             currentStoryID = storyID;
