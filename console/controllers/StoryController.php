@@ -244,4 +244,25 @@ class StoryController extends Controller
         $this->stdout('Done!' . PHP_EOL);
     }*/
 
+    public function actionStoryWithTransition()
+    {
+        $models = Story::find()->published()->all();
+        foreach ($models as $model) {
+            $haveTransition = false;
+            foreach ($model->storySlides as $slideModel) {
+                $reader = new HtmlSlideReader($slideModel->data);
+                $slide = $reader->load();
+                foreach ($slide->getBlocks() as $block) {
+                    if ($block->getType() === AbstractBlock::TYPE_TRANSITION) {
+                        $haveTransition = true;
+                    }
+                }
+            }
+            if ($haveTransition) {
+                $this->stdout($model->title . PHP_EOL);
+            }
+        }
+        $this->stdout('Done!' . PHP_EOL);
+    }
+
 }
