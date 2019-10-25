@@ -427,7 +427,7 @@ class Story extends ActiveRecord
             ->select(['id']);
         return (new Query())
             ->from('{{%story_slide_block}}')
-            ->where(['in', 'id', $storySlidesQuery])
+            ->where(['in', 'slide_id', $storySlidesQuery])
             ->select(['title'])
             ->all();
     }
