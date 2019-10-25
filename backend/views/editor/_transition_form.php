@@ -10,7 +10,6 @@ $form->action = ['/editor/update-transition'];
     <div class="col-xs-6"><?= $form->field($model, 'text_size')->textInput() ?></div>
 </div>
 <div class="row">
-    <div class="col-xs-6"><?= $form->field($model, 'transition_story_id')->dropDownList(common\helpers\StoryHelper::getStoryArray()) ?></div>
-    <div class="col-xs-6"><?= $form->field($model, 'slides')->textInput()->hint('Пример: 1,2,3-10,12,15') ?></div>
+    <div class="col-xs-6"><?= $form->field($model, 'transition_story_id')->dropDownList(common\helpers\StoryHelper::getStoryArray(), ['onchange' => 'StoryEditor.changeStory(this, "transitionform-slides", ' . $model->slides . ')', 'prompt' => 'Выбрать историю']) ?></div>
+    <div class="col-xs-6"><?= $form->field($model, 'slides')->dropDownList([], ['prompt' => 'Выбрать слайд']) ?></div>
 </div>
-<?php

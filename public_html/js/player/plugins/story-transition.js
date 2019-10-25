@@ -16,9 +16,12 @@ var TransitionSlide = (function() {
     function action() {
 
         var story_id = $(this).data("storyId"),
-            filter = $(this).data("slides"),
+            slide_id = $(this).data("slides"),
             slide_index = Reveal.getIndices().h;
 
+        goToSlide(story_id, slide_id);
+
+        /*
         var promise = $.ajax({
             "url": config.action + "/" + story_id + "?filter=" + filter,
             "type": "GET",
@@ -33,6 +36,7 @@ var TransitionSlide = (function() {
             stack.unshift({"story_id": currentStoryID, "slide_index": slide_index});
             currentStoryID = story_id;
         });
+        */
     }
 
     function goToSlide(storyID, slideID) {
@@ -51,7 +55,7 @@ var TransitionSlide = (function() {
             Reveal.sync();
             Reveal.slide(0);
 
-            stack.unshift({"story_id": currentStoryID, "slide_index": slide_index});
+            stack.unshift({"story_id": currentStoryID, "slide_index": slide_index, "slide_id": slideID});
             currentStoryID = storyID;
         });
     }
