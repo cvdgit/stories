@@ -82,7 +82,6 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
 
     }
 });
-
 JS;
 $this->registerJs($js);
 
@@ -101,6 +100,15 @@ $isBookView = $storyDefaultView === 'book';
                 </div>
                 <?php if (!empty($model->description)): ?>
                     <div class="story-text"><?= Html::encode($model->description) ?></div>
+                <?php endif ?>
+                <?php $facts = $model->storyFacts(); ?>
+                <?php if (count($facts) > 0): ?>
+                <div class="story-facts" style="font-size: 1.5rem">
+                    Из истории вы узнаете про:
+                <?php foreach ($facts as $fact): ?>
+                    <span class="label label-success"><?= $fact['title'] ?></span>
+                <?php endforeach ?>
+                </div>
                 <?php endif ?>
             </div>
         </div>

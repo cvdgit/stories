@@ -419,4 +419,17 @@ class Story extends ActiveRecord
         $model->save(false, ['slides_number']);
     }
 
+    public function storyFacts()
+    {
+        $storySlidesQuery = (new Query())
+            ->from('{{%story_slide}}')
+            ->where('story_id = :story', [':story' => $this->id])
+            ->select(['id']);
+        return (new Query())
+            ->from('{{%story_slide_block}}')
+            ->where(['in', 'id', $storySlidesQuery])
+            ->select(['title'])
+            ->all();
+    }
+
 }
