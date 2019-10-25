@@ -1,9 +1,17 @@
 <?php
 
-/** @var $form yii\widgets\ActiveForm */
-/** @var $model backend\models\editor\TransitionForm */
+use yii\helpers\Html;
 
+/** @var $form yii\widgets\ActiveForm */
 $form->action = ['/editor/update-transition'];
+
+/** @var $model backend\models\editor\TransitionForm */
+$actionStoryFieldID = Html::getInputId($model, 'transition_story_id');
+$js = <<< JS
+$("#$actionStoryFieldID").change();
+JS;
+/** @var $this yii\web\View */
+$this->registerJs($js);
 ?>
 <div class="row">
     <div class="col-xs-6"><?= $form->field($model, 'text')->textInput() ?></div>
