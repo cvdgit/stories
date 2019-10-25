@@ -26,8 +26,12 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 /** @var $trackID int? */
 $action = Url::to(['story/init-story-player', 'id' => $model->id, 'track_id' => $trackID]);
 
+$isGuest = var_export(Yii::$app->user->isGuest, true);
+
 /** @var $storyDefaultView string */
 $js = <<< JS
+
+var isGuest = $isGuest;
 
 var lazy = $(".lazy").Lazy({
     scrollDirection: "vertical",
@@ -82,6 +86,33 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
 
     }
 });
+
+$(".tab-slides").popover({
+    container: "#w0",
+    title: "Попробуйте режим обучения",
+    content: '<ul>' +
+'<li>просмотр истории в виде слайдов</li>' +
+'<li>возможность прослушивания озвучки по каждому слайду</li>' +
+'<li>возможность добавить свою, детскую озвучку</li>' +
+'<li>тесты для детей, чтобы закрепить материал</li>' +
+'<li>специально подобранные коллекции картинок и видео для улучшения восприятия</li>' +
+'<li>ссылки на дополнительные обучающие курсы</li>' +
+'</ul>',
+    html: true,
+    placement: "bottom",
+    trigger: isGuest ? "manual" : "hover"
+});
+    
+if (isGuest) {    
+    $("#w0").on("click", ".popover", function() {
+        $(".tab-slides").popover("hide");
+    });
+    
+    setTimeout(function() {
+        $(".tab-slides").popover("show");
+    }, 2000);
+}
+
 JS;
 $this->registerJs($js);
 
@@ -122,6 +153,7 @@ $isBookView = $storyDefaultView === 'book';
                         'content' => $this->render('_tab_slides', ['model' => $model]),
                         'active' => $isSlidesView,
                         'options' => ['id' => 'tab-slides'],
+                        'linkOptions' => ['class' => 'tab-slides'],
                     ],
                     [
                         'label' => 'Режим чтения',
