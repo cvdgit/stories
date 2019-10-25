@@ -11,10 +11,14 @@ var StoryBackground = (function () {
 
     var backgroundStorageItemName = "story_background";
 
-    var background = localStorage.getItem(backgroundStorageItemName) || "dark";
-    if (background !== "dark") {
-        setBackgroundColor(background);
+    function init() {
+        var background = localStorage.getItem(backgroundStorageItemName) || "dark";
+        if (background !== "dark") {
+            setBackgroundColor(background);
+        }
     }
+
+    init();
 
     function switchBackground() {
         var color = "";
@@ -29,6 +33,7 @@ var StoryBackground = (function () {
     }
 
     function setBackgroundColor(color) {
+        console.log("setBackgroundColor", color);
         color = backgroundColorMap[color] || backgroundColorMap["dark"];
         $(".slides section").attr("data-background-color", color);
     }
@@ -38,6 +43,7 @@ var StoryBackground = (function () {
     }
 
     return {
+        "init": init,
         "switchBackground": switchBackground
     };
 })();

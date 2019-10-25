@@ -30,6 +30,10 @@ var TransitionSlide = (function() {
         promise.done(function(data) {
 
             $(".reveal .slides").empty().append(data.html);
+            if (window["StoryBackground"]) {
+                StoryBackground.init();
+            }
+
             Reveal.sync();
             Reveal.slide(0);
 
@@ -47,6 +51,9 @@ var TransitionSlide = (function() {
 
     function syncReveal(data, slide_index) {
         $(".reveal .slides").empty().append(data);
+        if (window["StoryBackground"]) {
+            StoryBackground.init();
+        }
         Reveal.sync();
         Reveal.slide(slide_index);
     }
