@@ -110,10 +110,8 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 			else if ( autoplay ) {
 				currentAudio.play();
 			}
-
 		}
 	}
-
 
 	function setup() {
 		// deprecated parameters
@@ -195,6 +193,7 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 			}
 		}
 	}
+
 	function getText( textContainer ) {
 		var elements = textContainer.querySelectorAll( '[data-audio-text]' ) ;
 		for( var i = 0, len = elements.length; i < len; i++ ) {
@@ -231,7 +230,7 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 // alert( h + '.' + v + ": " + text );
 // console.log( h + '.' + v + ": " + text );
 		}
-		setupAudioElement( container, h + '.' + v, slide.getAttribute( 'data-audio-src' ), text, slide.querySelector( ':not(.fragment) > video[data-audio-controls]' ) );
+		setupAudioElement( container, h + '.' + v, slide.getAttribute( 'data-audio-src' ), text, slide.querySelector( ':not(.fragment) > video[data-audio-controls]' ), slide.getAttribute('data-id'));
 		var i = 0;
 		var  fragments;
 		while ( (fragments = slide.querySelectorAll( '.fragment[data-fragment-index="' + i +'"]' )).length > 0 ) {
@@ -305,7 +304,7 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 		}	
 	}
 
-	function setupAudioElement( container, indices, audioFile, text, videoElement ) {
+	function setupAudioElement( container, indices, audioFile, text, videoElement, slideID) {
 		var audioElement = document.createElement( 'audio' );
 		audioElement.setAttribute( 'style', "position: relative; top: 20px; left: 10%; width: 80%;" );
 		audioElement.id = "audioplayer-" + indices;
@@ -410,11 +409,13 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 				// check if audio file exists 
 				var xhr = new XMLHttpRequest();
 				var ts = new Date().getTime();
-				xhr.open('HEAD', prefix + indices + suffix + '?' + ts, true);
+				// xhr.open('HEAD', prefix + indices + suffix + '?' + ts, true);
+				xhr.open('HEAD', prefix + slideID + suffix + '?' + ts, true);
 	 			xhr.onload = function() {
 	   				if (xhr.readyState === 4 && xhr.status >= 200 && xhr.status < 300) {
 						var audioSource = document.createElement( 'source' );
-						audioSource.src = prefix + indices + suffix + '?' + ts;
+						// audioSource.src = prefix + indices + suffix + '?' + ts;
+						audioSource.src = prefix + slideID + suffix + '?' + ts;
 						audioElement.insertBefore(audioSource, audioElement.firstChild);
 						audioExists = true;
 					}

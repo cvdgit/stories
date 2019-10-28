@@ -35,7 +35,7 @@ $this->registerJs($js);
 ?>
 <h4 class="page-header" style="margin-top: 45px">Аудио файлы</h4>
 <ul class="list-group" id="audio-file-list">
-    <?php foreach ($audioUploadForm->audioFileList() as $file): ?>
-        <li class="list-group-item"><span data-audio-file="<?= $file ?>" class="badge" style="cursor: pointer">Удалить</span><?= $file ?></li>
+    <?php foreach ($audioUploadForm->audioFileListBySlideNumber() as $number => $file): ?>
+        <li class="list-group-item"><span data-audio-file="<?= $file ?>" class="badge" style="cursor: pointer">Удалить</span><?= $number ?></li>
     <?php endforeach ?>
 </ul>

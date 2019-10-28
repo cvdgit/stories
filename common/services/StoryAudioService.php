@@ -49,7 +49,7 @@ class StoryAudioService
 
         $audioFileName = StoryTrackModel::getTrackPath($slideModel->story_id, $model->track_id);
         $this->createTrackFolder($audioFileName);
-        file_put_contents($audioFileName . DIRECTORY_SEPARATOR . ($slideModel->number - 1) . '.0.mp3', $data);
+        file_put_contents($audioFileName . DIRECTORY_SEPARATOR . $slideModel->id . '.mp3', $data);
 
         foreach ($model->getFiles() as $fileName) {
             if (file_exists($fileName)) {

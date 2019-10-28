@@ -4,6 +4,7 @@
 namespace backend\models\audio;
 
 
+use common\models\StorySlide;
 use http\Exception\RuntimeException;
 use Yii;
 use yii\base\Model;
@@ -63,11 +64,21 @@ class AudioUploadForm extends Model
                 }
             }
             foreach ($this->audioFiles as $file) {
-                $file->saveAs($audioFolder . '/' . $file->baseName . '.' . $file->extension);
+                $file->saveAs($audioFolder . '/' . $this->createFileName($file->baseName) . '.' . $file->extension);
             }
             return true;
         }
         return false;
+    }
+
+    public function createFileName(string $file)
+    {
+        $slideNumber = explode('.', $file)[0];
+        $slide = StorySlide::findSlideByNumber($this->storyID, $slideNumber + 2);
+        if ($slide !== null) {
+            return $slide->id;
+        }
+        return $file;
     }
 
     public function audioFileList(): array
@@ -82,6 +93,23 @@ class AudioUploadForm extends Model
             }
         }
         sort($files, SORT_NUMERIC);
+        return $files;
+    }
+
+    public function audioFileListBySlideNumber(): array
+    {
+        $files = [];
+        if (file_exists($this->audioFilePath())) {
+            $dir = opendir($this->audioFilePath());
+            while (false !== ($filename = readdir($dir))) {
+                if (!in_array($filename, array('.', '..'))) {
+                    $slideID = explode('.', $filename)[0];
+                    $slide = StorySlide::findSlide($slideID);
+                    $files[$slide->number] = $filename;
+                }
+            }
+        }
+        //sort($files, SORT_NUMERIC);
         return $files;
     }
 

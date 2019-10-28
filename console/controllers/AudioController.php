@@ -4,6 +4,9 @@
 namespace console\controllers;
 
 
+use backend\models\audio\AudioUploadForm;
+use common\models\Story;
+use common\models\StorySlide;
 use common\services\StoryAudioService;
 use http\Exception\RuntimeException;
 use Yii;
@@ -55,5 +58,32 @@ class AudioController extends Controller
         $this->stdout('Done!' . PHP_EOL);
     }
     */
+
+    public function actionRenameAudioFiles()
+    {
+        $models = Story::find()->audio()->all();
+        foreach ($models as $story) {
+
+            foreach ($story->storyAudioTracks as $track) {
+
+                $form = new AudioUploadForm($story->id);
+                $form->audioTrackID = $track->id;
+                $path = $form->audioFilePath();
+
+                foreach ($form->audioFileList() as $file) {
+                    $slideNumber = explode('.', $file)[0];
+                    $slide = StorySlide::findSlideByNumber($story->id, $slideNumber + 2);
+                    if ($slide === null) {
+                        $this->stdout("slide $slideNumber not found" . PHP_EOL);
+                    }
+                    else {
+                        rename($path . DIRECTORY_SEPARATOR . $file, $path . DIRECTORY_SEPARATOR . $slide->id . '.mp3');
+                        $this->stdout($slide->id . ' - OK' . PHP_EOL);
+                    }
+                }
+            }
+        }
+        $this->stdout('Done!' . PHP_EOL);
+    }
 
 }
