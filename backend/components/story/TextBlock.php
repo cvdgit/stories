@@ -48,7 +48,7 @@ class TextBlock extends AbstractBlock
     public function getValues(): array
     {
         return array_merge([
-            'text' => preg_replace('/\<br(\s*)?\/?\>/i', PHP_EOL, $this->text),
+            'text' => preg_replace('/\<br(\s*)?\/?\>/i', PHP_EOL, preg_replace('/[\r\n]*/', '', $this->text)),
             'text_size' => $this->fontSize,
         ], parent::getValues());
     }
