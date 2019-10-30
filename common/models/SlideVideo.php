@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use backend\components\queue\ChangeVideoJob;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -89,6 +90,21 @@ class SlideVideo extends ActiveRecord
     public function isSuccess()
     {
         return (int)$this->status === self::STATUS_SUCCESS;
+    }
+
+    protected function addJob(string $oldVideoID, string $newVideoID) {
+        Yii::$app->queue->push(new ChangeVideoJob([
+            'oldVideoID' => $oldVideoID,
+            'newVideoID' => $newVideoID,
+        ]));
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        if ($insert && isset($changedAttributes['video_id']) && $changedAttributes['video_id'] !== $this->video_id) {
+            $this->addJob($changedAttributes['video_id'], $this->video_id);
+        }
+        parent::afterSave($insert, $changedAttributes);
     }
 
 }

@@ -432,4 +432,9 @@ class Story extends ActiveRecord
             ->all();
     }
 
+    public function getBaseModel()
+    {
+        return new StoryModel($this);
+    }
+
 }

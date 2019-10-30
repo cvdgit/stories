@@ -4,10 +4,14 @@
 namespace backend\controllers;
 
 
+use backend\components\story\AbstractBlock;
+use backend\components\story\reader\HtmlSlideReader;
+use backend\components\story\writer\HTMLWriter;
 use backend\models\video\CreateVideoForm;
 use backend\models\video\UpdateVideoForm;
 use backend\services\VideoService;
 use common\models\SlideVideo;
+use common\models\Story;
 use common\rbac\UserRoles;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -99,7 +103,33 @@ class VideoController extends Controller
         $model->status = $isValid ? SlideVideo::STATUS_SUCCESS : SlideVideo::STATUS_ERROR;
         $model->save(false, ['status']);
         
-        return ['success' => true];
+        return ['success' => $isValid];
+    }
+
+    public function actionGetStories(string $video_id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $data = [];
+        $models = Story::find()->with('storySlides')->all();
+        foreach ($models as $model) {
+            $videoFound = false;
+            foreach ($model->storySlides as $slideModel) {
+                $reader = new HtmlSlideReader($slideModel->data);
+                $slide = $reader->load();
+                foreach ($slide->getBlocks() as $block) {
+                    if (($block->getType() === AbstractBlock::TYPE_VIDEO) && $block->getVideoId() === $video_id) {
+                        $videoFound = true;
+                    }
+                }
+            }
+            if ($videoFound) {
+                $data[] = [
+                    'title' => $model->title,
+                    'cover' => $model->getBaseModel()->getCoverRelativePath(),
+                ];
+            }
+        }
+        return $data;
     }
 
 }

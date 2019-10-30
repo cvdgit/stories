@@ -366,12 +366,12 @@
             "version": "v1.7.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/uxsolutions/bootstrap-datepicker.git",
+                "url": "git@github.com:eternicode/bootstrap-datepicker.git",
                 "reference": "d364be5b066b38f3675a5a1dc174ce1ab1f3360e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/uxsolutions/bootstrap-datepicker/zipball/d364be5b066b38f3675a5a1dc174ce1ab1f3360e",
+                "url": "https://api.github.com/repos/eternicode/bootstrap-datepicker/zipball/d364be5b066b38f3675a5a1dc174ce1ab1f3360e",
                 "reference": "d364be5b066b38f3675a5a1dc174ce1ab1f3360e"
             },
             "require": {
@@ -402,16 +402,16 @@
         },
         {
             "name": "bower-asset/fancytree",
-            "version": "v2.32.0",
+            "version": "v2.33.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:mar10/fancytree.git",
-                "reference": "d04a36d7d5e410910ef93f3a6a16f6d01ac3302a"
+                "reference": "354caceec99e5f497b04a3bf57794d0c18f5aef2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mar10/fancytree/zipball/d04a36d7d5e410910ef93f3a6a16f6d01ac3302a",
-                "reference": "d04a36d7d5e410910ef93f3a6a16f6d01ac3302a"
+                "url": "https://api.github.com/repos/mar10/fancytree/zipball/354caceec99e5f497b04a3bf57794d0c18f5aef2",
+                "reference": "354caceec99e5f497b04a3bf57794d0c18f5aef2"
             },
             "require": {
                 "bower-asset/jquery": ">=1.7",
@@ -527,12 +527,12 @@
             "version": "v3.5.6",
             "source": {
                 "type": "git",
-                "url": "https://github.com/sampotts/plyr.git",
+                "url": "git@github.com:selz/plyr.git",
                 "reference": "7c442c93571fb5d75f96bff710e310d00e1289e9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sampotts/plyr/zipball/7c442c93571fb5d75f96bff710e310d00e1289e9",
+                "url": "https://api.github.com/repos/selz/plyr/zipball/7c442c93571fb5d75f96bff710e310d00e1289e9",
                 "reference": "7c442c93571fb5d75f96bff710e310d00e1289e9"
             },
             "type": "bower-asset"
@@ -542,7 +542,7 @@
             "version": "v1.3.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/bestiejs/punycode.js.git",
+                "url": "git@github.com:bestiejs/punycode.js.git",
                 "reference": "38c8d3131a82567bfef18da09f7f4db68c84f8a3"
             },
             "dist": {
@@ -557,7 +557,7 @@
             "version": "3.8.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/hakimel/reveal.js.git",
+                "url": "git@github.com:hakimel/reveal.js.git",
                 "reference": "3da09f1fef1fa3c140d2daa5bdee2a32683dd964"
             },
             "dist": {
