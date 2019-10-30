@@ -52,8 +52,8 @@ $("#video-stories-modal")
         list.append('<div class="col-md-12"><h3>Загрузка...</h3></div>');
     })
     .on("shown.bs.modal", function() {
-        list.empty();
         $.get("$action".replace('_VIDEO_', $("#updatevideoform-video_id").val())).done(function(data) {
+            list.empty();
             data.forEach(function(elem) {
                  var img = $("<img/>").attr("src", elem.cover);
                  list.append('<div class="col-xs-6 col-md-3"><a href="#" class="thumbnail">' + img.prop("outerHTML") + '<div class="caption"><h4>' + elem.title + '</h4></div></a></div>');
