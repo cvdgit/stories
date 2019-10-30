@@ -23,6 +23,19 @@ $this->title = 'Видео';
             'video_id',
             'created_at:datetime',
             [
+                'attribute' => 'status',
+                'value' => function(\common\models\SlideVideo $model) {
+                    $className = 'ok';
+                    $color = '#5cb85c';
+                    if (!$model->isSuccess()) {
+                        $className = 'remove';
+                        $color = '#a94442';
+                    }
+                    return Html::tag('i', '', ['class' => "glyphicon glyphicon-$className", 'style' => "color: $color"]);
+                },
+                'format' => 'raw',
+            ],
+            [
                 'class' => ActionColumn::class,
                 'buttons' => [
                     'view' => function($url, $model) {

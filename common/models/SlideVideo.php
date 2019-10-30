@@ -16,9 +16,14 @@ use yii\web\NotFoundHttpException;
  * @property string $title
  * @property int $created_at
  * @property int $updated_at
+ * @property int $status
  */
 class SlideVideo extends ActiveRecord
 {
+
+    const STATUS_SUCCESS = 0;
+    const STATUS_ERROR = 1;
+
     /**
      * {@inheritdoc}
      */
@@ -40,7 +45,7 @@ class SlideVideo extends ActiveRecord
     public function rules()
     {
         return [
-            [['created_at', 'updated_at'], 'integer'],
+            [['created_at', 'updated_at', 'status'], 'integer'],
             [['video_id'], 'unique'],
         ];
     }
@@ -56,6 +61,7 @@ class SlideVideo extends ActiveRecord
             'title' => 'Название',
             'created_at' => 'Дата добавления',
             'updated_at' => 'Updated At',
+            'status' => 'Статус',
         ];
     }
 
@@ -78,6 +84,11 @@ class SlideVideo extends ActiveRecord
             return $model;
         }
         throw new NotFoundHttpException('Видео не найдено.');
+    }
+
+    public function isSuccess()
+    {
+        return (int)$this->status === self::STATUS_SUCCESS;
     }
 
 }
