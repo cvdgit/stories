@@ -28,7 +28,7 @@ class TransitionForm extends TextForm
             'text' => 'Заголовок',
             'transition_story_id' => 'Перейти к истории',
             'slides' => 'Слайды',
-            'back_to_next_slide' => 'Возврат на следующий слайд',
+            'back_to_next_slide' => 'Возврат на текущий слайд',
         ]);
         return $labels;
     }

@@ -73,9 +73,12 @@ if (Wikids2.showSwipeHelp()) {
     toastr["info"]("Чтобы перейти к следующему слайду проведите пальцем справа-налево");
 }*/
 
+var inSlides = false;
 $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
     var view = e.target.getAttribute("href").substr(1);
     if (view === "tab-slides") {
+        inSlides = true;
+        $(".tab-slides").popover("hide");
         WikidsStory.loadStory("$action");
         ym(53566996, 'reachGoal', 'transition_to_training');
     }
@@ -109,7 +112,9 @@ if (isGuest) {
     });
     
     setTimeout(function() {
-        $(".tab-slides").popover("show");
+        if (!inSlides) {
+            $(".tab-slides").popover("show");
+        }
     }, 2000);
 }
 

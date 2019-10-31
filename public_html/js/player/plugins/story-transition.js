@@ -44,7 +44,7 @@ var TransitionSlide = (function() {
                 WikidsVideo.createPlayer();
             }
 
-            stack.unshift({"story_id": currentStoryID, "slide_index": backToNextSlide ? slide_index + 1 : slide_index, "slide_id": slideID});
+            stack.unshift({"story_id": currentStoryID, "slide_index": backToNextSlide ? slide_index : slide_index + 1, "slide_id": slideID});
             currentStoryID = storyID;
         });
     }
