@@ -45,9 +45,11 @@
         "wbraganca/yii2-fancytree-widget": "*",
         "wokster/yii2-nested-sets-tree-behavior": "*",
         "bower-asset/plyr": "^3.5",
-      "ext-json": "*"
+      "ext-json": "*",
+      "ext-http": "*"
     },
     "require-dev": {
+        "roave/security-advisories": "dev-master",
         "yiisoft/yii2-debug": "~2.0.0",
         "yiisoft/yii2-gii": "~2.0.0",
         "yiisoft/yii2-faker": "~2.0.0",

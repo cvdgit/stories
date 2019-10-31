@@ -16,7 +16,7 @@ class VideoService
         return json_decode(file_get_contents($api_url), true);
     }
 
-    public function checkVideo(string $videoID)
+    public function checkVideo(string $videoID): bool
     {
         $data = $this->getVideoInfo($videoID);
         return count($data['items']) > 0;

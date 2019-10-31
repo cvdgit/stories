@@ -101,7 +101,7 @@ class SlideVideo extends ActiveRecord
 
     public function afterSave($insert, $changedAttributes)
     {
-        if ($insert && isset($changedAttributes['video_id']) && $changedAttributes['video_id'] !== $this->video_id) {
+        if (!$insert && isset($changedAttributes['video_id']) && $changedAttributes['video_id'] !== $this->video_id) {
             $this->addJob($changedAttributes['video_id'], $this->video_id);
         }
         parent::afterSave($insert, $changedAttributes);
