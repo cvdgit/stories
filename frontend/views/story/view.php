@@ -118,8 +118,37 @@ if (isGuest) {
     }, 2000);
 }
 
+ $(window).scroll(function () {
+    if ($(this).scrollTop() > 100) {
+        $('#back-to-top').fadeIn();
+    } else {
+        $('#back-to-top').fadeOut();
+    }
+ });
+// scroll body to 0px on click
+$('#back-to-top').click(function () {
+    $('#back-to-top').tooltip('hide');
+    $('body,html').animate({
+        scrollTop: 0
+    }, 800);
+    return false;
+});
+
+$('#back-to-top').tooltip('show');
+
 JS;
 $this->registerJs($js);
+
+$css = <<< CSS
+.back-to-top {
+    cursor: pointer;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: none;
+}
+CSS;
+$this->registerCss($css);
 
 $isSlidesView = $storyDefaultView === 'slides';
 $isBookView = $storyDefaultView === 'book';
@@ -218,6 +247,7 @@ $isBookView = $storyDefaultView === 'book';
             </div>
 
 	    </div>
+        <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" title="Нажмите, чтобы подняться на верх" data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span></a>
 	</main>
 </div>
 <?= \frontend\widgets\Share::widget(['story' => $model]) ?>
