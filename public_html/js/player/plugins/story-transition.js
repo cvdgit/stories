@@ -16,11 +16,13 @@ var TransitionSlide = (function() {
     function action() {
         var story_id = $(this).data("storyId"),
             slide_id = $(this).data("slides"),
+            backToNextSlide = ($(this).attr("data-backtonextslide") === "1"),
             slide_index = Reveal.getIndices().h;
-        goToSlide(story_id, slide_id);
+        goToSlide(story_id, slide_id, backToNextSlide);
     }
 
-    function goToSlide(storyID, slideID) {
+    function goToSlide(storyID, slideID, backToNextSlide) {
+        backToNextSlide = backToNextSlide || false;
         var slide_index = Reveal.getIndices().h;
         var promise = $.ajax({
             "url": config.getSlideAction + "?story_id=" + storyID + "&slide_id=" + slideID,
@@ -42,7 +44,7 @@ var TransitionSlide = (function() {
                 WikidsVideo.createPlayer();
             }
 
-            stack.unshift({"story_id": currentStoryID, "slide_index": slide_index, "slide_id": slideID});
+            stack.unshift({"story_id": currentStoryID, "slide_index": backToNextSlide ? slide_index + 1 : slide_index, "slide_id": slideID});
             currentStoryID = storyID;
         });
     }

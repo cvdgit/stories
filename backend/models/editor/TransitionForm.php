@@ -8,13 +8,14 @@ class TransitionForm extends TextForm
 {
     public $transition_story_id;
     public $slides;
+    public $back_to_next_slide;
 
     public function rules(): array
     {
         $rules = parent::rules();
         $rules = array_merge($rules, [
             [['transition_story_id'], 'required'],
-            [['transition_story_id'], 'integer'],
+            [['transition_story_id', 'back_to_next_slide'], 'integer'],
             ['slides', 'string'],
         ]);
         return $rules;
@@ -27,6 +28,7 @@ class TransitionForm extends TextForm
             'text' => 'Заголовок',
             'transition_story_id' => 'Перейти к истории',
             'slides' => 'Слайды',
+            'back_to_next_slide' => 'Возврат на следующий слайд',
         ]);
         return $labels;
     }

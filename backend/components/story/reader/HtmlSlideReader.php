@@ -174,6 +174,7 @@ class HtmlSlideReader implements ReaderInterface
         $block->setFontSize($this->getStyleValue($style, 'font-size'));
         $block->setTransitionStoryId(pq($htmlBlock)->find('button')->attr('data-story-id'));
         $block->setSlides(pq($htmlBlock)->find('button')->attr('data-slides'));
+        $block->setBackToNextSlide(pq($htmlBlock)->find('button')->attr('data-backtonextslide'));
         $this->slide->addBlock($block);
     }
 

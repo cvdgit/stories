@@ -15,6 +15,9 @@ class TransitionBlock extends ButtonBlock
     /** @var string */
     protected $slides;
 
+    /** @var int */
+    protected $back_to_next_slide;
+
     protected $type = AbstractBlock::TYPE_TRANSITION;
 
     /**
@@ -56,6 +59,7 @@ class TransitionBlock extends ButtonBlock
             'text_size' => $this->fontSize,
             'transition_story_id' => $this->transition_story_id,
             'slides' => $this->slides,
+            'back_to_next_slide' => $this->back_to_next_slide,
         ], parent::getValues());
     }
 
@@ -82,6 +86,23 @@ class TransitionBlock extends ButtonBlock
         $this->fontSize = $form->text_size;
         $this->transition_story_id = $form->transition_story_id;
         $this->slides = $form->slides;
+        $this->back_to_next_slide = $form->back_to_next_slide;
+    }
+
+    /**
+     * @return int
+     */
+    public function getBackToNextSlide()
+    {
+        return $this->back_to_next_slide;
+    }
+
+    /**
+     * @param int $back_to_next_slide
+     */
+    public function setBackToNextSlide($back_to_next_slide): void
+    {
+        $this->back_to_next_slide = $back_to_next_slide;
     }
 
 }

@@ -24,6 +24,7 @@ class TransitionBlockMarkup extends AbstractMarkup
         $elementAttributes['style'] = $this->setStyleValue($elementAttributes['style'], 'font-size', $block->getFontSize());
         $elementAttributes['data-story-id'] = $block->getTransitionStoryId();
         $elementAttributes['data-slides'] = $block->getSlides();
+        $elementAttributes['data-backtonextslide'] = $block->getBackToNextSlide();
         return Html::tag($element->getTagName(), $block->getText(), $elementAttributes);
     }
 
