@@ -166,6 +166,17 @@ class EditorController extends Controller
         return $form->getErrors();
     }
 
+    public function actionUpdateHtml()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $form = new QuestionForm();
+        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+            $this->editorService->updateBlock($form);
+            return ['success' => true];
+        }
+        return $form->getErrors();
+    }
+
     public function actionForm(int $slide_id, string $block_id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;

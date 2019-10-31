@@ -5,7 +5,7 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 ?>
 <?php $form = ActiveForm::begin([
-        'enableClientValidation' => true,
+    'enableClientValidation' => true,
     'options' => [
         'id' => 'slide-source-form'
     ]]);
@@ -37,7 +37,7 @@ function slideSourceOnBeforeSubmit(e) {
         processData: false,
         success: function(data) {
             $('#slide-source-modal').modal('hide');
-            StoryEditor.loadSlide(StoryEditor.getCurrentSlideIndex(), true);
+            StoryEditor.loadSlide(StoryEditor.getCurrentSlideID(), true);
         },
         error: function(data) {
             toastr.warning('', data);

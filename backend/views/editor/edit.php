@@ -258,10 +258,7 @@ $options = [
                     ['prompt' => 'Выбрать историю', 'onchange' => 'StoryEditor.changeImageStory(this)', 'class' => 'form-control']) ?>
                 <div id="story-images-list" class="row" style="margin-top: 20px"></div>
             </div>
-            <div class="modal-footer">
-                <!--button class="btn btn-primary" onclick="StoryEditor.addImages()">Добавить изображения</button>
-                <button-- class="btn btn-default" data-dismiss="modal">Отмена</button-->
-            </div>
+            <div class="modal-footer"></div>
         </div>
     </div>
 </div>

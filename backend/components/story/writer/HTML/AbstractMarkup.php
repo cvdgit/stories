@@ -64,15 +64,5 @@ class AbstractMarkup
         $styleArray[$param] = $value;
         return $this->arrayToStyle($styleArray);
     }
-/*
-       public function getStyleValue($param): string
-       {
-           $value = '';
-           if (isset($this->attributes['style'])) {
-               $styleArray = $this->styleToArray($this->attributes['style']);
-               $value = isset($styleArray[$param]) ? $styleArray[$param] : '';
-           }
-           return $value;
-       }*/
 
 }
