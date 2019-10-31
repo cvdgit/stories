@@ -146,6 +146,7 @@ $css = <<< CSS
     bottom: 20px;
     right: 20px;
     display: none;
+    z-index: 9999;
 }
 CSS;
 $this->registerCss($css);
