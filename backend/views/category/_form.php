@@ -15,7 +15,7 @@ use common\models\Category;
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'alias')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
-    <?= $form->field($model, 'sort_field')->dropDownList(['created_at' => 'По дате создания', 'title' => 'По названию истории'], ['prompt' => 'По умолчанию']) ?>
+    <?= $form->field($model, 'sort_field')->dropDownList(['created_at' => 'По дате создания', 'title' => 'По названию истории', 'episode' => 'По эпизодам'], ['prompt' => 'По умолчанию']) ?>
     <?= $form->field($model, 'sort_order')->dropDownList([SORT_ASC => 'ASC', SORT_DESC => 'DESC'], ['prompt' => 'По умолчанию']) ?>
     <div class="form-group">
         <?= Html::submitButton(($model->isNewRecord ? 'Создать категорию' : 'Сохранить изменения'), ['class' => 'btn btn-success']) ?>

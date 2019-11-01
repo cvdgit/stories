@@ -57,6 +57,7 @@ $values = implode("\n", $values);
         'create' => true,
     ],
 ])->hint('Используйте запятые для разделения тегов') ?>
+<?= $form->field($model, 'episode')->textInput() ?>
 <div class="form-group">
 <?= Html::submitButton(($model->isNewRecord ? 'Создать историю' : 'Сохранить изменения'), ['class' => 'btn btn-success', 'style' => 'margin-right: 20px']) ?>
 </div>

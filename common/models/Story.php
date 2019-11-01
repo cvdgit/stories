@@ -36,6 +36,7 @@ use yii\db\ActiveQuery;
  * @property int $slides_number
  * @property int $audio
  * @property int $user_audio
+ * @property int $episode
  *
  * @property User $author
  * @property Tag[] $tags
@@ -98,7 +99,7 @@ class Story extends ActiveRecord
         return [
             [['title', 'alias', 'user_id', 'story_categories', 'source_id'], 'required'],
             [['body', 'cover', 'story_file', 'source_dropbox', 'source_powerpoint'], 'string'],
-            [['created_at', 'updated_at', 'user_id', 'sub_access', 'source_id', 'views_number', 'slides_number', 'audio', 'user_audio'], 'integer'],
+            [['created_at', 'updated_at', 'user_id', 'sub_access', 'source_id', 'views_number', 'slides_number', 'audio', 'user_audio', 'episode'], 'integer'],
             [['title', 'alias'], 'string', 'max' => 255],
             [['alias'], 'unique'],
             // ['story_categories', 'each', 'rule' => ['integer']],
@@ -136,6 +137,7 @@ class Story extends ActiveRecord
             'source_powerpoint' => 'Файл PowerPoint (pptx)',
             'views_number' => 'Просмотров',
             'audio' => 'История с озвучкой',
+            'episode' => 'Эпизод',
         ];
     }
 

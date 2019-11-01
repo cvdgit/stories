@@ -65,6 +65,11 @@ class StorySearch extends Model
                     'desc' => ['title' => SORT_DESC],
                     'label' => 'названию истории',
                 ],
+                'episode' => [
+                    'asc' => ['episode' => SORT_ASC],
+                    'desc' => ['episode' => SORT_DESC],
+                    'label' => 'эпизодам',
+                ],
             ],
         ];
         $sort = new Sort($sortParams);
