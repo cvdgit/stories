@@ -9,6 +9,9 @@ use common\components\StoryCover;
     <div class="story-item">
         <a href="<?= Url::toRoute(['/story/view', 'alias' => $model['alias']]) ?>">
             <div class="story-item-image">
+                <?php if ((int)$model['audio'] === 1): ?>
+                    <span data-toggle="tooltip" title="В истории доступна озвучка" class="label label-danger story-label"><i class="glyphicon glyphicon-volume-up"></i></span>
+                <?php endif ?>
                 <div class="story-item-image-overlay">
                     <span></span>
                 </div>
@@ -18,7 +21,7 @@ use common\components\StoryCover;
             <div class="story-item-caption">
                 <p class="flex-text"></p>
                 <p>
-                    <h3 class="story-item-name"><?= Html::encode($model['title']) ?><?= (int)$model['audio'] === 1 ? ' <i title="В истории доступна озвучка" class="glyphicon glyphicon-volume-up"></i>' : '' ?></h3>
+                    <h3 class="story-item-name"><?= Html::encode($model['title']) ?></h3>
                     <?php if ((int)$model['sub_access'] === 1): ?>
                     <span class="story-item-pay">По подписке</span>
                     <?php endif ?>

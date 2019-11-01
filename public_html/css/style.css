@@ -2221,3 +2221,10 @@ img.lazy {
 .nav-tabs, .nav-pills {
   text-align:center;
 }
+
+.story-label {
+  position: absolute;
+  left: -4px;
+  top: 4px;
+  z-index: 9999;
+}

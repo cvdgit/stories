@@ -14,6 +14,9 @@ use yii\helpers\Url;
         <div class="story-item">
             <a href="<?= Url::toRoute(['/story/view', 'alias' => $model->alias]) ?>">
                 <div class="story-item-image">
+                    <?php if ($model->isAudioStory()): ?>
+                        <span data-toggle="tooltip" title="В истории доступна озвучка" class="label label-danger story-label"><i class="glyphicon glyphicon-volume-up"></i></span>
+                    <?php endif ?>
                     <div class="story-item-image-overlay">
                         <span></span>
                     </div>
@@ -23,7 +26,7 @@ use yii\helpers\Url;
                 <div class="story-item-caption">
                     <p class="flex-text"></p>
                     <p>
-                        <h3 class="story-item-name"><?= Html::encode($model->title) ?><?= $model->isAudioStory() ? ' <i title="В истории доступна озвучка" class="glyphicon glyphicon-volume-up"></i>' : '' ?></h3>
+                        <h3 class="story-item-name"><?= Html::encode($model->title) ?></h3>
                         <?php
                         $categories = $model->categories;
                         $categoryName = '';
