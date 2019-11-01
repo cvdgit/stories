@@ -42,7 +42,7 @@ class StoryService
     {
         $fileName = Yii::getAlias('@public') . '/slides_file/' . $form->storyFile;
         $imagesFolder = '/slides/' . $form->storyFile;
-        $reader = new PowerPointReader($fileName, Yii::getAlias('@public') . $imagesFolder, $imagesFolder);
+        $reader = new PowerPointReader($fileName, Yii::getAlias('@public'), $imagesFolder);
         $story = $reader->load();
 
         $writer = new HTMLWriter();

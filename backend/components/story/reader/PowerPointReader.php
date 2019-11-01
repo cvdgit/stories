@@ -10,6 +10,7 @@ use backend\components\story\Slide;
 use backend\components\story\Story;
 use backend\components\story\TextBlock;
 use Exception;
+use yii\imagine\Image;
 use PhpOffice\PhpPresentation\IOFactory;
 use PhpOffice\PhpPresentation\PhpPresentation;
 use PhpOffice\PhpPresentation\Shape\Drawing\Gd;
@@ -21,8 +22,8 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
 {
 
     protected $fileName;
+    protected $rootImagesFolder;
     protected $imagesFolder;
-    protected $relativeImagesFolder;
 
     protected $reader;
 
@@ -30,24 +31,35 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
     protected $currentSlideNumber = 0;
     protected $currentSlideBlockNumber = 0;
 
-    public function __construct($fileName, $imagesFolder, $relativeImagesFolder)
+    public function __construct($fileName, $rootImagesFolder, $imagesFolder)
     {
         $this->story = new Story();
         $this->fileName = $fileName;
+        $this->rootImagesFolder = $rootImagesFolder;
         $this->imagesFolder = $imagesFolder;
-        $this->relativeImagesFolder = $relativeImagesFolder;
         $this->reader = IOFactory::createReader('PowerPoint2007');
+    }
+
+    public function getImagesPath()
+    {
+        return $this->imagesFolder;
+    }
+
+    public function getRootImagesPath()
+    {
+        return $this->rootImagesFolder . $this->imagesFolder;
     }
 
     private function clearImagesFolder(): void
     {
-        if (!file_exists($this->imagesFolder)) {
-            if (!mkdir($concurrentDirectory = $this->imagesFolder) && !is_dir($concurrentDirectory)) {
+        $folder = $this->getRootImagesPath();
+        if (!file_exists($folder)) {
+            if (!mkdir($concurrentDirectory = $folder) && !is_dir($concurrentDirectory)) {
                 throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
             }
         }
         else {
-            array_map('unlink', glob($this->imagesFolder . '*.*'));
+            array_map('unlink', glob($folder . DIRECTORY_SEPARATOR . '*.*'));
         }
     }
 
@@ -102,9 +114,6 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
 
     protected function loadShapeImage(Gd $powerPointShape, Slide $slide): void
     {
-        $shapeImageFilePath = $this->imagesFolder . '/' . $powerPointShape->getIndexedFilename();
-        file_put_contents($shapeImageFilePath, $powerPointShape->getContents());
-
         $block = new ImageBlock();
         $block->setType(AbstractBlock::TYPE_IMAGE);
         $block->setWidth($powerPointShape->isResizeProportional() . 'px');
@@ -112,10 +121,14 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
         $block->setLeft($powerPointShape->getOffsetX() . 'px');
         $block->setTop($powerPointShape->getOffsetY() . 'px');
 
-        $imagePath = $this->relativeImagesFolder . '/' . $powerPointShape->getIndexedFilename();
-        $block->setFilePath($imagePath);
-        $block->setImageSize($shapeImageFilePath, $powerPointShape->getWidth(), $powerPointShape->getHeight());
-        $block->setNaturalImageSizeFromFile($shapeImageFilePath);
+        $shapeImageFilePath = $this->getRootImagesPath() . '/' . $powerPointShape->getIndexedFilename();
+        file_put_contents($shapeImageFilePath, $powerPointShape->getContents());
+
+        $imageFilePath = $this->convertImage($shapeImageFilePath);
+
+        $block->setFilePath($this->getImagesPath() . '/' . $imageFilePath);
+        $block->setImageSize($this->getRootImagesPath() . '/' . $imageFilePath, $powerPointShape->getWidth(), $powerPointShape->getHeight());
+        $block->setNaturalImageSizeFromFile($this->getRootImagesPath() . '/' . $imageFilePath);
 
         $slide->addBlock($block);
     }
@@ -150,6 +163,18 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
 
         $block->setText(implode('<br>', $paragraphText));
         $slide->addBlock($block);
+    }
+
+    protected function convertImage(string $filePath)
+    {
+        [$imageWidth, $imageHeight, $type] = getimagesize($filePath);
+        if ((int)$type !== IMAGETYPE_PNG) {
+            return $filePath;
+        }
+        $newFilePath = str_replace('.png', '.jpg', $filePath);
+        Image::resize($filePath, $imageWidth, $imageHeight)->save($newFilePath, ['jpeg_quality' => 80]);
+        unlink($filePath);
+        return basename($newFilePath);
     }
 
 }
