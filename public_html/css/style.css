@@ -2230,3 +2230,15 @@ img.lazy {
   padding: 0.3em 0.6em 0.3em;
   font-size: 100%;
 }
+
+.wikids-jumbotron {
+
+}
+
+.wikids-jumbotron p {
+  font-weight: normal;
+}
+
+.wikids-jumbotron li {
+  line-height: 3rem;
+}

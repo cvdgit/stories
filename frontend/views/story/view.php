@@ -79,7 +79,9 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
     if (view === "tab-slides") {
         inSlides = true;
         $(".tab-slides").popover("hide");
-        WikidsStory.loadStory("$action");
+        if (!isGuest) {
+            WikidsStory.loadStory("$action");
+        }
         ym(53566996, 'reachGoal', 'transition_to_training');
     }
     else if (view === "tab-book") {
@@ -90,27 +92,25 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
     }
 });
 
-$(".tab-slides").popover({
-    container: "#w0",
-    title: "Попробуйте режим обучения",
-    content: '<ul>' +
-'<li>просмотр истории в виде слайдов</li>' +
-'<li>возможность прослушивания озвучки по каждому слайду</li>' +
-'<li>возможность добавить свою, детскую озвучку</li>' +
-'<li>тесты для детей, чтобы закрепить материал</li>' +
-'<li>специально подобранные коллекции картинок и видео для улучшения восприятия</li>' +
-'<li>ссылки на дополнительные обучающие курсы</li>' +
-'</ul>',
-    html: true,
-    placement: "bottom",
-    trigger: isGuest ? "manual" : "hover"
-});
-    
-if (isGuest) {    
+if (isGuest) {   
+    $(".tab-slides").popover({
+        container: "#w0",
+        title: "Попробуйте режим обучения",
+        content: '<ul>' +
+    '<li>просмотр истории в виде слайдов</li>' +
+    '<li>возможность прослушивания озвучки по каждому слайду</li>' +
+    '<li>возможность добавить свою, детскую озвучку</li>' +
+    '<li>тесты для детей, чтобы закрепить материал</li>' +
+    '<li>специально подобранные коллекции картинок и видео для улучшения восприятия</li>' +
+    '<li>ссылки на дополнительные обучающие курсы</li>' +
+    '</ul>',
+        html: true,
+        placement: "bottom",
+        trigger: "hover"
+    });
     $("#w0").on("click", ".popover", function() {
         $(".tab-slides").popover("hide");
     });
-    
     setTimeout(function() {
         if (!inSlides) {
             $(".tab-slides").popover("show");
@@ -125,17 +125,16 @@ if (isGuest) {
         $('#back-to-top').fadeOut();
     }
  });
-// scroll body to 0px on click
-$('#back-to-top').click(function () {
-    $('#back-to-top').tooltip('hide');
-    $('body,html').animate({
-        scrollTop: 0
-    }, 800);
-    return false;
-});
 
-$('#back-to-top').tooltip('show');
-
+$('#back-to-top')
+    .click(function () {
+        $('#back-to-top').tooltip('hide');
+        $('body,html').animate({
+            scrollTop: 0
+        }, 800);
+        return false;
+    })
+    .tooltip('show');
 JS;
 $this->registerJs($js);
 
