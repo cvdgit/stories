@@ -1,9 +1,8 @@
-<?php
-use frontend\widgets\StoryAudio;
-?>
 <div class="slides-readonly">
     <?php if ($model->isAudioStory()): ?>
-        <?= StoryAudio::widget(['storyID' => $model->id]) ?>
+    <div class="alert alert-info" style="position: relative">
+        <p>Озвучка доступна в режиме обучения</p>
+    </div>
     <?php endif ?>
     <?php if (!empty($model->body)): ?>
         <?= $model->body ?>
