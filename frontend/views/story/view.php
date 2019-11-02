@@ -138,18 +138,6 @@ $('#back-to-top')
 JS;
 $this->registerJs($js);
 
-$css = <<< CSS
-.back-to-top {
-    cursor: pointer;
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    display: none;
-    z-index: 9999;
-}
-CSS;
-$this->registerCss($css);
-
 $isSlidesView = $storyDefaultView === 'slides';
 $isBookView = $storyDefaultView === 'book';
 ?>

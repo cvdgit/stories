@@ -1,12 +1,11 @@
 <div id="story_wrapper">
     <?php if (Yii::$app->user->isGuest): ?>
+    <div class="alert alert-info story-wrapper-guest">
+        <h2>Режим обучения доступен только авторизованным пользователям</h2>
+        <p>Чтобы продолжить просмотр <a data-toggle="modal" data-target="#wikids-signup-modal" href="#">зарегистрируйтесь</a> или <a data-toggle="modal" data-target="#wikids-login-modal" href="#">войдите в аккаунт</a></p>
+    </div>
     <div class="jumbotron wikids-jumbotron">
-        <div class="text-center">
-            <h2>Режим обучения доступен только авторизованным пользователям</h2>
-            <p>Чтобы продолжить просмотр зарегистрируйтесь или войдите в аккаунт</p>
-            <br>
-            <p>Возможности режима обучения:</p>
-        </div>
+        <p class="text-center">Возможности режима обучения:</p>
         <div class="row">
             <div class="col-md-6 col-md-offset-3">
                 <ul>
@@ -17,15 +16,6 @@
                     <li>специально подобранные коллекции картинок и видео для улучшения восприятия</li>
                     <li>ссылки на дополнительные обучающие курсы</li>
                 </ul>
-            </div>
-        </div>
-        <br>
-        <div class="row">
-            <div class="col-md-6 text-center">
-                <button class="btn" data-toggle="modal" data-target="#wikids-signup-modal">Зарегистрироваться</button>
-            </div>
-            <div class="col-md-6 text-center">
-                <button class="btn" data-toggle="modal" data-target="#wikids-login-modal">Войти</button>
             </div>
         </div>
     </div>
