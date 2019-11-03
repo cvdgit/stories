@@ -42,6 +42,7 @@ $plugins = [
     ['class' => SlideLinks::class, 'storyID' => $model->id, 'links' => $model->slideBlocksData()],
     ['class' => Video::class],
     ['class' => \common\widgets\Reveal\Plugins\Actions::class],
+    ['class' => \common\widgets\Reveal\Plugins\SeeAlso::class, 'storyID' => $model->id],
 ];
 
 /** @var $audioTrackPath string */

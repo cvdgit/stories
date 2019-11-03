@@ -35,7 +35,7 @@ class StoryQuery extends ActiveQuery
 
     public function byCategories($ids)
     {
-        return $this->innerJoinWith('categories')->andWhere(['in', 'category.id', $ids])->limit(4);
+        return $this->innerJoinWith('categories')->andWhere(['in', 'category.id', $ids])->limit(8);
     }
 
     public function audio()

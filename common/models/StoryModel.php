@@ -24,7 +24,7 @@ class StoryModel
 
     public function getCoverRelativePath(): string
     {
-        return  '/slides_cover/' . $this->story->cover;
+        return  '/slides_cover/list/' . $this->story->cover;
     }
 
 }
