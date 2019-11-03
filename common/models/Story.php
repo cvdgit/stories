@@ -37,6 +37,7 @@ use yii\db\ActiveQuery;
  * @property int $audio
  * @property int $user_audio
  * @property int $episode
+ * @property int $video
  *
  * @property User $author
  * @property Tag[] $tags
@@ -99,10 +100,10 @@ class Story extends ActiveRecord
         return [
             [['title', 'alias', 'user_id', 'story_categories', 'source_id'], 'required'],
             [['body', 'cover', 'story_file', 'source_dropbox', 'source_powerpoint'], 'string'],
-            [['created_at', 'updated_at', 'user_id', 'sub_access', 'source_id', 'views_number', 'slides_number', 'audio', 'user_audio', 'episode'], 'integer'],
+            [['created_at', 'updated_at', 'user_id', 'sub_access', 'source_id', 'views_number', 'slides_number', 'audio'], 'integer'],
+            [['video', 'user_audio', 'episode'], 'integer'],
             [['title', 'alias'], 'string', 'max' => 255],
             [['alias'], 'unique'],
-            // ['story_categories', 'each', 'rule' => ['integer']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
             ['status', 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_PUBLISHED]],
             ['status', 'default', 'value' => self::STATUS_DRAFT],
@@ -345,6 +346,11 @@ class Story extends ActiveRecord
         return (int)$this->audio === 1;
     }
 
+    public function haveVideo(): bool
+    {
+        return (int)$this->video === 1;
+    }
+
     public function isUserAudioStory(): bool
     {
         return (int)$this->user_audio === 1;
@@ -437,6 +443,13 @@ class Story extends ActiveRecord
     public function getBaseModel()
     {
         return new StoryModel($this);
+    }
+
+    public static function updateVideo(int $storyID, int $video)
+    {
+        $model = self::findModel($storyID);
+        $model->video = $video;
+        $model->save(false, ['video']);
     }
 
 }

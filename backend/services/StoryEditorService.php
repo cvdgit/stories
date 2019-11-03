@@ -93,7 +93,30 @@ class StoryEditorService
         $writer = new HTMLWriter();
         $html = $writer->renderSlide($slide);
         $model->data = $html;
-        return $model->save(false, ['data']);
+        $model->save(false, ['data']);
+
+        $haveVideo = $this->haveVideoBlock($model->story_id);
+        Story::updateVideo($model->story_id, $haveVideo ? 1 : 0);
+    }
+
+    protected function haveVideoBlock(int $storyID)
+    {
+        $model = Story::findModel($storyID);
+        $haveVideo = false;
+        foreach ($model->storySlides as $slideModel) {
+            $reader = new HtmlSlideReader($slideModel->data);
+            $slide = $reader->load();
+            foreach ($slide->getBlocks() as $block) {
+                if ($block->getType() === AbstractBlock::TYPE_VIDEO) {
+                    $haveVideo = true;
+                    break;
+                }
+            }
+            if ($haveVideo) {
+                break;
+            }
+        }
+        return $haveVideo;
     }
 
     protected function updateSlideNumbers(int $storyID, int $targetSlideNumber)

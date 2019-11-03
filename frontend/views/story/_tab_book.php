@@ -1,8 +1,13 @@
 <div class="slides-readonly">
     <?php if ($model->isAudioStory()): ?>
-    <div class="alert alert-info" style="position: relative">
+    <div class="alert alert-info">
         <p>Озвучка доступна в режиме обучения</p>
     </div>
+    <?php endif ?>
+    <?php if ($model->haveVideo()): ?>
+        <div class="alert alert-info">
+            <p>Видео доступно в режиме обучения</p>
+        </div>
     <?php endif ?>
     <?php if (!empty($model->body)): ?>
         <?= $model->body ?>

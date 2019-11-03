@@ -275,6 +275,10 @@ class EditorController extends Controller
         $writer = new HTMLWriter();
         $html = $writer->renderSlide($slide);
 
+        if ($block_type === AbstractBlock::TYPE_VIDEO) {
+            Story::updateVideo($model->story_id, 1);
+        }
+
         $model->data = $html;
         $model->save(false, ['data']);
 
