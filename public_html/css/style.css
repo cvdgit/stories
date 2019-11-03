@@ -437,7 +437,7 @@ section h2 span {
 }
 
 .story-list .story-item .story-item-image {
-  margin-bottom: 14px;
+  /* margin-bottom: 14px; */
   position: relative;
 }
 
@@ -1255,7 +1255,7 @@ section h2 span {
 .flex-row .story-item a,
 .flex-row .story-item-caption {
   display: flex;
-  flex: 1 0 auto;
+  flex: 0 0 auto;
   flex-direction: column;
 }
 
