@@ -437,7 +437,7 @@ section h2 span {
 }
 
 .story-list .story-item .story-item-image {
-  /* margin-bottom: 14px; */
+  margin-bottom: 6px;
   position: relative;
 }
 
