@@ -102,16 +102,11 @@ class PlayerController extends Controller
         $stories = Story::followingStories($categoryIDs);
         $content = '';
         foreach ($stories as $story) {
-            //$storyContent = Html::tag('div', '<span></span>', ['class' => 'story-item-image-overlay']);
-            //$storyContent = Html::a('<div class="story-item-image">' . Html::img($story->getBaseModel()->getCoverRelativePath()) . '</div>', ['story/view', 'alias' => $story->alias]);
-            //$storyContentWrapper = Html::tag('div', $storyContent, ['class' => 'story-item', 'style' => 'margin-bottom: 20px']);
-            //$content .= Html::tag('div', $storyContentWrapper, ['class' => 'col-lg-3 col-md-4 col-sm-6']);
-
             $content .= $this->renderPartial('_story', ['model' => $story]);
         }
         $html = Html::tag('div', $content, ['class' => 'row flex-row']);
 
-        return ['html' => '<div class="sl-block" data-block-id="9fdcc8e4ed51ca6840da" data-block-type="html" style="width: 1254px;height: 700px;left: 14px;top: 20px;"><div class="sl-block-content" style="z-index: 10">' . $html . '</div></div>'];
+        return ['html' => '<div class="sl-block" data-block-id="9fdcc8e4ed51ca6840da" data-block-type="html" style="width: 1254px;height: 700px;left: 14px;top: 20px;"><div class="sl-block-content" style="z-index: 10">' . $html . '<div class="autoplay-overlay"></div></div></div>'];
     }
 
 }
