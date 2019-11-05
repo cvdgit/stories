@@ -1672,12 +1672,14 @@
 }
 
 .reveal.has-light-background section p,
-.reveal.has-light-background section h1 {
+.reveal.has-light-background section h1,
+.reveal.has-light-background section h3 {
 	color: #000000 !important;
 }
 
 .reveal.has-dark-background section p,
-.reveal.has-dark-background section h1 {
+.reveal.has-dark-background section h1,
+.reveal.has-dark-background section h3 {
 	color: #ffffff !important;
 }
 
