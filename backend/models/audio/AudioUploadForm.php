@@ -74,7 +74,7 @@ class AudioUploadForm extends Model
     public function createFileName(string $file)
     {
         $slideNumber = explode('.', $file)[0];
-        $slide = StorySlide::findSlideByNumber($this->storyID, $slideNumber + 2);
+        $slide = StorySlide::findSlideByNumber($this->storyID, $slideNumber);
         if ($slide !== null) {
             return $slide->id;
         }
