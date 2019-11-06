@@ -8,7 +8,9 @@ var WikidsSeeAlso = window.WikidsSeeAlso || (function() {
         $.get(config.action).done(function(data) {
             $(Reveal.getCurrentSlide()).empty().append(data.html);
             Reveal.sync();
-            setTimeout(showAutoPlayOverlay, 1000);
+            if (autoplay()) {
+                setTimeout(showAutoPlayOverlay, 1000);
+            }
         });
     }
 
@@ -50,10 +52,24 @@ var WikidsSeeAlso = window.WikidsSeeAlso || (function() {
         }, 1000);
     }
 
+    $("#autoplay-form input[value=" + (autoplay() ? "yes" : "no") + "]").prop("checked", true);
+    $("#autoplay-form input[type=radio]")
+        .on('change', function() {
+            var autoplay = $('input[name=autoplay]:checked', '#autoplay-form').val();
+            localStorage.setItem("wikids-autoplay-story", autoplay);
+        });
+
+    function autoplay() {
+        return localStorage.getItem("wikids-autoplay-story") === "yes";
+    }
+
     Reveal.addEventListener("slidechanged", function(event) {
         if (Reveal.isLastSlide()) {
             seeAlsoStories();
         }
     });
 
+    return {
+        "autoplay": autoplay
+    };
 })();

@@ -107,8 +107,10 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 					currentAudio.play();
 				}
 			}
-			else if ( autoplay ) {
-				currentAudio.play();
+			else if ( autoplay && WikidsSeeAlso.autoplay() ) {
+				setTimeout(function() {
+					currentAudio.play();
+				}, 1000);
 			}
 		}
 	}

@@ -22,6 +22,23 @@
         </div>
     </noindex>
     <?php else: ?>
+    <?php if ($model->isAudioStory()): ?>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="pull-right">
+                <span>Автовоспроизведение</span>
+                <form class="form" id="autoplay-form" style="display: inline-block">
+                    <div class="switch-field">
+                        <input type="radio" id="autoplay-yes" name="autoplay" value="yes" />
+                        <label for="autoplay-yes">Да</label>
+                        <input type="radio" id="autoplay-no" name="autoplay" value="no" />
+                        <label for="autoplay-no">Нет</label>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <?php endif ?>
     <div class="story-container">
         <div class="story-container-inner" id="story-container">
             <div class="story-no-subscription"><span class="story-loader">Загрузка истории...</span></div>
