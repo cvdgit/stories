@@ -14,6 +14,7 @@ class Audio extends AbstractPlugin implements PluginInterface
 
     public $defaultAudios = true;
     public $prefix;
+    public $autoplay = false;
 
     public function pluginConfig()
     {
@@ -25,7 +26,7 @@ class Audio extends AbstractPlugin implements PluginInterface
 		        'defaultNotes' => false, 	// use slide notes as default for the text to speech converter
 		        'defaultText' => false, 	// use slide text as default for the text to speech converter
 		        'advance' => 0, 		// advance to next slide after given time in milliseconds after audio has played, use negative value to not advance
-		        'autoplay' => false,	// automatically start slideshow
+		        'autoplay' => $this->autoplay,	// automatically start slideshow
 		        'defaultDuration' => 5,	// default duration in seconds if no audio is available
 		        'defaultAudios' => $this->defaultAudios,	// try to play audios with names such as audio/1.2.ogg
 		        'playerOpacity' => 1,	// opacity value of audio player if unfocused

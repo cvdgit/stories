@@ -51,6 +51,7 @@ if ($model->isAudioStory() && $audioTrackPath !== '') {
         'class' => \common\widgets\Reveal\Plugins\Audio::class,
         'storyID' => $model->id,
         'prefix' => $audioTrackPath . DIRECTORY_SEPARATOR,
+        'autoplay' => true,
     ];
 }
 
