@@ -21,6 +21,8 @@ var TransitionSlide = (function() {
         goToSlide(story_id, slide_id, backToNextSlide);
     }
 
+    var inTransitionStory = false;
+
     function goToSlide(storyID, slideID, backToNextSlide) {
         backToNextSlide = backToNextSlide || false;
         var slide_index = Reveal.getIndices().h;
@@ -38,6 +40,8 @@ var TransitionSlide = (function() {
 
             Reveal.sync();
             Reveal.slide(0);
+
+            inTransitionStory = true;
 
             if (slide_index === 0 && window["WikidsVideo"]) {
                 // Если переход происходит с первого (0) слайда, то событие slidechanged не генерится
@@ -58,6 +62,7 @@ var TransitionSlide = (function() {
         }
         Reveal.sync();
         Reveal.slide(slide_index);
+        inTransitionStory = false;
     }
 
     function backToStory() {
@@ -76,6 +81,9 @@ var TransitionSlide = (function() {
 
     return {
         "backToStory": backToStory,
-        "goToSlide": goToSlide
+        "goToSlide": goToSlide,
+        "getInTransition": function() {
+            return inTransitionStory;
+        }
     };
 })();

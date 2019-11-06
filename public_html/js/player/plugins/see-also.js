@@ -64,7 +64,7 @@ var WikidsSeeAlso = window.WikidsSeeAlso || (function() {
     }
 
     Reveal.addEventListener("slidechanged", function(event) {
-        if (Reveal.isLastSlide()) {
+        if (!TransitionSlide.getInTransition() && Reveal.isLastSlide()) {
             seeAlsoStories();
         }
     });
