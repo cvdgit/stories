@@ -33,6 +33,8 @@ var TransitionSlide = (function() {
         });
         promise.done(function(data) {
 
+            inTransitionStory = true;
+
             $(".reveal .slides").empty().append(data.html);
             if (window["StoryBackground"]) {
                 StoryBackground.init();
@@ -40,8 +42,6 @@ var TransitionSlide = (function() {
 
             Reveal.sync();
             Reveal.slide(0);
-
-            inTransitionStory = true;
 
             if (slide_index === 0 && window["WikidsVideo"]) {
                 // Если переход происходит с первого (0) слайда, то событие slidechanged не генерится
