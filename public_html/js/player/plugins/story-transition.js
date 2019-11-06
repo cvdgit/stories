@@ -62,7 +62,6 @@ var TransitionSlide = (function() {
         }
         Reveal.sync();
         Reveal.slide(slide_index);
-        inTransitionStory = false;
     }
 
     function backToStory() {
@@ -72,6 +71,7 @@ var TransitionSlide = (function() {
                 .done(function(data) {
                     syncReveal(data.html, state.slide_index);
                     currentStoryID = state.story_id;
+                    inTransitionStory = false;
                     if (state.slide_index === 0 && window["WikidsVideo"]) {
                         WikidsVideo.createPlayer();
                     }
