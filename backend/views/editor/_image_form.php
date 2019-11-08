@@ -7,10 +7,12 @@ use yii\helpers\Html;
 $actionFieldID = Html::getInputId($model, 'action');
 $actionStoryFieldID = Html::getInputId($model, 'actionStoryID');
 $actionSlideFieldID = Html::getInputId($model, 'actionSlideID');
+$actionBackToNextSlideID = Html::getInputId($model, 'back_to_next_slide');
 $js = <<< JS
 function onChangeAction() {
     $("#$actionStoryFieldID").attr("disabled", !this.checked);
     $("#$actionSlideFieldID").attr("disabled", !this.checked);
+    $("#$actionBackToNextSlideID").attr("disabled", !this.checked);
 }
 $("#$actionFieldID")
     .on("change", onChangeAction)
@@ -27,3 +29,4 @@ echo $form->field($model, 'image')->fileInput();
 echo $form->field($model, 'action')->checkbox();
 echo $form->field($model, 'actionStoryID')->dropDownList(StoryHelper::getStoryArray(), ['onchange' => 'StoryEditor.changeStory(this, "imageform-actionslideid", ' . $model->actionSlideID . ')', 'prompt' => 'Выбрать историю']);
 echo $form->field($model, 'actionSlideID')->dropDownList([], ['prompt' => 'Выбрать слайд']);
+echo $form->field($model, 'back_to_next_slide')->checkbox();

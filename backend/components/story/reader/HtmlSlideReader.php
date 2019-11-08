@@ -106,6 +106,8 @@ class HtmlSlideReader implements ReaderInterface
         $block->setActionStoryID($element->attr('data-action-story'));
         $block->setActionSlideID($element->attr('data-action-slide'));
 
+        $block->setBackToNextSlide($element->attr('data-backtonextslide'));
+
         $block->setId(pq($htmlBlock)->attr('data-block-id'));
 
         $style = pq($htmlBlock)->attr('style');

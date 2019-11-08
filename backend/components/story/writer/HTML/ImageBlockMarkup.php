@@ -27,6 +27,7 @@ class ImageBlockMarkup extends AbstractMarkup
             'data-action' => $block->getAction(),
             'data-action-story' => $block->getActionStoryID(),
             'data-action-slide' => $block->getActionSlideID(),
+            'data-backtonextslide' => $block->getBackToNextSlide(),
         ]);
     }
 

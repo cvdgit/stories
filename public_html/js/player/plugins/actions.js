@@ -6,8 +6,9 @@ var WikidsActions = window.WikidsActions || (function(transition) {
 
     function executeAction() {
         var storyID = $(this).attr("data-action-story"),
-            slideID = $(this).attr("data-action-slide");
-        transition.goToSlide(storyID, slideID);
+            slideID = $(this).attr("data-action-slide"),
+            backToNextSlide = ($(this).attr("data-backtonextslide") === "1");
+        transition.goToSlide(storyID, slideID, backToNextSlide);
     }
 
 })(TransitionSlide);

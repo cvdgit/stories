@@ -22,6 +22,9 @@ class ImageBlock extends AbstractBlock
     protected $actionStoryID;
     protected $actionSlideID;
 
+    /** @var int */
+    protected $back_to_next_slide;
+
     const DEFAULT_IMAGE_WIDTH = 973;
     const DEFAULT_IMAGE_HEIGHT = 720;
 
@@ -95,6 +98,7 @@ class ImageBlock extends AbstractBlock
             'action' => $this->action,
             'actionStoryID' => $this->actionStoryID,
             'actionSlideID' => $this->actionSlideID,
+            'back_to_next_slide' => $this->back_to_next_slide,
         ], parent::getValues());
     }
 
@@ -113,6 +117,7 @@ class ImageBlock extends AbstractBlock
         $this->setAction($form->action);
         $this->setActionStoryID($form->actionStoryID);
         $this->setActionSlideID($form->actionSlideID);
+        $this->back_to_next_slide = $form->back_to_next_slide;
     }
 
     public function create()
@@ -171,6 +176,22 @@ class ImageBlock extends AbstractBlock
     public function setActionSlideID($actionSlideID): void
     {
         $this->actionSlideID = $actionSlideID;
+    }
+
+    /**
+     * @return int
+     */
+    public function getBackToNextSlide()
+    {
+        return $this->back_to_next_slide;
+    }
+
+    /**
+     * @param int $back_to_next_slide
+     */
+    public function setBackToNextSlide($back_to_next_slide): void
+    {
+        $this->back_to_next_slide = $back_to_next_slide;
     }
 
 }

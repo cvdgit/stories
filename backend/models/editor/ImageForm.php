@@ -15,13 +15,14 @@ class ImageForm extends BaseForm
     public $action;
     public $actionStoryID;
     public $actionSlideID;
+    public $back_to_next_slide;
 
     public function rules(): array
     {
         $rules = parent::rules();
         $rules = array_merge($rules, [
             ['image', 'image', 'maxSize' => 50 * 1024 * 1024],
-            [['action', 'actionSlideID', 'actionStoryID'], 'integer'],
+            [['action', 'actionSlideID', 'actionStoryID', 'back_to_next_slide'], 'integer'],
         ]);
         return $rules;
     }
@@ -34,6 +35,7 @@ class ImageForm extends BaseForm
             'action' => 'Выполнить действие',
             'actionStoryID' => 'История',
             'actionSlideID' => 'Слайд',
+            'back_to_next_slide' => 'Возврат на текущий слайд',
         ]);
         return $labels;
     }
