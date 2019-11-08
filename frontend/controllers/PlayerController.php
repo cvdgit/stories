@@ -106,7 +106,7 @@ class PlayerController extends Controller
         }
         $html = Html::tag('div', $content, ['class' => 'row flex-row']);
 
-        return ['html' => '<div class="sl-block" data-block-id="9fdcc8e4ed51ca6840da" data-block-type="html" style="width: 1254px;height: 700px;left: 14px;top: 20px;"><div class="sl-block-content" style="z-index: 10">' . $html . '<div class="autoplay-overlay"></div></div></div>'];
+        return ['html' => '<div class="sl-block" data-block-id="9fdcc8e4ed51ca6840da" data-block-type="html" style="width: 1294px;height: 727px;left: -7px;top: -4px;"><div class="sl-block-content" style="z-index: 10">' . $html . '<div class="autoplay-overlay"></div></div></div>'];
     }
 
 }

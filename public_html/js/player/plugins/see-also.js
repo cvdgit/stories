@@ -5,8 +5,10 @@ var WikidsSeeAlso = window.WikidsSeeAlso || (function() {
     var config = Reveal.getConfig().seeAlso;
 
     function seeAlsoStories() {
+        var $slide = $(Reveal.getCurrentSlide());
+        $slide.empty();
         $.get(config.action).done(function(data) {
-            $(Reveal.getCurrentSlide()).empty().append(data.html);
+            $slide.append(data.html);
             Reveal.sync();
             if (autoplay()) {
                 setTimeout(showAutoPlayOverlay, 1000);
@@ -17,6 +19,8 @@ var WikidsSeeAlso = window.WikidsSeeAlso || (function() {
     function hideAutoPlayOverlay() {
         $(".autoplay-overlay", Reveal.getCurrentSlide()).fadeOut();
     }
+
+    var timeout;
 
     function showAutoPlayOverlay() {
 
@@ -42,7 +46,7 @@ var WikidsSeeAlso = window.WikidsSeeAlso || (function() {
             .append($timer)
             .fadeIn();
 
-        var timeout = setInterval(function() {
+        timeout = setInterval(function() {
             second--;
             $(".autoplay-timer-second", $timer).text(second);
             if (second <= 1) {
@@ -64,7 +68,9 @@ var WikidsSeeAlso = window.WikidsSeeAlso || (function() {
     }
 
     Reveal.addEventListener("slidechanged", function(event) {
-        console.log("getInTransition", TransitionSlide.getInTransition());
+        if (timeout) {
+            clearTimeout(timeout);
+        }
         if (TransitionSlide.getInTransition() === false && Reveal.isLastSlide()) {
             seeAlsoStories();
         }
