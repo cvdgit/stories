@@ -13,6 +13,7 @@ use Exception;
 use frontend\models\SlideAudio;
 use frontend\models\StoryTrackModel;
 use Yii;
+use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\helpers\Html;
 use yii\web\Controller;
@@ -99,7 +100,39 @@ class PlayerController extends Controller
             return $category->id;
         }, $model->categories);
 
-        $stories = Story::followingStories($categoryIDs);
+        $viewedStory = (new Query())
+            ->select('story_id')
+            ->from('{{%user_story_history}}')
+            ->where('user_id = :user', [':user' => Yii::$app->user->id])
+            ->all();
+        $viewedStoryIDs = array_map(function($row) {
+            return $row['story_id'];
+        }, $viewedStory);
+        $viewedStoryIDs[] = $model->id;
+
+        $stories = (new Query())
+            ->select('{{%story}}.*')
+            ->from('{{%category}}')
+            ->innerJoin('{{%story_category}}', '{{%story_category}}.category_id = {{%category}}.id')
+            ->innerJoin('{{%story}}', '{{%story_category}}.story_id = {{%story}}.id')
+            ->where(['in', '{{%category}}.id', $categoryIDs])
+            ->andWhere('{{%story}}.status = :status', [':status' => Story::STATUS_PUBLISHED])
+            ->andWhere(['not in', '{{%story}}.id', $viewedStoryIDs])
+            ->orderBy(['{{%story}}.episode' => SORT_ASC, '{{%story}}.created_at' => SORT_DESC])
+            ->limit(8)
+            ->all();
+
+        if (count($stories) === 0) {
+            $stories = (new Query())
+                ->select('*')
+                ->from('{{%story}}')
+                ->where('status = :status', [':status' => Story::STATUS_PUBLISHED])
+                ->andWhere(['not in', 'id', [$model->id]])
+                ->orderBy('rand()')
+                ->limit(8)
+                ->all();
+        }
+
         $content = '';
         foreach ($stories as $story) {
             $content .= $this->renderPartial('_story', ['model' => $story]);
