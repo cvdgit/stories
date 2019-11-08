@@ -5,6 +5,7 @@ namespace backend\models\audio;
 
 
 use common\models\StorySlide;
+use DomainException;
 use http\Exception\RuntimeException;
 use Yii;
 use yii\base\Model;
@@ -104,12 +105,17 @@ class AudioUploadForm extends Model
             while (false !== ($filename = readdir($dir))) {
                 if (!in_array($filename, array('.', '..'))) {
                     $slideID = explode('.', $filename)[0];
-                    $slide = StorySlide::findSlide($slideID);
-                    $files[$slide->number] = $filename;
+                    try {
+                        $slide = StorySlide::findSlide($slideID);
+                        $files[$slide->number] = $filename;
+                    }
+                    catch (DomainException $ex) {
+                        $files[$slideID] = $filename;
+                    }
                 }
             }
         }
-        //sort($files, SORT_NUMERIC);
+        ksort($files, SORT_NUMERIC);
         return $files;
     }
 
