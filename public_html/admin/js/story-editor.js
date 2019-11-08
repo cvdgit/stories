@@ -120,6 +120,9 @@ var StoryEditor = (function() {
     }
 
     function deleteBlock(blockID) {
+        if (!confirm("Удалить блок?")) {
+            return;
+        }
         var promise = $.ajax({
             "url": config.deleteBlockAction + "&slide_id=" + currentSlideID + "&block_id=" + blockID,
             "type": "GET",
