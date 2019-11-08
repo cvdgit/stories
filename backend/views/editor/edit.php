@@ -3,6 +3,7 @@
 use backend\assets\StoryEditorAsset;
 use common\widgets\Reveal\Plugins\Video;
 use common\widgets\RevealWidget;
+use frontend\assets\PlyrAsset;
 use yii\bootstrap\ButtonDropdown;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -10,6 +11,8 @@ use yii\helpers\Url;
 
 /** @var $this yii\web\View */
 StoryEditorAsset::register($this);
+
+PlyrAsset::register($this);
 
 /** @var $model common\models\Story */
 $this->title = 'Редактор историй' . $model->title;

@@ -41,6 +41,7 @@ var StoryEditor = (function() {
     }
 
     function init() {
+        console.log("StoryEditor.init");
         Reveal.initialize(WikidsRevealConfig);
     }
 
@@ -185,6 +186,7 @@ var StoryEditor = (function() {
                 if (loadBlocks) {
                     loadSlideBlocks();
                 }
+                WikidsVideo.createPlayer();
             })
             .fail(function(data) {
                 $editor.text(data);
