@@ -51,7 +51,13 @@ class SummaryHelper
             ->from('{{%story_statistics}}')
             ->where(new Expression('`created_at` >= UNIX_TIMESTAMP(CURDATE())'))
             ->groupBy(['story_id', 'session']);
-        return (new Query())->from($query)->count('cnt');
+        $query2 = (new Query())
+            ->select(new Expression('COUNT(DISTINCT story_id) AS cnt'))
+            ->from('{{%story_readonly_statistics}}')
+            ->where(new Expression('`created_at` >= UNIX_TIMESTAMP(CURDATE())'))
+            ->groupBy(['story_id']);
+        $query->union($query2, true);
+        return (new Query())->from(['a' => $query])->sum('a.cnt');
     }
 
 }

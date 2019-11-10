@@ -42,7 +42,15 @@ class CountersService
     public function updateCounters(Story $story): void
     {
         $updateCounters = true;
-        if (!Yii::$app->user->isGuest) {
+        if (Yii::$app->user->isGuest) {
+            $command = Yii::$app->db->createCommand();
+            $command->insert('{{%story_readonly_statistics}}', [
+                'story_id' => $story->id,
+                'created_at' => time(),
+            ]);
+            $command->execute();
+        }
+        else {
             $this->updateUserStoryHistory(Yii::$app->user->id, $story->id);
             $updateCounters = $this->needUpdateCounters();
         }
