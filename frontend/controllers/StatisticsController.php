@@ -24,7 +24,7 @@ class StatisticsController extends Controller
     public function actionWrite($id)
 	{
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $storeStatistics = true; // $this->countersService->needUpdateCounters();
+        $storeStatistics = $this->countersService->needUpdateCounters();
         if ($storeStatistics) {
             $story = Story::findModel($id);
             $model = new StoryStatistics();
