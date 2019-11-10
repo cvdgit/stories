@@ -33,8 +33,9 @@ var StoryRevealStatistics = window.StoryRevealStatistics || (function() {
 			slide_number: ev.indexh,
 			begin_time: start_time_ts,
 			end_time: toUnixTS(ev.timeStamp),
-			chars: ev.currentSlide.innerText.split(' ').length,
-			session: session
+			chars: ev.previousSlide.innerText.split(' ').length,
+			session: session,
+			slide_id: $(ev.previousSlide).attr("data-id")
 		};
 	}
 

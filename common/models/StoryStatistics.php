@@ -17,6 +17,7 @@ use yii\db\ActiveRecord;
  * @property int $chars
  * @property int $created_at
  * @property string $session
+ * @property int $slide_id
  *
  * @property Story $story
  */
@@ -50,10 +51,9 @@ class StoryStatistics extends ActiveRecord
     public function rules()
     {
         return [
-            [['story_id', 'slide_number', 'begin_time', 'end_time', 'chars', 'session'], 'required'],
-            [['story_id', 'slide_number', 'begin_time', 'end_time', 'chars', 'created_at'], 'integer'],
+            [['story_id', 'slide_id', 'begin_time', 'end_time', 'chars', 'session'], 'required'],
+            [['story_id', 'slide_number', 'begin_time', 'end_time', 'chars', 'created_at', 'slide_id'], 'integer'],
             [['session'], 'string', 'max' => 50],
-            // [['story_id'], 'exist', 'skipOnError' => true, 'targetClass' => Story::className(), 'targetAttribute' => ['story_id' => 'id']],
         ];
     }
 
@@ -73,6 +73,14 @@ class StoryStatistics extends ActiveRecord
             'session' => 'Сессия',
             'slide_time' => 'Время, на слайде',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSlide()
+    {
+        return $this->hasOne(StorySlide::class, ['id' => 'slide_id']);
     }
 
     /**

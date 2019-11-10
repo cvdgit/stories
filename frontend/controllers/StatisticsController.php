@@ -24,19 +24,15 @@ class StatisticsController extends Controller
     public function actionWrite($id)
 	{
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $storeStatistics = $this->countersService->needUpdateCounters();
+        $storeStatistics = true; // $this->countersService->needUpdateCounters();
         if ($storeStatistics) {
             $story = Story::findModel($id);
-            $post = Yii::$app->request->post();
             $model = new StoryStatistics();
             $model->story_id = $story->id;
-            $model->slide_number = $post['slide_number'];
-            $model->begin_time = $post['begin_time'];
-            $model->end_time = $post['end_time'];
-            $model->chars = $post['chars'];
-            $model->session = $post['session'];
-            $model->save();
-            return ['success' => true];
+            if ($model->load(Yii::$app->request->post(), '') && $model->validate()) {
+                $model->save();
+                return ['success' => true];
+            }
         }
         return ['success' => false];
 	}

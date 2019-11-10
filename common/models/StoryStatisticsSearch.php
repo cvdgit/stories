@@ -65,12 +65,13 @@ class StoryStatisticsSearch extends StoryStatistics
     public function getChartData($story_id)
     {
         $query = new \yii\db\Query();
-        $rows = $query->select(['slide_number', 'COUNT(id) AS views'])
-                      ->from('story_statistics')
-                      ->where('story_id = :storyid', [':storyid' => $story_id])
-                      ->groupBy('slide_number')
-                      ->indexBy('slide_number')
-                      ->all();
+        $rows = $query->select(['{{%story_slide}}.number AS slide_number', 'COUNT({{%story_statistics}}.id) AS views'])
+            ->from('{{%story_statistics}}')
+            ->innerJoin('{{%story_slide}}', '{{%story_statistics}}.slide_id = {{%story_slide}}.id')
+            ->where('{{%story_statistics}}.story_id = :story', [':story' => $story_id])
+            ->groupBy('{{%story_slide}}.number')
+            ->indexBy('slide_number')
+            ->all();
         return [
             'labels' => array_keys($rows),
             'data' => array_values(array_map(function($elem) { return $elem['views']; }, $rows)),
@@ -80,12 +81,13 @@ class StoryStatisticsSearch extends StoryStatistics
     public function getChartData2($story_id)
     {
         $query = new \yii\db\Query();
-        $rows = $query->select(['slide_number', 'ROUND(AVG(end_time - begin_time)) AS time'])
-                      ->from('story_statistics')
-                      ->where('story_id = :storyid', [':storyid' => $story_id])
-                      ->groupBy('slide_number')
-                      ->indexBy('slide_number')
-                      ->all();
+        $rows = $query->select(['{{%story_slide}}.number AS slide_number', 'ROUND(AVG({{%story_statistics}}.end_time - {{%story_statistics}}.begin_time)) AS time'])
+            ->from('{{%story_statistics}}')
+            ->innerJoin('{{%story_slide}}', '{{%story_statistics}}.slide_id = {{%story_slide}}.id')
+            ->where('{{%story_statistics}}.story_id = :story', [':story' => $story_id])
+            ->groupBy('{{%story_slide}}.number')
+            ->indexBy('slide_number')
+            ->all();
         return [
             'labels' => array_keys($rows),
             'data' => array_values(array_map(function($elem) { return $elem['time']; }, $rows)),
@@ -95,12 +97,13 @@ class StoryStatisticsSearch extends StoryStatistics
     public function getChartData3($story_id)
     {
         $query = new \yii\db\Query();
-        $rows = $query->select(['slide_number', 'ROUND(AVG(end_time - begin_time) / MAX(chars), 1) AS time'])
-                      ->from('story_statistics')
-                      ->where('story_id = :storyid', [':storyid' => $story_id])
-                      ->groupBy('slide_number')
-                      ->indexBy('slide_number')
-                      ->all();
+        $rows = $query->select(['{{%story_slide}}.number AS slide_number', 'ROUND(AVG({{%story_statistics}}.end_time - {{%story_statistics}}.begin_time) / MAX({{%story_statistics}}.chars), 1) AS time'])
+            ->from('{{%story_statistics}}')
+            ->innerJoin('{{%story_slide}}', '{{%story_statistics}}.slide_id = {{%story_slide}}.id')
+            ->where('{{%story_statistics}}.story_id = :story', [':story' => $story_id])
+            ->groupBy('{{%story_slide}}.number')
+            ->indexBy('slide_number')
+            ->all();
         return [
             'labels' => array_keys($rows),
             'data' => array_values(array_map(function($elem) { return $elem['time']; }, $rows)),
@@ -109,23 +112,23 @@ class StoryStatisticsSearch extends StoryStatistics
 
     public function getChartData4()
     {
-
-        $subQuery = (new \yii\db\Query())->select(['ROUND(COUNT(stat.story_id) * 100 / stry.views_number)'])
-                                         ->from('story_statistics stat')
-                                         ->where('stat.story_id = stry.id AND stat.slide_number = stry.slides_number - 1');
-
-        $rows = (new \yii\db\Query())->select(['stry.id', 'stry.title', 'stry.views_number', 'story_done' => $subQuery])
-                                     ->from('story stry')
-                                     ->where('stry.views_number > 0')
-                                     ->orderBy(['stry.views_number' => SORT_DESC])
-                                     ->limit(10)
-                                     ->indexBy('id')
-                                     ->all();
-
+        $subQuery = (new \yii\db\Query())
+            ->select(['ROUND(COUNT({{%story_statistics}}.story_id) * 100 / {{%story}}.views_number)'])
+            ->from('{{%story_statistics}}')
+            ->innerJoin('{{%story_slide}}', '{{%story_statistics}}.slide_id = {{%story_slide}}.id')
+            ->where('{{%story_statistics}}.story_id = {{%story}}.id')
+            ->andWhere('{{%story_slide}}.number = {{%story}}.slides_number - 1');
+        $rows = (new \yii\db\Query())
+            ->select(['{{%story}}.id', '{{%story}}.title', '{{%story}}.views_number', 'story_done' => $subQuery])
+            ->from('{{%story}}')
+            ->where('{{%story}}.views_number > 0')
+            ->orderBy(['{{%story}}.views_number' => SORT_DESC])
+            ->limit(10)
+            ->indexBy('id')
+            ->all();
         $dataProvider = new ArrayDataProvider([
             'allModels' => $rows,
         ]);
-
         return $dataProvider;
     }
 
