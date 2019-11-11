@@ -22,10 +22,21 @@ class CountersService
         return $role->name === UserRoles::ROLE_USER || $role->name === UserRoles::ROLE_ADMIN;
     }
 
-    protected function calculateStoryHistoryPercentage(int $userID, int $storyID, int $slideNumber)
+    public function calculateStoryHistoryPercentage(int $userID, int $storyID, int $slideNumber)
     {
-        //(new Query())
-        //    ->from('{{%story_statistics}}')->
+        $viewedSlidesNumber = (new Query())
+            ->select('slide_id')
+            ->from('{{%story_statistics}}')
+            ->where('story_id = :story', [':story' => $storyID])
+            ->andWhere('user_id = :user', [':user' => $userID])
+            ->groupBy(['slide_id'])
+            ->count();
+        if ($viewedSlidesNumber > 0 && $slideNumber > 0) {
+            $percent = $viewedSlidesNumber * 100 / $slideNumber;
+            $command = Yii::$app->db->createCommand();
+            $command->update('{{%user_story_history}}', ['percent' => $percent], ['user_id' => $userID, 'story_id' => $storyID]);
+            $command->execute();
+        }
     }
 
     public function updateUserStoryHistory(int $userID, int $storyID)

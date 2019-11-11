@@ -31,6 +31,9 @@ class StatisticsController extends Controller
             $model->user_id = Yii::$app->user->id;
             if ($model->load(Yii::$app->request->post(), '') && $model->validate()) {
                 $model->save();
+                if (!Yii::$app->user->isGuest) {
+                    $this->countersService->calculateStoryHistoryPercentage(Yii::$app->user->id, $story->id, $story->slides_number);
+                }
                 return ['success' => true];
             }
         }
