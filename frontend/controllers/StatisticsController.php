@@ -2,7 +2,6 @@
 
 namespace frontend\controllers;
 
-use common\rbac\UserRoles;
 use common\services\story\CountersService;
 use Yii;
 use common\models\Story;
