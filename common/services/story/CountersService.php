@@ -19,7 +19,7 @@ class CountersService
         }
         $role = Yii::$app->authManager->getRolesByUser(Yii::$app->user->id);
         $role = array_shift($role);
-        return $role->name === UserRoles::ROLE_USER;
+        return $role->name === UserRoles::ROLE_USER || $role->name === UserRoles::ROLE_ADMIN;
     }
 
     protected function calculateStoryHistoryPercentage(int $userID, int $storyID, int $slideNumber)
