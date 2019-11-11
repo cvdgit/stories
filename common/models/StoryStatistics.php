@@ -18,6 +18,7 @@ use yii\db\ActiveRecord;
  * @property int $created_at
  * @property string $session
  * @property int $slide_id
+ * @property int $user_id
  *
  * @property Story $story
  */
@@ -52,7 +53,7 @@ class StoryStatistics extends ActiveRecord
     {
         return [
             [['story_id', 'slide_id', 'begin_time', 'end_time', 'chars', 'session'], 'required'],
-            [['story_id', 'slide_number', 'begin_time', 'end_time', 'chars', 'created_at', 'slide_id'], 'integer'],
+            [['story_id', 'slide_number', 'begin_time', 'end_time', 'chars', 'created_at', 'slide_id', 'user_id'], 'integer'],
             [['session'], 'string', 'max' => 50],
         ];
     }

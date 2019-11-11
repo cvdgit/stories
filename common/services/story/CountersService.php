@@ -22,6 +22,12 @@ class CountersService
         return $role->name === UserRoles::ROLE_USER;
     }
 
+    protected function calculateStoryHistoryPercentage(int $userID, int $storyID, int $slideNumber)
+    {
+        //(new Query())
+        //    ->from('{{%story_statistics}}')->
+    }
+
     public function updateUserStoryHistory(int $userID, int $storyID)
     {
         $exists = (new Query())->from('{{%user_story_history}}')->where('user_id = :user AND story_id = :story', ['user' => $userID, 'story' => $storyID])->exists();
@@ -30,11 +36,7 @@ class CountersService
             $command->update('{{%user_story_history}}', ['updated_at' => time()], ['user_id' => $userID, 'story_id' => $storyID]);
         }
         else {
-            $command->insert('{{%user_story_history}}', [
-                'user_id' => $userID,
-                'story_id' => $storyID,
-                'updated_at' => time(),
-            ]);
+            $command->insert('{{%user_story_history}}', ['user_id' => $userID, 'story_id' => $storyID, 'updated_at' => time()]);
         }
         $command->execute();
     }

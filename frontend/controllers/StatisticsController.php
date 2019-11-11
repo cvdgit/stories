@@ -28,6 +28,7 @@ class StatisticsController extends Controller
             $story = Story::findModel($id);
             $model = new StoryStatistics();
             $model->story_id = $story->id;
+            $model->user_id = Yii::$app->user->id;
             if ($model->load(Yii::$app->request->post(), '') && $model->validate()) {
                 $model->save();
                 return ['success' => true];
