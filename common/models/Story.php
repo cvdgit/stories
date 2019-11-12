@@ -187,7 +187,7 @@ class Story extends ActiveRecord
      */
     public static function findPublishedStories()
     {
-        return self::find()->published()->with('categories');
+        return self::find()->published()->with('categories')->with('userStoryHistories');
     }
 
     public static function getStatusArray()
@@ -220,7 +220,7 @@ class Story extends ActiveRecord
 
     public static function findLastPublishedStories()
     {
-        return self::find()->published()->lastStories()->with('categories')->all();
+        return self::find()->published()->lastStories()->with(['categories', 'userStoryHistories'])->all();
     }
 
     public static function followingStories(array $categoryIDs)
@@ -472,6 +472,15 @@ class Story extends ActiveRecord
     public function getPlaylists()
     {
         return $this->hasMany(Playlist::class, ['id' => 'playlist_id'])->viaTable('story_playlist', ['story_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUserStoryHistories()
+    {
+        return $this->hasOne(UserStoryHistory::class, ['story_id' => 'id'])
+            ->andWhere('user_id = :user', [':user' => Yii::$app->user->id]);
     }
 
 }

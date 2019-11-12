@@ -2319,3 +2319,18 @@ img.lazy {
   font-weight: normal;
   line-height: 1.625;
 }
+
+.story-progress-wrapper {
+  display: block;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  height: 4px;
+  z-index: 1;
+}
+
+.story-progress {
+  background-color: #f00;
+  height: 100%;
+}

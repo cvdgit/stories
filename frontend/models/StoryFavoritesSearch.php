@@ -44,9 +44,13 @@ class StoryFavoritesSearch extends Model
         $user = User::findModel($this->user_id);
 
         $query = new Query();
-        $query->from('{{%story_favorites}}')
+        $query
+            ->select(['story.*', '{{%user_story_history}}.percent AS history_percent'])
+            ->from('{{%story_favorites}}')
             ->innerJoin('{{%story}}', '{{%story_favorites}}.story_id = {{%story}}.id')
-            ->andWhere('{{%story_favorites}}.user_id = :user', [':user' => $user->id]);
+            ->innerJoin('{{%user_story_history}}', '{{%story_favorites}}.story_id = {{%user_story_history}}.story_id')
+            ->andWhere('{{%story_favorites}}.user_id = :user', [':user' => $user->id])
+            ->andWhere('{{%user_story_history}}.user_id = :user', [':user' => $user->id]);
 
         $query->andFilterWhere(['or',
             ['like', '{{%story}}.title', $this->title],

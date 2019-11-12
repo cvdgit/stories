@@ -22,6 +22,11 @@ use yii\helpers\Url;
                     </div>
                     <?php $img = empty($model->cover) ? '/img/story-1.jpg' : StoryCover::getListThumbPath($model->cover); ?>
                     <?= Html::img($img) ?>
+                    <?php if (($history = $model->userStoryHistories) !== null && $history->percent > 0): ?>
+                        <div class="story-progress-wrapper">
+                            <div class="story-progress" style="width: <?= $history->percent ?>%;"></div>
+                        </div>
+                    <?php endif ?>
                 </div>
                 <div class="story-item-caption">
                     <p class="flex-text"></p>

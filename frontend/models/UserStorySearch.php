@@ -45,7 +45,7 @@ class UserStorySearch extends Model
 
         $query = new Query();
         $query
-            ->select(['story.*', 'user_story_history.updated_at AS history_updated_at'])
+            ->select(['story.*', 'user_story_history.updated_at AS history_updated_at', '{{%user_story_history}}.percent AS history_percent'])
             ->from('{{%user_story_history}}')
             ->innerJoin('{{%story}}', '{{%user_story_history}}.story_id = {{%story}}.id')
             ->andWhere('{{%user_story_history}}.user_id = :user', [':user' => $user->id]);
