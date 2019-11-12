@@ -58,6 +58,21 @@ $values = implode("\n", $values);
     ],
 ])->hint('Используйте запятые для разделения тегов') ?>
 <?= $form->field($model, 'episode')->textInput() ?>
+
+<?php
+$values = [];
+foreach ($model->playlists as $playlist) {
+    $values[] = '<span class="label label-default">' . $playlist->title . '</span>';
+}
+$values = implode("\n", $values);
+?>
+<?php $input = '<div id="selected-playlists-list" style="margin: 10px 0">' . $values . '</div>'; ?>
+<?= $form->field($model, 'story_playlists', ['template' => "{label}\n{$input}\n{input}\n{hint}\n{error}"])
+    ->hiddenInput()
+    ->hint($this->render('_playlists', [
+        'selectInputID' => Html::getInputId($model, 'story_playlists')
+    ]), ['class' => false]) ?>
+
 <div class="form-group">
 <?= Html::submitButton(($model->isNewRecord ? 'Создать историю' : 'Сохранить изменения'), ['class' => 'btn btn-success', 'style' => 'margin-right: 20px']) ?>
 </div>

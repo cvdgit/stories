@@ -96,31 +96,54 @@ class PlayerController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
 
         $model = Story::findModel($story_id);
-        $categoryIDs = array_map(function($category) {
-            return $category->id;
-        }, $model->categories);
+
+        $stories = [];
 
         $viewedStory = (new Query())
             ->select('story_id')
             ->from('{{%user_story_history}}')
             ->where('user_id = :user', [':user' => Yii::$app->user->id])
+            ->andWhere(['>', 'percent', '80'])
             ->all();
-        $viewedStoryIDs = array_map(function($row) {
+        $viewedStoryIDs = array_map(function ($row) {
             return $row['story_id'];
         }, $viewedStory);
         $viewedStoryIDs[] = $model->id;
 
-        $stories = (new Query())
-            ->select('{{%story}}.*')
-            ->from('{{%category}}')
-            ->innerJoin('{{%story_category}}', '{{%story_category}}.category_id = {{%category}}.id')
-            ->innerJoin('{{%story}}', '{{%story_category}}.story_id = {{%story}}.id')
-            ->where(['in', '{{%category}}.id', $categoryIDs])
-            ->andWhere('{{%story}}.status = :status', [':status' => Story::STATUS_PUBLISHED])
-            ->andWhere(['not in', '{{%story}}.id', $viewedStoryIDs])
-            ->orderBy(['{{%story}}.episode' => SORT_ASC, '{{%story}}.created_at' => SORT_DESC])
-            ->limit(8)
-            ->all();
+        $playlists = $model->playlists;
+        if ($playlists !== null) {
+            $playlistID = $playlists[0]->id;
+            $stories = (new Query())
+                ->select('{{%story}}.*')
+                ->from('{{%playlist}}')
+                ->where('{{%playlist}}.id = :id', [':id' => $playlistID])
+                ->innerJoin('{{%story_playlist}}', '{{%playlist}}.id = {{%story_playlist}}.playlist_id')
+                ->innerJoin('{{%story}}', '{{%story_playlist}}.story_id = {{%story}}.id')
+                ->andWhere('{{%story}}.status = :status', [':status' => Story::STATUS_PUBLISHED])
+                ->andWhere(['not in', '{{%story}}.id', $viewedStoryIDs])
+                ->orderBy(['{{%story_playlist}}.order' => SORT_ASC, '{{%story_playlist}}.created_at' => SORT_ASC])
+                ->limit(8)
+                ->all();
+        }
+
+        if (count($stories) === 0) {
+
+            $categoryIDs = array_map(function ($category) {
+                return $category->id;
+            }, $model->categories);
+
+            $stories = (new Query())
+                ->select('{{%story}}.*')
+                ->from('{{%category}}')
+                ->innerJoin('{{%story_category}}', '{{%story_category}}.category_id = {{%category}}.id')
+                ->innerJoin('{{%story}}', '{{%story_category}}.story_id = {{%story}}.id')
+                ->where(['in', '{{%category}}.id', $categoryIDs])
+                ->andWhere('{{%story}}.status = :status', [':status' => Story::STATUS_PUBLISHED])
+                ->andWhere(['not in', '{{%story}}.id', $viewedStoryIDs])
+                ->orderBy(['{{%story}}.episode' => SORT_ASC, '{{%story}}.created_at' => SORT_DESC])
+                ->limit(8)
+                ->all();
+        }
 
         if (count($stories) === 0) {
             $stories = (new Query())

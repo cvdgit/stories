@@ -1,0 +1,30 @@
+<?php
+
+use yii\db\Migration;
+
+/**
+ * Handles the creation of table `{{%playlist}}`.
+ */
+class m191112_065334_create_playlist_table extends Migration
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function safeUp()
+    {
+        $this->createTable('{{%playlist}}', [
+            'id' => $this->primaryKey(),
+            'title' => $this->string(255)->notNull(),
+            'created_at' => $this->integer()->notNull(),
+            'updated_at' => $this->integer()->notNull(),
+        ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function safeDown()
+    {
+        $this->dropTable('{{%playlist}}');
+    }
+}

@@ -89,6 +89,7 @@ class StoryController extends Controller
             }
 
             $model->categories = explode(',', $model->story_categories);
+            $model->playlists = explode(',', $model->story_playlists);
 
             $model->save(false);
             return $this->redirect(['update', 'id' => $model->id]);
@@ -128,6 +129,7 @@ class StoryController extends Controller
     {
         $model = $this->findModel($id);
         $model->fillStoryCategories();
+        $model->fillStoryPlaylists();
 
         if ($model->source_id == Story::SOURCE_SLIDESCOM) {
             $model->source_dropbox = $model->story_file;
@@ -172,6 +174,7 @@ class StoryController extends Controller
             }
 
             $model->categories = explode(',', $model->story_categories);
+            $model->playlists = explode(',', $model->story_playlists);
 
             $model->save(false);
             Yii::$app->session->setFlash('success', 'Изменения успешно сохранены');
