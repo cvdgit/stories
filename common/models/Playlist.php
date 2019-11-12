@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use DomainException;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\helpers\ArrayHelper;
@@ -87,6 +88,14 @@ class Playlist extends \yii\db\ActiveRecord
         $model = new self();
         $model->title = $title;
         return $model;
+    }
+
+    public static function findModel($id): self
+    {
+        if (($model = self::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new DomainException('Плейлист не найден.');
     }
 
 }

@@ -16,7 +16,7 @@ class m191112_065529_create_story_playlist_table extends Migration
         $this->createTable('{{%story_playlist}}', [
             'story_id' => $this->integer()->notNull(),
             'playlist_id' => $this->integer()->notNull(),
-            'order' => $this->integer()->notNull()->defaultValue(0),
+            'order' => $this->integer()->null(),
             'created_at' => $this->timestamp(),
         ], $tableOptions);
 

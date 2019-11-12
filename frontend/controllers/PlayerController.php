@@ -121,7 +121,7 @@ class PlayerController extends Controller
                 ->innerJoin('{{%story}}', '{{%story_playlist}}.story_id = {{%story}}.id')
                 ->andWhere('{{%story}}.status = :status', [':status' => Story::STATUS_PUBLISHED])
                 ->andWhere(['not in', '{{%story}}.id', $viewedStoryIDs])
-                ->orderBy(['{{%story_playlist}}.order' => SORT_ASC, '{{%story_playlist}}.created_at' => SORT_ASC])
+                ->orderBy(['-{{%story_playlist}}.order' => SORT_DESC, '{{%story_playlist}}.created_at' => SORT_ASC])
                 ->limit(8)
                 ->all();
         }

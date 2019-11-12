@@ -62,6 +62,7 @@ AppAsset::register($this);
                         ['label' => 'Блог', 'url' => ['/news/admin', 'status' => \common\models\News::STATUS_PROPOSED], 'active' => Yii::$app->controller->id === 'news'],
                         ['label' => 'Тесты', 'url' => ['/test/index'], 'active' => Yii::$app->controller->id === 'test'],
                         ['label' => 'Видео', 'url' => ['/video/index'], 'active' => Yii::$app->controller->id === 'video'],
+                        ['label' => 'Плейлисты', 'url' => ['/playlist/index'], 'active' => Yii::$app->controller->id === 'playlist'],
                     ],
                 ]) ?>
                 <?php endif ?>
