@@ -39,13 +39,20 @@
         </div>
     </div>
     <?php endif ?>
-    <div class="story-container">
-        <div class="story-container-inner" id="story-container">
-            <div class="story-no-subscription"><span class="story-loader">Загрузка истории...</span></div>
+    <div class="row">
+        <div class="col-md-9">
+            <div class="story-container">
+                <div class="story-container-inner" id="story-container">
+                    <div class="story-no-subscription"><span class="story-loader">Загрузка истории...</span></div>
+                </div>
+            </div>
+            <?php endif ?>
+            <?php if (Yii::$app->user->can('moderator')): ?>
+                <?= \frontend\widgets\RecorderWidget::widget(['story' => $model]) ?>
+            <?php endif ?>
+        </div>
+        <div class="col-md-3">
+
         </div>
     </div>
-    <?php endif ?>
-    <?php if (Yii::$app->user->can('moderator')): ?>
-        <?= \frontend\widgets\RecorderWidget::widget(['story' => $model]) ?>
-    <?php endif ?>
 </div>

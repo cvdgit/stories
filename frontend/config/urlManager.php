@@ -52,6 +52,7 @@ return [
         'story/store-test-result' => 'story/store-test-result',
         'story/init-story-player' => 'story/init-story-player',
         'story/<alias:[\w\-]+>' => 'story/view',
+        'story/<alias:[\w\-]+>/<list:\d+>' => 'story/view',
 
         'success' => 'rate/success',
         'fail' => 'rate/fail',

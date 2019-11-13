@@ -148,6 +148,9 @@ class StoryController extends Controller
      */
     public function actionView($alias, $track_id = null)
     {
+
+        $playlistID = Yii::$app->request->get('list');
+
         $model = Story::findModelByAlias($alias);
         $dataProvider = Comment::getStoryComments($model->id);
         if (Yii::$app->request->isPjax) {
