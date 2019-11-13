@@ -167,7 +167,6 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
 
     protected function convertImage(string $filePath)
     {
-        /*
         [$imageWidth, $imageHeight, $type] = getimagesize($filePath);
         if ((int)$type !== IMAGETYPE_PNG) {
             return $filePath;
@@ -175,8 +174,7 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
         $newFilePath = str_replace('.png', '.jpg', $filePath);
         Image::resize($filePath, $imageWidth, $imageHeight)->save($newFilePath, ['jpeg_quality' => 80]);
         unlink($filePath);
-        return basename($newFilePath);*/
-        return basename($filePath);
+        return basename($newFilePath);
     }
 
 }

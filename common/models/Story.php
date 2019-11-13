@@ -110,7 +110,7 @@ class Story extends ActiveRecord
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
             ['status', 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_PUBLISHED]],
             ['status', 'default', 'value' => self::STATUS_DRAFT],
-            [['tagNames', 'story_playlists'], 'safe'],
+            [['tagNames', 'story_playlists', 'story_categories'], 'safe'],
             [['description'], 'string', 'max' => 1024],
             ['source_id', 'default', 'value' => self::SOURCE_POWERPOINT],
         ];
@@ -161,6 +161,15 @@ class Story extends ActiveRecord
     public function getCategories()
     {
         return $this->hasMany(Category::class, ['id' => 'category_id'])->viaTable('story_category', ['story_id' => 'id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     * @throws InvalidConfigException
+     */
+    public function getPlaylists()
+    {
+        return $this->hasMany(Playlist::class, ['id' => 'playlist_id'])->viaTable('story_playlist', ['story_id' => 'id']);
     }
 
     /**
@@ -463,15 +472,6 @@ class Story extends ActiveRecord
         $model = self::findModel($storyID);
         $model->video = $video;
         $model->save(false, ['video']);
-    }
-
-    /**
-     * @return ActiveQuery
-     * @throws InvalidConfigException
-     */
-    public function getPlaylists()
-    {
-        return $this->hasMany(Playlist::class, ['id' => 'playlist_id'])->viaTable('story_playlist', ['story_id' => 'id']);
     }
 
     /**

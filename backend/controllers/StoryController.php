@@ -89,7 +89,9 @@ class StoryController extends Controller
             }
 
             $model->categories = explode(',', $model->story_categories);
-            $model->playlists = explode(',', $model->story_playlists);
+            if ($model->story_playlists) {
+                $model->playlists = explode(',', $model->story_playlists);
+            }
 
             $model->save(false);
             return $this->redirect(['update', 'id' => $model->id]);
@@ -174,7 +176,10 @@ class StoryController extends Controller
             }
 
             $model->categories = explode(',', $model->story_categories);
-            $model->playlists = explode(',', $model->story_playlists);
+
+            if ($model->story_playlists) {
+                $model->playlists = explode(',', $model->story_playlists);
+            }
 
             $model->save(false);
             Yii::$app->session->setFlash('success', 'Изменения успешно сохранены');
