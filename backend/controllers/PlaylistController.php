@@ -67,18 +67,8 @@ class PlaylistController extends Controller
     public function actionUpdate(int $id)
     {
         $model = Playlist::findModel($id);
-
-        $stories = (new Query())
-            ->from('{{%playlist}}')
-            ->where('{{%playlist}}.id = :id', [':id' => $model->id])
-            ->innerJoin('{{%story_playlist}}', '{{%playlist}}.id = {{%story_playlist}}.playlist_id')
-            ->innerJoin('{{%story}}', '{{%story_playlist}}.story_id = {{%story}}.id')
-            ->orderBy(['-{{%story_playlist}}.order' => SORT_DESC, '{{%story_playlist}}.created_at' => SORT_ASC])
-            ->all();
-
         return $this->render('update', [
             'model' => $model,
-            //'stories' => $stories,
         ]);
     }
 

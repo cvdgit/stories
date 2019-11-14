@@ -108,7 +108,6 @@ class Playlist extends \yii\db\ActiveRecord
         return self::find()
             ->limit(4)
             ->orderBy(new Expression('rand()'))
-            //->with('stories')
             ->all();
     }
 

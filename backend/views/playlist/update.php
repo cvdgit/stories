@@ -4,7 +4,6 @@ use yii\helpers\Html;
 use yii\jui\JuiAsset;
 
 /** @var $model common\models\Playlist */
-/** @var $stories [] */
 
 $this->title = 'Плейлист: ' . $model->title;
 ?>

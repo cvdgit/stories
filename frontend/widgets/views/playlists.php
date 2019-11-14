@@ -11,7 +11,7 @@ use yii\helpers\Url;
         <div class="category-item">
             <a href="<?= Url::toRoute(['/story/view', 'alias' => $story->alias, 'list' => $model->id]) ?>">
                 <div class="category-item-image-wrapper">
-                    <img src="<?php // $story->getBaseModel()->getCoverRelativePath() ?>" alt="">
+                    <img src="<?= $story->getBaseModel()->getCoverRelativePath() ?>" alt="">
                 </div>
                 <h3><?= $model->title ?></h3>
             </a>
