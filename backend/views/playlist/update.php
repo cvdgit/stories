@@ -45,6 +45,9 @@ $("#story-list").sortable({
 $("#story-list").disableSelection();
 $("#story-list").on("click", "a.delete-playlist-item", function(e) {
     e.preventDefault();
+    if (!confirm("Удалить запись?")) {
+        return;
+    }
     var link = $(this);
     $.get(link.attr("href")).then(function(data) {
         if (data && data.success) {
