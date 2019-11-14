@@ -70,6 +70,7 @@ use yii\helpers\Html;
         </div>
         <div class="col-md-3">
             <div class="playlist-stories-wrapper">
+                <h3 class="playlist-title"><?= $playlist->title ?></h3>
                 <div class="playlist-stories">
                     <?php foreach ($playlist->stories as $story): ?>
                     <div class="media playlist-story">
