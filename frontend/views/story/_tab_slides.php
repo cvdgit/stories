@@ -69,22 +69,24 @@ use yii\helpers\Html;
             <?php endif ?>
         </div>
         <div class="col-md-3">
-            <div class="playlist-stories">
-            <?php foreach ($playlist->stories as $story): ?>
-            <div class="media playlist-story">
-                <?php if ($story->id === $model->id): ?>
-                    <span class="playlist-story-active"><i class="glyphicon glyphicon-play"></i></span>
-                <?php endif ?>
-                <div class="media-left">
-                    <a href="<?= \yii\helpers\Url::to(['story/view', 'alias' => $story->alias, 'list' => $playlist->id]) ?>">
-                        <?= Html::img($story->getBaseModel()->getCoverRelativePath(), ['height' => 64]) ?>
-                    </a>
+            <div class="playlist-stories-wrapper">
+                <div class="playlist-stories">
+                    <?php foreach ($playlist->stories as $story): ?>
+                    <div class="media playlist-story">
+                        <?php if ($story->id === $model->id): ?>
+                            <span class="playlist-story-active"><i class="glyphicon glyphicon-play"></i></span>
+                        <?php endif ?>
+                        <div class="media-left">
+                            <a href="<?= \yii\helpers\Url::to(['story/view', 'alias' => $story->alias, 'list' => $playlist->id]) ?>">
+                                <?= Html::img($story->getBaseModel()->getCoverRelativePath(), ['height' => 64]) ?>
+                            </a>
+                        </div>
+                        <div class="media-body">
+                            <h4><?= $story->title ?></h4>
+                        </div>
+                    </div>
+                    <?php endforeach ?>
                 </div>
-                <div class="media-body">
-                    <h4><?= $story->title ?></h4>
-                </div>
-            </div>
-            <?php endforeach ?>
             </div>
         </div>
         <?php endif ?>
