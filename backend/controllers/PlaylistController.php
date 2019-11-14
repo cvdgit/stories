@@ -78,7 +78,7 @@ class PlaylistController extends Controller
 
         return $this->render('update', [
             'model' => $model,
-            'stories' => $stories,
+            //'stories' => $stories,
         ]);
     }
 

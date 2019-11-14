@@ -62,6 +62,8 @@ class Story extends ActiveRecord
     public $story_categories;
     public $story_playlists;
 
+    public $playlist_order;
+
     /**
      * {@inheritdoc}
      */

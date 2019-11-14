@@ -14,9 +14,9 @@ $this->title = 'Плейлист: ' . $model->title;
         <div class="col-md-6">
             <table class="table table-bordered table-hover">
                 <tbody id="story-list">
-                <?php foreach ($stories as $story): ?>
-                    <tr data-story-id="<?= $story['story_id'] ?>">
-                        <td><?= $story['order'] ?></td>
+                <?php foreach ($model->stories as $story): ?>
+                    <tr data-story-id="<?= $story['id'] ?>">
+                        <td><?= $story['playlist_order'] ?></td>
                         <td><?= $story['title'] ?></td>
                     </tr>
                 <?php endforeach ?>

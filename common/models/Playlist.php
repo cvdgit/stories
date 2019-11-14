@@ -77,7 +77,8 @@ class Playlist extends \yii\db\ActiveRecord
             ->viaTable('story_playlist', ['playlist_id' => 'id'])
             ->innerJoin('{{%story_playlist}}', '{{%story}}.id = {{%story_playlist}}.story_id')
             ->andWhere('{{%story_playlist}}.playlist_id = :playlist', [':playlist' => $this->id])
-            ->orderBy(['-{{%story_playlist}}.order' => SORT_DESC, '{{%story_playlist}}.created_at' => SORT_ASC]);
+            ->orderBy(['-{{%story_playlist}}.order' => SORT_DESC, '{{%story_playlist}}.created_at' => SORT_ASC])
+            ->select(['{{%story}}.*', '{{%story_playlist}}.order AS playlist_order']);
     }
 
     public static function playlistsArray(): array
