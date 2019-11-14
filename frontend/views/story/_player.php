@@ -22,6 +22,7 @@ $js = <<< JS
 JS;
 $this->registerJs($js);
 
+/** @var $playlistID int? */
 $plugins = [
     [
         'class' => \common\widgets\Reveal\Plugins\CustomControls::class,
@@ -42,7 +43,7 @@ $plugins = [
     ['class' => SlideLinks::class, 'storyID' => $model->id, 'links' => $model->slideBlocksData()],
     ['class' => Video::class],
     ['class' => \common\widgets\Reveal\Plugins\Actions::class],
-    ['class' => \common\widgets\Reveal\Plugins\SeeAlso::class, 'storyID' => $model->id],
+    ['class' => \common\widgets\Reveal\Plugins\SeeAlso::class, 'storyID' => $model->id, 'isPlaylist' => ($playlistID !== null)],
 ];
 
 /** @var $audioTrackPath string */

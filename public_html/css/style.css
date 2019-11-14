@@ -1994,7 +1994,12 @@ button:focus {
   padding-top: 0 !important;
 }
 
-.site-categories h2 {
+.site-playlists {
+  padding: 0;
+}
+
+.site-categories h2,
+.site-playlists h2 {
   padding: 30px 0 40px 0;
 }
 
@@ -2333,4 +2338,43 @@ img.lazy {
 .story-progress {
   background-color: #f00;
   height: 100%;
+}
+
+.playlist-stories {
+  margin-left: 10px;
+}
+
+.playlist-stories .playlist-story {
+  position: relative;
+  padding-left: 20px;
+}
+
+.playlist-stories .playlist-story h4 {
+  font-size: 1em;
+  color: #38405d;
+  margin-bottom: 6px;
+  margin-top: 0;
+  line-height: 1;
+  font-weight: normal;
+}
+
+.playlist-stories .playlist-story a {
+
+}
+
+.playlist-story-active {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.playlist-story-cover {
+  position: relative;
+}
+
+.playlist-story-cover img  {
+  max-width: 100%;
+  width: 100%;
+  height: auto;
 }

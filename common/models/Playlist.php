@@ -5,7 +5,7 @@ namespace common\models;
 use DomainException;
 use Yii;
 use yii\behaviors\TimestampBehavior;
-use yii\helpers\ArrayHelper;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "playlist".
@@ -15,7 +15,6 @@ use yii\helpers\ArrayHelper;
  * @property int $created_at
  * @property int $updated_at
  *
- * @property StoryPlaylist[] $storyPlaylists
  * @property Story[] $stories
  */
 class Playlist extends \yii\db\ActiveRecord
@@ -73,7 +72,12 @@ class Playlist extends \yii\db\ActiveRecord
      */
     public function getStories()
     {
-        return $this->hasMany(Story::class, ['id' => 'story_id'])->viaTable('story_playlist', ['playlist_id' => 'id']);
+        return $this
+            ->hasMany(Story::class, ['id' => 'story_id'])
+            ->viaTable('story_playlist', ['playlist_id' => 'id'])
+            ->innerJoin('{{%story_playlist}}', '{{%story}}.id = {{%story_playlist}}.story_id')
+            ->andWhere('{{%story_playlist}}.playlist_id = :playlist', [':playlist' => $this->id])
+            ->orderBy(['-{{%story_playlist}}.order' => SORT_DESC, '{{%story_playlist}}.created_at' => SORT_ASC]);
     }
 
     public static function playlistsArray(): array
@@ -96,6 +100,15 @@ class Playlist extends \yii\db\ActiveRecord
             return $model;
         }
         throw new DomainException('Плейлист не найден.');
+    }
+
+    public static function randomPlaylists()
+    {
+        return self::find()
+            ->limit(4)
+            ->orderBy(new Expression('rand()'))
+            ->with('stories')
+            ->all();
     }
 
 }

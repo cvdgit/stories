@@ -67,12 +67,32 @@ var WikidsSeeAlso = window.WikidsSeeAlso || (function() {
         return localStorage.getItem("wikids-autoplay-story") === "yes";
     }
 
+    function isPlaylist() {
+        return config.is_playlist;
+    }
+
+    function goToNextPlaylistStory() {
+        var $nextStoryElement = $(".playlist-story-active", ".playlist-stories").parent();
+        var href = '';
+        if ($nextStoryElement.length) {
+            href = $nextStoryElement.next().find("a").attr("href");
+        }
+        if (href && href.length) {
+            location.href = href;
+        }
+    }
+
     Reveal.addEventListener("slidechanged", function(event) {
         if (timeout) {
             clearTimeout(timeout);
         }
         if (TransitionSlide.getInTransition() === false && Reveal.isLastSlide()) {
-            seeAlsoStories();
+            if (isPlaylist()) {
+                goToNextPlaylistStory();
+            }
+            else {
+                seeAlsoStories();
+            }
         }
     });
 

@@ -14,11 +14,15 @@ class SeeAlso extends AbstractPlugin implements PluginInterface
     /** @var int */
     public $storyID;
 
+    /** @var bool */
+    public $isPlaylist = false;
+
     public function pluginConfig()
     {
         return [
             $this->configName => [
                 'action' => Url::to(['player/see-also-stories', 'story_id' => $this->storyID]),
+                'is_playlist' => $this->isPlaylist,
             ],
         ];
     }

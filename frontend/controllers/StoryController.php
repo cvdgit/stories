@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\models\Playlist;
 use common\models\StorySlide;
 use common\models\StoryTest;
 use common\rbac\UserPermissions;
@@ -150,6 +151,10 @@ class StoryController extends Controller
     {
 
         $playlistID = Yii::$app->request->get('list');
+        $playlist = null;
+        if ($playlistID !== null) {
+            $playlist = Playlist::findModel((int)$playlistID);
+        }
 
         $model = Story::findModelByAlias($alias);
         $dataProvider = Comment::getStoryComments($model->id);
@@ -164,6 +169,7 @@ class StoryController extends Controller
             'commentForm' => $commentForm,
             'dataProvider' => $dataProvider,
             'trackID' => $track_id,
+            'playlist' => $playlist,
         ]);
     }
 
@@ -235,7 +241,7 @@ class StoryController extends Controller
         return ['success' => true, 'correctAnswer' => $correctAnswer];
     }
 
-    public function actionInitStoryPlayer(int $id, $track_id = null)
+    public function actionInitStoryPlayer(int $id)
     {
         if (Yii::$app->user->isGuest) {
             $model = Story::findModel(Yii::$app->params['story.needSignup.id']);
@@ -250,6 +256,7 @@ class StoryController extends Controller
 
         $audioTrackPath = '';
         if ($model->isAudioStory()) {
+            $track_id = Yii::$app->request->get('track_id');
             $track = $this->audioService->getStoryTrack($model, $track_id, Yii::$app->user->id);
             if ($track !== null) {
                 $audioTrackPath = StoryTrackModel::getTrackRelativePath($model->id, $track->id);
@@ -260,6 +267,7 @@ class StoryController extends Controller
             'model' => $model,
             'userCanViewStory' => true,
             'audioTrackPath' => $audioTrackPath,
+            'playlistID' => Yii::$app->request->get('list'),
         ]);
     }
 

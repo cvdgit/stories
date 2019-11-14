@@ -23,8 +23,8 @@ $this->setMetaTags($title,
 
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 
-/** @var $trackID int? */
-$action = Url::to(['story/init-story-player', 'id' => $model->id, 'track_id' => $trackID]);
+$actionParams = array_merge(['story/init-story-player', 'id' => $model->id], Yii::$app->request->queryParams);
+$action = Url::to($actionParams);
 
 $isGuest = var_export(Yii::$app->user->isGuest, true);
 
@@ -140,6 +140,8 @@ $this->registerJs($js);
 
 $isSlidesView = $storyDefaultView === 'slides';
 $isBookView = $storyDefaultView === 'book';
+
+/** @var $playlist common\models\Playlist */
 ?>
 <div class="container story-head-container">
 	<main class="site-story-main">
@@ -172,7 +174,7 @@ $isBookView = $storyDefaultView === 'book';
                 'items' => [
                     [
                         'label' => 'Режим обучения',
-                        'content' => $this->render('_tab_slides', ['model' => $model]),
+                        'content' => $this->render('_tab_slides', ['model' => $model, 'playlist' => $playlist]),
                         'active' => $isSlidesView,
                         'options' => ['id' => 'tab-slides'],
                         'linkOptions' => ['class' => 'tab-slides'],

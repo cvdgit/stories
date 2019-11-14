@@ -1,3 +1,9 @@
+<?php
+
+use yii\helpers\Html;
+
+/** @var $playlist common\models\Playlist */
+?>
 <div id="story_wrapper">
     <?php if (Yii::$app->user->isGuest): ?>
     <noindex>
@@ -22,37 +28,66 @@
         </div>
     </noindex>
     <?php else: ?>
-    <?php if ($model->isAudioStory()): ?>
-    <div class="row">
-        <div class="col-md-12">
-            <div class="pull-right">
-                <span>Автовоспроизведение</span>
-                <form class="form" id="autoplay-form" style="display: inline-block">
-                    <div class="switch-field">
-                        <input type="radio" id="autoplay-yes" name="autoplay" value="yes" />
-                        <label for="autoplay-yes">Да</label>
-                        <input type="radio" id="autoplay-no" name="autoplay" value="no" />
-                        <label for="autoplay-no">Нет</label>
-                    </div>
-                </form>
+        <?php if ($model->isAudioStory()): ?>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="pull-right">
+                    <span>Автовоспроизведение</span>
+                    <form class="form" id="autoplay-form" style="display: inline-block">
+                        <div class="switch-field">
+                            <input type="radio" id="autoplay-yes" name="autoplay" value="yes" />
+                            <label for="autoplay-yes">Да</label>
+                            <input type="radio" id="autoplay-no" name="autoplay" value="no" />
+                            <label for="autoplay-no">Нет</label>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-    <?php endif ?>
-    <div class="row">
+        <?php endif ?>
+    <div class="row row-no-gutters">
+        <?php if ($playlist === null): ?>
+        <div class="col-md-12">
+            <div class="story-container">
+                <div class="story-container-inner" id="story-container">
+                    <div class="story-no-subscription"><span class="story-loader">Загрузка истории...</span></div>
+                </div>
+            </div>
+            <?php if (Yii::$app->user->can('moderator')): ?>
+                <?= \frontend\widgets\RecorderWidget::widget(['story' => $model]) ?>
+            <?php endif ?>
+        </div>
+        <?php else: ?>
         <div class="col-md-9">
             <div class="story-container">
                 <div class="story-container-inner" id="story-container">
                     <div class="story-no-subscription"><span class="story-loader">Загрузка истории...</span></div>
                 </div>
             </div>
-            <?php endif ?>
             <?php if (Yii::$app->user->can('moderator')): ?>
                 <?= \frontend\widgets\RecorderWidget::widget(['story' => $model]) ?>
             <?php endif ?>
         </div>
         <div class="col-md-3">
-
+            <div class="playlist-stories">
+            <?php foreach ($playlist->stories as $story): ?>
+            <div class="media playlist-story">
+                <?php if ($story->id === $model->id): ?>
+                    <span class="playlist-story-active"><i class="glyphicon glyphicon-play"></i></span>
+                <?php endif ?>
+                <div class="media-left">
+                    <a href="<?= \yii\helpers\Url::to(['story/view', 'alias' => $story->alias, 'list' => $playlist->id]) ?>">
+                        <?= Html::img($story->getBaseModel()->getCoverRelativePath(), ['height' => 64]) ?>
+                    </a>
+                </div>
+                <div class="media-body">
+                    <h4><?= $story->title ?></h4>
+                </div>
+            </div>
+            <?php endforeach ?>
+            </div>
         </div>
+        <?php endif ?>
     </div>
+    <?php endif ?>
 </div>
