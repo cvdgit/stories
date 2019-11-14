@@ -9,7 +9,6 @@ use common\rbac\UserRoles;
 use common\services\PlaylistService;
 use Yii;
 use yii\data\ActiveDataProvider;
-use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
@@ -84,6 +83,13 @@ class PlaylistController extends Controller
             $command->execute();
             $order++;
         }
+        return ['success' => true];
+    }
+
+    public function actionDelete(int $playlist_id, int $story_id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        Playlist::deletePlaylistItem($playlist_id, $story_id);
         return ['success' => true];
     }
 

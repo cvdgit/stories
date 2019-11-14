@@ -60,8 +60,8 @@ class Playlist extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'title' => 'Title',
-            'created_at' => 'Created At',
+            'title' => 'Название',
+            'created_at' => 'Дата создания',
             'updated_at' => 'Updated At',
         ];
     }
@@ -109,6 +109,13 @@ class Playlist extends \yii\db\ActiveRecord
             ->limit(4)
             ->orderBy(new Expression('rand()'))
             ->all();
+    }
+
+    public static function deletePlaylistItem(int $playlistID, int $storyID)
+    {
+        $command = Yii::$app->db->createCommand();
+        $command->delete('{{%story_playlist}}', 'playlist_id = :playlist AND story_id = :story', [':playlist' => $playlistID, ':story' => $storyID]);
+        return $command->execute();
     }
 
 }

@@ -1,6 +1,5 @@
 <?php
 
-use yii\grid\ActionColumn;
 use yii\grid\SerialColumn;
 use yii\grid\GridView;
 use yii\helpers\Html;
@@ -17,6 +16,13 @@ $this->title = 'Плейлисты';
         'columns' => [
             ['class' => SerialColumn::class],
             'title',
+            [
+                'attribute' => 'stories',
+                'label' => 'Количество историй',
+                'value' => function($model) {
+                    return count($model->stories);
+                }
+            ],
             'created_at:datetime',
             [
                 'class' => 'yii\grid\ActionColumn',

@@ -17,6 +17,9 @@ $this->title = 'Плейлист: ' . $model->title;
                     <tr data-story-id="<?= $story['id'] ?>">
                         <td><?= $story['playlist_order'] ?></td>
                         <td><?= $story['title'] ?></td>
+                        <td>
+                            <?= Html::a('Удалить', ['playlist/delete', 'playlist_id' => $model->id, 'story_id' => $story['id']], ['class' => 'delete-playlist-item']) ?>
+                        </td>
                     </tr>
                 <?php endforeach ?>
                 </tbody>
@@ -40,6 +43,15 @@ $("#story-list").sortable({
     }
 });
 $("#story-list").disableSelection();
+$("#story-list").on("click", "a.delete-playlist-item", function(e) {
+    e.preventDefault();
+    var link = $(this);
+    $.get(link.attr("href")).then(function(data) {
+        if (data && data.success) {
+            link.parent().parent().remove();
+        }
+    });
+});
 JS;
 /** @var $this yii\web\View */
 $this->registerJs($js);
