@@ -23,7 +23,7 @@ use yii\web\UploadedFile;
 class PlayerController extends Controller
 {
 
-    public function behaviors(): array
+/*    public function behaviors(): array
     {
         return [
             'access' => [
@@ -36,7 +36,7 @@ class PlayerController extends Controller
                 ],
             ],
         ];
-    }
+    }*/
 
     protected $audioService;
 
