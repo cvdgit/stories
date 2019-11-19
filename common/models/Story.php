@@ -427,7 +427,7 @@ class Story extends ActiveRecord
     public function getStoryTrack($userID)
     {
         $track = $this->getOriginalTrack();
-        if ($track === null) {
+        if (!$track) {
             $track = $this->getUserTrack($userID);
         }
         return $track;

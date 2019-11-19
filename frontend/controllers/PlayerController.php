@@ -77,6 +77,17 @@ class PlayerController extends Controller
         return ['success' => true, 'track' => $track];
     }
 
+    public function actionDeleteTrack(int $id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $model = StoryAudioTrack::findModel($id);
+        if (!$model->isUserTrack(Yii::$app->user->id)) {
+            return ['success' => false];
+        }
+        $model->delete();
+        return ['success' => true];
+    }
+
     public function actionGetTrack(int $track_id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;

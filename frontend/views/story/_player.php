@@ -5,6 +5,7 @@ use common\widgets\Reveal\Plugins\Video;
 use common\widgets\RevealButtons\BackgroundButton;
 use common\widgets\RevealWidget;
 use frontend\assets\PlyrAsset;
+use frontend\assets\RecorderAsset;
 use yii\helpers\Json;
 use yii\helpers\Url;
 
@@ -27,6 +28,7 @@ $plugins = [
     [
         'class' => \common\widgets\Reveal\Plugins\CustomControls::class,
         'buttons' => [
+            new \common\widgets\RevealButtons\RecorderButton(),
             new \common\widgets\RevealButtons\LeftButton(),
             new \common\widgets\RevealButtons\RightButton(),
             new \common\widgets\RevealButtons\FullscreenButton(),
@@ -44,6 +46,7 @@ $plugins = [
     ['class' => Video::class],
     ['class' => \common\widgets\Reveal\Plugins\Actions::class],
     ['class' => \common\widgets\Reveal\Plugins\SeeAlso::class, 'storyID' => $model->id, 'isPlaylist' => ($playlistID !== null)],
+    ['class' => \common\widgets\Reveal\Plugins\Recorder::class, 'story' => $model],
 ];
 
 /** @var $audioTrackPath string */
@@ -64,6 +67,7 @@ echo RevealWidget::widget([
         \frontend\assets\RevealAsset::class,
         \frontend\assets\WikidsRevealAsset::class,
         PlyrAsset::class,
+        RecorderAsset::class,
     ],
     'plugins' => $plugins,
 ]);

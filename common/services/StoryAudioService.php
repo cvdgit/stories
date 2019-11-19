@@ -63,7 +63,7 @@ class StoryAudioService
         $track = null;
         if ($trackID !== null) {
             $track = StoryAudioTrack::findModel((int)$trackID);
-            if (!$track->canAccessTrack(Yii::$app->user->id)) {
+            if (!$track->canAccessTrack($userID)) {
                 $track = null;
             }
         }

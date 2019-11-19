@@ -115,7 +115,7 @@ var WikidsPlayer = (function(document, $) {
         var filename = new Date().getTime();
         formData.append("SlideAudio[slide_audio_files][]", blob, filename);
         formData.append("SlideAudio[slide_id]", getCurrentSlideID());
-        formData.append("SlideAudio[track_id]", getCurrentTrackID());
+        formData.append("SlideAudio[track_id]", WikidsRecorder.getCurrentTrackID());
 
         var promise = $.ajax({
             "url": config.setSlideAudioAction,
@@ -140,7 +140,7 @@ var WikidsPlayer = (function(document, $) {
         delete(audioData[key]);
     }
 
-    function mergeAllAndSetSlideAudio() {
+    function mergeAllAndSetSlideAudio(trackID) {
 
         if (!audioData) {
             return;
@@ -148,7 +148,7 @@ var WikidsPlayer = (function(document, $) {
 
         var formData = new FormData();
         formData.append("SlideAudio[slide_id]", getCurrentSlideID());
-        formData.append("SlideAudio[track_id]", getCurrentTrackID());
+        formData.append("SlideAudio[track_id]", trackID);
 
         var i = 0;
         for (var name in audioData) {
@@ -208,7 +208,14 @@ var WikidsPlayer = (function(document, $) {
 function onSlideMouseDown(e) {
     e = e || window.event;
     var $target = $(e.target);
-    if ($target.parents("section[data-slide-view=question]").length || ($target[0].tagName === "IMG" && $target.attr("data-action") === "1") || $target.hasClass("btn") || $target.parents(".wikids-slide-links").length || $target.parents(".story-controls").length || $target[0].tagName === "AUDIO" || $target.hasClass("story-controls"))  {
+    if ($target.parents("section[data-slide-view=question]").length ||
+        ($target[0].tagName === "IMG" && $target.attr("data-action") === "1") ||
+        $target.hasClass("btn")||
+        $target.parents(".wikids-slide-links").length ||
+        $target.parents(".story-controls").length ||
+        $target[0].tagName === "AUDIO" ||
+        $target.hasClass("story-controls") ||
+        ($target.hasClass("wikids-recorder") || $target.parents(".wikids-recorder").length))  {
         return;
     }
     switch (e.which) {

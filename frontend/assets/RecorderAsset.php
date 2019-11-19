@@ -13,6 +13,6 @@ class RecorderAsset extends AssetBundle
     public $css = [];
     public $js = [
         'js/recorder.js',
-        'js/recorder-app.js',
+        // 'js/recorder-app.js',
     ];
 }

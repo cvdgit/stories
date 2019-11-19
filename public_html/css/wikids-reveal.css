@@ -1890,3 +1890,54 @@
 	display: inline-block;
 	margin: 20px 0 20px;
 }
+
+
+
+.wikids-recorder {
+	display: none;
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 1050;
+}
+
+.wikids-recorder-inner {
+	margin: 100px auto;
+	width: 700px;
+	height: 500px;
+	background-color: #fff;
+	border: 1px solid;
+	border-radius: 6px;
+	box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+	z-index: 1051;
+	font-size: 2.5rem;
+	padding: 20px;
+}
+
+.recorder-controls {
+	padding: 20px 0;
+	text-align: center;
+}
+
+.recorder-controls button {
+	margin: 0 10px;
+}
+
+.recorder-tracks {
+	text-align: center;
+}
+
+.recorder-merge-button {
+	display: none;
+	margin: 0 10px 10px 10px;
+}
+
+.recorder-create-track {
+	margin-left: 20px;
+}
+
+.recorder-audio {
+	text-align: center;
+}

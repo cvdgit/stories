@@ -53,9 +53,6 @@ use yii\helpers\Html;
                     <div class="story-no-subscription"><span class="story-loader">Загрузка истории...</span></div>
                 </div>
             </div>
-            <?php if (Yii::$app->user->can('moderator')): ?>
-                <?= \frontend\widgets\RecorderWidget::widget(['story' => $model]) ?>
-            <?php endif ?>
         </div>
         <?php else: ?>
         <div class="col-md-9">
@@ -64,9 +61,6 @@ use yii\helpers\Html;
                     <div class="story-no-subscription"><span class="story-loader">Загрузка истории...</span></div>
                 </div>
             </div>
-            <?php if (Yii::$app->user->can('moderator')): ?>
-                <?= \frontend\widgets\RecorderWidget::widget(['story' => $model]) ?>
-            <?php endif ?>
         </div>
         <div class="col-md-3">
             <div class="playlist-stories-wrapper">
