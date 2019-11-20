@@ -66,13 +66,8 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
     <div class="container">
         <div class="text-center">
             <div class="row">
-                <div class="col-md-8 col-md-offset-2">
-                    <p class="random-story-text">Не знаете какую историю показать ребенку?</p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-8 col-md-offset-2">
-                    <?= Html::a('Случайная история', ['story/random'], ['class' => 'btn btn-red']) ?>
+                <div class="col-md-12">
+                    <p class="random-story-text">Не знаете какую историю показать ребенку? <?= Html::a('Показать случайную историю', ['story/random'], ['class' => 'btn btn-red']) ?></p>
                 </div>
             </div>
         </div>
