@@ -14,14 +14,18 @@ var WikidsRecorder = window.WikidsRecorder || (function() {
         return config.currentTrack;
     }
 
+    var $closeButton = $("<button/>");
+    $closeButton.addClass("close");
+    $closeButton.html('×');
+    $closeButton.on("click", showRecorder);
+    $recorderInner.append($closeButton);
+
     var $trackWrapper = $("<div/>");
     $trackWrapper.addClass("recorder-tracks");
 
-    console.log("tracks", config.tracks);
     config.tracks = config.tracks || [];
     var $trackSelect = $("<select/>");
     if (config.tracks.length === 0) {
-        console.log("no tracks");
         $trackSelect.css("display", "none");
     }
     $trackSelect.on("change", function () {
