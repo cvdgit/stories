@@ -135,6 +135,12 @@ $('#back-to-top')
         return false;
     })
     .tooltip('show');
+
+$(".more-facts").on("click", function() {
+    $(".label:hidden", ".story-facts").show();
+    $(this).hide();
+})
+
 JS;
 $this->registerJs($js);
 
@@ -160,9 +166,14 @@ $isBookView = $storyDefaultView === 'book';
                 <?php if (count($facts) > 0): ?>
                 <div class="story-facts" style="font-size: 1.5rem">
                     Из истории вы узнаете про:
+                <?php $i = 1; ?>
                 <?php foreach ($facts as $fact): ?>
-                    <span class="label label-success"><?= $fact['title'] ?></span>
+                    <span class="label label-success" style="display: <?= $i <= 5 ? 'inline-block' : 'none' ?>"><?= $fact['title'] ?></span>
+                    <?php $i++; ?>
                 <?php endforeach ?>
+                    <?php if (($more = count($facts) - 5) > 0): ?>
+                    <span class="label label-default more-facts" style="cursor: pointer">+ <?= $more ?></span>
+                    <?php endif ?>
                 </div>
                 <?php endif ?>
             </div>
