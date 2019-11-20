@@ -51,6 +51,7 @@ return [
         'story/get-story-test/<id:\d+>' => 'story/get-story-test',
         'story/store-test-result' => 'story/store-test-result',
         'story/init-story-player' => 'story/init-story-player',
+        'story/myaudio' => 'story/myaudio',
         'story/<alias:[\w\-]+>/<list:\d+>' => 'story/view',
         'story/<alias:[\w\-]+>' => 'story/view',
 

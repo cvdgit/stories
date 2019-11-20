@@ -42,6 +42,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                         ['label' => 'История просмотра', 'url' => ['/story/history']],
                         ['label' => 'Понравившиеся', 'url' => ['/story/liked']],
                         ['label' => 'Избранное', 'url' => ['/story/favorites']],
+                        ['label' => 'Моя озвучка', 'url' => ['/story/myaudio']],
                     ],
                     'options' => ['class' => 'story-category-list'],
                 ]) ?>

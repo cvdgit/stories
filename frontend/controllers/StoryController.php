@@ -11,6 +11,7 @@ use common\services\StoryAudioService;
 use common\services\StoryFavoritesService;
 use common\services\StoryLikeService;
 use common\services\QuestionsService;
+use frontend\models\MyAudioStoriesSearch;
 use frontend\models\StoryFavoritesSearch;
 use frontend\models\StoryLikeForm;
 use frontend\models\StoryLikeSearch;
@@ -43,7 +44,7 @@ class StoryController extends Controller
                 'only' => ['add-comment', 'comment-list', 'history', 'liked', 'favorites'],
                 'rules' => [
                     [
-                        'actions' => ['add-comment', 'comment-list', 'history', 'liked', 'favorites'],
+                        'actions' => ['add-comment', 'comment-list', 'history', 'liked', 'favorites', 'myaudio'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -378,6 +379,19 @@ class StoryController extends Controller
             'dataProvider' => $dataProvider,
             'action' => ['/story/index'],
             'emptyText' => 'Список историй пуст',
+        ]);
+    }
+
+    public function actionMyaudio()
+    {
+        $this->getView()->setMetaTags('Моя озвучка', 'Моя озвучка', 'Моя озвучка', 'Моя озвучка');
+        $searchModel = new MyAudioStoriesSearch(Yii::$app->user->id);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'action' => ['/story/myaudio'],
+            'emptyText' => 'В этом разделе будут отображаться истории, озвученные вами',
         ]);
     }
 
