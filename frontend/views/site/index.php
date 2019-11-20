@@ -11,37 +11,6 @@ $this->setMetaTags('Сервис ускоренного развития реч�
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 ?>
 
-<section class="random-story">
-    <div class="container">
-        <div class="text-center">
-            <div class="row">
-                <div class="col-md-6 col-md-offset-3">
-                    <p class="random-story-text">Не знаете какую историю показать ребенку?</p>
-                </div>
-            </div>
-            <!--div class="row">
-                <div class="col-lg-12">
-                    <img src="/img/random-story.jpg" alt="" width="100%">
-                </div>
-            </div-->
-            <div class="row">
-                <div class="col-md-6 col-md-offset-3">
-                    <?= Html::a('Случайная история', ['story/random'], ['class' => 'btn btn-red']) ?>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<noindex>
-<section class="site-playlists">
-    <h2 class="container">Популярные <span>плейлисты</span></h2>
-    <div class="container">
-        <?= \frontend\widgets\Playlists::widget() ?>
-    </div>
-</section>
-</noindex>
-
 <section class="site-categories">
     <h2 class="container"><span>Популярные</span> категории</h2>
     <div class="container">
@@ -92,6 +61,32 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
         <?= Html::a('Все категории', ['/story/index'], ['class' => 'btn']) ?>
     </div>
 </section>
+
+<section class="random-story">
+    <div class="container">
+        <div class="text-center">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <p class="random-story-text">Не знаете какую историю показать ребенку?</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <?= Html::a('Случайная история', ['story/random'], ['class' => 'btn btn-red']) ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<noindex>
+    <section class="site-playlists">
+        <h2 class="container">Популярные <span>плейлисты</span></h2>
+        <div class="container">
+            <?= \frontend\widgets\Playlists::widget() ?>
+        </div>
+    </section>
+</noindex>
 
   <section class="site-about">
     <h2 class="container">О <span>портале</span></h2>

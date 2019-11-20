@@ -1988,14 +1988,14 @@ button:focus {
 }
 
 .site-categories {
+  padding: 0;
+}
+
+.site-playlists {
   background-image: url('../img/section-bg.png');
   background-position: bottom center;
   background-repeat: no-repeat;
   padding-top: 0 !important;
-}
-
-.site-playlists {
-  padding: 0;
 }
 
 .site-categories h2,
