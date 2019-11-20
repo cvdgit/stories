@@ -172,7 +172,7 @@ $isBookView = $storyDefaultView === 'book';
                     <?php $i++; ?>
                 <?php endforeach ?>
                     <?php if (($more = count($facts) - 5) > 0): ?>
-                    <span class="label label-default more-facts" style="cursor: pointer">+ <?= $more ?></span>
+                    <span class="label label-default more-facts" data-toggle="tooltip" title="Показать остальные факты" style="cursor: pointer">+ <?= $more ?></span>
                     <?php endif ?>
                 </div>
                 <?php endif ?>
