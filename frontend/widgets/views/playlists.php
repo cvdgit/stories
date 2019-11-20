@@ -10,7 +10,7 @@ use yii\helpers\Url;
     <?php $story = $model->stories[0]; ?>
     <div class="col-xs-offset-1 col-xs-10 col-sm-offset-0 col-sm-6 col-md-offset-0 col-md-6 col-lg-offset-0 col-lg-3">
         <div class="story-item">
-            <a href="<?= Url::toRoute(['/story/view', 'alias' => $story->alias, 'list' => $model->id]) ?>">
+            <a rel="nofollow" href="<?= Url::toRoute(['/story/view', 'alias' => $story->alias, 'list' => $model->id]) ?>">
                 <div class="story-item-image">
                     <div class="story-item-image-overlay">
                         <span></span>

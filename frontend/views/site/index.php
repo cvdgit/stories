@@ -33,14 +33,14 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
     </div>
 </section>
 
-<?php if (Yii::$app->user->can(\common\rbac\UserRoles::ROLE_MODERATOR)): ?>
+<noindex>
 <section class="site-playlists">
     <h2 class="container">Популярные <span>плейлисты</span></h2>
     <div class="container">
         <?= \frontend\widgets\Playlists::widget() ?>
     </div>
 </section>
-<?php endif ?>
+</noindex>
 
 <section class="site-categories">
     <h2 class="container"><span>Популярные</span> категории</h2>
