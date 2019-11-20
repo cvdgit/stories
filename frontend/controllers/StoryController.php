@@ -255,7 +255,7 @@ class StoryController extends Controller
         }
 
         $audioTrackPath = '';
-        if ($model->isAudioStory()) {
+        if ($model->isAudioStory() || $model->isUserAudioStory(Yii::$app->user->id)) {
             $track_id = Yii::$app->request->get('track_id');
             $track = $this->audioService->getStoryTrack($model, $track_id, Yii::$app->user->id);
             if ($track !== null) {

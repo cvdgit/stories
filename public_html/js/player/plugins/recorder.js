@@ -17,9 +17,11 @@ var WikidsRecorder = window.WikidsRecorder || (function() {
     var $trackWrapper = $("<div/>");
     $trackWrapper.addClass("recorder-tracks");
 
+    console.log("tracks", config.tracks);
     config.tracks = config.tracks || [];
     var $trackSelect = $("<select/>");
-    if (!config.tracks.length) {
+    if (config.tracks.length === 0) {
+        console.log("no tracks");
         $trackSelect.css("display", "none");
     }
     $trackSelect.on("change", function () {
@@ -86,15 +88,33 @@ var WikidsRecorder = window.WikidsRecorder || (function() {
     var $controls = $("<div/>");
     $controls.addClass("recorder-controls");
 
+    var timeout;
     var $recordButton = $("<button/>")
         .attr("id", "audioRecord")
-        .text("Записать")
-        .on("click", startRecording);
+        .html('Записать')
+        .addClass("btn")
+        .on("click", function() {
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+            var second = 4;
+            $recorderTimer.text('').show();
+            timeout = setInterval(function() {
+                second--;
+                $recorderTimer.text(second);
+                if (second <= 0) {
+                    clearInterval(timeout);
+                    $recorderTimer.hide();
+                    startRecording();
+                }
+            }, 1000);
+        });
     $recordButton.appendTo($controls);
 
     var $pauseButton = $("<button/>")
         .attr("id", "audioPause")
         .text("Пауза")
+        .addClass("btn")
         .prop("disabled", true)
         .on("click", pauseRecording);
     $pauseButton.appendTo($controls);
@@ -102,18 +122,43 @@ var WikidsRecorder = window.WikidsRecorder || (function() {
     var $stopButton = $("<button/>")
         .attr("id", "audioStop")
         .text("Стоп")
+        .addClass("btn")
         .prop("disabled", true)
         .on("click", stopRecording);
     $stopButton.appendTo($controls);
 
+    var $recorderStatus = $("<div/>");
+    $recorderStatus.addClass("recorder-status");
+    $recorderStatus.appendTo($controls);
+
     $recorderInner.append($controls);
+
+    function setRecordingStatus(state) {
+        var color = '';
+        if (state === "recording") {
+            color = $recordButton.css("color");
+            $recordButton.css({color: "red"}).html('<i class="glyphicon glyphicon-record"></i> Запись');
+        }
+        if (state === "pause") {
+            $recordButton.css({color: color}).html('Записать');
+        }
+        if (state === "stop") {
+            $recordButton.css({color: color}).html('Записать');
+        }
+    }
 
     var $recorderAudio = $("<div/>");
     $recorderAudio.addClass("recorder-audio");
 
+    var $recorderList = $("<ul/>");
+    $recorderList.addClass("list-unstyled");
+    $recorderList.attr("id", "recordingsList");
+
+    $recorderAudio.append($recorderList);
+
     var $mergeButton = $("<button/>");
     $mergeButton
-        .addClass("recorder-merge-button")
+        .addClass("recorder-merge-button btn")
         .attr("id", "mergeAllSlideAudio")
         .on("click", function() {
             WikidsPlayer.mergeAllAndSetSlideAudio(getCurrentTrack().id);
@@ -121,11 +166,9 @@ var WikidsRecorder = window.WikidsRecorder || (function() {
         .text("Объединить все и применить");
     $recorderAudio.append($mergeButton);
 
-    var $recorderList = $("<ul/>");
-    $recorderList.addClass("list-unstyled");
-    $recorderList.attr("id", "recordingsList");
-
-    $recorderAudio.append($recorderList);
+    var $recorderTimer = $("<div/>");
+    $recorderTimer.addClass("recorder-timer");
+    $recorderAudio.append($recorderTimer);
 
     $recorderInner.append($recorderAudio);
 
@@ -174,6 +217,7 @@ var WikidsRecorder = window.WikidsRecorder || (function() {
             input = audioContext.createMediaStreamSource(stream);
             rec = new Recorder(input, {numChannels: 1});
             rec.record();
+            setRecordingStatus('recording');
         })
         .catch(function(err) {
             $recordButton.prop("disabled", false);
@@ -183,6 +227,7 @@ var WikidsRecorder = window.WikidsRecorder || (function() {
     }
 
     function pauseRecording() {
+        setRecordingStatus('pause');
         if (rec.recording) {
             rec.stop();
             $pauseButton.text("Возобновить");
@@ -194,7 +239,7 @@ var WikidsRecorder = window.WikidsRecorder || (function() {
     }
 
     function stopRecording() {
-
+        setRecordingStatus('stop');
         $stopButton.prop("disabled", true);
         $recordButton.prop("disabled", false);
         $pauseButton.prop("disabled", true);

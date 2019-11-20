@@ -12,7 +12,7 @@ class RecorderButton extends Button
     {
         $this->icon = 'glyphicon glyphicon-music';
         $this->className = 'custom-recorder';
-        $this->title = 'Recorder';
+        $this->title = 'Озвучка';
         $this->action = new JsExpression('function() { if (window["WikidsRecorder"]) WikidsRecorder.showRecorder(); }');
     }
 }

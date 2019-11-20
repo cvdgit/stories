@@ -50,7 +50,7 @@ $plugins = [
 ];
 
 /** @var $audioTrackPath string */
-if ($model->isAudioStory() && $audioTrackPath !== '') {
+if (($model->isAudioStory() || $model->isUserAudioStory(Yii::$app->user->id)) && $audioTrackPath !== '') {
     $plugins[] = [
         'class' => \common\widgets\Reveal\Plugins\Audio::class,
         'storyID' => $model->id,

@@ -375,9 +375,15 @@ class Story extends ActiveRecord
         return (int)$this->video === 1;
     }
 
-    public function isUserAudioStory(): bool
+    public function isUserAudioStory($userID): bool
     {
-        return (int)$this->user_audio === 1;
+        if ($userID === null) {
+            return false;
+        }
+        $trackArray = array_filter($this->storyAudioTracks, function(StoryAudioTrack $model) use ($userID) {
+            return $model->isUserTrack($userID);
+        });
+        return count($trackArray) > 0;
     }
 
     public function slideBlocksData()
