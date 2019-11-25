@@ -43,7 +43,7 @@ $plugins = [
     ['class' => \common\widgets\Reveal\Plugins\Test::class, 'storyID' => $model->id],
     ['class' => \common\widgets\Reveal\Plugins\Background::class],
     ['class' => SlideLinks::class, 'storyID' => $model->id, 'links' => $model->slideBlocksData()],
-    ['class' => Video::class],
+    ['class' => Video::class, 'showControls' => Yii::$app->user->can(\common\rbac\UserRoles::ROLE_MODERATOR)],
     ['class' => \common\widgets\Reveal\Plugins\Actions::class],
     ['class' => \common\widgets\Reveal\Plugins\SeeAlso::class, 'storyID' => $model->id, 'isPlaylist' => ($playlistID !== null)],
     ['class' => \common\widgets\Reveal\Plugins\Recorder::class, 'story' => $model],
