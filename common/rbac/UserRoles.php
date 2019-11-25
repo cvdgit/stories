@@ -2,6 +2,8 @@
 
 namespace common\rbac;
 
+use Yii;
+
 class UserRoles
 {
     const ROLE_USER = 'user';
@@ -20,4 +22,15 @@ class UserRoles
     const PERMISSION_MANAGE_COMMENTS = 'manageComments';
     const PERMISSION_MANAGE_NEWS = 'manageNews';
     const PERMISSION_MANAGE_TEST = 'manageTest';
+
+    public static function isModerator($userID)
+    {
+        if ($userID === null) {
+            return false;
+        }
+        $role = Yii::$app->authManager->getRolesByUser(Yii::$app->user->id);
+        $role = array_shift($role);
+        return $role->name === self::ROLE_MODERATOR;
+    }
+
 }
