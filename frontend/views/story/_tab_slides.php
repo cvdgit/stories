@@ -28,7 +28,7 @@ use yii\helpers\Html;
         </div>
     </noindex>
     <?php else: ?>
-        <?php if ($model->isAudioStory()): ?>
+        <?php if ($model->isAudioStory() || $model->isUserAudioStory(Yii::$app->user->id)): ?>
         <div class="row">
             <div class="col-md-12">
                 <div class="pull-right">

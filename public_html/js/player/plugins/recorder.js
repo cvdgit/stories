@@ -80,7 +80,13 @@ var WikidsRecorder = window.WikidsRecorder || (function() {
                 var promise = $.get(config.deleteTrackAction + "?id=" + getCurrentTrack().id);
                 promise.done(function (data) {
                     if (data && data.success) {
-                        location.href = location.origin + location.pathname + location.hash;
+                        var href = location.origin + location.pathname + location.hash;
+                        if (href === location.href) {
+                            location.reload();
+                        }
+                        else {
+                            location.href = href;
+                        }
                     }
                 });
             });
