@@ -91,6 +91,9 @@ var WikidsVideo = window.WikidsVideo || (function() {
     });
 
     return {
-        "createPlayer": createPlayer
+        "createPlayer": createPlayer,
+        "showControls": function() {
+            return config.showControls;
+        }
     };
 })();
