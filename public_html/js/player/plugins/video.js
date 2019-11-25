@@ -11,7 +11,7 @@ function WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute, showControls
 
     var controls = [];
     if (showControls) {
-        controls = ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'];
+        controls = ['play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'];
     }
 
     player = new Plyr('#' + elemID, {
