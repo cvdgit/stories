@@ -167,7 +167,8 @@ class StoryService
     public function getDefaultStoryView()
     {
         $view = 'book';
-        if (!Yii::$app->user->isGuest && !Yii::$app->devicedetect->isMobile()) {
+        // !Yii::$app->devicedetect->isMobile()
+        if (!Yii::$app->user->isGuest) {
             $view = 'slides';
         }
         return $view;
