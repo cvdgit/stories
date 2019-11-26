@@ -4,6 +4,7 @@ namespace common\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "story_feedback".
@@ -15,11 +16,12 @@ use yii\behaviors\TimestampBehavior;
  * @property string $text
  * @property int $status
  * @property int $created_at
+ * @property int $slide_id
  *
  * @property Story $story
  * @property User $assignUser
  */
-class StoryFeedback extends \yii\db\ActiveRecord
+class StoryFeedback extends ActiveRecord
 {
 
     const STATUS_NEW = 0;
@@ -37,7 +39,7 @@ class StoryFeedback extends \yii\db\ActiveRecord
     {
         return [
             [
-                'class' => TimestampBehavior::className(),
+                'class' => TimestampBehavior::class,
                 'createdAtAttribute' => 'created_at',
                 'updatedAtAttribute' => null,
             ],
@@ -50,11 +52,11 @@ class StoryFeedback extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['story_id', 'assign_user_id', 'slide_number'], 'required'],
-            [['story_id', 'assign_user_id', 'slide_number', 'status', 'created_at'], 'integer'],
+            [['story_id', 'assign_user_id', 'slide_number', 'slide_id'], 'required'],
+            [['story_id', 'assign_user_id', 'slide_number', 'status', 'created_at', 'slide_id'], 'integer'],
             [['text'], 'string', 'max' => 255],
-            [['story_id'], 'exist', 'skipOnError' => true, 'targetClass' => Story::className(), 'targetAttribute' => ['story_id' => 'id']],
-            [['assign_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['assign_user_id' => 'id']],
+            [['story_id'], 'exist', 'skipOnError' => true, 'targetClass' => Story::class, 'targetAttribute' => ['story_id' => 'id']],
+            [['assign_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['assign_user_id' => 'id']],
         ];
     }
 
@@ -79,7 +81,7 @@ class StoryFeedback extends \yii\db\ActiveRecord
      */
     public function getStory()
     {
-        return $this->hasOne(Story::className(), ['id' => 'story_id']);
+        return $this->hasOne(Story::class, ['id' => 'story_id']);
     }
 
     /**
@@ -87,14 +89,15 @@ class StoryFeedback extends \yii\db\ActiveRecord
      */
     public function getAssignUser()
     {
-        return $this->hasOne(User::className(), ['id' => 'assign_user_id']);
+        return $this->hasOne(User::class, ['id' => 'assign_user_id']);
     }
 
-    public static function createFeedback($story_id, $slide_number)
+    public static function createFeedback(StorySlide $slide)
     {
         $model = new self;
-        $model->story_id = $story_id;
-        $model->slide_number = $slide_number;
+        $model->story_id = $slide->story_id;
+        $model->slide_id = $slide->id;
+        $model->slide_number = $slide->number;
         $model->assign_user_id = 1;
         return $model->save();
     }

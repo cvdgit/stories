@@ -33,12 +33,12 @@ var WikidsStoryFeedback = (function() {
 
     function sendFeedback() {
         var data = {
-            'slide_number': (Reveal.getIndices().h + 1)
-        }
+            'slide_number': WikidsPlayer.getCurrentSlideID()
+        };
         send(data)
             .done(function(response) {
                 if (response.success) {
-                    alert('Спасибо!');
+                    toastr.success('', 'Спасибо.');
                 }
             });
     }

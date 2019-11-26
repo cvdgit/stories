@@ -77,7 +77,7 @@ $this->registerJs($js, yii\web\View::POS_END);
                 'format' => 'raw',
                 'value' => function($model) {
                     return Html::a('Слайд', 
-                                   ['/editor/edit', 'id' => $model->story_id, '#' => '/' . $model->slide_number],
+                                   ['/editor/edit', 'id' => $model->story_id, '#' => '/' . $model->slide_id],
                                    ['class' => 'btn btn-primary btn-xs', 'target' => '_blank', 'data-pjax' => 0]);
                 }
             ],
