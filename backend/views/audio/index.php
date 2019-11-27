@@ -39,6 +39,16 @@ $this->params['sidebarMenuItems'] = [
                 }
             ],
             'user.username',
+            [
+                'attribute' => 'status',
+                'value' => function($model) {
+                    if ($model->isOriginal()) {
+                        return $model->getStatusText();
+                    }
+                    return '';
+                },
+                'filter' => \common\models\StoryAudioTrack::getStatusArray(),
+            ],
             'created_at:datetime',
             [
                 'class' => ActionColumn::class,

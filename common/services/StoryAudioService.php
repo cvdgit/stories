@@ -2,9 +2,13 @@
 
 namespace common\services;
 
+use backend\components\queue\PublishAudioJob;
+use backend\models\audio\AudioUploadForm;
+use backend\models\audio\UpdateAudioForm;
 use common\models\Story;
 use common\models\StoryAudioTrack;
 use common\models\StorySlide;
+use DomainException;
 use frontend\models\SlideAudio;
 use frontend\models\StoryTrackModel;
 use Yii;
@@ -71,6 +75,40 @@ class StoryAudioService
             $track = $story->getStoryTrack($userID);
         }
         return $track;
+    }
+
+    public function publishTrack(StoryAudioTrack $model): void
+    {
+        if ($model->isPublished()) {
+            throw new DomainException('Озвучка уже опубликована');
+        }
+
+        $form = new AudioUploadForm($model->story_id);
+        $files = $form->audioFileList();
+        if (count($files) === 0) {
+            throw new DomainException('Файлы озвучки не найдены');
+        }
+
+        $model->status = StoryAudioTrack::STATUS_PUBLISHED;
+        $model->save(false, ['status']);
+
+        $storyModel = Story::findModel($model->story_id);
+        $storyModel->audio = 1;
+        $storyModel->save(false, ['audio']);
+
+        Yii::$app->queue->push(new PublishAudioJob([
+            'storyID' => $model->id,
+        ]));
+    }
+
+    public function unPublishTrack(StoryAudioTrack $model): void
+    {
+        $model->status = StoryAudioTrack::STATUS_DRAFT;
+        $model->save(false, ['status']);
+
+        $storyModel = Story::findModel($model->story_id);
+        $storyModel->audio = 0;
+        $storyModel->save(false, ['audio']);
     }
 
 }

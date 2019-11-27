@@ -11,6 +11,7 @@ use common\models\Story;
 use common\models\StoryAudioTrack;
 use common\rbac\UserRoles;
 use common\services\StoryAudioService;
+use http\Exception;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -109,6 +110,38 @@ class AudioController extends Controller
         $model = StoryAudioTrack::findModel($id);
         $model->delete();
         return $this->redirect(['index', 'story_id' => $model->story_id]);
+    }
+
+    public function actionPublish(int $story_id)
+    {
+        $model = Story::findModel($story_id);
+        $track = $model->getOriginalTrack();
+        if (!$track) {
+            Yii::$app->session->setFlash('error', 'Не удалось определить оригинальную дорожку');
+        }
+        else {
+            try {
+                $this->audioService->publishTrack($track);
+                Yii::$app->session->setFlash('success', 'Озвучка опубликована');
+            } catch (Exception $e) {
+                Yii::$app->session->setFlash('error', 'Ошибка публикации: ' . $e->getMessage());
+            }
+        }
+        return $this->redirect(['story/update', 'id' => $model->id]);
+    }
+
+    public function actionUnpublish(int $story_id)
+    {
+        $model = Story::findModel($story_id);
+        $track = $model->getOriginalTrack();
+        if (!$track) {
+            Yii::$app->session->setFlash('error', 'Не удалось определить оригинальную дорожку');
+        }
+        else {
+            $this->audioService->unPublishTrack($track);
+            Yii::$app->session->setFlash('success', 'Озвучка для истории снята с публикации');
+        }
+        return $this->redirect(['story/update', 'id' => $model->id]);
     }
 
 }

@@ -18,6 +18,7 @@ use yii\web\NotFoundHttpException;
  * @property string $name
  * @property int $created_at
  * @property int $updated_at
+ * @property int $status
  *
  * @property Story $story
  * @property User $user
@@ -27,6 +28,9 @@ class StoryAudioTrack extends \yii\db\ActiveRecord
 
     const TYPE_ORIGINAL = 0;
     const TYPE_USER = 1;
+
+    const STATUS_DRAFT = 0;
+    const STATUS_PUBLISHED = 1;
 
     /**
      * {@inheritdoc}
@@ -67,6 +71,7 @@ class StoryAudioTrack extends \yii\db\ActiveRecord
             'name' => 'Заголовок',
             'created_at' => 'Дата создания',
             'updated_at' => 'Дата изменения',
+            'status' => 'Статус',
         ];
     }
 
@@ -139,7 +144,7 @@ class StoryAudioTrack extends \yii\db\ActiveRecord
         parent::afterDelete();
     }
 
-    public function afterSave($insert, $changedAttributes)
+/*    public function afterSave($insert, $changedAttributes)
     {
         if ($this->isOriginal() && $this->isDefault()) {
             $command = Yii::$app->db->createCommand();
@@ -147,6 +152,20 @@ class StoryAudioTrack extends \yii\db\ActiveRecord
             $command->execute();
         }
         parent::afterSave($insert, $changedAttributes);
+    }*/
+
+    public static function getStatusArray()
+    {
+        return [
+            self::STATUS_DRAFT => 'Черновик',
+            self::STATUS_PUBLISHED => 'Опубликован',
+        ];
+    }
+
+    public function getStatusText()
+    {
+        $arr = self::getStatusArray();
+        return $arr[$this->status];
     }
 
     public function isOriginal()
@@ -172,6 +191,11 @@ class StoryAudioTrack extends \yii\db\ActiveRecord
     public function canAccessTrack(int $userID): bool
     {
         return $this->isOriginal() || $this->isUserTrack($userID);
+    }
+
+    public function isPublished(): bool
+    {
+        return ((int)$this->status === self::STATUS_PUBLISHED);
     }
 
 }

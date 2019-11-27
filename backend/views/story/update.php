@@ -24,14 +24,24 @@ $this->params['sidebarMenuItems'] = [
 <div class="row">
 	<div class="col-xs-6">
         <?php if ($model->isPublished()): ?>
-            <div class="alert alert-success">
-                <div class="clearfix">
-                    <div class="pull-left" style="line-height: 34px">История опубликована</div>
-                    <div class="pull-right">
-                        <?= Html::beginForm(['/story/unpublish', 'id' => $model->id]) . Html::submitButton('Снять с публикации', ['class' => 'btn btn-primary']) . Html::endForm() ?>
-                    </div>
+        <div class="alert alert-success">
+            <div class="clearfix">
+                <div class="pull-left" style="line-height: 34px">История опубликована</div>
+                <div class="pull-right">
+                    <?= Html::beginForm(['/story/unpublish', 'id' => $model->id]) . Html::submitButton('Снять с публикации', ['class' => 'btn btn-primary']) . Html::endForm() ?>
                 </div>
             </div>
+        </div>
+        <?php if ($model->isOriginalAudioTrack()): ?>
+            <?php
+            $published = $model->audioTrackPublished();
+            echo $this->render('_publication', [
+                'published' => $published,
+                'text' => 'Озвучка ' . ($published ? 'опубликована' : 'не опубликована'),
+                'action' => $published ? ['audio/unpublish', 'story_id' => $model->id] : ['audio/publish', 'story_id' => $model->id],
+            ]);
+            ?>
+        <?php endif ?>
         <?php else: ?>
             <div class="alert alert-warning">
                 <div class="clearfix">

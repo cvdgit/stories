@@ -328,6 +328,19 @@ class Story extends ActiveRecord
         return ((int)$this->status === self::STATUS_PUBLISHED);
     }
 
+    public function isOriginalAudioTrack(): bool
+    {
+        return $this->getOriginalTrack() !== false;
+    }
+
+    public function audioTrackPublished()
+    {
+        if (!($track = $this->getOriginalTrack())) {
+            return false;
+        }
+        return $track->isPublished();
+    }
+
     /**
      * @return ActiveQuery
      * @throws InvalidConfigException
@@ -442,7 +455,7 @@ class Story extends ActiveRecord
     public function getUserAudioTracks($userID)
     {
         return array_filter($this->storyAudioTracks, function(StoryAudioTrack $track) use ($userID) {
-            return $track->isOriginal() || $track->isUserTrack($userID);
+            return ($track->isOriginal() && $track->isPublished()) || $track->isUserTrack($userID);
         });
     }
 
