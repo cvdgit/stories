@@ -97,7 +97,7 @@ class StoryAudioService
         $storyModel->save(false, ['audio']);
 
         Yii::$app->queue->push(new PublishAudioJob([
-            'storyID' => $model->id,
+            'storyID' => $storyModel->id,
         ]));
     }
 
