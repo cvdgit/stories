@@ -36,7 +36,7 @@ class PublishAudioJob extends BaseObject implements JobInterface
             'sender_email' => 'info@wikids.ru',
             'subject' => 'Новая озвучка для истории ' . $story->title . ' на Wikids',
             'body' => $view->render('@common/mail/newAudio-html', ['story' => $story]),
-            'list_id' => 17841361, // Yii::$app->params['unisender.listID'],
+            'list_id' => Yii::$app->params['unisender.listID'],
         ]);
         $messageID = $result['result']['message_id'];
 
