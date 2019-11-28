@@ -34,7 +34,8 @@ use yii\helpers\Html;
                                                             <tbody>
                                                             <tr>
                                                                 <td>
-                                                                    <p style="color:#444444;font-size:18px;font-family:Roboto,Arial,Helvetica Neue,Helvetica,sans-serif;line-height:24px;margin:10px 0 18px 0;padding:0">История <?= $story->title ?> теперь с озвучкой</p>
+                                                                    <p style="color:#444444;font-size:18px;font-family:Roboto,Arial,Helvetica Neue,Helvetica,sans-serif;line-height:24px;margin:10px 0 18px 0;padding:0">История <?= $story->title ?> теперь с озвучкой!</p>
+                                                                    <p style="color:#444444;font-size:18px;font-family:Roboto,Arial,Helvetica Neue,Helvetica,sans-serif;line-height:24px;margin:10px 0 18px 0;padding:0">Усаживайтесь поудобнее, включайте и наслаждайтесь!</p>
                                                                 </td>
                                                             </tr>
                                                             </tbody>
