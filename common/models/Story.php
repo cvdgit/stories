@@ -435,7 +435,7 @@ class Story extends ActiveRecord
         return current($trackArray);
     }
 
-    public function getUserTrack(int $userID)
+    public function getUserTrack($userID)
     {
         $trackArray = array_filter($this->storyAudioTracks, function(StoryAudioTrack $model) use ($userID) {
             return $model->isUserTrack($userID);
