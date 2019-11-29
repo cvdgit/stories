@@ -26,5 +26,20 @@ use common\helpers\SmartDate;
             <span><?= SmartDate::dateSmart($model->created_at, true) ?></span>
         </div>
         <div class="comment-body"><?= Html::encode($model->body) ?></div>
+        <?php if (!Yii::$app->user->isGuest): ?>
+        <div class="comment-footer">
+            <div>
+                <div class="btn-link comment-reply" data-comment-id="<?= $model->id ?>">Ответить</div>
+            </div>
+            <div class="comment-reply-form"></div>
+        </div>
+        <?php endif ?>
     </div>
 </div>
+<?php if ($model->hasChildren()) : ?>
+    <ul class="children">
+        <?php foreach ($model->getChildren() as $children) : ?>
+            <?php echo $this->render('_comment', ['model' => $children]); ?>
+        <?php endforeach; ?>
+    </ul>
+<?php endif; ?>

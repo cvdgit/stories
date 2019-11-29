@@ -48,6 +48,25 @@ $('#comment-form-pjax').on('pjax:success', function() {
     $.pjax.reload({container: '#comment-list-pjax'});
 });
 
+$(".comment-list").on("click", ".comment-reply", function() {
+    if ($(this).parent().parent().find(".comment-reply-form").children().length) {
+        return;
+    }
+    var commentID = $(this).data("commentId");
+    var form = $("#main-comment-form").clone();
+    form.find("form")
+        .removeClass("add-comment-focus")
+        .attr("id", "reply" + commentID)
+        .attr("action", "/comment/reply/" + commentID);
+    $(this)
+        .parent()
+        .parent()
+        .find(".comment-reply-form")
+        .append(form)
+        .find(".add-comment-placeholder textarea")
+        .focus();
+});
+
 /*
 if (Wikids2.showSwipeHelp()) {
     toastr.options = {
@@ -246,7 +265,6 @@ $isBookView = $storyDefaultView === 'book';
                     </div>
                 </div>
             </div>
-
 	    </div>
         <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" title="Нажмите, чтобы подняться на верх" data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span></a>
 	</main>

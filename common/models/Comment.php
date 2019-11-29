@@ -2,8 +2,11 @@
 
 namespace common\models;
 
+use DomainException;
 use yii\behaviors\TimestampBehavior;
 use yii\data\ActiveDataProvider;
+use yii\data\ArrayDataProvider;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "comment".
@@ -15,12 +18,19 @@ use yii\data\ActiveDataProvider;
  * @property int $status
  * @property int $created_at
  * @property int $updated_at
+ * @property int $parent_id
  *
  * @property Story $story
  * @property User $user
  */
-class Comment extends \yii\db\ActiveRecord
+class Comment extends ActiveRecord
 {
+
+    /**
+     * @var null|array|ActiveRecord[] comment children
+     */
+    protected $children;
+
     /**
      * {@inheritdoc}
      */
@@ -43,7 +53,7 @@ class Comment extends \yii\db\ActiveRecord
     {
         return [
             [['user_id', 'story_id', 'body'], 'required'],
-            [['user_id', 'story_id', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['user_id', 'story_id', 'status', 'created_at', 'updated_at', 'parent_id'], 'integer'],
             ['body', 'string'],
             ['body', 'filter', 'filter' => '\yii\helpers\HtmlPurifier::process'],
             ['body', 'filter', 'filter' => 'strip_tags'],
@@ -73,7 +83,7 @@ class Comment extends \yii\db\ActiveRecord
      */
     public function getStory()
     {
-        return $this->hasOne(Story::className(), ['id' => 'story_id']);
+        return $this->hasOne(Story::class, ['id' => 'story_id']);
     }
 
     /**
@@ -81,7 +91,7 @@ class Comment extends \yii\db\ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(User::className(), ['id' => 'user_id']);
+        return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
     /**
@@ -102,6 +112,98 @@ class Comment extends \yii\db\ActiveRecord
             'pagination' => false,
             'sort' => ['defaultOrder' => ['created_at' => SORT_ASC]],
         ]);
+        return $dataProvider;
+    }
+
+    public static function findModel(int $id)
+    {
+        if (($model = self::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new DomainException('Комментарий не найден');
+    }
+
+    /**
+     * Get comments tree.
+     *
+     * @param int $storyID
+     * @return array|ActiveRecord[]
+     */
+    public static function getTree(int $storyID)
+    {
+        $query = static::find()
+            ->alias('c')
+            ->andWhere([
+                'c.story_id' => $storyID,
+            ])
+            ->orderBy(['c.created_at' => SORT_ASC])
+            ->with(['user.profile.profilePhoto']);
+        $models = $query->all();
+        if (!empty($models)) {
+            $models = static::buildTree($models);
+        }
+        return $models;
+    }
+
+    /**
+     * Build comments tree.
+     *
+     * @param array $data comments list
+     * @param int $rootID
+     *
+     * @return array|ActiveRecord[]
+     */
+    protected static function buildTree(&$data, $rootID = 0)
+    {
+        $tree = [];
+        foreach ($data as $id => $node) {
+            if ($node->parent_id === $rootID) {
+                unset($data[$id]);
+                $node->children = self::buildTree($data, $node->id);
+                $tree[] = $node;
+            }
+        }
+        return $tree;
+    }
+
+    /**
+     * @return array|null|ActiveRecord[]
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    /**
+     * @param $value
+     */
+    public function setChildren($value)
+    {
+        $this->children = $value;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasChildren()
+    {
+        return !empty($this->children);
+    }
+
+    /**
+     * Get comment ArrayDataProvider
+     *
+     * @param int $storyID
+     * @return ArrayDataProvider
+     */
+    public static function getCommentDataProvider(int $storyID)
+    {
+        $dataProvider = new ArrayDataProvider([
+            'pagination' => [
+                'pageSize' => false,
+            ],
+        ]);
+        $dataProvider->allModels = self::getTree($storyID);
         return $dataProvider;
     }
 

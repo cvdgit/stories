@@ -1,11 +1,10 @@
 <?php
 
-/* @var $dataProvider yii\data\ActiveDataProvider */
-
-use yii\data\ArrayDataProvider;
 use yii\widgets\ListView;
 use yii\widgets\Pjax;
 
+/* @var $this yii\web\View */
+/* @var $dataProvider yii\data\ActiveDataProvider */
 Pjax::begin(['id' => 'comment-list-pjax', 'enablePushState' => false]);
 echo ListView::widget([
     'layout' => '{items}',

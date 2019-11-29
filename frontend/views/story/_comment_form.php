@@ -23,7 +23,7 @@ JS;
 $this->registerJs($js);
 ?>
 <?php Pjax::begin(['id' => 'comment-form-pjax', 'enablePushState' => false]); ?>
-<div class="comment-form">
+<div id="main-comment-form" class="comment-form">
     <div class="comment-form-wrapper">
         <div class="comment-logo">
             <?= Html::img($commentForm->getCurrentUserProfilePhotoPath()) ?>

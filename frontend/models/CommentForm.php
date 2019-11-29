@@ -31,12 +31,15 @@ class CommentForm extends Model
         ];
     }
 
-    public function createComment($userId)
+    public function createComment($userId, $reply = null)
     {
         $comment = new Comment();
         $comment->story_id = $this->story_id;
         $comment->user_id = $userId;
         $comment->body = $this->body;
+        if ($reply !== null) {
+            $comment->parent_id = $reply;
+        }
         return $comment->save();
     }
 

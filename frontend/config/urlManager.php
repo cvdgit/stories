@@ -66,5 +66,7 @@ return [
         'blog/<slug:[\w\-]+>' => 'news/view',
 
         'player/create-audio-track' => 'player/create-audio-track',
+
+        'comment/reply/<id:\d+>' => 'comment/reply',
     ],
 ];

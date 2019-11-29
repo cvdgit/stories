@@ -1228,6 +1228,10 @@ section h2 span {
   font-weight: 500;
 }
 
+.comment-reply {
+  cursor: pointer;
+}
+
 @media only screen and (min-width : 481px) {
   .flex-row.row {
     display: flex;
