@@ -116,6 +116,9 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 	}
 
 	function setup() {
+
+		console.log("RevealAudioSlideshow.setup()");
+
 		// deprecated parameters
 		if ( Reveal.getConfig().audioPrefix ) {
 			prefix = Reveal.getConfig().audioPrefix;
