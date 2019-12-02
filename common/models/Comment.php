@@ -7,6 +7,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
 use yii\db\ActiveRecord;
+use yii\db\Query;
 
 /**
  * This is the model class for table "comment".
@@ -205,6 +206,19 @@ class Comment extends ActiveRecord
         ]);
         $dataProvider->allModels = self::getTree($storyID);
         return $dataProvider;
+    }
+
+    public function getLeadCommentAuthorID()
+    {
+        return (new Query())->from(self::tableName())
+            ->where('id = :id', [':id' => $this->parent_id])
+            ->select('user_id')
+            ->scalar();
+    }
+
+    public function isMyReply(int $replyUserID)
+    {
+        return (int)$this->getLeadCommentAuthorID() === $replyUserID;
     }
 
 }

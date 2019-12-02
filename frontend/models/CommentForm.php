@@ -1,9 +1,8 @@
 <?php
 
-
 namespace frontend\models;
 
-
+use frontend\components\queue\CommentReplyJob;
 use common\models\Comment;
 use common\models\User;
 use Yii;
@@ -40,7 +39,20 @@ class CommentForm extends Model
         if ($reply !== null) {
             $comment->parent_id = $reply;
         }
-        return $comment->save();
+        $saved = $comment->save();
+        if ($saved && $reply !== null && !$comment->isMyReply($userId)) {
+            $this->addCommentReplyJob($comment->story_id, $comment->getLeadCommentAuthorID(), $userId);
+        }
+        return $saved;
+    }
+
+    protected function addCommentReplyJob(int $storyID, int $commentAuthorID, int $replyUserID)
+    {
+        Yii::$app->queue->push(new CommentReplyJob([
+            'storyID' => $storyID,
+            'commentAuthorID' => $commentAuthorID,
+            'replyUserID' => $replyUserID,
+        ]));
     }
 
     public function getCurrentUserProfilePhotoPath()
