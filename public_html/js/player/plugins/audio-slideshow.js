@@ -37,6 +37,8 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 	var previousAudio = null;
 	var timer = null;
 
+	var initialized = false;
+
 	Reveal.addEventListener( 'fragmentshown', function( event ) {
 		if ( timer ) { clearTimeout( timer ); timer = null; }
 //console.debug( "fragmentshown ");
@@ -49,12 +51,15 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 		selectAudio();
 	} );
 
-	Reveal.addEventListener( 'ready', function( event ) {
-		console.debug("RevealAudioSlideshow.ready()");
-		setup();
-		selectAudio();
-		document.dispatchEvent( new CustomEvent('stopplayback') );
-	} );
+	Reveal.addEventListener('ready', function(event) {
+		if (!initialized) {
+			initialized = true;
+			console.debug("RevealAudioSlideshow.ready()");
+			setup();
+			selectAudio();
+			document.dispatchEvent(new CustomEvent('stopplayback'));
+		}
+	});
 
 	Reveal.addEventListener( 'slidechanged', function( event ) {
 		if ( timer ) { clearTimeout( timer ); timer = null; }
