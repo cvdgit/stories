@@ -96,7 +96,6 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 		var indices = Reveal.getIndices();
 		var id = "audioplayer-" + indices.h + '.' + indices.v;
 		if ( indices.f != undefined && indices.f >= 0 ) id = id + '.' + indices.f;
-		console.log("id", id);
 		currentAudio = document.getElementById( id );
 		if ( currentAudio ) {
 			currentAudio.style.display = "block";
@@ -443,7 +442,7 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 
 	function sync() {
 		setup();
-		//console.debug("sync");
+		console.debug("sync");
 		selectAudio();
 		document.dispatchEvent(new CustomEvent('stopplayback'));
 	}
