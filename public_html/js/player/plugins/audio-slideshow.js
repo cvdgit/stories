@@ -50,8 +50,8 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 	} );
 
 	Reveal.addEventListener( 'ready', function( event ) {
+		console.debug("RevealAudioSlideshow.ready()");
 		setup();
-//console.debug( "ready ");
 		selectAudio();
 		document.dispatchEvent( new CustomEvent('stopplayback') );
 	} );
