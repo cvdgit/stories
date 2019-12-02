@@ -117,6 +117,10 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 
 	function setup() {
 
+		if ($(".audio-controls", ".reveal").length) {
+			return;
+		}
+
 		console.log("RevealAudioSlideshow.setup()");
 
 		// deprecated parameters
