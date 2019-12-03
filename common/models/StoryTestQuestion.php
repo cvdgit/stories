@@ -3,6 +3,7 @@
 namespace common\models;
 
 use DomainException;
+use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -13,11 +14,12 @@ use yii\helpers\ArrayHelper;
  * @property string $name
  * @property int $order
  * @property int $type
+ * @property int $mix_answers
  *
  * @property StoryTestAnswer[] $storyTestAnswers
  * @property StoryTest $storyTest
  */
-class StoryTestQuestion extends \yii\db\ActiveRecord
+class StoryTestQuestion extends ActiveRecord
 {
 
     const QUESTION_TYPE_RADIO = 0;
@@ -38,7 +40,7 @@ class StoryTestQuestion extends \yii\db\ActiveRecord
     {
         return [
             [['story_test_id', 'name', 'type'], 'required'],
-            [['story_test_id', 'order', 'type'], 'integer'],
+            [['story_test_id', 'order', 'type', 'mix_answers'], 'integer'],
             [['name'], 'string', 'max' => 255],
             [['story_test_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTest::class, 'targetAttribute' => ['story_test_id' => 'id']],
         ];
@@ -55,6 +57,7 @@ class StoryTestQuestion extends \yii\db\ActiveRecord
             'name' => 'Вопрос',
             'order' => 'Порядок сортировки',
             'type' => 'Тип',
+            'mix_answers' => 'Перемешивать ответы',
         ];
     }
 

@@ -13,6 +13,18 @@ var TestSlide = (function() {
         });
     }
 
+    function shuffleAnswers() {
+        $(".reveal > .slides .wikids-test-answers[data-mix-answers=1]").each(function() {
+            var parent = $(this);
+            var divs = parent.children();
+            while (divs.length) {
+                parent.append(divs.splice(Math.floor(Math.random() * divs.length), 1)[0]);
+            }
+        });
+    }
+
+    shuffleAnswers();
+
     function action() {
 
         var test_id = $(this).data("testId"),

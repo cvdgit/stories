@@ -115,8 +115,28 @@ var WikidsStoryTest = function() {
         return $answer;
     }
 
-    function createAnswers(answers, questionType) {
+    function shuffle(array) {
+        var counter = array.length;
+        // While there are elements in the array
+        while (counter > 0) {
+            // Pick a random index
+            var index = Math.floor(Math.random() * counter);
+            // Decrease counter by 1
+            counter--;
+            // And swap the last element with it
+            var temp = array[counter];
+            array[counter] = array[index];
+            array[index] = temp;
+        }
+        return array;
+    }
+
+    function createAnswers(answers, questionType, mixAnswers) {
         var $answers = $("<div/>").addClass("wikids-test-answers");
+        mixAnswers = mixAnswers || 0;
+        if (mixAnswers === 1) {
+            answers = shuffle(answers);
+        }
         answers.forEach(function(answer) {
             $answers.append(createAnswer(answer, questionType));
         });
@@ -135,7 +155,7 @@ var WikidsStoryTest = function() {
         var $questions = $("<div/>").addClass("wikids-test-questions");
         questions.forEach(function(question) {
             var $question = createQuestion(question);
-            var $answers = createAnswers(getAnswersData(question), question.type);
+            var $answers = createAnswers(getAnswersData(question), question.type, question.mix_answers);
             $answers.appendTo($question);
             $questions.append($question);
         });

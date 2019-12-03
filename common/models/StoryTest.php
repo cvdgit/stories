@@ -16,6 +16,7 @@ use yii\helpers\ArrayHelper;
  * @property int $status
  * @property int $created_at
  * @property int $updated_at
+ * @property int $mix_answers
  *
  * @property StoryTestQuestion[] $storyTestQuestions
  */
@@ -43,7 +44,7 @@ class StoryTest extends \yii\db\ActiveRecord
     {
         return [
             [['title'], 'required'],
-            [['status', 'created_at', 'updated_at'], 'integer'],
+            [['status', 'created_at', 'updated_at', 'mix_answers'], 'integer'],
             [['title', 'description'], 'string', 'max' => 255],
         ];
     }
@@ -60,6 +61,7 @@ class StoryTest extends \yii\db\ActiveRecord
             'status' => 'Статус',
             'created_at' => 'Дата создания',
             'updated_at' => 'Дата изменения',
+            'mix_answers' => 'Перемешивать ответы',
         ];
     }
 

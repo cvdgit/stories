@@ -17,6 +17,7 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'story_test_id')->hiddenInput()->label(false) ?>
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'type')->dropDownList(\common\models\StoryTestQuestion::questionTypeArray()) ?>
+    <?= $form->field($model, 'mix_answers')->checkbox() ?>
     <?php if (!$model->isNewRecord): ?>
         <div>
             <p>

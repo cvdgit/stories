@@ -37,7 +37,10 @@ class QuestionHTML
     {
         $content = Html::tag('p', $this->question->name);
         $content .= $this->createAnswers($this->question->storyTestAnswers);
-        return Html::tag('div', $content, ['class' => 'wikids-test-question', 'data-question-id' => $this->question->id]);
+        return Html::tag('div', $content, [
+            'class' => 'wikids-test-question',
+            'data-question-id' => $this->question->id,
+        ]);
     }
 
     protected function createAnswers($answers): string
@@ -46,7 +49,7 @@ class QuestionHTML
         foreach ($answers as $answer) {
             $content .= $this->createAnswer($answer);
         }
-        return Html::tag('div', $content, ['class' => 'wikids-test-answers']);
+        return Html::tag('div', $content, ['class' => 'wikids-test-answers', 'data-mix-answers' => $this->question->mix_answers]);
     }
 
     protected function createAnswer(StoryTestAnswer $answer): string
