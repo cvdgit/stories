@@ -38,6 +38,7 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 	var timer = null;
 
 	var initialized = false;
+	var isPlaying = false;
 
 	Reveal.addEventListener( 'fragmentshown', function( event ) {
 		if ( timer ) { clearTimeout( timer ); timer = null; }
@@ -340,7 +341,8 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 		audioElement.addEventListener( 'ended', function( event ) {
 			//if ( typeof Recorder == 'undefined' || !Recorder.isRecording ) {
 				// determine whether and when slideshow advances with next slide
-				var advanceNow = advance;
+			isPlaying = false;
+			var advanceNow = advance;
 				var slide = Reveal.getCurrentSlide();
 				// check current fragment
 				var indices = Reveal.getIndices();
@@ -349,15 +351,20 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 					if ( fragment ) {
 						advanceNow = fragment.getAttribute( 'data-audio-advance' );
 					}				
-				} 
+				}
 				else if ( slide.hasAttribute( 'data-audio-advance' ) ) {
 					advanceNow = slide.getAttribute( 'data-audio-advance' );
 				}
 				// advance immediately or set a timer - or do nothing 
 				if ( advance == "true" || advanceNow == 0 ) {
-					var previousAudio = currentAudio;		
-					Reveal.next();
-					selectAudio( previousAudio );
+					var previousAudio = currentAudio;
+					if (WikidsPlayer.isVideoStory() && TransitionSlide.hasTransitionInSlide()) {
+						TransitionSlide.autoGoToTransition();
+					}
+					else {
+						Reveal.next();
+						selectAudio(previousAudio);
+					}
 				}
 				else if ( advanceNow > 0 ) {
 					timer = setTimeout( function() {
@@ -373,6 +380,8 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 			var evt = new CustomEvent('startplayback');
 			evt.timestamp = 1000 * audioElement.currentTime;
 			document.dispatchEvent( evt );
+
+			isPlaying = true;
 
 			if ( timer ) { clearTimeout( timer ); timer = null; }
 			// preload next audio element so that it is available after slide change
@@ -401,6 +410,7 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 		audioElement.addEventListener( 'pause', function( event ) {
 			if ( timer ) { clearTimeout( timer ); timer = null; }
 			document.dispatchEvent( new CustomEvent('stopplayback') );
+			isPlaying = false;
 		} );
 		audioElement.addEventListener( 'seeked', function( event ) {
 			var evt = new CustomEvent('seekplayback');
@@ -408,6 +418,10 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 			document.dispatchEvent( evt );
 			if ( timer ) { clearTimeout( timer ); timer = null; }
 		} );
+
+		audioElement.addEventListener( 'stop', function( event ) {
+			isPlaying = false;
+		});
 
 		if ( audioFile != null && audioFile !== '') {
 			// Support comma separated lists of audio sources
@@ -460,7 +474,15 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 	}
 
 	return {
-		"sync": sync
+		"sync": sync,
+		"playCurrentAudio": function() {
+			if (currentAudio) {
+				currentAudio.play();
+			}
+		},
+		"audioIsPlaying": function() {
+			return isPlaying;
+		}
 	};
 })();
 

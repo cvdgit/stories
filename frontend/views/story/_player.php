@@ -16,6 +16,9 @@ use yii\helpers\Url;
 $config = [
     'setSlideAudioAction' => Url::to(['player/set-slide-audio']),
     'loadStoryAction' => Url::to(['story/init-story-player', 'id' => $model->id]),
+    'story' => [
+        'video' => $model->video,
+    ],
 ];
 $configJSON = Json::htmlEncode($config);
 $js = <<< JS

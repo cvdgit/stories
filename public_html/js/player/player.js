@@ -201,7 +201,10 @@ var WikidsPlayer = (function(document, $) {
         "getCurrentSlideID": getCurrentSlideID,
         "addAudioData": addAudioData,
         "removeAudioData": removeAudioData,
-        "mergeAllAndSetSlideAudio": mergeAllAndSetSlideAudio
+        "mergeAllAndSetSlideAudio": mergeAllAndSetSlideAudio,
+        "isVideoStory": function() {
+            return config.story.video === 1;
+        }
     };
 })(document, jQuery);
 

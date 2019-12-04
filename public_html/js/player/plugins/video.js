@@ -36,6 +36,14 @@ function WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute, showControls
         }
     });
 
+    player.on("pause", function() {
+        if (TransitionSlide.getInTransition()) {
+            TransitionSlide.backToStory(function() {
+                setTimeout(RevealAudioSlideshow.playCurrentAudio, 1000);
+            });
+        }
+    });
+
     function pauseVideo() {
         player.pause();
     }

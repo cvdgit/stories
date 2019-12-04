@@ -64,7 +64,7 @@ var TransitionSlide = (function() {
         Reveal.slide(slide_index);
     }
 
-    function backToStory() {
+    function backToStory(callback) {
         if (stack.length > 0) {
             var state = stack.shift();
             getStoryData(state.story_id)
@@ -75,6 +75,9 @@ var TransitionSlide = (function() {
                     if (state.slide_index === 0 && window["WikidsVideo"]) {
                         WikidsVideo.createPlayer();
                     }
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
                 });
         }
     }
@@ -84,6 +87,17 @@ var TransitionSlide = (function() {
         "goToSlide": goToSlide,
         "getInTransition": function() {
             return inTransitionStory;
+        },
+        "hasTransitionInSlide": function() {
+            var slide = Reveal.getCurrentSlide();
+            return $("div[data-block-type=transition] button", slide).length > 0;
+        },
+        "autoGoToTransition": function() {
+            var slide = Reveal.getCurrentSlide();
+            $("div[data-block-type=transition] button", slide).each(function() {
+                goToSlide($(this).attr("data-story-id"), $(this).attr("data-slides"));
+                return false;
+            });
         }
     };
 })();
