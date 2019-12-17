@@ -108,15 +108,29 @@ AppAsset::register($this);
         </nav>
     <?php if (Url::isHome()): ?>
     <div class="container">
-      <div class="row">
-        <div class="col-md-12 col-lg-6 site-offer">
-          <h1>Сервис ускоренного развития речи ребенка</h1>
-          <p>Зарегистрируйтесь, чтобы получить доступ ко всем историям</p>
-          <?php if (Yii::$app->user->isGuest): ?>
-          <?= Html::a('Регистрация', '#', ['class' => 'btn', 'data-toggle' => 'modal', 'data-target' => '#wikids-signup-modal']) ?>
-          <?php else: ?>
-          <?= Html::a('Каталог историй', ['/story/index'], ['class' => 'btn']) ?>
-          <?php endif ?>
+        <div class="row">
+            <div class="col-md-12 col-lg-6 site-offer">
+                <?php if (Yii::$app->user->isGuest): ?>
+                    <h1>Сервис ускоренного развития речи ребенка</h1>
+                    <p>Зарегистрируйтесь, чтобы получить доступ ко всем возможностям:</p>
+                    <ul>
+                        <li>аудиоистории - прослушивание озвучки к каждому слайду</li>
+                        <li>самостоятельное озвучивание историй</li>
+                        <li>тесты для детей, чтобы закрепить материал</li>
+                        <li>просмотр истории в виде слайдов</li>
+                        <li>специально подобранные коллекции картинок и видео для улучшения восприятия</li>
+                        <li>ссылки на дополнительные обучающие курсы</li>
+                    </ul>
+                    <div class="text-center">
+                        <?= Html::a('Регистрация', '#', ['class' => 'btn', 'data-toggle' => 'modal', 'data-target' => '#wikids-signup-modal']) ?>
+                    </div>
+                <?php else: ?>
+                    <h1 class="header-auth">Сервис ускоренного развития речи ребенка</h1>
+                    <p class="header-paragraph-auth">Истории для детей</p>
+                    <div class="text-center">
+                        <?= Html::a('Каталог историй', ['/story/index'], ['class' => 'btn']) ?>
+                    </div>
+                <?php endif ?>
         </div>
         <div class="col-md-12 col-lg-6 site-slider">
           <?= StorySlider::widget() ?>

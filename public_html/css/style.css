@@ -227,15 +227,28 @@ section h2 span {
 .site-offer {}
 
 .site-offer h1 {
-  margin-top: 80px;
+  margin-top: 20px;
   font-size: 2.8em;
   margin-bottom: 25px;
   font-weight: 600;
 }
 
+.site-offer h1.header-auth {
+  margin-top: 80px;
+}
+
 .site-offer p {
   font-size: 1em;
+  line-height: 1.3em;
+}
+
+.site-offer p.header-paragraph-auth {
   margin-bottom: 45px;
+}
+
+.site-offer li {
+  font-size: 1em;
+  line-height: 1.3em;
 }
 
 .btn {
@@ -649,8 +662,8 @@ section h2 span {
 
 
 #wikids-carousel {
-  margin-left: 50px;
-  margin-right: 50px;
+  margin-left: 30px;
+  margin-right: 30px;
 }
 
 .item img {
@@ -993,6 +1006,9 @@ section h2 span {
   .site-offer {
     text-align: center;
     margin-bottom: 40px;
+  }
+  .site-offer ul li {
+    text-align: left;
   }
 
   .site-offer h1 {
@@ -1761,7 +1777,8 @@ section h2 span {
     clear: none;
   }
 
-  .site-offer h1 {
+  .site-offer h1,
+  .site-offer h1.header-auth {
     margin-top: 10px;
     font-size: 3rem;
   }
@@ -1793,7 +1810,8 @@ section h2 span {
     margin-bottom: 30px;
   }
 
-  .site-offer p {
+  .site-offer p,
+  .site-offer p.header-paragraph-auth {
     margin-bottom: 20px;
   }
 
