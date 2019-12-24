@@ -94,10 +94,21 @@ $js = <<< JS
 	    StoryEditor.slideImagesModal("$slideSourceAction");
 	});
 	
-	$("#story-images-list").on("click", "a.thumbnail", function(e) {
+	$("#story-images-list", "#slide-images-modal").on("click", "a.thumbnail", function(e) {
 	    e.preventDefault();
 	    var imageSrc = $("img", this).attr("src");
 	    StoryEditor.addImages(imageSrc);
+	});
+	
+	$("#slide-collections").on("click", function(e) {
+	    e.preventDefault();
+	    StoryEditor.slideCollectionsModal("$slideSourceAction");
+	});
+	
+	$("#story-images-list", "#slide-collections-modal").on("click", "a.thumbnail", function(e) {
+	    e.preventDefault();
+	    var imageSrc = $("img", this).attr("src");
+	    StoryEditor.addCollectionImage(imageSrc);
 	});
 	
 JS;
@@ -170,6 +181,7 @@ $options = [
             <div class="editor-slide-actions pull-left">
                 <?= Html::a('Ссылки', '#', ['id' => 'slide-links', 'style' => 'font-size: 18px']) ?>
                 <?= Html::a('Изображения', '#', ['id' => 'slide-images', 'style' => 'font-size: 18px']) ?>
+                <?= Html::a('Коллекции', '#', ['id' => 'slide-collections', 'style' => 'font-size: 18px']) ?>
             </div>
             <div class="editor-slide-actions pull-right">
                 <a href="#" id="slide-copy" title="Копировать слайд"><i class="glyphicon glyphicon-copy"></i></a>
@@ -259,6 +271,25 @@ $options = [
                     null,
                     \common\helpers\StoryHelper::getStoryArray(),
                     ['prompt' => 'Выбрать историю', 'onchange' => 'StoryEditor.changeImageStory(this)', 'class' => 'form-control']) ?>
+                <div id="story-images-list" class="row" style="margin-top: 20px"></div>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="slide-collections-modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Коллекции</h4>
+            </div>
+            <div class="modal-body">
+                <?= Html::dropDownList('collections',
+                    null,
+                    [],
+                    ['prompt' => 'Выбрать коллекцию', 'onchange' => 'StoryEditor.changeCollection(this)', 'class' => 'form-control', 'id' => 'collections-select']) ?>
                 <div id="story-images-list" class="row" style="margin-top: 20px"></div>
             </div>
             <div class="modal-footer"></div>

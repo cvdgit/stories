@@ -533,3 +533,75 @@ var StoryEditor = (function() {
     };
 
 })(StoryEditor, jQuery, console);
+
+/** Collections */
+(function(editor, $, console) {
+    "use strict";
+
+    var config = {
+        addImagesAction: ""
+    };
+
+    var $modal = $("#slide-collections-modal");
+
+    $modal.on('show.bs.modal', function() {
+        var $select = $('#collections-select', this);
+        $select.empty();
+        $select.append($('<option/>').val('').text('Выбрать коллекцию'));
+        getCollections().done(function(data) {
+            if (data && data.results) {
+                data.results.forEach(function(collection) {
+                    $select.append($('<option/>').val(collection.id).text(collection.title));
+                });
+            }
+        });
+    });
+
+    editor.initCollectionsModule = function(params) {
+        config = params;
+    };
+
+    editor.slideCollectionsModal = function() {
+        $modal.modal("show");
+    };
+
+    function getCollections() {
+        return $.get('/admin/index.php?r=yandex/boards');
+    }
+
+    editor.changeCollection = function(obj) {
+        var $images = $("#story-images-list", $modal);
+        $images.empty();
+        var promise = $.ajax({
+            "url": "/admin/index.php?r=yandex/cards" + "&board_id=" + $(obj).val(),
+            "type": "GET",
+            "dataType": "json"
+        });
+        promise.done(function(data) {
+            if (data && data.results) {
+                data.results.forEach(function (card) {
+                    var img = $("<img/>").attr("src", card.content[0].source.url);
+                    $images.append('<div class="col-xs-6 col-md-3"><a href="#" class="thumbnail">' + img.prop("outerHTML") + '</a></div>');
+                });
+            }
+            else {
+                $images.append('<div class="col-md-12">Изображения в итории не найдены</div>');
+            }
+        });
+    };
+
+    editor.addCollectionImage = function(image) {
+        var promise = $.ajax({
+            "url": "/admin/index.php?r=editor/image/set&&slide_id=" + editor.getCurrentSlideID() + "&url=" + image,
+            "type": "GET",
+            "dataType": "json"
+        });
+        promise.done(function(data) {
+            if (data && data.success) {
+                $modal.modal("hide");
+                editor.loadSlide(editor.getCurrentSlideID(), true);
+            }
+        });
+    };
+
+})(StoryEditor, jQuery, console);

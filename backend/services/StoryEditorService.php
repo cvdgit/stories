@@ -5,6 +5,7 @@ namespace backend\services;
 use backend\components\QuestionHTML;
 use backend\components\story\AbstractBlock;
 use backend\components\story\HTMLBLock;
+use backend\components\story\ImageBlock;
 use backend\components\story\reader\HTMLReader;
 use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\writer\HTMLWriter;
@@ -14,8 +15,10 @@ use backend\models\editor\TextForm;
 use backend\models\editor\TransitionForm;
 use common\models\StorySlide;
 use common\models\StorySlideBlock;
+use common\models\StorySlideImage;
 use common\models\StoryTestQuestion;
 use DomainException;
+use http\Exception;
 use yii;
 use yii\db\Query;
 use yii\helpers\Html;
@@ -89,6 +92,32 @@ class StoryEditorService
         $model = StorySlide::findSlide($slideID);
         $reader = new HtmlSlideReader($model->data);
         $slide = $reader->load();
+
+        $block = $slide->findBlockByID($blockID);
+        if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
+            /** @var $block ImageBlock */
+            $path = $block->getFilePath();
+            $noFile = false;
+            if (strpos($path, '://') !== false) {
+                $query = parse_url($path, PHP_URL_QUERY);
+                parse_str($query, $result);
+                $imageHash = $result['id'];
+                try {
+                    $image = StorySlideImage::findByHash($imageHash);
+                    $path = Yii::getAlias('@public/admin/upload') . $image->folder . DIRECTORY_SEPARATOR . $image->hash . '.jpeg';
+                }
+                catch (DomainException $ex) {
+                    $noFile = true;
+                }
+            }
+            else {
+                $path = Yii::getAlias('@public') . $path;
+            }
+            if (!$noFile && file_exists($path)) {
+                unlink($path);
+            }
+        }
+
         $slide->deleteBlock($blockID);
         $writer = new HTMLWriter();
         $html = $writer->renderSlide($slide);

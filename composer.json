@@ -46,7 +46,8 @@
         "wokster/yii2-nested-sets-tree-behavior": "*",
         "bower-asset/plyr": "^3.5",
       "ext-json": "*",
-      "ext-http": "*"
+        "linslin/yii2-curl": "*",
+      "ext-curl": "*"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",

@@ -27,4 +27,9 @@ class StoryModel
         return  '/slides_cover/list/' . $this->story->cover;
     }
 
+    public function getImagesFolderPath($relative = false)
+    {
+        return ($relative ? '' : Yii::getAlias('@public')) . '/slides/' . $this->story->story_file;
+    }
+
 }
