@@ -544,15 +544,78 @@ var StoryEditor = (function() {
 
     var $modal = $("#slide-collections-modal");
 
+    var currentPageNumber;
+
+    var $collectionList = $("#collection-list", $modal);
+    var $cardList = $("#collection-card-list", $modal);
+
+    function drawCollectionCards(collectionID) {
+
+        $cardList.empty();
+        var promise = $.ajax({
+            "url": "/admin/index.php?r=yandex/cards" + "&board_id=" + collectionID,
+            "type": "GET",
+            "dataType": "json"
+        });
+        promise.done(function(data) {
+            if (data && data.results) {
+                data.results.forEach(function (card) {
+                    var img = $("<img/>").attr("src", card.content[0].source.url);
+                    $cardList.append('<div class="col-xs-6 col-md-3"><a href="#" class="thumbnail">' + img.prop("outerHTML") + '</a></div>');
+                });
+            }
+            else {
+                $cardList.append('<div class="col-md-12">Изображения в итории не найдены</div>');
+            }
+        });
+    }
+
+    function drawCollections(collections) {
+        collections.forEach(function(collection) {
+            $("<a/>")
+                .attr("href", "#")
+                .html('<span class="label label-primary">' + collection.title + '</span> ')
+                .on("click", function (e) {
+                    e.preventDefault();
+                    drawCollectionCards(collection.id);
+                })
+                .appendTo($collectionList);
+        });
+    }
+
     $modal.on('show.bs.modal', function() {
-        var $select = $('#collections-select', this);
-        $select.empty();
-        $select.append($('<option/>').val('').text('Выбрать коллекцию'));
+        var $pageList = $("#collection-page-list");
         getCollections().done(function(data) {
             if (data && data.results) {
-                data.results.forEach(function(collection) {
-                    $select.append($('<option/>').val(collection.id).text(collection.title));
-                });
+                if (!$pageList.find('li').length) {
+                    var pageCount = Math.ceil(data.count / 100),
+                        pages = [];
+                    for (var i = 1; i <= pageCount; i++) {
+                        pages.push(i);
+                    }
+                    pages.forEach(function (page) {
+                        $('<li/>')
+                            .addClass(page === currentPageNumber ? 'active' : '')
+                            .append($('<a/>')
+                                .attr("href", "#")
+                                .text(page)
+                                .on("click", function (e) {
+                                    e.preventDefault();
+                                    var $link = $(this);
+                                    $("li", $pageList).removeClass('active');
+                                    $link.parent().addClass('active');
+                                    $collectionList.empty();
+                                    $cardList.empty();
+                                    getCollections(page).done(function (data) {
+                                        if (data && data.results) {
+                                            drawCollections(data.results);
+                                        }
+                                    });
+                                }))
+                            .appendTo($pageList);
+                    });
+                    drawCollections(data.results);
+                }
             }
         });
     });
@@ -565,8 +628,10 @@ var StoryEditor = (function() {
         $modal.modal("show");
     };
 
-    function getCollections() {
-        return $.get('/admin/index.php?r=yandex/boards');
+    function getCollections(page) {
+        page = page || 1;
+        currentPageNumber = page;
+        return $.get('/admin/index.php?r=yandex/boards&page=' + page);
     }
 
     editor.changeCollection = function(obj) {

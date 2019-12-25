@@ -75,12 +75,25 @@ class YandexController extends Controller
         //return time() + $expire < time();
     }
 
-    public function actionBoards()
+    private $token;
+
+    protected function getAuthToken()
+    {
+        if ($this->token === null) {
+            $json = file_get_contents($this->getTokenFilePath());
+            $json = Json::decode($json);
+            $this->token = $json['access_token'];
+        }
+        return $this->token;
+    }
+
+    public function actionBoards(int $page = 1)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        //$this->checkTokenExpire();
         $result = $this->getCurl()
-            ->setHeader('Authorization', 'OAuth AgAAAAAFiuRxAAYJfU7NVbR7j0XAsfpS2tA5_1o')
+            ->setHeader('Authorization', 'OAuth ' . $this->getAuthToken())
+            ->setGetParams(['page' => $page])
+            ->setGetParams(['page_size' => 100])
             ->get('https://api.collections.yandex.net/v1/boards/');
         return Json::decode($result);
     }
@@ -90,7 +103,7 @@ class YandexController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
         //$this->checkTokenExpire();
         $result = $this->getCurl()
-            ->setHeader('Authorization', 'OAuth AgAAAAAFiuRxAAYJfU7NVbR7j0XAsfpS2tA5_1o')
+            ->setHeader('Authorization', 'OAuth ' . $this->getAuthToken())
             ->setGetParams(['board_id' => $board_id])
             ->get('https://api.collections.yandex.net/v1/cards/');
         return Json::decode($result);

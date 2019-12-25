@@ -63,6 +63,7 @@ AppAsset::register($this);
                         ['label' => 'Тесты', 'url' => ['/test/index'], 'active' => Yii::$app->controller->id === 'test'],
                         ['label' => 'Видео', 'url' => ['/video/index'], 'active' => Yii::$app->controller->id === 'video'],
                         ['label' => 'Плейлисты', 'url' => ['/playlist/index'], 'active' => Yii::$app->controller->id === 'playlist'],
+                        ['label' => 'Изображения', 'url' => ['/image/index'], 'active' => Yii::$app->controller->id === 'image'],
                     ],
                 ]) ?>
                 <?php endif ?>

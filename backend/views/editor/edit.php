@@ -105,10 +105,11 @@ $js = <<< JS
 	    StoryEditor.slideCollectionsModal("$slideSourceAction");
 	});
 	
-	$("#story-images-list", "#slide-collections-modal").on("click", "a.thumbnail", function(e) {
+	$("#collection-card-list", "#slide-collections-modal").on("click", "a.thumbnail", function(e) {
 	    e.preventDefault();
 	    var imageSrc = $("img", this).attr("src");
 	    StoryEditor.addCollectionImage(imageSrc);
+	    return false;
 	});
 	
 JS;
@@ -286,11 +287,9 @@ $options = [
                 <h4 class="modal-title">Коллекции</h4>
             </div>
             <div class="modal-body">
-                <?= Html::dropDownList('collections',
-                    null,
-                    [],
-                    ['prompt' => 'Выбрать коллекцию', 'onchange' => 'StoryEditor.changeCollection(this)', 'class' => 'form-control', 'id' => 'collections-select']) ?>
-                <div id="story-images-list" class="row" style="margin-top: 20px"></div>
+                <ul class="pagination pagination-lg" id="collection-page-list"></ul>
+                <div id="collection-list"></div>
+                <div id="collection-card-list" class="row" style="margin-top: 20px"></div>
             </div>
             <div class="modal-footer"></div>
         </div>
