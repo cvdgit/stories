@@ -637,7 +637,7 @@ var StoryEditor = (function() {
         return $.get('/admin/index.php?r=yandex/boards&page=' + page);
     }
 
-    editor.addCollectionImage = function(content_url, source_url) {
+    editor.addCollectionImage = function(source_url, content_url) {
         var promise = $.ajax({
             "url": "/admin/index.php?r=editor/image/set&&slide_id=" + editor.getCurrentSlideID() + "&content_url=" + content_url + '&source_url=' + source_url,
             "type": "GET",
