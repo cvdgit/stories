@@ -80,7 +80,7 @@ class ImageController extends Controller
         return ['success' => true];
     }
 
-    public function actionSet(int $slide_id, string $url)
+    public function actionSet(int $slide_id, string $content_url, string $source_url)
     {
 
         $model = StorySlide::findSlide($slide_id);
@@ -90,11 +90,12 @@ class ImageController extends Controller
 
         $image = new StorySlideImage();
         $image->hash = Yii::$app->security->generateRandomString();
-        $image->source_url = $url;
+        $image->source_url = $source_url;
+        $image->content_url = $content_url;
         $image->folder = Yii::$app->formatter->asDate('now', 'MM-yyyy');
         if ($image->save()) {
 
-            $ch = curl_init($url);
+            $ch = curl_init($content_url);
             curl_setopt($ch, CURLOPT_HEADER, 0);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);

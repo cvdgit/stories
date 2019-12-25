@@ -68,5 +68,7 @@ return [
         'player/create-audio-track' => 'player/create-audio-track',
 
         'comment/reply/<id:\d+>' => 'comment/reply',
+
+        'image/<id:[\w\d]+' => 'image/view',
     ],
 ];

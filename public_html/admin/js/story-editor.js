@@ -560,7 +560,9 @@ var StoryEditor = (function() {
         promise.done(function(data) {
             if (data && data.results) {
                 data.results.forEach(function (card) {
-                    var img = $("<img/>").attr("src", card.content[0].source.url);
+                    var img = $("<img/>")
+                        .attr("src", card.content[0].source.url)
+                        .attr("data-content-url", card.content[0].content.url);
                     $cardList.append('<div class="col-xs-6 col-md-3"><a href="#" class="thumbnail">' + img.prop("outerHTML") + '</a></div>');
                 });
             }
@@ -574,7 +576,8 @@ var StoryEditor = (function() {
         collections.forEach(function(collection) {
             $("<a/>")
                 .attr("href", "#")
-                .html('<span class="label label-primary">' + collection.title + '</span> ')
+                .html('<span class="label label-lg label-primary">' + collection.title + '</span> ')
+                .css("font-size", "1.7rem")
                 .on("click", function (e) {
                     e.preventDefault();
                     drawCollectionCards(collection.id);
@@ -634,30 +637,9 @@ var StoryEditor = (function() {
         return $.get('/admin/index.php?r=yandex/boards&page=' + page);
     }
 
-    editor.changeCollection = function(obj) {
-        var $images = $("#story-images-list", $modal);
-        $images.empty();
+    editor.addCollectionImage = function(content_url, source_url) {
         var promise = $.ajax({
-            "url": "/admin/index.php?r=yandex/cards" + "&board_id=" + $(obj).val(),
-            "type": "GET",
-            "dataType": "json"
-        });
-        promise.done(function(data) {
-            if (data && data.results) {
-                data.results.forEach(function (card) {
-                    var img = $("<img/>").attr("src", card.content[0].source.url);
-                    $images.append('<div class="col-xs-6 col-md-3"><a href="#" class="thumbnail">' + img.prop("outerHTML") + '</a></div>');
-                });
-            }
-            else {
-                $images.append('<div class="col-md-12">Изображения в итории не найдены</div>');
-            }
-        });
-    };
-
-    editor.addCollectionImage = function(image) {
-        var promise = $.ajax({
-            "url": "/admin/index.php?r=editor/image/set&&slide_id=" + editor.getCurrentSlideID() + "&url=" + image,
+            "url": "/admin/index.php?r=editor/image/set&&slide_id=" + editor.getCurrentSlideID() + "&content_url=" + content_url + '&source_url=' + source_url,
             "type": "GET",
             "dataType": "json"
         });

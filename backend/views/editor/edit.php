@@ -107,9 +107,8 @@ $js = <<< JS
 	
 	$("#collection-card-list", "#slide-collections-modal").on("click", "a.thumbnail", function(e) {
 	    e.preventDefault();
-	    var imageSrc = $("img", this).attr("src");
-	    StoryEditor.addCollectionImage(imageSrc);
-	    return false;
+	    var img = $("img", this);
+	    StoryEditor.addCollectionImage(img.attr("src"), img.attr("data-content-url"));
 	});
 	
 JS;

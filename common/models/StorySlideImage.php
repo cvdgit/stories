@@ -14,6 +14,7 @@ use yii\db\ActiveRecord;
  * @property string $hash
  * @property string $collection_id
  * @property string $source_url
+ * @property string $content_url
  * @property string $folder
  * @property int $created_at
  * @property int $updated_at
@@ -43,7 +44,7 @@ class StorySlideImage extends ActiveRecord
         return [
             [['hash', 'folder'], 'required'],
             [['created_at', 'updated_at'], 'integer'],
-            [['hash', 'collection_id', 'source_url', 'folder'], 'string', 'max' => 255],
+            [['hash', 'collection_id', 'source_url', 'folder', 'content_url'], 'string', 'max' => 255],
             [['hash'], 'unique'],
         ];
     }
