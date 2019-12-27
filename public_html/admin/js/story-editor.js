@@ -544,14 +544,18 @@ var StoryEditor = (function() {
 
     var $modal = $("#slide-collections-modal");
 
-    var currentPageNumber;
+    var currentPageNumber,
+        currentCollectionID;
 
     var $collectionList = $("#collection-list", $modal);
     var $cardList = $("#collection-card-list", $modal);
 
-    function drawCollectionCards(collectionID) {
+    function drawCollectionCards(collectionID, listID) {
 
-        $cardList.empty();
+        currentCollectionID = collectionID;
+
+        var $tabCardList = $(".collection_card_list", "#" + listID);
+        $tabCardList.empty();
         var promise = $.ajax({
             "url": "/admin/index.php?r=yandex/cards" + "&board_id=" + collectionID,
             "type": "GET",
@@ -563,16 +567,17 @@ var StoryEditor = (function() {
                     var img = $("<img/>")
                         .attr("src", card.content[0].source.url)
                         .attr("data-content-url", card.content[0].content.url);
-                    $cardList.append('<div class="col-xs-6 col-md-3"><a href="#" class="thumbnail">' + img.prop("outerHTML") + '</a></div>');
+                    $tabCardList.append('<div class="col-xs-6 col-md-3"><a href="#" class="thumbnail">' + img.prop("outerHTML") + '</a></div>');
                 });
             }
             else {
-                $cardList.append('<div class="col-md-12">Изображения в итории не найдены</div>');
+                $tabCardList.append('<div class="col-md-12">Изображения в итории не найдены</div>');
             }
         });
     }
 
     function drawCollections(collections) {
+        var $tabCollectionList = $(".collection_list", "#yandex-collection");
         collections.forEach(function(collection) {
             $("<a/>")
                 .attr("href", "#")
@@ -580,45 +585,73 @@ var StoryEditor = (function() {
                 .css("font-size", "1.7rem")
                 .on("click", function (e) {
                     e.preventDefault();
-                    drawCollectionCards(collection.id);
+                    drawCollectionCards(collection.id, 'yandex-collection');
                 })
-                .appendTo($collectionList);
+                .appendTo($tabCollectionList);
         });
     }
 
-    $modal.on('show.bs.modal', function() {
-        var $pageList = $("#collection-page-list");
-        getCollections().done(function(data) {
-            if (data && data.results) {
-                if (!$pageList.find('li').length) {
-                    var pageCount = Math.ceil(data.count / 100),
-                        pages = [];
-                    for (var i = 1; i <= pageCount; i++) {
-                        pages.push(i);
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        var $tab = $(e.target);
+        if ($tab.attr("href").substr(1) === 'yandex-collection') {
+            var $pageList = $("#collection-page-list");
+            getCollections().done(function(data) {
+                if (data && data.results) {
+                    if (!$pageList.find('li').length) {
+                        var pageCount = Math.ceil(data.count / 100),
+                            pages = [];
+                        for (var i = 1; i <= pageCount; i++) {
+                            pages.push(i);
+                        }
+                        pages.forEach(function (page) {
+                            $('<li/>')
+                                .addClass(page === currentPageNumber ? 'active' : '')
+                                .append($('<a/>')
+                                    .attr("href", "#")
+                                    .text(page)
+                                    .on("click", function (e) {
+                                        e.preventDefault();
+                                        var $link = $(this);
+                                        $("li", $pageList).removeClass('active');
+                                        $link.parent().addClass('active');
+                                        $collectionList.empty();
+                                        $cardList.empty();
+                                        getCollections(page).done(function (data) {
+                                            if (data && data.results) {
+                                                drawCollections(data.results, 'yandex-collection');
+                                            }
+                                        });
+                                    }))
+                                .appendTo($pageList);
+                        });
+                        drawCollections(data.results, 'yandex-collection');
                     }
-                    pages.forEach(function (page) {
-                        $('<li/>')
-                            .addClass(page === currentPageNumber ? 'active' : '')
-                            .append($('<a/>')
-                                .attr("href", "#")
-                                .text(page)
-                                .on("click", function (e) {
-                                    e.preventDefault();
-                                    var $link = $(this);
-                                    $("li", $pageList).removeClass('active');
-                                    $link.parent().addClass('active');
-                                    $collectionList.empty();
-                                    $cardList.empty();
-                                    getCollections(page).done(function (data) {
-                                        if (data && data.results) {
-                                            drawCollections(data.results);
-                                        }
-                                    });
-                                }))
-                            .appendTo($pageList);
-                    });
-                    drawCollections(data.results);
                 }
+            });
+        }
+    });
+
+    $modal.on('show.bs.modal', function() {
+        var $tabCollectionList = $(".collection_list", "#story-collection");
+        $tabCollectionList.empty();
+        var promise = $.ajax({
+            "url": "/admin/index.php?r=editor/image/get-used-collections&story_id=" + editor.getConfigValue('storyID'),
+            "type": "GET",
+            "dataType": "json"
+        });
+        promise.done(function(data) {
+            if (data && data.success) {
+                data.result.forEach(function(collection) {
+                    $("<a/>")
+                        .attr("href", "#")
+                        .html('<span class="label label-lg label-primary">' + collection.collection_id + '</span> ')
+                        .css("font-size", "1.7rem")
+                        .on("click", function (e) {
+                            e.preventDefault();
+                            drawCollectionCards(collection.collection_id, 'story-collection');
+                        })
+                        .appendTo($tabCollectionList);
+                });
             }
         });
     });
@@ -639,8 +672,14 @@ var StoryEditor = (function() {
 
     editor.addCollectionImage = function(source_url, content_url) {
         var promise = $.ajax({
-            "url": "/admin/index.php?r=editor/image/set&&slide_id=" + editor.getCurrentSlideID() + "&content_url=" + content_url + '&source_url=' + source_url,
-            "type": "GET",
+            "url": "/admin/index.php?r=editor/image/set",
+            "type": "POST",
+            "data": {
+                "slide_id": editor.getCurrentSlideID(),
+                "collection_id": currentCollectionID,
+                "content_url": content_url,
+                "source_url": source_url
+            },
             "dataType": "json"
         });
         promise.done(function(data) {
@@ -650,5 +689,24 @@ var StoryEditor = (function() {
             }
         });
     };
+
+    /*
+    function getCollectionSlug(link) {
+        var reg = new RegExp("^https:\\/\\/yandex\\.ru\\/collections\\/user\\/.*\\/(.*)\\/$", "i");
+        if (!reg.test(link)) {
+            return '';
+        }
+        return link.match(reg)[1];
+    }
+
+    editor.getCollectionFromLink = function(link) {
+        var collectionSlug = getCollectionSlug(link);
+        if (collectionSlug === '') {
+            toastr.warning('Не удалось определить коллекцию по ссылке');
+            return;
+        }
+        console.log(collectionSlug);
+    };
+    */
 
 })(StoryEditor, jQuery, console);

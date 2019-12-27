@@ -105,12 +105,11 @@ $js = <<< JS
 	    StoryEditor.slideCollectionsModal("$slideSourceAction");
 	});
 	
-	$("#collection-card-list", "#slide-collections-modal").on("click", "a.thumbnail", function(e) {
+	$(".collection_card_list", "#slide-collections-modal").on("click", "a.thumbnail", function(e) {
 	    e.preventDefault();
 	    var img = $("img", this);
 	    StoryEditor.addCollectionImage(img.attr("src"), img.attr("data-content-url"));
 	});
-	
 JS;
 $this->registerJs($js);
 
@@ -286,9 +285,23 @@ $options = [
                 <h4 class="modal-title">Коллекции</h4>
             </div>
             <div class="modal-body">
-                <ul class="pagination pagination-lg" id="collection-page-list"></ul>
-                <div id="collection-list"></div>
-                <div id="collection-card-list" class="row" style="margin-top: 20px"></div>
+                <div>
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active"><a href="#story-collection" aria-controls="story-collection" role="tab" data-toggle="tab">Коллекции истории</a></li>
+                        <li role="presentation"><a href="#yandex-collection" aria-controls="yandex-collection" role="tab" data-toggle="tab">Добавить из яндекс коллекции</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="story-collection">
+                            <div class="collection_list" style="margin: 20px 0"></div>
+                            <div class="row collection_card_list" style="margin-top: 20px"></div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="yandex-collection">
+                            <ul class="pagination pagination-lg" id="collection-page-list"></ul>
+                            <div class="collection_list" style="margin: 20px 0"></div>
+                            <div class="row collection_card_list" style="margin-top: 20px"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer"></div>
         </div>

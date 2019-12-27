@@ -351,4 +351,19 @@ class StoryEditorService
         return implode(PHP_EOL, $text);
     }
 
+    public function addImageBlockToSlide(int $slideID, ImageBlock $block)
+    {
+        $model = StorySlide::findSlide($slideID);
+
+        $reader = new HtmlSlideReader($model->data);
+        $slide = $reader->load();
+        $slide->addBlock($block);
+
+        $writer = new HTMLWriter();
+        $html = $writer->renderSlide($slide);
+
+        $model->data = $html;
+        $model->save(false, ['data']);
+    }
+
 }

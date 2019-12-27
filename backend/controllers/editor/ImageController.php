@@ -9,6 +9,9 @@ use backend\components\story\ImageBlock;
 use backend\components\story\reader\HTMLReader;
 use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\writer\HTMLWriter;
+use backend\models\ImageForm;
+use backend\services\ImageService;
+use backend\services\StoryEditorService;
 use common\models\Story;
 use common\models\StorySlide;
 use common\models\StorySlideImage;
@@ -21,6 +24,16 @@ use yii\web\Response;
 
 class ImageController extends Controller
 {
+
+    protected $imageService;
+    protected $editorService;
+
+    public function __construct($id, $module, ImageService $imageService, StoryEditorService $editorService, $config = [])
+    {
+        $this->imageService = $imageService;
+        $this->editorService = $editorService;
+        parent::__construct($id, $module, $config);
+    }
 
     public function behaviors()
     {
@@ -80,65 +93,35 @@ class ImageController extends Controller
         return ['success' => true];
     }
 
-    public function actionSet(int $slide_id, string $content_url, string $source_url)
+    public function actionSet()
     {
+        $form = new ImageForm();
+        $success = false;
+        if ($form->load(Yii::$app->request->post(), '') && $form->validate()) {
 
-        $model = StorySlide::findSlide($slide_id);
-        $storyBaseModel = $model->story->getBaseModel();
+            $image = $this->imageService->createImage($form->slide_id, $form->collection_id, $form->content_url, $form->source_url);
+            $path = $this->imageService->downloadImage($image->content_url, $image->hash, Yii::getAlias('@public/admin/upload/') . $image->folder);
 
-
-
-        $image = new StorySlideImage();
-        $image->hash = Yii::$app->security->generateRandomString();
-        $image->source_url = $source_url;
-        $image->content_url = $content_url;
-        $image->folder = Yii::$app->formatter->asDate('now', 'MM-yyyy');
-        if ($image->save()) {
-
-            $ch = curl_init($content_url);
-            curl_setopt($ch, CURLOPT_HEADER, 0);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
-            curl_setopt($ch,CURLOPT_USERAGENT,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36');
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            $raw = curl_exec($ch);
-
-            $info = curl_getinfo($ch);
-            curl_close($ch);
-
-            $ext = FileHelper::getExtensionsByMimeType($info['content_type']);
-            $imageFileName = $image->hash . '.' . $ext[1];
-
-
-            $path = Yii::getAlias('@public/admin/upload/') . $image->folder;
-            FileHelper::createDirectory($path);
-            $path .= '/' . $imageFileName;
-
-            $fp = fopen($path, 'xb');
-            fwrite($fp, $raw);
-            fclose($fp);
-
-
-            $reader = new HtmlSlideReader($model->data);
-            $slide = $reader->load();
-
-            /** @var $block ImageBlock */
-            $block = $slide->createBlock(['class' => ImageBlock::class]);
-
-            [$imageWidth, $imageHeight] = getimagesize($path);
+            $block = new ImageBlock();
             $block->setFilePath(Yii::$app->urlManagerFrontend->createAbsoluteUrl(['image/view', 'id' => $image->hash]));
-            $block->setWidth($imageWidth);
-            $block->setHeight($imageHeight);
-            $slide->addBlock($block);
+            [$imageWidth, $imageHeight] = getimagesize($path);
+            $block->setWidth($imageWidth . 'px');
+            $block->setHeight($imageHeight . 'px');
 
-            $writer = new HTMLWriter();
-            $html = $writer->renderSlide($slide);
-
-            $model->data = $html;
-            $model->save(false, ['data']);
+            $this->editorService->addImageBlockToSlide($form->slide_id, $block);
+            $success = true;
         }
 
-        return ['success' => true];
+        return ['success' => $success];
+    }
+
+    public function actionGetUsedCollections(int $story_id)
+    {
+        $model = Story::findModel($story_id);
+        return [
+            'success' => true,
+            'result' => StorySlideImage::usedCollections($model->id),
+        ];
     }
 
 }
