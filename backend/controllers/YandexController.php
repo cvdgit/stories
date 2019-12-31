@@ -4,10 +4,12 @@
 namespace backend\controllers;
 
 
+use http\Exception\RuntimeException;
 use linslin\yii2\curl\Curl;
 use Yii;
 use yii\helpers\Json;
 use yii\web\Controller;
+use yii\web\HttpException;
 use yii\web\Response;
 
 class YandexController extends Controller
@@ -42,17 +44,26 @@ class YandexController extends Controller
         return $this->_curl;
     }
 
-    public function actionAuthorize()
+    public function actionAuthorize(string $account)
     {
-        return $this->redirect($this->_authorizeLink);
+        return $this->redirect($this->_authorizeLink . '&state=' . $account);
     }
 
-    protected function getTokenFilePath()
+    protected function checkAccount($account)
     {
-        return Yii::getAlias('@public/admin/upload/token');
+        $accounts = Yii::$app->params['yandex.accounts'];
+        return isset($accounts[$account]);
     }
 
-    public function actionToken($code)
+    protected function getTokenFilePath(string $account)
+    {
+        if (!$this->checkAccount($account)) {
+            throw new HttpException(400, 'Invalid account');
+        }
+        return Yii::getAlias('@public/admin/upload/' . $account);
+    }
+
+    public function actionToken($code, $state = '')
     {
         $curl = new Curl();
         $result = $curl
@@ -63,7 +74,7 @@ class YandexController extends Controller
                 'client_secret' => $this->clientSecret,
             ]))
             ->post(self::TOKEN_URL);
-        file_put_contents($this->getTokenFilePath(), $result);
+        file_put_contents($this->getTokenFilePath($state), $result);
     }
 
     protected function checkTokenExpire()
@@ -77,33 +88,36 @@ class YandexController extends Controller
 
     private $token;
 
-    protected function getAuthToken()
+    protected function getAuthToken(string $account)
     {
-        if ($this->token === null) {
-            $json = file_get_contents($this->getTokenFilePath());
-            $json = Json::decode($json);
-            $this->token = $json['access_token'];
+        $tokenPath = $this->getTokenFilePath($account);
+        if (!file_exists($tokenPath)) {
+            throw new HttpException(400,'Token not found');
         }
+        $json = file_get_contents($tokenPath);
+        $json = Json::decode($json);
+        $this->token = $json['access_token'];
         return $this->token;
     }
 
-    public function actionBoards(int $page = 1)
+    public function actionBoards(string $account, int $page = 1)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $result = $this->getCurl()
-            ->setHeader('Authorization', 'OAuth ' . $this->getAuthToken())
+            ->setHeader('Authorization', 'OAuth ' . $this->getAuthToken($account))
             ->setGetParams(['page' => $page])
             ->setGetParams(['page_size' => 100])
             ->get('https://api.collections.yandex.net/v1/boards/');
         return Json::decode($result);
     }
 
-    public function actionCards(string $board_id)
+    public function actionCards(string $board_id, string $account)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
+
         //$this->checkTokenExpire();
         $result = $this->getCurl()
-            ->setHeader('Authorization', 'OAuth ' . $this->getAuthToken())
+            ->setHeader('Authorization', 'OAuth ' . $this->getAuthToken($account))
             ->setGetParams(['board_id' => $board_id])
             ->get('https://api.collections.yandex.net/v1/cards/');
         return Json::decode($result);

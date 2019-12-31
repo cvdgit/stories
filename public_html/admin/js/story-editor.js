@@ -539,25 +539,28 @@ var StoryEditor = (function() {
     "use strict";
 
     var config = {
-        addImagesAction: ""
+        setImageAction: "",
+        accounts: []
     };
 
     var $modal = $("#slide-collections-modal");
 
     var currentPageNumber,
-        currentCollectionID;
+        currentCollectionID,
+        currentAccount;
 
     var $collectionList = $("#collection-list", $modal);
     var $cardList = $("#collection-card-list", $modal);
 
-    function drawCollectionCards(collectionID, listID) {
+    function drawCollectionCards(collectionID, listID, account) {
 
         currentCollectionID = collectionID;
+        account = account || currentAccount;
 
         var $tabCardList = $(".collection_card_list", "#" + listID);
         $tabCardList.empty();
         var promise = $.ajax({
-            "url": "/admin/index.php?r=yandex/cards" + "&board_id=" + collectionID,
+            "url": "/admin/index.php?r=yandex/cards" + "&board_id=" + collectionID  + "&account=" + account,
             "type": "GET",
             "dataType": "json"
         });
@@ -566,7 +569,10 @@ var StoryEditor = (function() {
                 data.results.forEach(function (card) {
                     var img = $("<img/>")
                         .attr("src", card.content[0].source.url)
-                        .attr("data-content-url", card.content[0].content.url);
+                        .attr("data-content-url", card.content[0].content.url)
+                        .attr("data-collection-id", card.board.id)
+                        .attr("data-collection-name", card.board.title)
+                        .attr("data-collection-account", account);
                     $tabCardList.append('<div class="col-xs-6 col-md-3"><a href="#" class="thumbnail">' + img.prop("outerHTML") + '</a></div>');
                 });
             }
@@ -574,10 +580,15 @@ var StoryEditor = (function() {
                 $tabCardList.append('<div class="col-md-12">Изображения в итории не найдены</div>');
             }
         });
+        promise.fail(function(data) {
+            var response = data.responseJSON;
+            toastr.error(response.message, response.name);
+        });
     }
 
     function drawCollections(collections) {
         var $tabCollectionList = $(".collection_list", "#yandex-collection");
+        $tabCollectionList.empty();
         collections.forEach(function(collection) {
             $("<a/>")
                 .attr("href", "#")
@@ -591,11 +602,15 @@ var StoryEditor = (function() {
         });
     }
 
-    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-        var $tab = $(e.target);
-        if ($tab.attr("href").substr(1) === 'yandex-collection') {
-            var $pageList = $("#collection-page-list");
-            getCollections().done(function(data) {
+    function drawPagination(reload) {
+        reload = reload || false;
+        var $pageList = $("#collection-page-list");
+        if (reload) {
+            $pageList.empty();
+        }
+        $(".collection_list", "#yandex-collection").empty();
+        getCollections()
+            .done(function(data) {
                 if (data && data.results) {
                     if (!$pageList.find('li').length) {
                         var pageCount = Math.ceil(data.count / 100),
@@ -627,7 +642,20 @@ var StoryEditor = (function() {
                         drawCollections(data.results, 'yandex-collection');
                     }
                 }
+            })
+            .fail(function(data) {
+                var response = data.responseJSON;
+                toastr.error(response.message, response.name);
             });
+    }
+
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        var $tab = $(e.target);
+        if ($tab.attr("href").substr(1) === 'yandex-collection') {
+            if (!currentAccount) {
+                currentAccount = config.accounts[0];
+            }
+            drawPagination();
         }
     });
 
@@ -641,17 +669,24 @@ var StoryEditor = (function() {
         });
         promise.done(function(data) {
             if (data && data.success) {
-                data.result.forEach(function(collection) {
-                    $("<a/>")
-                        .attr("href", "#")
-                        .html('<span class="label label-lg label-primary">' + collection.collection_id + '</span> ')
-                        .css("font-size", "1.7rem")
-                        .on("click", function (e) {
-                            e.preventDefault();
-                            drawCollectionCards(collection.collection_id, 'story-collection');
-                        })
+                if (!data.result.length) {
+                    $("<p/>")
+                        .text("В историю не добавлено изображений из коллекций")
                         .appendTo($tabCollectionList);
-                });
+                }
+                else {
+                    data.result.forEach(function (collection) {
+                        $("<a/>")
+                            .attr("href", "#")
+                            .html('<span class="label label-lg label-primary">' + collection.collection_name + '</span> ')
+                            .css("font-size", "1.7rem")
+                            .on("click", function (e) {
+                                e.preventDefault();
+                                drawCollectionCards(collection.collection_id, 'story-collection', collection.collection_account);
+                            })
+                            .appendTo($tabCollectionList);
+                    });
+                }
             }
         });
     });
@@ -660,6 +695,12 @@ var StoryEditor = (function() {
         config = params;
     };
 
+    $("a[data-account]", $modal).on("click", function(e) {
+        e.preventDefault();
+        currentAccount = $(this).attr("data-account");
+        drawPagination(true);
+    });
+
     editor.slideCollectionsModal = function() {
         $modal.modal("show");
     };
@@ -667,16 +708,18 @@ var StoryEditor = (function() {
     function getCollections(page) {
         page = page || 1;
         currentPageNumber = page;
-        return $.get('/admin/index.php?r=yandex/boards&page=' + page);
+        return $.get('/admin/index.php?r=yandex/boards&page=' + page + '&account=' + currentAccount);
     }
 
-    editor.addCollectionImage = function(source_url, content_url) {
+    editor.addCollectionImage = function(source_url, content_url, collection_account, collection_id, collection_name) {
         var promise = $.ajax({
             "url": "/admin/index.php?r=editor/image/set",
             "type": "POST",
             "data": {
                 "slide_id": editor.getCurrentSlideID(),
-                "collection_id": currentCollectionID,
+                "collection_account": collection_account,
+                "collection_id": collection_id,
+                "collection_name": collection_name,
                 "content_url": content_url,
                 "source_url": source_url
             },

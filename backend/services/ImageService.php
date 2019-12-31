@@ -15,11 +15,11 @@ class ImageService
     {
     }
 
-    public function createImage(int $slideID, string $collectionID, string $contentUrl, string $sourceUrl)
+    public function createImage(int $slideID, string $collectionAccount, string $collectionID, string $collectionName, string $contentUrl, string $sourceUrl)
     {
         $hash = Yii::$app->security->generateRandomString();
         $folder = Yii::$app->formatter->asDate('now', 'MM-yyyy');
-        $model = StorySlideImage::createImage($slideID, $collectionID, $hash, $folder, $contentUrl, $sourceUrl);
+        $model = StorySlideImage::createImage($slideID, $collectionAccount, $collectionID, $collectionName, $hash, $folder, $contentUrl, $sourceUrl);
         $model->save();
         return $model;
     }

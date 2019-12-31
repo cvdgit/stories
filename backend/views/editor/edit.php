@@ -50,12 +50,16 @@ $slideLinksAction = Url::to(['editor/links/index']);
 $imagesConfigJSON = Json::htmlEncode([
     'addImagesAction' => Url::to(['editor/image/create']),
 ]);
+$collectionConfigJSON = Json::htmlEncode([
+    'setImageAction' => Url::to(['editor/image/set']),
+    'accounts' => array_keys(Yii::$app->params['yandex.accounts']),
+]);
 
 $js = <<< JS
     
     StoryEditor.initialize($configJSON);
-
     StoryEditor.initImagesModule($imagesConfigJSON);
+    StoryEditor.initCollectionsModule($collectionConfigJSON);
 
 	$("#form-container")
 	    .on("beforeSubmit", "form", StoryEditor.onBeforeSubmit)
@@ -108,7 +112,7 @@ $js = <<< JS
 	$(".collection_card_list", "#slide-collections-modal").on("click", "a.thumbnail", function(e) {
 	    e.preventDefault();
 	    var img = $("img", this);
-	    StoryEditor.addCollectionImage(img.attr("src"), img.attr("data-content-url"));
+	    StoryEditor.addCollectionImage(img.attr("src"), img.attr("data-content-url"), img.attr("data-collection-account"), img.attr("data-collection-id"), img.attr("data-collection-name"));
 	});
 JS;
 $this->registerJs($js);
@@ -296,8 +300,23 @@ $options = [
                             <div class="row collection_card_list" style="margin-top: 20px"></div>
                         </div>
                         <div role="tabpanel" class="tab-pane" id="yandex-collection">
+                            <div class="clearfix" style="padding-top: 20px">
+                                <div class="pull-right">
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            Аккаунт
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                            <?php foreach (array_keys(Yii::$app->params['yandex.accounts']) as $account): ?>
+                                                <li><?= Html::a($account, '#', ['data-account' => $account]) ?></li>
+                                            <?php endforeach ?>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
                             <ul class="pagination pagination-lg" id="collection-page-list"></ul>
-                            <div class="collection_list" style="margin: 20px 0"></div>
+                            <div class="collection_list"></div>
                             <div class="row collection_card_list" style="margin-top: 20px"></div>
                         </div>
                     </div>

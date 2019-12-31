@@ -99,7 +99,7 @@ class ImageController extends Controller
         $success = false;
         if ($form->load(Yii::$app->request->post(), '') && $form->validate()) {
 
-            $image = $this->imageService->createImage($form->slide_id, $form->collection_id, $form->content_url, $form->source_url);
+            $image = $this->imageService->createImage($form->slide_id, $form->collection_account, $form->collection_id, $form->collection_name, $form->content_url, $form->source_url);
             $path = $this->imageService->downloadImage($image->content_url, $image->hash, Yii::getAlias('@public/admin/upload/') . $image->folder);
 
             $block = new ImageBlock();

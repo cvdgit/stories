@@ -13,7 +13,9 @@ use yii\db\Query;
  *
  * @property int $id
  * @property string $hash
+ * @property string $collection_account
  * @property string $collection_id
+ * @property string $collection_name
  * @property string $source_url
  * @property string $content_url
  * @property string $folder
@@ -87,11 +89,13 @@ class StorySlideImage extends ActiveRecord
         throw new DomainException('Изображение не найдено');
     }
 
-    public static function createImage(int $slideID, string $collectionID, string $hash, string $folder, string $contentUrl, string $sourceUrl): StorySlideImage
+    public static function createImage(int $slideID, string $collectionAccount, string $collectionID, string $collectionName, string $hash, string $folder, string $contentUrl, string $sourceUrl): StorySlideImage
     {
         $image = new self;
         $image->slide_id = $slideID;
+        $image->collection_account = $collectionAccount;
         $image->collection_id = $collectionID;
+        $image->collection_name = $collectionName;
         $image->hash = $hash;
         $image->folder = $folder;
         $image->content_url = $contentUrl;
@@ -106,7 +110,7 @@ class StorySlideImage extends ActiveRecord
             ->from('{{story_slide}}')
             ->where('story_id = :story', [':story' => $storyID]);
         return (new Query())
-            ->select('collection_id')
+            ->select(['collection_account', 'collection_id', 'collection_name'])
             ->distinct(true)
             ->from(self::tableName())
             ->where(['in', 'slide_id', $storySlidesQuery])
