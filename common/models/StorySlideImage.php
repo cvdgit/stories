@@ -22,11 +22,17 @@ use yii\db\Query;
  * @property int $created_at
  * @property int $updated_at
  * @property int $slide_id
+ * @property int $status
+ * @property string $block_id
  *
  * @property StorySlide $slide
  */
 class StorySlideImage extends ActiveRecord
 {
+
+    const STATUS_SUCCESS = 0;
+    const STATUS_ERROR = 1;
+
     /**
      * {@inheritdoc}
      */
@@ -48,11 +54,6 @@ class StorySlideImage extends ActiveRecord
     public function rules()
     {
         return [
-            //[['hash', 'folder', 'slide_id'], 'required'],
-            //[['created_at', 'updated_at', 'slide_id'], 'integer'],
-            //[['hash', 'collection_id', 'source_url', 'folder', 'content_url'], 'string', 'max' => 255],
-            //[['hash'], 'unique'],
-            //[['slide_id'], 'exist', 'skipOnError' => true, 'targetClass' => StorySlide::class, 'targetAttribute' => ['slide_id' => 'id']],
             [['created_at', 'updated_at'], 'integer'],
         ];
     }
@@ -79,6 +80,14 @@ class StorySlideImage extends ActiveRecord
     public function getSlide()
     {
         return $this->hasOne(StorySlide::class, ['id' => 'slide_id']);
+    }
+
+    public static function findModel($id)
+    {
+        if (($model = self::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new DomainException('Изображение не найдено');
     }
 
     public static function findByHash(string $hash)
@@ -116,6 +125,20 @@ class StorySlideImage extends ActiveRecord
             ->where(['in', 'slide_id', $storySlidesQuery])
             ->andWhere('collection_id IS NOT NULL')
             ->all();
+    }
+
+    public function isSuccess()
+    {
+        return (int)$this->status === self::STATUS_SUCCESS;
+    }
+
+    public function afterDelete()
+    {
+        $filePath = Yii::getAlias('@public/admin/upload/') . $this->folder . '/' . $this->hash . '.jpeg';
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+        parent::afterDelete();
     }
 
 }

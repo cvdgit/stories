@@ -104,11 +104,10 @@ class StoryEditorService
                 $imageHash = $result['id'];
                 try {
                     $image = StorySlideImage::findByHash($imageHash);
-                    $path = Yii::getAlias('@public/admin/upload') . $image->folder . DIRECTORY_SEPARATOR . $image->hash . '.jpeg';
+                    $image->delete();
                 }
-                catch (DomainException $ex) {
-                    $noFile = true;
-                }
+                catch (DomainException $ex) {}
+                $noFile = true;
             }
             else {
                 $path = Yii::getAlias('@public') . $path;

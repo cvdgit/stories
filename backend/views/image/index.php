@@ -18,9 +18,29 @@ $this->title = 'Изображения';
             'source_url',
             'created_at:datetime',
             [
+                'attribute' => 'status',
+                'value' => function(\common\models\StorySlideImage $model) {
+                    $className = 'ok';
+                    $color = '#5cb85c';
+                    if (!$model->isSuccess()) {
+                        $className = 'remove';
+                        $color = '#a94442';
+                    }
+                    return Html::tag('i', '', ['class' => "glyphicon glyphicon-$className", 'style' => "color: $color"]);
+                },
+                'format' => 'raw',
+            ],
+            [
                 'class' => ActionColumn::class,
-                'buttons' => [],
-                'template' => '{view} {delete}',
+                'controller' => 'editor/image',
+                'buttons' => [
+                    'view' => function($url, $model) {
+                        return Html::a(
+                            '<span class="glyphicon glyphicon-eye-open"></span>',
+                            Yii::$app->urlManagerFrontend->createAbsoluteUrl(['image/view', 'id' => $model->hash]),
+                            ['target' => '_blank']);
+                    }
+                ],
             ],
         ],
     ]) ?>

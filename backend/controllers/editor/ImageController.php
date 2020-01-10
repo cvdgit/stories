@@ -107,8 +107,11 @@ class ImageController extends Controller
             [$imageWidth, $imageHeight] = getimagesize($path);
             $block->setWidth($imageWidth . 'px');
             $block->setHeight($imageHeight . 'px');
-
             $this->editorService->addImageBlockToSlide($form->slide_id, $block);
+
+            $image->block_id = $block->getId();
+            $image->save(false, ['block_id']);
+
             $success = true;
         }
 
@@ -122,6 +125,28 @@ class ImageController extends Controller
             'success' => true,
             'result' => StorySlideImage::usedCollections($model->id),
         ];
+    }
+
+    public function actionUpdate(int $id)
+    {
+        Yii::$app->response->format = Response::FORMAT_HTML;
+        $model = new ImageForm();
+        $model->loadModel($id);
+        //if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+        //    $model->saveVideo();
+        //    return $this->refresh();
+        //}
+        return $this->render('update', [
+            'model' => $model,
+        ]);
+    }
+
+    public function actionDelete(int $id)
+    {
+        Yii::$app->response->format = Response::FORMAT_HTML;
+        $model = StorySlideImage::findModel($id);
+        $this->editorService->deleteBlock($model->slide_id, $model->block_id);
+        $model->delete();
     }
 
 }
