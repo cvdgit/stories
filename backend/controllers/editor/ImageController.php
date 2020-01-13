@@ -97,9 +97,17 @@ class ImageController extends Controller
     {
         $form = new ImageForm();
         $success = false;
+        $errors = [];
         if ($form->load(Yii::$app->request->post(), '') && $form->validate()) {
 
-            $image = $this->imageService->createImage($form->slide_id, $form->collection_account, $form->collection_id, $form->collection_name, $form->content_url, $form->source_url);
+            $image = $this->imageService->createImage(
+                $form->collection_account,
+                $form->collection_id,
+                $form->collection_name,
+                $form->content_url,
+                $form->source_url
+            );
+
             $path = $this->imageService->downloadImage($image->content_url, $image->hash, Yii::getAlias('@public/admin/upload/') . $image->folder);
 
             $block = new ImageBlock();
@@ -109,13 +117,15 @@ class ImageController extends Controller
             $block->setHeight($imageHeight . 'px');
             $this->editorService->addImageBlockToSlide($form->slide_id, $block);
 
-            $image->block_id = $block->getId();
-            $image->save(false, ['block_id']);
+            $this->imageService->linkImage($image->id, $form->slide_id, $block->getId());
 
             $success = true;
         }
+        else {
+            $errors = $form->errors;
+        }
 
-        return ['success' => $success];
+        return ['success' => $success, 'errors' => $errors];
     }
 
     public function actionGetUsedCollections(int $story_id)
@@ -145,8 +155,55 @@ class ImageController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_HTML;
         $model = StorySlideImage::findModel($id);
-        $this->editorService->deleteBlock($model->slide_id, $model->block_id);
+        if (!empty($model->block_id)) {
+            $this->editorService->deleteBlock($model->slide_id, $model->block_id);
+        }
         $model->delete();
+        return $this->redirect(['image/index']);
+    }
+
+    public function actionGetImages(int $story_id)
+    {
+        $model = Story::findModel($story_id);
+        return [
+            'success' => true,
+            'result' => StorySlideImage::storyImages($model->id),
+        ];
+    }
+
+    public function actionBackup(int $image_id)
+    {
+        $model = StorySlideImage::findModel($image_id);
+        $form = new ImageForm();
+        $success = false;
+        $errors = [];
+        if ($form->load(Yii::$app->request->post(), '') && $form->validate()) {
+            $image = $this->imageService->createImage(
+                $form->collection_account,
+                $form->collection_id,
+                $form->collection_name,
+                $form->content_url,
+                $form->source_url
+            );
+            $this->imageService->downloadImage($image->content_url, $image->hash, Yii::getAlias('@public/admin/upload/') . $image->folder);
+            $this->imageService->boundImage($model->id, $image->id);
+            $success = true;
+        }
+        else {
+            $errors = $form->errors;
+        }
+        return ['success' => $success, 'errors' => $errors];
+    }
+
+    public function actionDeleteFromStory(int $image_id, int $slide_id, string $block_id)
+    {
+        $image = StorySlideImage::findModel($image_id);
+        $slide = StorySlide::findSlide($slide_id);
+
+        $this->imageService->unlinkImage($image->id, $slide->id, $block_id);
+        $this->editorService->deleteBlock($slide->id, $block_id);
+
+        return ['success' => true, 'errors' => []];
     }
 
 }

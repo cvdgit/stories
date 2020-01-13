@@ -15,13 +15,35 @@ class ImageService
     {
     }
 
-    public function createImage(int $slideID, string $collectionAccount, string $collectionID, string $collectionName, string $contentUrl, string $sourceUrl)
+    public function createImage(string $collectionAccount, string $collectionID, string $collectionName, string $contentUrl, string $sourceUrl)
     {
         $hash = Yii::$app->security->generateRandomString();
         $folder = Yii::$app->formatter->asDate('now', 'MM-yyyy');
-        $model = StorySlideImage::createImage($slideID, $collectionAccount, $collectionID, $collectionName, $hash, $folder, $contentUrl, $sourceUrl);
+        $model = StorySlideImage::createImage($collectionAccount, $collectionID, $collectionName, $hash, $folder, $contentUrl, $sourceUrl);
         $model->save();
         return $model;
+    }
+
+    public function linkImage(int $imageID, int $slideID, string $blockID)
+    {
+        $command = Yii::$app->db->createCommand();
+        $command->insert('{{%image_slide_block}}', [
+            'image_id' => $imageID,
+            'slide_id' => $slideID,
+            'block_id' => $blockID,
+        ]);
+        return $command->execute();
+    }
+
+    public function unlinkImage(int $imageID, int $slideID, string $blockID)
+    {
+        $command = Yii::$app->db->createCommand();
+        $command->delete('{{%image_slide_block}}', 'image_id = :image AND slide_id = :slide AND block_id = :block', [
+            'image' => $imageID,
+            'slide' => $slideID,
+            'block' => $blockID,
+        ]);
+        return $command->execute();
     }
 
     public function downloadImage(string $url, string $imageName, string $imagePath)
@@ -60,6 +82,21 @@ class ImageService
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
         return $httpCode === 200;
+    }
+
+    public function boundImage(int $imageID, int $linkImageID)
+    {
+        $command = Yii::$app->db->createCommand();
+        $command->insert('{{%image_link}}', [
+            'image_id' => $imageID,
+            'link_image_id' => $linkImageID,
+        ]);
+        return $command->execute();
+    }
+
+    public function breakBondImage()
+    {
+
     }
 
 }

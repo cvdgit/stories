@@ -271,7 +271,7 @@ var StoryEditor = (function() {
     init();
 
     function previewContainerSetHeight() {
-        var height = parseInt($('.story-container').css('height')) - 40;
+        var height = parseInt($('.story-container').css('height'));
         $previewContainer.css('height', height + 'px');
     }
 
@@ -552,6 +552,9 @@ var StoryEditor = (function() {
     var $collectionList = $("#collection-list", $modal);
     var $cardList = $("#collection-card-list", $modal);
 
+    var mode = "",
+        backupImage = "";
+
     function drawCollectionCards(collectionID, listID, account) {
 
         currentCollectionID = collectionID;
@@ -567,13 +570,15 @@ var StoryEditor = (function() {
         promise.done(function(data) {
             if (data && data.results) {
                 data.results.forEach(function (card) {
-                    var img = $("<img/>")
-                        .attr("src", card.content[0].source.url)
-                        .attr("data-content-url", card.content[0].content.url)
-                        .attr("data-collection-id", card.board.id)
-                        .attr("data-collection-name", card.board.title)
-                        .attr("data-collection-account", account);
-                    $tabCardList.append('<div class="col-xs-6 col-md-3"><a href="#" class="thumbnail">' + img.prop("outerHTML") + '</a></div>');
+                    var img = $("<img/>").attr("src", card.content[0].source.url);
+                    var $item = $('<div class="col-xs-6 col-md-3"><a href="#" class="thumbnail">' + img.prop("outerHTML") + '</a></div>');
+                    $item
+                        .find("a.thumbnail")
+                        .on("click", function(e) {
+                            e.preventDefault();
+                            addImage(card.content[0].source.url, card.content[0].content.url, account, card.board.id, card.board.title);
+                        });
+                    $tabCardList.append($item);
                 });
             }
             else {
@@ -660,6 +665,9 @@ var StoryEditor = (function() {
     });
 
     $modal.on('show.bs.modal', function() {
+
+        backupImage = $(this).data("backupImage");
+
         var $tabCollectionList = $(".collection_list", "#story-collection");
         $tabCollectionList.empty();
         var promise = $.ajax({
@@ -702,7 +710,17 @@ var StoryEditor = (function() {
     });
 
     editor.slideCollectionsModal = function() {
-        $modal.modal("show");
+        mode = "";
+        $modal
+            .data("backupImage", "")
+            .modal("show");
+    };
+
+    editor.slideCollectionsBackupModal = function(imageID) {
+        mode = "backup";
+        $modal
+            .data("backupImage", imageID)
+            .modal("show");
     };
 
     function getCollections(page) {
@@ -711,7 +729,16 @@ var StoryEditor = (function() {
         return $.get('/admin/index.php?r=yandex/boards&page=' + page + '&account=' + currentAccount);
     }
 
-    editor.addCollectionImage = function(source_url, content_url, collection_account, collection_id, collection_name) {
+    function addImage(source_url, content_url, collection_account, collection_id, collection_name) {
+        if (mode === "backup") {
+            addBackupImage(source_url, content_url, collection_account, collection_id, collection_name);
+        }
+        else {
+            addCollectionImage(source_url, content_url, collection_account, collection_id, collection_name);
+        }
+    }
+
+    function addCollectionImage(source_url, content_url, collection_account, collection_id, collection_name) {
         var promise = $.ajax({
             "url": "/admin/index.php?r=editor/image/set",
             "type": "POST",
@@ -731,7 +758,29 @@ var StoryEditor = (function() {
                 editor.loadSlide(editor.getCurrentSlideID(), true);
             }
         });
-    };
+    }
+
+    function addBackupImage(source_url, content_url, collection_account, collection_id, collection_name) {
+        var promise = $.ajax({
+            "url": "/admin/index.php?r=editor/image/backup&image_id=" + backupImage,
+            "type": "POST",
+            "data": {
+                "slide_id": editor.getCurrentSlideID(),
+                "collection_account": collection_account,
+                "collection_id": collection_id,
+                "collection_name": collection_name,
+                "content_url": content_url,
+                "source_url": source_url
+            },
+            "dataType": "json"
+        });
+        promise.done(function(data) {
+            if (data && data.success) {
+                $modal.modal("hide");
+
+            }
+        });
+    }
 
     /*
     function getCollectionSlug(link) {
@@ -751,5 +800,85 @@ var StoryEditor = (function() {
         console.log(collectionSlug);
     };
     */
+
+})(StoryEditor, jQuery, console);
+
+/** Story Images */
+(function(editor, $, console) {
+    "use strict";
+
+    var $modal = $("#story-images-modal");
+
+    function elementWrapper()
+    {
+        return $('<div class="media">' +
+                    '<div class="media-left"></div>' +
+                    '<div class="media-body">' +
+                        '<a href="#" class="add-backup-image">Добавить резервное изображение</a>' +
+                        '<br>' +
+                        '<a href="#" class="backup-images">Резервные изображения <span></span></a>' +
+                        '<br>' +
+                        '<a href="#" class="delete-image">Удалить из истории</a>' +
+                    '</div>' +
+                '</div>');
+    }
+
+    function backupImages(imageID) {
+        editor.slideCollectionsBackupModal(imageID);
+    }
+
+    function deleteImageFromStory(imageID, slideID, blockID, elem) {
+        return $.ajax({
+            "url": "/admin/index.php?r=editor/image/delete-from-story&image_id=" + imageID + '&slide_id=' + slideID + '&block_id=' + blockID,
+            "type": "GET",
+            "dataType": "json"
+        });
+    }
+
+    $modal.on('show.bs.modal', function() {
+        var $imagesList = $(".story-images-list", this);
+        $imagesList.empty();
+        var promise = $.ajax({
+            "url": "/admin/index.php?r=editor/image/get-images&story_id=" + editor.getConfigValue('storyID'),
+            "type": "GET",
+            "dataType": "json"
+        });
+        promise.done(function(data) {
+            if (data && data.success) {
+                if (!data.result.length) {
+                }
+                else {
+                    data.result.forEach(function(image) {
+                        var $img = $('<img/>')
+                            .attr("src", "/image/view?id=" + image.hash)
+                            .attr("width", 200);
+                        elementWrapper()
+                            .find(".media-left").append($img).end()
+                            .find(".add-backup-image").on("click", function(e) {
+                                e.preventDefault();
+                                backupImages(image.id);
+                            }).end()
+                            .find(".backup-images").attr("href", "/admin/index.php?r=editor/image/update&id=" + image.id).end()
+                            .find(".backup-images span").text(" (" + image.link_image_count + ")").end()
+                            .find(".delete-image").on("click", function(e) {
+                                e.preventDefault();
+                                if (!confirm("Удалить изображение?")) {
+                                    return;
+                                }
+                                var $link = $(this);
+                                deleteImageFromStory(image.id, image.slide_id, image.block_id)
+                                    .done(function(data) {
+                                        if (data && data.success) {
+                                            $link.parent().parent().remove();
+                                            editor.loadSlide(editor.getCurrentSlideID(), true);
+                                        }
+                                    });
+                            }).end()
+                            .appendTo($imagesList);
+                    });
+                }
+            }
+        });
+    });
 
 })(StoryEditor, jQuery, console);

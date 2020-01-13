@@ -108,12 +108,6 @@ $js = <<< JS
 	    e.preventDefault();
 	    StoryEditor.slideCollectionsModal("$slideSourceAction");
 	});
-	
-	$(".collection_card_list", "#slide-collections-modal").on("click", "a.thumbnail", function(e) {
-	    e.preventDefault();
-	    var img = $("img", this);
-	    StoryEditor.addCollectionImage(img.attr("src"), img.attr("data-content-url"), img.attr("data-collection-account"), img.attr("data-collection-id"), img.attr("data-collection-name"));
-	});
 JS;
 $this->registerJs($js);
 
@@ -194,6 +188,11 @@ $options = [
             </div>
         </div>
 	</div>
+</div>
+<div class="row">
+    <div class="col-md-3 text-center">
+        <?= Html::a('Изображения', '#', ['class' => 'btn btn-primary', 'data-toggle' => 'modal', 'data-target' => '#story-images-modal']) ?>
+    </div>
 </div>
 <div class="row">
     <div class="col-lg-3">
@@ -281,7 +280,7 @@ $options = [
     </div>
 </div>
 
-<div class="modal fade" id="slide-collections-modal">
+<div class="modal fade" id="slide-collections-modal" style="z-index: 1051">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -321,6 +320,21 @@ $options = [
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="story-images-modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Изображения истории</h4>
+            </div>
+            <div class="modal-body">
+                <div class="story-images-list"></div>
             </div>
             <div class="modal-footer"></div>
         </div>

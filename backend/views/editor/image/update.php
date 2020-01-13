@@ -15,6 +15,7 @@ $this->title = 'Изображение';
         <?= $form->field($model, 'source_url')->textInput(['readonly' => true]) ?>
         <?= $form->field($model, 'collection_name')->textInput(['readonly' => true]) ?>
         <?php ActiveForm::end(); ?>
+        <h4>Изображение в историях</h4>
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -23,10 +24,27 @@ $this->title = 'Изображение';
                 </tr>
             </thead>
             <tbody>
+                <?php foreach ($model->getModel()->slides as $slide): ?>
                 <tr>
-                    <td><?= $model->getModel()->slide->story->title ?></td>
-                    <td><?= $model->getModel()->slide->number ?></td>
+                    <td><?= $slide->story->title ?></td>
+                    <td><?= $slide->number ?></td>
                 </tr>
+                <?php endforeach ?>
+            </tbody>
+        </table>
+        <h4>Связанные изображения</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Изображение</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($model->getModel()->linkImages as $image): ?>
+                <tr>
+                    <td><?= $image->source_url ?></td>
+                </tr>
+            <?php endforeach ?>
             </tbody>
         </table>
     </div>

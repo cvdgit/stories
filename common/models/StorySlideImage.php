@@ -21,11 +21,10 @@ use yii\db\Query;
  * @property string $folder
  * @property int $created_at
  * @property int $updated_at
- * @property int $slide_id
  * @property int $status
- * @property string $block_id
  *
- * @property StorySlide $slide
+ * @property StorySlide[] $slides
+ * @property StorySlideImage[] $linkImages
  */
 class StorySlideImage extends ActiveRecord
 {
@@ -76,10 +75,19 @@ class StorySlideImage extends ActiveRecord
 
     /**
      * @return \yii\db\ActiveQuery
+     * @throws \yii\base\InvalidConfigException
      */
-    public function getSlide()
+    public function getSlides()
     {
-        return $this->hasOne(StorySlide::class, ['id' => 'slide_id']);
+        return $this->hasMany(StorySlide::class, ['id' => 'slide_id'])->viaTable('image_slide_block', ['image_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLinkImages()
+    {
+        return $this->hasMany(__CLASS__, ['id' => 'link_image_id'])->viaTable('image_link', ['image_id' => 'id']);
     }
 
     public static function findModel($id)
@@ -98,10 +106,9 @@ class StorySlideImage extends ActiveRecord
         throw new DomainException('Изображение не найдено');
     }
 
-    public static function createImage(int $slideID, string $collectionAccount, string $collectionID, string $collectionName, string $hash, string $folder, string $contentUrl, string $sourceUrl): StorySlideImage
+    public static function createImage(string $collectionAccount, string $collectionID, string $collectionName, string $hash, string $folder, string $contentUrl, string $sourceUrl): StorySlideImage
     {
         $image = new self;
-        $image->slide_id = $slideID;
         $image->collection_account = $collectionAccount;
         $image->collection_id = $collectionID;
         $image->collection_name = $collectionName;
@@ -121,9 +128,29 @@ class StorySlideImage extends ActiveRecord
         return (new Query())
             ->select(['collection_account', 'collection_id', 'collection_name'])
             ->distinct(true)
-            ->from(self::tableName())
+            ->from('{{%image_slide_block}}')
             ->where(['in', 'slide_id', $storySlidesQuery])
+            ->innerJoin('{{%story_slide_image}}', '{{%story_slide_image}}.id = {{%image_slide_block}}.image_id')
             ->andWhere('collection_id IS NOT NULL')
+            ->all();
+    }
+
+    public static function storyImages(int $storyID)
+    {
+        $storySlidesQuery = (new Query())
+            ->select(['id'])
+            ->from('{{story_slide}}')
+            ->where('story_id = :story', [':story' => $storyID]);
+        return (new Query())
+            ->select([
+                '{{%story_slide_image}}.*',
+                '(SELECT COUNT(image_link.image_id) FROM image_link WHERE image_link.image_id = image_slide_block.image_id) AS link_image_count',
+                '{{%image_slide_block}}.slide_id',
+                '{{%image_slide_block}}.block_id',
+            ])
+            ->from('{{%image_slide_block}}')
+            ->where(['in', 'slide_id', $storySlidesQuery])
+            ->innerJoin('{{%story_slide_image}}', '{{%story_slide_image}}.id = {{%image_slide_block}}.image_id')
             ->all();
     }
 

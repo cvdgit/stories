@@ -30,7 +30,14 @@ use backend\components\StoryEditor;
 class StoryEditorService
 {
 
-	protected function uploadImage(ImageForm $form, $model): string
+    protected $imageService;
+
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
+    protected function uploadImage(ImageForm $form, $model): string
     {
         $imageFile = UploadedFile::getInstance($form, 'image');
         if ($imageFile) {
@@ -104,7 +111,7 @@ class StoryEditorService
                 $imageHash = $result['id'];
                 try {
                     $image = StorySlideImage::findByHash($imageHash);
-                    $image->delete();
+                    $this->imageService->unlinkImage($image->id, $model->id, $block->getId());
                 }
                 catch (DomainException $ex) {}
                 $noFile = true;

@@ -16,6 +16,13 @@ class ImageController extends Controller
     public function actionView(string $id)
     {
         $image = StorySlideImage::findOne(['hash' => $id]);
+        if (!$image->isSuccess()) {
+            if ($image->linkImages === null) {
+                throw new HttpException(404);
+            }
+            $image = $image->linkImages[0];
+        }
+
         $response = Yii::$app->response;
         $response->format = Response::FORMAT_RAW;
         $response->headers->add('content-type', 'image/jpg');
