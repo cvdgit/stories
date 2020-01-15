@@ -172,6 +172,7 @@ var StoryEditor = (function() {
                 Reveal.sync();
                 Reveal.slide(0);
                 $(".sl-block", ".reveal").draggable({
+                    //containment: $('.slides'),
                     start: function(event) {
                         setActiveBlock($(event.target).attr("data-block-id"));
                         click.x = event.clientX;
