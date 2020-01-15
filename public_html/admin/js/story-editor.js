@@ -22,7 +22,8 @@ var StoryEditor = (function() {
     };
 
     var currentSlideIndex = 0,
-        currentSlideID;
+        currentSlideID,
+        activeBlockID;
 
     function initialize(params) {
         config = params;
@@ -83,6 +84,10 @@ var StoryEditor = (function() {
     }
 
     function setActiveBlock(blockID) {
+        if (blockID === activeBlockID) {
+            return;
+        }
+        activeBlockID = blockID;
         $("a", $list).removeClass("active");
         $("a[data-block-id=" + blockID + "]", $list).addClass("active");
         selectActiveBlock(blockID);
