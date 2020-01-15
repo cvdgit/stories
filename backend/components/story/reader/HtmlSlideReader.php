@@ -116,6 +116,11 @@ class HtmlSlideReader implements ReaderInterface
         $block->setImageSize($element->attr('data-src'), $width, $height);
         $block->setNaturalImageSize($element->attr('data-natural-width'), $element->attr('data-natural-height'));
 
+        $imageSourceElement = pq($htmlBlock)->find('span');
+        if ($imageSourceElement->length > 0) {
+            $block->setImageSource($imageSourceElement->text());
+        }
+
         $this->loadBlockProperties($block, $style);
 
         $this->slide->addBlock($block);

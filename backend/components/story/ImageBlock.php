@@ -25,6 +25,9 @@ class ImageBlock extends AbstractBlock
     /** @var int */
     protected $back_to_next_slide;
 
+    /** @var string */
+    protected $imageSource = '';
+
     const DEFAULT_IMAGE_WIDTH = 973;
     const DEFAULT_IMAGE_HEIGHT = 720;
 
@@ -192,6 +195,22 @@ class ImageBlock extends AbstractBlock
     public function setBackToNextSlide($back_to_next_slide): void
     {
         $this->back_to_next_slide = $back_to_next_slide;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImageSource(): string
+    {
+        return $this->imageSource;
+    }
+
+    /**
+     * @param string $imageSource
+     */
+    public function setImageSource(string $imageSource): void
+    {
+        $this->imageSource = $imageSource;
     }
 
 }

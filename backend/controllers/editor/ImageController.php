@@ -115,6 +115,7 @@ class ImageController extends Controller
             [$imageWidth, $imageHeight] = getimagesize($path);
             $block->setWidth($imageWidth . 'px');
             $block->setHeight($imageHeight . 'px');
+            $block->setImageSource(parse_url($image->source_url, PHP_URL_HOST));
             $this->editorService->addImageBlockToSlide($form->slide_id, $block);
 
             $this->imageService->linkImage($image->id, $form->slide_id, $block->getId());

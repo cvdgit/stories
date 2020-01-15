@@ -16,6 +16,10 @@ class ImageController extends Controller
     public function actionView(string $id)
     {
         $image = StorySlideImage::findOne(['hash' => $id]);
+        if ($image === null) {
+            throw new HttpException(404);
+        }
+
         if (!$image->isSuccess()) {
             if ($image->linkImages === null) {
                 throw new HttpException(404);

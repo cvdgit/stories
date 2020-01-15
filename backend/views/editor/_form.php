@@ -9,11 +9,11 @@ $form = ActiveForm::begin([
 /** @var $model backend\models\editor\BaseForm */
 ?>
 <div class="row">
-    <div class="col-xs-6"><?= $form->field($model, 'width') ?></div>
+    <div class="col-xs-6"><?= $form->field($model, 'width', ['inputOptions' => ['class' => 'form-control editor-width']]) ?></div>
     <div class="col-xs-6"><?= $form->field($model, 'top', ['inputOptions' => ['class' => 'form-control editor-top']]) ?></div>
 </div>
 <div class="row">
-    <div class="col-xs-6"><?= $form->field($model, 'height') ?></div>
+    <div class="col-xs-6"><?= $form->field($model, 'height', ['inputOptions' => ['class' => 'form-control editor-height']]) ?></div>
     <div class="col-xs-6"><?= $form->field($model, 'left', ['inputOptions' => ['class' => 'form-control editor-left']]) ?></div>
 </div>
 <?php

@@ -37,6 +37,9 @@ class ImageBlockMarkup extends AbstractMarkup
         $block = $this->getBlock();
 
         $elementTag = $this->getElementMarkup($block);
+        if ($block->getImageSource() !== '') {
+            $elementTag .= Html::tag('span', $block->getImageSource(), ['class' => 'image-source']);
+        }
         $contentBlockTag = Html::tag('div', $elementTag, [
             'class' => 'sl-block-content',
             'style' => $this->arrayToStyle([

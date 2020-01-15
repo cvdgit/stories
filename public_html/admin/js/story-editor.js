@@ -183,6 +183,30 @@ var StoryEditor = (function() {
                         $("input.editor-left").val(Math.round(ui.position.left) + "px");
                     }
                 });
+                $(".sl-block", ".reveal").resizable({
+                    //containment: '.slides',
+                    handles: 'all',
+                    start: function(event) {
+                        setActiveBlock($(event.target).attr("data-block-id"));
+                    },
+                    resize: function(event, ui) {
+                        var zoomScale = Reveal.getScale();
+                        var opl = ui.originalPosition.left, opt = ui.originalPosition.top,
+                            pl = ui.position.left, pt = ui.position.top,
+                            osl = ui.originalSize.width, ost = ui.originalSize.height,
+                            sl = ui.size.width, st = ui.size.height;
+                        ui.size.width = osl + (sl - osl) / zoomScale;
+                        if (pl + osl !== opl + osl) { //left side
+                            ui.position.left = opl + (osl - ui.size.width);
+                        }
+                        ui.size.height = ost + (st - ost) / zoomScale;
+                        if (pt + ost !== opt + ost) { //top side
+                            ui.position.top = opt + (ost - ui.size.height);
+                        }
+                        $("input.editor-width").val(Math.round(ui.size.width) + "px");
+                        $("input.editor-height").val(Math.round(ui.size.height) + "px");
+                    }
+                });
                 if (loadBlocks) {
                     loadSlideBlocks();
                 }

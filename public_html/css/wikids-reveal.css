@@ -1954,3 +1954,12 @@
 	font-size: 12rem;
 	padding-top: 70px;
 }
+
+.sl-block-content .image-source {
+	position: absolute;
+	left: 10px;
+	top: 10px;
+	text-align: left;
+	font-size: .8em;
+	color: white;
+}
