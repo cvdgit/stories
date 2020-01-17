@@ -119,6 +119,8 @@ class YandexController extends Controller
         $result = $this->getCurl()
             ->setHeader('Authorization', 'OAuth ' . $this->getAuthToken($account))
             ->setGetParams(['board_id' => $board_id])
+            ->setGetParams(['page' => 1])
+            ->setGetParams(['page_size' => 100])
             ->get('https://api.collections.yandex.net/v1/cards/');
         return Json::decode($result);
     }
