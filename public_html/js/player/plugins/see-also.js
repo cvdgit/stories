@@ -86,7 +86,7 @@ var WikidsSeeAlso = window.WikidsSeeAlso || (function() {
         if (timeout) {
             clearTimeout(timeout);
         }
-        if (TransitionSlide.getInTransition() === false && Reveal.isLastSlide()) {
+        if (TransitionSlide.getInTransition() === false && TestSlide.inTest() === false && Reveal.isLastSlide()) {
             if (isPlaylist()) {
                 goToNextPlaylistStory();
             }

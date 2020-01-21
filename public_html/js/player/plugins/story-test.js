@@ -25,7 +25,11 @@ var TestSlide = (function() {
 
     shuffleAnswers();
 
+    var inTest = false;
+
     function action() {
+
+        inTest = true;
 
         var test_id = $(this).data("testId"),
             slide_index = Reveal.getIndices().h;
@@ -85,6 +89,7 @@ var TestSlide = (function() {
     function backToStory() {
         if (stack.length > 0) {
             var state = stack.shift();
+            inTest = false;
             getStoryData(state.story_id)
                 .done(function(data) {
                     syncReveal(data.html, state.slide_index);
@@ -145,6 +150,9 @@ var TestSlide = (function() {
         "isQuestionSlide": function() {
             console.log(Reveal.getCurrentSlide());
             return true;
+        },
+        "inTest": function() {
+            return inTest;
         }
     };
 })();

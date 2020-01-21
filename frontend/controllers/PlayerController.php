@@ -122,7 +122,7 @@ class PlayerController extends Controller
         $viewedStoryIDs[] = $model->id;
 
         $playlists = $model->playlists;
-        if ($playlists !== null) {
+        if ($playlists !== null && count($playlists) > 0) {
             $playlistID = $playlists[0]->id;
             $stories = (new Query())
                 ->select('{{%story}}.*')
