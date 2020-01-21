@@ -113,6 +113,16 @@ class ImageController extends Controller
             $block = new ImageBlock();
             $block->setFilePath(Yii::$app->urlManagerFrontend->createAbsoluteUrl(['image/view', 'id' => $image->hash]));
             [$imageWidth, $imageHeight] = getimagesize($path);
+
+            $ratio = $imageWidth / $imageHeight;
+            if (ImageBlock::DEFAULT_IMAGE_WIDTH / ImageBlock::DEFAULT_IMAGE_HEIGHT > $ratio) {
+                $imageWidth = ImageBlock::DEFAULT_IMAGE_HEIGHT * $ratio;
+                $imageHeight = ImageBlock::DEFAULT_IMAGE_HEIGHT;
+            } else {
+                $imageHeight = ImageBlock::DEFAULT_IMAGE_WIDTH / $ratio;
+                $imageWidth = ImageBlock::DEFAULT_IMAGE_WIDTH;
+            }
+
             $block->setWidth($imageWidth . 'px');
             $block->setHeight($imageHeight . 'px');
             $block->setImageSource(parse_url($image->source_url, PHP_URL_HOST));
