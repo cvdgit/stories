@@ -78,7 +78,7 @@ class UserService
         $user = $this->findUserByID($userID);
         /* @var $payments PaymentQuery */
         $payments = $user->getPayments();
-        return $payments->freeSubscription()->isValid()->exists();
+        return $payments->freeSubscription()->exists();
     }
 
     public function create(UserCreateForm $form): User
