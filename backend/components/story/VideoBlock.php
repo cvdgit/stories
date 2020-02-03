@@ -7,6 +7,8 @@ namespace backend\components\story;
 class VideoBlock extends AbstractBlock
 {
 
+    public const DEFAULT_SPEED = 1;
+
     /** @var string */
     protected $video_id;
 

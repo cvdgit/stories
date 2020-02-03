@@ -228,7 +228,11 @@ class HtmlSlideReader implements ReaderInterface
         $block->setSeekTo(pq($element)->attr('data-seek-to'));
         $block->setDuration(pq($element)->attr('data-video-duration'));
         $block->setMute(pq($element)->attr('data-mute') === 'true' ? 1 : 0);
-        $block->setSpeed(pq($element)->attr('data-speed'));
+        $speed = pq($element)->attr('data-speed');
+        if (empty($speed)) {
+            $speed = VideoBlock::DEFAULT_SPEED;
+        }
+        $block->setSpeed($speed);
 
         $style = pq($htmlBlock)->attr('style');
         $this->loadBlockProperties($block, $style);
