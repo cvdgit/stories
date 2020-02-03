@@ -13,6 +13,7 @@ class VideoElement extends AbstractElement
         'data-seek-to' => '',
         'data-video-duration' => '',
         'data-mute' => '',
+        'data-speed' => '',
     ];
 
 }

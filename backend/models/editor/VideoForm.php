@@ -11,6 +11,7 @@ class VideoForm extends BaseForm
     public $seek_to;
     public $duration;
     public $mute;
+    public $speed = 1;
 
     public function rules(): array
     {
@@ -18,7 +19,7 @@ class VideoForm extends BaseForm
         $rules = array_merge($rules, [
             ['video_id', 'string'],
             ['video_id', 'string'],
-            [['seek_to', 'duration'], 'double'],
+            [['seek_to', 'duration', 'speed'], 'double'],
             ['mute', 'integer'],
         ]);
         return $rules;
@@ -32,8 +33,22 @@ class VideoForm extends BaseForm
             'seek_to' => 'Начать с (сек)',
             'duration' => 'Продолжительность (сек)',
             'mute' => 'Отключить звук',
+            'speed' => 'Скорость воспроизведения',
         ]);
         return $labels;
+    }
+
+    public static function videoSpeedArray(): array
+    {
+        return [
+            '0.5' => 0.5,
+            '0.75' => 0.75,
+            '1' => 1,
+            '1.25' => 1.25,
+            '1.5' => 1.5,
+            '1.75' => 1.75,
+            '2' => 2,
+        ];
     }
 
 }

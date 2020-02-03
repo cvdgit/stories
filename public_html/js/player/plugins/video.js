@@ -1,9 +1,10 @@
 
-function WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute, showControls) {
+function WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute, speed, showControls) {
     "use strict";
 
     seekTo = seekTo || 0;
     duration = duration || 0;
+    speed = speed || 1;
     showControls = showControls || false;
 
     var player,
@@ -20,7 +21,8 @@ function WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute, showControls
 
     player.on("ready", function(event) {
         player.play();
-        player.currentTime = parseInt(seekTo);
+        player.speed = parseInt(speed);
+        player.currentTime = parseFloat(seekTo);
         if (mute) {
             player.volume = 0;
         }
@@ -73,13 +75,14 @@ var WikidsVideo = window.WikidsVideo || (function() {
             var videoID = elem.attr("data-video-id"),
                 seekTo = elem.attr("data-seek-to"),
                 duration = elem.attr("data-video-duration"),
-                mute = elem.attr("data-mute") === "true";
+                mute = elem.attr("data-mute") === "true",
+                speed = elem.attr("data-speed");
 
             elem.addClass("plyr__video-embed");
             elem.attr("data-plyr-provider", "youtube");
             elem.attr("data-plyr-embed-id", videoID);
 
-            player = WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute, config.showControls);
+            player = WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute, speed, config.showControls);
         }
     }
 
