@@ -25,8 +25,8 @@ $this->registerJs($js);
 /** @var $form yii\widgets\ActiveForm */
 $form->action = ['/editor/update-image'];
 
-echo $form->field($model, 'image')->fileInput();
-echo $form->field($model, 'action')->checkbox();
-echo $form->field($model, 'actionStoryID')->dropDownList(StoryHelper::getStoryArray(), ['onchange' => 'StoryEditor.changeStory(this, "imageform-actionslideid", ' . $model->actionSlideID . ')', 'prompt' => 'Выбрать историю']);
-echo $form->field($model, 'actionSlideID')->dropDownList([], ['prompt' => 'Выбрать слайд']);
-echo $form->field($model, 'back_to_next_slide')->checkbox();
+echo $form->field($model, 'image', ['inputOptions' => ['class' => 'form-control']])->fileInput();
+echo $form->field($model, 'action', ['inputOptions' => ['class' => 'form-control input-sm']])->checkbox();
+echo $form->field($model, 'actionStoryID', ['inputOptions' => ['class' => 'form-control input-sm']])->dropDownList(StoryHelper::getStoryArray(), ['onchange' => 'StoryEditor.changeStory(this, "imageform-actionslideid", ' . $model->actionSlideID . ')', 'prompt' => 'Выбрать историю']);
+echo $form->field($model, 'actionSlideID', ['inputOptions' => ['class' => 'form-control input-sm']])->dropDownList([], ['prompt' => 'Выбрать слайд']);
+echo $form->field($model, 'back_to_next_slide', ['inputOptions' => ['class' => 'form-control input-sm']])->checkbox();

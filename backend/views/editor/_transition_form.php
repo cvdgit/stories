@@ -14,15 +14,15 @@ JS;
 $this->registerJs($js);
 ?>
 <div class="row">
-    <div class="col-xs-6"><?= $form->field($model, 'text')->textInput() ?></div>
-    <div class="col-xs-6"><?= $form->field($model, 'text_size')->textInput() ?></div>
+    <div class="col-xs-6"><?= $form->field($model, 'text', ['inputOptions' => ['class' => 'form-control input-sm']])->textInput() ?></div>
+    <div class="col-xs-6"><?= $form->field($model, 'text_size', ['inputOptions' => ['class' => 'form-control input-sm']])->textInput() ?></div>
 </div>
 <div class="row">
-    <div class="col-xs-6"><?= $form->field($model, 'transition_story_id')->dropDownList(common\helpers\StoryHelper::getStoryArray(), ['onchange' => 'StoryEditor.changeStory(this, "transitionform-slides", ' . $model->slides . ')', 'prompt' => 'Выбрать историю']) ?></div>
-    <div class="col-xs-6"><?= $form->field($model, 'slides')->dropDownList([], ['prompt' => 'Выбрать слайд']) ?></div>
+    <div class="col-xs-6"><?= $form->field($model, 'transition_story_id', ['inputOptions' => ['class' => 'form-control input-sm']])->dropDownList(common\helpers\StoryHelper::getStoryArray(), ['onchange' => 'StoryEditor.changeStory(this, "transitionform-slides", ' . $model->slides . ')', 'prompt' => 'Выбрать историю']) ?></div>
+    <div class="col-xs-6"><?= $form->field($model, 'slides', ['inputOptions' => ['class' => 'form-control input-sm']])->dropDownList([], ['prompt' => 'Выбрать слайд']) ?></div>
 </div>
 <div class="row">
     <div class="col-xs-6">
-        <?= $form->field($model, 'back_to_next_slide')->checkbox() ?>
+        <?= $form->field($model, 'back_to_next_slide', ['inputOptions' => ['class' => 'form-control input-sm']])->checkbox() ?>
     </div>
 </div>

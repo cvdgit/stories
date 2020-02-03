@@ -17,7 +17,9 @@ class VideoForm extends BaseForm
         $rules = parent::rules();
         $rules = array_merge($rules, [
             ['video_id', 'string'],
-            [['seek_to', 'duration', 'mute'], 'integer'],
+            ['video_id', 'string'],
+            [['seek_to', 'duration'], 'double'],
+            ['mute', 'integer'],
         ]);
         return $rules;
     }

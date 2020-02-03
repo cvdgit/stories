@@ -108,6 +108,11 @@ $js = <<< JS
 	    e.preventDefault();
 	    StoryEditor.slideCollectionsModal("$slideSourceAction");
 	});
+	
+	$("#slide-block-params").on("click", ".show-block-params", function() {
+	    $(".block-params", "#slide-block-params").removeClass("hide");
+	    $(this).remove();
+	});
 JS;
 $this->registerJs($js);
 
@@ -169,7 +174,7 @@ $options = [
                                 new \common\widgets\RevealButtons\FullscreenButton(),
                             ],
                         ],
-                        ['class' => Video::class],
+                        ['class' => Video::class, 'showControls' => true],
 					],
 		    	]) ?>
 		    </div>
@@ -202,7 +207,6 @@ $options = [
     </div>
     <div class="col-lg-9">
         <div id="slide-block-params">
-            <h4>Параметры блока</h4>
             <div id="form-container"></div>
         </div>
     </div>

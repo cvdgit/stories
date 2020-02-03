@@ -37,7 +37,7 @@ function WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute, showControls
     });
 
     player.on("pause", function() {
-        if (TransitionSlide.getInTransition()) {
+        if (window["TransitionSlide"] && TransitionSlide.getInTransition()) {
             TransitionSlide.backToStory(function() {
                 setTimeout(RevealAudioSlideshow.playCurrentAudio, 1000);
             });
@@ -48,6 +48,7 @@ function WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute, showControls
         player.pause();
     }
 
+    return player;
 }
 
 
@@ -59,8 +60,8 @@ var WikidsVideo = window.WikidsVideo || (function() {
     }
 
     var loaded = false;
-
     var config = Reveal.getConfig().video;
+    var player;
 
     function createPlayer() {
         //console.log("createPlayer");
@@ -78,7 +79,7 @@ var WikidsVideo = window.WikidsVideo || (function() {
             elem.attr("data-plyr-provider", "youtube");
             elem.attr("data-plyr-embed-id", videoID);
 
-            WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute, config.showControls);
+            player = WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute, config.showControls);
         }
     }
 
@@ -102,6 +103,13 @@ var WikidsVideo = window.WikidsVideo || (function() {
         "createPlayer": createPlayer,
         "showControls": function() {
             return config.showControls;
+        },
+        "setBeginVideo": function(el) {
+            $(el).parent().parent().find("input[type=text]").val(player.currentTime);
+        },
+        "setEndVideo": function(el, beginElementID) {
+            var beginTime = parseFloat($("#" + beginElementID).val());
+            $(el).parent().parent().find("input[type=text]").val(player.currentTime - beginTime);
         }
     };
 })();
