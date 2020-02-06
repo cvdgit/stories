@@ -161,7 +161,7 @@ AppAsset::register($this);
                     <?= Html::a('Правообладателям', ['site/copyright']) ?>
                 </div>
                 <div class="col-sm-12 col-md-3">
-                    <div class="footer-copyright pull-right text-right">Wikids © <?= date('Y') ?><br>ИП Муталов Артур Сагадеевич</div>
+                    <div class="footer-copyright pull-right text-right">©&nbsp;2018—<?= date('Y') ?>,&nbsp;Wikids<br>ИП Муталов Артур Сагадеевич</div>
                 </div>
             </div>
         </div>
