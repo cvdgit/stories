@@ -4,7 +4,7 @@ return [
     'class' => 'yii\web\UrlManager',
     'enablePrettyUrl' => true,
     'showScriptName' => false,
-    'enableStrictParsing' => false,
+    'enableStrictParsing' => true,
     'rules' => [
         '' => 'site/index',
 
@@ -69,7 +69,7 @@ return [
 
         'comment/reply/<id:\d+>' => 'comment/reply',
 
-        'image/<id:[\w\d]+>' => 'image/view',
+        'image/<id:[\w\d]+' => 'image/view',
         'question/<param:[\w\d]+>/<value:[\w\d]+>' => 'question/get',
     ],
 ];
