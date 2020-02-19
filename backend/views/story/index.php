@@ -21,20 +21,13 @@ $this->title = 'Управление историями';
 <p>
     <?= Html::a('Создать историю', ['create'], ['class' => 'btn btn-success']) ?>
 </p>
-<div class="row">
-    <div class="col-md-3 col-md-offset-9">
-        <?= $this->render('_command_form', ['model' => $batchForm]) ?>
-    </div>
-</div>
 <?php Pjax::begin(['id' => 'pjax-stories']) ?>
 <?= GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
     'options' => ['class' => 'table-responsive'],
     'columns' => [
-        [
-            'class' => CheckboxColumn::class,
-        ],
+        // ['class' => CheckboxColumn::class],
         'id',
         'title',
         [
