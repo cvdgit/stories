@@ -105,6 +105,12 @@ return [
         'devicedetect' => [
             'class' => 'alexandernst\devicedetect\DeviceDetect',
         ],
+        'unisender' => [
+            'class' => \matperez\yii2unisender\UniSender::class,
+            'apiConfig' => [
+                'apiKey' => $params['unisenderKey'],
+            ],
+        ],
     ],
     'params' => $params,
 ];

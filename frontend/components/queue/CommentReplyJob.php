@@ -2,6 +2,7 @@
 
 namespace frontend\components\queue;
 
+use common\helpers\EmailHelper;
 use common\models\Story;
 use common\models\User;
 use RuntimeException;
@@ -31,17 +32,9 @@ class CommentReplyJob extends BaseObject implements JobInterface
         $story = Story::findModel($this->storyID);
         $commentAuthor = User::findModel($this->commentAuthorID);
         $replyUser = User::findModel($this->replyUserID);
-        $sent = Yii::$app->mailer
-            ->compose(['html' => 'commentReply-html', 'text' => 'commentReply-text'], [
-                'story' => $story,
-                'commentAuthor' => $commentAuthor,
-                'replyUser' => $replyUser,
-                ])
-            ->setTo($commentAuthor->email)
-            ->setFrom([Yii::$app->params['infoEmail'] => Yii::$app->name])
-            ->setSubject('Ответ на ваш комментарий')
-            ->send();
-        if (!$sent) {
+
+        $response = EmailHelper::sendEmail($commentAuthor->email, 'Ответ на ваш комментарий на ' . Yii::$app->name, 'commentReply-html', ['story' => $story, 'commentAuthor' => $commentAuthor, 'replyUser' => $replyUser]);
+        if (!$response->isSuccess()) {
             throw new RuntimeException('Reply email sent error');
         }
     }

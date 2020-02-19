@@ -3,6 +3,7 @@
 
 namespace common\services\auth;
 
+use common\helpers\EmailHelper;
 use Exception;
 use frontend\components\queue\UnisenderAddJob;
 use RuntimeException;
@@ -33,7 +34,7 @@ class SignupService
             $email,
             $password
         );
-        $this->transaction->wrap(function () use ($user) {
+        $this->transaction->wrap(function() use ($user) {
 
             /* @var $user User */
             $user->save();
@@ -46,26 +47,16 @@ class SignupService
 
     public function sentEmailConfirm(User $user): void
     {
-        $sent = Yii::$app->mailer
-            ->compose(['html' => 'userSignupComfirm-html', 'text' => 'userSignupComfirm-text'], ['user' => $user])
-            ->setTo($user->email)
-            ->setFrom([Yii::$app->params['infoEmail'] => Yii::$app->name])
-            ->setSubject('Подтверждение регистрации')
-            ->send();
-        if (!$sent) {
+        $response = EmailHelper::sendEmail($user->email, 'Подтверждение регистрации', 'userSignupComfirm-html', ['user' => $user]);
+        if (!$response->isSuccess()) {
             throw new RuntimeException('Confirm email sent error');
         }
     }
 
-    public function sendWelcomeEmail(User $user)
+    public function sendWelcomeEmail(User $user): void
     {
-        $sent = Yii::$app->mailer
-            ->compose(['html' => 'userWelcome-html', 'text' => 'userWelcome-text'], ['user' => $user])
-            ->setTo($user->email)
-            ->setFrom([Yii::$app->params['infoEmail'] => Yii::$app->name])
-            ->setSubject('Добро пожаловать на Wikids')
-            ->send();
-        if (!$sent) {
+        $response = EmailHelper::sendEmail($user->email, 'Добро пожаловать на Wikids', 'userWelcome-html', ['user' => $user]);
+        if (!$response->isSuccess()) {
             throw new RuntimeException('Welcome email sent error');
         }
     }

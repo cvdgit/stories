@@ -2,6 +2,7 @@
 
 namespace common\services;
 
+use common\helpers\EmailHelper;
 use common\models\Rate;
 use common\models\User;
 use DomainException;
@@ -82,13 +83,8 @@ class UserPaymentService
 
     protected function sendEmailActivate(User $user, Rate $rate): void
     {
-        $sent = Yii::$app->mailer
-            ->compose(['html' => 'userActivateSub-html', 'text' => 'userActivateSub-text'], ['user' => $user, 'rate' => $rate])
-            ->setTo($user->email)
-            ->setFrom([Yii::$app->params['infoEmail'] => Yii::$app->name])
-            ->setSubject('Активирована подписка на wikids.ru')
-            ->send();
-        if (!$sent) {
+        $response = EmailHelper::sendEmail($user->email, 'Активирована подписка на wikids.ru', 'userActivateSub-html', ['user' => $user, 'rate' => $rate]);
+        if (!$response->isSuccess()) {
             throw new RuntimeException('Ошибка при отправке email об активации подписки');
         }
     }
@@ -97,13 +93,8 @@ class UserPaymentService
     {
         /** @var $user User */
         $user = $payment->user;
-        $sent = Yii::$app->mailer
-            ->compose(['html' => 'userCancelSub-html', 'text' => 'userCancelSub-text'], ['user' => $user, 'rate' => $payment->rate])
-            ->setTo($user->email)
-            ->setFrom([Yii::$app->params['infoEmail'] => Yii::$app->name])
-            ->setSubject('Закончилась подписка на wikids.ru')
-            ->send();
-        if (!$sent) {
+        $response = EmailHelper::sendEmail($user->email, 'Закончилась подписка на wikids.ru', 'userCancelSub-html', ['user' => $user, 'rate' => $payment->rate]);
+        if (!$response->isSuccess()) {
             throw new RuntimeException('Ошибка при отправке email об отмене подписки');
         }
     }
@@ -151,7 +142,7 @@ class UserPaymentService
             $payment->data = Json::encode($args);
         }
         else {
-            $payment->data = $payment->data . "\n\n" . Json::encode($args);
+            $payment->data .= "\n\n" . Json::encode($args);
         }
         $payment->save(false);
         if ($payment->isValid()) {

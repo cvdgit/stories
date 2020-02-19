@@ -2,7 +2,8 @@
 
 namespace frontend\models;
 
-use Yii;
+use common\helpers\EmailHelper;
+use RuntimeException;
 use yii\base\Model;
 
 /**
@@ -49,18 +50,12 @@ class ContactForm extends Model
      * Sends an email to the specified email address using the information collected by this model.
      *
      * @param string $email the target email address
-     * @return bool whether the email was sent
      */
-    public function sendEmail($email)
+    public function sendEmail($email): void
     {
-        if (!Yii::$app->mailer
-            ->compose()
-            ->setTo($email)
-            ->setFrom(Yii::$app->params['infoEmail'])
-            ->setSubject('Сообщение с формы контакты от ' . $this->email)
-            ->setTextBody($this->email . "\n" . $this->name . "\n" . $this->subject . "\n" . $this->body)
-            ->send()) {
-            throw new \RuntimeException('Email not sent (contact)');
+        $response = EmailHelper::sendEmail($email, 'Сообщение с формы контакты от ' . $this->email, 'contact', ['form' => $this]);
+        if (!$response->isSuccess()) {
+            throw new RuntimeException('Email not sent (contact)');
         }
     }
 }

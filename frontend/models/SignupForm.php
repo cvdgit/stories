@@ -83,19 +83,6 @@ class SignupForm extends Model
         return $user;
     }
 
-    public function sentEmailConfirm(User $user)
-    {
-        $sent = Yii::$app->mailer
-            ->compose(['html' => 'userSignupComfirm-html', 'text' => 'userSignupComfirm-text'], ['user' => $user])
-            ->setTo($user->email)
-            ->setFrom([Yii::$app->params['infoEmail'] => Yii::$app->name])
-            ->setSubject('Подтверждение регистрации')
-            ->send();
-        if (!$sent) {
-            throw new RuntimeException('Confirm email sent error');
-        }
-    }
-
     /**
      * @param $token
      * @return User|null

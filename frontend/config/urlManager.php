@@ -4,6 +4,7 @@ return [
     'class' => 'yii\web\UrlManager',
     'enablePrettyUrl' => true,
     'showScriptName' => false,
+    'enableStrictParsing' => true,
     'rules' => [
         '' => 'site/index',
 
@@ -20,9 +21,8 @@ return [
         'logout' => 'auth/logout',
 
         'signup' => 'signup/request',
-        'signup-confirm' => 'signup/signup-confirm',
-
-        'reset-password' => 'site/reset-password',
+        'signup-confirm/<token>' => 'signup/signup-confirm',
+        'reset-password/<token>' => 'site/reset-password',
 
         'payment' => 'payment/create',
         'payment/notify' => 'payment/notify',
@@ -69,6 +69,7 @@ return [
 
         'comment/reply/<id:\d+>' => 'comment/reply',
 
-        'image/<id:[\w\d]+' => 'image/view',
+        'image/<id>' => 'image/view',
+        'question/<param:[\w\d]+>/<value:[\w\d]+>' => 'question/get',
     ],
 ];

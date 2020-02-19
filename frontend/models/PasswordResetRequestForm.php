@@ -1,6 +1,8 @@
 <?php
 namespace frontend\models;
 
+use common\helpers\EmailHelper;
+use RuntimeException;
 use Yii;
 use yii\base\Model;
 use common\models\User;
@@ -54,15 +56,7 @@ class PasswordResetRequestForm extends Model
             }
         }
 
-        return Yii::$app
-            ->mailer
-            ->compose(
-                ['html' => 'passwordResetToken-html', 'text' => 'passwordResetToken-text'],
-                ['user' => $user]
-            )
-            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
-            ->setTo($this->email)
-            ->setSubject('Восстановление пароля на ' . Yii::$app->name)
-            ->send();
+        $response = EmailHelper::sendEmail($this->email, 'Восстановление пароля на ' . Yii::$app->name, 'passwordResetToken-html', ['user' => $user]);
+        return $response->isSuccess();
     }
 }
