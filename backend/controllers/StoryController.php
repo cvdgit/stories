@@ -112,11 +112,9 @@ class StoryController extends Controller
     {
         $searchModel = new StorySearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $batchForm = new StoryBatchCommandForm();
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'batchForm' => $batchForm,
         ]);
     }
 

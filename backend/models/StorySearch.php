@@ -32,7 +32,7 @@ class StorySearch extends Model
 
     public function search($params): ActiveDataProvider
     {
-        $query = Story::findStories()->joinWith(['author', 'tags', 'categories']);
+        $query = Story::find()->joinWith(['author']);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
