@@ -38,6 +38,7 @@ use yii\db\ActiveQuery;
  * @property int $user_audio
  * @property int $episode
  * @property int $video
+ * @property int $published_at
  *
  * @property User $author
  * @property Tag[] $tags
@@ -105,7 +106,7 @@ class Story extends ActiveRecord
         return [
             [['title', 'alias', 'user_id', 'story_categories', 'source_id'], 'required'],
             [['body', 'cover', 'story_file', 'source_dropbox', 'source_powerpoint'], 'string'],
-            [['created_at', 'updated_at', 'user_id', 'sub_access', 'source_id', 'views_number', 'slides_number', 'audio'], 'integer'],
+            [['created_at', 'updated_at', 'user_id', 'sub_access', 'source_id', 'views_number', 'slides_number', 'audio', 'published_at'], 'integer'],
             [['video', 'user_audio', 'episode'], 'integer'],
             [['title', 'alias'], 'string', 'max' => 255],
             [['alias'], 'unique'],
@@ -145,6 +146,7 @@ class Story extends ActiveRecord
             'audio' => 'История с озвучкой',
             'episode' => 'Эпизод',
             'story_playlists' => 'Плейлисты',
+            'published_at' => 'Дата публикации истории',
         ];
     }
 
@@ -502,6 +504,20 @@ class Story extends ActiveRecord
     {
         return $this->hasOne(UserStoryHistory::class, ['story_id' => 'id'])
             ->andWhere('user_id = :user', [':user' => Yii::$app->user->id]);
+    }
+
+    public function publishStory()
+    {
+        $this->status = self::STATUS_PUBLISHED;
+        if ($this->published_at === null) {
+            $this->published_at = time();
+        }
+        $this->save(false, ['status', 'published_at']);
+    }
+
+    public function submitPublicationTask(): bool
+    {
+        return ($this->published_at === null);
     }
 
 }
