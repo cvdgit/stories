@@ -26,7 +26,7 @@ $this->params['sidebarMenuItems'] = [
         <?php if ($model->isPublished()): ?>
         <div class="alert alert-success">
             <div class="clearfix">
-                <div class="pull-left" style="line-height: 34px">История опубликована</div>
+                <div class="pull-left" style="line-height: 34px">История опубликована <?= Yii::$app->formatter->asDate($model->published_at) ?></div>
                 <div class="pull-right">
                     <?= Html::beginForm(['/story/unpublish', 'id' => $model->id]) . Html::submitButton('Снять с публикации', ['class' => 'btn btn-primary']) . Html::endForm() ?>
                 </div>
