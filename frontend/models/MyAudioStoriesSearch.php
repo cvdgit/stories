@@ -67,12 +67,12 @@ class MyAudioStoriesSearch extends Model
         ]);
 
         $sortParams = [
-            'defaultOrder' => ['created_at' => SORT_DESC],
+            'defaultOrder' => ['published_at' => SORT_DESC],
             'attributes' => [
-                'created_at' => [
-                    'asc' => ['created_at' => SORT_ASC],
-                    'desc' => ['created_at' => SORT_DESC],
-                    'label' => 'дате создания',
+                'published_at' => [
+                    'asc' => ['published_at' => SORT_ASC],
+                    'desc' => ['published_at' => SORT_DESC],
+                    'label' => 'дате публикации',
                 ],
                 'title' => [
                     'asc' => ['title' => SORT_ASC],

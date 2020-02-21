@@ -48,17 +48,17 @@ class StorySearch extends Model
             ],
         ]);
 
-        $defaultOrder = ['created_at' => SORT_DESC];
+        $defaultOrder = ['published_at' => SORT_DESC];
         if ($this->defaultSortField !== null) {
             $defaultOrder = [$this->defaultSortField => $this->defaultSortOrder];
         }
         $sortParams = [
             'defaultOrder' => $defaultOrder,
             'attributes' => [
-                'created_at' => [
-                    'asc' => ['created_at' => SORT_ASC],
-                    'desc' => ['created_at' => SORT_DESC],
-                    'label' => 'дате создания',
+                'published_at' => [
+                    'asc' => ['published_at' => SORT_ASC],
+                    'desc' => ['published_at' => SORT_DESC],
+                    'label' => 'дате публикации',
                 ],
                 'title' => [
                     'asc' => ['title' => SORT_ASC],
