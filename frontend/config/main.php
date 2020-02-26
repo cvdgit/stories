@@ -99,6 +99,12 @@ return [
                     'scope' => 'email',
                     'returnUrl' => 'https://wikids.ru/auth?authclient=vkontakte',
                 ],
+                'yandex' => [
+                    'class' => 'yii\authclient\clients\Yandex',
+                    'clientId' => $params['yaClientId'],
+                    'clientSecret' => $params['yaClientSecret'],
+                    'returnUrl' => 'https://wikids.ru/auth?authclient=yandex',
+                ],
             ],
         ],
         'queue' => $params['components.queue'],
