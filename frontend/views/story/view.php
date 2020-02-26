@@ -97,7 +97,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
     var view = e.target.getAttribute("href").substr(1);
     if (view === "tab-slides") {
         inSlides = true;
-        $(".tab-slides").popover("hide");
+        //$(".tab-slides").popover("hide");
         if (!isGuest) {
             WikidsStory.loadStory("$action");
         }
@@ -111,6 +111,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
     }
 });
 
+/*
 if (isGuest) {   
     $(".tab-slides").popover({
         container: "#w0",
@@ -136,6 +137,7 @@ if (isGuest) {
         }
     }, 2000);
 }
+*/
 
  $(window).scroll(function () {
     if ($(this).scrollTop() > 100) {
@@ -249,10 +251,6 @@ $isBookView = $storyDefaultView === 'book';
                 <div class="col-md-9">
                     <?php if (!Yii::$app->user->isGuest): ?>
                         <?= $this->render('_comment_form', ['commentForm' => $commentForm]) ?>
-                    <?php else: ?>
-                        <div class="alert alert-info text-center comment-guest-info">
-                            Чтобы оставить комментарий <a href="#" data-toggle="modal" data-target="#wikids-signup-modal">зарегистрируйтесь</a> или <a href="#" data-toggle="modal" data-target="#wikids-login-modal">войдите</a> в аккаунт
-                        </div>
                     <?php endif ?>
                     <div class="comment-list">
                         <?= $this->render('_comment_list', ['dataProvider' => $dataProvider]) ?>

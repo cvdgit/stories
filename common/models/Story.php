@@ -520,4 +520,20 @@ class Story extends ActiveRecord
         return ($this->published_at === null);
     }
 
+    public function storyPreview()
+    {
+        $document = \phpQuery::newDocumentHTML($this->body);
+        $sections = $document->find('section');
+        $i = 0;
+        $html = '';
+        foreach ($sections as $section) {
+            $html .= pq($section)->htmlOuter();
+            $i++;
+            if ($i >= 5) {
+                break;
+            }
+        }
+        return $html;
+    }
+
 }
