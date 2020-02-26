@@ -212,6 +212,7 @@ function onSlideMouseDown(e) {
     e = e || window.event;
     var $target = $(e.target);
     if ($target.parents("section[data-slide-view=question]").length ||
+        $target.parents("section[data-slide-view=new-question]").length ||
         ($target[0].tagName === "IMG" && $target.attr("data-action") === "1") ||
         $target.hasClass("btn")||
         $target.parents(".wikids-slide-links").length ||

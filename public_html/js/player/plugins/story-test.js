@@ -148,11 +148,47 @@ var TestSlide = (function() {
     return {
         "backToStory": backToStory,
         "isQuestionSlide": function() {
-            console.log(Reveal.getCurrentSlide());
             return true;
         },
         "inTest": function() {
             return inTest;
         }
+    };
+})();
+
+
+var Education = (function() {
+
+
+    function getCurrentSlide() {
+        return Reveal.getCurrentSlide();
+    }
+
+    function loadQuestionData(param, paramValue) {
+        return $.getJSON("/question/" + param + "/" + paramValue);
+    }
+
+    function init() {
+        var elem = $("div.new-questions", getCurrentSlide());
+        if (!elem.length) {
+            return;
+        }
+        var param = elem.attr("data-param"),
+            paramValue = elem.attr("data-param-value");
+        loadQuestionData(param, paramValue)
+            .done(function(data) {
+                WikidsStoryTest.init();
+                //WikidsStoryTest.addEventListener("finish", storyTestResults);
+                //WikidsStoryTest.addEventListener("backToStory", backToStory);
+                var html =  WikidsStoryTest.load(data, false);
+                elem.html(html);
+            });
+    }
+
+    Reveal.addEventListener("slidechanged", function() {
+        init();
+    });
+
+    return {
     };
 })();

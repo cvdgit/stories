@@ -469,6 +469,48 @@ var StoryEditor = (function() {
 
 })(StoryEditor, jQuery, console);
 
+(function(editor, $, console) {
+    "use strict";
+
+    var $modal = $("#slide-new-question-modal");
+
+    editor.createNewSlideQuestion = function() {
+        $modal.modal("show");
+    };
+
+    editor.showQuestionList = function() {
+        var param = $("#question-param").val(),
+            paramValue = $("#question-param-value").val();
+        if (!param || !paramValue) {
+            return false;
+        }
+        $.getJSON("https://neo.test:8443/api/question/", {"param": param, "value": paramValue})
+            .done(function(data) {
+                var list = $("table#question-list tbody");
+                list.empty();
+                data.forEach(function(elem) {
+                    $('<tr><td>' + elem.question + '</td></tr>').appendTo(list);
+                });
+            });
+    };
+
+    editor.createQuestions = function() {
+        var param = $("#question-param").val(),
+            paramValue = $("#question-param-value").val();
+        if (!param || !paramValue) {
+            return false;
+        }
+        $.getJSON(editor.getConfigValue("createNewSlideQuestionAction"), {
+            "slide_id": editor.getCurrentSlideID(),
+            "param": param,
+            "paramValue": paramValue
+        }).done(function(data) {
+            editor.loadSlides(data.id);
+        });
+        $modal.modal("hide");
+    };
+
+})(StoryEditor, jQuery, console);
 
 (function(editor, $, console) {
     "use strict";

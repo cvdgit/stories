@@ -1713,9 +1713,18 @@
 
 .wikids-test-questions {
 	margin-top: 20px;
-	margin-left: 20%;
-	margin-right: 20%;
+	/*margin-left: 20%;
+	margin-right: 20%;*/
 	text-align: left;
+}
+
+.wikids-test-questions .question-title {
+	text-align: center;
+	font-weight: 500;
+}
+
+.wikids-test-questions .question-image {
+	text-align: center;
 }
 
 .wikids-test-questions p {
@@ -1775,6 +1784,8 @@
 .wikids-test-results p {
 	margin: 100px 0;
 }
+
+
 
 .wikids-test-buttons {
 	padding: 20px;

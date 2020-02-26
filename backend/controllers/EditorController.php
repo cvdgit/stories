@@ -316,6 +316,18 @@ class EditorController extends Controller
         return ['success' => true, 'id' => $slideID];
     }
 
+    public function actionNewCreateSlideQuestion(int $slide_id, string $param, string $paramValue)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        try {
+            $slideID = $this->editorService->newCreateSlideQuestion($slide_id, $param, $paramValue);
+        }
+        catch (\Exception $ex) {
+            return ['success' => false, 'error' => $ex->getMessage()];
+        }
+        return ['success' => true, 'id' => $slideID];
+    }
+
     public function actionCopySlide(int $slide_id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;

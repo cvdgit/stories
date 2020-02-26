@@ -5,6 +5,7 @@ namespace backend\controllers;
 
 
 use backend\models\AnswerImageUploadForm;
+use backend\models\ImportAnswersForm;
 use common\models\StoryTest;
 use common\models\StoryTestAnswer;
 use common\models\StoryTestQuestion;
@@ -16,6 +17,7 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 use yii\web\UploadedFile;
 
 class TestController extends Controller
@@ -208,6 +210,21 @@ class TestController extends Controller
         return $this->render('results', [
             'dataProvider' => $dataProvider,
         ]);
+    }
+
+    public function actionImportAnswers()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $form = new ImportAnswersForm();
+        $result = ['success' => true, 'result' => [], 'error' => ''];
+        if ($form->load(Yii::$app->request->post(), '') && $form->validate()) {
+            $form->createAnswers();
+        }
+        else {
+            $result['success'] = false;
+            $result['error'] = $form->errors;
+        }
+        return $result;
     }
 
 }

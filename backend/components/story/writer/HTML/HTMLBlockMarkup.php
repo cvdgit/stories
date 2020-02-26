@@ -19,8 +19,9 @@ class HTMLBlockMarkup extends AbstractMarkup
 
     private function getElementMarkup(HTMLBLock $block): string
     {
-        $element = $this->getElement();
-        return Html::tag($element->getTagName(), $block->getContent());
+        //$element = $this->getElement();
+        //return Html::tag($element->getTagName(), $block->getContent());
+        return $block->getContent();
     }
 
     public function markup(): string

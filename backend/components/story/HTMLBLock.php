@@ -37,7 +37,7 @@ class HTMLBLock extends AbstractBlock
     {
         $block = new self();
         $block->setWidth('1200px');
-        $block->setHeight('auto');
+        $block->setHeight('650px');
         $block->setLeft('40px');
         $block->setTop('20px');
         return $block;

@@ -244,6 +244,35 @@ class StoryEditorService
         return $model->id;
     }
 
+    public function newCreateSlideQuestion(int $slideID, string $param, string $paramValue)
+    {
+
+        $currentSlideModel = StorySlide::findSlide($slideID);
+
+        $reader = new HtmlSlideReader('');
+        $slide = $reader->load();
+        $slide->setView('new-question');
+
+        /** @var HTMLBLock $block */
+        $block = $slide->createBlock(HTMLBLock::class);
+        $content = Html::tag('div', '', ['class' => 'new-questions', 'data-param' => $param, 'data-param-value' => $paramValue]);
+        $block->setContent($content);
+        $slide->addBlock($block);
+
+        $writer = new HTMLWriter();
+        $html = $writer->renderSlide($slide);
+
+        $model = StorySlide::createSlide($currentSlideModel->story_id);
+        $model->kind = StorySlide::KIND_QUESTION;
+        $model->data = $html;
+
+        $this->updateSlideNumbers($currentSlideModel->story_id, $currentSlideModel->number);
+        $model->number = $currentSlideModel->number + 1;
+        $model->save();
+
+        return $model->id;
+    }
+
     public function copySlide(int $slideID): int
     {
         $slide = StorySlide::findSlide($slideID);

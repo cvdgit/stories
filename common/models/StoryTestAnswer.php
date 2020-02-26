@@ -79,4 +79,19 @@ class StoryTestAnswer extends \yii\db\ActiveRecord
         return (int)$this->is_correct === self::CORRECT_ANSWER;
     }
 
+    public static function create(int $questionID, string $name, int $isCorrect, int $order = null, string $image = null): StoryTestAnswer
+    {
+        $model = new self;
+        $model->story_question_id = $questionID;
+        $model->name = $name;
+        $model->is_correct = $isCorrect;
+        if ($order !== null) {
+            $model->order = $order;
+        }
+        if ($image !== null) {
+            $model->image = $image;
+        }
+        return $model;
+    }
+
 }
