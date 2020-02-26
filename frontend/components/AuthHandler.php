@@ -40,8 +40,10 @@ class AuthHandler
     public function handle(): void
     {
         $attributes = $this->client->getUserAttributes();
-        die(print_r($attributes));
         $email = ArrayHelper::getValue($attributes, 'email');
+        if (empty($email)) {
+            $email = ArrayHelper::getValue($attributes, 'default_email');
+        }
         $id = ArrayHelper::getValue($attributes, 'id');
         $username = ArrayHelper::getValue($attributes, 'login');
         if (empty($username)) {
