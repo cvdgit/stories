@@ -103,7 +103,6 @@ return [
                     'class' => 'yii\authclient\clients\Yandex',
                     'clientId' => $params['yaClientId'],
                     'clientSecret' => $params['yaClientSecret'],
-                    'scope' => 'email',
                     'returnUrl' => 'https://wikids.ru/auth?authclient=yandex',
                 ],
             ],
