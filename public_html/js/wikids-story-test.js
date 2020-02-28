@@ -94,7 +94,7 @@ var WikidsStoryTest = function() {
     function createAnswer(answer, questionType) {
 
         var type = "radio";
-        if (questionType === 1) {
+        if (parseInt(questionType) === 1) {
             type = "checkbox";
         }
 
