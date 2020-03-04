@@ -24,7 +24,7 @@ class SummaryHelper
     public static function publishedStories()
     {
         return (new Query())->from('{{%story}}')
-            ->where(new Expression('`created_at` >= UNIX_TIMESTAMP(CURDATE())'))
+            ->where(new Expression('`published_at` >= UNIX_TIMESTAMP(CURDATE())'))
             ->andWhere(['status' => Story::STATUS_PUBLISHED])
             ->count('id');
     }
