@@ -122,7 +122,7 @@ class Category extends ActiveRecord
     {
         if (parent::beforeValidate()) {
             if (empty($this->alias)) {
-                $this->alias = Translit::translit($this->name);
+                $this->alias = str_replace(' ', '-', strtolower(Translit::translit($this->name)));
             }
             return true;
         }
