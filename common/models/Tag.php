@@ -95,14 +95,14 @@ class Tag extends \yii\db\ActiveRecord
                 'frequency AS weight',
             ])
             ->from(self::tableName())
-            ->where('frequency > 0')
+            ->where('frequency > 1')
             ->indexBy('name')
             ->all();
         $tags = array_map(function($elem) {
             $elem['options']['target'] = '_self';
             $elem['options']['rel'] = 'nofollow';
             return $elem;
-            }, $tags);
+        }, $tags);
         return $tags;
     }
 
