@@ -106,7 +106,7 @@ class StorySlide extends \yii\db\ActiveRecord
     {
         $slide = new self();
         $slide->story_id = $storyID;
-        $slide->kind = self::IS_LINK;
+        $slide->kind = self::KIND_LINK;
         $slide->number = (new Query())->from(self::tableName())->where('story_id = :story', [':story' => $storyID])->max('number') + 1;
         $slide->link_slide_id = $linkSlideID;
         return $slide;

@@ -5,6 +5,7 @@ namespace common\services\story;
 
 
 use common\models\Story;
+use common\models\StorySlide;
 use common\rbac\UserRoles;
 use Yii;
 use yii\db\Query;
@@ -31,8 +32,16 @@ class CountersService
             ->andWhere('user_id = :user', [':user' => $userID])
             ->groupBy(['slide_id'])
             ->count();
-        if ($viewedSlidesNumber > 0 && $slideNumber > 0) {
-            $percent = $viewedSlidesNumber * 100 / $slideNumber;
+        // все видимые слайды
+        $numberOfSlides = (new Query())
+            ->select('id')
+            ->from('{{%story_slide}}')
+            ->where('story_id = :story', [':story' => $storyID])
+            ->andWhere('status = :status', [':status' => StorySlide::STATUS_VISIBLE])
+            ->count();
+        $numberOfSlides--; // отнять последнй слайд - Конец
+        if ($viewedSlidesNumber > 0 && $numberOfSlides > 0) {
+            $percent = $viewedSlidesNumber * 100 / $numberOfSlides;
             $command = Yii::$app->db->createCommand();
             $command->update('{{%user_story_history}}', ['percent' => $percent], ['user_id' => $userID, 'story_id' => $storyID]);
             $command->execute();
