@@ -24,11 +24,11 @@ $this->title = 'Панель управления';
                 </ul>
             </div>
         	<div class="col-xs-6">
-        		<h4>Количество просмотров историй с % завершения</h4>
+        		<h4>Количество просмотров историй (в режиме обучения) с % завершенных просмотров</h4>
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     'summary' => false,
-                    'columns' => [
+                        'columns' => [
                         [
                             'attribute' => 'title',
                             'label' => 'История',

@@ -117,7 +117,7 @@ class StoryStatisticsSearch extends StoryStatistics
             ->from('{{%story_statistics}}')
             ->innerJoin('{{%story_slide}}', '{{%story_statistics}}.slide_id = {{%story_slide}}.id')
             ->where('{{%story_statistics}}.story_id = {{%story}}.id')
-            ->andWhere('{{%story_slide}}.number = {{%story}}.slides_number - 1');
+            ->andWhere('{{%story_slide}}.number = (SELECT MAX(z.number) - 1 FROM story_slide z WHERE z.story_id = {{%story_statistics}}.story_id AND z.status = 1)');
 
         $viewsSubQuery = (new Query())
             ->select(['{{%story_statistics}}.story_id AS storyID', 'COUNT(DISTINCT {{%story_statistics}}.session) AS storyViews'])
