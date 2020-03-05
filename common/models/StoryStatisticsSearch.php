@@ -112,8 +112,9 @@ class StoryStatisticsSearch extends StoryStatistics
 
     public function getChartData4()
     {
+
         $doneSubQuery = (new Query())
-            ->select(['ROUND(COUNT({{%story_statistics}}.story_id) * 100 / t.storyViews, 2)'])
+            ->select(['ROUND(COUNT(DISTINCT {{%story_statistics}}.session) * 100 / t.storyViews, 2)'])
             ->from('{{%story_statistics}}')
             ->innerJoin('{{%story_slide}}', '{{%story_statistics}}.slide_id = {{%story_slide}}.id')
             ->where('{{%story_statistics}}.story_id = {{%story}}.id')
