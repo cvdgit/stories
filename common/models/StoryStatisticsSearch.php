@@ -161,4 +161,9 @@ class StoryStatisticsSearch extends StoryStatistics
         ];
     }
 
+    public function statDateFrom()
+    {
+        return (new Query())->from('{{%story_statistics}}')->min('created_at');
+    }
+
 }

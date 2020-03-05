@@ -25,6 +25,7 @@ $this->title = 'Панель управления';
             </div>
         	<div class="col-xs-6">
         		<h4>Количество просмотров историй (в режиме обучения) с % завершенных просмотров</h4>
+                <p>Начиная с <?= Yii::$app->formatter->asDatetime($statDateFrom) ?></p>
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     'summary' => false,
