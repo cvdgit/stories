@@ -113,12 +113,12 @@ class StoryStatisticsSearch extends StoryStatistics
     public function getChartData4()
     {
         $subQuery = (new \yii\db\Query())
-            ->select(['ROUND(COUNT({{%story_statistics}}.story_id) * 100 / {{%story}}.views_number)'])
+            ->select(['ROUND(COUNT({{%story_statistics}}.story_id) * 100 / {{%story}}.views_number, 2)'])
             ->from('{{%story_statistics}}')
             ->innerJoin('{{%story_slide}}', '{{%story_statistics}}.slide_id = {{%story_slide}}.id')
             ->where('{{%story_statistics}}.story_id = {{%story}}.id')
             ->andWhere('{{%story_slide}}.number = {{%story}}.slides_number - 1');
-        $rows = (new \yii\db\Query())
+        $rows = (new Query())
             ->select(['{{%story}}.id', '{{%story}}.title', '{{%story}}.views_number', 'story_done' => $subQuery])
             ->from('{{%story}}')
             ->where('{{%story}}.views_number > 0')
@@ -126,10 +126,9 @@ class StoryStatisticsSearch extends StoryStatistics
             ->limit(10)
             ->indexBy('id')
             ->all();
-        $dataProvider = new ArrayDataProvider([
+        return new ArrayDataProvider([
             'allModels' => $rows,
         ]);
-        return $dataProvider;
     }
 
     public function chartStoryViews()
