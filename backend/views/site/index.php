@@ -24,6 +24,45 @@ $this->title = 'Панель управления';
                     <li class="list-group-item"><span class="badge"><?= SummaryHelper::viewedStories() ?></span> Просмотрено историй</li>
                 </ul>
             </div>
+            <div class="col-xs-9">
+                <div style="height: 400px">
+                    <?= ChartJs::widget([
+                        'type' => 'line',
+                        'options' => [
+
+                        ],
+                        'clientOptions' => [
+                            'maintainAspectRatio' => false,
+                            'title' => [
+                                'display' => true,
+                                'text' => 'Количество просмотров историй по дням',
+                            ],
+                            'legend' => [
+                                'display' => false,
+                            ],
+                            'scales' => [
+                                'yAxes' => [
+                                    ['ticks' => [
+                                        'beginAtZero' => true,
+                                    ]]
+                                ],
+                            ],
+                        ],
+                        'data' => [
+                            'labels' => $storyViewsData['labels'],
+                            'datasets' => [
+                                [
+                                    'label' => "Количество просмотров",
+                                    'fill' => false,
+                                    'borderColor' => 'rgb(75, 192, 192)',
+                                    'lineTension' => 0.1,
+                                    'data' => $storyViewsData['data'],
+                                ],
+                            ]
+                        ]
+                    ]) ?>
+                </div>
+            </div>
         </div>
         <div class="row">
             <div class="col-xs-6">
@@ -69,40 +108,7 @@ $this->title = 'Панель управления';
         </div>
         <div class="row">
             <div class="col-xs-12">
-                <?= ChartJs::widget([
-                    'type' => 'line',
-                    'options' => [
-                    ],
-                    'clientOptions' => [
-                        'title' => [
-                            'display' => true,
-                            'text' => 'Количество просмотров историй по дням',
-                        ],
-                        'legend' => [
-                            'display' => false,
-                        ],
-                        'scales' => [
-                            'yAxes' => [
-                                ['ticks' => [
-                                    'beginAtZero' => true,
-                                ]]
-                            ],
-                        ],
-                    ],
-                    'data' => [
-                        'labels' => $storyViewsData['labels'],
-                        'datasets' => [
-                            [
-                                'label' => "Количество просмотров",
-                                'fill' => false,
-                                'borderColor' => 'rgb(75, 192, 192)',
-                                'lineTension' => 0.1,
-                                'data' => $storyViewsData['data'],
-                            ],
-                        ]
-                    ]
-                ]);
-                ?>
+
             </div>
         </div>
     </div>
