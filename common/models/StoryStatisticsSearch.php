@@ -112,20 +112,27 @@ class StoryStatisticsSearch extends StoryStatistics
 
     public function getChartData4()
     {
-        $subQuery = (new \yii\db\Query())
-            ->select(['ROUND(COUNT({{%story_statistics}}.story_id) * 100 / {{%story}}.views_number, 2)'])
+        $doneSubQuery = (new Query())
+            ->select(['ROUND(COUNT({{%story_statistics}}.story_id) * 100 / t.storyViews, 2)'])
             ->from('{{%story_statistics}}')
             ->innerJoin('{{%story_slide}}', '{{%story_statistics}}.slide_id = {{%story_slide}}.id')
             ->where('{{%story_statistics}}.story_id = {{%story}}.id')
             ->andWhere('{{%story_slide}}.number = {{%story}}.slides_number - 1');
+
+        $viewsSubQuery = (new Query())
+            ->select(['{{%story_statistics}}.story_id AS storyID', 'COUNT(DISTINCT {{%story_statistics}}.session) AS storyViews'])
+            ->from('{{%story_statistics}}')
+            ->groupBy(['{{%story_statistics}}.story_id']);
+
         $rows = (new Query())
-            ->select(['{{%story}}.id', '{{%story}}.title', '{{%story}}.views_number', 'story_done' => $subQuery])
-            ->from('{{%story}}')
-            ->where('{{%story}}.views_number > 0')
-            ->orderBy(['{{%story}}.views_number' => SORT_DESC])
+            ->select(['{{%story}}.id', '{{%story}}.title', 't.storyViews AS views_number', 'story_done' => $doneSubQuery])
+            ->from(['t' => $viewsSubQuery])
+            ->innerJoin('{{%story}}', '{{%story}}.id = t.storyID')
+            ->orderBy(['t.storyViews' => SORT_DESC])
             ->limit(10)
             ->indexBy('id')
             ->all();
+
         return new ArrayDataProvider([
             'allModels' => $rows,
         ]);
