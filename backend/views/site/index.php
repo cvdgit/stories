@@ -3,17 +3,18 @@
 use backend\helpers\SummaryHelper;
 use dosamigos\chartjs\ChartJs;
 use yii\grid\GridView;
-use yii\web\JsExpression;
 
 /** @var $this yii\web\View */
 /** @var $dataProvider yii\data\ActiveDataProvider */
+/** @var $readOnlyDataProvider yii\data\ActiveDataProvider */
+/** @var $statDateFrom int */
 
 $this->title = 'Панель управления';
 ?>
 <div class="site-index">
     <div class="body-content">
         <div class="row">
-            <div class="col-xs-6">
+            <div class="col-xs-3">
                 <h4>Сегодня</h4>
                 <ul class="list-group">
                     <li class="list-group-item"><span class="badge"><?= SummaryHelper::activatedSubscriptions() ?></span> Активировано подписок</li>
@@ -23,13 +24,15 @@ $this->title = 'Панель управления';
                     <li class="list-group-item"><span class="badge"><?= SummaryHelper::viewedStories() ?></span> Просмотрено историй</li>
                 </ul>
             </div>
-        	<div class="col-xs-6">
-        		<h4>Количество просмотров историй (в режиме обучения) с % завершенных просмотров</h4>
+        </div>
+        <div class="row">
+            <div class="col-xs-6">
+                <h4>Просмотры историй (в режиме обучения)</h4>
                 <p>Начиная с <?= Yii::$app->formatter->asDatetime($statDateFrom) ?></p>
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     'summary' => false,
-                        'columns' => [
+                    'columns' => [
                         [
                             'attribute' => 'title',
                             'label' => 'История',
@@ -44,7 +47,25 @@ $this->title = 'Панель управления';
                         ],
                     ],
                 ]) ?>
-        	</div>
+            </div>
+            <div class="col-xs-6">
+                <h4>Просмотры историй (в режиме чтения)</h4>
+                <p>Начиная с <?= Yii::$app->formatter->asDatetime($statDateFrom) ?></p>
+                <?= GridView::widget([
+                    'dataProvider' => $readOnlyDataProvider,
+                    'summary' => false,
+                    'columns' => [
+                        [
+                            'attribute' => 'title',
+                            'label' => 'История',
+                        ],
+                        [
+                            'attribute' => 'views_number',
+                            'label' => 'Количество просмотров',
+                        ],
+                    ],
+                ]) ?>
+            </div>
         </div>
         <div class="row">
             <div class="col-xs-12">

@@ -55,6 +55,8 @@ class SiteController extends Controller
             'dataProvider' => $dataProvider,
             'storyViewsData' => $statisticsModel->chartStoryViews(),
             'statDateFrom' => $statisticsModel->statDateFrom(),
+            'readOnlyDataProvider' => $statisticsModel->readOnlyData(),
+            'readOnlyStatDateFrom' => $statisticsModel->readOnlyStatDateFrom(),
         ]);
     }
 

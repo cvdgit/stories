@@ -166,4 +166,25 @@ class StoryStatisticsSearch extends StoryStatistics
         return (new Query())->from('{{%story_statistics}}')->min('created_at');
     }
 
+    public function readOnlyData(): ArrayDataProvider
+    {
+        $models = (new Query())
+            ->select(['{{%story}}.id', '{{%story}}.title', 'COUNT({{%story_readonly_statistics}}.story_id) AS views_number'])
+            ->from('{{%story_readonly_statistics}}')
+            ->innerJoin('{{%story}}', '{{%story}}.id = {{%story_readonly_statistics}}.story_id')
+            ->groupBy('{{%story_readonly_statistics}}.story_id')
+            ->orderBy(['views_number' => SORT_DESC])
+            ->limit(10)
+            ->indexBy('id')
+            ->all();
+        return new ArrayDataProvider([
+            'allModels' => $models,
+        ]);
+    }
+
+    public function readOnlyStatDateFrom()
+    {
+        return (new Query())->from('{{%story_readonly_statistics}}')->min('created_at');
+    }
+
 }
