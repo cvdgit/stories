@@ -19,9 +19,6 @@
         "yiisoft/yii2-bootstrap": "~2.0.0",
         "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
         "bower-asset/reveal.js": "^3.7",
-        "creocoder/yii2-flysystem": "dev-master",
-        "srmklive/flysystem-dropbox-v2": "^1.0",
-        "spatie/flysystem-dropbox": "^1.0",
         "electrolinux/phpquery": "^0.9.6",
         "2amigos/yii2-taggable-behavior": "~1.0",
         "2amigos/yii2-selectize-widget": "~1.0",
@@ -45,9 +42,10 @@
         "wbraganca/yii2-fancytree-widget": "*",
         "wokster/yii2-nested-sets-tree-behavior": "*",
         "bower-asset/plyr": "^3.5",
-      "ext-json": "*",
+        "ext-json": "*",
         "linslin/yii2-curl": "*",
-      "ext-curl": "*"
+        "ext-curl": "*",
+        "alikdex/yii2-crawler-detect": "1.0"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",
