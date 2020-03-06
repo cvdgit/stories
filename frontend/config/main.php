@@ -15,6 +15,7 @@ return [
         'log',
         'common\bootstrap\Bootstrap',
         'devicedetect',
+        'crawlerdetect',
     ],
     'controllerNamespace' => 'frontend\controllers',
     'on beforeAction' => function($event) {
@@ -116,6 +117,10 @@ return [
             'apiConfig' => [
                 'apiKey' => $params['unisenderKey'],
             ],
+        ],
+        'crawlerdetect' => [
+            'class' => 'alikdex\crawlerdetect\CrawlerDetect',
+            'setParams' => true, // optional, bootstrap initialize requred
         ],
     ],
     'params' => $params,

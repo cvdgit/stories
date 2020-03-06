@@ -158,12 +158,13 @@ class StoryController extends Controller
         }
 
         $model = Story::findModelByAlias($alias);
-        //$dataProvider = Comment::getStoryComments($model->id);
         $dataProvider = Comment::getCommentDataProvider($model->id);
         if (Yii::$app->request->isPjax) {
             return $this->renderAjax('_comment_list', ['dataProvider' => $dataProvider]);
         }
+
         $this->countersService->updateCounters($model);
+
         $commentForm = new CommentForm($model->id);
         return $this->render('view', [
             'model' => $model,
