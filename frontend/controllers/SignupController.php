@@ -84,4 +84,13 @@ class SignupController extends Controller
         return $this->goHome();
     }
 
+    public function actionEmail()
+    {
+        $model = new SignupForm();
+
+        return $this->render('email', [
+            'model' => $model,
+        ]);
+    }
+
 }

@@ -57,6 +57,10 @@ class AuthHandler
         $username = mb_strtolower($username);
         $username = strtr($username, ['-' => '_']);
 
+        if (empty($email)) {
+
+        }
+
         /* @var Auth $auth */
         $auth = Auth::find()->where([
             'source' => $this->client->getId(),
@@ -157,4 +161,5 @@ class AuthHandler
         //    $user->save();
         //}
     }
+
 }
