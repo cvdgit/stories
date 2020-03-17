@@ -44,3 +44,37 @@ var StoryAudio = function() {
 
     };
 }();
+
+var Neo = (function(jQuery) {
+    "use strict";
+
+    var $ = jQuery;
+
+    function getEntities() {
+        return $.getJSON("/admin/index.php?r=neo/entity-list");
+    }
+
+    function getRelations(entityID) {
+        return $.getJSON("/admin/index.php?r=neo/relations-list&entity_id=" + entityID);
+    }
+
+    function getRelatedEntities(entityID, relationID) {
+        return $.getJSON("/admin/index.php?r=neo/related-entities-list&entity_id=" + entityID + "&relation_id=" + relationID);
+    }
+
+    function saveRelations(relations) {
+        return $.post('/admin/index.php?r=neo/save-relations', relations);
+    }
+
+    function deleteRelation(relation) {
+        return $.post('/admin/index.php?r=neo/delete-relation', relation);
+    }
+
+    return {
+        "getEntities": getEntities,
+        "getRelations": getRelations,
+        "getRelatedEntities": getRelatedEntities,
+        "saveRelations": saveRelations,
+        "deleteRelation": deleteRelation
+    };
+})(jQuery);

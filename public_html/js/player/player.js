@@ -204,6 +204,9 @@ var WikidsPlayer = (function(document, $) {
         "mergeAllAndSetSlideAudio": mergeAllAndSetSlideAudio,
         "isVideoStory": function() {
             return config.story.video === 1;
+        },
+        "getStoryID": function() {
+            return config.storyID;
         }
     };
 })(document, jQuery);

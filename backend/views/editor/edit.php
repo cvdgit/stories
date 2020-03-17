@@ -190,6 +190,7 @@ $options = [
                 <?= Html::a('Ссылки', '#', ['id' => 'slide-links', 'style' => 'font-size: 18px']) ?>
                 <?= Html::a('Изображения', '#', ['id' => 'slide-images', 'style' => 'font-size: 18px']) ?>
                 <?= Html::a('Коллекции', '#', ['id' => 'slide-collections', 'style' => 'font-size: 18px']) ?>
+                <?= Html::a('Связи', '#neo-relation-modal', ['data-toggle' => 'modal', 'style' => 'font-size: 18px']) ?>
             </div>
             <div class="editor-slide-actions pull-right">
                 <a href="#" id="slide-copy" title="Копировать слайд"><i class="glyphicon glyphicon-copy"></i></a>
@@ -392,3 +393,5 @@ $options = [
         </div>
     </div>
 </div>
+
+<?= $this->render('modal/relations', ['model' => $model]) ?>

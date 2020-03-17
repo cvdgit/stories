@@ -19,6 +19,7 @@ $config = [
     'story' => [
         'video' => $model->video,
     ],
+    'storyID' => $model->id,
 ];
 $configJSON = Json::htmlEncode($config);
 $js = <<< JS

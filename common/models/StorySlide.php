@@ -3,6 +3,7 @@
 namespace common\models;
 
 use backend\components\queue\GenerateBookStoryJob;
+use backend\models\NeoSlideRelations;
 use DomainException;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -21,8 +22,11 @@ use yii\db\Query;
  * @property int $kind
  * @property int $link_slide_id
  *
+ * @property NeoSlideRelations[] $neoSlideRelations
+ * @property StoryFeedback[] $storyFeedbacks
  * @property Story $story
  * @property StorySlideBlock[] $storySlideBlocks
+ * @property StoryStatistics[] $storyStatistics
  */
 class StorySlide extends \yii\db\ActiveRecord
 {
@@ -92,6 +96,30 @@ class StorySlide extends \yii\db\ActiveRecord
     public function getStorySlideBlocks()
     {
         return $this->hasMany(StorySlideBlock::class, ['slide_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getNeoSlideRelations()
+    {
+        return $this->hasMany(NeoSlideRelations::class, ['slide_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStoryFeedbacks()
+    {
+        return $this->hasMany(StoryFeedback::class, ['slide_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStoryStatistics()
+    {
+        return $this->hasMany(StoryStatistics::class, ['slide_id' => 'id']);
     }
 
     public static function createSlide(int $storyID)

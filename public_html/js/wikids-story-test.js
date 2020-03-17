@@ -9,12 +9,17 @@ var WikidsStoryTest = function() {
         dom = {},
         remoteTest = false;
 
+    var questionHistory = [],
+        skipQuestion = [];
+
     function getTestData() {
         return testData;
     }
 
     function getQuestionsData() {
-        return testData.storyTestQuestions;
+        return testData.storyTestQuestions.filter(function(el) {
+            return (skipQuestion.indexOf(el.id) === -1);
+        });
     }
 
     function getAnswersData(question) {
@@ -22,6 +27,7 @@ var WikidsStoryTest = function() {
     }
 
     function init(remote) {
+        console.debug('WikidsStoryTest.init');
         remoteTest = remote || false;
         dom.wrapper = $("<div/>").addClass("wikids-test");
         dom.wrapper.empty();
@@ -31,6 +37,9 @@ var WikidsStoryTest = function() {
 
         testData = data[0];
         numQuestions = getQuestionsData().length;
+        if (numQuestions === 0) {
+            return;
+        }
 
         setupDOM();
         addEventListeners();
@@ -161,7 +170,8 @@ var WikidsStoryTest = function() {
             .hide()
             .addClass("wikids-test-question")
             .html('<p class="question-title">' + question.name + '</p>')
-            .attr("data-question-id", question.id);
+            .attr("data-question-id", question.id)
+            .data("question", question);
     }
 
     function createQuestions(questions) {
@@ -201,11 +211,16 @@ var WikidsStoryTest = function() {
     }
 
     function start() {
+
         correctAnswersNumber = 0;
         currentQuestionIndex = 0;
-        $(".wikids-test-question:first-child", dom.questions)
+
+        var $question = $(".wikids-test-question:first-child", dom.questions);
+
+        $question
             .show()
             .addClass("wikids-test-active-question");
+
         dom.results.hide();
         dom.nextButton.show();
         dom.restartButton.hide();
@@ -249,10 +264,10 @@ var WikidsStoryTest = function() {
     function answerQuestion(element, answer) {
         var questionID = element.attr("data-question-id");
         var question = getQuestionsData().filter(function(elem) {
-            return elem.id == questionID;
+            return parseInt(elem.id) === parseInt(questionID);
         });
         var correctAnswers = getAnswersData(question[0]).filter(function(elem) {
-            return elem.is_correct == "1";
+            return parseInt(elem.is_correct) === 1;
         });
         correctAnswers = correctAnswers.map(function(elem) {
             return elem.id;
@@ -273,6 +288,13 @@ var WikidsStoryTest = function() {
         return answer;
     }
 
+    var answerIsCorrect,
+        currentQuestion;
+
+    function getCurrentQuestion() {
+        return currentQuestion;
+    }
+
     function nextQuestion() {
 
         var $activeQuestion = $('.wikids-test-active-question');
@@ -282,7 +304,12 @@ var WikidsStoryTest = function() {
             return;
         }
 
-        var correct = answerQuestion($activeQuestion, answer);
+        answerIsCorrect = answerQuestion($activeQuestion, answer);
+        currentQuestion = $activeQuestion.data('question');
+
+        if (answerIsCorrect) {
+            skipQuestion.push(currentQuestion.id);
+        }
 
         $activeQuestion
             .hide()
@@ -291,25 +318,15 @@ var WikidsStoryTest = function() {
             .addClass('wikids-test-active-question');
 
         dom.results
-            .html("<p>Ответ " + (correct ? "" : "не ") + "верный.</p>")
+            .html("<p>Ответ " + (answerIsCorrect ? "" : "не ") + "верный.</p>")
             .show();
         dom.nextButton.hide();
         dom.continueButton.show();
-
-        /*
-        if (++currentQuestionIndex === numQuestions) {
-            dom.nextButton.hide();
-            dom.finishButton.show();
-            dom.results
-                .html("<p>Тест завершен. Нажмите Закончить тест, что бы узнать результат.</p>")
-                .show();
-        }
-        */
     }
 
     function continueTestAction() {
 
-        dom.results.hide();
+        dom.continueButton.hide();
 
         if (++currentQuestionIndex === numQuestions) {
             if (remoteTest) {
@@ -320,13 +337,27 @@ var WikidsStoryTest = function() {
             }
         }
         else {
-            var $activeQuestion = $('.wikids-test-active-question');
-            $activeQuestion.show();
 
-            dom.nextButton.show();
-            dom.continueButton.hide();
+            if (!answerIsCorrect) {
+                var params = {
+                    'entity_id': getCurrentQuestion().entity_id,
+                    'relation_id': getCurrentQuestion().relation_id,
+                };
+                $.getJSON('/question/get-related-slide', params).done(function(data) {
+                    if (data && data['slide_id'] && data['story_id']) {
+                        TransitionSlide.goToSlide(data.story_id, data.slide_id, true);
+                    }
+                });
+            }
+            else {
+                dom.results.hide();
+
+                var $activeQuestion = $('.wikids-test-active-question');
+                $activeQuestion.show();
+
+                dom.nextButton.show();
+            }
         }
-
     }
 
     function extend(a, b) {

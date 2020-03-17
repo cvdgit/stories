@@ -159,7 +159,6 @@ var TestSlide = (function() {
 
 var Education = (function() {
 
-
     function getCurrentSlide() {
         return Reveal.getCurrentSlide();
     }
@@ -169,6 +168,7 @@ var Education = (function() {
     }
 
     function init() {
+        console.debug('Education.init');
         var elem = $("div.new-questions", getCurrentSlide());
         if (!elem.length) {
             return;
@@ -177,9 +177,7 @@ var Education = (function() {
             paramValue = elem.attr("data-param-value");
         loadQuestionData(param, paramValue)
             .done(function(data) {
-                WikidsStoryTest.init();
-                //WikidsStoryTest.addEventListener("finish", storyTestResults);
-                //WikidsStoryTest.addEventListener("backToStory", backToStory);
+                WikidsStoryTest.init(true);
                 var html =  WikidsStoryTest.load(data, false);
                 elem.html(html);
             });
