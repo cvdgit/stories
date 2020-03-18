@@ -16,6 +16,9 @@ use Yii;
  */
 class Auth extends \yii\db\ActiveRecord
 {
+
+    const AUTH_SESSION_KEY = 'authHandler';
+
     /**
      * {@inheritdoc}
      */
@@ -33,7 +36,7 @@ class Auth extends \yii\db\ActiveRecord
             [['user_id', 'source', 'source_id'], 'required'],
             [['user_id'], 'integer'],
             [['source', 'source_id'], 'string', 'max' => 255],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
@@ -55,6 +58,16 @@ class Auth extends \yii\db\ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(User::className(), ['id' => 'user_id']);
+        return $this->hasOne(User::class, ['id' => 'user_id']);
     }
+
+    public static function create(int $userID, string $source, string $sourceID): Auth
+    {
+        $model = new self();
+        $model->user_id = $userID;
+        $model->source = $source;
+        $model->source_id = $sourceID;
+        return $model;
+    }
+
 }

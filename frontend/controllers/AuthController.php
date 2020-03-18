@@ -3,8 +3,10 @@
 
 namespace frontend\controllers;
 
+use common\models\Auth;
 use Yii;
 use yii\filters\VerbFilter;
+use yii\helpers\Url;
 use yii\web\Controller;
 use common\models\LoginForm;
 use common\services\auth\AuthService;
@@ -91,4 +93,15 @@ class AuthController extends Controller
         Yii::$app->user->logout();
         return $this->goHome();
     }
+
+    public function actionTest()
+    {
+        Yii::$app->session->set(Auth::AUTH_SESSION_KEY, [
+            'source' => 'vkontakte',
+            'source_id' => '123',
+            'username' => 'test_vk',
+        ]);
+        Yii::$app->response->redirect(Url::to('/signup/email'));
+    }
+
 }

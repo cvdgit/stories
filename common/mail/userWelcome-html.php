@@ -12,7 +12,7 @@ use yii\helpers\Html;
     <p>Популярные категории:</p>
     <p>
     <ul>
-        <li><a target="_blank" href="https://wikids.ru/stories/category/drevnegrecheskie-mify?">Древнегреческие мифы</a></li>
+        <li><a target="_blank" href="https://wikids.ru/stories/category/drevnegrecheskie-mify">Древнегреческие мифы</a></li>
         <li><a target="_blank" href="https://wikids.ru/stories/category/russkie-skazki-i-byliny">Русские сказки и былины</a></li>
         <li><a target="_blank" href="https://wikids.ru/stories/category/poznavatelnye">Познавательные</a></li>
         <li><a target="_blank" href="https://wikids.ru/stories/category/altayskie-narodnye-skazki">Алтайские народные сказки</a></li>

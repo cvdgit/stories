@@ -4,8 +4,10 @@
 namespace frontend\controllers;
 
 
+use common\models\Auth;
 use common\models\User;
 use Exception;
+use frontend\models\EmailForm;
 use Yii;
 use yii\web\Controller;
 use yii\web\Response;
@@ -86,7 +88,44 @@ class SignupController extends Controller
 
     public function actionEmail()
     {
-        $model = new SignupForm();
+        $session = Yii::$app->session;
+        $authHandler = $session->get(Auth::AUTH_SESSION_KEY);
+        if ($authHandler === null) {
+            return $this->goHome();
+        }
+
+        $model = new EmailForm();
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+
+            $username = $authHandler['username'];
+            $password = Yii::$app->security->generateRandomString(6);
+
+            try {
+                $this->service->signup($username, $model->email, $password);
+            }
+            catch (Exception $ex) {
+                Yii::$app->errorHandler->logException($ex);
+                $session->setFlash('error', $ex->getMessage());
+            }
+
+            $user = User::findByUsername($username);
+            if ($user !== null) {
+
+                $auth = Auth::create($user->id, $authHandler['source'], $authHandler['source_id']);
+                $auth->save();
+
+                try {
+                    $this->service->sentEmailConfirm($user);
+                    Yii::$app->session->setFlash('success', 'Проверьте свой адрес электронной почты, чтобы подтвердить регистрацию');
+                } catch (Exception $ex) {
+                    Yii::$app->errorHandler->logException($ex);
+                    $session->setFlash('error', 'Ошибка при отправке письма с подтверждением регистрации на сайте');
+                }
+            }
+
+            $session->remove(Auth::AUTH_SESSION_KEY);
+            return $this->goHome();
+        }
 
         return $this->render('email', [
             'model' => $model,

@@ -5,7 +5,7 @@ use yii\bootstrap\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
-/* @var $model frontend\models\SignupForm */
+/* @var $model frontend\models\EmailForm */
 
 $title = 'Завершение регистрации';
 $this->setMetaTags($title,
@@ -20,12 +20,12 @@ $this->setMetaTags($title,
             <div class="col-md-4 col-md-offset-4">
                 <p class="info-text">Введите email:</p>
                 <?php $form = ActiveForm::begin([
-                    'id' => 'reset-password-form',
+                    'id' => 'save-email-form',
                     'options' => [
                         'class' => 'story-form',
                     ],
                 ]); ?>
-                <?= $form->field($model, 'email', ['inputOptions' => ['placeholder' => 'Email']])->passwordInput()->label(false) ?>
+                <?= $form->field($model, 'email', ['inputOptions' => ['placeholder' => 'Email']])->textInput()->label(false) ?>
                 <?= Html::submitButton('Сохранить', ['class' => 'btn']) ?>
                 <?php ActiveForm::end(); ?>
             </div>

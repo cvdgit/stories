@@ -11,7 +11,7 @@
 
     Популярные категории:
 
-    <a target="_blank" href="https://wikids.ru/stories/category/drevnegrecheskie-mify?">Древнегреческие мифы</a>
+    <a target="_blank" href="https://wikids.ru/stories/category/drevnegrecheskie-mify">Древнегреческие мифы</a>
 
     <a target="_blank" href="https://wikids.ru/stories/category/russkie-skazki-i-byliny">Русские сказки и былины</a>
 

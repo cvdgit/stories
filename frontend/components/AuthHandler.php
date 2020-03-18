@@ -13,6 +13,7 @@ use common\models\User;
 use common\services\auth\AuthService;
 use common\services\auth\SignupService;
 use common\services\TransactionManager;
+use yii\helpers\Url;
 
 
 /**
@@ -58,7 +59,12 @@ class AuthHandler
         $username = strtr($username, ['-' => '_']);
 
         if (empty($email)) {
-
+            Yii::$app->session->set(Auth::AUTH_SESSION_KEY, [
+                'source' => $this->client->getId(),
+                'source_id' => $id,
+                'username' => $username,
+            ]);
+            Yii::$app->response->redirect(Url::to('signup/email'));
         }
 
         /* @var Auth $auth */
