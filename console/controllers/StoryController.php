@@ -77,6 +77,7 @@ class StoryController extends Controller
 
             $this->stdout($fileName . PHP_EOL);
 
+            /*
             $imagesPath = Yii::getAlias('@public/slides/' . $fileName . '/');
             if (file_exists($imagesPath)) {
                 array_map('unlink', glob($imagesPath . '*.*'));
@@ -84,6 +85,7 @@ class StoryController extends Controller
 
             $filePath = $path . $fileName;
             unlink($filePath);
+            */
         }
 
         $this->stdout('Done!' . PHP_EOL);

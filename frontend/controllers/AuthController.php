@@ -94,14 +94,4 @@ class AuthController extends Controller
         return $this->goHome();
     }
 
-    public function actionTest()
-    {
-        Yii::$app->session->set(Auth::AUTH_SESSION_KEY, [
-            'source' => 'vkontakte',
-            'source_id' => '123',
-            'username' => 'test_vk',
-        ]);
-        Yii::$app->response->redirect(Url::to('/signup/email'));
-    }
-
 }
