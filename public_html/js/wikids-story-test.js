@@ -337,8 +337,7 @@ var WikidsStoryTest = function() {
             }
         }
         else {
-
-            if (!answerIsCorrect) {
+            if (!answerIsCorrect && remoteTest) {
                 var params = {
                     'entity_id': getCurrentQuestion().entity_id,
                     'relation_id': getCurrentQuestion().relation_id,
@@ -351,10 +350,8 @@ var WikidsStoryTest = function() {
             }
             else {
                 dom.results.hide();
-
                 var $activeQuestion = $('.wikids-test-active-question');
                 $activeQuestion.show();
-
                 dom.nextButton.show();
             }
         }
