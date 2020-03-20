@@ -41,7 +41,10 @@ class CountersService
             ->count();
         $numberOfSlides--; // отнять последнй слайд - Конец
         if ($viewedSlidesNumber > 0 && $numberOfSlides > 0) {
-            $percent = $viewedSlidesNumber * 100 / $numberOfSlides;
+            $percent = round($viewedSlidesNumber * 100 / $numberOfSlides);
+            if ($percent > 100) {
+                $percent = 100;
+            }
             $command = Yii::$app->db->createCommand();
             $command->update('{{%user_story_history}}', ['percent' => $percent], ['user_id' => $userID, 'story_id' => $storyID]);
             $command->execute();
