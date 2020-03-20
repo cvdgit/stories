@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use linslin\yii2\curl\Curl;
+use Yii;
 use yii\db\Query;
 use yii\helpers\Json;
 use yii\rest\Controller;
@@ -22,7 +23,7 @@ class QuestionController extends Controller
                 CURLOPT_SSL_VERIFYHOST => false,
             ])
             ->setGetParams(['param' => $param, 'value' => $value])
-            ->get('https://neo.test/api/question');
+            ->get(Yii::$app->params['neo.url'] . '/api/question');
         $result = Json::decode($result);
 
         $questions = [];

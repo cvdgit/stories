@@ -23,7 +23,7 @@ class NeoController extends Controller
                 CURLOPT_SSL_VERIFYPEER => false,
                 CURLOPT_SSL_VERIFYHOST => false,
             ])
-            ->get('https://neo.test/api/entity/list');
+            ->get(Yii::$app->params['neo.url'] . '/api/entity/list');
         //die(var_dump($curl->errorText));
         return Json::decode($result);
     }
@@ -39,7 +39,7 @@ class NeoController extends Controller
                 CURLOPT_SSL_VERIFYHOST => false,
             ])
             ->setGetParams(['entity_id' => $entity_id])
-            ->get('https://neo.test/api/relations/list');
+            ->get(Yii::$app->params['neo.url'] . '/api/relations/list');
         //die(var_dump($curl->errorText));
         return Json::decode($result);
     }
@@ -55,7 +55,7 @@ class NeoController extends Controller
                 CURLOPT_SSL_VERIFYHOST => false,
             ])
             ->setGetParams(['entity_id' => $entity_id, 'relation_id' => $relation_id])
-            ->get('https://neo.test/api/entity/related');
+            ->get(Yii::$app->params['neo.url'] . '/api/entity/related');
         //die(var_dump($curl->errorText));
         return Json::decode($result);
     }
@@ -78,6 +78,21 @@ class NeoController extends Controller
             'entity_id' => $post['entity_id'],
         ]);
         return $model->delete();
+    }
+
+    public function actionQuestions(string $param, string $value)
+    {
+        $curl = new Curl();
+        $result = $curl
+            ->setHeader('Accept', 'application/json')
+            ->setOptions([
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_SSL_VERIFYHOST => false,
+            ])
+            ->setGetParams(['param' => $param, 'value' => $value])
+            ->get(Yii::$app->params['neo.url'] . '/api/question/');
+        return Json::decode($result);
     }
 
 }

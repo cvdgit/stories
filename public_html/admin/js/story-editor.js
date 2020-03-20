@@ -484,7 +484,7 @@ var StoryEditor = (function() {
         if (!param || !paramValue) {
             return false;
         }
-        $.getJSON("https://neo.test:8443/api/question/", {"param": param, "value": paramValue})
+        $.getJSON("/admin/index.php?r=neo/questions", {"param": param, "value": paramValue})
             .done(function(data) {
                 var list = $("table#question-list tbody");
                 list.empty();
