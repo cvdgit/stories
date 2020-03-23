@@ -38,6 +38,7 @@ $this->title = 'Платежи';
                 'summary' => false,
                 'columns' => [
                     'rate.title',
+                    'user.profileName',
                     'payment',
                     'finish',
                 ],

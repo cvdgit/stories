@@ -38,6 +38,7 @@ class PaymentController extends Controller
     public function actionIndex(int $status)
     {
         $query = Payment::find()->orderBy('created_at DESC');
+        $query->with(['rate', 'user.profile']);
         $query->andWhere(['state' => $status]);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
