@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use backend\models\ChangePasswordForm;
 use backend\models\UserCreateForm;
+use backend\models\UserSearch;
 use backend\models\UserUpdateForm;
 use common\models\SubscriptionForm;
 use common\services\UserService;
@@ -51,18 +52,10 @@ class UserController extends Controller
 
     public function actionIndex()
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => User::find(),
-            'sort' => [
-                'defaultOrder' => [
-                    'last_activity' => SORT_DESC,
-                ],
-            ],
-            'pagination' => [
-                'pageSize' => 50,
-            ],
-        ]);
+        $searchModel = new UserSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('index', [
+            'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
     }

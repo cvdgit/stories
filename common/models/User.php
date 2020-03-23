@@ -74,6 +74,7 @@ class User extends ActiveRecord implements IdentityInterface
             'updated_at' => 'Дата изменения',
             'status' => 'Статус',
             'active_payment' => 'Подписка',
+            'last_activity' => 'Последняя активность',
         ];
     }
 

@@ -7,6 +7,7 @@ use common\helpers\UserHelper;
 use backend\widgets\grid\RoleColumn;
 
 /* @var $this yii\web\View */
+/* @var $searchModel backend\models\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Пользователи';
@@ -17,11 +18,13 @@ $this->title = 'Пользователи';
 </p>
 <?= GridView::widget([
     'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
     'options' => ['class' => 'table-responsive'],
     'columns' => [
         'id',
-        'last_activity:datetime',
+        'username',
         'email:email',
+        'last_activity:datetime',
         'created_at:datetime',
         [
             'attribute' => 'status',
