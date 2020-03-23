@@ -41,7 +41,7 @@ class StoryController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['add-comment', 'comment-list', 'history', 'liked', 'favorites'],
+                'only' => ['add-comment', 'comment-list', 'history', 'liked', 'favorites', 'myaudio'],
                 'rules' => [
                     [
                         'actions' => ['add-comment', 'comment-list', 'history', 'liked', 'favorites', 'myaudio'],
