@@ -66,8 +66,8 @@ class SummaryHelper
     {
         return (new Query())
             ->from('{{%payment}}')
-            ->where(['>=', '{{%payment}}.payment', new Expression('NOW()')])
-            ->andWhere(['<=', '{{%payment}}.finish', new Expression('NOW()')])
+            ->where(['<=', '{{%payment}}.payment', new Expression('NOW()')])
+            ->andWhere(['>=', '{{%payment}}.finish', new Expression('NOW()')])
             ->andWhere('{{%payment}}.state = :valid', [':valid' => Payment::STATUS_VALID])
             ->count('{{%payment}}.id');
     }
