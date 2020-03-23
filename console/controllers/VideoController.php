@@ -3,6 +3,7 @@
 namespace console\controllers;
 
 use backend\services\VideoService;
+use common\helpers\EmailHelper;
 use common\models\SlideVideo;
 use http\Exception\RuntimeException;
 use Yii;
@@ -34,19 +35,15 @@ class VideoController extends Controller
             }
         }
         if (count($invalidVideos) > 0) {
+
             $body = '<ul>';
             foreach ($invalidVideos as $item) {
                 $body .= '<li>' . $item['title'] . '</li>';
             }
             $body .= '</ul>';
-            $sent = Yii::$app->mailer
-                ->compose()
-                ->setHtmlBody($body)
-                ->setTo(Yii::$app->params['youtube.video.user.email'])
-                ->setFrom([Yii::$app->params['infoEmail'] => Yii::$app->name])
-                ->setSubject('Wikids - Найдены удаленные видео youtube')
-                ->send();
-            if (!$sent) {
+
+            $response = EmailHelper::sendEmail(Yii::$app->params['youtube.video.user.email'], 'Wikids - Найдены удаленные видео youtube', 'video-html', ['videoList' => $body]);
+            if (!$response->isSuccess()) {
                 throw new RuntimeException('Ошибка при отправке email об удаленном видео');
             }
         }
