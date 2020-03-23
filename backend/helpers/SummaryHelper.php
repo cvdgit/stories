@@ -62,4 +62,14 @@ class SummaryHelper
         return (new Query())->from(['a' => $query])->sum('a.cnt');
     }
 
+    public static function activePayments()
+    {
+        return (new Query())
+            ->from('{{%payment}}')
+            ->where(['>=', 'payment', new Expression('NOW()')])
+            ->andWhere(['<=', 'finish', new Expression('NOW()')])
+            ->andWhere('state = :valid', [':valid' => Payment::STATUS_VALID])
+            ->count();
+    }
+
 }

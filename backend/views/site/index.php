@@ -1,8 +1,10 @@
 <?php
 
 use backend\helpers\SummaryHelper;
+use common\models\Payment;
 use dosamigos\chartjs\ChartJs;
 use yii\grid\GridView;
+use yii\helpers\Html;
 
 /** @var $this yii\web\View */
 /** @var $dataProvider yii\data\ActiveDataProvider */
@@ -22,6 +24,9 @@ $this->title = 'Панель управления';
                     <li class="list-group-item"><span class="badge"><?= SummaryHelper::registeredUsers() ?></span> Зарегистрировано пользователей</li>
                     <li class="list-group-item"><span class="badge"><?= SummaryHelper::commentsWritten() ?></span> Написано комментариев</li>
                     <li class="list-group-item"><span class="badge"><?= SummaryHelper::viewedStories() ?></span> Просмотрено историй</li>
+                </ul>
+                <ul class="list-group">
+                    <?= Html::a('<span class="badge">' . SummaryHelper::activePayments() . '</span> Активных подписок', ['payment/index', 'status' => Payment::STATUS_VALID], ['class' => 'list-group-item list-group-item-info']) ?>
                 </ul>
             </div>
             <div class="col-xs-9">
