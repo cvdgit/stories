@@ -70,6 +70,6 @@ return [
         'comment/reply/<id:\d+>' => 'comment/reply',
 
         'image/<id:[\w\d]+' => 'image/view',
-        'question/<param:[\w\d]+>/<value:[\w\d]+>' => 'question/get',
+        'question/<param:[\w\s\d]+>/<value:[\w\d\s]+>' => 'question/get',
     ],
 ];
