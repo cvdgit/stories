@@ -330,7 +330,18 @@ var WikidsStoryTest = function() {
 
         if (++currentQuestionIndex === numQuestions) {
             if (remoteTest) {
-                WikidsPlayer.right();
+                var params = {
+                    'entity_id': getCurrentQuestion().entity_id,
+                    'relation_id': getCurrentQuestion().relation_id,
+                };
+                $.getJSON('/question/get-related-slide', params).done(function(data) {
+                    if (data && data['slide_id'] && data['story_id']) {
+                        TransitionSlide.goToSlide(data.story_id, data.slide_id, true);
+                    }
+                    else {
+                        WikidsPlayer.right();
+                    }
+                });
             }
             else {
                 dispatchEvent("backToStory", {});
