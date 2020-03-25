@@ -153,7 +153,7 @@ $options = [
 ?>
 <div class="row">
 	<div class="col-lg-3">
-        <h4>Слайды <div class="pull-right"><?= ButtonDropdown::widget($options) ?></div></h4>
+        <h4>Слайды <a href="#"><i class="glyphicon glyphicon-floppy-disk"></i></a> <div class="pull-right"><?= ButtonDropdown::widget($options) ?></div></h4>
         <div class="list-group" id="preview-container" style="margin-top: 20px"></div>
 	</div>
 	<div class="col-lg-9">

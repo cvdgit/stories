@@ -76,9 +76,11 @@ $values = implode("\n", $values);
 <?= $form->field($model, 'neo_entity_name')
     ->textInput(['readonly' => true])
     ->hint($this->render('_neo_entities', [
+        'neoLabelIDField' => Html::getInputId($model, 'neo_label_id'),
         'neoEntityIDField' => Html::getInputId($model, 'neo_entity_id'),
         'neoEntityNameField' => Html::getInputId($model, 'neo_entity_name'),
     ]), ['class' => false]) ?>
+<?= $form->field($model, 'neo_label_id')->hiddenInput()->label(false) ?>
 <?= $form->field($model, 'neo_entity_id')->hiddenInput()->label(false) ?>
 
 <div class="form-group">

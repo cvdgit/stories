@@ -13,18 +13,29 @@ use yii\rest\Controller;
 class NeoController extends Controller
 {
 
-    public function actionEntityList()
+    protected function serviceCurl()
     {
-        $curl = new Curl();
-        $result = $curl
+        return (new Curl())
             ->setHeader('Accept', 'application/json')
             ->setOptions([
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_SSL_VERIFYPEER => false,
                 CURLOPT_SSL_VERIFYHOST => false,
-            ])
-            ->get(Yii::$app->params['neo.url'] . '/api/entity/list');
-        //die(var_dump($curl->errorText));
+            ]);
+    }
+
+    protected function serviceMethodUrl($method)
+    {
+        return Yii::$app->params['neo.url'] . $method;
+    }
+
+    public function actionEntityList($label_id = null)
+    {
+        $curl = $this->serviceCurl();
+        if ($label_id !== null) {
+            $curl->setGetParams(['label_id' => $label_id]);
+        }
+        $result = $curl->get($this->serviceMethodUrl('/api/entity/list'));
         return Json::decode($result);
     }
 
@@ -92,6 +103,12 @@ class NeoController extends Controller
             ])
             ->setGetParams(['param' => $param, 'value' => $value])
             ->get(Yii::$app->params['neo.url'] . '/api/question/');
+        return Json::decode($result);
+    }
+
+    public function actionLabels()
+    {
+        $result = $this->serviceCurl()->get($this->serviceMethodUrl('/api/label/list'));
         return Json::decode($result);
     }
 

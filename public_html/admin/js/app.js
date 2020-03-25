@@ -50,8 +50,11 @@ var Neo = (function(jQuery) {
 
     var $ = jQuery;
 
-    function getEntities() {
-        return $.getJSON("/admin/index.php?r=neo/entity-list");
+    function getEntities(labelID) {
+        if (labelID) {
+            labelID = '&label_id=' + labelID;
+        }
+        return $.getJSON("/admin/index.php?r=neo/entity-list" + labelID);
     }
 
     function getRelations(entityID) {
@@ -70,11 +73,16 @@ var Neo = (function(jQuery) {
         return $.post('/admin/index.php?r=neo/delete-relation', relation);
     }
 
+    function getLabels() {
+        return $.post('/admin/index.php?r=neo/labels');
+    }
+
     return {
         "getEntities": getEntities,
         "getRelations": getRelations,
         "getRelatedEntities": getRelatedEntities,
         "saveRelations": saveRelations,
-        "deleteRelation": deleteRelation
+        "deleteRelation": deleteRelation,
+        "getLabels": getLabels
     };
 })(jQuery);

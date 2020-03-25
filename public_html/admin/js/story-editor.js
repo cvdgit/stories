@@ -267,6 +267,8 @@ var StoryEditor = (function() {
                         .appendTo($container);
                 });
                 loadSlide(activeSlideID, true);
+
+                $container.sortable();
             }
             else {
                 $("<span/>").text("Нет слайдов").appendTo($container);
