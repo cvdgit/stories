@@ -38,7 +38,7 @@ use yii\helpers\Html;
                 </table>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary" id="create-questions">Создать с слайд с вопросами</button>
+                <button class="btn btn-primary" id="create-questions">Создать слайд с вопросами</button>
                 <button class="btn btn-default" data-dismiss="modal">Отмена</button>
             </div>
         </div>
