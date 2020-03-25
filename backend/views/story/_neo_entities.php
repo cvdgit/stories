@@ -20,15 +20,9 @@ Modal::begin([
 ]);
 ?>
 <div style="margin: 10px 0">
-<?= Html::dropDownList('neoLabels',
-    null,
-    [],
-    ['prompt' => 'Выберите метку', 'onchange' => '', 'class' => 'form-control', 'id' => 'label-list']) ?>
+    <?= Html::dropDownList('neoLabels', null, [], ['prompt' => 'Выберите метку', 'class' => 'form-control', 'id' => 'label-list']) ?>
 </div>
-<?= Html::dropDownList('neoEntities',
-    null,
-    [],
-    ['prompt' => 'Выберите сущность', 'onchange' => '', 'class' => 'form-control', 'id' => 'entity-list']) ?>
+<?= Html::dropDownList('neoEntities', null, [], ['prompt' => 'Выберите сущность', 'class' => 'form-control', 'id' => 'entity-list']) ?>
 <?php Modal::end() ?>
 
 <?php

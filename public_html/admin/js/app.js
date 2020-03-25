@@ -51,6 +51,7 @@ var Neo = (function(jQuery) {
     var $ = jQuery;
 
     function getEntities(labelID) {
+        labelID = labelID || '';
         if (labelID) {
             labelID = '&label_id=' + labelID;
         }
@@ -77,12 +78,17 @@ var Neo = (function(jQuery) {
         return $.post('/admin/index.php?r=neo/labels');
     }
 
+    function getQuestions(param, paramValue) {
+        return $.getJSON('/admin/index.php?r=neo/questions', {"param": param, "value": paramValue});
+    }
+
     return {
         "getEntities": getEntities,
         "getRelations": getRelations,
         "getRelatedEntities": getRelatedEntities,
         "saveRelations": saveRelations,
         "deleteRelation": deleteRelation,
-        "getLabels": getLabels
+        "getLabels": getLabels,
+        "getQuestions": getQuestions
     };
 })(jQuery);

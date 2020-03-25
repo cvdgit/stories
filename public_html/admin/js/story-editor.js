@@ -474,31 +474,7 @@ var StoryEditor = (function() {
 (function(editor, $, console) {
     "use strict";
 
-    var $modal = $("#slide-new-question-modal");
-
-    editor.createNewSlideQuestion = function() {
-        $modal.modal("show");
-    };
-
-    editor.showQuestionList = function() {
-        var param = $("#question-param").val(),
-            paramValue = $("#question-param-value").val();
-        if (!param || !paramValue) {
-            return false;
-        }
-        $.getJSON("/admin/index.php?r=neo/questions", {"param": param, "value": paramValue})
-            .done(function(data) {
-                var list = $("table#question-list tbody");
-                list.empty();
-                data.forEach(function(elem) {
-                    $('<tr><td>' + elem.question + '</td></tr>').appendTo(list);
-                });
-            });
-    };
-
-    editor.createQuestions = function() {
-        var param = $("#question-param").val(),
-            paramValue = $("#question-param-value").val();
+    editor.createQuestions = function(param, paramValue, callback) {
         if (!param || !paramValue) {
             return false;
         }
@@ -507,9 +483,11 @@ var StoryEditor = (function() {
             "param": param,
             "paramValue": paramValue
         }).done(function(data) {
+            if (typeof callback === 'function') {
+                callback();
+            }
             editor.loadSlides(data.id);
         });
-        $modal.modal("hide");
     };
 
 })(StoryEditor, jQuery, console);

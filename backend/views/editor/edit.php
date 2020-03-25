@@ -143,8 +143,8 @@ $options = [
             ],
             [
                 'label' => 'Вопросы',
-                'url' => '#',
-                'linkOptions' => ['onclick' => 'StoryEditor.createNewSlideQuestion(); return false;'],
+                'url' => '#slide-new-question-modal',
+                'linkOptions' => ['data-toggle' => 'modal'],
             ],
         ],
     ]
@@ -352,46 +352,5 @@ $options = [
     </div>
 </div>
 
-<div class="modal fade" id="slide-new-question-modal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Вопросы</h4>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12">
-                        <?= Html::label('Параметр:', 'question-param') ?>
-                        <?= Html::textInput('', null, ['class' => 'form-control', 'id' => 'question-param']) ?>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <?= Html::label('Значение параметра:', 'question-param-value') ?>
-                        <?= Html::textInput('QuestionSubject', null, ['class' => 'form-control', 'id' => 'question-param-value']) ?>
-                    </div>
-                </div>
-                <?= Html::button('Показать вопросы', ['onclick' => 'StoryEditor.showQuestionList()', 'class' => 'btn btn-success btn-sm', 'style' => 'margin: 10px 0']) ?>
-                <table class="table table-bordered" id="question-list">
-                    <thead>
-                        <tr>
-                            <th>Вопросы</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Пусто</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" onclick="StoryEditor.createQuestions()">Создать с слайд с вопросами</button>
-                <button class="btn btn-default" data-dismiss="modal">Отмена</button>
-            </div>
-        </div>
-    </div>
-</div>
-
+<?= $this->render('modal/questions', []) ?>
 <?= $this->render('modal/relations', ['model' => $model]) ?>
