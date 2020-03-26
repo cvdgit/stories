@@ -154,7 +154,12 @@ class StoryStatisticsSearch extends StoryStatistics
             ->andWhere(new Expression('`created_at` <= UNIX_TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 1 DAY))'))
             ->groupBy(new Expression('DATE_FORMAT(FROM_UNIXTIME(`created_at`),\'%d-%m-%Y\')'));
         $query->union($query2, true);
-        $data = (new Query())->from(['a' => $query])->indexBy('date')->all();
+        $data = (new Query())
+            ->select(['a.date AS date', 'SUM(a.views) AS views'])
+            ->from(['a' => $query])
+            ->groupBy('a.date')
+            ->indexBy('date')
+            ->all();
         return [
             'labels' => array_keys($data),
             'data' => array_values(array_map(function($elem) { return $elem['views']; }, $data)),
