@@ -168,7 +168,7 @@ var Education = (function() {
     }
 
     function init() {
-        console.debug('Education.init');
+        //console.debug('Education.init');
         var elem = $("div.new-questions", getCurrentSlide());
         if (!elem.length) {
             return;

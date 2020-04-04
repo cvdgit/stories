@@ -55,7 +55,7 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 	Reveal.addEventListener('ready', function(event) {
 		if (!initialized) {
 			initialized = true;
-			console.debug("RevealAudioSlideshow.ready()");
+			//console.debug("RevealAudioSlideshow.ready()");
 			setup();
 			selectAudio();
 			document.dispatchEvent(new CustomEvent('stopplayback'));
@@ -127,7 +127,7 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 			return;
 		}
 
-		console.log("RevealAudioSlideshow.setup()");
+		//console.log("RevealAudioSlideshow.setup()");
 
 		// deprecated parameters
 		if ( Reveal.getConfig().audioPrefix ) {
@@ -468,7 +468,7 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 
 	function sync() {
 		setup();
-		console.debug("sync");
+		//console.debug("sync");
 		selectAudio();
 		document.dispatchEvent(new CustomEvent('stopplayback'));
 	}
