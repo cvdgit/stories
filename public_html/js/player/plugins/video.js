@@ -41,7 +41,9 @@ function WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute, speed, showC
     player.on("pause", function() {
         if (window["TransitionSlide"] && TransitionSlide.getInTransition()) {
             TransitionSlide.backToStory(function() {
-                setTimeout(RevealAudioSlideshow.playCurrentAudio, 1000);
+                if (window['WikidsSeeAlso'] && WikidsSeeAlso.autoplay()) {
+                    setTimeout(RevealAudioSlideshow.playCurrentAudio, 1000);
+                }
             });
         }
     });
