@@ -64,8 +64,8 @@ var WikidsRecorder = window.WikidsRecorder || (function() {
         });
     $trackWrapper.append($newTrackLink);
 
-    console.log("getCurrentTrack", getCurrentTrack());
-    console.log("isUserTrack", isUserTrack());
+    //console.log("getCurrentTrack", getCurrentTrack());
+    //console.log("isUserTrack", isUserTrack());
 
     if (isUserTrack()) {
         var $deleteTrackLink = $("<a/>");
