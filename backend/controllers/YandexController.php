@@ -100,15 +100,37 @@ class YandexController extends Controller
         return $this->token;
     }
 
+    protected function query(string $httpMethod, string $apiMethod, array $params = []) {
+        $this->token = 'AgAAAAA4xBBoAAYMF1BRwQwQfU59ingSfBfwDb8';
+        $params['headers'] = ['Authorization' => 'OAuth ' . $this->token];
+        if ($httpMethod == 'GET') {
+            $params['headers']['Accept'] = 'application/json';
+        } else if ($httpMethod == 'POST' || $httpMethod == 'PATCH') {
+            $params['headers']['Content-Type'] = 'application/json; charset=utf-8';
+        }
+        $httpClient = new \GuzzleHttp\Client;
+        $res = $httpClient->request($httpMethod, 'https://api.collections.yandex.net' . $apiMethod, $params);
+        if ($res->getStatusCode() == 204) {
+            return true;
+        }
+        return \GuzzleHttp\json_decode($res->getBody()->getContents());
+    }
+
     public function actionBoards(string $account, int $page = 1)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
+        /*
         $result = $this->getCurl()
+            ->setHeader('Accept', 'application/json')
+            ->setHeader('Content-Type', 'application/json; charset=utf-8')
             ->setHeader('Authorization', 'OAuth ' . $this->getAuthToken($account))
             ->setGetParams(['page' => $page])
-            ->setGetParams(['page_size' => 100])
+            ->setGetParams(['page_size' => 10])
             ->get('https://api.collections.yandex.net/v1/boards/');
         return Json::decode($result);
+        */
+        $params['query'] = ['page' => $page, 'page_size' => 10];
+        return $this->query('GET', '/v1/boards/', $params);
     }
 
     public function actionCards(string $board_id, string $account)
@@ -131,10 +153,16 @@ class YandexController extends Controller
         $result = $curl
             ->setOption(CURLOPT_POSTFIELDS, http_build_query([
                 'grant_type' => 'refresh_token',
-                'refresh_token' => '',
+                'refresh_token' => '1:vv2pooU-Eiqzfvo_:7IJS3rvGHH4I_a5wurn-6YQ2PaxSFeN5Mk0ucrZMIvD-yoCZ6uiu:M5pgBLGa04JA_gx6vD1YCg',
             ]))
             ->post(self::TOKEN_URL);
-        $result = Json::decode($result);
+        return Json::decode($result);
+    }
+
+    public function actionRefreshToken()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return $this->refreshToken();
     }
 
 }
