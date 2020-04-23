@@ -22,7 +22,7 @@ class BaseForm extends Model
     public function rules(): array
     {
         return [
-            [['slide_id'], 'required'],
+            //[['slide_id'], 'required'],
             [['slide_id'], 'integer'],
             [['block_id', 'left', 'top', 'width', 'height'], 'string'],
         ];

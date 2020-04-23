@@ -13,18 +13,18 @@ use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
 use backend\models\editor\TextForm;
 use backend\models\editor\TransitionForm;
+use common\helpers\StoryHelper;
 use common\models\StorySlide;
 use common\models\StorySlideBlock;
 use common\models\StorySlideImage;
 use common\models\StoryTestQuestion;
 use DomainException;
-use http\Exception;
 use yii;
 use yii\db\Query;
+use yii\helpers\FileHelper;
 use yii\helpers\Html;
 use yii\web\UploadedFile;
 use common\models\Story;
-use common\services\StoryService;
 use backend\components\StoryEditor;
 
 class StoryEditorService
@@ -41,14 +41,20 @@ class StoryEditorService
     {
         $imageFile = UploadedFile::getInstance($form, 'image');
         if ($imageFile) {
-            $storyService = new StoryService();
-            $storyImagesPath = $storyService->getImagesFolderPath($model);
+            //$storyService = new StoryService();
+            //$storyImagesPath = $storyService->getImagesFolderPath($model);
+
+            $storyImagesPath = StoryHelper::getImagesPath($model);
+            FileHelper::createDirectory($storyImagesPath);
+
             $slideImageFileName = Yii::$app->security->generateRandomString() . '.' . $imageFile->extension;
             $imagePath = "{$storyImagesPath}/$slideImageFileName";
             if ($imageFile->saveAs($imagePath)) {
-                $form->imagePath = $storyService->getImagesFolderPath($model, true) . '/' . $slideImageFileName;
+                // $form->imagePath = $storyService->getImagesFolderPath($model, true) . '/' . $slideImageFileName;
+                $form->imagePath = StoryHelper::getImagesPath($model, true) . '/' . $slideImageFileName;
                 $form->fullImagePath = Yii::getAlias('@public') . $form->imagePath;
-            	return $storyService->getImagesFolderPath($model, true) . '/' . $slideImageFileName;
+            	// return $storyService->getImagesFolderPath($model, true) . '/' . $slideImageFileName;
+            	return StoryHelper::getImagesPath($model, true) . '/' . $slideImageFileName;
         	}
         }
         return '';
@@ -97,36 +103,14 @@ class StoryEditorService
     public function deleteBlock(int $slideID, string $blockID)
     {
         $model = StorySlide::findSlide($slideID);
+
         $reader = new HtmlSlideReader($model->data);
         $slide = $reader->load();
-
-        $block = $slide->findBlockByID($blockID);
-        if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
-            /** @var $block ImageBlock */
-            $path = $block->getFilePath();
-            $noFile = false;
-            if (strpos($path, '://') !== false) {
-                $query = parse_url($path, PHP_URL_QUERY);
-                parse_str($query, $result);
-                $imageHash = $result['id'];
-                try {
-                    $image = StorySlideImage::findByHash($imageHash);
-                    $this->imageService->unlinkImage($image->id, $model->id, $block->getId());
-                }
-                catch (DomainException $ex) {}
-                $noFile = true;
-            }
-            else {
-                $path = Yii::getAlias('@public') . $path;
-            }
-            if (!$noFile && file_exists($path)) {
-                unlink($path);
-            }
-        }
-
         $slide->deleteBlock($blockID);
+
         $writer = new HTMLWriter();
         $html = $writer->renderSlide($slide);
+
         $model->data = $html;
         $model->save(false, ['data']);
 
@@ -293,6 +277,12 @@ class StoryEditorService
 
     public function deleteSlide(int $slideID)
     {
+        $slideModel = StorySlide::findSlide($slideID);
+        $reader = new HtmlSlideReader($slideModel->data);
+        $slide = $reader->load();
+        foreach ($slide->getBlocks() as $block) {
+            $this->deleteBlock($slideID, $block->getId());
+        }
         StorySlide::deleteSlide($slideID);
     }
 

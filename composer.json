@@ -45,7 +45,9 @@
         "ext-json": "*",
         "linslin/yii2-curl": "*",
         "ext-curl": "*",
-        "alikdex/yii2-crawler-detect": "1.0"
+        "alikdex/yii2-crawler-detect": "1.0",
+        "bower-asset/cropperjs": "^1.5",
+        "guzzlehttp/guzzle": "^6.5"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",

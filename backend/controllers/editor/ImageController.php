@@ -9,9 +9,12 @@ use backend\components\story\ImageBlock;
 use backend\components\story\reader\HTMLReader;
 use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\writer\HTMLWriter;
+use backend\models\editor\CropImageForm;
+use backend\models\editor\ImageFromUrlForm;
 use backend\models\ImageForm;
 use backend\services\ImageService;
 use backend\services\StoryEditorService;
+use common\helpers\StoryHelper;
 use common\models\Story;
 use common\models\StorySlide;
 use common\models\StorySlideImage;
@@ -21,6 +24,7 @@ use yii\filters\AccessControl;
 use yii\helpers\FileHelper;
 use yii\web\Controller;
 use yii\web\Response;
+use yii\web\UploadedFile;
 
 class ImageController extends Controller
 {
@@ -96,10 +100,8 @@ class ImageController extends Controller
     public function actionSet()
     {
         $form = new ImageForm();
-        $success = false;
-        $errors = [];
+        $result = ['success' => false, 'errors' => [], 'image' => []];
         if ($form->load(Yii::$app->request->post(), '') && $form->validate()) {
-
             $image = $this->imageService->createImage(
                 $form->collection_account,
                 $form->collection_id,
@@ -107,36 +109,18 @@ class ImageController extends Controller
                 $form->content_url,
                 $form->source_url
             );
-
-            $path = $this->imageService->downloadImage($image->content_url, $image->hash, Yii::getAlias('@public/admin/upload/') . $image->folder);
-
-            $block = new ImageBlock();
-            $block->setFilePath(Yii::$app->urlManagerFrontend->createAbsoluteUrl(['image/view', 'id' => $image->hash]));
-            [$imageWidth, $imageHeight] = getimagesize($path);
-
-            $ratio = $imageWidth / $imageHeight;
-            if (ImageBlock::DEFAULT_IMAGE_WIDTH / ImageBlock::DEFAULT_IMAGE_HEIGHT > $ratio) {
-                $imageWidth = ImageBlock::DEFAULT_IMAGE_HEIGHT * $ratio;
-                $imageHeight = ImageBlock::DEFAULT_IMAGE_HEIGHT;
-            } else {
-                $imageHeight = ImageBlock::DEFAULT_IMAGE_WIDTH / $ratio;
-                $imageWidth = ImageBlock::DEFAULT_IMAGE_WIDTH;
-            }
-
-            $block->setWidth($imageWidth . 'px');
-            $block->setHeight($imageHeight . 'px');
-            $block->setImageSource(parse_url($image->source_url, PHP_URL_HOST));
-            $this->editorService->addImageBlockToSlide($form->slide_id, $block);
-
-            $this->imageService->linkImage($image->id, $form->slide_id, $block->getId());
-
-            $success = true;
+            $this->imageService->downloadImage($image->content_url, $image->hash, Yii::getAlias('@public/admin/upload/') . $image->folder);
+            $result['image'] = [
+                'url' => $image->imageUrl(),
+                'id' => $image->hash,
+            ];
+            $result['success'] = true;
         }
         else {
-            $errors = $form->errors;
+            $result['errors'] = $form->errors;
         }
 
-        return ['success' => $success, 'errors' => $errors];
+        return $result;
     }
 
     public function actionGetUsedCollections(int $story_id)
@@ -215,6 +199,113 @@ class ImageController extends Controller
         $this->editorService->deleteBlock($slide->id, $block_id);
 
         return ['success' => true, 'errors' => []];
+    }
+
+    public function actionCropperSave()
+    {
+        $form = new CropImageForm();
+        if ($form->load(Yii::$app->request->post(), '') && $form->validate()) {
+            $form->croppedImage = UploadedFile::getInstanceByName('croppedImage');
+
+            $image = null;
+            try {
+                $image = StorySlideImage::findByHash($form->croppedImageID);
+            }
+            catch (\Exception $ex) {
+            }
+
+            if ($image !== null) {
+                $image = $this->imageService->cropImage($form);
+                $block = new ImageBlock();
+                $block->setFilePath($image->imageUrl());
+                $block->setSizeAndPosition($form->width . 'px', $form->height . 'px', $form->left . 'px', $form->top . 'px');
+                $block->setImageSource(parse_url($image->source_url, PHP_URL_HOST));
+                $this->editorService->addImageBlockToSlide($form->slide_id, $block);
+                $this->imageService->linkImage($image->id, $form->slide_id, $block->getId());
+            }
+            else {
+
+                $slide = StorySlide::findSlide($form->slide_id);
+                $story = $slide->story;
+                $storyImagesPath = StoryHelper::getImagesPath($story);
+                $this->imageService->crop($form, $storyImagesPath . '/' . $form->croppedImageID);
+
+                $block = new ImageBlock();
+                $block->setFilePath(StoryHelper::getImagesPath($story, true) . '/' . $form->croppedImageID);
+                $block->setSizeAndPosition($form->width . 'px', $form->height . 'px', $form->left . 'px', $form->top . 'px');
+                $this->editorService->addImageBlockToSlide($form->slide_id, $block);
+            }
+        }
+        return ['success' => true];
+    }
+
+    public function actionUploadImage()
+    {
+        $result = ['success' => false, 'errors' => [], 'image' => []];
+        $form = new \backend\models\editor\ImageForm();
+        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+            $form->image = UploadedFile::getInstance($form, 'image');
+            if ($form->image !== null) {
+
+                $model = Story::findModel($form->story_id);
+                $storyImagesPath = StoryHelper::getImagesPath($model);
+                FileHelper::createDirectory($storyImagesPath);
+                $slideImageFileName = Yii::$app->security->generateRandomString() . '.' . $form->image->extension;
+                $imagePath = "{$storyImagesPath}/$slideImageFileName";
+                $form->upload($imagePath);
+
+                $result['success'] = true;
+                $result['image'] = [
+                    'url' => StoryHelper::getImagesPath($model, true) . '/' . $slideImageFileName,
+                    'id' => $slideImageFileName,
+                ];
+            }
+        }
+        else {
+            $result['errors'] = $form->errors;
+        }
+        return $result;
+    }
+
+    public function actionSave()
+    {
+        $form = new \backend\models\editor\ImageForm();
+        if ($form->load(Yii::$app->request->post(), '') && $form->validate()) {
+            $block = new ImageBlock();
+
+            if ($form->what === 'collection') {
+                $image = StorySlideImage::findByHash($form->imageID);
+
+            }
+
+        }
+        return ['success' => true];
+    }
+
+    public function actionImageFromUrl()
+    {
+        $form = new ImageFromUrlForm();
+        $result = ['success' => false, 'errors' => [], 'image' => []];
+        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+            $image = $this->imageService->createImage(
+                '',
+                '',
+                '',
+                $form->url,
+                $form->url
+            );
+            $this->imageService->downloadImage($image->source_url, $image->hash, Yii::getAlias('@public/admin/upload/') . $image->folder);
+            $result['image'] = [
+                'url' => $image->imageUrl(),
+                'id' => $image->hash,
+            ];
+            $result['success'] = true;
+        }
+        else {
+            $result['errors'] = $form->errors;
+        }
+
+        return $result;
     }
 
 }

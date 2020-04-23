@@ -68,6 +68,16 @@ var StoryEditor = (function() {
                         e.preventDefault();
                         setActiveBlock(block.id);
                     });
+                    var deleteElem = $('<span/>')
+                        .addClass('glyphicon glyphicon-trash')
+                        .css({'float': 'right', 'color': 'red', 'fontWeight': '500'})
+                        .attr({'title': 'Удалить блок'});
+                    deleteElem.on('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        deleteBlock(block.id);
+                    });
+                    elem.append(deleteElem);
                     elem.appendTo($list);
                 });
                 setActiveBlock($list.find("a").attr("data-block-id"));
@@ -154,14 +164,21 @@ var StoryEditor = (function() {
     }
 
     function loadSlide(slideID, loadBlocks) {
-
         loadBlocks = loadBlocks || false;
         currentSlideID = slideID;
-
         var click = {
             x: 0,
             y: 0
         };
+        EditorActions.reset();
+
+        function getContainment($box, $drag, space) {
+            var x1 = $box.offset().left + space;
+            var y1 = $box.offset().top + space;
+            var x2 = $box.offset().left + $box.width() - $drag.width() - space;
+            var y2 = $box.offset().top + $box.height() - $drag.height() - space;
+            return [x1, y1, x2, y2];
+        }
 
         send(slideID)
             .done(function(data) {
@@ -169,10 +186,9 @@ var StoryEditor = (function() {
                 changeSlideVisibleIcon(data.status);
                 updateLinkCounter(data.blockNumber);
                 $(".slides", $editor).empty().append(data.data);
-                Reveal.sync();
-                Reveal.slide(0);
+                $('section', '#story-editor').css({'height': '720px', 'width': '1280px'}).attr('id', 'slide-container');
                 $(".sl-block", ".reveal").draggable({
-                    //containment: $('.slides'),
+                    //containment: '#slide-container',
                     start: function(event) {
                         setActiveBlock($(event.target).attr("data-block-id"));
                         click.x = event.clientX;
@@ -213,6 +229,8 @@ var StoryEditor = (function() {
                         $("input.editor-height").val(Math.round(ui.size.height) + "px");
                     }
                 });
+                Reveal.sync();
+                Reveal.slide(0);
                 if (loadBlocks) {
                     loadSlideBlocks();
                 }
@@ -223,12 +241,12 @@ var StoryEditor = (function() {
             });
     }
 
-    function deleteSlide() {
+    function deleteSlide(slideID) {
         if (!confirm("Удалить слайд?")) {
             return;
         }
         var promise = $.ajax({
-            "url": config.deleteSlideAction + "&slide_id=" + currentSlideID,
+            "url": config.deleteSlideAction + "&slide_id=" + slideID,
             "type": "GET",
             "dataType": "json"
         });
@@ -254,7 +272,7 @@ var StoryEditor = (function() {
         promise.done(function(data) {
             if (data.length > 0) {
                 data.forEach(function (slide) {
-                    $("<a/>")
+                    var $element = $("<a/>")
                         .attr("href", "#")
                         .addClass("list-group-item")
                         .attr("data-slide-id", slide.id)
@@ -263,11 +281,20 @@ var StoryEditor = (function() {
                         .on("click", function () {
                             loadSlide(slide.id, true);
                             return false;
-                        })
-                        .appendTo($container);
+                        });
+                    var $deleteElement = $('<span/>')
+                        .addClass('glyphicon glyphicon-trash')
+                        .css({'float': 'right', 'color': 'red', 'fontWeight': '500'})
+                        .attr({'title': 'Удалить слайд'});
+                    $deleteElement.on('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        deleteSlide(slide.id);
+                    });
+                    $deleteElement.appendTo($element);
+                    $element.appendTo($container);
                 });
                 loadSlide(activeSlideID, true);
-
                 $container.sortable();
             }
             else {
@@ -368,6 +395,10 @@ var StoryEditor = (function() {
         $("#slide-source-modal").modal({"remote": url + "&slide_id=" + currentSlideID});
     }
 
+    function getConfigValue(value) {
+        return config[value];
+    }
+
     return {
         "initialize": initialize,
         "loadSlides": loadSlides,
@@ -387,11 +418,13 @@ var StoryEditor = (function() {
         "toggleSlideVisible": toggleSlideVisible,
         "createSlide": createSlide,
         "slideSourceModal": slideSourceModal,
-        "getConfigValue": function(value) {
-            return config[value];
+        "getConfigValue": getConfigValue,
+        "getStoryID": function() {
+            return getConfigValue('storyID');
         }
     };
 })();
+
 
 
 (function(editor, $, console) {
@@ -443,7 +476,6 @@ var StoryEditor = (function() {
     };
 
 })(StoryEditor, jQuery, console);
-
 
 (function(editor, $, console) {
     "use strict";
@@ -530,60 +562,61 @@ var StoryEditor = (function() {
 
 })(StoryEditor, jQuery, console);
 
-
 /** Images */
-(function(editor, $, console) {
+var ImageFromStory = (function(editor, $, console) {
     "use strict";
 
     var config = {
         addImagesAction: ""
     };
 
-    var $modal = $("#slide-images-modal");
+    function extend(a, b) {
+        for (var i in b) {
+            a[i] = b[i];
+        }
+        return a;
+    }
 
-    editor.initImagesModule = function(params) {
-        config = params;
-    };
+    function dispatchEvent(type, args) {
+        var event = document.createEvent("HTMLEvents", 1, 2);
+        event.initEvent(type, true, true);
+        extend(event, args);
+        document.dispatchEvent(event);
+    }
 
-    editor.slideImagesModal = function() {
-        $modal.modal("show");
-    };
-
-    editor.changeImageStory = function(obj) {
-        var $images = $("#story-images-list");
-        $images.empty();
+    function changeImageStory(storyID) {
         var promise = $.ajax({
-            "url": editor.getConfigValue("storyImagesAction") + "&story_id=" + $(obj).val(),
+            "url": editor.getConfigValue("storyImagesAction") + "&story_id=" + storyID,
             "type": "GET",
             "dataType": "json"
         });
         promise.done(function(data) {
-            if (data && data.length) {
-                data.forEach(function (image) {
-                    var img = $("<img/>").attr("src", image);
-                    $images.append('<div class="col-xs-6 col-md-3"><a href="#" class="thumbnail">' + img.prop("outerHTML") + '</a></div>');
-                });
-            }
-            else {
-                $images.append('<div class="col-md-12">Изображения в итории не найдены</div>');
-            }
+            dispatchEvent('onChangeStory', {
+                'data': data
+            });
         });
-    };
+    }
 
-    editor.addImages = function(image) {
-        var promise = $.ajax({
+    function addImages(image) {
+        return $.ajax({
             "url": config.addImagesAction + "&slide_id=" + editor.getCurrentSlideID() + "&image=" + image,
             "type": "GET",
             "dataType": "json"
         });
-        promise.done(function(data) {
-            if (data && data.success) {
-                $modal.modal("hide");
-                editor.loadSlide(editor.getCurrentSlideID(), true);
-            }
-        });
-    };
+    }
 
+    return {
+        'init': function(params) {
+            config = params;
+        },
+        'changeImageStory': changeImageStory,
+        'addImages': addImages,
+        'addEventListener': function(type, listener, useCapture) {
+            if ('addEventListener' in window) {
+                document.addEventListener(type, listener, useCapture);
+            }
+        },
+    };
 })(StoryEditor, jQuery, console);
 
 /** Collections */
@@ -807,7 +840,8 @@ var StoryEditor = (function() {
         promise.done(function(data) {
             if (data && data.success) {
                 $modal.modal("hide");
-                editor.loadSlide(editor.getCurrentSlideID(), true);
+                data.image['what'] = 'collection';
+                ImageCropper.showModal(data.image);
             }
         });
     }
@@ -829,31 +863,105 @@ var StoryEditor = (function() {
         promise.done(function(data) {
             if (data && data.success) {
                 $modal.modal("hide");
-
             }
         });
     }
 
-    /*
-    function getCollectionSlug(link) {
-        var reg = new RegExp("^https:\\/\\/yandex\\.ru\\/collections\\/user\\/.*\\/(.*)\\/$", "i");
-        if (!reg.test(link)) {
-            return '';
-        }
-        return link.match(reg)[1];
+})(StoryEditor, jQuery, console);
+
+/** Cropper */
+var ImageCropper = (function(editor, $) {
+
+    var $modal = $('#image-crop-modal'),
+        sourceImage = {},
+        aspectRatio = NaN;
+
+    function showModal(image, ratio) {
+        sourceImage = image;
+        aspectRatio = ratio || EditorImage.aspectRatio();
+        $modal.modal('show');
     }
 
-    editor.getCollectionFromLink = function(link) {
-        var collectionSlug = getCollectionSlug(link);
-        if (collectionSlug === '') {
-            toastr.warning('Не удалось определить коллекцию по ссылке');
-            return;
-        }
-        console.log(collectionSlug);
-    };
-    */
+    var cropper;
 
-})(StoryEditor, jQuery, console);
+    $modal.on('shown.bs.modal', function() {
+
+        var $img = $('<img/>').attr('src', sourceImage.url);
+        $img.appendTo($('#crop-image-container', this));
+
+        var options = {
+            aspectRatio: aspectRatio
+        };
+        cropper = new Cropper($img[0], options);
+    });
+
+    $modal.on('hide.bs.modal', function() {
+        if (cropper) {
+            cropper.destroy();
+        }
+        $('#crop-image-container', this).find('img').remove();
+    });
+
+    /** Обрезать и сохранить изображение */
+    function crop() {
+        cropper.getCroppedCanvas().toBlob(function (blob) {
+            var formData = new FormData(),
+                params = EditorImage.getParams();
+            formData.append('slide_id', editor.getCurrentSlideID());
+            formData.append('croppedImage', blob);
+            formData.append('croppedImageID', sourceImage.id);
+            formData.append('what', sourceImage.what);
+            formData.append('left', params.left);
+            formData.append('top', params.top);
+            formData.append('width', params.width);
+            formData.append('height', params.height);
+            $.ajax('/admin/index.php?r=editor/image/cropper-save', {
+                method: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function () {
+                    console.log('Upload success');
+                    editor.loadSlide(editor.getCurrentSlideID(), true);
+                    $modal.modal('hide');
+                },
+                error: function () {
+                    console.log('Upload error');
+                }
+            });
+        });
+    }
+
+    /** Сохранение изображения без обрезки */
+    function save() {
+        var formData = new FormData(),
+            params = EditorImage.getParams();
+        formData.append('slide_id', editor.getCurrentSlideID());
+        formData.append('imagePath', sourceImage.url);
+        formData.append('imageID', sourceImage.id);
+        formData.append('what', sourceImage.what);
+        $.ajax('/admin/index.php?r=editor/image/save', {
+            method: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function () {
+                console.log('Upload success');
+                //editor.loadSlide(editor.getCurrentSlideID(), true);
+                //$modal.modal('hide');
+            },
+            error: function () {
+                console.log('Upload error');
+            }
+        });
+    }
+
+    return {
+        'showModal': showModal,
+        'crop': crop,
+        'save': save
+    };
+})(StoryEditor, jQuery);
 
 /** Story Images */
 (function(editor, $, console) {
@@ -861,8 +969,7 @@ var StoryEditor = (function() {
 
     var $modal = $("#story-images-modal");
 
-    function elementWrapper()
-    {
+    function elementWrapper() {
         return $('<div class="media">' +
                     '<div class="media-left"></div>' +
                     '<div class="media-body">' +
@@ -934,3 +1041,339 @@ var StoryEditor = (function() {
     });
 
 })(StoryEditor, jQuery, console);
+
+var EditorImage = (function($, editor) {
+
+    var element,
+        drawingRect,
+        selectedRect;
+
+    var canvasOffsetLeft = 0,
+        canvasOffsetTop = 0,
+        drawStartX = 0,
+        drawStartY = 0;
+
+    function getScale() {
+        return Reveal.getScale();
+    }
+
+    function pointX(x) {
+        return (x - canvasOffsetLeft) / getScale();
+    }
+
+    function pointY(y) {
+        return (y - canvasOffsetTop) / getScale();
+    }
+
+    function startDrawRect(e) {
+
+        var offset = element.offset();
+        canvasOffsetLeft = offset.left;
+        canvasOffsetTop = offset.top;
+
+        drawStartX = pointX(e.pageX);
+        drawStartY = pointY(e.pageY);
+        drawingRect = createRect(drawStartX, drawStartY, 0, 0);
+
+        element.on('mousemove.wikids', drawRect);
+        element.on('mouseup.wikids', endDrawRect);
+    }
+
+    function drawRect(e) {
+        var currentX = pointX(e.pageX);
+        var currentY = pointY(e.pageY);
+        var position = calculateRectPos(drawStartX, drawStartY, currentX, currentY);
+        drawingRect.css(position);
+    }
+
+    function endDrawRect(e) {
+
+        var currentX = pointX(e.pageX);
+        var currentY = pointY(e.pageY);
+        var position = calculateRectPos(drawStartX, drawStartY, currentX, currentY);
+        if (position.width < 10 || position.height < 10) {
+            drawingRect.remove();
+        }
+        else {
+            drawingRect.css(position);
+            selectRect(drawingRect);
+        }
+        element.off('mousemove.wikids');
+        element.off('mouseup.wikids');
+    }
+
+    var params = {};
+
+    function createRect(x, y, w, h) {
+        var rect = $('<div/>')
+            .addClass('rect')
+            .css({
+                left: x,
+                top: y,
+                width: w,
+                height: h
+            });
+        rect.on('click', function() {
+            var $el = $(this);
+            params = {
+                left: parseInt($el.css('left')),
+                top: parseInt($el.css('top')),
+                width: parseFloat($el.css('width')),
+                height: parseFloat($el.css('height'))
+            };
+            EditorImageDialog.show();
+        });
+        rect.appendTo(element);
+        return rect;
+    }
+
+    function selectRect(rect) {
+        selectedRect && selectedRect.removeClass('selected');
+        selectedRect = rect;
+        selectedRect.addClass('selected');
+    }
+
+    function calculateRectPos(startX, startY, endX, endY) {
+        var width = endX - startX;
+        var height = endY - startY;
+        var posX = startX;
+        var posY = startY;
+        if (width < 0) {
+            width = Math.abs(width);
+            posX -= width;
+        }
+        if (height < 0) {
+            height = Math.abs(height);
+            posY -= height;
+        }
+        return {
+            left: posX,
+            top: posY,
+            width: width,
+            height: height
+        };
+    }
+
+    function init(el) {
+        element = el;
+        $(document)
+            .off('mousedown.wikids')
+            .on('mousedown.wikids', element, function(e) {
+                var target = e.target;
+                if (target.tagName !== 'SECTION') {
+                    return;
+                }
+
+                $('div.rect', element).remove();
+
+                startDrawRect(e);
+            });
+    }
+
+    function destroy() {
+        $(document).off('mousedown.wikids');
+        $('div.rect', element).remove();
+    }
+
+    return {
+        'init': init,
+        'getParams': function() {
+            return params;
+        },
+        'aspectRatio': function() {
+            return (params.width / params.height).toFixed(2);
+        },
+        'destroy': destroy
+    };
+})(jQuery, StoryEditor);
+
+var EditorImageDialog = (function(editor, $, console) {
+    "use strict";
+
+    var dialog = $('#create-image-modal');
+
+    $('#image-from-file', dialog).on('click', function() {
+        dialog.modal('hide');
+        ImageFromFile.show();
+    });
+
+    $('#image-from-story', dialog).on('click', function() {
+        dialog.modal('hide');
+        ImageFromStoryDialog.show();
+    });
+
+    $('#image-from-collection', dialog).on('click', function() {
+        dialog.modal('hide');
+        editor.slideCollectionsModal();
+    });
+
+    $('#image-from-url', dialog).on('click', function() {
+        dialog.modal('hide');
+        imageFromUrlDialog.show();
+    });
+
+    return {
+        'show': function() {
+            dialog.modal('show');
+        },
+        'hide': function() {
+            dialog.modal('hide');
+        }
+    };
+})(StoryEditor, jQuery, console);
+
+var ImageFromFile = (function() {
+    "use strict";
+
+    var dialog = $('#image-from-file-modal');
+
+    dialog.on('show.bs.modal', function() {
+        $('form', this).trigger('reset');
+    });
+
+    return {
+        'show': function() {
+            dialog.modal('show');
+        },
+        'hide': function() {
+            dialog.modal('hide');
+        }
+    };
+})();
+
+var ImageFromStoryDialog = (function(module, $, editor) {
+    "use strict";
+
+    var dialog = $('#image-from-story-modal');
+
+    var $images = $('#story-images-list', dialog);
+    module.addEventListener('onChangeStory', function(event) {
+        var data = event.data;
+        $images.empty();
+        if (data && data.length) {
+            data.forEach(function (image) {
+                var img = $("<img/>").attr("src", image);
+                $images.append('<div class="col-xs-6 col-md-3"><a href="#" class="thumbnail">' + img.prop("outerHTML") + '</a></div>');
+            });
+        }
+        else {
+            $images.append('<div class="col-md-12">Изображения в итории не найдены</div>');
+        }
+    });
+
+    $("#story-images-list", dialog).on("click", "a.thumbnail", function(e) {
+        e.preventDefault();
+
+        dialog.modal('hide');
+        var imageSrc = $("img", this).attr("src");
+
+        var image = {
+            'url': imageSrc,
+            'id': imageSrc.split('\\').pop().split('/').pop(),
+            'what': 'story'
+        };
+        ImageCropper.showModal(image);
+    });
+
+    return {
+        'show': function() {
+            dialog.modal('show');
+        },
+        'hide': function() {
+            dialog.modal('hide');
+        }
+    };
+})(ImageFromStory, jQuery, StoryEditor);
+
+var EditorImageUploader = (function(editor) {
+    "use strict";
+
+    function uploadImageHandler(form) {
+        return $.ajax({
+            url: form.attr("action"),
+            type: form.attr("method"),
+            data: new FormData(form[0]),
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+
+    return {
+        'uploadImageHandler': uploadImageHandler
+    };
+})(StoryEditor);
+
+var SlideImageUploader = (function(uploader, editor, dialog) {
+    "use strict";
+
+    function uploadHandler(form) {
+        uploader.uploadImageHandler(form).done(function(data) {
+            if (data && data.success) {
+                dialog.hide();
+                data.image['what'] = 'file';
+                ImageCropper.showModal(data.image);
+            }
+        });
+    }
+
+    return {
+        'uploadHandler': uploadHandler
+    };
+})(EditorImageUploader, StoryEditor, ImageFromFile);
+
+var StoryImageFromUrl = (function() {
+
+})();
+
+function StoryDialog(selector, options) {
+    "use strict";
+
+    this.dialog = $(selector);
+    this.options = options || {};
+    this.dialog.on('show.bs.modal', options.onShow);
+
+    var that = this;
+    this.dialog.find('form').submit(function(e) {
+        e.preventDefault();
+        var formData = new FormData(this),
+            $form = $(this);
+        options.submit(that, formData, $form.attr('method'), $form.attr('action'));
+    });
+}
+
+StoryDialog.prototype.show = function() {
+    "use strict";
+
+    this.dialog.modal('show');
+};
+
+StoryDialog.prototype.hide = function() {
+    "use strict";
+
+    this.dialog.modal('hide');
+};
+
+var imageFromUrlDialog = new StoryDialog('#image-from-url-modal', {
+    'onShow': function() {
+
+    },
+    'submit': function(dialog, formData, method, action) {
+        var promise = $.ajax({
+            'url': action,
+            'type': method,
+            'data': formData,
+            'cache': false,
+            'contentType': false,
+            'processData': false
+        });
+        promise.done(function(data) {
+            if (data && data.success) {
+                dialog.hide();
+                data.image['what'] = 'collection';
+                ImageCropper.showModal(data.image);
+            }
+        });
+
+    }
+});

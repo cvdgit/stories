@@ -467,3 +467,29 @@ body {
 .reveal .slides {
     border: 1px #fff dashed;
 }
+
+.rect {
+    position: absolute;
+    border: 4px solid rgba(199, 25, 9, 0.64);
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none;      /* IE 10+ */
+
+    /* No support for these yet, use at own risk */
+    -o-user-select: none;
+    user-select: none;
+
+    cursor: pointer;
+}
+
+#story-editor section {
+    pointer-events: auto !important;
+}
+
+#crop-image-container {
+    min-height: 500px;
+}
+
+#crop-image-container img {
+    max-width: 100%;
+}

@@ -11,8 +11,8 @@ use yii\helpers\Url;
 
 /** @var $this yii\web\View */
 StoryEditorAsset::register($this);
-
 PlyrAsset::register($this);
+\backend\assets\CropperAsset::register($this);
 
 /** @var $model common\models\Story */
 $this->title = 'Редактор историй' . $model->title;
@@ -57,9 +57,11 @@ $collectionConfigJSON = Json::htmlEncode([
 ]);
 
 $js = <<< JS
+
+$('[data-toggle="tooltip"]').tooltip();
     
     StoryEditor.initialize($configJSON);
-    StoryEditor.initImagesModule($imagesConfigJSON);
+    ImageFromStory.init($imagesConfigJSON);
     StoryEditor.initCollectionsModule($collectionConfigJSON);
 
 	$("#form-container")
@@ -68,12 +70,7 @@ $js = <<< JS
 	        e.preventDefault();
 	        return false;
 	    });
-	
-	$("#slide-delete").on("click", function(e) {
-	    e.preventDefault();
-	    StoryEditor.deleteSlide();
-	});
-	
+
 	$("#slide-visible").on("click", function(e) {
 	    e.preventDefault();
 	    StoryEditor.toggleSlideVisible();
@@ -92,22 +89,6 @@ $js = <<< JS
 	$("#slide-links").on("click", function(e) {
 	    e.preventDefault();
 	    location.href = "$slideLinksAction&slide_id=" + StoryEditor.getCurrentSlideID();
-	});
-	
-	$("#slide-images").on("click", function(e) {
-	    e.preventDefault();
-	    StoryEditor.slideImagesModal("$slideSourceAction");
-	});
-	
-	$("#story-images-list", "#slide-images-modal").on("click", "a.thumbnail", function(e) {
-	    e.preventDefault();
-	    var imageSrc = $("img", this).attr("src");
-	    StoryEditor.addImages(imageSrc);
-	});
-	
-	$("#slide-collections").on("click", function(e) {
-	    e.preventDefault();
-	    StoryEditor.slideCollectionsModal("$slideSourceAction");
 	});
 	
 	$("#slide-block-params").on("click", ".show-block-params", function() {
@@ -188,13 +169,10 @@ $options = [
         <div class="clearfix">
             <div class="editor-slide-actions pull-left">
                 <?= Html::a('Ссылки', '#', ['id' => 'slide-links', 'style' => 'font-size: 18px']) ?>
-                <?= Html::a('Изображения', '#', ['id' => 'slide-images', 'style' => 'font-size: 18px']) ?>
-                <?= Html::a('Коллекции', '#', ['id' => 'slide-collections', 'style' => 'font-size: 18px']) ?>
                 <?= Html::a('Связи', '#neo-relation-modal', ['data-toggle' => 'modal', 'style' => 'font-size: 18px']) ?>
             </div>
             <div class="editor-slide-actions pull-right">
                 <a href="#" id="slide-copy" title="Копировать слайд"><i class="glyphicon glyphicon-copy"></i></a>
-                <a href="#" class="remove-slide" id="slide-delete" title="Удалить слайд"><i class="glyphicon glyphicon-trash"></i></a>
                 <a href="#" id="slide-source" title="Код слайда"><i class="glyphicon glyphicon-fire"></i></a>
                 <a href="#" id="slide-visible" title="Скрыть слайд"><i class="glyphicon"></i></a>
             </div>
@@ -272,25 +250,6 @@ $options = [
     </div>
 </div>
 
-<div class="modal fade" id="slide-images-modal">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Изображения</h4>
-            </div>
-            <div class="modal-body">
-                <?= Html::dropDownList('imagesStories',
-                    null,
-                    \common\helpers\StoryHelper::getStoryArray(),
-                    ['prompt' => 'Выбрать историю', 'onchange' => 'StoryEditor.changeImageStory(this)', 'class' => 'form-control']) ?>
-                <div id="story-images-list" class="row" style="margin-top: 20px"></div>
-            </div>
-            <div class="modal-footer"></div>
-        </div>
-    </div>
-</div>
-
 <div class="modal fade" id="slide-collections-modal" style="z-index: 1051">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -352,5 +311,11 @@ $options = [
     </div>
 </div>
 
-<?= $this->render('modal/questions', []) ?>
-<?= $this->render('modal/relations', ['model' => $model]) ?>
+<?php
+echo $this->render('modal/questions');
+echo $this->render('modal/relations', ['model' => $model]);
+echo $this->render('modal/crop');
+echo $this->render('modal/new_image');
+echo $this->render('modal/image_from_file', ['imageModel' => $imageModel]);
+echo $this->render('modal/image_from_story');
+echo $this->render('modal/image_from_url', ['imageModel' => $imageFromUrlModel]);

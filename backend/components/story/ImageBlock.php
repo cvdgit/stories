@@ -213,4 +213,29 @@ class ImageBlock extends AbstractBlock
         $this->imageSource = $imageSource;
     }
 
+    public function delete(): void
+    {
+        $path = $this->filePath;
+        $noFile = false;
+        if (strpos($path, '://') !== false) {
+            /*
+            $query = parse_url($path, PHP_URL_QUERY);
+            parse_str($query, $result);
+            $imageHash = $result['id'];
+            try {
+                $image = StorySlideImage::findByHash($imageHash);
+                $this->imageService->unlinkImage($image->id, $model->id, $block->getId());
+            }
+            catch (DomainException $ex) {}
+            */
+            $noFile = true;
+        }
+        else {
+            $path = Yii::getAlias('@public') . $path;
+        }
+        if (!$noFile && file_exists($path)) {
+            unlink($path);
+        }
+    }
+
 }

@@ -3,17 +3,13 @@
 
 namespace backend\services;
 
-
+use backend\models\editor\CropImageForm;
 use common\models\StorySlideImage;
 use Yii;
 use yii\helpers\FileHelper;
 
 class ImageService
 {
-
-    public function __construct()
-    {
-    }
 
     public function createImage(string $collectionAccount, string $collectionID, string $collectionName, string $contentUrl, string $sourceUrl)
     {
@@ -94,9 +90,15 @@ class ImageService
         return $command->execute();
     }
 
-    public function breakBondImage()
+    public function cropImage(CropImageForm $form)
     {
-
+        $image = StorySlideImage::findByHash($form->croppedImageID);
+        $form->upload($image->getFullPath());
+        return $image;
     }
 
+    public function crop(CropImageForm $form, string $path)
+    {
+        $form->upload($path);
+    }
 }

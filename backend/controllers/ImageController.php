@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\controllers;
-
 
 use common\models\StorySlideImage;
 use common\rbac\UserRoles;

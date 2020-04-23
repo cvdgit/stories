@@ -27,7 +27,7 @@ var WikidsStoryTest = function() {
     }
 
     function init(remote) {
-        console.debug('WikidsStoryTest.init');
+        //console.debug('WikidsStoryTest.init');
         remoteTest = remote || false;
         dom.wrapper = $("<div/>").addClass("wikids-test");
         dom.wrapper.empty();

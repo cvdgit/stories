@@ -44,6 +44,8 @@ class Slide
 
     public function deleteBlock(string $blockID)
     {
+        $block = $this->findBlockByID($blockID);
+        $block->delete();
         $blocks = array_filter($this->blocks, function(AbstractBlock $block) use ($blockID) {
             return ($block->getId() !== $blockID);
         });

@@ -7,6 +7,7 @@ use backend\models\StoryBatchCommandForm;
 use backend\services\StoryEditorService;
 use Exception;
 use Yii;
+use yii\db\Query;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -309,6 +310,18 @@ class StoryController extends Controller
         $model = Story::findModel($id);
         $text = $this->editorService->textFromStory($model);
         Yii::$app->response->sendContentAsFile($text, $model->alias. '.txt');
+    }
+
+    public function actionAutocomplite(string $query)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return (new Query())
+            ->select(['title', 'id', "CONCAT('/slides_cover/list/', cover) AS cover"])
+            ->from(Story::tableName())
+            ->where(['like', 'title', $query])
+            ->orderBy(['title' => SORT_ASC])
+            ->limit(30)
+            ->all();
     }
 
 }

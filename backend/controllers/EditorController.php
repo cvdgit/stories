@@ -13,6 +13,7 @@ use backend\components\story\VideoBlock;
 use backend\components\story\writer\HTMLWriter;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
+use backend\models\editor\ImageFromUrlForm;
 use backend\models\editor\QuestionForm;
 use backend\models\editor\SlideSourceForm;
 use backend\models\editor\TestForm;
@@ -64,8 +65,14 @@ class EditorController extends Controller
 	public function actionEdit($id)
 	{
         $model = Story::findModel($id);
+        $imageForm = new ImageForm();
+        $imageForm->story_id = $model->id;
+        $imageFromUrlForm = new ImageFromUrlForm();
+        $imageFromUrlForm->story_id = $model->id;
         return $this->render('edit', [
             'model' => $model,
+            'imageModel' => $imageForm,
+            'imageFromUrlModel' => $imageFromUrlForm,
 		]);
 	}
 

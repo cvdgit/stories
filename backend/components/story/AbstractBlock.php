@@ -151,4 +151,6 @@ abstract class AbstractBlock
 
     abstract public function update($form);
 
+    public function delete(): void {}
+
 }

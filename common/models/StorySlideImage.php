@@ -168,4 +168,19 @@ class StorySlideImage extends ActiveRecord
         parent::afterDelete();
     }
 
+    public function imageUrl()
+    {
+        return Yii::$app->urlManagerFrontend->createAbsoluteUrl(['image/view', 'id' => $this->hash]);
+    }
+
+    public function getFullPath()
+    {
+        return Yii::getAlias('@public/admin/upload/') . $this->folder . '/' . $this->hash . '.jpeg';
+    }
+
+    public function getShortPath()
+    {
+        return '/' . $this->folder . '/' . $this->hash . '.jpeg';
+    }
+
 }
