@@ -155,6 +155,7 @@ class UserPaymentService
         $freeRate = Rate::findRateByCode(Yii::$app->params['subscription.free.auto1year']);
         $form = new SubscriptionForm();
         $form->subscription_id = $freeRate->id;
+        $form->validate();
         $paymentID = $this->createSubscription($userID, $form);
     }
 
