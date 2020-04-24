@@ -25,12 +25,7 @@ use common\components\StoryCover;
             </div>
             <div class="story-item-caption">
                 <p class="flex-text"></p>
-                <p>
-                    <h3 class="story-item-name"><?= Html::encode($model['title']) ?></h3>
-                    <?php if ((int)$model['sub_access'] === 1): ?>
-                    <span class="story-item-pay">По подписке</span>
-                    <?php endif ?>
-                </p>
+                <p><h3 class="story-item-name"><?= Html::encode($model['title']) ?></h3></p>
             </div>
         </a>
     </div>
