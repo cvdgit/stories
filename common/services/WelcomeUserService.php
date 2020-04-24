@@ -43,11 +43,11 @@ class WelcomeUserService
 
     public function afterUserSignup(User $user)
     {
-        $this->transactionManager->wrap(function() use ($user) {
+        //$this->transactionManager->wrap(function() use ($user) {
             $this->sendWelcomeEmail($user);
             $this->activateFreeSubscription($user);
             $this->addJob($user->id);
-        });
+        //});
     }
 
 }
