@@ -16,14 +16,16 @@ use yii\helpers\Html;
         <div class="price-description"><?= $rate->description ?></div>
         <div class="price-amount"><?= $rate->cost ?> ₽</div>
         <?php if (Yii::$app->user->isGuest): ?>
-            <a href="#" class="btn" data-toggle="modal" data-target="#wikids-login-modal">Купить</a>
+            <a href="#wikids-login-modal" class="btn" data-toggle="modal">Купить</a>
         <?php else: ?>
-            <?php if (!$hasSubscription): ?>
-                <?php $form = ActiveForm::begin(['action' => ['/payment/create'], 'options' => ['class' => 'payment-form']]); ?>
-                <?= $form->field($model, 'subscription_id', ['template' => '{input}', 'options' => ['tag' => false]])->hiddenInput(['value' => $rate->id])->label(false) ?>
-                <?= Html::submitButton('Купить', ['class' => 'btn']) ?>
-                <?php ActiveForm::end(); ?>
-            <?php endif ?>
+            <?php
+            /* if (!$hasSubscription) {
+                $form = ActiveForm::begin(['action' => ['/payment/create'], 'options' => ['class' => 'payment-form']]);
+                echo $form->field($model, 'subscription_id', ['template' => '{input}', 'options' => ['tag' => false]])->hiddenInput(['value' => $rate->id])->label(false);
+                echo Html::submitButton('Купить', ['class' => 'btn']);
+                ActiveForm::end();
+            } */
+            ?>
         <?php endif ?>
     </div>
 </div>

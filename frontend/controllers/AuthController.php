@@ -4,6 +4,8 @@
 namespace frontend\controllers;
 
 use common\models\Auth;
+use common\services\auth\SignupService;
+use common\services\WelcomeUserService;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\helpers\Url;
@@ -16,11 +18,13 @@ class AuthController extends Controller
 {
 
     protected $service;
+    protected $welcomeUserService;
 
-    public function __construct($id, $module, AuthService $service, $config = [])
+    public function __construct($id, $module, AuthService $service, WelcomeUserService $welcomeUserService, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->service = $service;
+        $this->welcomeUserService = $welcomeUserService;
     }
 
     public function behaviors()
@@ -47,7 +51,7 @@ class AuthController extends Controller
 
     public function onAuthSuccess($client)
     {
-        (new AuthHandler($client))->handle();
+        (new AuthHandler($client, $this->welcomeUserService))->handle();
     }
 
     /**

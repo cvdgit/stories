@@ -40,11 +40,6 @@ use yii\helpers\Url;
                         }
                         ?>
                         <span class="story-item-category"><?= $categoryName ?></span>
-                        <?php if (!Yii::$app->user->isGuest): ?>
-                        <?php if ($model->bySubscription()): ?>
-                        <span class="story-item-pay">По подписке</span>
-                        <?php endif ?>
-                        <?php endif ?>
                     </p>
                 </div>
             </a>

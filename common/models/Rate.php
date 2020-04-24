@@ -77,7 +77,7 @@ class Rate extends ActiveRecord
 
     public function isFreeSubscription(): bool
     {
-        return ($this->code === 'free');
+        return ($this->code === 'free' || $this->code === 'free1year');
     }
 
     public function isArchive(): bool

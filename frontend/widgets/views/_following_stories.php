@@ -27,9 +27,6 @@ use yii\helpers\Url;
                         <p class="flex-text"></p>
                         <p>
                             <h3 class="story-item-name"><?= Html::encode($model->title) ?></h3>
-                            <?php if (!Yii::$app->user->isGuest): ?>
-                            <span class="story-item-pay"><?= $model->bySubscription() ? 'По подписке' : 'Бесплатно' ?></span>
-                            <?php endif ?>
                         </p>
                     </div>
                 </a>

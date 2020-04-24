@@ -4,6 +4,8 @@
 namespace frontend\components;
 
 use common\helpers\Translit;
+use common\services\UserPaymentService;
+use common\services\WelcomeUserService;
 use Exception;
 use Yii;
 use yii\authclient\ClientInterface;
@@ -29,13 +31,15 @@ class AuthHandler
     private $authService;
     private $transactionManager;
     private $signupService;
+    protected $welcomeUserService;
 
-    public function __construct(ClientInterface $client)
+    public function __construct(ClientInterface $client, WelcomeUserService $welcomeUserService)
     {
         $this->client = $client;
         $this->authService = new AuthService();
         $this->transactionManager = new TransactionManager();
         $this->signupService = new SignupService(new TransactionManager());
+        $this->welcomeUserService = $welcomeUserService;
     }
 
     public function handle(): void
@@ -113,12 +117,11 @@ class AuthHandler
                     });
 
                     try {
-                        $this->signupService->sendWelcomeEmail($user);
+                        $this->welcomeUserService->afterUserSignup($user);
                     }
                     catch (Exception $e) {
                         Yii::$app->errorHandler->logException($e);
                     }
-                    $this->signupService->addJob($user->id);
                 }
             }
         } else { // user already logged in

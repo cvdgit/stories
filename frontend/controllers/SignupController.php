@@ -6,6 +6,7 @@ namespace frontend\controllers;
 
 use common\models\Auth;
 use common\models\User;
+use common\services\WelcomeUserService;
 use Exception;
 use frontend\models\EmailForm;
 use Yii;
@@ -19,11 +20,13 @@ class SignupController extends Controller
 {
 
     protected $service;
+    protected $welcomeService;
 
-    public function __construct($id, $module, SignupService $service, $config = [])
+    public function __construct($id, $module, SignupService $service, WelcomeUserService $welcomeService, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->service = $service;
+        $this->welcomeService = $welcomeService;
     }
 
     /**
@@ -76,12 +79,11 @@ class SignupController extends Controller
         }
         if ($user !== null) {
             try {
-                $this->service->sendWelcomeEmail($user);
+                $this->welcomeService->afterUserSignup($user);
             }
             catch (Exception $e) {
                 Yii::$app->errorHandler->logException($e);
             }
-            $this->service->addJob($user->id);
         }
         return $this->goHome();
     }

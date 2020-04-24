@@ -122,7 +122,8 @@ AppAsset::register($this);
                         <li>ссылки на дополнительные обучающие курсы</li>
                     </ul>
                     <div class="text-center">
-                        <?= Html::a('Регистрация', '#', ['class' => 'btn', 'data-toggle' => 'modal', 'data-target' => '#wikids-signup-modal']) ?>
+                        <?= Html::a('Регистрация', '#wikids-signup-modal', ['class' => 'btn', 'data-toggle' => 'modal', 'style' => 'margin: 10px 0']) ?>
+                        <p style="font-size: .889em">При регистрации подписка на 1 год бесплатно ;)</p>
                     </div>
                 <?php else: ?>
                     <h1 class="header-auth">Сервис ускоренного развития речи ребенка</h1>
