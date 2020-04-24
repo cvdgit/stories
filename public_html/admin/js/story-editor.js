@@ -921,7 +921,6 @@ var ImageCropper = (function(editor, $) {
                 processData: false,
                 contentType: false,
                 success: function () {
-                    console.log('Upload success');
                     editor.loadSlide(editor.getCurrentSlideID(), true);
                     $modal.modal('hide');
                 },
@@ -934,21 +933,21 @@ var ImageCropper = (function(editor, $) {
 
     /** Сохранение изображения без обрезки */
     function save() {
-        var formData = new FormData(),
-            params = EditorImage.getParams();
+
+        var formData = new FormData();
         formData.append('slide_id', editor.getCurrentSlideID());
         formData.append('imagePath', sourceImage.url);
         formData.append('imageID', sourceImage.id);
         formData.append('what', sourceImage.what);
+
         $.ajax('/admin/index.php?r=editor/image/save', {
             method: "POST",
             data: formData,
             processData: false,
             contentType: false,
             success: function () {
-                console.log('Upload success');
-                //editor.loadSlide(editor.getCurrentSlideID(), true);
-                //$modal.modal('hide');
+                editor.loadSlide(editor.getCurrentSlideID(), true);
+                $modal.modal('hide');
             },
             error: function () {
                 console.log('Upload error');

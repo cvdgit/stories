@@ -247,18 +247,20 @@ class ImageController extends Controller
             $form->image = UploadedFile::getInstance($form, 'image');
             if ($form->image !== null) {
 
-                $model = Story::findModel($form->story_id);
-                $storyImagesPath = StoryHelper::getImagesPath($model);
-                FileHelper::createDirectory($storyImagesPath);
-                $slideImageFileName = Yii::$app->security->generateRandomString() . '.' . $form->image->extension;
-                $imagePath = "{$storyImagesPath}/$slideImageFileName";
-                $form->upload($imagePath);
+                $image = $this->imageService->createImage(
+                    '',
+                    '',
+                    '',
+                    '',
+                    ''
+                );
+                $form->upload($image->getFullPath());
 
-                $result['success'] = true;
                 $result['image'] = [
-                    'url' => StoryHelper::getImagesPath($model, true) . '/' . $slideImageFileName,
-                    'id' => $slideImageFileName,
+                    'url' => $image->imageUrl(),
+                    'id' => $image->hash,
                 ];
+                $result['success'] = true;
             }
         }
         else {
@@ -273,11 +275,52 @@ class ImageController extends Controller
         if ($form->load(Yii::$app->request->post(), '') && $form->validate()) {
             $block = new ImageBlock();
 
-            if ($form->what === 'collection') {
+            if ($form->what === 'story') {
+
+                $slide = StorySlide::findSlide($form->slide_id);
+                $story = $slide->story;
+                $storyImagesPath = Yii::getAlias('@public') . $form->imagePath;
+
+                [$imageWidth, $imageHeight] = getimagesize($storyImagesPath);
+                $ratio = $imageWidth / $imageHeight;
+                if (ImageBlock::DEFAULT_IMAGE_WIDTH / ImageBlock::DEFAULT_IMAGE_HEIGHT > $ratio) {
+                    $imageWidth = ImageBlock::DEFAULT_IMAGE_HEIGHT * $ratio;
+                    $imageHeight = ImageBlock::DEFAULT_IMAGE_HEIGHT;
+                } else {
+                    $imageHeight = ImageBlock::DEFAULT_IMAGE_WIDTH / $ratio;
+                    $imageWidth = ImageBlock::DEFAULT_IMAGE_WIDTH;
+                }
+
+                $block->setFilePath($form->imagePath);
+                $block->setWidth($imageWidth . 'px');
+                $block->setHeight($imageHeight . 'px');
+                $this->editorService->addImageBlockToSlide($form->slide_id, $block);
+            }
+            else {
+
                 $image = StorySlideImage::findByHash($form->imageID);
 
-            }
+                $block->setFilePath(Yii::$app->urlManagerFrontend->createAbsoluteUrl(['image/view', 'id' => $image->hash]));
 
+                [$imageWidth, $imageHeight] = getimagesize($image->getFullPath());
+                $ratio = $imageWidth / $imageHeight;
+                if (ImageBlock::DEFAULT_IMAGE_WIDTH / ImageBlock::DEFAULT_IMAGE_HEIGHT > $ratio) {
+                    $imageWidth = ImageBlock::DEFAULT_IMAGE_HEIGHT * $ratio;
+                    $imageHeight = ImageBlock::DEFAULT_IMAGE_HEIGHT;
+                } else {
+                    $imageHeight = ImageBlock::DEFAULT_IMAGE_WIDTH / $ratio;
+                    $imageWidth = ImageBlock::DEFAULT_IMAGE_WIDTH;
+                }
+
+                $block->setWidth($imageWidth . 'px');
+                $block->setHeight($imageHeight . 'px');
+                if ($image->source_url !== '') {
+                    $block->setImageSource(parse_url($image->source_url, PHP_URL_HOST));
+                }
+                $this->editorService->addImageBlockToSlide($form->slide_id, $block);
+
+                $this->imageService->linkImage($image->id, $form->slide_id, $block->getId());
+            }
         }
         return ['success' => true];
     }
