@@ -162,6 +162,9 @@ $(".more-facts").on("click", function() {
     $(this).hide();
 })
 
+$('.to-slides-tab').on('click', function() {
+    $('#story-views-tab a:first').tab('show');
+});
 JS;
 $this->registerJs($js);
 
@@ -203,6 +206,7 @@ $isBookView = $storyDefaultView === 'book';
             <div class="tabbable-line">
             <?= Tabs::widget([
                 'class' => 'profile-tabs',
+                'id' => 'story-views-tab',
                 'items' => [
                     [
                         'label' => 'Режим обучения',
