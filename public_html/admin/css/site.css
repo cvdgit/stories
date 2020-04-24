@@ -1,8 +1,10 @@
+/*
 html,
 body {
     height: 100%;
     overflow: auto;
 }
+*/
 
 .wrap {
     min-height: 100%;
@@ -492,4 +494,8 @@ body {
 
 #crop-image-container img {
     max-width: 100%;
+}
+
+.modal {
+    overflow: auto;
 }

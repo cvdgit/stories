@@ -890,7 +890,11 @@ var ImageCropper = (function(editor, $) {
         $img.appendTo($('#crop-image-container', this));
 
         var options = {
-            aspectRatio: aspectRatio
+            aspectRatio: aspectRatio,
+            dragMode: 'none',
+            background: false,
+            zoomOnWheel: false,
+            zoomOnTouch: false,
         };
         cropper = new Cropper($img[0], options);
     });
