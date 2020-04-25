@@ -5,6 +5,7 @@ namespace backend\services;
 
 use backend\models\editor\CropImageForm;
 use common\models\StorySlideImage;
+use http\Exception\RuntimeException;
 use Yii;
 use yii\helpers\FileHelper;
 
@@ -44,6 +45,7 @@ class ImageService
 
     public function downloadImage(string $url, string $imageName, string $imagePath)
     {
+
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -55,6 +57,10 @@ class ImageService
         curl_close($ch);
 
         $ext = FileHelper::getExtensionsByMimeType($info['content_type']);
+        if (count($ext) === 0) {
+            throw new \RuntimeException('Неизвестный формат изображения');
+        }
+
         $imageFileName = $imageName . '.' . $ext[1];
         $path = $imagePath;
         FileHelper::createDirectory($path);

@@ -1371,12 +1371,22 @@ var imageFromUrlDialog = new StoryDialog('#image-from-url-modal', {
             'processData': false
         });
         promise.done(function(data) {
-            if (data && data.success) {
-                dialog.hide();
-                data.image['what'] = 'collection';
-                ImageCropper.showModal(data.image);
+            if (data) {
+                if (data.success) {
+                    dialog.hide();
+                    data.image['what'] = 'collection';
+                    ImageCropper.showModal(data.image);
+                }
+                else {
+                    toastr.error(JSON.stringify(data.errors));
+                }
+            }
+            else {
+                toastr.error('Неизвестная ошибка');
             }
         });
-
+        promise.fail(function(data) {
+            toastr.error(data.responseJSON.message);
+        });
     }
 });

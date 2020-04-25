@@ -347,7 +347,6 @@ class ImageController extends Controller
         else {
             $result['errors'] = $form->errors;
         }
-
         return $result;
     }
 
