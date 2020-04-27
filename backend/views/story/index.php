@@ -31,6 +31,17 @@ $this->title = 'Управление историями';
         'id',
         'title',
         [
+            'format' => 'raw',
+            'attribute' => 'mode',
+            'value' => function($model) {
+                $mode = '';
+                if ($model->isAudioStory()) {
+                    $mode = '<i class="glyphicon glyphicon-volume-up" style="font-size: 20px; color: #d9534f"></i>';
+                }
+                return $mode;
+            }
+        ],
+        [
             'attribute' => 'user_id',
             'value' => 'author.username',
             'filter' => UserHelper::getUserArray(),
