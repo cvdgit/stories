@@ -36,7 +36,7 @@ $this->title = 'Управление историями';
             'value' => function($model) {
                 $mode = '';
                 if ($model->isAudioStory()) {
-                    $mode = '<i class="glyphicon glyphicon-volume-up" style="font-size: 20px; color: #d9534f"></i>';
+                    $mode = '<i class="glyphicon glyphicon-volume-up" data-toggle="popover" title="Озвучено" style="font-size: 20px; color: #d9534f"></i>';
                 }
                 return $mode;
             }
