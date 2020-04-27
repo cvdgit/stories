@@ -73,16 +73,6 @@ $values = implode("\n", $values);
         'selectInputID' => Html::getInputId($model, 'story_playlists')
     ]), ['class' => false]) ?>
 
-<?= $form->field($model, 'neo_entity_name')
-    ->textInput(['readonly' => true])
-    ->hint($this->render('_neo_entities', [
-        'neoLabelIDField' => Html::getInputId($model, 'neo_label_id'),
-        'neoEntityIDField' => Html::getInputId($model, 'neo_entity_id'),
-        'neoEntityNameField' => Html::getInputId($model, 'neo_entity_name'),
-    ]), ['class' => false]) ?>
-<?= $form->field($model, 'neo_label_id')->hiddenInput()->label(false) ?>
-<?= $form->field($model, 'neo_entity_id')->hiddenInput()->label(false) ?>
-
 <div class="form-group">
 <?= Html::submitButton(($model->isNewRecord ? 'Создать историю' : 'Сохранить изменения'), ['class' => 'btn btn-success', 'style' => 'margin-right: 20px']) ?>
 </div>

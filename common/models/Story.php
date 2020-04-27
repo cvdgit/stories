@@ -39,9 +39,6 @@ use yii\db\ActiveQuery;
  * @property int $episode
  * @property int $video
  * @property int $published_at
- * @property int $neo_label_id
- * @property int $neo_entity_id
- * @property string $neo_entity_name
  *
  * @property User $author
  * @property Tag[] $tags
@@ -110,8 +107,8 @@ class Story extends ActiveRecord
             [['title', 'alias', 'user_id', 'story_categories', 'source_id'], 'required'],
             [['body', 'cover', 'story_file', 'source_dropbox', 'source_powerpoint'], 'string'],
             [['created_at', 'updated_at', 'user_id', 'sub_access', 'source_id', 'views_number', 'slides_number', 'audio', 'published_at'], 'integer'],
-            [['video', 'user_audio', 'episode', 'neo_entity_id', 'neo_label_id'], 'integer'],
-            [['title', 'alias', 'neo_entity_name'], 'string', 'max' => 255],
+            [['video', 'user_audio', 'episode'], 'integer'],
+            [['title', 'alias'], 'string', 'max' => 255],
             [['alias'], 'unique'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
             ['status', 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_PUBLISHED]],
@@ -150,7 +147,6 @@ class Story extends ActiveRecord
             'episode' => 'Эпизод',
             'story_playlists' => 'Плейлисты',
             'published_at' => 'Дата публикации истории',
-            'neo_entity_name' => 'Сущность',
         ];
     }
 
