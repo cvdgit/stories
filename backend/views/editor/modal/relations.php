@@ -16,8 +16,8 @@ use yii\helpers\Html;
                 <div class="row" style="margin-bottom: 10px">
                     <div class="col-md-12">
                         <?= Html::label('Сущность:', 'neo-entity-name') ?>
-                        <?= Html::textInput('', $model->neo_entity_name, ['class' => 'form-control', 'id' => 'neo-entity-name', 'readonly' => true]) ?>
-                        <?= Html::hiddenInput('', $model->neo_entity_id, ['id' => 'neo-entity-id']) ?>
+                        <?= Html::textInput('', '', ['class' => 'form-control', 'id' => 'neo-entity-name', 'readonly' => true]) ?>
+                        <?= Html::hiddenInput('', '', ['id' => 'neo-entity-id']) ?>
                     </div>
                 </div>
                 <div class="row" style="margin-bottom: 10px">
