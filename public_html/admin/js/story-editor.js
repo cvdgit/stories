@@ -1335,6 +1335,7 @@ function StoryDialog(selector, options) {
     this.dialog = $(selector);
     this.options = options || {};
     this.dialog.on('show.bs.modal', options.onShow);
+    this.dialog.on('shown.bs.modal', options.onShown);
 
     var that = this;
     this.dialog.find('form').submit(function(e) {
@@ -1359,7 +1360,10 @@ StoryDialog.prototype.hide = function() {
 
 var imageFromUrlDialog = new StoryDialog('#image-from-url-modal', {
     'onShow': function() {
-
+        $('input[type=text]:eq(0)', this).val('');
+    },
+    'onShown': function() {
+        $('input[type=text]:eq(0)', this).focus();
     },
     'submit': function(dialog, formData, method, action) {
         var promise = $.ajax({
