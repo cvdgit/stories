@@ -95,6 +95,11 @@ $('[data-toggle="tooltip"]').tooltip();
 	    $(".block-params", "#slide-block-params").removeClass("hide");
 	    $(this).remove();
 	});
+	
+	$('#save-slides-order').on('click', function(e) {
+	    e.preventDefault();
+	    StoryEditor.saveSlidesOrder();
+	});
 JS;
 $this->registerJs($js);
 
@@ -134,7 +139,7 @@ $options = [
 ?>
 <div class="row">
 	<div class="col-lg-3">
-        <h4>Слайды <a href="#"><i class="glyphicon glyphicon-floppy-disk"></i></a> <div class="pull-right"><?= ButtonDropdown::widget($options) ?></div></h4>
+        <h4>Слайды <a href="#" id="save-slides-order"><i class="glyphicon glyphicon-floppy-disk"></i></a> <div class="pull-right"><?= ButtonDropdown::widget($options) ?></div></h4>
         <div class="list-group" id="preview-container" style="margin-top: 20px"></div>
 	</div>
 	<div class="col-lg-9">

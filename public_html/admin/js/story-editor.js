@@ -399,6 +399,39 @@ var StoryEditor = (function() {
         return config[value];
     }
 
+    function saveSlidesOrder() {
+        var formData = new FormData();
+        formData.append('SlidesOrder[story_id]', config.storyID);
+        $('#preview-container a').each(function(i) {
+            formData.append('SlidesOrder[slides][' + i + ']', $(this).attr('data-slide-id'));
+            formData.append('SlidesOrder[order][' + i + ']', ++i);
+        });
+        var promise = $.ajax({
+            'url': '/admin/index.php?r=slide/save-order',
+            'type': 'POST',
+            'data': formData,
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+        promise.done(function(data) {
+            if (data) {
+                if (data.success) {
+                    toastr.success('Порядок слайдов успешно изменен');
+                }
+                else {
+                    toastr.error(JSON.stringify(data.errors));
+                }
+            }
+            else {
+                toastr.error('Неизвестная ошибка');
+            }
+        });
+        promise.fail(function(data) {
+            toastr.error(data.responseJSON.message);
+        });
+    }
+
     return {
         "initialize": initialize,
         "loadSlides": loadSlides,
@@ -421,7 +454,8 @@ var StoryEditor = (function() {
         "getConfigValue": getConfigValue,
         "getStoryID": function() {
             return getConfigValue('storyID');
-        }
+        },
+        "saveSlidesOrder": saveSlidesOrder
     };
 })();
 
@@ -1394,3 +1428,4 @@ var imageFromUrlDialog = new StoryDialog('#image-from-url-modal', {
         });
     }
 });
+
