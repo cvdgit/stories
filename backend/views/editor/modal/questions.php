@@ -1,7 +1,5 @@
 <?php
-
 use yii\helpers\Html;
-
 ?>
 <div class="modal fade" id="slide-new-question-modal">
     <div class="modal-dialog">
@@ -13,18 +11,24 @@ use yii\helpers\Html;
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <?= Html::label('Метка:', 'label-list') ?>
-                        <?= Html::dropDownList('', null, [], ['prompt' => 'Выберите метку', 'class' => 'form-control', 'id' => 'label-list']) ?>
+                        <?= Html::label('Вопрос:', 'question-list') ?>
+                        <?= Html::dropDownList('', null, [], ['prompt' => 'Выберите вопрос', 'class' => 'form-control', 'id' => 'question-list']) ?>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <?= Html::label('Сущнсть:', 'entity-list') ?>
-                        <?= Html::dropDownList('', null, [], ['prompt' => 'Выберите сущность', 'class' => 'form-control', 'id' => 'entity-list']) ?>
+                        <?= Html::label('Количество вопросов:', 'questions-number') ?>
+                        <?= Html::textInput('', '5', ['class' => 'form-control', 'id' => 'questions-number']) ?>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <?= Html::label('Количество ответов:', 'answers-number') ?>
+                        <?= Html::textInput('', '5', ['class' => 'form-control', 'id' => 'answers-number']) ?>
                     </div>
                 </div>
                 <?= Html::button('Показать вопросы', ['id' => 'show-questions', 'class' => 'btn btn-success btn-sm', 'style' => 'margin: 10px 0']) ?>
-                <table class="table table-bordered" id="question-list">
+                <table class="table table-bordered" id="show-question-list">
                     <thead>
                     <tr>
                         <th>Вопросы</th>
@@ -68,6 +72,16 @@ $js = <<< JS
     
     var modal = $("#slide-new-question-modal");
     
+    var questionList = $('#question-list');
+    
+    modal.on("show.bs.modal", function() {
+        resetSelect(questionList, 'Выберите вопрос');
+        Neo.getQuestionList().done(function(data) {
+            fillSelect(data, questionList, null, 'id');
+        });
+    });
+    
+    /*
     var entityList = $('#entity-list'),
         labelList = $('#label-list');
     
@@ -99,14 +113,18 @@ $js = <<< JS
         });
     });
     
+
+    */
+    
     $('#show-questions', modal).on('click', function() {
-        var param = labelList.val(),
-            paramValue = entityList.val();
-        if (!param || !paramValue) {
+        var questionID = questionList.val(),
+            questionsNumber = $('#questions-number', modal).val(),
+            answersNumber = $('#answers-number', modal).val();
+        if (!questionID) {
             return false;
         }
-        Neo.getQuestions(param, paramValue).done(function(data) {
-            var list = $("table#question-list tbody", modal);
+        Neo.questions(questionID, questionsNumber, answersNumber).done(function(data) {
+            var list = $("table#show-question-list tbody", modal);
             list.empty();
             data.forEach(function(elem) {
                 $('<tr><td>' + elem.question + '</td></tr>').appendTo(list);
@@ -120,7 +138,7 @@ $js = <<< JS
         StoryEditor.createQuestions(param, paramValue, function() {
             modal.modal('hide');
         });
-    });
+    });    
 })();
 JS;
 /** @var $this yii\web\View  */

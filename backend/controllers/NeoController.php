@@ -112,4 +112,18 @@ class NeoController extends Controller
         return Json::decode($result);
     }
 
+    public function actionQuestionList()
+    {
+        $result = $this->serviceCurl()->get($this->serviceMethodUrl('/api/question/list'));
+        return Json::decode($result);
+    }
+
+    public function actionQuestionGet(int $id, int $number, int $answers)
+    {
+        $result = $this->serviceCurl()
+            ->setGetParams(['id' => $id, 'number' => $number, 'answers' => $answers])
+            ->get($this->serviceMethodUrl('/api/question/get'));
+        return Json::decode($result);
+    }
+
 }

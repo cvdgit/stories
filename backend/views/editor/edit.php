@@ -128,7 +128,7 @@ $options = [
                 'linkOptions' => ['onclick' => 'StoryEditor.createSlideQuestion(); return false;'],
             ],
             [
-                'label' => 'Вопросы',
+                'label' => 'Вопросы (neo4j)',
                 'url' => '#slide-new-question-modal',
                 'linkOptions' => ['data-toggle' => 'modal'],
             ],

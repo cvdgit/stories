@@ -82,6 +82,14 @@ var Neo = (function(jQuery) {
         return $.getJSON('/admin/index.php?r=neo/questions', {"param": param, "value": paramValue});
     }
 
+    function getQuestionList() {
+        return $.getJSON('/admin/index.php?r=neo/question-list');
+    }
+
+    function questions(questionID, questionsNumber, answersNumber) {
+        return $.getJSON('/admin/index.php?r=neo/question-get', {'id': questionID, 'number': questionsNumber, 'answers': answersNumber});
+    }
+
     return {
         "getEntities": getEntities,
         "getRelations": getRelations,
@@ -89,6 +97,8 @@ var Neo = (function(jQuery) {
         "saveRelations": saveRelations,
         "deleteRelation": deleteRelation,
         "getLabels": getLabels,
-        "getQuestions": getQuestions
+        "getQuestions": getQuestions,
+        "getQuestionList": getQuestionList,
+        "questions": questions
     };
 })(jQuery);
