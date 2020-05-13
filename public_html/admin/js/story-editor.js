@@ -540,15 +540,11 @@ var StoryEditor = (function() {
 (function(editor, $, console) {
     "use strict";
 
-    editor.createQuestions = function(param, paramValue, callback) {
-        if (!param || !paramValue) {
-            return false;
-        }
-        $.getJSON(editor.getConfigValue("createNewSlideQuestionAction"), {
-            "slide_id": editor.getCurrentSlideID(),
-            "param": param,
-            "paramValue": paramValue
-        }).done(function(data) {
+    editor.createQuestions = function(params, callback) {
+        params = params || {};
+        params.story_id = editor.getStoryID();
+        params.after_slide_id = editor.getCurrentSlideID();
+        $.getJSON(editor.getConfigValue("createNewSlideQuestionAction"), params).done(function(data) {
             if (typeof callback === 'function') {
                 callback();
             }

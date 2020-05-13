@@ -75,6 +75,9 @@ var TransitionSlide = (function() {
                     if (state.slide_index === 0 && window["WikidsVideo"]) {
                         WikidsVideo.createPlayer();
                     }
+                    if (WikidsPlayer.isTestSlide()) {
+                        WikidsStoryTest.restore();
+                    }
                     if (typeof callback === 'function') {
                         callback();
                     }

@@ -228,10 +228,10 @@ class StoryEditorService
         return $model->id;
     }
 
-    public function newCreateSlideQuestion(int $slideID, string $param, string $paramValue)
+    public function newCreateSlideQuestion(int $storyID, array $params)
     {
 
-        $currentSlideModel = StorySlide::findSlide($slideID);
+        // $currentSlideModel = StorySlide::findSlide($slideID);
 
         $reader = new HtmlSlideReader('');
         $slide = $reader->load();
@@ -239,19 +239,24 @@ class StoryEditorService
 
         /** @var HTMLBLock $block */
         $block = $slide->createBlock(HTMLBLock::class);
-        $content = Html::tag('div', '', ['class' => 'new-questions', 'data-param' => $param, 'data-param-value' => $paramValue]);
+
+        $options = ['class' => 'new-questions'];
+        foreach ($params as $paramName => $paramValue) {
+            $options['data-' . $paramName] = $paramValue;
+        }
+        $content = Html::tag('div', '', $options);
         $block->setContent($content);
         $slide->addBlock($block);
 
         $writer = new HTMLWriter();
         $html = $writer->renderSlide($slide);
 
-        $model = StorySlide::createSlide($currentSlideModel->story_id);
+        $model = StorySlide::createSlide($storyID);
         $model->kind = StorySlide::KIND_QUESTION;
         $model->data = $html;
 
-        $this->updateSlideNumbers($currentSlideModel->story_id, $currentSlideModel->number);
-        $model->number = $currentSlideModel->number + 1;
+        // $this->updateSlideNumbers($currentSlideModel->story_id, $currentSlideModel->number);
+        $model->number = 1;
         $model->save();
 
         return $model->id;

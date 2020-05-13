@@ -11,7 +11,7 @@ use yii\rest\Controller;
 class QuestionController extends Controller
 {
 
-    public function actionGet(string $param, string $value)
+    public function actionGet(int $questionId, int $questionsNumber, int $answersNumber)
     {
 
         $curl = new Curl();
@@ -22,8 +22,8 @@ class QuestionController extends Controller
                 CURLOPT_SSL_VERIFYPEER => false,
                 CURLOPT_SSL_VERIFYHOST => false,
             ])
-            ->setGetParams(['param' => $param, 'value' => $value])
-            ->get(Yii::$app->params['neo.url'] . '/api/question');
+            ->setGetParams(['id' => $questionId, 'questions' => $questionsNumber, 'answers' => $answersNumber])
+            ->get(Yii::$app->params['neo.url'] . '/api/question/get');
         $result = Json::decode($result);
 
         $questions = [];
@@ -58,14 +58,19 @@ class QuestionController extends Controller
 
     public function actionGetRelatedSlide(int $entity_id, int $relation_id)
     {
-        $slide = (new Query())
-            ->select(['{{%story}}.id AS story_id', '{{%story_slide}}.id AS slide_id'])
-            ->from('{{%story}}')
-            ->innerJoin('{{%story_slide}}', '{{%story_slide}}.story_id = {{%story}}.id')
-            ->innerJoin('{{%neo_slide_relations}}', '{{%neo_slide_relations}}.slide_id = {{%story_slide}}.id')
-            ->where('{{%story}}.neo_entity_id = :entity', [':entity' => $entity_id])
-            ->andWhere('{{%neo_slide_relations}}.relation_id = :relation', [':relation' => $relation_id]);
-        return $slide->one();
+        return (new Query())
+            ->select(['{{%story_slide}}.story_id AS story_id', '{{%story_slide}}.id AS slide_id'])
+            ->from('{{%neo_slide_relations}}')
+            ->innerJoin('{{%story_slide}}', '{{%story_slide}}.id = {{%neo_slide_relations}}.slide_id')
+            ->where('{{%neo_slide_relations}}.entity_id = :entity', [':entity' => $entity_id])
+            ->andWhere('{{%neo_slide_relations}}.relation_id = :relation', [':relation' => $relation_id])
+            ->one();
+    }
+
+    public function actionAnswer(int $slide_id, int $entity_id, int $relation_id, int $answer_id)
+    {
+
+        return ['success' => true];
     }
 
 }

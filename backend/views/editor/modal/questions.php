@@ -27,7 +27,7 @@ use yii\helpers\Html;
                         <?= Html::textInput('', '5', ['class' => 'form-control', 'id' => 'answers-number']) ?>
                     </div>
                 </div>
-                <?= Html::button('Показать вопросы', ['id' => 'show-questions', 'class' => 'btn btn-success btn-sm', 'style' => 'margin: 10px 0']) ?>
+                <?= Html::button('Показать пример вопросов', ['id' => 'show-questions', 'class' => 'btn btn-success btn-sm', 'style' => 'margin: 10px 0']) ?>
                 <table class="table table-bordered" id="show-question-list">
                     <thead>
                     <tr>
@@ -133,9 +133,18 @@ $js = <<< JS
     });
     
     $('#create-questions', modal).on('click', function() {
-        var param = labelList.val(),
-            paramValue = entityList.val();
-        StoryEditor.createQuestions(param, paramValue, function() {
+        var questionID = questionList.val(),
+            questionsNumber = $('#questions-number', modal).val(),
+            answersNumber = $('#answers-number', modal).val();
+        if (!questionID) {
+            return false;
+        }
+        var params = {
+            'id': questionID,
+            'number': questionsNumber,
+            'answers': answersNumber
+        };
+        StoryEditor.createQuestions(params, function() {
             modal.modal('hide');
         });
     });    

@@ -198,6 +198,7 @@ var WikidsPlayer = (function(document, $) {
             }
         },
         "setSlideAudio": setSlideAudio,
+        "getCurrentSlide": getCurrentSlide,
         "getCurrentSlideID": getCurrentSlideID,
         "addAudioData": addAudioData,
         "removeAudioData": removeAudioData,
@@ -207,6 +208,9 @@ var WikidsPlayer = (function(document, $) {
         },
         "getStoryID": function() {
             return config.storyID;
+        },
+        "isTestSlide": function() {
+            return ($(getCurrentSlide()).attr('data-slide-view') === 'new-question');
         }
     };
 })(document, jQuery);

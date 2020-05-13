@@ -1772,6 +1772,10 @@
 	float: left;
 }
 
+.wikids-test-answer label {
+	pointer-events: none;
+}
+
 .wikids-test-answer input[type=checkbox],
 .wikids-test-answer input[type=radio] {
 	-ms-transform: scale(1.5);

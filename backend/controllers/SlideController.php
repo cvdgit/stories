@@ -34,11 +34,7 @@ class SlideController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $slide = StorySlide::findSlide($slide_id);
-        $relation = null;
-        if (count($slide->neoSlideRelations) > 0) {
-            $relation = $slide->neoSlideRelations[0];
-        }
-        return $relation;
+        return $slide->neoSlideRelations;
     }
 
     public function actionSaveOrder()

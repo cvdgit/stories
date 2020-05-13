@@ -5,6 +5,7 @@ namespace backend\controllers;
 
 
 use backend\models\NeoSlideRelations;
+use backend\models\NeoSlideRelationsForm;
 use linslin\yii2\curl\Curl;
 use Yii;
 use yii\helpers\Json;
@@ -71,13 +72,28 @@ class NeoController extends Controller
         return Json::decode($result);
     }
 
-    public function actionSaveRelations()
+    public function actionCreateRelation()
     {
-        $model = new NeoSlideRelations();
-        if ($model->load(Yii::$app->request->post(), '') && $model->validate()) {
-            $model->save();
+        $model = new NeoSlideRelationsForm();
+        $result = ['success' => false, 'errors' => []];
+        if ($model->load(Yii::$app->request->post())) {
+            try {
+                $model->create();
+                $result['success'] = true;
+            }
+            catch (\Exception $ex) {
+                if ($ex instanceof \DomainException) {
+                    $result['errors'] = $model->errors;
+                }
+                else {
+                    $result['errors'] = [$ex->getMessage()];
+                }
+            }
         }
-        return [];
+        else {
+            $result['errors'] = 'no';
+        }
+        return $result;
     }
 
     public function actionDeleteRelation()
@@ -85,8 +101,9 @@ class NeoController extends Controller
         $post = Yii::$app->request->post();
         $model = NeoSlideRelations::findOne([
             'slide_id' => $post['slide_id'],
-            'relation_id' => $post['relation_id'],
             'entity_id' => $post['entity_id'],
+            'relation_id' => $post['relation_id'],
+            'related_entity_id' => $post['related_entity_id'],
         ]);
         return $model->delete();
     }

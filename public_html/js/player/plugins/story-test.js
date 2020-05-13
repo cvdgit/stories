@@ -75,10 +75,13 @@ var TestSlide = (function() {
 
     $(".reveal > .slides").on("click", "button[data-test-id]", action);
 
+    /*
     $(".reveal > .slides").on("click", ".wikids-test-answer", function() {
-        var $input = $(this).find("input");
-        $input.prop("checked", !$input.prop("checked"));
+        console.log('click2');
+        //var $input = $(this).find("input");
+        //$input.prop("checked", !$input.prop("checked"));
     });
+    */
 
     function syncReveal(data, slide_index) {
         $(".reveal .slides").empty().append(data);
@@ -159,23 +162,23 @@ var TestSlide = (function() {
 
 var Education = (function() {
 
+    var readySlides = [];
+
     function getCurrentSlide() {
         return Reveal.getCurrentSlide();
     }
 
-    function loadQuestionData(param, paramValue) {
-        return $.getJSON("/question/" + param + "/" + paramValue);
+    function loadQuestionData(params) {
+        return $.getJSON("/question/get", params);
     }
 
     function init() {
-        //console.debug('Education.init');
         var elem = $("div.new-questions", getCurrentSlide());
         if (!elem.length) {
             return;
         }
-        var param = elem.attr("data-param"),
-            paramValue = elem.attr("data-param-value");
-        loadQuestionData(param, paramValue)
+        console.log('Education.init');
+        loadQuestionData(elem.data())
             .done(function(data) {
                 WikidsStoryTest.init(true);
                 var html =  WikidsStoryTest.load(data, false);
@@ -183,8 +186,23 @@ var Education = (function() {
             });
     }
 
-    Reveal.addEventListener("slidechanged", function() {
+    function initEducation() {
+        var currentSlideID = $(getCurrentSlide()).attr('data-id');
+        if (readySlides[currentSlideID]) {
+            return;
+        }
+        readySlides[currentSlideID] = true;
         init();
+    }
+
+    Reveal.addEventListener("slidechanged", function() {
+        console.log('slidechanged');
+        initEducation();
+    });
+
+    Reveal.addEventListener("ready", function() {
+        console.log('ready');
+        initEducation();
     });
 
     return {

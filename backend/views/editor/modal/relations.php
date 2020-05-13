@@ -1,8 +1,9 @@
 <?php
 
 use yii\helpers\Html;
+use yii\widgets\ActiveForm;
 
-/* @var $model common\models\Story */
+/* @var $model backend\models\NeoSlideRelationsForm */
 ?>
 
 <div class="modal fade" id="neo-relation-modal">
@@ -13,36 +14,34 @@ use yii\helpers\Html;
                 <h4 class="modal-title">Связи</h4>
             </div>
             <div class="modal-body">
-                <div class="row" style="margin-bottom: 10px">
-                    <div class="col-md-12">
-                        <?= Html::label('Сущность:', 'neo-entity-name') ?>
-                        <?= Html::textInput('', '', ['class' => 'form-control', 'id' => 'neo-entity-name', 'readonly' => true]) ?>
-                        <?= Html::hiddenInput('', '', ['id' => 'neo-entity-id']) ?>
-                    </div>
+                <?php $form = ActiveForm::begin([
+                    'action' => ['neo/create-relation'],
+                    'id' => 'create-relation-form',
+                    'validateOnSubmit' => false,
+                ]); ?>
+                <?= $form->field($model, 'entity_id')->dropDownList([]) ?>
+                <?= $form->field($model, 'entity_name')->hiddenInput()->label(false) ?>
+                <?= $form->field($model, 'relation_id')->dropDownList([], ['disabled' => true]) ?>
+                <?= $form->field($model, 'relation_name')->hiddenInput()->label(false) ?>
+                <?= $form->field($model, 'related_entity_id')->dropDownList([], ['disabled' => true]) ?>
+                <?= $form->field($model, 'related_entity_name')->hiddenInput()->label(false) ?>
+                <?= $form->field($model, 'slide_id')->hiddenInput()->label(false) ?>
+                <div class="form-group">
+                    <?= Html::submitButton('Добавить новую связь', ['class' => 'btn btn-primary']) ?>
                 </div>
-                <div class="row" style="margin-bottom: 10px">
-                    <div class="col-md-12">
-                        <?= Html::label('Отношение:') ?>
-                        <?= Html::dropDownList('',
-                            null,
-                            [],
-                            ['prompt' => 'Выберите связь', 'id' => 'neo-relation-list', 'class' => 'form-control']) ?>
-                    </div>
-                </div>
-                <div class="row" style="margin-bottom: 10px">
-                    <div class="col-md-12">
-                        <?= Html::label('Сущность:') ?>
-                        <?= Html::dropDownList('',
-                            null,
-                            [],
-                            ['prompt' => 'Выберите сущность', 'id' => 'neo-related-entities-list', 'class' => 'form-control']) ?>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-danger" style="display: none" id="neo-delete-relation">Удалить связь</button>
-                <button class="btn btn-primary" id="neo-save-relations">Сохранить</button>
-                <button class="btn btn-default" data-dismiss="modal">Отмена</button>
+                <?php ActiveForm::end(); ?>
+                <h4 class="text-center">Существующие связи</h4>
+                <table class="table table-bordered" id="slide-relations">
+                    <thead>
+                        <tr>
+                            <th>Сущность</th>
+                            <th>Отношение</th>
+                            <th>Связанная сущность</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -53,23 +52,6 @@ use yii\helpers\Html;
 $js = <<<JS
 (function() {
     
-    var modal = $('#neo-relation-modal'),
-        relationList = $('#neo-relation-list'),
-        relatedEntitiesList = $('#neo-related-entities-list'),
-        entityID = $('#neo-entity-id').val(),
-        deleteButton = $('#neo-delete-relation', modal);
-
-    relationList.on('change', function() {
-        resetSelect(relatedEntitiesList, 'Выберите сущность');
-        var relationID = $(this).val();
-        if (!relationID) {
-            return;
-        }
-        Neo.getRelatedEntities(entityID, relationID).done(function(entity) {
-            fillSelect([entity], relatedEntitiesList);
-        });
-    });
-
     function resetSelect(select, emptyText) {
         select.empty();
         $('<option/>').text(emptyText).val('').appendTo(select);
@@ -86,48 +68,121 @@ $js = <<<JS
             item.appendTo(select);
         });
     }
+    
+    var modal = $('#neo-relation-modal');
 
-    modal.on("show.bs.modal", function() {
-        resetSelect(relationList, 'Выберите отношение');
-        resetSelect(relatedEntitiesList, 'Выберите сущность');
-        deleteButton.hide();
-        $.getJSON('/admin/index.php?r=slide/slide-relations', {"slide_id": StoryEditor.getCurrentSlideID()})
+    $('select', modal).on('change', function() {
+        var targetID = $(this).attr('id').replace('_id', '_name');
+        $('#' + targetID).val($(this).find(':selected').text());
+    });
+    
+    var entityList = $('#neosliderelationsform-entity_id', modal);
+    entityList.on('change', function() {
+        resetSelect(relationList, 'Загрузка...');
+        var entityID = $(this).val();
+        if (!entityID) {
+            relationList.empty().prop('disabled', true);
+            relatedEntityList.empty().prop('disabled', true);
+            return;
+        }
+        Neo.getRelations(entityID).done(function(data) {
+            resetSelect(relationList, 'Выберите связь');
+            fillSelect(data, relationList);
+            relationList.prop('disabled', false);
+        });
+    });    
+    
+    var relationList = $('#neosliderelationsform-relation_id', modal);
+    relationList.on('change', function() {
+        resetSelect(relatedEntityList, 'Загрузка...');
+        var entityID = $('#neosliderelationsform-entity_id').val();
+        var relationID = $(this).val();
+        if (!entityID || !relationID) {
+            relatedEntityList.empty().prop('disabled', true);
+            return;
+        }
+        Neo.getRelatedEntities(entityID, relationID).done(function(entity) {
+            resetSelect(relatedEntityList, 'Выберите связанную сущность');
+            fillSelect([entity], relatedEntityList);
+            relatedEntityList.prop('disabled', false);
+        });
+    });
+    
+    var relatedEntityList = $('#neosliderelationsform-related_entity_id', modal);
+    
+    modal.on('show.bs.modal', function() {
+        
+        $('#create-relation-form')[0].reset();
+        relationList.empty().prop('disabled', true);
+        relatedEntityList.empty().prop('disabled', true);
+        
+        $('#neosliderelationsform-slide_id', this).val(StoryEditor.getCurrentSlideID());
+        
+        resetSelect(entityList, 'Загрузка...');
+        Neo.getEntities().done(function(data) {
+            resetSelect(entityList, 'Выберите сущность');
+            fillSelect(data, entityList);
+        });
+        
+        var tableBody = $('#slide-relations tbody', modal);
+        tableBody.empty();
+        tableBody.append($('<tr/>').append($('<td/>').attr('colspan', 4).text('Загрузка...')));
+        $.getJSON('/admin/index.php?r=slide/slide-relations', {'slide_id': StoryEditor.getCurrentSlideID()})        
             .done(function(data) {
-                if (data) {
-                    var selectedEntityID = data.entity_id,
-                        relationID = data.relation_id;
-                    $.when(Neo.getRelations(entityID), Neo.getRelatedEntities(entityID, relationID)).done(function(data1, data2) {
-                        data1 = data1[0];
-                        fillSelect(data1, relationList, relationID);
-                        data2 = data2[0];
-                        fillSelect([data2], relatedEntitiesList, selectedEntityID);
+                tableBody.empty();
+                if (data && data.length) {
+                    data.forEach(function(row) {
+                        var deleteRelation = $('<a/>')
+                            .attr('href', '#')
+                            .on('click', function(e) {
+                                e.preventDefault();
+                                if (!confirm('Удалить связь?')) {
+                                    return;
+                                }
+                                var str = 'slide_id=' + StoryEditor.getCurrentSlideID() + '&entity_id=' + row.entity_id + '&relation_id=' + row.relation_id + '&related_entity_id=' + row.related_entity_id;
+                                Neo.deleteRelation(str);
+                                $(this).parent().parent().remove();
+                            })
+                            .html('<span class="glyphicon glyphicon-trash" title="Удалить" style="color: rgb(255, 0, 0); font-weight: 500;"></span>');
+                        $('<tr/>')
+                            .append($('<td/>').text(row.entity_name))
+                            .append($('<td/>').text(row.relation_name))
+                            .append($('<td/>').text(row.related_entity_name))
+                            .append($('<td/>').append(deleteRelation))
+                            .appendTo(tableBody);
                     });
-                    deleteButton.show();
                 }
                 else {
-                    Neo.getRelations(entityID).done(function(data) {
-                        fillSelect(data, relationList);
-                    });
+                    tableBody.append($('<tr/>').append($('<td/>').attr('colspan', 4).text('Пусто')));
                 }
             });
     });
-
-    $('#neo-save-relations').on('click', function() {
-        var relationID = $('#neo-relation-list').val();
-        var relatedEntityID = $('#neo-related-entities-list').val();
-        var str = 'slide_id=' + StoryEditor.getCurrentSlideID() + '&relation_id=' + relationID + '&entity_id=' + relatedEntityID;
-        Neo.saveRelations(str);
-        modal.modal('hide');
-    });
     
-    deleteButton.on('click', function() {
-        var relationID = $('#neo-relation-list').val();
-        var relatedEntityID = $('#neo-related-entities-list').val();
-        var str = 'slide_id=' + StoryEditor.getCurrentSlideID() + '&relation_id=' + relationID + '&entity_id=' + relatedEntityID;
-        Neo.deleteRelation(str);
-        modal.modal('hide');
+    $('#create-relation-form').submit(function(e) {
+        e.preventDefault();
+        var yiiform = $(this);
+        $.ajax({
+            type: yiiform.attr('method'),
+            url: yiiform.attr('action'),
+            data: yiiform.serializeArray()
+        }).done(function(data) {
+            if (data) {
+                if (data.success) {
+                    toastr.success('Успешно');
+                    modal.modal('hide');
+                }
+                else {
+                    toastr.error(JSON.stringify(data.errors));
+                }
+            }
+            else {
+                toastr.error('Неизвестная ошибка');
+            }
+        })
+        .fail(function(data) {
+            toastr.error(data.responseJSON.message);
+        });
     });
 })();
 JS;
-/* @var $this yii\web\View */
 $this->registerJs($js);

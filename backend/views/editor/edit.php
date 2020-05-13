@@ -318,7 +318,7 @@ $options = [
 
 <?php
 echo $this->render('modal/questions');
-echo $this->render('modal/relations', ['model' => $model]);
+echo $this->render('modal/relations', ['model' => new \backend\models\NeoSlideRelationsForm()]);
 echo $this->render('modal/crop');
 echo $this->render('modal/new_image');
 echo $this->render('modal/image_from_file', ['imageModel' => $imageModel]);
