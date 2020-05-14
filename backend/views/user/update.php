@@ -7,6 +7,7 @@ use yii\helpers\Html;
 /** @var $model common\models\User */
 /** @var $dataProvider yii\data\ActiveDataProvider */
 /** @var $historyDataProvider yii\data\ActiveDataProvider */
+/** @var $questionHistoryDataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Пользователь: ' . $model->username;
 $this->params['sidebarMenuItems'] = [
@@ -31,6 +32,10 @@ $this->params['sidebarMenuItems'] = [
                     'label' => 'Просмотры историй',
                     'content' => $this->render('_story_history', ['model' => $model, 'dataProvider' => $historyDataProvider]),
                 ],
+                [
+                    'label' => 'История ответов на вопросы',
+                    'content' => $this->render('_user_question_history', ['dataProvider' => $questionHistoryDataProvider]),
+                ]
             ],
         ]) ?>
 	</div>
