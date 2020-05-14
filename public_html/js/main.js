@@ -13,6 +13,18 @@ $(function() {
 
 });
 
+var App = (function() {
+	'use strict';
+
+	return {
+		'getConfig': function() {
+			return WikidsConfig;
+		},
+		'userIsGuest': function() {
+			return WikidsConfig.user.isGuest;
+		}
+	};
+})();
 
 /*
 

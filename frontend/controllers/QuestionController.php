@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\models\UserQuestionHistoryModel;
 use linslin\yii2\curl\Curl;
 use Yii;
 use yii\db\Query;
@@ -47,7 +48,11 @@ class QuestionController extends Controller
                 'image' => $resultItem['question_image'],
                 'storyTestAnswers' => $answers,
                 'entity_id' => $resultItem['question_entity_id'],
+                'entity_name' => $resultItem['question_entity_name'],
                 'relation_id' => $resultItem['question_relation_id'],
+                'relation_name' => $resultItem['question_relation_name'],
+                'topic_id' => $resultItem['question_topic_id'],
+                'topic_name' => $resultItem['question_topic_name'],
             ];
             $questions[] = $question;
             $i++;
@@ -67,9 +72,16 @@ class QuestionController extends Controller
             ->one();
     }
 
-    public function actionAnswer(int $slide_id, int $entity_id, int $relation_id, int $answer_id)
+    public function actionAnswer()
     {
-
+        $model = new UserQuestionHistoryModel();
+        $model->user_id = Yii::$app->user->id;
+        if ($model->load(Yii::$app->request->post(), '') && $model->validate()) {
+            $model->createUserQuestionHistory();
+        }
+        else {
+            return $model->errors;
+        }
         return ['success' => true];
     }
 

@@ -177,7 +177,6 @@ var Education = (function() {
         if (!elem.length) {
             return;
         }
-        console.log('Education.init');
         loadQuestionData(elem.data())
             .done(function(data) {
                 WikidsStoryTest.init(true);
@@ -196,12 +195,10 @@ var Education = (function() {
     }
 
     Reveal.addEventListener("slidechanged", function() {
-        console.log('slidechanged');
         initEducation();
     });
 
     Reveal.addEventListener("ready", function() {
-        console.log('ready');
         initEducation();
     });
 

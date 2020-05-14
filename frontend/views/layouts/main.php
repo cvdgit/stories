@@ -12,6 +12,7 @@ use frontend\widgets\SignupWidget;
 use frontend\widgets\StorySlider;
 use yii\bootstrap\Dropdown;
 use yii\helpers\Html;
+use yii\helpers\Json;
 use yii\widgets\Menu;
 use common\helpers\Url;
 
@@ -29,6 +30,13 @@ AppAsset::register($this);
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
     <?= Yii::$app->params['metrica'] ?>
+    <script>
+        var WikidsConfig = {
+            'user': {
+                'isGuest': <?= Json::encode(Yii::$app->user->isGuest) ?>
+            }
+        };
+    </script>
 </head>
 <body>
 <?php $this->beginBody() ?>
