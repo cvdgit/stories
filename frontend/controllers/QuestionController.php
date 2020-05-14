@@ -22,7 +22,7 @@ class QuestionController extends Controller
                 CURLOPT_SSL_VERIFYPEER => false,
                 CURLOPT_SSL_VERIFYHOST => false,
             ])
-            ->setGetParams(['id' => $questionId, 'questions' => $questionsNumber, 'answers' => $answersNumber])
+            ->setGetParams(['id' => $questionId, 'number' => $questionsNumber, 'answers' => $answersNumber])
             ->get(Yii::$app->params['neo.url'] . '/api/question/get');
         $result = Json::decode($result);
 
