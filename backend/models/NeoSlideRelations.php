@@ -2,9 +2,11 @@
 
 namespace backend\models;
 
+use common\models\Story;
 use common\models\StorySlide;
 use Yii;
 use yii\db\ActiveRecord;
+use yii\db\Query;
 
 /**
  * This is the model class for table "neo_slide_relations".
@@ -64,6 +66,34 @@ class NeoSlideRelations extends ActiveRecord
         $model->relation_name = $relationName;
         $model->related_entity_name = $relatedEntityName;
         return $model;
+    }
+
+    public function updateStory()
+    {
+        $storyID = $this->slide->story->id;
+        $slidesSubQuery = (new Query())
+            ->select(['story_slide.id'])
+            ->from('story_slide')
+            ->where('story_slide.story_id = :story', [':story' => $storyID]);
+        $haveNeoRelation = (new Query())
+            ->from('neo_slide_relations')
+            ->where(['in', 'slide_id', $slidesSubQuery])
+            ->exists();
+        Story::updateNeoRelationValue($storyID, $haveNeoRelation ? 1 : 0);
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        if ($insert) {
+            $this->updateStory();
+        }
+        parent::afterSave($insert, $changedAttributes);
+    }
+
+    public function afterDelete()
+    {
+        $this->updateStory();
+        parent::afterDelete();
     }
 
 }

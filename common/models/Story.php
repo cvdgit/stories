@@ -39,6 +39,7 @@ use yii\db\ActiveQuery;
  * @property int $episode
  * @property int $video
  * @property int $published_at
+ * @property int $have_neo_relation
  *
  * @property User $author
  * @property Tag[] $tags
@@ -534,6 +535,18 @@ class Story extends ActiveRecord
             }
         }
         return $html;
+    }
+
+    public function hasNeoRelation(): bool
+    {
+        return (int)$this->have_neo_relation === 1;
+    }
+
+    public static function updateNeoRelationValue(int $storyID, int $value)
+    {
+        $model = self::findModel($storyID);
+        $model->have_neo_relation = $value;
+        $model->save(false, ['have_neo_relation']);
     }
 
 }
