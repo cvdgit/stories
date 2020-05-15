@@ -21,7 +21,7 @@ class NeoSlideRelationsForm extends Model
     public function rules()
     {
         return [
-            [['slide_id', 'entity_id', 'relation_id', 'related_entity_id'], 'required'],
+            [['slide_id', 'entity_id', 'relation_id'], 'required'],
             [['slide_id', 'entity_id', 'relation_id', 'related_entity_id'], 'integer'],
             [['entity_name', 'relation_name', 'related_entity_name'], 'string'],
             //[['entity_id', 'relation_id', 'related_entity_id'], 'unique', 'targetAttribute' => ['entity_id', 'relation_id', 'related_entity_id']],

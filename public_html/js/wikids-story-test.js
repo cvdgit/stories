@@ -11,7 +11,8 @@ var WikidsStoryTest = function() {
 
     var questionHistory = [],
         skipQuestion = [],
-        questions = [];
+        questions = [],
+        questionsRepeat = [];
 
     function getTestData() {
         return testData;
@@ -44,6 +45,10 @@ var WikidsStoryTest = function() {
         }
 
         questions = getQuestionsData();
+
+        questionsRepeat = questions.map(function(currentValue, index, array) {
+            return {'entity_id': currentValue.entity_id, 'number': 5};
+        });
 
         setupDOM();
         addEventListeners();

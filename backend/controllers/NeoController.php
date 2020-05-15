@@ -56,19 +56,11 @@ class NeoController extends Controller
         return Json::decode($result);
     }
 
-    public function actionRelatedEntitiesList(int $entity_id, int $relation_id)
+    public function actionRelatedEntitiesList(int $entity_id, int $relation_id, string $direction)
     {
-        $curl = new Curl();
-        $result = $curl
-            ->setHeader('Accept', 'application/json')
-            ->setOptions([
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_SSL_VERIFYHOST => false,
-            ])
-            ->setGetParams(['entity_id' => $entity_id, 'relation_id' => $relation_id])
-            ->get(Yii::$app->params['neo.url'] . '/api/entity/related');
-        //die(var_dump($curl->errorText));
+        $result = $this->serviceCurl()
+            ->setGetParams(['entity_id' => $entity_id, 'relation_id' => $relation_id, 'direction' => $direction])
+            ->get($this->serviceMethodUrl('/api/entity/related'));
         return Json::decode($result);
     }
 

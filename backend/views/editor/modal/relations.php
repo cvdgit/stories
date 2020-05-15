@@ -57,11 +57,19 @@ $js = <<<JS
         $('<option/>').text(emptyText).val('').appendTo(select);
     }
     
-    function fillSelect(data, select, selected) {
+    function fillSelect(data, select, selected, nameCallback, dataAttributes) {
+        dataAttributes = dataAttributes || [];
         data.forEach(function(row) {
             var item = $('<option/>')
-                .text(row.name)
+                .html(typeof nameCallback === 'function' ? nameCallback(row) : row.name)
                 .val(row.id);
+            if (dataAttributes.length) {
+                var attr = {};
+                dataAttributes.forEach(function(attrName) {
+                    attr[attrName] = row[attrName];
+                });
+                item.data(attr);
+            }
             if (selected) {
                 item.attr('selected', parseInt(row.id) === parseInt(selected))
             }
@@ -85,9 +93,12 @@ $js = <<<JS
             relatedEntityList.empty().prop('disabled', true);
             return;
         }
+        var formatDirection = function(direction) {
+            return direction === 'in' ? '&larr;' : '&rarr;';
+        };
         Neo.getRelations(entityID).done(function(data) {
             resetSelect(relationList, 'Выберите связь');
-            fillSelect(data, relationList);
+            fillSelect(data, relationList, null, function(row) { return row.name + ' (' + formatDirection(row.direction) + ')'; }, ['direction']);
             relationList.prop('disabled', false);
         });
     });    
@@ -101,9 +112,10 @@ $js = <<<JS
             relatedEntityList.empty().prop('disabled', true);
             return;
         }
-        Neo.getRelatedEntities(entityID, relationID).done(function(entity) {
+        var direction = $(this).find(':selected').data('direction');
+        Neo.getRelatedEntities(entityID, relationID, direction).done(function(entity) {
             resetSelect(relatedEntityList, 'Выберите связанную сущность');
-            fillSelect([entity], relatedEntityList);
+            fillSelect(entity, relatedEntityList);
             relatedEntityList.prop('disabled', false);
         });
     });

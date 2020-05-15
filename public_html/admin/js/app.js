@@ -62,8 +62,8 @@ var Neo = (function(jQuery) {
         return $.getJSON("/admin/index.php?r=neo/relations-list&entity_id=" + entityID);
     }
 
-    function getRelatedEntities(entityID, relationID) {
-        return $.getJSON("/admin/index.php?r=neo/related-entities-list&entity_id=" + entityID + "&relation_id=" + relationID);
+    function getRelatedEntities(entityID, relationID, direction) {
+        return $.getJSON('/admin/index.php?r=neo/related-entities-list', {'entity_id': entityID, 'relation_id': relationID, 'direction': direction});
     }
 
     function saveRelations(relations) {
