@@ -87,6 +87,7 @@ $js = <<<JS
     var entityList = $('#neosliderelationsform-entity_id', modal);
     entityList.on('change', function() {
         resetSelect(relationList, 'Загрузка...');
+        relatedEntityList.empty().prop('disabled', true);
         var entityID = $(this).val();
         if (!entityID) {
             relationList.empty().prop('disabled', true);
