@@ -39,7 +39,7 @@ $this->title = 'Управление историями';
                     $mode = '<i class="glyphicon glyphicon-volume-up" data-toggle="popover" title="Озвучено" style="font-size: 20px; color: #d9534f"></i>';
                 }
                 if ($model->hasNeoRelation()) {
-                    $mode = '<i class="glyphicon glyphicon glyphicon-globe" data-toggle="popover" title="Есть связь с Neo4j" style="font-size: 20px; color: #d9534f"></i>';
+                    $mode .= '<i class="glyphicon glyphicon glyphicon-globe" data-toggle="popover" title="Есть связь с Neo4j" style="font-size: 20px; color: #d9534f"></i>';
                 }
                 return $mode;
             }
