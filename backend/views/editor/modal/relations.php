@@ -123,20 +123,7 @@ $js = <<<JS
     
     var relatedEntityList = $('#neosliderelationsform-related_entity_id', modal);
     
-    modal.on('show.bs.modal', function() {
-        
-        $('#create-relation-form')[0].reset();
-        relationList.empty().prop('disabled', true);
-        relatedEntityList.empty().prop('disabled', true);
-        
-        $('#neosliderelationsform-slide_id', this).val(StoryEditor.getCurrentSlideID());
-        
-        resetSelect(entityList, 'Загрузка...');
-        Neo.getEntities().done(function(data) {
-            resetSelect(entityList, 'Выберите сущность');
-            fillSelect(data, entityList);
-        });
-        
+    function loadRelations() {
         var tableBody = $('#slide-relations tbody', modal);
         tableBody.empty();
         tableBody.append($('<tr/>').append($('<td/>').attr('colspan', 4).text('Загрузка...')));
@@ -169,6 +156,23 @@ $js = <<<JS
                     tableBody.append($('<tr/>').append($('<td/>').attr('colspan', 4).text('Пусто')));
                 }
             });
+    }
+    
+    modal.on('show.bs.modal', function() {
+        
+        $('#create-relation-form')[0].reset();
+        relationList.empty().prop('disabled', true);
+        relatedEntityList.empty().prop('disabled', true);
+        
+        $('#neosliderelationsform-slide_id', this).val(StoryEditor.getCurrentSlideID());
+        
+        resetSelect(entityList, 'Загрузка...');
+        Neo.getEntities().done(function(data) {
+            resetSelect(entityList, 'Выберите сущность');
+            fillSelect(data, entityList);
+        });
+        
+        loadRelations();
     });
     
     $('#create-relation-form').submit(function(e) {
@@ -182,7 +186,7 @@ $js = <<<JS
             if (data) {
                 if (data.success) {
                     toastr.success('Успешно');
-                    modal.modal('hide');
+                    loadRelations();
                 }
                 else {
                     toastr.error(JSON.stringify(data.errors));
