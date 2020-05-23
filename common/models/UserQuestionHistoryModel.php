@@ -5,6 +5,7 @@ namespace common\models;
 
 
 use yii\base\Model;
+use yii\db\Query;
 
 class UserQuestionHistoryModel extends Model
 {
@@ -18,6 +19,12 @@ class UserQuestionHistoryModel extends Model
     public $relation_id;
     public $relation_name;
     public $correct_answer;
+
+    public function __construct($userID, $config = [])
+    {
+        $this->user_id = $userID;
+        parent::__construct($config);
+    }
 
     public function rules()
     {
@@ -40,12 +47,26 @@ class UserQuestionHistoryModel extends Model
             $this->slide_id,
             $this->question_topic_id,
             $this->question_topic_name,
-            $this->entity_id, $this->entity_name,
+            $this->entity_id,
+            $this->entity_name,
             $this->relation_id,
             $this->relation_name,
             $this->correct_answer
         );
         $model->save();
+    }
+
+    public function getUserQuestionHistory()
+    {
+        $topicID = 1;
+        return (new Query())
+            ->select(['entity_id', 'relation_id'])
+            ->distinct(true)
+            ->from(UserQuestionHistory::tableName())
+            ->where('user_id = :user', [':user' => $this->user_id])
+            ->andWhere('question_topic_id = :topic', [':topic' => $topicID])
+            ->andWhere('correct_answer = 1')
+            ->all();
     }
 
 }

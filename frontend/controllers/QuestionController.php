@@ -14,7 +14,10 @@ class QuestionController extends Controller
 
     public function actionGet(int $questionId, int $questionsNumber, int $answersNumber)
     {
-
+        $userHistory = [];
+        if (!Yii::$app->user->isGuest) {
+            $userHistory = (new UserQuestionHistoryModel(Yii::$app->user->id))->getUserQuestionHistory();
+        }
         $curl = new Curl();
         $result = $curl
             ->setHeader('Accept', 'application/json')
@@ -24,6 +27,7 @@ class QuestionController extends Controller
                 CURLOPT_SSL_VERIFYHOST => false,
             ])
             ->setGetParams(['id' => $questionId, 'number' => $questionsNumber, 'answers' => $answersNumber])
+            ->setPostParams(['history' => Json::encode($userHistory)])
             ->get(Yii::$app->params['neo.url'] . '/api/question/get');
         $result = Json::decode($result);
 
@@ -74,8 +78,7 @@ class QuestionController extends Controller
 
     public function actionAnswer()
     {
-        $model = new UserQuestionHistoryModel();
-        $model->user_id = Yii::$app->user->id;
+        $model = new UserQuestionHistoryModel(Yii::$app->user->id);
         if ($model->load(Yii::$app->request->post(), '') && $model->validate()) {
             $model->createUserQuestionHistory();
         }
