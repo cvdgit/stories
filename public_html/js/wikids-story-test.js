@@ -35,6 +35,47 @@ var WikidsStoryTest = function() {
         dom.wrapper.empty();
     }
 
+    var QuestionsRepeat = function(questions) {
+        this.items = questions.map(function(currentValue) {
+            return {"entity_id": currentValue.entity_id, "number": 5};
+        });
+    };
+
+    QuestionsRepeat.prototype.getItems = function() {
+        return this.items;
+    };
+
+    QuestionsRepeat.prototype.findItem = function(id) {
+        var currentItem;
+        this.items.forEach(function(item) {
+            if (parseInt(item.entity_id) === parseInt(id)) {
+                currentItem = item;
+                return;
+            }
+        });
+        return currentItem;
+    };
+
+    QuestionsRepeat.prototype.inc = function(id) {
+        var item = this.findItem(id);
+        item.number++;
+    };
+
+    QuestionsRepeat.prototype.dec = function(id) {
+        var item = this.findItem(id);
+        item.number--;
+    };
+
+    QuestionsRepeat.prototype.done = function(id) {
+        var item = this.findItem(id);
+        return parseInt(item.number) <= 0;
+    };
+
+    QuestionsRepeat.prototype.number = function(id) {
+        var number = 5 - this.findItem(id).number;
+        return number < 0 ? 0 : number;
+    };
+
     function load(data, for_slide) {
 
         testData = data[0];
@@ -46,9 +87,7 @@ var WikidsStoryTest = function() {
 
         questions = getQuestionsData();
 
-        questionsRepeat = questions.map(function(currentValue, index, array) {
-            return {"entity_id": currentValue.entity_id, "number": 5};
-        });
+        questionsRepeat = new QuestionsRepeat(questions);
 
         setupDOM();
         addEventListeners();
@@ -175,15 +214,40 @@ var WikidsStoryTest = function() {
         return $wrapper;
     }
 
+    function appendStars($elem, total, current) {
+        $elem.empty();
+        for (var i = 0, $star, className; i < total; i++) {
+            $star = $('<i/>');
+            className = 'star-empty';
+            if (i + 1 <= current) {
+                className = 'star';
+            }
+            $star.addClass('glyphicon glyphicon-' + className);
+            $star.appendTo($elem);
+        }
+    }
+
+    function createStars(total, current) {
+        var $elem = $('<p/>');
+        $elem.addClass('question-stars');
+        $elem.css('textAlign', 'right');
+        appendStars($elem, total, current);
+        return $elem[0].outerHTML;
+    }
+
     function createQuestion(question) {
         var questionName = question.name;
         if (question['correct_number'] && question.correct_number > 1) {
             questionName += ' (верных ответов: ' + question.correct_number + ')';
         }
+        var stars = '';
+        if (question['stars']) {
+            stars = createStars(question.stars.total, question.stars.current);
+        }
         return $("<div/>")
             .hide()
             .addClass("wikids-test-question")
-            .html('<p class="question-title">' + questionName + '</p>')
+            .html('<p class="question-title">' + questionName + '</p>' + stars)
             .attr("data-question-id", question.id)
             .data("question", question);
     }
@@ -319,6 +383,11 @@ var WikidsStoryTest = function() {
         return currentQuestion;
     }
 
+    function updateStars($question, current) {
+        var $stars = $('.question-stars', $question);
+        appendStars($stars, 5, current);
+    }
+
     /* Ответ на вопрос */
     function nextQuestion() {
 
@@ -332,13 +401,20 @@ var WikidsStoryTest = function() {
         currentQuestion = $activeQuestion.data('question');
 
         if (answerIsCorrect) {
-            skipQuestion.push(currentQuestion.id);
+            //skipQuestion.push(currentQuestion.id);
+            questionsRepeat.dec(currentQuestion.entity_id);
+        }
+        else {
         }
 
-        if (!answerIsCorrect) {
+        updateStars($activeQuestion, questionsRepeat.number(currentQuestion.entity_id));
+
+        //console.log(answerIsCorrect, questionsRepeat.done(currentQuestion.entity_id));
+        if (!answerIsCorrect || !questionsRepeat.done(currentQuestion.entity_id)) {
             questions.push(currentQuestion);
         }
 
+        //console.log(questions);
         //console.log(currentQuestion.name, answerIsCorrect);
 
         $activeQuestion
