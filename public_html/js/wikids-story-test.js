@@ -73,9 +73,18 @@ var WikidsStoryTest = function() {
 
     QuestionsRepeat.prototype.number = function(id) {
         var number = 5 - this.findItem(id).number;
-        console.log(number);
         return number < 0 ? 0 : number;
     };
+
+    var stars = [];
+
+    function loadStars(questions) {
+        questions.forEach(function(question) {
+            if (question['stars']) {
+                stars[question.entity_id] = question.stars;
+            }
+        });
+    }
 
     function load(data, for_slide) {
 
@@ -88,6 +97,7 @@ var WikidsStoryTest = function() {
 
         questions = getQuestionsData();
 
+        loadStars(questions);
         questionsRepeat = new QuestionsRepeat(questions);
 
         setupDOM();
@@ -228,11 +238,11 @@ var WikidsStoryTest = function() {
         }
     }
 
-    function createStars(total, current) {
+    function createStars(id) {
         var $elem = $('<p/>');
         $elem.addClass('question-stars');
         $elem.css('textAlign', 'right');
-        appendStars($elem, total, current);
+        appendStars($elem, stars[id].total, stars[id].current);
         return $elem[0].outerHTML;
     }
 
@@ -243,7 +253,7 @@ var WikidsStoryTest = function() {
         }
         var stars = '';
         if (question['stars']) {
-            stars = createStars(question.stars.total, question.stars.current);
+            stars = createStars(question.entity_id);
         }
         return $("<div/>")
             .hide()
@@ -415,7 +425,6 @@ var WikidsStoryTest = function() {
             questions.push(currentQuestion);
         }
 
-        console.log(questionsRepeat.getItems());
         //console.log(questions);
         //console.log(currentQuestion.name, answerIsCorrect);
 
