@@ -76,6 +76,11 @@ var WikidsStoryTest = function() {
         return number < 0 ? 0 : number;
     };
 
+    QuestionsRepeat.prototype.stars = function(id) {
+        var number = this.number(id);
+        return number;
+    };
+
     var stars = [];
 
     function loadStars(questions) {
@@ -242,7 +247,7 @@ var WikidsStoryTest = function() {
         var $elem = $('<p/>');
         $elem.addClass('question-stars');
         $elem.css('textAlign', 'right');
-        appendStars($elem, stars[id].total, stars[id].current);
+        appendStars($elem, 5, questionsRepeat.stars(id));
         return $elem[0].outerHTML;
     }
 
