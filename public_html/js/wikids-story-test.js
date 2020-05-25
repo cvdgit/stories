@@ -73,6 +73,7 @@ var WikidsStoryTest = function() {
 
     QuestionsRepeat.prototype.number = function(id) {
         var number = 5 - this.findItem(id).number;
+        console.log(number);
         return number < 0 ? 0 : number;
     };
 
