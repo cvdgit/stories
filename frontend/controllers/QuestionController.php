@@ -57,6 +57,11 @@ class QuestionController extends Controller
                 'relation_name' => $resultItem['question_relation_name'],
                 'topic_id' => $resultItem['question_topic_id'],
                 'topic_name' => $resultItem['question_topic_name'],
+                'correct_number' => $resultItem['correct_number'],
+                'stars' => [
+                    'total' => 5,
+                    'current' => 0,
+                ]
             ];
             $questions[] = $question;
             $i++;

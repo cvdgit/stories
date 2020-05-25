@@ -47,7 +47,7 @@ var WikidsStoryTest = function() {
         questions = getQuestionsData();
 
         questionsRepeat = questions.map(function(currentValue, index, array) {
-            return {'entity_id': currentValue.entity_id, 'number': 5};
+            return {"entity_id": currentValue.entity_id, "number": 5};
         });
 
         setupDOM();
@@ -176,10 +176,14 @@ var WikidsStoryTest = function() {
     }
 
     function createQuestion(question) {
+        var questionName = question.name;
+        if (question['correct_number'] && question.correct_number > 1) {
+            questionName += ' (верных ответов: ' + question.correct_number + ')';
+        }
         return $("<div/>")
             .hide()
             .addClass("wikids-test-question")
-            .html('<p class="question-title">' + question.name + '</p>')
+            .html('<p class="question-title">' + questionName + '</p>')
             .attr("data-question-id", question.id)
             .data("question", question);
     }
