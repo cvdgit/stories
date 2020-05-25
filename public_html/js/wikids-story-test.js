@@ -414,6 +414,7 @@ var WikidsStoryTest = function() {
             questions.push(currentQuestion);
         }
 
+        console.log(questionsRepeat.getItems());
         //console.log(questions);
         //console.log(currentQuestion.name, answerIsCorrect);
 
