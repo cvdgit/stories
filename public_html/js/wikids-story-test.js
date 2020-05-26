@@ -36,8 +36,12 @@ var WikidsStoryTest = function() {
     }
 
     var QuestionsRepeat = function(questions) {
-        this.items = questions.map(function(currentValue) {
-            return {"entity_id": currentValue.entity_id, "number": 5};
+        this.items = questions.map(function(question) {
+            var number = 1;
+            if (question['stars']) {
+                number = question.stars.total - question.stars.current;
+            }
+            return {"entity_id": question.entity_id, "number": number};
         });
     };
 

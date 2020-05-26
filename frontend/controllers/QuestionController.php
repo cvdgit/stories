@@ -15,8 +15,11 @@ class QuestionController extends Controller
     public function actionGet(int $questionId, int $questionsNumber, int $answersNumber)
     {
         $userHistory = [];
+        $userStars = [];
         if (!Yii::$app->user->isGuest) {
-            $userHistory = (new UserQuestionHistoryModel(Yii::$app->user->id))->getUserQuestionHistory();
+            $userQuestionHistoryModel = new UserQuestionHistoryModel(Yii::$app->user->id);
+            $userHistory = $userQuestionHistoryModel->getUserQuestionHistory();
+            $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStars();
         }
         $curl = new Curl();
         $result = $curl
@@ -44,6 +47,10 @@ class QuestionController extends Controller
                 ];
                 $answers[] = $answer;
             }
+            $stars = 0;
+            if (isset($userStars[$resultItem['question_entity_id']])) {
+                $stars = $userStars[$resultItem['question_entity_id']]['stars'];
+            }
             $question = [
                 'id' => $i,
                 'name' => $resultItem['question'],
@@ -60,7 +67,7 @@ class QuestionController extends Controller
                 'correct_number' => $resultItem['correct_number'],
                 'stars' => [
                     'total' => 5,
-                    'current' => 0,
+                    'current' => $stars,
                 ]
             ];
             $questions[] = $question;
