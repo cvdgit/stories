@@ -405,8 +405,12 @@ var WikidsStoryTest = function() {
         currentQuestion = $activeQuestion.data('question');
 
         if (answerIsCorrect) {
-            //skipQuestion.push(currentQuestion.id);
-            questionsRepeat.dec(currentQuestion.entity_id);
+            if (currentQuestion['stars']) {
+                questionsRepeat.dec(currentQuestion.entity_id);
+            }
+            else {
+                skipQuestion.push(currentQuestion.id);
+            }
         }
         else {
         }
