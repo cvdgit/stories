@@ -81,16 +81,6 @@ var WikidsStoryTest = function() {
         return number;
     };
 
-    var stars = [];
-
-    function loadStars(questions) {
-        questions.forEach(function(question) {
-            if (question['stars']) {
-                stars[question.entity_id] = question.stars;
-            }
-        });
-    }
-
     function load(data, for_slide) {
 
         testData = data[0];
@@ -101,8 +91,6 @@ var WikidsStoryTest = function() {
         }
 
         questions = getQuestionsData();
-
-        loadStars(questions);
         questionsRepeat = new QuestionsRepeat(questions);
 
         setupDOM();
@@ -423,11 +411,20 @@ var WikidsStoryTest = function() {
         else {
         }
 
-        updateStars($activeQuestion, questionsRepeat.number(currentQuestion.entity_id));
+        if (currentQuestion['stars']) {
+            updateStars($activeQuestion, questionsRepeat.number(currentQuestion.entity_id));
+        }
 
         //console.log(answerIsCorrect, questionsRepeat.done(currentQuestion.entity_id));
-        if (!answerIsCorrect || !questionsRepeat.done(currentQuestion.entity_id)) {
-            questions.push(currentQuestion);
+        if (remoteTest) {
+            if (!answerIsCorrect || !questionsRepeat.done(currentQuestion.entity_id)) {
+                questions.push(currentQuestion);
+            }
+        }
+        else {
+            if (!answerIsCorrect) {
+                questions.push(currentQuestion);
+            }
         }
 
         //console.log(questions);
