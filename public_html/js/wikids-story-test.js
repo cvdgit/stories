@@ -541,7 +541,7 @@ var WikidsStoryTest = function() {
         setupDOM();
         addEventListeners();
         start();
-console.log(stars);
+
         var elem = $("div.new-questions", WikidsPlayer.getCurrentSlide());
         elem.html(dom.wrapper);
     }
