@@ -36,7 +36,14 @@ return [
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
-                'v1/stories' => 'v1/story/index',
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/story',
+                    'tokens' => [
+                        '{id}' => '<id:\w+>'
+                    ],
+                    'only' => ['index'],
+                ],
             ]
         ]
     ],

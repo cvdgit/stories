@@ -4,14 +4,11 @@
 namespace api\modules\v1\controllers;
 
 
-use yii\rest\Controller;
+use yii\rest\ActiveController;
 
-class StoryController extends Controller
+class StoryController extends ActiveController
 {
 
-    public function actionIndex()
-    {
-        return ['hello' => 'world'];
-    }
+    public $modelClass = 'api\modules\v1\models\Story';
 
 }
