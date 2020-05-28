@@ -42,7 +42,7 @@ return [
                     'tokens' => [
                         '{id}' => '<id:\w+>'
                     ],
-                    'only' => ['index'],
+                    'only' => ['index', 'view'],
                 ],
             ]
         ]
