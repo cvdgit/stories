@@ -4,17 +4,26 @@
 namespace api\modules\v1\controllers;
 
 use api\modules\v1\models\Story;
-use yii\data\ActiveDataProvider;
-use yii\rest\Controller;
+use api\modules\v1\models\StorySearch;
+use Yii;
+use yii\rest\ActiveController;
 
-class StoryController extends Controller
+class StoryController extends ActiveController
 {
 
-    public function actionIndex()
+    public $modelClass = Story::class;
+
+    public function actions()
     {
-        return new ActiveDataProvider([
-            'query' => Story::find(),
-        ]);
+        $actions = parent::actions();
+        $actions['index']['prepareDataProvider'] = [$this, 'prepareDataProvider'];
+        return $actions;
+    }
+
+    public function prepareDataProvider()
+    {
+        $search = new StorySearch();
+        return $search->search(Yii::$app->request->getQueryParams());
     }
 
 }
