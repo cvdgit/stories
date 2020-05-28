@@ -3,6 +3,7 @@
 
 namespace api\modules\v1\models;
 
+use common\helpers\Url;
 use yii\db\ActiveRecord;
 
 class Story extends ActiveRecord
@@ -18,6 +19,13 @@ class Story extends ActiveRecord
         return [
             'id',
             'title',
+            'cover' => function() {
+                $url = '';
+                if ($this->cover !== null) {
+                    $url = Url::homeUrl() . '/slides_cover/list/' . $this->cover;
+                }
+                return $url;
+            }
         ];
     }
 
