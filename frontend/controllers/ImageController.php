@@ -29,7 +29,7 @@ class ImageController extends Controller
 
         $response = Yii::$app->response;
         $response->format = Response::FORMAT_RAW;
-        $response->headers->add('content-type', 'image/jpg');
+        $response->headers->add('content-type', 'image/jpeg');
         try {
             $img_data = file_get_contents(Yii::getAlias('@public/admin/upload/') . $image->folder . '/' . $image->hash . '.jpeg');
         }
