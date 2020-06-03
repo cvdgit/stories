@@ -65,7 +65,7 @@ class AuthController extends Controller
             return $this->goHome();
         }
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        if (Yii::$app->request->isAjax) {
+        //if (Yii::$app->request->isAjax) {
             $form = new LoginForm();
             if ($form->load(Yii::$app->request->post()) && $form->validate()) {
                 try {
@@ -80,7 +80,7 @@ class AuthController extends Controller
             else {
                 return ['success' => false, 'message' => $form->errors];
             }
-        }
+        //}
         return ['success' => false, 'message' => ['']];
     }
 
