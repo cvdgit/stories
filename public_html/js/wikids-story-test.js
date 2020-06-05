@@ -13,6 +13,7 @@ var WikidsStoryTest = function() {
         skipQuestion = [],
         questions = [],
         questionsRepeat = [];
+    var questionAnswers = {};
 
     function getTestData() {
         return testData;
@@ -222,6 +223,48 @@ var WikidsStoryTest = function() {
         return $wrapper;
     }
 
+    function createSvgAnswer(question, answers) {
+        var $object = $('<object/>')
+            .attr({
+                data: '/upload/Continents.svg',
+                type: 'image/svg+xml',
+                id: 'svg' + question.id
+            })
+            .css('width', '100%');
+        var getAnswersIDs = function(dom) {
+            var answers = [];
+            $('.continent.selected', dom).each(function() {
+                var id = $(this).attr('id');
+                answers.push(id);
+            });
+            return answers;
+        }
+        $object[0].addEventListener('load', function() {
+            var svgDOM = $object[0].contentDocument;
+            $('.continent', svgDOM).on('click', function() {
+                if ($(this).hasClass('selected')) {
+                    $(this).removeClass('selected');
+                }
+                else {
+                    if (parseInt(question.correct_number) === 1) {
+                        $('.selected', svgDOM).removeClass('selected');
+                    }
+                    $(this).addClass('selected');
+                }
+                questionAnswers['q' + question.id] = getAnswersIDs(svgDOM);
+            });
+        }, true);
+        return $object;
+    }
+
+    function createSvgAnswers(question, answers) {
+        var $answers = $("<div/>").addClass("wikids-test-answers");
+        $answers.append(createSvgAnswer(question, answers));
+        var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-4 question-image"></div><div class="col-md-8 question-wrapper"></div></div>');
+        $wrapper.find(".question-wrapper").append($answers);
+        return $wrapper;
+    }
+
     function appendStars($elem, total, current) {
         $elem.empty();
         for (var i = 0, $star, className; i < total; i++) {
@@ -263,9 +306,21 @@ var WikidsStoryTest = function() {
     function createQuestions(questions) {
         var $questions = $("<div/>").addClass("wikids-test-questions");
         questions.forEach(function(question) {
+
             var $question = createQuestion(question);
-            var $answers = createAnswers(getAnswersData(question), question.type, question.mix_answers);
+
+            var view = question['view'] ? question.view : '';
+            var $answers;
+
+            if (view === 'svg') {
+                $answers = createSvgAnswers(question, getAnswersData(question));
+            }
+            else {
+                $answers = createAnswers(getAnswersData(question), question.type, question.mix_answers);
+            }
+
             $answers.appendTo($question);
+
             if (question.image) {
                 $('<img/>').attr("src", question.image).appendTo($(".question-image", $question));
             }
@@ -296,17 +351,27 @@ var WikidsStoryTest = function() {
             .append($("<p/>").text(test.description));
     }
 
+    function questionIsVisible() {
+        var object = $('object', this);
+        if (object.length) {
+            var domSVG = object.contents();
+            $('.continent', domSVG).removeClass('selected');
+        }
+    }
+
     function start() {
 
         correctAnswersNumber = 0;
         currentQuestionIndex = 0;
 
-        var nextQuestion = questions.shift();
+/*        var nextQuestion = questions.shift();
         var $question = $('.wikids-test-question[data-question-id=' + nextQuestion.id + ']', dom.questions);
         $question
             .find('input[type=checkbox]').prop('checked', false).end()
-            .show()
-            .addClass("wikids-test-active-question");
+            .show(1, function() { $(this).trigger('isVisible'); })
+            .on('isVisible', questionIsVisible)
+            .addClass("wikids-test-active-question");*/
+        showNextQuestion();
 
         dom.results.hide();
         dom.nextButton.show();
@@ -384,6 +449,33 @@ var WikidsStoryTest = function() {
         return answer;
     }
 
+    function getSvgQuestionAnswers(question) {
+        if (questionAnswers.length === 0) {
+            return [];
+        }
+        var questionAnswerNames = [];
+        $.each(questionAnswers, function(key, value) {
+            var questionID = key.replace(/\D+/, '');
+            if (parseInt(questionID) === parseInt(question.id)) {
+                questionAnswerNames = value;
+                return;
+            }
+        });
+        var answers = [];
+        if (questionAnswerNames.length > 0) {
+            var questionParams = question.svg.params;
+            questionAnswerNames.forEach(function (answerName) {
+                var param = questionParams.filter(function (value) {
+                    return (value.param_name === answerName);
+                });
+                if (param.length > 0) {
+                    answers.push(param[0].entity_id);
+                }
+            });
+        }
+        return answers;
+    }
+
     var answerIsCorrect,
         currentQuestion;
 
@@ -400,14 +492,22 @@ var WikidsStoryTest = function() {
     function nextQuestion() {
 
         var $activeQuestion = $('.wikids-test-active-question');
-        var answer = getQuestionAnswers($activeQuestion);
+        currentQuestion = $activeQuestion.data('question');
+
+        var answer = [];
+        var view = currentQuestion['view'] ? currentQuestion.view : '';
+        if (view === 'svg') {
+            answer = getSvgQuestionAnswers(currentQuestion);
+        }
+        else {
+            answer = getQuestionAnswers($activeQuestion);
+        }
+
         if (answer.length === 0) {
             return;
         }
 
         answerIsCorrect = answerQuestion($activeQuestion, answer);
-        currentQuestion = $activeQuestion.data('question');
-
         if (answerIsCorrect) {
             if (currentQuestion['stars']) {
                 questionsRepeat.dec(currentQuestion.entity_id);
@@ -468,7 +568,8 @@ var WikidsStoryTest = function() {
         $('.wikids-test-question[data-question-id=' + nextQuestion.id + ']', dom.questions)
             .find('input[type=checkbox],input[type=radio]').prop('checked', false).end()
             .addClass('wikids-test-active-question')
-            .show();
+            .show(1, function() { $(this).trigger('isVisible'); })
+            .on('isVisible', questionIsVisible);
     }
 
     function continueTestAction() {

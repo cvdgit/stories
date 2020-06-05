@@ -37,6 +37,7 @@ class QuestionController extends Controller
         $questions = [];
         $i = 1;
         foreach ($result as $resultItem) {
+
             $answers = [];
             foreach ($resultItem['answers'] as $_answer) {
                 $answer = [
@@ -47,10 +48,14 @@ class QuestionController extends Controller
                 ];
                 $answers[] = $answer;
             }
+
             $stars = 0;
             if (isset($userStars[$resultItem['question_entity_id']])) {
                 $stars = $userStars[$resultItem['question_entity_id']]['stars'];
             }
+
+            $svg = $resultItem['question_svg'] ?? [];
+
             $question = [
                 'id' => $i,
                 'name' => $resultItem['question'],
@@ -68,7 +73,9 @@ class QuestionController extends Controller
                 'stars' => [
                     'total' => 5,
                     'current' => $stars,
-                ]
+                ],
+                'view' => 'svg',
+                'svg' => $svg,
             ];
             $questions[] = $question;
             $i++;
