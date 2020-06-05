@@ -226,7 +226,7 @@ var WikidsStoryTest = function() {
     function createSvgAnswer(question, answers) {
         var $object = $('<object/>')
             .attr({
-                data: '/upload/Continents.svg',
+                data: '/upload/Continents.svg?t=' + (new Date().getMilliseconds()),
                 type: 'image/svg+xml',
                 id: 'svg' + question.id
             })
