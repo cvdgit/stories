@@ -158,7 +158,7 @@ class StoryStatisticsSearch extends StoryStatistics
             ->select(['a.date AS date', 'SUM(a.views) AS views'])
             ->from(['a' => $query])
             ->groupBy('a.date')
-            ->orderBy(['a.date' => SORT_ASC])
+            ->orderBy(['date' => SORT_DESC])
             ->indexBy('date')
             ->all();
         return [
