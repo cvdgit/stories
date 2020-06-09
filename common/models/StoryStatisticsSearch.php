@@ -146,19 +146,20 @@ class StoryStatisticsSearch extends StoryStatistics
             ->from('{{%story_statistics}}')
             ->where(new Expression('`created_at` >= UNIX_TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL -10 DAY))'))
             ->andWhere(new Expression('`created_at` <= UNIX_TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 1 DAY))'))
-            ->groupBy(new Expression('DATE_FORMAT(FROM_UNIXTIME(`created_at`),\'%d-%m-%Y\')'));
+            ->groupBy(new Expression('DATE_FORMAT(FROM_UNIXTIME(`created_at`),\'%d-%m-%Y\')'))
+            ->orderBy(['created_at' => SORT_ASC]);
         $query2 = (new Query())
             ->select(['DATE_FORMAT(FROM_UNIXTIME(`created_at`),\'%d-%m-%Y\') AS date', 'COUNT(DISTINCT `story_id`) AS views'])
             ->from('{{%story_readonly_statistics}}')
             ->where(new Expression('`created_at` >= UNIX_TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL -10 DAY))'))
             ->andWhere(new Expression('`created_at` <= UNIX_TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 1 DAY))'))
-            ->groupBy(new Expression('DATE_FORMAT(FROM_UNIXTIME(`created_at`),\'%d-%m-%Y\')'));
+            ->groupBy(new Expression('DATE_FORMAT(FROM_UNIXTIME(`created_at`),\'%d-%m-%Y\')'))
+            ->orderBy(['created_at' => SORT_ASC]);
         $query->union($query2, true);
         $data = (new Query())
             ->select(['a.date AS date', 'SUM(a.views) AS views'])
             ->from(['a' => $query])
             ->groupBy('a.date')
-            ->orderBy(['date' => SORT_DESC])
             ->indexBy('date')
             ->all();
         return [
