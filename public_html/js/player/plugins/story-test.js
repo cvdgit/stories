@@ -177,6 +177,7 @@ var Education = (function() {
         if (!elem.length) {
             return;
         }
+        elem.html($('<img/>').attr('src', '/img/loading.gif').css('marginTop', '22%'));
         loadQuestionData(elem.data())
             .done(function(data) {
                 WikidsStoryTest.init(true);

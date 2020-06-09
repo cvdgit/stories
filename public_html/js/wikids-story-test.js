@@ -118,7 +118,7 @@ var WikidsStoryTest = function() {
         dom.questions = createQuestions(getQuestionsData());
         dom.controls = createControls();
         dom.nextButton = $("<button/>")
-            .addClass("wikids-test-next")
+            .addClass("btn wikids-test-next")
             .text('Следующий вопрос')
             .appendTo($(".wikids-test-buttons", dom.controls));
         dom.finishButton = $("<button/>")
@@ -364,13 +364,6 @@ var WikidsStoryTest = function() {
         correctAnswersNumber = 0;
         currentQuestionIndex = 0;
 
-/*        var nextQuestion = questions.shift();
-        var $question = $('.wikids-test-question[data-question-id=' + nextQuestion.id + ']', dom.questions);
-        $question
-            .find('input[type=checkbox]').prop('checked', false).end()
-            .show(1, function() { $(this).trigger('isVisible'); })
-            .on('isVisible', questionIsVisible)
-            .addClass("wikids-test-active-question");*/
         showNextQuestion();
 
         dom.results.hide();
@@ -538,16 +531,6 @@ var WikidsStoryTest = function() {
         //console.log(questions);
         //console.log(currentQuestion.name, answerIsCorrect);
 
-        $activeQuestion
-            .hide()
-            .removeClass('wikids-test-active-question');
-
-        dom.results
-            .html("<p>Ответ " + (answerIsCorrect ? "" : "не ") + "верный.</p>")
-            .show();
-        dom.nextButton.hide();
-        dom.continueButton.show();
-
         if (remoteTest && !App.userIsGuest()) {
             var answerParams = {
                 'slide_id': WikidsPlayer.getCurrentSlideID(),
@@ -561,6 +544,24 @@ var WikidsStoryTest = function() {
             };
             $.post('/question/answer', answerParams);
         }
+
+        $activeQuestion
+            .slideUp()
+            .hide()
+            .removeClass('wikids-test-active-question');
+
+        dom.nextButton.hide();
+        if (!answerIsCorrect) {
+            dom.results
+                .html("<p>Ответ " + (answerIsCorrect ? "" : "не ") + "верный.</p>")
+                .show()
+                .delay(1000)
+                .fadeOut('slow', continueTestAction);
+        }
+        else {
+            continueTestAction();
+        }
+        //dom.continueButton.show();
     }
 
     function showNextQuestion() {
@@ -568,7 +569,8 @@ var WikidsStoryTest = function() {
         $('.wikids-test-question[data-question-id=' + nextQuestion.id + ']', dom.questions)
             .find('input[type=checkbox],input[type=radio]').prop('checked', false).end()
             .addClass('wikids-test-active-question')
-            .show(1, function() { $(this).trigger('isVisible'); })
+            .slideDown(function() { $(this).trigger('isVisible'); })
+            //.show('fast', 'linear', )
             .on('isVisible', questionIsVisible);
     }
 
