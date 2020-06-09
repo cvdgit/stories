@@ -161,7 +161,13 @@ class StoryStatisticsSearch extends StoryStatistics
             ->orderBy(['stat_date' => SORT_ASC])
             ->indexBy('stat_date')
             ->all();
-        ksort($data);
+
+        uksort($data, function ($dt1, $dt2) {
+            $tm1 = strtotime($dt1);
+            $tm2 = strtotime($dt2);
+            return ($tm1 < $tm2) ? -1 : (($tm1 > $tm2) ? 1 : 0);
+        });
+
         return [
             'labels' => array_keys($data),
             'data' => array_values(array_map(function($elem) { return $elem['views']; }, $data)),
