@@ -67,6 +67,7 @@ var TransitionSlide = (function() {
     function backToStory(callback) {
         if (stack.length > 0) {
             var state = stack.shift();
+            $(".reveal .slides").empty().html($('<img/>').attr('src', '/img/loading.gif').css('marginTop', '22%'));
             getStoryData(state.story_id)
                 .done(function(data) {
                     syncReveal(data.html, state.slide_index);
