@@ -501,15 +501,23 @@ var WikidsStoryTest = function() {
         }
 
         answerIsCorrect = answerQuestion($activeQuestion, answer);
+        //console.log(currentQuestion.id, currentQuestion.lastAnswerIsCorrect);
+
         if (answerIsCorrect) {
             if (currentQuestion['stars']) {
-                questionsRepeat.dec(currentQuestion.entity_id);
+                if (currentQuestion.lastAnswerIsCorrect) {
+                    questionsRepeat.dec(currentQuestion.entity_id);
+                }
+                else {
+                    currentQuestion.lastAnswerIsCorrect = true;
+                }
             }
             else {
                 skipQuestion.push(currentQuestion.id);
             }
         }
         else {
+            currentQuestion.lastAnswerIsCorrect = false;
         }
 
         if (currentQuestion['stars']) {
@@ -518,13 +526,18 @@ var WikidsStoryTest = function() {
 
         //console.log(answerIsCorrect, questionsRepeat.done(currentQuestion.entity_id));
         if (remoteTest) {
-            if (!answerIsCorrect || !questionsRepeat.done(currentQuestion.entity_id)) {
-                questions.push(currentQuestion);
+            if (!answerIsCorrect) {
+                questions.unshift(currentQuestion);
+            }
+            else {
+                if (!questionsRepeat.done(currentQuestion.entity_id)) {
+                    questions.push(currentQuestion);
+                }
             }
         }
         else {
             if (!answerIsCorrect) {
-                questions.push(currentQuestion);
+                questions.unshift(currentQuestion);
             }
         }
 
