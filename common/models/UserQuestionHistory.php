@@ -25,6 +25,10 @@ use yii\behaviors\TimestampBehavior;
  */
 class UserQuestionHistory extends \yii\db\ActiveRecord
 {
+
+    public $correct_answers;
+    public $max_created_at;
+
     /**
      * {@inheritdoc}
      */
@@ -60,11 +64,11 @@ class UserQuestionHistory extends \yii\db\ActiveRecord
             'user_id' => 'User ID',
             'slide_id' => 'Slide ID',
             'question_topic_id' => 'Question Topic ID',
-            'question_topic_name' => 'Question Topic Name',
+            'question_topic_name' => 'Вопрос',
             'entity_id' => 'Entity ID',
-            'entity_name' => 'Entity Name',
+            'entity_name' => 'Сущность',
             'relation_id' => 'Relation ID',
-            'relation_name' => 'Relation Name',
+            'relation_name' => 'Отношение',
             'correct_answer' => 'Correct Answer',
             'created_at' => 'Created At',
         ];

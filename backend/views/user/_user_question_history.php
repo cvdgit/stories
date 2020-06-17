@@ -1,4 +1,6 @@
 <?php
+
+use backend\widgets\grid\StarColumn;
 use yii\grid\GridView;
 /** @var $this yii\web\View */
 /** @var $model common\models\User */
@@ -9,12 +11,14 @@ use yii\grid\GridView;
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'columns' => [
-                'id',
                 'question_topic_name',
                 'entity_name',
                 'relation_name',
-                'correct_answer',
-                'created_at:datetime',
+                [
+                    'attribute' => 'correct_answers',
+                    'label' => 'Прогресс',
+                    'class' => StarColumn::class,
+                ],
             ],
         ]) ?>
     </div>
