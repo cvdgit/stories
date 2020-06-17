@@ -8,11 +8,13 @@ use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\reader\PowerPointReader;
 use backend\components\story\writer\HTMLWriter;
 use backend\models\SourcePowerPointForm;
+use common\models\NotificationModel;
 use common\models\Story;
 use common\models\StorySlide;
 use DomainException;
 use frontend\models\SlideAudio;
 use http\Exception\RuntimeException;
+use backend\components\notification\NewStoryNotification;
 use yii;
 use yii\helpers\Url;
 
@@ -21,9 +23,11 @@ class StoryService
 
 	protected $dropboxSerivce;
     protected $powerPointService;
+    protected $notificationService;
 
-	public function __construct()
+	public function __construct(NotificationService $notificationService)
 	{
+	    $this->notificationService = $notificationService;
 		$this->dropboxSerivce = new StoryDropboxService();
         $this->powerPointService = new StoryPowerPointService();
 	}
@@ -150,13 +154,16 @@ class StoryService
             throw new DomainException('В истории отсутствуют слайды');
         }
 
-        if ($model->submitPublicationTask()) {
-            Yii::$app->queue->push(new PublishStoryJob([
-                'storyID' => $model->id,
-            ]));
-        }
+        if ($model->submitPublicationTask() && $model->publishStory()) {
 
-        $model->publishStory();
+            /*            Yii::$app->queue->push(new PublishStoryJob([
+            'storyID' => $model->id,
+        ]));*/
+
+            $notification = new NotificationModel();
+            $notification->text = (new NewStoryNotification($model))->render();
+            $this->notificationService->sendToAllUsers($notification);
+        }
     }
 
     public function unPublishStory(Story $model): void

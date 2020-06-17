@@ -31,6 +31,7 @@ use yii\web\IdentityInterface;
  * @property Payment[] $payments
  * @property Profile $profile
  * @property Story[] $stories
+ * @property Notification[] $notifications
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -60,6 +61,11 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             TimestampBehavior::class,
         ];
+    }
+
+    public static function find()
+    {
+        return new UserQuery(static::class);
     }
 
     /**
@@ -359,6 +365,30 @@ class User extends ActiveRecord implements IdentityInterface
         if (!Yii::$app->user->isGuest) {
             self::updateAll(['last_activity' => time()], 'id = :id', [':id' => Yii::$app->user->id]);
         }
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getNotifications()
+    {
+        return $this->hasMany(Notification::class, ['id' => 'notification_id'])
+            ->viaTable('user_notification', ['user_id' => 'id']);
+    }
+
+    public function getUnreadUserNotificationCount()
+    {
+        return $this->getNotifications()->unreadCount();
+    }
+
+    public function getUnreadUserNotification()
+    {
+        return $this->getNotifications()->unread()->all();
+    }
+
+    public function getLastUserNotification()
+    {
+        return $this->getNotifications()->last()->all();
     }
 
 }

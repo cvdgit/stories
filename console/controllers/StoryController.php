@@ -46,6 +46,7 @@ class StoryController extends Controller
 		$this->stdout('Done!' . PHP_EOL);
 	}*/
 
+    /*
 	public function actionClearStoryFiles()
     {
 
@@ -88,6 +89,7 @@ class StoryController extends Controller
 
         $this->stdout('Done!' . PHP_EOL);
     }
+    */
 
 /*    public function actionChangeCategories(): void
     {

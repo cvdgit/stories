@@ -86,15 +86,13 @@ AppAsset::register($this);
                         <?php if (Yii::$app->user->isGuest): ?>
                             <div class="user-menu-inner">
                                 <?= Html::a('Регистрация', '#', ['data-toggle' => 'modal', 'data-target' => '#wikids-signup-modal', 'onclick' => "ym(53566996, 'reachGoal', 'show_registration_form'); return true;"]) ?>
-                                <span></span>
+                                <span class="delimiter"></span>
                                 <?= Html::a('Войти', '#', ['class' => 'login-item', 'data-toggle' => 'modal', 'data-target' => '#wikids-login-modal']) ?>
                             </div>
                         <?php else: ?>
-                            <div class="profile-photo pull-right">
-                                <?= Html::img(Yii::$app->user->identity->getProfilePhoto()) ?>
-                            </div>
-                            <div class="dropdown">
-                                <div style="cursor: pointer" data-toggle="dropdown" class="dropdown-toggle"><b class="caret"></b> <?= Yii::$app->user->identity->getProfileName() ?></div>
+                            <?= \frontend\widgets\UserNotification::widget() ?>
+                            <div class="dropdown pull-right">
+                                <div style="cursor: pointer" data-toggle="dropdown" class="dropdown-toggle"><?= Html::img(Yii::$app->user->identity->getProfilePhoto()) ?></div>
                                 <?= Dropdown::widget(['items' => [
                                         ['label' => 'Профиль', 'url' => ['/profile/index']],
                                         ['label' => 'История просмотра', 'url' => ['/story/history']],
@@ -106,7 +104,7 @@ AppAsset::register($this);
                                  Html::endForm(),
                                             'encode' => false,
                                         ],
-                                ], 'options' => ['class' => 'dropdown-menu-right']]) ?>
+                                ], 'options' => ['class' => 'user-menu-dropdown pull-right']]) ?>
                             </div>
                         <?php endif ?>
                         </div>

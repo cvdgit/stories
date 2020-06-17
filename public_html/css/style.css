@@ -66,7 +66,7 @@ section h2 span {
 }
 
 .user-menu-wrapper .dropdown {
-  padding-right: 60px;
+  /*padding-right: 60px;*/
 }
 
 .site-header .user-menu-wrapper,
@@ -82,14 +82,14 @@ section h2 span {
   padding: 0;
 }
 
-.site-header-main .user-menu-wrapper span {
+.site-header-main .user-menu-wrapper .delimiter {
   border-left: 1px #d8dbde solid;
   padding: 7px 0;
   margin: 0 10px;
 }
 
 .site-header-main .dropdown-toggle {
-  margin-top: 16px;
+  margin-top: 4px; /* 16 */
   display: block;
   font-size: .83em;
 }
@@ -112,7 +112,7 @@ section h2 span {
   text-align: left;
 }
 
-.site-header-main .dropdown-menu .dropdown-header {
+.site-header-main .user-menu-dropdown .dropdown-header {
   padding: 0;
 }
 
@@ -2469,4 +2469,8 @@ img.lazy {
     padding: 1.5rem 4rem;
     font-size: 1.6rem;
   }
+}
+
+.label-important, .badge-important {
+  background-color: rgb(204, 0, 0);
 }

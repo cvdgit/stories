@@ -507,13 +507,13 @@ class Story extends ActiveRecord
             ->andWhere('user_id = :user', [':user' => Yii::$app->user->id]);
     }
 
-    public function publishStory()
+    public function publishStory(): bool
     {
         $this->status = self::STATUS_PUBLISHED;
         if ($this->published_at === null) {
             $this->published_at = time();
         }
-        $this->save(false, ['status', 'published_at']);
+        return $this->save(false, ['status', 'published_at']);
     }
 
     public function submitPublicationTask(): bool
