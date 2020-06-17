@@ -92,7 +92,9 @@ AppAsset::register($this);
                         <?php else: ?>
                             <?= \frontend\widgets\UserNotification::widget() ?>
                             <div class="dropdown pull-right">
-                                <div style="cursor: pointer" data-toggle="dropdown" class="dropdown-toggle"><?= Html::img(Yii::$app->user->identity->getProfilePhoto()) ?></div>
+                                <div style="cursor: pointer" data-toggle="dropdown" class="dropdown-toggle profile-photo">
+                                    <?= Html::img(Yii::$app->user->identity->getProfilePhoto()) ?>
+                                </div>
                                 <?= Dropdown::widget(['items' => [
                                         ['label' => 'Профиль', 'url' => ['/profile/index']],
                                         ['label' => 'История просмотра', 'url' => ['/story/history']],
