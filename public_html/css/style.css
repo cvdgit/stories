@@ -964,8 +964,13 @@ section h2 span {
   font-weight: 300;
 }
 
+.story-category-list a {
+  font-weight: 500;
+}
+
 .story-category-list li.active > a {
   color: #99cd50;
+  text-decoration: underline;
 }
 
 .story-category-list li > a:hover {
@@ -1601,6 +1606,7 @@ section h2 span {
 
 .site-sidebar-wrapper h2 {
   font-size: 2rem;
+  font-weight: 600;
 }
 
 .wikids-story-view-book {

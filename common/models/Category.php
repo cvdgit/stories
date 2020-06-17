@@ -196,7 +196,7 @@ class Category extends ActiveRecord
             ->indexBy('category_id')
             ->all();
 
-        $items = $root->toNestedArray(null, 'items', function($node) use ($storyNumbers) {
+        return $root->toNestedArray(null, 'items', function($node) use ($storyNumbers) {
             $storiesInCategory = 0;
             if (isset($storyNumbers[$node->id])) {
                 $storiesInCategory = (int)$storyNumbers[$node->id]['stories_in_category'];
@@ -210,8 +210,6 @@ class Category extends ActiveRecord
             }
             return $item;
         });
-
-        return $items;
     }
 
     public static function categoryArray()
