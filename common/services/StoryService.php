@@ -156,9 +156,9 @@ class StoryService
 
         if ($model->submitPublicationTask() && $model->publishStory()) {
 
-            /*            Yii::$app->queue->push(new PublishStoryJob([
-            'storyID' => $model->id,
-        ]));*/
+            Yii::$app->queue->push(new PublishStoryJob([
+                'storyID' => $model->id,
+            ]));
 
             $notification = new NotificationModel();
             $notification->text = (new NewStoryNotification($model))->render();
