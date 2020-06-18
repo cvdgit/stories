@@ -37,6 +37,7 @@ var WikidsStoryTest = function() {
     }
 
     var QuestionsRepeat = function(questions) {
+        this.starsTotal = 5;
         this.items = questions.map(function(question) {
             var number = 1;
             if (question['stars']) {
@@ -64,6 +65,9 @@ var WikidsStoryTest = function() {
     QuestionsRepeat.prototype.inc = function(id) {
         var item = this.findItem(id);
         item.number++;
+        if (item.number > this.starsTotal) {
+            item.number = this.starsTotal;
+        }
     };
 
     QuestionsRepeat.prototype.dec = function(id) {
@@ -518,7 +522,12 @@ var WikidsStoryTest = function() {
         }
         else {
             currentQuestion.lastAnswerIsCorrect = false;
+            if (currentQuestion['stars']) {
+                questionsRepeat.inc(currentQuestion.entity_id);
+            }
         }
+
+        console.log(questionsRepeat.getItems());
 
         if (currentQuestion['stars']) {
             updateStars($activeQuestion, questionsRepeat.number(currentQuestion.entity_id));

@@ -76,6 +76,7 @@ class QuestionController extends Controller
                 ],
                 'view' => 'svg',
                 'svg' => $svg,
+                'lastAnswerIsCorrect' => true,
             ];
             $questions[] = $question;
             $i++;
