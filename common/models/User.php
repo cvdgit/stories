@@ -378,17 +378,17 @@ class User extends ActiveRecord implements IdentityInterface
 
     public function getUnreadUserNotificationCount()
     {
-        return $this->getNotifications()->unreadCount();
+        return $this->getNotifications()->unreadCount($this->id);
     }
 
     public function getUnreadUserNotification()
     {
-        return $this->getNotifications()->unread()->all();
+        return $this->getNotifications()->unread($this->id)->all();
     }
 
     public function getLastUserNotification()
     {
-        return $this->getNotifications()->last()->all();
+        return $this->getNotifications()->last($this->id)->all();
     }
 
 }
