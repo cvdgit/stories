@@ -12,9 +12,19 @@ use yii\grid\GridView;
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'columns' => [
-                'id',
-                'title',
-                'history_updated_at:datetime',
+                [
+                    'attribute' => 'title',
+                    'label' => 'История',
+                ],
+                [
+                    'attribute' => 'history_percent',
+                    'label' => 'Процент просмотра',
+                ],
+                [
+                    'attribute' => 'history_updated_at',
+                    'format' => 'datetime',
+                    'label' => 'Дата изменения истории',
+                ],
             ],
         ]) ?>
     </div>
