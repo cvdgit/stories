@@ -123,7 +123,7 @@ class AudioController extends Controller
             try {
                 $this->audioService->publishTrack($track);
                 Yii::$app->session->setFlash('success', 'Озвучка опубликована');
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 Yii::$app->session->setFlash('error', 'Ошибка публикации: ' . $e->getMessage());
             }
         }

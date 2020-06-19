@@ -549,4 +549,10 @@ class Story extends ActiveRecord
         $model->save(false, ['have_neo_relation']);
     }
 
+    public function updateAudioFlag(int $flag)
+    {
+        $this->audio = $flag;
+        return $this->save(false, ['audio']);
+    }
+
 }

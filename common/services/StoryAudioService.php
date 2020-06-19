@@ -2,9 +2,11 @@
 
 namespace common\services;
 
+use backend\components\notification\NewStoryAudioNotification;
 use backend\components\queue\PublishAudioJob;
 use backend\models\audio\AudioUploadForm;
 use backend\models\audio\UpdateAudioForm;
+use common\models\NotificationModel;
 use common\models\Story;
 use common\models\StoryAudioTrack;
 use common\models\StorySlide;
@@ -15,6 +17,13 @@ use Yii;
 
 class StoryAudioService
 {
+
+    protected $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
 
     public function joinWavs($wavs)
     {
@@ -89,16 +98,19 @@ class StoryAudioService
             throw new DomainException('Файлы озвучки не найдены');
         }
 
-        $model->status = StoryAudioTrack::STATUS_PUBLISHED;
-        $model->save(false, ['status']);
+        if ($model->publishAudioTrack()) {
 
-        $storyModel = Story::findModel($model->story_id);
-        $storyModel->audio = 1;
-        $storyModel->save(false, ['audio']);
+            $storyModel = Story::findModel($model->story_id);
+            $storyModel->updateAudioFlag(1);
 
-        Yii::$app->queue->push(new PublishAudioJob([
-            'storyID' => $storyModel->id,
-        ]));
+            /*        Yii::$app->queue->push(new PublishAudioJob([
+                        'storyID' => $storyModel->id,
+                    ]));*/
+
+            $notification = new NotificationModel();
+            $notification->text = (new NewStoryAudioNotification($storyModel))->render();
+            $this->notificationService->sendToAllUsers($notification);
+        }
     }
 
     public function unPublishTrack(StoryAudioTrack $model): void

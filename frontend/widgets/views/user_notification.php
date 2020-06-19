@@ -85,6 +85,7 @@ var UserNotification = (function() {
             list.append(header);
             list.append($('<li/>').addClass('divider'));
             if (response.length) {
+                $('#user-notifications .notification-counter').remove();
                 response.forEach(function(item) {
                     var li = createNotification(item);
                     list.append(li);
@@ -105,7 +106,6 @@ var UserNotification = (function() {
         if (!loaded) {
             loaded = true;
             loadNotifications();
-            console.log('loading...');
         }
     })
 })();

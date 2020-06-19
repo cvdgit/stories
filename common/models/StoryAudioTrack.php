@@ -144,16 +144,6 @@ class StoryAudioTrack extends \yii\db\ActiveRecord
         parent::afterDelete();
     }
 
-/*    public function afterSave($insert, $changedAttributes)
-    {
-        if ($this->isOriginal() && $this->isDefault()) {
-            $command = Yii::$app->db->createCommand();
-            $command->update('{{%story}}', ['audio' => 1], 'id = :storyID', [':storyID' => $this->story_id]);
-            $command->execute();
-        }
-        parent::afterSave($insert, $changedAttributes);
-    }*/
-
     public static function getStatusArray()
     {
         return [
@@ -196,6 +186,12 @@ class StoryAudioTrack extends \yii\db\ActiveRecord
     public function isPublished(): bool
     {
         return ((int)$this->status === self::STATUS_PUBLISHED);
+    }
+
+    public function publishAudioTrack()
+    {
+        $this->status = self::STATUS_PUBLISHED;
+        return $this->save(false, ['status']);
     }
 
 }
