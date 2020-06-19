@@ -27,4 +27,9 @@ $form->action = ['/editor/update-video'];
     <div class="col-xs-6">
         <?= $form->field($model, 'mute', ['inputOptions' => ['class' => 'form-control input-sm']])->checkbox() ?>
     </div>
+    <div class="col-xs-6">
+        <?= $form->field($model, 'volume', ['inputOptions' => ['class' => 'form-control input-sm']])
+            ->textInput()
+            ->hint('0 - без звука; 1 - максимальная громкость') ?>
+    </div>
 </div>

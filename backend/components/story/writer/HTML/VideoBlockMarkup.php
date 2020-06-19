@@ -27,6 +27,7 @@ class VideoBlockMarkup extends AbstractMarkup
             'data-video-duration' => $block->getDuration(),
             'data-mute' => var_export((bool)$block->getMute(), true),
             'data-speed' => $block->getSpeed(),
+            'data-volume' => $block->getVolume(),
         ]);
     }
 

@@ -228,6 +228,11 @@ class HtmlSlideReader implements ReaderInterface
         $block->setSeekTo(pq($element)->attr('data-seek-to'));
         $block->setDuration(pq($element)->attr('data-video-duration'));
         $block->setMute(pq($element)->attr('data-mute') === 'true' ? 1 : 0);
+        $volume = pq($element)->attr('data-volume');
+        if (empty($volume)) {
+            $volume = VideoBlock::DEFAULT_VOLUME;
+        }
+        $block->setVolume($volume);
         $speed = pq($element)->attr('data-speed');
         if (empty($speed)) {
             $speed = VideoBlock::DEFAULT_SPEED;

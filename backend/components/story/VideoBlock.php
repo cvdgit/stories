@@ -8,6 +8,7 @@ class VideoBlock extends AbstractBlock
 {
 
     public const DEFAULT_SPEED = 1;
+    public const DEFAULT_VOLUME = 0.8;
 
     /** @var string */
     protected $video_id;
@@ -24,6 +25,9 @@ class VideoBlock extends AbstractBlock
     /** @var int */
     protected $speed;
 
+    /** @var int */
+    protected $volume;
+
     public function update($form)
     {
         $this->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
@@ -32,6 +36,7 @@ class VideoBlock extends AbstractBlock
         $this->duration = $form->duration;
         $this->mute = $form->mute;
         $this->speed = $form->speed;
+        $this->volume = $form->volume;
     }
 
     public function create()
@@ -84,6 +89,7 @@ class VideoBlock extends AbstractBlock
             'duration' => $this->duration,
             'mute' => $this->mute,
             'speed' => $this->speed,
+            'volume' => $this->volume,
         ], parent::getValues());
     }
 
@@ -138,6 +144,22 @@ class VideoBlock extends AbstractBlock
     public function setSpeed($speed): void
     {
         $this->speed = $speed;
+    }
+
+    /**
+     * @return int
+     */
+    public function getVolume()
+    {
+        return $this->volume;
+    }
+
+    /**
+     * @param int $volume
+     */
+    public function setVolume($volume): void
+    {
+        $this->volume = $volume;
     }
 
 }

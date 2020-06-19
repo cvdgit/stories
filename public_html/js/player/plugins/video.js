@@ -1,11 +1,12 @@
 
-function WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute, speed, showControls) {
+function WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute, speed, showControls, volume) {
     "use strict";
 
     seekTo = seekTo || 0;
     duration = duration || 0;
     speed = speed || 1;
     showControls = showControls || false;
+    volume = volume || 0.8;
 
     var player,
         done = false;
@@ -23,12 +24,7 @@ function WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute, speed, showC
         player.play();
         player.speed = parseInt(speed);
         player.currentTime = parseFloat(seekTo);
-        if (mute) {
-            player.volume = 0;
-        }
-        else {
-            player.volume = 0.8;
-        }
+        player.volume = parseFloat(volume);
     });
 
     player.on("statechange", function(event) {
@@ -78,13 +74,14 @@ var WikidsVideo = window.WikidsVideo || (function() {
                 seekTo = elem.attr("data-seek-to"),
                 duration = elem.attr("data-video-duration"),
                 mute = elem.attr("data-mute") === "true",
-                speed = elem.attr("data-speed");
+                speed = elem.attr("data-speed"),
+                volume = elem.attr("data-volume");
 
             elem.addClass("plyr__video-embed");
             elem.attr("data-plyr-provider", "youtube");
             elem.attr("data-plyr-embed-id", videoID);
 
-            player = WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute, speed, config.showControls);
+            player = WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute, speed, config.showControls, volume);
         }
     }
 
