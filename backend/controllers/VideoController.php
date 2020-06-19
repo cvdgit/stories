@@ -110,7 +110,7 @@ class VideoController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $data = [];
-        $models = Story::find()->with('storySlides')->all();
+        $models = Story::find()->with('storySlides')->andWhere(['video' => 1])->all();
         foreach ($models as $model) {
             $videoFound = false;
             foreach ($model->storySlides as $slideModel) {
