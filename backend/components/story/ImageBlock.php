@@ -41,10 +41,17 @@ class ImageBlock extends AbstractBlock
         return $this->filePath;
     }
 
-    public function setImageSize($imagePath, float $imageWidth = 0, float $imageHeight = 0): void
+    public function setImageSize($imagePath, $imageWidth = 0, $imageHeight = 0): void
     {
         if ($imagePath === null) {
             return;
+        }
+
+        if (is_numeric($imageWidth)) {
+            $imageWidth = 0;
+        }
+        if (is_numeric($imageHeight)) {
+            $imageHeight = 0;
         }
 
         if ($imageWidth === 0 || $imageHeight === 0) {
