@@ -7,6 +7,9 @@ function WikidsVideoPlayer(elemID, videoID, seekTo, duration, mute, speed, showC
     speed = speed || 1;
     showControls = showControls || false;
     volume = volume || 0.8;
+    if (mute) {
+        volume = 0;
+    }
 
     var player,
         done = false;
