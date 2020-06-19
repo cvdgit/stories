@@ -5,7 +5,7 @@ use yii\grid\SerialColumn;
 use yii\grid\GridView;
 use yii\helpers\Html;
 
-/** @var $model common\models\SlideVideo */
+/** @var $searchModel backend\models\SlideVideoSearch */
 /** @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Видео';
@@ -17,6 +17,7 @@ $this->title = 'Видео';
     </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
         'columns' => [
             ['class' => SerialColumn::class],
             'title',

@@ -7,6 +7,7 @@ namespace backend\controllers;
 use backend\components\story\AbstractBlock;
 use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\writer\HTMLWriter;
+use backend\models\SlideVideoSearch;
 use backend\models\video\CreateVideoForm;
 use backend\models\video\UpdateVideoForm;
 use backend\services\VideoService;
@@ -47,17 +48,10 @@ class VideoController extends Controller
 
     public function actionIndex()
     {
-        $query = SlideVideo::find();
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-            'pagination' => [
-                'pageSize' => 50,
-            ],
-            'sort' => [
-                'defaultOrder' => ['created_at' => SORT_DESC],
-            ]
-        ]);
+        $model = new SlideVideoSearch();
+        $dataProvider = $model->search(Yii::$app->request->queryParams);
         return $this->render('index', [
+            'searchModel' => $model,
             'dataProvider' => $dataProvider,
         ]);
     }
