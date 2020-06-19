@@ -27,7 +27,7 @@ class ChangeVideoJob extends BaseObject implements JobInterface
      */
     public function execute($queue)
     {
-        $models = Story::find()->with('storySlides')->all();
+        $models = Story::find()->with('storySlides')->andWhere(['video' => 1])->all();
         foreach ($models as $model) {
             foreach ($model->storySlides as $slideModel) {
                 $slideChanged = false;
