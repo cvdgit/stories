@@ -85,6 +85,9 @@ var TestSlide = (function() {
 
     function syncReveal(data, slide_index) {
         $(".reveal .slides").empty().append(data);
+        if (window["StoryBackground"]) {
+            StoryBackground.init();
+        }
         Reveal.sync();
         Reveal.slide(slide_index);
     }

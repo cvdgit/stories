@@ -82,7 +82,22 @@ class QuestionController extends Controller
             $i++;
         }
 
-        return [0 => ['storyTestQuestions' => $questions]];
+        $progressCurrent = array_reduce($questions, function($carry, $item) use ($userStars) {
+            if (isset($userStars[$item['entity_id']])) {
+                $carry += $userStars[$item['entity_id']]['stars'];
+            }
+            return $carry;
+        });
+
+        return [0 => [
+            'storyTestQuestions' => $questions,
+            'test' => [
+                'progress' => [
+                    'total' => count($questions) * 5,
+                    'current' => $progressCurrent,
+                ]
+            ],
+        ]];
     }
 
     public function actionGetRelatedSlide(int $entity_id, int $relation_id)

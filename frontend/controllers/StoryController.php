@@ -231,7 +231,16 @@ class StoryController extends Controller
     public function actionGetStoryTest(int $id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        return ['json' => StoryTest::find()->where('id = :id', [':id' => $id])->with('storyTestQuestions.storyTestAnswers')->asArray()->all()];
+        $json = StoryTest::find()->where('id = :id', [':id' => $id])->with('storyTestQuestions.storyTestAnswers')->asArray()->all();
+        $json[0]['test']['progress'] = [
+            'current' => 0,
+            'total' => 2,
+        ];
+/*        $json[0]['storyTestQuestions'] = array_map(function($item) {
+            $item['stars'] = ['total' => 1, 'current' => 0];
+            return $item;
+        }, $json[0]['storyTestQuestions']);*/
+        return ['json' => $json];
     }
 
     public function actionStoreTestResult(int $story_id, int $question_id, string $answers)

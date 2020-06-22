@@ -29,6 +29,12 @@ var WikidsStoryTest = function() {
         return question.storyTestAnswers;
     }
 
+    function getProgressData() {
+        var progress = testData['test'] || {};
+        progress = progress['progress'] || {};
+        return progress;
+    }
+
     function init(remote) {
         //console.debug('WikidsStoryTest.init');
         remoteTest = remote || false;
@@ -36,8 +42,8 @@ var WikidsStoryTest = function() {
         dom.wrapper.empty();
     }
 
-    var QuestionsRepeat = function(questions) {
-        this.starsTotal = 5;
+    var QuestionsRepeat = function(questions, starsTotal) {
+        this.starsTotal = starsTotal;
         this.items = questions.map(function(question) {
             var number = 1;
             if (question['stars']) {
@@ -65,9 +71,12 @@ var WikidsStoryTest = function() {
     QuestionsRepeat.prototype.inc = function(id) {
         var item = this.findItem(id);
         item.number++;
+        var increased = true;
         if (item.number > this.starsTotal) {
             item.number = this.starsTotal;
+            increased = false;
         }
+        return increased;
     };
 
     QuestionsRepeat.prototype.dec = function(id) {
@@ -81,7 +90,7 @@ var WikidsStoryTest = function() {
     };
 
     QuestionsRepeat.prototype.number = function(id) {
-        var number = 5 - this.findItem(id).number;
+        var number = this.starsTotal - this.findItem(id).number;
         return number < 0 ? 0 : number;
     };
 
@@ -89,6 +98,38 @@ var WikidsStoryTest = function() {
         var number = this.number(id);
         return number;
     };
+
+    var testProgress;
+    var TestProgress = function(progress) {
+        this.progress = progress;
+    };
+
+    TestProgress.prototype.getProgress = function() {
+        return this.progress;
+    };
+
+    TestProgress.prototype.getCurrent = function() {
+        return this.progress.current;
+    };
+
+    TestProgress.prototype.getTotal = function() {
+        return this.progress.total;
+    };
+
+    TestProgress.prototype.calcPercent = function() {
+        return this.getCurrent() * 100 / this.getTotal();
+    }
+
+    TestProgress.prototype.inc = function() {
+        this.progress.current++;
+    }
+
+    TestProgress.prototype.dec = function() {
+        this.progress.current--;
+        if (this.progress.current < 0) {
+            this.progress.current = 0;
+        }
+    }
 
     function load(data, for_slide) {
 
@@ -100,7 +141,9 @@ var WikidsStoryTest = function() {
         }
 
         questions = getQuestionsData();
-        questionsRepeat = new QuestionsRepeat(questions);
+        questionsRepeat = new QuestionsRepeat(questions, remoteTest ? 5 : 1);
+
+        testProgress = new TestProgress(getProgressData());
 
         setupDOM();
         addEventListeners();
@@ -286,8 +329,26 @@ var WikidsStoryTest = function() {
         var $elem = $('<p/>');
         $elem.addClass('question-stars');
         $elem.css('textAlign', 'right');
-        appendStars($elem, 5, questionsRepeat.stars(id));
+        appendStars($elem, remoteTest ? 5 : 1, questionsRepeat.stars(id));
         return $elem[0].outerHTML;
+    }
+
+    function createProgress() {
+        var progress = testProgress.calcPercent();
+        return $('<div/>')
+            .addClass('wikids-progress')
+            .append(
+                $('<div/>')
+                    .addClass('progress-bar progress-bar-info')
+                    .css('width', progress + '%')
+                    .append($('<span/>').addClass('sr-only'))
+            )[0].outerHTML;
+    }
+
+    function updateProgress() {
+        var progress = testProgress.calcPercent();
+        //console.log('update progress', testProgress.getProgress());
+        $('.wikids-progress .progress-bar', dom.header).css('width', progress + '%');
     }
 
     function createQuestion(question) {
@@ -349,10 +410,12 @@ var WikidsStoryTest = function() {
     }
 
     function createHeader(test) {
-        return $("<div/>")
+        var $header = $("<div/>")
             .addClass("wikids-test-header")
             .append($("<h3/>").text(test.title))
-            .append($("<p/>").text(test.description));
+            .append($("<p/>").text(test.description))
+            .append(createProgress());
+        return $header;
     }
 
     function questionIsVisible() {
@@ -511,6 +574,7 @@ var WikidsStoryTest = function() {
             if (currentQuestion['stars']) {
                 if (currentQuestion.lastAnswerIsCorrect) {
                     questionsRepeat.dec(currentQuestion.entity_id);
+                    testProgress.inc();
                 }
                 else {
                     currentQuestion.lastAnswerIsCorrect = true;
@@ -519,19 +583,24 @@ var WikidsStoryTest = function() {
             else {
                 skipQuestion.push(currentQuestion.id);
             }
+            if (!remoteTest) {
+                testProgress.inc();
+            }
         }
         else {
             currentQuestion.lastAnswerIsCorrect = false;
             if (currentQuestion['stars']) {
-                questionsRepeat.inc(currentQuestion.entity_id);
+                var increased = questionsRepeat.inc(currentQuestion.entity_id);
+                if (increased) {
+                    testProgress.dec();
+                }
             }
         }
-
-        console.log(questionsRepeat.getItems());
 
         if (currentQuestion['stars']) {
             updateStars($activeQuestion, questionsRepeat.number(currentQuestion.entity_id));
         }
+        updateProgress();
 
         //console.log(answerIsCorrect, questionsRepeat.done(currentQuestion.entity_id));
         if (remoteTest) {
