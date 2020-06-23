@@ -154,7 +154,8 @@ class StoryService
             throw new DomainException('В истории отсутствуют слайды');
         }
 
-        if ($model->publishStory() && $model->submitPublicationTask()) {
+        $sendNotification = $model->submitPublicationTask();
+        if ($model->publishStory() && $sendNotification) {
 
             Yii::$app->queue->push(new PublishStoryJob([
                 'storyID' => $model->id,
