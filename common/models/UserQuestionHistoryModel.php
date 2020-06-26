@@ -56,9 +56,8 @@ class UserQuestionHistoryModel extends Model
         $model->save();
     }
 
-    public function getUserQuestionHistory()
+    public function getUserQuestionHistory(int $topicID)
     {
-        $topicID = 1;
         return (new Query())
             ->select(['entity_id'])
             ->from(UserQuestionHistory::tableName())
@@ -70,9 +69,8 @@ class UserQuestionHistoryModel extends Model
             ->all();
     }
 
-    public function getUserQuestionHistoryStars()
+    public function getUserQuestionHistoryStars(int $topicID)
     {
-        $topicID = 1;
         return (new Query())
             ->select(['entity_id', 'COUNT(entity_id) AS stars'])
             ->from(UserQuestionHistory::tableName())

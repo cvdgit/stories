@@ -18,8 +18,8 @@ class QuestionController extends Controller
         $userStars = [];
         if (!Yii::$app->user->isGuest) {
             $userQuestionHistoryModel = new UserQuestionHistoryModel(Yii::$app->user->id);
-            $userHistory = $userQuestionHistoryModel->getUserQuestionHistory();
-            $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStars();
+            $userHistory = $userQuestionHistoryModel->getUserQuestionHistory($questionId);
+            $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStars($questionId);
         }
         $curl = new Curl();
         $result = $curl
