@@ -228,7 +228,7 @@ var WikidsStoryTest = function() {
         if (answer.image) {
             var $image = $("<img/>")
                 .attr("src", answer.image)
-                .attr("width", 180);
+                .attr("height", 100);
             $answer.append($image);
         }
 
