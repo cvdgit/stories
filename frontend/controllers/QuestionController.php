@@ -57,7 +57,7 @@ class QuestionController extends Controller
 
             $svg = $resultItem['question_svg'] ?? false;
 
-            if (in_array($resultItem['question_entity_id'], $questionEntities, true)) {
+            if (!in_array($resultItem['question_entity_id'], $questionEntities, true)) {
                 $questionEntities[] = $resultItem['question_entity_id'];
             }
 
