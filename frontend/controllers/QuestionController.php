@@ -35,6 +35,7 @@ class QuestionController extends Controller
         $result = Json::decode($result);
 
         $questions = [];
+        $questionEntities = [];
         $i = 1;
         foreach ($result as $resultItem) {
 
@@ -55,6 +56,10 @@ class QuestionController extends Controller
             }
 
             $svg = $resultItem['question_svg'] ?? false;
+
+            if (in_array($resultItem['question_entity_id'], $questionEntities, true)) {
+                $questionEntities[] = $resultItem['question_entity_id'];
+            }
 
             $question = [
                 'id' => $i,
@@ -93,7 +98,7 @@ class QuestionController extends Controller
             'storyTestQuestions' => $questions,
             'test' => [
                 'progress' => [
-                    'total' => count($questions) * 5,
+                    'total' => count($questionEntities) * 5,
                     'current' => $progressCurrent,
                 ]
             ],
