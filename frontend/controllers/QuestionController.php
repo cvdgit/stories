@@ -54,7 +54,7 @@ class QuestionController extends Controller
                 $stars = $userStars[$resultItem['question_entity_id']]['stars'];
             }
 
-            $svg = $resultItem['question_svg'] ?? [];
+            $svg = $resultItem['question_svg'] ?? false;
 
             $question = [
                 'id' => $i,
@@ -74,7 +74,7 @@ class QuestionController extends Controller
                     'total' => 5,
                     'current' => $stars,
                 ],
-                'view' => 'svg',
+                'view' => $svg ? 'svg' : '',
                 'svg' => $svg,
                 'lastAnswerIsCorrect' => true,
             ];

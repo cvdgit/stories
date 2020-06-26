@@ -347,7 +347,6 @@ var WikidsStoryTest = function() {
 
     function updateProgress() {
         var progress = testProgress.calcPercent();
-        //console.log('update progress', testProgress.getProgress());
         $('.wikids-progress .progress-bar', dom.header).css('width', progress + '%');
     }
 
