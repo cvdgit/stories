@@ -1774,6 +1774,8 @@
 
 .wikids-test-answer label {
 	pointer-events: none;
+	font-size: 24px;
+	user-select: none;
 }
 
 .wikids-test-answer input[type=checkbox],
