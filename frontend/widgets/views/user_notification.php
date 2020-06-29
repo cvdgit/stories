@@ -25,6 +25,10 @@ $css = <<< CSS
     width: 400px;
     white-space: normal;
 }
+#user-notifications ul.dropdown-menu {
+    overflow: hidden !important;
+    overflow-y: auto !important;
+}
 #user-notifications .media-body i {
     display: block;
     font-size: 13px;
@@ -86,9 +90,15 @@ var UserNotification = (function() {
             list.append($('<li/>').addClass('divider'));
             if (response.length) {
                 $('#user-notifications .notification-counter').remove();
+                var i = 1;
+                var height = 10;
                 response.forEach(function(item) {
                     var li = createNotification(item);
                     list.append(li);
+                    if (i++ <= 5) {
+                        height += parseInt(li.height());
+                        list.css('height', height + 'px')
+                    }
                 });
                 smartdate.init({
                     locale: 'ru',
