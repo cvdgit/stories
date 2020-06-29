@@ -91,7 +91,7 @@ var UserNotification = (function() {
             if (response.length) {
                 $('#user-notifications .notification-counter').remove();
                 var i = 1;
-                var height = 10;
+                var height = 30;
                 response.forEach(function(item) {
                     var li = createNotification(item);
                     list.append(li);
