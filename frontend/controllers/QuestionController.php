@@ -120,7 +120,8 @@ class QuestionController extends Controller
     {
         $model = new UserQuestionHistoryModel(Yii::$app->user->id);
         if ($model->load(Yii::$app->request->post(), '') && $model->validate()) {
-            $model->createUserQuestionHistory();
+            $userQuestionHistoryID = $model->createUserQuestionHistory();
+            $model->createUserQuestionAnswers($userQuestionHistoryID);
         }
         else {
             return $model->errors;

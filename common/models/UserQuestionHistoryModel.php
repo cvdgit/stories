@@ -20,6 +20,8 @@ class UserQuestionHistoryModel extends Model
     public $relation_name;
     public $correct_answer;
 
+    public $answers;
+
     public function __construct($userID, $config = [])
     {
         $this->user_id = $userID;
@@ -34,6 +36,7 @@ class UserQuestionHistoryModel extends Model
             [['question_topic_name', 'entity_name', 'relation_name'], 'string', 'max' => 255],
             [['slide_id'], 'exist', 'skipOnError' => true, 'targetClass' => StorySlide::class, 'targetAttribute' => ['slide_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+            ['answers', 'safe'],
         ];
     }
 
@@ -54,31 +57,47 @@ class UserQuestionHistoryModel extends Model
             $this->correct_answer
         );
         $model->save();
+        return $model->id;
+    }
+
+    public function createUserQuestionAnswers(int $questionAnswerID)
+    {
+        if (count($this->answers) > 0) {
+            foreach ($this->answers as $answerData) {
+                $answerModel = new UserQuestionAnswerModel();
+                $answerModel->question_answer_id = $questionAnswerID;
+                if ($answerModel->load($answerData, '') && $answerModel->validate()) {
+                    $answerModel->createUserQuestionAnswer();
+                }
+            }
+        }
     }
 
     public function getUserQuestionHistory(int $topicID)
     {
         return (new Query())
-            ->select(['entity_id'])
-            ->from(UserQuestionHistory::tableName())
-            ->where('user_id = :user', [':user' => $this->user_id])
-            ->andWhere('question_topic_id = :topic', [':topic' => $topicID])
-            ->andWhere('correct_answer = 1')
-            ->groupBy(['entity_id'])
-            ->having('COUNT(entity_id) >= 5')
+            ->select(['t.entity_id', 't.relation_id', 't2.answer_entity_id'])
+            ->from(['t' => UserQuestionHistory::tableName()])
+            ->innerJoin(['t2' => UserQuestionAnswer::tableName()], 't2.question_history_id = t.id')
+            ->where('t.user_id = :user', [':user' => $this->user_id])
+            ->andWhere('t.question_topic_id = :topic', [':topic' => $topicID])
+            ->andWhere('t.correct_answer = 1')
+            ->groupBy(['t.entity_id', 't.relation_id', 't2.answer_entity_id'])
+            ->having('COUNT(t.entity_id) >= 5')
             ->all();
     }
 
     public function getUserQuestionHistoryStars(int $topicID)
     {
         return (new Query())
-            ->select(['entity_id', 'COUNT(entity_id) AS stars'])
-            ->from(UserQuestionHistory::tableName())
-            ->where('user_id = :user', [':user' => $this->user_id])
-            ->andWhere('question_topic_id = :topic', [':topic' => $topicID])
-            ->andWhere('correct_answer = 1')
-            ->groupBy(['entity_id'])
-            ->having('COUNT(entity_id) < 5')
+            ->select(['t.entity_id', 't.relation_id', 't2.answer_entity_id', 'COUNT(t.entity_id) AS stars'])
+            ->from(['t' => UserQuestionHistory::tableName()])
+            ->innerJoin(['t2' => UserQuestionAnswer::tableName()], 't2.question_history_id = t.id')
+            ->where('t.user_id = :user', [':user' => $this->user_id])
+            ->andWhere('t.question_topic_id = :topic', [':topic' => $topicID])
+            ->andWhere('t.correct_answer = 1')
+            ->groupBy(['t.entity_id', 't.relation_id', 't2.answer_entity_id'])
+            ->having('COUNT(t.entity_id) < 5')
             ->indexBy(['entity_id'])
             ->all();
     }

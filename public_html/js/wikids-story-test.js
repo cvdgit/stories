@@ -622,6 +622,12 @@ var WikidsStoryTest = function() {
         //console.log(currentQuestion.name, answerIsCorrect);
 
         if (remoteTest && !App.userIsGuest()) {
+            var answerList = answer.map(function(entity_id) {
+                return {
+                    'answer_entity_id': entity_id,
+                    'answer_entity_name': entity_id
+                };
+            });
             var answerParams = {
                 'slide_id': WikidsPlayer.getCurrentSlideID(),
                 'question_topic_id': currentQuestion.topic_id,
@@ -630,7 +636,8 @@ var WikidsStoryTest = function() {
                 'entity_name': currentQuestion.entity_name,
                 'relation_id': currentQuestion.relation_id,
                 'relation_name': currentQuestion.relation_name,
-                'correct_answer': answerIsCorrect ? 1 : 0
+                'correct_answer': answerIsCorrect ? 1 : 0,
+                'answers': answerList
             };
             $.post('/question/answer', answerParams);
         }
