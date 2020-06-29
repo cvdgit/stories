@@ -66,11 +66,11 @@ class UserQuestionHistory extends \yii\db\ActiveRecord
             'question_topic_id' => 'Question Topic ID',
             'question_topic_name' => 'Вопрос',
             'entity_id' => 'Entity ID',
-            'entity_name' => 'Сущность',
+            'entity_name' => 'Сущность вопроса',
             'relation_id' => 'Relation ID',
             'relation_name' => 'Отношение',
-            'correct_answer' => 'Correct Answer',
-            'created_at' => 'Created At',
+            'correct_answer' => 'Ответ верный',
+            'created_at' => 'Дата ответа',
         ];
     }
 

@@ -547,6 +547,12 @@ var WikidsStoryTest = function() {
         appendStars($stars, 5, current);
     }
 
+    function answerByID(question, id) {
+        return getAnswersData(question).filter(function(answer) {
+            return parseInt(answer.id) === parseInt(id);
+        })[0];
+    }
+
     /* Ответ на вопрос */
     function nextQuestion() {
 
@@ -625,13 +631,13 @@ var WikidsStoryTest = function() {
             var answerList = answer.map(function(entity_id) {
                 return {
                     'answer_entity_id': entity_id,
-                    'answer_entity_name': entity_id
+                    'answer_entity_name': answerByID(currentQuestion, entity_id).name
                 };
             });
             var answerParams = {
                 'slide_id': WikidsPlayer.getCurrentSlideID(),
                 'question_topic_id': currentQuestion.topic_id,
-                'question_topic_name': currentQuestion.topic_name,
+                'question_topic_name': currentQuestion.name,
                 'entity_id': currentQuestion.entity_id,
                 'entity_name': currentQuestion.entity_name,
                 'relation_id': currentQuestion.relation_id,

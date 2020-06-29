@@ -12,13 +12,15 @@ use yii\grid\GridView;
             'dataProvider' => $dataProvider,
             'columns' => [
                 'question_topic_name',
+                'created_at:datetime',
                 'entity_name',
                 'relation_name',
-                [
+                'correct_answer',
+/*                [
                     'attribute' => 'correct_answers',
                     'label' => 'Прогресс',
                     'class' => StarColumn::class,
-                ],
+                ],*/
             ],
         ]) ?>
     </div>

@@ -22,13 +22,13 @@ class UserQuestionHistorySearch extends Model
     public function search($params): ActiveDataProvider
     {
         $query = UserQuestionHistory::find();
-        $query->select(['question_topic_name', 'entity_name', 'relation_name', 'SUM(correct_answer) AS correct_answers', 'MAX(created_at) AS max_created_at']);
-        $query->groupBy(['question_topic_name', 'entity_name', 'relation_name']);
+        $query->select(['question_topic_name', 'entity_name', 'relation_name', 'correct_answer', 'created_at']);
+        //$query->groupBy(['question_topic_name', 'entity_name', 'relation_name']);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'sort' => [
-                'attributes' => ['max_created_at'],
-                'defaultOrder' => ['max_created_at' => SORT_DESC],
+                'attributes' => ['created_at'],
+                'defaultOrder' => ['created_at' => SORT_DESC],
             ],
             'pagination' => false,
         ]);
