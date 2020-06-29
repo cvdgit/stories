@@ -21,8 +21,8 @@ class UserQuestionHistorySearch extends Model
 
     public function search($params): ActiveDataProvider
     {
-        $query = UserQuestionHistory::find();
-        $query->select(['question_topic_name', 'entity_name', 'relation_name', 'correct_answer', 'created_at']);
+        $query = UserQuestionHistory::find()->innerJoinWith('userQuestionAnswers');
+        //$query->select(['question_topic_name', 'entity_name', 'relation_name', 'correct_answer', 'created_at', "`123` AS answers"]);
         //$query->groupBy(['question_topic_name', 'entity_name', 'relation_name']);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

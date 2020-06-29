@@ -22,12 +22,14 @@ use yii\behaviors\TimestampBehavior;
  *
  * @property StorySlide $slide
  * @property User $user
+ * @property UserQuestionAnswer[] $userQuestionAnswers
  */
 class UserQuestionHistory extends \yii\db\ActiveRecord
 {
 
     public $correct_answers;
     public $max_created_at;
+    public $answers;
 
     /**
      * {@inheritdoc}
@@ -51,6 +53,7 @@ class UserQuestionHistory extends \yii\db\ActiveRecord
     {
         return [
             ['created_at', 'integer'],
+            ['answers', 'safe'],
         ];
     }
 
@@ -71,6 +74,7 @@ class UserQuestionHistory extends \yii\db\ActiveRecord
             'relation_name' => 'Отношение',
             'correct_answer' => 'Ответ верный',
             'created_at' => 'Дата ответа',
+            'answers' => 'Ответы',
         ];
     }
 
@@ -88,6 +92,14 @@ class UserQuestionHistory extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUserQuestionAnswers()
+    {
+        return $this->hasMany(UserQuestionAnswer::class, ['question_history_id' => 'id']);
     }
 
     public static function create(int $userID,
