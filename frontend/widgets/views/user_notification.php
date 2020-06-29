@@ -95,7 +95,7 @@ var UserNotification = (function() {
                 response.forEach(function(item) {
                     var li = createNotification(item);
                     list.append(li);
-                    if (i++ <= 5) {
+                    if (i++ <= 6) {
                         height += parseInt(li.height());
                         list.css('height', height + 'px')
                     }
