@@ -98,7 +98,7 @@ class QuestionController extends Controller
             'storyTestQuestions' => $questions,
             'test' => [
                 'progress' => [
-                    'total' => count($questionEntities) * 5,
+                    'total' => count($questions) * 5,
                     'current' => $progressCurrent,
                 ]
             ],
