@@ -4,6 +4,7 @@
 namespace backend\components\story;
 
 
+use backend\components\story\writer\HTML\ParagraphBlockMarkup;
 use backend\models\editor\ImageForm;
 use Yii;
 
@@ -54,20 +55,20 @@ class ImageBlock extends AbstractBlock
             $imageHeight = 0;
         }
 
-        if ($imageWidth === 0 || $imageHeight === 0) {
+        if (($imageWidth === 0 || $imageHeight === 0) && file_exists($imagePath)) {
             [$imageWidth, $imageHeight] = getimagesize($imagePath);
         }
 
         if ($imageHeight > 0) {
 
-/*            $ratio = $imageWidth / $imageHeight;
+            $ratio = $imageWidth / $imageHeight;
             if (self::DEFAULT_IMAGE_WIDTH / self::DEFAULT_IMAGE_HEIGHT > $ratio) {
                 $imageWidth = self::DEFAULT_IMAGE_HEIGHT * $ratio;
                 $imageHeight = self::DEFAULT_IMAGE_HEIGHT;
             } else {
                 $imageHeight = self::DEFAULT_IMAGE_WIDTH / $ratio;
                 $imageWidth = self::DEFAULT_IMAGE_WIDTH;
-            }*/
+            }
 
             $this->width = $imageWidth . 'px';
             $this->height = $imageHeight . 'px';
