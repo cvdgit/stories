@@ -402,7 +402,7 @@ class User extends ActiveRecord implements IdentityInterface
 
     public function getStudentsAsArray()
     {
-        return $this->getStudents()->asArray()->all();
+        return $this->getStudents()->andWhere('status = 0')->asArray()->all();
     }
 
     public function createMainStudent()
