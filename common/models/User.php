@@ -32,6 +32,7 @@ use yii\web\IdentityInterface;
  * @property Profile $profile
  * @property Story[] $stories
  * @property Notification[] $notifications
+ * @property UserStudent[] $students
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -389,6 +390,25 @@ class User extends ActiveRecord implements IdentityInterface
     public function getLastUserNotification()
     {
         return $this->getNotifications()->last($this->id)->all();
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStudents()
+    {
+        return $this->hasMany(UserStudent::class, ['user_id' => 'id']);
+    }
+
+    public function getStudentsAsArray()
+    {
+        return $this->getStudents()->asArray()->all();
+    }
+
+    public function createMainStudent()
+    {
+        $student = UserStudent::createMain($this->id, $this->username, 0);
+        $student->save();
     }
 
 }

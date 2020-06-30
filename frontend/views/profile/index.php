@@ -36,13 +36,15 @@ $this->setMetaTags($title,
             </div>
             <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
                 <?= Tabs::widget([
-                    'class' => 'profile-tabs',
+                    'options' => ['class' => 'profile-tabs'],
                     'items' => [
                         ['label' => 'Основная информация',
                          'content' => $this->render('_tab_general', ['model' => $model, 'activePayment' => $activePayment]),
                          'active' => true],
                         ['label' => 'История подписок',
                             'content' => $this->render('_tab_payments', ['payments' => $model->payments])],
+                        ['label' => 'Ученики',
+                            'content' => $this->render('_tab_students', ['students' => $model->getStudentsAsArray()])],
                     ],
                 ]) ?>
             </div>

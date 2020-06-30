@@ -1390,6 +1390,10 @@ section h2 span {
   color: #99cd50;
 }
 
+.profile-tabs.nav-tabs {
+  text-align: left !important;
+}
+
 /*
 .site-user-profile .payment-tab a {
   text-decoration: underline;
@@ -2479,4 +2483,8 @@ img.lazy {
 
 .label-important, .badge-important {
   background-color: rgb(204, 0, 0);
+}
+
+.btn-small {
+  padding: 1.5rem 2rem;
 }

@@ -44,6 +44,8 @@ class SignupService
             $auth = Yii::$app->authManager;
             $authorRole = $auth->getRole('user');
             $auth->assign($authorRole, $user->getId());
+
+            $user->createMainStudent();
         });
     }
 

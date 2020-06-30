@@ -91,6 +91,7 @@ class UserService
         $this->transaction->wrap(function () use ($user, $form) {
             $user->save();
             $this->roleManager->assign($user->id, $form->role);
+            $user->createMainStudent();
         });
 
         try {
