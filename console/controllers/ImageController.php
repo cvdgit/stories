@@ -5,6 +5,7 @@ namespace console\controllers;
 
 
 use backend\services\ImageService;
+use common\helpers\EmailHelper;
 use common\models\StorySlideImage;
 use http\Exception\RuntimeException;
 use Yii;
@@ -39,14 +40,8 @@ class ImageController extends Controller
                 $body .= '<li>' . $image->source_url . '</li>';
             }
             $body .= '</ul>';
-            $sent = Yii::$app->mailer
-                ->compose()
-                ->setHtmlBody($body)
-                ->setTo(Yii::$app->params['youtube.video.user.email'])
-                ->setFrom([Yii::$app->params['infoEmail'] => Yii::$app->name])
-                ->setSubject('Wikids - Изображения больше недоступны')
-                ->send();
-            if (!$sent) {
+            $response = EmailHelper::sendEmail(Yii::$app->params['youtube.video.user.email'], 'Wikids - Изображения больше недоступны', 'image-html', ['imageList' => $body]);
+            if (!$response->isSuccess()) {
                 throw new RuntimeException('Ошибка при отправке email об недоступном изображении');
             }
         }
