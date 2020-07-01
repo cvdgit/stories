@@ -104,4 +104,9 @@ class UserStudent extends ActiveRecord
         return self::create($userID, $name, $age_year, self::STATUS_MAIN);
     }
 
+    public function isMain()
+    {
+        return (int)$this->status === self::STATUS_MAIN;
+    }
+
 }
