@@ -25,7 +25,10 @@ class UserController extends Controller
                 }
                 $needCreate = !$haveMain;
             }
-            $this->stdout($model->username . ' - ' . var_export($needCreate, true) . PHP_EOL);
+            if ($needCreate) {
+                $model->createMainStudent();
+                $this->stdout($model->username . ' - OK' . PHP_EOL);
+            }
         }
         $this->stdout('Done!' . PHP_EOL);
     }
