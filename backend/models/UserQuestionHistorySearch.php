@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\models;
-
 
 use common\models\UserQuestionHistory;
 use yii\base\Model;
@@ -11,11 +9,11 @@ use yii\data\ActiveDataProvider;
 class UserQuestionHistorySearch extends Model
 {
 
-    public $user_id;
+    public $student_id;
 
-    public function __construct(int $userID, $config = [])
+    public function __construct(int $studentID, $config = [])
     {
-        $this->user_id = $userID;
+        $this->student_id = $studentID;
         parent::__construct($config);
     }
 
@@ -39,7 +37,7 @@ class UserQuestionHistorySearch extends Model
         }
 
         $query->andFilterWhere([
-            'user_id' => $this->user_id,
+            'student_id' => $this->student_id,
         ]);
 
         return $dataProvider;

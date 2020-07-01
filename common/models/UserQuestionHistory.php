@@ -2,14 +2,14 @@
 
 namespace common\models;
 
-use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "user_question_history".
  *
  * @property int $id
- * @property int $user_id
+ * @property int $student_id
  * @property int $slide_id
  * @property int $question_topic_id
  * @property string $question_topic_name
@@ -21,10 +21,10 @@ use yii\behaviors\TimestampBehavior;
  * @property int $created_at
  *
  * @property StorySlide $slide
- * @property User $user
+ * @property UserStudent $student
  * @property UserQuestionAnswer[] $userQuestionAnswers
  */
-class UserQuestionHistory extends \yii\db\ActiveRecord
+class UserQuestionHistory extends ActiveRecord
 {
 
     public $correct_answers;
@@ -64,7 +64,7 @@ class UserQuestionHistory extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'user_id' => 'User ID',
+            'student_id' => 'Student ID',
             'slide_id' => 'Slide ID',
             'question_topic_id' => 'Question Topic ID',
             'question_topic_name' => 'Вопрос',
@@ -89,9 +89,9 @@ class UserQuestionHistory extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getUser()
+    public function getStudent()
     {
-        return $this->hasOne(User::class, ['id' => 'user_id']);
+        return $this->hasOne(UserStudent::class, ['id' => 'student_id']);
     }
 
     /**
@@ -102,7 +102,7 @@ class UserQuestionHistory extends \yii\db\ActiveRecord
         return $this->hasMany(UserQuestionAnswer::class, ['question_history_id' => 'id']);
     }
 
-    public static function create(int $userID,
+    public static function create(int $studentID,
                                   int $slideID,
                                   int $questionTopicID,
                                   string $questionTopicName,
@@ -113,7 +113,7 @@ class UserQuestionHistory extends \yii\db\ActiveRecord
                                   int $correctAnswer): UserQuestionHistory
     {
         $model = new self;
-        $model->user_id = $userID;
+        $model->student_id = $studentID;
         $model->slide_id = $slideID;
         $model->question_topic_id = $questionTopicID;
         $model->question_topic_name = $questionTopicName;

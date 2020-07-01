@@ -411,4 +411,17 @@ class User extends ActiveRecord implements IdentityInterface
         $student->save();
     }
 
+    public function student()
+    {
+        return $this
+            ->getStudents()
+            ->andWhere('status = :status', [':status' => UserStudent::STATUS_MAIN])
+            ->one();
+    }
+
+    public function getStudentID()
+    {
+        return $this->student()->id;
+    }
+
 }

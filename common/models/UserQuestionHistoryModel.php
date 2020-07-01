@@ -1,8 +1,6 @@
 <?php
 
-
 namespace common\models;
-
 
 use yii\base\Model;
 use yii\db\Query;
@@ -10,7 +8,7 @@ use yii\db\Query;
 class UserQuestionHistoryModel extends Model
 {
 
-    public $user_id;
+    public $student_id;
     public $slide_id;
     public $question_topic_id;
     public $question_topic_name;
@@ -22,20 +20,20 @@ class UserQuestionHistoryModel extends Model
 
     public $answers;
 
-    public function __construct($userID, $config = [])
+    public function __construct($studentID, $config = [])
     {
-        $this->user_id = $userID;
+        $this->student_id = $studentID;
         parent::__construct($config);
     }
 
     public function rules()
     {
         return [
-            [['user_id', 'slide_id', 'question_topic_id', 'question_topic_name', 'entity_id', 'entity_name', 'relation_id', 'relation_name'], 'required'],
-            [['user_id', 'slide_id', 'question_topic_id', 'entity_id', 'relation_id', 'correct_answer'], 'integer'],
+            [['student_id', 'slide_id', 'question_topic_id', 'question_topic_name', 'entity_id', 'entity_name', 'relation_id', 'relation_name'], 'required'],
+            [['student_id', 'slide_id', 'question_topic_id', 'entity_id', 'relation_id', 'correct_answer'], 'integer'],
             [['question_topic_name', 'entity_name', 'relation_name'], 'string', 'max' => 255],
             [['slide_id'], 'exist', 'skipOnError' => true, 'targetClass' => StorySlide::class, 'targetAttribute' => ['slide_id' => 'id']],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+            [['student_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserStudent::class, 'targetAttribute' => ['student_id' => 'id']],
             ['answers', 'safe'],
         ];
     }
@@ -46,7 +44,7 @@ class UserQuestionHistoryModel extends Model
             throw new \DomainException('User question history data is not valid');
         }
         $model = UserQuestionHistory::create(
-            $this->user_id,
+            $this->student_id,
             $this->slide_id,
             $this->question_topic_id,
             $this->question_topic_name,
@@ -79,7 +77,7 @@ class UserQuestionHistoryModel extends Model
             ->select(['t.entity_id', 't.relation_id', 't2.answer_entity_id'])
             ->from(['t' => UserQuestionHistory::tableName()])
             ->innerJoin(['t2' => UserQuestionAnswer::tableName()], 't2.question_history_id = t.id')
-            ->where('t.user_id = :user', [':user' => $this->user_id])
+            ->where('t.student_id = :student', [':student' => $this->student_id])
             ->andWhere('t.question_topic_id = :topic', [':topic' => $topicID])
             ->andWhere('t.correct_answer = 1')
             ->groupBy(['t.entity_id', 't.relation_id', 't2.answer_entity_id'])
@@ -93,7 +91,7 @@ class UserQuestionHistoryModel extends Model
             ->select(['t.entity_id', 't.relation_id', 't2.answer_entity_id', 'COUNT(t.entity_id) AS stars'])
             ->from(['t' => UserQuestionHistory::tableName()])
             ->innerJoin(['t2' => UserQuestionAnswer::tableName()], 't2.question_history_id = t.id')
-            ->where('t.user_id = :user', [':user' => $this->user_id])
+            ->where('t.student_id = :student', [':student' => $this->student_id])
             ->andWhere('t.question_topic_id = :topic', [':topic' => $topicID])
             ->andWhere('t.correct_answer = 1')
             ->groupBy(['t.entity_id', 't.relation_id', 't2.answer_entity_id'])

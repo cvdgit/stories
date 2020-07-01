@@ -97,7 +97,7 @@ class UserController extends Controller
         $dataProvider = $paymentSearch->search(Yii::$app->request->queryParams, $user->id);
 
         $searchModel = new UserStorySearch($user->id);
-        $questionHistorySearchModel = new UserQuestionHistorySearch($user->id);
+        $questionHistorySearchModel = new UserQuestionHistorySearch($user->getStudentID());
 
         return $this->render('update', [
             'model' => $form,
