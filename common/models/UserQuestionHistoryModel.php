@@ -20,12 +20,6 @@ class UserQuestionHistoryModel extends Model
 
     public $answers;
 
-    public function __construct($studentID, $config = [])
-    {
-        $this->student_id = $studentID;
-        parent::__construct($config);
-    }
-
     public function rules()
     {
         return [

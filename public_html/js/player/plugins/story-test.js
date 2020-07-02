@@ -47,7 +47,7 @@ var TestSlide = (function() {
             WikidsStoryTest.init();
             WikidsStoryTest.addEventListener("finish", storyTestResults);
             WikidsStoryTest.addEventListener("backToStory", backToStory);
-            var html =  WikidsStoryTest.load(data.json);
+            var html = WikidsStoryTest.load(data.json);
 
             $(".reveal .slides").append(html);
             Reveal.sync();

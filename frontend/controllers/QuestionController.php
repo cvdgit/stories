@@ -18,8 +18,8 @@ class QuestionController extends Controller
         $userHistory = [];
         $userStars = [];
         if (!Yii::$app->user->isGuest) {
-            $studentID = Yii::$app->user->identity->getStudentID();
-            $userQuestionHistoryModel = new UserQuestionHistoryModel($studentID);
+            $userQuestionHistoryModel = new UserQuestionHistoryModel();
+            $userQuestionHistoryModel->student_id = Yii::$app->user->identity->getStudentID();
             $userHistory = $userQuestionHistoryModel->getUserQuestionHistory($questionId);
             $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStars($questionId);
         }
@@ -104,7 +104,23 @@ class QuestionController extends Controller
                     'current' => $progressCurrent,
                 ]
             ],
+            'students' => $this->getStudents(),
         ]];
+    }
+
+    protected function getStudents()
+    {
+        $students = [];
+        if (!Yii::$app->user->isGuest) {
+            $user = Yii::$app->user->identity;
+            foreach ($user->students as $student) {
+                $students[] = [
+                    'id' => $student->id,
+                    'name' => $student->isMain() ? $student->user->getProfileName() : $student->name,
+                ];
+            }
+        }
+        return $students;
     }
 
     public function actionGetRelatedSlide(int $entity_id, int $relation_id)
@@ -123,10 +139,7 @@ class QuestionController extends Controller
         if (Yii::$app->user->isGuest) {
             return ['success' => false];
         }
-        /** @var User $user */
-        $user = Yii::$app->user->identity;
-        $student = $user->student();
-        $model = new UserQuestionHistoryModel($student->id);
+        $model = new UserQuestionHistoryModel();
         if ($model->load(Yii::$app->request->post(), '') && $model->validate()) {
             $userQuestionHistoryID = $model->createUserQuestionHistory();
             $model->createUserQuestionAnswers($userQuestionHistoryID);

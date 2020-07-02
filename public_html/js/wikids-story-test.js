@@ -35,6 +35,10 @@ var WikidsStoryTest = function() {
         return progress;
     }
 
+    function getStudentsData() {
+        return testData['students'];
+    }
+
     function init(remote) {
         //console.debug('WikidsStoryTest.init');
         remoteTest = remote || false;
@@ -147,7 +151,9 @@ var WikidsStoryTest = function() {
 
         setupDOM();
         addEventListeners();
-        start();
+
+        //start();
+        begin();
 
         if (for_slide === undefined) {
             for_slide = true;
@@ -160,7 +166,46 @@ var WikidsStoryTest = function() {
         return dom.wrapper;
     }
 
+    var currentStudent;
+
+    function setActiveStudentElement(element) {
+        element.siblings().removeClass('active');
+        element.addClass('active');
+        currentStudent = element.data('student');
+        $('.wikids-test-student-info', dom.header).text(currentStudent.name);
+    }
+
+    function createBeginPage() {
+        var students = getStudentsData();
+        var $listGroup = $('<div/>').addClass('list-group');
+        $listGroup.on('click', 'a', function(e) {
+            e.preventDefault();
+            setActiveStudentElement($(this));
+        });
+        students.forEach(function(student) {
+            var $item = $('<a/>')
+                .attr('href', '#')
+                .addClass('list-group-item')
+                .data('student', student)
+                .append($('<h4/>').addClass('list-group-item-heading').text(student.name));
+            $item.appendTo($listGroup);
+        });
+        setActiveStudentElement($listGroup.find('a:eq(0)'));
+        var $beginButton = $('<button/>')
+            .addClass('btn wikids-test-begin')
+            .text('Начать тест')
+            .on('click', function() {
+                start();
+            });
+        return $('<div/>')
+            .addClass('wikids-test-begin-page')
+            .append($('<p/>').text('Выберите ученика:'))
+            .append($listGroup)
+            .append($beginButton);
+    }
+
     function setupDOM() {
+        dom.beginPage = createBeginPage();
         dom.header = createHeader(getTestData());
         dom.questions = createQuestions(getQuestionsData());
         dom.controls = createControls();
@@ -190,10 +235,17 @@ var WikidsStoryTest = function() {
             .appendTo($(".wikids-test-buttons", dom.controls));
         dom.results = createResults();
         dom.wrapper
+            .append(dom.beginPage)
             .append(dom.header)
             .append(dom.questions)
             .append(dom.results)
             .append(dom.controls);
+    }
+
+    function createStudentInfo() {
+        return $('<div/>')
+            .addClass('wikids-test-student-info')
+            .text(currentStudent.name);
     }
 
     function addEventListeners() {
@@ -410,9 +462,16 @@ var WikidsStoryTest = function() {
 
     function createHeader(test) {
         var $header = $("<div/>")
-            .addClass("wikids-test-header")
-            .append($("<h3/>").text(test.title))
-            .append($("<p/>").text(test.description))
+            .addClass("wikids-test-header");
+
+        if (test.title) {
+            $header.append($("<h3/>").text(test.title));
+        }
+        if (test.description) {
+            $header.append($("<p/>").text(test.description));
+        }
+        $header
+            .append(createStudentInfo())
             .append(createProgress());
         return $header;
     }
@@ -425,6 +484,15 @@ var WikidsStoryTest = function() {
         }
     }
 
+    function begin() {
+        dom.header.hide();
+        dom.results.hide();
+        dom.nextButton.hide();
+        dom.restartButton.hide();
+        dom.backToStoryButton.hide();
+        dom.continueButton.hide();
+    }
+
     function start() {
 
         correctAnswersNumber = 0;
@@ -432,11 +500,14 @@ var WikidsStoryTest = function() {
 
         showNextQuestion();
 
-        dom.results.hide();
+        dom.beginPage.hide();
+
+        //dom.results.hide();
+        dom.header.show();
         dom.nextButton.show();
-        dom.restartButton.hide();
-        dom.backToStoryButton.hide();
-        dom.continueButton.hide();
+        //dom.restartButton.hide();
+        //dom.backToStoryButton.hide();
+        //dom.continueButton.hide();
     }
 
     function finish() {
@@ -636,6 +707,7 @@ var WikidsStoryTest = function() {
             });
             var answerParams = {
                 'slide_id': WikidsPlayer.getCurrentSlideID(),
+                'student_id': currentStudent.id,
                 'question_topic_id': currentQuestion.topic_id,
                 'question_topic_name': currentQuestion.name,
                 'entity_id': currentQuestion.entity_id,
