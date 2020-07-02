@@ -240,7 +240,23 @@ class StoryController extends Controller
             $item['stars'] = ['total' => 1, 'current' => 0];
             return $item;
         }, $json[0]['storyTestQuestions']);*/
+        $json[0]['students'] = $this->getStudents();
         return ['json' => $json];
+    }
+
+    protected function getStudents()
+    {
+        $students = [];
+        if (!Yii::$app->user->isGuest) {
+            $user = Yii::$app->user->identity;
+            foreach ($user->students as $student) {
+                $students[] = [
+                    'id' => $student->id,
+                    'name' => $student->isMain() ? $student->user->getProfileName() : $student->name,
+                ];
+            }
+        }
+        return $students;
     }
 
     public function actionStoreTestResult(int $story_id, int $question_id, string $answers)

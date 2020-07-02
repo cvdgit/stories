@@ -36,7 +36,7 @@ var WikidsStoryTest = function() {
     }
 
     function getStudentsData() {
-        return testData['students'];
+        return testData['students'] || [];
     }
 
     function init(remote) {
