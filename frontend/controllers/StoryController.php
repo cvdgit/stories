@@ -234,12 +234,8 @@ class StoryController extends Controller
         $json = StoryTest::find()->where('id = :id', [':id' => $id])->with('storyTestQuestions.storyTestAnswers')->asArray()->all();
         $json[0]['test']['progress'] = [
             'current' => 0,
-            'total' => 2,
+            'total' => count($json[0]['storyTestQuestions']),
         ];
-/*        $json[0]['storyTestQuestions'] = array_map(function($item) {
-            $item['stars'] = ['total' => 1, 'current' => 0];
-            return $item;
-        }, $json[0]['storyTestQuestions']);*/
         $json[0]['students'] = $this->getStudents();
         return ['json' => $json];
     }

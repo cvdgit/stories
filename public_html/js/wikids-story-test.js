@@ -476,8 +476,8 @@ var WikidsStoryTest = function() {
         return $header;
     }
 
-    function questionIsVisible() {
-        var object = $('object', this);
+    function questionIsVisible(questionElement) {
+        var object = $('object', questionElement);
         if (object.length) {
             var domSVG = object.contents();
             $('.continent', domSVG).removeClass('selected');
@@ -634,6 +634,7 @@ var WikidsStoryTest = function() {
         var view = currentQuestion['view'] ? currentQuestion.view : '';
         if (view === 'svg') {
             answer = getSvgQuestionAnswers(currentQuestion);
+            questionIsVisible($activeQuestion);
         }
         else {
             answer = getQuestionAnswers($activeQuestion);
@@ -743,10 +744,10 @@ var WikidsStoryTest = function() {
         var nextQuestion = questions.shift();
         $('.wikids-test-question[data-question-id=' + nextQuestion.id + ']', dom.questions)
             .find('input[type=checkbox],input[type=radio]').prop('checked', false).end()
-            .addClass('wikids-test-active-question')
             .slideDown(function() { $(this).trigger('isVisible'); })
             //.show('fast', 'linear', )
-            .on('isVisible', questionIsVisible);
+            //.on('isVisible', questionIsVisible)
+            .addClass('wikids-test-active-question');
     }
 
     function continueTestAction() {
