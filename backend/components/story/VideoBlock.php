@@ -46,6 +46,7 @@ class VideoBlock extends AbstractBlock
         $block->setHeight('720px');
         $block->setLeft(0);
         $block->setTop(0);
+        $block->setDuration(0);
         return $block;
     }
 

@@ -9,7 +9,7 @@ class VideoForm extends BaseForm
 
     public $video_id;
     public $seek_to;
-    public $duration;
+    public $duration = 0;
     public $mute;
     public $speed = 1;
     public $volume = 0.8;
