@@ -1380,11 +1380,14 @@ section h2 span {
   line-height: 3rem;
 }
 
+.site-user-profile {
+  padding-bottom: 100px;
+}
+
 .site-user-profile > h1 {
   font-weight: bold;
   font-size: 3rem;
-  text-align: center;
-  margin-bottom: 50px;
+  margin-bottom: 20px;
 }
 .site-user-profile h1 > span {
   color: #99cd50;
@@ -1392,6 +1395,40 @@ section h2 span {
 
 .profile-tabs.nav-tabs {
   text-align: left !important;
+}
+
+.profile-menu {
+  list-style: none;
+  padding-left: 0;
+  font-size: 2rem;
+  line-height: 3.5rem;
+  font-weight: 500;
+  margin-top: 14px;
+}
+
+.profile-menu li {
+  padding: 6px;
+}
+
+.profile-menu i {
+  margin: 0 10px;
+}
+
+.profile-menu li:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.profile-menu a:hover {
+  font-weight: bold;
+}
+
+.profile-menu li.active {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.profile-menu li.active a {
+  font-weight: bold;
+  color: #99cd50;
 }
 
 /*

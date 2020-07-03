@@ -7,6 +7,7 @@ use common\models\Rate;
 use common\services\UserPaymentService;
 use common\services\UserService;
 use Exception;
+use frontend\components\UserController;
 use frontend\models\PaymentForm;
 use Yii;
 use common\models\SubscriptionForm;
@@ -18,7 +19,7 @@ use yii\web\Controller;
 use yii\web\Response;
 use common\models\User;
 
-class PaymentController extends Controller
+class PaymentController extends UserController
 {
 
     protected $paymentService;
@@ -43,7 +44,7 @@ class PaymentController extends Controller
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['create'],
+                        //'actions' => ['index'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -52,7 +53,7 @@ class PaymentController extends Controller
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
-                    'create' => ['post'],
+                    // 'create' => ['post'],
                     'notify' => ['post'],
                 ],
             ],
@@ -72,7 +73,16 @@ class PaymentController extends Controller
         return parent::beforeAction($action);
     }
 
-    public function actionCreate(): array
+    public function actionIndex()
+    {
+        $user = User::findModel(Yii::$app->user->id);
+        return $this->render('index', [
+            'payments' => $user->payments,
+        ]);
+    }
+
+    /*
+    public function actionCreate()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         if (Yii::$app->request->isAjax) {
@@ -88,7 +98,6 @@ class PaymentController extends Controller
                     $user = User::findModel(Yii::$app->user->getId());
                     $paymentForm->email = $user->email;
 
-                    /** @var $rate Rate */
                     $rate = $model->getRate();
                     $paymentForm->amount = $rate->cost;
                     $paymentForm->order = $paymentID;
@@ -110,6 +119,7 @@ class PaymentController extends Controller
         }
         return ['success' => false, 'message' => 'При создании платежа произошла ошибка'];
     }
+    */
 
     public function actionNotify()
     {

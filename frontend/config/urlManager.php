@@ -25,6 +25,7 @@ return [
         'reset-password/<token>' => 'site/reset-password',
 
         'payment' => 'payment/create',
+        'payments' => 'payment/index',
         'payment/notify' => 'payment/notify',
 
         'profile' => 'profile/index',

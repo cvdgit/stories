@@ -1,24 +1,29 @@
 <?php
 use yii\helpers\Html;
 use yii\helpers\Json;
-/** @var $students array */
+/* @var $this yii\web\View */
+/* @var $students */
+$title = 'Обучение пользователя';
+$this->setMetaTags($title,
+    $title,
+    '',
+    $title);
 ?>
-<div class="profile-tab-content payment-tab">
-    <table class="table table-bordered" id="user-students-table">
-        <thead>
-        <tr>
-            <th>Имя</th>
-            <th>Возраст</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-    <?= Html::a('Добавить ученика', ['student/create'], ['class' => 'btn btn-small', 'data-toggle' => 'modal', 'data-target' => '#create-child-modal']) ?>
-    <div class="modal remote fade" id="create-child-modal">
-        <div class="modal-dialog">
-            <div class="modal-content"></div>
-        </div>
+<h1>Обучение</h1>
+<table class="table table-bordered" id="user-students-table">
+    <thead>
+    <tr>
+        <th>Имя</th>
+        <th>Возраст</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+<?= Html::a('Добавить ученика', ['student/create'], ['class' => 'btn btn-small', 'data-toggle' => 'modal', 'data-target' => '#create-child-modal']) ?>
+<div class="modal remote fade" id="create-child-modal">
+    <div class="modal-dialog">
+        <div class="modal-content"></div>
     </div>
 </div>
 <?php
@@ -77,4 +82,3 @@ $('#create-child-modal')
     });
 JS;
 $this->registerJs($js);
-

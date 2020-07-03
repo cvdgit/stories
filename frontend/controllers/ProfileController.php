@@ -4,14 +4,12 @@ namespace frontend\controllers;
 
 use common\services\ProfileService;
 use Exception;
+use frontend\components\UserController;
 use frontend\models\ProfileEditForm;
 use Yii;
-use yii\filters\AccessControl;
-use yii\web\Controller;
 use common\models\User;
-use common\services\UserPaymentService;
 
-class ProfileController extends Controller
+class ProfileController extends UserController
 {
 
     protected $profileService;
@@ -20,21 +18,6 @@ class ProfileController extends Controller
     {
         $this->profileService = $profileService;
         parent::__construct($id, $module, $config);
-    }
-
-    public function behaviors(): array
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::class,
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'roles' => ['user'],
-                    ],
-                ],
-            ],
-        ];
     }
 
     public function actionIndex()
