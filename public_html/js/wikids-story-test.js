@@ -866,7 +866,9 @@ var WikidsStoryTest = function() {
 
     function restore() {
 
-        init(true);
+        //init(true);
+        dom.wrapper = $("<div/>").addClass("wikids-test");
+
         setupDOM();
         addEventListeners();
         start();
