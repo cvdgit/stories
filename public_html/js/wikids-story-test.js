@@ -15,6 +15,11 @@ var WikidsStoryTest = function() {
         questionsRepeat = [];
     var questionAnswers = {};
 
+    var dataUrl,
+        dataParams;
+
+    var container;
+
     function getTestData() {
         return testData;
     }
@@ -37,13 +42,6 @@ var WikidsStoryTest = function() {
 
     function getStudentsData() {
         return testData['students'] || [];
-    }
-
-    function init(remote) {
-        //console.debug('WikidsStoryTest.init');
-        remoteTest = remote || false;
-        dom.wrapper = $("<div/>").addClass("wikids-test");
-        dom.wrapper.empty();
     }
 
     var QuestionsRepeat = function(questions, starsTotal) {
@@ -135,8 +133,34 @@ var WikidsStoryTest = function() {
         }
     }
 
+    function init(remote, for_slide, students, element) {
+
+        console.debug('WikidsStoryTest.init');
+
+        container = element;
+        remoteTest = remote || false;
+
+        dom.wrapper = $("<div/>").addClass("wikids-test");
+        dom.beginPage = createBeginPage(students);
+        dom.wrapper.append(dom.beginPage);
+
+        if (for_slide === undefined) {
+            for_slide = true;
+        }
+        if (for_slide) {
+            container.html($("<section/>")
+                .attr("data-background-color", "#ffffff")
+                .append(dom.wrapper));
+        }
+        else {
+            container.html(dom.wrapper);
+        }
+    }
+
     function load(data, for_slide) {
 
+        //dom.wrapper = $("<div/>").addClass("wikids-test");
+        dom.wrapper.empty();
         testData = data[0];
 
         numQuestions = getQuestionsData().length;
@@ -152,18 +176,40 @@ var WikidsStoryTest = function() {
         setupDOM();
         addEventListeners();
 
-        //start();
-        begin();
+        start();
+        //begin();
 
         if (for_slide === undefined) {
             for_slide = true;
         }
-        if (for_slide) {
-            return $("<section/>")
+        if (for_slide && !remoteTest) {
+            container.html($("<section/>")
                 .attr("data-background-color", "#ffffff")
-                .append(dom.wrapper);
+                .append(dom.wrapper));
         }
-        return dom.wrapper;
+        else {
+            container.html(dom.wrapper);
+        }
+    }
+
+    function createLoader() {
+        return $('<div/>')
+            .addClass('wikids-test-loader')
+            .append($('<p/>').text('Loading...'))
+            .append($('<img/>').attr('src', '/img/loading.gif'));
+    }
+
+    function loadData() {
+        dataParams.studentId = currentStudent.id;
+        container.html(createLoader());
+        $.getJSON(dataUrl, dataParams)
+            .done(function(response) {
+                load(response);
+                if (!remoteTest) {
+                    Reveal.sync();
+                    Reveal.slide(0);
+                }
+            });
     }
 
     var currentStudent;
@@ -175,8 +221,7 @@ var WikidsStoryTest = function() {
         $('.wikids-test-student-info', dom.header).text(currentStudent.name);
     }
 
-    function createBeginPage() {
-        var students = getStudentsData();
+    function createBeginPage(students) {
         var $listGroup = $('<div/>').addClass('list-group');
         $listGroup.on('click', 'a', function(e) {
             e.preventDefault();
@@ -195,7 +240,8 @@ var WikidsStoryTest = function() {
             .addClass('btn wikids-test-begin')
             .text('Начать тест')
             .on('click', function() {
-                start();
+                //start();
+                loadData();
             });
         return $('<div/>')
             .addClass('wikids-test-begin-page')
@@ -205,7 +251,7 @@ var WikidsStoryTest = function() {
     }
 
     function setupDOM() {
-        dom.beginPage = createBeginPage();
+        //dom.beginPage = createBeginPage();
         dom.header = createHeader(getTestData());
         dom.questions = createQuestions(getQuestionsData());
         dom.controls = createControls();
@@ -235,7 +281,7 @@ var WikidsStoryTest = function() {
             .appendTo($(".wikids-test-buttons", dom.controls));
         dom.results = createResults();
         dom.wrapper
-            .append(dom.beginPage)
+            //.append(dom.beginPage)
             .append(dom.header)
             .append(dom.questions)
             .append(dom.results)
@@ -645,7 +691,7 @@ var WikidsStoryTest = function() {
         }
 
         answerIsCorrect = answerQuestion($activeQuestion, answer);
-        //console.log(currentQuestion.id, currentQuestion.lastAnswerIsCorrect);
+        //console.log(answerIsCorrect);
 
         if (answerIsCorrect) {
             if (currentQuestion['stars']) {
@@ -838,5 +884,10 @@ var WikidsStoryTest = function() {
                 dom.wrapper[0].addEventListener(type, listener, useCapture);
             }
         },
+        "setDataParams": function(url, params) {
+            dataUrl = url;
+            params = params || {};
+            dataParams = params;
+        }
     };
 }();

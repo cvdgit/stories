@@ -177,6 +177,14 @@ var WikidsPlayer = (function(document, $) {
         return $("#audio-track-list").val();
     }
 
+    function ready() {
+        console.log('WikidsPlayer.ready');
+
+        StoryBackground.init();
+    }
+
+    Reveal.addEventListener('ready', ready);
+
     return {
         "initialize": initialize,
         "toggleFullscreen": toggleFullscreen,

@@ -18,6 +18,7 @@ class Test extends AbstractPlugin implements PluginInterface
                 'storeAction' => Url::to(['story/store-test-result', 'story_id' => $this->storyID]),
                 'storyBodyAction' => Url::to(['story/get-story-body']),
                 'story_id' => $this->storyID,
+                'initAction' => Url::to(['question/init']),
             ],
         ];
     }

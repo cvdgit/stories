@@ -67,7 +67,7 @@ class UserQuestionHistoryModel extends Model
 
     public function getUserQuestionHistory(int $topicID)
     {
-        return (new Query())
+        $query = (new Query())
             ->select(['t.entity_id', 't.relation_id', 't2.answer_entity_id'])
             ->from(['t' => UserQuestionHistory::tableName()])
             ->innerJoin(['t2' => UserQuestionAnswer::tableName()], 't2.question_history_id = t.id')
@@ -75,8 +75,8 @@ class UserQuestionHistoryModel extends Model
             ->andWhere('t.question_topic_id = :topic', [':topic' => $topicID])
             ->andWhere('t.correct_answer = 1')
             ->groupBy(['t.entity_id', 't.relation_id', 't2.answer_entity_id'])
-            ->having('COUNT(t.entity_id) >= 5')
-            ->all();
+            ->having('COUNT(t.entity_id) >= 5');
+        return $query->all();
     }
 
     public function getUserQuestionHistoryStars(int $topicID)

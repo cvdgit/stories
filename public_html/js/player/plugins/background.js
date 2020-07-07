@@ -12,13 +12,18 @@ var StoryBackground = (function () {
     var backgroundStorageItemName = "story_background";
 
     function init() {
+        console.log('StoryBackground.init');
         var background = localStorage.getItem(backgroundStorageItemName) || "dark";
         if (background !== "dark") {
             setBackgroundColor(background);
         }
+        if (WikidsPlayer.isTestSlide()) {
+            setBackgroundColor('light');
+            Reveal.sync();
+        }
     }
 
-    init();
+    //init();
 
     function switchBackground() {
         var color = "";
@@ -44,6 +49,7 @@ var StoryBackground = (function () {
 
     return {
         "init": init,
-        "switchBackground": switchBackground
+        "switchBackground": switchBackground,
+        "setBackgroundColor": setBackgroundColor
     };
 })();

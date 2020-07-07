@@ -1792,12 +1792,16 @@
 }
 
 .wikids-test-begin-page {
-	margin-top: 12%;
+	margin-top: 15%;
+}
+
+.wikids-test-begin-page p {
+	margin: 20px 0;
 }
 
 .wikids-test-begin-page .list-group {
 	max-width: 400px;
-	margin: 0 auto 20px;
+	margin: 0 auto 30px;
 }
 
 .wikids-test-student-info {
@@ -2002,4 +2006,8 @@
 	border-radius: 4px;
 	-webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
 	box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.wikids-test-loader {
+	margin-top: 20%;
 }

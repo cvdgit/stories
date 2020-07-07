@@ -35,21 +35,23 @@ var TestSlide = (function() {
             slide_index = Reveal.getIndices().h;
 
         var promise = $.ajax({
-            "url": config.action + "/" + test_id + "?t=" + Math.random(),
+            "url": config.initAction,
             "type": "GET",
             "dataType": "json"
         });
 
+        WikidsStoryTest.setDataParams(config.action + "/" + test_id + "?t=" + Math.random())
         promise.done(function(data) {
 
-            $(".reveal .slides").empty();
+            //$(".reveal .slides").empty();
 
-            WikidsStoryTest.init();
+            WikidsStoryTest.init(false, true, data.students, $('.reveal .slides'));
             WikidsStoryTest.addEventListener("finish", storyTestResults);
             WikidsStoryTest.addEventListener("backToStory", backToStory);
-            var html = WikidsStoryTest.load(data.json);
+            //var html = WikidsStoryTest.load(data.json);
 
-            $(".reveal .slides").append(html);
+            //$(".reveal .slides").append(html);
+
             Reveal.sync();
             Reveal.slide(0);
 
@@ -74,14 +76,6 @@ var TestSlide = (function() {
     }
 
     $(".reveal > .slides").on("click", "button[data-test-id]", action);
-
-    /*
-    $(".reveal > .slides").on("click", ".wikids-test-answer", function() {
-        console.log('click2');
-        //var $input = $(this).find("input");
-        //$input.prop("checked", !$input.prop("checked"));
-    });
-    */
 
     function syncReveal(data, slide_index) {
         $(".reveal .slides").empty().append(data);
@@ -171,6 +165,10 @@ var Education = (function() {
         return Reveal.getCurrentSlide();
     }
 
+    function initQuestions() {
+        return $.getJSON("/question/init");
+    }
+
     function loadQuestionData(params) {
         return $.getJSON("/question/get", params);
     }
@@ -181,12 +179,11 @@ var Education = (function() {
             return;
         }
         elem.html($('<img/>').attr('src', '/img/loading.gif').css('marginTop', '22%'));
-        loadQuestionData(elem.data())
-            .done(function(data) {
-                WikidsStoryTest.init(true);
-                var html =  WikidsStoryTest.load(data, false);
-                elem.html(html);
-            });
+        WikidsStoryTest.setDataParams('/question/get', elem.data());
+        initQuestions().done(function(response) {
+            StoryBackground.setBackgroundColor('light');
+            WikidsStoryTest.init(true, false, response.students, elem);
+        });
     }
 
     function initEducation() {

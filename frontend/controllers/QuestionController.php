@@ -2,7 +2,6 @@
 
 namespace frontend\controllers;
 
-use common\models\User;
 use common\models\UserQuestionHistoryModel;
 use linslin\yii2\curl\Curl;
 use Yii;
@@ -13,13 +12,21 @@ use yii\rest\Controller;
 class QuestionController extends Controller
 {
 
-    public function actionGet(int $questionId, int $questionsNumber, int $answersNumber)
+    public function actionInit()
+    {
+        $json = [
+            'students' => $this->getStudents(),
+        ];
+        return $json;
+    }
+
+    public function actionGet(int $questionId, int $questionsNumber, int $answersNumber, int $studentId = null)
     {
         $userHistory = [];
         $userStars = [];
-        if (!Yii::$app->user->isGuest) {
+        if ($studentId !== null) {
             $userQuestionHistoryModel = new UserQuestionHistoryModel();
-            $userQuestionHistoryModel->student_id = Yii::$app->user->identity->getStudentID();
+            $userQuestionHistoryModel->student_id = $studentId;
             $userHistory = $userQuestionHistoryModel->getUserQuestionHistory($questionId);
             $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStars($questionId);
         }
