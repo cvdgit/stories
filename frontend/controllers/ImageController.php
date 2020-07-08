@@ -37,10 +37,10 @@ class ImageController extends Controller
         $response->headers->add('content-type', 'image/jpeg');
 
         $imagePath = Yii::getAlias('@public/admin/upload/') . $image->folder . '/' . $image->hash . '.jpeg';
-        $response->headers->add('Cache-control: max-age=', (60*60*24*365));
-        $response->headers->add('Expires:', gmdate(DATE_RFC1123,time()+60*60*24*365));
-        $response->headers->add('Last-Modified:', gmdate(DATE_RFC1123, filemtime($imagePath)));
-        $response->headers->add('Cache-Control:', 'private');
+        $response->headers->add('Cache-control', 'max-age=' . (60*60*24*365));
+        $response->headers->add('Expires', gmdate(DATE_RFC1123,time()+60*60*24*365));
+        $response->headers->add('Last-Modified', gmdate(DATE_RFC1123, filemtime($imagePath)));
+        $response->headers->add('ETag', sprintf('%08x-%08x', crc32($imagePath), filemtime($imagePath)));
 
         try {
             $img_data = file_get_contents($imagePath);
