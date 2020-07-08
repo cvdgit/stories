@@ -19,8 +19,8 @@ var StoryBackground = (function () {
         }
         if (WikidsPlayer.isTestSlide()) {
             setBackgroundColor('light');
-            Reveal.sync();
         }
+        Reveal.sync();
     }
 
     //init();
