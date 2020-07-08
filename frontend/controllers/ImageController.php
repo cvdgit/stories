@@ -40,6 +40,7 @@ class ImageController extends Controller
         $response->headers->add('Cache-control: max-age=', (60*60*24*365));
         $response->headers->add('Expires:', gmdate(DATE_RFC1123,time()+60*60*24*365));
         $response->headers->add('Last-Modified:', gmdate(DATE_RFC1123, filemtime($imagePath)));
+        $response->headers->add('Cache-Control:', 'private');
 
         try {
             $img_data = file_get_contents($imagePath);
