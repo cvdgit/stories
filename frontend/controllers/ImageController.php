@@ -20,6 +20,11 @@ class ImageController extends Controller
             throw new HttpException(404);
         }
 
+        if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
+            header('HTTP/1.1 304 Not Modified');
+            die();
+        }
+
         if (!$image->isSuccess()) {
             if ($image->linkImages === null) {
                 throw new HttpException(404);
