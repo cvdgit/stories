@@ -46,59 +46,38 @@ var WikidsStoryTest = function() {
 
     var QuestionsRepeat = function(questions, starsTotal) {
         this.starsTotal = starsTotal;
-        this.items = questions.map(function(question) {
-            var number = 1;
+        questions.map(function(question) {
             if (question['stars']) {
-                number = question.stars.total - question.stars.current;
-            }
-            return {"entity_id": question.entity_id, "number": number};
-        });
-    };
-
-    QuestionsRepeat.prototype.getItems = function() {
-        return this.items;
-    };
-
-    QuestionsRepeat.prototype.findItem = function(id) {
-        var currentItem;
-        this.items.forEach(function(item) {
-            if (parseInt(item.entity_id) === parseInt(id)) {
-                currentItem = item;
-                return;
+                question.stars.number = question.stars.total - question.stars.current;
             }
         });
-        return currentItem;
     };
 
-    QuestionsRepeat.prototype.inc = function(id) {
-        var item = this.findItem(id);
-        item.number++;
+    QuestionsRepeat.prototype.inc = function(question) {
+        question.stars.number++;
         var increased = true;
-        if (item.number > this.starsTotal) {
-            item.number = this.starsTotal;
+        if (question.stars.number > this.starsTotal) {
+            question.stars.number = this.starsTotal;
             increased = false;
         }
         return increased;
     };
 
-    QuestionsRepeat.prototype.dec = function(id) {
-        var item = this.findItem(id);
-        item.number--;
+    QuestionsRepeat.prototype.dec = function(question) {
+        question.stars.number--;
     };
 
-    QuestionsRepeat.prototype.done = function(id) {
-        var item = this.findItem(id);
-        return parseInt(item.number) <= 0;
+    QuestionsRepeat.prototype.done = function(question) {
+        return parseInt(question.stars.number) <= 0;
     };
 
-    QuestionsRepeat.prototype.number = function(id) {
-        var number = this.starsTotal - this.findItem(id).number;
+    QuestionsRepeat.prototype.number = function(question) {
+        var number = this.starsTotal - question.stars.number;
         return number < 0 ? 0 : number;
     };
 
-    QuestionsRepeat.prototype.stars = function(id) {
-        var number = this.number(id);
-        return number;
+    QuestionsRepeat.prototype.stars = function(question) {
+        return question.stars.number;
     };
 
     var testProgress;
@@ -251,7 +230,6 @@ var WikidsStoryTest = function() {
     }
 
     function setupDOM() {
-        //dom.beginPage = createBeginPage();
         dom.header = createHeader(getTestData());
         dom.questions = createQuestions(getQuestionsData());
         dom.controls = createControls();
@@ -281,7 +259,6 @@ var WikidsStoryTest = function() {
             .appendTo($(".wikids-test-buttons", dom.controls));
         dom.results = createResults();
         dom.wrapper
-            //.append(dom.beginPage)
             .append(dom.header)
             .append(dom.questions)
             .append(dom.results)
@@ -423,11 +400,11 @@ var WikidsStoryTest = function() {
         }
     }
 
-    function createStars(id) {
+    function createStars(stars) {
         var $elem = $('<p/>');
         $elem.addClass('question-stars');
         $elem.css('textAlign', 'right');
-        appendStars($elem, remoteTest ? 5 : 1, questionsRepeat.stars(id));
+        appendStars($elem, remoteTest ? 5 : 1, stars.current);
         return $elem[0].outerHTML;
     }
 
@@ -455,7 +432,7 @@ var WikidsStoryTest = function() {
         }
         var stars = '';
         if (question['stars']) {
-            stars = createStars(question.entity_id);
+            stars = createStars(question.stars);
         }
         return $("<div/>")
             .hide()
@@ -696,7 +673,7 @@ var WikidsStoryTest = function() {
         if (answerIsCorrect) {
             if (currentQuestion['stars']) {
                 if (currentQuestion.lastAnswerIsCorrect) {
-                    questionsRepeat.dec(currentQuestion.entity_id);
+                    questionsRepeat.dec(currentQuestion);
                     testProgress.inc();
                 }
                 else {
@@ -713,7 +690,7 @@ var WikidsStoryTest = function() {
         else {
             currentQuestion.lastAnswerIsCorrect = false;
             if (currentQuestion['stars']) {
-                var increased = questionsRepeat.inc(currentQuestion.entity_id);
+                var increased = questionsRepeat.inc(currentQuestion);
                 if (increased) {
                     testProgress.dec();
                 }
@@ -721,17 +698,17 @@ var WikidsStoryTest = function() {
         }
 
         if (currentQuestion['stars']) {
-            updateStars($activeQuestion, questionsRepeat.number(currentQuestion.entity_id));
+            updateStars($activeQuestion, questionsRepeat.number(currentQuestion));
         }
         updateProgress();
 
-        //console.log(answerIsCorrect, questionsRepeat.done(currentQuestion.entity_id));
+        //console.log(answerIsCorrect, questionsRepeat.done(currentQuestion));
         if (remoteTest) {
             if (!answerIsCorrect) {
                 questions.unshift(currentQuestion);
             }
             else {
-                if (!questionsRepeat.done(currentQuestion.entity_id)) {
+                if (!questionsRepeat.done(currentQuestion)) {
                     questions.push(currentQuestion);
                 }
             }
@@ -743,7 +720,7 @@ var WikidsStoryTest = function() {
         }
 
         //console.log(questions);
-        //console.log(currentQuestion.name, answerIsCorrect);
+        console.log(currentQuestion);
 
         if (remoteTest && !App.userIsGuest()) {
             var answerList = answer.map(function(entity_id) {
@@ -783,7 +760,6 @@ var WikidsStoryTest = function() {
         else {
             continueTestAction();
         }
-        //dom.continueButton.show();
     }
 
     function showNextQuestion() {
@@ -791,8 +767,6 @@ var WikidsStoryTest = function() {
         $('.wikids-test-question[data-question-id=' + nextQuestion.id + ']', dom.questions)
             .find('input[type=checkbox],input[type=radio]').prop('checked', false).end()
             .slideDown(function() { $(this).trigger('isVisible'); })
-            //.show('fast', 'linear', )
-            //.on('isVisible', questionIsVisible)
             .addClass('wikids-test-active-question');
     }
 

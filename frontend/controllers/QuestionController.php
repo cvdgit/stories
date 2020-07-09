@@ -28,7 +28,7 @@ class QuestionController extends Controller
             $userQuestionHistoryModel = new UserQuestionHistoryModel();
             $userQuestionHistoryModel->student_id = $studentId;
             $userHistory = $userQuestionHistoryModel->getUserQuestionHistory($questionId);
-            $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStars($questionId);
+            $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStars2($questionId);
         }
         $curl = new Curl();
         $result = $curl
@@ -44,11 +44,11 @@ class QuestionController extends Controller
         $result = Json::decode($result);
 
         $questions = [];
-        $questionEntities = [];
         $i = 1;
         foreach ($result as $resultItem) {
 
             $answers = [];
+            $correctAnswerIDs = [];
             foreach ($resultItem['answers'] as $_answer) {
                 $answer = [
                     'id' => $_answer['id'],
@@ -56,19 +56,18 @@ class QuestionController extends Controller
                     'is_correct' => $_answer['correct'] ? 1 : 0,
                     'image' => $_answer['image'],
                 ];
+                if ($_answer['correct']) {
+                    $correctAnswerIDs[] = $_answer['id'];
+                }
                 $answers[] = $answer;
             }
 
             $stars = 0;
-            if (isset($userStars[$resultItem['question_entity_id']])) {
+            if (isset($userStars[$resultItem['question_entity_id']]) && in_array($userStars[$resultItem['question_entity_id']]['answer_entity_id'], $correctAnswerIDs, true)) {
                 $stars = $userStars[$resultItem['question_entity_id']]['stars'];
             }
 
             $svg = $resultItem['question_svg'] ?? false;
-
-            if (!in_array($resultItem['question_entity_id'], $questionEntities, true)) {
-                $questionEntities[] = $resultItem['question_entity_id'];
-            }
 
             $question = [
                 'id' => $i,
@@ -86,7 +85,7 @@ class QuestionController extends Controller
                 'correct_number' => $resultItem['correct_number'],
                 'stars' => [
                     'total' => 5,
-                    'current' => $stars,
+                    'current' => (int)$stars,
                 ],
                 'view' => $svg ? 'svg' : '',
                 'svg' => $svg,
