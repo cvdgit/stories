@@ -3,14 +3,13 @@
 namespace frontend\models;
 
 use common\models\UserStudent;
-use http\Exception\RuntimeException;
 use yii\base\Model;
 
 class CreateStudentForm extends Model
 {
 
     public $name;
-    public $age_year;
+    public $birth_date;
 
     protected $user_id;
 
@@ -23,9 +22,9 @@ class CreateStudentForm extends Model
     public function rules()
     {
         return [
-            [['name', 'age_year'], 'required'],
+            [['name', 'birth_date'], 'required'],
             ['name', 'string', 'max' => 50],
-            ['age_year', 'integer'],
+            ['birth_date', 'default', 'value' => null],
         ];
     }
 
@@ -33,16 +32,16 @@ class CreateStudentForm extends Model
     {
         return [
             'name' => 'Имя',
-            'age_year' => 'Возраст',
+            'birth_date' => 'Дата рождения',
         ];
     }
 
     public function createStudent()
     {
         if (!$this->validate()) {
-            throw new RuntimeException('Model not valid');
+            throw new \RuntimeException('Model not valid');
         }
-        $model = UserStudent::create($this->user_id, $this->name, $this->age_year);
+        $model = UserStudent::createStudent($this->user_id, $this->name, $this->birth_date);
         $model->save();
     }
 

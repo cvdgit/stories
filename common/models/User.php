@@ -407,7 +407,7 @@ class User extends ActiveRecord implements IdentityInterface
 
     public function createMainStudent()
     {
-        $student = UserStudent::createMain($this->id, $this->username, 0);
+        $student = UserStudent::createMain($this->id, $this->username);
         $student->save();
     }
 

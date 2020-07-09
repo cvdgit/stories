@@ -14,7 +14,7 @@ $this->setMetaTags($title,
     <thead>
     <tr>
         <th>Имя</th>
-        <th>Возраст</th>
+        <th>Дата рождения</th>
         <th></th>
     </tr>
     </thead>
@@ -61,7 +61,7 @@ window.fillUserStudentsTable = function(students) {
                 })
             $('<tr/>')
                 .append($('<td/>').text(student.name))
-                .append($('<td/>').text(student.age_year))
+                .append($('<td/>').text(student.birth_date))
                 .append($('<td/>').append(deleteLink))
                 .appendTo(table);
         });
@@ -74,8 +74,10 @@ window.fillUserStudentsTable = function(students) {
 }
 fillUserStudentsTable(userStudents);
 $('#create-child-modal')
-    .on('show.bs.modal', function() {
-        $('form', this).trigger('reset');
+    .on('show.bs.modal', function(e) {
+        if (e.namespace === 'bs.modal') {
+            $('form', this).trigger('reset');
+        }
     })
     .on('shown.bs.modal', function () {
         $('input[type=text]:eq(0)', this).focus();

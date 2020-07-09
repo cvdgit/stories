@@ -53,7 +53,7 @@ class SignupService
     {
         $response = EmailHelper::sendEmail($user->email, 'Подтверждение регистрации', 'userSignupComfirm-html', ['user' => $user]);
         if (!$response->isSuccess()) {
-            throw new RuntimeException('Confirm email sent error');
+            throw new RuntimeException('Confirm email sent error - ' . $response->getError()->getMessage());
         }
     }
 

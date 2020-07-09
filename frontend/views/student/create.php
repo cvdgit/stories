@@ -10,11 +10,20 @@ $form = ActiveForm::begin([
 ?>
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Добавить ребенка</h4>
+        <h4 class="modal-title">Добавить ученика</h4>
     </div>
     <div class="modal-body">
-        <?php echo $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-        <?php echo $form->field($model, 'age_year')->textInput() ?>
+        <?php echo $form->field($model, 'name')->textInput(['maxlength' => true, 'autocomplete' => 'off']) ?>
+        <?php echo $form->field($model, 'birth_date')->widget(\dosamigos\datepicker\DatePicker::class, [
+            'language' => 'ru',
+            'clientOptions' => [
+                'autoclose' => true,
+                'format' => 'yyyy-mm-dd',
+            ],
+            'options' => [
+                'autocomplete' => 'off',
+            ],
+        ]) ?>
     </div>
     <div class="modal-footer">
         <?php echo Html::submitButton('Добавить', ['class' => 'btn btn-small']) ?>
@@ -39,6 +48,9 @@ $('#create-child-form').on('beforeSubmit', function (event) {
     .done(function(response) {
             if (response && response.success) {
                 fillUserStudentsTable(response.students);
+            }
+            else {
+                toastr.error(response.errors.join(', '));
             }
         })
     .always(function() {

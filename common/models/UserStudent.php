@@ -13,15 +13,16 @@ use yii\db\ActiveRecord;
  * @property int $user_id
  * @property int $status
  * @property string $name
- * @property int $age_year
  * @property int $created_at
  * @property int $updated_at
+ * @property string $birth_date;
  *
  * @property User $user
  */
 class UserStudent extends ActiveRecord
 {
 
+    const STATUS_STUDENT = 0;
     const STATUS_MAIN = 1;
 
     /**
@@ -62,7 +63,7 @@ class UserStudent extends ActiveRecord
             'user_id' => 'User ID',
             'status' => 'Status',
             'name' => 'Name',
-            'age_year' => 'Age Year',
+            'birth_date' => 'Дата рождения',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
@@ -84,12 +85,12 @@ class UserStudent extends ActiveRecord
         throw new DomainException('Пользователь не найден.');
     }
 
-    public static function create(int $userID, string $name, int $age_year, $status = 0)
+    public static function create(int $userID, string $name, $birth_date, $status)
     {
         $model = new self();
         $model->user_id = $userID;
         $model->name = $name;
-        $model->age_year = $age_year;
+        $model->birth_date = $birth_date;
         $model->status = $status;
         return $model;
     }
@@ -99,9 +100,14 @@ class UserStudent extends ActiveRecord
         return (int)$this->user_id === $userID;
     }
 
-    public static function createMain(int $userID, string $name, int $age_year)
+    public static function createStudent(int $userID, string $name, string $birth_date)
     {
-        return self::create($userID, $name, $age_year, self::STATUS_MAIN);
+        return self::create($userID, $name, $birth_date, self::STATUS_STUDENT);
+    }
+
+    public static function createMain(int $userID, string $name, string $birth_date = null)
+    {
+        return self::create($userID, $name, $birth_date, self::STATUS_MAIN);
     }
 
     public function isMain()
