@@ -1,16 +1,16 @@
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-/* @var $model frontend\models\CreateStudentForm */
+/* @var $model frontend\models\UpdateStudentForm */
 $form = ActiveForm::begin([
-    'action' => ['student/create'],
+    'action' => ['student/update', 'id' => $model->getModelID()],
     'enableClientValidation' => true,
-    'id' => 'create-child-form',
+    'id' => 'update-child-form',
 ]);
 ?>
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Добавить ученика</h4>
+        <h4 class="modal-title">Изменить профиль ученика</h4>
     </div>
     <div class="modal-body">
         <?php echo $form->field($model, 'name')->textInput(['maxlength' => true, 'autocomplete' => 'off']) ?>
@@ -26,15 +26,15 @@ $form = ActiveForm::begin([
         ]) ?>
     </div>
     <div class="modal-footer">
-        <?php echo Html::submitButton('Добавить', ['class' => 'btn btn-small']) ?>
+        <?php echo Html::submitButton('Изменить', ['class' => 'btn btn-small']) ?>
         <button type="button" class="btn btn-small" data-dismiss="modal">Отмена</button>
     </div>
 <?php ActiveForm::end(); ?>
 
 <?php
 $js = <<< JS
-$('#create-child-form').on('beforeSubmit', function (event) {
-    event.preventDefault();            
+$('#update-child-form').on('beforeSubmit', function (event) {
+    event.preventDefault();
     var form_data = new FormData(this);
     $.ajax({
         url: $(this).attr('action'),
@@ -48,7 +48,7 @@ $('#create-child-form').on('beforeSubmit', function (event) {
     .done(function(response) {
             if (response && response.success) {
                 fillUserStudentsTable(response.students);
-                toastr.success('Запись создана успешно');
+                toastr.success('Данные успешно изменены');
             }
             else {
                 toastr.error(response.errors.join(', '));

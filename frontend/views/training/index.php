@@ -58,11 +58,25 @@ window.fillUserStudentsTable = function(students) {
                     .fail(function(response) {
                         toastr.error(response.responseJSON.message);
                     });
-                })
+                });
+            var editLink = $('<a/>')
+                .attr({href: '/student/update?id=' + student.id, title: 'Изменить запись'})
+                .html('<i class="glyphicon glyphicon-edit"></i>')
+                .on('click', function(e) {
+                    e.preventDefault();
+                    $('.modal-content', modal).load($(this).attr('href'), function(response) {
+                        modal.modal('show');
+                    });
+                });
             $('<tr/>')
-                .append($('<td/>').text(student.name))
-                .append($('<td/>').text(student.birth_date))
-                .append($('<td/>').append(deleteLink))
+                .append($('<td/>').attr('width', '55%').text(student.name))
+                .append($('<td/>').attr('width', '30%').text(student.birth_date))
+                .append($('<td/>')
+                    .attr('width', '15%')
+                    .addClass('wikids-students-table-actions')
+                    .append(editLink)
+                    .append(deleteLink)
+                )
                 .appendTo(table);
         });
     }
@@ -73,13 +87,16 @@ window.fillUserStudentsTable = function(students) {
     }
 }
 fillUserStudentsTable(userStudents);
-$('#create-child-modal')
+
+var modal = $('#create-child-modal');
+
+modal
     .on('show.bs.modal', function(e) {
         if (e.namespace === 'bs.modal') {
             $('form', this).trigger('reset');
         }
     })
-    .on('shown.bs.modal', function () {
+    .on('shown.bs.modal', function() {
         $('input[type=text]:eq(0)', this).focus();
     });
 JS;

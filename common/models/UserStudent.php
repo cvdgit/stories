@@ -3,6 +3,7 @@
 namespace common\models;
 
 use DomainException;
+use frontend\models\UpdateStudentForm;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 

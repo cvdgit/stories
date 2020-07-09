@@ -2525,3 +2525,11 @@ img.lazy {
 .btn-small {
   padding: 1.5rem 2rem;
 }
+
+.wikids-students-table-actions {
+  text-align: center;
+}
+
+.wikids-students-table-actions a {
+  margin: 0 5px;
+}
