@@ -20,8 +20,8 @@ $this->setMetaTags($title,
     </thead>
     <tbody></tbody>
 </table>
-<?= Html::a('Добавить ученика', ['student/create'], ['class' => 'btn btn-small', 'data-toggle' => 'modal', 'data-target' => '#create-child-modal']) ?>
-<div class="modal remote fade" id="create-child-modal">
+<?= Html::a('Добавить ученика', ['student/create'], ['class' => 'btn btn-small', 'id' => 'create-student']) ?>
+<div class="modal fade" id="create-child-modal">
     <div class="modal-dialog">
         <div class="modal-content"></div>
     </div>
@@ -99,5 +99,13 @@ modal
     .on('shown.bs.modal', function() {
         $('input[type=text]:eq(0)', this).focus();
     });
+
+$('#create-student').on('click', function(e) {
+    e.preventDefault();
+     $('.modal-content', modal).load($(this).attr('href'), function(response) {
+         modal.modal('show');
+     });
+});
+
 JS;
 $this->registerJs($js);
