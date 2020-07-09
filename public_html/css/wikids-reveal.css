@@ -2009,5 +2009,9 @@
 }
 
 .wikids-test-loader {
-	margin-top: 20%;
+	margin-top: 18%;
+}
+
+.wikids-test-loader p {
+	padding: 20px 0;
 }

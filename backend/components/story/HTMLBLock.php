@@ -36,10 +36,10 @@ class HTMLBLock extends AbstractBlock
     public function create()
     {
         $block = new self();
-        $block->setWidth('1200px');
+        $block->setWidth('1260px');
         $block->setHeight('650px');
-        $block->setLeft('40px');
-        $block->setTop('20px');
+        $block->setLeft('10px');
+        $block->setTop('4px');
         return $block;
     }
 

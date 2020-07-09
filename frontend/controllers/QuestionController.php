@@ -63,8 +63,11 @@ class QuestionController extends Controller
             }
 
             $stars = 0;
-            if (isset($userStars[$resultItem['question_entity_id']]) && in_array($userStars[$resultItem['question_entity_id']]['answer_entity_id'], $correctAnswerIDs, true)) {
-                $stars = $userStars[$resultItem['question_entity_id']]['stars'];
+            foreach ($userStars as $star) {
+                if ((int)$star['entity_id'] === (int)$resultItem['question_entity_id'] && in_array($star['answer_entity_id'], $correctAnswerIDs, true)) {
+                    $stars = $star['stars'];
+                    break;
+                }
             }
 
             $svg = $resultItem['question_svg'] ?? false;

@@ -174,7 +174,7 @@ var WikidsStoryTest = function() {
     function createLoader() {
         return $('<div/>')
             .addClass('wikids-test-loader')
-            .append($('<p/>').text('Loading...'))
+            .append($('<p/>').text('Загружка вопросов'))
             .append($('<img/>').attr('src', '/img/loading.gif'));
     }
 
@@ -720,7 +720,7 @@ var WikidsStoryTest = function() {
         }
 
         //console.log(questions);
-        console.log(currentQuestion);
+        //console.log(currentQuestion);
 
         if (remoteTest && !App.userIsGuest()) {
             var answerList = answer.map(function(entity_id) {

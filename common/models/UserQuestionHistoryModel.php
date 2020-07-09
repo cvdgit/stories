@@ -105,7 +105,7 @@ class UserQuestionHistoryModel extends Model
             ->andWhere('t.correct_answer = 1')
             ->groupBy(['t2.answer_entity_id', 't.relation_id', 't.entity_id'])
             ->having('COUNT(t2.answer_entity_id) < 5')
-            ->indexBy(['entity_id'])
+            //->indexBy(['entity_id'])
             ->all();
     }
 
