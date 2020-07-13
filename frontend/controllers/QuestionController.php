@@ -42,6 +42,8 @@ class QuestionController extends Controller
             ->setPostParams(['history' => Json::encode($userHistory)])
             ->get(Yii::$app->params['neo.url'] . '/api/question/get');
         $result = Json::decode($result);
+        $numberQuestions = $result['total'];
+        $result = $result['questions'];
 
         $questions = [];
         $i = 1;
@@ -109,9 +111,9 @@ class QuestionController extends Controller
             'storyTestQuestions' => $questions,
             'test' => [
                 'progress' => [
-                    'total' => count($questions) * 5,
+                    'total' => $numberQuestions * 5,
                     'current' => $progressCurrent,
-                ]
+                ],
             ],
             'students' => $this->getStudents(),
         ]];
