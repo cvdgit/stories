@@ -24,11 +24,13 @@ class QuestionController extends Controller
     {
         $userHistory = [];
         $userStars = [];
+        $userStarsCount = 0;
         if ($studentId !== null) {
             $userQuestionHistoryModel = new UserQuestionHistoryModel();
             $userQuestionHistoryModel->student_id = $studentId;
             $userHistory = $userQuestionHistoryModel->getUserQuestionHistory($questionId);
             $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStars2($questionId);
+            $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCount($questionId);
         }
         $curl = new Curl();
         $result = $curl
@@ -100,17 +102,12 @@ class QuestionController extends Controller
             $i++;
         }
 
-        $progressCurrent = array_reduce($questions, function($carry, $item) use ($userStars) {
-            $carry += $item['stars']['current'];
-            return $carry;
-        });
-
         return [0 => [
             'storyTestQuestions' => $questions,
             'test' => [
                 'progress' => [
                     'total' => $numberQuestions * 5,
-                    'current' => $progressCurrent,
+                    'current' => $userStarsCount,
                 ],
             ],
             'students' => $this->getStudents(),

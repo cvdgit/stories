@@ -174,7 +174,7 @@ var WikidsStoryTest = function() {
     function createLoader() {
         return $('<div/>')
             .addClass('wikids-test-loader')
-            .append($('<p/>').text('Загружка вопросов'))
+            .append($('<p/>').text('Загрузка вопросов'))
             .append($('<img/>').attr('src', '/img/loading.gif'));
     }
 

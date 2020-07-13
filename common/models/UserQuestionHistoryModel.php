@@ -79,6 +79,19 @@ class UserQuestionHistoryModel extends Model
         return $query->all();
     }
 
+    public function getUserHistoryStarsCount(int $topicID)
+    {
+        $query = (new Query())
+            ->select(['t.id'])
+            ->from(['t' => UserQuestionHistory::tableName()])
+            ->innerJoin(['t2' => UserQuestionAnswer::tableName()], 't2.question_history_id = t.id')
+            ->where('t.student_id = :student', [':student' => $this->student_id])
+            ->andWhere('t.question_topic_id = :topic', [':topic' => $topicID])
+            ->andWhere('t.correct_answer = 1')
+            ->groupBy(['t.id']);
+        return $query->count();
+    }
+
     public function getUserQuestionHistoryStars(int $topicID)
     {
         return (new Query())
