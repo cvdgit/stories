@@ -101,9 +101,7 @@ class QuestionController extends Controller
         }
 
         $progressCurrent = array_reduce($questions, function($carry, $item) use ($userStars) {
-            if (isset($userStars[$item['entity_id']])) {
-                $carry += $userStars[$item['entity_id']]['stars'];
-            }
+            $carry += $item['stars']['current'];
             return $carry;
         });
 
