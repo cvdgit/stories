@@ -49,6 +49,14 @@ $historyModel = new UserQuestionHistoryModel();
         <blockquote>
             <p>Кто обитает на континенте?</p>
         </blockquote>
+        <?php $progress = $student->getProgress(2); ?>
+        <?php if ($progress !== null): ?>
+            <div class="row row-no-gutters">
+                <div class="wikids-progress col-md-6" style="height: 20px">
+                    <div class="progress-bar progress-bar-info" style="width: <?= $progress->progress ?>%;"><?= $progress->progress ?>%</div>
+                </div>
+            </div>
+        <?php endif ?>
         <?php foreach ($continentsData as $item): ?>
             <p>На континенте <?= $item['entityName'] ?> обитает <?= $item['number_animals'] ?> животных</p>
         <?php endforeach ?>
