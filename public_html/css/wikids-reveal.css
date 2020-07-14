@@ -1799,6 +1799,19 @@
 	margin: 20px 0;
 }
 
+.wikids-test-begin-page .list-group h4 {
+	font-size: 2.2rem;
+}
+
+.wikids-test-begin-page .list-group p {
+	margin: 0;
+	font-size: 1.8rem;
+}
+
+.wikids-test-begin-page .list-group a.active p {
+	color: inherit !important;
+}
+
 .wikids-test-begin-page .list-group {
 	max-width: 400px;
 	margin: 0 auto 30px;

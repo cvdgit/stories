@@ -212,6 +212,11 @@ var WikidsStoryTest = function() {
                 .addClass('list-group-item')
                 .data('student', student)
                 .append($('<h4/>').addClass('list-group-item-heading').text(student.name));
+            if (student['progress'] && student.progress > 0) {
+                $item.append(
+                    $('<p/>').addClass('list-group-item-text').text(student.progress + '% завершено')
+                );
+            }
             $item.appendTo($listGroup);
         });
         setActiveStudentElement($listGroup.find('a:eq(0)'));

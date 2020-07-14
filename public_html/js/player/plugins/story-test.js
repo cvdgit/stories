@@ -165,8 +165,9 @@ var Education = (function() {
         return Reveal.getCurrentSlide();
     }
 
-    function initQuestions() {
-        return $.getJSON("/question/init");
+    function initQuestions(params) {
+        params = params || {};
+        return $.getJSON("/question/init", params);
     }
 
     function loadQuestionData(params) {
@@ -180,7 +181,7 @@ var Education = (function() {
         }
         elem.html($('<img/>').attr('src', '/img/loading.gif').css('marginTop', '22%'));
         WikidsStoryTest.setDataParams('/question/get', elem.data());
-        initQuestions().done(function(response) {
+        initQuestions(elem.data()).done(function(response) {
             StoryBackground.setBackgroundColor('light');
             WikidsStoryTest.init(true, false, response.students, elem);
         });

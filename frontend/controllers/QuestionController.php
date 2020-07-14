@@ -12,10 +12,10 @@ use yii\rest\Controller;
 class QuestionController extends Controller
 {
 
-    public function actionInit()
+    public function actionInit($questionId)
     {
         $json = [
-            'students' => $this->getStudents(),
+            'students' => $this->getStudents($questionId),
         ];
         return $json;
     }
@@ -110,11 +110,11 @@ class QuestionController extends Controller
                     'current' => (int)$userStarsCount,
                 ],
             ],
-            'students' => $this->getStudents(),
+            'students' => $this->getStudents($questionId),
         ]];
     }
 
-    protected function getStudents()
+    protected function getStudents(int $questionId)
     {
         $students = [];
         if (!Yii::$app->user->isGuest) {
@@ -123,6 +123,7 @@ class QuestionController extends Controller
                 $students[] = [
                     'id' => $student->id,
                     'name' => $student->isMain() ? $student->user->getProfileName() : $student->name,
+                    'progress' => (int)$student->getProgress($questionId),
                 ];
             }
         }
