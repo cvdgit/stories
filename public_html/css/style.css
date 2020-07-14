@@ -2533,3 +2533,19 @@ img.lazy {
 .wikids-students-table-actions a {
   margin: 0 5px;
 }
+
+.user-question-history h4 {
+  margin-top: 20px;
+}
+
+.user-question-history-block {
+  margin: 20px 0 40px;
+}
+
+.user-question-history-block blockquote {
+  margin-bottom: 10px;
+}
+
+.user-question-history-block p {
+  line-height: 2.1rem;
+}

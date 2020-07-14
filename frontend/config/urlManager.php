@@ -72,5 +72,7 @@ return [
 
         'image/<id:[\w\d]+' => 'image/view',
         'question/<param:[\w\s\d]+>/<value:[\w\d\s]+>' => 'question/get',
+
+        'students' => 'student/index',
     ],
 ];

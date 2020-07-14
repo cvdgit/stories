@@ -4,17 +4,17 @@ namespace frontend\controllers;
 
 use common\models\User;
 use common\models\UserStudent;
+use frontend\components\UserController;
 use frontend\models\CreateStudentForm;
 use frontend\models\UpdateStudentForm;
 use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\Json;
-use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
-class StudentController extends Controller
+class StudentController extends UserController
 {
 
     public function behaviors(): array
@@ -74,6 +74,14 @@ class StudentController extends Controller
         }
         return $this->renderAjax('update', [
             'model' => $model,
+        ]);
+    }
+
+    public function actionIndex()
+    {
+        $user = User::findModel(Yii::$app->user->id);
+        return $this->render('index', [
+            'students' => $user->getStudentsAsArray(),
         ]);
     }
 

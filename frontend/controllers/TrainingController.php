@@ -13,7 +13,7 @@ class TrainingController extends UserController
     {
         $user = User::findModel(Yii::$app->user->id);
         return $this->render('index', [
-            'students' => $user->getStudentsAsArray(),
+            'students' => $user->students,
         ]);
     }
 

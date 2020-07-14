@@ -3,7 +3,6 @@
 namespace common\models;
 
 use DomainException;
-use frontend\models\UpdateStudentForm;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 
@@ -18,6 +17,7 @@ use yii\db\ActiveRecord;
  * @property int $updated_at
  * @property string $birth_date;
  *
+ * @property UserQuestionHistory[] $userQuestionHistories
  * @property User $user
  */
 class UserStudent extends ActiveRecord
@@ -76,6 +76,14 @@ class UserStudent extends ActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUserQuestionHistories()
+    {
+        return $this->hasMany(UserQuestionHistory::class, ['student_id' => 'id']);
     }
 
     public static function findModel($id): self

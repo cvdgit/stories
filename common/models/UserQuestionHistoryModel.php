@@ -122,4 +122,36 @@ class UserQuestionHistoryModel extends Model
             ->all();
     }
 
+    public function getUserContinentsData(int $questionID)
+    {
+        $subQuery = (new Query())
+            ->select(['t.entity_name AS entityName', 't.relation_name AS relationName', 't2.answer_entity_name AS answerEntityName'])
+            ->from(['t' => UserQuestionHistory::tableName()])
+            ->innerJoin(['t2' => UserQuestionAnswer::tableName()], 't2.question_history_id = t.id')
+            ->where('t.student_id = :student', [':student' => $this->student_id])
+            ->andWhere('t.question_topic_id = :topic', [':topic' => $questionID])
+            ->andWhere('t.correct_answer = 1')
+            ->groupBy(['t.entity_name', 't.relation_name', 't2.answer_entity_name'])
+            ->having('COUNT(t.entity_name) >= 5');
+        $query = (new Query())
+            ->select(['q.entityName', 'COUNT(q.answerEntityName) AS number_animals'])
+            ->from(['q' => $subQuery])
+            ->groupBy(['q.entityName']);
+        return $query->all();
+    }
+
+    public function getUserAnimalsData(int $questionID)
+    {
+        $query = (new Query())
+            ->select(['t.entity_name', 't.relation_name', 't2.answer_entity_name'])
+            ->from(['t' => UserQuestionHistory::tableName()])
+            ->innerJoin(['t2' => UserQuestionAnswer::tableName()], 't2.question_history_id = t.id')
+            ->where('t.student_id = :student', [':student' => $this->student_id])
+            ->andWhere('t.question_topic_id = :topic', [':topic' => $questionID])
+            ->andWhere('t.correct_answer = 1')
+            ->groupBy(['t.entity_name', 't.relation_name', 't2.answer_entity_name']);
+            //->having('COUNT(t.entity_id) >= 5');
+        return $query->all();
+    }
+
 }
