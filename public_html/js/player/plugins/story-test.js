@@ -35,7 +35,7 @@ var TestSlide = (function() {
             slide_index = Reveal.getIndices().h;
 
         var promise = $.ajax({
-            "url": config.initAction,
+            "url": config.initAction + '?questionId=-1',
             "type": "GET",
             "dataType": "json"
         });
