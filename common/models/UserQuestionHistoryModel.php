@@ -17,6 +17,7 @@ class UserQuestionHistoryModel extends Model
     public $relation_id;
     public $relation_name;
     public $correct_answer;
+    public $progress;
 
     public $answers;
 
@@ -29,6 +30,7 @@ class UserQuestionHistoryModel extends Model
             [['slide_id'], 'exist', 'skipOnError' => true, 'targetClass' => StorySlide::class, 'targetAttribute' => ['slide_id' => 'id']],
             [['student_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserStudent::class, 'targetAttribute' => ['student_id' => 'id']],
             ['answers', 'safe'],
+            ['progress', 'integer', 'min' => 0, 'max' => 100]
         ];
     }
 
@@ -46,7 +48,8 @@ class UserQuestionHistoryModel extends Model
             $this->entity_name,
             $this->relation_id,
             $this->relation_name,
-            $this->correct_answer
+            $this->correct_answer,
+            $this->progress
         );
         $model->save();
         return $model->id;

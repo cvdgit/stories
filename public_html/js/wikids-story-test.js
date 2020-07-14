@@ -98,7 +98,7 @@ var WikidsStoryTest = function() {
     };
 
     TestProgress.prototype.calcPercent = function() {
-        return this.getCurrent() * 100 / this.getTotal();
+        return Math.round(this.getCurrent() * 100 / this.getTotal());
     }
 
     TestProgress.prototype.inc = function() {
@@ -739,7 +739,8 @@ var WikidsStoryTest = function() {
                 'relation_id': currentQuestion.relation_id,
                 'relation_name': currentQuestion.relation_name,
                 'correct_answer': answerIsCorrect ? 1 : 0,
-                'answers': answerList
+                'answers': answerList,
+                'progress': testProgress.calcPercent()
             };
             $.post('/question/answer', answerParams);
         }

@@ -86,6 +86,14 @@ class UserStudent extends ActiveRecord
         return $this->hasMany(UserQuestionHistory::class, ['student_id' => 'id']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStudentQuestionProgresses()
+    {
+        return $this->hasMany(StudentQuestionProgress::class, ['student_id' => 'id']);
+    }
+
     public static function findModel($id): self
     {
         if (($model = self::findOne($id)) !== null) {
@@ -122,6 +130,13 @@ class UserStudent extends ActiveRecord
     public function isMain()
     {
         return (int)$this->status === self::STATUS_MAIN;
+    }
+
+    public function getProgress(int $questionID)
+    {
+        return $this->getStudentQuestionProgresses()
+            ->andWhere('question_id = :question', [':question' => $questionID])
+            ->one();
     }
 
 }

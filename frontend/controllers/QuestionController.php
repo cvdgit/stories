@@ -107,7 +107,7 @@ class QuestionController extends Controller
             'test' => [
                 'progress' => [
                     'total' => $numberQuestions * 5,
-                    'current' => $userStarsCount,
+                    'current' => (int)$userStarsCount,
                 ],
             ],
             'students' => $this->getStudents(),

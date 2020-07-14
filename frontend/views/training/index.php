@@ -31,6 +31,14 @@ $historyModel = new UserQuestionHistoryModel();
         <blockquote>
             <p>Кто где живет?</p>
         </blockquote>
+        <?php $progress = $student->getProgress(1); ?>
+        <?php if ($progress !== null): ?>
+        <div class="row row-no-gutters">
+            <div class="wikids-progress col-md-6" style="height: 20px">
+                <div class="progress-bar progress-bar-info" style="width: <?= $progress->progress ?>%;"><?= $progress->progress ?>%</div>
+            </div>
+        </div>
+        <?php endif ?>
         <?php foreach ($animalsData as $item): ?>
             <p><?= $item['entity_name'] ?> живет на континенте <?= $item['answer_entity_name'] ?></p>
         <?php endforeach ?>

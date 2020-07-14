@@ -30,6 +30,7 @@ class UserQuestionHistory extends ActiveRecord
     public $correct_answers;
     public $max_created_at;
     public $answers;
+    public $progress;
 
     /**
      * {@inheritdoc}
@@ -53,7 +54,7 @@ class UserQuestionHistory extends ActiveRecord
     {
         return [
             ['created_at', 'integer'],
-            ['answers', 'safe'],
+            [['answers', 'progress'], 'safe'],
         ];
     }
 
@@ -110,7 +111,9 @@ class UserQuestionHistory extends ActiveRecord
                                   string $entityName,
                                   int $relationID,
                                   string $relationName,
-                                  int $correctAnswer): UserQuestionHistory
+                                  int $correctAnswer,
+                                  $progress
+    ): UserQuestionHistory
     {
         $model = new self;
         $model->student_id = $studentID;
@@ -122,7 +125,18 @@ class UserQuestionHistory extends ActiveRecord
         $model->relation_id = $relationID;
         $model->relation_name = $relationName;
         $model->correct_answer = $correctAnswer;
+        $model->progress = $progress;
         return $model;
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        $progressModel = new \frontend\models\StudentQuestionProgress();
+        $progressModel->student_id = $this->student_id;
+        $progressModel->question_id = $this->question_topic_id;
+        $progressModel->progress = $this->progress;
+        $progressModel->updateProgress();
+        parent::afterSave($insert, $changedAttributes);
     }
 
 }
