@@ -99,12 +99,11 @@ class Tag extends \yii\db\ActiveRecord
             ->from(['t' => $subQuery])
             ->orderBy('rand(1)')
             ->indexBy('name');
-        $tags = array_map(function($elem) {
+        return array_map(function($elem) {
             $elem['options']['target'] = '_self';
             $elem['options']['rel'] = 'nofollow';
             return $elem;
         }, $query->all());
-        return $tags;
     }
 
 }
