@@ -181,9 +181,7 @@ class Category extends ActiveRecord
             return [];
         }
         
-        $rootItem = [
-            ['label' => 'Все категории', 'url' => ['/story/index'], 'options' => ['class' => 'widget-category-hover']],
-        ];
+        $rootItem = ['label' => 'Все категории', 'url' => ['/story/index']];
 
         $storyNumbers = (new Query())
             ->select('COUNT({{%story_category}}.story_id) AS stories_in_category, {{%story_category}}.category_id')
@@ -196,7 +194,7 @@ class Category extends ActiveRecord
             ->indexBy('category_id')
             ->all();
 
-        return $root->toNestedArray(null, 'items', function($node) use ($storyNumbers) {
+        $items = $root->toNestedArray(null, 'items', function($node) use ($storyNumbers) {
             $storiesInCategory = 0;
             if (isset($storyNumbers[$node->id])) {
                 $storiesInCategory = (int)$storyNumbers[$node->id]['stories_in_category'];
@@ -210,6 +208,8 @@ class Category extends ActiveRecord
             }
             return $item;
         });
+        array_unshift($items, $rootItem);
+        return $items;
     }
 
     public static function categoryArray()
