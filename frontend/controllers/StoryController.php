@@ -389,10 +389,10 @@ class StoryController extends Controller
     public function actionAudioStories()
     {
         $this->getView()->setMetaTags(
-            'Аудио истории для детей',
-            'Аудио истории для детей',
-            'Аудио истории для детей, сказки, истории, wikids',
-            'Аудио истории для детей'
+            'Аудио сказки для детей',
+            'Аудио сказки для детей',
+            'Аудио сказки для детей, сказки, истории, wikids',
+            'Аудио сказки для детей'
         );
         $searchModel = new StorySearch();
         $searchModel->audio = 1;

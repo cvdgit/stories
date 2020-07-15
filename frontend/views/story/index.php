@@ -75,7 +75,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 <?= Menu::widget([
                     'items' => [
                         ['label' => '#ИсторииДляДетей', 'url' => ['/story/index']],
-                        ['label' => '#АудиоИстории', 'url' => ['/story/audio-stories'], 'active' => Yii::$app->controller->id === 'story' && Yii::$app->controller->action->id === 'audio-stories'],
+                        ['label' => '#АудиоСказки', 'url' => ['/story/audio-stories'], 'active' => Yii::$app->controller->id === 'story' && Yii::$app->controller->action->id === 'audio-stories'],
                         ['label' => '#СказкиНаНочь', 'url' => ['/story/bedtime-stories'], 'active' => Yii::$app->controller->id === 'story' && Yii::$app->controller->action->id === 'bedtime-stories'],
                     ],
                     'options' => ['class' => 'list-inline'],
