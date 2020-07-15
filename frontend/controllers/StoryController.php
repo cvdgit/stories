@@ -373,7 +373,7 @@ class StoryController extends Controller
         $this->getView()->setMetaTags(
             'Сказки на ночь для детей',
             'Сказки на ночь для детей',
-            'wikids, сказки, истории, каталог историй, сказки на ночь для детей',
+            'wikids, сказки, сказки на ночь, истории, каталог историй, сказки на ночь для детей',
             'Сказки на ночь для детей'
         );
         $searchModel = new StorySearch();

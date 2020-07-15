@@ -20,6 +20,8 @@ class SitemapController extends Controller
 
         $lastModified = (new Query())->from('{{%story}}')->max('created_at');
         $sitemap->addItem($urlManager->createAbsoluteUrl(['story/index']), $lastModified, Sitemap::DAILY, 1);
+        $sitemap->addItem($urlManager->createAbsoluteUrl(['story/bedtime-stories']), $lastModified, Sitemap::DAILY, 1);
+        $sitemap->addItem($urlManager->createAbsoluteUrl(['story/audio-stories']), $lastModified, Sitemap::DAILY, 1);
 
         $query = (new Query())
             ->from('{{%story}}')
