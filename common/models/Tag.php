@@ -96,6 +96,8 @@ class Tag extends \yii\db\ActiveRecord
             ])
             ->from(self::tableName())
             ->where('frequency > 1')
+            ->orderBy(['frequency' => SORT_DESC])
+            ->limit(30)
             ->indexBy('name')
             ->all();
         $tags = array_map(function($elem) {
