@@ -219,7 +219,10 @@ class ImageController extends Controller
                 $block = new ImageBlock();
                 $block->setFilePath($image->imageUrl());
                 $block->setSizeAndPosition($form->width . 'px', $form->height . 'px', $form->left . 'px', $form->top . 'px');
-                $block->setImageSource(parse_url($image->source_url, PHP_URL_HOST));
+                $imageSource = parse_url($image->source_url, PHP_URL_HOST);
+                if ($imageSource !== null) {
+                    $block->setImageSource($imageSource);
+                }
                 $this->editorService->addImageBlockToSlide($form->slide_id, $block);
                 $this->imageService->linkImage($image->id, $form->slide_id, $block->getId());
             }
