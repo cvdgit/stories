@@ -180,7 +180,9 @@ var WikidsPlayer = (function(document, $) {
     function ready() {
         console.log('WikidsPlayer.ready');
 
-        StoryBackground.init();
+        if (window['StoryBackground']) {
+            StoryBackground.init();
+        }
     }
 
     Reveal.addEventListener('ready', ready);
