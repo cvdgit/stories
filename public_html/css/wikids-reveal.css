@@ -2018,3 +2018,43 @@
 .wikids-test-loader p {
 	padding: 20px 0;
 }
+
+.wikids-test-correct-answer-page {
+	position: absolute;
+	left: 0;
+	top: 50px;
+	width: 100%;
+	height: 100%;
+	background-color: inherit;
+}
+
+.wikids-test-correct-answer-page-header {
+	font-weight: bold !important;
+	margin: 20px 0 40px;
+}
+
+.wikids-test-correct-answer-answers {
+	height: 500px;
+}
+
+.wikids-test-correct-answer-page-answer h4 {
+	font-size: 3.2rem !important;
+}
+
+.wikids-test-correct-answer-page-answer ul {
+	margin-left: 20px;
+}
+
+.wikids-test-correct-answer-page-answer li {
+	margin: 20px 0 40px;
+	font-size: 2.5rem;
+}
+
+.wikids-test-correct-answer-page-answer li div {
+	margin: 20px 0;
+}
+
+.wikids-test-correct-answer-answers img {
+	display: block;
+	margin: 0 auto;
+}

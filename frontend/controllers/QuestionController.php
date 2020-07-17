@@ -45,6 +45,7 @@ class QuestionController extends Controller
             ->get(Yii::$app->params['neo.url'] . '/api/question/get');
         $result = Json::decode($result);
         $numberQuestions = $result['total'];
+        $incorrectAnswerAction = $result['incorrectAnswerAction'];
         $result = $result['questions'];
 
         $questions = [];
@@ -111,6 +112,7 @@ class QuestionController extends Controller
                 ],
             ],
             'students' => $this->getStudents($questionId),
+            'incorrectAnswerAction' => $incorrectAnswerAction,
         ]];
     }
 

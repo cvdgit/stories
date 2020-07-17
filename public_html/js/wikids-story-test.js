@@ -136,6 +136,14 @@ var WikidsStoryTest = function() {
         }
     }
 
+    function incorrectAnswerAction() {
+        return testData['incorrectAnswerAction'] || '';
+    }
+
+    function incorrectAnswerActionRelated() {
+        return incorrectAnswerAction() === 'related';
+    }
+
     function load(data, for_slide) {
 
         //dom.wrapper = $("<div/>").addClass("wikids-test");
@@ -234,6 +242,41 @@ var WikidsStoryTest = function() {
             .append($beginButton);
     }
 
+    function createCorrectAnswerPage() {
+        var $action = $('<button/>')
+            .addClass('btn')
+            .text('Продолжить')
+            .on('click', function() {
+                dom.correctAnswerPage.hide();
+                showNextQuestion();
+                dom.results.hide();
+                dom.nextButton.show();
+            });
+        return $('<div/>')
+            .addClass('wikids-test-correct-answer-page')
+            .hide()
+            //.append($('<p/>').addClass('wikids-test-correct-answer-page-header'))
+            .append($('<div/>').addClass('row row-no-gutters wikids-test-correct-answer-answers')
+                .append(
+                    $('<div/>')
+                        .addClass('col-md-6 wikids-test-correct-answer-page-answer wikids-test-correct-answer-page-left')
+                        .append(
+                            $('<h4/>').text('Правильные ответы')
+                        )
+                        .append($('<ul/>').addClass('list-unstyled'))
+                )
+                .append(
+                    $('<div/>')
+                        .addClass('col-md-6 wikids-test-correct-answer-page-answer wikids-test-correct-answer-page-right')
+                        .append(
+                            $('<h4/>').text('Неправильные ответы')
+                        )
+                        .append($('<ul/>').addClass('list-unstyled'))
+                )
+            )
+            .append($('<div/>').addClass('wikids-test-correct-answer-page-action').append($action));
+    }
+
     function setupDOM() {
         dom.header = createHeader(getTestData());
         dom.questions = createQuestions(getQuestionsData());
@@ -263,11 +306,13 @@ var WikidsStoryTest = function() {
             .text('Продолжить')
             .appendTo($(".wikids-test-buttons", dom.controls));
         dom.results = createResults();
+        dom.correctAnswerPage = createCorrectAnswerPage();
         dom.wrapper
             .append(dom.header)
             .append(dom.questions)
             .append(dom.results)
-            .append(dom.controls);
+            .append(dom.controls)
+            .append(dom.correctAnswerPage);
     }
 
     function createStudentInfo() {
@@ -761,10 +806,10 @@ var WikidsStoryTest = function() {
                 .html("<p>Ответ " + (answerIsCorrect ? "" : "не ") + "верный.</p>")
                 .show()
                 .delay(1000)
-                .fadeOut('slow', continueTestAction);
+                .fadeOut('slow', function() {continueTestAction(answer);});
         }
         else {
-            continueTestAction();
+            continueTestAction(answer);
         }
     }
 
@@ -776,29 +821,83 @@ var WikidsStoryTest = function() {
             .addClass('wikids-test-active-question');
     }
 
-    function continueTestAction() {
+    function goToRelatedSlide(goToSlideCallback, otherCallback) {
+        var params = {
+            'entity_id': getCurrentQuestion().entity_id,
+            'relation_id': getCurrentQuestion().relation_id,
+        };
+        $.getJSON('/question/get-related-slide', params).done(function (data) {
+            if (data && data['slide_id'] && data['story_id']) {
+                goToSlideCallback(data);
+            } else {
+                otherCallback();
+            }
+        });
+    }
+
+    function showCorrectAnswerPage(question, answer) {
+
+        var $leftElements = $('<div/>'),
+            $rightElements = $('<div/>');
+        var p;
+        getAnswersData(question).forEach(function(questionAnswer) {
+            p = $('<li/>');
+            p.append($('<div/>').text(questionAnswer.name));
+            if (questionAnswer.image) {
+                var $image = $("<img/>")
+                    .attr("src", questionAnswer.image)
+                    .attr("height", 160);
+                p.append($image);
+            }
+            if (parseInt(questionAnswer.is_correct) === 1) {
+                if ($.inArray(questionAnswer.id, answer) !== -1) {
+                    p.addClass('text-success');
+                }
+                else {
+                    p.addClass('text-danger');
+                }
+                $leftElements.append(p);
+            }
+            else {
+                if ($.inArray(questionAnswer.id, answer) !== -1) {
+                    p.addClass('text-danger');
+                }
+                $rightElements.append(p);
+            }
+        });
+
+        dom.correctAnswerPage
+            //.find('.wikids-test-correct-answer-page-header').text(question.name).end()
+            .find('.wikids-test-correct-answer-page-left ul').empty().html($leftElements[0].childNodes).end()
+            .find('.wikids-test-correct-answer-page-right ul').empty().html($rightElements[0].childNodes).end()
+            .show();
+    }
+
+    function continueTestAction(answer) {
 
         dom.continueButton.hide();
 
         var isLastQuestion = (questions.length === 0);
+        var actionRelated = incorrectAnswerActionRelated();
         if (isLastQuestion) {
             if (remoteTest) {
                 if (!answerIsCorrect) {
-                    var params = {
-                        'entity_id': getCurrentQuestion().entity_id,
-                        'relation_id': getCurrentQuestion().relation_id,
-                    };
-                    $.getJSON('/question/get-related-slide', params).done(function (data) {
-                        if (data && data['slide_id'] && data['story_id']) {
-                            TransitionSlide.goToSlide(data.story_id, data.slide_id, true);
-                        } else {
-                            WikidsPlayer.right();
-                        }
-                    });
+                    if (actionRelated) {
+                        goToRelatedSlide(
+                            function (data) {
+                                TransitionSlide.goToSlide(data.story_id, data.slide_id, true);
+                            },
+                            function () {
+                                WikidsPlayer.right();
+                            }
+                        );
+                    }
+                    else {
+                        showCorrectAnswerPage(currentQuestion, answer);
+                    }
                 }
                 else {
                     finish();
-                    //WikidsPlayer.right();
                 }
             }
             else {
@@ -807,20 +906,21 @@ var WikidsStoryTest = function() {
         }
         else {
             if (!answerIsCorrect && remoteTest) {
-                var params = {
-                    'entity_id': getCurrentQuestion().entity_id,
-                    'relation_id': getCurrentQuestion().relation_id,
-                };
-                $.getJSON('/question/get-related-slide', params).done(function(data) {
-                    if (data && data['slide_id'] && data['story_id']) {
-                        TransitionSlide.goToSlide(data.story_id, data.slide_id, true);
-                    }
-                    else {
-                        showNextQuestion();
-                        dom.results.hide();
-                        dom.nextButton.show();
-                    }
-                });
+                if (actionRelated) {
+                    goToRelatedSlide(
+                        function (data) {
+                            TransitionSlide.goToSlide(data.story_id, data.slide_id, true);
+                        },
+                        function () {
+                            showNextQuestion();
+                            dom.results.hide();
+                            dom.nextButton.show();
+                        }
+                    );
+                }
+                else {
+                    showCorrectAnswerPage(currentQuestion, answer);
+                }
             }
             else {
                 showNextQuestion();
