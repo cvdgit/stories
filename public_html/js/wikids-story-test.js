@@ -847,6 +847,12 @@ var WikidsStoryTest = function() {
                 var $image = $("<img/>")
                     .attr("src", questionAnswer.image)
                     .attr("height", 160);
+                if (questionAnswer['description']) {
+                    $image.attr('title', function() {
+                        var title = questionAnswer.name + ' обитает на континент' + (questionAnswer.description.split(',').length > 1 ? 'ах' : 'е');
+                        return title + ' ' + questionAnswer.description;
+                    });
+                }
                 p.append($image);
             }
             if (parseInt(questionAnswer.is_correct) === 1) {

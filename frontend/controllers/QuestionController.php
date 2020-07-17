@@ -55,11 +55,13 @@ class QuestionController extends Controller
             $answers = [];
             $correctAnswerIDs = [];
             foreach ($resultItem['answers'] as $_answer) {
+                $description = $_answer['description'] ?? '';
                 $answer = [
                     'id' => $_answer['id'],
                     'name' => $_answer['answer'],
                     'is_correct' => $_answer['correct'] ? 1 : 0,
                     'image' => $_answer['image'],
+                    'description' => $description,
                 ];
                 if ($_answer['correct']) {
                     $correctAnswerIDs[] = $_answer['id'];
