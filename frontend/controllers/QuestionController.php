@@ -71,7 +71,7 @@ class QuestionController extends Controller
 
             $stars = 0;
             foreach ($userStars as $star) {
-                if ((int)$star['entity_id'] === (int)$resultItem['question_entity_id'] && in_array($star['answer_entity_id'], $correctAnswerIDs, true)) {
+                if ((int)$star['entity_id'] === (int)$resultItem['question_entity_id'] && in_array((int)$star['answer_entity_id'], $correctAnswerIDs, true)) {
                     $stars = $star['stars'];
                     break;
                 }

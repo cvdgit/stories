@@ -634,10 +634,10 @@ var WikidsStoryTest = function() {
             return parseInt(elem.is_correct) === 1;
         });
         correctAnswers = correctAnswers.map(function(elem) {
-            return elem.id;
+            return parseInt(elem.id);
         });
         var correct = false;
-        if (answer.length === correctAnswers.length && answer.sort().every(function(value, index) { return value === correctAnswers.sort()[index];})) {
+        if (answer.length === correctAnswers.length && answer.sort().every(function(value, index) { return parseInt(value) === correctAnswers.sort()[index];})) {
             correctAnswersNumber++;
             correct = true;
         }
@@ -718,7 +718,7 @@ var WikidsStoryTest = function() {
         }
 
         answerIsCorrect = answerQuestion($activeQuestion, answer);
-        //console.log(answerIsCorrect);
+        console.log(answerIsCorrect);
 
         if (answerIsCorrect) {
             if (currentQuestion['stars']) {
