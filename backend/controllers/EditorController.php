@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\components\SlideModifier;
 use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
 use backend\components\story\ImageBlock;
@@ -89,10 +90,11 @@ class EditorController extends Controller
             $linkSlide = StorySlide::findSlideByID($model->link_slide_id);
             $model->data = $linkSlide->data;
         }
+        $slideData = (new SlideModifier())->addImageParams($model->data);
         return [
             'id' => $model->id,
             'status' => $model->status,
-            'data' => $model->data,
+            'data' => $slideData,
             'blockNumber' => count($model->storySlideBlocks),
             'number' => $model->number,
         ];
