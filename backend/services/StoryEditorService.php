@@ -230,9 +230,6 @@ class StoryEditorService
 
     public function newCreateSlideQuestion(int $storyID, array $params)
     {
-
-        // $currentSlideModel = StorySlide::findSlide($slideID);
-
         $reader = new HtmlSlideReader('');
         $slide = $reader->load();
         $slide->setView('new-question');
@@ -255,10 +252,8 @@ class StoryEditorService
         $model->kind = StorySlide::KIND_QUESTION;
         $model->data = $html;
 
-        // $this->updateSlideNumbers($currentSlideModel->story_id, $currentSlideModel->number);
         $model->number = 1;
         $model->save();
-
         return $model->id;
     }
 

@@ -19,10 +19,9 @@ $this->params['sidebarMenuItems'] = [
     'dataProvider' => $dataProvider,
     'options' => ['class' => 'table-responsive'],
     'columns' => [
-        'id',
         'title',
-        'description',
-        'status',
+        'header',
+        'remote',
         'created_at:datetime',
         [
             'class' => 'yii\grid\ActionColumn',

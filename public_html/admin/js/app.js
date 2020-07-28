@@ -86,8 +86,8 @@ var Neo = (function(jQuery) {
         return $.getJSON('/admin/index.php?r=neo/question-list');
     }
 
-    function questions(questionID, questionsNumber, answersNumber) {
-        return $.getJSON('/admin/index.php?r=neo/question-get', {'id': questionID, 'number': questionsNumber, 'answers': answersNumber});
+    function questions(questionID) {
+        return $.getJSON('/admin/index.php?r=neo/question-get', {'id': questionID});
     }
 
     return {

@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\models\StoryTest;
 use common\models\UserQuestionHistoryModel;
 use linslin\yii2\curl\Curl;
 use Yii;
@@ -12,16 +13,28 @@ use yii\rest\Controller;
 class QuestionController extends Controller
 {
 
-    public function actionInit($questionId)
+    public function actionInit(int $testId)
     {
-        $json = [
+        $test = StoryTest::findModel($testId);
+        $questionId = -1;
+        if ($test->question_list_id !== null) {
+            $questionId = $test->question_list_id;
+        }
+        return [
+            'test' => [
+                'header' => $test->header,
+                'description' => $test->description_text,
+            ],
             'students' => $this->getStudents($questionId),
         ];
-        return $json;
     }
 
-    public function actionGet(int $questionId, int $questionsNumber, int $answersNumber, int $studentId = null)
+    public function actionGet(int $testId, int $studentId = null)
     {
+
+        $test = StoryTest::findModel($testId);
+        $questionId = $test->question_list_id;
+
         $userHistory = [];
         $userStars = [];
         $userStarsCount = 0;
@@ -40,7 +53,7 @@ class QuestionController extends Controller
                 CURLOPT_SSL_VERIFYPEER => false,
                 CURLOPT_SSL_VERIFYHOST => false,
             ])
-            ->setGetParams(['id' => $questionId, 'number' => $questionsNumber, 'answers' => $answersNumber])
+            ->setGetParams(['id' => $questionId])
             ->setPostParams(['history' => Json::encode($userHistory)])
             ->get(Yii::$app->params['neo.url'] . '/api/question/get');
         $result = Json::decode($result);

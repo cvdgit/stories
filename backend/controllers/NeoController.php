@@ -6,6 +6,7 @@ namespace backend\controllers;
 
 use backend\models\NeoSlideRelations;
 use backend\models\NeoSlideRelationsForm;
+use common\models\StoryTest;
 use linslin\yii2\curl\Curl;
 use Yii;
 use yii\helpers\Json;
@@ -127,10 +128,11 @@ class NeoController extends Controller
         return Json::decode($result);
     }
 
-    public function actionQuestionGet(int $id, int $number, int $answers)
+    public function actionQuestionGet(int $id)
     {
+        $test = StoryTest::findModel($id);
         $result = $this->serviceCurl()
-            ->setGetParams(['id' => $id, 'number' => $number, 'answers' => $answers])
+            ->setGetParams(['id' => $test->question_list_id])
             ->get($this->serviceMethodUrl('/api/question/get'));
         return Json::decode($result);
     }

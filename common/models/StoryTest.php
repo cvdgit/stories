@@ -5,6 +5,7 @@ namespace common\models;
 use DomainException;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -12,16 +13,25 @@ use yii\helpers\ArrayHelper;
  *
  * @property int $id
  * @property string $title
- * @property string $description
  * @property int $status
  * @property int $created_at
  * @property int $updated_at
  * @property int $mix_answers
+ * @property int $remote
+ * @property int $question_list_id
+ * @property string $question_list_name
+ * @property string $description_text
+ * @property string $header
  *
  * @property StoryTestQuestion[] $storyTestQuestions
  */
-class StoryTest extends \yii\db\ActiveRecord
+class StoryTest extends ActiveRecord
 {
+
+    const REMOTE = 1;
+
+    public $question_list = [];
+
     /**
      * {@inheritdoc}
      */
@@ -43,9 +53,11 @@ class StoryTest extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['title'], 'required'],
-            [['status', 'created_at', 'updated_at', 'mix_answers'], 'integer'],
-            [['title', 'description'], 'string', 'max' => 255],
+            [['title', 'header'], 'required'],
+            [['status', 'created_at', 'updated_at', 'mix_answers', 'remote', 'question_list_id'], 'integer'],
+            [['title', 'question_list_name', 'header'], 'string', 'max' => 255],
+            [['description_text'], 'string'],
+            [['question_list'], 'safe'],
         ];
     }
 
@@ -57,11 +69,14 @@ class StoryTest extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'title' => 'Название теста',
-            'description' => 'Описание',
+            'description_text' => 'Описание',
             'status' => 'Статус',
             'created_at' => 'Дата создания',
             'updated_at' => 'Дата изменения',
             'mix_answers' => 'Перемешивать ответы',
+            'remote' => 'Вопросы из neo4j',
+            'question_list' => 'Список вопросов',
+            'header' => 'Заголовок',
         ];
     }
 
@@ -84,6 +99,11 @@ class StoryTest extends \yii\db\ActiveRecord
             return $model;
         }
         throw new DomainException('Тест не найден');
+    }
+
+    public function isRemote()
+    {
+        return (int) $this->remote === self::REMOTE;
     }
 
 }

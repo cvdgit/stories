@@ -1792,11 +1792,15 @@
 }
 
 .wikids-test-begin-page {
-	margin-top: 15%;
+
 }
 
 .wikids-test-begin-page p {
 	margin: 20px 0;
+}
+
+.wikids-test-students-help {
+	font-size: 1.8rem;
 }
 
 .wikids-test-begin-page .list-group h4 {
@@ -1825,6 +1829,12 @@
 
 .wikids-test-buttons {
 	padding: 20px;
+}
+
+p.wikids-test-description {
+	text-align: left;
+	font-size: 1.8rem;
+	line-height: 2.4rem;
 }
 
 .sl-block[data-block-type=text] p {
@@ -2057,4 +2067,8 @@
 .wikids-test-correct-answer-answers img {
 	display: block;
 	margin: 0 auto;
+}
+
+.new-questions-header {
+	display: none;
 }

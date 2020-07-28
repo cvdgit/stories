@@ -22,6 +22,7 @@ use backend\models\editor\TextForm;
 use backend\models\editor\TransitionForm;
 use backend\models\editor\VideoForm;
 use common\models\StorySlide;
+use common\models\StoryTest;
 use DomainException;
 use Yii;
 use yii\filters\AccessControl;
@@ -325,13 +326,12 @@ class EditorController extends Controller
         return ['success' => true, 'id' => $slideID];
     }
 
-    public function actionNewCreateSlideQuestion(int $story_id, int $id, int $number, int $answers, int $after_slide_id = null)
+    public function actionNewCreateSlideQuestion(int $story_id, int $id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
+        $test = StoryTest::findModel($id);
         $params = [
-            'question-id' => $id,
-            'questions-number' => $number,
-            'answers-number' => $answers,
+            'test-id' => $test->id,
         ];
         try {
             $slideID = $this->editorService->newCreateSlideQuestion($story_id, $params);

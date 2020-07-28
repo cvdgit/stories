@@ -35,7 +35,7 @@ var TestSlide = (function() {
             slide_index = Reveal.getIndices().h;
 
         var promise = $.ajax({
-            "url": config.initAction + '?questionId=-1',
+            "url": config.initAction + '?testId=' + test_id,
             "type": "GET",
             "dataType": "json"
         });
@@ -45,7 +45,7 @@ var TestSlide = (function() {
 
             //$(".reveal .slides").empty();
 
-            WikidsStoryTest.init(false, true, data.students, $('.reveal .slides'));
+            WikidsStoryTest.init(false, true, data, $('.reveal .slides'));
             WikidsStoryTest.addEventListener("finish", storyTestResults);
             WikidsStoryTest.addEventListener("backToStory", backToStory);
             //var html = WikidsStoryTest.load(data.json);
@@ -183,7 +183,7 @@ var Education = (function() {
         WikidsStoryTest.setDataParams('/question/get', elem.data());
         initQuestions(elem.data()).done(function(response) {
             StoryBackground.setBackgroundColor('light');
-            WikidsStoryTest.init(true, false, response.students, elem);
+            WikidsStoryTest.init(true, false, response, elem);
         });
     }
 

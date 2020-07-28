@@ -82,6 +82,7 @@ class TestController extends Controller
         $model = $this->findModel($id);
         $dataProvider = new ActiveDataProvider([
             'query' => $model->getStoryTestQuestions(),
+            'pagination' => false,
         ]);
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->addFlash('success', 'Тест успешно обновлен');

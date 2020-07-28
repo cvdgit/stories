@@ -111,8 +111,8 @@ var WikidsStoryTest = function() {
             this.progress.current = 0;
         }
     }
-
-    function init(remote, for_slide, students, element) {
+    
+    function init(remote, for_slide, testResponse, element) {
 
         console.debug('WikidsStoryTest.init');
 
@@ -120,7 +120,7 @@ var WikidsStoryTest = function() {
         remoteTest = remote || false;
 
         dom.wrapper = $("<div/>").addClass("wikids-test");
-        dom.beginPage = createBeginPage(students);
+        dom.beginPage = createBeginPage(testResponse);
         dom.wrapper.append(dom.beginPage);
 
         if (for_slide === undefined) {
@@ -208,13 +208,13 @@ var WikidsStoryTest = function() {
         $('.wikids-test-student-info', dom.header).text(currentStudent.name);
     }
 
-    function createBeginPage(students) {
+    function createBeginPage(testResponse) {
         var $listGroup = $('<div/>').addClass('list-group');
         $listGroup.on('click', 'a', function(e) {
             e.preventDefault();
             setActiveStudentElement($(this));
         });
-        students.forEach(function(student) {
+        testResponse.students.forEach(function(student) {
             var $item = $('<a/>')
                 .attr('href', '#')
                 .addClass('list-group-item')
@@ -236,10 +236,14 @@ var WikidsStoryTest = function() {
                 loadData();
             });
         return $('<div/>')
-            .addClass('wikids-test-begin-page')
-            .append($('<p/>').text('Выберите ученика:'))
-            .append($listGroup)
-            .append($beginButton);
+            .addClass('wikids-test-begin-page row')
+            .append($('<h3/>').text(testResponse.test.header))
+            .append($('<div/>').addClass('col-md-6')
+                .append($('<h3/>').text('Выберите ученика:'))
+                .append($listGroup)
+                .append($beginButton))
+            .append($('<div/>').addClass('col-md-6')
+                .append($('<p/>').addClass('wikids-test-description').html(testResponse.test.description)));
     }
 
     function createCorrectAnswerPage() {
