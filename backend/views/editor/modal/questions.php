@@ -12,7 +12,7 @@ use yii\helpers\Html;
                 <div class="row">
                     <div class="col-md-12">
                         <?= Html::label('Тест:', 'question-list') ?>
-                        <?= Html::dropDownList('', null, \common\models\StoryTest::getTestArray(), ['prompt' => 'Выберите тест', 'class' => 'form-control', 'id' => 'question-list']) ?>
+                        <?= Html::dropDownList('', null, \common\models\StoryTest::getRemoteTestArray(), ['prompt' => 'Выберите тест', 'class' => 'form-control', 'id' => 'question-list']) ?>
                     </div>
                 </div>
                 <?= Html::button('Показать пример вопросов', ['id' => 'show-questions', 'class' => 'btn btn-success btn-sm', 'style' => 'margin: 10px 0']) ?>

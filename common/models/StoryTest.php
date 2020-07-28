@@ -90,7 +90,12 @@ class StoryTest extends ActiveRecord
 
     public static function getTestArray(): array
     {
-        return ArrayHelper::map(self::find()->all(), 'id', 'title');
+        return ArrayHelper::map(self::find()->orderBy(['title' => SORT_ASC])->all(), 'id', 'title');
+    }
+
+    public static function getRemoteTestArray(): array
+    {
+        return ArrayHelper::map(self::find()->where('remote = :remote', [':remote' => self::REMOTE])->orderBy(['title' => SORT_ASC])->all(), 'id', 'title');
     }
 
     public static function findModel($id): self
