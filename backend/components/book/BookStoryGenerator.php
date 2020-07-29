@@ -4,6 +4,7 @@ namespace backend\components\book;
 
 use backend\components\book\blocks\Image;
 use backend\components\book\blocks\Html;
+use backend\components\book\blocks\Link;
 use backend\components\book\blocks\Test;
 use backend\components\book\blocks\Text;
 use backend\components\book\blocks\Transition;
@@ -15,7 +16,9 @@ use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
 use backend\components\story\TransitionBlock;
 use common\models\Story;
+use common\models\StorySlideBlock;
 use Yii;
+use yii\db\Query;
 
 class BookStoryGenerator
 {
@@ -35,8 +38,26 @@ class BookStoryGenerator
         return $this->getView()->render($view, $params, $this);
     }
 
+    private function getStoryLinks()
+    {
+        $query = (new Query())
+            ->select([])
+            ->from(StorySlideBlock::tableName())
+        ->where('');
+    }
+
+    private function getSlideLinks($slideID, $storyLinks)
+    {
+        return array_filter($storyLinks, function($value) use ($slideID) {
+            return (int) $slideID === (int) $value['slideID'];
+        });
+    }
+
     public function generate(Story $model)
     {
+
+        $storyLinks = $model->slideBlocksData();
+
         $story = (new HTMLReader($model->slidesData()))->load();
         $html = '';
         foreach ($story->getSlides() as $slide) {
@@ -71,13 +92,25 @@ class BookStoryGenerator
                 }
             }
 
+            $slideLinks = $this->getSlideLinks($slide->id, $storyLinks);
+            $links = [];
+            if (count($slideLinks) > 0) {
+                foreach ($slideLinks as $link) {
+                    $links[] = new Link($link['title'], $link['href']);
+                }
+            }
+
             $html .= $this->render('@backend/components/book/views/slide', [
                 'images' => $images,
                 'texts' => $texts,
                 'tests' => $tests,
                 'transitions' => $transitions,
+                'links' => $links,
             ]);
         }
+
+
+
         return $html;
     }
 

@@ -4,10 +4,12 @@ use yii\helpers\Html;
 /** @var $texts backend\components\book\blocks\Text[] */
 /** @var $tests backend\components\book\blocks\Html[] */
 /** @var $transitions backend\components\book\blocks\Transition[] */
+/** @var $links backend\components\book\blocks\Link[] */
 $haveImages = count($images) > 0;
 $haveTexts = count($texts) > 0;
 $haveTests = count($tests) > 0;
 $haveTransitions = count($transitions) > 0;
+$haveLinks = count($links) > 0;
 ?>
 <section>
     <?php if ($haveImages && $haveTexts): ?>
@@ -78,6 +80,19 @@ $haveTransitions = count($transitions) > 0;
             </div>
         <?php endif ?>
     <?php endforeach ?>
+    <?php endif ?>
+
+    <?php if ($haveLinks): ?>
+        <div class="row">
+            <div class="col-lg-offset-3 col-lg-6 text-center">
+                <h3>Полезные ссылки</h3>
+                <ul class="list-inline">
+                    <?php foreach ($links as $link): ?>
+                        <li><?= Html::a($link->title, $link->href) ?></li>
+                    <?php endforeach ?>
+                </ul>
+            </div>
+        </div>
     <?php endif ?>
 </section>
 <hr>
