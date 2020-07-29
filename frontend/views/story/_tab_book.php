@@ -4,11 +4,6 @@
         <p>Озвучка доступна в режиме обучения</p>
     </div>
     <?php endif ?>
-    <?php if ($model->haveVideo()): ?>
-        <div class="alert alert-info to-slides-tab noselect">
-            <p>Видео доступно в режиме обучения</p>
-        </div>
-    <?php endif ?>
     <?php if (!empty($model->body)): ?>
         <?= $model->body ?>
     <?php else: ?>

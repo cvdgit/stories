@@ -2097,6 +2097,10 @@ img.lazy {
   margin-top: 20px;
 }
 
+.slides-readonly section img {
+  margin: 10px 0;
+}
+
 
 @media (min-width: 1470px) {
   .container {
