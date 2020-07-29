@@ -11,6 +11,7 @@ class Slide
 
     const VIEW_SLIDE = 'slide';
     const VIEW_QUESTION = 'question';
+    const VIEW_NEWQUESTION = 'new-question';
 
     public $id;
     public $slideNumber;

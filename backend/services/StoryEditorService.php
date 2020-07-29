@@ -16,7 +16,6 @@ use backend\models\editor\TransitionForm;
 use common\helpers\StoryHelper;
 use common\models\StorySlide;
 use common\models\StorySlideBlock;
-use common\models\StorySlideImage;
 use common\models\StoryTestQuestion;
 use DomainException;
 use yii;
@@ -252,8 +251,10 @@ class StoryEditorService
         $model->kind = StorySlide::KIND_QUESTION;
         $model->data = $html;
 
+        // $this->updateSlideNumbers($currentSlideModel->story_id, $currentSlideModel->number);
         $model->number = 1;
         $model->save();
+
         return $model->id;
     }
 
@@ -309,53 +310,6 @@ class StoryEditorService
         $model->title = $form->text;
         $model->href = $form->url;
         return $model->save();
-    }
-
-    public function generateBookStoryHtml(Story $model)
-    {
-        $reader = new HTMLReader($model->slidesData(true));
-        $story = $reader->load();
-        $html = '';
-        foreach ($story->getSlides() as $slide) {
-            $text = '';
-            $image = '';
-            foreach ($slide->getBlocks() as $block) {
-                if ($block->getType() === AbstractBlock::TYPE_TEXT) {
-                    $text = $block->getText();
-                }
-                if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
-                    $image = $block->getFilePath();
-                }
-            }
-            $content = '';
-
-            if ($image !== '') {
-                $content .= Html::tag('div', Html::img(null, ['data-src' => '{IMAGE}', 'width' => '100%', 'height' => '100%', 'class' => 'lazy']), ['class' => '{CLASS}']);
-                $content = strtr($content, [
-                    '{IMAGE}' => $image,
-                ]);
-            }
-
-            if ($text !== '') {
-                $content .= Html::tag('div', Html::tag('p', '{TEXT}'), ['class' => '{CLASS}']);
-                $content = strtr($content, [
-                    '{TEXT}' => $text,
-                ]);
-            }
-
-            $colClass = 'col-lg-6';
-            if (($text !== '' && $image === '') || ($text === '' && $image !== '')) {
-                $colClass = 'col-lg-12';
-            }
-            $content = strtr($content, [
-                '{CLASS}' => $colClass,
-            ]);
-
-            if ($content !== '') {
-                $html .= Html::tag('section', Html::tag('div', $content, ['class' => 'row']));
-            }
-        }
-        return $html;
     }
 
     public function textFromStory(Story $model)

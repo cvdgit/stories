@@ -2,8 +2,7 @@
 
 namespace backend\components\queue;
 
-use backend\services\ImageService;
-use backend\services\StoryEditorService;
+use backend\components\book\BookStoryGenerator;
 use common\models\Story;
 use yii\base\BaseObject;
 use yii\queue\JobInterface;
@@ -15,6 +14,14 @@ class GenerateBookStoryJob extends BaseObject implements JobInterface
     /** @var int */
     public $storyID;
 
+    private $bookStoryGenerator;
+
+    public function __construct(BookStoryGenerator $bookStoryGenerator, $config = [])
+    {
+        $this->bookStoryGenerator = $bookStoryGenerator;
+        parent::__construct($config);
+    }
+
     /**
      * @param Queue $queue which pushed and is handling the job
      * @return void|mixed result of the job execution
@@ -22,8 +29,7 @@ class GenerateBookStoryJob extends BaseObject implements JobInterface
     public function execute($queue)
     {
         $story = Story::findModel($this->storyID);
-        $editorService = new StoryEditorService(new ImageService());
-        $html = $editorService->generateBookStoryHtml($story);
+        $html = $this->bookStoryGenerator->generate($story);
         $story->body = $html;
         $story->save(false, ['body']);
     }

@@ -177,9 +177,11 @@ class StorySlide extends \yii\db\ActiveRecord
     }
 
     protected function addJob(int $storyID) {
-        Yii::$app->queue->push(new GenerateBookStoryJob([
+        $job = Yii::createObject([
+            'class' => GenerateBookStoryJob::class,
             'storyID' => $storyID,
-        ]));
+        ]);
+        Yii::$app->queue->push($job);
     }
 
     public function afterSave($insert, $changedAttributes)

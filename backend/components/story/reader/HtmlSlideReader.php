@@ -36,7 +36,7 @@ class HtmlSlideReader implements ReaderInterface
 
     protected function loadSlide($htmlSlide)
     {
-        $this->slide->setView(pq($htmlSlide)->attr('data-slide-view') ?? '');
+        $this->slide->setView(pq($htmlSlide)->find('section')->attr('data-slide-view') ?? '');
         $blocks = pq($htmlSlide)->find('div.sl-block');
         $this->loadSlideBlocks($blocks);
     }

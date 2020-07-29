@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\components\book\BookStoryGenerator;
 use backend\models\AudioUploadForm;
 use backend\models\StoryBatchCommandForm;
 use backend\services\StoryEditorService;
@@ -27,12 +28,19 @@ class StoryController extends Controller
     
     public $service;
     protected $editorService;
+    private $bookStoryGenerator;
 
-    public function __construct($id, $module, StoryService $service, StoryEditorService $editorService, $config = [])
+    public function __construct($id,
+                                $module,
+                                StoryService $service,
+                                StoryEditorService $editorService,
+                                BookStoryGenerator $bookStoryGenerator,
+                                $config = [])
     {
-        parent::__construct($id, $module, $config);
         $this->service = $service;
         $this->editorService = $editorService;
+        $this->bookStoryGenerator = $bookStoryGenerator;
+        parent::__construct($id, $module, $config);
     }
 
     public function behaviors()
@@ -298,7 +306,7 @@ class StoryController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $model = Story::findModel($id);
-        $html = $this->editorService->generateBookStoryHtml($model);
+        $html = $this->bookStoryGenerator->generate($model);
         $model->body = $html;
         $model->save(false, ['body']);
         return ['success' => true];

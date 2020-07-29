@@ -2092,6 +2092,11 @@ img.lazy {
   cursor: pointer;
 }
 
+.slides-readonly .alert {
+  margin-bottom: 0;
+  margin-top: 20px;
+}
+
 
 @media (min-width: 1470px) {
   .container {
