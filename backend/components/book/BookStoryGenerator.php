@@ -3,6 +3,7 @@
 namespace backend\components\book;
 
 use backend\components\book\blocks\Image;
+use backend\components\book\blocks\Html;
 use backend\components\book\blocks\Test;
 use backend\components\book\blocks\Text;
 use backend\components\book\blocks\Transition;
@@ -10,6 +11,7 @@ use backend\components\story\AbstractBlock;
 use backend\components\story\HTMLBLock;
 use backend\components\story\ImageBlock;
 use backend\components\story\reader\HTMLReader;
+use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
 use backend\components\story\TransitionBlock;
 use common\models\Story;
@@ -56,11 +58,15 @@ class BookStoryGenerator
                         break;
                     case AbstractBlock::TYPE_HTML:
                         /** @var $block HTMLBLock */
-                        $tests[] = new Test($block->getContent());
+                        $tests[] = new Html($block->getContent());
                         break;
                     case AbstractBlock::TYPE_TRANSITION:
                         /** @var $block TransitionBlock */
                         $transitions[] = new Transition($block->getText());
+                        break;
+                    case AbstractBlock::TYPE_TEST:
+                        /** @var $block TestBlock */
+                        $tests[] = new Test($block->getTestID());
                         break;
                 }
             }

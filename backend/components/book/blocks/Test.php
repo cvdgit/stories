@@ -10,20 +10,17 @@ class Test extends Block
     public $header;
     public $description;
 
-    private $content;
+    private $testID;
 
-    public function __construct($content)
+    public function __construct($testID)
     {
-        $this->content = $content;
+        $this->testID = $testID;
         $this->generate();
     }
 
-    private function generate()
+    public function generate()
     {
-        $fragment = \phpQuery::newDocumentHTML($this->content);
-        $testId = $fragment->find('.new-questions')->attr('data-test-id');
-
-        $test = StoryTest::findModel($testId);
+        $test = StoryTest::findModel($this->testID);
         $this->header = $test->header;
         $this->description = $test->description_text;
     }

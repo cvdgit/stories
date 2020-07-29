@@ -2,7 +2,7 @@
 use yii\helpers\Html;
 /** @var $images backend\components\book\blocks\Image[] */
 /** @var $texts backend\components\book\blocks\Text[] */
-/** @var $tests backend\components\book\blocks\Test[] */
+/** @var $tests backend\components\book\blocks\Html[] */
 /** @var $transitions backend\components\book\blocks\Transition[] */
 $haveImages = count($images) > 0;
 $haveTexts = count($texts) > 0;
@@ -53,11 +53,11 @@ $haveTransitions = count($transitions) > 0;
         <div class="col-lg-12">
             <h3><?= $test->header ?></h3>
             <p><?= $test->description ?></p>
-        </div>
-        <div class="row">
-            <div class="col-lg-offset-3 col-lg-6">
-                <div class="alert alert-success to-slides-tab noselect text-center">
-                    <p>Прохождение теста доступно в режиме обуения</p>
+            <div class="row">
+                <div class="col-lg-offset-3 col-lg-6">
+                    <div class="alert alert-success to-slides-tab noselect text-center">
+                        <p>Прохождение теста доступно в режиме обуения</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -80,3 +80,4 @@ $haveTransitions = count($transitions) > 0;
     <?php endforeach ?>
     <?php endif ?>
 </section>
+<hr>

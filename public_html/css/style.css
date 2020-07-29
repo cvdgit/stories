@@ -2101,6 +2101,9 @@ img.lazy {
   margin: 10px 0;
 }
 
+.slides-readonly hr {
+
+}
 
 @media (min-width: 1470px) {
   .container {
