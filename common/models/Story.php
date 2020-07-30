@@ -258,7 +258,7 @@ class Story extends ActiveRecord
     public function saveBody($body)
     {
         $this->body = $body;
-        return $this->save(false, ['body']);
+        return $this->save();
     }
 
     public function bySubscription()
@@ -427,7 +427,7 @@ class Story extends ActiveRecord
     {
         $audio = $this->storyAudioTracks ? 1 : 0;
         $this->audio = $audio;
-        $this->save(false);
+        $this->save();
     }
 
     public function getOriginalTrack()
@@ -470,7 +470,7 @@ class Story extends ActiveRecord
             ->where('story_id = :story', [':story' => $model->id])
             ->count();
         $model->slides_number = $slideNumber;
-        $model->save(false, ['slides_number']);
+        $model->save();
     }
 
     public function storyFacts()
@@ -495,7 +495,7 @@ class Story extends ActiveRecord
     {
         $model = self::findModel($storyID);
         $model->video = $video;
-        $model->save(false, ['video']);
+        $model->save();
     }
 
     /**
@@ -513,7 +513,7 @@ class Story extends ActiveRecord
         if ($this->published_at === null) {
             $this->published_at = time();
         }
-        return $this->save(false, ['status', 'published_at']);
+        return $this->save();
     }
 
     public function submitPublicationTask(): bool
@@ -546,13 +546,13 @@ class Story extends ActiveRecord
     {
         $model = self::findModel($storyID);
         $model->have_neo_relation = $value;
-        $model->save(false, ['have_neo_relation']);
+        $model->save();
     }
 
     public function updateAudioFlag(int $flag)
     {
         $this->audio = $flag;
-        return $this->save(false, ['audio']);
+        return $this->save();
     }
 
 }
