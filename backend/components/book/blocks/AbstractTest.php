@@ -21,4 +21,9 @@ abstract class AbstractTest extends Block
         $this->description = $test->description_text;
     }
 
+    public function isInlineTest()
+    {
+        return $this instanceof Test;
+    }
+
 }

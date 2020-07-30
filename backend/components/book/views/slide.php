@@ -40,23 +40,28 @@ use yii\helpers\Html;
     <?php endif ?>
 
     <?php if ($manager->haveTests()): ?>
-    <?php foreach ($manager->getTests() as $test): ?>
-    <?php if (!$test->isEmpty()): ?>
-    <div class="row">
-        <div class="col-lg-12">
-            <h3><?= $test->header ?></h3>
-            <p><?= $test->description ?></p>
-            <div class="row">
-                <div class="col-lg-offset-3 col-lg-6">
-                    <div class="alert alert-success to-slides-tab noselect text-center">
-                        <p>Прохождение теста доступно в режиме обуения</p>
+        <?php foreach ($manager->getTests() as $test): ?>
+            <?php if (!$test->isEmpty()): ?>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <?php if ($test->isInlineTest()): ?>
+                            <h3>Тест для закрепления материала</h3>
+                            <p><?= $test->header ?></p>
+                        <?php else: ?>
+                            <h3><?= $test->header ?></h3>
+                        <?php endif ?>
+                        <p><?= $test->description ?></p>
+                        <div class="row">
+                            <div class="col-lg-offset-3 col-lg-6">
+                                <div class="alert alert-success to-slides-tab noselect text-center">
+                                    <p>Прохождение теста доступно в режиме обуения</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    <?php endif ?>
-    <?php endforeach ?>
+            <?php endif ?>
+        <?php endforeach ?>
     <?php endif ?>
 
     <?php if ($manager->haveTransitions()): ?>
