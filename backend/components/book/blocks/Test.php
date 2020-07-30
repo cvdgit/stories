@@ -2,27 +2,23 @@
 
 namespace backend\components\book\blocks;
 
-use common\models\StoryTest;
-
-class Test extends Block
+class Test extends AbstractTest
 {
 
     public $header;
     public $description;
 
-    private $testID;
+    protected $testID;
 
     public function __construct($testID)
     {
         $this->testID = $testID;
-        $this->generate();
+        parent::__construct();
     }
 
-    public function generate()
+    public function getTestID()
     {
-        $test = StoryTest::findModel($this->testID);
-        $this->header = $test->header;
-        $this->description = $test->description_text;
+        return $this->testID;
     }
 
 }
