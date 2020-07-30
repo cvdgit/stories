@@ -165,9 +165,6 @@ class StoryService
             $notification->text = (new NewStoryNotification($model))->render();
             $this->notificationService->sendToAllUsers($notification);
         }
-        else {
-            die(print_r($model->errors));
-        }
     }
 
     public function unPublishStory(Story $model): void
