@@ -223,4 +223,9 @@ class StorySlide extends \yii\db\ActiveRecord
         }, $this->storySlideBlocks);
     }
 
+    public function isHidden()
+    {
+        return (int) $this->status === self::STATUS_HIDDEN;
+    }
+
 }

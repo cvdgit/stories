@@ -192,11 +192,8 @@ class EditorController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
 
         $model = StorySlide::findSlide($slide_id);
-        $reader = new HtmlSlideReader($model->data);
-        $slide = $reader->load();
+        $slide = (new HtmlSlideReader($model->data))->load();
         $block = $slide->findBlockByID($block_id);
-        $block_type = $block->getType();
-        $values = $block->getValues();
 
         $types = [
             AbstractBlock::TYPE_HEADER => [
@@ -232,6 +229,7 @@ class EditorController extends Controller
                 'view' => '_video_form',
             ],
         ];
+        $block_type = $block->getType();
         if (!isset($types[$block_type])) {
             throw new DomainException($block_type . ' - Unknown block type');
         }
@@ -240,7 +238,12 @@ class EditorController extends Controller
         $form->slide_id = $model->id;
         $form->block_id = $block_id;
 
+        $values = $block->getValues();
         $form->load($values, '');
+
+        if (($block->getType() === AbstractBlock::TYPE_TRANSITION) && $form->transition_story_id === null) {
+            $form->transition_story_id = $model->story_id;
+        }
 
         return $this->renderAjax('_form', [
             'model' => $form,
@@ -276,19 +279,15 @@ class EditorController extends Controller
         }
 
         $model = StorySlide::findSlide($slide_id);
-        $reader = new HtmlSlideReader($model->data);
-        $slide = $reader->load();
-
+        $slide = (new HtmlSlideReader($model->data))->load();
         $block = $slide->createBlock($types[$block_type]);
         $slide->addBlock($block);
-
-        $writer = new HTMLWriter();
-        $html = $writer->renderSlide($slide);
 
         if ($block_type === AbstractBlock::TYPE_VIDEO) {
             Story::updateVideo($model->story_id, 1);
         }
 
+        $html = (new HTMLWriter())->renderSlide($slide);
         $model->data = $html;
         $model->save(false, ['data']);
 
@@ -379,6 +378,7 @@ class EditorController extends Controller
                 'isLink' => $slide->isLink(),
                 'isQuestion' => $slide->isQuestion(),
                 'linkSlideID' => $slide->link_slide_id,
+                'isHidden' => $slide->isHidden(),
             ];
         }, $model->storySlides);
     }

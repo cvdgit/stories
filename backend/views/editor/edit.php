@@ -71,11 +71,6 @@ $('[data-toggle="tooltip"]').tooltip();
 	        return false;
 	    });
 
-	$("#slide-visible").on("click", function(e) {
-	    e.preventDefault();
-	    StoryEditor.toggleSlideVisible();
-	});
-	
 	$("#slide-source").on("click", function(e) {
 	    e.preventDefault();
 	    StoryEditor.slideSourceModal("$slideSourceAction");
@@ -179,7 +174,6 @@ $options = [
             <div class="editor-slide-actions pull-right">
                 <a href="#" id="slide-copy" title="Копировать слайд"><i class="glyphicon glyphicon-copy"></i></a>
                 <a href="#" id="slide-source" title="Код слайда"><i class="glyphicon glyphicon-fire"></i></a>
-                <a href="#" id="slide-visible" title="Скрыть слайд"><i class="glyphicon"></i></a>
             </div>
         </div>
 	</div>

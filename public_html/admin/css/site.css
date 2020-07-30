@@ -499,3 +499,20 @@ body {
 .modal {
     overflow: auto;
 }
+
+.toggle-slide-visible {
+    float: right;
+    color: #555555;
+    font-weight: 500;
+    margin-right: 10px;
+}
+
+.list-group-item.active .toggle-slide-visible {
+    color: #ffffff;
+}
+
+.delete-slide {
+    float: right;
+    color: #c7254e;
+    font-weight: 500;
+}

@@ -183,7 +183,6 @@ var StoryEditor = (function() {
         send(slideID)
             .done(function(data) {
                 setActiveSlide(data);
-                changeSlideVisibleIcon(data.status);
                 updateLinkCounter(data.blockNumber);
                 $(".slides", $editor).empty().append(data.data);
                 $('section', '#story-editor').css({'height': '720px', 'width': '1280px'}).attr('id', 'slide-container');
@@ -258,7 +257,11 @@ var StoryEditor = (function() {
     }
 
     function slideIcon(slide) {
-        return slide.isLink ? '<i class="glyphicon glyphicon-link"></i>' : slide.isQuestion ? '<i class="glyphicon glyphicon-question-sign"></i>' : '#';
+        return slide.isLink ?
+            '<i class="glyphicon glyphicon-link"></i>' :
+            slide.isQuestion ?
+                '<i class="glyphicon glyphicon-question-sign"></i>' :
+                '#';
     }
 
     function loadSlides(activeSlideID) {
@@ -272,6 +275,7 @@ var StoryEditor = (function() {
         promise.done(function(data) {
             if (data.length > 0) {
                 data.forEach(function (slide) {
+
                     var $element = $("<a/>")
                         .attr("href", "#")
                         .addClass("list-group-item")
@@ -282,16 +286,33 @@ var StoryEditor = (function() {
                             loadSlide(slide.id, true);
                             return false;
                         });
-                    var $deleteElement = $('<span/>')
-                        .addClass('glyphicon glyphicon-trash')
-                        .css({'float': 'right', 'color': 'red', 'fontWeight': '500'})
-                        .attr({'title': 'Удалить слайд'});
-                    $deleteElement.on('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        deleteSlide(slide.id);
-                    });
-                    $deleteElement.appendTo($element);
+
+                    $('<span/>')
+                        .addClass('delete-slide glyphicon glyphicon-trash')
+                        .attr({'title': 'Удалить слайд'})
+                        .on('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            deleteSlide(slide.id);
+                        })
+                        .appendTo($element);
+
+                    $('<span/>')
+                        .addClass('toggle-slide-visible glyphicon glyphicon-eye-' + (slide.isHidden ? 'close' : 'open'))
+                        .attr('title', (slide.isHidden ? 'Показать' : 'Скрыть') + ' слайд')
+                        .on('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            var that = this;
+                            toggleSlideVisible(slide.id)
+                                .done(function(data) {
+                                    if (data && data.success) {
+                                        changeSlideVisibleIcon($(that), data.status);
+                                    }
+                                });
+                        })
+                        .appendTo($element);
+
                     $element.appendTo($container);
                 });
                 loadSlide(activeSlideID, true);
@@ -364,30 +385,22 @@ var StoryEditor = (function() {
         window.location.hash = locationHash();
     }
 
-    function toggleSlideVisible() {
-        var promise = $.ajax({
-            "url": config.slideVisibleAction + "&slide_id=" + currentSlideID,
+    function toggleSlideVisible(slideID) {
+        slideID = slideID || currentSlideID;
+        return $.ajax({
+            "url": config.slideVisibleAction + "&slide_id=" + slideID,
             "type": "GET",
             "dataType": "json"
         });
-        promise.done(function(data) {
-            if (data && data.success) {
-                changeSlideVisibleIcon(data.status);
-            }
-        });
     }
 
-    var $slideVisibleControl = $("#slide-visible");
-    function changeSlideVisibleIcon(status) {
-        var $icon = $("i", $slideVisibleControl);
-        $icon
-            .removeClass("glyphicon-eye-open")
-            .removeClass("glyphicon-eye-close");
+    function changeSlideVisibleIcon(element, status) {
+        element.removeClass('glyphicon-eye-open glyphicon-eye-close');
         if (status === 1) {
-            $icon.addClass("glyphicon-eye-open");
+            element.addClass('glyphicon-eye-open');
         }
         else {
-            $icon.addClass("glyphicon-eye-close");
+            element.addClass('glyphicon-eye-close');
         }
     }
 
@@ -448,7 +461,6 @@ var StoryEditor = (function() {
         "createBlock": createBlock,
         "deleteBlock": deleteBlock,
         "deleteSlide": deleteSlide,
-        "toggleSlideVisible": toggleSlideVisible,
         "createSlide": createSlide,
         "slideSourceModal": slideSourceModal,
         "getConfigValue": getConfigValue,
@@ -482,7 +494,7 @@ var StoryEditor = (function() {
                 data.forEach(function (slide) {
                     var $option = $("<option />")
                         .val(slide.id)
-                        .text("Слайд" + slide.slideNumber);
+                        .text("Слайд " + slide.slideNumber + (slide.isHidden ? ' (скрытый)' : ''));
                     if (slide.id === defaultValue) {
                         $option.attr("selected", "selected");
                     }
