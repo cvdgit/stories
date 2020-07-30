@@ -44,8 +44,7 @@ use yii\helpers\Html;
     <?php if (!$test->isEmpty()): ?>
     <div class="row">
         <div class="col-lg-12">
-            <h3>Тест для закрепления материала</h3>
-            <p><?= $test->header ?></p>
+            <h3><?= $test->header ?></h3>
             <p><?= $test->description ?></p>
             <div class="row">
                 <div class="col-lg-offset-3 col-lg-6">
