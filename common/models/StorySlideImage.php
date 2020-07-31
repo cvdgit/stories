@@ -52,9 +52,7 @@ class StorySlideImage extends ActiveRecord
      */
     public function rules()
     {
-        return [
-            [['created_at', 'updated_at'], 'integer'],
-        ];
+        return [];
     }
 
     /**

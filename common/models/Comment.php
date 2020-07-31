@@ -54,7 +54,7 @@ class Comment extends ActiveRecord
     {
         return [
             [['user_id', 'story_id', 'body'], 'required'],
-            [['user_id', 'story_id', 'status', 'created_at', 'updated_at', 'parent_id'], 'integer'],
+            [['user_id', 'story_id', 'status', 'parent_id'], 'integer'],
             ['body', 'string'],
             ['body', 'filter', 'filter' => '\yii\helpers\HtmlPurifier::process'],
             ['body', 'filter', 'filter' => 'strip_tags'],

@@ -61,7 +61,7 @@ class Payment extends ActiveRecord
     {
         return [
             [['payment', 'finish', 'user_id', 'rate_id'], 'required'],
-            [['created_at', 'updated_at', 'user_id', 'rate_id'], 'integer'],
+            [['user_id', 'rate_id'], 'integer'],
             [['state', 'data'], 'safe'],
             [['payment', 'finish'], 'date', 'format' => 'yyyy-M-d H:m:s'],
         ];

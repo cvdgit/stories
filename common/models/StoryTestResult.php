@@ -46,7 +46,7 @@ class StoryTestResult extends \yii\db\ActiveRecord
     {
         return [
             [['question_id', 'user_id', 'story_id', 'answer_is_correct'], 'required'],
-            [['question_id', 'user_id', 'story_id', 'answer_is_correct', 'created_at'], 'integer'],
+            [['question_id', 'user_id', 'story_id', 'answer_is_correct'], 'integer'],
             [['question_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTestQuestion::class, 'targetAttribute' => ['question_id' => 'id']],
             [['story_id'], 'exist', 'skipOnError' => true, 'targetClass' => Story::class, 'targetAttribute' => ['story_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],

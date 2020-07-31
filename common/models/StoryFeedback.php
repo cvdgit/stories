@@ -40,7 +40,6 @@ class StoryFeedback extends ActiveRecord
         return [
             [
                 'class' => TimestampBehavior::class,
-                'createdAtAttribute' => 'created_at',
                 'updatedAtAttribute' => null,
             ],
         ];
@@ -53,7 +52,7 @@ class StoryFeedback extends ActiveRecord
     {
         return [
             [['story_id', 'assign_user_id', 'slide_number', 'slide_id'], 'required'],
-            [['story_id', 'assign_user_id', 'slide_number', 'status', 'created_at', 'slide_id'], 'integer'],
+            [['story_id', 'assign_user_id', 'slide_number', 'status', 'slide_id'], 'integer'],
             [['text'], 'string', 'max' => 255],
             [['story_id'], 'exist', 'skipOnError' => true, 'targetClass' => Story::class, 'targetAttribute' => ['story_id' => 'id']],
             [['assign_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['assign_user_id' => 'id']],

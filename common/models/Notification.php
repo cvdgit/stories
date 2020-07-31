@@ -46,9 +46,7 @@ class Notification extends ActiveRecord
      */
     public function rules()
     {
-        return [
-            [['created_at'], 'integer'],
-        ];
+        return [];
     }
 
     /**

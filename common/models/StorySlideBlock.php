@@ -46,7 +46,7 @@ class StorySlideBlock extends \yii\db\ActiveRecord
     {
         return [
             [['slide_id', 'title'], 'required'],
-            [['slide_id', 'type', 'created_at', 'updated_at'], 'integer'],
+            [['slide_id', 'type'], 'integer'],
             [['title', 'href'], 'string', 'max' => 255],
         ];
     }

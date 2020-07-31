@@ -48,7 +48,6 @@ class Playlist extends \yii\db\ActiveRecord
     {
         return [
             [['title'], 'required'],
-            [['created_at', 'updated_at'], 'integer'],
             [['title'], 'string', 'max' => 255],
         ];
     }

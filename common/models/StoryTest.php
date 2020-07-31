@@ -54,7 +54,7 @@ class StoryTest extends ActiveRecord
     {
         return [
             [['title', 'header'], 'required'],
-            [['status', 'created_at', 'updated_at', 'mix_answers', 'remote', 'question_list_id'], 'integer'],
+            [['status', 'mix_answers', 'remote', 'question_list_id'], 'integer'],
             [['title', 'question_list_name', 'header'], 'string', 'max' => 255],
             [['description_text'], 'string'],
             [['question_list'], 'safe'],

@@ -50,7 +50,7 @@ class UserStudent extends ActiveRecord
     public function rules()
     {
         return [
-            [['created_at', 'updated_at', 'status'], 'integer'],
+            [['status'], 'integer'],
         ];
     }
 

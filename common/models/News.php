@@ -63,7 +63,7 @@ class News extends ActiveRecord
         return [
             [['title', 'text', 'status'], 'required'],
             [['text'], 'string'],
-            [['status', 'user_id', 'created_at', 'updated_at'], 'integer'],
+            [['status', 'user_id'], 'integer'],
             [['title', 'slug'], 'string', 'max' => 255],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];

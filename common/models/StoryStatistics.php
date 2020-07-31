@@ -40,7 +40,6 @@ class StoryStatistics extends ActiveRecord
         return [
             [
                 'class' => TimestampBehavior::class,
-                'createdAtAttribute' => 'created_at',
                 'updatedAtAttribute' => null,
             ],
         ];
@@ -53,7 +52,7 @@ class StoryStatistics extends ActiveRecord
     {
         return [
             [['story_id', 'slide_id', 'begin_time', 'end_time', 'chars', 'session'], 'required'],
-            [['story_id', 'slide_number', 'begin_time', 'end_time', 'chars', 'created_at', 'slide_id', 'user_id'], 'integer'],
+            [['story_id', 'slide_number', 'begin_time', 'end_time', 'chars', 'slide_id', 'user_id'], 'integer'],
             [['session'], 'string', 'max' => 50],
         ];
     }

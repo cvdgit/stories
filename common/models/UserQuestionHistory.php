@@ -53,7 +53,6 @@ class UserQuestionHistory extends ActiveRecord
     public function rules()
     {
         return [
-            ['created_at', 'integer'],
             [['answers', 'progress'], 'safe'],
         ];
     }
