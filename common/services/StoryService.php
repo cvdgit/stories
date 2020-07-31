@@ -2,18 +2,14 @@
 
 namespace common\services;
 
-use backend\components\queue\GenerateBookStoryJob;
 use backend\components\queue\PublishStoryJob;
-use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\reader\PowerPointReader;
 use backend\components\story\writer\HTMLWriter;
 use backend\models\SourcePowerPointForm;
 use common\models\NotificationModel;
 use common\models\Story;
-use common\models\StorySlide;
+use DirectoryIterator;
 use DomainException;
-use frontend\models\SlideAudio;
-use http\Exception\RuntimeException;
 use backend\components\notification\NewStoryNotification;
 use yii;
 use yii\helpers\Url;
@@ -67,10 +63,6 @@ class StoryService
         $storyModel = Story::findModel($form->storyId);
         $storyModel->slides_number = count($slides);
         $storyModel->save(false, ['slides_number']);
-
-        Yii::$app->queue->push(new GenerateBookStoryJob([
-            'storyID' => $form->storyId,
-        ]));
     }
 
     public function getCoverPath($cover, $web = false)
@@ -110,7 +102,7 @@ class StoryService
             $files[] = self::getStoryFilePath($story->story_file);
             $imagesFolder = Yii::getAlias('@public') . '/slides/' . $story->story_file . '/';
             if (file_exists($imagesFolder)) {
-                $dir = new \DirectoryIterator($imagesFolder);
+                $dir = new DirectoryIterator($imagesFolder);
                 foreach ($dir as $file) {
                     if ($file->isFile()) {
                         $files[] = $file->getPathname();

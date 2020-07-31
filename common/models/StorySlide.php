@@ -2,11 +2,10 @@
 
 namespace common\models;
 
-use backend\components\queue\GenerateBookStoryJob;
 use backend\models\NeoSlideRelations;
 use DomainException;
-use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
 use yii\db\Query;
 
 /**
@@ -28,7 +27,7 @@ use yii\db\Query;
  * @property StorySlideBlock[] $storySlideBlocks
  * @property StoryStatistics[] $storyStatistics
  */
-class StorySlide extends \yii\db\ActiveRecord
+class StorySlide extends ActiveRecord
 {
 
     const STATUS_VISIBLE = 1;
@@ -176,19 +175,8 @@ class StorySlide extends \yii\db\ActiveRecord
             ->one();
     }
 
-    protected function addJob(int $storyID) {
-        $job = Yii::createObject([
-            'class' => GenerateBookStoryJob::class,
-            'storyID' => $storyID,
-        ]);
-        Yii::$app->queue->push($job);
-    }
-
     public function afterSave($insert, $changedAttributes)
     {
-        if (isset($changedAttributes['data']) && $changedAttributes['data'] !== $this->data) {
-            $this->addJob($this->story_id);
-        }
         if ($insert) {
             Story::updateSlideNumber($this->story_id);
         }
@@ -197,7 +185,6 @@ class StorySlide extends \yii\db\ActiveRecord
 
     public function afterDelete()
     {
-        $this->addJob($this->story_id);
         Story::updateSlideNumber($this->story_id);
         parent::afterDelete();
     }

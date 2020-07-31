@@ -2,7 +2,6 @@
 
 namespace common\models;
 
-use backend\components\queue\GenerateBookStoryJob;
 use DomainException;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use Yii;
