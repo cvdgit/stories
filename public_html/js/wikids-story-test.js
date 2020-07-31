@@ -348,9 +348,11 @@ var WikidsStoryTest = function() {
             .data("answer", answer);
 
         var $answer = $("<div/>").addClass("wikids-test-answer")
-            .on("click", function() {
-                var $input = $(this).find("input");
-                $input.prop("checked", !$input.prop("checked"));
+            .on("click", function(e) {
+                if (e.target.tagName !== 'INPUT') {
+                    var $input = $(this).find("input");
+                    $input.prop("checked", !$input.prop("checked"));
+                }
             })
             .append($element);
 
