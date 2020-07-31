@@ -107,7 +107,7 @@ class Story extends ActiveRecord
         return [
             [['title', 'alias', 'user_id', 'source_id'], 'required'],
             [['body', 'cover', 'story_file', 'source_dropbox', 'source_powerpoint'], 'string'],
-            [['created_at', 'updated_at', 'user_id', 'sub_access', 'source_id', 'views_number', 'slides_number', 'audio', 'published_at'], 'integer'],
+            [['user_id', 'sub_access', 'source_id', 'views_number', 'slides_number', 'audio', 'published_at'], 'integer'],
             [['video', 'user_audio', 'episode'], 'integer'],
             [['title', 'alias'], 'string', 'max' => 255],
             [['alias'], 'unique'],
@@ -258,7 +258,7 @@ class Story extends ActiveRecord
     public function saveBody($body)
     {
         $this->body = $body;
-        return $this->save();
+        return $this->save(false);
     }
 
     public function bySubscription()
@@ -427,7 +427,7 @@ class Story extends ActiveRecord
     {
         $audio = $this->storyAudioTracks ? 1 : 0;
         $this->audio = $audio;
-        $this->save();
+        $this->save(false);
     }
 
     public function getOriginalTrack()
@@ -470,7 +470,7 @@ class Story extends ActiveRecord
             ->where('story_id = :story', [':story' => $model->id])
             ->count();
         $model->slides_number = $slideNumber;
-        $model->save();
+        $model->save(false);
     }
 
     public function storyFacts()
@@ -495,7 +495,7 @@ class Story extends ActiveRecord
     {
         $model = self::findModel($storyID);
         $model->video = $video;
-        $model->save();
+        $model->save(false);
     }
 
     /**
@@ -513,28 +513,12 @@ class Story extends ActiveRecord
         if ($this->published_at === null) {
             $this->published_at = time();
         }
-        return $this->save();
+        return $this->save(false);
     }
 
     public function submitPublicationTask(): bool
     {
         return ($this->published_at === null);
-    }
-
-    public function storyPreview()
-    {
-        $document = \phpQuery::newDocumentHTML($this->body);
-        $sections = $document->find('section');
-        $i = 0;
-        $html = '';
-        foreach ($sections as $section) {
-            $html .= pq($section)->htmlOuter();
-            $i++;
-            if ($i >= 5) {
-                break;
-            }
-        }
-        return $html;
     }
 
     public function hasNeoRelation(): bool
@@ -546,13 +530,13 @@ class Story extends ActiveRecord
     {
         $model = self::findModel($storyID);
         $model->have_neo_relation = $value;
-        $model->save();
+        $model->save(false);
     }
 
     public function updateAudioFlag(int $flag)
     {
         $this->audio = $flag;
-        return $this->save();
+        return $this->save(false);
     }
 
 }

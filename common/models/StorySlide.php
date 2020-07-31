@@ -59,7 +59,7 @@ class StorySlide extends \yii\db\ActiveRecord
     {
         return [
             [['story_id', 'data', 'number'], 'required'],
-            [['story_id', 'number', 'status', 'created_at', 'updated_at', 'kind', 'link_slide_id'], 'integer'],
+            [['story_id', 'number', 'status', 'kind', 'link_slide_id'], 'integer'],
             [['data'], 'string'],
             [['story_id'], 'exist', 'skipOnError' => true, 'targetClass' => Story::class, 'targetAttribute' => ['story_id' => 'id']],
         ];

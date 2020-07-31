@@ -111,7 +111,7 @@ class StoryEditorService
         $html = $writer->renderSlide($slide);
 
         $model->data = $html;
-        $model->save();
+        $model->save(false);
 
         $haveVideo = $this->haveVideoBlock($model->story_id);
         Story::updateVideo($model->story_id, $haveVideo ? 1 : 0);
@@ -171,7 +171,7 @@ class StoryEditorService
             $model->number = $currentSlide->number + 1;
         }
 
-        $model->save();
+        $model->save(false);
 
         return $model->id;
     }
@@ -301,7 +301,7 @@ class StoryEditorService
         $writer = new HTMLWriter();
         $html = $writer->renderSlide($slide);
         $model->data = $html;
-        return $model->save();
+        return $model->save(false);
     }
 
     public function newUpdateBlock($form)
@@ -309,7 +309,7 @@ class StoryEditorService
         $model = StorySlideBlock::findBlock($form->block_id);
         $model->title = $form->text;
         $model->href = $form->url;
-        return $model->save();
+        return $model->save(false);
     }
 
     public function textFromStory(Story $model)
@@ -342,7 +342,7 @@ class StoryEditorService
         $html = $writer->renderSlide($slide);
 
         $model->data = $html;
-        $model->save();
+        $model->save(false);
     }
 
 }
