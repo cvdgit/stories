@@ -44,12 +44,12 @@ class GuestStoryController extends Controller
         if (count($storyIDs) > 0) {
             $models = Story::find()->where(['in', 'id', $storyIDs])->published()->all();
             foreach ($models as $model) {
-                $this->stdout($model->title . PHP_EOL);
+                //$this->stdout($model->title . PHP_EOL);
                 $model->body = $this->bookStoryGenerator->generate($model);
                 $model->save(false, ['body']);
             }
         }
-        $this->stdout('Done!' . PHP_EOL);
+        //$this->stdout('Done!' . PHP_EOL);
     }
 
 }
