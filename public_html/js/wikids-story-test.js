@@ -559,6 +559,10 @@ var WikidsStoryTest = function() {
             if (question.image) {
                 $('<img/>')
                     .attr("src", question.image)
+                    .css('cursor', 'zoom-in')
+                    .on('click', function() {
+                        showOriginalImage($(this).attr('src'));
+                    })
                     .appendTo($(".question-image", $question));
             }
             $questions.append($question);
