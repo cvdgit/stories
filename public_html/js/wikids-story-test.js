@@ -273,24 +273,7 @@ var WikidsStoryTest = function() {
             .addClass('wikids-test-correct-answer-page')
             .hide()
             //.append($('<p/>').addClass('wikids-test-correct-answer-page-header'))
-            .append($('<div/>').addClass('row row-no-gutters wikids-test-correct-answer-answers')
-                .append(
-                    $('<div/>')
-                        .addClass('col-md-6 wikids-test-correct-answer-page-answer wikids-test-correct-answer-page-left')
-                        .append(
-                            $('<h4/>').text('Правильные ответы')
-                        )
-                        .append($('<ul/>').addClass('list-unstyled'))
-                )
-                .append(
-                    $('<div/>')
-                        .addClass('col-md-6 wikids-test-correct-answer-page-answer wikids-test-correct-answer-page-right')
-                        .append(
-                            $('<h4/>').text('Неправильные ответы')
-                        )
-                        .append($('<ul/>').addClass('list-unstyled'))
-                )
-            )
+            .append($('<div/>').addClass('wikids-test-correct-answer-answers'))
             .append($('<div/>').addClass('wikids-test-correct-answer-page-action').append($action));
     }
 
@@ -395,7 +378,7 @@ var WikidsStoryTest = function() {
         if (answer.image) {
             var $image = $("<img/>")
                 .attr("src", answer.image)
-                .attr("height", 100)
+                .attr('height', 100)
                 .css('cursor', 'zoom-in')
                 .on('click', function() {
                     showOriginalImage($(this).attr('src'));
@@ -878,45 +861,38 @@ var WikidsStoryTest = function() {
 
     function showCorrectAnswerPage(question, answer) {
 
-        var $leftElements = $('<div/>'),
-            $rightElements = $('<div/>');
-        var p;
+        var $elements = $('<div/>');
+        $elements.append($('<h4/>').text('На континенте ' + question.entity_name + ' обитают:'));
+        var $element;
         getAnswersData(question).forEach(function(questionAnswer) {
-            p = $('<li/>');
-            p.append($('<div/>').text(questionAnswer.name));
-            if (questionAnswer.image) {
-                var $image = $("<img/>")
-                    .attr("src", questionAnswer.image)
-                    .attr("height", 160);
-                if (questionAnswer['description']) {
-                    $image.attr('title', function() {
-                        var title = questionAnswer.name + ' обитает на континент' + (questionAnswer.description.split(',').length > 1 ? 'ах' : 'е');
-                        return title + ' ' + questionAnswer.description;
-                    });
-                }
-                p.append($image);
-            }
+
+            $element = $('<div/>').addClass('row');
+            var $content = $('<div/>').addClass('col-md-offset-3 col-md-9');
             if (parseInt(questionAnswer.is_correct) === 1) {
-                if ($.inArray(questionAnswer.id, answer) !== -1) {
-                    p.addClass('text-success');
+                if (questionAnswer.image) {
+                    var $image = $('<img/>')
+                        .attr("src", questionAnswer.image)
+                        .attr("width", 180)
+                        .css('cursor', 'zoom-in')
+                        .on('click', function() {
+                            showOriginalImage($(this).attr('src'));
+                        });
+/*                    if (questionAnswer['description']) {
+                        $image.attr('title', function() {
+                            var title = questionAnswer.name + ' обитает на континент' + (questionAnswer.description.split(',').length > 1 ? 'ах' : 'е');
+                            return title + ' ' + questionAnswer.description;
+                        });
+                    }*/
+                    $content.append($image);
                 }
-                else {
-                    p.addClass('text-danger');
-                }
-                $leftElements.append(p);
-            }
-            else {
-                if ($.inArray(questionAnswer.id, answer) !== -1) {
-                    p.addClass('text-danger');
-                }
-                $rightElements.append(p);
+                $content.append($('<p/>').text(questionAnswer.name));
+                $elements.append($element.append($content));
             }
         });
 
         dom.correctAnswerPage
             //.find('.wikids-test-correct-answer-page-header').text(question.name).end()
-            .find('.wikids-test-correct-answer-page-left ul').empty().html($leftElements[0].childNodes).end()
-            .find('.wikids-test-correct-answer-page-right ul').empty().html($rightElements[0].childNodes).end()
+            .find('.wikids-test-correct-answer-answers').empty().html($elements[0].childNodes).end()
             .show();
     }
 

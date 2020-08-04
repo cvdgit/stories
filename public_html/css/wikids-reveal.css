@@ -1776,6 +1776,7 @@
 	pointer-events: none;
 	font-size: 24px;
 	user-select: none;
+	vertical-align: top;
 }
 
 .wikids-test-answer input[type=checkbox],
@@ -2073,28 +2074,31 @@ p.wikids-test-description {
 
 .wikids-test-correct-answer-answers {
 	height: 500px;
+	text-align: left;
 }
 
-.wikids-test-correct-answer-page-answer h4 {
+.wikids-test-correct-answer-answers > .row {
+	margin-bottom: 20px;
+}
+
+.wikids-test-correct-answer-answers h4 {
 	font-size: 3.2rem !important;
-}
-
-.wikids-test-correct-answer-page-answer ul {
-	margin-left: 20px;
-}
-
-.wikids-test-correct-answer-page-answer li {
-	margin: 20px 0 40px;
-	font-size: 2.5rem;
-}
-
-.wikids-test-correct-answer-page-answer li div {
-	margin: 20px 0;
+	text-align: center;
+	color: #000000;
+	margin-bottom: 30px;
 }
 
 .wikids-test-correct-answer-answers img {
-	display: block;
-	margin: 0 auto;
+	float: left;
+}
+
+.wikids-test-correct-answer-page-answer p {
+	font-size: 2.5rem;
+}
+
+.wikids-test-correct-answer-answers p {
+	margin-left: 200px;
+	font-size: 2.5rem;
 }
 
 .new-questions-header {
