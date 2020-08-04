@@ -346,6 +346,28 @@ var WikidsStoryTest = function() {
         dom.continueButton.off("click").on("click", continueTestAction);
     }
 
+    function showOriginalImage(url) {
+
+        $('<div/>')
+            .addClass('wikids-test-image-original')
+            .append(
+                $('<div/>')
+                    .addClass('wikids-test-image-original-inner image-loader')
+                    .append(
+                        $('<img/>')
+                            .attr('src', url + '/original')
+                            .on('load', function() {
+                                $(this).parent().removeClass('image-loader');
+                                $(this).show();
+                            })
+                            .on('click', function() {
+                                $(this).parent().parent().remove();
+                            })
+                    )
+            )
+            .appendTo(dom.wrapper);
+    }
+
     function createAnswer(answer, questionType) {
 
         var type = "radio";
@@ -362,7 +384,8 @@ var WikidsStoryTest = function() {
 
         var $answer = $("<div/>").addClass("wikids-test-answer")
             .on("click", function(e) {
-                if (e.target.tagName !== 'INPUT') {
+                var tagName = e.target.tagName;
+                if (tagName !== 'INPUT' && tagName !== 'IMG') {
                     var $input = $(this).find("input");
                     $input.prop("checked", !$input.prop("checked"));
                 }
@@ -372,7 +395,11 @@ var WikidsStoryTest = function() {
         if (answer.image) {
             var $image = $("<img/>")
                 .attr("src", answer.image)
-                .attr("height", 100);
+                .attr("height", 100)
+                .css('cursor', 'zoom-in')
+                .on('click', function() {
+                    showOriginalImage($(this).attr('src'));
+                });
             $answer.append($image);
         }
 
@@ -530,7 +557,9 @@ var WikidsStoryTest = function() {
             $answers.appendTo($question);
 
             if (question.image) {
-                $('<img/>').attr("src", question.image).appendTo($(".question-image", $question));
+                $('<img/>')
+                    .attr("src", question.image)
+                    .appendTo($(".question-image", $question));
             }
             $questions.append($question);
         });
@@ -611,7 +640,7 @@ var WikidsStoryTest = function() {
 
     function restart() {
 
-        var nextQuestion = questions.shift();
+        var nextQuestion = testQuestions.shift();
         $('.wikids-test-question[data-question-id=' + nextQuestion.id + ']', dom.questions)
             .find('input[type=checkbox],input[type=radio]').prop('checked', false).end()
             .addClass('wikids-test-active-question');
