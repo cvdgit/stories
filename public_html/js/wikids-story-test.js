@@ -167,12 +167,16 @@ var WikidsStoryTest = function() {
             return;
         }
 
+        console.log(skipQuestion);
+
         questions = getQuestionsData();
+        console.log(questions);
 
         questionsRepeat = new QuestionsRepeat(questions, remoteTest ? 5 : 1);
         testProgress = new TestProgress(getProgressData());
 
         makeTestQuestions();
+        console.log(testQuestions);
 
         setupDOM();
         addEventListeners();
@@ -900,7 +904,7 @@ var WikidsStoryTest = function() {
 
         dom.continueButton.hide();
 
-        var isLastQuestion = (questions.length === 0);
+        var isLastQuestion = (testQuestions.length === 0);
         var actionRelated = incorrectAnswerActionRelated();
         if (isLastQuestion) {
             if (remoteTest) {
