@@ -152,7 +152,7 @@ $isBookView = $storyDefaultView === 'book';
 </div>
 
 <div class="container">
-    <main class="site-story-main">
+    <main class="site-story-main-descr">
         <?php if (!Yii::$app->user->isGuest): ?>
         <?= $this->render('_story_main_block', ['model' => $model]) ?>
         <?php endif ?>
