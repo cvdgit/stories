@@ -28,7 +28,7 @@ section {
 }
 
 section h2 {
-  font-size: 2.8em;
+  font-size: 3rem;
   font-weight: 600;
   text-align: center;
   margin: 0;
@@ -38,11 +38,16 @@ section h2 span {
   color: #99cd50;
 }
 
+section h3 {
+  font-size: 2.2rem;
+}
+
 .site-header {
   background-image: url('../img/header-main-bg.png');
   background-position: top center;
   background-repeat: no-repeat;
   background-attachment: scroll;
+  background-size: 100% 22%;
   padding-bottom: 40px;
 }
 
@@ -127,7 +132,7 @@ section h2 span {
 }
 
 .site-header .menu-wrapper {
-  margin-top: 60px;
+  margin-top: 38px;
 }
 
 .site-header-mini .menu-wrapper {
@@ -136,7 +141,7 @@ section h2 span {
 
 .site-header .site-nav {
   background-color: #f0f4f9;
-  margin-bottom: 84px;
+  margin-bottom: 50px;
 }
 
 .site-header-mini .site-nav {
@@ -145,7 +150,7 @@ section h2 span {
 }
 
 .site-header img.site-logo  {
-  margin-top: 25px;
+  margin-top: 4px; /* 25 px */
 }
 
 .logo-wrapper {
@@ -222,8 +227,8 @@ section h2 span {
 .site-offer {}
 
 .site-offer h1 {
-  margin-top: 20px;
-  font-size: 2.8em;
+  margin-top: 30px;
+  font-size: 3rem;
   margin-bottom: 25px;
   font-weight: 600;
 }
@@ -241,9 +246,13 @@ section h2 span {
   margin-bottom: 45px;
 }
 
+.site-offer ul {
+  margin-bottom: 30px;
+}
+
 .site-offer li {
-  font-size: .889em;
-  line-height: 1.3em;
+  font-size: 1.8rem;
+  line-height: 2.5rem;
 }
 
 .btn {
@@ -1678,6 +1687,15 @@ button:focus {
 
 .site-categories {
   padding: 0;
+  background-color: #f0f4f9;
+}
+
+.site-categories-bg {
+  background-image: url(../img/section-bg.png);
+  background-position: top center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  height: 65px;
 }
 
 .site-playlists {

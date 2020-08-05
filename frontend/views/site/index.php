@@ -1,16 +1,13 @@
 <?php
-
 use yii\helpers\Html;
 use yii\helpers\Url;
-
 /* @var $this yii\web\View */
-
 $this->setMetaTags('Сервис ускоренного развития речи ребёнка',
                    'Сервис ускоренного развития речи ребёнка',
                    'wikids, сказки, истории');
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 ?>
-
+<div class="site-categories-bg"></div>
 <section class="site-categories">
     <h2 class="container"><span>Популярные</span> категории</h2>
     <div class="container">
@@ -62,26 +59,12 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
     </div>
 </section>
 
-<section class="random-story">
+<section class="site-playlists">
+    <h2 class="container">Популярные <span>плейлисты</span></h2>
     <div class="container">
-        <div class="text-center">
-            <div class="row">
-                <div class="col-md-12">
-                    <p class="random-story-text">Не знаете какую историю показать ребенку? <?= Html::a('Показать случайную историю', ['story/random'], ['class' => 'btn btn-red']) ?></p>
-                </div>
-            </div>
-        </div>
+        <?= \frontend\widgets\Playlists::widget() ?>
     </div>
 </section>
-
-<noindex>
-    <section class="site-playlists">
-        <h2 class="container">Популярные <span>плейлисты</span></h2>
-        <div class="container">
-            <?= \frontend\widgets\Playlists::widget() ?>
-        </div>
-    </section>
-</noindex>
 
   <section class="site-about">
     <h2 class="container">О <span>портале</span></h2>

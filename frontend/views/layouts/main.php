@@ -130,12 +130,20 @@ AppAsset::register($this);
                         <li>ссылки на дополнительные обучающие курсы</li>
                     </ul>
                     <div class="text-center">
-                        <?= Html::a('Регистрация', '#wikids-signup-modal', ['class' => 'btn', 'data-toggle' => 'modal', 'style' => 'margin: 10px 0']) ?>
+                        <?= Html::a('Зарегистрироваться', '#wikids-signup-modal', ['class' => 'btn', 'data-toggle' => 'modal', 'style' => 'margin: 10px 0']) ?>
                         <p style="font-size: .889em">При регистрации подписка на 1 год бесплатно ;)</p>
                     </div>
                 <?php else: ?>
                     <h1 class="header-auth">Сервис ускоренного развития речи ребенка</h1>
-                    <p class="header-paragraph-auth">Истории для детей</p>
+                    <p>Используйте все возможности Wikids:</p>
+                    <ul>
+                        <li>аудиоистории - прослушивание озвучки к каждому слайду</li>
+                        <li>самостоятельное озвучивание историй</li>
+                        <li>тесты для детей, чтобы закрепить материал</li>
+                        <li>просмотр истории в виде слайдов</li>
+                        <li>специально подобранные коллекции картинок и видео для улучшения восприятия</li>
+                        <li>ссылки на дополнительные обучающие курсы</li>
+                    </ul>
                     <div class="text-center">
                         <?= Html::a('Каталог историй', ['/story/index'], ['class' => 'btn']) ?>
                     </div>
