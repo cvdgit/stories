@@ -1,7 +1,6 @@
 <?php
-
 use yii\helpers\Html;
-
+/** @var $model common\models\Story */
 /** @var $playlist common\models\Playlist */
 ?>
 <div id="story_wrapper">

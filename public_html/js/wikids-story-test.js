@@ -282,7 +282,7 @@ var WikidsStoryTest = function() {
         dom.questions = createQuestions(getQuestionsData());
         dom.controls = createControls();
         dom.nextButton = $("<button/>")
-            .addClass("btn wikids-test-next")
+            .addClass("btn btn-small btn-test wikids-test-next")
             .text('Следующий вопрос')
             .appendTo($(".wikids-test-buttons", dom.controls));
         dom.finishButton = $("<button/>")

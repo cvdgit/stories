@@ -1,6 +1,5 @@
 <?php
 
-use frontend\widgets\StoryAudio;
 use frontend\widgets\StoryFavorites;
 use frontend\widgets\StoryLikeWidget;
 use yii\bootstrap\Tabs;
@@ -67,41 +66,15 @@ $(".comment-list").on("click", ".comment-reply", function() {
         .focus();
 });
 
-/*
-if (Wikids2.showSwipeHelp()) {
-    toastr.options = {
-      "closeButton": true,
-      "debug": false,
-      "newestOnTop": false,
-      "progressBar": false,
-      "positionClass": "toast-top-center",
-      "preventDuplicates": false,
-      "onclick": function() {
-          Wikids2.hideSwipeHelp();
-      },
-      "showDuration": "300",
-      "hideDuration": "1000",
-      "timeOut": 0,
-      "extendedTimeOut": 0,
-      "showEasing": "swing",
-      "hideEasing": "linear",
-      "showMethod": "fadeIn",
-      "hideMethod": "fadeOut",
-      "tapToDismiss": false
-    };
-    toastr["info"]("Чтобы перейти к следующему слайду проведите пальцем справа-налево");
-}*/
-
 var inSlides = false;
 $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
     var view = e.target.getAttribute("href").substr(1);
     if (view === "tab-slides") {
         inSlides = true;
-        //$(".tab-slides").popover("hide");
         if (!isGuest) {
             WikidsStory.loadStory("$action");
         }
-        ym(53566996, 'reachGoal', 'transition_to_training');
+        window['ym'] && ym(53566996, 'reachGoal', 'transition_to_training');
     }
     else if (view === "tab-book") {
         lazy.update(false);
@@ -110,34 +83,6 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
 
     }
 });
-
-/*
-if (isGuest) {   
-    $(".tab-slides").popover({
-        container: "#w0",
-        title: "Попробуйте режим обучения",
-        content: '<ul>' +
-    '<li>просмотр истории в виде слайдов</li>' +
-    '<li>возможность прослушивания озвучки по каждому слайду</li>' +
-    '<li>возможность добавить свою, детскую озвучку</li>' +
-    '<li>тесты для детей, чтобы закрепить материал</li>' +
-    '<li>специально подобранные коллекции картинок и видео для улучшения восприятия</li>' +
-    '<li>ссылки на дополнительные обучающие курсы</li>' +
-    '</ul>',
-        html: true,
-        placement: "bottom",
-        trigger: "hover"
-    });
-    $("#w0").on("click", ".popover", function() {
-        $(".tab-slides").popover("hide");
-    });
-    setTimeout(function() {
-        if (!inSlides) {
-            $(".tab-slides").popover("show");
-        }
-    }, 2000);
-}
-*/
 
  $(window).scroll(function () {
     if ($(this).scrollTop() > 100) {
@@ -175,33 +120,8 @@ $isBookView = $storyDefaultView === 'book';
 ?>
 <div class="container story-head-container">
 	<main class="site-story-main">
-        <div style="padding: 0 15px">
-            <h1><?= Html::encode($model->title) ?></h1>
-            <div class="story-description">
-                <div class="story-categories">
-                    <?php foreach ($model->categories as $category): ?>
-                    <?= Html::a($category->name, ['story/category', 'category' => $category->alias]) ?>
-                    <?php endforeach ?>
-                </div>
-                <?php if (!empty($model->description)): ?>
-                    <div class="story-text"><?= Html::encode($model->description) ?></div>
-                <?php endif ?>
-                <?php $facts = $model->storyFacts(); ?>
-                <?php if (count($facts) > 0): ?>
-                <div class="story-facts" style="font-size: 1.5rem">
-                    Из истории вы узнаете про:
-                <?php $i = 1; ?>
-                <?php foreach ($facts as $fact): ?>
-                    <span class="label label-success" style="display: <?= $i <= 5 ? 'inline-block' : 'none' ?>"><?= $fact['title'] ?></span>
-                    <?php $i++; ?>
-                <?php endforeach ?>
-                    <?php if (($more = count($facts) - 5) > 0): ?>
-                    <span class="label label-default more-facts" data-toggle="tooltip" title="Показать остальные факты" style="cursor: pointer">+ <?= $more ?></span>
-                    <?php endif ?>
-                </div>
-                <?php endif ?>
-            </div>
-        </div>
+        <?php if (Yii::$app->user->isGuest): ?>
+        <?= $this->render('_story_main_block', ['model' => $model]) ?>
         <div class="tabbable-panel">
             <div class="tabbable-line">
             <?= Tabs::widget([
@@ -225,10 +145,17 @@ $isBookView = $storyDefaultView === 'book';
             ]) ?>
             </div>
         </div>
+        <?php else: ?>
+        <?= $this->render('_tab_slides', ['model' => $model, 'playlist' => $playlist]) ?>
+        <?php endif ?>
     </main>
 </div>
+
 <div class="container">
     <main class="site-story-main">
+        <?php if (!Yii::$app->user->isGuest): ?>
+        <?= $this->render('_story_main_block', ['model' => $model]) ?>
+        <?php endif ?>
         <div class="story-description" style="margin-top: 10px">
             <div class="row">
                 <div class="col-lg-7 col-md-7 col-sm-12">
