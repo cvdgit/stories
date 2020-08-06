@@ -1,19 +1,17 @@
 <?php
-
 use asu\tagcloud\TagCloud;
 use common\models\Tag;
+use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ListView;
 use yii\widgets\ActiveForm;
 use yii\widgets\Menu;
 use common\models\Category;
-
 /** @var $this yii\web\View */
 /** @var $searchModel frontend\models\StorySearch */
 /** @var $dataProvider yii\data\ActiveDataProvider */
 /** @var $action array */
 /** @var $emptyText string */
-
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 ?>
 <div class="container">
@@ -71,15 +69,19 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
         </nav>
         <main class="col-xs-12 col-sm-12 col-md-12 col-lg-9 site-main" style="margin-top: 0">
             <h1 style="margin-top: 6px; margin-bottom: 20px"><?= $this->getHeader() ?></h1>
-            <div class="story-popular-categories">
-                <?= Menu::widget([
-                    'items' => [
-                        ['label' => '#ИсторииДляДетей', 'url' => ['/story/index']],
-                        ['label' => '#АудиоСказки', 'url' => ['/story/audio-stories'], 'active' => Yii::$app->controller->id === 'story' && Yii::$app->controller->action->id === 'audio-stories'],
-                        ['label' => '#СказкиНаНочь', 'url' => ['/story/bedtime-stories'], 'active' => Yii::$app->controller->id === 'story' && Yii::$app->controller->action->id === 'bedtime-stories'],
-                    ],
-                    'options' => ['class' => 'list-inline'],
-                ]) ?>
+            <div class="story-popular-categories row row-no-gutters">
+                <div class="col-md-6">
+                    <?= Menu::widget([
+                        'items' => [
+                            ['label' => '#АудиоСказки', 'url' => ['/story/audio-stories'], 'active' => Yii::$app->controller->id === 'story' && Yii::$app->controller->action->id === 'audio-stories'],
+                            ['label' => '#СказкиНаНочь', 'url' => ['/story/bedtime-stories'], 'active' => Yii::$app->controller->id === 'story' && Yii::$app->controller->action->id === 'bedtime-stories'],
+                        ],
+                        'options' => ['class' => 'list-inline'],
+                    ]) ?>
+                </div>
+                <div class="col-md-6 text-right">
+                    <?= Html::a('Случайная сказка', ['/story/random'], ['style' => 'color: #d9534f']) ?>
+                </div>
             </div>
             <?php
             $layout = '<div class="story-list-filter clearfix">
