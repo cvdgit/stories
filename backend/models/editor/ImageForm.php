@@ -1,9 +1,8 @@
 <?php
 
-
 namespace backend\models\editor;
 
-
+use yii\helpers\FileHelper;
 use yii\web\UploadedFile;
 
 class ImageForm extends BaseForm
@@ -54,6 +53,7 @@ class ImageForm extends BaseForm
 
     public function upload(string $path)
     {
+        FileHelper::createDirectory(pathinfo($path, PATHINFO_DIRNAME));
         if (!$this->image->saveAs($path)) {
             throw new \DomainException('Slide image upload error');
         }

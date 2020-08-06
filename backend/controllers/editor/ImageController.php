@@ -257,6 +257,7 @@ class ImageController extends Controller
                     '',
                     ''
                 );
+
                 $form->upload($image->getFullPath());
 
                 $result['image'] = [
