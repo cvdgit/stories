@@ -2,12 +2,6 @@
 
 namespace backend\components\book;
 
-use backend\components\book\blocks\HtmlTest;
-use backend\components\book\blocks\Image;
-use backend\components\book\blocks\Link;
-use backend\components\book\blocks\Test;
-use backend\components\book\blocks\Text;
-use backend\components\book\blocks\Transition;
 use backend\components\story\AbstractBlock;
 use backend\components\story\HTMLBLock;
 use backend\components\story\ImageBlock;
@@ -15,6 +9,7 @@ use backend\components\story\reader\HTMLReader;
 use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
 use backend\components\story\TransitionBlock;
+use backend\components\story\VideoBlock;
 use common\models\Story;
 use Yii;
 
@@ -58,31 +53,34 @@ class BookStoryGenerator
                 switch ($block->getType()) {
                     case AbstractBlock::TYPE_TEXT:
                         /** @var $block TextBlock */
-                        $slideBlocks->addText(new Text($block->getText()));
+                        $slideBlocks->createTexts($block->getText());
                         break;
                     case AbstractBlock::TYPE_IMAGE:
                         /** @var $block ImageBlock */
-                        $slideBlocks->addImage(new Image($block->getFilePath()));
+                        $slideBlocks->createImages($block->getFilePath());
                         break;
                     case AbstractBlock::TYPE_HTML:
                         /** @var $block HTMLBLock */
-                        $slideBlocks->addTest(new HtmlTest($block->getContent()));
+                        $slideBlocks->createHtmlTests($block->getContent());
                         break;
                     case AbstractBlock::TYPE_TRANSITION:
                         /** @var $block TransitionBlock */
-                        $slideBlocks->addTransition(new Transition($block->getText()));
+                        $slideBlocks->createTransitions($block->getText());
                         break;
                     case AbstractBlock::TYPE_TEST:
                         /** @var $block TestBlock */
-                        $slideBlocks->addTest(new Test($block->getTestID()));
+                        $slideBlocks->createTests($block->getTestID());
                         break;
+                    case AbstractBlock::TYPE_VIDEO:
+                        /** @var $block VideoBlock */
+                        $slideBlocks->createVideos($block->getVideoId());
                 }
             }
 
             $slideLinks = $this->getSlideLinks($slide->id, $storyLinks);
             if (count($slideLinks) > 0) {
                 foreach ($slideLinks as $link) {
-                    $slideBlocks->addLink(new Link($link['title'], $link['href']));
+                    $slideBlocks->createLinks($link['title'], $link['href']);
                 }
             }
 

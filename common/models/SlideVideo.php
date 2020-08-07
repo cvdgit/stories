@@ -87,6 +87,11 @@ class SlideVideo extends ActiveRecord
         throw new NotFoundHttpException('Видео не найдено.');
     }
 
+    public static function findModelByVideoID($videoID)
+    {
+        return self::findOne(['video_id' => $videoID]);
+    }
+
     public function isSuccess()
     {
         return (int)$this->status === self::STATUS_SUCCESS;

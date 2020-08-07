@@ -1,55 +1,55 @@
 <?php
+use backend\components\BlockRenderer;
 use yii\helpers\Html;
 /** @var $manager backend\components\book\SlideBlocks */
 ?>
 <section>
-    <?php if ($manager->haveImages() && $manager->haveTexts()): ?>
+
+    <?php if (!$manager->videos->isEmpty()): ?>
         <div class="row">
             <div class="col-lg-6">
-                <?php foreach($manager->getImages() as $image): ?>
-                <?php if (!$image->isEmpty()): ?>
-                <?= Html::img(null, ['data-src' => $image->image, 'width' => '100%', 'height' => '100%', 'class' => 'lazy']) ?>
-                <?php endif ?>
-                <?php endforeach ?>
+                <?= BlockRenderer::renderVideos($manager->videos) ?>
             </div>
+            <?php if (!$manager->texts->isEmpty()): ?>
             <div class="col-lg-6">
-                <?php foreach($manager->getTexts() as $text): ?>
-                <?= Html::tag('p', $text->text) ?>
-                <?php endforeach ?>
+                <?= BlockRenderer::renderTexts($manager->texts) ?>
             </div>
+            <?php endif ?>
         </div>
     <?php else: ?>
-        <?php if (!$manager->haveTexts() && $manager->haveImages()): ?>
-        <div class="row">
-            <div class="col-lg-6">
-                <?php foreach($manager->getImages() as $image): ?>
-                    <?= Html::img(null, ['data-src' => $image->image, 'width' => '100%', 'height' => '100%', 'class' => 'lazy']) ?>
-                <?php endforeach ?>
+        <?php if (!$manager->images->isEmpty() && !$manager->texts->isEmpty()): ?>
+            <div class="row">
+                <div class="col-lg-6">
+                    <?= BlockRenderer::renderImages($manager->images) ?>
+                </div>
+                <div class="col-lg-6">
+                    <?= BlockRenderer::renderTexts($manager->texts) ?>
+                </div>
             </div>
-        </div>
-        <?php endif ?>
-        <?php if (!$manager->haveImages() && $manager->haveTexts()): ?>
-        <div class="row">
-            <div class="col-lg-12">
-                <?php foreach($manager->getTexts() as $text): ?>
-                    <?= Html::tag('p', $text->text) ?>
-                <?php endforeach ?>
-            </div>
-        </div>
+        <?php else: ?>
+            <?php if ($manager->texts->isEmpty() && !$manager->images->isEmpty()): ?>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <?= BlockRenderer::renderImages($manager->images) ?>
+                    </div>
+                </div>
+            <?php endif ?>
+            <?php if ($manager->images->isEmpty() && !$manager->texts->isEmpty()): ?>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <?= BlockRenderer::renderTexts($manager->texts) ?>
+                    </div>
+                </div>
+            <?php endif ?>
         <?php endif ?>
     <?php endif ?>
 
-    <?php if ($manager->haveTests()): ?>
-        <?php foreach ($manager->getTests() as $test): ?>
+    <?php if (!$manager->htmltests->isEmpty()): ?>
+        <?php foreach ($manager->htmltests as $test): ?>
             <?php if (!$test->isEmpty()): ?>
                 <div class="row">
                     <div class="col-lg-12">
-                        <?php if ($test->isInlineTest()): ?>
-                            <h3>Тест для закрепления материала</h3>
-                            <p><?= $test->header ?></p>
-                        <?php else: ?>
-                            <h3><?= $test->header ?></h3>
-                        <?php endif ?>
+                        <h3><?= $test->header ?></h3>
                         <p><?= $test->description ?></p>
                         <div class="row">
                             <div class="col-lg-offset-3 col-lg-6">
@@ -64,8 +64,29 @@ use yii\helpers\Html;
         <?php endforeach ?>
     <?php endif ?>
 
-    <?php if ($manager->haveTransitions()): ?>
-    <?php foreach ($manager->getTransitions() as $transition): ?>
+    <?php if (!$manager->tests->isEmpty()): ?>
+        <?php foreach ($manager->tests as $test): ?>
+            <?php if (!$test->isEmpty()): ?>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h3>Тест для закрепления материала</h3>
+                        <p><?= $test->header ?></p>
+                        <p><?= $test->description ?></p>
+                        <div class="row">
+                            <div class="col-lg-offset-3 col-lg-6">
+                                <div class="alert alert-success to-slides-tab noselect text-center">
+                                    <p>Прохождение теста доступно в режиме обуения</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endif ?>
+        <?php endforeach ?>
+    <?php endif ?>
+
+    <?php if (!$manager->transitions->isEmpty()): ?>
+    <?php foreach ($manager->transitions as $transition): ?>
         <?php if (!$transition->isEmpty()): ?>
             <div class="row">
                 <div class="col-lg-offset-3 col-lg-6">
@@ -78,12 +99,12 @@ use yii\helpers\Html;
     <?php endforeach ?>
     <?php endif ?>
 
-    <?php if ($manager->haveLinks()): ?>
+    <?php if (!$manager->links->isEmpty()): ?>
         <div class="row">
             <div class="col-lg-offset-3 col-lg-6 text-center">
                 <h3>Полезные ссылки</h3>
                 <ul class="list-inline">
-                    <?php foreach ($manager->getLinks() as $link): ?>
+                    <?php foreach ($manager->links as $link): ?>
                         <li><?= Html::a($link->title, $link->href, ['rel' => 'nofollow']) ?></li>
                     <?php endforeach ?>
                 </ul>

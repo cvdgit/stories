@@ -2,138 +2,69 @@
 
 namespace backend\components\book;
 
-use backend\components\book\blocks\AbstractTest;
+use backend\components\book\blocks\HtmlTest;
 use backend\components\book\blocks\Image;
 use backend\components\book\blocks\Link;
+use backend\components\book\blocks\Test;
 use backend\components\book\blocks\Text;
 use backend\components\book\blocks\Transition;
+use backend\components\book\blocks\Video;
 
 class SlideBlocks
 {
 
-    /** @var $texts Text[] */
-    protected $texts = [];
+    protected $params = [
+        'texts' => Text::class,
+        'images' => Image::class,
+        'htmltests' => HtmlTest::class,
+        'tests' => Test::class,
+        'transitions' => Transition::class,
+        'links' => Link::class,
+        'videos' => Video::class,
+    ];
 
-    /** @var $images Image[] */
-    protected $images = [];
+    /** @var BlockCollection[] */
+    protected $blocks = [];
 
-    /** @var $tests AbstractTest[] */
-    protected $tests = [];
-
-    /** @var $transitions Transition[] */
-    protected $transitions = [];
-
-    /** @var $links Link[] */
-    protected $links = [];
-
-    public function addText(Text $text)
+    public function __construct()
     {
-        $this->texts[] = $text;
+        foreach ($this->params as $blocksName => $className) {
+            $this->blocks[$blocksName] = new BlockCollection($className);
+        }
     }
 
-    public function addImage(Image $image)
+    public function __get(string $name)
     {
-        $this->images[] = $image;
+        if (isset($this->blocks[$name])) {
+            return $this->blocks[$name];
+        }
+        return null;
     }
 
-    public function addTest(AbstractTest $test)
+    public function __call($name, $arguments)
     {
-        $this->tests[] = $test;
-    }
-
-    public function addTransition(Transition $transition)
-    {
-        $this->transitions[] = $transition;
-    }
-
-    public function addLink(Link $link)
-    {
-        $this->links[] = $link;
+        $blockName = strtolower(str_replace('create', '', $name));
+        if (isset($this->blocks[$blockName])) {
+            $blockCollection = $this->blocks[$blockName];
+            $blockCollection->createBlock($arguments);
+        }
+        else {
+            $this->$name($arguments);
+        }
     }
 
     public function isEmpty()
     {
-        return !$this->haveTexts()
-            && !$this->haveImages()
-            && !$this->haveTests()
-            && !$this->haveTransitions()
-            && !$this->haveLinks();
+        $empty = true;
+        foreach ($this->blocks as $block) {
+            $empty = $empty && $block->isEmpty();
+        }
+        return $empty;
     }
 
     public function getBlocks()
     {
-        return [
-            'images' => $this->images,
-            'texts' => $this->texts,
-            'tests' => $this->tests,
-            'transitions' => $this->transitions,
-            'links' => $this->links,
-        ];
-    }
-
-    /**
-     * @return Text[]
-     */
-    public function getTexts(): array
-    {
-        return $this->texts;
-    }
-
-    /**
-     * @return Image[]
-     */
-    public function getImages(): array
-    {
-        return $this->images;
-    }
-
-    /**
-     * @return AbstractTest[]
-     */
-    public function getTests(): array
-    {
-        return $this->tests;
-    }
-
-    /**
-     * @return Transition[]
-     */
-    public function getTransitions(): array
-    {
-        return $this->transitions;
-    }
-
-    /**
-     * @return Link[]
-     */
-    public function getLinks(): array
-    {
-        return $this->links;
-    }
-
-    public function haveTexts()
-    {
-        return count($this->texts) !== 0;
-    }
-
-    public function haveImages()
-    {
-        return count($this->images) !== 0;
-    }
-
-    public function haveTests()
-    {
-        return count($this->tests) !== 0;
-    }
-
-    public function haveTransitions()
-    {
-        return count($this->transitions) !== 0;
-    }
-
-    public function haveLinks()
-    {
-        return count($this->links) !== 0;
+        return $this->blocks;
     }
 
 }

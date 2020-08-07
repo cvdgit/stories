@@ -2604,3 +2604,13 @@ img.lazy {
 .site-story-main-descr h2 {
   font-size: 2.2rem;
 }
+
+.guest-story-video {
+  text-align: center;
+  height: 200px;
+}
+
+.guest-story-video span {
+  font-size: 10rem;
+  margin-top: 30px;
+}
