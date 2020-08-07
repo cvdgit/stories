@@ -68,7 +68,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
             </div>
         </nav>
         <main class="col-xs-12 col-sm-12 col-md-12 col-lg-9 site-main" style="margin-top: 0">
-            <h1 style="margin-top: 6px; margin-bottom: 20px"><?= $this->getHeader() ?></h1>
+            <h1 style="margin-top: 0; margin-bottom: 20px"><?= $this->getHeader() ?></h1>
             <div class="story-popular-categories row row-no-gutters">
                 <div class="col-md-6">
                     <?= Menu::widget([

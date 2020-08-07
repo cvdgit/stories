@@ -105,7 +105,7 @@ use yii\helpers\Html;
                 <h3>Полезные ссылки</h3>
                 <ul class="list-inline">
                     <?php foreach ($manager->links as $link): ?>
-                        <li><?= Html::a($link->title, $link->href, ['rel' => 'nofollow']) ?></li>
+                        <li><?= Html::a($link->title, $link->href, ['rel' => 'nofollow', 'target' => '_blank']) ?></li>
                     <?php endforeach ?>
                 </ul>
             </div>
