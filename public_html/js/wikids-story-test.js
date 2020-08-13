@@ -167,16 +167,16 @@ var WikidsStoryTest = function() {
             return;
         }
 
-        console.log(skipQuestion);
+        //console.log(skipQuestion);
 
         questions = getQuestionsData();
-        console.log(questions);
+        //console.log(questions);
 
         questionsRepeat = new QuestionsRepeat(questions, remoteTest ? 5 : 1);
         testProgress = new TestProgress(getProgressData());
 
         makeTestQuestions();
-        console.log(testQuestions);
+        //console.log(testQuestions);
 
         setupDOM();
         addEventListeners();
@@ -249,7 +249,6 @@ var WikidsStoryTest = function() {
             .addClass('btn wikids-test-begin')
             .text('Начать тест')
             .on('click', function() {
-                //start();
                 loadData();
             });
         return $('<div/>')
@@ -794,6 +793,11 @@ var WikidsStoryTest = function() {
         else {
             if (!answerIsCorrect) {
                 testQuestions.unshift(currentQuestion);
+            }
+            else {
+                if (!testQuestions.length) {
+                    makeTestQuestions();
+                }
             }
         }
 

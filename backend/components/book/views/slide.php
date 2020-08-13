@@ -100,7 +100,7 @@ use yii\helpers\Html;
     <?php endif ?>
 
     <?php if (!$manager->links->isEmpty()): ?>
-        <div class="row">
+        <div class="row guest-story-links">
             <div class="col-lg-offset-3 col-lg-6 text-center">
                 <h3>Полезные ссылки</h3>
                 <ul class="list-inline">

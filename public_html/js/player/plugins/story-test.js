@@ -43,20 +43,14 @@ var TestSlide = (function() {
         WikidsStoryTest.setDataParams(config.action + "/" + test_id + "?t=" + Math.random())
         promise.done(function(data) {
 
-            //$(".reveal .slides").empty();
-
             WikidsStoryTest.init(false, true, data, $('.reveal .slides'));
             WikidsStoryTest.addEventListener("finish", storyTestResults);
             WikidsStoryTest.addEventListener("backToStory", backToStory);
-            //var html = WikidsStoryTest.load(data.json);
-
-            //$(".reveal .slides").append(html);
 
             Reveal.sync();
             Reveal.slide(0);
 
             stack.unshift({"story_id": currentStoryID, "slide_index": slide_index});
-            //currentStoryID = story_id;
         });
     }
 
