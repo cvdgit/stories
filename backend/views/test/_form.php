@@ -29,7 +29,7 @@ $this->registerCss($css);
                 <?= $form->field($model, 'question_list_name')->hiddenInput()->label(false) ?>
             </div>
             <div class="form-group">
-                <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
+                <?= Html::submitButton(($model->isNewRecord ? 'Создать' : 'Изменить') . ' тест', ['class' => 'btn btn-success']) ?>
             </div>
             <?php ActiveForm::end(); ?>
         </div>
@@ -37,8 +37,9 @@ $this->registerCss($css);
             <?php if (!$model->isNewRecord && !$model->isRemote()): ?>
                 <div>
                     <p>
-                        <?= Html::a('Новый вопрос', ['test/create-question', 'test_id' => $model->id], ['class' => 'btn btn-primary']) ?>
+                        <?= Html::a('Создать вопрос', ['test/create-question', 'test_id' => $model->id], ['class' => 'btn btn-primary']) ?>
                     </p>
+                    <h4>Вопросы теста</h4>
                     <?= GridView::widget([
                         'dataProvider' => $dataProvider,
                         'options' => ['class' => 'table-responsive'],

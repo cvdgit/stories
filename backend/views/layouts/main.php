@@ -1,18 +1,13 @@
 <?php
-
 /* @var $this yii\web\View */
 /* @var $content string */
-
 use backend\assets\AppAsset;
 use common\rbac\UserRoles;
 use common\widgets\ToastrFlash;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
-use common\widgets\Alert;
 use yii\helpers\Html;
-
 AppAsset::register($this);
-
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
