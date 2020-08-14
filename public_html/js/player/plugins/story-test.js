@@ -26,6 +26,7 @@ var TestSlide = (function() {
     shuffleAnswers();
 
     var inTest = false;
+    var container = $('.reveal .slides');
 
     function action() {
 
@@ -43,7 +44,7 @@ var TestSlide = (function() {
         WikidsStoryTest.setDataParams(config.action + "/" + test_id + "?t=" + Math.random())
         promise.done(function(data) {
 
-            WikidsStoryTest.init(false, true, data, $('.reveal .slides'));
+            WikidsStoryTest.init(false, true, data, container);
             WikidsStoryTest.addEventListener("finish", storyTestResults);
             WikidsStoryTest.addEventListener("backToStory", backToStory);
 

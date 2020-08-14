@@ -1,5 +1,5 @@
 
-var WikidsStoryTest = function() {
+var WikidsStoryTest = (function() {
     "use strict";
 
     var numQuestions,
@@ -14,6 +14,21 @@ var WikidsStoryTest = function() {
         questions = [],
         questionsRepeat = [];
     var questionAnswers = {};
+
+    function reset()
+    {
+        numQuestions = 0;
+        currentQuestionIndex = 0;
+        correctAnswersNumber = 0;
+        testData = {};
+        dom = {};
+        questionHistory = [];
+        skipQuestion = [];
+        questions = [];
+        questionsRepeat = [];
+        questionAnswers = {};
+        container = null;
+    }
 
     var dataUrl,
         dataParams;
@@ -113,8 +128,9 @@ var WikidsStoryTest = function() {
     }
     
     function init(remote, for_slide, testResponse, element) {
-
         console.debug('WikidsStoryTest.init');
+
+        reset();
 
         container = element;
         remoteTest = remote || false;
@@ -157,20 +173,22 @@ var WikidsStoryTest = function() {
     }
 
     function load(data, for_slide) {
+        console.debug('WikidsStoryTest.load');
 
-        dom.wrapper.empty();
+        //dom.wrapper.empty();
+        //dom.wrapper = $("<div/>").addClass("wikids-test");
 
         testData = data[0];
 
-        numQuestions = getQuestionsData().length;
+        questions = getQuestionsData();
+        //console.log(questions);
+
+        numQuestions = questions.length;
         if (numQuestions === 0) {
             return;
         }
 
         //console.log(skipQuestion);
-
-        questions = getQuestionsData();
-        //console.log(questions);
 
         questionsRepeat = new QuestionsRepeat(questions, remoteTest ? 5 : 1);
         testProgress = new TestProgress(getProgressData());
@@ -204,6 +222,7 @@ var WikidsStoryTest = function() {
     }
 
     function loadData() {
+        console.debug('WikidsStoryTest.loadData');
         dataParams.studentId = currentStudent.id;
         container.html(createLoader());
         $.getJSON(dataUrl, dataParams)
@@ -281,6 +300,7 @@ var WikidsStoryTest = function() {
     }
 
     function setupDOM() {
+        console.debug('WikidsStoryTest.setupDOM');
         dom.header = createHeader(getTestData());
         dom.questions = createQuestions(getQuestionsData());
         dom.controls = createControls();
@@ -595,15 +615,6 @@ var WikidsStoryTest = function() {
         }
     }
 
-/*    function begin() {
-        dom.header.hide();
-        dom.results.hide();
-        dom.nextButton.hide();
-        dom.restartButton.hide();
-        dom.backToStoryButton.hide();
-        dom.continueButton.hide();
-    }*/
-
     function start() {
 
         correctAnswersNumber = 0;
@@ -846,10 +857,11 @@ var WikidsStoryTest = function() {
     }
 
     function showNextQuestion() {
+        console.debug('WikidsStoryTest.showNextQuestion');
         var nextQuestion = testQuestions.shift();
         $('.wikids-test-question[data-question-id=' + nextQuestion.id + ']', dom.questions)
             .find('input[type=checkbox],input[type=radio]').prop('checked', false).end()
-            .slideDown(function() { $(this).trigger('isVisible'); })
+            .slideDown()
             .addClass('wikids-test-active-question');
     }
 
@@ -905,6 +917,7 @@ var WikidsStoryTest = function() {
     }
 
     function continueTestAction(answer) {
+        console.debug('continueTestAction');
 
         dom.continueButton.hide();
 
@@ -1003,4 +1016,4 @@ var WikidsStoryTest = function() {
             dataParams = params;
         }
     };
-}();
+})();
