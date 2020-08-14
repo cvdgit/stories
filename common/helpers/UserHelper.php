@@ -2,6 +2,7 @@
 
 namespace common\helpers;
 
+use Yii;
 use yii\helpers\ArrayHelper;
 use common\models\User;
 
@@ -26,6 +27,15 @@ class UserHelper
     {
         $arr = static::getStatusArray();
         return isset($arr[$status]) ? $arr[$status] : '';
+    }
+
+    public static function getCurrentUserStudentID()
+    {
+        $webUser = Yii::$app->user;
+        if ($webUser->isGuest) {
+            return null;
+        }
+        return $webUser->identity->getStudentID();
     }
 
 }

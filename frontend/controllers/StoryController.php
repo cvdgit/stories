@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\helpers\UserHelper;
 use common\models\Playlist;
 use common\models\StorySlide;
 use common\models\StoryTest;
@@ -11,6 +12,7 @@ use common\services\StoryAudioService;
 use common\services\StoryFavoritesService;
 use common\services\StoryLikeService;
 use common\services\QuestionsService;
+use frontend\models\CreateStoryTestRun;
 use frontend\models\MyAudioStoriesSearch;
 use frontend\models\StoryFavoritesSearch;
 use frontend\models\StoryLikeForm;
@@ -231,6 +233,15 @@ class StoryController extends Controller
     public function actionGetStoryTest(int $id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
+
+        if (!Yii::$app->user->isGuest) {
+
+            $testRunModel = new CreateStoryTestRun();
+            $testRunModel->test_id = $id;
+            $testRunModel->student_id = UserHelper::getCurrentUserStudentID();
+            $testRunModel->createStoryTestRun();
+        }
+
         $json = StoryTest::find()->where('id = :id', [':id' => $id])->with('storyTestQuestions.storyTestAnswers')->asArray()->all();
         $json[0]['test']['progress'] = [
             'current' => 0,

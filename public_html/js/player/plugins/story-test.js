@@ -26,7 +26,7 @@ var TestSlide = (function() {
     shuffleAnswers();
 
     var inTest = false;
-    var container = $('.reveal .slides');
+    var container = $('.reveal > .slides');
 
     function action() {
 
@@ -73,7 +73,7 @@ var TestSlide = (function() {
     $(".reveal > .slides").on("click", "button[data-test-id]", action);
 
     function syncReveal(data, slide_index) {
-        $(".reveal .slides").empty().append(data);
+        $(".reveal > .slides").empty().append(data);
         if (window["StoryBackground"]) {
             StoryBackground.init();
         }
@@ -93,6 +93,7 @@ var TestSlide = (function() {
         }
     }
 
+    /*
     $(".reveal > .slides").on("click", "button[data-answer-question]", answerQuestion);
 
     function getQuestionAnswers() {
@@ -139,6 +140,7 @@ var TestSlide = (function() {
             }
         });
     }
+    */
 
     return {
         "backToStory": backToStory,
