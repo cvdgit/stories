@@ -35,6 +35,8 @@ var WikidsStoryTest = (function() {
 
     var container;
 
+    var questionSuccess;
+
     function getTestData() {
         return testData;
     }
@@ -126,7 +128,7 @@ var WikidsStoryTest = (function() {
             this.progress.current = 0;
         }
     }
-    
+
     function init(remote, for_slide, testResponse, element) {
         console.debug('WikidsStoryTest.init');
 
@@ -174,6 +176,8 @@ var WikidsStoryTest = (function() {
 
     function load(data, for_slide) {
         console.debug('WikidsStoryTest.load');
+
+        questionSuccess = new QuestionSuccess();
 
         //dom.wrapper.empty();
         //dom.wrapper = $("<div/>").addClass("wikids-test");
@@ -301,6 +305,7 @@ var WikidsStoryTest = (function() {
 
     function setupDOM() {
         console.debug('WikidsStoryTest.setupDOM');
+        questionSuccess.create();
         dom.header = createHeader(getTestData());
         dom.questions = createQuestions(getQuestionsData());
         dom.controls = createControls();
@@ -353,7 +358,6 @@ var WikidsStoryTest = (function() {
     }
 
     function showOriginalImage(url) {
-
         $('<div/>')
             .addClass('wikids-test-image-original')
             .append(
@@ -732,6 +736,17 @@ var WikidsStoryTest = (function() {
         })[0];
     }
 
+    function showQuestionSuccessPage(answer) {
+
+        var action = function() {
+            $(this).parent().parent().remove();
+            continueTestAction(answer);
+        };
+        var $content = questionSuccess.create(action, currentQuestion.name, currentQuestion.image);
+        dom.wrapper.append($content)
+        $content.fadeIn();
+    }
+
     /* Ответ на вопрос */
     function nextQuestion() {
 
@@ -788,12 +803,14 @@ var WikidsStoryTest = (function() {
         updateProgress();
 
         //console.log(answerIsCorrect, questionsRepeat.done(currentQuestion));
+        var done = false;
         if (remoteTest) {
             if (!answerIsCorrect) {
                 testQuestions.unshift(currentQuestion);
             }
             else {
-                if (questionsRepeat.done(currentQuestion)) {
+                done = questionsRepeat.done(currentQuestion);
+                if (done) {
                     makeTestQuestions();
                 }
                 else {
@@ -852,7 +869,12 @@ var WikidsStoryTest = (function() {
                 .fadeOut('slow', function() {continueTestAction(answer);});
         }
         else {
-            continueTestAction(answer);
+            if (done) {
+                showQuestionSuccessPage(answer);
+            }
+            else {
+                continueTestAction(answer);
+            }
         }
     }
 
@@ -1017,3 +1039,33 @@ var WikidsStoryTest = (function() {
         }
     };
 })();
+
+var QuestionSuccess = function() {
+
+    function create(action, title, image) {
+        var $action = $('<button/>')
+            .addClass('btn')
+            .text('Продолжить')
+            .on('click', action);
+        return $('<div/>')
+            .addClass('wikids-test-success-question-page')
+            .hide()
+            .append(
+                $('<div/>').addClass('wikids-test-success-question-page-content')
+                    .append('<i class="glyphicon glyphicon-star"></i>')
+                    .append('<i class="glyphicon glyphicon-star"></i>')
+                    .append('<i class="glyphicon glyphicon-star"></i>')
+                    .append('<i class="glyphicon glyphicon-star"></i>')
+                    .append(
+                        $('<h4/>').text('Вы заработали 5 звезд!')
+                    )
+                    .append($('<p/>').text(title))
+                    .append($('<img/>').attr('src', image))
+            )
+            .append($('<div/>').addClass('wikids-test-success-question-page-action').append($action));
+    }
+
+    return {
+        'create': create
+    }
+}
