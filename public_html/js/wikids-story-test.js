@@ -378,8 +378,8 @@ var WikidsStoryTest = (function() {
             .appendTo(dom.wrapper);
     }
 
-    function createAnswer(answer, questionType) {
-
+    function createAnswer(answer, question) {
+        var questionType = question.type;
         var type = "radio";
         if (parseInt(questionType) === 1) {
             type = "checkbox";
@@ -398,6 +398,12 @@ var WikidsStoryTest = (function() {
                 if (tagName !== 'INPUT' && tagName !== 'IMG') {
                     var $input = $(this).find("input");
                     $input.prop("checked", !$input.prop("checked"));
+                }
+
+                var key = 'q' + question.id;
+                questionAnswers[key] = getQuestionAnswers($(this).parent());
+                if (questionAnswers[key].length === parseInt(question.correct_number)) {
+                    nextQuestion();
                 }
             })
             .append($element);
@@ -437,14 +443,17 @@ var WikidsStoryTest = (function() {
         return array;
     }
 
-    function createAnswers(answers, questionType, mixAnswers) {
+    function createAnswers(answers, question) {
+
+        var mixAnswers = question.mix_answers;
+
         var $answers = $("<div/>").addClass("wikids-test-answers");
         mixAnswers = mixAnswers || 0;
         if (mixAnswers === 1) {
             answers = shuffle(answers);
         }
         answers.forEach(function(answer) {
-            $answers.append(createAnswer(answer, questionType));
+            $answers.append(createAnswer(answer, question));
         });
         var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-4 question-image"></div><div class="col-md-8 question-wrapper"></div></div>');
         $wrapper.find(".question-wrapper").append($answers);
@@ -479,7 +488,11 @@ var WikidsStoryTest = (function() {
                     }
                     $(this).addClass('selected');
                 }
-                questionAnswers['q' + question.id] = getAnswersIDs(svgDOM);
+                var key = 'q' + question.id;
+                questionAnswers[key] = getAnswersIDs(svgDOM);
+                if (questionAnswers[key].length === parseInt(question.correct_number)) {
+                    nextQuestion();
+                }
             });
         }, true);
         return $object;
@@ -561,7 +574,7 @@ var WikidsStoryTest = (function() {
                 $answers = createSvgAnswers(question, getAnswersData(question));
             }
             else {
-                $answers = createAnswers(getAnswersData(question), question.type, question.mix_answers);
+                $answers = createAnswers(getAnswersData(question), question);
             }
 
             $answers.appendTo($question);
@@ -692,7 +705,7 @@ var WikidsStoryTest = (function() {
     }
 
     function getSvgQuestionAnswers(question) {
-        if (questionAnswers.length === 0) {
+        if (Object.keys(questionAnswers).length === 0) {
             return [];
         }
         var questionAnswerNames = [];
