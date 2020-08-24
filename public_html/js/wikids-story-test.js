@@ -357,21 +357,24 @@ var WikidsStoryTest = (function() {
         dom.continueButton.off("click").on("click", continueTestAction);
     }
 
-    function showOriginalImage(url) {
+    function showOriginalImage(url, elem) {
         $('<div/>')
             .addClass('wikids-test-image-original')
             .append(
                 $('<div/>')
                     .addClass('wikids-test-image-original-inner image-loader')
+                    .on('click', function() {
+                        $(this).parent().remove();
+                        if (elem) {
+                            $(elem).parent()[0].click();
+                        }
+                    })
                     .append(
                         $('<img/>')
                             .attr('src', url + '/original')
                             .on('load', function() {
                                 $(this).parent().removeClass('image-loader');
                                 $(this).show();
-                            })
-                            .on('click', function() {
-                                $(this).parent().parent().remove();
                             })
                     )
             )
@@ -414,7 +417,7 @@ var WikidsStoryTest = (function() {
                 .attr('height', 100)
                 .css('cursor', 'zoom-in')
                 .on('click', function() {
-                    showOriginalImage($(this).attr('src'));
+                    showOriginalImage($(this).attr('src'), this);
                 });
             $answer.append($image);
         }
