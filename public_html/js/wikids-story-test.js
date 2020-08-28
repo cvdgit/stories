@@ -452,7 +452,7 @@ var WikidsStoryTest = (function() {
 
         var $answers = $("<div/>").addClass("wikids-test-answers");
         mixAnswers = mixAnswers || 0;
-        if (mixAnswers === 1) {
+        if (parseInt(mixAnswers) === 1) {
             answers = shuffle(answers);
         }
         answers.forEach(function(answer) {
