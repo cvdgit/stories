@@ -117,4 +117,14 @@ class StoryTest extends ActiveRecord
         return count($this->storyTestQuestions) > 0;
     }
 
+    public static function findAllAsArray(int $id)
+    {
+        return self::find()
+            ->where('id = :id', [':id' => $id])
+            ->andWhere('remote = 0')
+            ->with('storyTestQuestions.storyTestAnswers')
+            ->asArray()
+            ->all();
+    }
+
 }

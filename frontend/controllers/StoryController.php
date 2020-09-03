@@ -242,7 +242,22 @@ class StoryController extends Controller
             $testRunModel->createStoryTestRun();
         }
 
-        $json = StoryTest::find()->where('id = :id', [':id' => $id])->with('storyTestQuestions.storyTestAnswers')->asArray()->all();
+        $json = StoryTest::findAllAsArray($id);
+
+        $json[0]['storyTestQuestions'] = array_filter($json[0]['storyTestQuestions'], function($question) {
+            $ok = count($question['storyTestAnswers']) > 0;
+            if ($ok) {
+                $haveCorrectAnswers = false;
+                foreach ($question['storyTestAnswers'] as $answer) {
+                    if ((int)$answer['is_correct'] === 1) {
+                        $haveCorrectAnswers = true;
+                    }
+                }
+                $ok = $haveCorrectAnswers;
+            }
+            return $ok;
+        });
+
         $json[0]['test']['progress'] = [
             'current' => 0,
             'total' => count($json[0]['storyTestQuestions']),
