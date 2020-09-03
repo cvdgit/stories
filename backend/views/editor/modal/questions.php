@@ -15,6 +15,12 @@ use yii\helpers\Html;
                         <?= Html::dropDownList('', null, \common\models\StoryTest::getRemoteTestArray(), ['prompt' => 'Выберите тест', 'class' => 'form-control', 'id' => 'question-list']) ?>
                     </div>
                 </div>
+                <div class="row" style="margin-top: 20px">
+                    <div class="col-md-12">
+                        <?= Html::label('Параметры:', 'question-params') ?>
+                        <?= Html::textInput('', null, ['id' => 'question-params', 'class' => 'form-control']) ?>
+                    </div>
+                </div>
                 <?= Html::button('Показать пример вопросов', ['id' => 'show-questions', 'class' => 'btn btn-success btn-sm', 'style' => 'margin: 10px 0']) ?>
                 <table class="table table-bordered" id="show-question-list">
                     <thead>
@@ -61,6 +67,7 @@ $js = <<< JS
     var modal = $("#slide-new-question-modal");
     
     var questionList = $('#question-list');
+    var paramsInput = $('#question-params');
     
 /*    modal.on("show.bs.modal", function() {
         resetSelect(questionList, 'Выберите вопрос');
@@ -74,7 +81,7 @@ $js = <<< JS
         if (!questionID) {
             return false;
         }
-        Neo.questions(questionID).done(function(data) {
+        Neo.questions(questionID, paramsInput.val()).done(function(data) {
             var list = $("table#show-question-list tbody", modal);
             list.empty();
             data.questions.forEach(function(elem) {
@@ -89,7 +96,8 @@ $js = <<< JS
             return false;
         }
         var params = {
-            'id': questionID
+            'id': questionID,
+            'question_params': paramsInput.val()
         };
         StoryEditor.createQuestions(params, function() {
             modal.modal('hide');

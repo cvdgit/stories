@@ -325,13 +325,16 @@ class EditorController extends Controller
         return ['success' => true, 'id' => $slideID];
     }
 
-    public function actionNewCreateSlideQuestion(int $story_id, int $id)
+    public function actionNewCreateSlideQuestion(int $story_id, int $id, $question_params = null)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $test = StoryTest::findModel($id);
         $params = [
             'test-id' => $test->id,
         ];
+        if ($question_params !== null) {
+            $params['question_params'] = $question_params;
+        }
         try {
             $slideID = $this->editorService->newCreateSlideQuestion($story_id, $params);
         }

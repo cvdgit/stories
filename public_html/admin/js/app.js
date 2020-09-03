@@ -45,6 +45,51 @@ var StoryAudio = function() {
     };
 }();
 
+function queryStringToJSON(qs) {
+    var pairs = qs.split('&');
+    var result = {};
+    pairs.forEach(function(p) {
+
+        var pair = p.split('=');
+
+        var key = pair[0];
+        key = key.replace(/\+/g, '%20');
+        key = decodeURIComponent(key);
+
+        var key_is_array = false;
+        if (key.indexOf('[]') !== -1) {
+            key = key.slice(0, key.indexOf('[]'));
+            key_is_array = true;
+        }
+
+        var value = pair[1] || '';
+
+        value = value.replace(/\+/g, '%20');
+        value = decodeURIComponent(value);
+
+        if (value.indexOf('&') !== -1) {
+            if (!result[key] && key_is_array) {
+                value = [queryStringToJSON(value)];
+            }
+            else {
+                value = queryStringToJSON(value);
+            }
+        }
+
+        if (result[key]) {
+            if (Object.prototype.toString.call(result[key]) === '[object Array]') {
+                result[key].push(value);
+            } else {
+                result[key] = [result[key], value];
+            }
+        } else {
+            result[key] = value;
+        }
+
+    });
+    return JSON.parse(JSON.stringify(result));
+}
+
 var Neo = (function(jQuery) {
     "use strict";
 
@@ -86,8 +131,13 @@ var Neo = (function(jQuery) {
         return $.getJSON('/admin/index.php?r=neo/question-list');
     }
 
-    function questions(questionID) {
-        return $.getJSON('/admin/index.php?r=neo/question-get', {'id': questionID});
+    function questions(questionID, params) {
+        params = params || '';
+        var data = {'id': questionID};
+        if (params.length) {
+            data = $.extend(data, queryStringToJSON(params));
+        }
+        return $.getJSON('/admin/index.php?r=neo/question-get', data);
     }
 
     return {

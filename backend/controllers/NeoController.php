@@ -128,11 +128,17 @@ class NeoController extends Controller
         return Json::decode($result);
     }
 
-    public function actionQuestionGet(int $id)
+    public function actionQuestionGet(int $id, $animalID = null)
     {
         $test = StoryTest::findModel($id);
+        $params = [
+            'id' => $test->question_list_id
+        ];
+        if ($animalID !== null) {
+            $params['animalID'] = $animalID;
+        }
         $result = $this->serviceCurl()
-            ->setGetParams(['id' => $test->question_list_id])
+            ->setGetParams($params)
             ->get($this->serviceMethodUrl('/api/question/get'));
         return Json::decode($result);
     }

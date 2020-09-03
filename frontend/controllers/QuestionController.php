@@ -29,7 +29,14 @@ class QuestionController extends Controller
         ];
     }
 
-    public function actionGet(int $testId, int $studentId = null)
+    private function createQuestionParams($paramString)
+    {
+        $params = [];
+        parse_str($paramString, $params);
+        return $params;
+    }
+
+    public function actionGet(int $testId, int $studentId = null, $question_params = null)
     {
 
         $test = StoryTest::findModel($testId);
@@ -46,6 +53,12 @@ class QuestionController extends Controller
             $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCount($questionId);
         }
         $curl = new Curl();
+
+        $params = ['id' => $questionId];
+        if ($question_params !== null) {
+            $params = array_merge($params, $this->createQuestionParams($question_params));
+        }
+
         $result = $curl
             ->setHeader('Accept', 'application/json')
             ->setOptions([
@@ -53,9 +66,10 @@ class QuestionController extends Controller
                 CURLOPT_SSL_VERIFYPEER => false,
                 CURLOPT_SSL_VERIFYHOST => false,
             ])
-            ->setGetParams(['id' => $questionId])
+            ->setGetParams($params)
             ->setPostParams(['history' => Json::encode($userHistory)])
             ->get(Yii::$app->params['neo.url'] . '/api/question/get');
+
         $result = Json::decode($result);
         $numberQuestions = $result['total'];
         $incorrectAnswerAction = $result['incorrectAnswerAction'];
