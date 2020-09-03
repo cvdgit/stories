@@ -3,7 +3,6 @@
 namespace common\models;
 
 use DomainException;
-use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -31,6 +30,7 @@ class StoryTest extends ActiveRecord
     const REMOTE = 1;
 
     public $question_list = [];
+    public $question_number;
 
     /**
      * {@inheritdoc}
@@ -77,6 +77,7 @@ class StoryTest extends ActiveRecord
             'remote' => 'Вопросы из neo4j',
             'question_list' => 'Список вопросов',
             'header' => 'Заголовок',
+            'question_number' => 'Количество вопросов',
         ];
     }
 
@@ -109,6 +110,11 @@ class StoryTest extends ActiveRecord
     public function isRemote()
     {
         return (int) $this->remote === self::REMOTE;
+    }
+
+    public function haveQuestions()
+    {
+        return count($this->storyTestQuestions) > 0;
     }
 
 }

@@ -25,6 +25,9 @@ class StoryTestQuestion extends ActiveRecord
     const QUESTION_TYPE_RADIO = 0;
     const QUESTION_TYPE_CHECKBOX = 1;
 
+    public $answer_number;
+    public $correct_answer_number;
+
     /**
      * {@inheritdoc}
      */
@@ -58,6 +61,8 @@ class StoryTestQuestion extends ActiveRecord
             'order' => 'Порядок сортировки',
             'type' => 'Тип',
             'mix_answers' => 'Перемешивать ответы',
+            'answer_number' => 'Количество ответов',
+            'correct_answer_number' => 'Количество верных ответов',
         ];
     }
 
@@ -98,14 +103,18 @@ class StoryTestQuestion extends ActiveRecord
         return ArrayHelper::map(self::find()->orderBy(['name' => SORT_ASC])->all(), 'id', 'name');
     }
 
-    public function correctAnswersArray()
+    public function getCorrectAnswers()
     {
-        $correctAnswers = array_filter($this->storyTestAnswers, function(StoryTestAnswer $item) {
+        return array_filter($this->storyTestAnswers, function(StoryTestAnswer $item) {
             return $item->answerIsCorrect();
         });
+    }
+
+    public function correctAnswersArray()
+    {
         return array_values(array_map(function(StoryTestAnswer $item) {
             return $item->id;
-        }, $correctAnswers));
+        }, $this->getCorrectAnswers()));
     }
 
 }

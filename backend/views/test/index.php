@@ -21,6 +21,12 @@ $this->params['sidebarMenuItems'] = [
     'columns' => [
         'title',
         'header',
+        [
+            'attribute' => 'question_number',
+            'value' => function($model) {
+                return count($model->storyTestQuestions);
+            }
+        ],
         'remote',
         [
             'attribute' => 'created_at',

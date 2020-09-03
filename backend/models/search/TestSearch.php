@@ -13,20 +13,20 @@ class TestSearch extends Model
     public $header;
     public $created_at;
     public $remote;
+    public $question_number;
 
     public function rules()
     {
         return [
             [['title', 'header'], 'string', 'max' => 50],
             [['created_at'], 'date'],
-            [['remote'], 'integer'],
+            [['remote', 'question_number'], 'integer'],
         ];
     }
 
     public function search($params)
     {
-        $query = StoryTest::find();
-
+        $query = StoryTest::find()->with('storyTestQuestions');
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'sort' => [

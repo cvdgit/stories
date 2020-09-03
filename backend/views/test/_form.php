@@ -22,7 +22,9 @@ $this->registerCss($css);
             <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
             <?= $form->field($model, 'header')->textInput(['maxlength' => true]) ?>
             <?= $form->field($model, 'description_text')->textarea(['rows' => 6]) ?>
+            <?php if (!$model->haveQuestions()): ?>
             <?= $form->field($model, 'remote')->checkbox() ?>
+            <?php endif ?>
             <div class="remote-questions-block" style="display: <?= $model->isRemote() ? 'block' : 'none' ?>">
                 <?= $form->field($model, 'question_list')->dropDownList([], ['prompt' => 'Загрузка...', 'disabled' => true]) ?>
                 <?= $form->field($model, 'question_list_id')->hiddenInput()->label(false) ?>
@@ -45,6 +47,18 @@ $this->registerCss($css);
                         'options' => ['class' => 'table-responsive'],
                         'columns' => [
                             'name',
+                            [
+                                'attribute' => 'answer_number',
+                                'value' => function($model) {
+                                    return count($model->storyTestAnswers);
+                                }
+                            ],
+                            [
+                                'attribute' => 'correct_answer_number',
+                                'value' => function($model) {
+                                    return count($model->getCorrectAnswers());
+                                }
+                            ],
                             [
                                 'class' => ActionColumn::class,
                                 'template' => '{update} {delete}',
