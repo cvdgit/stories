@@ -333,7 +333,7 @@ class EditorController extends Controller
             'test-id' => $test->id,
         ];
         if ($question_params !== null) {
-            $params['question_params'] = $question_params;
+            $params['question_params'] = base64_encode($question_params);
         }
         try {
             $slideID = $this->editorService->newCreateSlideQuestion($story_id, $params);
