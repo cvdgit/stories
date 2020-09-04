@@ -56,7 +56,8 @@ class QuestionController extends Controller
 
         $params = ['id' => $questionId];
         if ($question_params !== null) {
-            $params = array_merge($params, $this->createQuestionParams($question_params));
+            //$params = array_merge($params, $this->createQuestionParams($question_params));
+            $params['params'] = $question_params;
         }
 
         $result = $curl
