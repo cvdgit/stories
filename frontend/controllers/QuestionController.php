@@ -16,16 +16,16 @@ class QuestionController extends Controller
     public function actionInit(int $testId)
     {
         $test = StoryTest::findModel($testId);
-        $questionId = -1;
+/*        $questionId = -1;
         if ($test->question_list_id !== null) {
             $questionId = $test->question_list_id;
-        }
+        }*/
         return [
             'test' => [
                 'header' => $test->header,
                 'description' => $test->description_text,
             ],
-            'students' => $this->getStudents($questionId),
+            'students' => $this->getStudents($testId),
         ];
     }
 
@@ -48,16 +48,19 @@ class QuestionController extends Controller
         if ($studentId !== null) {
             $userQuestionHistoryModel = new UserQuestionHistoryModel();
             $userQuestionHistoryModel->student_id = $studentId;
-            $userHistory = $userQuestionHistoryModel->getUserQuestionHistory($questionId);
-            $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStars2($questionId);
-            $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCount($questionId);
+            $userHistory = $userQuestionHistoryModel->getUserQuestionHistory($test->id);
+            $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStars2($test->id);
+            $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCount($test->id);
         }
         $curl = new Curl();
 
         $params = ['id' => $questionId];
         if ($question_params !== null) {
-            //$params = array_merge($params, $this->createQuestionParams($question_params));
             $params['params'] = $question_params;
+        }
+
+        if ($test->question_params !== null) {
+            $params['params'] = base64_encode($test->question_params);
         }
 
         $result = $curl
@@ -128,6 +131,7 @@ class QuestionController extends Controller
                 'view' => $svg ? 'svg' : '',
                 'svg' => $svg,
                 'lastAnswerIsCorrect' => true,
+                'test_id' => $test->id,
             ];
             $questions[] = $question;
             $i++;
@@ -141,12 +145,12 @@ class QuestionController extends Controller
                     'current' => (int)$userStarsCount,
                 ],
             ],
-            'students' => $this->getStudents($questionId),
+            'students' => $this->getStudents($test->id),
             'incorrectAnswerAction' => $incorrectAnswerAction,
         ]];
     }
 
-    protected function getStudents(int $questionId)
+    protected function getStudents(int $testID)
     {
         $students = [];
         if (!Yii::$app->user->isGuest) {
@@ -155,7 +159,7 @@ class QuestionController extends Controller
                 $students[] = [
                     'id' => $student->id,
                     'name' => $student->isMain() ? $student->user->getProfileName() : $student->name,
-                    'progress' => (int)$student->getProgress($questionId),
+                    'progress' => (int)$student->getProgress($testID),
                 ];
             }
         }

@@ -17,9 +17,9 @@ $historyModel = new UserQuestionHistoryModel();
 <?php foreach ($students as $student): ?>
     <?php
     $historyModel->student_id = $student->id;
-    $animalsData = $historyModel->getUserAnimalsData(1);
+    $animalsData = $historyModel->getUserAnimalsData(Yii::$app->params['test.animals.id']);
     $haveAnimalsData = count($animalsData) > 0;
-    $continentsData = $historyModel->getUserContinentsData(2);
+    $continentsData = $historyModel->getUserContinentsData(Yii::$app->params['test.continents.id']);
     $haveContinentsData = count($continentsData) > 0;
     ?>
     <?php if ($haveAnimalsData || $haveContinentsData): ?>
@@ -31,7 +31,7 @@ $historyModel = new UserQuestionHistoryModel();
         <blockquote>
             <p>Кто где живет?</p>
         </blockquote>
-        <?php $progress = $student->getProgress(1); ?>
+        <?php $progress = $student->getProgress(Yii::$app->params['test.animals.id']); ?>
         <?php if ($progress > 0): ?>
         <div class="row row-no-gutters">
             <div class="wikids-progress col-md-6" style="height: 20px">
@@ -49,7 +49,7 @@ $historyModel = new UserQuestionHistoryModel();
         <blockquote>
             <p>Кто обитает на континенте?</p>
         </blockquote>
-        <?php $progress = $student->getProgress(2); ?>
+        <?php $progress = $student->getProgress(Yii::$app->params['test.continents.id']); ?>
         <?php if ($progress > 0): ?>
             <div class="row row-no-gutters">
                 <div class="wikids-progress col-md-6" style="height: 20px">

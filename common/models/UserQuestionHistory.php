@@ -10,7 +10,6 @@ use yii\db\ActiveRecord;
  *
  * @property int $id
  * @property int $student_id
- * @property int $slide_id
  * @property int $question_topic_id
  * @property string $question_topic_name
  * @property int $entity_id
@@ -19,10 +18,10 @@ use yii\db\ActiveRecord;
  * @property string $relation_name
  * @property int $correct_answer
  * @property int $created_at
+ * @property int $test_id
  *
- * @property StorySlide $slide
- * @property UserStudent $student
  * @property UserQuestionAnswer[] $userQuestionAnswers
+ * @property UserStudent $student
  */
 class UserQuestionHistory extends ActiveRecord
 {
@@ -65,7 +64,7 @@ class UserQuestionHistory extends ActiveRecord
         return [
             'id' => 'ID',
             'student_id' => 'Student ID',
-            'slide_id' => 'Slide ID',
+            'test_id' => 'Test ID',
             'question_topic_id' => 'Question Topic ID',
             'question_topic_name' => 'Вопрос',
             'entity_id' => 'Entity ID',
@@ -81,9 +80,9 @@ class UserQuestionHistory extends ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getSlide()
+    public function getUserQuestionAnswers()
     {
-        return $this->hasOne(StorySlide::class, ['id' => 'slide_id']);
+        return $this->hasMany(UserQuestionAnswer::class, ['question_history_id' => 'id']);
     }
 
     /**
@@ -94,16 +93,8 @@ class UserQuestionHistory extends ActiveRecord
         return $this->hasOne(UserStudent::class, ['id' => 'student_id']);
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUserQuestionAnswers()
-    {
-        return $this->hasMany(UserQuestionAnswer::class, ['question_history_id' => 'id']);
-    }
-
     public static function create(int $studentID,
-                                  int $slideID,
+                                  int $testID,
                                   int $questionTopicID,
                                   string $questionTopicName,
                                   int $entityID,
@@ -116,7 +107,7 @@ class UserQuestionHistory extends ActiveRecord
     {
         $model = new self;
         $model->student_id = $studentID;
-        $model->slide_id = $slideID;
+        $model->test_id = $testID;
         $model->question_topic_id = $questionTopicID;
         $model->question_topic_name = $questionTopicName;
         $model->entity_id = $entityID;
@@ -133,6 +124,7 @@ class UserQuestionHistory extends ActiveRecord
         $progressModel = new \frontend\models\StudentQuestionProgress();
         $progressModel->student_id = $this->student_id;
         $progressModel->question_id = $this->question_topic_id;
+        $progressModel->test_id = $this->test_id;
         $progressModel->progress = $this->progress;
         $progressModel->updateProgress();
         parent::afterSave($insert, $changedAttributes);

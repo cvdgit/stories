@@ -1,0 +1,64 @@
+<?php
+
+namespace backend\controllers;
+
+use common\models\StoryTest;
+use common\rbac\UserRoles;
+use backend\models\test\CreateForm;
+use Yii;
+use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
+use yii\helpers\Json;
+use yii\web\Controller;
+use yii\web\NotFoundHttpException;
+use yii\web\Response;
+
+class TestVariantController extends Controller
+{
+
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => [UserRoles::PERMISSION_MANAGE_TEST],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    public function actionCreate(int $parent_id)
+    {
+        $model = new CreateForm($parent_id);
+        if ($model->load(Yii::$app->request->post())) {
+            try {
+                $model->createTestVariant();
+                return Json::encode(['success' => true, 'params' => $model->getChildrenTestsAsArray()]);
+            }
+            catch (\Exception $ex) {
+                return Json::encode(['success' => false, 'errors' => [$ex->getMessage()]]);
+            }
+        }
+        return $this->renderAjax('create', ['model' => $model]);
+    }
+
+    protected function findModel($id)
+    {
+        if (($model = StoryTest::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    public function actionDelete(int $id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $this->findModel($id)->delete();
+        return ['success' => true];
+    }
+
+}

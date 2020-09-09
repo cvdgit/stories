@@ -132,10 +132,10 @@ class UserStudent extends ActiveRecord
         return (int)$this->status === self::STATUS_MAIN;
     }
 
-    public function getProgress(int $questionID)
+    public function getProgress(int $testID)
     {
         $model = $this->getStudentQuestionProgresses()
-            ->andWhere('question_id = :question', [':question' => $questionID])
+            ->andWhere('test_id = :test', [':test' => $testID])
             ->one();
         if ($model === null) {
             return 0;

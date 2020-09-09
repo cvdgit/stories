@@ -856,7 +856,8 @@ var WikidsStoryTest = (function() {
                 };
             });
             var answerParams = {
-                'slide_id': WikidsPlayer.getCurrentSlideID(),
+                //'slide_id': WikidsPlayer.getCurrentSlideID(),
+                'test_id': currentQuestion.test_id,
                 'student_id': currentStudent.id,
                 'question_topic_id': currentQuestion.topic_id,
                 'question_topic_name': currentQuestion.name,

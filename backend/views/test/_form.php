@@ -1,19 +1,10 @@
 <?php
-use common\helpers\Url;
-use yii\grid\ActionColumn;
-use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 /** @var $this yii\web\View */
 /** @var $model common\models\StoryTest */
 /** @var $form yii\widgets\ActiveForm */
 /** @var $dataProvider yii\data\ActiveDataProvider */
-$css = <<< CSS
-.remote-questions-block {
-
-}
-CSS;
-$this->registerCss($css);
 ?>
 <div class="story-test-form">
     <div class="row">
@@ -36,46 +27,12 @@ $this->registerCss($css);
             <?php ActiveForm::end(); ?>
         </div>
         <div class="col-md-6">
-            <?php if (!$model->isNewRecord && !$model->isRemote()): ?>
-                <div>
-                    <p>
-                        <?= Html::a('Создать вопрос', ['test/create-question', 'test_id' => $model->id], ['class' => 'btn btn-primary']) ?>
-                    </p>
-                    <h4>Вопросы теста</h4>
-                    <?= GridView::widget([
-                        'dataProvider' => $dataProvider,
-                        'options' => ['class' => 'table-responsive'],
-                        'columns' => [
-                            'name',
-                            [
-                                'attribute' => 'answer_number',
-                                'value' => function($model) {
-                                    return count($model->storyTestAnswers);
-                                }
-                            ],
-                            [
-                                'attribute' => 'correct_answer_number',
-                                'value' => function($model) {
-                                    return count($model->getCorrectAnswers());
-                                }
-                            ],
-                            [
-                                'class' => ActionColumn::class,
-                                'template' => '{update} {delete}',
-                                'urlCreator' => function($action, $model, $key, $index) {
-                                    $url = '';
-                                    if ($action === 'update') {
-                                        $url = Url::to(['test/update-question', 'question_id' => $model->id]);
-                                    }
-                                    if ($action === 'delete') {
-                                        $url = Url::to(['test/delete-question', 'question_id' => $model->id]);
-                                    }
-                                    return $url;
-                                },
-                            ],
-                        ],
-                    ]) ?>
-                </div>
+            <?php if (!$model->isNewRecord): ?>
+                <?php if ($model->isRemote()): ?>
+                <?= $this->render('_test_children_list', ['model' => $model]) ?>
+                <?php else: ?>
+                <?= $this->render('_test_question_list', ['model' => $model, 'dataProvider' => $dataProvider]) ?>
+                <?php endif ?>
             <?php endif ?>
         </div>
     </div>

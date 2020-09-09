@@ -10,8 +10,8 @@ use yii\db\ActiveRecord;
  * @property int $student_id
  * @property int $question_id
  * @property int $progress
+ * @property int $test_id
  *
- * @property UserQuestionHistory $question
  * @property UserStudent $student
  */
 class StudentQuestionProgress extends ActiveRecord
@@ -33,15 +33,8 @@ class StudentQuestionProgress extends ActiveRecord
             'student_id' => 'Student ID',
             'question_id' => 'Question ID',
             'progress' => 'Progress',
+            'test_id' => 'Test ID',
         ];
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getQuestion()
-    {
-        return $this->hasOne(UserQuestionHistory::class, ['id' => 'question_id']);
     }
 
     /**
@@ -52,17 +45,18 @@ class StudentQuestionProgress extends ActiveRecord
         return $this->hasOne(UserStudent::class, ['id' => 'student_id']);
     }
 
-    public static function findProgressModel(int $studentID, int $questionID)
+    public static function findProgressModel(int $studentID, int $testID)
     {
-        return self::findOne(['student_id' => $studentID, 'question_id' => $questionID]);
+        return self::findOne(['student_id' => $studentID, 'test_id' => $testID]);
     }
 
-    public static function create(int $studentID, int $questionID, int $progress)
+    public static function create(int $studentID, int $questionID, int $progress, int $testID)
     {
         $model = new self();
         $model->student_id = $studentID;
         $model->question_id = $questionID;
         $model->progress = $progress;
+        $model->test_id = $testID;
         return $model;
     }
 

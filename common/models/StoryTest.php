@@ -21,13 +21,16 @@ use yii\helpers\ArrayHelper;
  * @property string $question_list_name
  * @property string $description_text
  * @property string $header
+ * @property int $parent_id
+ * @property string $question_params
  *
  * @property StoryTestQuestion[] $storyTestQuestions
  */
 class StoryTest extends ActiveRecord
 {
 
-    const REMOTE = 1;
+    public const LOCAL = 0;
+    public const REMOTE = 1;
 
     public $question_list = [];
     public $question_number;
@@ -54,8 +57,8 @@ class StoryTest extends ActiveRecord
     {
         return [
             [['title', 'header'], 'required'],
-            [['status', 'mix_answers', 'remote', 'question_list_id'], 'integer'],
-            [['title', 'question_list_name', 'header'], 'string', 'max' => 255],
+            [['status', 'mix_answers', 'remote', 'question_list_id', 'parent_id'], 'integer'],
+            [['title', 'question_list_name', 'header', 'question_params'], 'string', 'max' => 255],
             [['description_text'], 'string'],
             [['question_list'], 'safe'],
         ];
@@ -78,6 +81,8 @@ class StoryTest extends ActiveRecord
             'question_list' => 'Список вопросов',
             'header' => 'Заголовок',
             'question_number' => 'Количество вопросов',
+            'parent_id' => 'Родительский тест',
+            'question_params' => 'Параметры вопроса',
         ];
     }
 
@@ -125,6 +130,40 @@ class StoryTest extends ActiveRecord
             ->with('storyTestQuestions.storyTestAnswers')
             ->asArray()
             ->all();
+    }
+
+    public function getChildrenTestsAsArray()
+    {
+        return self::find()
+            ->where('parent_id = :id', [':id' => $this->id])
+            ->asArray()
+            ->all();
+    }
+
+    public static function create(string $title, string $header, string $description, int $remote = self::LOCAL)
+    {
+        $model = new self();
+        $model->title = $title;
+        $model->header = $header;
+        $model->description_text = $description;
+        $model->remote = $remote;
+        return $model;
+    }
+
+    public static function createVariant(int $parentID,
+                                         string $title,
+                                         string $header,
+                                         string $description,
+                                         int $questionID,
+                                         string $questionName,
+                                         string $questionParams)
+    {
+        $model = self::create($title, $header, $description, self::REMOTE);
+        $model->parent_id = $parentID;
+        $model->question_list_id = $questionID;
+        $model->question_list_name = $questionName;
+        $model->question_params = $questionParams;
+        return $model;
     }
 
 }

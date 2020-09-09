@@ -27,6 +27,7 @@ class TestSearch extends Model
     public function search($params)
     {
         $query = StoryTest::find()->with('storyTestQuestions');
+        $query->where('parent_id = 0');
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'sort' => [
