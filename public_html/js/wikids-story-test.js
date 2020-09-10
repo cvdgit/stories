@@ -926,7 +926,11 @@ var WikidsStoryTest = (function() {
     function showCorrectAnswerPage(question, answer) {
 
         var $elements = $('<div/>');
-        $elements.append($('<h4/>').text(incorrectAnswerText || 'Правильные ответы'));
+
+        var text = incorrectAnswerText || 'Правильные ответы';
+        text = text.replace('{1}', question.entity_name);
+        $elements.append($('<h4/>').text(text + ':'));
+
         var $element;
         getAnswersData(question).forEach(function(questionAnswer) {
             $element = $('<div/>').addClass('row');
