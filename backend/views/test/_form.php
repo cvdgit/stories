@@ -13,6 +13,7 @@ use yii\widgets\ActiveForm;
             <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
             <?= $form->field($model, 'header')->textInput(['maxlength' => true]) ?>
             <?= $form->field($model, 'description_text')->textarea(['rows' => 6]) ?>
+            <?= $form->field($model, 'incorrect_answer_text')->textInput(['maxlength' => true]) ?>
             <?php if (!$model->haveQuestions()): ?>
             <?= $form->field($model, 'remote')->checkbox() ?>
             <?php endif ?>

@@ -174,6 +174,8 @@ var WikidsStoryTest = (function() {
         }
     }
 
+    var incorrectAnswerText = '';
+
     function load(data, for_slide) {
         console.debug('WikidsStoryTest.load');
 
@@ -193,6 +195,10 @@ var WikidsStoryTest = (function() {
         }
 
         //console.log(skipQuestion);
+
+        if (testData['test']) {
+            incorrectAnswerText = testData['test']['incorrectAnswerText'] || '';
+        }
 
         questionsRepeat = new QuestionsRepeat(questions, remoteTest ? 5 : 1);
         testProgress = new TestProgress(getProgressData());
@@ -856,7 +862,6 @@ var WikidsStoryTest = (function() {
                 };
             });
             var answerParams = {
-                //'slide_id': WikidsPlayer.getCurrentSlideID(),
                 'test_id': currentQuestion.test_id,
                 'student_id': currentStudent.id,
                 'question_topic_id': currentQuestion.topic_id,
@@ -921,10 +926,9 @@ var WikidsStoryTest = (function() {
     function showCorrectAnswerPage(question, answer) {
 
         var $elements = $('<div/>');
-        $elements.append($('<h4/>').text('На континенте ' + question.entity_name + ' обитают:'));
+        $elements.append($('<h4/>').text(incorrectAnswerText || 'Правильные ответы'));
         var $element;
         getAnswersData(question).forEach(function(questionAnswer) {
-
             $element = $('<div/>').addClass('row');
             var $content = $('<div/>').addClass('col-md-offset-3 col-md-9');
             if (parseInt(questionAnswer.is_correct) === 1) {
@@ -936,12 +940,6 @@ var WikidsStoryTest = (function() {
                         .on('click', function() {
                             showOriginalImage($(this).attr('src'));
                         });
-/*                    if (questionAnswer['description']) {
-                        $image.attr('title', function() {
-                            var title = questionAnswer.name + ' обитает на континент' + (questionAnswer.description.split(',').length > 1 ? 'ах' : 'е');
-                            return title + ' ' + questionAnswer.description;
-                        });
-                    }*/
                     $content.append($image);
                 }
                 $content.append($('<p/>').text(questionAnswer.name));
@@ -965,7 +963,7 @@ var WikidsStoryTest = (function() {
         if (isLastQuestion) {
             if (remoteTest) {
                 if (!answerIsCorrect) {
-                    if (actionRelated) {
+                    /*if (actionRelated) {
                         goToRelatedSlide(
                             function (data) {
                                 TransitionSlide.goToSlide(data.story_id, data.slide_id, true);
@@ -975,9 +973,9 @@ var WikidsStoryTest = (function() {
                             }
                         );
                     }
-                    else {
+                    else {*/
                         showCorrectAnswerPage(currentQuestion, answer);
-                    }
+                    //}
                 }
                 else {
                     finish();
@@ -989,7 +987,7 @@ var WikidsStoryTest = (function() {
         }
         else {
             if (!answerIsCorrect && remoteTest) {
-                if (actionRelated) {
+                /*if (actionRelated) {
                     goToRelatedSlide(
                         function (data) {
                             TransitionSlide.goToSlide(data.story_id, data.slide_id, true);
@@ -1001,9 +999,9 @@ var WikidsStoryTest = (function() {
                         }
                     );
                 }
-                else {
+                else {*/
                     showCorrectAnswerPage(currentQuestion, answer);
-                }
+                //}
             }
             else {
                 showNextQuestion();

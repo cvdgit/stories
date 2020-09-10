@@ -144,6 +144,7 @@ class QuestionController extends Controller
                     'total' => $numberQuestions * 5,
                     'current' => (int)$userStarsCount,
                 ],
+                'incorrectAnswerText' => $test->incorrect_answer_text,
             ],
             'students' => $this->getStudents($test->id),
             'incorrectAnswerAction' => $incorrectAnswerAction,

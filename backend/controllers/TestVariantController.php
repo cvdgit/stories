@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\models\test\UpdateForm;
 use common\models\StoryTest;
 use common\rbac\UserRoles;
 use backend\models\test\CreateForm;
@@ -44,6 +45,22 @@ class TestVariantController extends Controller
             }
         }
         return $this->renderAjax('create', ['model' => $model]);
+    }
+
+    public function actionUpdate(int $id)
+    {
+        $model = $this->findModel($id);
+        $updateForm = new UpdateForm($model);
+        if ($updateForm->load(Yii::$app->request->post())) {
+            try {
+                $updateForm->updateTestVariant();
+                return Json::encode(['success' => true, 'params' => $model->getParent()->getChildrenTestsAsArray()]);
+            }
+            catch (\Exception $ex) {
+                return Json::encode(['success' => false, 'errors' => [$ex->getMessage()]]);
+            }
+        }
+        return $this->renderAjax('update', ['model' => $updateForm]);
     }
 
     protected function findModel($id)

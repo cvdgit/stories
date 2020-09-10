@@ -15,7 +15,6 @@ use yii\helpers\Url;
         <tr>
             <th>Вариант</th>
             <th></th>
-            <th></th>
         </tr>
         </thead>
         <tbody></tbody>
@@ -28,15 +27,40 @@ use yii\helpers\Url;
     </div>
 </div>
 
+<div class="modal remote fade" id="update-test-variant-modal">
+    <div class="modal-dialog">
+        <div class="modal-content"></div>
+    </div>
+</div>
+
 <?php
 $testVariants = Json::encode($model->getChildrenTestsAsArray());
 $deleteUrl = Url::to(['test-variant/delete']);
+$updateUrl = Url::to(['test-variant/update']);
 $js = <<< JS
+
+$('#test-variants-table').on('click', '.update-test-variant', function(e) {
+    e.preventDefault();
+    $('#update-test-variant-modal')
+        .modal({'remote': $(this).attr('href')})
+        .modal('show');
+});
+
+$('#update-test-variant-modal').on('hide.bs.modal', function() {
+    $(this).removeData('bs.modal');
+    $(this).find('.modal-content').html('');
+});
+
 var testVariants = $testVariants;
 window.fillTestVariantsTable = function(params) {
     var table = $('#test-variants-table tbody');
     table.empty();
     params.forEach(function(param) {
+        var updateLink = $('<a/>')
+            .addClass('update-test-variant')
+            .attr({href: '$updateUrl' + '&id=' + param.id, title: 'Изменить запись'})
+            .html('<i class="glyphicon glyphicon-edit"></i>')
+            .css('marginRight', '10px');
         var deleteLink = $('<a/>')
             .attr({href: '#', title: 'Удалить запись'})
             .html('<i class="glyphicon glyphicon-trash"></i>')
@@ -52,11 +76,10 @@ window.fillTestVariantsTable = function(params) {
                         $(that).parent().parent().remove();
                     }
                 })
-            })
+            });
         $('<tr/>')
             .append($('<td/>').text(param.title))
-            .append($('<td/>').text(''))
-            .append($('<td/>').append(deleteLink))
+            .append($('<td/>').append(updateLink).append(deleteLink))
             .appendTo(table);
     });
 }

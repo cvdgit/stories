@@ -6,7 +6,7 @@ use common\models\StoryTest;
 use DomainException;
 use yii\base\Model;
 
-class CreateForm extends Model
+class UpdateForm extends Model
 {
 
     public $title;
@@ -15,19 +15,20 @@ class CreateForm extends Model
     public $question_params;
     public $incorrect_answer_text;
 
-    private $parentID;
-    /** @var StoryTest */
-    private $parentTest;
+    private $model;
 
-    public function __construct(int $parentID, $config = [])
+    public function __construct(StoryTest $model, $config = [])
     {
-        $this->parentID = $parentID;
+        $this->model = $model;
+        $this->loadModelAttributes();
         parent::__construct($config);
     }
 
-    private function loadParentTest()
+    private function loadModelAttributes()
     {
-        $this->parentTest = StoryTest::findModel($this->parentID);
+        foreach ($this->getAttributes() as $name => $value) {
+            $this->{$name} = $this->model->{$name};
+        }
     }
 
     public function rules()
@@ -50,30 +51,16 @@ class CreateForm extends Model
         ];
     }
 
-    public function createTestVariant()
+    public function updateTestVariant()
     {
         if (!$this->validate()) {
             throw new DomainException('Model not valid');
         }
-        $this->loadParentTest();
-        $model = StoryTest::createVariant(
-            $this->parentID,
-            $this->title,
-            $this->header,
-            $this->description_text,
-            $this->incorrect_answer_text,
-            $this->parentTest->question_list_id,
-            $this->parentTest->question_list_name,
-            $this->question_params);
-        $model->save();
-    }
 
-    public function getChildrenTestsAsArray()
-    {
-        if ($this->parentTest === null) {
-            return [];
+        foreach ($this->getAttributes() as $name => $value) {
+            $this->model->{$name} = $this->{$name};
         }
-        return $this->parentTest->getChildrenTestsAsArray();
+        $this->model->save();
     }
 
 }

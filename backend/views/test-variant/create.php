@@ -15,7 +15,8 @@ use yii\widgets\ActiveForm;
 <div class="modal-body">
     <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'header')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'description_text')->textarea(['rows' => 6]) ?>
+    <?= $form->field($model, 'description_text')->textarea(['rows' => 4]) ?>
+    <?= $form->field($model, 'incorrect_answer_text')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'question_params')->textInput(['maxlength' => true]) ?>
 </div>
 <div class="modal-footer">
