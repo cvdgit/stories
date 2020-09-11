@@ -75,8 +75,10 @@ class QuestionController extends Controller
             ->get(Yii::$app->params['neo.url'] . '/api/question/get');
 
         $result = Json::decode($result);
+
         $numberQuestions = $result['total'];
         $incorrectAnswerAction = $result['incorrectAnswerAction'];
+        $showAnswerImage = filter_var($result['showAnswerImage'], FILTER_VALIDATE_BOOLEAN);
         $result = $result['questions'];
 
         $questions = [];
@@ -145,6 +147,7 @@ class QuestionController extends Controller
                     'current' => (int)$userStarsCount,
                 ],
                 'incorrectAnswerText' => $test->incorrect_answer_text,
+                'showAnswerImage' => $showAnswerImage,
             ],
             'students' => $this->getStudents($test->id),
             'incorrectAnswerAction' => $incorrectAnswerAction,

@@ -175,6 +175,7 @@ var WikidsStoryTest = (function() {
     }
 
     var incorrectAnswerText = '';
+    var showAnswerImage = true;
 
     function load(data, for_slide) {
         console.debug('WikidsStoryTest.load');
@@ -198,6 +199,11 @@ var WikidsStoryTest = (function() {
 
         if (testData['test']) {
             incorrectAnswerText = testData['test']['incorrectAnswerText'] || '';
+        }
+
+        if (testData['test']) {
+            showAnswerImage = testData['test']['showAnswerImage'];
+            console.log(showAnswerImage);
         }
 
         questionsRepeat = new QuestionsRepeat(questions, remoteTest ? 5 : 1);
@@ -417,7 +423,7 @@ var WikidsStoryTest = (function() {
             })
             .append($element);
 
-        if (answer.image) {
+        if (showAnswerImage && answer.image) {
             var $image = $("<img/>")
                 .attr("src", answer.image)
                 .attr('height', 100)
