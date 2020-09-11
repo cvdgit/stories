@@ -542,10 +542,16 @@ var WikidsStoryTest = (function() {
         return $elem[0].outerHTML;
     }
 
+    function getCurrentProgressStateText() {
+        return 'Вопрос ' + testProgress.getCurrent() + ' из ' + testProgress.getTotal();
+    }
+
     function createProgress() {
         var progress = testProgress.calcPercent();
         return $('<div/>')
             .addClass('wikids-progress')
+            .attr('title', getCurrentProgressStateText())
+            .attr('data-toggle', 'tooltip')
             .append(
                 $('<div/>')
                     .addClass('progress-bar progress-bar-info')
@@ -556,6 +562,7 @@ var WikidsStoryTest = (function() {
 
     function updateProgress() {
         var progress = testProgress.calcPercent();
+        $('.wikids-progress', dom.header).attr('title', getCurrentProgressStateText()).tooltip('fixTitle');
         $('.wikids-progress .progress-bar', dom.header).css('width', progress + '%');
     }
 
@@ -636,6 +643,9 @@ var WikidsStoryTest = (function() {
         $header
             .append(createStudentInfo())
             .append(createProgress());
+
+        $('[data-toggle="tooltip"]', $header).tooltip();
+
         return $header;
     }
 
