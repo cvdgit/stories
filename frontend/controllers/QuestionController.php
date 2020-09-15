@@ -100,7 +100,11 @@ class QuestionController extends Controller
 
         $numberQuestions = $result['total'];
         $incorrectAnswerAction = $result['incorrectAnswerAction'];
+
         $showAnswerImage = filter_var($result['showAnswerImage'], FILTER_VALIDATE_BOOLEAN);
+        $showAnswerText = filter_var($result['showAnswerText'], FILTER_VALIDATE_BOOLEAN);
+        $showQuestionImage = filter_var($result['showQuestionImage'], FILTER_VALIDATE_BOOLEAN);
+
         $result = $result['questions'];
 
         $questions = [];
@@ -170,6 +174,8 @@ class QuestionController extends Controller
                 ],
                 'incorrectAnswerText' => $test->incorrect_answer_text,
                 'showAnswerImage' => $showAnswerImage,
+                'showAnswerText' => $showAnswerText,
+                'showQuestionImage' => $showQuestionImage,
             ],
             'students' => $this->getStudents($test->id),
             'incorrectAnswerAction' => $incorrectAnswerAction,

@@ -175,7 +175,9 @@ var WikidsStoryTest = (function() {
     }
 
     var incorrectAnswerText = '';
-    var showAnswerImage = true;
+    var showAnswerImage = true,
+        showAnswerText = true,
+        showQuestionImage = true;
 
     function load(data, for_slide) {
         console.debug('WikidsStoryTest.load');
@@ -203,7 +205,8 @@ var WikidsStoryTest = (function() {
 
         if (testData['test']) {
             showAnswerImage = testData['test']['showAnswerImage'];
-            console.log(showAnswerImage);
+            showAnswerText = testData['test']['showAnswerText'];
+            showQuestionImage = testData['test']['showQuestionImage'];
         }
 
         questionsRepeat = new QuestionsRepeat(questions, remoteTest ? 5 : 1);
@@ -301,7 +304,6 @@ var WikidsStoryTest = (function() {
     }
 
     function createErrorPage() {
-
         return $('<div/>')
             .addClass('wikids-test-error-page')
             .append($('<h3/>').text('При загрузке теста произошла ошибка'));
@@ -444,10 +446,12 @@ var WikidsStoryTest = (function() {
             $answer.append($image);
         }
 
-        var $label = $("<label/>")
-            .attr("for", "answer" + answer.id)
-            .text(answer.name);
-        $answer.append($label);
+        if (showAnswerText) {
+            var $label = $("<label/>")
+                .attr("for", "answer" + answer.id)
+                .text(answer.name);
+            $answer.append($label);
+        }
 
         return $answer;
     }
@@ -611,7 +615,7 @@ var WikidsStoryTest = (function() {
 
             $answers.appendTo($question);
 
-            if (question.image) {
+            if (showQuestionImage && question.image) {
                 $('<img/>')
                     .attr("src", question.image)
                     .css('cursor', 'zoom-in')
