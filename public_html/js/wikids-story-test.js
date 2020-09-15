@@ -248,6 +248,9 @@ var WikidsStoryTest = (function() {
                     Reveal.sync();
                     Reveal.slide(0);
                 }
+            })
+            .fail(function(response) {
+                container.html(createErrorPage());
             });
     }
 
@@ -295,6 +298,13 @@ var WikidsStoryTest = (function() {
                 .append($beginButton))
             .append($('<div/>').addClass('col-md-6')
                 .append($('<p/>').addClass('wikids-test-description').html(testResponse.test.description)));
+    }
+
+    function createErrorPage() {
+
+        return $('<div/>')
+            .addClass('wikids-test-error-page')
+            .append($('<h3/>').text('При загрузке теста произошла ошибка'));
     }
 
     function createCorrectAnswerPage() {

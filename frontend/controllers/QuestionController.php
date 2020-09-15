@@ -9,6 +9,7 @@ use Yii;
 use yii\db\Query;
 use yii\helpers\Json;
 use yii\rest\Controller;
+use yii\web\HttpException;
 
 class QuestionController extends Controller
 {
@@ -16,10 +17,6 @@ class QuestionController extends Controller
     public function actionInit(int $testId)
     {
         $test = StoryTest::findModel($testId);
-/*        $questionId = -1;
-        if ($test->question_list_id !== null) {
-            $questionId = $test->question_list_id;
-        }*/
         return [
             'test' => [
                 'header' => $test->header,
@@ -34,6 +31,31 @@ class QuestionController extends Controller
         $params = [];
         parse_str($paramString, $params);
         return $params;
+    }
+
+    private function decodeQueryResult($result)
+    {
+        if (empty($result)) {
+            throw new HttpException(500, 'No data');
+        }
+        try {
+            $result = Json::decode($result);
+        }
+        catch (\Exception $ex) {
+            throw new HttpException(500, 'Incorrect JSON');
+        }
+
+        if (isset($result['type']) && mb_strtolower($result['type']) === 'error') {
+            Yii::error($result, 'neo.load.test');
+            throw new HttpException(500, 'Request error');
+        }
+
+        if (!isset($result['total'])) {
+            Yii::error($result, 'neo.load.test');
+            throw new HttpException(500, 'Request error');
+        }
+
+        return $result;
     }
 
     public function actionGet(int $testId, int $studentId = null, $question_params = null)
@@ -74,7 +96,7 @@ class QuestionController extends Controller
             ->setPostParams(['history' => Json::encode($userHistory)])
             ->get(Yii::$app->params['neo.url'] . '/api/question/get');
 
-        $result = Json::decode($result);
+        $result = $this->decodeQueryResult($result);
 
         $numberQuestions = $result['total'];
         $incorrectAnswerAction = $result['incorrectAnswerAction'];

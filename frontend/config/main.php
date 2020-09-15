@@ -64,6 +64,12 @@ return [
                     'logFile' => '@runtime/logs/pay.log',
                     'logVars' => [],
                 ],
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'categories' => ['neo.*'],
+                    'logFile' => '@runtime/logs/neo.log',
+                    'logVars' => [],
+                ],
             ],
         ],
         'errorHandler' => [
