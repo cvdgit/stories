@@ -34,7 +34,7 @@ $this->params['sidebarMenuItems'] = [
                 ],
                 [
                     'label' => 'История ответов на вопросы',
-                    'content' => $this->render('_user_question_history', ['dataProvider' => $questionHistoryDataProvider]),
+                    'content' => $this->render('_user_question_history', ['dataProvider' => $userStudentsDataProvider]),
                 ]
             ],
         ]) ?>

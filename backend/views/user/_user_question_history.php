@@ -1,7 +1,7 @@
 <?php
-
-use backend\widgets\grid\StarColumn;
 use yii\grid\GridView;
+use yii\helpers\Html;
+
 /** @var $this yii\web\View */
 /** @var $model common\models\User */
 /** @var $dataProvider yii\data\ActiveDataProvider  */
@@ -12,24 +12,14 @@ use yii\grid\GridView;
             'dataProvider' => $dataProvider,
             'options' => ['class' => 'table-responsive'],
             'columns' => [
-                'question_topic_name',
-                'created_at:datetime',
-                'entity_name',
-                'relation_name',
-                'correct_answer',
                 [
-                    'attribute' => 'answers',
+                    'format' => 'raw',
+                    'attribute' => 'name',
                     'value' => function($model) {
-                        return implode(', ', array_map(function($item){
-                            return $item->answer_entity_name;
-                        }, $model->userQuestionAnswers));
+                        return Html::a($model->name, '#');
                     }
                 ],
-/*                [
-                    'attribute' => 'correct_answers',
-                    'label' => 'Прогресс',
-                    'class' => StarColumn::class,
-                ],*/
+                'created_at:datetime',
             ],
         ]) ?>
     </div>

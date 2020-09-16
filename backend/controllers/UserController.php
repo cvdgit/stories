@@ -99,11 +99,16 @@ class UserController extends Controller
         $searchModel = new UserStorySearch($user->id);
         $questionHistorySearchModel = new UserQuestionHistorySearch($user->getStudentID());
 
+        $userStudentsDataProvider = new ActiveDataProvider([
+            'query' => $user->getStudents(),
+        ]);
+
         return $this->render('update', [
             'model' => $form,
             'dataProvider' => $dataProvider,
             'historyDataProvider' => $searchModel->search(Yii::$app->request->queryParams),
             'questionHistoryDataProvider' => $questionHistorySearchModel->search(Yii::$app->request->queryParams),
+            'userStudentsDataProvider' => $userStudentsDataProvider,
         ]);
     }
 
