@@ -263,6 +263,9 @@ class StoryController extends Controller
             'total' => count($json[0]['storyTestQuestions']),
         ];
         $json[0]['students'] = $this->getStudents();
+        $json[0]['test']['showAnswerImage'] = true;
+        $json[0]['test']['showAnswerText'] = true;
+        $json[0]['test']['showQuestionImage'] = true;
         return $json;
     }
 
