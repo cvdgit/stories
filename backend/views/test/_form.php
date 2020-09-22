@@ -7,39 +7,35 @@ use yii\widgets\ActiveForm;
 /** @var $dataProvider yii\data\ActiveDataProvider */
 ?>
 <div class="story-test-form">
-    <div class="row">
-        <div class="col-md-6">
-            <?php $form = ActiveForm::begin(); ?>
-            <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
-            <?= $form->field($model, 'header')->textInput(['maxlength' => true]) ?>
-            <?= $form->field($model, 'description_text')->textarea(['rows' => 6]) ?>
-            <?= $form->field($model, 'incorrect_answer_text')->textInput(['maxlength' => true]) ?>
-            <?php if (!$model->haveQuestions()): ?>
-            <?= $form->field($model, 'remote')->checkbox() ?>
-            <?php endif ?>
-            <div class="remote-questions-block" style="display: <?= $model->isRemote() ? 'block' : 'none' ?>">
-                <?= $form->field($model, 'question_list')->dropDownList([], ['prompt' => 'Загрузка...', 'disabled' => true]) ?>
-                <?= $form->field($model, 'question_list_id')->hiddenInput()->label(false) ?>
-                <?= $form->field($model, 'question_list_name')->hiddenInput()->label(false) ?>
-            </div>
-            <div class="form-group">
-                <?= Html::submitButton(($model->isNewRecord ? 'Создать' : 'Изменить') . ' тест', ['class' => 'btn btn-success']) ?>
-            </div>
-            <?php ActiveForm::end(); ?>
-        </div>
-        <div class="col-md-6">
-            <?php if (!$model->isNewRecord): ?>
-                <?php if ($model->isRemote()): ?>
-                <?= $this->render('_test_children_list', ['model' => $model]) ?>
-                <?php else: ?>
-                <?= $this->render('_test_question_list', ['model' => $model, 'dataProvider' => $dataProvider]) ?>
-                <?php endif ?>
-            <?php endif ?>
-        </div>
+    <?php $form = ActiveForm::begin(); ?>
+    <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'header')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'description_text')->textarea(['rows' => 6]) ?>
+    <?= $form->field($model, 'incorrect_answer_text')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'source')->dropDownList(\common\models\StoryTest::testSourcesAsArray()) ?>
+
+    <div class="remote-questions-block" style="display: <?= $model->isRemote() ? 'block' : 'none' ?>">
+        <?= $form->field($model, 'question_list')->dropDownList([], ['prompt' => 'Загрузка...', 'disabled' => true]) ?>
+        <?= $form->field($model, 'question_list_id')->hiddenInput()->label(false) ?>
+        <?= $form->field($model, 'question_list_name')->hiddenInput()->label(false) ?>
     </div>
+
+    <div class="word-list-block" style="display: <?= $model->isSourceWordList() ? 'block' : 'none' ?>">
+        <?= $form->field($model, 'word_list_id')->dropDownList(\common\models\TestWordList::getWordListAsArray(), ['prompt' => 'Выберите список слов']) ?>
+    </div>
+
+    <div class="form-group">
+        <?= Html::submitButton(($model->isNewRecord ? 'Создать' : 'Изменить') . ' тест', ['class' => 'btn btn-success']) ?>
+    </div>
+    <?php ActiveForm::end(); ?>
 </div>
+
 <?php
 $selected = strtolower(var_export($model->question_list_id, true));
+$isSourceNeo = var_export($model->isRemote(), true);
+$sourceTest = \common\models\StoryTest::TEST;
+$sourceNeo = \common\models\StoryTest::NEO;
+$sourceList = \common\models\StoryTest::LIST;
 $js = <<< JS
 var loaded = false;
 var selected = parseInt($selected);
@@ -65,14 +61,30 @@ function loadRemoteQuestions() {
         loaded = true;
     });
 }
-$('#storytest-remote').on('click', function() {
-    var checked = $(this).prop('checked');
-    $('.remote-questions-block').toggle();
-    loadRemoteQuestions();
-});
-if ($('#storytest-remote').prop('checked')) {
+
+var source = $('#storytest-source');
+var SOURCE_NEO = $isSourceNeo;
+
+if (SOURCE_NEO) {
     loadRemoteQuestions();
 }
+
+source.on('change', function() {
+    $('.remote-questions-block').hide();
+    $('.word-list-block').hide();
+    switch ($(this).val()) {
+        case '$sourceTest':
+            break;
+        case '$sourceNeo':
+            $('.remote-questions-block').show();
+            loadRemoteQuestions();
+            break;
+        case '$sourceList':
+            $('.word-list-block').show();
+            break;
+    }
+});
+
 $('#storytest-question_list').on('change', function() {
     var id = $(this).val();
     var name = $(this).find('option:selected').text();

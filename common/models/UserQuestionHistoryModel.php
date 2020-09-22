@@ -8,6 +8,7 @@ use yii\db\Query;
 class UserQuestionHistoryModel extends Model
 {
 
+    public $source;
     public $student_id;
     public $question_topic_id;
     public $question_topic_name;
@@ -24,8 +25,8 @@ class UserQuestionHistoryModel extends Model
     public function rules()
     {
         return [
-            [['student_id', 'test_id', 'question_topic_id', 'question_topic_name', 'entity_id', 'entity_name', 'relation_id', 'relation_name'], 'required'],
-            [['student_id', 'test_id', 'question_topic_id', 'entity_id', 'relation_id', 'correct_answer'], 'integer'],
+            [['source', 'student_id', 'test_id', 'entity_id', 'entity_name'], 'required'],
+            [['source', 'student_id', 'test_id', 'question_topic_id', 'entity_id', 'relation_id', 'correct_answer'], 'integer'],
             [['question_topic_name', 'entity_name', 'relation_name'], 'string', 'max' => 255],
             [['test_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTest::class, 'targetAttribute' => ['test_id' => 'id']],
             [['student_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserStudent::class, 'targetAttribute' => ['student_id' => 'id']],
@@ -48,6 +49,23 @@ class UserQuestionHistoryModel extends Model
             $this->entity_name,
             $this->relation_id,
             $this->relation_name,
+            $this->correct_answer,
+            $this->progress
+        );
+        $model->save();
+        return $model->id;
+    }
+
+    public function createWordListQuestionHistory()
+    {
+        if (!$this->validate()) {
+            throw new \DomainException('User question history data is not valid');
+        }
+        $model = UserQuestionHistory::createWordList(
+            $this->student_id,
+            $this->test_id,
+            $this->entity_id,
+            $this->entity_name,
             $this->correct_answer,
             $this->progress
         );
@@ -78,6 +96,20 @@ class UserQuestionHistoryModel extends Model
             ->andWhere('t.test_id = :test', [':test' => $testID])
             ->andWhere('t.correct_answer = 1')
             ->groupBy(['t.entity_id', 't.relation_id', 't2.answer_entity_id'])
+            ->having('COUNT(t.entity_id) >= 5');
+        return $query->all();
+    }
+
+    public function getUserQuestionHistoryWithOutRelation(int $testID)
+    {
+        $query = (new Query())
+            ->select(['t.entity_id', 't2.answer_entity_id'])
+            ->from(['t' => UserQuestionHistory::tableName()])
+            ->innerJoin(['t2' => UserQuestionAnswer::tableName()], 't2.question_history_id = t.id')
+            ->where('t.student_id = :student', [':student' => $this->student_id])
+            ->andWhere('t.test_id = :test', [':test' => $testID])
+            ->andWhere('t.correct_answer = 1')
+            ->groupBy(['t.entity_id', 't2.answer_entity_id'])
             ->having('COUNT(t.entity_id) >= 5');
         return $query->all();
     }
@@ -140,4 +172,18 @@ class UserQuestionHistoryModel extends Model
         return $query->all();
     }
 
+    public function isSourceTest()
+    {
+        return (int) $this->source === StoryTest::TEST;
+    }
+
+    public function isSourceWordList()
+    {
+        return (int) $this->source === StoryTest::LIST;
+    }
+
+    public function isSourceNeo()
+    {
+        return (int) $this->source === StoryTest::NEO;
+    }
 }

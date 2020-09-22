@@ -119,6 +119,19 @@ class UserQuestionHistory extends ActiveRecord
         return $model;
     }
 
+    public static function createWordList(int $studentID, int $testID, int $entityID, string $entityName, int $correctAnswer, $progress)
+    {
+        $model = new self;
+        $model->student_id = $studentID;
+        $model->test_id = $testID;
+        $model->entity_id = $entityID;
+        $model->entity_name = $entityName;
+        $model->correct_answer = $correctAnswer;
+        $model->progress = $progress;
+        $model->question_topic_id = 0;
+        return $model;
+    }
+
     public function afterSave($insert, $changedAttributes)
     {
         $progressModel = new \frontend\models\StudentQuestionProgress();

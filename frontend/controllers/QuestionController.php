@@ -2,7 +2,10 @@
 
 namespace frontend\controllers;
 
+use backend\components\training\base\Serializer;
+use backend\components\WordTestBuilder;
 use common\models\StoryTest;
+use common\models\TestWordList;
 use common\models\UserQuestionHistoryModel;
 use linslin\yii2\curl\Curl;
 use Yii;
@@ -10,6 +13,7 @@ use yii\db\Query;
 use yii\helpers\Json;
 use yii\rest\Controller;
 use yii\web\HttpException;
+use yii\web\NotFoundHttpException;
 
 class QuestionController extends Controller
 {
@@ -21,6 +25,7 @@ class QuestionController extends Controller
             'test' => [
                 'header' => $test->header,
                 'description' => $test->description_text,
+                'remote' => $test->isRemote(),
             ],
             'students' => $this->getStudents($testId),
         ];
@@ -74,6 +79,15 @@ class QuestionController extends Controller
             $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStars2($test->id);
             $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCount($test->id);
         }
+
+        if ($test->isSourceWordList()) {
+            $wordListModel = $this->findWordListModel($test->word_list_id);
+            $data = $wordListModel->getTestWordsAsArray($userHistory);
+            $dataCount = $wordListModel->getTestWordsCount();
+            $collection = (new WordTestBuilder($test->id, $data, $dataCount, $userStars))->build();
+            return (new Serializer())->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount);
+        }
+
         $curl = new Curl();
 
         $params = ['id' => $questionId];
@@ -216,13 +230,31 @@ class QuestionController extends Controller
         }
         $model = new UserQuestionHistoryModel();
         if ($model->load(Yii::$app->request->post(), '') && $model->validate()) {
-            $userQuestionHistoryID = $model->createUserQuestionHistory();
+            if ($model->isSourceNeo()) {
+                $userQuestionHistoryID = $model->createUserQuestionHistory();
+            }
+            if ($model->isSourceWordList()) {
+                $userQuestionHistoryID = $model->createWordListQuestionHistory();
+            }
             $model->createUserQuestionAnswers($userQuestionHistoryID);
         }
         else {
             return $model->errors;
         }
         return ['success' => true];
+    }
+
+    /**
+     * @param int $id
+     * @return TestWordList|null
+     * @throws NotFoundHttpException
+     */
+    protected function findWordListModel(int $id)
+    {
+        if (($model = TestWordList::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('The requested page does not exist.');
     }
 
 }

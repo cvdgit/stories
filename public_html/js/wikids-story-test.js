@@ -7,7 +7,8 @@ var WikidsStoryTest = (function() {
         correctAnswersNumber = 0,
         testData = {},
         dom = {},
-        remoteTest = false;
+        remoteTest = false,
+        forSlide;
 
     var questionHistory = [],
         skipQuestion = [],
@@ -129,6 +130,28 @@ var WikidsStoryTest = (function() {
         }
     }
 
+    var TestConfig = function(data) {
+        this.source = parseInt(data.source);
+    }
+
+    TestConfig.prototype.getSource = function() {
+        return this.source;
+    }
+
+    TestConfig.prototype.sourceIsLocal = function() {
+        return this.source === 1;
+    }
+
+    TestConfig.prototype.sourceIsNeo = function() {
+        return this.source === 2;
+    }
+
+    TestConfig.prototype.sourceIsWord = function() {
+        return this.source === 3;
+    }
+
+    var testConfig;
+
     function init(remote, for_slide, testResponse, element) {
         console.debug('WikidsStoryTest.init');
 
@@ -144,6 +167,7 @@ var WikidsStoryTest = (function() {
         if (for_slide === undefined) {
             for_slide = true;
         }
+        forSlide = for_slide;
         if (for_slide) {
             container.html($("<section/>")
                 .attr("data-background-color", "#ffffff")
@@ -184,9 +208,6 @@ var WikidsStoryTest = (function() {
 
         questionSuccess = new QuestionSuccess();
 
-        //dom.wrapper.empty();
-        //dom.wrapper = $("<div/>").addClass("wikids-test");
-
         testData = data[0];
 
         questions = getQuestionsData();
@@ -209,7 +230,9 @@ var WikidsStoryTest = (function() {
             showQuestionImage = testData['test']['showQuestionImage'];
         }
 
-        questionsRepeat = new QuestionsRepeat(questions, remoteTest ? 5 : 1);
+        testConfig = new TestConfig(testData['test']);
+
+        questionsRepeat = new QuestionsRepeat(questions, testConfig.sourceIsLocal() ? 1 : 5);
         testProgress = new TestProgress(getProgressData());
 
         makeTestQuestions();
@@ -223,7 +246,7 @@ var WikidsStoryTest = (function() {
         if (for_slide === undefined) {
             for_slide = true;
         }
-        if (for_slide && !remoteTest) {
+        if (for_slide && testConfig.sourceIsLocal()) { // !remoteTest
             container.html($("<section/>")
                 .attr("data-background-color", "#ffffff")
                 .append(dom.wrapper));
@@ -246,8 +269,8 @@ var WikidsStoryTest = (function() {
         container.html(createLoader());
         $.getJSON(dataUrl, dataParams)
             .done(function(response) {
-                load(response);
-                if (!remoteTest) {
+                load(response, forSlide);
+                if (forSlide) {
                     Reveal.sync();
                     Reveal.slide(0);
                 }
@@ -552,7 +575,7 @@ var WikidsStoryTest = (function() {
         var $elem = $('<p/>');
         $elem.addClass('question-stars');
         $elem.css('textAlign', 'right');
-        appendStars($elem, remoteTest ? 5 : 1, stars.current);
+        appendStars($elem, testConfig.sourceIsLocal() ? 1 : 5, stars.current);
         return $elem[0].outerHTML;
     }
 
@@ -819,6 +842,7 @@ var WikidsStoryTest = (function() {
             return;
         }
 
+        //console.log(answer);
         answerIsCorrect = answerQuestion($activeQuestion, answer);
         //console.log(answerIsCorrect);
 
@@ -835,7 +859,7 @@ var WikidsStoryTest = (function() {
             else {
                 skipQuestion.push(currentQuestion.id);
             }
-            if (!remoteTest) {
+            if (testConfig.sourceIsLocal()) { // !remoteTest
                 testProgress.inc();
             }
         }
@@ -856,7 +880,7 @@ var WikidsStoryTest = (function() {
 
         //console.log(answerIsCorrect, questionsRepeat.done(currentQuestion));
         var done = false;
-        if (remoteTest) {
+        if (!testConfig.sourceIsLocal()) {
             if (!answerIsCorrect) {
                 testQuestions.unshift(currentQuestion);
             }
@@ -884,27 +908,51 @@ var WikidsStoryTest = (function() {
         //console.log(questions);
         //console.log(currentQuestion);
 
-        if (remoteTest && !App.userIsGuest()) {
-            var answerList = answer.map(function(entity_id) {
-                return {
-                    'answer_entity_id': entity_id,
-                    'answer_entity_name': answerByID(currentQuestion, entity_id).name
+        if (!App.userIsGuest()) {
+            var answerParams = {};
+            var answerList = [];
+            if (testConfig.sourceIsNeo()) {
+                answerList = answer.map(function (entity_id) {
+                    return {
+                        'answer_entity_id': entity_id,
+                        'answer_entity_name': answerByID(currentQuestion, entity_id).name
+                    };
+                });
+                answerParams = {
+                    'source': testConfig.getSource(),
+                    'test_id': currentQuestion.test_id,
+                    'student_id': currentStudent.id,
+                    'question_topic_id': currentQuestion.topic_id,
+                    'question_topic_name': currentQuestion.name,
+                    'entity_id': currentQuestion.entity_id,
+                    'entity_name': currentQuestion.entity_name,
+                    'relation_id': currentQuestion.relation_id,
+                    'relation_name': currentQuestion.relation_name,
+                    'correct_answer': answerIsCorrect ? 1 : 0,
+                    'answers': answerList,
+                    'progress': testProgress.calcPercent()
                 };
-            });
-            var answerParams = {
-                'test_id': currentQuestion.test_id,
-                'student_id': currentStudent.id,
-                'question_topic_id': currentQuestion.topic_id,
-                'question_topic_name': currentQuestion.name,
-                'entity_id': currentQuestion.entity_id,
-                'entity_name': currentQuestion.entity_name,
-                'relation_id': currentQuestion.relation_id,
-                'relation_name': currentQuestion.relation_name,
-                'correct_answer': answerIsCorrect ? 1 : 0,
-                'answers': answerList,
-                'progress': testProgress.calcPercent()
-            };
-            $.post('/question/answer', answerParams);
+                $.post('/question/answer', answerParams);
+            }
+            if (testConfig.sourceIsWord()) {
+                answerList = answer.map(function (entity_id) {
+                    return {
+                        'answer_entity_id': entity_id,
+                        'answer_entity_name': answerByID(currentQuestion, entity_id).name
+                    };
+                });
+                answerParams = {
+                    'source': testConfig.getSource(),
+                    'test_id': currentQuestion.test_id,
+                    'student_id': currentStudent.id,
+                    'entity_id': currentQuestion.id,
+                    'entity_name': currentQuestion.name,
+                    'correct_answer': answerIsCorrect ? 1 : 0,
+                    'answers': answerList,
+                    'progress': testProgress.calcPercent()
+                };
+                $.post('/question/answer', answerParams);
+            }
         }
 
         $activeQuestion
@@ -995,7 +1043,7 @@ var WikidsStoryTest = (function() {
         var isLastQuestion = (testQuestions.length === 0);
         var actionRelated = incorrectAnswerActionRelated();
         if (isLastQuestion) {
-            if (remoteTest) {
+            if (!testConfig.sourceIsLocal()) {
                 if (!answerIsCorrect) {
                     /*if (actionRelated) {
                         goToRelatedSlide(
@@ -1020,7 +1068,7 @@ var WikidsStoryTest = (function() {
             }
         }
         else {
-            if (!answerIsCorrect && remoteTest) {
+            if (!answerIsCorrect && !testConfig.sourceIsLocal()) {
                 /*if (actionRelated) {
                     goToRelatedSlide(
                         function (data) {
@@ -1101,6 +1149,7 @@ var QuestionSuccess = function() {
             .hide()
             .append(
                 $('<div/>').addClass('wikids-test-success-question-page-content')
+                    .append('<i class="glyphicon glyphicon-star"></i>')
                     .append('<i class="glyphicon glyphicon-star"></i>')
                     .append('<i class="glyphicon glyphicon-star"></i>')
                     .append('<i class="glyphicon glyphicon-star"></i>')

@@ -93,55 +93,6 @@ var TestSlide = (function() {
         }
     }
 
-    /*
-    $(".reveal > .slides").on("click", "button[data-answer-question]", answerQuestion);
-
-    function getQuestionAnswers() {
-        var answer = [];
-        $(Reveal.getCurrentSlide()).find(".wikids-test-answer input:checked").each(function(i, elem) {
-            answer.push($(elem).val());
-        });
-        return answer;
-    }
-
-    function answerQuestion() {
-
-        var answers = getQuestionAnswers();
-        if (!answers.length) {
-            return;
-        }
-
-        var questionID = $(this).attr("data-answer-question"),
-            $slide = $(Reveal.getCurrentSlide());
-
-        $(".wikids-test-answers", $slide)
-            .hide()
-            .find("input").prop("checked", false);
-        $(".wikids-test-controls", $slide).hide();
-
-        $.getJSON(config.storeAction, {
-            "question_id": questionID,
-            "answers": answers.join(',')
-        }).done(function(data) {
-            if (data && data.success) {
-                $(".wikids-test-results", $slide)
-                    .show()
-                    .find('p')
-                    .text("Вы ответили " + (data.correctAnswer ? "правильно" : "неправильно"))
-                    .end()
-                    .find('button')
-                    .off("click")
-                    .on("click", function() {
-                        Reveal.next();
-                        $(".wikids-test-answers", $slide).show();
-                        $(".wikids-test-controls", $slide).show();
-                        $(".wikids-test-results", $slide).hide();
-                    });
-            }
-        });
-    }
-    */
-
     return {
         "backToStory": backToStory,
         "isQuestionSlide": function() {
@@ -180,7 +131,7 @@ var Education = (function() {
         WikidsStoryTest.setDataParams('/question/get', elem.data());
         initQuestions(elem.data()).done(function(response) {
             StoryBackground.setBackgroundColor('light');
-            WikidsStoryTest.init(true, false, response, elem);
+            WikidsStoryTest.init(response.test.remote, false, response, elem);
         });
     }
 

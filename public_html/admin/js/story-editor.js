@@ -546,7 +546,6 @@ var StoryEditor = (function() {
         });
         $modal.modal("hide");
     };
-
 })(StoryEditor, jQuery, console);
 
 (function(editor, $, console) {

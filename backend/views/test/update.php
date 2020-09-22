@@ -10,8 +10,22 @@ $this->params['sidebarMenuItems'] = [
 ?>
 <div class="story-test-update">
     <h1><?= Html::encode($this->title) ?></h1>
-    <?= $this->render('_form', [
-        'model' => $model,
-        'dataProvider' => $dataProvider,
-    ]) ?>
+    <div class="row">
+        <div class="col-md-6">
+            <?= $this->render('_form', [
+                'model' => $model,
+                'dataProvider' => $dataProvider,
+            ]) ?>
+        </div>
+        <div class="col-md-6">
+            <?php if (!$model->isNewRecord): ?>
+                <?php if ($model->isRemote()): ?>
+                    <?= $this->render('_test_children_list', ['model' => $model]) ?>
+                <?php endif ?>
+                <?php if ($model->isSourceTest()): ?>
+                    <?= $this->render('_test_question_list', ['model' => $model, 'dataProvider' => $dataProvider]) ?>
+                <?php endif ?>
+            <?php endif ?>
+        </div>
+    </div>
 </div>

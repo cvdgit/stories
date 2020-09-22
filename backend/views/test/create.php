@@ -10,8 +10,12 @@ $this->params['sidebarMenuItems'] = [
 ?>
 <div class="story-test-create">
     <h1><?= Html::encode($this->title) ?></h1>
-    <?= $this->render('_form', [
-        'model' => $model,
-        'dataProvider' => $dataProvider,
-    ]) ?>
+    <div class="row">
+        <div class="col-md-6">
+            <?= $this->render('_form', [
+                'model' => $model,
+                'dataProvider' => $dataProvider,
+            ]) ?>
+        </div>
+    </div>
 </div>

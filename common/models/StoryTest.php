@@ -24,6 +24,8 @@ use yii\helpers\ArrayHelper;
  * @property int $parent_id
  * @property string $question_params
  * @property string $incorrect_answer_text
+ * @property int $source
+ * @property int $word_list_id
  *
  * @property StoryTestQuestion[] $storyTestQuestions
  */
@@ -32,6 +34,10 @@ class StoryTest extends ActiveRecord
 
     public const LOCAL = 0;
     public const REMOTE = 1;
+
+    public const TEST = 1;
+    public const NEO = 2;
+    public const LIST = 3;
 
     public $question_list = [];
     public $question_number;
@@ -58,7 +64,7 @@ class StoryTest extends ActiveRecord
     {
         return [
             [['title', 'header'], 'required'],
-            [['status', 'mix_answers', 'remote', 'question_list_id', 'parent_id'], 'integer'],
+            [['status', 'mix_answers', 'remote', 'question_list_id', 'parent_id', 'source', 'word_list_id'], 'integer'],
             [['title', 'question_list_name', 'header', 'question_params', 'incorrect_answer_text'], 'string', 'max' => 255],
             [['description_text'], 'string'],
             [['question_list'], 'safe'],
@@ -85,6 +91,8 @@ class StoryTest extends ActiveRecord
             'parent_id' => 'Родительский тест',
             'question_params' => 'Параметры вопроса',
             'incorrect_answer_text' => 'Текст неправильного ответа',
+            'source' => 'Источник вопросов',
+            'word_list_id' => 'Список слов',
         ];
     }
 
@@ -103,7 +111,12 @@ class StoryTest extends ActiveRecord
 
     public static function getRemoteTestArray(): array
     {
-        return ArrayHelper::map(self::find()->where('remote = :remote', [':remote' => self::REMOTE])->orderBy(['title' => SORT_ASC])->all(), 'id', 'title');
+        return ArrayHelper::map(self::find()->where('source = :source', [':source' => self::NEO])->orderBy(['title' => SORT_ASC])->all(), 'id', 'title');
+    }
+
+    public static function getLocalTestArray(): array
+    {
+        return ArrayHelper::map(self::find()->where('source = :source', [':source' => self::LIST])->orderBy(['title' => SORT_ASC])->all(), 'id', 'title');
     }
 
     public static function findModel($id): self
@@ -116,7 +129,7 @@ class StoryTest extends ActiveRecord
 
     public function isRemote()
     {
-        return (int) $this->remote === self::REMOTE;
+        return (int) $this->source === self::NEO;
     }
 
     public function haveQuestions()
@@ -181,6 +194,25 @@ class StoryTest extends ActiveRecord
     public static function updateVariant()
     {
 
+    }
+
+    public static function testSourcesAsArray()
+    {
+        return [
+            self::TEST => 'Тест',
+            self::NEO => 'Neo4j',
+            self::LIST => 'Список слов',
+        ];
+    }
+
+    public function isSourceTest()
+    {
+        return (int) $this->source === self::TEST;
+    }
+
+    public function isSourceWordList()
+    {
+        return (int) $this->source === self::LIST;
     }
 
 }

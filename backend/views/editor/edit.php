@@ -127,6 +127,11 @@ $options = [
                 'url' => '#slide-new-question-modal',
                 'linkOptions' => ['data-toggle' => 'modal'],
             ],
+            [
+                'label' => 'Тест',
+                'url' => '#new-test-modal',
+                'linkOptions' => ['data-toggle' => 'modal'],
+            ],
         ],
     ]
 ];
@@ -318,3 +323,4 @@ echo $this->render('modal/new_image');
 echo $this->render('modal/image_from_file', ['imageModel' => $imageModel]);
 echo $this->render('modal/image_from_story');
 echo $this->render('modal/image_from_url', ['imageModel' => $imageFromUrlModel]);
+echo $this->render('modal/new_test');
