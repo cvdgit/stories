@@ -962,11 +962,18 @@ var WikidsStoryTest = (function() {
 
         dom.nextButton.hide();
         if (!answerIsCorrect) {
-            dom.results
-                .html("<p>Ответ " + (answerIsCorrect ? "" : "не ") + "верный.</p>")
-                .show()
-                .delay(1000)
-                .fadeOut('slow', function() {continueTestAction(answer);});
+            if (testConfig.sourceIsWord()) {
+                continueTestAction(answer);
+            }
+            else {
+                dom.results
+                    .html("<p>Ответ " + (answerIsCorrect ? "" : "не ") + "верный.</p>")
+                    .show()
+                    .delay(1000)
+                    .fadeOut('slow', function () {
+                        continueTestAction(answer);
+                    });
+            }
         }
         else {
             if (done) {
@@ -1056,7 +1063,14 @@ var WikidsStoryTest = (function() {
                         );
                     }
                     else {*/
+                    if (testConfig.sourceIsWord()) {
+                        showNextQuestion();
+                        dom.results.hide();
+                        dom.nextButton.show();
+                    }
+                    else {
                         showCorrectAnswerPage(currentQuestion, answer);
+                    }
                     //}
                 }
                 else {
@@ -1082,7 +1096,14 @@ var WikidsStoryTest = (function() {
                     );
                 }
                 else {*/
-                    showCorrectAnswerPage(currentQuestion, answer);
+                    if (testConfig.sourceIsWord()) {
+                        showNextQuestion();
+                        dom.results.hide();
+                        dom.nextButton.show();
+                    }
+                    else {
+                        showCorrectAnswerPage(currentQuestion, answer);
+                    }
                 //}
             }
             else {

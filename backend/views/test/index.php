@@ -1,4 +1,5 @@
 <?php
+use common\models\StoryTest;
 use dosamigos\datepicker\DatePicker;
 use yii\helpers\Html;
 use yii\grid\GridView;
@@ -22,12 +23,11 @@ $this->params['sidebarMenuItems'] = [
         'title',
         'header',
         [
-            'attribute' => 'question_number',
+            'attribute' => 'source',
             'value' => function($model) {
-                return count($model->storyTestQuestions);
+                return StoryTest::sourceText($model->source);
             }
         ],
-        'remote',
         [
             'attribute' => 'created_at',
             'value' => 'created_at',

@@ -191,11 +191,6 @@ class StoryTest extends ActiveRecord
         return self::findOne($this->parent_id);
     }
 
-    public static function updateVariant()
-    {
-
-    }
-
     public static function testSourcesAsArray()
     {
         return [
@@ -213,6 +208,12 @@ class StoryTest extends ActiveRecord
     public function isSourceWordList()
     {
         return (int) $this->source === self::LIST;
+    }
+
+    public static function sourceText(int $source)
+    {
+        $values = self::testSourcesAsArray();
+        return $values[$source];
     }
 
 }
