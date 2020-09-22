@@ -54,19 +54,6 @@ class WordListController extends Controller
     }
 
     /**
-     * Displays a single TestWordList model.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
-
-    /**
      * Creates a new TestWordList model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
@@ -74,11 +61,10 @@ class WordListController extends Controller
     public function actionCreate()
     {
         $model = new TestWordList();
-
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            Yii::$app->session->setFlash('success', 'Список успешно создан');
+            return $this->redirect(['update', 'id' => $model->id]);
         }
-
         return $this->render('create', [
             'model' => $model,
         ]);
@@ -94,11 +80,10 @@ class WordListController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            Yii::$app->session->setFlash('success', 'Список успешно обновлен');
+            return $this->refresh();
         }
-
         return $this->render('update', [
             'model' => $model,
         ]);

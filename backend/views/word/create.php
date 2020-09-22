@@ -22,6 +22,14 @@ use yii\widgets\ActiveForm;
 <?php ActiveForm::end(); ?>
 <?php
 $js = <<< JS
+$('#create-test-word-modal')
+    .on('shown.bs.modal', function () {
+        $('input[type=text]:first', this).focus();
+    })
+    .on('show.bs.modal', function () {
+        $('#create-test-word-form')[0].reset();
+        
+    });
 $('#create-test-word-form')
     .on('beforeSubmit', function(e) {
         e.preventDefault();
