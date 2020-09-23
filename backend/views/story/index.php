@@ -1,20 +1,17 @@
 <?php
-
+use common\models\Category;
 use yii\grid\ActionColumn;
-use yii\grid\CheckboxColumn;
 use yii\helpers\Html;
 use yii\grid\GridView;
 use common\helpers\UserHelper;
-use common\models\Category;
 use common\models\Story;
 use dosamigos\datepicker\DatePicker;
+use yii\widgets\Menu;
 use yii\widgets\Pjax;
-
 /** @var $this yii\web\View */
 /** @var $dataProvider yii\data\ActiveDataProvider */
 /** @var $searchModel backend\models\StorySearch */
 /** @var $batchForm backend\models\StoryBatchCommandForm */
-
 $this->title = 'Управление историями';
 ?>
 <h1 class="page-header"><?= Html::encode($this->title) ?></h1>
@@ -55,7 +52,9 @@ $this->title = 'Управление историями';
                 return implode(', ', array_map(function($item){
                     return $item->name;
                 }, $model->categories));
-            }
+            },
+            'filter' => Html::a('Категории', '#filter-categories-modal', ['data-toggle' => 'modal'])
+                        . Html::activeHiddenInput($searchModel, 'category_id')
         ],
         [
             'attribute' => 'created_at',
@@ -114,3 +113,69 @@ $this->title = 'Управление историями';
     ],
 ]) ?>
 <?php Pjax::end(); ?>
+
+<div class="modal fade" id="filter-categories-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                <h4 class="modal-title">Категории</h4>
+            </div>
+            <div class="modal-body">
+                <div id="category-list">
+                    <?= Menu::widget([
+                        'items' => Category::categoryArray(),
+                        'encodeLabels' => false,
+                        'linkTemplate' => '<label><input type="checkbox" value="{url}"> {label}</label>',
+                    ]) ?>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="do-category-filter">Применить</button>
+                <button class="btn btn-default" data-dismiss="modal">Отмена</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php
+$css = <<< CSS
+#category-list ul {
+    list-style: none;
+}
+CSS;
+$this->registerCss($css);
+$js = <<< JS
+$('#filter-categories-modal').on('show.bs.modal', function() {
+    var list = $('#category-list'),
+        id = 'storysearch-category_id';
+    $('input[type=checkbox]', list).prop('checked', false);
+    var value = $('#' + id).val();
+    if (value) {
+        value.split(',').forEach(function(value) {
+            $('input[value=' + value + ']', list).prop('checked', true);
+        });
+    }
+});
+$('#do-category-filter').on('click', function() {
+    var list = $('#selected-category-list'),
+        id = 'storysearch-category_id',
+        ids = [];
+    list.empty();
+    $('#category-list input[type=checkbox]').each(function() {
+        var el = $(this);
+        if (el.is(':checked')) {
+            $('<span>')
+              .addClass('label label-default')
+              .text($.trim(el.parent().text()))
+              .appendTo(list);
+            list.append(' ');
+            ids.push(el.val());
+        }
+    });
+    $('#' + id).val(ids.join(',')).trigger('change');
+    $('#filter-categories-modal').modal('hide');
+});
+JS;
+$this->registerJs($js);
+?>

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\models;
-
 
 use common\models\Story;
 use yii\base\Model;
@@ -27,12 +25,13 @@ class StorySearch extends Model
             [['title'], 'string'],
             [['id', 'user_id', 'status', 'sub_access'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
+            ['category_id', 'string'],
         ];
     }
 
     public function search($params): ActiveDataProvider
     {
-        $query = Story::find()->joinWith(['author']);
+        $query = Story::find()->joinWith(['author', 'categories']);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
@@ -79,12 +78,15 @@ class StorySearch extends Model
         $query->andFilterWhere([
             'story.id' => $this->id,
             'user.id' => $this->user_id,
-            'story_category.category_id' => $this->category_id,
+            //'story_category.category_id' => $this->category_id,
             "DATE_FORMAT(FROM_UNIXTIME(story.created_at), '%d.%m.%Y')" => $this->created_at,
             "DATE_FORMAT(FROM_UNIXTIME(story.updated_at), '%d.%m.%Y')" => $this->updated_at,
             'story.status' => $this->status,
             'story.sub_access' => $this->sub_access,
         ]);
+        if (!empty($this->category_id)) {
+            $query->andFilterWhere(['in', 'category.id', explode(',', $this->category_id)]);
+        }
 
         return $dataProvider;
     }
