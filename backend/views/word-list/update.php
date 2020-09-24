@@ -54,7 +54,7 @@ $deleteUrl = Url::to(['word/delete']);
 $updateUrl = Url::to(['word/update']);
 $js = <<< JS
 
-$('#create-test-word-table').on('click', '.update-test-word', function(e) {
+$('#test-word-table').on('click', '.update-test-word', function(e) {
     e.preventDefault();
     $('#update-test-word-modal')
         .modal({'remote': $(this).attr('href')})
@@ -72,7 +72,7 @@ window.fillTestWordsTable = function(params) {
     table.empty();
     params.forEach(function(param) {
         var updateLink = $('<a/>')
-            .addClass('update-test-variant')
+            .addClass('update-test-word')
             .attr({href: '$updateUrl' + '&id=' + param.id, title: 'Изменить запись'})
             .html('<i class="glyphicon glyphicon-edit"></i>')
             .css('marginRight', '10px');

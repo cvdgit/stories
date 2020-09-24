@@ -78,7 +78,6 @@ class StorySearch extends Model
         $query->andFilterWhere([
             'story.id' => $this->id,
             'user.id' => $this->user_id,
-            //'story_category.category_id' => $this->category_id,
             "DATE_FORMAT(FROM_UNIXTIME(story.created_at), '%d.%m.%Y')" => $this->created_at,
             "DATE_FORMAT(FROM_UNIXTIME(story.updated_at), '%d.%m.%Y')" => $this->updated_at,
             'story.status' => $this->status,
