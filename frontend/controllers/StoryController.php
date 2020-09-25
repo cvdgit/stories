@@ -30,6 +30,7 @@ use common\models\Comment;
 use common\services\StoryService;
 use frontend\models\CommentForm;
 use yii\web\HttpException;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class StoryController extends Controller
@@ -230,9 +231,19 @@ class StoryController extends Controller
         return ['html' => $html];
     }
 
+    protected function findTestModel($id)
+    {
+        if (($model = StoryTest::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
     public function actionGetStoryTest(int $id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $test = $this->findTestModel($id);
 
         if (!Yii::$app->user->isGuest) {
 
@@ -266,6 +277,7 @@ class StoryController extends Controller
         $json[0]['test']['showAnswerImage'] = true;
         $json[0]['test']['showAnswerText'] = true;
         $json[0]['test']['showQuestionImage'] = true;
+        $json[0]['test']['source'] = $test->source;
         return $json;
     }
 
