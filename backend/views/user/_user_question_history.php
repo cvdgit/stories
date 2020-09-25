@@ -1,9 +1,7 @@
 <?php
 use yii\grid\GridView;
 use yii\helpers\Html;
-
 /** @var $this yii\web\View */
-/** @var $model common\models\User */
 /** @var $dataProvider yii\data\ActiveDataProvider  */
 ?>
 <div class="row">
@@ -16,7 +14,7 @@ use yii\helpers\Html;
                     'format' => 'raw',
                     'attribute' => 'name',
                     'value' => function($model) {
-                        return Html::a($model->name, '#');
+                        return Html::a($model->name, ['history/view', 'id' => $model->id]);
                     }
                 ],
                 'created_at:datetime',

@@ -186,4 +186,5 @@ class UserQuestionHistoryModel extends Model
     {
         return (int) $this->source === StoryTest::NEO;
     }
+
 }

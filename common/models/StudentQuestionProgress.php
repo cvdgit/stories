@@ -65,4 +65,11 @@ class StudentQuestionProgress extends ActiveRecord
         $this->progress = $progress;
     }
 
+    public static function resetProgress(int $studentID, int $testID)
+    {
+        $model = self::findProgressModel($studentID, $testID);
+        $model->updateProgress(0);
+        $model->save();
+    }
+
 }

@@ -63,9 +63,9 @@ class UserStudent extends ActiveRecord
             'id' => 'ID',
             'user_id' => 'User ID',
             'status' => 'Status',
-            'name' => 'Name',
+            'name' => 'Имя',
             'birth_date' => 'Дата рождения',
-            'created_at' => 'Created At',
+            'created_at' => 'Дата создания',
             'updated_at' => 'Updated At',
         ];
     }

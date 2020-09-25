@@ -100,7 +100,7 @@ class UserController extends Controller
         $questionHistorySearchModel = new UserQuestionHistorySearch($user->getStudentID());
 
         $userStudentsDataProvider = new ActiveDataProvider([
-            'query' => $user->getStudents(),
+            'query' => $user->getStudents()->orderBy(['created_at' => SORT_ASC]),
         ]);
 
         return $this->render('update', [

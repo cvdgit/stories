@@ -143,4 +143,9 @@ class UserQuestionHistory extends ActiveRecord
         parent::afterSave($insert, $changedAttributes);
     }
 
+    public static function clearTestHistory(int $studentID, int $testID)
+    {
+        self::deleteAll('student_id = :student AND test_id = :test', [':student' => $studentID, ':test' => $testID]);
+    }
+
 }
