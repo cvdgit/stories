@@ -2,6 +2,10 @@
 
 namespace backend\controllers;
 
+use backend\components\StoryTextFormatter;
+use backend\models\WordListFromStoryForm;
+use common\models\Story;
+use backend\services\StoryEditorService;
 use common\rbac\UserRoles;
 use Yii;
 use common\models\TestWordList;
@@ -10,12 +14,21 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  * WordListController implements the CRUD actions for TestWordList model.
  */
 class WordListController extends Controller
 {
+
+    private $storyService;
+
+    public function __construct($id, $module, StoryEditorService $storyService, $config = [])
+    {
+        $this->storyService = $storyService;
+        parent::__construct($id, $module, $config);
+    }
 
     public function behaviors()
     {
@@ -118,4 +131,46 @@ class WordListController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
+    protected function findStoryModel($id)
+    {
+        if (($model = Story::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    public function actionMakeFromStoryByProposals(int $story_id)
+    {
+        Yii::$app->response->format = Response::FORMAT_RAW;
+        $model = $this->findStoryModel($story_id);
+        $texts = $this->storyService->textFromStory($model);
+        return (new StoryTextFormatter($texts))->formatByProposals();
+    }
+
+    public function actionMakeFromStoryByWords(int $story_id)
+    {
+        Yii::$app->response->format = Response::FORMAT_RAW;
+        $model = $this->findStoryModel($story_id);
+        $texts = $this->storyService->textFromStory($model);
+        return (new StoryTextFormatter($texts))->formatByWords();
+    }
+
+    public function actionCreateFromStory()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $model = new WordListFromStoryForm();
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            try {
+                $storyModel = $this->findStoryModel($model->story_id);
+                $wordListID = $model->createWordList($storyModel);
+            }
+            catch (Exception $ex) {
+                return ['message' => $ex->getMessage()];
+            }
+            return $this->redirect(['word-list/update', 'id' => $wordListID]);
+        }
+        return ['message' => 'Error'];
+    }
+
 }

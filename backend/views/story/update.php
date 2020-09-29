@@ -7,7 +7,7 @@ use yii\helpers\Html;
 /** @var $coverUploadForm backend\models\StoryCoverUploadForm */
 /** @var $fileUploadForm backend\models\StoryFileUploadForm */
 /** @var $powerPointForm backend\models\SourcePowerPointForm */
-/** @var $audioUploadForm backend\models\AudioUploadForm */
+/** @var $wordListModel backend\models\WordListFromStoryForm */
 
 $this->title = 'История: ' . $model->title;
 $this->params['breadcrumbs'][] = ['label' => 'Истории', 'url' => ['index']];
@@ -59,6 +59,6 @@ $this->params['sidebarMenuItems'] = [
 		]) ?>
 	</div>
 	<div class="col-xs-6" style="padding-top: 69px">
-		<?= $this->render('_form_powerpoint', ['story' => $model, 'source' => $powerPointForm]) ?>
+		<?= $this->render('_form_powerpoint', ['story' => $model, 'source' => $powerPointForm, 'wordListModel' => $wordListModel]) ?>
 	</div>
 </div>

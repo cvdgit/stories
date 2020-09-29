@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use backend\components\book\BookStoryGenerator;
 use backend\models\StoryBatchCommandForm;
+use backend\models\WordListFromStoryForm;
 use backend\services\StoryEditorService;
 use Exception;
 use Yii;
@@ -194,12 +195,16 @@ class StoryController extends Controller
             $dropboxForm->storyFile = $model->story_file;
         }
 
+        $wordListModel = new WordListFromStoryForm();
+        $wordListModel->story_id = $model->id;
+
         return $this->render('update', [
             'model' => $model,
             'coverUploadForm' => $coverUploadForm,
             'fileUploadForm' => $fileUploadForm,
             'powerPointForm' => $powerPointForm,
             'dropboxForm' => $dropboxForm,
+            'wordListModel' => $wordListModel,
         ]);
     }
 

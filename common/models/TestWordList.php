@@ -88,4 +88,11 @@ class TestWordList extends ActiveRecord
         return ArrayHelper::map(self::find()->orderBy(['name' => SORT_ASC])->all(), 'id', 'name');
     }
 
+    public static function create(string $name)
+    {
+        $model = new self();
+        $model->name = $name;
+        return $model;
+    }
+
 }

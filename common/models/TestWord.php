@@ -55,4 +55,18 @@ class TestWord extends ActiveRecord
         return $model;
     }
 
+    public static function createBatch(int $wordListID, array $words)
+    {
+        $command = Yii::$app->db->createCommand();
+        $rows = [];
+        $i = 1;
+        foreach ($words as $word) {
+            $rows[] = [$word, $wordListID, $i++];
+        }
+        if (count($rows) > 0) {
+            $command->batchInsert(self::tableName(), ['name', 'word_list_id', 'order'], $rows);
+            $command->execute();
+        }
+    }
+
 }
