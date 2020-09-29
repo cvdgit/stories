@@ -20,6 +20,13 @@ class UpdateWordForm extends Model
         parent::__construct($config);
     }
 
+    public function attributeLabels()
+    {
+        return [
+            'name' => 'Слово',
+        ];
+    }
+
     private function loadModelAttributes()
     {
         foreach ($this->getAttributes() as $name => $value) {
@@ -45,6 +52,16 @@ class UpdateWordForm extends Model
             $this->model->{$name} = $this->{$name};
         }
         $this->model->save();
+    }
+
+    public function copyWord()
+    {
+        if (!$this->validate()) {
+            throw new DomainException('Model not valid');
+        }
+
+        $model = TestWord::create($this->name, $this->model->word_list_id, 1);
+        $model->save();
     }
 
 }

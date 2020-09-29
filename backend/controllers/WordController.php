@@ -114,4 +114,20 @@ class WordController extends Controller
         return ['success' => true];
     }
 
+    public function actionCopy(int $id)
+    {
+        $model = $this->findModel($id);
+        $updateForm = new UpdateWordForm($model);
+        if ($updateForm->load(Yii::$app->request->post())) {
+            try {
+                $updateForm->copyWord();
+                return Json::encode(['success' => true, 'params' => $model->wordList->getTestWordsAsArray()]);
+            }
+            catch (\Exception $ex) {
+                return Json::encode(['success' => false, 'errors' => [$ex->getMessage()]]);
+            }
+        }
+        return $this->renderAjax('copy', ['model' => $updateForm]);
+    }
+
 }

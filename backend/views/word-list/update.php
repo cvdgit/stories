@@ -52,9 +52,10 @@ $this->params['breadcrumbs'][] = 'Update';
 $words = Json::encode($model->getTestWordsAsArray());
 $deleteUrl = Url::to(['word/delete']);
 $updateUrl = Url::to(['word/update']);
+$copyUrl = Url::to(['word/copy']);
 $js = <<< JS
 
-$('#test-word-table').on('click', '.update-test-word', function(e) {
+$('#test-word-table').on('click', '.update-test-word,.copy-test-word', function(e) {
     e.preventDefault();
     $('#update-test-word-modal')
         .modal({'remote': $(this).attr('href')})
@@ -76,6 +77,11 @@ window.fillTestWordsTable = function(params) {
             .attr({href: '$updateUrl' + '&id=' + param.id, title: 'Изменить запись'})
             .html('<i class="glyphicon glyphicon-edit"></i>')
             .css('marginRight', '10px');
+        var copyLink = $('<a/>')
+            .addClass('copy-test-word')
+            .attr({href: '$copyUrl' + '&id=' + param.id, title: 'Копировать запись'})
+            .html('<i class="glyphicon glyphicon-copy"></i>')
+            .css('marginRight', '10px');
         var deleteLink = $('<a/>')
             .attr({href: '#', title: 'Удалить запись'})
             .html('<i class="glyphicon glyphicon-trash"></i>')
@@ -94,7 +100,10 @@ window.fillTestWordsTable = function(params) {
             });
         $('<tr/>')
             .append($('<td/>').text(param.name))
-            .append($('<td/>').append(updateLink).append(deleteLink))
+            .append($('<td/>')
+                .append(updateLink)
+                .append(copyLink)
+                .append(deleteLink))
             .appendTo(table);
     });
 }

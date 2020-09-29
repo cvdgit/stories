@@ -5,7 +5,7 @@ use yii\widgets\ActiveForm;
 ?>
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Изменить слово</h4>
+        <h4 class="modal-title">Копировать слово</h4>
     </div>
 <?php $form = ActiveForm::begin([
     'enableClientValidation' => true,
@@ -16,7 +16,7 @@ use yii\widgets\ActiveForm;
         <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
     </div>
     <div class="modal-footer">
-        <?= Html::submitButton('Изменить', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Создать копию', ['class' => 'btn btn-success']) ?>
         <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
     </div>
 <?php ActiveForm::end(); ?>
