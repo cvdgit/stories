@@ -43,9 +43,9 @@ $this->registerCss($css);
 
 $this->registerJsFile('/js/smartdate.js');
 ?>
-<div class="notification-wrapper" data-toggle="tooltip" title="Уведомления" data-placement="bottom">
+<div class="notification-wrapper">
     <div class="dropdown" id="user-notifications">
-        <button data-toggle="dropdown" class="dropdown-toggle notification-button"><i class="glyphicon glyphicon-bell"></i></button>
+        <button data-toggle="dropdown" class="dropdown-toggle notification-button"><i class="glyphicon glyphicon-bell" data-toggle="tooltip" title="Уведомления" data-placement="bottom"></i></button>
         <?php if ($count > 0): ?>
             <i class="badge badge-important notification-counter"><?= $count ?></i>
         <?php endif ?>
