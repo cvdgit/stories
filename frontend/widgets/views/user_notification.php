@@ -98,7 +98,7 @@ var UserNotification = (function() {
                     list.append(li);
                     if (i++ <= 6) {
                         height += parseInt(li.height());
-                        list.css('height', height + 'px')
+                        //list.css('height', height + 'px');
                     }
                 });
                 smartdate.init({
@@ -114,6 +114,11 @@ var UserNotification = (function() {
     }
     
     $('#user-notifications').on('show.bs.dropdown', function () {
+        
+        var vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+        vh -= 100;
+        $('#user-notifications .dropdown-menu').css('height', vh + 'px');
+        
         if (!loaded) {
             loaded = true;
             loadNotifications();
