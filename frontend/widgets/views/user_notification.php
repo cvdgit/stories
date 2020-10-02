@@ -20,6 +20,7 @@ $css = <<< CSS
     position: absolute;
     top: 1px;
     right: 1px;
+    pointer-events: none;
 }
 #user-notifications .dropdown-menu > li > a {
     width: 400px;
@@ -42,7 +43,7 @@ $this->registerCss($css);
 
 $this->registerJsFile('/js/smartdate.js');
 ?>
-<div class="notification-wrapper">
+<div class="notification-wrapper" data-toggle="tooltip" title="Уведомления" data-placement="bottom">
     <div class="dropdown" id="user-notifications">
         <button data-toggle="dropdown" class="dropdown-toggle notification-button"><i class="glyphicon glyphicon-bell"></i></button>
         <?php if ($count > 0): ?>
