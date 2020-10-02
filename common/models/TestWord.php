@@ -11,7 +11,8 @@ use yii\db\ActiveRecord;
  * @property int $id
  * @property string $name
  * @property int $word_list_id
- * @property int $order;
+ * @property int $order
+ * @property string $correct_answer
  *
  * @property TestWordList $wordList
  */
@@ -35,6 +36,7 @@ class TestWord extends ActiveRecord
             'name' => 'Name',
             'word_list_id' => 'Word List ID',
             'order' => 'Порядок',
+            'correct_answer' => 'Правильный ответ',
         ];
     }
 
@@ -46,12 +48,13 @@ class TestWord extends ActiveRecord
         return $this->hasOne(TestWordList::class, ['id' => 'word_list_id']);
     }
 
-    public static function create(string $name, int $wordListID, int $order)
+    public static function create(string $name, int $wordListID, int $order, string $correctAnswer = null)
     {
         $model = new self();
         $model->name = $name;
         $model->word_list_id = $wordListID;
         $model->order = $order;
+        $model->correct_answer = $correctAnswer;
         return $model;
     }
 

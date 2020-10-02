@@ -24,6 +24,8 @@ use yii\widgets\ActiveForm;
         <?= $form->field($model, 'word_list_id')->dropDownList(\common\models\TestWordList::getWordListAsArray(), ['prompt' => 'Выберите список слов']) ?>
     </div>
 
+    <?= $form->field($model, 'answer_type')->dropDownList(\common\models\StoryTest::answerTypeAsArray()) ?>
+
     <div class="form-group">
         <?= Html::submitButton(($model->isNewRecord ? 'Создать' : 'Изменить') . ' тест', ['class' => 'btn btn-success']) ?>
     </div>

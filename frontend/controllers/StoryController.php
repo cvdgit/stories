@@ -278,6 +278,7 @@ class StoryController extends Controller
         $json[0]['test']['showAnswerText'] = true;
         $json[0]['test']['showQuestionImage'] = true;
         $json[0]['test']['source'] = $test->source;
+        $json[0]['test']['answerType'] = $test->answer_type;
         return $json;
     }
 

@@ -132,6 +132,7 @@ var WikidsStoryTest = (function() {
 
     var TestConfig = function(data) {
         this.source = parseInt(data.source);
+        this.answerType = parseInt(data.answerType);
     }
 
     TestConfig.prototype.getSource = function() {
@@ -148,6 +149,14 @@ var WikidsStoryTest = (function() {
 
     TestConfig.prototype.sourceIsWord = function() {
         return this.source === 3;
+    }
+
+    TestConfig.prototype.getAnswerType = function() {
+        return this.answerType;
+    }
+
+    TestConfig.prototype.answerTypeIsNumPad = function() {
+        return this.answerType === 1;
     }
 
     var testConfig;
@@ -203,6 +212,8 @@ var WikidsStoryTest = (function() {
         showAnswerText = true,
         showQuestionImage = true;
 
+    var numPad;
+
     function load(data, for_slide) {
         console.debug('WikidsStoryTest.load');
 
@@ -234,6 +245,8 @@ var WikidsStoryTest = (function() {
 
         questionsRepeat = new QuestionsRepeat(questions, testConfig.sourceIsLocal() ? 1 : 5);
         testProgress = new TestProgress(getProgressData());
+
+        numPad = new AnswerTypeNumPad();
 
         makeTestQuestions();
         //console.log(testQuestions);
@@ -429,6 +442,7 @@ var WikidsStoryTest = (function() {
     }
 
     function createAnswer(answer, question) {
+
         var questionType = question.type;
         var type = "radio";
         if (parseInt(questionType) === 1) {
@@ -558,6 +572,22 @@ var WikidsStoryTest = (function() {
         return $wrapper;
     }
 
+    function createNumPadAnswer(question, answer) {
+        return numPad.create(function(text) {
+            nextQuestion();
+        });
+    }
+
+    function createNumPadAnswers(question, answers) {
+        var $answers = $("<div/>").addClass("wikids-test-answers");
+        answers.forEach(function(answer) {
+            $answers.append(createNumPadAnswer(question, answer));
+        });
+        var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-4 question-image"></div><div class="col-md-8 question-wrapper"></div></div>');
+        $wrapper.find(".question-wrapper").append($answers);
+        return $wrapper;
+    }
+
     function appendStars($elem, total, current) {
         $elem.empty();
         for (var i = 0, $star, className; i < total; i++) {
@@ -627,13 +657,20 @@ var WikidsStoryTest = (function() {
             var $question = createQuestion(question);
 
             var view = question['view'] ? question.view : '';
-            var $answers;
-
-            if (view === 'svg') {
-                $answers = createSvgAnswers(question, getAnswersData(question));
+            if (testConfig.answerTypeIsNumPad()) {
+                view = 'numpad';
             }
-            else {
-                $answers = createAnswers(getAnswersData(question), question);
+
+            var $answers;
+            switch (view) {
+                case 'svg':
+                    $answers = createSvgAnswers(question, getAnswersData(question));
+                    break;
+                case 'numpad':
+                    $answers = createNumPadAnswers(question, getAnswersData(question));
+                    break;
+                default:
+                    $answers = createAnswers(getAnswersData(question), question);
             }
 
             $answers.appendTo($question);
@@ -703,7 +740,7 @@ var WikidsStoryTest = (function() {
 
         dom.beginPage.hide();
         dom.header.show();
-        dom.nextButton.show();
+        showNextButton();
     }
 
     function finish() {
@@ -739,7 +776,7 @@ var WikidsStoryTest = (function() {
         dispatchEvent("backToStory", {});
     }
 
-    function answerQuestion(element, answer) {
+    function answerQuestion(element, answer, correctAnswersCallback) {
         var questionID = element.attr("data-question-id");
         var question = getQuestionsData().filter(function(elem) {
             return parseInt(elem.id) === parseInt(questionID);
@@ -747,9 +784,7 @@ var WikidsStoryTest = (function() {
         var correctAnswers = getAnswersData(question[0]).filter(function(elem) {
             return parseInt(elem.is_correct) === 1;
         });
-        correctAnswers = correctAnswers.map(function(elem) {
-            return parseInt(elem.id);
-        });
+        correctAnswers = correctAnswers.map(correctAnswersCallback);
         var correct = false;
         if (answer.length === correctAnswers.length && answer.sort().every(function(value, index) { return parseInt(value) === correctAnswers.sort()[index];})) {
             correctAnswersNumber++;
@@ -793,6 +828,11 @@ var WikidsStoryTest = (function() {
         return answers;
     }
 
+    function getNumPadQuestionAnswers(element) {
+        var answer = [parseInt(element.find('#keyboard + p').text())];
+        return answer;
+    }
+
     var answerIsCorrect,
         currentQuestion;
 
@@ -828,14 +868,23 @@ var WikidsStoryTest = (function() {
         var $activeQuestion = $('.wikids-test-active-question');
         currentQuestion = $activeQuestion.data('question');
 
-        var answer = [];
         var view = currentQuestion['view'] ? currentQuestion.view : '';
-        if (view === 'svg') {
-            answer = getSvgQuestionAnswers(currentQuestion);
-            questionIsVisible($activeQuestion);
+        if (testConfig.answerTypeIsNumPad()) {
+            view = 'numpad';
         }
-        else {
-            answer = getQuestionAnswers($activeQuestion);
+
+        var answer = [];
+        switch (view) {
+            case 'svg':
+                answer = getSvgQuestionAnswers(currentQuestion);
+                questionIsVisible($activeQuestion);
+                break;
+            case 'numpad':
+                answer = getNumPadQuestionAnswers($activeQuestion);
+                numPad.reset($activeQuestion);
+                break;
+            default:
+                answer = getQuestionAnswers($activeQuestion);
         }
 
         if (answer.length === 0) {
@@ -843,7 +892,15 @@ var WikidsStoryTest = (function() {
         }
 
         //console.log(answer);
-        answerIsCorrect = answerQuestion($activeQuestion, answer);
+        var correctAnswersCallback = function(elem) {
+            return parseInt(elem.id);
+        };
+        if (view === 'numpad') {
+            correctAnswersCallback = function(elem) {
+                return parseInt(elem.name);
+            };
+        }
+        answerIsCorrect = answerQuestion($activeQuestion, answer, correctAnswersCallback);
         //console.log(answerIsCorrect);
 
         if (answerIsCorrect) {
@@ -936,9 +993,10 @@ var WikidsStoryTest = (function() {
             }
             if (testConfig.sourceIsWord()) {
                 answerList = answer.map(function (entity_id) {
+                    var answer = answerByID(currentQuestion, entity_id);
                     return {
                         'answer_entity_id': entity_id,
-                        'answer_entity_name': answerByID(currentQuestion, entity_id).name
+                        'answer_entity_name': answer ? answer.name : entity_id
                     };
                 });
                 answerParams = {
@@ -962,7 +1020,7 @@ var WikidsStoryTest = (function() {
 
         dom.nextButton.hide();
         if (!answerIsCorrect) {
-            if (testConfig.sourceIsWord()) {
+            if (testConfig.sourceIsWord() && !testConfig.answerTypeIsNumPad()) {
                 continueTestAction(answer);
             }
             else {
@@ -992,6 +1050,9 @@ var WikidsStoryTest = (function() {
             .find('input[type=checkbox],input[type=radio]').prop('checked', false).end()
             .slideDown()
             .addClass('wikids-test-active-question');
+        if (testConfig.answerTypeIsNumPad()) {
+            dom.nextButton.hide();
+        }
     }
 
     function goToRelatedSlide(goToSlideCallback, otherCallback) {
@@ -1042,6 +1103,12 @@ var WikidsStoryTest = (function() {
             .show();
     }
 
+    function showNextButton() {
+        if (!testConfig.answerTypeIsNumPad()) {
+            dom.nextButton.show();
+        }
+    }
+
     function continueTestAction(answer) {
         console.debug('continueTestAction');
 
@@ -1052,26 +1119,14 @@ var WikidsStoryTest = (function() {
         if (isLastQuestion) {
             if (!testConfig.sourceIsLocal()) {
                 if (!answerIsCorrect) {
-                    /*if (actionRelated) {
-                        goToRelatedSlide(
-                            function (data) {
-                                TransitionSlide.goToSlide(data.story_id, data.slide_id, true);
-                            },
-                            function () {
-                                WikidsPlayer.right();
-                            }
-                        );
-                    }
-                    else {*/
                     if (testConfig.sourceIsWord()) {
                         showNextQuestion();
                         dom.results.hide();
-                        dom.nextButton.show();
+                        showNextButton();
                     }
                     else {
                         showCorrectAnswerPage(currentQuestion, answer);
                     }
-                    //}
                 }
                 else {
                     finish();
@@ -1083,33 +1138,19 @@ var WikidsStoryTest = (function() {
         }
         else {
             if (!answerIsCorrect && !testConfig.sourceIsLocal()) {
-                /*if (actionRelated) {
-                    goToRelatedSlide(
-                        function (data) {
-                            TransitionSlide.goToSlide(data.story_id, data.slide_id, true);
-                        },
-                        function () {
-                            showNextQuestion();
-                            dom.results.hide();
-                            dom.nextButton.show();
-                        }
-                    );
-                }
-                else {*/
                     if (testConfig.sourceIsWord()) {
                         showNextQuestion();
                         dom.results.hide();
-                        dom.nextButton.show();
+                        showNextButton();
                     }
                     else {
                         showCorrectAnswerPage(currentQuestion, answer);
                     }
-                //}
             }
             else {
                 showNextQuestion();
                 dom.results.hide();
-                dom.nextButton.show();
+                showNextButton();
             }
         }
     }
@@ -1187,4 +1228,38 @@ var QuestionSuccess = function() {
     return {
         'create': create
     }
+}
+
+var AnswerTypeNumPad = function() {
+
+};
+
+AnswerTypeNumPad.prototype.create = function(callback) {
+
+    var html = '<div><ul id="keyboard" class="clearfix">' +
+        '<li class="letter">1</li>' +
+        '<li class="letter">2</li>' +
+        '<li class="letter">3</li>' +
+        '<li class="letter clearl">4</li>' +
+        '<li class="letter">5</li>' +
+        '<li class="letter">6</li>' +
+        '<li class="letter clearl">7</li>' +
+        '<li class="letter ">8</li>' +
+        '<li class="letter">9</li>' +
+        '<li class="letter">10</li>' +
+        '</ul>' +
+        '<p></p></div>',
+        $html = $(html);
+
+    $html.find('li').on('click', function() {
+
+        $(this).parent().parent().find('p').text($(this).text());
+        callback($(this).text());
+    });
+
+    return $html;
+}
+
+AnswerTypeNumPad.prototype.reset = function(element) {
+    element.find('#keyboard + p').text('');
 }

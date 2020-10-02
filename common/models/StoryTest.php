@@ -26,6 +26,7 @@ use yii\helpers\ArrayHelper;
  * @property string $incorrect_answer_text
  * @property int $source
  * @property int $word_list_id
+ * @property int $answer_type
  *
  * @property StoryTestQuestion[] $storyTestQuestions
  */
@@ -64,7 +65,7 @@ class StoryTest extends ActiveRecord
     {
         return [
             [['title', 'header'], 'required'],
-            [['status', 'mix_answers', 'remote', 'question_list_id', 'parent_id', 'source', 'word_list_id'], 'integer'],
+            [['status', 'mix_answers', 'remote', 'question_list_id', 'parent_id', 'source', 'word_list_id', 'answer_type'], 'integer'],
             [['title', 'question_list_name', 'header', 'question_params', 'incorrect_answer_text'], 'string', 'max' => 255],
             [['description_text'], 'string'],
             [['question_list'], 'safe'],
@@ -93,6 +94,7 @@ class StoryTest extends ActiveRecord
             'incorrect_answer_text' => 'Текст неправильного ответа',
             'source' => 'Источник вопросов',
             'word_list_id' => 'Список слов',
+            'answer_type' => 'Тип ответов',
         ];
     }
 
@@ -214,6 +216,22 @@ class StoryTest extends ActiveRecord
     {
         $values = self::testSourcesAsArray();
         return $values[$source];
+    }
+
+    public const ANSWER_TYPE_DEFAULT = 0;
+    public const ANSWER_TYPE_NUMPAD = 1;
+
+    public static function answerTypeAsArray()
+    {
+        return [
+            self::ANSWER_TYPE_DEFAULT => 'По умолчанию',
+            self::ANSWER_TYPE_NUMPAD => 'Цифровая клавиатура',
+        ];
+    }
+
+    public function isAnswerTypeNumPad()
+    {
+        return (int) $this->answer_type === self::ANSWER_TYPE_NUMPAD;
     }
 
 }

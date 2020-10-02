@@ -84,7 +84,7 @@ class QuestionController extends Controller
             $wordListModel = $this->findWordListModel($test->word_list_id);
             $data = $wordListModel->getTestWordsAsArray($userHistory);
             $dataCount = $wordListModel->getTestWordsCount();
-            $collection = (new WordTestBuilder($test->id, $data, $dataCount, $userStars))->build();
+            $collection = (new WordTestBuilder($test, $data, $dataCount, $userStars))->build();
             return (new Serializer())->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount);
         }
 
@@ -190,6 +190,7 @@ class QuestionController extends Controller
                 'showAnswerImage' => $showAnswerImage,
                 'showAnswerText' => $showAnswerText,
                 'showQuestionImage' => $showQuestionImage,
+                'answerType' => 0,
             ],
             'students' => $this->getStudents($test->id),
             'incorrectAnswerAction' => $incorrectAnswerAction,

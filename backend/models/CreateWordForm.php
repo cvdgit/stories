@@ -11,6 +11,7 @@ class CreateWordForm extends Model
 {
 
     public $name;
+    public $correct_answer;
 
     /** @var TestWordList */
     private $list;
@@ -26,6 +27,7 @@ class CreateWordForm extends Model
         return [
             [['name'], 'required'],
             [['name'], 'string', 'max' => 255],
+            ['correct_answer', 'integer'],
         ];
     }
 
@@ -33,6 +35,7 @@ class CreateWordForm extends Model
     {
         return [
             'name' => 'Слово',
+            'correct_answer' => 'Правильный ответ',
         ];
     }
 
@@ -46,7 +49,7 @@ class CreateWordForm extends Model
         if (!$this->validate()) {
             throw new DomainException('Model not valid');
         }
-        $model = TestWord::create($this->name, $this->list->id, 1);
+        $model = TestWord::create($this->name, $this->list->id, 1, $this->correct_answer);
         $model->save();
     }
 

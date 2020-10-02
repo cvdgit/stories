@@ -2132,5 +2132,67 @@ p.wikids-test-description {
 
 .wikids-test-error-page {
 	margin-top: 18%;
+}
 
+#keyboard {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+#keyboard li {
+	float: left;
+	margin: 0 5px 5px 0;
+	width: 80px;
+	height: 80px;
+	font-size: 3rem;
+	line-height: 80px;
+	text-align: center;
+	background: #fff;
+	border: 1px solid #c0c0c0;
+	border-radius: 5px;
+}
+.capslock, .tab, .left-shift, .clearl, .switch {
+	clear: left;
+}
+#keyboard .tab, #keyboard .delete {
+	width: 70px;
+}
+#keyboard .capslock {
+	width: 80px;
+}
+#keyboard .return {
+	width: 90px;
+}
+#keyboard .left-shift{
+	width: 70px;
+}
+
+#keyboard .switch {
+	width: 90px;
+}
+#keyboard .rightright-shift {
+	width: 109px;
+}
+.lastitem {
+	margin-right: 0;
+}
+.uppercase {
+	text-transform: uppercase;
+}
+#keyboard .space {
+	float: left;
+	width: 556px;
+}
+#keyboard .switch, #keyboard .space, #keyboard .return{
+	font-size: 16px;
+}
+.on {
+	display: none;
+}
+#keyboard li:hover {
+	position: relative;
+	top: 1px;
+	left: 1px;
+	border-color: #808080;
+	cursor: pointer;
 }

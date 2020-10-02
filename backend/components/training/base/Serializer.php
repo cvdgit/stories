@@ -21,6 +21,7 @@ class Serializer
                     'showAnswerText' => true,
                     'showQuestionImage' => true,
                     'source' => $test->source,
+                    'answerType' => $test->answer_type,
                 ],
                 'students' => $students,
             ],

@@ -10,6 +10,7 @@ class UpdateWordForm extends Model
 {
 
     public $name;
+    public $correct_answer;
 
     private $model;
 
@@ -24,6 +25,7 @@ class UpdateWordForm extends Model
     {
         return [
             'name' => 'Слово',
+            'correct_answer' => 'Правильный ответ',
         ];
     }
 
@@ -39,6 +41,7 @@ class UpdateWordForm extends Model
         return [
             [['name'], 'required'],
             [['name'], 'string', 'max' => 255],
+            ['correct_answer', 'integer'],
         ];
     }
 
@@ -60,7 +63,7 @@ class UpdateWordForm extends Model
             throw new DomainException('Model not valid');
         }
 
-        $model = TestWord::create($this->name, $this->model->word_list_id, 1);
+        $model = TestWord::create($this->name, $this->model->word_list_id, 1, $this->correct_answer);
         $model->save();
     }
 

@@ -14,6 +14,7 @@ use yii\widgets\ActiveForm;
     ]]); ?>
     <div class="modal-body">
         <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+        <?= $form->field($model, 'correct_answer')->textInput(['maxlength' => true]) ?>
     </div>
     <div class="modal-footer">
         <?= Html::submitButton('Создать', ['class' => 'btn btn-success']) ?>
