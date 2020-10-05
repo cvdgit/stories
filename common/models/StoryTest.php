@@ -157,7 +157,7 @@ class StoryTest extends ActiveRecord
             ->all();
     }
 
-    public static function create(string $title, string $header, string $description, string $incorrectAnswerText, int $remote = self::LOCAL)
+    public static function create(string $title, string $header, string $description, string $incorrectAnswerText, int $remote = self::LOCAL, int $source = self::TEST)
     {
         $model = new self();
         $model->title = $title;
@@ -165,6 +165,7 @@ class StoryTest extends ActiveRecord
         $model->description_text = $description;
         $model->incorrect_answer_text = $incorrectAnswerText;
         $model->remote = $remote;
+        $model->source = $source;
         return $model;
     }
 
@@ -177,7 +178,7 @@ class StoryTest extends ActiveRecord
                                          string $questionName,
                                          string $questionParams)
     {
-        $model = self::create($title, $header, $description, $incorrectAnswerText, self::REMOTE);
+        $model = self::create($title, $header, $description, $incorrectAnswerText, self::REMOTE, self::NEO);
         $model->parent_id = $parentID;
         $model->question_list_id = $questionID;
         $model->question_list_name = $questionName;

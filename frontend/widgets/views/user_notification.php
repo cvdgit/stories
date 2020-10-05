@@ -92,14 +92,9 @@ var UserNotification = (function() {
             if (response.length) {
                 $('#user-notifications .notification-counter').remove();
                 var i = 1;
-                var height = 30;
                 response.forEach(function(item) {
                     var li = createNotification(item);
                     list.append(li);
-                    if (i++ <= 6) {
-                        height += parseInt(li.height());
-                        //list.css('height', height + 'px');
-                    }
                 });
                 smartdate.init({
                     locale: 'ru',
