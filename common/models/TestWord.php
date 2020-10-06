@@ -72,4 +72,11 @@ class TestWord extends ActiveRecord
         }
     }
 
+    public static function clearWords(int $wordListID)
+    {
+        $command = Yii::$app->db->createCommand();
+        $command->delete(self::tableName(), 'word_list_id = :id', [':id' => $wordListID]);
+        $command->execute();
+    }
+
 }

@@ -3,6 +3,8 @@
 namespace backend\controllers;
 
 use backend\components\StoryTextFormatter;
+use backend\components\WordListFormatter;
+use backend\models\WordListAsTextForm;
 use backend\models\WordListFromStoryForm;
 use common\models\Story;
 use backend\services\StoryEditorService;
@@ -128,7 +130,6 @@ class WordListController extends Controller
         if (($model = TestWordList::findOne($id)) !== null) {
             return $model;
         }
-
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
@@ -165,12 +166,36 @@ class WordListController extends Controller
                 $storyModel = $this->findStoryModel($model->story_id);
                 $wordListID = $model->createWordList($storyModel);
             }
-            catch (Exception $ex) {
+            catch (\Exception $ex) {
                 return ['message' => $ex->getMessage()];
             }
             return $this->redirect(['word-list/update', 'id' => $wordListID]);
         }
         return ['message' => 'Error'];
+    }
+
+    public function actionCreateFromText()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $model = new WordListAsTextForm();
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            try {
+                $wordList = $this->findModel($model->word_list_id);
+                $model->createWordList();
+            }
+            catch (\Exception $ex) {
+                return ['message' => $ex->getMessage(), 'success' => false];
+            }
+            return ['message' => 'OK', 'success' => true, 'params' => $wordList->getTestWordsAsArray()];
+        }
+        return ['message' => 'Error', 'success' => false];
+    }
+
+    public function actionTextEdit(int $word_list_id)
+    {
+        Yii::$app->response->format = Response::FORMAT_RAW;
+        $model = $this->findModel($word_list_id);
+        return WordListFormatter::asText($model->getTestWordsAsArray());
     }
 
 }

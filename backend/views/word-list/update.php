@@ -21,6 +21,7 @@ $this->params['breadcrumbs'][] = 'Update';
         <div class="col-md-6">
             <p>
                 <?= Html::a('Добавить слово', ['word/create', 'list_id' => $model->id], ['class' => 'btn btn-primary', 'id' => 'create-test-word']) ?>
+                <?= Html::a('Редактировать как текст', ['word-list/text-edit', 'word_list_id' => $model->id], ['class' => 'btn btn-primary', 'id' => 'edit-as-text']) ?>
             </p>
             <h4>Слова</h4>
             <table class="table table-bordered" id="test-word-table">
@@ -47,6 +48,12 @@ $this->params['breadcrumbs'][] = 'Update';
         <div class="modal-content"></div>
     </div>
 </div>
+
+<?= \backend\widgets\WordEditWidget::widget([
+    'modelAttribute' => 'word-list-id',
+    'modelAttributeValue' => $model->id,
+    'target' => '#edit-as-text',
+]) ?>
 
 <?php
 $words = Json::encode($model->getTestWordsAsArray());
@@ -113,5 +120,6 @@ $('#create-test-word').on('click', function(e) {
     e.preventDefault();
     $('#create-test-word-modal').modal({'remote': $(this).attr('href')});
 });
+
 JS;
 $this->registerJs($js);
