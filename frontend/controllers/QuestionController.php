@@ -191,6 +191,7 @@ class QuestionController extends Controller
                 'showAnswerText' => $showAnswerText,
                 'showQuestionImage' => $showQuestionImage,
                 'answerType' => 0,
+                'source' => $test->source,
             ],
             'students' => $this->getStudents($test->id),
             'incorrectAnswerAction' => $incorrectAnswerAction,
