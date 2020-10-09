@@ -159,6 +159,10 @@ var WikidsStoryTest = (function() {
         return this.answerType === 1;
     }
 
+    TestConfig.prototype.answerTypeIsInput = function() {
+        return this.answerType === 2;
+    }
+
     var testConfig;
 
     function init(remote, for_slide, testResponse, element) {
@@ -588,6 +592,21 @@ var WikidsStoryTest = (function() {
         return $wrapper;
     }
 
+    function createInputAnswer(question, answer) {
+        var $html = '<a href="#" title="Повторить слово" class="glyphicon glyphicon-repeat synthesis-question" style="top: 5px; right: 10px"><i></i></a>';
+        return $('<div/>').append($html).append(answerTypeInput.create(nextQuestion));
+    }
+
+    function createInputAnswers(question, answers) {
+        var $answers = $("<div/>").addClass("wikids-test-answers");
+        answers.forEach(function(answer) {
+            $answers.append(createInputAnswer(question, answer));
+        });
+        var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-4 question-image"></div><div class="col-md-8 question-wrapper"></div></div>');
+        $wrapper.find(".question-wrapper").append($answers);
+        return $wrapper;
+    }
+
     function appendStars($elem, total, current) {
         $elem.empty();
         for (var i = 0, $star, className; i < total; i++) {
@@ -660,6 +679,9 @@ var WikidsStoryTest = (function() {
             if (testConfig.answerTypeIsNumPad()) {
                 view = 'numpad';
             }
+            if (testConfig.answerTypeIsInput()) {
+                view = 'input';
+            }
 
             var $answers;
             switch (view) {
@@ -668,6 +690,9 @@ var WikidsStoryTest = (function() {
                     break;
                 case 'numpad':
                     $answers = createNumPadAnswers(question, getAnswersData(question));
+                    break;
+                case 'input':
+                    $answers = createInputAnswers(question, getAnswersData(question));
                     break;
                 default:
                     $answers = createAnswers(getAnswersData(question), question);
@@ -777,6 +802,7 @@ var WikidsStoryTest = (function() {
     }
 
     function answerQuestion(element, answer, correctAnswersCallback) {
+
         var questionID = element.attr("data-question-id");
         var question = getQuestionsData().filter(function(elem) {
             return parseInt(elem.id) === parseInt(questionID);
@@ -784,12 +810,18 @@ var WikidsStoryTest = (function() {
         var correctAnswers = getAnswersData(question[0]).filter(function(elem) {
             return parseInt(elem.is_correct) === 1;
         });
+
         correctAnswers = correctAnswers.map(correctAnswersCallback);
+        var answerCheckCallback = function(value, index) {
+            return value === correctAnswers.sort()[index];
+        };
+
         var correct = false;
-        if (answer.length === correctAnswers.length && answer.sort().every(function(value, index) { return parseInt(value) === correctAnswers.sort()[index];})) {
+        if (answer.length === correctAnswers.length && answer.sort().every(answerCheckCallback)) {
             correctAnswersNumber++;
             correct = true;
         }
+
         return correct;
     }
 
@@ -833,6 +865,14 @@ var WikidsStoryTest = (function() {
         return answer;
     }
 
+    function getInputQuestionAnswers(element) {
+        var val = element.find('.answer-input').val();
+        if (!val.length) {
+            return [];
+        }
+        return [val.toLowerCase()];
+    }
+
     var answerIsCorrect,
         currentQuestion;
 
@@ -872,6 +912,9 @@ var WikidsStoryTest = (function() {
         if (testConfig.answerTypeIsNumPad()) {
             view = 'numpad';
         }
+        if (testConfig.answerTypeIsInput()) {
+            view = 'input';
+        }
 
         var answer = [];
         switch (view) {
@@ -883,6 +926,9 @@ var WikidsStoryTest = (function() {
                 answer = getNumPadQuestionAnswers($activeQuestion);
                 numPad.reset($activeQuestion);
                 break;
+            case 'input':
+                answer = getInputQuestionAnswers($activeQuestion);
+                break;
             default:
                 answer = getQuestionAnswers($activeQuestion);
         }
@@ -891,7 +937,6 @@ var WikidsStoryTest = (function() {
             return;
         }
 
-        //console.log(answer);
         var correctAnswersCallback = function(elem) {
             return parseInt(elem.id);
         };
@@ -900,8 +945,12 @@ var WikidsStoryTest = (function() {
                 return parseInt(elem.name);
             };
         }
+        if (view === 'input') {
+            correctAnswersCallback = function(elem) {
+                return elem.name.toLowerCase();
+            };
+        }
         answerIsCorrect = answerQuestion($activeQuestion, answer, correctAnswersCallback);
-        //console.log(answerIsCorrect);
 
         if (answerIsCorrect) {
             if (currentQuestion['stars']) {
@@ -991,12 +1040,31 @@ var WikidsStoryTest = (function() {
                 };
                 $.post('/question/answer', answerParams);
             }
-            if (testConfig.sourceIsWord()) {
+            if (testConfig.sourceIsWord() && !testConfig.answerTypeIsInput()) {
                 answerList = answer.map(function (entity_id) {
                     var answer = answerByID(currentQuestion, entity_id);
                     return {
                         'answer_entity_id': entity_id,
                         'answer_entity_name': answer ? answer.name : entity_id
+                    };
+                });
+                answerParams = {
+                    'source': testConfig.getSource(),
+                    'test_id': currentQuestion.test_id,
+                    'student_id': currentStudent.id,
+                    'entity_id': currentQuestion.id,
+                    'entity_name': currentQuestion.name,
+                    'correct_answer': answerIsCorrect ? 1 : 0,
+                    'answers': answerList,
+                    'progress': testProgress.calcPercent()
+                };
+                $.post('/question/answer', answerParams);
+            }
+            if (testConfig.sourceIsWord() && testConfig.answerTypeIsInput()) {
+                answerList = answer.map(function (answerText) {
+                    return {
+                        'answer_entity_id': currentQuestion.id,
+                        'answer_entity_name': answerText
                     };
                 });
                 answerParams = {
@@ -1020,7 +1088,7 @@ var WikidsStoryTest = (function() {
 
         dom.nextButton.hide();
         if (!answerIsCorrect) {
-            if (testConfig.sourceIsWord() && !testConfig.answerTypeIsNumPad()) {
+            if (testConfig.sourceIsWord() && !testConfig.answerTypeIsNumPad() && !testConfig.answerTypeIsInput()) {
                 continueTestAction(answer);
             }
             else {
@@ -1044,14 +1112,40 @@ var WikidsStoryTest = (function() {
     }
 
     function showNextQuestion() {
+
         console.debug('WikidsStoryTest.showNextQuestion');
+
         var nextQuestion = testQuestions.shift();
         $('.wikids-test-question[data-question-id=' + nextQuestion.id + ']', dom.questions)
             .find('input[type=checkbox],input[type=radio]').prop('checked', false).end()
             .slideDown()
             .addClass('wikids-test-active-question');
-        if (testConfig.answerTypeIsNumPad()) {
+
+        if (testConfig.answerTypeIsNumPad() || testConfig.answerTypeIsInput()) {
             dom.nextButton.hide();
+        }
+
+        if (testConfig.answerTypeIsInput()) {
+
+            var text = getAnswersData(nextQuestion)[0].name;
+            var q = $('.wikids-test-active-question .answer-input', dom.questions);
+            setTimeout(function () {
+                testSpeech.ReadText(text);
+                q.focus();
+            }, 500);
+
+            setTimeout(function() {
+                q
+                    .val('')
+                    .focus();
+            }, 100);
+
+            $('.wikids-test-active-question .synthesis-question', dom.questions)
+                .off('click')
+                .on('click', function (e) {
+                    e.preventDefault();
+                    testSpeech.ReadText(text);
+                });
         }
     }
 
@@ -1104,7 +1198,7 @@ var WikidsStoryTest = (function() {
     }
 
     function showNextButton() {
-        if (!testConfig.answerTypeIsNumPad()) {
+        if (!testConfig.answerTypeIsNumPad() && !testConfig.answerTypeIsInput()) {
             dom.nextButton.show();
         }
     }
@@ -1263,3 +1357,28 @@ AnswerTypeNumPad.prototype.create = function(callback) {
 AnswerTypeNumPad.prototype.reset = function(element) {
     element.find('#keyboard + p').text('');
 }
+
+var answerTypeInput = {};
+answerTypeInput.create = function(action) {
+    var $html = $('<input type="text" class="answer-input" />');
+    $html.keypress(function(e) {
+        if (e.which == 13) {
+            action();
+            return false;
+        }
+    });
+    return $html;
+};
+
+var testSpeech = {};
+testSpeech.Synth = window.speechSynthesis;
+testSpeech.Voices = [];
+testSpeech.Voices = testSpeech.Synth.getVoices();
+testSpeech.VoiceIndex = 0;
+testSpeech.Rate = 0.85;
+testSpeech.ReadText = function(txt) {
+    var ttsSpeechChunk = new SpeechSynthesisUtterance(txt);
+    ttsSpeechChunk.voice = testSpeech.Voices[testSpeech.VoiceIndex];
+    ttsSpeechChunk.rate = testSpeech.Rate;
+    testSpeech.Synth.speak(ttsSpeechChunk);
+};

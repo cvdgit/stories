@@ -16,7 +16,7 @@ class AnswerSerializer
     {
         return [
             'id' => $this->answer->getId(),
-            'name' => $this->answer->getName(),
+            'name' => trim($this->answer->getName()),
             'is_correct' => (int) $this->answer->isCorrect(),
             'description' => '',
         ];

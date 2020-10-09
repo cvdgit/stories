@@ -221,18 +221,25 @@ class StoryTest extends ActiveRecord
 
     public const ANSWER_TYPE_DEFAULT = 0;
     public const ANSWER_TYPE_NUMPAD = 1;
+    public const ANSWER_TYPE_INPUT = 2;
 
     public static function answerTypeAsArray()
     {
         return [
             self::ANSWER_TYPE_DEFAULT => 'По умолчанию',
             self::ANSWER_TYPE_NUMPAD => 'Цифровая клавиатура',
+            self::ANSWER_TYPE_INPUT => 'Поле для ввода',
         ];
     }
 
     public function isAnswerTypeNumPad()
     {
         return (int) $this->answer_type === self::ANSWER_TYPE_NUMPAD;
+    }
+
+    public function isAnswerTypeInput()
+    {
+        return (int) $this->answer_type === self::ANSWER_TYPE_INPUT;
     }
 
 }

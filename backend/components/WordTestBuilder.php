@@ -29,6 +29,9 @@ class WordTestBuilder
         if ($this->test->isAnswerTypeNumPad()) {
             (new NumPadBuilder($this->test->id, $this->data, $this->stars))->build($this->collection);
         }
+        else if ($this->test->isAnswerTypeInput()) {
+            (new InputBuilder($this->test->id, $this->data, $this->stars))->build($this->collection);
+        }
         else {
             (new CorrectIncorrectBuilder($this->test->id, $this->data, $this->stars))->build($this->collection);
         }
