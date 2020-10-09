@@ -801,7 +801,7 @@ var WikidsStoryTest = (function() {
         dispatchEvent("backToStory", {});
     }
 
-    function answerQuestion(element, answer, correctAnswersCallback) {
+    function answerQuestion(element, answer, correctAnswersCallback, convertAnswerToInt) {
 
         var questionID = element.attr("data-question-id");
         var question = getQuestionsData().filter(function(elem) {
@@ -810,12 +810,14 @@ var WikidsStoryTest = (function() {
         var correctAnswers = getAnswersData(question[0]).filter(function(elem) {
             return parseInt(elem.is_correct) === 1;
         });
-
         correctAnswers = correctAnswers.map(correctAnswersCallback);
+
         var answerCheckCallback = function(value, index) {
+            if (convertAnswerToInt) {
+                value = parseInt(value)
+            }
             return value === correctAnswers.sort()[index];
         };
-
         var correct = false;
         if (answer.length === correctAnswers.length && answer.sort().every(answerCheckCallback)) {
             correctAnswersNumber++;
@@ -937,6 +939,7 @@ var WikidsStoryTest = (function() {
             return;
         }
 
+        var convertAnswerToInt = true;
         var correctAnswersCallback = function(elem) {
             return parseInt(elem.id);
         };
@@ -949,8 +952,10 @@ var WikidsStoryTest = (function() {
             correctAnswersCallback = function(elem) {
                 return elem.name.toLowerCase();
             };
+            convertAnswerToInt = false;
         }
-        answerIsCorrect = answerQuestion($activeQuestion, answer, correctAnswersCallback);
+        answerIsCorrect = answerQuestion($activeQuestion, answer, correctAnswersCallback, convertAnswerToInt);
+        console.log(answerIsCorrect);
 
         if (answerIsCorrect) {
             if (currentQuestion['stars']) {
