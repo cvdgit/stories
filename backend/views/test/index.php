@@ -1,5 +1,5 @@
 <?php
-use common\models\StoryTest;
+use common\models\test\SourceType;
 use dosamigos\datepicker\DatePicker;
 use yii\helpers\Html;
 use yii\grid\GridView;
@@ -25,7 +25,7 @@ $this->params['sidebarMenuItems'] = [
         [
             'attribute' => 'source',
             'value' => function($model) {
-                return StoryTest::sourceText($model->source);
+                return SourceType::asText($model->source);
             }
         ],
         [

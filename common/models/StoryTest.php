@@ -2,6 +2,8 @@
 
 namespace common\models;
 
+use common\models\test\AnswerType;
+use common\models\test\SourceType;
 use DomainException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -35,10 +37,6 @@ class StoryTest extends ActiveRecord
 
     public const LOCAL = 0;
     public const REMOTE = 1;
-
-    public const TEST = 1;
-    public const NEO = 2;
-    public const LIST = 3;
 
     public $question_list = [];
     public $question_number;
@@ -113,12 +111,12 @@ class StoryTest extends ActiveRecord
 
     public static function getRemoteTestArray(): array
     {
-        return ArrayHelper::map(self::find()->where('source = :source', [':source' => self::NEO])->orderBy(['title' => SORT_ASC])->all(), 'id', 'title');
+        return ArrayHelper::map(self::find()->where('source = :source', [':source' => SourceType::NEO])->orderBy(['title' => SORT_ASC])->all(), 'id', 'title');
     }
 
     public static function getLocalTestArray(): array
     {
-        return ArrayHelper::map(self::find()->where('source = :source', [':source' => self::LIST])->orderBy(['title' => SORT_ASC])->all(), 'id', 'title');
+        return ArrayHelper::map(self::find()->where('source = :source', [':source' => SourceType::LIST])->orderBy(['title' => SORT_ASC])->all(), 'id', 'title');
     }
 
     public static function findModel($id): self
@@ -131,7 +129,7 @@ class StoryTest extends ActiveRecord
 
     public function isRemote()
     {
-        return (int) $this->source === self::NEO;
+        return (int) $this->source === SourceType::NEO;
     }
 
     public function haveQuestions()
@@ -157,7 +155,7 @@ class StoryTest extends ActiveRecord
             ->all();
     }
 
-    public static function create(string $title, string $header, string $description, string $incorrectAnswerText, int $remote = self::LOCAL, int $source = self::TEST)
+    public static function create(string $title, string $header, string $description, string $incorrectAnswerText, int $remote = self::LOCAL, int $source = SourceType::TEST)
     {
         $model = new self();
         $model->title = $title;
@@ -178,7 +176,7 @@ class StoryTest extends ActiveRecord
                                          string $questionName,
                                          string $questionParams)
     {
-        $model = self::create($title, $header, $description, $incorrectAnswerText, self::REMOTE, self::NEO);
+        $model = self::create($title, $header, $description, $incorrectAnswerText, self::REMOTE, SourceType::NEO);
         $model->parent_id = $parentID;
         $model->question_list_id = $questionID;
         $model->question_list_name = $questionName;
@@ -194,52 +192,29 @@ class StoryTest extends ActiveRecord
         return self::findOne($this->parent_id);
     }
 
-    public static function testSourcesAsArray()
-    {
-        return [
-            self::TEST => 'Тест',
-            self::NEO => 'Neo4j',
-            self::LIST => 'Список слов',
-        ];
-    }
-
     public function isSourceTest()
     {
-        return (int) $this->source === self::TEST;
+        return (int) $this->source === SourceType::TEST;
     }
 
     public function isSourceWordList()
     {
-        return (int) $this->source === self::LIST;
-    }
-
-    public static function sourceText(int $source)
-    {
-        $values = self::testSourcesAsArray();
-        return $values[$source];
-    }
-
-    public const ANSWER_TYPE_DEFAULT = 0;
-    public const ANSWER_TYPE_NUMPAD = 1;
-    public const ANSWER_TYPE_INPUT = 2;
-
-    public static function answerTypeAsArray()
-    {
-        return [
-            self::ANSWER_TYPE_DEFAULT => 'По умолчанию',
-            self::ANSWER_TYPE_NUMPAD => 'Цифровая клавиатура',
-            self::ANSWER_TYPE_INPUT => 'Поле для ввода',
-        ];
+        return (int) $this->source === SourceType::LIST;
     }
 
     public function isAnswerTypeNumPad()
     {
-        return (int) $this->answer_type === self::ANSWER_TYPE_NUMPAD;
+        return (int) $this->answer_type === AnswerType::NUMPAD;
     }
 
     public function isAnswerTypeInput()
     {
-        return (int) $this->answer_type === self::ANSWER_TYPE_INPUT;
+        return (int) $this->answer_type === AnswerType::INPUT;
+    }
+
+    public function isAnswerTypeRecording()
+    {
+        return (int) $this->answer_type === AnswerType::RECORDING;
     }
 
 }

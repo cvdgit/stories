@@ -3,7 +3,7 @@
 namespace frontend\controllers;
 
 use backend\components\training\base\Serializer;
-use backend\components\WordTestBuilder;
+use backend\components\training\collection\WordTestBuilder;
 use common\models\StoryTest;
 use common\models\TestWordList;
 use common\models\UserQuestionHistoryModel;

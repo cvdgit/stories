@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\models\test\SourceType;
 use yii\base\Model;
 use yii\db\Query;
 
@@ -174,17 +175,17 @@ class UserQuestionHistoryModel extends Model
 
     public function isSourceTest()
     {
-        return (int) $this->source === StoryTest::TEST;
+        return (int) $this->source === SourceType::TEST;
     }
 
     public function isSourceWordList()
     {
-        return (int) $this->source === StoryTest::LIST;
+        return (int) $this->source === SourceType::LIST;
     }
 
     public function isSourceNeo()
     {
-        return (int) $this->source === StoryTest::NEO;
+        return (int) $this->source === SourceType::NEO;
     }
 
 }

@@ -1,4 +1,5 @@
 <?php
+use common\models\test\SourceType;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 /** @var $this yii\web\View */
@@ -12,7 +13,7 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'header')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'description_text')->textarea(['rows' => 6]) ?>
     <?= $form->field($model, 'incorrect_answer_text')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'source')->dropDownList(\common\models\StoryTest::testSourcesAsArray()) ?>
+    <?= $form->field($model, 'source')->dropDownList(SourceType::asArray()) ?>
 
     <div class="remote-questions-block" style="display: <?= $model->isRemote() ? 'block' : 'none' ?>">
         <?= $form->field($model, 'question_list')->dropDownList([], ['prompt' => 'Загрузка...', 'disabled' => true]) ?>
@@ -24,7 +25,7 @@ use yii\widgets\ActiveForm;
         <?= $form->field($model, 'word_list_id')->dropDownList(\common\models\TestWordList::getWordListAsArray(), ['prompt' => 'Выберите список слов']) ?>
     </div>
 
-    <?= $form->field($model, 'answer_type')->dropDownList(\common\models\StoryTest::answerTypeAsArray()) ?>
+    <?= $form->field($model, 'answer_type')->dropDownList(\common\models\test\AnswerType::asArray()) ?>
 
     <div class="form-group">
         <?= Html::submitButton(($model->isNewRecord ? 'Создать' : 'Изменить') . ' тест', ['class' => 'btn btn-success']) ?>
@@ -35,9 +36,9 @@ use yii\widgets\ActiveForm;
 <?php
 $selected = strtolower(var_export($model->question_list_id, true));
 $isSourceNeo = var_export($model->isRemote(), true);
-$sourceTest = \common\models\StoryTest::TEST;
-$sourceNeo = \common\models\StoryTest::NEO;
-$sourceList = \common\models\StoryTest::LIST;
+$sourceTest = SourceType::TEST;
+$sourceNeo = SourceType::NEO;
+$sourceList = SourceType::LIST;
 $js = <<< JS
 var loaded = false;
 var selected = parseInt($selected);

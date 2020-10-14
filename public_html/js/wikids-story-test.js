@@ -163,6 +163,10 @@ var WikidsStoryTest = (function() {
         return this.answerType === 2;
     }
 
+    TestConfig.prototype.answerTypeIsRecording = function() {
+        return this.answerType === 3;
+    }
+
     var testConfig;
 
     function init(remote, for_slide, testResponse, element) {
@@ -607,6 +611,20 @@ var WikidsStoryTest = (function() {
         return $wrapper;
     }
 
+    function createRecordingAnswer(question, answer) {
+        return answerTypeRecording.create(question, answer);
+    }
+
+    function createRecordingAnswers(question, answers) {
+        var $answers = $("<div/>").addClass("wikids-test-answers");
+        answers.forEach(function(answer) {
+            $answers.append(createRecordingAnswer(question, answer));
+        });
+        var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-4 question-image"></div><div class="col-md-8 question-wrapper"></div></div>');
+        $wrapper.find(".question-wrapper").append($answers);
+        return $wrapper;
+    }
+
     function appendStars($elem, total, current) {
         $elem.empty();
         for (var i = 0, $star, className; i < total; i++) {
@@ -682,6 +700,9 @@ var WikidsStoryTest = (function() {
             if (testConfig.answerTypeIsInput()) {
                 view = 'input';
             }
+            if (testConfig.answerTypeIsRecording()) {
+                view = 'recording';
+            }
 
             var $answers;
             switch (view) {
@@ -693,6 +714,9 @@ var WikidsStoryTest = (function() {
                     break;
                 case 'input':
                     $answers = createInputAnswers(question, getAnswersData(question));
+                    break;
+                case 'recording':
+                    $answers = createRecordingAnswers(question, getAnswersData(question));
                     break;
                 default:
                     $answers = createAnswers(getAnswersData(question), question);
@@ -875,6 +899,14 @@ var WikidsStoryTest = (function() {
         return [val.toLowerCase()];
     }
 
+    function getRecognitionQuestionAnswers(element) {
+        var val = answerTypeRecording.getResult();
+        if (!val.length) {
+            return [];
+        }
+        return [val.toLowerCase()];
+    }
+
     var answerIsCorrect,
         currentQuestion;
 
@@ -907,6 +939,8 @@ var WikidsStoryTest = (function() {
     /* Ответ на вопрос */
     function nextQuestion() {
 
+        console.debug('WikidsStoryTest.nextQuestion');
+
         var $activeQuestion = $('.wikids-test-active-question');
         currentQuestion = $activeQuestion.data('question');
 
@@ -916,6 +950,9 @@ var WikidsStoryTest = (function() {
         }
         if (testConfig.answerTypeIsInput()) {
             view = 'input';
+        }
+        if (testConfig.answerTypeIsRecording()) {
+            view = 'recognition';
         }
 
         var answer = [];
@@ -930,6 +967,10 @@ var WikidsStoryTest = (function() {
                 break;
             case 'input':
                 answer = getInputQuestionAnswers($activeQuestion);
+                break;
+            case 'recognition':
+                answer = getRecognitionQuestionAnswers($activeQuestion);
+                answerTypeRecording.resetResult();
                 break;
             default:
                 answer = getQuestionAnswers($activeQuestion);
@@ -948,14 +989,14 @@ var WikidsStoryTest = (function() {
                 return parseInt(elem.name);
             };
         }
-        if (view === 'input') {
+        if (view === 'input' || view === 'recognition') {
             correctAnswersCallback = function(elem) {
                 return elem.name.toLowerCase();
             };
             convertAnswerToInt = false;
         }
         answerIsCorrect = answerQuestion($activeQuestion, answer, correctAnswersCallback, convertAnswerToInt);
-        console.log(answerIsCorrect);
+        // console.debug(answerIsCorrect);
 
         if (answerIsCorrect) {
             if (currentQuestion['stars']) {
@@ -970,7 +1011,7 @@ var WikidsStoryTest = (function() {
             else {
                 skipQuestion.push(currentQuestion.id);
             }
-            if (testConfig.sourceIsLocal()) { // !remoteTest
+            if (testConfig.sourceIsLocal()) {
                 testProgress.inc();
             }
         }
@@ -1093,7 +1134,7 @@ var WikidsStoryTest = (function() {
 
         dom.nextButton.hide();
         if (!answerIsCorrect) {
-            if (testConfig.sourceIsWord() && !testConfig.answerTypeIsNumPad() && !testConfig.answerTypeIsInput()) {
+            if (testConfig.sourceIsWord() && !testConfig.answerTypeIsNumPad() && !testConfig.answerTypeIsInput() && !testConfig.answerTypeIsRecording()) {
                 continueTestAction(answer);
             }
             else {
@@ -1121,12 +1162,13 @@ var WikidsStoryTest = (function() {
         console.debug('WikidsStoryTest.showNextQuestion');
 
         var nextQuestion = testQuestions.shift();
+        currentQuestion = nextQuestion;
         $('.wikids-test-question[data-question-id=' + nextQuestion.id + ']', dom.questions)
             .find('input[type=checkbox],input[type=radio]').prop('checked', false).end()
             .slideDown()
             .addClass('wikids-test-active-question');
 
-        if (testConfig.answerTypeIsNumPad() || testConfig.answerTypeIsInput()) {
+        if (testConfig.answerTypeIsNumPad() || testConfig.answerTypeIsInput() || testConfig.answerTypeIsRecording()) {
             dom.nextButton.hide();
         }
 
@@ -1151,6 +1193,11 @@ var WikidsStoryTest = (function() {
                     e.preventDefault();
                     testSpeech.ReadText(text);
                 });
+        }
+
+        if (testConfig.answerTypeIsRecording()) {
+
+            answerTypeRecording.autoStart(new Event('autoStart'));
         }
     }
 
@@ -1203,7 +1250,7 @@ var WikidsStoryTest = (function() {
     }
 
     function showNextButton() {
-        if (!testConfig.answerTypeIsNumPad() && !testConfig.answerTypeIsInput()) {
+        if (!testConfig.answerTypeIsNumPad() && !testConfig.answerTypeIsInput() && !testConfig.answerTypeIsRecording()) {
             dom.nextButton.show();
         }
     }
@@ -1294,7 +1341,9 @@ var WikidsStoryTest = (function() {
             dataUrl = url;
             params = params || {};
             dataParams = params;
-        }
+        },
+        "getCurrentQuestion": getCurrentQuestion,
+        "nextQuestion": nextQuestion
     };
 })();
 
@@ -1387,3 +1436,166 @@ testSpeech.ReadText = function(txt) {
     ttsSpeechChunk.rate = testSpeech.Rate;
     testSpeech.Synth.speak(ttsSpeechChunk);
 };
+
+
+var answerTypeRecording = {};
+answerTypeRecording.elements = [];
+
+answerTypeRecording.create = function(question, answer) {
+
+    var element = $('<div/>');
+    element
+        .append($('<p/>').addClass('recognition-status'));
+
+    $('<a/>')
+        .attr('href', '#')
+        .on('click', function(e) {
+            e.preventDefault();
+            answerTypeRecording.autoStart(e);
+        })
+        .append($('<i/>').addClass('glyphicon glyphicon-record'))
+        .appendTo(element);
+
+    element
+        .append($('<p/>').addClass('recognition-result'));
+
+    answerTypeRecording.elements[question.id] = element;
+    return element;
+};
+
+answerTypeRecording.autoStart = function(e) {
+
+    setTimeout(function() {
+        testRecognition.Start(e);
+    }, 1000);
+
+    setTimeout(function() {
+        testRecognition.Stop();
+        answerTypeRecording.setStatus('Запись завершена. Проверка результата...');
+    }, 5000);
+};
+
+answerTypeRecording.getElement = function() {
+    var currentQuestion = WikidsStoryTest.getCurrentQuestion();
+    return answerTypeRecording.elements[currentQuestion.id];
+}
+answerTypeRecording.setStatus = function(statusText) {
+    answerTypeRecording.getElement()
+        .find('.recognition-status').text(statusText);
+};
+answerTypeRecording.setResult = function(text) {
+    answerTypeRecording.getElement()
+        .find('.recognition-result').text(text);
+}
+answerTypeRecording.getResult = function() {
+    return answerTypeRecording.getElement()
+        .find('.recognition-result').text();
+}
+answerTypeRecording.resetResult = function() {
+    answerTypeRecording.setResult('');
+}
+
+var testRecognition = {};
+testRecognition.recognizing = false;
+testRecognition.start_timestamp = null;
+testRecognition.recorder = new webkitSpeechRecognition();
+testRecognition.recorder.continuous = true;
+testRecognition.recorder.interimResults = true;
+
+testRecognition.Stop = function() {
+    testRecognition.recorder.stop();
+}
+
+testRecognition.Start = function(event) {
+
+    if (testRecognition.recognizing) {
+        testRecognition.recorder.stop();
+        return;
+    }
+
+    testRecognition.final_transcript = '';
+    testRecognition.recorder.lang = 'ru-RU';
+    testRecognition.recorder.start();
+
+    //ignore_onend = false;
+    //final_span.innerHTML = '';
+    //interim_span.innerHTML = '';
+    //start_img.src = '/intl/en/chrome/assets/common/images/content/mic-slash.gif';
+
+    testRecognition.start_timestamp = event.timeStamp;
+};
+
+testRecognition.recorder.onstart = function() {
+    testRecognition.recognizing = true;
+    answerTypeRecording.setStatus('Запись с микрофона...');
+};
+
+testRecognition.recorder.onerror = function(event) {
+    console.log('error');
+    if (event.error === 'no-speech') {
+        //start_img.src = '/intl/en/chrome/assets/common/images/content/mic.gif';
+        //showInfo('info_no_speech');
+        //ignore_onend = true;
+        answerTypeRecording.setStatus('no-speech');
+    }
+    if (event.error === 'audio-capture') {
+        //start_img.src = '/intl/en/chrome/assets/common/images/content/mic.gif';
+        //showInfo('info_no_microphone');
+        //ignore_onend = true;
+        answerTypeRecording.setStatus('audio-capture');
+    }
+    if (event.error === 'not-allowed') {
+        //if (event.timeStamp - start_timestamp < 100) {
+        //    showInfo('info_blocked');
+        //} else {
+        //    showInfo('info_denied');
+        //}
+        //ignore_onend = true;
+        answerTypeRecording.setStatus('not-allowed');
+    }
+};
+
+testRecognition.recorder.onend = function() {
+
+    testRecognition.recognizing = false;
+    var result = answerTypeRecording.getResult();
+    if (result.length) {
+        WikidsStoryTest.nextQuestion();
+    }
+    else {
+        answerTypeRecording.setStatus('Ответ не получен');
+    }
+};
+
+testRecognition.final_transcript = '';
+testRecognition.recorder.onresult = function(event) {
+
+    var interim_transcript = '';
+    if (typeof(event.results) == 'undefined') {
+        testRecognition.recorder.onend = null;
+        testRecognition.recorder.stop();
+        return;
+    }
+
+    for (var i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+            testRecognition.final_transcript += event.results[i][0].transcript;
+        } else {
+            interim_transcript += event.results[i][0].transcript;
+        }
+    }
+
+    testRecognition.final_transcript = testRecognition.capitalize(testRecognition.final_transcript);
+    answerTypeRecording.setResult(testRecognition.linebreak(testRecognition.final_transcript));
+};
+
+testRecognition.linebreak = function(s) {
+    var two_line = /\n\n/g;
+    var one_line = /\n/g;
+    return s.replace(two_line, '<p></p>').replace(one_line, '<br>');
+};
+
+testRecognition.capitalize = function(s) {
+    var first_char = /\S/;
+    return s.replace(first_char, function(m) { return m.toUpperCase(); });
+}

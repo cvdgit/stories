@@ -1,10 +1,8 @@
 <?php
 
-namespace backend\components;
+namespace backend\components\training\collection;
 
-use backend\components\training\base\Answer;
 use backend\components\training\base\QuestionCollection;
-use backend\components\training\local\WordQuestion;
 use common\models\StoryTest;
 
 class WordTestBuilder
@@ -23,19 +21,27 @@ class WordTestBuilder
         $this->collection = new QuestionCollection($dataCount);
     }
 
+    private function create(string $className)
+    {
+        return \Yii::createObject($className, [
+            $this->test->id, $this->data, $this->stars
+        ]);
+    }
+
     public function build()
     {
-
         if ($this->test->isAnswerTypeNumPad()) {
-            (new NumPadBuilder($this->test->id, $this->data, $this->stars))->build($this->collection);
+            $this->create(NumPadBuilder::class)->build($this->collection);
         }
         else if ($this->test->isAnswerTypeInput()) {
-            (new InputBuilder($this->test->id, $this->data, $this->stars))->build($this->collection);
+            $this->create(InputBuilder::class)->build($this->collection);
+        }
+        else if ($this->test->isAnswerTypeRecording()) {
+            $this->create(RecordingCollection::class)->build($this->collection);
         }
         else {
-            (new CorrectIncorrectBuilder($this->test->id, $this->data, $this->stars))->build($this->collection);
+            $this->create(CorrectIncorrectBuilder::class)->build($this->collection);
         }
-
         return $this->collection;
     }
 
