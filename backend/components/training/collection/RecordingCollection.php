@@ -11,7 +11,8 @@ class RecordingCollection extends BaseCollection
     public function createQuestion(int $testID, array $word, int $stars)
     {
         $question = new WordQuestion($testID, $word['id'], $word['name'], true,0, 0, $stars);
-        $question->addAnswer(new Answer(1, $word['name'], true));
+        $correctAnswer = empty($word['correct_answer']) ? $word['name'] : $word['correct_answer'];
+        $question->addAnswer(new Answer(1, $correctAnswer, true));
         return $question;
     }
 

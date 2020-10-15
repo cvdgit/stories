@@ -26,8 +26,7 @@ class CreateWordForm extends Model
     {
         return [
             [['name'], 'required'],
-            [['name'], 'string', 'max' => 255],
-            ['correct_answer', 'integer'],
+            [['name', 'correct_answer'], 'string', 'max' => 255],
         ];
     }
 

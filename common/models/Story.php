@@ -203,6 +203,11 @@ class Story extends ActiveRecord
         return self::find()->published()->with('categories')->with('userStoryHistories');
     }
 
+    public static function findPublishedStoriesModerator()
+    {
+        return self::find()->with('categories')->with('userStoryHistories');
+    }
+
     public static function getStatusArray()
     {
         return [

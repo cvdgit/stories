@@ -1087,11 +1087,17 @@ var WikidsStoryTest = (function() {
                 $.post('/question/answer', answerParams);
             }
             if (testConfig.sourceIsWord() && !testConfig.answerTypeIsInput()) {
-                answerList = answer.map(function (entity_id) {
+/*                answerList = answer.map(function (entity_id) {
                     var answer = answerByID(currentQuestion, entity_id);
                     return {
                         'answer_entity_id': entity_id,
                         'answer_entity_name': answer ? answer.name : entity_id
+                    };
+                });*/
+                answerList = answer.map(function (answerText) {
+                    return {
+                        'answer_entity_id': currentQuestion.id,
+                        'answer_entity_name': answerText
                     };
                 });
                 answerParams = {

@@ -5,7 +5,9 @@ namespace frontend\models;
 
 
 use common\models\Story;
+use common\rbac\UserRoles;
 use frontend\components\StorySorter as Sort;
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -39,7 +41,12 @@ class StorySearch extends Model
      */
     public function search($params): ActiveDataProvider
     {
-        $query = Story::findPublishedStories();
+        //if (UserRoles::canModerator()) {
+            //$query = Story::findPublishedStoriesModerator();
+        //}
+        //else {
+            $query = Story::findPublishedStories();
+        //}
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

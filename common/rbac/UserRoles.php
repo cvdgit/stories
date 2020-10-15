@@ -33,4 +33,9 @@ class UserRoles
         return $role->name === self::ROLE_MODERATOR;
     }
 
+    public static function canModerator()
+    {
+        return Yii::$app->user->can(self::ROLE_MODERATOR);
+    }
+
 }
