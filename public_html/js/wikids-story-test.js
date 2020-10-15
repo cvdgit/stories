@@ -1478,7 +1478,7 @@ answerTypeRecording.autoStart = function(e) {
     setTimeout(function() {
         testRecognition.Stop();
         answerTypeRecording.setStatus('Запись завершена. Проверка результата...');
-    }, 5000);
+    }, 10000);
 };
 
 answerTypeRecording.getElement = function() {
