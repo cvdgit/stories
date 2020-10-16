@@ -12,6 +12,7 @@ class RecordingCollection extends BaseCollection
     {
         $question = new WordQuestion($testID, $word['id'], $word['name'], true,0, 0, $stars);
         $correctAnswer = empty($word['correct_answer']) ? $word['name'] : $word['correct_answer'];
+        $correctAnswer = trim(preg_replace('/[^A-ZА-Я0-9\-\sё]/ui', '', $correctAnswer));
         $question->addAnswer(new Answer(1, $correctAnswer, true));
         return $question;
     }

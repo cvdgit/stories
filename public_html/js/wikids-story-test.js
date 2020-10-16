@@ -620,7 +620,7 @@ var WikidsStoryTest = (function() {
         answers.forEach(function(answer) {
             $answers.append(createRecordingAnswer(question, answer));
         });
-        var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-4 question-image"></div><div class="col-md-8 question-wrapper"></div></div>');
+        var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-12 question-wrapper"></div></div>');
         $wrapper.find(".question-wrapper").append($answers);
         return $wrapper;
     }
@@ -908,7 +908,8 @@ var WikidsStoryTest = (function() {
     }
 
     var answerIsCorrect,
-        currentQuestion;
+        currentQuestion,
+        currentQuestionElement;
 
     function getCurrentQuestion() {
         return currentQuestion;
@@ -1169,7 +1170,10 @@ var WikidsStoryTest = (function() {
 
         var nextQuestion = testQuestions.shift();
         currentQuestion = nextQuestion;
-        $('.wikids-test-question[data-question-id=' + nextQuestion.id + ']', dom.questions)
+
+        currentQuestionElement = $('.wikids-test-question[data-question-id=' + nextQuestion.id + ']', dom.questions);
+
+        currentQuestionElement
             .find('input[type=checkbox],input[type=radio]').prop('checked', false).end()
             .slideDown()
             .addClass('wikids-test-active-question');
@@ -1349,7 +1353,10 @@ var WikidsStoryTest = (function() {
             dataParams = params;
         },
         "getCurrentQuestion": getCurrentQuestion,
-        "nextQuestion": nextQuestion
+        "nextQuestion": nextQuestion,
+        "getCurrentQuestionElement": function() {
+            return currentQuestionElement;
+        }
     };
 })();
 
@@ -1450,35 +1457,66 @@ answerTypeRecording.elements = [];
 answerTypeRecording.create = function(question, answer) {
 
     var element = $('<div/>');
+    element.addClass('test-recognition');
+
+    $('<div/>')
+        .addClass('wikids-test-loader')
+        .append($('<img/>').attr('src', '/img/loading.gif'))
+        .hide()
+        .appendTo(element);
+
     element
         .append($('<p/>').addClass('recognition-status'));
 
     $('<a/>')
         .attr('href', '#')
+        .attr('title', 'Повторить ввод с микрофона')
+        .addClass('recognition-repeat')
         .on('click', function(e) {
             e.preventDefault();
             answerTypeRecording.autoStart(e);
         })
-        .append($('<i/>').addClass('glyphicon glyphicon-record'))
+        .append($('<i/>').addClass('glyphicon glyphicon-refresh'))
+        .hide()
         .appendTo(element);
 
     element
-        .append($('<p/>').addClass('recognition-result'));
+        .append($('<p/>').addClass('recognition-result').hide());
 
     answerTypeRecording.elements[question.id] = element;
+
     return element;
 };
 
 answerTypeRecording.autoStart = function(e) {
 
-    setTimeout(function() {
-        testRecognition.Start(e);
-    }, 1000);
+    answerTypeRecording.setStatus('Инициализация');
+    answerTypeRecording.repeatButtonHide();
 
     setTimeout(function() {
-        testRecognition.Stop();
-        answerTypeRecording.setStatus('Запись завершена. Проверка результата...');
-    }, 10000);
+        answerTypeRecording.showLoader();
+        testRecognition.Start(e);
+    }, 1000);
+};
+
+answerTypeRecording.repeatButtonShow = function() {
+    answerTypeRecording.getElement()
+        .find('.recognition-repeat').show();
+};
+
+answerTypeRecording.repeatButtonHide = function() {
+    answerTypeRecording.getElement()
+        .find('.recognition-repeat').hide();
+};
+
+answerTypeRecording.showLoader = function() {
+    answerTypeRecording.getElement()
+        .find('.wikids-test-loader').show();
+};
+
+answerTypeRecording.hideLoader = function() {
+    answerTypeRecording.getElement()
+        .find('.wikids-test-loader').hide();
 };
 
 answerTypeRecording.getElement = function() {
@@ -1523,58 +1561,51 @@ testRecognition.Start = function(event) {
     testRecognition.recorder.lang = 'ru-RU';
     testRecognition.recorder.start();
 
-    //ignore_onend = false;
-    //final_span.innerHTML = '';
-    //interim_span.innerHTML = '';
-    //start_img.src = '/intl/en/chrome/assets/common/images/content/mic-slash.gif';
-
     testRecognition.start_timestamp = event.timeStamp;
 };
 
 testRecognition.recorder.onstart = function() {
     testRecognition.recognizing = true;
-    answerTypeRecording.setStatus('Запись с микрофона...');
+    answerTypeRecording.setStatus('Идет запись с микрофона');
 };
 
 testRecognition.recorder.onerror = function(event) {
-    console.log('error');
+
+    answerTypeRecording.hideLoader();
+
+    var ignore_onend = false;
     if (event.error === 'no-speech') {
-        //start_img.src = '/intl/en/chrome/assets/common/images/content/mic.gif';
-        //showInfo('info_no_speech');
-        //ignore_onend = true;
-        answerTypeRecording.setStatus('no-speech');
+        answerTypeRecording.setStatus('Речи не обнаружено');
     }
-    if (event.error === 'audio-capture') {
-        //start_img.src = '/intl/en/chrome/assets/common/images/content/mic.gif';
-        //showInfo('info_no_microphone');
-        //ignore_onend = true;
-        answerTypeRecording.setStatus('audio-capture');
+    else if (event.error === 'audio-capture') {
+        answerTypeRecording.setStatus('Не удалось захватить звук');
     }
-    if (event.error === 'not-allowed') {
-        //if (event.timeStamp - start_timestamp < 100) {
-        //    showInfo('info_blocked');
-        //} else {
-        //    showInfo('info_denied');
-        //}
-        //ignore_onend = true;
-        answerTypeRecording.setStatus('not-allowed');
+    else if (event.error === 'not-allowed') {
+        answerTypeRecording.setStatus('Пользовательский агент запретил ввод речи из соображений безопасности, конфиденциальности или предпочтений пользователя.');
+    }
+    else {
+        answerTypeRecording.setStatus(event.error);
     }
 };
 
 testRecognition.recorder.onend = function() {
-
+    answerTypeRecording.hideLoader();
     testRecognition.recognizing = false;
     var result = answerTypeRecording.getResult();
     if (result.length) {
         WikidsStoryTest.nextQuestion();
     }
     else {
-        answerTypeRecording.setStatus('Ответ не получен');
+        answerTypeRecording.setStatus('Речи не обнаружено');
+        answerTypeRecording.repeatButtonShow();
     }
 };
 
 testRecognition.final_transcript = '';
+testRecognition.resultTimeout = 0;
 testRecognition.recorder.onresult = function(event) {
+
+    clearTimeout(testRecognition.resultTimeout);
 
     var interim_transcript = '';
     if (typeof(event.results) == 'undefined') {
@@ -1593,7 +1624,17 @@ testRecognition.recorder.onresult = function(event) {
 
     testRecognition.final_transcript = testRecognition.capitalize(testRecognition.final_transcript);
     answerTypeRecording.setResult(testRecognition.linebreak(testRecognition.final_transcript));
+
+    if (testRecognition.final_transcript.length) {
+        testRecognition.resultTimeout = setTimeout(function() {
+            testRecognition.recorder.stop();
+        }, 1500);
+    }
 };
+
+testRecognition.recorder.onspeechend = function() {
+
+}
 
 testRecognition.linebreak = function(s) {
     var two_line = /\n\n/g;
@@ -1605,3 +1646,25 @@ testRecognition.capitalize = function(s) {
     var first_char = /\S/;
     return s.replace(first_char, function(m) { return m.toUpperCase(); });
 }
+
+
+var SlideLoader = (function() {
+
+    var $element = $('<div/>')
+        .addClass('wikids-test-loader')
+        .append($('<p/>').text('Загрузка вопросов'))
+        .append($('<img/>').attr('src', '/img/loading.gif'));
+
+    function show() {
+        WikidsStoryTest.getCurrentQuestionElement().append($element);
+    }
+
+    function hide() {
+
+    }
+
+    return {
+        'show': show,
+        'hide': hide
+    };
+})();

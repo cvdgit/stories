@@ -2196,3 +2196,22 @@ p.wikids-test-description {
 	border-color: #808080;
 	cursor: pointer;
 }
+
+.test-recognition {
+	text-align: center;
+}
+
+.test-recognition .recognition-status {
+	font-size: 2rem;
+}
+
+.test-recognition .wikids-test-loader {
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.test-recognition .recognition-repeat {
+	font-size: 5rem;
+	color: red;
+	margin-top: 40px;
+}
