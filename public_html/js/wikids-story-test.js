@@ -1248,7 +1248,27 @@ var WikidsStoryTest = (function() {
                         });
                     $content.append($image);
                 }
-                $content.append($('<p/>').text(questionAnswer.name));
+
+                var $answerElement;
+                if (testConfig.answerTypeIsRecording()) {
+                    $answerElement = $('<p/>')
+                        .append($('<span/>').text(questionAnswer.name))
+                        .append($('<a/>')
+                            .attr('href', '#')
+                            .attr('title', 'Прослушать')
+                            .css('font-size', '3rem')
+                            .on('click', function(e) {
+                                e.preventDefault();
+                                testSpeech.ReadText(questionAnswer.name);
+                            })
+                            .html('<i class="glyphicon glyphicon-volume-up" style="left: 10px; top: 6px"></i>')
+                        );
+                }
+                else {
+                    $answerElement = $('<p/>').text(questionAnswer.name);
+                }
+                $content.append($answerElement);
+
                 $elements.append($element.append($content));
             }
         });
