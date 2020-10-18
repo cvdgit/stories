@@ -353,15 +353,19 @@ var WikidsStoryTest = (function() {
             .append($('<h3/>').text('При загрузке теста произошла ошибка'));
     }
 
+    function correctAnswerPageNext() {
+        dom.correctAnswerPage.hide();
+        showNextQuestion();
+        dom.results.hide();
+        showNextButton();
+    }
+
     function createCorrectAnswerPage() {
         var $action = $('<button/>')
             .addClass('btn')
             .text('Продолжить')
             .on('click', function() {
-                dom.correctAnswerPage.hide();
-                showNextQuestion();
-                dom.results.hide();
-                showNextButton();
+                correctAnswerPageNext();
             });
         return $('<div/>')
             .addClass('wikids-test-correct-answer-page')
@@ -1234,10 +1238,14 @@ var WikidsStoryTest = (function() {
         $elements.append($('<h4/>').text(text + ':'));
 
         var $element;
+        var answerText = '';
         getAnswersData(question).forEach(function(questionAnswer) {
             $element = $('<div/>').addClass('row');
             var $content = $('<div/>').addClass('col-md-offset-3 col-md-9');
             if (parseInt(questionAnswer.is_correct) === 1) {
+
+                answerText = questionAnswer.name;
+
                 if (questionAnswer.image) {
                     var $image = $('<img/>')
                         .attr("src", questionAnswer.image)
@@ -1277,6 +1285,12 @@ var WikidsStoryTest = (function() {
             //.find('.wikids-test-correct-answer-page-header').text(question.name).end()
             .find('.wikids-test-correct-answer-answers').empty().html($elements[0].childNodes).end()
             .show();
+
+        if (testConfig.answerTypeIsRecording()) {
+            setTimeout(function() {
+                testSpeech.ReadText(answerText, correctAnswerPageNext);
+            }, 1000);
+        }
     }
 
     function showNextButton() {
@@ -1463,10 +1477,13 @@ testSpeech.Voices = [];
 testSpeech.Voices = testSpeech.Synth.getVoices();
 testSpeech.VoiceIndex = 0;
 testSpeech.Rate = 0.85;
-testSpeech.ReadText = function(txt) {
+testSpeech.ReadText = function(txt, afterSpeech) {
     var ttsSpeechChunk = new SpeechSynthesisUtterance(txt);
     ttsSpeechChunk.voice = testSpeech.Voices[testSpeech.VoiceIndex];
     ttsSpeechChunk.rate = testSpeech.Rate;
+    if (afterSpeech) {
+        ttsSpeechChunk.onend = afterSpeech;
+    }
     testSpeech.Synth.speak(ttsSpeechChunk);
 };
 
