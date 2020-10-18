@@ -361,7 +361,7 @@ var WikidsStoryTest = (function() {
                 dom.correctAnswerPage.hide();
                 showNextQuestion();
                 dom.results.hide();
-                dom.nextButton.show();
+                showNextButton();
             });
         return $('<div/>')
             .addClass('wikids-test-correct-answer-page')
@@ -1141,7 +1141,7 @@ var WikidsStoryTest = (function() {
 
         dom.nextButton.hide();
         if (!answerIsCorrect) {
-            if (testConfig.sourceIsWord() && !testConfig.answerTypeIsNumPad() && !testConfig.answerTypeIsInput() && !testConfig.answerTypeIsRecording()) {
+            if (testConfig.sourceIsWord() && !testConfig.answerTypeIsNumPad() && !testConfig.answerTypeIsInput()) {
                 continueTestAction(answer);
             }
             else {
@@ -1275,7 +1275,7 @@ var WikidsStoryTest = (function() {
         if (isLastQuestion) {
             if (!testConfig.sourceIsLocal()) {
                 if (!answerIsCorrect) {
-                    if (testConfig.sourceIsWord()) {
+                    if (testConfig.sourceIsWord() && !testConfig.answerTypeIsRecording()) {
                         showNextQuestion();
                         dom.results.hide();
                         showNextButton();
@@ -1294,7 +1294,7 @@ var WikidsStoryTest = (function() {
         }
         else {
             if (!answerIsCorrect && !testConfig.sourceIsLocal()) {
-                    if (testConfig.sourceIsWord()) {
+                    if (testConfig.sourceIsWord() && !testConfig.answerTypeIsRecording()) {
                         showNextQuestion();
                         dom.results.hide();
                         showNextButton();
