@@ -1518,7 +1518,7 @@ answerTypeRecording.create = function(question, answer) {
         .appendTo(element);
 
     element
-        .append($('<p/>').addClass('recognition-result').hide());
+        .append($('<p/>').addClass('recognition-result'));
 
     answerTypeRecording.elements[question.id] = element;
 
