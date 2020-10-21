@@ -610,7 +610,7 @@ var WikidsStoryTest = (function() {
         answers.forEach(function(answer) {
             $answers.append(createInputAnswer(question, answer));
         });
-        var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-12 question-wrapper"></div></div>');
+        var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-12 question-wrapper text-center"></div></div>');
         $wrapper.find(".question-wrapper").append($answers);
         return $wrapper;
     }
