@@ -1507,22 +1507,28 @@ answerTypeRecording.create = function(question, answer) {
             .addClass('recognition-result-wrapper')
             .append($('<span/>').prop('contenteditable', true).addClass('recognition-result'))
             .append($('<span/>').addClass('recognition-result-interim'))
-            .append($('<a/>')
-                .attr('href', '#')
-                .attr('title', 'Повторить фрагмент')
-                .on('click', function(e) {
-                    e.preventDefault();
-                    var range = window.getSelection().getRangeAt(0);
-                    if (!range.toString().length) {
-                        return;
-                    }
-                    answerTypeRecording.startFragment(range, e);
-                })
-                .hide()
-                .addClass('recognition-repeat-word')
-                .append($('<i/>').addClass('glyphicon glyphicon-refresh'))
-            )
         );
+
+    element.append(
+        $('<div/>')
+            .css('text-align', 'center')
+            .append(
+                $('<a/>')
+                    .attr('href', '#')
+                    .attr('title', 'Повторить фрагмент')
+                    .on('click', function(e) {
+                        e.preventDefault();
+                        var range = window.getSelection().getRangeAt(0);
+                        if (!range.toString().length) {
+                            return;
+                        }
+                        answerTypeRecording.startFragment(range, e);
+                    })
+                    .hide()
+                    .addClass('recognition-repeat-word')
+                    .append($('<i/>').addClass('glyphicon glyphicon-refresh'))
+        )
+    );
 
     $('<div/>')
         .addClass('wikids-test-loader')
@@ -1561,7 +1567,6 @@ answerTypeRecording.create = function(question, answer) {
         .appendTo(element);
 
     answerTypeRecording.elements[question.id] = element;
-
     return element;
 };
 
@@ -1729,10 +1734,10 @@ testRecognition.recorder.onend = function() {
     testRecognition.endSpeech();
 
     if (testRecognition.recognizingFragment) {
-        var match = answerTypeRecording.getResult().substring(0, testRecognition.selectionRange.startOffset)
+        /*var match = answerTypeRecording.getResult().substring(0, testRecognition.selectionRange.startOffset)
             + testRecognition.speechFragment
             + answerTypeRecording.getResult().substring(testRecognition.selectionRange.endOffset);
-        answerTypeRecording.setResult(match);
+        answerTypeRecording.setResult(match);*/
     }
     else {
         if (window.getSelection) {
@@ -1782,7 +1787,16 @@ testRecognition.recorder.onresult = function(event) {
     }
 
     if (testRecognition.recognizingFragment) {
-        testRecognition.speechFragment = testRecognition.lowerCase(testRecognition.final_transcript);
+
+        if (testRecognition.final_transcript.length) {
+            testRecognition.speechFragment = testRecognition.lowerCase(testRecognition.final_transcript);
+            var result = answerTypeRecording.getResult();
+
+            var match = result.substring(0, testRecognition.selectionRange.startOffset)
+                + testRecognition.speechFragment
+                + result.substring(testRecognition.selectionRange.endOffset);
+            answerTypeRecording.setResult(match);
+        }
     }
     else {
         testRecognition.final_transcript = testRecognition.lowerCase(testRecognition.final_transcript);
