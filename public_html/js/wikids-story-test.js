@@ -1390,6 +1390,12 @@ var WikidsStoryTest = (function() {
         "nextQuestion": nextQuestion,
         "getCurrentQuestionElement": function() {
             return currentQuestionElement;
+        },
+        "showNextButton": function() {
+            dom.nextButton.show();
+        },
+        "hideNextButton": function() {
+            dom.nextButton.hide();
         }
     };
 })();
@@ -1496,9 +1502,34 @@ answerTypeRecording.create = function(question, answer) {
     var element = $('<div/>');
     element.addClass('test-recognition');
 
+    element
+        .append($('<div/>')
+            .addClass('recognition-result-wrapper')
+            .append($('<span/>').prop('contenteditable', true).addClass('recognition-result'))
+            .append($('<span/>').addClass('recognition-result-interim'))
+            .append($('<a/>')
+                .attr('href', '#')
+                .attr('title', 'Повторить фрагмент')
+                .on('click', function(e) {
+                    e.preventDefault();
+                    var range = window.getSelection().getRangeAt(0);
+                    if (!range.toString().length) {
+                        return;
+                    }
+                    answerTypeRecording.startFragment(range, e);
+                })
+                .hide()
+                .addClass('recognition-repeat-word')
+                .append($('<i/>').addClass('glyphicon glyphicon-refresh'))
+            )
+        );
+
     $('<div/>')
         .addClass('wikids-test-loader')
-        .append($('<img/>').attr('src', '/img/loading.gif'))
+        .append($('<img/>')
+            .attr('src', '/img/loading.gif')
+            .attr('width', '60px')
+        )
         .hide()
         .appendTo(element);
 
@@ -1517,8 +1548,17 @@ answerTypeRecording.create = function(question, answer) {
         .hide()
         .appendTo(element);
 
-    element
-        .append($('<p/>').addClass('recognition-result'));
+    $('<a/>')
+        .attr('href', '#')
+        .attr('title', 'Остановить')
+        .addClass('recognition-stop')
+        .on('click', function(e) {
+            e.preventDefault();
+            testRecognition.Stop();
+        })
+        .append($('<i/>').addClass('glyphicon glyphicon-stop'))
+        .hide()
+        .appendTo(element);
 
     answerTypeRecording.elements[question.id] = element;
 
@@ -1527,7 +1567,7 @@ answerTypeRecording.create = function(question, answer) {
 
 answerTypeRecording.autoStart = function(e) {
 
-    answerTypeRecording.setStatus('Инициализация');
+    answerTypeRecording.setStatus('');
     answerTypeRecording.repeatButtonHide();
 
     setTimeout(function() {
@@ -1535,6 +1575,13 @@ answerTypeRecording.autoStart = function(e) {
         testRecognition.Start(e);
     }, 1000);
 };
+
+answerTypeRecording.startFragment = function(range, e) {
+    answerTypeRecording.setStatus('');
+    answerTypeRecording.repeatButtonHide();
+    answerTypeRecording.showLoader();
+    testRecognition.StartFragment(range, e);
+}
 
 answerTypeRecording.repeatButtonShow = function() {
     answerTypeRecording.getElement()
@@ -1565,8 +1612,18 @@ answerTypeRecording.setStatus = function(statusText) {
         .find('.recognition-status').text(statusText);
 };
 answerTypeRecording.setResult = function(text) {
+    var element = answerTypeRecording.getElement();
+    if (text.length) {
+        element.find('.recognition-repeat-word').show();
+    }
+    else {
+        element.find('.recognition-repeat-word').hide();
+    }
+    element.find('.recognition-result').text(text);
+}
+answerTypeRecording.setResultInterim = function(text) {
     answerTypeRecording.getElement()
-        .find('.recognition-result').text(text);
+        .find('.recognition-result-interim').text(text);
 }
 answerTypeRecording.getResult = function() {
     return answerTypeRecording.getElement()
@@ -1576,9 +1633,22 @@ answerTypeRecording.resetResult = function() {
     answerTypeRecording.setResult('');
 }
 
+answerTypeRecording.showStopButton = function() {
+    answerTypeRecording.getElement()
+        .find('.recognition-stop').show();
+};
+
+answerTypeRecording.hideStopButton = function() {
+    answerTypeRecording.getElement()
+        .find('.recognition-stop').hide();
+};
+
 var testRecognition = {};
+
+testRecognition.recognizingFragment = false;
 testRecognition.recognizing = false;
 testRecognition.start_timestamp = null;
+
 testRecognition.recorder = new webkitSpeechRecognition();
 testRecognition.recorder.continuous = true;
 testRecognition.recorder.interimResults = true;
@@ -1589,6 +1659,9 @@ testRecognition.Stop = function() {
 
 testRecognition.Start = function(event) {
 
+    testRecognition.recognizingFragment = false;
+    answerTypeRecording.showStopButton();
+
     if (testRecognition.recognizing) {
         testRecognition.recorder.stop();
         return;
@@ -1597,9 +1670,25 @@ testRecognition.Start = function(event) {
     testRecognition.final_transcript = '';
     testRecognition.recorder.lang = 'ru-RU';
     testRecognition.recorder.start();
-
     testRecognition.start_timestamp = event.timeStamp;
 };
+
+testRecognition.StartFragment = function(range, event) {
+
+    testRecognition.recognizingFragment = true;
+    answerTypeRecording.showStopButton();
+
+    if (testRecognition.recognizing) {
+        testRecognition.recorder.stop();
+        return;
+    }
+
+    testRecognition.final_transcript = '';
+    testRecognition.recorder.lang = 'ru-RU';
+    testRecognition.recorder.start();
+    testRecognition.start_timestamp = event.timeStamp;
+    testRecognition.selectionRange = range;
+}
 
 testRecognition.recorder.onstart = function() {
     testRecognition.recognizing = true;
@@ -1625,24 +1714,57 @@ testRecognition.recorder.onerror = function(event) {
     }
 };
 
-testRecognition.recorder.onend = function() {
+testRecognition.endSpeech = function() {
     answerTypeRecording.hideLoader();
+    answerTypeRecording.hideStopButton();
     testRecognition.recognizing = false;
-    var result = answerTypeRecording.getResult();
-    if (result.length) {
-        WikidsStoryTest.nextQuestion();
+    answerTypeRecording.setStatus('');
+    if (answerTypeRecording.getResult() !== '') {
+        WikidsStoryTest.showNextButton();
+    }
+}
+
+testRecognition.recorder.onend = function() {
+
+    testRecognition.endSpeech();
+
+    if (testRecognition.recognizingFragment) {
+        var match = answerTypeRecording.getResult().substring(0, testRecognition.selectionRange.startOffset)
+            + testRecognition.speechFragment
+            + answerTypeRecording.getResult().substring(testRecognition.selectionRange.endOffset);
+        answerTypeRecording.setResult(match);
     }
     else {
-        answerTypeRecording.setStatus('Речи не обнаружено');
-        answerTypeRecording.repeatButtonShow();
+        if (window.getSelection) {
+            window.getSelection().removeAllRanges();
+            var range = document.createRange();
+            range.selectNode(answerTypeRecording.getElement().find('.recognition-result')[0]);
+            window.getSelection().addRange(range);
+        }
+
+        var result = answerTypeRecording.getResult();
+        if (result.length) {
+            //WikidsStoryTest.nextQuestion();
+        }
+        else {
+            answerTypeRecording.setStatus('Речи не обнаружено');
+            answerTypeRecording.repeatButtonShow();
+        }
     }
 };
 
 testRecognition.final_transcript = '';
-testRecognition.resultTimeout = 0;
+
+testRecognition.selectionRange = null;
+testRecognition.speechFragment = '';
+
+//testRecognition.resultTimeout = 0;
+
 testRecognition.recorder.onresult = function(event) {
 
-    clearTimeout(testRecognition.resultTimeout);
+    //clearTimeout(testRecognition.resultTimeout);
+    answerTypeRecording.getElement()
+        .find('.recognition-result').blur();
 
     var interim_transcript = '';
     if (typeof(event.results) == 'undefined') {
@@ -1659,18 +1781,26 @@ testRecognition.recorder.onresult = function(event) {
         }
     }
 
-    testRecognition.final_transcript = testRecognition.capitalize(testRecognition.final_transcript);
-    answerTypeRecording.setResult(testRecognition.linebreak(testRecognition.final_transcript));
-
-    if (testRecognition.final_transcript.length) {
-        testRecognition.resultTimeout = setTimeout(function() {
-            testRecognition.recorder.stop();
-        }, 1500);
+    if (testRecognition.recognizingFragment) {
+        testRecognition.speechFragment = testRecognition.lowerCase(testRecognition.final_transcript);
     }
+    else {
+        testRecognition.final_transcript = testRecognition.lowerCase(testRecognition.final_transcript);
+        answerTypeRecording.setResult(testRecognition.linebreak(testRecognition.final_transcript));
+        answerTypeRecording.setResultInterim(testRecognition.linebreak(interim_transcript));
+    }
+
+    //if (testRecognition.final_transcript.length) {
+/*        testRecognition.resultTimeout = setTimeout(function() {
+            testRecognition.endSpeech();
+            testRecognition.recorder.onend = null;
+            testRecognition.recorder.stop();
+        }, 1500);*/
+    //}
 };
 
 testRecognition.recorder.onspeechend = function() {
-
+    console.log('onspeechend');
 }
 
 testRecognition.linebreak = function(s) {
@@ -1682,6 +1812,10 @@ testRecognition.linebreak = function(s) {
 testRecognition.capitalize = function(s) {
     var first_char = /\S/;
     return s.replace(first_char, function(m) { return m.toUpperCase(); });
+}
+
+testRecognition.lowerCase = function(s) {
+    return s.toLowerCase();
 }
 
 

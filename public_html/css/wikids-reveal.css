@@ -2210,8 +2210,26 @@ p.wikids-test-description {
 	margin-bottom: 20px;
 }
 
-.test-recognition .recognition-repeat {
+.test-recognition .recognition-repeat,
+.test-recognition .recognition-stop {
 	font-size: 5rem;
 	color: red;
 	margin-top: 40px;
+}
+
+.test-recognition .recognition-result {
+
+}
+
+.test-recognition .recognition-result-interim {
+
+}
+
+.test-recognition .recognition-result-wrapper {
+	min-height: 100px;
+}
+
+.test-recognition .recognition-repeat-word {
+	margin-top: 10px;
+	display: block;
 }
