@@ -1145,7 +1145,7 @@ var WikidsStoryTest = (function() {
 
         dom.nextButton.hide();
         if (!answerIsCorrect) {
-            if (testConfig.sourceIsWord() && !testConfig.answerTypeIsNumPad()) {
+            if (testConfig.sourceIsWord() && !testConfig.answerTypeIsNumPad() && !testConfig.answerTypeIsInput()) {
                 continueTestAction(answer);
             }
             else {
