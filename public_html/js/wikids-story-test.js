@@ -829,6 +829,25 @@ var WikidsStoryTest = (function() {
         dispatchEvent("backToStory", {});
     }
 
+    function checkAnswerCorrect(question, answer, correctAnswersCallback, convertAnswerToInt) {
+        var correctAnswers = getAnswersData(question).filter(function(elem) {
+            return parseInt(elem.is_correct) === 1;
+        });
+        correctAnswers = correctAnswers.map(correctAnswersCallback);
+        var answerCheckCallback = function(value, index) {
+            if (convertAnswerToInt) {
+                value = parseInt(value)
+            }
+            return value === correctAnswers.sort()[index];
+        };
+        var correct = false;
+        if (answer.length === correctAnswers.length && answer.sort().every(answerCheckCallback)) {
+            correctAnswersNumber++;
+            correct = true;
+        }
+        return correct;
+    }
+
     function answerQuestion(element, answer, correctAnswersCallback, convertAnswerToInt) {
 
         var questionID = element.attr("data-question-id");
@@ -1396,7 +1415,8 @@ var WikidsStoryTest = (function() {
         },
         "hideNextButton": function() {
             dom.nextButton.hide();
-        }
+        },
+        "checkAnswerCorrect": checkAnswerCorrect
     };
 })();
 
@@ -1648,6 +1668,14 @@ answerTypeRecording.hideStopButton = function() {
         .find('.recognition-stop').hide();
 };
 
+answerTypeRecording.checkResult = function(result) {
+    var question = WikidsStoryTest.getCurrentQuestion();
+    var correctAnswersCallback = function(elem) {
+        return elem.name.toLowerCase();
+    };
+    return WikidsStoryTest.checkAnswerCorrect(question, [result], correctAnswersCallback, false);
+}
+
 var testRecognition = {};
 
 testRecognition.recognizingFragment = false;
@@ -1659,6 +1687,7 @@ testRecognition.recorder.continuous = true;
 testRecognition.recorder.interimResults = true;
 
 testRecognition.Stop = function() {
+    //testRecognition.recorder.onend = null;
     testRecognition.recorder.stop();
 }
 
@@ -1749,7 +1778,9 @@ testRecognition.recorder.onend = function() {
 
         var result = answerTypeRecording.getResult();
         if (result.length) {
-            //WikidsStoryTest.nextQuestion();
+            if (answerTypeRecording.checkResult(result)) {
+                WikidsStoryTest.nextQuestion();
+            }
         }
         else {
             answerTypeRecording.setStatus('Речи не обнаружено');
@@ -1763,11 +1794,11 @@ testRecognition.final_transcript = '';
 testRecognition.selectionRange = null;
 testRecognition.speechFragment = '';
 
-//testRecognition.resultTimeout = 0;
+testRecognition.resultTimeout = 0;
 
 testRecognition.recorder.onresult = function(event) {
 
-    //clearTimeout(testRecognition.resultTimeout);
+    clearTimeout(testRecognition.resultTimeout);
     answerTypeRecording.getElement()
         .find('.recognition-result').blur();
 
@@ -1804,13 +1835,15 @@ testRecognition.recorder.onresult = function(event) {
         answerTypeRecording.setResultInterim(testRecognition.linebreak(interim_transcript));
     }
 
-    //if (testRecognition.final_transcript.length) {
-/*        testRecognition.resultTimeout = setTimeout(function() {
-            testRecognition.endSpeech();
-            testRecognition.recorder.onend = null;
-            testRecognition.recorder.stop();
-        }, 1500);*/
-    //}
+    if (testRecognition.final_transcript.length) {
+        testRecognition.resultTimeout = setTimeout(function() {
+            if (answerTypeRecording.checkResult(testRecognition.final_transcript)) {
+                //testRecognition.endSpeech();
+                //testRecognition.recorder.onend = null;
+                testRecognition.recorder.stop();
+            }
+        }, 1500);
+    }
 };
 
 testRecognition.recorder.onspeechend = function() {
