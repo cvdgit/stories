@@ -1309,7 +1309,7 @@ var WikidsStoryTest = (function() {
         if (isLastQuestion) {
             if (!testConfig.sourceIsLocal()) {
                 if (!answerIsCorrect) {
-                    if (testConfig.sourceIsWord() && !testConfig.answerTypeIsRecording()) {
+                    if (testConfig.sourceIsWord() && !testConfig.answerTypeIsRecording() && !testConfig.answerTypeIsInput()) {
                         showNextQuestion();
                         dom.results.hide();
                         showNextButton();
@@ -1328,7 +1328,7 @@ var WikidsStoryTest = (function() {
         }
         else {
             if (!answerIsCorrect && !testConfig.sourceIsLocal()) {
-                    if (testConfig.sourceIsWord() && !testConfig.answerTypeIsRecording()) {
+                    if (testConfig.sourceIsWord() && !testConfig.answerTypeIsRecording() && !testConfig.answerTypeIsInput()) {
                         showNextQuestion();
                         dom.results.hide();
                         showNextButton();
