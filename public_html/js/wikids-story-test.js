@@ -610,7 +610,7 @@ var WikidsStoryTest = (function() {
         answers.forEach(function(answer) {
             $answers.append(createInputAnswer(question, answer));
         });
-        var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-4 question-image"></div><div class="col-md-8 question-wrapper"></div></div>');
+        var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-12 question-wrapper"></div></div>');
         $wrapper.find(".question-wrapper").append($answers);
         return $wrapper;
     }
@@ -1487,7 +1487,7 @@ AnswerTypeNumPad.prototype.reset = function(element) {
 
 var answerTypeInput = {};
 answerTypeInput.create = function(action) {
-    var $html = $('<input type="text" class="answer-input" />');
+    var $html = $('<input type="text" class="answer-input" style="width: 80%" />');
     $html.keypress(function(e) {
         if (e.which == 13) {
             action();
