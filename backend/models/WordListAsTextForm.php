@@ -30,11 +30,16 @@ class WordListAsTextForm extends Model
     public function createWordList()
     {
         TestWord::clearWords($this->word_list_id);
-        $rows = explode(PHP_EOL, $this->text);
-        array_map(function($row) {
-            $row = trim(preg_replace('/[^A-ZА-Я0-9\-]/ui', '', $row));
-            return $row;
-        }, $rows);
+        $texts = explode(PHP_EOL, $this->text);
+        $rows = array_map(static function($row) {
+            @list($text, $correctAnswer) = explode('|', $row);
+            $text = trim(preg_replace('/[^\w\-\s.,!?]/u', '', $text));
+            $correctAnswer = trim(preg_replace('/[^\w\-\s.,]/u', '', $correctAnswer));
+            return [
+                'name' => $text,
+                'correct_answer' => $correctAnswer,
+            ];
+        }, $texts);
         TestWord::createBatch($this->word_list_id, $rows);
     }
 

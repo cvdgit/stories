@@ -64,10 +64,10 @@ class TestWord extends ActiveRecord
         $rows = [];
         $i = 1;
         foreach ($words as $word) {
-            $rows[] = [$word, $wordListID, $i++];
+            $rows[] = [$word['name'], $word['correct_answer'], $wordListID, $i++];
         }
         if (count($rows) > 0) {
-            $command->batchInsert(self::tableName(), ['name', 'word_list_id', 'order'], $rows);
+            $command->batchInsert(self::tableName(), ['name', 'correct_answer', 'word_list_id', 'order'], $rows);
             $command->execute();
         }
     }
