@@ -1503,11 +1503,21 @@ testSpeech.Synth = window.speechSynthesis;
 testSpeech.Voices = [];
 testSpeech.Voices = testSpeech.Synth.getVoices();
 testSpeech.VoiceIndex = 0;
-testSpeech.Rate = 0.85;
+testSpeech.Rate = 1;
+testSpeech.Pitch = 1;
 testSpeech.ReadText = function(txt, afterSpeech) {
     var ttsSpeechChunk = new SpeechSynthesisUtterance(txt);
-    ttsSpeechChunk.voice = testSpeech.Voices[testSpeech.VoiceIndex];
+
+    var index = 0;
+    for(var i = 0; i < testSpeech.Synth.getVoices().length ; i++) {
+        if(testSpeech.Synth.getVoices()[i].name === 'Google русский') {
+            ttsSpeechChunk.voice = testSpeech.Synth.getVoices()[i];
+            break;
+        }
+    }
+
     ttsSpeechChunk.rate = testSpeech.Rate;
+    ttsSpeechChunk.pitch = testSpeech.Pitch;
     if (afterSpeech) {
         ttsSpeechChunk.onend = afterSpeech;
     }
