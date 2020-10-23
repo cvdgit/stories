@@ -2,6 +2,7 @@
 
 namespace backend\models;
 
+use backend\components\WordListFormatter;
 use common\models\Story;
 use common\models\TestWord;
 use common\models\TestWordList;
@@ -12,6 +13,14 @@ class WordListFromStoryForm extends Model
 
     public $story_id;
     public $text;
+
+    private $wordFormatter;
+
+    public function __construct($config = [])
+    {
+        $this->wordFormatter = new WordListFormatter();
+        parent::__construct($config);
+    }
 
     public function rules()
     {
@@ -33,7 +42,9 @@ class WordListFromStoryForm extends Model
     {
         $wordList = TestWordList::create($story->title);
         $wordList->save();
-        TestWord::createBatch($wordList->id, explode(PHP_EOL, $this->text));
+        $texts = explode(PHP_EOL, $this->text);
+        $rows = $this->wordFormatter->create($texts);
+        TestWord::createBatch($wordList->id, $rows);
         return $wordList->id;
     }
 
