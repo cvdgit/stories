@@ -17,7 +17,7 @@ class NumPadBuilder extends BaseCollection
 
     public function getCorrectValue(array $word): int
     {
-        return $word['correct_answer'];
+        return $word['id'];
     }
 
 }
