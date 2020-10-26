@@ -22,4 +22,10 @@ class AnswerType
         ];
     }
 
+    public static function asText(int $type)
+    {
+        $values = self::asArray();
+        return $values[$type];
+    }
+
 }

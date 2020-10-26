@@ -1,4 +1,5 @@
 <?php
+use common\models\test\AnswerType;
 use common\models\test\SourceType;
 use dosamigos\datepicker\DatePicker;
 use yii\helpers\Html;
@@ -21,12 +22,19 @@ $this->params['sidebarMenuItems'] = [
     'options' => ['class' => 'table-responsive'],
     'columns' => [
         'title',
-        'header',
         [
             'attribute' => 'source',
             'value' => function($model) {
                 return SourceType::asText($model->source);
-            }
+            },
+            'filter' => SourceType::asArray(),
+        ],
+        [
+            'attribute' => 'answer_type',
+            'value' => function($model) {
+                return AnswerType::asText($model->answer_type);
+            },
+            'filter' => AnswerType::asArray(),
         ],
         [
             'attribute' => 'created_at',

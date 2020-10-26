@@ -10,17 +10,16 @@ class TestSearch extends Model
 {
 
     public $title;
-    public $header;
     public $created_at;
-    public $remote;
-    public $question_number;
+    public $source;
+    public $answer_type;
 
     public function rules()
     {
         return [
-            [['title', 'header'], 'string', 'max' => 50],
+            [['title'], 'string', 'max' => 50],
             [['created_at'], 'date'],
-            [['remote', 'question_number'], 'integer'],
+            [['source', 'answer_type'], 'integer'],
         ];
     }
 
@@ -45,11 +44,11 @@ class TestSearch extends Model
         }
 
         $query->andFilterWhere(['like', 'title', $this->title]);
-        $query->andFilterWhere(['like', 'header', $this->header]);
         $query->andFilterWhere([
             "DATE_FORMAT(FROM_UNIXTIME(created_at), '%d.%m.%Y')" => $this->created_at,
         ]);
-        $query->andFilterWhere(['remote' => $this->remote]);
+        $query->andFilterWhere(['source' => $this->source]);
+        $query->andFilterWhere(['answer_type' => $this->answer_type]);
 
         return $dataProvider;
     }
