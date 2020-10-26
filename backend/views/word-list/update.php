@@ -28,6 +28,7 @@ $this->params['breadcrumbs'][] = 'Update';
                 <thead>
                 <tr>
                     <th>Слово</th>
+                    <th>Правильный ответ</th>
                     <th></th>
                 </tr>
                 </thead>
@@ -107,6 +108,7 @@ window.fillTestWordsTable = function(params) {
             });
         $('<tr/>')
             .append($('<td/>').text(param.name))
+            .append($('<td/>').text(param.correct_answer))
             .append($('<td/>')
                 .append(updateLink)
                 .append(copyLink)
