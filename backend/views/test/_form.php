@@ -29,6 +29,7 @@ use yii\widgets\ActiveForm;
 
     <div class="form-group">
         <?= Html::submitButton(($model->isNewRecord ? 'Создать' : 'Изменить') . ' тест', ['class' => 'btn btn-success']) ?>
+        <?= Html::a('История прохождения', ['/history/list', 'test_id' => $model->id], ['class' => 'btn']) ?>
     </div>
     <?php ActiveForm::end(); ?>
 </div>

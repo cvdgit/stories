@@ -4,6 +4,8 @@ namespace backend\controllers;
 
 use backend\models\StudentTestHistory;
 use common\models\StoryTest;
+use common\models\StudentQuestionProgress;
+use common\models\UserQuestionHistory;
 use common\models\UserStudent;
 use common\rbac\UserRoles;
 use Yii;
@@ -62,6 +64,25 @@ class HistoryController extends Controller
         (new StudentTestHistory($studentModel->id))->clearTestHistory($testModel->id);
         Yii::$app->session->setFlash('success', 'История прохождения теста удалена');
         return $this->redirect(['view', 'id' => $student_id]);
+    }
+
+    public function actionClearAll(int $test_id)
+    {
+        $testModel = $this->findTestModel($test_id);
+        UserQuestionHistory::clearAllTestHistory($testModel->id);
+        StudentQuestionProgress::resetProgressByTest($testModel->id);
+        Yii::$app->session->setFlash('success', 'История прохождения теста удалена');
+        return $this->redirect(['list', 'test_id' => $testModel->id]);
+    }
+
+    public function actionList(int $test_id)
+    {
+        $testModel = $this->findTestModel($test_id);
+        $students = UserQuestionHistory::getTestStudents($testModel->id);
+        return $this->render('list', [
+            'test' => $testModel,
+            'students' => $students,
+        ]);
     }
 
 }

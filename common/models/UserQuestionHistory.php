@@ -4,6 +4,7 @@ namespace common\models;
 
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
+use yii\db\Query;
 
 /**
  * This is the model class for table "user_question_history".
@@ -146,6 +147,25 @@ class UserQuestionHistory extends ActiveRecord
     public static function clearTestHistory(int $studentID, int $testID)
     {
         self::deleteAll('student_id = :student AND test_id = :test', [':student' => $studentID, ':test' => $testID]);
+    }
+
+    public static function clearAllTestHistory(int $testID)
+    {
+        self::deleteAll('test_id = :test', [':test' => $testID]);
+    }
+
+    public static function getTestStudents(int $testID)
+    {
+        $query = (new Query())
+            ->select('student_id')
+            ->distinct()
+            ->from(self::tableName())
+            ->where('test_id = :test', [':test' => $testID]);
+        $ids = $query->all();
+        $ids = array_map(static function($row) {
+            return $row['student_id'];
+        }, $ids);
+        return UserStudent::find()->where(['in', 'id', $ids])->all();
     }
 
 }

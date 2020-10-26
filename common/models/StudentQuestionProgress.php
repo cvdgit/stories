@@ -50,6 +50,11 @@ class StudentQuestionProgress extends ActiveRecord
         return self::findOne(['student_id' => $studentID, 'test_id' => $testID]);
     }
 
+    public static function findProgressModelsByTest(int $testID)
+    {
+        return self::findAll(['test_id' => $testID]);
+    }
+
     public static function create(int $studentID, int $questionID, int $progress, int $testID)
     {
         $model = new self();
@@ -70,6 +75,15 @@ class StudentQuestionProgress extends ActiveRecord
         $model = self::findProgressModel($studentID, $testID);
         $model->updateProgress(0);
         $model->save();
+    }
+
+    public static function resetProgressByTest(int $testID)
+    {
+        $models = self::findProgressModelsByTest($testID);
+        foreach ($models as $model) {
+            $model->updateProgress(0);
+            $model->save();
+        }
     }
 
 }
