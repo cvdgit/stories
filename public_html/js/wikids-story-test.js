@@ -1252,7 +1252,7 @@ var WikidsStoryTest = (function() {
 
         var $elements = $('<div/>');
 
-        var text = incorrectAnswerText || 'Правильные ответы';
+        var text = incorrectAnswerText || 'Правильный ответ';
         text = text.replace('{1}', question.entity_name);
         $elements.append($('<h4/>').text(text + ':'));
 
@@ -1276,10 +1276,11 @@ var WikidsStoryTest = (function() {
                     $content.append($image);
                 }
 
-                var $answerElement;
+                var $answerElement,
+                    answerText = questionAnswer.name;
                 if (testConfig.answerTypeIsRecording()) {
                     $answerElement = $('<p/>')
-                        .append($('<span/>').text(questionAnswer.name))
+                        .append($('<span/>').text(answerText))
                         .append($('<a/>')
                             .attr('href', '#')
                             .attr('title', 'Прослушать')
@@ -1292,7 +1293,10 @@ var WikidsStoryTest = (function() {
                         );
                 }
                 else {
-                    $answerElement = $('<p/>').text(questionAnswer.name);
+                    if (testConfig.answerTypeIsInput()) {
+                        answerText = '';
+                    }
+                    $answerElement = $('<p/>').text(answerText);
                 }
                 $content.append($answerElement);
 
