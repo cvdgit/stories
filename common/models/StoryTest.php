@@ -29,6 +29,7 @@ use yii\helpers\ArrayHelper;
  * @property int $source
  * @property int $word_list_id
  * @property int $answer_type
+ * @property int $strict_answer
  *
  * @property StoryTestQuestion[] $storyTestQuestions
  */
@@ -63,7 +64,7 @@ class StoryTest extends ActiveRecord
     {
         return [
             [['title', 'header'], 'required'],
-            [['status', 'mix_answers', 'remote', 'question_list_id', 'parent_id', 'source', 'word_list_id', 'answer_type'], 'integer'],
+            [['status', 'mix_answers', 'remote', 'question_list_id', 'parent_id', 'source', 'word_list_id', 'answer_type', 'strict_answer'], 'integer'],
             [['title', 'question_list_name', 'header', 'question_params', 'incorrect_answer_text'], 'string', 'max' => 255],
             [['description_text'], 'string'],
             [['question_list'], 'safe'],
@@ -93,6 +94,7 @@ class StoryTest extends ActiveRecord
             'source' => 'Источник вопросов',
             'word_list_id' => 'Список слов',
             'answer_type' => 'Тип ответов',
+            'strict_answer' => 'Строгое сравнение ответов',
         ];
     }
 

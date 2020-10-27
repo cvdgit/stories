@@ -27,6 +27,10 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'answer_type')->dropDownList(\common\models\test\AnswerType::asArray()) ?>
 
+    <div id="answer-input-block" style="display: <?= $model->isAnswerTypeInput() ? 'block' : 'none' ?>">
+        <?= $form->field($model, 'strict_answer')->checkbox() ?>
+    </div>
+
     <div class="form-group">
         <?= Html::submitButton(($model->isNewRecord ? 'Создать' : 'Изменить') . ' тест', ['class' => 'btn btn-success']) ?>
         <?= Html::a('История прохождения', ['/history/list', 'test_id' => $model->id], ['class' => 'btn']) ?>
@@ -40,6 +44,7 @@ $isSourceNeo = var_export($model->isRemote(), true);
 $sourceTest = SourceType::TEST;
 $sourceNeo = SourceType::NEO;
 $sourceList = SourceType::LIST;
+$answerTypeInput = \common\models\test\AnswerType::INPUT;
 $js = <<< JS
 var loaded = false;
 var selected = parseInt($selected);
@@ -97,6 +102,19 @@ $('#storytest-question_list').on('change', function() {
     }
     $('#storytest-question_list_id').val(id);
     $('#storytest-question_list_name').val(name);
+});
+
+var ANSWER_TYPE_INPUT = $answerTypeInput;
+var inputBlockElement = $('#answer-input-block');
+$('#storytest-answer_type').on('change', function() {
+    if (parseInt(this.value) === ANSWER_TYPE_INPUT) {
+        inputBlockElement.show();
+    }
+    else {
+        inputBlockElement
+            .hide()
+            .find('input[type=checkbox]').prop('checked', false);
+    }
 });
 JS;
 $this->registerJs($js);

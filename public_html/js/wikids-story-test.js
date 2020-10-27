@@ -133,6 +133,7 @@ var WikidsStoryTest = (function() {
     var TestConfig = function(data) {
         this.source = parseInt(data.source);
         this.answerType = parseInt(data.answerType);
+        this.strictAnswer = parseInt(data.strictAnswer);
     }
 
     TestConfig.prototype.getSource = function() {
@@ -165,6 +166,10 @@ var WikidsStoryTest = (function() {
 
     TestConfig.prototype.answerTypeIsRecording = function() {
         return this.answerType === 3;
+    }
+
+    TestConfig.prototype.isStrictAnswer = function() {
+        return this.strictAnswer === 1;
     }
 
     var testConfig;
@@ -919,6 +924,9 @@ var WikidsStoryTest = (function() {
         if (!val.length) {
             return [];
         }
+        if (testConfig.isStrictAnswer()) {
+            return [val];
+        }
         return [val.toLowerCase()];
     }
 
@@ -1015,7 +1023,12 @@ var WikidsStoryTest = (function() {
         }
         if (view === 'input' || view === 'recognition') {
             correctAnswersCallback = function(elem) {
-                return elem.name.toLowerCase();
+                if (testConfig.isStrictAnswer()) {
+                    return elem.name;
+                }
+                else {
+                    return elem.name.toLowerCase();
+                }
             };
             convertAnswerToInt = false;
         }
@@ -1292,9 +1305,9 @@ var WikidsStoryTest = (function() {
                         );
                 }
                 else {
-                    if (testConfig.answerTypeIsInput()) {
-                        answerText = answer.name;
-                    }
+                    //if (testConfig.answerTypeIsInput()) {
+                    //    answerText = answer.name;
+                    //}
                     $answerElement = $('<p/>').text(answerText);
                 }
                 $content.append($answerElement);
