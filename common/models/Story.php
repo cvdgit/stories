@@ -543,4 +543,17 @@ class Story extends ActiveRecord
         return $this->save(false);
     }
 
+    public static function create(string $title, int $userID, array $categories)
+    {
+        $model = new self();
+        $model->loadDefaultValues();
+        $model->category_id = 1;
+        $model->title = $title;
+        $model->user_id = $userID;
+        $model->source_id = self::SOURCE_POWERPOINT;
+        $model->story_categories = implode(',', $categories);
+        $model->categories = $categories;
+        return $model;
+    }
+
 }

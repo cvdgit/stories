@@ -4,8 +4,10 @@ namespace backend\controllers;
 
 use backend\components\StoryTextFormatter;
 use backend\components\WordListFormatter;
+use backend\models\test\CreateStoryForm;
 use backend\models\WordListAsTextForm;
 use backend\models\WordListFromStoryForm;
+use backend\services\WordListService;
 use common\models\Story;
 use backend\services\StoryEditorService;
 use common\rbac\UserRoles;
@@ -13,6 +15,7 @@ use Yii;
 use common\models\TestWordList;
 use backend\models\TestWordListSearch;
 use yii\filters\AccessControl;
+use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -25,10 +28,12 @@ class WordListController extends Controller
 {
 
     private $storyService;
+    private $wordListService;
 
-    public function __construct($id, $module, StoryEditorService $storyService, $config = [])
+    public function __construct($id, $module, StoryEditorService $storyService, WordListService $wordListService, $config = [])
     {
         $this->storyService = $storyService;
+        $this->wordListService = $wordListService;
         parent::__construct($id, $module, $config);
     }
 
@@ -196,6 +201,25 @@ class WordListController extends Controller
         Yii::$app->response->format = Response::FORMAT_RAW;
         $model = $this->findModel($word_list_id);
         return WordListFormatter::asText($model->getTestWordsAsArray());
+    }
+
+    public function actionCreateStoryForm(int $id)
+    {
+        $wordListModel = $this->findModel($id);
+        $model = new CreateStoryForm($wordListModel);
+        if ($model->load(Yii::$app->request->post())) {
+            try {
+                $model->create();
+                $this->wordListService->create($model, Yii::$app->user->id);
+                return Json::encode(['success' => true, 'message' => '']);
+            }
+            catch (\Exception $ex) {
+                return Json::encode(['success' => false, 'message' => $ex->getMessage()]);
+            }
+        }
+        return $this->renderAjax('_create_story', [
+            'model' => $model,
+        ]);
     }
 
 }

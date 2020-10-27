@@ -227,7 +227,7 @@ class StoryEditorService
         return $model->id;
     }
 
-    public function newCreateSlideQuestion(int $storyID, array $params)
+    public function createQuestionBlock(array $params)
     {
         $reader = new HtmlSlideReader('');
         $slide = $reader->load();
@@ -245,16 +245,17 @@ class StoryEditorService
         $slide->addBlock($block);
 
         $writer = new HTMLWriter();
-        $html = $writer->renderSlide($slide);
+        return $writer->renderSlide($slide);
+    }
 
+    public function newCreateSlideQuestion(int $storyID, array $params)
+    {
         $model = StorySlide::createSlide($storyID);
         $model->kind = StorySlide::KIND_QUESTION;
-        $model->data = $html;
-
+        $model->data = $this->createQuestionBlock($params);
         // $this->updateSlideNumbers($currentSlideModel->story_id, $currentSlideModel->number);
         $model->number = 1;
         $model->save();
-
         return $model->id;
     }
 
