@@ -1328,7 +1328,7 @@ var WikidsStoryTest = (function() {
         if (isLastQuestion) {
             if (!testConfig.sourceIsLocal()) {
                 if (!answerIsCorrect) {
-                    if (testConfig.sourceIsWord() && !testConfig.answerTypeIsRecording() && !testConfig.answerTypeIsInput()) {
+                    if (testConfig.sourceIsWord() && !testConfig.answerTypeIsNumPad() && !testConfig.answerTypeIsRecording() && !testConfig.answerTypeIsInput()) {
                         showNextQuestion();
                         dom.results.hide();
                         showNextButton();
@@ -1347,7 +1347,7 @@ var WikidsStoryTest = (function() {
         }
         else {
             if (!answerIsCorrect && !testConfig.sourceIsLocal()) {
-                    if (testConfig.sourceIsWord() && !testConfig.answerTypeIsRecording() && !testConfig.answerTypeIsInput()) {
+                    if (testConfig.sourceIsWord() && !testConfig.answerTypeIsNumPad() && !testConfig.answerTypeIsRecording() && !testConfig.answerTypeIsInput()) {
                         showNextQuestion();
                         dom.results.hide();
                         showNextButton();
@@ -1467,7 +1467,8 @@ AnswerTypeNumPad.prototype.create = function(callback) {
         '<li class="letter clearl">7</li>' +
         '<li class="letter ">8</li>' +
         '<li class="letter">9</li>' +
-        '<li class="letter">10</li>' +
+        '<li class="letter clearl">10</li>' +
+        '<li class="letter">0</li>' +
         '</ul>' +
         '<p></p></div>',
         $html = $(html);
