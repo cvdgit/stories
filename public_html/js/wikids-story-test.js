@@ -1276,8 +1276,7 @@ var WikidsStoryTest = (function() {
                     $content.append($image);
                 }
 
-                var $answerElement,
-                    answerText = questionAnswer.name;
+                var $answerElement;
                 if (testConfig.answerTypeIsRecording()) {
                     $answerElement = $('<p/>')
                         .append($('<span/>').text(answerText))
@@ -1294,7 +1293,7 @@ var WikidsStoryTest = (function() {
                 }
                 else {
                     if (testConfig.answerTypeIsInput()) {
-                        answerText = '';
+                        answerText = answer.name;
                     }
                     $answerElement = $('<p/>').text(answerText);
                 }
