@@ -19,6 +19,9 @@ use yii\widgets\ActiveForm;
                 'validateOnSubmit' => false,
             ]); ?>
             <div class="modal-body">
+                <div>
+                    <a href="#" id="split-text" class="btn">Разбить по предложениям</a>
+                </div>
                 <?= $wordListForm->field($model, 'text')->textarea(['cols' => 30, 'rows' => 20]) ?>
                 <?= $wordListForm->field($model, 'word_list_id')->hiddenInput()->label(false) ?>
             </div>
@@ -43,11 +46,9 @@ $('$target').on('click', function(e) {
 
 $('#word-list-as-text-form')
     .on('beforeSubmit', function(e) {
-        console.log('beforeSubmit');
         e.preventDefault();
     })
     .on('submit', function(e) {
-        console.log('submit');
         e.preventDefault();
         var form_data = new FormData(this);
         $.ajax({
@@ -72,5 +73,15 @@ $('#word-list-as-text-form')
         });
         return false;
     });
+
+$('#split-text').on('click', function(e) {
+    e.preventDefault();
+    var text = $('#wordlistastextform-text').val();
+    text = text.replace(/\. /g, ".\\n");
+    text = text.replace(/\! /g, "!\\n");
+    text = text.replace(/\? /g, "?\\n");
+    $('#wordlistastextform-text').val(text);
+});
+
 JS;
 $this->registerJs($js);
