@@ -30,7 +30,9 @@ class StoryTextFormatter
 
     public function formatByProposals()
     {
-        $this->text = str_replace([".", "!", "?"], PHP_EOL, $this->text);
+        $this->text = str_replace('.', "." . PHP_EOL, $this->text);
+        $this->text = str_replace('!', "!" . PHP_EOL, $this->text);
+        $this->text = str_replace('?', "?" . PHP_EOL, $this->text);
         $this->format();
         return $this->text;
     }
