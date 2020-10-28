@@ -1261,6 +1261,28 @@ var WikidsStoryTest = (function() {
         });
     }
 
+    function textDiff(a, b) {
+        var diff = patienceDiff(a.split(''), b.split(''));
+        var diffAnswer = '';
+        diff.lines.forEach(function(line) {
+            var char = '',
+                color = 'red';
+            if (line.aIndex >= 0) {
+                char = line.line;
+                if (line.bIndex === -1) {
+                    color = 'red';
+                }
+                if (line.aIndex === line.bIndex) {
+                    color = 'green';
+                }
+            }
+            if (char.length) {
+                diffAnswer += '<span style="color: ' + color + '">' + char + '</span>';
+            }
+        });
+        return diffAnswer;
+    }
+
     function showCorrectAnswerPage(question, answer) {
 
         var $elements = $('<div/>');
@@ -1271,6 +1293,7 @@ var WikidsStoryTest = (function() {
 
         var $element;
         var answerText = '';
+        var userAnswer = answer[0];
         getAnswersData(question).forEach(function(questionAnswer) {
             $element = $('<div/>').addClass('row');
             var $content = $('<div/>').addClass('col-md-offset-3 col-md-9');
@@ -1305,12 +1328,24 @@ var WikidsStoryTest = (function() {
                         );
                 }
                 else {
-                    //if (testConfig.answerTypeIsInput()) {
-                    //    answerText = answer.name;
-                    //}
-                    $answerElement = $('<p/>').text(answerText);
+                    if (testConfig.answerTypeIsInput()) {
+                        $answerElement = $('<p/>').html(textDiff(answerText, userAnswer));
+                    }
+                    else {
+                        $answerElement = $('<p/>').text(answerText);
+                    }
                 }
                 $content.append($answerElement);
+
+                if (testConfig.answerTypeIsInput()) {
+                    $('<p/>').html('&nbsp;').appendTo($content);
+                    $('<p/>')
+                        .text('Ваш ответ:')
+                        .appendTo($content);
+                    $('<p/>')
+                        .html(userAnswer)
+                        .appendTo($content);
+                }
 
                 $elements.append($element.append($content));
             }
