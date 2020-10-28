@@ -963,7 +963,11 @@ var WikidsStoryTest = (function() {
             $(this).parent().parent().remove();
             continueTestAction(answer);
         };
-        var $content = questionSuccess.create(action, currentQuestion.name, currentQuestion.image);
+        var text = currentQuestion.name;
+        if (testConfig.answerTypeIsInput()) {
+            text = answer[0];
+        }
+        var $content = questionSuccess.create(action, text, currentQuestion.image);
         dom.wrapper.append($content)
         $content.fadeIn();
     }
