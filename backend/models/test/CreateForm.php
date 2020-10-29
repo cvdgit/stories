@@ -62,6 +62,9 @@ class CreateForm extends Model
             throw new DomainException('Model not valid');
         }
         $this->loadParentTest();
+
+        $this->question_params = sprintf('taxonName=%1s;taxonValue=%2s', $this->taxonName, $this->taxonValue);
+
         $model = StoryTest::createVariant(
             $this->parentID,
             $this->title,
