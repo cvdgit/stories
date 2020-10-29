@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\controllers;
-
 
 use backend\models\NeoSlideRelations;
 use backend\models\NeoSlideRelationsForm;
@@ -140,6 +138,20 @@ class NeoController extends Controller
         $result = $this->serviceCurl()
             ->setGetParams($params)
             ->get($this->serviceMethodUrl('/api/question/get'));
+        return Json::decode($result);
+    }
+
+    public function actionTaxonList()
+    {
+        $result = $this->serviceCurl()->get($this->serviceMethodUrl('/api/taxon/list'));
+        return Json::decode($result);
+    }
+
+    public function actionTaxonValueList(string $taxon)
+    {
+        $result = $this->serviceCurl()
+            ->setGetParams(['taxon' => $taxon])
+            ->get($this->serviceMethodUrl('/api/taxon/values'));
         return Json::decode($result);
     }
 

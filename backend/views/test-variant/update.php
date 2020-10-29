@@ -1,7 +1,7 @@
 <?php
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-/** @var $model backend\models\test\CreateForm */
+/** @var $model backend\models\test\UpdateForm */
 ?>
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -17,7 +17,9 @@ use yii\widgets\ActiveForm;
         <?= $form->field($model, 'header')->textInput(['maxlength' => true]) ?>
         <?= $form->field($model, 'description_text')->textarea(['rows' => 4]) ?>
         <?= $form->field($model, 'incorrect_answer_text')->textInput(['maxlength' => true]) ?>
-        <?= $form->field($model, 'question_params')->textInput(['maxlength' => true]) ?>
+        <?= $form->field($model, 'question_params')->hiddenInput()->label(false) ?>
+        <?= $form->field($model, 'taxonName')->dropDownList([], ['data-value' => $model->taxonName]) ?>
+        <?= $form->field($model, 'taxonValue')->dropDownList([], ['data-value' => $model->taxonValue]) ?>
     </div>
     <div class="modal-footer">
         <?= Html::submitButton('Изменить вариант теста', ['class' => 'btn btn-success']) ?>

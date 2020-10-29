@@ -140,6 +140,14 @@ var Neo = (function(jQuery) {
         return $.getJSON('/admin/index.php?r=neo/question-get', data);
     }
 
+    function getTaxonList() {
+        return $.getJSON('/admin/index.php?r=neo/taxon-list');
+    }
+
+    function getTaxonValueList(taxon) {
+        return $.getJSON('/admin/index.php?r=neo/taxon-value-list', {"taxon": taxon});
+    }
+
     return {
         "getEntities": getEntities,
         "getRelations": getRelations,
@@ -149,6 +157,8 @@ var Neo = (function(jQuery) {
         "getLabels": getLabels,
         "getQuestions": getQuestions,
         "getQuestionList": getQuestionList,
-        "questions": questions
+        "questions": questions,
+        "getTaxonList": getTaxonList,
+        "getTaxonValueList": getTaxonValueList
     };
 })(jQuery);

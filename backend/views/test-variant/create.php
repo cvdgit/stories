@@ -17,7 +17,9 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'header')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'description_text')->textarea(['rows' => 4]) ?>
     <?= $form->field($model, 'incorrect_answer_text')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'question_params')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'question_params')->hiddenInput()->label(false) ?>
+    <?= $form->field($model, 'taxonName')->dropDownList([], ['data-value' => $model->taxonName, 'prompt' => '...']) ?>
+    <?= $form->field($model, 'taxonValue')->dropDownList([], ['data-value' => $model->taxonValue, 'prompt' => '...']) ?>
 </div>
 <div class="modal-footer">
     <?= Html::submitButton('Создать вариант теста', ['class' => 'btn btn-success']) ?>

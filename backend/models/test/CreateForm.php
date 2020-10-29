@@ -15,6 +15,9 @@ class CreateForm extends Model
     public $question_params;
     public $incorrect_answer_text;
 
+    public $taxonName;
+    public $taxonValue;
+
     private $parentID;
     /** @var StoryTest */
     private $parentTest;
@@ -33,8 +36,9 @@ class CreateForm extends Model
     public function rules()
     {
         return [
-            [['title', 'header', 'question_params'], 'required'],
+            [['title', 'header', 'taxonName', 'taxonValue'], 'required'],
             [['title', 'header', 'question_params', 'incorrect_answer_text'], 'string', 'max' => 255],
+            [['taxonName', 'taxonValue'], 'string', 'max' => 255],
             [['description_text'], 'string'],
         ];
     }
@@ -47,6 +51,8 @@ class CreateForm extends Model
             'header' => 'Заголовок',
             'question_params' => 'Параметры вопроса',
             'incorrect_answer_text' => 'Текст неправильного ответа',
+            'taxonName' => 'Таксон',
+            'taxonValue' => 'Значение таксона',
         ];
     }
 

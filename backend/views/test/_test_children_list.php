@@ -42,8 +42,7 @@ $js = <<< JS
 $('#test-variants-table').on('click', '.update-test-variant', function(e) {
     e.preventDefault();
     $('#update-test-variant-modal')
-        .modal({'remote': $(this).attr('href')})
-        .modal('show');
+        .modal({'remote': $(this).attr('href')});
 });
 
 $('#update-test-variant-modal').on('hide.bs.modal', function() {
@@ -88,6 +87,61 @@ fillTestVariantsTable(testVariants);
 $('#create-test-variant').on('click', function(e) {
     e.preventDefault();
     $('#test-variant-modal').modal({'remote': $(this).attr('href')});
+});
+
+window.loadNeoTaxon = function(element) {
+    element.empty().append($('<option/>').text('Выберите значение'));
+    Neo.getTaxonList()
+        .done(function(response) {
+            response.forEach(function(item) {
+                $('<option/>')
+                    .text(item.name)
+                    .val(item.label)
+                    .prop('selected', (element.attr('data-value') === item.label))
+                    .appendTo(element);
+            });
+        });
+};
+
+window.loadNeoTaxonValues = function(taxon, element) {
+    element.empty()
+        .append($('<option/>').val('').text('Выберите значение'));
+    Neo.getTaxonValueList(taxon).done(function(response) {
+        response.forEach(function(item) {
+            $('<option/>')
+                .text(item.name)
+                .val(item.name)
+                .prop('selected', (element.attr('data-value') === item.name))
+                .appendTo(element);
+        });
+    });
+};
+
+$('#test-variant-modal')
+    .on('shown.bs.modal', function() {
+        var taxonNameElement = $('#createform-taxonname', this);
+        var taxonValueElement = $('#createform-taxonvalue', this);
+        window.loadNeoTaxon(taxonNameElement);
+        taxonNameElement
+            .off('change')
+            .on('change', function() {
+                window.loadNeoTaxonValues(taxonNameElement.val(), taxonValueElement);
+            });
+    });
+
+$('#update-test-variant-modal').on('shown.bs.modal', function() {
+    
+    var taxonNameElement = $('#updateform-taxonname', this);
+    var taxonValueElement = $('#updateform-taxonvalue', this);
+
+    window.loadNeoTaxon(taxonNameElement);
+    
+    taxonNameElement
+        .off('change')
+        .on('change', function() {
+            window.loadNeoTaxonValues(taxonNameElement.attr('data-value'), taxonValueElement);
+        })
+        .trigger('change');
 });
 JS;
 $this->registerJs($js);
