@@ -11,10 +11,7 @@ $isNewRecord = $model instanceof CreateWordList;
 <div class="test-word-list-form">
     <?php $form = ActiveForm::begin(); ?>
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-    <?= SelectStoryWidget::widget([
-        'model' => $model,
-        'attribute' => 'story',
-    ]) ?>
+    <?= $form->field($model, 'story')->widget(SelectStoryWidget::class) ?>
     <div class="form-group">
         <?= Html::submitButton($isNewRecord ? 'Создать' : 'Сохранить', ['class' => 'btn btn-success']) ?>
         <?php if (!$isNewRecord): ?>
