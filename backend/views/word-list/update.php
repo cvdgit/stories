@@ -2,9 +2,8 @@
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
-
 /* @var $this yii\web\View */
-/* @var $model common\models\TestWordList */
+/* @var $model backend\forms\UpdateWordList */
 $this->title = 'Изменить список слов';
 $this->params['breadcrumbs'][] = ['label' => 'Test Word Lists', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];

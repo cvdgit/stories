@@ -1,7 +1,7 @@
 <?php
 use yii\helpers\Html;
 /* @var $this yii\web\View */
-/* @var $model common\models\TestWordList */
+/* @var $model backend\forms\CreateWordList */
 $this->title = 'Создать список слов';
 $this->params['breadcrumbs'][] = ['label' => 'Test Word Lists', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;

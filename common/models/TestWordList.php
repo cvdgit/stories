@@ -3,7 +3,6 @@
 namespace common\models;
 
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
-use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -21,6 +20,9 @@ use yii\helpers\ArrayHelper;
  */
 class TestWordList extends ActiveRecord
 {
+
+    public $linked_story;
+
     /**
      * {@inheritdoc}
      */

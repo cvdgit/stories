@@ -4,6 +4,8 @@ namespace backend\controllers;
 
 use backend\components\StoryTextFormatter;
 use backend\components\WordListFormatter;
+use backend\forms\CreateWordList;
+use backend\forms\UpdateWordList;
 use backend\models\test\CreateStoryForm;
 use backend\models\WordListAsTextForm;
 use backend\models\WordListFromStoryForm;
@@ -80,10 +82,17 @@ class WordListController extends Controller
      */
     public function actionCreate()
     {
-        $model = new TestWordList();
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            Yii::$app->session->setFlash('success', 'Список успешно создан');
-            return $this->redirect(['update', 'id' => $model->id]);
+        $model = new CreateWordList();
+        if ($model->load(Yii::$app->request->post())) {
+            try {
+                $id = $model->createWordList();
+                Yii::$app->session->setFlash('success', 'Список успешно создан');
+                return $this->redirect(['update', 'id' => $id]);
+            }
+            catch (\Exception $ex) {
+                Yii::$app->session->setFlash('error', $ex->getMessage());
+                return $this->refresh();
+            }
         }
         return $this->render('create', [
             'model' => $model,
@@ -99,9 +108,15 @@ class WordListController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            Yii::$app->session->setFlash('success', 'Список успешно обновлен');
+        $model = new UpdateWordList($this->findModel($id));
+        if ($model->load(Yii::$app->request->post())) {
+            try {
+                $model->updateWordList();
+                Yii::$app->session->setFlash('success', 'Список успешно обновлен');
+            }
+            catch (\Exception $ex) {
+                Yii::$app->session->setFlash('error', $ex->getMessage());
+            }
             return $this->refresh();
         }
         return $this->render('update', [
