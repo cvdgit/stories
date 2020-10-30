@@ -41,10 +41,13 @@ class WordListFromStoryForm extends Model
     public function createWordList(Story $story)
     {
         $wordList = TestWordList::create($story->title);
+        $wordList->stories = [$story];
         $wordList->save();
+
         $texts = explode(PHP_EOL, $this->text);
         $rows = $this->wordFormatter->create($texts);
         TestWord::createBatch($wordList->id, $rows);
+
         return $wordList->id;
     }
 

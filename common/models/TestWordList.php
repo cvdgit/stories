@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -16,6 +17,7 @@ use yii\helpers\ArrayHelper;
  * @property int $updated_at
  *
  * @property TestWord[] $testWords
+ * @property Story[] $stories
  */
 class TestWordList extends ActiveRecord
 {
@@ -31,6 +33,12 @@ class TestWordList extends ActiveRecord
     {
         return [
             TimestampBehavior::class,
+            'saveRelations' => [
+                'class' => SaveRelationsBehavior::class,
+                'relations' => [
+                    'stories',
+                ],
+            ],
         ];
     }
 
@@ -93,6 +101,27 @@ class TestWordList extends ActiveRecord
         $model = new self();
         $model->name = $name;
         return $model;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function getStories()
+    {
+        return $this->hasMany(Story::class, ['id' => 'story_id'])
+            ->viaTable('test_word_list_story', ['test_word_list_id' => 'id']);
+    }
+
+    public function getLinkedStories()
+    {
+        return array_map(function(Story $story) {
+            return [
+                'title' => $story->title,
+                'url' => $story->getStoryUrl(),
+                'image' => $story->getListThumbPath(),
+            ];
+        }, $this->stories);
     }
 
 }

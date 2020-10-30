@@ -156,6 +156,10 @@ var WikidsStoryTest = (function() {
         return this.answerType;
     }
 
+    TestConfig.prototype.answerTypeIsDefault = function() {
+        return this.answerType === 0;
+    }
+
     TestConfig.prototype.answerTypeIsNumPad = function() {
         return this.answerType === 1;
     }
@@ -227,6 +231,8 @@ var WikidsStoryTest = (function() {
 
     var numPad;
 
+    var linked;
+
     function load(data, for_slide) {
         console.debug('WikidsStoryTest.load');
 
@@ -255,6 +261,7 @@ var WikidsStoryTest = (function() {
         }
 
         testConfig = new TestConfig(testData['test']);
+        linked = new TestLinked(testData['stories']);
 
         questionsRepeat = new QuestionsRepeat(questions, testConfig.sourceIsLocal() ? 1 : 5);
         testProgress = new TestProgress(getProgressData());
@@ -802,11 +809,16 @@ var WikidsStoryTest = (function() {
     }
 
     function finish() {
+
         $('.wikids-test-active-question').hide().removeClass('wikids-test-active-question');
         dom.finishButton.hide();
+
         dom.results
-            .html("<p>Тест успешно пройден</p>")
+            .empty()
+            .append("<h2>Тест успешно пройден</h2>")
+            .append(linked.getHtml())
             .show();
+
         dispatchEvent("finish", {
             "testID": getTestData().id,
             "correctAnswers": correctAnswersNumber
@@ -1218,7 +1230,7 @@ var WikidsStoryTest = (function() {
             .slideDown()
             .addClass('wikids-test-active-question');
 
-        if (testConfig.answerTypeIsNumPad() || testConfig.answerTypeIsInput() || testConfig.answerTypeIsRecording()) {
+        if (testConfig.sourceIsWord()) {
             dom.nextButton.hide();
         }
 
@@ -1368,7 +1380,8 @@ var WikidsStoryTest = (function() {
     }
 
     function showNextButton() {
-        if (!testConfig.answerTypeIsNumPad() && !testConfig.answerTypeIsInput() && !testConfig.answerTypeIsRecording()) {
+        //if (!testConfig.answerTypeIsNumPad() && !testConfig.answerTypeIsInput() && !testConfig.answerTypeIsRecording()) {
+        if (!testConfig.sourceIsWord()) {
             dom.nextButton.show();
         }
     }
@@ -1953,3 +1966,39 @@ var SlideLoader = (function() {
         'hide': hide
     };
 })();
+
+
+var TestLinked = function(data) {
+
+    var stories = [];
+
+    function init() {
+        if (!data || !data.length) {
+            return;
+        }
+        stories = data;
+    }
+
+    init();
+
+    function getHtml() {
+        var $wrapper = $('<div/>')
+            .addClass('test-linked-stories-wrapper');
+        $wrapper.append($('<p/>').text('Посмотрите историю'))
+        stories.forEach(function(story) {
+            $('<a/>')
+                .attr('href', story['url'])
+                .css('display', 'block')
+                .append(
+                    $('<img/>').attr('src', story['image'])
+                )
+                .append($('<p/>').text(story['title']))
+                .appendTo($wrapper);
+        });
+        return $wrapper;
+    }
+
+    var API = {};
+    API.getHtml = getHtml;
+    return API;
+}

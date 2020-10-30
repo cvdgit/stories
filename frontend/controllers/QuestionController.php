@@ -85,7 +85,12 @@ class QuestionController extends Controller
             $data = $wordListModel->getTestWordsAsArray($userHistory);
             $dataCount = $wordListModel->getTestWordsCount();
             $collection = (new WordTestBuilder($test, $data, $dataCount, $userStars))->build();
-            return (new Serializer())->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount);
+            return (new Serializer())->serialize(
+                $test,
+                $collection,
+                $this->getStudents($test->id),
+                $userStarsCount,
+                $wordListModel->getLinkedStories());
         }
 
         $curl = new Curl();

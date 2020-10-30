@@ -2,6 +2,8 @@
 
 namespace common\models;
 
+use common\components\StoryCover;
+use common\helpers\Url;
 use DomainException;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use Yii;
@@ -554,6 +556,16 @@ class Story extends ActiveRecord
         $model->story_categories = implode(',', $categories);
         $model->categories = $categories;
         return $model;
+    }
+
+    public function getStoryUrl()
+    {
+        return Url::toRoute(['/story/view', 'alias' => $this->alias]);
+    }
+
+    public function getListThumbPath()
+    {
+        return empty($model->cover) ? '/img/story-1.jpg' : StoryCover::getListThumbPath($this->cover);
     }
 
 }

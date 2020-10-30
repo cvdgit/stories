@@ -1790,8 +1790,12 @@
 	transform: scale(1.5);
 }
 
+.wikids-test-results h2 {
+	margin: 50px 0;
+}
+
 .wikids-test-results p {
-	margin: 100px 0;
+	margin: 10px 0;
 }
 
 .wikids-test-begin-page {
