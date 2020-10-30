@@ -44,6 +44,13 @@ class TestWordList extends ActiveRecord
         ];
     }
 
+    public function transactions()
+    {
+        return [
+            self::SCENARIO_DEFAULT => self::OP_ALL,
+        ];
+    }
+
     /**
      * {@inheritdoc}
      */

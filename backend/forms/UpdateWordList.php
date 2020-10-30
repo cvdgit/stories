@@ -3,6 +3,7 @@
 namespace backend\forms;
 
 use common\models\TestWordList;
+use DomainException;
 use yii\base\Model;
 
 class UpdateWordList extends Model
@@ -46,7 +47,7 @@ class UpdateWordList extends Model
                 $this->{$name} = $this->model->{$name};
             }
         }
-        if ($this->model->stories !== null) {
+        if (!empty($this->model->stories)) {
             $this->story = $this->model->stories[0]->id;
         }
     }
@@ -58,7 +59,19 @@ class UpdateWordList extends Model
 
     public function updateWordList()
     {
-
+        if (!$this->validate()) {
+            throw new DomainException('Model not valid');
+        }
+        foreach ($this->getAttributes() as $name => $value) {
+            $modelAttributes = $this->model->getAttributes();
+            if (isset($modelAttributes[$name])) {
+                $this->model->{$name} = $this->{$name};
+            }
+        }
+        if (!empty($this->story)) {
+            $this->model->stories = [$this->story];
+        }
+        $this->model->save();
     }
 
 }

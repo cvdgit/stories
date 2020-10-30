@@ -34,7 +34,7 @@ class CreateWordList extends Model
             throw new \DomainException('Model not valid');
         }
         $model = TestWordList::create($this->name);
-        if ($this->story !== null) {
+        if (!empty($this->story)) {
             $model->stories = [$this->story];
         }
         $model->save();
