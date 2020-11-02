@@ -188,4 +188,18 @@ class UserQuestionHistoryModel extends Model
         return (int) $this->source === SourceType::NEO;
     }
 
+    public function getDetail(int $testID)
+    {
+        $query = (new Query())
+            ->select(['t.entity_name', 't2.answer_entity_name', 'MIN(t.id) AS question_id', 'COUNT(t.id) AS answer_count'])
+            ->from(['t' => UserQuestionHistory::tableName()])
+            ->innerJoin(['t2' => UserQuestionAnswer::tableName()], 't2.question_history_id = t.id')
+            ->where('t.student_id = :student', [':student' => $this->student_id])
+            ->andWhere('t.test_id = :test', [':test' => $testID])
+            ->andWhere('t.correct_answer = 1')
+            ->groupBy(['t.entity_name', 't2.answer_entity_name'])
+            ->orderBy(['MIN(t.id)' => SORT_ASC]);
+        return $query->all();
+    }
+
 }

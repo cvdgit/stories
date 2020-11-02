@@ -6,6 +6,7 @@ use backend\models\StudentTestHistory;
 use common\models\StoryTest;
 use common\models\StudentQuestionProgress;
 use common\models\UserQuestionHistory;
+use common\models\UserQuestionHistoryModel;
 use common\models\UserStudent;
 use common\rbac\UserRoles;
 use Yii;
@@ -82,6 +83,19 @@ class HistoryController extends Controller
         return $this->render('list', [
             'test' => $testModel,
             'students' => $students,
+        ]);
+    }
+
+    public function actionDetail(int $student_id, int $test_id)
+    {
+        $student = $this->findStudentModel($student_id);
+        $test = $this->findTestModel($test_id);
+        $model = new UserQuestionHistoryModel();
+        $model->student_id = $student->id;
+        return $this->render('detail', [
+            'student' => $student,
+            'test' => $test,
+            'detail' => $model->getDetail($test->id),
         ]);
     }
 
