@@ -1176,7 +1176,8 @@ var WikidsStoryTest = (function() {
                     'entity_name': currentQuestion.name,
                     'correct_answer': answerIsCorrect ? 1 : 0,
                     'answers': answerList,
-                    'progress': testProgress.calcPercent()
+                    'progress': testProgress.calcPercent(),
+                    'stars': questionsRepeat.number(currentQuestion)
                 };
                 $.post('/question/answer', answerParams);
             }
