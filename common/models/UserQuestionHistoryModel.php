@@ -20,6 +20,7 @@ class UserQuestionHistoryModel extends Model
     public $correct_answer;
     public $progress;
     public $test_id;
+    public $stars;
 
     public $answers;
 
@@ -32,7 +33,8 @@ class UserQuestionHistoryModel extends Model
             [['test_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTest::class, 'targetAttribute' => ['test_id' => 'id']],
             [['student_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserStudent::class, 'targetAttribute' => ['student_id' => 'id']],
             ['answers', 'safe'],
-            ['progress', 'integer', 'min' => 0, 'max' => 100]
+            ['progress', 'integer', 'min' => 0, 'max' => 100],
+            [['stars'], 'integer'],
         ];
     }
 
@@ -51,7 +53,8 @@ class UserQuestionHistoryModel extends Model
             $this->relation_id,
             $this->relation_name,
             $this->correct_answer,
-            $this->progress
+            $this->progress,
+            $this->stars
         );
         $model->save();
         return $model->id;
@@ -68,7 +71,8 @@ class UserQuestionHistoryModel extends Model
             $this->entity_id,
             $this->entity_name,
             $this->correct_answer,
-            $this->progress
+            $this->progress,
+            $this->stars
         );
         $model->save();
         return $model->id;
@@ -117,7 +121,7 @@ class UserQuestionHistoryModel extends Model
 
     public function getUserHistoryStarsCount(int $testID)
     {
-        $query = (new Query())
+/*        $query = (new Query())
             ->select(['t.id'])
             ->from(['t' => UserQuestionHistory::tableName()])
             ->innerJoin(['t2' => UserQuestionAnswer::tableName()], 't2.question_history_id = t.id')
@@ -125,7 +129,18 @@ class UserQuestionHistoryModel extends Model
             ->andWhere('t.test_id = :test', [':test' => $testID])
             ->andWhere('t.correct_answer = 1')
             ->groupBy(['t.id']);
-        return $query->count();
+        return $query->count();*/
+
+        $stars = $this->getUserQuestionHistoryStars3($testID);
+        $ids = [];
+        $total = 0;
+        foreach ($stars as $star) {
+            if (!isset($ids[$star['question_id']])) {
+                $total += (int) $star['stars'];
+                $ids[$star['question_id']] = $star['question_id'];
+            }
+        }
+        return $total;
     }
 
     public function getUserQuestionHistoryStars2(int $testID)
@@ -140,6 +155,34 @@ class UserQuestionHistoryModel extends Model
             ->groupBy(['t2.answer_entity_id', 't.relation_id', 't.entity_id'])
             ->having('COUNT(t2.answer_entity_id) < 5')
             ->all();
+    }
+
+    public function getUserQuestionHistoryStars3(int $testID)
+    {
+        $query = (new Query())
+            ->select([
+                't.entity_id AS entityID',
+                't.relation_id AS relationID',
+                't2.answer_entity_id AS answerEntityID',
+                'MAX(t.created_at) AS maxCreatedAt',
+                'MAX(t.id) AS questionID',
+            ])
+            ->from(['t' => UserQuestionHistory::tableName()])
+            ->innerJoin(['t2' => UserQuestionAnswer::tableName()], 't2.question_history_id = t.id')
+            ->where('t.student_id = :student', [':student' => $this->student_id])
+            ->andWhere('t.test_id = :test', [':test' => $testID])
+            ->groupBy(['t2.answer_entity_id', 't.relation_id', 't.entity_id']);
+        $leadQuery = (new Query())
+            ->select([
+                'tbl.questionID AS question_id',
+                'tbl.entityID AS entity_id',
+                'tbl.relationID AS relation_id',
+                'tbl.answerEntityID AS answer_entity_id',
+                'tbl2.stars AS stars'
+            ])
+            ->from(['tbl' => $query])
+            ->innerJoin(['tbl2' => UserQuestionHistory::tableName()], 'tbl2.id = tbl.questionID');
+        return $leadQuery->all();
     }
 
     public function getUserContinentsData(int $testID)

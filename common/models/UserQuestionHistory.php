@@ -20,6 +20,7 @@ use yii\db\Query;
  * @property int $correct_answer
  * @property int $created_at
  * @property int $test_id
+ * @property int $stars;
  *
  * @property UserQuestionAnswer[] $userQuestionAnswers
  * @property UserStudent $student
@@ -103,7 +104,8 @@ class UserQuestionHistory extends ActiveRecord
                                   int $relationID,
                                   string $relationName,
                                   int $correctAnswer,
-                                  $progress
+                                  $progress,
+                                  $stars
     ): UserQuestionHistory
     {
         $model = new self;
@@ -117,10 +119,11 @@ class UserQuestionHistory extends ActiveRecord
         $model->relation_name = $relationName;
         $model->correct_answer = $correctAnswer;
         $model->progress = $progress;
+        $model->stars = $stars;
         return $model;
     }
 
-    public static function createWordList(int $studentID, int $testID, int $entityID, string $entityName, int $correctAnswer, $progress)
+    public static function createWordList(int $studentID, int $testID, int $entityID, string $entityName, int $correctAnswer, $progress, $stars)
     {
         $model = new self;
         $model->student_id = $studentID;
@@ -130,6 +133,7 @@ class UserQuestionHistory extends ActiveRecord
         $model->correct_answer = $correctAnswer;
         $model->progress = $progress;
         $model->question_topic_id = 0;
+        $model->stars = $stars;
         return $model;
     }
 

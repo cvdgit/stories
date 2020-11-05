@@ -21,7 +21,7 @@ class CorrectIncorrectBuilder extends BaseCollection
 
     public function getCorrectValue(array $word): int
     {
-        return self::CORRECT;
+        return $word['id'];
     }
 
 }

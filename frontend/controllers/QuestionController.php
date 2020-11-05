@@ -76,7 +76,7 @@ class QuestionController extends Controller
             $userQuestionHistoryModel = new UserQuestionHistoryModel();
             $userQuestionHistoryModel->student_id = $studentId;
             $userHistory = $userQuestionHistoryModel->getUserQuestionHistory($test->id);
-            $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStars2($test->id);
+            $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStars3($test->id);
             $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCount($test->id);
         }
 

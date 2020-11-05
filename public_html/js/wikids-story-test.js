@@ -1048,10 +1048,10 @@ var WikidsStoryTest = (function() {
             };
             convertAnswerToInt = false;
         }
+
         answerIsCorrect = answerQuestion($activeQuestion, answer, correctAnswersCallback, convertAnswerToInt);
         // console.debug(answerIsCorrect);
 
-        var saveHistory = currentQuestion.lastAnswerIsCorrect;
         if (answerIsCorrect) {
             if (currentQuestion['stars']) {
                 if (currentQuestion.lastAnswerIsCorrect) {
@@ -1117,75 +1117,68 @@ var WikidsStoryTest = (function() {
         if (!App.userIsGuest()) {
             var answerParams = {};
             var answerList = [];
-            if (saveHistory) {
-                if (testConfig.sourceIsNeo()) {
-                    answerList = answer.map(function (entity_id) {
-                        return {
-                            'answer_entity_id': entity_id,
-                            'answer_entity_name': answerByID(currentQuestion, entity_id).name
-                        };
-                    });
-                    answerParams = {
-                        'source': testConfig.getSource(),
-                        'test_id': currentQuestion.test_id,
-                        'student_id': currentStudent.id,
-                        'question_topic_id': currentQuestion.topic_id,
-                        'question_topic_name': currentQuestion.name,
-                        'entity_id': currentQuestion.entity_id,
-                        'entity_name': currentQuestion.entity_name,
-                        'relation_id': currentQuestion.relation_id,
-                        'relation_name': currentQuestion.relation_name,
-                        'correct_answer': answerIsCorrect ? 1 : 0,
-                        'answers': answerList,
-                        'progress': testProgress.calcPercent()
+            if (testConfig.sourceIsNeo()) {
+                answerList = answer.map(function (entity_id) {
+                    return {
+                        'answer_entity_id': entity_id,
+                        'answer_entity_name': answerByID(currentQuestion, entity_id).name
                     };
-                    $.post('/question/answer', answerParams);
-                }
-                if (testConfig.sourceIsWord() && !testConfig.answerTypeIsInput()) {
-                    /*                answerList = answer.map(function (entity_id) {
-                                        var answer = answerByID(currentQuestion, entity_id);
-                                        return {
-                                            'answer_entity_id': entity_id,
-                                            'answer_entity_name': answer ? answer.name : entity_id
-                                        };
-                                    });*/
-                    answerList = answer.map(function (answerText) {
-                        return {
-                            'answer_entity_id': currentQuestion.id,
-                            'answer_entity_name': answerText
-                        };
-                    });
-                    answerParams = {
-                        'source': testConfig.getSource(),
-                        'test_id': currentQuestion.test_id,
-                        'student_id': currentStudent.id,
-                        'entity_id': currentQuestion.id,
-                        'entity_name': currentQuestion.name,
-                        'correct_answer': answerIsCorrect ? 1 : 0,
-                        'answers': answerList,
-                        'progress': testProgress.calcPercent()
+                });
+                answerParams = {
+                    'source': testConfig.getSource(),
+                    'test_id': currentQuestion.test_id,
+                    'student_id': currentStudent.id,
+                    'question_topic_id': currentQuestion.topic_id,
+                    'question_topic_name': currentQuestion.name,
+                    'entity_id': currentQuestion.entity_id,
+                    'entity_name': currentQuestion.entity_name,
+                    'relation_id': currentQuestion.relation_id,
+                    'relation_name': currentQuestion.relation_name,
+                    'correct_answer': answerIsCorrect ? 1 : 0,
+                    'answers': answerList,
+                    'progress': testProgress.calcPercent(),
+                    'stars': questionsRepeat.number(currentQuestion)
+                };
+                $.post('/question/answer', answerParams);
+            }
+            if (testConfig.sourceIsWord() && !testConfig.answerTypeIsInput()) {
+                answerList = answer.map(function (answerText) {
+                    return {
+                        'answer_entity_id': currentQuestion.id,
+                        'answer_entity_name': answerText
                     };
-                    $.post('/question/answer', answerParams);
-                }
-                if (testConfig.sourceIsWord() && testConfig.answerTypeIsInput()) {
-                    answerList = answer.map(function (answerText) {
-                        return {
-                            'answer_entity_id': currentQuestion.id,
-                            'answer_entity_name': answerText
-                        };
-                    });
-                    answerParams = {
-                        'source': testConfig.getSource(),
-                        'test_id': currentQuestion.test_id,
-                        'student_id': currentStudent.id,
-                        'entity_id': currentQuestion.id,
-                        'entity_name': currentQuestion.name,
-                        'correct_answer': answerIsCorrect ? 1 : 0,
-                        'answers': answerList,
-                        'progress': testProgress.calcPercent()
+                });
+                answerParams = {
+                    'source': testConfig.getSource(),
+                    'test_id': currentQuestion.test_id,
+                    'student_id': currentStudent.id,
+                    'entity_id': currentQuestion.id,
+                    'entity_name': currentQuestion.name,
+                    'correct_answer': answerIsCorrect ? 1 : 0,
+                    'answers': answerList,
+                    'progress': testProgress.calcPercent(),
+                    'stars': questionsRepeat.number(currentQuestion)
+                };
+                $.post('/question/answer', answerParams);
+            }
+            if (testConfig.sourceIsWord() && testConfig.answerTypeIsInput()) {
+                answerList = answer.map(function (answerText) {
+                    return {
+                        'answer_entity_id': currentQuestion.id,
+                        'answer_entity_name': answerText
                     };
-                    $.post('/question/answer', answerParams);
-                }
+                });
+                answerParams = {
+                    'source': testConfig.getSource(),
+                    'test_id': currentQuestion.test_id,
+                    'student_id': currentStudent.id,
+                    'entity_id': currentQuestion.id,
+                    'entity_name': currentQuestion.name,
+                    'correct_answer': answerIsCorrect ? 1 : 0,
+                    'answers': answerList,
+                    'progress': testProgress.calcPercent()
+                };
+                $.post('/question/answer', answerParams);
             }
         }
 
