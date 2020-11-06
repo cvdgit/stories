@@ -16,8 +16,8 @@ $this->params['sidebarMenuItems'] = [
                 <tr>
                     <th>question_id</th>
                     <th>entity_name</th>
-                    <th>answer_entity_name</th>
-                    <th>answer_count</th>
+                    <th>Ответ пользователя</th>
+                    <th>stars</th>
                 </tr>
             </thead>
             <tbody>
@@ -26,7 +26,7 @@ $this->params['sidebarMenuItems'] = [
                     <td><?= $row['question_id'] ?></td>
                     <td><?= $row['entity_name'] ?></td>
                     <td><?= $row['answer_entity_name'] ?></td>
-                    <td><?= $row['answer_count'] ?></td>
+                    <td><?= $row['stars'] ?></td>
                 </tr>
             <?php endforeach ?>
             </tbody>

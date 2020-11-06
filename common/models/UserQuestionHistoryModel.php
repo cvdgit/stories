@@ -234,15 +234,28 @@ class UserQuestionHistoryModel extends Model
     public function getDetail(int $testID)
     {
         $query = (new Query())
-            ->select(['t.entity_name', 't2.answer_entity_name', 'MIN(t.id) AS question_id', 'COUNT(t.id) AS answer_count'])
+            ->select([
+                't.entity_id AS entityID',
+                't.relation_id AS relationID',
+                't2.answer_entity_id AS answerEntityID',
+                'MAX(t.id) AS questionID',
+            ])
             ->from(['t' => UserQuestionHistory::tableName()])
             ->innerJoin(['t2' => UserQuestionAnswer::tableName()], 't2.question_history_id = t.id')
             ->where('t.student_id = :student', [':student' => $this->student_id])
             ->andWhere('t.test_id = :test', [':test' => $testID])
-            ->andWhere('t.correct_answer = 1')
-            ->groupBy(['t.entity_name', 't2.answer_entity_name'])
-            ->orderBy(['MIN(t.id)' => SORT_ASC]);
-        return $query->all();
+            ->groupBy(['t2.answer_entity_id', 't.relation_id', 't.entity_id']);
+        $leadQuery = (new Query())
+            ->select([
+                'tbl.questionID AS question_id',
+                'tbl2.entity_name AS entity_name',
+                '(SELECT t3.answer_entity_name FROM user_question_answer t3 WHERE t3.question_history_id = tbl.questionID AND t3.answer_entity_id = tbl.answerEntityID) AS answer_entity_name',
+                'tbl2.stars AS stars'
+            ])
+            ->from(['tbl' => $query])
+            ->innerJoin(['tbl2' => UserQuestionHistory::tableName()], 'tbl2.id = tbl.questionID')
+        ->orderBy(['tbl2.created_at' => SORT_ASC]);
+        return $leadQuery->all();
     }
 
 }
