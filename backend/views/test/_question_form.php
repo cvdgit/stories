@@ -15,7 +15,7 @@ use yii\widgets\ActiveForm;
             <?php $form = ActiveForm::begin(); ?>
             <?= $form->field($model, 'story_test_id')->hiddenInput()->label(false) ?>
             <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-            <?= $form->field($model, 'type')->dropDownList(\common\models\StoryTestQuestion::questionTypeArray()) ?>
+            <?= $form->field($model, 'type')->dropDownList(\backend\models\question\QuestionType::asArray()) ?>
             <?= $form->field($model, 'mix_answers')->checkbox() ?>
             <div class="form-group">
                 <?= Html::submitButton(($model->isNewRecord ? 'Создать' : 'Изменить') . ' вопрос', ['class' => 'btn btn-success']) ?>

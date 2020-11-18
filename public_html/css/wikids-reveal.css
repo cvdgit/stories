@@ -2236,3 +2236,7 @@ p.wikids-test-description {
 .test-recognition .recognition-repeat-word {
 	margin-top: 10px;
 }
+
+.question-region {
+	cursor: crosshair;
+}

@@ -2,7 +2,9 @@
 
 namespace common\models;
 
+use backend\models\question\QuestionType;
 use DomainException;
+use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
@@ -15,6 +17,8 @@ use yii\helpers\ArrayHelper;
  * @property int $order
  * @property int $type
  * @property int $mix_answers
+ * @property string $image
+ * @property string $regions;
  *
  * @property StoryTestAnswer[] $storyTestAnswers
  * @property StoryTest $storyTest
@@ -44,8 +48,9 @@ class StoryTestQuestion extends ActiveRecord
         return [
             [['story_test_id', 'name', 'type'], 'required'],
             [['story_test_id', 'order', 'type', 'mix_answers'], 'integer'],
-            [['name'], 'string', 'max' => 255],
+            [['name', 'image'], 'string', 'max' => 255],
             [['story_test_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTest::class, 'targetAttribute' => ['story_test_id' => 'id']],
+            [['regions'], 'safe'],
         ];
     }
 
@@ -63,6 +68,7 @@ class StoryTestQuestion extends ActiveRecord
             'mix_answers' => 'Перемешивать ответы',
             'answer_number' => 'Количество ответов',
             'correct_answer_number' => 'Количество верных ответов',
+            'image' => 'Изображение',
         ];
     }
 
@@ -90,14 +96,6 @@ class StoryTestQuestion extends ActiveRecord
         throw new DomainException('Вопрос не найден');
     }
 
-    public static function questionTypeArray()
-    {
-        return [
-            self::QUESTION_TYPE_RADIO => 'Один ответ',
-            self::QUESTION_TYPE_CHECKBOX => 'Множественный выбор',
-        ];
-    }
-
     public static function questionArray(): array
     {
         return ArrayHelper::map(self::find()->orderBy(['name' => SORT_ASC])->all(), 'id', 'name');
@@ -115,6 +113,39 @@ class StoryTestQuestion extends ActiveRecord
         return array_values(array_map(function(StoryTestAnswer $item) {
             return $item->id;
         }, $this->getCorrectAnswers()));
+    }
+
+    public static function create(int $testID, string $name, int $type, int $order, int $mixAnswers, string $image, string $regions)
+    {
+        $model = new self();
+        $model->story_test_id = $testID;
+        $model->name = $name;
+        $model->type = $type;
+        $model->order = $order;
+        $model->mix_answers = $mixAnswers;
+        $model->image = $image;
+        $model->regions = $regions;
+        return $model;
+    }
+
+    public static function createRegion(int $testID, string $name, string $regions = '', int $order = 1, int $mixAnswers = 0, string $image = '')
+    {
+        return self::create($testID, $name, QuestionType::REGION, $order, $mixAnswers, $image, $regions);
+    }
+
+    public function getImagesPath()
+    {
+        return Yii::getAlias('@public') . Yii::$app->params['test.question.images'] . '/' . $this->story_test_id . '/';
+    }
+
+    public function getImageUrl()
+    {
+        return Yii::$app->params['test.question.images'] . '/' . $this->story_test_id . '/' . $this->image;
+    }
+
+    public function typeIsRegion(): bool
+    {
+        return (int) $this->type === QuestionType::REGION;
     }
 
 }

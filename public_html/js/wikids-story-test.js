@@ -116,6 +116,7 @@ var WikidsStoryTest = (function() {
     };
 
     TestProgress.prototype.calcPercent = function() {
+        console.log(this.getCurrent(), this.getTotal());
         return Math.round(this.getCurrent() * 100 / this.getTotal());
     }
 
@@ -263,7 +264,7 @@ var WikidsStoryTest = (function() {
         testConfig = new TestConfig(testData['test']);
         linked = new TestLinked(testData['stories']);
 
-        questionsRepeat = new QuestionsRepeat(questions, testConfig.sourceIsLocal() ? 1 : 5);
+        questionsRepeat = new QuestionsRepeat(questions, 5);
         testProgress = new TestProgress(getProgressData());
 
         numPad = new AnswerTypeNumPad();
@@ -631,11 +632,24 @@ var WikidsStoryTest = (function() {
         return answerTypeRecording.create(question, answer);
     }
 
+    function createRegionAnswer(question, answers) {
+        var regionQuestion = new RegionQuestion(question, answers);
+        return regionQuestion.create();
+    }
+
     function createRecordingAnswers(question, answers) {
         var $answers = $("<div/>").addClass("wikids-test-answers");
         answers.forEach(function(answer) {
             $answers.append(createRecordingAnswer(question, answer));
         });
+        var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-12 question-wrapper"></div></div>');
+        $wrapper.find(".question-wrapper").append($answers);
+        return $wrapper;
+    }
+
+    function createRegionAnswers(question, answers) {
+        var $answers = $("<div/>").addClass("wikids-test-answers");
+        $answers.append(createRegionAnswer(question, answers));
         var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-12 question-wrapper"></div></div>');
         $wrapper.find(".question-wrapper").append($answers);
         return $wrapper;
@@ -658,7 +672,7 @@ var WikidsStoryTest = (function() {
         var $elem = $('<p/>');
         $elem.addClass('question-stars');
         $elem.css('textAlign', 'right');
-        appendStars($elem, testConfig.sourceIsLocal() ? 1 : 5, stars.current);
+        appendStars($elem, 5, stars.current);
         return $elem[0].outerHTML;
     }
 
@@ -733,6 +747,9 @@ var WikidsStoryTest = (function() {
                     break;
                 case 'recording':
                     $answers = createRecordingAnswers(question, getAnswersData(question));
+                    break;
+                case 'region':
+                    $answers = createRegionAnswers(question, getAnswersData(question));
                     break;
                 default:
                     $answers = createAnswers(getAnswersData(question), question);
@@ -985,43 +1002,49 @@ var WikidsStoryTest = (function() {
     }
 
     /* Ответ на вопрос */
-    function nextQuestion() {
+    function nextQuestion(preparedAnswers) {
 
         console.debug('WikidsStoryTest.nextQuestion');
 
+        preparedAnswers = preparedAnswers || false;
         var $activeQuestion = $('.wikids-test-active-question');
         currentQuestion = $activeQuestion.data('question');
 
-        var view = currentQuestion['view'] ? currentQuestion.view : '';
-        if (testConfig.answerTypeIsNumPad()) {
-            view = 'numpad';
-        }
-        if (testConfig.answerTypeIsInput()) {
-            view = 'input';
-        }
-        if (testConfig.answerTypeIsRecording()) {
-            view = 'recognition';
-        }
-
         var answer = [];
-        switch (view) {
-            case 'svg':
-                answer = getSvgQuestionAnswers(currentQuestion);
-                questionIsVisible($activeQuestion);
-                break;
-            case 'numpad':
-                answer = getNumPadQuestionAnswers($activeQuestion);
-                numPad.reset($activeQuestion);
-                break;
-            case 'input':
-                answer = getInputQuestionAnswers($activeQuestion);
-                break;
-            case 'recognition':
-                answer = getRecognitionQuestionAnswers($activeQuestion);
-                answerTypeRecording.resetResult();
-                break;
-            default:
-                answer = getQuestionAnswers($activeQuestion);
+        if (!preparedAnswers) {
+
+            var view = currentQuestion['view'] ? currentQuestion.view : '';
+            if (testConfig.answerTypeIsNumPad()) {
+                view = 'numpad';
+            }
+            if (testConfig.answerTypeIsInput()) {
+                view = 'input';
+            }
+            if (testConfig.answerTypeIsRecording()) {
+                view = 'recognition';
+            }
+            switch (view) {
+                case 'svg':
+                    answer = getSvgQuestionAnswers(currentQuestion);
+                    questionIsVisible($activeQuestion);
+                    break;
+                case 'numpad':
+                    answer = getNumPadQuestionAnswers($activeQuestion);
+                    numPad.reset($activeQuestion);
+                    break;
+                case 'input':
+                    answer = getInputQuestionAnswers($activeQuestion);
+                    break;
+                case 'recognition':
+                    answer = getRecognitionQuestionAnswers($activeQuestion);
+                    answerTypeRecording.resetResult();
+                    break;
+                default:
+                    answer = getQuestionAnswers($activeQuestion);
+            }
+        }
+        else {
+            answer = preparedAnswers;
         }
 
         if (answer.length === 0) {
@@ -1065,9 +1088,9 @@ var WikidsStoryTest = (function() {
             else {
                 skipQuestion.push(currentQuestion.id);
             }
-            if (testConfig.sourceIsLocal()) {
-                testProgress.inc();
-            }
+            //if (testConfig.sourceIsLocal()) {
+            //    testProgress.inc();
+            //}
         }
         else {
             currentQuestion.lastAnswerIsCorrect = false;
@@ -1086,7 +1109,7 @@ var WikidsStoryTest = (function() {
 
         //console.log(answerIsCorrect, questionsRepeat.done(currentQuestion));
         var done = false;
-        if (!testConfig.sourceIsLocal()) {
+        //if (!testConfig.sourceIsLocal()) {
             if (!answerIsCorrect) {
                 testQuestions.unshift(currentQuestion);
             }
@@ -1099,8 +1122,8 @@ var WikidsStoryTest = (function() {
                     testQuestions.push(currentQuestion);
                 }
             }
-        }
-        else {
+        //}
+/*        else {
             if (!answerIsCorrect) {
                 testQuestions.unshift(currentQuestion);
             }
@@ -1109,7 +1132,7 @@ var WikidsStoryTest = (function() {
                     makeTestQuestions();
                 }
             }
-        }
+        }*/
 
         //console.log(questions);
         //console.log(currentQuestion);
@@ -1166,6 +1189,26 @@ var WikidsStoryTest = (function() {
                     return {
                         'answer_entity_id': currentQuestion.id,
                         'answer_entity_name': answerText
+                    };
+                });
+                answerParams = {
+                    'source': testConfig.getSource(),
+                    'test_id': currentQuestion.test_id,
+                    'student_id': currentStudent.id,
+                    'entity_id': currentQuestion.id,
+                    'entity_name': currentQuestion.name,
+                    'correct_answer': answerIsCorrect ? 1 : 0,
+                    'answers': answerList,
+                    'progress': testProgress.calcPercent(),
+                    'stars': questionsRepeat.number(currentQuestion)
+                };
+                $.post('/question/answer', answerParams);
+            }
+            if (testConfig.sourceIsLocal()) {
+                answerList = answer.map(function (entity_id) {
+                    return {
+                        'answer_entity_id': entity_id,
+                        'answer_entity_name': answerByID(currentQuestion, entity_id).name
                     };
                 });
                 answerParams = {
@@ -1387,7 +1430,6 @@ var WikidsStoryTest = (function() {
         console.debug('continueTestAction');
 
         dom.continueButton.hide();
-
         var isLastQuestion = (testQuestions.length === 0);
         var actionRelated = incorrectAnswerActionRelated();
         if (isLastQuestion) {
@@ -1999,3 +2041,70 @@ var TestLinked = function(data) {
     API.getHtml = getHtml;
     return API;
 }
+
+var RegionQuestion = function(question, questionAnswers) {
+
+    this.question = question;
+    this.questionAnswers = questionAnswers;
+
+    var answers = [];
+    this.addAnswer = function(answer) {
+        if (answers.indexOf(answer) === -1) {
+            answers.push(answer);
+        }
+    };
+    this.getAnswers = function() {
+        return answers;
+    };
+    this.resetAnswers = function() {
+        answers = [];
+    }
+
+    this.getAnswerByRegion = function(region) {
+        return questionAnswers.filter(function(answer) {
+            return answer.region_id === region;
+        });
+    };
+}
+RegionQuestion.prototype.create = function() {
+
+    var $img = $('<img/>')
+        .attr('src', this.question.params.image)
+        .css({'position': 'absolute', 'left': 0, 'top': 0, 'width': '100%'});
+
+    var that = this;
+    var $wrapper = $('<div/>')
+        .addClass('question-region')
+        .css({'width': '640px', 'height': '480px', 'position': 'relative'})
+        .on('click', function(e) {
+            var $target  = $(e.target);
+            var isRect = $target[0].tagName === 'DIV' && $target.hasClass('answer-rect');
+            if (!isRect) {
+                return;
+            }
+
+            var regionID = $target.attr('data-answer-id');
+            var answer = that.getAnswerByRegion(regionID);
+
+            that.addAnswer(answer[0].id);
+
+            WikidsStoryTest.nextQuestion(that.getAnswers());
+            that.resetAnswers();
+        })
+        .append($img);
+
+    this.question.params.regions.forEach(function(region) {
+        $('<div/>')
+            .addClass('answer-rect')
+            .attr('data-answer-id', region.id)
+            .css({
+                'position': 'absolute',
+                'left': parseInt(region.rect.left) + 'px',
+                'top': parseInt(region.rect.top) + 'px',
+                'width': parseInt(region.rect.width) + 'px',
+                'height': parseInt(region.rect.height) + 'px'
+            })
+            .appendTo($wrapper);
+    });
+    return $wrapper;
+};

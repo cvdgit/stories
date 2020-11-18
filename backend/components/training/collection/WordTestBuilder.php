@@ -31,16 +31,16 @@ class WordTestBuilder
     public function build()
     {
         if ($this->test->isAnswerTypeNumPad()) {
-            $this->create(NumPadBuilder::class)->build($this->collection);
+            $this->create(NumPadCollection::class)->build($this->collection);
         }
         else if ($this->test->isAnswerTypeInput()) {
-            $this->create(InputBuilder::class)->build($this->collection);
+            $this->create(InputCollection::class)->build($this->collection);
         }
         else if ($this->test->isAnswerTypeRecording()) {
             $this->create(RecordingCollection::class)->build($this->collection);
         }
         else {
-            $this->create(CorrectIncorrectBuilder::class)->build($this->collection);
+            $this->create(CorrectIncorrectCollection::class)->build($this->collection);
         }
         return $this->collection;
     }

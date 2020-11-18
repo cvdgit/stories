@@ -118,7 +118,7 @@ class StoryTest extends ActiveRecord
 
     public static function getLocalTestArray(): array
     {
-        return ArrayHelper::map(self::find()->where('source = :source', [':source' => SourceType::LIST])->orderBy(['title' => SORT_ASC])->all(), 'id', 'title');
+        return ArrayHelper::map(self::find()->where(['in', 'source', [SourceType::TEST, SourceType::LIST]])->orderBy(['title' => SORT_ASC])->all(), 'id', 'title');
     }
 
     public static function findModel($id): self
@@ -217,6 +217,21 @@ class StoryTest extends ActiveRecord
     public function isAnswerTypeRecording()
     {
         return (int) $this->answer_type === AnswerType::RECORDING;
+    }
+
+    public function getQuestionData()
+    {
+        return StoryTestQuestion::find()
+            ->where('story_test_id = :id', [':id' => $this->id])
+            ->with('storyTestAnswers')
+            ->all();
+    }
+
+    public function getQuestionDataCount()
+    {
+        return StoryTestQuestion::find()
+            ->where('story_test_id = :id', [':id' => $this->id])
+            ->count();
     }
 
 }

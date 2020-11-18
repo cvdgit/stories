@@ -98,4 +98,25 @@ class BaseQuestion
         return $this->testID;
     }
 
+    protected function makeStars(array $starsData, BaseQuestion $question)
+    {
+        $stars = 0;
+        $questionID = $question->getId();
+        $correctAnswerIDs = $question->getCorrectAnswerIDs();
+        foreach ($starsData as $star) {
+            if ((int)$star['entity_id'] === $questionID && in_array((int)$star['answer_entity_id'], $correctAnswerIDs, true)) {
+                $stars = $star['stars'];
+                break;
+            }
+        }
+        return $stars;
+    }
+
+    public function getCorrectAnswerIDs()
+    {
+        return array_map(function(Answer $answer) {
+            return $answer->getId();
+        }, $this->answers);
+    }
+
 }

@@ -3,7 +3,7 @@
 namespace common\models;
 
 use DomainException;
-use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "story_test_answer".
@@ -14,10 +14,11 @@ use Yii;
  * @property int $order
  * @property int $is_correct
  * @property string $image
+ * @property string $region_id
  *
  * @property StoryTestQuestion $storyQuestion
  */
-class StoryTestAnswer extends \yii\db\ActiveRecord
+class StoryTestAnswer extends ActiveRecord
 {
 
     const CORRECT_ANSWER = 1;

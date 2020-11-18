@@ -6,12 +6,14 @@ class WordQuestion extends Question
 {
 
     private $starsTotal = 5;
-    private $starsCurrent;
+    private $stars;
+    private $questionID;
 
-    public function __construct(int $testID, int $id, string $name, bool $lastAnswerIsCorrect, int $mixAnswers, int $type, int $starsCurrent, $image = null)
+    public function __construct(int $testID, int $questionID, string $name, array $stars)
     {
-        parent::__construct($testID, $id, $name, $lastAnswerIsCorrect, $mixAnswers, $type, $image);
-        $this->starsCurrent = $starsCurrent;
+        parent::__construct($testID, $questionID, $name, true, 0, 0);
+        $this->stars = $stars;
+        $this->questionID = $questionID;
     }
 
     public function serialize()
@@ -19,9 +21,15 @@ class WordQuestion extends Question
         return array_merge([
             'stars' => [
                 'total' => $this->starsTotal,
-                'current' => $this->starsCurrent,
-            ]
+                'current' => $this->makeStars($this->stars, $this),
+            ],
+            'view' => 'word',
         ], parent::serialize());
+    }
+
+    public function getCorrectAnswerIDs()
+    {
+        return [$this->questionID];
     }
 
 }

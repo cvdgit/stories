@@ -88,7 +88,7 @@ class TestWordList extends ActiveRecord
         return $this->getTestWords()->count();
     }
 
-    public function getTestWordsAsArray($filter = null)
+    private function getWordsQuery($filter = null)
     {
         $query = $this->getTestWords();
         if ($filter !== null) {
@@ -97,7 +97,17 @@ class TestWordList extends ActiveRecord
             }, $filter);
             $query->andFilterWhere(['not in', 'id', $ids]);
         }
-        return $query->asArray()->all();
+        return $query;
+    }
+
+    public function getTestWordsAsArray($filter = null)
+    {
+        return $this->getWordsQuery($filter)->asArray()->all();
+    }
+
+    public function getTestWordsData($filter = null)
+    {
+        return $this->getWordsQuery($filter)->all();
     }
 
     public static function getWordListAsArray()

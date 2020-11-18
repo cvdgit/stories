@@ -36,4 +36,5 @@ return [
         ],
     ],
 
+    'test.question.images' => '/test_images/question',
 ];

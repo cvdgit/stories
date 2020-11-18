@@ -19,6 +19,7 @@ class AnswerSerializer
             'name' => trim($this->answer->getName()),
             'is_correct' => (int) $this->answer->isCorrect(),
             'description' => '',
+            'region_id' => $this->answer->getRegionID(),
         ];
     }
 

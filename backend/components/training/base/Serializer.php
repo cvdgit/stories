@@ -7,7 +7,7 @@ use common\models\StoryTest;
 class Serializer
 {
 
-    public function serialize(StoryTest $test, QuestionCollection $collection, $students, $userStarsCount, $stories): array
+    public function serialize(StoryTest $test, QuestionCollection $collection, $students, $userStarsCount, $stories = []): array
     {
         return [
             0 => [

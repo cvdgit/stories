@@ -17,11 +17,15 @@ class Answer
     /** @var bool */
     private $correct;
 
-    public function __construct(int $id, string $name, bool $correct, $image = null)
+    /** @var mixed|string */
+    private $regionID;
+
+    public function __construct(int $id, string $name, bool $correct, $regionID = '', $image = null)
     {
         $this->id = $id;
         $this->name = $name;
         $this->correct = $correct;
+        $this->regionID = $regionID;
         $this->image = $image;
     }
 
@@ -55,6 +59,22 @@ class Answer
     public function isCorrect(): bool
     {
         return $this->correct;
+    }
+
+    /**
+     * @return mixed|string
+     */
+    public function getRegionID()
+    {
+        return $this->regionID;
+    }
+
+    /**
+     * @param mixed|string $regionID
+     */
+    public function setRegionID($regionID): void
+    {
+        $this->regionID = $regionID;
     }
 
 }

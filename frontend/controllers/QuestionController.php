@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use backend\components\training\base\Serializer;
+use backend\components\training\collection\TestBuilder;
 use backend\components\training\collection\WordTestBuilder;
 use common\models\StoryTest;
 use common\models\TestWordList;
@@ -66,7 +67,7 @@ class QuestionController extends Controller
     public function actionGet(int $testId, int $studentId = null, $question_params = null)
     {
 
-        $test = StoryTest::findModel($testId);
+        $test = $this->findTestModel($testId);
         $questionId = $test->question_list_id;
 
         $userHistory = [];
@@ -82,15 +83,20 @@ class QuestionController extends Controller
 
         if ($test->isSourceWordList()) {
             $wordListModel = $this->findWordListModel($test->word_list_id);
-            $data = $wordListModel->getTestWordsAsArray($userHistory);
-            $dataCount = $wordListModel->getTestWordsCount();
-            $collection = (new WordTestBuilder($test, $data, $dataCount, $userStars))->build();
+            $collection = (new WordTestBuilder($test, $wordListModel->getTestWordsData($userHistory), $wordListModel->getTestWordsCount(), $userStars))->build();
             return (new Serializer())->serialize(
                 $test,
                 $collection,
                 $this->getStudents($test->id),
                 $userStarsCount,
                 $wordListModel->getLinkedStories());
+        }
+
+        if ($test->isSourceTest()) {
+            $collection = (new TestBuilder($test, $test->getQuestionData(), $test->getQuestionDataCount(), $userStars))
+                ->build();
+            return (new Serializer())
+                ->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount);
         }
 
         $curl = new Curl();
@@ -240,7 +246,7 @@ class QuestionController extends Controller
             if ($model->isSourceNeo()) {
                 $userQuestionHistoryID = $model->createUserQuestionHistory();
             }
-            if ($model->isSourceWordList()) {
+            if ($model->isSourceWordList() || $model->isSourceTest()) {
                 $userQuestionHistoryID = $model->createWordListQuestionHistory();
             }
             $model->createUserQuestionAnswers($userQuestionHistoryID);
@@ -259,6 +265,14 @@ class QuestionController extends Controller
     protected function findWordListModel(int $id)
     {
         if (($model = TestWordList::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    protected function findTestModel(int $id)
+    {
+        if (($model = StoryTest::findOne($id)) !== null) {
             return $model;
         }
         throw new NotFoundHttpException('The requested page does not exist.');
