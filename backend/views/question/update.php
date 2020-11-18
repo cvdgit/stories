@@ -13,7 +13,7 @@ TestQuestionAsset::register($this);
     <h1><?= Html::encode($this->title) ?></h1>
     <div class="story-test-form">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-7">
                 <?php $form = ActiveForm::begin(['id' => 'update-region-question-form']); ?>
                 <?= $form->field($model, 'test_id')->hiddenInput()->label(false) ?>
                 <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
@@ -33,7 +33,7 @@ TestQuestionAsset::register($this);
                 </div>
                 <?php ActiveForm::end(); ?>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-5">
                 <div id="region-table"></div>
             </div>
         </div>

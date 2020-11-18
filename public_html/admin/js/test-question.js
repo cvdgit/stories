@@ -183,6 +183,7 @@ var RegionTable = function() {
         '</tr>' +
         '</thead>' +
         '<tbody>' +
+        '<tr class="empty-row"><td colspan="3">Выделите область на изображении</td></tr>' +
         '</tbody>' +
         '</table>');
 
@@ -196,11 +197,17 @@ var RegionTable = function() {
         });
     });
 
+    $table.on('click', 'input[type=checkbox]', function() {
+        $table.find('input[type=checkbox]').prop('checked', false);
+        this.checked = true;
+    });
+
     function create() {
         return $table;
     }
 
     function addRow(id, title, correct) {
+        $table.find('tr.empty-row').remove();
         var $deleteElement = $('<a/>')
             .attr('href', '#')
             .addClass('delete-region')
@@ -229,7 +236,11 @@ var RegionTable = function() {
     }
 
     function rowsCount() {
-        return $('tbody tr', $table).length;
+        return $('tbody tr:not(.empty-row)', $table).length;
+    }
+
+    function getCorrect() {
+        return $table.find('input[type=checkbox]:checked').length === 0;
     }
 
     return {
@@ -241,7 +252,8 @@ var RegionTable = function() {
             }
         },
         'getRows': getRows,
-        'rowsCount': rowsCount
+        'rowsCount': rowsCount,
+        'getCorrect': getCorrect
     }
 }
 
@@ -255,7 +267,7 @@ var RegionQuestion = (function() {
             "id": 'region' + table.rowsCount().toString(),
             "title": 'Region ' + table.rowsCount().toString(),
             "rect": args.rect,
-            "correct": true
+            "correct": table.getCorrect()
         };
         table.addRow(item.id, item.title, item.correct);
         args.element.attr('id', item.id);
