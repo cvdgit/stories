@@ -16,7 +16,7 @@ $this->params['sidebarMenuItems'] = [];
                 <?= $form->field($model, 'test_id')->hiddenInput()->label(false) ?>
                 <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
                 <?= $form->field($model, 'type')->dropDownList(QuestionType::asArray(), ['readonly' => true]) ?>
-                <?= $form->field($model, 'image')->fileInput() ?>
+                <?= $form->field($model, 'imageFile')->fileInput() ?>
                 <div class="form-group">
                     <?= Html::submitButton('Создать вопрос', ['class' => 'btn btn-success']) ?>
                 </div>
