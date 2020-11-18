@@ -45,8 +45,9 @@ class QuestionController extends Controller
         $model->type = $type;
         if ($model->load(Yii::$app->request->post())) {
             try {
-                $model->create();
+                $id = $model->create();
                 Yii::$app->session->setFlash('success', 'Вопрос успешно создан');
+                return $this->redirect(['update', 'id' => $id]);
             }
             catch (\Exception $ex) {
                 Yii::$app->session->setFlash('error', $ex->getMessage());
@@ -74,6 +75,13 @@ class QuestionController extends Controller
         return $this->render('update', [
             'model' => $form,
         ]);
+    }
+
+    public function actionDelete(int $id)
+    {
+        $model = $this->findModel($id);
+        $model->delete();
+        return $this->redirect(['test/update', 'id' => $model->story_test_id]);
     }
 
     protected function findModel($id)

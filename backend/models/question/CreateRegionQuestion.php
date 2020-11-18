@@ -24,6 +24,7 @@ class CreateRegionQuestion extends RegionQuestion
         $model = StoryTestQuestion::createRegion($this->test_id, $this->name);
         $this->uploadImage($model);
         $model->save();
+        return $model->id;
     }
 
 }

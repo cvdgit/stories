@@ -7,6 +7,7 @@ use DomainException;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\helpers\FileHelper;
 
 /**
  * This is the model class for table "story_test_question".
@@ -146,6 +147,15 @@ class StoryTestQuestion extends ActiveRecord
     public function typeIsRegion(): bool
     {
         return (int) $this->type === QuestionType::REGION;
+    }
+
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        if ($this->typeIsRegion()) {
+            $path = $this->getImagesPath() . $this->image;
+            FileHelper::unlink($path);
+        }
     }
 
 }

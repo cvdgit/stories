@@ -41,15 +41,18 @@ use yii\helpers\Url;
                 'urlCreator' => function($action, $model, $key, $index) {
                     $url = '';
                     if ($action === 'update') {
+                        $route = ['test/update-question', 'question_id' => $model->id];
                         if ($model->typeIsRegion()) {
-                            $url = Url::to(['question/update', 'id' => $model->id]);
+                            $route = ['question/update', 'id' => $model->id];
                         }
-                        else {
-                            $url = Url::to(['test/update-question', 'question_id' => $model->id]);
-                        }
+                        $url = Url::to($route);
                     }
                     if ($action === 'delete') {
-                        $url = Url::to(['test/delete-question', 'question_id' => $model->id]);
+                        $route = ['test/delete-question', 'question_id' => $model->id];
+                        if ($model->typeIsRegion()) {
+                            $route = ['question/delete', 'id' => $model->id];
+                        }
+                        $url = Url::to($route);
                     }
                     return $url;
                 },
