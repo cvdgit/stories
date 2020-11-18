@@ -242,7 +242,7 @@ class StoryController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
-    public function actionGetStoryTest(int $id)
+    public function actionGetStoryTest(int $id, int $studentId = null)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
@@ -287,8 +287,6 @@ class StoryController extends Controller
         return $json;
         */
 
-        $studentId = UserHelper::getCurrentUserStudentID();
-
         $userHistory = [];
         $userStars = [];
         $userStarsCount = 0;
@@ -299,14 +297,13 @@ class StoryController extends Controller
             $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStars3($test->id);
             $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCount($test->id);
         }
-
         $collection = (new TestBuilder($test, $test->getQuestionData(), $test->getQuestionDataCount(), $userStars))
             ->build();
         return (new Serializer())
             ->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount);
     }
 
-    protected function getStudents()
+    protected function getStudents(int $testID)
     {
         $students = [];
         if (!Yii::$app->user->isGuest) {
@@ -315,6 +312,7 @@ class StoryController extends Controller
                 $students[] = [
                     'id' => $student->id,
                     'name' => $student->isMain() ? $student->user->getProfileName() : $student->name,
+                    'progress' => (int)$student->getProgress($testID),
                 ];
             }
         }

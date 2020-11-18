@@ -36,4 +36,12 @@ class Question extends BaseQuestion
         return $this->type;
     }
 
+    public function serialize()
+    {
+        return array_merge([
+            'type' => $this->getType(),
+            'mix_answers' => $this->getMixAnswers(),
+        ], parent::serialize());
+    }
+
 }
