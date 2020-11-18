@@ -2,10 +2,13 @@
 
 namespace frontend\controllers;
 
+use backend\components\training\base\Serializer;
+use backend\components\training\collection\TestBuilder;
 use common\helpers\UserHelper;
 use common\models\Playlist;
 use common\models\StorySlide;
 use common\models\StoryTest;
+use common\models\UserQuestionHistoryModel;
 use common\rbac\UserPermissions;
 use common\services\story\CountersService;
 use common\services\StoryAudioService;
@@ -253,6 +256,7 @@ class StoryController extends Controller
             $testRunModel->createStoryTestRun();
         }
 
+        /*
         $json = StoryTest::findAllAsArray($id);
 
         $json[0]['storyTestQuestions'] = array_filter($json[0]['storyTestQuestions'], function($question) {
@@ -281,6 +285,25 @@ class StoryController extends Controller
         $json[0]['test']['answerType'] = $test->answer_type;
         $json[0]['test']['strictAnswer'] = $test->strict_answer;
         return $json;
+        */
+
+        $studentId = UserHelper::getCurrentUserStudentID();
+
+        $userHistory = [];
+        $userStars = [];
+        $userStarsCount = 0;
+        if ($studentId !== null) {
+            $userQuestionHistoryModel = new UserQuestionHistoryModel();
+            $userQuestionHistoryModel->student_id = $studentId;
+            $userHistory = $userQuestionHistoryModel->getUserQuestionHistory($test->id);
+            $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStars3($test->id);
+            $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCount($test->id);
+        }
+
+        $collection = (new TestBuilder($test, $test->getQuestionData(), $test->getQuestionDataCount(), $userStars))
+            ->build();
+        return (new Serializer())
+            ->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount);
     }
 
     protected function getStudents()
