@@ -105,6 +105,30 @@ class UserQuestionHistoryModel extends Model
         return $query->all();
     }
 
+    public function getUserQuestionHistoryLocal(int $testID)
+    {
+        $query = (new Query())
+            ->select([
+                't.entity_id AS entityID',
+                'MAX(t.id) AS questionID',
+            ])
+            ->from(['t' => UserQuestionHistory::tableName()])
+            ->where('t.student_id = :student', [':student' => $this->student_id])
+            ->andWhere('t.test_id = :test', [':test' => $testID])
+            ->andWhere('t.correct_answer = 1')
+            ->groupBy(['t.entity_id']);
+        $leadQuery = (new Query())
+            ->select([
+                'tbl.questionID AS question_id',
+                'tbl.entityID AS entity_id',
+                'tbl2.stars AS stars'
+            ])
+            ->from(['tbl' => $query])
+            ->innerJoin(['tbl2' => UserQuestionHistory::tableName()], 'tbl2.id = tbl.questionID')
+            ->having('tbl2.stars >= 5');
+        return $leadQuery->all();
+    }
+
     public function getUserQuestionHistoryWithOutRelation(int $testID)
     {
         $query = (new Query())
@@ -121,17 +145,21 @@ class UserQuestionHistoryModel extends Model
 
     public function getUserHistoryStarsCount(int $testID)
     {
-/*        $query = (new Query())
-            ->select(['t.id'])
-            ->from(['t' => UserQuestionHistory::tableName()])
-            ->innerJoin(['t2' => UserQuestionAnswer::tableName()], 't2.question_history_id = t.id')
-            ->where('t.student_id = :student', [':student' => $this->student_id])
-            ->andWhere('t.test_id = :test', [':test' => $testID])
-            ->andWhere('t.correct_answer = 1')
-            ->groupBy(['t.id']);
-        return $query->count();*/
-
         $stars = $this->getUserQuestionHistoryStars3($testID);
+        $ids = [];
+        $total = 0;
+        foreach ($stars as $star) {
+            if (!isset($ids[$star['question_id']])) {
+                $total += (int) $star['stars'];
+                $ids[$star['question_id']] = $star['question_id'];
+            }
+        }
+        return $total;
+    }
+
+    public function getUserHistoryStarsCountLocal(int $testID)
+    {
+        $stars = $this->getUserQuestionHistoryStarsLocal($testID);
         $ids = [];
         $total = 0;
         foreach ($stars as $star) {
@@ -178,6 +206,28 @@ class UserQuestionHistoryModel extends Model
                 'tbl.entityID AS entity_id',
                 'tbl.relationID AS relation_id',
                 'tbl.answerEntityID AS answer_entity_id',
+                'tbl2.stars AS stars'
+            ])
+            ->from(['tbl' => $query])
+            ->innerJoin(['tbl2' => UserQuestionHistory::tableName()], 'tbl2.id = tbl.questionID');
+        return $leadQuery->all();
+    }
+
+    public function getUserQuestionHistoryStarsLocal(int $testID)
+    {
+        $query = (new Query())
+            ->select([
+                't.entity_id AS entityID',
+                'MAX(t.id) AS questionID',
+            ])
+            ->from(['t' => UserQuestionHistory::tableName()])
+            ->where('t.student_id = :student', [':student' => $this->student_id])
+            ->andWhere('t.test_id = :test', [':test' => $testID])
+            ->groupBy(['t.entity_id']);
+        $leadQuery = (new Query())
+            ->select([
+                'tbl.questionID AS question_id',
+                'tbl.entityID AS entity_id',
                 'tbl2.stars AS stars'
             ])
             ->from(['tbl' => $query])

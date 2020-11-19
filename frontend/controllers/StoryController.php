@@ -293,9 +293,9 @@ class StoryController extends Controller
         if ($studentId !== null) {
             $userQuestionHistoryModel = new UserQuestionHistoryModel();
             $userQuestionHistoryModel->student_id = $studentId;
-            $userHistory = $userQuestionHistoryModel->getUserQuestionHistory($test->id);
-            $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStars3($test->id);
-            $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCount($test->id);
+            //$userHistory = $userQuestionHistoryModel->getUserQuestionHistory($test->id);
+            $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStarsLocal($test->id);
+            $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCountLocal($test->id);
         }
         $collection = (new TestBuilder($test, $test->getQuestionData(), $test->getQuestionDataCount(), $userStars))
             ->build();

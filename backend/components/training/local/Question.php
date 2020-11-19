@@ -44,4 +44,17 @@ class Question extends BaseQuestion
         ], parent::serialize());
     }
 
+    protected function makeStars(array $starsData, BaseQuestion $question)
+    {
+        $stars = 0;
+        $questionID = $question->getId();
+        foreach ($starsData as $star) {
+            if ((int)$star['entity_id'] === $questionID) {
+                $stars = $star['stars'];
+                break;
+            }
+        }
+        return $stars;
+    }
+
 }

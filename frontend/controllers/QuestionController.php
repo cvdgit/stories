@@ -74,11 +74,20 @@ class QuestionController extends Controller
         $userStars = [];
         $userStarsCount = 0;
         if ($studentId !== null) {
+
             $userQuestionHistoryModel = new UserQuestionHistoryModel();
             $userQuestionHistoryModel->student_id = $studentId;
-            $userHistory = $userQuestionHistoryModel->getUserQuestionHistory($test->id);
-            $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStars3($test->id);
-            $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCount($test->id);
+
+            if ($test->isRemote()) {
+                $userHistory = $userQuestionHistoryModel->getUserQuestionHistory($test->id);
+                $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStars3($test->id);
+                $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCount($test->id);
+            }
+            else {
+                $userHistory = $userQuestionHistoryModel->getUserQuestionHistoryLocal($test->id);
+                $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStarsLocal($test->id);
+                $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCountLocal($test->id);
+            }
         }
 
         if ($test->isSourceWordList()) {
