@@ -2,8 +2,10 @@
 
 namespace backend\models\question;
 
+use common\models\StoryTestAnswer;
 use common\models\StoryTestQuestion;
 use DomainException;
+use yii\helpers\Json;
 
 class UpdateRegionQuestion extends RegionQuestion
 {
@@ -49,6 +51,16 @@ class UpdateRegionQuestion extends RegionQuestion
             }
         }
         $this->uploadImage($this->model);
+
+        $regions = Json::decode($this->model->regions);
+        foreach ($regions as $i => $region) {
+            $create = !isset($region['answer_id']) || empty($region['answer_id']);
+            if ($create) {
+                $regions[$i]['answer_id'] = StoryTestAnswer::createFromRegion($this->model->id, $region['title'], $region['correct'], $region['id']);
+            }
+        }
+        $this->model->regions = Json::encode($regions);
+
         $this->model->save();
     }
 

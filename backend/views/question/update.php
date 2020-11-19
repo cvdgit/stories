@@ -29,7 +29,6 @@ TestQuestionAsset::register($this);
                 <?php endif ?>
                 <div class="form-group">
                     <?= Html::submitButton('Изменить вопрос', ['class' => 'btn btn-success']) ?>
-                    <?= Html::a('Создать ответы', ['question/create-answers', 'question_id' => $model->getModelID()], ['class' => 'btn btn-primary']) ?>
                 </div>
                 <?php ActiveForm::end(); ?>
             </div>
@@ -46,6 +45,15 @@ RegionQuestion.init(element.val());
 $('#update-region-question-form').on('beforeSubmit', function() {
     element.val(RegionQuestion.getRegionsJson());
     return true;
+});
+RegionQuestion.addEventListener('onDeleteRegion', function(args) {
+    if (args.answerID) {
+        $.get('/admin/index.php?r=question/delete-answer', {'id': args.answerID})
+            .done(function(response) {
+                console.log(response);
+                $('#update-region-question-form').submit();
+            });
+    }
 });
 JS;
 $this->registerJs($js);

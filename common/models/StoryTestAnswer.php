@@ -3,6 +3,7 @@
 namespace common\models;
 
 use DomainException;
+use Yii;
 use yii\db\ActiveRecord;
 
 /**
@@ -93,6 +94,14 @@ class StoryTestAnswer extends ActiveRecord
             $model->image = $image;
         }
         return $model;
+    }
+
+    public static function createFromRegion(int $questionID, string $name, int $isCorrect, string $regionID)
+    {
+        $model = self::create($questionID, $name, $isCorrect);
+        $model->region_id = $regionID;
+        $model->save();
+        return $model->id;
     }
 
 }

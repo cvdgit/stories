@@ -179,21 +179,27 @@ var RegionTable = function() {
         '<tr>' +
         '<td>Верный</td>' +
         '<td>Область</td>' +
+        '<td>Вопрос</td>' +
         '<td></td>' +
         '</tr>' +
         '</thead>' +
         '<tbody>' +
-        '<tr class="empty-row"><td colspan="3">Выделите область на изображении</td></tr>' +
+        '<tr class="empty-row"><td colspan="4">Выделите область на изображении</td></tr>' +
         '</tbody>' +
         '</table>');
 
     $table.on('click', '.delete-region', function(e) {
         e.preventDefault();
+        if (!confirm('Удалить запись?')) {
+            return;
+        }
         var $row = $(this).parent().parent();
         var id = $row.attr('id');
+        var answerID = $row.find('td:eq(2)').text();
         $row.remove();
         dispatchEvent('onDeleteRegion', {
-            "id": id
+            "id": id,
+            "answerID": answerID
         });
     });
 
@@ -206,7 +212,7 @@ var RegionTable = function() {
         return $table;
     }
 
-    function addRow(id, title, correct) {
+    function addRow(id, title, correct, answer_id) {
         $table.find('tr.empty-row').remove();
         var $deleteElement = $('<a/>')
             .attr('href', '#')
@@ -220,6 +226,7 @@ var RegionTable = function() {
             .attr('id', id)
             .append($('<td/>').append($checkBox))
             .append($('<td/>').text(title))
+            .append($('<td/>').text(answer_id))
             .append($('<td/>').append($deleteElement));
         $table.find('tbody').append($row);
     }
@@ -230,7 +237,8 @@ var RegionTable = function() {
             return {
                 'id': elem.attr('id'),
                 'title': elem.find('td:eq(1)').text(),
-                'correct': elem.find('td:eq(0) input[type=checkbox]').prop('checked')
+                'correct': elem.find('td:eq(0) input[type=checkbox]').prop('checked'),
+                'answer_id': elem.find('td:eq(2)').text()
             }
         }).get();
     }
@@ -284,7 +292,7 @@ var RegionQuestion = (function() {
             data = JSON.parse(data);
         }
         data.forEach(function(item) {
-            table.addRow(item.id, item.title, item.correct);
+            table.addRow(item.id, item.title, item.correct, item.answer_id);
             selection.addRect(item.id, item.rect);
         });
 
@@ -302,6 +310,7 @@ var RegionQuestion = (function() {
 
     return {
         'init': init,
-        'getRegionsJson': getRegionsJson
+        'getRegionsJson': getRegionsJson,
+        'addEventListener': table.addEventListener
     };
 })();

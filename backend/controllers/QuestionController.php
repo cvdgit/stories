@@ -10,9 +10,9 @@ use common\rbac\UserRoles;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
-use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 class QuestionController extends Controller
 {
@@ -92,17 +92,20 @@ class QuestionController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
-    public function actionCreateAnswers(int $question_id)
+    protected function findAnswerModel($id)
     {
-        $model = $this->findModel($question_id);
-        $regions = Json::decode($model->regions);
-        foreach ($regions as $region) {
-            $answer = StoryTestAnswer::create($model->id, $region['title'], $region['correct']);
-            $answer->region_id = $region['id'];
-            $answer->save();
+        if (($model = StoryTestAnswer::findOne($id)) !== null) {
+            return $model;
         }
-        Yii::$app->session->setFlash('success', 'Успешно');
-        return $this->redirect(['update', 'id' => $question_id]);
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    public function actionDeleteAnswer($id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $model = $this->findAnswerModel($id);
+        $model->delete();
+        return ['success' => true];
     }
 
 }
