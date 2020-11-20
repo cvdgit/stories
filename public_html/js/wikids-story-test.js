@@ -1206,9 +1206,10 @@ var WikidsStoryTest = (function() {
             }
             if (testConfig.sourceIsLocal()) {
                 answerList = answer.map(function (entity_id) {
+                    var answer = answerByID(currentQuestion, entity_id);
                     return {
                         'answer_entity_id': entity_id,
-                        'answer_entity_name': answerByID(currentQuestion, entity_id).name
+                        'answer_entity_name': answer ? answer.name : 'no correct'
                     };
                 });
                 answerParams = {
@@ -2075,21 +2076,44 @@ RegionQuestion.prototype.create = function() {
     var that = this;
     var $wrapper = $('<div/>')
         .addClass('question-region')
-        .css({'width': '640px', 'height': '480px', 'position': 'relative'})
+        .css({'width': '640px', 'height': '480px', 'position': 'relative', 'margin': '0 auto'})
         .on('click', function(e) {
+
+            var offset = $(this).offset();
+            var canvasOffsetLeft = offset.left;
+            var canvasOffsetTop = offset.top;
+
+            $('<span/>')
+                .addClass('answer-point')
+                .css({
+                    'position': 'absolute',
+                    'left': (e.pageX - canvasOffsetLeft) / Reveal.getScale() - 15,
+                    'top': (e.pageY - canvasOffsetTop) / Reveal.getScale() - 15,
+                    'shape-outside': 'circle()',
+                    'clip-path': 'circle()',
+                    'background': 'orangered',
+                    'width': '3rem',
+                    'height': '3rem'
+                })
+                .appendTo(this);
+
             var $target  = $(e.target);
             var isRect = $target[0].tagName === 'DIV' && $target.hasClass('answer-rect');
-            if (!isRect) {
-                return;
-            }
 
-            var regionID = $target.attr('data-answer-id');
-            var answer = that.getAnswerByRegion(regionID);
+            setTimeout(function() {
 
-            that.addAnswer(answer[0].id);
-
-            WikidsStoryTest.nextQuestion(that.getAnswers());
-            that.resetAnswers();
+                if (isRect) {
+                    var regionID = $target.attr('data-answer-id');
+                    var answer = that.getAnswerByRegion(regionID);
+                    that.addAnswer(answer[0].id);
+                }
+                else {
+                    that.addAnswer('no correct');
+                }
+                WikidsStoryTest.nextQuestion(that.getAnswers());
+                that.resetAnswers();
+                $wrapper.find('span.answer-point').remove();
+            }, 500);
         })
         .append($img);
 
