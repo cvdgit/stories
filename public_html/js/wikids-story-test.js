@@ -2073,22 +2073,41 @@ RegionQuestion.prototype.create = function() {
         .attr('src', this.question.params.image)
         .css({'position': 'absolute', 'left': 0, 'top': 0, 'width': '100%'});
 
+    function getRelativeCoordinates(event, target) {
+
+        const position = {
+            x: event.clientX,
+            y: event.clientY
+        };
+        var container = $('.reveal .slides')[0]
+
+        var scaleX = parseFloat(target.offsetWidth  / target.getBoundingClientRect().width).toFixed(2);
+        var scaleY = parseFloat(target.offsetHeight  / target.getBoundingClientRect().height).toFixed(2);
+
+        var offset = $(target).offset();
+        var canvasOffsetLeft = offset.left;
+        var canvasOffsetTop = offset.top;
+
+        return {
+            x: (position.x - canvasOffsetLeft + $(window).scrollLeft()) / Reveal.getScale(),
+            y: (position.y - canvasOffsetTop + $(window).scrollTop()) / Reveal.getScale()
+        };
+    }
+
     var that = this;
     var $wrapper = $('<div/>')
         .addClass('question-region')
-        .css({'width': '640px', 'height': '480px', 'position': 'relative', 'margin': '0 auto'})
+        .css({'width': '640px', 'height': '480px', 'position': 'relative'})
         .on('click', function(e) {
 
-            var offset = $(this).offset();
-            var canvasOffsetLeft = offset.left;
-            var canvasOffsetTop = offset.top;
+            var rect = getRelativeCoordinates(e, $wrapper[0]);
 
             $('<span/>')
                 .addClass('answer-point')
                 .css({
                     'position': 'absolute',
-                    'left': (e.pageX - canvasOffsetLeft) / Reveal.getScale() - 15,
-                    'top': (e.pageY - canvasOffsetTop) / Reveal.getScale() - 15,
+                    'left': rect.x,
+                    'top': rect.y,
                     'shape-outside': 'circle()',
                     'clip-path': 'circle()',
                     'background': 'orangered',
