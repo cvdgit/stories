@@ -1,6 +1,7 @@
 <?php
 /** @var $model common\models\Story */
 /** @var $student common\models\UserStudent */
+/** @var $category common\models\Category */
 use common\components\StoryCover;
 use yii\helpers\Html;
 ?>
@@ -14,7 +15,7 @@ use yii\helpers\Html;
         <p>Прогресс (<?= $student->getStudentName() ?>): <?= $student->getProgress($test->id) ?>%</p>
         <p>
             <?= Html::a('<i class="glyphicon glyphicon-play-circle"></i> Запустить тест', $model->getStoryUrl()) ?>
-            | <?= Html::a('Очистить историю', '#') ?>
+            | <?= Html::a('Очистить историю', ['test/clear-history', 'category_id' => $category->id, 'student_id' => $student->id, 'test_id' => $test->id]) ?>
         </p>
         <?php endforeach ?>
     </div>

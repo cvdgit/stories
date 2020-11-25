@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\widgets\ListView;
 /** @var $this yii\web\View */
 /** @var $dataProvider yii\data\ActiveDataProvider */
 /** @var $students array */
@@ -21,10 +22,13 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
         </nav>
         <main class="col-xs-12 col-sm-12 col-md-12 col-lg-9 site-main" style="margin-top: 0">
             <h1 style="margin-top: 0; margin-bottom: 20px"><?= $this->getHeader() ?></h1>
-            <?= \yii\widgets\ListView::widget([
+            <?= ListView::widget([
                 'dataProvider' => $dataProvider,
                 'itemView' => '_item',
-                'viewParams' => ['student' => $activeStudent],
+                'viewParams' => [
+                    'student' => $activeStudent,
+                    'category' => $category,
+                ],
             ]) ?>
         </main>
     </div>
