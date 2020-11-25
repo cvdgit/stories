@@ -4,6 +4,7 @@ namespace frontend\models;
 
 use common\helpers\EmailHelper;
 use RuntimeException;
+use Yii;
 use yii\base\Model;
 
 /**
@@ -55,6 +56,7 @@ class ContactForm extends Model
     {
         $response = EmailHelper::sendEmail($email, 'Сообщение с формы контакты от ' . $this->email, 'contact', ['form' => $this]);
         if (!$response->isSuccess()) {
+            Yii::error($response->getApiResponse(), 'email.contact');
             throw new RuntimeException('Email not sent (contact)');
         }
     }
