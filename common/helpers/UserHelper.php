@@ -38,4 +38,35 @@ class UserHelper
         return $webUser->identity->getStudentID();
     }
 
+    public static function getStudent(int $id = null)
+    {
+        $webUser = Yii::$app->user;
+        if ($webUser->isGuest) {
+            return null;
+        }
+        if ($id === null) {
+            return $webUser->identity->student();
+        }
+        foreach ($webUser->identity->students as $student) {
+            if ($student->id === $id) {
+                return $student;
+            }
+        }
+    }
+
+    public static function getStudents()
+    {
+        $students = [];
+        if (!Yii::$app->user->isGuest) {
+            $user = Yii::$app->user->identity;
+            foreach ($user->students as $student) {
+                $students[] = [
+                    'id' => $student->id,
+                    'name' => $student->isMain() ? $student->user->getProfileName() : $student->name,
+                ];
+            }
+        }
+        return $students;
+    }
+
 }

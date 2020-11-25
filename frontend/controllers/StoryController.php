@@ -85,6 +85,18 @@ class StoryController extends Controller
         parent::__construct($id, $module, $config);
     }
 
+
+    private function getRenderParams($searchModel, $dataProvider, $action, $category = null, $emptyText = 'Список историй пуст')
+    {
+        return [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'action' => $action,
+            'emptyText' => $emptyText,
+            'category' => $category,
+        ];
+    }
+
     public function actionIndex()
     {
         $this->getView()->setMetaTags(
@@ -95,12 +107,7 @@ class StoryController extends Controller
         );
         $searchModel = new StorySearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'action' => ['/story/index'],
-            'emptyText' => 'Список историй пуст',
-        ]);
+        return $this->render('index', $this->getRenderParams($searchModel, $dataProvider, ['/story/index']));
     }
 
     public function actionCategory($category)
@@ -119,12 +126,7 @@ class StoryController extends Controller
             'wikids, сказки, истории, каталог историй',
             $model->name
         );
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'action' => ['/story/category', 'category' => $model->alias],
-            'emptyText' => 'Список историй пуст',
-        ]);
+        return $this->render('index', $this->getRenderParams($searchModel, $dataProvider, ['/story/category', 'category' => $model->alias], $model));
     }
 
     public function actionTag($tag)
@@ -139,12 +141,7 @@ class StoryController extends Controller
             'wikids, сказки, истории, каталог историй',
             $model->name
         );
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'action' => ['/story/tag', 'tag' => $model->name],
-            'emptyText' => 'Список историй пуст',
-        ]);
+        return $this->render('index', $this->getRenderParams($searchModel, $dataProvider, ['/story/tag', 'tag' => $model->name]));
     }
 
     /**
@@ -364,12 +361,7 @@ class StoryController extends Controller
         $this->getView()->setMetaTags('История просмотра', 'История просмотра', 'История просмотра', 'История просмотра');
         $searchModel = new UserStorySearch(Yii::$app->user->id);
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'action' => ['/story/history'],
-            'emptyText' => 'В этом разделе будут отображаться истории, которые были просмотрены вами',
-        ]);
+        return $this->render('index', $this->getRenderParams($searchModel, $dataProvider, ['/story/history'], null, 'В этом разделе будут отображаться истории, которые были просмотрены вами'));
     }
 
     public function actionLiked()
@@ -377,12 +369,7 @@ class StoryController extends Controller
         $this->getView()->setMetaTags('Понравившиеся истории', 'Понравившиеся истории', 'Понравившиеся истории', 'Понравившиеся истории');
         $searchModel = new StoryLikeSearch(Yii::$app->user->id);
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'action' => ['/story/liked'],
-            'emptyText' => 'В этом разделе будут отображаться понравившиеся вам истории',
-        ]);
+        return $this->render('index', $this->getRenderParams($searchModel, $dataProvider, ['/story/liked'], null, 'В этом разделе будут отображаться понравившиеся вам истории'));
     }
 
     public function actionLike()
@@ -418,12 +405,7 @@ class StoryController extends Controller
         $this->getView()->setMetaTags('Избранные истории', 'Избранные истории', 'Избранные истории', 'Избранные истории');
         $searchModel = new StoryFavoritesSearch(Yii::$app->user->id);
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'action' => ['/story/favorites'],
-            'emptyText' => 'В этом разделе будут отображаться истории, добавленные вами в избранное',
-        ]);
+        return $this->render('index', $this->getRenderParams($searchModel, $dataProvider, ['/story/favorites'], null, 'В этом разделе будут отображаться истории, добавленные вами в избранное'));
     }
 
     public function actionRandom()
@@ -442,12 +424,7 @@ class StoryController extends Controller
         );
         $searchModel = new StorySearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'action' => ['/story/index'],
-            'emptyText' => 'Список историй пуст',
-        ]);
+        return $this->render('index', $this->getRenderParams($searchModel, $dataProvider, ['/story/index']));
     }
 
     public function actionAudioStories()
@@ -461,12 +438,7 @@ class StoryController extends Controller
         $searchModel = new StorySearch();
         $searchModel->audio = 1;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'action' => ['/story/index'],
-            'emptyText' => 'Список историй пуст',
-        ]);
+        return $this->render('index', $this->getRenderParams($searchModel, $dataProvider, ['/story/index']));
     }
 
     public function actionMyaudio()
@@ -474,12 +446,6 @@ class StoryController extends Controller
         $this->getView()->setMetaTags('Моя озвучка', 'Моя озвучка', 'Моя озвучка', 'Моя озвучка');
         $searchModel = new MyAudioStoriesSearch(Yii::$app->user->id);
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'action' => ['/story/myaudio'],
-            'emptyText' => 'В этом разделе будут отображаться истории, озвученные вами',
-        ]);
+        return $this->render('index', $this->getRenderParams($searchModel, $dataProvider, ['/story/myaudio'], null, 'В этом разделе будут отображаться истории, озвученные вами'));
     }
-
 }

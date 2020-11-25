@@ -21,6 +21,7 @@ use backend\models\editor\TestForm;
 use backend\models\editor\TextForm;
 use backend\models\editor\TransitionForm;
 use backend\models\editor\VideoForm;
+use backend\services\StoryLinksService;
 use common\models\StorySlide;
 use common\models\StoryTest;
 use DomainException;
@@ -38,12 +39,14 @@ class EditorController extends Controller
 
     protected $storyService;
     protected $editorService;
+    private $storyLinksService;
 
-    public function __construct($id, $module, StoryService $storyService, StoryEditorService $editorService, $config = [])
+    public function __construct($id, $module, StoryService $storyService, StoryEditorService $editorService, StoryLinksService $storyLinksService, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->storyService = $storyService;
         $this->editorService = $editorService;
+        $this->storyLinksService = $storyLinksService;
     }
 
     /**
@@ -337,6 +340,7 @@ class EditorController extends Controller
         }
         try {
             $slideID = $this->editorService->newCreateSlideQuestion($story_id, $params);
+            $this->storyLinksService->createTestLink($story_id, $test->id);
         }
         catch (\Exception $ex) {
             return ['success' => false, 'error' => $ex->getMessage()];

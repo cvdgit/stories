@@ -12,6 +12,7 @@ use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
 use dosamigos\taggable\Taggable;
 use common\helpers\Translit;
+use yii\db\Expression;
 use yii\db\Query;
 use yii\web\NotFoundHttpException;
 use yii\db\ActiveQuery;
@@ -48,6 +49,8 @@ use yii\db\ActiveQuery;
  * @property Comment[] $comments
  * @property StoryAudioTrack[] $storyAudioTracks
  * @property Playlist[] $playlists
+ * @property StoryStoryTest[] $storyStoryTests
+ * @property StoryTest[] $tests
  */
 
 class Story extends ActiveRecord
@@ -566,6 +569,35 @@ class Story extends ActiveRecord
     public function getListThumbPath()
     {
         return empty($model->cover) ? '/img/story-1.jpg' : StoryCover::getListThumbPath($this->cover);
+    }
+
+    public static function findWithQuestionSlide(array $ids)
+    {
+        $existsQuery = (new Query())
+            ->select([new Expression('1')])
+            ->from(['t2' => StorySlide::tableName()])
+            ->where('t2.story_id = t.id');
+        return self::find()
+            ->from(['t' => self::tableName()])
+            ->where(['in', 'id', $ids])
+            ->andWhere(['exists', $existsQuery])
+            ->all();
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStoryStoryTests()
+    {
+        return $this->hasMany(StoryStoryTest::class, ['story_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTests()
+    {
+        return $this->hasMany(StoryTest::class, ['id' => 'test_id'])->viaTable('story_story_test', ['story_id' => 'id']);
     }
 
 }

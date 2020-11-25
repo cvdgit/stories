@@ -74,5 +74,7 @@ return [
         'question/<param:[\w\s\d]+>/<value:[\w\d\s]+>' => 'question/get',
 
         'students' => 'student/index',
+
+        'tests/<category_id:\d+>' => 'test/index',
     ],
 ];

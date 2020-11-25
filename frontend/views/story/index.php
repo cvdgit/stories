@@ -1,6 +1,7 @@
 <?php
 use asu\tagcloud\TagCloud;
 use common\models\Tag;
+use common\rbac\UserRoles;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ListView;
@@ -80,6 +81,9 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                     ]) ?>
                 </div>
                 <div class="col-md-6 text-right">
+                    <?php if ($category !== null && UserRoles::canModerator()): ?>
+                    <?= Html::a('Тесты', ['/test/index', 'category_id' => $category->id]) ?> |
+                    <?php endif ?>
                     <?= Html::a('Случайная сказка', ['/story/random'], ['style' => 'color: #d9534f']) ?>
                 </div>
             </div>
