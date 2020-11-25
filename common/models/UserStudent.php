@@ -143,4 +143,9 @@ class UserStudent extends ActiveRecord
         return $model->progress;
     }
 
+    public function getStudentName()
+    {
+        return $this->isMain() ? $this->user->getProfileName() : $this->name;
+    }
+
 }

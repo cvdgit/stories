@@ -11,8 +11,11 @@ use yii\helpers\Html;
     <div class="col-lg-7 col-md-9 col-sm-9 clearfix">
         <h3 style="margin-top:0"><?= $model->title ?></h3>
         <?php foreach($model->tests as $test): ?>
-        <p><?= $test->title ?></p>
-        <p><?= $student->getProgress($test->id) ?></p>
+        <p>Прогресс (<?= $student->getStudentName() ?>): <?= $student->getProgress($test->id) ?>%</p>
+        <p>
+            <?= Html::a('<i class="glyphicon glyphicon-play-circle"></i> Запустить тест', $model->getStoryUrl()) ?>
+            | <?= Html::a('Очистить историю', '#') ?>
+        </p>
         <?php endforeach ?>
     </div>
 </div>

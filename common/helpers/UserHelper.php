@@ -2,6 +2,7 @@
 
 namespace common\helpers;
 
+use common\models\UserStudent;
 use Yii;
 use yii\helpers\ArrayHelper;
 use common\models\User;
@@ -60,9 +61,10 @@ class UserHelper
         if (!Yii::$app->user->isGuest) {
             $user = Yii::$app->user->identity;
             foreach ($user->students as $student) {
+                /** @var $student UserStudent */
                 $students[] = [
                     'id' => $student->id,
-                    'name' => $student->isMain() ? $student->user->getProfileName() : $student->name,
+                    'name' => $student->getStudentName(),
                 ];
             }
         }
