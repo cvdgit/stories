@@ -17,7 +17,7 @@ $this->params['sidebarMenuItems'] = [
                 'dataProvider' => $dataProvider,
             ]) ?>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 test-sidebar">
             <?php if (!$model->isNewRecord): ?>
                 <?php if ($model->isRemote()): ?>
                     <?= $this->render('_test_children_list', ['model' => $model]) ?>

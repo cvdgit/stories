@@ -4,19 +4,9 @@ namespace backend\models\test;
 
 use common\models\StoryTest;
 use DomainException;
-use yii\base\Model;
 
-class UpdateForm extends Model
+class UpdateForm extends BaseVariantModel
 {
-
-    public $title;
-    public $header;
-    public $description_text;
-    public $question_params;
-    public $incorrect_answer_text;
-
-    public $taxonName;
-    public $taxonValue;
 
     private $model;
 
@@ -25,6 +15,7 @@ class UpdateForm extends Model
         $this->model = $model;
         $this->loadModelAttributes();
         $this->loadParamAttributes();
+        $this->loadWrongParamAttributes();
         parent::__construct($config);
     }
 
@@ -48,27 +39,23 @@ class UpdateForm extends Model
         }
     }
 
-    public function rules()
+    private function loadWrongParamAttributes()
     {
-        return [
-            [['title', 'header', 'question_params'], 'required'],
-            [['title', 'header', 'question_params', 'incorrect_answer_text'], 'string', 'max' => 255],
-            [['taxonName', 'taxonValue'], 'string', 'max' => 255],
-            [['description_text'], 'string'],
-        ];
-    }
-
-    public function attributeLabels()
-    {
-        return [
-            'title' => 'Название теста',
-            'description_text' => 'Описание',
-            'header' => 'Заголовок',
-            'question_params' => 'Параметры вопроса',
-            'incorrect_answer_text' => 'Текст неправильного ответа',
-            'taxonName' => 'Таксон',
-            'taxonValue' => 'Значение таксона',
-        ];
+        foreach (explode('|', $this->wrong_answers_params) as $i => $param) {
+            $taxonName = '';
+            $taxonValue = '';
+            foreach (explode(';', $param) as $paramItem) {
+                [$name, $value] = explode('=', $paramItem);
+                if ($name === 'taxonName') {
+                    $taxonName = $value;
+                }
+                if ($name === 'taxonValue') {
+                    $taxonValue = $value;
+                }
+            }
+            $this->wrongAnswerTaxonNames[$i] = $taxonName;
+            $this->wrongAnswerTaxonValues[$i] = $taxonValue;
+        }
     }
 
     public function updateTestVariant()
@@ -76,7 +63,6 @@ class UpdateForm extends Model
         if (!$this->validate()) {
             throw new DomainException('Model not valid');
         }
-
         foreach ($this->getAttributes() as $name => $value) {
             $modelAttributes = $this->model->getAttributes();
             if (isset($modelAttributes[$name])) {
@@ -84,7 +70,7 @@ class UpdateForm extends Model
             }
         }
         $this->model->question_params = sprintf('taxonName=%1s;taxonValue=%2s', $this->taxonName, $this->taxonValue);
-
+        $this->model->wrong_answers_params = $this->createWrongAnswersParams();
         $this->model->save();
     }
 

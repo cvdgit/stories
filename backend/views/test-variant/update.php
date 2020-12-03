@@ -2,6 +2,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 /** @var $model backend\models\test\UpdateForm */
+/** @var $this yii\web\View */
 ?>
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -13,13 +14,20 @@ use yii\widgets\ActiveForm;
         'id' => 'update-test-variant-form'
     ]]); ?>
     <div class="modal-body">
-        <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
-        <?= $form->field($model, 'header')->textInput(['maxlength' => true]) ?>
-        <?= $form->field($model, 'description_text')->textarea(['rows' => 4]) ?>
-        <?= $form->field($model, 'incorrect_answer_text')->textInput(['maxlength' => true]) ?>
-        <?= $form->field($model, 'question_params')->hiddenInput()->label(false) ?>
-        <?= $form->field($model, 'taxonName')->dropDownList([], ['data-value' => $model->taxonName]) ?>
-        <?= $form->field($model, 'taxonValue')->dropDownList([], ['data-value' => $model->taxonValue]) ?>
+        <div class="row">
+            <div class="col-md-6">
+                <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
+                <?= $form->field($model, 'header')->textInput(['maxlength' => true]) ?>
+                <?= $form->field($model, 'description_text')->textarea(['rows' => 4]) ?>
+                <?= $form->field($model, 'incorrect_answer_text')->textInput(['maxlength' => true]) ?>
+                <?= $form->field($model, 'question_params')->hiddenInput()->label(false) ?>
+                <?= $form->field($model, 'taxonName')->dropDownList([], ['data-value' => $model->taxonName]) ?>
+                <?= $form->field($model, 'taxonValue')->dropDownList([], ['data-value' => $model->taxonValue]) ?>
+            </div>
+            <div class="col-md-6">
+                <?= $this->render('_wrong_answers', ['form' => $form, 'model' => $model]) ?>
+            </div>
+        </div>
     </div>
     <div class="modal-footer">
         <?= Html::submitButton('Изменить вариант теста', ['class' => 'btn btn-success']) ?>

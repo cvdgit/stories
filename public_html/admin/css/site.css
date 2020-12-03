@@ -516,3 +516,7 @@ body {
     color: #c7254e;
     font-weight: 500;
 }
+
+.wrong-answer-list .delete-wrong-answer-row {
+    margin-top: 35px;
+}

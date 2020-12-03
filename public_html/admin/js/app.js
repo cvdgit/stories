@@ -94,6 +94,7 @@ var Neo = (function(jQuery) {
     "use strict";
 
     var $ = jQuery;
+    var cache = {};
 
     function getEntities(labelID) {
         labelID = labelID || '';
@@ -141,11 +142,29 @@ var Neo = (function(jQuery) {
     }
 
     function getTaxonList() {
-        return $.getJSON('/admin/index.php?r=neo/taxon-list');
+        var key = 'taxonNames';
+        if (cache[key]) {
+            var def = $.Deferred();
+            def.resolve(cache[key]);
+            return def.promise();
+        }
+        return $.getJSON('/admin/index.php?r=neo/taxon-list')
+            .done(function(response) {
+                cache[key] = response;
+            });
     }
 
     function getTaxonValueList(taxon) {
-        return $.getJSON('/admin/index.php?r=neo/taxon-value-list', {"taxon": taxon});
+        var key = taxon;
+        if (cache[key]) {
+            var def = $.Deferred();
+            def.resolve(cache[key]);
+            return def.promise();
+        }
+        return $.getJSON('/admin/index.php?r=neo/taxon-value-list', {"taxon": taxon})
+            .done(function(response) {
+                cache[key] = response;
+            });
     }
 
     return {

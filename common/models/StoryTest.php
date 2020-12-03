@@ -30,6 +30,7 @@ use yii\helpers\ArrayHelper;
  * @property int $word_list_id
  * @property int $answer_type
  * @property int $strict_answer
+ * @property string wrong_answers_params
  *
  * @property StoryTestQuestion[] $storyTestQuestions
  */
@@ -176,13 +177,15 @@ class StoryTest extends ActiveRecord
                                          string $incorrectAnswerText,
                                          int $questionID,
                                          string $questionName,
-                                         string $questionParams)
+                                         string $questionParams,
+                                         $wrongAnswersParams = null)
     {
         $model = self::create($title, $header, $description, $incorrectAnswerText, self::REMOTE, SourceType::NEO);
         $model->parent_id = $parentID;
         $model->question_list_id = $questionID;
         $model->question_list_name = $questionName;
         $model->question_params = $questionParams;
+        $model->wrong_answers_params = $wrongAnswersParams;
         return $model;
     }
 
