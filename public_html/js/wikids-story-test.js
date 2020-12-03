@@ -1567,6 +1567,7 @@ AnswerTypeNumPad.prototype.create = function(callback) {
 
     var html = '<div class="keyboard-wrapper"><ul id="keyboard" class="clearfix">' +
         '<li class="letter">0</li>' +
+        '<li class="letter-empty"></li>' +
         '<li class="letter">1</li>' +
         '<li class="letter">2</li>' +
         '<li class="letter">3</li>' +
@@ -1577,7 +1578,9 @@ AnswerTypeNumPad.prototype.create = function(callback) {
         '<li class="letter">8</li>' +
         '<li class="letter">9</li>' +
         '<li class="letter">10</li>' +
-        '<li class="letter clearl">11</li>' +
+        '<li class="letter-empty clearl"></li>' +
+        '<li class="letter-empty"></li>' +
+        '<li class="letter">11</li>' +
         '<li class="letter">12</li>' +
         '<li class="letter">13</li>' +
         '<li class="letter">14</li>' +
@@ -1591,8 +1594,7 @@ AnswerTypeNumPad.prototype.create = function(callback) {
         '<p></p></div>',
         $html = $(html);
 
-    $html.find('li').on('click', function() {
-
+    $html.find('li.letter').on('click', function() {
         $(this).parent().parent().find('p').text($(this).text());
         callback($(this).text());
     });

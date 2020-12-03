@@ -2161,6 +2161,9 @@ p.wikids-test-description {
 	border: 1px solid #c0c0c0;
 	border-radius: 5px;
 }
+#keyboard li.letter-empty {
+	border: 0 none;
+}
 .capslock, .tab, .left-shift, .clearl, .switch {
 	clear: left;
 }
@@ -2199,7 +2202,7 @@ p.wikids-test-description {
 .on {
 	display: none;
 }
-#keyboard li:hover {
+#keyboard li.letter:hover {
 	position: relative;
 	top: 1px;
 	left: 1px;
