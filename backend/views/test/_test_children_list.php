@@ -93,7 +93,6 @@ $('#create-test-variant').on('click', function(e) {
 });
 
 window.loadNeoTaxon = function(element) {
-    console.log(element);
     element.empty().append($('<option/>').val('').text('Выберите значение'));
     var def = $.Deferred();
     Neo.getTaxonList()
