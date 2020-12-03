@@ -2138,14 +2138,20 @@ p.wikids-test-description {
 	margin-top: 18%;
 }
 
+.keyboard-wrapper {
+	text-align: center;
+	margin-top: 50px;
+}
+
 #keyboard {
 	margin: 0;
 	padding: 0;
 	list-style: none;
+	display: inline-block;
 }
 #keyboard li {
 	float: left;
-	margin: 0 5px 5px 0;
+	margin: 25px 5px 25px 0;
 	width: 80px;
 	height: 80px;
 	font-size: 3rem;

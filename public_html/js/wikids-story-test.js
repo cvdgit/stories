@@ -608,7 +608,7 @@ var WikidsStoryTest = (function() {
         answers.forEach(function(answer) {
             $answers.append(createNumPadAnswer(question, answer));
         });
-        var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-4 question-image"></div><div class="col-md-8 question-wrapper"></div></div>');
+        var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-12 question-wrapper"></div></div>');
         $wrapper.find(".question-wrapper").append($answers);
         return $wrapper;
     }
@@ -1565,18 +1565,28 @@ var AnswerTypeNumPad = function() {
 
 AnswerTypeNumPad.prototype.create = function(callback) {
 
-    var html = '<div><ul id="keyboard" class="clearfix">' +
+    var html = '<div class="keyboard-wrapper"><ul id="keyboard" class="clearfix">' +
+        '<li class="letter">0</li>' +
         '<li class="letter">1</li>' +
         '<li class="letter">2</li>' +
         '<li class="letter">3</li>' +
-        '<li class="letter clearl">4</li>' +
+        '<li class="letter">4</li>' +
         '<li class="letter">5</li>' +
         '<li class="letter">6</li>' +
-        '<li class="letter clearl">7</li>' +
-        '<li class="letter ">8</li>' +
+        '<li class="letter">7</li>' +
+        '<li class="letter">8</li>' +
         '<li class="letter">9</li>' +
-        '<li class="letter clearl">10</li>' +
-        '<li class="letter">0</li>' +
+        '<li class="letter">10</li>' +
+        '<li class="letter clearl">11</li>' +
+        '<li class="letter">12</li>' +
+        '<li class="letter">13</li>' +
+        '<li class="letter">14</li>' +
+        '<li class="letter">15</li>' +
+        '<li class="letter">16</li>' +
+        '<li class="letter">17</li>' +
+        '<li class="letter">18</li>' +
+        '<li class="letter">19</li>' +
+        '<li class="letter">20</li>' +
         '</ul>' +
         '<p></p></div>',
         $html = $(html);
