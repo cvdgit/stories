@@ -17,7 +17,7 @@ class StoryCoverUploadForm extends Model
     public function rules()
     {
         return [
-            [['coverFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg'],
+            [['coverFile'], 'file', 'skipOnEmpty' => true, 'checkExtensionByMimeType' => false, 'extensions' => 'png, jpg, jfif'],
         ];
     }
     
@@ -34,6 +34,7 @@ class StoryCoverUploadForm extends Model
     public function upload($existsCover)
     {
         if (!$this->validate()) {
+            die(print_r($this->errors));
             throw new \DomainException('Cover is not valid');
         }
 
