@@ -34,7 +34,6 @@ class StoryCoverUploadForm extends Model
     public function upload($existsCover)
     {
         if (!$this->validate()) {
-            die(print_r($this->errors));
             throw new \DomainException('Cover is not valid');
         }
 
