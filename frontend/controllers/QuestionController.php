@@ -119,6 +119,11 @@ class QuestionController extends Controller
             $params['params'] = base64_encode($test->question_params);
         }
 
+        $postParams = [
+            'history' => Json::encode($userHistory),
+            'wrong_params' => empty($test->wrong_answers_params) ? '' : urlencode(base64_encode($test->wrong_answers_params)),
+        ];
+
         $result = $curl
             ->setHeader('Accept', 'application/json')
             ->setOptions([
@@ -127,10 +132,7 @@ class QuestionController extends Controller
                 CURLOPT_SSL_VERIFYHOST => false,
             ])
             ->setGetParams($params)
-            ->setPostParams([
-                'history' => Json::encode($userHistory),
-                'wrong_answers_params' => empty($test->wrong_answers_params) ? '' : urlencode(base64_encode($test->wrong_answers_params)),
-            ])
+            ->setPostParams($postParams)
             ->get(Yii::$app->params['neo.url'] . '/api/question/get');
 
         $result = $this->decodeQueryResult($result);

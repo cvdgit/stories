@@ -41,6 +41,9 @@ class UpdateForm extends BaseVariantModel
 
     private function loadWrongParamAttributes()
     {
+        if (empty($this->wrong_answers_params)) {
+            return;
+        }
         foreach (explode('|', $this->wrong_answers_params) as $i => $param) {
             $taxonName = '';
             $taxonValue = '';
