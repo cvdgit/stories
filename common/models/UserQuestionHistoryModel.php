@@ -93,7 +93,7 @@ class UserQuestionHistoryModel extends Model
 
     public function getUserQuestionHistory(int $testID)
     {
-        $query = (new Query())
+/*        $query = (new Query())
             ->select(['t.entity_id', 't.relation_id', 't2.answer_entity_id'])
             ->from(['t' => UserQuestionHistory::tableName()])
             ->innerJoin(['t2' => UserQuestionAnswer::tableName()], 't2.question_history_id = t.id')
@@ -102,7 +102,28 @@ class UserQuestionHistoryModel extends Model
             ->andWhere('t.correct_answer = 1')
             ->groupBy(['t.entity_id', 't.relation_id', 't2.answer_entity_id'])
             ->having('COUNT(t.entity_id) >= 5');
-        return $query->all();
+        return $query->all();*/
+        $query = (new Query())
+            ->select([
+                't.entity_id AS entityID',
+                'MAX(t.id) AS questionID',
+            ])
+            ->from(['t' => UserQuestionHistory::tableName()])
+            ->where('t.student_id = :student', [':student' => $this->student_id])
+            ->andWhere('t.test_id = :test', [':test' => $testID])
+            ->andWhere('t.correct_answer = 1')
+            ->groupBy(['t.entity_id']);
+        $leadQuery = (new Query())
+            ->select([
+                'tbl.entityID AS entity_id',
+                'tbl2.relation_id AS relation_id',
+                'tbl3.answer_entity_id AS answer_entity_id',
+            ])
+            ->from(['tbl' => $query])
+            ->innerJoin(['tbl2' => UserQuestionHistory::tableName()], 'tbl2.id = tbl.questionID')
+            ->innerJoin(['tbl3' => UserQuestionAnswer::tableName()], 'tbl3.question_history_id = tbl2.id')
+            ->where('tbl2.stars >= 5');
+        return $leadQuery->all();
     }
 
     public function getUserQuestionHistoryLocal(int $testID)
