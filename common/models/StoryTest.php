@@ -34,6 +34,9 @@ use yii\helpers\ArrayHelper;
  * @property string input_voice
  *
  * @property StoryTestQuestion[] $storyTestQuestions
+ * @property Story[] $stories
+ * @property StoryStoryTest[] $storyStoryTests
+ * @property StoryTestRun[] $storyTestRuns
  */
 class StoryTest extends ActiveRecord
 {
@@ -237,6 +240,30 @@ class StoryTest extends ActiveRecord
         return StoryTestQuestion::find()
             ->where('story_test_id = :id', [':id' => $this->id])
             ->count();
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStoryStoryTests()
+    {
+        return $this->hasMany(StoryStoryTest::class, ['test_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStories()
+    {
+        return $this->hasMany(Story::class, ['id' => 'story_id'])->viaTable('story_story_test', ['test_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStoryTestRuns()
+    {
+        return $this->hasMany(StoryTestRun::class, ['test_id' => 'id']);
     }
 
 }

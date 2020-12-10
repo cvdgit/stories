@@ -51,6 +51,19 @@ $this->params['sidebarMenuItems'] = [
             ]),
         ],
         [
+            'attribute' => 'test_story',
+            'label' => 'История',
+            'format' => 'html',
+            'value' => function($model) {
+                $stories = $model->stories;
+                if (count($stories) > 0) {
+                    $story = $stories[0];
+                    return Html::a('Перейти к истории', Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $story->alias]), ['target' => '_blank']);
+                }
+                return '';
+            }
+        ],
+        [
             'class' => 'yii\grid\ActionColumn',
             'template' => '{update} {delete}',
         ],
