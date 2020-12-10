@@ -27,8 +27,13 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'answer_type')->dropDownList(\common\models\test\AnswerType::asArray()) ?>
 
-    <div id="answer-input-block" style="display: <?= $model->isAnswerTypeInput() ? 'block' : 'none' ?>">
+    <div class="answer-block" data-block-type="<?= \common\models\test\AnswerType::INPUT ?>" style="display: <?= $model->isAnswerTypeInput() ? 'block' : 'none' ?>">
         <?= $form->field($model, 'strict_answer')->checkbox() ?>
+        <?= $form->field($model, 'input_voice')->dropDownList(\backend\models\test\InputVoice::asArray()) ?>
+    </div>
+
+    <div class="answer-block" data-block-type="<?= \common\models\test\AnswerType::RECORDING ?>" style="display: <?= $model->isAnswerTypeRecording() ? 'block' : 'none' ?>">
+        <?= $form->field($model, 'input_voice')->dropDownList(\backend\models\test\RecorderLang::asArray()) ?>
     </div>
 
     <div class="form-group">
@@ -44,7 +49,6 @@ $isSourceNeo = var_export($model->isRemote(), true);
 $sourceTest = SourceType::TEST;
 $sourceNeo = SourceType::NEO;
 $sourceList = SourceType::LIST;
-$answerTypeInput = \common\models\test\AnswerType::INPUT;
 $js = <<< JS
 var loaded = false;
 var selected = parseInt($selected);
@@ -104,16 +108,11 @@ $('#storytest-question_list').on('change', function() {
     $('#storytest-question_list_name').val(name);
 });
 
-var ANSWER_TYPE_INPUT = $answerTypeInput;
-var inputBlockElement = $('#answer-input-block');
 $('#storytest-answer_type').on('change', function() {
-    if (parseInt(this.value) === ANSWER_TYPE_INPUT) {
-        inputBlockElement.show();
-    }
-    else {
-        inputBlockElement
-            .hide()
-            .find('input[type=checkbox]').prop('checked', false);
+    var block = $('div[data-block-type=' + this.value + ']');
+    $('.answer-block').hide();
+    if (block.length) {
+        block.show();
     }
 });
 JS;

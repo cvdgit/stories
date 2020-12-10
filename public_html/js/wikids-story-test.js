@@ -135,6 +135,7 @@ var WikidsStoryTest = (function() {
         this.source = parseInt(data.source);
         this.answerType = parseInt(data.answerType);
         this.strictAnswer = parseInt(data.strictAnswer);
+        this.inputVoice = data.inputVoice;
     }
 
     TestConfig.prototype.getSource = function() {
@@ -175,6 +176,10 @@ var WikidsStoryTest = (function() {
 
     TestConfig.prototype.isStrictAnswer = function() {
         return this.strictAnswer === 1;
+    }
+
+    TestConfig.prototype.getInputVoice = function() {
+        return this.inputVoice;
     }
 
     var testConfig;
@@ -1524,7 +1529,10 @@ var WikidsStoryTest = (function() {
         "hideNextButton": function() {
             dom.nextButton.hide();
         },
-        "checkAnswerCorrect": checkAnswerCorrect
+        "checkAnswerCorrect": checkAnswerCorrect,
+        "getTestConfig": function() {
+            return testConfig;
+        }
     };
 })();
 
@@ -1629,9 +1637,9 @@ testSpeech.Pitch = 1;
 testSpeech.ReadText = function(txt, afterSpeech) {
     var ttsSpeechChunk = new SpeechSynthesisUtterance(txt);
 
-    var index = 0;
-    for(var i = 0; i < testSpeech.Synth.getVoices().length ; i++) {
-        if(testSpeech.Synth.getVoices()[i].name === 'Google русский') {
+    var inputVoice = WikidsStoryTest.getTestConfig().getInputVoice() || 'Google русский';
+    for (var i = 0; i < testSpeech.Synth.getVoices().length ; i++) {
+        if (testSpeech.Synth.getVoices()[i].name === inputVoice) {
             ttsSpeechChunk.voice = testSpeech.Synth.getVoices()[i];
             break;
         }
@@ -1834,7 +1842,7 @@ testRecognition.Start = function(event) {
     }
 
     testRecognition.final_transcript = '';
-    testRecognition.recorder.lang = 'ru-RU';
+    testRecognition.recorder.lang = WikidsStoryTest.getTestConfig().getInputVoice() || 'ru-RU';
     testRecognition.recorder.start();
     testRecognition.start_timestamp = event.timeStamp;
 };
@@ -1850,7 +1858,7 @@ testRecognition.StartFragment = function(range, event) {
     }
 
     testRecognition.final_transcript = '';
-    testRecognition.recorder.lang = 'ru-RU';
+    testRecognition.recorder.lang = WikidsStoryTest.getTestConfig().getInputVoice() || 'ru-RU';
     testRecognition.recorder.start();
     testRecognition.start_timestamp = event.timeStamp;
     testRecognition.selectionRange = range;
