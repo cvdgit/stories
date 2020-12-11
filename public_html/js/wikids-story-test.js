@@ -136,6 +136,7 @@ var WikidsStoryTest = (function() {
         this.answerType = parseInt(data.answerType);
         this.strictAnswer = parseInt(data.strictAnswer);
         this.inputVoice = data.inputVoice;
+        this.recordingLang = data.recordingLang;
     }
 
     TestConfig.prototype.getSource = function() {
@@ -180,6 +181,10 @@ var WikidsStoryTest = (function() {
 
     TestConfig.prototype.getInputVoice = function() {
         return this.inputVoice;
+    }
+
+    TestConfig.prototype.getRecordingLang = function() {
+        return this.recordingLang;
     }
 
     var testConfig;
@@ -1842,7 +1847,7 @@ testRecognition.Start = function(event) {
     }
 
     testRecognition.final_transcript = '';
-    testRecognition.recorder.lang = WikidsStoryTest.getTestConfig().getInputVoice() || 'ru-RU';
+    testRecognition.recorder.lang = WikidsStoryTest.getTestConfig().getRecordingLang() || 'ru-RU';
     testRecognition.recorder.start();
     testRecognition.start_timestamp = event.timeStamp;
 };
@@ -1858,7 +1863,7 @@ testRecognition.StartFragment = function(range, event) {
     }
 
     testRecognition.final_transcript = '';
-    testRecognition.recorder.lang = WikidsStoryTest.getTestConfig().getInputVoice() || 'ru-RU';
+    testRecognition.recorder.lang = WikidsStoryTest.getTestConfig().getRecordingLang() || 'ru-RU';
     testRecognition.recorder.start();
     testRecognition.start_timestamp = event.timeStamp;
     testRecognition.selectionRange = range;

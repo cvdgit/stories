@@ -34,7 +34,7 @@ use yii\widgets\ActiveForm;
     </div>
 
     <div class="answer-block" data-block-type="<?= \common\models\test\AnswerType::RECORDING ?>" style="display: <?= $model->isAnswerTypeRecording() ? 'block' : 'none' ?>">
-        <?php // $form->field($model, 'input_voice')->dropDownList(\backend\models\test\RecorderLang::asArray()) ?>
+        <?= $form->field($model, 'recording_lang')->dropDownList(\backend\models\test\RecorderLang::asArray()) ?>
     </div>
 
     <div class="form-group">

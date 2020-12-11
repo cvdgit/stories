@@ -24,6 +24,7 @@ class Serializer
                     'answerType' => $test->answer_type,
                     'strictAnswer' => $test->strict_answer,
                     'inputVoice' => $test->input_voice,
+                    'recordingLang' => $test->recording_lang,
                 ],
                 'students' => $students,
                 'stories' => $stories,
