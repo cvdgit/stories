@@ -31,8 +31,11 @@ class QuestionCollection
         return $this->total;
     }
 
-    public function serialize()
+    public function serialize($shuffle = false)
     {
+        if ($shuffle) {
+            shuffle($this->questions);
+        }
         return array_map(static function($item) {
             return $item->serialize();
         }, $this->questions);

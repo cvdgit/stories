@@ -30,8 +30,9 @@ use yii\helpers\ArrayHelper;
  * @property int $word_list_id
  * @property int $answer_type
  * @property int $strict_answer
- * @property string wrong_answers_params
- * @property string input_voice
+ * @property string $wrong_answers_params
+ * @property string $input_voice
+ * @property int $shuffle_word_list
  *
  * @property StoryTestQuestion[] $storyTestQuestions
  * @property Story[] $stories
@@ -70,6 +71,7 @@ class StoryTest extends ActiveRecord
         return [
             [['title', 'header'], 'required'],
             [['status', 'mix_answers', 'remote', 'question_list_id', 'parent_id', 'source', 'word_list_id', 'answer_type', 'strict_answer'], 'integer'],
+            [['shuffle_word_list'], 'integer'],
             [['title', 'question_list_name', 'header', 'question_params', 'incorrect_answer_text', 'input_voice'], 'string', 'max' => 255],
             [['description_text'], 'string'],
             [['question_list'], 'safe'],
@@ -101,6 +103,7 @@ class StoryTest extends ActiveRecord
             'answer_type' => 'Тип ответов',
             'strict_answer' => 'Строгое сравнение ответов',
             'input_voice' => 'Голос',
+            'shuffle_word_list' => 'Перемешивать элементы списка',
         ];
     }
 
@@ -264,6 +267,11 @@ class StoryTest extends ActiveRecord
     public function getStoryTestRuns()
     {
         return $this->hasMany(StoryTestRun::class, ['test_id' => 'id']);
+    }
+
+    public function isShuffleQuestions()
+    {
+        return (int) $this->shuffle_word_list === 1;
     }
 
 }

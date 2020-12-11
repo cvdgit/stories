@@ -23,6 +23,7 @@ use yii\widgets\ActiveForm;
 
     <div class="word-list-block" style="display: <?= $model->isSourceWordList() ? 'block' : 'none' ?>">
         <?= $form->field($model, 'word_list_id')->dropDownList(\common\models\TestWordList::getWordListAsArray(), ['prompt' => 'Выберите список слов']) ?>
+        <?= $form->field($model, 'shuffle_word_list')->checkbox() ?>
     </div>
 
     <?= $form->field($model, 'answer_type')->dropDownList(\common\models\test\AnswerType::asArray()) ?>

@@ -11,7 +11,7 @@ class Serializer
     {
         return [
             0 => [
-                'storyTestQuestions' => $collection->serialize(),
+                'storyTestQuestions' => $collection->serialize($test->isShuffleQuestions()),
                 'test' => [
                     'progress' => [
                         'total' => $collection->getTotal() * 5,
