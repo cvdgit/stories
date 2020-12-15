@@ -9,6 +9,7 @@ use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -273,6 +274,11 @@ class Category extends ActiveRecord
         return array_merge(array_map(function(Category $category) {
             return $category->id;
         }, $categories), [$this->id]);
+    }
+
+    public function getCategoryUrl()
+    {
+        return Url::to(['story/category', 'category' => $this->alias]);
     }
 
 }
