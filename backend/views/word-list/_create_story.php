@@ -16,6 +16,7 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'test_name')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'test_answer_type')->dropDownList(\common\models\test\AnswerType::asArray()) ?>
     <?= $form->field($model, 'story_name')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'test_shuffle_word_list')->checkbox() ?>
     <?= $form->field($model, 'word_list_id')->hiddenInput()->label(false) ?>
 </div>
 <div class="modal-footer">

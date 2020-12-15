@@ -37,7 +37,7 @@ class WordListService
     {
         $this->transactionManager->wrap(function() use ($form, $userID) {
 
-            $test = $this->storyTestService->createFromWordList($form->test_name, $form->word_list_id, $form->test_answer_type);
+            $test = $this->storyTestService->createFromWordList($form->test_name, $form->word_list_id, $form->test_answer_type, $form->test_shuffle_word_list);
             if (!$test->save()) {
                 throw new \Exception('Can\'t be saved StoryTest model. Errors: '. implode(', ', $test->getFirstErrors()));
             }

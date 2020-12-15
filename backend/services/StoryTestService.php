@@ -8,11 +8,12 @@ use common\models\test\SourceType;
 class StoryTestService
 {
 
-    public function createFromWordList(string $title, int $wordListID, int $answerType)
+    public function createFromWordList(string $title, int $wordListID, int $answerType, int $shuffleWordList)
     {
         $model = StoryTest::create($title, $title, '', '', StoryTest::LOCAL, SourceType::LIST);
         $model->word_list_id = $wordListID;
         $model->answer_type = $answerType;
+        $model->shuffle_word_list = $shuffleWordList;
         return $model;
     }
 
