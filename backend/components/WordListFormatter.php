@@ -20,6 +20,12 @@ class WordListFormatter
 
     public function create(array $texts)
     {
+        $texts = array_filter($texts, function($value) {
+            if (strpos($value, '|') !== false) {
+                $value = explode('|', $value)[0];
+            }
+            return !is_null($value) && $value !== '';
+        });
         return array_map(static function($row) {
             @list($text, $correctAnswer) = explode('|', $row);
             $text = trim(preg_replace('/[^\w\-\s.,!?+-]/u', '', $text));
