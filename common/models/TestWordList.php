@@ -6,6 +6,7 @@ use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 
 /**
  * This is the model class for table "test_word_list".
@@ -141,6 +142,11 @@ class TestWordList extends ActiveRecord
                 'image' => $story->getListThumbPath(),
             ];
         }, $this->stories);
+    }
+
+    public static function getUpdateUrl(int $id)
+    {
+        return Url::to(['word-list/update', 'id' => $id]);
     }
 
 }

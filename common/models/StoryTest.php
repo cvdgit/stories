@@ -276,4 +276,9 @@ class StoryTest extends ActiveRecord
         return (int) $this->shuffle_word_list === 1;
     }
 
+    public function haveWordList()
+    {
+        return !empty($this->word_list_id);
+    }
+
 }

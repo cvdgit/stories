@@ -51,16 +51,23 @@ $this->params['sidebarMenuItems'] = [
             ]),
         ],
         [
-            'attribute' => 'test_story',
-            'label' => 'История',
-            'format' => 'html',
+            'attribute' => 'transition',
+            'label' => 'Переход',
+            'format' => 'raw',
             'value' => function($model) {
+                $html = '';
                 $stories = $model->stories;
                 if (count($stories) > 0) {
                     $story = $stories[0];
-                    return Html::a('Перейти к истории', Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $story->alias]), ['target' => '_blank']);
+                    $html = Html::a('к истории', Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $story->alias]), ['target' => '_blank']);
                 }
-                return '';
+                if ($model->haveWordList()) {
+                    if (!empty($html)) {
+                        $html .= '<br/>';
+                    }
+                    $html .= Html::a('к списку слов', \common\models\TestWordList::getUpdateUrl($model->word_list_id), ['target' => '_blank']);
+                }
+                return $html;
             }
         ],
         [
