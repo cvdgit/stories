@@ -16,18 +16,21 @@ class WordListService
     private $transactionManager;
     private $storyEditorService;
     private $storySlideService;
+    private $storyLinksService;
 
     public function __construct(StoryService $storyService,
                                 StorySlideService $storySlideService,
                                 StoryTestService $storyTestService,
                                 TransactionManager $transactionManager,
-                                StoryEditorService $storyEditorService)
+                                StoryEditorService $storyEditorService,
+                                StoryLinksService $storyLinksService)
     {
         $this->storyService = $storyService;
         $this->storySlideService = $storySlideService;
         $this->storyTestService = $storyTestService;
         $this->transactionManager = $transactionManager;
         $this->storyEditorService = $storyEditorService;
+        $this->storyLinksService = $storyLinksService;
     }
 
     public function create(CreateStoryForm $form, int $userID)
@@ -47,6 +50,8 @@ class WordListService
             $data = $this->storyEditorService->createQuestionBlock(['test-id' => $test->id]);
             $slide = $this->storySlideService->create($story->id, $data, StorySlide::KIND_QUESTION);
             $slide->save();
+
+            $this->storyLinksService->createTestLink($story->id, $test->id);
         });
     }
 

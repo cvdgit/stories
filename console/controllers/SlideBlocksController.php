@@ -38,8 +38,13 @@ class SlideBlocksController extends Controller
                             $this->stdout('no test' . PHP_EOL);
                         }
                         else {
-                            $this->storyLinksService->createTestLink($row['story_id'], $testID);
-                            $this->stdout('+' . PHP_EOL);
+                            try {
+                                $this->storyLinksService->createTestLink($row['story_id'], $testID);
+                                $this->stdout('+' . PHP_EOL);
+                            }
+                            catch (\Exception $ex) {
+                                $this->stdout('Уже существует' . PHP_EOL);
+                            }
                         }
                     }
                 }
