@@ -23,7 +23,7 @@ class BaseVariantModel extends Model
     public function rules()
     {
         return [
-            [['title', 'header', 'question_params'], 'required'],
+            [['title', 'header'], 'required'],
             [['title', 'header', 'question_params', 'incorrect_answer_text'], 'string', 'max' => 255],
             [['taxonName', 'taxonValue'], 'string', 'max' => 255],
             [['description_text'], 'string'],
