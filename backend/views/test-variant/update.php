@@ -21,8 +21,8 @@ use yii\widgets\ActiveForm;
                 <?= $form->field($model, 'description_text')->textarea(['rows' => 4]) ?>
                 <?= $form->field($model, 'incorrect_answer_text')->textInput(['maxlength' => true]) ?>
                 <?= $form->field($model, 'question_params')->hiddenInput()->label(false) ?>
-                <?= $form->field($model, 'taxonName')->dropDownList([], ['data-value' => $model->taxonName]) ?>
-                <?= $form->field($model, 'taxonValue')->dropDownList([], ['data-value' => $model->taxonValue]) ?>
+                <?= $form->field($model, 'neo_question_id')->hiddenInput()->label(false) ?>
+                <div class="question-config"></div>
             </div>
             <div class="col-md-6">
                 <?= $this->render('_wrong_answers', ['form' => $form, 'model' => $model]) ?>
@@ -39,6 +39,9 @@ $js = <<< JS
 $('#update-test-variant-form')
     .on('beforeSubmit', function(e) {
         e.preventDefault();
+        
+        fillTestVariantConfig(this, 'updateform-question_params');
+        
         var form_data = new FormData(this);
         $.ajax({
             url: $(this).attr('action'),

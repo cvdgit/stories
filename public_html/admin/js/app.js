@@ -167,6 +167,10 @@ var Neo = (function(jQuery) {
             });
     }
 
+    function getQuestionValues(id) {
+        return $.getJSON('/admin/index.php?r=neo/question-values', {"id": id});
+    }
+
     return {
         "getEntities": getEntities,
         "getRelations": getRelations,
@@ -178,6 +182,7 @@ var Neo = (function(jQuery) {
         "getQuestionList": getQuestionList,
         "questions": questions,
         "getTaxonList": getTaxonList,
-        "getTaxonValueList": getTaxonValueList
+        "getTaxonValueList": getTaxonValueList,
+        "getQuestionValues": getQuestionValues
     };
 })(jQuery);

@@ -34,7 +34,9 @@ class TestVariantController extends Controller
 
     public function actionCreate(int $parent_id)
     {
+        $testModel = $this->findModel($parent_id);
         $model = new CreateForm($parent_id);
+        $model->neo_question_id = $testModel->question_list_id;
         if ($model->load(Yii::$app->request->post())) {
             try {
                 $model->createTestVariant();
@@ -51,6 +53,7 @@ class TestVariantController extends Controller
     {
         $model = $this->findModel($id);
         $updateForm = new UpdateForm($model);
+        $updateForm->neo_question_id = $model->question_list_id;
         if ($updateForm->load(Yii::$app->request->post())) {
             try {
                 $updateForm->updateTestVariant();

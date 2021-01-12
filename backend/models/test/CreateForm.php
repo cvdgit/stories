@@ -31,7 +31,7 @@ class CreateForm extends BaseVariantModel
         }
         $this->loadParentTest();
 
-        $this->question_params = sprintf('taxonName=%1s;taxonValue=%2s', $this->taxonName, $this->taxonValue);
+        //$this->question_params = sprintf('taxonName=%1s;taxonValue=%2s', $this->taxonName, $this->taxonValue);
         $this->wrong_answers_params = $this->createWrongAnswersParams();
 
         $model = StoryTest::createVariant(

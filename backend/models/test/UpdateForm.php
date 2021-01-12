@@ -72,7 +72,7 @@ class UpdateForm extends BaseVariantModel
                 $this->model->{$name} = $this->{$name};
             }
         }
-        $this->model->question_params = sprintf('taxonName=%1s;taxonValue=%2s', $this->taxonName, $this->taxonValue);
+        //$this->model->question_params = sprintf('taxonName=%1s;taxonValue=%2s', $this->taxonName, $this->taxonValue);
         $this->model->wrong_answers_params = $this->createWrongAnswersParams();
         $this->model->save();
     }

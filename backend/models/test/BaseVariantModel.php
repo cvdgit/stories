@@ -13,6 +13,7 @@ class BaseVariantModel extends Model
     public $question_params;
     public $incorrect_answer_text;
     public $wrong_answers_params;
+    public $neo_question_id;
 
     public $taxonName;
     public $taxonValue;
@@ -28,6 +29,7 @@ class BaseVariantModel extends Model
             [['taxonName', 'taxonValue'], 'string', 'max' => 255],
             [['description_text'], 'string'],
             [['wrongAnswerTaxonNames', 'wrongAnswerTaxonValues'], 'safe'],
+            [['neo_question_id'], 'integer'],
         ];
     }
 
@@ -50,7 +52,11 @@ class BaseVariantModel extends Model
     {
         $taxonItems = [];
         for ($i = 0, $iMax = count($this->wrongAnswerTaxonNames); $i < $iMax; $i++) {
-            $taxonItems[] = sprintf('taxonName=%1s;taxonValue=%2s', $this->wrongAnswerTaxonNames[$i], $this->wrongAnswerTaxonValues[$i]);
+            $name = $this->wrongAnswerTaxonNames[$i];
+            $value = $this->wrongAnswerTaxonValues[$i];
+            if (!empty($name) && !empty($value)) {
+                $taxonItems[] = sprintf('taxonName=%1s;taxonValue=%2s', $name, $value);
+            }
         }
         return implode('|', $taxonItems);
     }

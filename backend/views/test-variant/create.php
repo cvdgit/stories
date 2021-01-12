@@ -10,8 +10,9 @@ use yii\widgets\ActiveForm;
 <?php $form = ActiveForm::begin([
     'enableClientValidation' => true,
     'options' => [
-        'id' => 'test-variant-form'
-    ]]); ?>
+        'id' => 'test-variant-form',
+        'class' => 'test-variant-form',
+]]); ?>
 <div class="modal-body">
     <div class="row">
         <div class="col-md-6">
@@ -20,14 +21,15 @@ use yii\widgets\ActiveForm;
             <?= $form->field($model, 'description_text')->textarea(['rows' => 4]) ?>
             <?= $form->field($model, 'incorrect_answer_text')->textInput(['maxlength' => true]) ?>
             <?= $form->field($model, 'question_params')->hiddenInput()->label(false) ?>
-            <?= $form->field($model, 'taxonName')->dropDownList([], ['data-value' => $model->taxonName, 'prompt' => '...']) ?>
-            <?= $form->field($model, 'taxonValue')->dropDownList([], ['data-value' => $model->taxonValue, 'prompt' => '...']) ?>
+            <?= $form->field($model, 'neo_question_id')->hiddenInput()->label(false) ?>
+            <div class="question-config">
+                <p>Загрузка параметров вопроса...</p>
+            </div>
         </div>
         <div class="col-md-6">
             <?= $this->render('_wrong_answers', ['form' => $form, 'model' => $model]) ?>
         </div>
     </div>
-
 </div>
 <div class="modal-footer">
     <?= Html::submitButton('Создать вариант теста', ['class' => 'btn btn-success']) ?>
@@ -39,6 +41,9 @@ $js = <<< JS
 $('#test-variant-form')
     .on('beforeSubmit', function(e) {
         e.preventDefault();
+        
+        fillTestVariantConfig(this, 'createform-question_params');
+
         var form_data = new FormData(this);
         $.ajax({
             url: $(this).attr('action'),

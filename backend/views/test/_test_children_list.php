@@ -123,25 +123,140 @@ window.loadNeoTaxonValues = function(taxon, element) {
         });
 };
 
+window.loadNeoQuestionValues = function(list, id, selected) {
+    
+    selected = selected || [];
+    function isSelected(name, value) {
+        return selected.filter(function(item) {
+            return item.name == name && item.value == value;
+        }).length > 0;
+    }    
+    
+    function addChangeEvent(values, targetParam, relatedParam, valueKey) {
+
+        $('select[name=' + targetParam + ']', list).on('change', function() {
+            
+            var relatedSelect = $('select[name=' + relatedParam + ']', list),
+                currentValue = $(this).find('option:selected').attr('data-id');
+            
+            relatedSelect.empty();
+            $('<option/>')
+                .text('Выберите значение')
+                .addClass('empty-value')
+                .appendTo(relatedSelect);
+            
+            if (currentValue === '') {
+                return;
+            }
+            
+            var selectValues = [];
+            values.forEach(function(item) {
+                if (item.param == relatedParam) {
+                    selectValues = item.values;
+                    return;
+                }
+            });
+            
+            selectValues
+                .filter(function(value) {
+                    return currentValue == value.entity_id;
+                })
+                .forEach(function(item) {
+                    $('<option/>')
+                        .text(item.name)
+                        .attr('data-id', item.id)
+                        .val(item[valueKey])
+                        .prop('selected', isSelected(relatedParam, item[valueKey]))
+                        .appendTo(relatedSelect);
+                });
+        })
+        .trigger('change');
+    }
+    
+    Neo.getQuestionValues(id).done(function(response) {
+        
+        var values = response.data;
+        var form = $('.test-variant-form');
+        
+        response.data.forEach(function(field) {
+            
+            var select = $('<select/>')
+                .attr('name', field.param)
+                .addClass('form-control')
+                .addClass('test-variant-config-element');
+
+            $('<option/>')
+                .text('Выберите значение')
+                .addClass('empty-value')
+                .appendTo(select);
+            
+            $('<div/>').addClass('form-group')
+                .append($('<label/>').addClass('control-label').text(field.title))
+                .append(select)
+                .appendTo(list);
+            
+            if (field.relation.length) {
+                addChangeEvent(values, field.relation, field.param, field.field);
+            }
+            else {
+                field.values.forEach(function(item) {
+                    $('<option/>')
+                        .text(item.name)
+                        .val(item[field.field])
+                        .attr('data-id', item.id)
+                        .prop('selected', isSelected(field.param, item[field.field]))
+                        .appendTo(select);
+                });
+            }
+        });
+    });
+};
+
+window.fillTestVariantConfig = function(form, id) {
+    form = $(form);
+    var str = form.find('.test-variant-config-element').map(function() {
+        return $(this).attr('name') + '=' + $(this).val();
+    }).get().join(';');
+    form.find('#' + id).val(str);
+};
+
 createVariantModal
     .on('shown.bs.modal', function() {
-        var taxonNameElement = $('#createform-taxonname', this);
-        var taxonValueElement = $('#createform-taxonvalue', this);
-        window.loadNeoTaxon(taxonNameElement);
-        taxonNameElement
-            .off('change')
-            .on('change', function() {
-                window.loadNeoTaxonValues(taxonNameElement.val(), taxonValueElement);
-            });
+        var id = $('#createform-neo_question_id').val();
+        var list = $('.question-config', this);
+        if (!list.find('div.form-group').length) {
+            list.empty();
+            window.loadNeoQuestionValues(list, id);
+        }
     });
+
+function createVariantParams(params) {
+    return params.split(';').map(function(value) {
+        return {"name": value.split('=')[0], "value": value.split('=')[1]};
+    });
+}
 
 updateVariantModal
     .on('shown.bs.modal', function() {
         
-        var taxonNameElement = $('#updateform-taxonname', updateVariantModal);
-        var taxonValueElement = $('#updateform-taxonvalue', updateVariantModal);
-    
+        var id = $('#updateform-neo_question_id').val();
+        var params = $('#updateform-question_params').val();
+        var list = $('.question-config', this);
+        list.empty();
+        window.loadNeoQuestionValues(list, id, createVariantParams(params));
+       
         var wrongElementList = $('.wrong-answer-list > .wrong-answer-list-item:visible', updateVariantModal);
+        wrongElementList.each(function() {
+            var elem = $(this).find('.taxon-name-select select'),
+                valueElem = $(this).find('.taxon-value-select select');
+            window
+                .loadNeoTaxon(elem)
+                .done(function() {
+                    window.loadNeoTaxonValues(elem.attr('data-value'), valueElem);
+                });
+        });
+                
+/*      
         
         window
             .loadNeoTaxon(taxonNameElement)
@@ -162,7 +277,7 @@ updateVariantModal
             .on('change', function() {
                 window.loadNeoTaxonValues(taxonNameElement.attr('data-value'), taxonValueElement);
             })
-            .trigger('change');
+            .trigger('change');*/
     });
 
 function createWrongAnswerRow(list) {
