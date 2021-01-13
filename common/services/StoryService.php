@@ -134,7 +134,7 @@ class StoryService
         }
     }
 
-    public function publishStory(Story $model): void
+    public function publishStory(Story $model, bool $sendEmail = true): void
     {
         if ($model->isPublished()) {
             throw new DomainException('История уже опубликована');
@@ -146,8 +146,9 @@ class StoryService
             throw new DomainException('В истории отсутствуют слайды');
         }
 
-        $sendNotification = $model->submitPublicationTask();
-        if ($model->publishStory() && $sendNotification) {
+        $model->publishStory();
+
+        if ($sendEmail) {
 
             Yii::$app->queue->push(new PublishStoryJob([
                 'storyID' => $model->id,
@@ -157,6 +158,22 @@ class StoryService
             $notification->text = (new NewStoryNotification($model))->render();
             $this->notificationService->sendToAllUsers($notification);
         }
+
+        /*
+        $sendNotification = $model->submitPublicationTask();
+        if ($model->publishStory() && $sendNotification) {
+
+            if ($sendEmail) {
+                Yii::$app->queue->push(new PublishStoryJob([
+                    'storyID' => $model->id,
+                ]));
+            }
+
+            $notification = new NotificationModel();
+            $notification->text = (new NewStoryNotification($model))->render();
+            $this->notificationService->sendToAllUsers($notification);
+        }
+        */
     }
 
     public function unPublishStory(Story $model): void

@@ -287,9 +287,10 @@ class StoryController extends Controller
 
     public function actionPublish($id)
     {
+        $sendEmail = (int) Yii::$app->request->post('sendNotification') === 1;
         $model = Story::findModel($id);
         try {
-            $this->service->publishStory($model);
+            $this->service->publishStory($model, $sendEmail);
             Yii::$app->session->setFlash('success', 'История опубликована');
         }
         catch (Exception $e) {

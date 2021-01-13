@@ -47,7 +47,12 @@ $this->params['sidebarMenuItems'] = [
                 <div class="clearfix">
                     <div class="pull-left" style="line-height: 34px">История не опубликована</div>
                     <div class="pull-right">
-                        <?= Html::beginForm(['/story/publish', 'id' => $model->id]) . Html::submitButton('Опубликовать', ['class' => 'btn btn-primary']) . Html::endForm() ?>
+                        <?= Html::beginForm(['/story/publish', 'id' => $model->id]) ?>
+                        <?php if ($model->submitPublicationTask()): ?>
+                        <?= Html::checkbox('sendNotification', true, ['id' => 'send-notification']) . ' ' . Html::label('Запустить рассылку', 'send-notification') ?>
+                        <?php endif ?>
+                        <?= Html::submitButton('Опубликовать', ['class' => 'btn btn-primary']) ?>
+                        <?= Html::endForm() ?>
                     </div>
                 </div>
             </div>
