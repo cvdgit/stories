@@ -1328,7 +1328,7 @@ var WikidsStoryTest = (function() {
 
         currentQuestionElement = $('.wikids-test-question[data-question-id=' + nextQuestion.id + ']', dom.questions);
 
-        if (getQuestionView(currentQuestion) !== 'svg') {
+        if (getQuestionView(currentQuestion) !== 'svg' && testConfig.sourceIsNeo()) {
             $('.wikids-test-answers', currentQuestionElement)
                 .empty()
                 .append(createAnswers(getAnswersData(currentQuestion), currentQuestion)
