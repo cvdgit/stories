@@ -199,6 +199,7 @@ class QuestionController extends Controller
                 'svg' => $svg,
                 'lastAnswerIsCorrect' => true,
                 'test_id' => $test->id,
+                'answer_number' => $resultItem['answer_number'],
             ];
             $questions[] = $question;
             $i++;

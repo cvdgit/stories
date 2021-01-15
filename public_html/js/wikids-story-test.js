@@ -116,7 +116,6 @@ var WikidsStoryTest = (function() {
     };
 
     TestProgress.prototype.calcPercent = function() {
-        console.log(this.getCurrent(), this.getTotal());
         return Math.round(this.getCurrent() * 100 / this.getTotal());
     }
 
@@ -544,18 +543,83 @@ var WikidsStoryTest = (function() {
         return array;
     }
 
+    function generateAnswerList(answers, num) {
+
+        var list = answers.filter(function(answer) {
+            return answer.is_correct === 1;
+        });
+
+        function sample(population, k){
+            if (!Array.isArray(population)) {
+                throw new TypeError("Population must be an array.");
+            }
+            var n = population.length;
+            if (k < 0 || k > n) {
+                throw new RangeError("Sample larger than population or is negative");
+            }
+            var result = new Array(k);
+            var setsize = 21;   // size of a small set minus size of an empty list
+            if (k > 5) {
+                setsize += Math.pow(4, Math.ceil(Math.log(k * 3) / Math.log(4)))
+            }
+            if (n <= setsize) {
+                // An n-length list is smaller than a k-length set
+                var pool = population.slice();
+                for (var i = 0; i < k; i++) {          // invariant:  non-selected at [0,n-i)
+                    var j = Math.random() * (n - i) | 0;
+                    result[i] = pool[j];
+                    pool[j] = pool[n - i - 1];       // move non-selected item into vacancy
+                }
+            } else {
+                var selected = new Set();
+                for (var i = 0; i < k; i++) {
+                    var j = Math.random() * n | 0;
+                    while (selected.has(j)) {
+                        j = Math.random() * n | 0;
+                    }
+                    selected.add(j);
+                    result[i] = population[j];
+                }
+            }
+            return result;
+        }
+
+        var max = num - list.length;
+        sample(answers.filter(function(answer) {
+            return answer.is_correct !== 1;
+        }), max).map(function(elem) {
+            list.push(elem);
+        });
+
+        return shuffle(list);
+    }
+
+    function getQuestionAnswerNumber(question) {
+        return parseInt(question.answer_number);
+    }
+
+    function getQuestionView(question) {
+        return question.view;
+    }
+
     function createAnswers(answers, question) {
 
-        var mixAnswers = question.mix_answers;
+        var num = getQuestionAnswerNumber(question);
+        if (testConfig.sourceIsNeo() && num > 0) {
+            answers = generateAnswerList(answers, num);
+        }
+        else {
+            var mixAnswers = question.mix_answers || 0;
+            if (parseInt(mixAnswers) === 1 || testConfig.sourceIsNeo()) {
+                answers = shuffle(answers);
+            }
+        }
 
         var $answers = $("<div/>").addClass("wikids-test-answers");
-        mixAnswers = mixAnswers || 0;
-        if (parseInt(mixAnswers) === 1) {
-            answers = shuffle(answers);
-        }
         answers.forEach(function(answer) {
             $answers.append(createAnswer(answer, question));
         });
+
         var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-4 question-image"></div><div class="col-md-8 question-wrapper"></div></div>');
         $wrapper.find(".question-wrapper").append($answers);
         return $wrapper;
@@ -1119,30 +1183,18 @@ var WikidsStoryTest = (function() {
 
         //console.log(answerIsCorrect, questionsRepeat.done(currentQuestion));
         var done = false;
-        //if (!testConfig.sourceIsLocal()) {
-            if (!answerIsCorrect) {
-                testQuestions.unshift(currentQuestion);
+        if (!answerIsCorrect) {
+            testQuestions.unshift(currentQuestion);
+        }
+        else {
+            done = questionsRepeat.done(currentQuestion);
+            if (done) {
+                makeTestQuestions();
             }
             else {
-                done = questionsRepeat.done(currentQuestion);
-                if (done) {
-                    makeTestQuestions();
-                }
-                else {
-                    testQuestions.push(currentQuestion);
-                }
+                testQuestions.push(currentQuestion);
             }
-        //}
-/*        else {
-            if (!answerIsCorrect) {
-                testQuestions.unshift(currentQuestion);
-            }
-            else {
-                if (!testQuestions.length) {
-                    makeTestQuestions();
-                }
-            }
-        }*/
+        }
 
         //console.log(questions);
         //console.log(currentQuestion);
@@ -1275,6 +1327,13 @@ var WikidsStoryTest = (function() {
         currentQuestion = nextQuestion;
 
         currentQuestionElement = $('.wikids-test-question[data-question-id=' + nextQuestion.id + ']', dom.questions);
+
+        if (getQuestionView(currentQuestion) !== 'svg') {
+            $('.wikids-test-answers', currentQuestionElement)
+                .empty()
+                .append(createAnswers(getAnswersData(currentQuestion), currentQuestion)
+                    .find('.wikids-test-answers > div'));
+        }
 
         currentQuestionElement
             .find('input[type=checkbox],input[type=radio]').prop('checked', false).end()
