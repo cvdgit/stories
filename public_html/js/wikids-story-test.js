@@ -459,9 +459,9 @@ var WikidsStoryTest = (function() {
                     .addClass('wikids-test-image-original-inner image-loader')
                     .on('click', function() {
                         $(this).parent().remove();
-                        if (elem) {
-                            $(elem).parent()[0].click();
-                        }
+                        //if (elem) {
+                        //    $(elem).parent()[0].click();
+                        //}
                     })
                     .append(
                         $('<img/>')
