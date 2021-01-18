@@ -2,11 +2,13 @@
 use common\models\test\AnswerType;
 use common\models\test\SourceType;
 use dosamigos\datepicker\DatePicker;
+use yii\bootstrap\Nav;
 use yii\helpers\Html;
 use yii\grid\GridView;
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\search\TestSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $source int */
 $this->title = 'Тесты';
 $this->params['sidebarMenuItems'] = [
     ['label' => 'Результаты тестов', 'url' => ['test/results']],
@@ -14,21 +16,18 @@ $this->params['sidebarMenuItems'] = [
 ?>
 <h1 class="page-header"><?= Html::encode($this->title) ?></h1>
 <p>
-    <?= Html::a('Создать тест', ['create'], ['class' => 'btn btn-primary']) ?>
+    <?= Html::a('Создать тест', ['create', 'source' => $source], ['class' => 'btn btn-primary']) ?>
 </p>
+<?= Nav::widget([
+    'options' => ['class' => 'nav nav-tabs material-tabs'],
+    'items' => SourceType::asNavItems($source),
+]) ?>
 <?= GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
-    'options' => ['class' => 'table-responsive'],
+    'options' => ['class' => 'table-responsive test-grid'],
     'columns' => [
         'title',
-        [
-            'attribute' => 'source',
-            'value' => function($model) {
-                return SourceType::asText($model->source);
-            },
-            'filter' => SourceType::asArray(),
-        ],
         [
             'attribute' => 'answer_type',
             'value' => function($model) {
@@ -76,3 +75,14 @@ $this->params['sidebarMenuItems'] = [
         ],
     ],
 ]) ?>
+
+<?php
+$css = <<<CSS
+.test-grid {
+    margin-top: 20px;
+}
+.test-grid .summary {
+    text-align: right;
+}
+CSS;
+$this->registerCss($css);

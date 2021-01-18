@@ -55,7 +55,7 @@ AppAsset::register($this);
                         ['label' => 'Комментарии', 'url' => ['/comment/index']],
                         ['label' => 'Подписки', 'url' => ['/rate/index']],
                         ['label' => 'Блог', 'url' => ['/news/admin', 'status' => \common\models\News::STATUS_PROPOSED], 'active' => Yii::$app->controller->id === 'news'],
-                        ['label' => 'Тесты', 'url' => ['/test/index'], 'active' => Yii::$app->controller->id === 'test'],
+                        ['label' => 'Тесты', 'url' => ['/test/index', 'source' => \common\models\test\SourceType::TEST], 'active' => Yii::$app->controller->id === 'test'],
                         ['label' => 'Видео', 'url' => ['/video/index'], 'active' => Yii::$app->controller->id === 'video'],
                         ['label' => 'Плейлисты', 'url' => ['/playlist/index'], 'active' => Yii::$app->controller->id === 'playlist'],
                         ['label' => 'Изображения', 'url' => ['/image/index'], 'active' => Yii::$app->controller->id === 'image'],

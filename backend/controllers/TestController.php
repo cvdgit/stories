@@ -42,19 +42,23 @@ class TestController extends Controller
         ];
     }
 
-    public function actionIndex()
+    public function actionIndex(int $source)
     {
         $searchModel = new TestSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $params = array_merge([], Yii::$app->request->queryParams);
+        $params['TestSearch']['source'] = $source;
+        $dataProvider = $searchModel->search($params);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'source' => $source,
         ]);
     }
 
-    public function actionCreate()
+    public function actionCreate(int $source)
     {
         $model = new StoryTest();
+        $model->source = $source;
         $dataProvider = new ActiveDataProvider([
             'query' => $model->getStoryTestQuestions(),
         ]);
