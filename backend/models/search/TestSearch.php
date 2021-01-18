@@ -3,6 +3,7 @@
 namespace backend\models\search;
 
 use common\models\StoryTest;
+use common\models\test\SourceType;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -23,10 +24,14 @@ class TestSearch extends Model
         ];
     }
 
+    public function isNeoTest()
+    {
+        return $this->source === SourceType::NEO;
+    }
+
     public function search($params)
     {
         $query = StoryTest::find()->with('storyTestQuestions');
-        $query->where('parent_id = 0');
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'sort' => [
@@ -38,9 +43,12 @@ class TestSearch extends Model
                 'pageSize' => 50,
             ],
         ]);
-
         if (!($this->load($params) && $this->validate())) {
             return $dataProvider;
+        }
+
+        if (!$this->isNeoTest()) {
+            $query->where('parent_id = 0');
         }
 
         $query->andFilterWhere(['like', 'title', $this->title]);

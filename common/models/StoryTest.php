@@ -40,6 +40,7 @@ use yii\helpers\ArrayHelper;
  * @property Story[] $stories
  * @property StoryStoryTest[] $storyStoryTests
  * @property StoryTestRun[] $storyTestRuns
+ * @property StoryTest $parentTest;
  */
 class StoryTest extends ActiveRecord
 {
@@ -284,6 +285,11 @@ class StoryTest extends ActiveRecord
         return $this->hasMany(StoryTestRun::class, ['test_id' => 'id']);
     }
 
+    public function getParentTest()
+    {
+        return $this->hasOne(self::class, ['id' => 'parent_id']);
+    }
+
     public function isShuffleQuestions()
     {
         return (int) $this->shuffle_word_list === 1;
@@ -292,6 +298,11 @@ class StoryTest extends ActiveRecord
     public function haveWordList()
     {
         return !empty($this->word_list_id);
+    }
+
+    public function isVariant()
+    {
+        return $this->parent_id > 0;
     }
 
 }

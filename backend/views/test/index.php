@@ -22,58 +22,83 @@ $this->params['sidebarMenuItems'] = [
     'options' => ['class' => 'nav nav-tabs material-tabs'],
     'items' => SourceType::asNavItems($source),
 ]) ?>
-<?= GridView::widget([
+<?php
+
+$columns = [];
+$columns[] = 'title';
+if ($searchModel->isNeoTest()) {
+    $columns[] = [
+        'attribute' => 'parentTest.title',
+    ];
+}
+$columns[] = [
+    'attribute' => 'answer_type',
+    'value' => function($model) {
+        return AnswerType::asText($model->answer_type);
+    },
+    'filter' => AnswerType::asArray(),
+];
+$columns[] = [
+    'attribute' => 'created_at',
+    'value' => 'created_at',
+    'format' => 'datetime',
+    'filter' => DatePicker::widget([
+        'model' => $searchModel,
+        'attribute' => 'created_at',
+        'language' => 'ru',
+        'clientOptions' => [
+            'autoclose' => true,
+            'format' => 'dd.mm.yyyy'
+        ]
+    ]),
+];
+$columns[] = [
+    'attribute' => 'transition',
+    'label' => 'Переход',
+    'format' => 'raw',
+    'value' => function($model) {
+        $html = '';
+        $stories = $model->stories;
+        if (count($stories) > 0) {
+            $story = $stories[0];
+            $html = Html::a('к истории', Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $story->alias]), ['target' => '_blank']);
+        }
+        if ($model->haveWordList()) {
+            if (!empty($html)) {
+                $html .= '<br/>';
+            }
+            $html .= Html::a('к списку слов', \common\models\TestWordList::getUpdateUrl($model->word_list_id), ['target' => '_blank']);
+        }
+        return $html;
+    }
+];
+
+$columns[] = [
+    'class' => 'yii\grid\ActionColumn',
+    'template' => '{update} {delete}',
+    'buttons' => [
+        'update' => function($url, $model) {
+            $id = $model->id;
+            if ($model->isVariant()) {
+                $id = $model->parent_id;
+            }
+            return Html::a('<span class="glyphicon glyphicon-pencil"></span>', ['test/update', 'id' => $id]);
+        },
+        'delete' => function($url, $model) {
+            $id = $model->id;
+            if ($model->isVariant()) {
+                $id = $model->parent_id;
+            }
+            return Html::a('<span class="glyphicon glyphicon-trash"></span>', ['test/delete', 'id' => $id]);
+        }
+    ],
+];
+
+echo GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
     'options' => ['class' => 'table-responsive test-grid'],
-    'columns' => [
-        'title',
-        [
-            'attribute' => 'answer_type',
-            'value' => function($model) {
-                return AnswerType::asText($model->answer_type);
-            },
-            'filter' => AnswerType::asArray(),
-        ],
-        [
-            'attribute' => 'created_at',
-            'value' => 'created_at',
-            'format' => 'datetime',
-            'filter' => DatePicker::widget([
-                'model' => $searchModel,
-                'attribute' => 'created_at',
-                'language' => 'ru',
-                'clientOptions' => [
-                    'autoclose' => true,
-                    'format' => 'dd.mm.yyyy'
-                ]
-            ]),
-        ],
-        [
-            'attribute' => 'transition',
-            'label' => 'Переход',
-            'format' => 'raw',
-            'value' => function($model) {
-                $html = '';
-                $stories = $model->stories;
-                if (count($stories) > 0) {
-                    $story = $stories[0];
-                    $html = Html::a('к истории', Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $story->alias]), ['target' => '_blank']);
-                }
-                if ($model->haveWordList()) {
-                    if (!empty($html)) {
-                        $html .= '<br/>';
-                    }
-                    $html .= Html::a('к списку слов', \common\models\TestWordList::getUpdateUrl($model->word_list_id), ['target' => '_blank']);
-                }
-                return $html;
-            }
-        ],
-        [
-            'class' => 'yii\grid\ActionColumn',
-            'template' => '{update} {delete}',
-        ],
-    ],
+    'columns' => $columns,
 ]) ?>
 
 <?php

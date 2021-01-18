@@ -18,7 +18,7 @@ $this->params['sidebarMenuItems'] = [
             ]) ?>
         </div>
         <div class="col-md-6 test-sidebar">
-            <?php if (!$model->isNewRecord): ?>
+            <?php if (!$model->isNewRecord && !$model->isVariant()): ?>
                 <?php if ($model->isRemote()): ?>
                     <?= $this->render('_test_children_list', ['model' => $model]) ?>
                 <?php endif ?>
