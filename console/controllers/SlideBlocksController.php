@@ -30,6 +30,7 @@ class SlideBlocksController extends Controller
             $reader = new HtmlSlideReader($row['data']);
             $slide = $reader->load();
             if ($slide->getView() === 'question') {
+                $this->stdout('question' . PHP_EOL);
                 foreach ($slide->getBlocks() as $block) {
                     if ($block->getType() === AbstractBlock::TYPE_HTML) {
                         $document = \phpQuery::newDocumentHTML($block->getContent());
