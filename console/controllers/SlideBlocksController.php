@@ -32,7 +32,14 @@ class SlideBlocksController extends Controller
             $slide = (new HtmlSlideReader($row['data']))->load();
             foreach ($slide->getBlocks() as $block) {
                 if ($block->isTest()) {
-                    $this->stdout('story - ' . $row['story_id'] . '; test - ' . $block->getTestID() . PHP_EOL);
+                    $line = 'story - ' . $row['story_id'] . '; test - ' . $block->getTestID();
+                    try {
+                        $this->storyLinksService->createTestLink($row['story_id'], $block->getTestID());
+                        $this->stdout('[+] ' . $line . PHP_EOL);
+                    }
+                    catch (\Exception $ex) {
+                        $this->stdout('Уже существует' . $line . PHP_EOL);
+                    }
                 }
             }
         }
