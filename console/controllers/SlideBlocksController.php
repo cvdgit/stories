@@ -25,18 +25,31 @@ class SlideBlocksController extends Controller
         $query = (new Query())
             ->select(['id', 'story_id', 'data'])
             ->from(StorySlide::tableName())
+            ->where('kind = :kind', [':kind' => 0])
+            ->andWhere('status = :status', [':status' => StorySlide::STATUS_VISIBLE])
+            ->andWhere('data IS NOT NULL');
+        foreach ($query->each() as $row) {
+            $slide = (new HtmlSlideReader($row['data']))->load();
+            foreach ($slide->getBlocks() as $block) {
+                if ($block->isTest()) {
+                    $this->stdout('story - ' . $row['story_id'] . '; test - ' . $block->getTestID() . PHP_EOL);
+                }
+            }
+        }
+
+        /*
+        $query = (new Query())
+            ->select(['id', 'story_id', 'data'])
+            ->from(StorySlide::tableName())
             ->where('kind = :kind', [':kind' => StorySlide::KIND_QUESTION]);
         foreach ($query->each() as $row) {
             $reader = new HtmlSlideReader($row['data']);
             $slide = $reader->load();
-            if ($slide->getView() === 'question') {
-                $this->stdout('question' . PHP_EOL);
+            if ($slide->getView() === 'new-question') {
                 foreach ($slide->getBlocks() as $block) {
                     if ($block->getType() === AbstractBlock::TYPE_HTML) {
                         $document = \phpQuery::newDocumentHTML($block->getContent());
                         $testID = $document->find('div.new-questions')->attr('data-test-id');
-                        $this->stdout('story - ' . $row['story_id'] . '; test - ' . $testID . PHP_EOL);
-                        /*
                         if (empty($testID)) {
                             $this->stdout('no test' . PHP_EOL);
                         }
@@ -48,11 +61,13 @@ class SlideBlocksController extends Controller
                             catch (\Exception $ex) {
                                 $this->stdout('Уже существует' . PHP_EOL);
                             }
-                        }*/
+                        }
                     }
                 }
             }
         }
+        */
+
         $this->stdout('Done!' . PHP_EOL);
     }
 
