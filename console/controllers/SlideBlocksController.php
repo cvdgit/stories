@@ -29,11 +29,13 @@ class SlideBlocksController extends Controller
         foreach ($query->each() as $row) {
             $reader = new HtmlSlideReader($row['data']);
             $slide = $reader->load();
-            if ($slide->getView() === 'new-question') {
+            if ($slide->getView() === 'question') {
                 foreach ($slide->getBlocks() as $block) {
                     if ($block->getType() === AbstractBlock::TYPE_HTML) {
                         $document = \phpQuery::newDocumentHTML($block->getContent());
                         $testID = $document->find('div.new-questions')->attr('data-test-id');
+                        $this->stdout('story - ' . $row['story_id'] . '; test - ' . $testID . PHP_EOL);
+                        /*
                         if (empty($testID)) {
                             $this->stdout('no test' . PHP_EOL);
                         }
@@ -45,7 +47,7 @@ class SlideBlocksController extends Controller
                             catch (\Exception $ex) {
                                 $this->stdout('Уже существует' . PHP_EOL);
                             }
-                        }
+                        }*/
                     }
                 }
             }
