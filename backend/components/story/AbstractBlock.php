@@ -153,4 +153,19 @@ abstract class AbstractBlock
 
     public function delete(): void {}
 
+    public function isVideo(): bool
+    {
+        return $this->type === self::TYPE_VIDEO;
+    }
+
+    public function isButton(): bool
+    {
+        return $this->type === self::TYPE_BUTTON;
+    }
+
+    public function isTest(): bool
+    {
+        return $this->type === self::TYPE_TEST;
+    }
+
 }
