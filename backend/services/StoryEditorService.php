@@ -16,6 +16,7 @@ use backend\models\editor\TransitionForm;
 use common\helpers\StoryHelper;
 use common\models\StorySlide;
 use common\models\StorySlideBlock;
+use common\models\StoryStoryTest;
 use common\models\StoryTestQuestion;
 use DomainException;
 use yii;
@@ -30,10 +31,12 @@ class StoryEditorService
 {
 
     protected $imageService;
+    private $storyLinkService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(ImageService $imageService, StoryLinksService $storyLinkService)
     {
         $this->imageService = $imageService;
+        $this->storyLinkService = $storyLinkService;
     }
 
     protected function uploadImage(ImageForm $form, $model): string
@@ -105,6 +108,12 @@ class StoryEditorService
 
         $reader = new HtmlSlideReader($model->data);
         $slide = $reader->load();
+
+        $block = $slide->findBlockByID($blockID);
+        if ($block->isTest()) {
+            $this->storyLinkService->deleteTestLink($model->story_id, $block->getTestID());
+        }
+
         $slide->deleteBlock($blockID);
 
         $writer = new HTMLWriter();
@@ -283,9 +292,11 @@ class StoryEditorService
         $reader = new HtmlSlideReader($slideModel->data);
         $slide = $reader->load();
         foreach ($slide->getBlocks() as $block) {
-            $this->deleteBlock($slideID, $block->getId());
+            if ($block->isVideo()) {
+                Story::updateVideo($slideModel->story_id, false);
+            }
         }
-        StorySlide::deleteSlide($slideID);
+        $slideModel->delete();
     }
 
     public function updateBlock($form)
@@ -298,7 +309,18 @@ class StoryEditorService
             $storyModel = Story::findModel($model->story_id);
             $this->uploadImage($form, $storyModel);
         }
+
         $block->update($form);
+
+        if ($block->isTest()) {
+            try {
+                $this->storyLinkService->createTestLink($model->story_id, $block->getTestID());
+            }
+            catch (\Exception $exception) {
+
+            }
+        }
+
         $writer = new HTMLWriter();
         $html = $writer->renderSlide($slide);
         $model->data = $html;

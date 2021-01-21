@@ -72,4 +72,14 @@ class StoryStoryTest extends ActiveRecord
         return $model;
     }
 
+    public static function deleteStoryTests(int $storyID)
+    {
+        self::deleteAll(['story_id' => $storyID]);
+    }
+
+    public static function deleteStoryTest(int $storyID, int $testID)
+    {
+        self::findOne(['story_id' => $storyID, 'test_id' => $testID])->delete();
+    }
+
 }

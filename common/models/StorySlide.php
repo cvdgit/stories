@@ -186,6 +186,9 @@ class StorySlide extends ActiveRecord
     public function afterDelete()
     {
         Story::updateSlideNumber($this->story_id);
+        if ($this->isQuestion()) {
+            StoryStoryTest::deleteStoryTests($this->story_id);
+        }
         parent::afterDelete();
     }
 

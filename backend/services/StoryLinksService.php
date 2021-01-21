@@ -16,4 +16,9 @@ class StoryLinksService
         return $model->save(false);
     }
 
+    public function deleteTestLink(int $storyID, int $testID)
+    {
+        StoryStoryTest::deleteStoryTest($storyID, $testID);
+    }
+
 }
