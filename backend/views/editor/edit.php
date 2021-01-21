@@ -1,8 +1,8 @@
 <?php
 
 use backend\assets\StoryEditorAsset;
+use backend\widgets\BackendRevealWidget;
 use common\widgets\Reveal\Plugins\Video;
-use common\widgets\RevealWidget;
 use frontend\assets\PlyrAsset;
 use yii\bootstrap\ButtonDropdown;
 use yii\helpers\Html;
@@ -117,11 +117,11 @@ $options = [
                 'url' => '#',
                 'linkOptions' => ['onclick' => 'StoryEditor.createSlideLink(); return false;'],
             ],
-            [
+            /*[
                 'label' => 'Новый вопрос',
                 'url' => '#',
                 'linkOptions' => ['onclick' => 'StoryEditor.createSlideQuestion(); return false;'],
-            ],
+            ],*/
             [
                 'label' => 'Тест из neo4j',
                 'url' => '#slide-new-question-modal',
@@ -145,7 +145,7 @@ $options = [
 	<div class="col-lg-9">
 		<div class="story-container">
 			<div class="story-container-inner">
-		    <?= RevealWidget::widget([
+		    <?= BackendRevealWidget::widget([
 		    		'id' => 'story-editor',
 		    		'initializeReveal' => false,
 		    		'canViewStory' => true,

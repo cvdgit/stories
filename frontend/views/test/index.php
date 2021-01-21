@@ -1,4 +1,6 @@
 <?php
+
+use frontend\assets\TestAsset;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ListView;
@@ -8,6 +10,7 @@ use yii\widgets\ListView;
 /** @var $activeStudent common\models\UserStudent */
 /** @var $category common\models\Category */
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
+TestAsset::register($this);
 ?>
 <div class="container">
     <div class="row">
@@ -22,14 +25,74 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
         </nav>
         <main class="col-xs-12 col-sm-12 col-md-12 col-lg-9 site-main" style="margin-top: 0">
             <h1 style="margin-top: 0; margin-bottom: 20px"><?= Html::a($category->name, $category->getCategoryUrl()) ?> / <?= $this->getHeader() ?></h1>
-            <?= ListView::widget([
-                'dataProvider' => $dataProvider,
-                'itemView' => '_item',
-                'viewParams' => [
-                    'student' => $activeStudent,
-                    'category' => $category,
-                ],
-            ]) ?>
+            <div id="test-list">
+                <?= ListView::widget([
+                    'dataProvider' => $dataProvider,
+                    'itemView' => '_item',
+                    'viewParams' => [
+                        'student' => $activeStudent,
+                        'category' => $category,
+                    ],
+                ]) ?>
+            </div>
         </main>
     </div>
 </div>
+
+<div class="modal remote fade modal-fullscreen" id="run-test-modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content"></div>
+    </div>
+</div>
+
+<?php
+$css = <<< CSS
+.run-test {
+    padding: 0;
+    text-align: center;
+}
+.run-test .wikids-test-answer label {
+    font-size: 18px;
+}
+.run-test .wikids-test-questions .question-title {
+    font-size: 24px;
+}
+.run-test .wikids-test-answer label, .wikids-test-answer img {
+    height: 90px;
+}
+.modal-fullscreen .modal-dialog {
+  width: 80%;
+  height: 50%;
+  margin-top: 10px;
+  padding: 0;
+}
+.modal-fullscreen .modal-content {
+  height: auto;
+  min-height: 100%;
+}
+CSS;
+$this->registerCss($css);
+$js = <<< JS
+$('#test-list').on('click', '.run-test', function(e) {
+    e.preventDefault();
+    $('#run-test-modal')
+        .modal({'remote': $(this).attr('href')});
+});
+
+$('#run-test-modal').on('shown.bs.modal', function() {
+    function initQuestions(params) {
+        params = params || {};
+        return $.getJSON("/question/init", params);
+    }
+    var elem = $("div.new-questions", this);
+    WikidsStoryTest.setDataParams('/question/get', elem.data());
+    initQuestions(elem.data()).done(function(response) {
+        WikidsStoryTest.init(response.test.remote, false, response, elem);
+    });
+});
+$('#run-test-modal').on('hide.bs.modal', function() {
+    $(this).removeData('bs.modal');
+    $(this).find('.modal-content').html('');
+});
+JS;
+$this->registerJs($js);

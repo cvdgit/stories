@@ -52,9 +52,9 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                     'submenuTemplate' => "\n<ul class=\"story-category-list story-sub-category-list\">\n{items}\n</ul>\n",
                     'options' => ['class' => 'story-category-list'],
                 ]) ?>
-                <h2>Облако тегов</h2>
+                <!--h2>Облако тегов</h2-->
                 <!--noindex-->
-                <?= TagCloud::widget([
+                <?php /* TagCloud::widget([
                     'beginColor' => '38405d',
                     'endColor' => '000000',
                     'minFontSize' => 8,
@@ -64,7 +64,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                     'options' => [
                         'style' => 'word-wrap: break-word;'
                     ],
-                ]) ?>
+                ]) */ ?>
                 <!--/noindex-->
             </div>
         </nav>

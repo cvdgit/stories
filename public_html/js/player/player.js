@@ -5,7 +5,7 @@ var Wikids = (function() {
 
     function getRevealConfig()
     {
-        return WikidsRevealConfig;
+        return window.WikidsRevealConfig || {};
     }
 
     function isMobile() {
@@ -185,7 +185,9 @@ var WikidsPlayer = (function(document, $) {
         }
     }
 
-    Reveal.addEventListener('ready', ready);
+    if (window['Reveal']) {
+        Reveal.addEventListener('ready', ready);
+    }
 
     return {
         "initialize": initialize,

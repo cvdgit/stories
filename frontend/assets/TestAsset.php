@@ -4,7 +4,7 @@ namespace frontend\assets;
 
 use yii\web\AssetBundle;
 
-class WikidsRevealAsset extends AssetBundle
+class TestAsset extends AssetBundle
 {
     public $basePath = '@webroot';
     public $baseUrl = '@web';
@@ -12,11 +12,10 @@ class WikidsRevealAsset extends AssetBundle
         'css/wikids-reveal.css',
     ];
     public $js = [
-        'js/player/player.js',
         'js/wikids-story-test.js',
         'js/PatienceDiff.js',
     ];
     public $depends = [
-        RevealAsset::class
+        'yii\web\YiiAsset',
     ];
 }

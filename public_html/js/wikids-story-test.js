@@ -29,6 +29,7 @@ var WikidsStoryTest = (function() {
         questionsRepeat = [];
         questionAnswers = {};
         container = null;
+        testQuestions = [];
     }
 
     var dataUrl,
@@ -295,6 +296,7 @@ var WikidsStoryTest = (function() {
                 .append(dom.wrapper));
         }
         else {
+            console.debug('html');
             container.html(dom.wrapper);
         }
     }
@@ -1080,7 +1082,11 @@ var WikidsStoryTest = (function() {
 
         console.debug('WikidsStoryTest.nextQuestion');
 
+        if (typeof preparedAnswers === 'object') {
+            preparedAnswers = false;
+        }
         preparedAnswers = preparedAnswers || false;
+
         var $activeQuestion = $('.wikids-test-active-question');
         currentQuestion = $activeQuestion.data('question');
 
@@ -1121,6 +1127,7 @@ var WikidsStoryTest = (function() {
             answer = preparedAnswers;
         }
 
+        console.log(answer);
         if (answer.length === 0) {
             return;
         }
@@ -1335,6 +1342,7 @@ var WikidsStoryTest = (function() {
                     .find('.wikids-test-answers > div'));
         }
 
+        console.log(currentQuestionElement)
         currentQuestionElement
             .find('input[type=checkbox],input[type=radio]').prop('checked', false).end()
             .slideDown()

@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use backend\services\StoryEditorService;
 use common\helpers\UserHelper;
 use common\models\Category;
 use common\models\Story;
@@ -9,7 +10,6 @@ use common\models\StoryTest;
 use common\models\StudentQuestionProgress;
 use common\models\UserQuestionHistory;
 use common\models\UserStudent;
-use frontend\models\StorySearch;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -18,6 +18,14 @@ use yii\web\NotFoundHttpException;
 
 class TestController extends Controller
 {
+
+    private $storyEditorService;
+
+    public function __construct($id, $module, StoryEditorService $storyEditorService, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->storyEditorService = $storyEditorService;
+    }
 
     public function behaviors()
     {
@@ -92,6 +100,23 @@ class TestController extends Controller
         StudentQuestionProgress::resetProgress($studentModel->id, $testModel->id);
         Yii::$app->session->setFlash('success', 'История прохождения теста удалена');
         return $this->redirect(['index', 'category_id' => $categoryModel->id, 'student_id' => $studentModel->id]);
+    }
+
+    public function actionView(int $id)
+    {
+        $model = $this->findTestModel($id);
+/*        $params = [
+            'storyId' => $model->id,
+            'data' => '<div class="slides">' . $this->storyEditorService->createQuestionBlock(['test-id' => $model->id]) . '</div>',
+            'canViewStory' => true,
+            'plugins' => [
+                ['class' => \common\widgets\Reveal\Plugins\Test::class, 'storyID' => 123],
+                ['class' => \common\widgets\Reveal\Plugins\Background::class],
+            ]
+        ];*/
+        return $this->renderAjax('view', [
+            'model' => $model,
+        ]);
     }
 
 }

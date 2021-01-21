@@ -3,9 +3,9 @@
 use common\widgets\Reveal\Plugins\SlideLinks;
 use common\widgets\Reveal\Plugins\Video;
 use common\widgets\RevealButtons\BackgroundButton;
-use common\widgets\RevealWidget;
 use frontend\assets\PlyrAsset;
 use frontend\assets\RecorderAsset;
+use frontend\widgets\FrontendRevealWidget;
 use yii\helpers\Json;
 use yii\helpers\Url;
 
@@ -63,13 +63,11 @@ if (($model->isAudioStory() || $model->isUserAudioStory(Yii::$app->user->id)) &&
     ];
 }
 
-echo RevealWidget::widget([
+echo FrontendRevealWidget::widget([
     'storyId' => $model->id,
     'data' => $model->slidesData(),
     'canViewStory' => $userCanViewStory,
     'assets' => [
-        \frontend\assets\RevealAsset::class,
-        \frontend\assets\WikidsRevealAsset::class,
         PlyrAsset::class,
         RecorderAsset::class,
     ],

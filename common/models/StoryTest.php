@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\helpers\Url;
 use common\models\test\AnswerType;
 use common\models\test\SourceType;
 use DomainException;
@@ -303,6 +304,11 @@ class StoryTest extends ActiveRecord
     public function isVariant()
     {
         return $this->parent_id > 0;
+    }
+
+    public function getRunUrl()
+    {
+        return Url::toRoute(['/test/view', 'id' => $this->id]);
     }
 
 }
