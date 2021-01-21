@@ -18,8 +18,7 @@ use yii\helpers\Html;
                 $test->getRunUrl(),
                 ['class' => 'run-test']) ?>
             | <?= Html::a('<i class="glyphicon glyphicon-picture"></i> Перейти к истории',
-                $model->getStoryUrl(),
-                ['class' => 'run-test']) ?>
+                $model->getStoryUrl()) ?>
             | <?= Html::a('Очистить историю', ['test/clear-history', 'category_id' => $category->id, 'student_id' => $student->id, 'test_id' => $test->id]) ?>
         </p>
         <?php endforeach ?>
