@@ -57,7 +57,7 @@ $css = <<< CSS
 .run-test .wikids-test-questions .question-title {
     font-size: 24px;
 }
-.run-test .wikids-test-answer label, .wikids-test-answer img {
+.run-test .wikids-test-answer img {
     height: 90px;
 }
 .modal-fullscreen .modal-dialog {
