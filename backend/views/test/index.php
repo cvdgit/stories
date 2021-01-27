@@ -29,6 +29,7 @@ $columns[] = 'title';
 if ($searchModel->isNeoTest()) {
     $columns[] = [
         'attribute' => 'parentTest.title',
+        'label' => 'Основной тест',
     ];
 }
 $columns[] = [
@@ -78,11 +79,12 @@ $columns[] = [
     'template' => '{update} {delete}',
     'buttons' => [
         'update' => function($url, $model) {
-            $id = $model->id;
+            $urlParam = ['test/update', 'id' => $model->id];
             if ($model->isVariant()) {
-                $id = $model->parent_id;
+                $urlParam['id'] = $model->parent_id;
+                $urlParam['#'] = $model->id;
             }
-            return Html::a('<span class="glyphicon glyphicon-pencil"></span>', ['test/update', 'id' => $id]);
+            return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $urlParam);
         },
         'delete' => function($url, $model) {
             $id = $model->id;

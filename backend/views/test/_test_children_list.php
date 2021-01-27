@@ -53,6 +53,14 @@ updateVariantModal.on('hide.bs.modal', function() {
     $(this).find('.modal-content').html('');
 });
 
+function showModal(element, remote) {
+    element.modal({'remote': remote});
+}
+
+function getUpdateVariantUrl(id) {
+    return '$updateUrl' + '&id=' + id;
+}
+
 var testVariants = $testVariants;
 window.fillTestVariantsTable = function(params) {
     var table = $('#test-variants-table tbody');
@@ -60,7 +68,7 @@ window.fillTestVariantsTable = function(params) {
     params.forEach(function(param) {
         var updateLink = $('<a/>')
             .addClass('update-test-variant')
-            .attr({href: '$updateUrl' + '&id=' + param.id, title: 'Изменить запись'})
+            .attr({href: getUpdateVariantUrl(param.id), title: 'Изменить запись'})
             .html('<i class="glyphicon glyphicon-edit"></i>')
             .css('marginRight', '10px');
         var deleteLink = $('<a/>')
@@ -344,6 +352,13 @@ $('.test-sidebar').on('click', '.delete-wrong-answer-row', function(e) {
 $('.test-sidebar').on('change', '.taxon-name-select select', function(e) {
     window.loadNeoTaxonValues(this.value, $(this).parent().parent().parent().find('.taxon-value-select select'));
 });
+
+var test_id = parseInt(location.hash.slice(1));
+if (Number.isInteger(test_id)) {
+    setTimeout(function() {
+        showModal(updateVariantModal, getUpdateVariantUrl(test_id));
+    }, 500);
+}
 
 JS;
 $this->registerJs($js);
