@@ -6,6 +6,7 @@ use backend\components\training\base\Serializer;
 use backend\components\training\collection\TestBuilder;
 use backend\components\training\collection\WordTestBuilder;
 use common\models\StoryTest;
+use common\models\TestRememberAnswer;
 use common\models\TestWordList;
 use common\models\UserQuestionHistoryModel;
 use linslin\yii2\curl\Curl;
@@ -92,7 +93,7 @@ class QuestionController extends Controller
 
         if ($test->isSourceWordList()) {
             $wordListModel = $this->findWordListModel($test->word_list_id);
-            $collection = (new WordTestBuilder($test, $wordListModel->getTestWordsData($userHistory), $wordListModel->getTestWordsCount(), $userStars))->build();
+            $collection = (new WordTestBuilder($test, $wordListModel->getTestWordsData($test->id, $studentId, $userHistory), $wordListModel->getTestWordsCount(), $userStars))->build();
             return (new Serializer())->serialize(
                 $test,
                 $collection,
@@ -263,6 +264,10 @@ class QuestionController extends Controller
             }
             if ($model->isSourceWordList() || $model->isSourceTest()) {
                 $userQuestionHistoryID = $model->createWordListQuestionHistory();
+                $testModel = $this->findTestModel($model->test_id);
+                if ($testModel->isRememberAnswers()) {
+                    TestRememberAnswer::updateTestRememberAnswer($testModel->id, $model->student_id, $model->entity_id, $model->entity_name);
+                }
             }
             $model->createUserQuestionAnswers($userQuestionHistoryID);
         }

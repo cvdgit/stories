@@ -36,6 +36,7 @@ use yii\helpers\ArrayHelper;
  * @property string $input_voice
  * @property int $shuffle_word_list
  * @property string $recording_lang
+ * @property int $remember_answers;
  *
  * @property StoryTestQuestion[] $storyTestQuestions
  * @property Story[] $stories
@@ -74,7 +75,7 @@ class StoryTest extends ActiveRecord
     {
         return [
             [['title', 'header'], 'required'],
-            [['status', 'mix_answers', 'remote', 'question_list_id', 'parent_id', 'source', 'word_list_id', 'answer_type', 'strict_answer'], 'integer'],
+            [['status', 'mix_answers', 'remote', 'question_list_id', 'parent_id', 'source', 'word_list_id', 'answer_type', 'strict_answer', 'remember_answers'], 'integer'],
             [['shuffle_word_list'], 'integer'],
             [['title', 'question_list_name', 'header', 'question_params', 'incorrect_answer_text', 'input_voice', 'recording_lang'], 'string', 'max' => 255],
             [['description_text'], 'string'],
@@ -109,6 +110,7 @@ class StoryTest extends ActiveRecord
             'input_voice' => 'Голос',
             'recording_lang' => 'Язык',
             'shuffle_word_list' => 'Перемешивать элементы списка',
+            'remember_answers' => 'Запоминать ответы',
         ];
     }
 
@@ -309,6 +311,11 @@ class StoryTest extends ActiveRecord
     public function getRunUrl()
     {
         return Url::toRoute(['/test/view', 'id' => $this->id]);
+    }
+
+    public function isRememberAnswers(): bool
+    {
+        return (int) $this->remember_answers === 1;
     }
 
 }

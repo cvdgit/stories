@@ -37,7 +37,10 @@ class WordTestBuilder
             $this->create(InputCollection::class)->build($this->collection);
         }
         else if ($this->test->isAnswerTypeRecording()) {
-            $this->create(RecordingCollection::class)->build($this->collection);
+            /** @var RecordingCollection $collection */
+            $collection = $this->create(RecordingCollection::class);
+            $collection->setRememberAnswers($this->test->isRememberAnswers());
+            $collection->build($this->collection);
         }
         else {
             $this->create(CorrectIncorrectCollection::class)->build($this->collection);

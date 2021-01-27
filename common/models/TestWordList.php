@@ -106,9 +106,21 @@ class TestWordList extends ActiveRecord
         return $this->getWordsQuery($filter)->asArray()->all();
     }
 
-    public function getTestWordsData($filter = null)
+    public function getTestWordsData(int $testID, int $studentID, $filter = null)
     {
-        return $this->getWordsQuery($filter)->all();
+        $data = $this->getWordsQuery($filter)->all();
+
+        $rememberData = TestRememberAnswer::getTestRememberAnswerData($testID, $studentID);
+        foreach ($rememberData as $row) {
+            foreach ($data as $key => $value) {
+                if ((int)$value['id'] === (int)$row['entity_id']) {
+                    $data[$key]['correct_answer'] = $row['answer'];
+                    break;
+                }
+            }
+        }
+
+        return $data;
     }
 
     public static function getWordListAsArray()

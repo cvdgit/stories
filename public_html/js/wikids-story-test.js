@@ -137,6 +137,7 @@ var WikidsStoryTest = (function() {
         this.strictAnswer = parseInt(data.strictAnswer);
         this.inputVoice = data.inputVoice;
         this.recordingLang = data.recordingLang;
+        this.rememberAnswers = data.rememberAnswers;
     }
 
     TestConfig.prototype.getSource = function() {
@@ -185,6 +186,10 @@ var WikidsStoryTest = (function() {
 
     TestConfig.prototype.getRecordingLang = function() {
         return this.recordingLang;
+    }
+
+    TestConfig.prototype.isRememberAnswers = function() {
+        return this.rememberAnswers;
     }
 
     var testConfig;
@@ -1077,6 +1082,15 @@ var WikidsStoryTest = (function() {
         $content.fadeIn();
     }
 
+    function getQuestionRememberAnswers(question) {
+        return question['rememberAnswer'] || false;
+    }
+
+    function changeQuestionRememberAnswers(question, answer) {
+        question.rememberAnswer = false;
+        question.storyTestAnswers[0].name = answer[0];
+    }
+
     /* Ответ на вопрос */
     function nextQuestion(preparedAnswers) {
 
@@ -1127,7 +1141,7 @@ var WikidsStoryTest = (function() {
             answer = preparedAnswers;
         }
 
-        console.log(answer);
+        //console.log(answer);
         if (answer.length === 0) {
             return;
         }
@@ -1153,7 +1167,14 @@ var WikidsStoryTest = (function() {
             convertAnswerToInt = false;
         }
 
-        answerIsCorrect = answerQuestion($activeQuestion, answer, correctAnswersCallback, convertAnswerToInt);
+        var rememberAnswer = getQuestionRememberAnswers(currentQuestion);
+        if (!rememberAnswer) {
+            answerIsCorrect = answerQuestion($activeQuestion, answer, correctAnswersCallback, convertAnswerToInt);
+        }
+        else {
+            changeQuestionRememberAnswers(currentQuestion, answer);
+            answerIsCorrect = true;
+        }
         // console.debug(answerIsCorrect);
 
         if (answerIsCorrect) {
@@ -1332,6 +1353,7 @@ var WikidsStoryTest = (function() {
 
         var nextQuestion = testQuestions.shift();
         currentQuestion = nextQuestion;
+        //console.log('current:', currentQuestion);
 
         currentQuestionElement = $('.wikids-test-question[data-question-id=' + nextQuestion.id + ']', dom.questions);
 
@@ -1342,7 +1364,6 @@ var WikidsStoryTest = (function() {
                     .find('.wikids-test-answers > div'));
         }
 
-        console.log(currentQuestionElement)
         currentQuestionElement
             .find('input[type=checkbox],input[type=radio]').prop('checked', false).end()
             .slideDown()

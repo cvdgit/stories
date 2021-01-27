@@ -35,6 +35,7 @@ use yii\widgets\ActiveForm;
 
     <div class="answer-block" data-block-type="<?= \common\models\test\AnswerType::RECORDING ?>" style="display: <?= $model->isAnswerTypeRecording() ? 'block' : 'none' ?>">
         <?= $form->field($model, 'recording_lang')->dropDownList(\backend\models\test\RecorderLang::asArray()) ?>
+        <?= $form->field($model, 'remember_answers')->checkbox() ?>
     </div>
 
     <div class="form-group">
