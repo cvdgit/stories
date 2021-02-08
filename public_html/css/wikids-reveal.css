@@ -1740,6 +1740,7 @@
 .wikids-test-answer {
 	padding: 10px;
 	cursor: pointer;
+	display: flex;
 }
 
 .wikids-test-answer:hover {
