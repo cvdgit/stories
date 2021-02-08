@@ -150,6 +150,7 @@ window.loadNeoQuestionValues = function(list, id, selected) {
             relatedSelect.empty();
             $('<option/>')
                 .text('Выберите значение')
+                .val('')
                 .addClass('empty-value')
                 .appendTo(relatedSelect);
             
@@ -195,6 +196,7 @@ window.loadNeoQuestionValues = function(list, id, selected) {
 
             $('<option/>')
                 .text('Выберите значение')
+                .val('')
                 .addClass('empty-value')
                 .appendTo(select);
             
@@ -222,10 +224,14 @@ window.loadNeoQuestionValues = function(list, id, selected) {
 
 window.fillTestVariantConfig = function(form, id) {
     form = $(form);
-    var str = form.find('.test-variant-config-element').map(function() {
-        return $(this).attr('name') + '=' + $(this).val();
-    }).get().join(';');
-    form.find('#' + id).val(str);
+    var values = [];
+    form.find('.test-variant-config-element').each(function(i, elem) {
+        var val = $(this).val() || '';
+        if (val.length) {
+            values.push($(this).attr('name') + '=' + val);
+        }
+    });
+    form.find('#' + id).val(values.join(';'));
 };
 
 createVariantModal
@@ -263,29 +269,6 @@ updateVariantModal
                     window.loadNeoTaxonValues(elem.attr('data-value'), valueElem);
                 });
         });
-                
-/*      
-        
-        window
-            .loadNeoTaxon(taxonNameElement)
-            .done(function() {
-                wrongElementList.each(function() {
-                    var elem = $(this).find('.taxon-name-select select'),
-                        valueElem = $(this).find('.taxon-value-select select');
-                    window
-                        .loadNeoTaxon(elem)
-                        .done(function() {
-                            window.loadNeoTaxonValues(elem.attr('data-value'), valueElem);
-                        });
-                });
-            });
-        
-        taxonNameElement
-            .off('change')
-            .on('change', function() {
-                window.loadNeoTaxonValues(taxonNameElement.attr('data-value'), taxonValueElement);
-            })
-            .trigger('change');*/
     });
 
 function createWrongAnswerRow(list) {
