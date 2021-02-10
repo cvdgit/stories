@@ -1243,7 +1243,7 @@ var WikidsStoryTest = (function() {
                     'student_id': currentStudent.id,
                     'question_topic_id': currentQuestion.topic_id,
                     'question_topic_name': currentQuestion.name,
-                    'entity_id': currentQuestion.entity_id,
+                    'entity_id': currentQuestion.id,
                     'entity_name': currentQuestion.entity_name,
                     'relation_id': currentQuestion.relation_id,
                     'relation_name': currentQuestion.relation_name,

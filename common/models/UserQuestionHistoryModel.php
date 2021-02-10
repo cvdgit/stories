@@ -93,16 +93,6 @@ class UserQuestionHistoryModel extends Model
 
     public function getUserQuestionHistory(int $testID)
     {
-/*        $query = (new Query())
-            ->select(['t.entity_id', 't.relation_id', 't2.answer_entity_id'])
-            ->from(['t' => UserQuestionHistory::tableName()])
-            ->innerJoin(['t2' => UserQuestionAnswer::tableName()], 't2.question_history_id = t.id')
-            ->where('t.student_id = :student', [':student' => $this->student_id])
-            ->andWhere('t.test_id = :test', [':test' => $testID])
-            ->andWhere('t.correct_answer = 1')
-            ->groupBy(['t.entity_id', 't.relation_id', 't2.answer_entity_id'])
-            ->having('COUNT(t.entity_id) >= 5');
-        return $query->all();*/
         $query = (new Query())
             ->select([
                 't.entity_id AS entityID',

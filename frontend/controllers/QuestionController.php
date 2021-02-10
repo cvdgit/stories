@@ -79,16 +79,16 @@ class QuestionController extends Controller
             $userQuestionHistoryModel = new UserQuestionHistoryModel();
             $userQuestionHistoryModel->student_id = $studentId;
 
-            if ($test->isRemote()) {
+            /*if ($test->isRemote()) {
                 $userHistory = $userQuestionHistoryModel->getUserQuestionHistory($test->id);
                 $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStars3($test->id);
                 $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCount($test->id);
             }
-            else {
+            else {*/
                 $userHistory = $userQuestionHistoryModel->getUserQuestionHistoryLocal($test->id);
                 $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStarsLocal($test->id);
                 $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCountLocal($test->id);
-            }
+            //}
         }
 
         if ($test->isSourceWordList()) {
@@ -121,7 +121,7 @@ class QuestionController extends Controller
         }
 
         $postParams = [
-            'history' => Json::encode($userHistory),
+            //'history' => Json::encode($userHistory),
             'wrong_params' => empty($test->wrong_answers_params) ? '' : urlencode(base64_encode($test->wrong_answers_params)),
         ];
 
@@ -151,26 +151,44 @@ class QuestionController extends Controller
         $i = 1;
         foreach ($result as $resultItem) {
 
+            $questionID = (int)$resultItem['hash'];
+
+            $skipQuestion = false;
+            foreach ($userHistory as $history) {
+                if ((int)$history['entity_id'] === $questionID) {
+                    $skipQuestion = true;
+                    break;
+                }
+            }
+            if ($skipQuestion) {
+                continue;
+            }
+
             $answers = [];
-            $correctAnswerIDs = [];
+            //$correctAnswerIDs = [];
             foreach ($resultItem['answers'] as $_answer) {
-                $description = $_answer['description'] ?? '';
                 $answer = [
                     'id' => $_answer['id'],
                     'name' => $_answer['answer'],
                     'is_correct' => $_answer['correct'] ? 1 : 0,
                     'image' => $_answer['image'],
-                    'description' => $description,
+                    'description' => $_answer['description'] ?? '',
                 ];
-                if ($_answer['correct']) {
+/*                if ($_answer['correct']) {
                     $correctAnswerIDs[] = $_answer['id'];
-                }
+                }*/
                 $answers[] = $answer;
             }
 
             $stars = 0;
-            foreach ($userStars as $star) {
+/*            foreach ($userStars as $star) {
                 if ((int)$star['entity_id'] === (int)$resultItem['question_entity_id'] && in_array((int)$star['answer_entity_id'], $correctAnswerIDs, true)) {
+                    $stars = $star['stars'];
+                    break;
+                }
+            }*/
+            foreach ($userStars as $star) {
+                if ((int)$star['entity_id'] === $questionID) {
                     $stars = $star['stars'];
                     break;
                 }
@@ -179,7 +197,7 @@ class QuestionController extends Controller
             $svg = $resultItem['question_svg'] ?? false;
 
             $question = [
-                'id' => $i,
+                'id' => $questionID,
                 'name' => $resultItem['question'],
                 'mix_answers' => 0,
                 'type' => ((int)$resultItem['correct_number'] > 1 ? 1 : 0),
