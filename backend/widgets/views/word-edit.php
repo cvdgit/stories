@@ -21,6 +21,7 @@ use yii\widgets\ActiveForm;
             <div class="modal-body">
                 <div>
                     <a href="#" id="split-text" class="btn">Разбить по предложениям</a>
+                    <a href="#" id="split-text-by-word" class="btn">Разбить по словам</a>
                 </div>
                 <?= $wordListForm->field($model, 'text')->textarea(['cols' => 30, 'rows' => 20]) ?>
                 <?= $wordListForm->field($model, 'word_list_id')->hiddenInput()->label(false) ?>
@@ -35,10 +36,23 @@ use yii\widgets\ActiveForm;
 </div>
 <?php
 $js = <<< JS
+
+var WordList = (function() {
+    var element = $('#wordlistastextform-text');
+    return {
+        'getText': function() {
+            return element.val();
+        },
+        'setText': function(text) {
+            element.val(text);
+        }
+    }
+})();
+
 $('$target').on('click', function(e) {
     e.preventDefault();
     $.get($(this).attr('href')).done(function(response) {
-        $('#wordlistastextform-text').val(response);
+        WordList.setText(response);
         $('#story-text-modal')
             .modal('show');
     });
@@ -76,11 +90,26 @@ $('#word-list-as-text-form')
 
 $('#split-text').on('click', function(e) {
     e.preventDefault();
-    var text = $('#wordlistastextform-text').val();
+    var text = WordList.getText();
     text = text.replace(/\. /g, ".\\n");
     text = text.replace(/\! /g, "!\\n");
     text = text.replace(/\? /g, "?\\n");
-    $('#wordlistastextform-text').val(text);
+    WordList.setText(text);
+});
+
+$('#split-text-by-word').on('click', function(e) {
+    e.preventDefault();
+    var text = WordList.getText();
+    text = text
+        .split(' ')
+        .map(function(value) {
+            return value.replace(/[^\wа-яёЁ\-]+/ig, '');
+        })
+        .filter(function(value) {
+            return value.replace(/[^\wа-яёЁ]+/ig, '') !== '';
+        })
+        .join("\\n");
+    WordList.setText(text);
 });
 
 JS;
