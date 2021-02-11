@@ -1329,7 +1329,7 @@ var WikidsStoryTest = (function() {
             }
             else {
                 dom.results
-                    .html("<p>Ответ " + (answerIsCorrect ? "" : "не ") + "верный.</p>")
+                    .html("<p>Ответ не верный.</p>")
                     .show()
                     .delay(1000)
                     .fadeOut('slow', function () {
@@ -1532,27 +1532,28 @@ var WikidsStoryTest = (function() {
         var isLastQuestion = (testQuestions.length === 0);
         var actionRelated = incorrectAnswerActionRelated();
         if (isLastQuestion) {
-            if (!testConfig.sourceIsLocal()) {
-                if (!answerIsCorrect) {
-                    if (testConfig.sourceIsWord() && !testConfig.answerTypeIsNumPad() && !testConfig.answerTypeIsRecording() && !testConfig.answerTypeIsInput()) {
-                        showNextQuestion();
-                        dom.results.hide();
-                        showNextButton();
-                    }
-                    else {
-                        showCorrectAnswerPage(currentQuestion, answer);
-                    }
+
+            if (!answerIsCorrect) {
+                if (testConfig.sourceIsWord() && !testConfig.answerTypeIsNumPad() && !testConfig.answerTypeIsRecording() && !testConfig.answerTypeIsInput()) {
+                    showNextQuestion();
+                    dom.results.hide();
+                    showNextButton();
+                }
+                else {
+                    showCorrectAnswerPage(currentQuestion, answer);
+                }
+            }
+            else {
+                if (testConfig.sourceIsLocal()) {
+                    dispatchEvent("backToStory", {});
                 }
                 else {
                     finish();
                 }
             }
-            else {
-                dispatchEvent("backToStory", {});
-            }
         }
         else {
-            if (!answerIsCorrect && !testConfig.sourceIsLocal()) {
+            if (!answerIsCorrect) {
                     if (testConfig.sourceIsWord() && !testConfig.answerTypeIsNumPad() && !testConfig.answerTypeIsRecording() && !testConfig.answerTypeIsInput()) {
                         showNextQuestion();
                         dom.results.hide();
