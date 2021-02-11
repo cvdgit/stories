@@ -15,6 +15,9 @@ use yii\widgets\ActiveForm;
 <div class="modal-body">
     <?= $form->field($model, 'test_name')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'test_answer_type')->dropDownList(\common\models\test\AnswerType::asArray()) ?>
+    <div class="answer-block" data-block-type="<?= \common\models\test\AnswerType::INPUT ?>" style="display: <?= $model->isAnswerTypeInput() ? 'block' : 'none' ?>">
+        <?= $form->field($model, 'test_strict_answer')->checkbox() ?>
+    </div>
     <?= $form->field($model, 'story_name')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'test_shuffle_word_list')->checkbox() ?>
     <?= $form->field($model, 'word_list_id')->hiddenInput()->label(false) ?>
@@ -58,5 +61,13 @@ $('#create-test-and-story-form')
     .on('submit', function(e) {
         e.preventDefault();
     });
+
+$('#createstoryform-test_answer_type').on('change', function() {
+    var block = $('div[data-block-type=' + this.value + ']');
+    $('.answer-block').hide();
+    if (block.length) {
+        block.show();
+    }
+});
 JS;
 $this->registerJs($js);
