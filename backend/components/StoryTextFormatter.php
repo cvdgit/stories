@@ -2,6 +2,10 @@
 
 namespace backend\components;
 
+/**
+ * Class StoryTextFormatter
+ * @package backend\components
+ */
 class StoryTextFormatter
 {
 
@@ -18,12 +22,10 @@ class StoryTextFormatter
 
         $texts = explode(PHP_EOL, $this->text);
         $texts = array_filter($texts, static function($word) {
-            $word = trim($word);
-            return !empty($word);
+            return trim($word);
         });
         $texts = array_map(static function($word) {
-            $word = trim($word);
-            return $word;
+            return trim($word);
         }, $texts);
         $this->text = implode(PHP_EOL, $texts);
     }

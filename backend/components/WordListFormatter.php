@@ -28,7 +28,7 @@ class WordListFormatter
         });
         return array_map(static function($row) {
             @list($text, $correctAnswer) = explode('|', $row);
-            $text = trim(preg_replace('/[^\w\-\s.,!?+-]/u', '', $text));
+            // $text = trim(preg_replace('/[^\w\-\s.,!?+-]/u', '', $text));
             $correctAnswer = trim(preg_replace('/[^\w\-\s.,]/u', '', $correctAnswer));
             return [
                 'name' => $text,
