@@ -6,6 +6,7 @@ use DomainException;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
+use yii\db\Query;
 
 /**
  * This is the model class for table "playlist".
@@ -76,6 +77,7 @@ class Playlist extends \yii\db\ActiveRecord
             ->viaTable('story_playlist', ['playlist_id' => 'id'])
             ->innerJoin('{{%story_playlist}}', '{{%story}}.id = {{%story_playlist}}.story_id')
             ->andWhere('{{%story_playlist}}.playlist_id = :playlist', [':playlist' => $this->id])
+            ->andWhere('{{%story}}.status = :status', [':status' => Story::STATUS_PUBLISHED])
             ->orderBy(['-{{%story_playlist}}.order' => SORT_DESC, '{{%story_playlist}}.created_at' => SORT_ASC])
             ->select(['{{%story}}.*', '{{%story_playlist}}.order AS playlist_order']);
     }
@@ -104,9 +106,19 @@ class Playlist extends \yii\db\ActiveRecord
 
     public static function randomPlaylists()
     {
+        $query = (new Query())
+            ->select('t.id')
+            ->from(['t' => self::tableName()])
+            ->innerJoin(['t2' => '{{story_playlist}}'], 't.id = t2.playlist_id')
+            ->innerJoin(['t3' => Story::tableName()], 't2.story_id = t3.id')
+            ->where('t3.status = :status', [':status' => Story::STATUS_PUBLISHED])
+            ->orderBy('rand()');
+        $ids = array_keys($query->indexBy('id')->all());
+        if (count($ids) === 0) {
+            return null;
+        }
         return self::find()
-            ->limit(4)
-            ->orderBy(new Expression('rand()'))
+            ->where(['in', 'id', $ids])
             ->all();
     }
 

@@ -59,12 +59,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
     </div>
 </section>
 
-<section class="site-playlists">
-    <h2 class="container">Популярные <span>плейлисты</span></h2>
-    <div class="container">
-        <?= \frontend\widgets\Playlists::widget() ?>
-    </div>
-</section>
+<?= \frontend\widgets\Playlists::widget() ?>
 
   <section class="site-about">
     <h2 class="container">О <span>портале</span></h2>

@@ -11,6 +11,7 @@ use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class PlaylistController extends Controller
@@ -86,11 +87,25 @@ class PlaylistController extends Controller
         return ['success' => true];
     }
 
-    public function actionDelete(int $playlist_id, int $story_id)
+    public function actionDeleteItem(int $playlist_id, int $story_id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         Playlist::deletePlaylistItem($playlist_id, $story_id);
         return ['success' => true];
+    }
+
+    protected function findModel($id)
+    {
+        if (($model = Playlist::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    public function actionDelete(int $id)
+    {
+        $this->findModel($id)->delete();
+        return $this->redirect(['index']);
     }
 
 }

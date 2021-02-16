@@ -1,10 +1,7 @@
 <?php
-
 use yii\helpers\Html;
 use yii\jui\JuiAsset;
-
 /** @var $model common\models\Playlist */
-
 $this->title = 'Плейлист: ' . $model->title;
 ?>
 <div>
@@ -18,7 +15,7 @@ $this->title = 'Плейлист: ' . $model->title;
                         <td><?= $story['playlist_order'] ?></td>
                         <td><?= $story['title'] ?></td>
                         <td>
-                            <?= Html::a('Удалить', ['playlist/delete', 'playlist_id' => $model->id, 'story_id' => $story['id']], ['class' => 'delete-playlist-item']) ?>
+                            <?= Html::a('Удалить', ['playlist/delete-item', 'playlist_id' => $model->id, 'story_id' => $story['id']], ['class' => 'delete-playlist-item']) ?>
                         </td>
                     </tr>
                 <?php endforeach ?>
