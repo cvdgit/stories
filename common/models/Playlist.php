@@ -108,6 +108,7 @@ class Playlist extends \yii\db\ActiveRecord
     {
         $query = (new Query())
             ->select('t.id')
+            ->distinct()
             ->from(['t' => self::tableName()])
             ->innerJoin(['t2' => '{{story_playlist}}'], 't.id = t2.playlist_id')
             ->innerJoin(['t3' => Story::tableName()], 't2.story_id = t3.id')
