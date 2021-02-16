@@ -104,7 +104,7 @@ class Playlist extends \yii\db\ActiveRecord
         throw new DomainException('Плейлист не найден.');
     }
 
-    public static function randomPlaylists()
+    public static function randomPlaylists(int $limit = 4)
     {
         $query = (new Query())
             ->select('t.id')
@@ -112,6 +112,7 @@ class Playlist extends \yii\db\ActiveRecord
             ->innerJoin(['t2' => '{{story_playlist}}'], 't.id = t2.playlist_id')
             ->innerJoin(['t3' => Story::tableName()], 't2.story_id = t3.id')
             ->where('t3.status = :status', [':status' => Story::STATUS_PUBLISHED])
+            ->limit($limit)
             ->orderBy('rand()');
         $ids = array_keys($query->indexBy('id')->all());
         if (count($ids) === 0) {
