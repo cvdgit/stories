@@ -26,6 +26,12 @@ $this->params['sidebarMenuItems'] = [
 
 $columns = [];
 $columns[] = 'title';
+if ($searchModel->isWordList()) {
+    $columns[] = [
+        'attribute' => 'wordList.name',
+        'label' => 'Список слов',
+    ];
+}
 if ($searchModel->isNeoTest()) {
     $columns[] = [
         'attribute' => 'parentTest.title',

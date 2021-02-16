@@ -43,6 +43,7 @@ use yii\helpers\ArrayHelper;
  * @property StoryStoryTest[] $storyStoryTests
  * @property StoryTestRun[] $storyTestRuns
  * @property StoryTest $parentTest;
+ * @property TestWordList $wordList;
  */
 class StoryTest extends ActiveRecord
 {
@@ -316,6 +317,11 @@ class StoryTest extends ActiveRecord
     public function isRememberAnswers(): bool
     {
         return (int) $this->remember_answers === 1;
+    }
+
+    public function getWordList()
+    {
+        return $this->hasOne(TestWordList::class, ['id' => 'word_list_id']);
     }
 
 }

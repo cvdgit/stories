@@ -29,6 +29,11 @@ class TestSearch extends Model
         return $this->source === SourceType::NEO;
     }
 
+    public function isWordList()
+    {
+        return $this->source === SourceType::LIST;
+    }
+
     public function search($params)
     {
         $query = StoryTest::find()->with('storyTestQuestions');

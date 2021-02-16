@@ -25,6 +25,9 @@ $this->params['sidebarMenuItems'] = [
                 <?php if ($model->isSourceTest()): ?>
                     <?= $this->render('_test_question_list', ['model' => $model, 'dataProvider' => $dataProvider]) ?>
                 <?php endif ?>
+                <?php if ($model->isSourceWordList()): ?>
+                    <?= $this->renderFile('@backend/views/word-list/_list.php', ['model' => new \backend\forms\UpdateWordList($model->wordList)]) ?>
+                <?php endif ?>
             <?php endif ?>
         </div>
     </div>
