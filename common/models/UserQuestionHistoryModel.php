@@ -80,15 +80,19 @@ class UserQuestionHistoryModel extends Model
 
     public function createUserQuestionAnswers(int $questionAnswerID)
     {
+        $models = [];
         if (count($this->answers) > 0) {
             foreach ($this->answers as $answerData) {
                 $answerModel = new UserQuestionAnswerModel();
                 $answerModel->question_answer_id = $questionAnswerID;
                 if ($answerModel->load($answerData, '') && $answerModel->validate()) {
-                    $answerModel->createUserQuestionAnswer();
+                    $model = $answerModel->createUserQuestionAnswer();
+                    $model->save();
+                    $models[] = $model;
                 }
             }
         }
+        return $models;
     }
 
     public function getUserQuestionHistory(int $testID)

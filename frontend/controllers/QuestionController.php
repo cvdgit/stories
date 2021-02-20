@@ -257,17 +257,23 @@ class QuestionController extends Controller
         }
         $model = new UserQuestionHistoryModel();
         if ($model->load(Yii::$app->request->post(), '') && $model->validate()) {
+
             if ($model->isSourceNeo()) {
                 $userQuestionHistoryID = $model->createUserQuestionHistory();
             }
             if ($model->isSourceWordList() || $model->isSourceTest()) {
                 $userQuestionHistoryID = $model->createWordListQuestionHistory();
-                $testModel = $this->findTestModel($model->test_id);
-                if ($testModel->isRememberAnswers()) {
-                    TestRememberAnswer::updateTestRememberAnswer($testModel->id, $model->student_id, $model->entity_id, $model->entity_name);
+            }
+            $createdModels = $model->createUserQuestionAnswers($userQuestionHistoryID);
+
+            if (count($createdModels) > 0) {
+                if ($model->isSourceWordList()) {
+                    $testModel = $this->findTestModel($model->test_id);
+                    if ($testModel->isRememberAnswers()) {
+                        TestRememberAnswer::updateTestRememberAnswer($testModel->id, $model->student_id, $model->entity_id, $createdModels[0]->answer_entity_name);
+                    }
                 }
             }
-            $model->createUserQuestionAnswers($userQuestionHistoryID);
         }
         else {
             return $model->errors;

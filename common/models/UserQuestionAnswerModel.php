@@ -29,7 +29,7 @@ class UserQuestionAnswerModel extends Model
             $this->answer_entity_id,
             $this->answer_entity_name
         );
-        $model->save();
+        return $model;
     }
 
 }
