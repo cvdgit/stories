@@ -18,7 +18,7 @@ class m210122_094357_create_table_test_remember_answer extends Migration
             'entity_id' => $this->integer()->notNull(),
             'student_id' => $this->integer()->notNull(),
             'answer' => $this->string()->notNull(),
-            'PRIMARY KEY(test_id, entity_id)',
+            'PRIMARY KEY(test_id, entity_id, student_id)',
         ], $this->tableOptions);
 
         $this->createIndex(
@@ -40,6 +40,12 @@ class m210122_094357_create_table_test_remember_answer extends Migration
             '{{%idx-test_remember_answer-entity_id}}',
             $this->tableName,
             'entity_id'
+        );
+
+        $this->createIndex(
+            '{{%idx-test_remember_answer-student_id}}',
+            $this->tableName,
+            'student_id'
         );
 
         $this->addForeignKey(
