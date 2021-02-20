@@ -34,7 +34,7 @@ class TestRememberAnswer extends ActiveRecord
             [['test_id', 'entity_id', 'student_id', 'answer'], 'required'],
             [['test_id', 'entity_id', 'student_id'], 'integer'],
             [['answer'], 'string', 'max' => 255],
-            [['test_id', 'entity_id'], 'unique', 'targetAttribute' => ['test_id', 'entity_id']],
+            [['test_id', 'entity_id'], 'unique', 'targetAttribute' => ['test_id', 'entity_id', 'student_id']],
             [['student_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserStudent::class, 'targetAttribute' => ['student_id' => 'id']],
             [['test_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTest::class, 'targetAttribute' => ['test_id' => 'id']],
         ];
