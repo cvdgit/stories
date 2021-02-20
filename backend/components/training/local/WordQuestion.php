@@ -9,9 +9,9 @@ class WordQuestion extends Question
     private $stars;
     private $questionID;
 
-    public function __construct(int $testID, int $questionID, string $name, array $stars)
+    public function __construct(int $questionID, string $name, array $stars)
     {
-        parent::__construct($testID, $questionID, $name, true, 0, 0);
+        parent::__construct($questionID, $name, true, 0, 0);
         $this->stars = $stars;
         $this->questionID = $questionID;
     }

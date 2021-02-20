@@ -24,7 +24,7 @@ class WordTestBuilder
     private function create(string $className)
     {
         return \Yii::createObject($className, [
-            $this->test->id, $this->data, $this->stars
+            $this->data, $this->stars
         ]);
     }
 
@@ -41,6 +41,9 @@ class WordTestBuilder
             $collection = $this->create(RecordingCollection::class);
             $collection->setRememberAnswers($this->test->isRememberAnswers());
             $collection->build($this->collection);
+        }
+        else if ($this->test->isAnswerTypeMissingWords()) {
+            $this->create(MissingWordsCollection::class)->build($this->collection);
         }
         else {
             $this->create(CorrectIncorrectCollection::class)->build($this->collection);

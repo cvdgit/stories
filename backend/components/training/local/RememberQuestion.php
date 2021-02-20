@@ -7,10 +7,10 @@ class RememberQuestion extends WordQuestion
 
     private $rememberAnswer;
 
-    public function __construct(int $testID, int $questionID, string $name, array $stars, bool $remember)
+    public function __construct(int $questionID, string $name, array $stars, bool $remember)
     {
         $this->rememberAnswer = $remember;
-        parent::__construct($testID, $questionID, $name, $stars);
+        parent::__construct($questionID, $name, $stars);
     }
 
     public function serialize()

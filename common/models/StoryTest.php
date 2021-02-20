@@ -250,6 +250,11 @@ class StoryTest extends ActiveRecord
         return (int) $this->answer_type === AnswerType::RECORDING;
     }
 
+    public function isAnswerTypeMissingWords()
+    {
+        return (int) $this->answer_type === AnswerType::MISSING_WORDS;
+    }
+
     public function getQuestionData()
     {
         return StoryTestQuestion::find()

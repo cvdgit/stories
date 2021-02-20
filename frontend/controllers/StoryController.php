@@ -246,43 +246,11 @@ class StoryController extends Controller
         $test = $this->findTestModel($id);
 
         if (!Yii::$app->user->isGuest) {
-
             $testRunModel = new CreateStoryTestRun();
             $testRunModel->test_id = $id;
             $testRunModel->student_id = UserHelper::getCurrentUserStudentID();
             $testRunModel->createStoryTestRun();
         }
-
-        /*
-        $json = StoryTest::findAllAsArray($id);
-
-        $json[0]['storyTestQuestions'] = array_filter($json[0]['storyTestQuestions'], function($question) {
-            $ok = count($question['storyTestAnswers']) > 0;
-            if ($ok) {
-                $haveCorrectAnswers = false;
-                foreach ($question['storyTestAnswers'] as $answer) {
-                    if ((int)$answer['is_correct'] === 1) {
-                        $haveCorrectAnswers = true;
-                    }
-                }
-                $ok = $haveCorrectAnswers;
-            }
-            return $ok;
-        });
-
-        $json[0]['test']['progress'] = [
-            'current' => 0,
-            'total' => count($json[0]['storyTestQuestions']),
-        ];
-        $json[0]['students'] = $this->getStudents();
-        $json[0]['test']['showAnswerImage'] = true;
-        $json[0]['test']['showAnswerText'] = true;
-        $json[0]['test']['showQuestionImage'] = true;
-        $json[0]['test']['source'] = $test->source;
-        $json[0]['test']['answerType'] = $test->answer_type;
-        $json[0]['test']['strictAnswer'] = $test->strict_answer;
-        return $json;
-        */
 
         $userHistory = [];
         $userStars = [];

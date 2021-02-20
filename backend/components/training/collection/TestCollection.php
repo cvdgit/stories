@@ -9,7 +9,7 @@ use common\models\StoryTestQuestion;
 class TestCollection extends BaseCollection
 {
 
-    public function createQuestion(int $testID, $questionData, $stars)
+    public function createQuestion($questionData, $stars)
     {
         /** @var StoryTestQuestion $questionData */
         if ($questionData->typeIsRegion()) {

@@ -11,13 +11,13 @@ class RecordingCollection extends BaseCollection
     /** @var bool */
     private $rememberAnswers;
 
-    public function createQuestion(int $testID, $questionData, $stars)
+    public function createQuestion($questionData, $stars)
     {
         $remember = $this->rememberAnswers;
         if ($remember) {
             $remember = empty($questionData->correct_answer);
         }
-        $question = new RememberQuestion($testID, $questionData->id, $questionData->name, $stars, $remember);
+        $question = new RememberQuestion($questionData->id, $questionData->name, $stars, $remember);
         $question->addAnswer(new Answer(1, $this->createCorrectAnswer($questionData), true));
         return $question;
     }

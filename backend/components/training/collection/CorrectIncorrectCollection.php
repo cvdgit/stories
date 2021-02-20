@@ -11,9 +11,9 @@ class CorrectIncorrectCollection extends BaseCollection
     public const CORRECT = 1;
     public const INCORRECT = 2;
 
-    public function createQuestion(int $testID, $questionData, $stars)
+    public function createQuestion($questionData, $stars)
     {
-        $question = new WordQuestion($testID, $questionData->id, $questionData->name, $stars);
+        $question = new WordQuestion($questionData->id, $questionData->name, $stars);
         $question->addAnswer(new Answer(self::CORRECT, 'Правильно', true));
         $question->addAnswer(new Answer(self::INCORRECT, 'Неправильно', false));
         return $question;

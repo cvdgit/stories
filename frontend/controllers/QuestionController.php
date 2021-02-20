@@ -75,20 +75,11 @@ class QuestionController extends Controller
         $userStars = [];
         $userStarsCount = 0;
         if ($studentId !== null) {
-
             $userQuestionHistoryModel = new UserQuestionHistoryModel();
             $userQuestionHistoryModel->student_id = $studentId;
-
-            /*if ($test->isRemote()) {
-                $userHistory = $userQuestionHistoryModel->getUserQuestionHistory($test->id);
-                $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStars3($test->id);
-                $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCount($test->id);
-            }
-            else {*/
-                $userHistory = $userQuestionHistoryModel->getUserQuestionHistoryLocal($test->id);
-                $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStarsLocal($test->id);
-                $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCountLocal($test->id);
-            //}
+            $userHistory = $userQuestionHistoryModel->getUserQuestionHistoryLocal($test->id);
+            $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStarsLocal($test->id);
+            $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCountLocal($test->id);
         }
 
         if ($test->isSourceWordList()) {
@@ -148,7 +139,6 @@ class QuestionController extends Controller
         $result = $result['questions'];
 
         $questions = [];
-        $i = 1;
         foreach ($result as $resultItem) {
 
             $questionID = (int)$resultItem['hash'];
@@ -165,7 +155,6 @@ class QuestionController extends Controller
             }
 
             $answers = [];
-            //$correctAnswerIDs = [];
             foreach ($resultItem['answers'] as $_answer) {
                 $answer = [
                     'id' => $_answer['id'],
@@ -174,19 +163,10 @@ class QuestionController extends Controller
                     'image' => $_answer['image'],
                     'description' => $_answer['description'] ?? '',
                 ];
-/*                if ($_answer['correct']) {
-                    $correctAnswerIDs[] = $_answer['id'];
-                }*/
                 $answers[] = $answer;
             }
 
             $stars = 0;
-/*            foreach ($userStars as $star) {
-                if ((int)$star['entity_id'] === (int)$resultItem['question_entity_id'] && in_array((int)$star['answer_entity_id'], $correctAnswerIDs, true)) {
-                    $stars = $star['stars'];
-                    break;
-                }
-            }*/
             foreach ($userStars as $star) {
                 if ((int)$star['entity_id'] === $questionID) {
                     $stars = $star['stars'];
@@ -221,12 +201,12 @@ class QuestionController extends Controller
                 'answer_number' => $resultItem['answer_number'],
             ];
             $questions[] = $question;
-            $i++;
         }
 
         return [0 => [
             'storyTestQuestions' => $questions,
             'test' => [
+                'id' => $test->id,
                 'progress' => [
                     'total' => $numberQuestions * 5,
                     'current' => (int)$userStarsCount,

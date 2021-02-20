@@ -131,67 +131,6 @@ var WikidsStoryTest = (function() {
         }
     }
 
-    var TestConfig = function(data) {
-        this.source = parseInt(data.source);
-        this.answerType = parseInt(data.answerType);
-        this.strictAnswer = parseInt(data.strictAnswer);
-        this.inputVoice = data.inputVoice;
-        this.recordingLang = data.recordingLang;
-        this.rememberAnswers = data.rememberAnswers;
-    }
-
-    TestConfig.prototype.getSource = function() {
-        return this.source;
-    }
-
-    TestConfig.prototype.sourceIsLocal = function() {
-        return this.source === 1;
-    }
-
-    TestConfig.prototype.sourceIsNeo = function() {
-        return this.source === 2;
-    }
-
-    TestConfig.prototype.sourceIsWord = function() {
-        return this.source === 3;
-    }
-
-    TestConfig.prototype.getAnswerType = function() {
-        return this.answerType;
-    }
-
-    TestConfig.prototype.answerTypeIsDefault = function() {
-        return this.answerType === 0;
-    }
-
-    TestConfig.prototype.answerTypeIsNumPad = function() {
-        return this.answerType === 1;
-    }
-
-    TestConfig.prototype.answerTypeIsInput = function() {
-        return this.answerType === 2;
-    }
-
-    TestConfig.prototype.answerTypeIsRecording = function() {
-        return this.answerType === 3;
-    }
-
-    TestConfig.prototype.isStrictAnswer = function() {
-        return this.strictAnswer === 1;
-    }
-
-    TestConfig.prototype.getInputVoice = function() {
-        return this.inputVoice;
-    }
-
-    TestConfig.prototype.getRecordingLang = function() {
-        return this.recordingLang;
-    }
-
-    TestConfig.prototype.isRememberAnswers = function() {
-        return this.rememberAnswers;
-    }
-
     var testConfig;
 
     function init(remote, for_slide, testResponse, element) {
@@ -246,8 +185,9 @@ var WikidsStoryTest = (function() {
         showQuestionImage = true;
 
     var numPad;
-
     var linked;
+    var missingWords,
+        missingWordsRecognition;
 
     function load(data, for_slide) {
         console.debug('WikidsStoryTest.load');
@@ -284,24 +224,36 @@ var WikidsStoryTest = (function() {
 
         numPad = new AnswerTypeNumPad();
 
+        if (testConfig.answerTypeIsMissingWords()) {
+            missingWordsRecognition = new MissingWordsRecognition(testConfig);
+            missingWords = new MissingWords(missingWordsRecognition);
+        }
+
         makeTestQuestions();
         //console.log(testQuestions);
 
         setupDOM();
         addEventListeners();
 
+        if (testConfig.answerTypeIsMissingWords()) {
+            dom.nextButton.off("click").on("click", function() {
+                var result = missingWords.getResult();
+                missingWords.resetMatchElements();
+                nextQuestion([result]);
+            });
+        }
+
         start();
 
         if (for_slide === undefined) {
             for_slide = true;
         }
-        if (for_slide && testConfig.sourceIsLocal()) { // !remoteTest
+        if (for_slide && testConfig.sourceIsLocal()) {
             container.html($("<section/>")
                 .attr("data-background-color", "#ffffff")
                 .append(dom.wrapper));
         }
         else {
-            console.debug('html');
             container.html(dom.wrapper);
         }
     }
@@ -736,6 +688,20 @@ var WikidsStoryTest = (function() {
         return $wrapper;
     }
 
+    function createMissingWordsAnswer(question, answer) {
+        return missingWords.init(question, answer);
+    }
+
+    function createMissingWordsAnswers(question, answers) {
+        var $answers = $("<div/>").addClass("wikids-test-answers");
+        answers.forEach(function(answer) {
+            $answers.append(createMissingWordsAnswer(question, answer));
+        });
+        var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-12 question-wrapper"></div></div>');
+        $wrapper.find(".question-wrapper").append($answers);
+        return $wrapper;
+    }
+
     function appendStars($elem, total, current) {
         $elem.empty();
         for (var i = 0, $star, className; i < total; i++) {
@@ -754,7 +720,7 @@ var WikidsStoryTest = (function() {
         $elem.addClass('question-stars');
         $elem.css('textAlign', 'right');
         appendStars($elem, 5, stars.current);
-        return $elem[0].outerHTML;
+        return $elem;
     }
 
     function getCurrentProgressStateText() {
@@ -782,10 +748,37 @@ var WikidsStoryTest = (function() {
     }
 
     function createQuestion(question) {
+
         var questionName = question.name;
         if (question['correct_number'] && question.correct_number > 1) {
             questionName += ' (верных ответов: ' + question.correct_number + ')';
         }
+
+        if (testConfig.answerTypeIsMissingWords()) {
+
+            questionName = 'Заполните пропущенные части';
+
+            /*
+            var re = /\{([\wа-яА-ЯёЁ]+)\}/igm;
+            var match;
+            while ((match = re.exec(questionName)) !== null) {
+                questionName = questionName.replace(match[0], '<span style="cursor:pointer" class="label label-primary">' + '*'.repeat(match[0].length) + '</span>')
+            }
+            */
+        }
+
+        var titleElement = $('<p/>')
+            .addClass('question-title')
+            .append(questionName);
+
+        /*
+        if (testConfig.answerTypeIsMissingWords()) {
+            titleElement.on('click', 'span.label', function (e) {
+                missingWords.start(e, question.id, '');
+            });
+        }
+        */
+
         var stars = '';
         if (question['stars']) {
             stars = createStars(question.stars);
@@ -793,7 +786,8 @@ var WikidsStoryTest = (function() {
         return $("<div/>")
             .hide()
             .addClass("wikids-test-question")
-            .html('<p class="question-title">' + questionName + '</p>' + stars)
+            .append(stars)
+            .append(titleElement)
             .attr("data-question-id", question.id)
             .data("question", question);
     }
@@ -814,6 +808,9 @@ var WikidsStoryTest = (function() {
             if (testConfig.answerTypeIsRecording()) {
                 view = 'recording';
             }
+            if (testConfig.answerTypeIsMissingWords()) {
+                view = 'missing_words';
+            }
 
             var $answers;
             switch (view) {
@@ -831,6 +828,9 @@ var WikidsStoryTest = (function() {
                     break;
                 case 'region':
                     $answers = createRegionAnswers(question, getAnswersData(question));
+                    break;
+                case 'missing_words':
+                    $answers = createMissingWordsAnswers(question, getAnswersData(question));
                     break;
                 default:
                     $answers = createAnswers(getAnswersData(question), question);
@@ -973,7 +973,6 @@ var WikidsStoryTest = (function() {
             return parseInt(elem.is_correct) === 1;
         });
         correctAnswers = correctAnswers.map(correctAnswersCallback);
-
         var answerCheckCallback = function(value, index) {
             if (convertAnswerToInt) {
                 value = parseInt(value)
@@ -1095,8 +1094,7 @@ var WikidsStoryTest = (function() {
     function nextQuestion(preparedAnswers) {
 
         console.debug('WikidsStoryTest.nextQuestion');
-
-        if (typeof preparedAnswers === 'object') {
+        if (!Array.isArray(preparedAnswers)) {
             preparedAnswers = false;
         }
         preparedAnswers = preparedAnswers || false;
@@ -1140,8 +1138,7 @@ var WikidsStoryTest = (function() {
         else {
             answer = preparedAnswers;
         }
-
-        //console.log(answer);
+console.log(answer);
         if (answer.length === 0) {
             return;
         }
@@ -1155,7 +1152,7 @@ var WikidsStoryTest = (function() {
                 return parseInt(elem.name);
             };
         }
-        if (view === 'input' || view === 'recognition') {
+        if (view === 'input' || view === 'recognition' || testConfig.answerTypeIsMissingWords()) {
             correctAnswersCallback = function(elem) {
                 if (testConfig.isStrictAnswer()) {
                     return elem.name;
@@ -1239,7 +1236,7 @@ var WikidsStoryTest = (function() {
                 });
                 answerParams = {
                     'source': testConfig.getSource(),
-                    'test_id': currentQuestion.test_id,
+                    'test_id': testConfig.getTestID(),
                     'student_id': currentStudent.id,
                     'question_topic_id': currentQuestion.topic_id,
                     'question_topic_name': currentQuestion.name,
@@ -1263,7 +1260,7 @@ var WikidsStoryTest = (function() {
                 });
                 answerParams = {
                     'source': testConfig.getSource(),
-                    'test_id': currentQuestion.test_id,
+                    'test_id': testConfig.getTestID(),
                     'student_id': currentStudent.id,
                     'entity_id': currentQuestion.id,
                     'entity_name': currentQuestion.name,
@@ -1283,7 +1280,7 @@ var WikidsStoryTest = (function() {
                 });
                 answerParams = {
                     'source': testConfig.getSource(),
-                    'test_id': currentQuestion.test_id,
+                    'test_id': testConfig.getTestID(),
                     'student_id': currentStudent.id,
                     'entity_id': currentQuestion.id,
                     'entity_name': currentQuestion.name,
@@ -1304,7 +1301,7 @@ var WikidsStoryTest = (function() {
                 });
                 answerParams = {
                     'source': testConfig.getSource(),
-                    'test_id': currentQuestion.test_id,
+                    'test_id': testConfig.getTestID(),
                     'student_id': currentStudent.id,
                     'entity_id': currentQuestion.id,
                     'entity_name': currentQuestion.name,
@@ -1324,7 +1321,10 @@ var WikidsStoryTest = (function() {
 
         dom.nextButton.hide();
         if (!answerIsCorrect) {
-            if (testConfig.sourceIsWord() && !testConfig.answerTypeIsNumPad() && !testConfig.answerTypeIsInput()) {
+            if (testConfig.sourceIsWord()
+                && !testConfig.answerTypeIsNumPad()
+                && !testConfig.answerTypeIsInput()
+                && !testConfig.answerTypeIsMissingWords()) {
                 continueTestAction(answer);
             }
             else {
@@ -1530,11 +1530,17 @@ var WikidsStoryTest = (function() {
 
         dom.continueButton.hide();
         var isLastQuestion = (testQuestions.length === 0);
-        var actionRelated = incorrectAnswerActionRelated();
+        // var actionRelated = incorrectAnswerActionRelated();
+        var showCorrectAnswerPageCondition = testConfig.sourceIsWord()
+            && !testConfig.answerTypeIsNumPad()
+            && !testConfig.answerTypeIsRecording()
+            && !testConfig.answerTypeIsInput()
+            && !testConfig.answerTypeIsMissingWords();
+
         if (isLastQuestion) {
 
             if (!answerIsCorrect) {
-                if (testConfig.sourceIsWord() && !testConfig.answerTypeIsNumPad() && !testConfig.answerTypeIsRecording() && !testConfig.answerTypeIsInput()) {
+                if (showCorrectAnswerPageCondition) {
                     showNextQuestion();
                     dom.results.hide();
                     showNextButton();
@@ -1554,7 +1560,7 @@ var WikidsStoryTest = (function() {
         }
         else {
             if (!answerIsCorrect) {
-                    if (testConfig.sourceIsWord() && !testConfig.answerTypeIsNumPad() && !testConfig.answerTypeIsRecording() && !testConfig.answerTypeIsInput()) {
+                    if (showCorrectAnswerPageCondition) {
                         showNextQuestion();
                         dom.results.hide();
                         showNextButton();
@@ -1911,11 +1917,9 @@ answerTypeRecording.checkResult = function(result) {
 }
 
 var testRecognition = {};
-
 testRecognition.recognizingFragment = false;
 testRecognition.recognizing = false;
 testRecognition.start_timestamp = null;
-
 testRecognition.recorder = new webkitSpeechRecognition();
 testRecognition.recorder.continuous = true;
 testRecognition.recorder.interimResults = true;
@@ -2121,7 +2125,6 @@ var SlideLoader = (function() {
     };
 })();
 
-
 var TestLinked = function(data) {
 
     var stories = [];
@@ -2265,3 +2268,330 @@ RegionQuestion.prototype.create = function() {
     });
     return $wrapper;
 };
+
+var TestConfig = function(data) {
+
+    function getSource() {
+        return parseInt(data.source);
+    }
+
+    function getAnswerType() {
+        return parseInt(data.answerType);
+    }
+
+    return {
+        'getSource': getSource,
+        'sourceIsLocal': function() {
+            return getSource() === 1;
+        },
+        'sourceIsNeo': function() {
+            return getSource() === 2;
+        },
+        'sourceIsWord': function() {
+            return getSource() === 3;
+        },
+        'answerTypeIsDefault': function() {
+            return getAnswerType() === 0;
+        },
+        'answerTypeIsNumPad': function() {
+            return getAnswerType() === 1;
+        },
+        'answerTypeIsInput': function() {
+            return getAnswerType() === 2;
+        },
+        'answerTypeIsRecording': function() {
+            return getAnswerType() === 3;
+        },
+        'answerTypeIsMissingWords': function() {
+            return getAnswerType() === 4;
+        },
+        'isStrictAnswer': function() {
+            return parseInt(data.strictAnswer);
+        },
+        'getInputVoice': function() {
+            return data.inputVoice;
+        },
+        'getRecordingLang': function() {
+            return data.recordingLang;
+        },
+        'isRememberAnswers': function() {
+            return data.rememberAnswers;
+        },
+        'getTestID': function() {
+            return parseInt(data.id);
+        }
+    }
+}
+
+var MissingWords = function(recognition) {
+
+    var elements = [];
+
+    recognition.addEventListener('onStart', function() {
+        WikidsStoryTest.hideNextButton();
+        var element = getElement(WikidsStoryTest.getCurrentQuestion().id);
+        setStatus(element, 'Идет запись с микрофона');
+    });
+
+    recognition.addEventListener('onResult', function(event) {
+
+        var args = event.args;
+        var elem = $(args.target);
+        var match = elem.attr('data-match')
+        var result = $.trim(args.result);
+
+        elem.text(result);
+
+        if (result.length >= match.length) {
+            recognition.stop();
+        }
+    });
+
+    recognition.addEventListener('onEnd', function() {
+
+        var element = getElement(WikidsStoryTest.getCurrentQuestion().id);
+        hideLoader(element);
+        hideStopButton(element);
+        setStatus(element);
+
+        var result = getMissingWordsText(element);
+        if (checkResult(result)) {
+            resetMatchElements();
+            WikidsStoryTest.nextQuestion([result]);
+        }
+        else {
+            WikidsStoryTest.showNextButton();
+        }
+    });
+
+    function createMaskedString(string) {
+        var re = /\{([\wа-яА-ЯёЁ]+)\}/igm;
+        var match;
+        while ((match = re.exec(string)) !== null) {
+            string = string.replace(match[0], '<span style="cursor:pointer" class="label label-primary" data-match="'+match[1]+'">' + '*'.repeat(match[1].length) + '</span>')
+        }
+        return string;
+    }
+
+    function resetMatchElements() {
+        var element = getElement(WikidsStoryTest.getCurrentQuestion().id);
+        $('.missing-words-text', element).find('span.label').each(function() {
+            var match = $(this).attr('data-match');
+            $(this).text('*'.repeat(match.length));
+        });
+    }
+
+    function init(question, answer) {
+
+        var element = $('<div/>', {
+            'class': 'missing-words test-recognition'
+        });
+
+        element.data('correctAnswer', answer.name);
+
+        element
+            .append($('<p/>', {
+                'class': 'missing-words-text',
+                'html': createMaskedString(question.name)
+            }));
+
+        element.on('click', 'span.label', function (e) {
+            start(e, question.id, $(this).attr('data-match'));
+        });
+
+        element
+            .append($('<div/>')
+                .addClass('recognition-result-wrapper')
+                .append($('<span/>').addClass('recognition-result'))
+                .append($('<span/>').addClass('recognition-result-interim'))
+            );
+
+        $('<div/>')
+            .addClass('wikids-test-loader')
+            .append($('<img/>')
+                .attr('src', '/img/loading.gif')
+                .attr('width', '60px')
+            )
+            .hide()
+            .appendTo(element);
+
+        element
+            .append($('<p/>').addClass('recognition-status'));
+
+        $('<a/>')
+            .attr('href', '#')
+            .attr('title', 'Остановить')
+            .addClass('recognition-stop')
+            .on('click', function(e) {
+                e.preventDefault();
+                recognition.stop();
+            })
+            .append($('<i/>').addClass('glyphicon glyphicon-stop'))
+            .hide()
+            .appendTo(element);
+
+        elements[question.id] = element;
+        return element;
+    }
+
+    function getElement(id) {
+        return elements[id];
+    }
+
+    function showLoader(element) {
+        element.find('.wikids-test-loader').show();
+    }
+
+    function hideLoader(element) {
+        element.find('.wikids-test-loader').hide();
+    }
+
+    function setStatus(element, status) {
+        status = status || '';
+        element.find('.recognition-status').text(status);
+    }
+
+    function showStopButton(element) {
+        element.find('.recognition-stop').show();
+    }
+
+    function hideStopButton(element) {
+        element.find('.recognition-stop').hide();
+    }
+
+    function checkResult(result) {
+        return WikidsStoryTest.checkAnswerCorrect(
+            WikidsStoryTest.getCurrentQuestion(),
+            [result],
+            function(elem) {
+                return elem.name.toLowerCase();
+            },
+            false);
+    }
+
+    function getMissingWordsText(element) {
+        return $.trim(element.find('.missing-words-text').text()).toLowerCase();
+    }
+
+    function start(event, questionID, match) {
+        var element = getElement(questionID);
+        setStatus(element);
+        showLoader(element);
+        showStopButton(element);
+        recognition.start(event, match);
+    }
+
+    return {
+        'init': init,
+        'start': start,
+        'getResult': function() {
+            var element = getElement(WikidsStoryTest.getCurrentQuestion().id);
+            return getMissingWordsText(element);
+        },
+        'resetMatchElements': resetMatchElements
+    };
+};
+
+var MissingWordsRecognition = function(config) {
+
+    var recorder = new webkitSpeechRecognition();
+    recorder.continuous = true;
+    recorder.interimResults = true;
+    recorder.lang = config.getRecordingLang() || 'ru-RU';
+
+    var recognizing = false;
+    var startTimestamp = null;
+    var finalTranscript = '';
+    var targetElement;
+
+    var eventListeners = [];
+
+    recorder.onstart = function() {
+        recognizing = true;
+        dispatchEvent({type: 'onStart'});
+    };
+
+    recorder.onresult = function(event) {
+
+        var interimTranscript = '';
+        if (typeof(event.results) === 'undefined') {
+            recorder.onend = null;
+            recorder.stop();
+            return;
+        }
+
+        for (var i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                finalTranscript = event.results[i][0].transcript;
+            } else {
+                interimTranscript += event.results[i][0].transcript;
+            }
+        }
+
+        if (finalTranscript.length) {
+            finalTranscript = lowerCase(finalTranscript);
+            dispatchEvent({
+                type: 'onResult',
+                args: {
+                    target: targetElement,
+                    result: linebreak(finalTranscript),
+                    interim: linebreak(interimTranscript)
+                }
+            });
+        }
+    };
+
+    recorder.onend = function() {
+        recognizing = false;
+        dispatchEvent({type: 'onEnd'});
+    }
+
+    function start(event, text) {
+        if (recognizing) {
+            recorder.stop();
+            return;
+        }
+        finalTranscript = '';
+        recorder.start();
+        startTimestamp = event.timeStamp;
+        targetElement = event.target;
+    }
+
+    function stop() {
+        recorder.stop();
+    }
+
+    function dispatchEvent(event) {
+        for (var i = 0; i < eventListeners.length; i++) {
+            if (event.type === eventListeners[i].type) {
+                eventListeners[i].eventHandler(event);
+            }
+        }
+    }
+
+    function linebreak(s) {
+        var two_line = /\n\n/g;
+        var one_line = /\n/g;
+        return s.replace(two_line, '<p></p>').replace(one_line, '<br>');
+    }
+
+    function capitalize(s) {
+        var first_char = /\S/;
+        return s.replace(first_char, function(m) { return m.toUpperCase(); });
+    }
+
+    function lowerCase(s) {
+        return s.toLowerCase();
+    }
+
+    return {
+        'start': start,
+        'stop': stop,
+        'addEventListener': function(type, eventHandler) {
+            var listener = {};
+            listener.type = type;
+            listener.eventHandler = eventHandler;
+            eventListeners.push(listener);
+        }
+    }
+}

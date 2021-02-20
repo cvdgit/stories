@@ -13,9 +13,9 @@ class Question extends BaseQuestion
     /** @var int */
     private $type;
 
-    public function __construct(int $testID, int $id, string $name, bool $lastAnswerIsCorrect, int $mixAnswers, int $type, $image = null)
+    public function __construct(int $id, string $name, bool $lastAnswerIsCorrect, int $mixAnswers, int $type, $image = null)
     {
-        parent::__construct($testID, $id, $name, $lastAnswerIsCorrect, $image);
+        parent::__construct($id, $name, $lastAnswerIsCorrect, $image);
         $this->mixAnswers = $mixAnswers;
         $this->type = $type;
     }

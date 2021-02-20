@@ -6,9 +6,6 @@ class BaseQuestion
 {
 
     /** @var int */
-    private $testID;
-
-    /** @var int */
     private $id;
 
     /** @var string */
@@ -23,9 +20,8 @@ class BaseQuestion
     /** @var Answer[] */
     private $answers = [];
 
-    public function __construct(int $testID, int $id, string $name, bool $lastAnswerIsCorrect, $image = null)
+    public function __construct(int $id, string $name, bool $lastAnswerIsCorrect, $image = null)
     {
-        $this->testID = $testID;
         $this->id = $id;
         $this->name = $name;
         $this->image = $image;
@@ -88,14 +84,6 @@ class BaseQuestion
     public function serialize()
     {
         return (new BaseQuestionSerializer($this))->serialize();
-    }
-
-    /**
-     * @return int
-     */
-    public function getTestID(): int
-    {
-        return $this->testID;
     }
 
     protected function makeStars(array $starsData, BaseQuestion $question)

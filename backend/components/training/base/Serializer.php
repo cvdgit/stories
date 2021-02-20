@@ -13,6 +13,7 @@ class Serializer
             0 => [
                 'storyTestQuestions' => $collection->serialize($test->isShuffleQuestions()),
                 'test' => [
+                    'id' => $test->id,
                     'progress' => [
                         'total' => $collection->getTotal() * 5,
                         'current' => (int) $userStarsCount,

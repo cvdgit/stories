@@ -2250,3 +2250,11 @@ p.wikids-test-description {
 .question-region {
 	cursor: crosshair;
 }
+
+.missing-words {
+
+}
+
+.missing-words .missing-words-text {
+	margin-top: 50px;
+}

@@ -13,8 +13,7 @@ class DefaultQuestion extends Question
 
     public function __construct(StoryTestQuestion $question, array $stars)
     {
-        parent::__construct($question->story_test_id,
-            $question->id,
+        parent::__construct($question->id,
             $question->name,
             true,
             $question->mix_answers,

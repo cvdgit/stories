@@ -24,7 +24,6 @@ class BaseQuestionSerializer
     public function serialize(): array
     {
         return [
-            'test_id' => $this->question->getTestID(),
             'id' => $this->question->getId(),
             'name' => $this->question->getName(),
             'image' => $this->question->getImage(),
