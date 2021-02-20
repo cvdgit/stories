@@ -2047,15 +2047,15 @@ testRecognition.recorder.onresult = function(event) {
         return;
     }
 
-    for (var i = event.resultIndex; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-            testRecognition.final_transcript += event.results[i][0].transcript;
-        } else {
-            interim_transcript += event.results[i][0].transcript;
-        }
-    }
-
     if (testRecognition.recognizingFragment) {
+
+        for (var i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                testRecognition.final_transcript = event.results[i][0].transcript;
+            } else {
+                interim_transcript += event.results[i][0].transcript;
+            }
+        }
 
         if (testRecognition.final_transcript.length) {
             testRecognition.speechFragment = testRecognition.lowerCase(testRecognition.final_transcript);
@@ -2068,6 +2068,15 @@ testRecognition.recorder.onresult = function(event) {
         }
     }
     else {
+
+        for (var i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                testRecognition.final_transcript += event.results[i][0].transcript;
+            } else {
+                interim_transcript += event.results[i][0].transcript;
+            }
+        }
+
         testRecognition.final_transcript = testRecognition.lowerCase(testRecognition.final_transcript);
         answerTypeRecording.setResult(testRecognition.linebreak(testRecognition.final_transcript));
         answerTypeRecording.setResultInterim(testRecognition.linebreak(interim_transcript));
