@@ -22,6 +22,7 @@ use yii\widgets\ActiveForm;
                 <div>
                     <a href="#" id="split-text" class="btn">Разбить по предложениям</a>
                     <a href="#" id="split-text-by-word" class="btn">Разбить по словам</a>
+                    <a href="#" id="missing-words" class="btn">Вставить пропуск</a>
                 </div>
                 <?= $wordListForm->field($model, 'text')->textarea(['cols' => 30, 'rows' => 20]) ?>
                 <?= $wordListForm->field($model, 'word_list_id')->hiddenInput()->label(false) ?>
@@ -40,6 +41,9 @@ $js = <<< JS
 var WordList = (function() {
     var element = $('#wordlistastextform-text');
     return {
+        'getElement' : function() {
+            return element;
+        },
         'getText': function() {
             return element.val();
         },
@@ -110,6 +114,45 @@ $('#split-text-by-word').on('click', function(e) {
         })
         .join("\\n");
     WordList.setText(text);
+});
+
+$('#missing-words').on('click', function(e) {
+    e.preventDefault();
+    var element = WordList.getElement()[0];
+    var selected;
+    var boundaries = {
+        start: element.selectionStart,
+        end: element.selectionEnd
+    }
+    if (element.selectionStart === element.selectionEnd) {
+        if (element.selectionStart > 0) {
+            var text = element.value;
+            if (text) {
+                var i = 0;
+                var reg = /[\s\.\!\?\|]+/g;
+                while (i < 1) {
+                    var start = boundaries.start;
+                    var end = boundaries.end;
+                    var prevChar = text.charAt(start - 1);
+                    var currentChar = text.charAt(end);
+                    if (!prevChar.match(reg) && prevChar.length > 0) {
+                        boundaries.start--;
+                    }
+                    if (!currentChar.match(reg) && currentChar.length > 0) {
+                        boundaries.end++;
+                    }
+                    if (start === boundaries.start && end === boundaries.end) {
+                        i = 1;
+                    }
+                }
+                selected = text.slice(boundaries.start, boundaries.end)
+            }
+        }
+    }
+    else {
+        selected = element.value.slice(element.selectionStart, element.selectionEnd);
+    }
+    element.setRangeText('{' + selected + '}', boundaries.start, boundaries.end);
 });
 
 JS;
