@@ -129,7 +129,7 @@ $('#missing-words').on('click', function(e) {
             var text = element.value;
             if (text) {
                 var i = 0;
-                var reg = /[\s\.\!\?\|]+/g;
+                var reg = /[^\wа-яёЁ\-]+/ig;
                 while (i < 1) {
                     var start = boundaries.start;
                     var end = boundaries.end;
