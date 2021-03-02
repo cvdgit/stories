@@ -329,4 +329,11 @@ class StoryTest extends ActiveRecord
         return $this->hasOne(TestWordList::class, ['id' => 'word_list_id']);
     }
 
+    public static function findAllByWordList(int $wordListID)
+    {
+        return self::find()
+            ->where('word_list_id = :id', [':id' => $wordListID])
+            ->all();
+    }
+
 }

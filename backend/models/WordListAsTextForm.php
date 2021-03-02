@@ -3,7 +3,10 @@
 namespace backend\models;
 
 use backend\components\WordListFormatter;
+use common\models\StoryTest;
+use common\models\StudentQuestionProgress;
 use common\models\TestWord;
+use common\models\UserQuestionHistory;
 use yii\base\Model;
 
 class WordListAsTextForm extends Model
@@ -39,6 +42,12 @@ class WordListAsTextForm extends Model
     public function createWordList()
     {
         TestWord::clearWords($this->word_list_id);
+        $testModels = StoryTest::findAllByWordList($this->word_list_id);
+        foreach ($testModels as $testModel) {
+            UserQuestionHistory::clearAllTestHistory($testModel->id);
+            StudentQuestionProgress::resetProgressByTest($testModel->id);
+        }
+
         $texts = explode(PHP_EOL, $this->text);
         $rows = $this->wordFormatter->create($texts);
         TestWord::createBatch($this->word_list_id, $rows);

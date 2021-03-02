@@ -28,6 +28,7 @@ use yii\widgets\ActiveForm;
                 <?= $wordListForm->field($model, 'word_list_id')->hiddenInput()->label(false) ?>
             </div>
             <div class="modal-footer">
+                <div class="alert alert-danger text-left">Будет очищена история прохождения тестов, в которых указан текущий список слов</div>
                 <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']) ?>
                 <button class="btn btn-default" data-dismiss="modal">Отмена</button>
             </div>
