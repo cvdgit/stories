@@ -2373,11 +2373,17 @@ var MissingWords = function(recognition) {
         }
     });
 
+    function createRepeatString(string) {
+        return string.split(' ').map(function(word) {
+            return '*'.repeat(word.length);
+        }).join('_');
+    }
+
     function createMaskedString(string) {
-        var re = /\{([\wа-яА-ЯёЁ]+)\}/igm;
+        var re = /\{([\wа-яА-ЯёЁ\s]+)\}/igm;
         var match;
         while ((match = re.exec(string)) !== null) {
-            string = string.replace(match[0], '<span style="cursor:pointer" class="label label-primary" data-match="'+match[1]+'">' + '*'.repeat(match[1].length) + '</span>')
+            string = string.replace(match[0], '<span style="cursor:pointer" class="label label-primary" data-match="'+match[1]+'">' + createRepeatString(match[1]) + '</span>')
         }
         return string;
     }

@@ -2,7 +2,7 @@
 /** @var $form yii\widgets\ActiveForm */
 ?>
 <?= $form->field($model, 'wrong_answers_params')->hiddenInput()->label(false) ?>
-<h4>Фильтр неправильных ответов</h4>
+<h4>Таксоны для неправильных ответов</h4>
 <div class="wrong-answer-list">
     <?php if (count($model->wrongAnswerTaxonNames) === 0): ?>
         <div class="row wrong-answer-list-item hide">
