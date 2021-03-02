@@ -1138,7 +1138,7 @@ var WikidsStoryTest = (function() {
         else {
             answer = preparedAnswers;
         }
-console.log(answer);
+
         if (answer.length === 0) {
             return;
         }
@@ -2392,7 +2392,7 @@ var MissingWords = function(recognition) {
         var element = getElement(WikidsStoryTest.getCurrentQuestion().id);
         $('.missing-words-text', element).find('span.label').each(function() {
             var match = $(this).attr('data-match');
-            $(this).text('*'.repeat(match.length));
+            $(this).text(createRepeatString(match));
         });
     }
 
