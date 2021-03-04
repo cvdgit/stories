@@ -1,5 +1,6 @@
 <?php
 
+use common\models\test\SourceType;
 use yii\db\Migration;
 
 /**
@@ -19,7 +20,7 @@ class m200916_135816_add_source_column_to_story_test_table extends Migration
         $this->addColumn($this->tableName, $this->tableColumnName, $this->tinyInteger()->notNull()->defaultValue(1));
 
         $command = Yii::$app->db->createCommand();
-        $command->update($this->tableName, ['source' => \common\models\StoryTest::NEO], 'remote = 1');
+        $command->update($this->tableName, ['source' => SourceType::NEO], 'remote = 1');
         $command->execute();
     }
 
