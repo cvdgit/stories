@@ -126,12 +126,12 @@ class StoryStatisticsSearch extends StoryStatistics
             ->groupBy(['{{%story_statistics}}.story_id']);
 
         $rows = (new Query())
-            ->select(['{{%story}}.id', '{{%story}}.title', 't.storyViews AS views_number', 'story_done' => $doneSubQuery])
+            ->select(['{{%story}}.id AS story_id', '{{%story}}.title', 't.storyViews AS views_number', 'story_done' => $doneSubQuery])
             ->from(['t' => $viewsSubQuery])
             ->innerJoin('{{%story}}', '{{%story}}.id = t.storyID')
             ->orderBy(['t.storyViews' => SORT_DESC])
             ->limit(10)
-            ->indexBy('id')
+            ->indexBy('story_id')
             ->all();
 
         return new ArrayDataProvider([
