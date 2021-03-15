@@ -9,6 +9,7 @@ use yii\grid\GridView;
 /* @var $searchModel backend\models\search\TestSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $source int */
+/* @var $sourceRecordsTotal int */
 $this->title = 'Тесты';
 $this->params['sidebarMenuItems'] = [
     ['label' => 'Результаты тестов', 'url' => ['test/results']],
@@ -23,6 +24,17 @@ $this->params['sidebarMenuItems'] = [
     'items' => SourceType::asNavItems($source),
 ]) ?>
 <?php
+
+if (Yii::$app->user->can('admin') && $searchModel->isNeoTest()) {
+    echo Html::tag(
+        'div',
+        Html::a('Очистить историю по всем тестам (' . ($sourceRecordsTotal === 0 ? 'нет записей' : $sourceRecordsTotal) . ')', ['history/clear-all-by-source', 'source' => $source], ['class' => 'btn btn-danger pull-right']),
+        ['class' => 'clearfix', 'style' => 'padding: 20px 0 0 0']);
+    $js = <<< JS
+
+JS;
+    $this->registerJs($js);
+}
 
 $columns = [];
 $columns[] = 'title';

@@ -9,6 +9,8 @@ use common\models\UserQuestionHistory;
 use common\models\UserQuestionHistoryModel;
 use common\models\UserStudent;
 use common\rbac\UserRoles;
+use common\services\TestHistoryService;
+use Exception;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -16,6 +18,14 @@ use yii\web\NotFoundHttpException;
 
 class HistoryController extends Controller
 {
+
+    private $historyService;
+
+    public function __construct($id, $module, TestHistoryService $historyService, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->historyService = $historyService;
+    }
 
     public function behaviors()
     {
@@ -97,6 +107,18 @@ class HistoryController extends Controller
             'test' => $test,
             'detail' => $model->getDetail($test->id),
         ]);
+    }
+
+    public function actionClearAllBySource(int $source)
+    {
+        try {
+            $this->historyService->clearBySource($source);
+            Yii::$app->session->setFlash('success', 'История прохождения теста удалена');
+        }
+        catch (Exception $ex) {
+            Yii::$app->session->setFlash('error', str_replace("\n", '<br/>', $ex->getMessage()));
+        }
+        return $this->redirect(['test/index', 'source' => $source]);
     }
 
 }

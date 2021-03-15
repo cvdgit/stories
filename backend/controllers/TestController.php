@@ -9,6 +9,7 @@ use common\models\StoryTestAnswer;
 use common\models\StoryTestQuestion;
 use common\models\StoryTestResult;
 use common\rbac\UserRoles;
+use common\services\TestHistoryService;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -20,6 +21,14 @@ use yii\web\UploadedFile;
 
 class TestController extends Controller
 {
+
+    private $historyService;
+
+    public function __construct($id, $module, TestHistoryService $historyService, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->historyService = $historyService;
+    }
 
     public function behaviors()
     {
@@ -52,6 +61,7 @@ class TestController extends Controller
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'source' => $source,
+            'sourceRecordsTotal' => $this->historyService->getRecordsCountBySource($source),
         ]);
     }
 
