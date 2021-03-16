@@ -10,7 +10,7 @@ class WordListFormatter
         $texts = [];
         foreach ($data as $item) {
             $text = $item['name'];
-            if ($item['correct_answer'] !== null) {
+            if (!empty($item['correct_answer'])) {
                 $text .= '|' . $item['correct_answer'];
             }
             $texts[] = $text;
