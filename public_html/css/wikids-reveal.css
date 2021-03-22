@@ -2232,7 +2232,10 @@ p.wikids-test-description {
 }
 
 .test-recognition .recognition-result {
-
+	min-height: 36px;
+	background-color: #eee;
+	margin: 6px 50px;
+	padding: 10px;
 }
 
 .test-recognition .recognition-result-interim {

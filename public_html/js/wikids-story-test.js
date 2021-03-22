@@ -187,7 +187,8 @@ var WikidsStoryTest = (function() {
     var numPad;
     var linked;
     var missingWords,
-        missingWordsRecognition;
+        missingWordsRecognition,
+        recordingAnswer;
 
     function load(data, for_slide) {
         console.debug('WikidsStoryTest.load');
@@ -229,6 +230,10 @@ var WikidsStoryTest = (function() {
             missingWords = new MissingWords(missingWordsRecognition);
         }
 
+        if (testConfig.answerTypeIsRecording()) {
+            recordingAnswer = RecordingAnswer(new MissingWordsRecognition(testConfig))
+        }
+
         makeTestQuestions();
         //console.log(testQuestions);
 
@@ -239,6 +244,13 @@ var WikidsStoryTest = (function() {
             dom.nextButton.off("click").on("click", function() {
                 var result = missingWords.getResult();
                 missingWords.resetMatchElements();
+                nextQuestion([result]);
+            });
+        }
+        if (testConfig.answerTypeIsRecording()) {
+            dom.nextButton.off("click").on("click", function() {
+                var result = recordingAnswer.getResult();
+                recordingAnswer.resetResult();
                 nextQuestion([result]);
             });
         }
@@ -662,7 +674,7 @@ var WikidsStoryTest = (function() {
     }
 
     function createRecordingAnswer(question, answer) {
-        return answerTypeRecording.create(question, answer);
+        return recordingAnswer.create(question, answer);
     }
 
     function createRegionAnswer(question, answers) {
@@ -945,6 +957,7 @@ var WikidsStoryTest = (function() {
     }
 
     function checkAnswerCorrect(question, answer, correctAnswersCallback, convertAnswerToInt) {
+        console.debug('WikidsStoryTest.checkAnswerCorrect');
         var correctAnswers = getAnswersData(question).filter(function(elem) {
             return parseInt(elem.is_correct) === 1;
         });
@@ -964,7 +977,7 @@ var WikidsStoryTest = (function() {
     }
 
     function answerQuestion(element, answer, correctAnswersCallback, convertAnswerToInt) {
-
+        console.debug('WikidsStoryTest.answerQuestion');
         var questionID = element.attr("data-question-id");
         var question = getQuestionsData().filter(function(elem) {
             return parseInt(elem.id) === parseInt(questionID);
@@ -984,7 +997,6 @@ var WikidsStoryTest = (function() {
             correctAnswersNumber++;
             correct = true;
         }
-
         return correct;
     }
 
@@ -1039,13 +1051,13 @@ var WikidsStoryTest = (function() {
         return [val.toLowerCase()];
     }
 
-    function getRecognitionQuestionAnswers(element) {
+    /*function getRecognitionQuestionAnswers(element) {
         var val = answerTypeRecording.getResult();
         if (!val.length) {
             return [];
         }
         return [val.toLowerCase()];
-    }
+    }*/
 
     var answerIsCorrect,
         currentQuestion,
@@ -1102,19 +1114,19 @@ var WikidsStoryTest = (function() {
         var $activeQuestion = $('.wikids-test-active-question');
         currentQuestion = $activeQuestion.data('question');
 
+        var view = currentQuestion['view'] ? currentQuestion.view : '';
+        if (testConfig.answerTypeIsNumPad()) {
+            view = 'numpad';
+        }
+        if (testConfig.answerTypeIsInput()) {
+            view = 'input';
+        }
+        if (testConfig.answerTypeIsRecording()) {
+            view = 'recognition';
+        }
+
         var answer = [];
         if (!preparedAnswers) {
-
-            var view = currentQuestion['view'] ? currentQuestion.view : '';
-            if (testConfig.answerTypeIsNumPad()) {
-                view = 'numpad';
-            }
-            if (testConfig.answerTypeIsInput()) {
-                view = 'input';
-            }
-            if (testConfig.answerTypeIsRecording()) {
-                view = 'recognition';
-            }
             switch (view) {
                 case 'svg':
                     answer = getSvgQuestionAnswers(currentQuestion);
@@ -1127,10 +1139,10 @@ var WikidsStoryTest = (function() {
                 case 'input':
                     answer = getInputQuestionAnswers($activeQuestion);
                     break;
-                case 'recognition':
+                /*case 'recognition':
                     answer = getRecognitionQuestionAnswers($activeQuestion);
                     answerTypeRecording.resetResult();
-                    break;
+                    break;*/
                 default:
                     answer = getQuestionAnswers($activeQuestion);
             }
@@ -1172,7 +1184,6 @@ var WikidsStoryTest = (function() {
             changeQuestionRememberAnswers(currentQuestion, answer);
             answerIsCorrect = true;
         }
-        // console.debug(answerIsCorrect);
 
         if (answerIsCorrect) {
             if (currentQuestion['stars']) {
@@ -1187,9 +1198,6 @@ var WikidsStoryTest = (function() {
             else {
                 skipQuestion.push(currentQuestion.id);
             }
-            //if (testConfig.sourceIsLocal()) {
-            //    testProgress.inc();
-            //}
         }
         else {
             currentQuestion.lastAnswerIsCorrect = false;
@@ -1397,8 +1405,7 @@ var WikidsStoryTest = (function() {
         }
 
         if (testConfig.answerTypeIsRecording()) {
-
-            answerTypeRecording.autoStart(new Event('autoStart'));
+            recordingAnswer.autoStart(new Event('autoStart'));
         }
     }
 
@@ -1752,366 +1759,6 @@ testSpeech.ReadText = function(txt, afterSpeech) {
     }
     testSpeech.Synth.speak(ttsSpeechChunk);
 };
-
-
-var answerTypeRecording = {};
-answerTypeRecording.elements = [];
-
-answerTypeRecording.create = function(question, answer) {
-
-    var element = $('<div/>');
-    element.addClass('test-recognition');
-
-    element
-        .append($('<div/>')
-            .addClass('recognition-result-wrapper')
-            .append($('<span/>').prop('contenteditable', true).addClass('recognition-result'))
-            .append($('<span/>').addClass('recognition-result-interim'))
-        );
-
-    element.append(
-        $('<div/>')
-            .css('text-align', 'center')
-            .append(
-                $('<a/>')
-                    .attr('href', '#')
-                    .attr('title', 'Повторить фрагмент')
-                    .on('click', function(e) {
-                        e.preventDefault();
-                        var range = window.getSelection().getRangeAt(0);
-                        if (!range.toString().length) {
-                            return;
-                        }
-                        answerTypeRecording.startFragment(range, e);
-                    })
-                    .hide()
-                    .addClass('recognition-repeat-word')
-                    .append($('<i/>').addClass('glyphicon glyphicon-refresh'))
-        )
-    );
-
-    $('<div/>')
-        .addClass('wikids-test-loader')
-        .append($('<img/>')
-            .attr('src', '/img/loading.gif')
-            .attr('width', '60px')
-        )
-        .hide()
-        .appendTo(element);
-
-    element
-        .append($('<p/>').addClass('recognition-status'));
-
-    $('<a/>')
-        .attr('href', '#')
-        .attr('title', 'Повторить ввод с микрофона')
-        .addClass('recognition-repeat')
-        .on('click', function(e) {
-            e.preventDefault();
-            answerTypeRecording.autoStart(e);
-        })
-        .append($('<i/>').addClass('glyphicon glyphicon-refresh'))
-        .hide()
-        .appendTo(element);
-
-    $('<a/>')
-        .attr('href', '#')
-        .attr('title', 'Остановить')
-        .addClass('recognition-stop')
-        .on('click', function(e) {
-            e.preventDefault();
-            testRecognition.Stop();
-        })
-        .append($('<i/>').addClass('glyphicon glyphicon-stop'))
-        .hide()
-        .appendTo(element);
-
-    answerTypeRecording.elements[question.id] = element;
-    return element;
-};
-
-answerTypeRecording.autoStart = function(e) {
-
-    answerTypeRecording.setStatus('');
-    answerTypeRecording.repeatButtonHide();
-
-    setTimeout(function() {
-        answerTypeRecording.showLoader();
-        testRecognition.Start(e);
-    }, 1000);
-};
-
-answerTypeRecording.startFragment = function(range, e) {
-    answerTypeRecording.setStatus('');
-    answerTypeRecording.repeatButtonHide();
-    answerTypeRecording.showLoader();
-    testRecognition.StartFragment(range, e);
-}
-
-answerTypeRecording.repeatButtonShow = function() {
-    answerTypeRecording.getElement()
-        .find('.recognition-repeat').show();
-};
-
-answerTypeRecording.repeatButtonHide = function() {
-    answerTypeRecording.getElement()
-        .find('.recognition-repeat').hide();
-};
-
-answerTypeRecording.showLoader = function() {
-    answerTypeRecording.getElement()
-        .find('.wikids-test-loader').show();
-};
-
-answerTypeRecording.hideLoader = function() {
-    answerTypeRecording.getElement()
-        .find('.wikids-test-loader').hide();
-};
-
-answerTypeRecording.getElement = function() {
-    var currentQuestion = WikidsStoryTest.getCurrentQuestion();
-    return answerTypeRecording.elements[currentQuestion.id];
-}
-answerTypeRecording.setStatus = function(statusText) {
-    answerTypeRecording.getElement()
-        .find('.recognition-status').text(statusText);
-};
-answerTypeRecording.setResult = function(text) {
-    var element = answerTypeRecording.getElement();
-    if (text.length) {
-        element.find('.recognition-repeat-word').show();
-    }
-    else {
-        element.find('.recognition-repeat-word').hide();
-    }
-    element.find('.recognition-result').text(text);
-}
-answerTypeRecording.setResultInterim = function(text) {
-    answerTypeRecording.getElement()
-        .find('.recognition-result-interim').text(text);
-}
-answerTypeRecording.getResult = function() {
-    return answerTypeRecording.getElement()
-        .find('.recognition-result').text();
-}
-answerTypeRecording.resetResult = function() {
-    answerTypeRecording.setResult('');
-}
-
-answerTypeRecording.showStopButton = function() {
-    answerTypeRecording.getElement()
-        .find('.recognition-stop').show();
-};
-
-answerTypeRecording.hideStopButton = function() {
-    answerTypeRecording.getElement()
-        .find('.recognition-stop').hide();
-};
-
-answerTypeRecording.checkResult = function(result) {
-    var question = WikidsStoryTest.getCurrentQuestion();
-    var correctAnswersCallback = function(elem) {
-        return elem.name.toLowerCase();
-    };
-    return WikidsStoryTest.checkAnswerCorrect(question, [result], correctAnswersCallback, false);
-}
-
-var testRecognition = {};
-testRecognition.recognizingFragment = false;
-testRecognition.recognizing = false;
-testRecognition.start_timestamp = null;
-testRecognition.recorder = new webkitSpeechRecognition();
-testRecognition.recorder.continuous = true;
-testRecognition.recorder.interimResults = true;
-
-testRecognition.Stop = function() {
-    //testRecognition.recorder.onend = null;
-    testRecognition.recorder.stop();
-}
-
-testRecognition.Start = function(event) {
-
-    testRecognition.recognizingFragment = false;
-    answerTypeRecording.showStopButton();
-
-    if (testRecognition.recognizing) {
-        testRecognition.recorder.stop();
-        return;
-    }
-
-    testRecognition.final_transcript = '';
-    testRecognition.recorder.lang = WikidsStoryTest.getTestConfig().getRecordingLang() || 'ru-RU';
-    testRecognition.recorder.start();
-    testRecognition.start_timestamp = event.timeStamp;
-};
-
-testRecognition.StartFragment = function(range, event) {
-
-    testRecognition.recognizingFragment = true;
-    answerTypeRecording.showStopButton();
-
-    if (testRecognition.recognizing) {
-        testRecognition.recorder.stop();
-        return;
-    }
-
-    testRecognition.final_transcript = '';
-    testRecognition.recorder.lang = WikidsStoryTest.getTestConfig().getRecordingLang() || 'ru-RU';
-    testRecognition.recorder.start();
-    testRecognition.start_timestamp = event.timeStamp;
-    testRecognition.selectionRange = range;
-}
-
-testRecognition.recorder.onstart = function() {
-    testRecognition.recognizing = true;
-    answerTypeRecording.setStatus('Идет запись с микрофона');
-};
-
-testRecognition.recorder.onerror = function(event) {
-
-    answerTypeRecording.hideLoader();
-
-    var ignore_onend = false;
-    if (event.error === 'no-speech') {
-        answerTypeRecording.setStatus('Речи не обнаружено');
-    }
-    else if (event.error === 'audio-capture') {
-        answerTypeRecording.setStatus('Не удалось захватить звук');
-    }
-    else if (event.error === 'not-allowed') {
-        answerTypeRecording.setStatus('Пользовательский агент запретил ввод речи из соображений безопасности, конфиденциальности или предпочтений пользователя.');
-    }
-    else {
-        answerTypeRecording.setStatus(event.error);
-    }
-};
-
-testRecognition.endSpeech = function() {
-    answerTypeRecording.hideLoader();
-    answerTypeRecording.hideStopButton();
-    testRecognition.recognizing = false;
-    answerTypeRecording.setStatus('');
-    if (answerTypeRecording.getResult() !== '') {
-        WikidsStoryTest.showNextButton();
-    }
-}
-
-testRecognition.recorder.onend = function() {
-
-    testRecognition.endSpeech();
-
-    if (testRecognition.recognizingFragment) {
-        /*var match = answerTypeRecording.getResult().substring(0, testRecognition.selectionRange.startOffset)
-            + testRecognition.speechFragment
-            + answerTypeRecording.getResult().substring(testRecognition.selectionRange.endOffset);
-        answerTypeRecording.setResult(match);*/
-    }
-    else {
-        if (window.getSelection) {
-            window.getSelection().removeAllRanges();
-            var range = document.createRange();
-            range.selectNode(answerTypeRecording.getElement().find('.recognition-result')[0]);
-            window.getSelection().addRange(range);
-        }
-
-        var result = answerTypeRecording.getResult();
-        if (result.length) {
-            if (answerTypeRecording.checkResult(result)) {
-                WikidsStoryTest.nextQuestion();
-            }
-        }
-        else {
-            answerTypeRecording.setStatus('Речи не обнаружено');
-            answerTypeRecording.repeatButtonShow();
-        }
-    }
-};
-
-testRecognition.final_transcript = '';
-
-testRecognition.selectionRange = null;
-testRecognition.speechFragment = '';
-
-testRecognition.resultTimeout = 0;
-
-testRecognition.recorder.onresult = function(event) {
-
-    clearTimeout(testRecognition.resultTimeout);
-    answerTypeRecording.getElement()
-        .find('.recognition-result').blur();
-
-    var interim_transcript = '';
-    if (typeof(event.results) == 'undefined') {
-        testRecognition.recorder.onend = null;
-        testRecognition.recorder.stop();
-        return;
-    }
-
-    if (testRecognition.recognizingFragment) {
-
-        for (var i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) {
-                testRecognition.final_transcript = event.results[i][0].transcript;
-            } else {
-                interim_transcript += event.results[i][0].transcript;
-            }
-        }
-
-        if (testRecognition.final_transcript.length) {
-            testRecognition.speechFragment = testRecognition.lowerCase(testRecognition.final_transcript);
-            var result = answerTypeRecording.getResult();
-
-            var match = result.substring(0, testRecognition.selectionRange.startOffset)
-                + testRecognition.speechFragment
-                + result.substring(testRecognition.selectionRange.endOffset);
-            answerTypeRecording.setResult(match);
-        }
-    }
-    else {
-
-        for (var i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) {
-                testRecognition.final_transcript = event.results[i][0].transcript;
-            } else {
-                interim_transcript += event.results[i][0].transcript;
-            }
-        }
-
-        testRecognition.final_transcript = testRecognition.lowerCase(testRecognition.final_transcript);
-        answerTypeRecording.setResult(testRecognition.linebreak(testRecognition.final_transcript));
-        answerTypeRecording.setResultInterim(testRecognition.linebreak(interim_transcript));
-    }
-
-    if (testRecognition.final_transcript.length) {
-        testRecognition.resultTimeout = setTimeout(function() {
-            if (answerTypeRecording.checkResult(testRecognition.final_transcript)) {
-                //testRecognition.endSpeech();
-                //testRecognition.recorder.onend = null;
-                testRecognition.recorder.stop();
-            }
-        }, 1500);
-    }
-};
-
-testRecognition.recorder.onspeechend = function() {
-    console.log('onspeechend');
-}
-
-testRecognition.linebreak = function(s) {
-    var two_line = /\n\n/g;
-    var one_line = /\n/g;
-    return s.replace(two_line, '<p></p>').replace(one_line, '<br>');
-};
-
-testRecognition.capitalize = function(s) {
-    var first_char = /\S/;
-    return s.replace(first_char, function(m) { return m.toUpperCase(); });
-}
-
-testRecognition.lowerCase = function(s) {
-    return s.toLowerCase();
-}
-
 
 var SlideLoader = (function() {
 
@@ -2507,6 +2154,252 @@ var MissingWords = function(recognition) {
     };
 };
 
+var RecognitionControl = function() {
+
+    function getElement() {
+        return WikidsStoryTest.getCurrentQuestionElement();
+    }
+
+    var API = {}
+
+    API.showLoader = function() {
+        getElement().find('.wikids-test-loader').show();
+    };
+
+    API.hideLoader = function() {
+        getElement().find('.wikids-test-loader').hide();
+    };
+
+    API.setStatus = function(status) {
+        status = status || '';
+        getElement().find('.recognition-status').text(status);
+    };
+
+    API.showStopButton = function() {
+        getElement().find('.recognition-stop').show();
+    }
+
+    API.hideStopButton = function() {
+        getElement().find('.recognition-stop').hide();
+    }
+
+    API.getResult = function() {
+        return getElement().find('.recognition-result').text();
+    }
+
+    API.setResult = function(text) {
+        text = text || '';
+        var element = getElement();
+        /*if (text.length) {
+            element.find('.recognition-repeat-word').show();
+        }
+        else {
+            element.find('.recognition-repeat-word').hide();
+        }*/
+        element.find('.recognition-result').text(text).trigger('input');
+    }
+
+    API.setFragmentResult = function(fragment, range) {
+        var result = API.getResult();
+        var match = result.substring(0, range.startOffset)
+            + fragment
+            + result.substring(range.endOffset);
+        API.setResult(match);
+    }
+
+    API.showRepeatWord = function() {
+        return getElement().find('.recognition-repeat-word').show();
+    };
+
+    API.hideRepeatWord = function() {
+        return getElement().find('.recognition-repeat-word').hide();
+    };
+
+    API.getQuestionTitle = function() {
+        return $.trim(getElement().find('.question-title').text());
+    };
+
+    API.repeatButtonShow = function() {
+        getElement().find('.recognition-repeat').show();
+    };
+
+    API.repeatButtonHide = function() {
+        getElement().find('.recognition-repeat').hide();
+    };
+
+    return API;
+}
+
+var RecordingAnswer = function(recognition) {
+
+    var control = new RecognitionControl();
+
+    function create(question, answer) {
+
+        var element = $('<div/>');
+        element.addClass('test-recognition');
+
+        element
+            .append($('<div/>')
+                .addClass('recognition-result-wrapper')
+                .append(
+                    $('<div/>')
+                        .prop('contenteditable', true)
+                        .addClass('recognition-result')
+                        .on('input', function(e) {
+                            var value = $(this).text();
+                            value.length > 0
+                                ? WikidsStoryTest.showNextButton()
+                                : WikidsStoryTest.hideNextButton();
+                        })
+                )
+                .append($('<span/>').addClass('recognition-result-interim'))
+            );
+
+        element.append(
+            $('<div/>')
+                .css('text-align', 'center')
+                .append(
+                    $('<a/>')
+                        .attr('href', '#')
+                        .attr('title', 'Повторить фрагмент')
+                        .on('click', function(e) {
+                            e.preventDefault();
+                            var range = window.getSelection().getRangeAt(0);
+                            if (!range.toString().length) {
+                                return;
+                            }
+                            startFragment(range, e);
+                        })
+                        .hide()
+                        .addClass('recognition-repeat-word')
+                        .append($('<i/>').addClass('glyphicon glyphicon-refresh'))
+                )
+        );
+
+        $('<div/>')
+            .addClass('wikids-test-loader')
+            .append($('<img/>')
+                .attr('src', '/img/loading.gif')
+                .attr('width', '60px')
+            )
+            .hide()
+            .appendTo(element);
+
+        element
+            .append($('<p/>').addClass('recognition-status'));
+
+        $('<a/>')
+            .attr('href', '#')
+            .attr('title', 'Повторить ввод с микрофона')
+            .addClass('recognition-repeat')
+            .on('click', function(e) {
+                e.preventDefault();
+                start(e);
+            })
+            .append($('<i/>').addClass('glyphicon glyphicon-refresh'))
+            .hide()
+            .appendTo(element);
+
+        $('<a/>')
+            .attr('href', '#')
+            .attr('title', 'Остановить')
+            .addClass('recognition-stop')
+            .on('click', function(e) {
+                e.preventDefault();
+                recognition.stop();
+            })
+            .append($('<i/>').addClass('glyphicon glyphicon-stop'))
+            .hide()
+            .appendTo(element);
+
+        return element;
+    }
+
+    function start(event) {
+        control.setStatus();
+        control.setResult();
+        control.repeatButtonHide();
+        control.showLoader();
+        recognition.start(event);
+    }
+
+    function autoStart(event) {
+        control.setStatus();
+        control.repeatButtonHide();
+        setTimeout(function() {
+            control.showLoader();
+            recognition.start(event);
+        }, 1000);
+    }
+
+    function startFragment(range, event) {
+        control.showStopButton();
+        recognition.start(event);
+    }
+
+    recognition.addEventListener('onStart', function() {
+        WikidsStoryTest.hideNextButton();
+        control.setStatus('Идет запись с микрофона');
+        control.showStopButton();
+    });
+
+    function checkResult(result) {
+        return WikidsStoryTest.checkAnswerCorrect(
+            WikidsStoryTest.getCurrentQuestion(),
+            [result],
+            function(elem) {
+                return elem.name.toLowerCase();
+            },
+            false);
+    }
+
+    function getResult() {
+        return control.getResult();
+    }
+
+    function resetResult() {
+        control.setResult();
+    }
+
+    recognition.addEventListener('onEnd', function() {
+        control.hideLoader();
+        control.hideStopButton();
+        control.setStatus();
+        var result = getResult();
+        if (checkResult(result)) {
+            resetResult();
+            WikidsStoryTest.nextQuestion([result]);
+        }
+        else {
+            control.repeatButtonShow();
+        }
+    });
+
+    recognition.addEventListener('onError', function(event) {
+        control.hideLoader();
+        control.setStatus(event.args.error);
+    });
+
+    recognition.addEventListener('onResult', function(event) {
+        var args = event.args;
+        var result = $.trim(args.result);
+        control.setResult(result);
+        var match = control.getQuestionTitle();
+        if (result.length >= match.length) {
+            recognition.stop();
+        }
+    });
+
+    return {
+        'create': create,
+        'start': start,
+        'autoStart': autoStart,
+        'getResult': getResult,
+        'resetResult': resetResult
+    };
+};
+
 var MissingWordsRecognition = function(config) {
 
     var recorder = new webkitSpeechRecognition();
@@ -2560,6 +2453,27 @@ var MissingWordsRecognition = function(config) {
         recognizing = false;
         dispatchEvent({type: 'onEnd'});
     }
+
+    function errorString(error) {
+        var result = '';
+        switch (error) {
+            case 'no-speech': result = 'Речи не обнаружено'; break;
+            case 'audio-capture': result = 'Не удалось захватить звук'; break;
+            case 'not-allowed': result = 'Пользовательский агент запретил ввод речи из соображений безопасности, конфиденциальности или предпочтений пользователя'; break;
+            default: result = error;
+        }
+        return result
+    }
+
+    recorder.onerror = function(event) {
+
+        dispatchEvent({
+            type: 'onError',
+            args: {
+                error: errorString(event.error)
+            }
+        });
+    };
 
     function start(event, text) {
         if (recognizing) {
