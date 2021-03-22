@@ -956,6 +956,12 @@ var WikidsStoryTest = (function() {
         dispatchEvent("backToStory", {});
     }
 
+    function getCorrectAnswers(question) {
+        return getAnswersData(question).filter(function(elem) {
+            return parseInt(elem.is_correct) === 1;
+        });
+    }
+
     function checkAnswerCorrect(question, answer, correctAnswersCallback, convertAnswerToInt) {
         console.debug('WikidsStoryTest.checkAnswerCorrect');
         var correctAnswers = getAnswersData(question).filter(function(elem) {
@@ -1639,6 +1645,9 @@ var WikidsStoryTest = (function() {
         "checkAnswerCorrect": checkAnswerCorrect,
         "getTestConfig": function() {
             return testConfig;
+        },
+        "getCorrectAnswer": function(question) {
+            return getCorrectAnswers(question);
         }
     };
 })();
@@ -2227,6 +2236,14 @@ var RecognitionControl = function() {
         getElement().find('.recognition-repeat').hide();
     };
 
+    API.getCurrentCorrectAnswer = function() {
+        return WikidsStoryTest.getCorrectAnswer(WikidsStoryTest.getCurrentQuestion())
+            .map(function(elem) {
+                return $.trim(elem.name);
+            })
+            .join('');
+    }
+
     return API;
 }
 
@@ -2385,7 +2402,7 @@ var RecordingAnswer = function(recognition) {
         var args = event.args;
         var result = $.trim(args.result);
         control.setResult(result);
-        var match = control.getQuestionTitle();
+        var match = control.getCurrentCorrectAnswer();
         if (result.length >= match.length) {
             recognition.stop();
         }
