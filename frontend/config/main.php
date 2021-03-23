@@ -43,6 +43,7 @@ return [
                 'domain' => $params['cookieDomain'],
             ],
         ],
+        'sentry' => $params['sentry'],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
@@ -69,6 +70,13 @@ return [
                     'categories' => ['neo.*'],
                     'logFile' => '@runtime/logs/neo.log',
                     'logVars' => [],
+                ],
+                [
+                    'class' => 'mito\sentry\Target',
+                    'levels' => ['error'],
+                    'except' => [
+                        'yii\web\HttpException:500',
+                    ],
                 ],
             ],
         ],

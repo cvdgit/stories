@@ -32,7 +32,6 @@
         "yii-dream-team/yii2-upload-behavior": "*",
         "la-haute-societe/yii2-save-relations-behavior": "*",
         "samdark/sitemap": "^2.2",
-        "alexander-suter/yii2-tag-cloud": "*",
         "matperez/yii2unisender": "~1.0",
         "yiisoft/yii2-queue": "^2.2",
         "cebe/yii2-gravatar": "^1.0",
@@ -47,7 +46,8 @@
         "ext-curl": "*",
         "alikdex/yii2-crawler-detect": "1.0",
         "bower-asset/cropperjs": "^1.5",
-        "guzzlehttp/guzzle": "^6.5"
+        "guzzlehttp/guzzle": "^6.5",
+        "mito/yii2-sentry": "~1.0.0"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",
@@ -61,7 +61,9 @@
         "process-timeout": 1800,
         "fxp-asset": {
             "enabled": false
-        }
+        },
+        "preferred-install": "dist",
+        "github-protocols": ["https"]
     },
     "repositories": [
         {
