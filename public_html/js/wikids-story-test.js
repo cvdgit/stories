@@ -355,7 +355,7 @@ var WikidsStoryTest = (function() {
 
     function createCorrectAnswerPage() {
         var $action = $('<button/>')
-            .addClass('btn')
+            .addClass('btn correct-answer-page-next')
             .text('Продолжить')
             .on('click', function() {
                 correctAnswerPageNext();
@@ -1452,7 +1452,7 @@ var WikidsStoryTest = (function() {
     }
 
     function showCorrectAnswerPage(question, answer) {
-
+        console.debug('WikidsStoryTest.showCorrectAnswerPage');
         var $elements = $('<div/>');
 
         var text = incorrectAnswerText || 'Правильный ответ';
@@ -1519,6 +1519,10 @@ var WikidsStoryTest = (function() {
             }
         });
 
+        if (testConfig.answerTypeIsRecording() || testConfig.answerTypeIsMissingWords()) {
+            dom.correctAnswerPage.find('.correct-answer-page-next').hide();
+        }
+
         dom.correctAnswerPage
             //.find('.wikids-test-correct-answer-page-header').text(question.name).end()
             .find('.wikids-test-correct-answer-answers').empty().html($elements[0].childNodes).end()
@@ -1527,7 +1531,7 @@ var WikidsStoryTest = (function() {
         if (testConfig.answerTypeIsRecording()) {
             setTimeout(function() {
                 testSpeech.ReadText(answerText, correctAnswerPageNext);
-            }, 1000);
+            }, 600);
         }
     }
 
@@ -1573,14 +1577,14 @@ var WikidsStoryTest = (function() {
         }
         else {
             if (!answerIsCorrect) {
-                    if (showCorrectAnswerPageCondition) {
-                        showNextQuestion();
-                        dom.results.hide();
-                        showNextButton();
-                    }
-                    else {
-                        showCorrectAnswerPage(currentQuestion, answer);
-                    }
+                if (showCorrectAnswerPageCondition) {
+                    showNextQuestion();
+                    dom.results.hide();
+                    showNextButton();
+                }
+                else {
+                    showCorrectAnswerPage(currentQuestion, answer);
+                }
             }
             else {
                 showNextQuestion();
@@ -2012,14 +2016,29 @@ var MissingWords = function(recognition) {
         }
     });
 
-    recognition.addEventListener('onEnd', function() {
+    function correctResult(match, result) {
+        return $.post('/morphy/root', {
+            match, result
+        });
+    }
+
+    recognition.addEventListener('onEnd', function(event) {
 
         var element = getElement(WikidsStoryTest.getCurrentQuestion().id);
         hideLoader(element);
         hideStopButton(element);
         setStatus(element);
 
+        var args = event.args,
+            elem = $(args.target),
+            match = elem.attr('data-match');
+
         var result = getMissingWordsText(element);
+
+        //correctResult(match, args.result).done(function(response) {
+        //    console.log(response);
+        //})
+
         if (checkResult(result)) {
             resetMatchElements();
             WikidsStoryTest.nextQuestion([result]);
@@ -2468,7 +2487,13 @@ var MissingWordsRecognition = function(config) {
 
     recorder.onend = function() {
         recognizing = false;
-        dispatchEvent({type: 'onEnd'});
+        dispatchEvent({
+            type: 'onEnd',
+            args: {
+                target: targetElement,
+                result: linebreak(finalTranscript)
+            }
+        });
     }
 
     function errorString(error) {
