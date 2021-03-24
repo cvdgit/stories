@@ -16,6 +16,7 @@ return [
         'common\bootstrap\Bootstrap',
         'devicedetect',
         'crawlerdetect',
+        'sentry',
     ],
     'controllerNamespace' => 'frontend\controllers',
     'on beforeAction' => function($event) {
@@ -43,7 +44,7 @@ return [
                 'domain' => $params['cookieDomain'],
             ],
         ],
-        'sentry' => $params['sentry'],
+        'sentry' => $params['components.sentry'],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
@@ -73,10 +74,8 @@ return [
                 ],
                 [
                     'class' => 'mito\sentry\Target',
-                    'levels' => ['error'],
-                    'except' => [
-                        'yii\web\HttpException:500',
-                    ],
+                    'levels' => ['error', 'warning'],
+                    'except' => ['yii\web\HttpException:40*'],
                 ],
             ],
         ],
