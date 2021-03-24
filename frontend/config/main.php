@@ -49,6 +49,11 @@ return [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
                 [
+                    'class' => 'mito\sentry\Target',
+                    'levels' => ['error', 'warning'],
+                    'except' => ['yii\web\HttpException:40*'],
+                ],
+                [
                     'class' => 'yii\log\FileTarget',
                     'categories' => ['yii\web\HttpException:404'],
                     'levels' => ['error', 'warning'],
@@ -71,11 +76,6 @@ return [
                     'categories' => ['neo.*'],
                     'logFile' => '@runtime/logs/neo.log',
                     'logVars' => [],
-                ],
-                [
-                    'class' => 'mito\sentry\Target',
-                    'levels' => ['error', 'warning'],
-                    'except' => ['yii\web\HttpException:40*'],
                 ],
             ],
         ],
