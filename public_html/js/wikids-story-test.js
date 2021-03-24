@@ -2264,6 +2264,10 @@ var RecognitionControl = function() {
             .join('');
     }
 
+    API.resultSetFocus = function() {
+        getElement().find('.recognition-result').focus();
+    };
+
     return API;
 }
 
@@ -2422,6 +2426,7 @@ var RecordingAnswer = function(recognition) {
         }
         else {
             control.repeatButtonShow();
+            control.resultSetFocus();
         }
     });
 
