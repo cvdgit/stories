@@ -2288,6 +2288,15 @@ var RecordingAnswer = function(recognition) {
                                 ? WikidsStoryTest.showNextButton()
                                 : WikidsStoryTest.hideNextButton();
                         })
+                        .on('keydown', function(e) {
+                            if (e.key === "Enter") {
+                                e.preventDefault();
+                                var value = $(this).text();
+                                if (value.length > 0) {
+                                    WikidsStoryTest.nextQuestion([value]);
+                                }
+                            }
+                        })
                 )
                 .append($('<span/>').addClass('recognition-result-interim'))
             );
