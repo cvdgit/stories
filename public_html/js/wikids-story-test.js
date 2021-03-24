@@ -2217,15 +2217,16 @@ var RecognitionControl = function() {
 
     API.setResult = function(text) {
         text = text || '';
-        var element = getElement();
-        /*if (text.length) {
-            element.find('.recognition-repeat-word').show();
-        }
-        else {
-            element.find('.recognition-repeat-word').hide();
-        }*/
-        element.find('.recognition-result').text(text).trigger('input');
+        getElement().find('.recognition-result').text(text).trigger('input');
     }
+
+    API.disableResult = function() {
+        getElement().find('.recognition-result').prop('contenteditable', false);
+    };
+
+    API.enableResult = function() {
+        getElement().find('.recognition-result').prop('contenteditable', true);
+    };
 
     API.setFragmentResult = function(fragment, range) {
         var result = API.getResult();
@@ -2293,6 +2294,7 @@ var RecordingAnswer = function(recognition) {
                                 e.preventDefault();
                                 var value = $(this).text();
                                 if (value.length > 0) {
+                                    resetResult();
                                     WikidsStoryTest.nextQuestion([value]);
                                 }
                             }
@@ -2387,6 +2389,7 @@ var RecordingAnswer = function(recognition) {
         WikidsStoryTest.hideNextButton();
         control.setStatus('Идет запись с микрофона');
         control.showStopButton();
+        control.disableResult();
     });
 
     function checkResult(result) {
@@ -2411,6 +2414,7 @@ var RecordingAnswer = function(recognition) {
         control.hideLoader();
         control.hideStopButton();
         control.setStatus();
+        control.enableResult();
         var result = getResult();
         if (checkResult(result)) {
             resetResult();
