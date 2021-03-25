@@ -1519,7 +1519,7 @@ var WikidsStoryTest = (function() {
             }
         });
 
-        if (testConfig.answerTypeIsRecording() || testConfig.answerTypeIsMissingWords()) {
+        if (testConfig.answerTypeIsRecording()) {
             dom.correctAnswerPage.find('.correct-answer-page-next').hide();
         }
 
@@ -2003,14 +2003,11 @@ var MissingWords = function(recognition) {
     });
 
     recognition.addEventListener('onResult', function(event) {
-
         var args = event.args;
         var elem = $(args.target);
         var match = elem.attr('data-match')
         var result = $.trim(args.result);
-
         elem.text(result);
-
         if (result.length >= match.length) {
             recognition.stop();
         }
@@ -2034,17 +2031,22 @@ var MissingWords = function(recognition) {
             match = elem.attr('data-match');
 
         var result = getMissingWordsText(element);
-
-        //correctResult(match, args.result).done(function(response) {
-        //    console.log(response);
-        //})
-
         if (checkResult(result)) {
             resetMatchElements();
             WikidsStoryTest.nextQuestion([result]);
         }
         else {
-            WikidsStoryTest.showNextButton();
+            correctResult(match, args.result).done(function(response) {
+                elem.text(response.result);
+                result = getMissingWordsText(element);
+                if (checkResult(result)) {
+                    resetMatchElements();
+                    WikidsStoryTest.nextQuestion([result]);
+                }
+                else {
+                    WikidsStoryTest.showNextButton();
+                }
+            });
         }
     });
 
@@ -2092,7 +2094,7 @@ var MissingWords = function(recognition) {
         element
             .append($('<div/>')
                 .addClass('recognition-result-wrapper')
-                .append($('<span/>').addClass('recognition-result'))
+                .append($('<span/>').addClass('recognition-result').css('background-color', 'inherit'))
                 .append($('<span/>').addClass('recognition-result-interim'))
             );
 
