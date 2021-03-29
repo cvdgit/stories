@@ -242,7 +242,10 @@ class ImageBlock extends AbstractBlock
             $path = Yii::getAlias('@public') . $path;
         }
         if (!$noFile && file_exists($path)) {
-            unlink($path);
+            try {
+                unlink($path);
+            }
+            catch (\Exception $ex) {}
         }
     }
 
