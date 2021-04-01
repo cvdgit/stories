@@ -1992,6 +1992,19 @@ var TestConfig = function(data) {
     }
 }
 
+var Morphy = function() {
+
+    var API = {};
+
+    API.correctResult = function(match, result) {
+        return $.post('/morphy/root', {
+            match, result
+        });
+    }
+
+    return API;
+};
+
 var MissingWords = function(recognition) {
 
     var elements = [];
@@ -2427,6 +2440,18 @@ var RecordingAnswer = function(recognition) {
             WikidsStoryTest.nextQuestion([result]);
         }
         else {
+            var morphy = new Morphy();
+            morphy.correctResult(control.getCurrentCorrectAnswer(), result).done(function(response) {
+                result = response.result;
+                control.setResult(result);
+                if (checkResult(result)) {
+                    resetResult();
+                    WikidsStoryTest.nextQuestion([result]);
+                }
+                else {
+                    WikidsStoryTest.showNextButton();
+                }
+            })
             control.repeatButtonShow();
             control.resultSetFocus();
         }
