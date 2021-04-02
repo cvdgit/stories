@@ -739,6 +739,10 @@ var WikidsStoryTest = (function() {
         return 'Вопрос ' + testProgress.getCurrent() + ' из ' + testProgress.getTotal();
     }
 
+    function progressValue(value) {
+        return ' ' + value + '% ';
+    }
+
     function createProgress() {
         var progress = testProgress.calcPercent();
         return $('<div/>')
@@ -749,14 +753,17 @@ var WikidsStoryTest = (function() {
                 $('<div/>')
                     .addClass('progress-bar progress-bar-info')
                     .css('width', progress + '%')
-                    .append($('<span/>').addClass('sr-only'))
+                    .css('minWidth', '2em')
+                    .text(progressValue(progress))
             )[0].outerHTML;
     }
 
     function updateProgress() {
         var progress = testProgress.calcPercent();
         $('.wikids-progress', dom.header).attr('title', getCurrentProgressStateText()).tooltip('fixTitle');
-        $('.wikids-progress .progress-bar', dom.header).css('width', progress + '%');
+        $('.wikids-progress .progress-bar', dom.header)
+            .css('width', progress + '%')
+            .text(progressValue(progress));
     }
 
     function createQuestion(question) {
