@@ -2337,6 +2337,7 @@ var RecordingAnswer = function(recognition) {
                 .append($('<span/>').addClass('recognition-result-interim'))
             );
 
+        /*
         element.append(
             $('<div/>')
                 .css('text-align', 'center')
@@ -2356,7 +2357,7 @@ var RecordingAnswer = function(recognition) {
                         .addClass('recognition-repeat-word')
                         .append($('<i/>').addClass('glyphicon glyphicon-refresh'))
                 )
-        );
+        );*/
 
         $('<div/>')
             .addClass('wikids-test-loader')
@@ -2445,11 +2446,19 @@ var RecordingAnswer = function(recognition) {
     }
 
     recognition.addEventListener('onEnd', function() {
+
         control.hideLoader();
         control.hideStopButton();
         control.setStatus();
         control.enableResult();
         var result = getResult();
+
+        if (result.length === 0) {
+            control.repeatButtonShow();
+            control.resultSetFocus();
+            return;
+        }
+
         if (checkResult(result)) {
             resetResult();
             WikidsStoryTest.nextQuestion([result]);
