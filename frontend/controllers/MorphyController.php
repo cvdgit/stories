@@ -26,7 +26,7 @@ class MorphyController extends Controller
         ];
     }
 
-    private function getBaseWord(Morphy $morphy, string $word): ?string
+    private function getBaseWord(Morphy $morphy, $word): ?string
     {
         if (is_int($word)) {
             return $word;
