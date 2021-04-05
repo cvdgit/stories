@@ -28,6 +28,9 @@ class MorphyController extends Controller
 
     private function getBaseWord(Morphy $morphy, string $word): ?string
     {
+        if (is_int($word)) {
+            return $word;
+        }
         $matchPseudoRoot = $this->getPseudoRoot($morphy, $word);
         if (!empty($matchPseudoRoot)) {
             return $matchPseudoRoot;
