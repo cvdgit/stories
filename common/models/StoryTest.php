@@ -108,8 +108,8 @@ class StoryTest extends ActiveRecord
             'word_list_id' => 'Список слов',
             'answer_type' => 'Тип ответов',
             'strict_answer' => 'Строгое сравнение ответов',
-            'input_voice' => 'Голос',
-            'recording_lang' => 'Язык',
+            'input_voice' => 'Голос синтезатора',
+            'recording_lang' => 'Язык распознавания',
             'shuffle_word_list' => 'Перемешивать элементы списка',
             'remember_answers' => 'Запоминать ответы',
         ];

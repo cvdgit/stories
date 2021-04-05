@@ -190,6 +190,8 @@ var WikidsStoryTest = (function() {
         missingWordsRecognition,
         recordingAnswer;
 
+    var speech;
+
     function load(data, for_slide) {
         console.debug('WikidsStoryTest.load');
 
@@ -224,6 +226,8 @@ var WikidsStoryTest = (function() {
         testProgress = new TestProgress(getProgressData());
 
         numPad = new AnswerTypeNumPad();
+
+        speech = new TestSpeech();
 
         if (testConfig.answerTypeIsMissingWords()) {
             missingWordsRecognition = new MissingWordsRecognition(testConfig);
@@ -1399,7 +1403,8 @@ var WikidsStoryTest = (function() {
             var text = getAnswersData(nextQuestion)[0].name;
             var q = $('.wikids-test-active-question .answer-input', dom.questions);
             setTimeout(function () {
-                testSpeech.ReadText(text);
+                //testSpeech.ReadText(text);
+                speech.readText(text, testConfig.getInputVoice());
                 q.focus();
             }, 500);
 
@@ -1413,7 +1418,8 @@ var WikidsStoryTest = (function() {
                 .off('click')
                 .on('click', function (e) {
                     e.preventDefault();
-                    testSpeech.ReadText(text);
+                    //testSpeech.ReadText(text);
+                    speech.readText(text, testConfig.getInputVoice());
                 });
         }
 
@@ -1497,7 +1503,8 @@ var WikidsStoryTest = (function() {
                             .css('font-size', '3rem')
                             .on('click', function(e) {
                                 e.preventDefault();
-                                testSpeech.ReadText(questionAnswer.name);
+                                //testSpeech.ReadText(questionAnswer.name);
+                                speech.readText(questionAnswer.name, testConfig.getInputVoice());
                             })
                             .html('<i class="glyphicon glyphicon-volume-up" style="left: 10px; top: 6px"></i>')
                         );
@@ -1537,7 +1544,8 @@ var WikidsStoryTest = (function() {
 
         if (testConfig.answerTypeIsRecording()) {
             setTimeout(function() {
-                testSpeech.ReadText(answerText, correctAnswerPageNext);
+                //testSpeech.ReadText(answerText, correctAnswerPageNext);
+                speech.readText(answerText, testConfig.getInputVoice(), correctAnswerPageNext);
             }, 600);
         }
     }
@@ -1754,6 +1762,7 @@ answerTypeInput.create = function(action) {
     return $html;
 };
 
+/*
 var testSpeech = {};
 testSpeech.Synth = window.speechSynthesis;
 testSpeech.Voices = [];
@@ -1763,7 +1772,6 @@ testSpeech.Rate = 1;
 testSpeech.Pitch = 1;
 testSpeech.ReadText = function(txt, afterSpeech) {
     var ttsSpeechChunk = new SpeechSynthesisUtterance(txt);
-
     var inputVoice = WikidsStoryTest.getTestConfig().getInputVoice() || 'Google русский';
     for (var i = 0; i < testSpeech.Synth.getVoices().length ; i++) {
         if (testSpeech.Synth.getVoices()[i].name === inputVoice) {
@@ -1771,7 +1779,6 @@ testSpeech.ReadText = function(txt, afterSpeech) {
             break;
         }
     }
-
     ttsSpeechChunk.rate = testSpeech.Rate;
     ttsSpeechChunk.pitch = testSpeech.Pitch;
     if (afterSpeech) {
@@ -1779,6 +1786,7 @@ testSpeech.ReadText = function(txt, afterSpeech) {
     }
     testSpeech.Synth.speak(ttsSpeechChunk);
 };
+*/
 
 var SlideLoader = (function() {
 
@@ -2615,6 +2623,61 @@ var MissingWordsRecognition = function(config) {
             listener.type = type;
             listener.eventHandler = eventHandler;
             eventListeners.push(listener);
+        }
+    }
+}
+
+var TestSpeech = function(options) {
+
+    var defaultOptions = {
+        pitch: 1,
+        rate: 1
+    };
+    options = options || {};
+    options = Object.assign(defaultOptions, options);
+
+    var synthesis = window.speechSynthesis;
+
+    function setSpeech() {
+        return new Promise(function(resolve, reject) {
+            var handle;
+            handle = setInterval(function() {
+                if (synthesis.getVoices().length > 0) {
+                    resolve(synthesis.getVoices());
+                    clearInterval(handle);
+                }
+            }, 50);
+        });
+    }
+
+    var voices = [];
+    setSpeech().then(function(speech) {
+        voices = speech;
+    });
+
+    return {
+        'readText': function(text, voice, onEnd) {
+
+            var utterance = new SpeechSynthesisUtterance(text);
+
+            voice = voice || 'Google русский';
+            for (var i = 0; i < voices.length; i++) {
+                console.log(voices[i].name);
+                if (voices[i].name === voice) {
+                    utterance.voice = voices[i];
+                    break;
+                }
+            }
+
+            for (var [key, value] of Object.entries(options)) {
+                utterance[key] = value;
+            }
+
+            if (typeof onEnd === 'function') {
+                utterance.onend = onEnd;
+            }
+
+            synthesis.speak(utterance);
         }
     }
 }
