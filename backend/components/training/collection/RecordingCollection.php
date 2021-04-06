@@ -4,12 +4,21 @@ namespace backend\components\training\collection;
 
 use backend\components\training\base\Answer;
 use backend\components\training\local\RememberQuestion;
+use backend\components\WordListFormatter;
 
 class RecordingCollection extends BaseCollection
 {
 
     /** @var bool */
     private $rememberAnswers;
+
+    private $wordListFormatter;
+
+    public function __construct($data, $stars, WordListFormatter $wordListFormatter)
+    {
+        parent::__construct($data, $stars);
+        $this->wordListFormatter = $wordListFormatter;
+    }
 
     public function createQuestion($questionData, $stars)
     {
@@ -24,13 +33,17 @@ class RecordingCollection extends BaseCollection
 
     private function createCorrectAnswer($data): string
     {
-        if ($this->rememberAnswers) {
-            $correctAnswer = empty($data->correct_answer) ? '' : $data->correct_answer;
+        $rememberAnswersCondition = $this->rememberAnswers ? '' : $data->name;
+        $correctAnswer = empty($data->correct_answer) ? $rememberAnswersCondition : $data->correct_answer;
+
+        $correctAnswer = trim($correctAnswer);
+        $matches = [];
+        if ($this->wordListFormatter->haveMatches($correctAnswer, $matches)) {
+            //$correctAnswer = str_replace($matches[0], $matches[2], $correctAnswer);
         }
         else {
-            $correctAnswer = empty($data->correct_answer) ? $data->name : $data->correct_answer;
+            $correctAnswer = preg_replace('/[^A-ZА-Я0-9\-\sё]/ui', '', $correctAnswer);
         }
-        $correctAnswer = trim(preg_replace('/[^A-ZА-Я0-9\-\sё]/ui', '', $correctAnswer));
         return $correctAnswer;
     }
 

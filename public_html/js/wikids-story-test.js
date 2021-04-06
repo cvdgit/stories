@@ -973,23 +973,65 @@ var WikidsStoryTest = (function() {
         });
     }
 
+    function createAnswerSteps(answers) {
+        var steps = [];
+        answers.map(function(item) {
+            if (/(\d+)#([\wа-яА-ЯёЁ]+)/ui.test(item.name)) {
+                var match;
+                var re = /(\d+)#([\wа-яА-ЯёЁ]+)/uig;
+                var parts = {};
+                while ((match = re.exec(item.name)) !== null) {
+                    parts[match[0]] = [];
+                    parts[match[0]].push(match[1]);
+                    parts[match[0]].push(match[2]);
+                }
+                for (var i = 0, str = ''; i < 2; i++) {
+                    str = item.name;
+                    for (var [key, value] of Object.entries(parts)) {
+                        str = str.replace(key, value[i]);
+                    }
+                    steps.push(str);
+                }
+            }
+        });
+        return steps;
+    }
+
+    function correctAnswerSteps(steps, userAnswers) {
+        return userAnswers.every(function(userAnswer) {
+            return steps.some(function(stepAnswer) {
+                return userAnswer === stepAnswer;
+            });
+        });
+    }
+
     function checkAnswerCorrect(question, answer, correctAnswersCallback, convertAnswerToInt) {
         console.debug('WikidsStoryTest.checkAnswerCorrect');
+
         var correctAnswers = getAnswersData(question).filter(function(elem) {
             return parseInt(elem.is_correct) === 1;
         });
-        correctAnswers = correctAnswers.map(correctAnswersCallback);
-        var answerCheckCallback = function(value, index) {
-            if (convertAnswerToInt) {
-                value = parseInt(value)
-            }
-            return value === correctAnswers.sort()[index];
-        };
+
+        var steps = createAnswerSteps(correctAnswers);
         var correct = false;
-        if (answer.length === correctAnswers.length && answer.sort().every(answerCheckCallback)) {
-            correctAnswersNumber++;
-            correct = true;
+        if (steps.length > 0) {
+            correct = correctAnswerSteps(steps, answer);
         }
+        else {
+            correctAnswers = correctAnswers.map(correctAnswersCallback);
+            var answerCheckCallback = function (value, index) {
+                if (convertAnswerToInt) {
+                    value = parseInt(value)
+                }
+                return value === correctAnswers.sort()[index];
+            };
+
+            if (answer.length === correctAnswers.length && answer.sort().every(answerCheckCallback)) {
+                correctAnswersNumber++;
+                correct = true;
+            }
+        }
+
         return correct;
     }
 
@@ -1002,17 +1044,24 @@ var WikidsStoryTest = (function() {
         var correctAnswers = getAnswersData(question[0]).filter(function(elem) {
             return parseInt(elem.is_correct) === 1;
         });
-        correctAnswers = correctAnswers.map(correctAnswersCallback);
-        var answerCheckCallback = function(value, index) {
-            if (convertAnswerToInt) {
-                value = parseInt(value)
-            }
-            return value === correctAnswers.sort()[index];
-        };
+
+        var steps = createAnswerSteps(correctAnswers);
         var correct = false;
-        if (answer.length === correctAnswers.length && answer.sort().every(answerCheckCallback)) {
-            correctAnswersNumber++;
-            correct = true;
+        if (steps.length > 0) {
+            correct = correctAnswerSteps(steps, answer);
+        }
+        else {
+            correctAnswers = correctAnswers.map(correctAnswersCallback);
+            var answerCheckCallback = function(value, index) {
+                if (convertAnswerToInt) {
+                    value = parseInt(value)
+                }
+                return value === correctAnswers.sort()[index];
+            };
+            if (answer.length === correctAnswers.length && answer.sort().every(answerCheckCallback)) {
+                correctAnswersNumber++;
+                correct = true;
+            }
         }
         return correct;
     }
@@ -2486,12 +2535,16 @@ var RecordingAnswer = function(recognition) {
         control.setStatus(event.args.error);
     });
 
+    function checkResultLength(result, match) {
+        return result.length >= match.replaceAll(/(\d+)#([\wа-яА-ЯёЁ]+)/uig, "$1").length;
+    }
+
     recognition.addEventListener('onResult', function(event) {
         var args = event.args;
         var result = $.trim(args.result);
         control.setResult(result);
         var match = control.getCurrentCorrectAnswer();
-        if (result.length >= match.length) {
+        if (checkResultLength(result, match)) {
             recognition.stop();
         }
     });
@@ -2671,7 +2724,6 @@ var TestSpeech = function(options) {
 
             voice = voice || 'Google русский';
             for (var i = 0; i < voices.length; i++) {
-                console.log(voices[i].name);
                 if (voices[i].name === voice) {
                     utterance.voice = voices[i];
                     break;

@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use backend\components\WordListFormatter;
 use cijic\phpMorphy\Morphy;
 use Yii;
 use yii\filters\AccessControl;
@@ -10,6 +11,14 @@ use yii\web\Response;
 
 class MorphyController extends Controller
 {
+
+    private $wordListFormatter;
+
+    public function __construct($id, $module, WordListFormatter $wordListFormatter, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->wordListFormatter = $wordListFormatter;
+    }
 
     public function behaviors()
     {
@@ -61,37 +70,58 @@ class MorphyController extends Controller
         $match = Yii::$app->request->post('match');
         $result = Yii::$app->request->post('result');
 
-        $matchArray = explode(' ', $match);
+        $matches = [];
+        $allMatchArray = [];
+        if ($this->wordListFormatter->haveMatches($match, $matches) !== false) {
+            for ($i = 1; $i <= 2; $i++) {
+                $str = $match;
+                $j = 0;
+                foreach ($matches[0] as $key) {
+                    $str = str_replace($key, $matches[$i][$j], $str);
+                    $j++;
+                }
+                $allMatchArray[] = $str;
+            }
+        }
+        else {
+            $allMatchArray[] = $match;
+        }
+
         $resultArray = explode(' ', $result);
 
         /** TODO: переписать на свою обертку для phpMorphy */
         $morphy = new Morphy();
 
-        $matchPseudoRoot = '';
-        $resultPseudoRoot = '';
-        if (count($matchArray) === 1) {
-            $matchPseudoRoot = $this->getPseudoRoot($morphy, $match);
-            $resultPseudoRoot = $this->getPseudoRoot($morphy, $result);
-            $matchBaseForm = $this->getBaseForm($morphy, $match);
-            $resultBaseForm = $this->getBaseForm($morphy, $result);
-            if ((!empty($matchPseudoRoot) && !empty($resultPseudoRoot)) && ($matchPseudoRoot === $resultPseudoRoot)) {
-                $result = $match;
-            }
-            else {
-                if ((!empty($matchBaseForm) && !empty($resultBaseForm)) && $matchBaseForm === $resultBaseForm) {
+        foreach ($allMatchArray as $matchItem) {
+
+            $matchArray = explode(' ', $matchItem);
+
+            $matchPseudoRoot = '';
+            $resultPseudoRoot = '';
+            if (count($matchArray) === 1) {
+                $matchPseudoRoot = $this->getPseudoRoot($morphy, $match);
+                $resultPseudoRoot = $this->getPseudoRoot($morphy, $result);
+                $matchBaseForm = $this->getBaseForm($morphy, $match);
+                $resultBaseForm = $this->getBaseForm($morphy, $result);
+                if ((!empty($matchPseudoRoot) && !empty($resultPseudoRoot)) && ($matchPseudoRoot === $resultPseudoRoot)) {
                     $result = $match;
                 }
+                else {
+                    if ((!empty($matchBaseForm) && !empty($resultBaseForm)) && $matchBaseForm === $resultBaseForm) {
+                        $result = $match;
+                    }
+                }
             }
-        }
-        else {
-            $baseMatchArray = $this->getBaseArray($morphy, $matchArray);
-            $baseResultArray = $this->getBaseArray($morphy, $resultArray);
-            $baseMatch = implode(' ', $baseMatchArray);
-            $baseResult = implode(' ', $baseResultArray);
-            $matchBaseForm = $baseMatch;
-            $resultBaseForm = $baseResult;
-            if (strcasecmp($baseMatch, $baseResult) === 0) {
-                $result = $match;
+            else {
+                $baseMatchArray = $this->getBaseArray($morphy, $matchArray);
+                $baseResultArray = $this->getBaseArray($morphy, $resultArray);
+                $baseMatch = implode(' ', $baseMatchArray);
+                $baseResult = implode(' ', $baseResultArray);
+                $matchBaseForm = $baseMatch;
+                $resultBaseForm = $baseResult;
+                if (strcasecmp($baseMatch, $baseResult) === 0) {
+                    $result = $matchItem;
+                }
             }
         }
 

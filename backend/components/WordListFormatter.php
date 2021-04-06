@@ -29,12 +29,17 @@ class WordListFormatter
         return array_map(static function($row) {
             @list($text, $correctAnswer) = explode('|', $row);
             // $text = trim(preg_replace('/[^\w\-\s.,!?+-]/u', '', $text));
-            $correctAnswer = trim(preg_replace('/[^\w\-\s.,]/u', '', $correctAnswer));
+            $correctAnswer = trim(preg_replace('/[^\w\-\s.,#]/u', '', $correctAnswer));
             return [
                 'name' => $text,
                 'correct_answer' => $correctAnswer,
             ];
         }, $texts);
+    }
+
+    public function haveMatches(string $text, &$matches)
+    {
+        return preg_match_all('/(\\d+)#([\\w]+)/ui', $text, $matches);
     }
 
 }
