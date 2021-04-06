@@ -24,7 +24,8 @@ use yii\widgets\ActiveForm;
                     <a href="#" id="split-text-by-word" class="btn">Разбить по словам</a>
                     <a href="#" id="missing-words" class="btn">Вставить пропуск</a>
                 </div>
-                <?= $wordListForm->field($model, 'text')->textarea(['cols' => 30, 'rows' => 20]) ?>
+                <div class="alert alert-info text-left">Можно использовать альтернативные значения слов для тестов с вводом ответа с микрофона. Пример: 5#пять</div>
+                <?= $wordListForm->field($model, 'text')->textarea(['cols' => 30, 'rows' => 18]) ?>
                 <?= $wordListForm->field($model, 'word_list_id')->hiddenInput()->label(false) ?>
             </div>
             <div class="modal-footer">
