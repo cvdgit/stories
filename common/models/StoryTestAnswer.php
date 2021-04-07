@@ -104,4 +104,12 @@ class StoryTestAnswer extends ActiveRecord
         return $model->id;
     }
 
+    public function getImagePath()
+    {
+        if ($this->image === null) {
+            return;
+        }
+        return '/test_images/' . $this->image;
+    }
+
 }

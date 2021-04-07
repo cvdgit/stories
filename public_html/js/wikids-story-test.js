@@ -465,10 +465,16 @@ var WikidsStoryTest = (function() {
             .attr("value", answer.id)
             .data("answer", answer);
 
+        var originalImageExists = answer['original_image'] === undefined ? true : answer['original_image'];
+
         var $answer = $("<div/>").addClass("wikids-test-answer")
             .on("click", function(e) {
                 var tagName = e.target.tagName;
-                if (tagName !== 'INPUT' && tagName !== 'IMG') {
+                var tags = ['INPUT'];
+                if (originalImageExists) {
+                    tags.push('IMG');
+                }
+                if ($.inArray(tagName, tags) === -1) {
                     var $input = $(this).find("input");
                     $input.prop("checked", !$input.prop("checked"));
                 }
@@ -484,11 +490,14 @@ var WikidsStoryTest = (function() {
         if (showAnswerImage && answer.image) {
             var $image = $("<img/>")
                 .attr("src", answer.image)
-                .attr('height', 100)
-                .css('cursor', 'zoom-in')
-                .on('click', function() {
-                    showOriginalImage($(this).attr('src'), this);
-                });
+                .attr('height', 100);
+            if (originalImageExists) {
+                $image
+                    .css('cursor', 'zoom-in')
+                    .on('click', function () {
+                        showOriginalImage($(this).attr('src'), this);
+                    });
+            }
             $answer.append($image);
         }
 
@@ -778,29 +787,12 @@ var WikidsStoryTest = (function() {
         }
 
         if (testConfig.answerTypeIsMissingWords()) {
-
             questionName = 'Заполните пропущенные части';
-
-            /*
-            var re = /\{([\wа-яА-ЯёЁ]+)\}/igm;
-            var match;
-            while ((match = re.exec(questionName)) !== null) {
-                questionName = questionName.replace(match[0], '<span style="cursor:pointer" class="label label-primary">' + '*'.repeat(match[0].length) + '</span>')
-            }
-            */
         }
 
         var titleElement = $('<p/>')
             .addClass('question-title')
             .append(questionName);
-
-        /*
-        if (testConfig.answerTypeIsMissingWords()) {
-            titleElement.on('click', 'span.label', function (e) {
-                missingWords.start(e, question.id, '');
-            });
-        }
-        */
 
         var stars = '';
         if (question['stars']) {

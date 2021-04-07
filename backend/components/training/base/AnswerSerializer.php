@@ -20,6 +20,8 @@ class AnswerSerializer
             'is_correct' => (int) $this->answer->isCorrect(),
             'description' => '',
             'region_id' => $this->answer->getRegionID(),
+            'image' => $this->answer->getImage(),
+            'original_image' => false,
         ];
     }
 
