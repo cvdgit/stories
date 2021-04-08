@@ -5,28 +5,38 @@ use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 /** @var $this yii\web\View */
-/** @var $model common\models\StoryTestQuestion */
+/** @var $model backend\models\question\QuestionModel */
 /** @var $form yii\widgets\ActiveForm */
 /** @var $dataProvider yii\data\ActiveDataProvider */
+$isNewRecord = $model instanceof \backend\models\question\CreateQuestion;
 ?>
 <div class="story-test-form">
     <div class="row">
         <div class="col-md-6">
             <?php $form = ActiveForm::begin(); ?>
-            <?= $form->field($model, 'story_test_id')->hiddenInput()->label(false) ?>
+            <?= $form->field($model, 'test_id')->hiddenInput()->label(false) ?>
             <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
             <?= $form->field($model, 'type')->dropDownList(\backend\models\question\QuestionType::asArray()) ?>
             <?= $form->field($model, 'mix_answers')->checkbox() ?>
+            <?= $form->field($model, 'imageFile')->fileInput() ?>
+            <?php if (!$isNewRecord && $model->haveImage()): ?>
+            <div style="padding: 20px 0; text-align: center">
+                <?= Html::img($model->getImageUrl(), ['style' => 'max-width: 330px']) ?>
+                <div>
+                    <?= Html::a('Удалить изображение', ['question/delete-image', 'id' => $model->getModelID()]) ?>
+                </div>
+            </div>
+            <?php endif ?>
             <div class="form-group">
-                <?= Html::submitButton(($model->isNewRecord ? 'Создать' : 'Изменить') . ' вопрос', ['class' => 'btn btn-success']) ?>
+                <?= Html::submitButton(($isNewRecord ? 'Создать' : 'Изменить') . ' вопрос', ['class' => 'btn btn-success']) ?>
             </div>
             <?php ActiveForm::end(); ?>
         </div>
         <div class="col-md-6">
-            <?php if (!$model->isNewRecord): ?>
+            <?php if (!$isNewRecord): ?>
                 <div>
                     <p>
-                        <?= Html::a('Создать ответ', ['test/create-answer', 'question_id' => $model->id], ['class' => 'btn btn-primary']) ?>
+                        <?= Html::a('Создать ответ', ['test/create-answer', 'question_id' => $model->getModelID()], ['class' => 'btn btn-primary']) ?>
                     </p>
                     <h4>Ответы на вопрос</h4>
                     <?= GridView::widget([
@@ -86,7 +96,7 @@ use yii\widgets\ActiveForm;
 </div>
 
 <?php
-$questionID = $model->id;
+$questionID = $isNewRecord ? '' : $model->getModelID();
 $js = <<< JS
 (function() {
     "use strict";

@@ -854,13 +854,21 @@ var WikidsStoryTest = (function() {
             $answers.appendTo($question);
 
             if (showQuestionImage && question.image) {
-                $('<img/>')
+
+                var $image = $('<img/>')
                     .attr("src", question.image)
-                    .css('cursor', 'zoom-in')
-                    .on('click', function() {
-                        showOriginalImage($(this).attr('src'));
-                    })
-                    .appendTo($(".question-image", $question));
+                    .css('max-width', '330px');
+
+                var originalImageExists = question['original_image'] === undefined ? true : question['original_image'];
+                if (originalImageExists) {
+                    $image
+                        .css('cursor', 'zoom-in')
+                        .on('click', function () {
+                            showOriginalImage($(this).attr('src'));
+                        });
+                }
+
+                $image.appendTo($(".question-image", $question));
             }
             $questions.append($question);
         });

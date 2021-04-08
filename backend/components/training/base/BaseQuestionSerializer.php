@@ -27,6 +27,7 @@ class BaseQuestionSerializer
             'id' => $this->question->getId(),
             'name' => $this->question->getName(),
             'image' => $this->question->getImage(),
+            'original_image' => false,
             'correct_number' => $this->question->getCorrectAnswerNumber(),
             'storyTestAnswers' => $this->createAnswers($this->question->getAnswers()),
             'lastAnswerIsCorrect' => $this->question->isLastAnswerIsCorrect(),

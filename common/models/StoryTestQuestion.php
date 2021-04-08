@@ -116,7 +116,7 @@ class StoryTestQuestion extends ActiveRecord
         }, $this->getCorrectAnswers()));
     }
 
-    public static function create(int $testID, string $name, int $type, int $order, int $mixAnswers, string $image, string $regions)
+    public static function create(int $testID, string $name, int $type, int $order = 1, int $mixAnswers = 0, string $image = '', string $regions = '')
     {
         $model = new self();
         $model->story_test_id = $testID;
@@ -139,8 +139,11 @@ class StoryTestQuestion extends ActiveRecord
         return Yii::getAlias('@public') . Yii::$app->params['test.question.images'] . '/' . $this->story_test_id . '/';
     }
 
-    public function getImageUrl()
+    public function getImageUrl(): string
     {
+        if (empty($this->image)) {
+            return '';
+        }
         return Yii::$app->params['test.question.images'] . '/' . $this->story_test_id . '/' . $this->image;
     }
 
@@ -156,6 +159,12 @@ class StoryTestQuestion extends ActiveRecord
             $path = $this->getImagesPath() . $this->image;
             FileHelper::unlink($path);
         }
+    }
+
+    public function deleteImage(): void
+    {
+        $path = $this->getImagesPath() . $this->image;
+        FileHelper::unlink($path);
     }
 
 }

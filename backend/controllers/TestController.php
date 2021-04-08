@@ -3,6 +3,8 @@
 namespace backend\controllers;
 
 use backend\models\AnswerImageUploadForm;
+use backend\models\question\CreateQuestion;
+use backend\models\question\UpdateQuestion;
 use backend\models\search\TestSearch;
 use common\models\StoryTest;
 use common\models\StoryTestAnswer;
@@ -115,34 +117,36 @@ class TestController extends Controller
     public function actionCreateQuestion(int $test_id)
     {
         $testModel = $this->findModel($test_id);
-        $model = new StoryTestQuestion();
-        $model->story_test_id = $testModel->id;
-        $dataProvider = new ActiveDataProvider([
-            'query' => $model->getStoryTestAnswers(),
-        ]);
+        $model = new CreateQuestion();
+        $model->test_id = $testModel->id;
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $model->save();
-            return $this->redirect(['test/update-question', 'question_id' => $model->id]);
+            try {
+                $id = $model->create();
+                Yii::$app->session->setFlash('success', 'Вопрос успешно создан');
+                return $this->redirect(['test/update-question', 'question_id' => $id]);
+            }
+            catch (\Exception $ex) {
+                Yii::$app->session->setFlash('error', $ex->getMessage());
+            }
         }
         return $this->render('create_question', [
             'testModel' => $testModel,
             'model' => $model,
-            'dataProvider' => $dataProvider,
+            'dataProvider' => null,
         ]);
     }
 
     public function actionUpdateQuestion(int $question_id)
     {
-        $model = StoryTestQuestion::findModel($question_id);
-        $dataProvider = new ActiveDataProvider([
-            'query' => $model->getStoryTestAnswers(),
-        ]);
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['test/update', 'id' => $model->story_test_id]);
+        $question = StoryTestQuestion::findModel($question_id);
+        $model = new UpdateQuestion($question);
+        if ($model->load(Yii::$app->request->post())) {
+            $model->update();
+            return $this->refresh();
         }
         return $this->render('update_question', [
             'model' => $model,
-            'dataProvider' => $dataProvider,
+            'dataProvider' => $model->getAnswersDataProvider(),
         ]);
     }
 

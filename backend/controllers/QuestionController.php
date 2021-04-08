@@ -108,4 +108,23 @@ class QuestionController extends Controller
         return ['success' => true];
     }
 
+    public function actionDeleteImage(int $id)
+    {
+        $model = $this->findModel($id);
+        $fileDeleted = false;
+        try {
+            $model->deleteImage();
+            $fileDeleted = true;
+        }
+        catch (\Exception $ex) {
+            Yii::$app->session->setFlash('error', $ex->getMessage());
+        }
+
+        $model->image = null;
+        $model->save();
+        Yii::$app->session->setFlash('success', 'Изображение успешно удалено');
+
+        return $this->redirect(['test/update-question', 'question_id' => $model->id]);
+    }
+
 }

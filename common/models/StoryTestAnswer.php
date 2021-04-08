@@ -5,6 +5,7 @@ namespace common\models;
 use DomainException;
 use Yii;
 use yii\db\ActiveRecord;
+use yii\helpers\FileHelper;
 
 /**
  * This is the model class for table "story_test_answer".
@@ -104,12 +105,28 @@ class StoryTestAnswer extends ActiveRecord
         return $model->id;
     }
 
+    public function haveImage()
+    {
+        return !empty($this->image);
+    }
+
     public function getImagePath()
     {
         if ($this->image === null) {
             return;
         }
         return '/test_images/' . $this->image;
+    }
+
+    public function getImagesPath()
+    {
+        return Yii::getAlias('@public') . '/test_images/';
+    }
+
+    public function deleteImage(): void
+    {
+        $path = $this->getImagesPath() . $this->image;
+        FileHelper::unlink($path);
     }
 
 }

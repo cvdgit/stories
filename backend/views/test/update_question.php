@@ -5,7 +5,7 @@ use yii\helpers\Html;
 /** @var $dataProvider yii\data\ActiveDataProvider */
 $this->title = 'Изменить вопрос';
 $this->params['sidebarMenuItems'] = [
-    ['label' => $model->storyTest->title, 'url' => ['test/update', 'id' => $model->storyTest->id]],
+    //['label' => $model->storyTest->title, 'url' => ['test/update', 'id' => $model->storyTest->id]],
 ];
 ?>
 <div class="story-test-question-update">
