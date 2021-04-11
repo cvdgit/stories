@@ -101,7 +101,7 @@ $js = <<< JS
 (function() {
     "use strict";
 
-    var questionID = $questionID;
+    var questionID = '$questionID';
     
     var modal = $("#make-answers-modal"),
         labels = $("#graph-label"),
