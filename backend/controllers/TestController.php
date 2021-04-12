@@ -118,7 +118,7 @@ class TestController extends Controller
     {
         $testModel = $this->findModel($test_id);
         $model = new CreateQuestion();
-        $model->test_id = $testModel->id;
+        $model->story_test_id = $testModel->id;
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             try {
                 $id = $model->create();
@@ -142,7 +142,7 @@ class TestController extends Controller
         $model = new UpdateQuestion($question);
         if ($model->load(Yii::$app->request->post())) {
             $model->update();
-            return $this->refresh();
+            return $this->redirect(['test/update', 'id' => $model->story_test_id]);
         }
         return $this->render('update_question', [
             'model' => $model,

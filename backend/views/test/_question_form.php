@@ -14,7 +14,7 @@ $isNewRecord = $model instanceof \backend\models\question\CreateQuestion;
     <div class="row">
         <div class="col-md-6">
             <?php $form = ActiveForm::begin(); ?>
-            <?= $form->field($model, 'test_id')->hiddenInput()->label(false) ?>
+            <?= $form->field($model, 'story_test_id')->hiddenInput()->label(false) ?>
             <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
             <?= $form->field($model, 'type')->dropDownList(\backend\models\question\QuestionType::asArray()) ?>
             <?= $form->field($model, 'mix_answers')->checkbox() ?>

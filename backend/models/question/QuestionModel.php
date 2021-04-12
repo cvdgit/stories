@@ -2,6 +2,7 @@
 
 namespace backend\models\question;
 
+use common\models\StoryTest;
 use common\models\StoryTestQuestion;
 use Yii;
 use yii\base\Model;
@@ -11,7 +12,7 @@ use yii\web\UploadedFile;
 class QuestionModel extends Model
 {
 
-    public $test_id;
+    public $story_test_id;
     public $name;
     public $type;
     public $order;
@@ -21,17 +22,18 @@ class QuestionModel extends Model
     public function rules()
     {
         return [
-            [['name', 'type'], 'required'],
-            [['order', 'type', 'mix_answers'], 'integer'],
+            [['name', 'type', 'story_test_id'], 'required'],
+            [['order', 'type', 'mix_answers', 'story_test_id'], 'integer'],
             [['name'], 'string', 'max' => 255],
             [['imageFile'], 'image'],
+            [['story_test_id'], 'exist', 'targetClass' => StoryTest::class, 'targetAttribute' => ['story_test_id' => 'id']],
         ];
     }
 
     public function attributeLabels()
     {
         return [
-            'test_id' => 'Тест',
+            'story_test_id' => 'Тест',
             'name' => 'Вопрос',
             'type' => 'Тип',
             'imageFile' => 'Изображение',
