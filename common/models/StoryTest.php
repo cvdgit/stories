@@ -181,9 +181,17 @@ class StoryTest extends ActiveRecord
     public function getChildrenTestsAsArray()
     {
         return self::find()
+            ->with('stories')
             ->where('parent_id = :id', [':id' => $this->id])
             ->asArray()
             ->all();
+    }
+
+    public function getChildrenTestsCount()
+    {
+        return self::find()
+            ->where('parent_id = :id', [':id' => $this->id])
+            ->count();
     }
 
     public static function create(string $title, string $header, string $description, string $incorrectAnswerText, int $remote = self::LOCAL, int $source = SourceType::TEST)

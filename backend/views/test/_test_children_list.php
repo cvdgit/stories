@@ -1,8 +1,9 @@
 <?php
+
+use backend\helpers\StoryHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
-
 /** @var $model common\models\StoryTest */
 ?>
 <div>
@@ -14,6 +15,7 @@ use yii\helpers\Url;
         <thead>
         <tr>
             <th>Вариант</th>
+            <th>Переход</th>
             <th></th>
         </tr>
         </thead>
@@ -37,6 +39,7 @@ use yii\helpers\Url;
 $testVariants = Json::encode($model->getChildrenTestsAsArray());
 $deleteUrl = Url::to(['test-variant/delete']);
 $updateUrl = Url::to(['test-variant/update']);
+$storyViewUrl = StoryHelper::createStoryViewUrl('ALIAS');
 $js = <<< JS
 
 var createVariantModal = $('#test-variant-modal'),
@@ -59,6 +62,18 @@ function showModal(element, remote) {
 
 function getUpdateVariantUrl(id) {
     return '$updateUrl' + '&id=' + id;
+}
+
+function getStoryViewUrl(alias) {
+    return '$storyViewUrl'.replace('ALIAS', alias);
+}
+
+function createVariantStory(story) {
+    return $('<a/>', {
+        'href': getStoryViewUrl(story.alias),
+        'text': story.title,
+        'target': '_blank'
+    });
 }
 
 var testVariants = $testVariants;
@@ -87,10 +102,23 @@ window.fillTestVariantsTable = function(params) {
                     }
                 })
             });
-        $('<tr/>')
-            .append($('<td/>').text(param.title))
-            .append($('<td/>').append(updateLink).append(deleteLink))
-            .appendTo(table);
+        
+        var tr = $('<tr/>');
+        tr.append($('<td/>').text(param.title));
+        
+        var td = $('<td/>');
+        if (param.stories.length) {
+            param.stories.forEach(function(story) {
+                td.append(createVariantStory(story));
+            });
+        }
+        tr.append(td);
+
+        tr.append($('<td/>')
+            .append(updateLink)
+            .append(deleteLink)
+        );
+        tr.appendTo(table);
     });
 }
 fillTestVariantsTable(testVariants);

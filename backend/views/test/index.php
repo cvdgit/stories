@@ -1,4 +1,5 @@
 <?php
+use common\models\StoryTest;
 use common\models\test\AnswerType;
 use common\models\test\SourceType;
 use dosamigos\datepicker\DatePicker;
@@ -37,7 +38,13 @@ JS;
 }
 
 $columns = [];
-$columns[] = 'title';
+$columns[] = [
+    'attribute' =>'title',
+    'format' => 'raw',
+    'value' => static function(StoryTest $model) {
+        return Html::a($model->title, ['test/update', 'id' => $model->id], ['title' => 'Перейти к редактированию']);
+    },
+];
 if ($searchModel->isWordList()) {
     $columns[] = [
         'attribute' => 'wordList.name',
@@ -46,17 +53,19 @@ if ($searchModel->isWordList()) {
 }
 if ($searchModel->isNeoTest()) {
     $columns[] = [
-        'attribute' => 'parentTest.title',
-        'label' => 'Основной тест',
+        'attribute' => 'childrenTestsCount',
+        'label' => 'Количество вариантов',
     ];
 }
-$columns[] = [
-    'attribute' => 'answer_type',
-    'value' => function($model) {
-        return AnswerType::asText($model->answer_type);
-    },
-    'filter' => AnswerType::asArray(),
-];
+if (!$searchModel->isNeoTest()) {
+    $columns[] = [
+        'attribute' => 'answer_type',
+        'value' => static function($model) {
+            return AnswerType::asText($model->answer_type);
+        },
+        'filter' => AnswerType::asArray(),
+    ];
+}
 $columns[] = [
     'attribute' => 'created_at',
     'value' => 'created_at',
@@ -71,26 +80,28 @@ $columns[] = [
         ]
     ]),
 ];
-$columns[] = [
-    'attribute' => 'transition',
-    'label' => 'Переход',
-    'format' => 'raw',
-    'value' => function($model) {
-        $html = '';
-        $stories = $model->stories;
-        if (count($stories) > 0) {
-            $story = $stories[0];
-            $html = Html::a('к истории', Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $story->alias]), ['target' => '_blank']);
-        }
-        if ($model->haveWordList()) {
-            if (!empty($html)) {
-                $html .= '<br/>';
+if (!$searchModel->isNeoTest()) {
+    $columns[] = [
+        'attribute' => 'transition',
+        'label' => 'Переход',
+        'format' => 'raw',
+        'value' => function ($model) {
+            $html = '';
+            $stories = $model->stories;
+            if (count($stories) > 0) {
+                $story = $stories[0];
+                $html = Html::a('к истории', Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $story->alias]), ['target' => '_blank']);
             }
-            $html .= Html::a('к списку слов', \common\models\TestWordList::getUpdateUrl($model->word_list_id), ['target' => '_blank']);
+            if ($model->haveWordList()) {
+                if (!empty($html)) {
+                    $html .= '<br/>';
+                }
+                $html .= Html::a('к списку слов', \common\models\TestWordList::getUpdateUrl($model->word_list_id), ['target' => '_blank']);
+            }
+            return $html;
         }
-        return $html;
-    }
-];
+    ];
+}
 
 $columns[] = [
     'class' => 'yii\grid\ActionColumn',

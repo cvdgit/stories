@@ -52,10 +52,7 @@ class TestSearch extends Model
             return $dataProvider;
         }
 
-        if (!$this->isNeoTest()) {
-            $query->where('parent_id = 0');
-        }
-
+        $query->where('parent_id = 0');
         $query->andFilterWhere(['like', 'title', $this->title]);
         $query->andFilterWhere([
             "DATE_FORMAT(FROM_UNIXTIME(created_at), '%d.%m.%Y')" => $this->created_at,
