@@ -27,6 +27,8 @@ class Serializer
                     'inputVoice' => $test->input_voice,
                     'recordingLang' => $test->recording_lang,
                     'rememberAnswers' => filter_var($test->remember_answers, FILTER_VALIDATE_BOOLEAN),
+                    'askQuestion' => filter_var($test->ask_question, FILTER_VALIDATE_BOOLEAN),
+                    'askQuestionLang' => $test->ask_question_lang,
                 ],
                 'students' => $students,
                 'stories' => $stories,

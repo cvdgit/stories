@@ -37,6 +37,8 @@ use yii\widgets\ActiveForm;
         <?= $form->field($model, 'recording_lang')->dropDownList(\backend\models\test\RecorderLang::asArray()) ?>
         <?= $form->field($model, 'input_voice')->dropDownList(\backend\models\test\InputVoice::asArray()) ?>
         <?= $form->field($model, 'remember_answers')->checkbox() ?>
+        <?= $form->field($model, 'ask_question')->checkbox() ?>
+        <?= $form->field($model, 'ask_question_lang')->dropDownList(\backend\models\test\InputVoice::asArray()) ?>
     </div>
 
     <div class="form-group">

@@ -1477,7 +1477,17 @@ var WikidsStoryTest = (function() {
         }
 
         if (testConfig.answerTypeIsRecording()) {
-            recordingAnswer.autoStart(new Event('autoStart'));
+            if (testConfig.isAskQuestion()) {
+                var text = currentQuestion.name;
+                setTimeout(function() {
+                    speech.readText(text, testConfig.getAskQuestionLang(), function () {
+                        recordingAnswer.autoStart(new Event('autoStart'), 500);
+                    });
+                }, 500);
+            }
+            else {
+                recordingAnswer.autoStart(new Event('autoStart'));
+            }
         }
     }
 
@@ -1597,7 +1607,6 @@ var WikidsStoryTest = (function() {
 
         if (testConfig.answerTypeIsRecording()) {
             setTimeout(function() {
-                //testSpeech.ReadText(answerText, correctAnswerPageNext);
                 speech.readText(answerText, testConfig.getInputVoice(), correctAnswerPageNext);
             }, 600);
         }
@@ -2033,6 +2042,9 @@ var TestConfig = function(data) {
         },
         'isAskQuestion': function() {
             return data.askQuestion;
+        },
+        'getAskQuestionLang': function() {
+            return data.askQuestionLang;
         }
     }
 }
@@ -2436,13 +2448,14 @@ var RecordingAnswer = function(recognition) {
         recognition.start(event);
     }
 
-    function autoStart(event) {
+    function autoStart(event, timeout) {
         control.setStatus();
         control.repeatButtonHide();
+        timeout = timeout || 1000;
         setTimeout(function() {
             control.showLoader();
             recognition.start(event);
-        }, 1000);
+        }, timeout);
     }
 
     function startFragment(range, event) {
@@ -2674,7 +2687,7 @@ var TestSpeech = function(options) {
 
     var defaultOptions = {
         pitch: 1,
-        rate: 1
+        rate: 0.8
     };
     options = options || {};
     options = Object.assign(defaultOptions, options);

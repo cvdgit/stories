@@ -37,6 +37,8 @@ use yii\helpers\ArrayHelper;
  * @property int $shuffle_word_list
  * @property string $recording_lang
  * @property int $remember_answers;
+ * @property int $ask_question;
+ * @property string $ask_question_lang
  *
  * @property StoryTestQuestion[] $storyTestQuestions
  * @property Story[] $stories
@@ -76,9 +78,9 @@ class StoryTest extends ActiveRecord
     {
         return [
             [['title', 'header'], 'required'],
-            [['status', 'mix_answers', 'remote', 'question_list_id', 'parent_id', 'source', 'word_list_id', 'answer_type', 'strict_answer', 'remember_answers'], 'integer'],
+            [['status', 'mix_answers', 'remote', 'question_list_id', 'parent_id', 'source', 'word_list_id', 'answer_type', 'strict_answer', 'remember_answers', 'ask_question'], 'integer'],
             [['shuffle_word_list'], 'integer'],
-            [['title', 'question_list_name', 'header', 'question_params', 'incorrect_answer_text', 'input_voice', 'recording_lang'], 'string', 'max' => 255],
+            [['title', 'question_list_name', 'header', 'question_params', 'incorrect_answer_text', 'input_voice', 'recording_lang', 'ask_question_lang'], 'string', 'max' => 255],
             [['description_text'], 'string'],
             [['question_list'], 'safe'],
         ];
@@ -112,6 +114,8 @@ class StoryTest extends ActiveRecord
             'recording_lang' => 'Язык распознавания',
             'shuffle_word_list' => 'Перемешивать элементы списка',
             'remember_answers' => 'Запоминать ответы',
+            'ask_question' => 'Произносить вопросы',
+            'ask_question_lang' => 'Язык синтезатора вопросов',
         ];
     }
 
