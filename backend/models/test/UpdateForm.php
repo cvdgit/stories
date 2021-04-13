@@ -29,8 +29,11 @@ class UpdateForm extends BaseVariantModel
         }
     }
 
-    private function loadParamAttributes()
+    private function loadParamAttributes(): void
     {
+        if (empty($this->question_params)) {
+            return;
+        }
         foreach (explode(';', $this->question_params) as $param) {
             [$paramName, $paramValue] = explode('=', $param);
             if (property_exists($this, $paramName)) {
