@@ -529,6 +529,10 @@ var WikidsStoryTest = (function() {
 
     function generateAnswerList(answers, num) {
 
+        if (answers.length <= num) {
+            return shuffle(answers);
+        }
+
         var list = answers.filter(function(answer) {
             return answer.is_correct === 1;
         });
@@ -1811,32 +1815,6 @@ answerTypeInput.create = function(action) {
     return $html;
 };
 
-/*
-var testSpeech = {};
-testSpeech.Synth = window.speechSynthesis;
-testSpeech.Voices = [];
-testSpeech.Voices = testSpeech.Synth.getVoices();
-testSpeech.VoiceIndex = 0;
-testSpeech.Rate = 1;
-testSpeech.Pitch = 1;
-testSpeech.ReadText = function(txt, afterSpeech) {
-    var ttsSpeechChunk = new SpeechSynthesisUtterance(txt);
-    var inputVoice = WikidsStoryTest.getTestConfig().getInputVoice() || 'Google русский';
-    for (var i = 0; i < testSpeech.Synth.getVoices().length ; i++) {
-        if (testSpeech.Synth.getVoices()[i].name === inputVoice) {
-            ttsSpeechChunk.voice = testSpeech.Synth.getVoices()[i];
-            break;
-        }
-    }
-    ttsSpeechChunk.rate = testSpeech.Rate;
-    ttsSpeechChunk.pitch = testSpeech.Pitch;
-    if (afterSpeech) {
-        ttsSpeechChunk.onend = afterSpeech;
-    }
-    testSpeech.Synth.speak(ttsSpeechChunk);
-};
-*/
-
 var SlideLoader = (function() {
 
     var $element = $('<div/>')
@@ -2052,6 +2030,9 @@ var TestConfig = function(data) {
         },
         'getTestID': function() {
             return parseInt(data.id);
+        },
+        'isAskQuestion': function() {
+            return data.askQuestion;
         }
     }
 }
