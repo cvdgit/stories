@@ -983,17 +983,19 @@ var WikidsStoryTest = (function() {
             if (/(\d+)#([\wа-яА-ЯёЁ]+)/ui.test(item.name)) {
                 var match;
                 var re = /(\d+)#([\wа-яА-ЯёЁ]+)/uig;
-                var parts = {};
+                var parts = [];
+                var key = 0;
+                var line = item.name;
                 while ((match = re.exec(item.name)) !== null) {
-                    parts[match[0]] = [];
-                    parts[match[0]].push(match[1]);
-                    parts[match[0]].push(match[2]);
+                    parts.push({match, values: [match[1], match[2]], key});
+                    line = line.replace(match[0], key);
+                    key++;
                 }
                 for (var i = 0, str = ''; i < 2; i++) {
-                    str = item.name;
-                    for (var [key, value] of Object.entries(parts)) {
-                        str = str.replace(key, value[i]);
-                    }
+                    str = line;
+                    parts.forEach(function(value) {
+                        str = str.replace(value.key, value.values[i]);
+                    });
                     steps.push(str);
                 }
             }
@@ -1011,11 +1013,9 @@ var WikidsStoryTest = (function() {
 
     function checkAnswerCorrect(question, answer, correctAnswersCallback, convertAnswerToInt) {
         console.debug('WikidsStoryTest.checkAnswerCorrect');
-
         var correctAnswers = getAnswersData(question).filter(function(elem) {
             return parseInt(elem.is_correct) === 1;
         });
-
         var steps = createAnswerSteps(correctAnswers);
         var correct = false;
         if (steps.length > 0) {
@@ -1035,7 +1035,6 @@ var WikidsStoryTest = (function() {
                 correct = true;
             }
         }
-
         return correct;
     }
 
@@ -1053,6 +1052,7 @@ var WikidsStoryTest = (function() {
         var correct = false;
         if (steps.length > 0) {
             correct = correctAnswerSteps(steps, answer);
+            console.log(correct);
         }
         else {
             correctAnswers = correctAnswers.map(correctAnswersCallback);
