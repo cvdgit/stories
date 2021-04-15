@@ -3,13 +3,9 @@
 namespace backend\models\links;
 
 use common\models\StorySlideBlock;
-use yii\base\Model;
 
-class UpdateLinkForm extends Model
+class UpdateLinkForm extends BaseLink
 {
-
-    public $title;
-    public $href;
 
     public $link_id;
 
@@ -36,6 +32,7 @@ class UpdateLinkForm extends Model
         $model = $this->getLink();
         $this->title = $model->title;
         $this->href = $model->href;
+        $this->slide_id = $model->slide_id;
     }
 
     public function saveLink()

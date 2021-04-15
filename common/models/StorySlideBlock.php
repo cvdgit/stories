@@ -2,8 +2,10 @@
 
 namespace common\models;
 
+use backend\models\links\BlockType;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -60,8 +62,8 @@ class StorySlideBlock extends \yii\db\ActiveRecord
             'id' => 'ID',
             'slide_id' => 'Slide ID',
             'type' => 'Type',
-            'title' => 'Title',
-            'href' => 'Href',
+            'title' => 'Заголовок',
+            'href' => 'Ссылка',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
@@ -75,10 +77,10 @@ class StorySlideBlock extends \yii\db\ActiveRecord
         return $this->hasOne(StorySlide::class, ['id' => 'slide_id']);
     }
 
-    public static function create(int $slideID, string $title, string $href = ''): StorySlideBlock
+    public static function create(int $slideID, string $title, string $href = '', int $type = BlockType::BUTTON): StorySlideBlock
     {
         $model = new self();
-        $model->type = self::TYPE_BUTTON;
+        $model->type = $type;
         $model->slide_id = $slideID;
         $model->title = $title;
         $model->href = $href;
@@ -91,6 +93,15 @@ class StorySlideBlock extends \yii\db\ActiveRecord
             return $model;
         }
         throw new NotFoundHttpException('Блок не найден.');
+    }
+
+    public function getUpdateUrl(): string
+    {
+        $links = [
+            BlockType::BUTTON => 'editor/links/update',
+            BlockType::YOUTUBE => 'editor/links/youtube-update'
+        ];
+        return Url::to([$links[$this->type], 'id' => $this->id]);
     }
 
 }

@@ -1052,7 +1052,6 @@ var WikidsStoryTest = (function() {
         var correct = false;
         if (steps.length > 0) {
             correct = correctAnswerSteps(steps, answer);
-            console.log(correct);
         }
         else {
             correctAnswers = correctAnswers.map(correctAnswersCallback);
