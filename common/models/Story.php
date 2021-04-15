@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use backend\models\links\BlockType;
 use common\components\StoryCover;
 use common\helpers\Url;
 use DomainException;
@@ -419,7 +420,7 @@ class Story extends ActiveRecord
             ->innerJoin('{{%story_slide_block}} t2', 't1.id = t2.slide_id')
             ->where('t1.story_id = :story', [':story' => $this->id])
             ->andWhere('t1.status = :status', [':status' => 1])
-            ->andWhere('t2.type = :block_type', [':block_type' => StorySlideBlock::TYPE_BUTTON])
+            ->andWhere(['in', 't2.type', [BlockType::BUTTON, BlockType::YOUTUBE]])
             //->indexBy('slideID')
             ->all();
     }
