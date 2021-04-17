@@ -24,7 +24,7 @@ class ParagraphBlockMarkup extends TextBlockMarkup
 
         $element = $this->getElement();
         $elementAttributes = $element->getAttributes();
-        $elementAttributes['style'] = $this->setStyleValue($elementAttributes['style'], 'font-size', $block->getFontSize());
+        //$elementAttributes['style'] = $this->setStyleValue($elementAttributes['style'], 'font-size', $block->getFontSize());
         $elementTag = Html::tag($element->getTagName(), $block->getText(), $elementAttributes);
 
         $contentBlockAttributes = array_merge($this->getContentBlockAttributes(), [

@@ -137,8 +137,12 @@ class HtmlSlideReader implements ReaderInterface
         }
         else {
             $block->setType(AbstractBlock::TYPE_TEXT);
-            $style = pq($htmlBlock)->find('p')->attr('style');
-            $text = pq($htmlBlock)->find('p')->html();
+            $selector = 'p';
+            if (pq($htmlBlock)->find('div.slide-paragraph')->length > 0) {
+                $selector = 'div.slide-paragraph';
+            }
+            $style = pq($htmlBlock)->find($selector)->attr('style');
+            $text = pq($htmlBlock)->find($selector)->html();
         }
         $block->setFontSize($this->getStyleValue($style, 'font-size'));
         $block->setText($text);

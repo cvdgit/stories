@@ -2261,3 +2261,8 @@ p.wikids-test-description {
 .missing-words .missing-words-text {
 	margin-top: 50px;
 }
+
+.reveal section .slide-paragraph {
+	color: #FFFFFF;
+	font-size: 0.8em;
+}

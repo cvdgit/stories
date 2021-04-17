@@ -363,7 +363,10 @@ class EditorController extends Controller
     public function actionDeleteBlock(int $slide_id, string $block_id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $this->editorService->deleteBlock($slide_id, $block_id);
+        try {
+            $this->editorService->deleteBlock($slide_id, $block_id);
+        }
+        catch (\Exception $ex) {}
         return ['success' => true];
     }
 
