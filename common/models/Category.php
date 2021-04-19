@@ -3,9 +3,8 @@
 namespace common\models;
 
 use common\helpers\Translit;
+use common\models\story\StoryStatus;
 use creocoder\nestedsets\NestedSetsBehavior;
-use wokster\treebehavior\NestedSetsTreeBehavior;
-use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
@@ -190,7 +189,7 @@ class Category extends ActiveRecord
             ->leftJoin('{{%story_category}}', '{{%story_category}}.category_id = {{%category}}.id')
             ->leftJoin('{{%story}}', '{{%story_category}}.story_id = {{%story}}.id')
             ->where('tree = :tree', [':tree' => $root->tree])
-            ->andWhere('{{%story}}.status = :story_stat', [':story_stat' => Story::STATUS_PUBLISHED])
+            ->andWhere('{{%story}}.status = :story_stat', [':story_stat' => StoryStatus::PUBLISHED])
             ->groupBy(['{{%story_category}}.category_id'])
             ->indexBy('category_id')
             ->all();

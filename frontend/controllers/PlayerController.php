@@ -1,11 +1,9 @@
 <?php
 
-
 namespace frontend\controllers;
 
-
-use common\helpers\Url;
 use common\models\Story;
+use common\models\story\StoryStatus;
 use common\models\StoryAudioTrack;
 use common\models\StorySlide;
 use common\services\StoryAudioService;
@@ -14,7 +12,6 @@ use frontend\models\SlideAudio;
 use frontend\models\StoryTrackModel;
 use Yii;
 use yii\db\Query;
-use yii\filters\AccessControl;
 use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\Response;
@@ -130,7 +127,7 @@ class PlayerController extends Controller
                 ->where('{{%playlist}}.id = :id', [':id' => $playlistID])
                 ->innerJoin('{{%story_playlist}}', '{{%playlist}}.id = {{%story_playlist}}.playlist_id')
                 ->innerJoin('{{%story}}', '{{%story_playlist}}.story_id = {{%story}}.id')
-                ->andWhere('{{%story}}.status = :status', [':status' => Story::STATUS_PUBLISHED])
+                ->andWhere('{{%story}}.status = :status', [':status' => StoryStatus::PUBLISHED])
                 ->andWhere(['not in', '{{%story}}.id', $viewedStoryIDs])
                 ->orderBy(['-{{%story_playlist}}.order' => SORT_DESC, '{{%story_playlist}}.created_at' => SORT_ASC])
                 ->limit(8)
@@ -149,7 +146,7 @@ class PlayerController extends Controller
                 ->innerJoin('{{%story_category}}', '{{%story_category}}.category_id = {{%category}}.id')
                 ->innerJoin('{{%story}}', '{{%story_category}}.story_id = {{%story}}.id')
                 ->where(['in', '{{%category}}.id', $categoryIDs])
-                ->andWhere('{{%story}}.status = :status', [':status' => Story::STATUS_PUBLISHED])
+                ->andWhere('{{%story}}.status = :status', [':status' => StoryStatus::PUBLISHED])
                 ->andWhere(['not in', '{{%story}}.id', $viewedStoryIDs])
                 ->orderBy(['{{%story}}.episode' => SORT_ASC, '{{%story}}.created_at' => SORT_DESC])
                 ->limit(8)
@@ -160,7 +157,7 @@ class PlayerController extends Controller
             $stories = (new Query())
                 ->select('*')
                 ->from('{{%story}}')
-                ->where('status = :status', [':status' => Story::STATUS_PUBLISHED])
+                ->where('status = :status', [':status' => StoryStatus::PUBLISHED])
                 ->andWhere(['not in', 'id', [$model->id]])
                 ->orderBy('rand()')
                 ->limit(8)

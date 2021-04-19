@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\models\story\StoryStatus;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
 
@@ -10,7 +11,7 @@ class StoryQuery extends ActiveQuery
 
     public function published()
     {
-        return $this->andWhere(['{{%story}}.status' => Story::STATUS_PUBLISHED]);
+        return $this->andWhere(['{{%story}}.status' => StoryStatus::PUBLISHED]);
     }
 
     public function bySubAccess()

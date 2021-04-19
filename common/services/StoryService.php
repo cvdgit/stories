@@ -8,6 +8,7 @@ use backend\components\story\writer\HTMLWriter;
 use backend\models\SourcePowerPointForm;
 use common\models\NotificationModel;
 use common\models\Story;
+use common\models\story\StoryStatus;
 use DirectoryIterator;
 use DomainException;
 use backend\components\notification\NewStoryNotification;
@@ -178,7 +179,7 @@ class StoryService
 
     public function unPublishStory(Story $model): void
     {
-        $model->status = Story::STATUS_DRAFT;
+        $model->status = StoryStatus::DRAFT;
         $model->save(false, ['status']);
     }
 

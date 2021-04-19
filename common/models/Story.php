@@ -5,6 +5,7 @@ namespace common\models;
 use backend\models\links\BlockType;
 use common\components\StoryCover;
 use common\helpers\Url;
+use common\models\story\StoryStatus;
 use DomainException;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use Yii;
@@ -56,9 +57,6 @@ use yii\db\ActiveQuery;
 
 class Story extends ActiveRecord
 {
-
-    const STATUS_DRAFT = 0;
-    const STATUS_PUBLISHED = 1;
 
     const SOURCE_SLIDESCOM = 1;
     const SOURCE_POWERPOINT = 2;
@@ -118,8 +116,8 @@ class Story extends ActiveRecord
             [['title', 'alias'], 'string', 'max' => 255],
             [['alias'], 'unique'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
-            ['status', 'in', 'range' => [self::STATUS_DRAFT, self::STATUS_PUBLISHED]],
-            ['status', 'default', 'value' => self::STATUS_DRAFT],
+            ['status', 'in', 'range' => [StoryStatus::DRAFT, StoryStatus::PUBLISHED, StoryStatus::FOR_PUBLICATION]],
+            ['status', 'default', 'value' => StoryStatus::DRAFT],
             [['tagNames', 'story_playlists', 'story_categories'], 'safe'],
             [['description'], 'string', 'max' => 1024],
             ['source_id', 'default', 'value' => self::SOURCE_POWERPOINT],
@@ -213,20 +211,6 @@ class Story extends ActiveRecord
     public static function findPublishedStoriesModerator()
     {
         return self::find()->with('categories')->with('userStoryHistories');
-    }
-
-    public static function getStatusArray()
-    {
-        return [
-            self::STATUS_DRAFT => 'Черновик',
-            self::STATUS_PUBLISHED => 'Опубликован',
-        ];
-    }
-
-    public function getStatusText()
-    {
-        $arr = self::getStatusArray();
-        return $arr[$this->status];
     }
 
     public static function getSubAccessArray()
@@ -339,7 +323,7 @@ class Story extends ActiveRecord
 
     public function isPublished(): bool
     {
-        return ((int)$this->status === self::STATUS_PUBLISHED);
+        return ((int)$this->status === StoryStatus::PUBLISHED);
     }
 
     public function isOriginalAudioTrack(): bool
@@ -520,7 +504,7 @@ class Story extends ActiveRecord
 
     public function publishStory(): bool
     {
-        $this->status = self::STATUS_PUBLISHED;
+        $this->status = StoryStatus::PUBLISHED;
         if ($this->published_at === null) {
             $this->published_at = time();
         }

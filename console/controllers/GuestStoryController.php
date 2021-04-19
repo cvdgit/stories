@@ -4,6 +4,7 @@ namespace console\controllers;
 
 use backend\components\book\BookStoryGenerator;
 use common\models\Story;
+use common\models\story\StoryStatus;
 use common\models\StorySlide;
 use Yii;
 use yii\console\Controller;
@@ -56,7 +57,7 @@ class GuestStoryController extends Controller
     public function actionReset()
     {
         $command = Yii::$app->db->createCommand();
-        $command->update(Story::tableName(), ['body' => null], 'status = :status', [':status' => Story::STATUS_PUBLISHED]);
+        $command->update(Story::tableName(), ['body' => null], 'status = :status', [':status' => StoryStatus::PUBLISHED]);
         $affectedRows = $command->execute();
         $this->stdout($affectedRows . ' Done!' . PHP_EOL);
     }
@@ -67,7 +68,7 @@ class GuestStoryController extends Controller
             ->select(['id AS storyID'])
             ->from(Story::tableName())
             ->where('body IS NULL')
-            ->andWhere('status = :status', [':status' => Story::STATUS_PUBLISHED]);
+            ->andWhere('status = :status', [':status' => StoryStatus::PUBLISHED]);
         $storyIDs = [];
         foreach ($query->each() as $row) {
             $storyIDs[] = $row['storyID'];

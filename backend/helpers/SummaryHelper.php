@@ -1,11 +1,9 @@
 <?php
 
-
 namespace backend\helpers;
 
-
 use common\models\Payment;
-use common\models\Story;
+use common\models\story\StoryStatus;
 use common\models\User;
 use yii\db\Expression;
 use yii\db\Query;
@@ -25,7 +23,7 @@ class SummaryHelper
     {
         return (new Query())->from('{{%story}}')
             ->where(new Expression('`published_at` >= UNIX_TIMESTAMP(CURDATE())'))
-            ->andWhere(['status' => Story::STATUS_PUBLISHED])
+            ->andWhere(['status' => StoryStatus::PUBLISHED])
             ->count('id');
     }
 
@@ -71,5 +69,4 @@ class SummaryHelper
             ->andWhere('{{%payment}}.state = :valid', [':valid' => Payment::STATUS_VALID])
             ->count('{{%payment}}.id');
     }
-
 }

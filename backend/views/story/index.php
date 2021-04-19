@@ -1,5 +1,6 @@
 <?php
 use common\models\Category;
+use common\models\story\StoryStatus;
 use yii\grid\ActionColumn;
 use yii\helpers\Html;
 use yii\grid\GridView;
@@ -86,10 +87,10 @@ $this->title = 'Управление историями';
         ],
         [
             'attribute' => 'status',
-            'value' => function($model) {
-                return $model->getStatusText();
+            'value' => static function(Story $model) {
+                return StoryStatus::asText($model->status);
             },
-            'filter' => Story::getStatusArray(),
+            'filter' => StoryStatus::asArray(),
         ],
         [
             'attribute' => 'sub_access',

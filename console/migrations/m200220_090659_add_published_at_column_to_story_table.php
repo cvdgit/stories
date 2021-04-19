@@ -1,6 +1,5 @@
 <?php
 
-use common\models\Story;
 use yii\db\Migration;
 
 /**
@@ -17,7 +16,7 @@ class m200220_090659_add_published_at_column_to_story_table extends Migration
         $this->addColumn('{{%story}}', 'published_at', $this->integer()->null());
 
         $command = Yii::$app->db->createCommand();
-        $command->update('{{%story}}', ['published_at' => new \yii\db\Expression('created_at')], 'status = :status', [':status' => Story::STATUS_PUBLISHED]);
+        $command->update('{{%story}}', ['published_at' => new \yii\db\Expression('created_at')], 'status = :status', [':status' => \common\models\story\StoryStatus::PUBLISHED]);
         $command->execute();
     }
 
