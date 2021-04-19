@@ -111,6 +111,7 @@ class Story extends ActiveRecord
     {
         return [
             [['title', 'alias', 'user_id', 'source_id', 'story_categories'], 'required'],
+            [['title'], 'trim'],
             [['body', 'cover', 'story_file', 'source_dropbox', 'source_powerpoint'], 'string'],
             [['user_id', 'sub_access', 'source_id', 'views_number', 'slides_number', 'audio', 'published_at'], 'integer'],
             [['video', 'user_audio', 'episode'], 'integer'],
