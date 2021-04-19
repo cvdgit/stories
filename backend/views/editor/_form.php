@@ -1,12 +1,12 @@
 <?php
-
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
-
 $form = ActiveForm::begin([
     'id' => 'block-form',
 ]);
 /** @var $model backend\models\editor\BaseForm */
+/** @var $this yii\web\View  */
+echo $this->render($model->view, ['form' => $form, 'model' => $model]);
 ?>
 <div>
     <div style="text-align: center; margin: 6px; cursor: pointer; border-bottom: 1px #808080 dashed" class="show-block-params">Показать параметры</div>
@@ -22,10 +22,6 @@ $form = ActiveForm::begin([
     </div>
 </div>
 <?php
-
-/** @var $this yii\web\View  */
-echo $this->render($model->view, ['form' => $form, 'model' => $model]);
-
 echo $form->field($model, 'slide_id')->hiddenInput()->label(false);
 echo $form->field($model, 'block_id')->hiddenInput()->label(false);
 echo Html::submitButton('Сохранить', ['class' => 'btn btn-primary', 'style' => 'margin-right: 20px']);
