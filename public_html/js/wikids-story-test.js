@@ -977,6 +977,36 @@ var WikidsStoryTest = (function() {
         });
     }
 
+    function combineArraysRecursively(array_of_arrays) {
+        if (!array_of_arrays) {
+            return [];
+        }
+        if (!Array.isArray(array_of_arrays)) {
+            return [];
+        }
+        if (array_of_arrays.length == 0) {
+            return [];
+        }
+        for (let i = 0; i < array_of_arrays.length; i++) {
+            if (!Array.isArray(array_of_arrays[i]) || array_of_arrays[i].length == 0) {
+                return [];
+            }
+        }
+        let outputs = [];
+        function permute(arrayOfArrays, whichArray=0, output="") {
+            arrayOfArrays[whichArray].forEach((array_element) => {
+                if (whichArray == array_of_arrays.length - 1) {
+                    outputs.push([output, array_element]);
+                }
+                else{
+                    permute(arrayOfArrays, whichArray + 1, output + array_element);
+                }
+            });
+        }
+        permute(array_of_arrays);
+        return outputs;
+    }
+
     function createAnswerSteps(answers) {
         var steps = [];
         answers.map(function(item) {
@@ -987,17 +1017,33 @@ var WikidsStoryTest = (function() {
                 var key = 0;
                 var line = item.name;
                 while ((match = re.exec(item.name)) !== null) {
-                    parts.push({match, values: [match[1], match[2]], key});
-                    line = line.replace(match[0], key);
+                    parts.push({match, values: [match[1], match[2]], key: '{' + key + '}'});
+                    line = line.replace(match[0], '{' + key + '}');
                     key++;
                 }
-                for (var i = 0, str = ''; i < 2; i++) {
+
+                var variants = [];
+                if (parts.length === 1) {
+                    variants.push([parts[0].values[0]]);
+                    variants.push([parts[0].values[1]]);
+                }
+                else {
+                    variants = combineArraysRecursively(parts.map(function (item) {
+                        return item.values;
+                    }));
+                }
+
+                var str = '';
+                var j = 0;
+                variants.forEach(function(value) {
                     str = line;
-                    parts.forEach(function(value) {
-                        str = str.replace(value.key, value.values[i]);
+                    j = 0
+                    parts.forEach(function(partValue) {
+                        str = str.replace(partValue.key, value[j]);
+                        j++;
                     });
                     steps.push(str);
-                }
+                });
             }
         });
         return steps;
