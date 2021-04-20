@@ -518,6 +518,11 @@ class Story extends ActiveRecord
         $this->save(false);
     }
 
+    public function isForPublication(): bool
+    {
+        return $this->status === StoryStatus::FOR_PUBLICATION;
+    }
+
     public function submitPublicationTask(): bool
     {
         return ($this->published_at === null);
@@ -599,5 +604,15 @@ class Story extends ActiveRecord
             ->where('status = :status', [':status' => StoryStatus::FOR_PUBLICATION])
             ->orderBy(['published_at' => SORT_ASC])
             ->all();
+    }
+
+    public function cancelPublication(): void
+    {
+        if ($this->isPublished()) {
+            throw new DomainException('Невозможно отменить т.к. история уже опубликована');
+        }
+        $this->status = StoryStatus::DRAFT;
+        $this->published_at = null;
+        $this->save(false, ['status', 'published_at']);
     }
 }

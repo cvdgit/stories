@@ -149,9 +149,6 @@ class StoryService
 
         if ($sendEmail) {
             $model->storyToPublish();
-            /*Yii::$app->queue->push(new PublishStoryJob([
-                'storyID' => $model->id,
-            ]));*/
         }
         else {
             $model->publishStory();

@@ -291,7 +291,11 @@ class StoryController extends Controller
         $model = Story::findModel($id);
         try {
             $this->service->publishStory($model, $sendEmail);
-            Yii::$app->session->setFlash('success', 'История опубликована');
+            $message = 'История опубликована';
+            if ($model->isForPublication()) {
+                $message = 'История отправлена на публикацию';
+            }
+            Yii::$app->session->setFlash('success', $message);
         }
         catch (Exception $e) {
             Yii::$app->session->setFlash('error', 'Ошибка публикации: ' . $e->getMessage());
@@ -335,6 +339,19 @@ class StoryController extends Controller
             ->orderBy(['title' => SORT_ASC])
             ->limit(30)
             ->all();
+    }
+
+    public function actionCancelPublication($id)
+    {
+        $model = $this->findModel($id);
+        try {
+            $model->cancelPublication();
+            Yii::$app->session->setFlash('success', 'Публикация отменена');
+        }
+        catch (Exception $ex) {
+            Yii::$app->session->setFlash('error', $ex->getMessage());
+        }
+        return $this->redirect(['update', 'id' => $model->id]);
     }
 
 }

@@ -42,6 +42,14 @@ $this->params['sidebarMenuItems'] = [
         <?php else: ?>
             <div class="alert alert-warning">
                 <div class="clearfix">
+                    <?php if ($model->isForPublication()): ?>
+                    <div class="pull-left" style="line-height: 34px">История отправлена на публикацию</div>
+                    <div class="pull-right">
+                        <?= Html::beginForm(['/story/cancel-publication', 'id' => $model->id]) ?>
+                        <?= Html::submitButton('Отменить', ['class' => 'btn btn-primary']) ?>
+                        <?= Html::endForm() ?>
+                    </div>
+                    <?php else: ?>
                     <div class="pull-left" style="line-height: 34px">История не опубликована</div>
                     <div class="pull-right">
                         <?= Html::beginForm(['/story/publish', 'id' => $model->id]) ?>
@@ -51,6 +59,7 @@ $this->params['sidebarMenuItems'] = [
                         <?= Html::submitButton('Опубликовать', ['class' => 'btn btn-primary']) ?>
                         <?= Html::endForm() ?>
                     </div>
+                    <?php endif ?>
                 </div>
             </div>
         <?php endif ?>
