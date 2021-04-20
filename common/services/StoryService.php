@@ -143,38 +143,23 @@ class StoryService
         if (empty($model->cover)) {
             throw new DomainException('Не установлена обложка');
         }
-        if ((int)$model->slides_number === 0) {
+        if ($model->slides_number === 0) {
             throw new DomainException('В истории отсутствуют слайды');
         }
 
-        $model->publishStory();
-
         if ($sendEmail) {
-
-            Yii::$app->queue->push(new PublishStoryJob([
+            $model->storyToPublish();
+            /*Yii::$app->queue->push(new PublishStoryJob([
                 'storyID' => $model->id,
-            ]));
-
-            $notification = new NotificationModel();
-            $notification->text = (new NewStoryNotification($model))->render();
-            $this->notificationService->sendToAllUsers($notification);
+            ]));*/
+        }
+        else {
+            $model->publishStory();
         }
 
-        /*
-        $sendNotification = $model->submitPublicationTask();
-        if ($model->publishStory() && $sendNotification) {
-
-            if ($sendEmail) {
-                Yii::$app->queue->push(new PublishStoryJob([
-                    'storyID' => $model->id,
-                ]));
-            }
-
-            $notification = new NotificationModel();
-            $notification->text = (new NewStoryNotification($model))->render();
-            $this->notificationService->sendToAllUsers($notification);
-        }
-        */
+        $notification = new NotificationModel();
+        $notification->text = (new NewStoryNotification($model))->render();
+        $this->notificationService->sendToAllUsers($notification);
     }
 
     public function unPublishStory(Story $model): void

@@ -502,13 +502,20 @@ class Story extends ActiveRecord
             ->andWhere('user_id = :user', [':user' => Yii::$app->user->id]);
     }
 
-    public function publishStory(): bool
+    public function publishStory(): void
     {
         $this->status = StoryStatus::PUBLISHED;
         if ($this->published_at === null) {
             $this->published_at = time();
         }
-        return $this->save(false);
+        $this->save(false);
+    }
+
+    public function storyToPublish(): void
+    {
+        $this->status = StoryStatus::FOR_PUBLICATION;
+        $this->published_at = time();
+        $this->save(false);
     }
 
     public function submitPublicationTask(): bool
@@ -586,4 +593,11 @@ class Story extends ActiveRecord
         return $this->hasMany(StoryTest::class, ['id' => 'test_id'])->viaTable('story_story_test', ['story_id' => 'id']);
     }
 
+    public static function getToPublishStories()
+    {
+        return self::find()
+            ->where('status = :status', [':status' => StoryStatus::FOR_PUBLICATION])
+            ->orderBy(['published_at' => SORT_ASC])
+            ->all();
+    }
 }

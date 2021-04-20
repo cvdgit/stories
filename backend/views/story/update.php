@@ -1,14 +1,11 @@
 <?php
-
 use yii\helpers\Html;
-
 /** @var $this yii\web\View */
 /** @var $model common\models\Story */
 /** @var $coverUploadForm backend\models\StoryCoverUploadForm */
 /** @var $fileUploadForm backend\models\StoryFileUploadForm */
 /** @var $powerPointForm backend\models\SourcePowerPointForm */
 /** @var $wordListModel backend\models\WordListFromStoryForm */
-
 $this->title = 'История: ' . $model->title;
 $this->params['breadcrumbs'][] = ['label' => 'Истории', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->title, 'url' => Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $model->alias])];
