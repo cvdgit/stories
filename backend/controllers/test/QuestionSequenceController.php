@@ -1,10 +1,9 @@
 <?php
 
-namespace backend\controllers;
+namespace backend\controllers\test;
 
-use backend\models\question\CreateRegionQuestion;
-use backend\models\question\UpdateRegionQuestion;
-use common\models\StoryTestAnswer;
+use backend\models\question\sequence\CreateSequenceQuestion;
+use backend\models\question\sequence\UpdateSequenceQuestion;
 use common\models\StoryTestQuestion;
 use common\rbac\UserRoles;
 use Yii;
@@ -12,9 +11,8 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\web\Response;
 
-class QuestionController extends Controller
+class QuestionSequenceController extends Controller
 {
 
     public function behaviors()
@@ -38,13 +36,12 @@ class QuestionController extends Controller
         ];
     }
 
-    public function actionCreate(int $test_id, int $type)
+    public function actionCreate(int $test_id)
     {
-        $model = new CreateRegionQuestion();
-        $model->test_id = $test_id;
+        $model = new CreateSequenceQuestion($test_id);
         if ($model->load(Yii::$app->request->post())) {
             try {
-                $id = $model->create();
+                $id = $model->createQuestion();
                 Yii::$app->session->setFlash('success', 'Вопрос успешно создан');
                 return $this->redirect(['update', 'id' => $id]);
             }
@@ -60,10 +57,10 @@ class QuestionController extends Controller
     public function actionUpdate(int $id)
     {
         $model = $this->findModel($id);
-        $form = new UpdateRegionQuestion($model);
+        $form = new UpdateSequenceQuestion($model);
         if ($form->load(Yii::$app->request->post())) {
             try {
-                $form->update();
+                $form->updateQuestion();
                 Yii::$app->session->setFlash('success', 'Вопрос успешно изменен');
             }
             catch (\Exception $ex) {
@@ -89,41 +86,6 @@ class QuestionController extends Controller
             return $model;
         }
         throw new NotFoundHttpException('The requested page does not exist.');
-    }
-
-    protected function findAnswerModel($id)
-    {
-        if (($model = StoryTestAnswer::findOne($id)) !== null) {
-            return $model;
-        }
-        throw new NotFoundHttpException('The requested page does not exist.');
-    }
-
-    public function actionDeleteAnswer($id)
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $model = $this->findAnswerModel($id);
-        $model->delete();
-        return ['success' => true];
-    }
-
-    public function actionDeleteImage(int $id)
-    {
-        $model = $this->findModel($id);
-        $fileDeleted = false;
-        try {
-            $model->deleteImage();
-            $fileDeleted = true;
-        }
-        catch (\Exception $ex) {
-            Yii::$app->session->setFlash('error', $ex->getMessage());
-        }
-
-        $model->image = null;
-        $model->save();
-        Yii::$app->session->setFlash('success', 'Изображение успешно удалено');
-
-        return $this->redirect(['test/update-question', 'question_id' => $model->id]);
     }
 
 }

@@ -78,7 +78,8 @@ class StoryTestQuestion extends ActiveRecord
      */
     public function getStoryTestAnswers()
     {
-        return $this->hasMany(StoryTestAnswer::class, ['story_question_id' => 'id']);
+        return $this->hasMany(StoryTestAnswer::class, ['story_question_id' => 'id'])
+            ->orderBy(['order' => SORT_ASC]);
     }
 
     /**
@@ -134,6 +135,11 @@ class StoryTestQuestion extends ActiveRecord
         return self::create($testID, $name, QuestionType::REGION, $order, $mixAnswers, $image, $regions);
     }
 
+    public static function createSequence(int $testID, string $name, int $order = 1): self
+    {
+        return self::create($testID, $name, QuestionType::SEQUENCE, $order, 1);
+    }
+
     public function getImagesPath()
     {
         return Yii::getAlias('@public') . Yii::$app->params['test.question.images'] . '/' . $this->story_test_id . '/';
@@ -149,7 +155,12 @@ class StoryTestQuestion extends ActiveRecord
 
     public function typeIsRegion(): bool
     {
-        return (int) $this->type === QuestionType::REGION;
+        return $this->type === QuestionType::REGION;
+    }
+
+    public function typeIsSequence(): bool
+    {
+        return (new QuestionType($this->type))->isSequence();
     }
 
     public function afterDelete()

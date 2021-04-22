@@ -129,4 +129,9 @@ class StoryTestAnswer extends ActiveRecord
         FileHelper::unlink($path);
     }
 
+    public static function createSequenceAnswer(int $questionID, string $name, int $order): self
+    {
+        return self::create($questionID, $name, true, $order);
+    }
+
 }
