@@ -790,6 +790,10 @@ var WikidsStoryTest = (function() {
             questionName = 'Заполните пропущенные части';
         }
 
+        if (questionViewSequence(question)) {
+            questionName = question.name;
+        }
+
         var titleElement = $('<p/>')
             .addClass('question-title')
             .append(questionName);
@@ -1511,7 +1515,6 @@ var WikidsStoryTest = (function() {
         }
 
         if (questionViewSequence(currentQuestion)) {
-            console.log(currentQuestion['_object'].createAnswers(getAnswersData(currentQuestion)));
             $('.wikids-test-answers', currentQuestionElement)
                 .empty()
                 .append(currentQuestion['_object'].createAnswers(getAnswersData(currentQuestion))
@@ -1523,7 +1526,7 @@ var WikidsStoryTest = (function() {
             .slideDown()
             .addClass('wikids-test-active-question');
 
-        if (testConfig.sourceIsWord()) {
+        if (testConfig.sourceIsWord() || questionViewSequence(currentQuestion)) {
             dom.nextButton.hide();
         }
 
@@ -1690,7 +1693,7 @@ var WikidsStoryTest = (function() {
 
     function showNextButton() {
         //if (!testConfig.answerTypeIsNumPad() && !testConfig.answerTypeIsInput() && !testConfig.answerTypeIsRecording()) {
-        if (!testConfig.sourceIsWord()) {
+        if (!testConfig.sourceIsWord() && !questionViewSequence(currentQuestion)) {
             dom.nextButton.show();
         }
     }
