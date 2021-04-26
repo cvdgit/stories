@@ -586,10 +586,6 @@ var WikidsStoryTest = (function() {
         return parseInt(question.answer_number);
     }
 
-    function getQuestionView(question) {
-        return question.view;
-    }
-
     function createAnswers(answers, question) {
 
         var num = getQuestionAnswerNumber(question);
@@ -851,18 +847,20 @@ var WikidsStoryTest = (function() {
                 case 'missing_words':
                     $answers = createMissingWordsAnswers(question, getAnswersData(question));
                     break;
+                case 'sequence':
+                    var questionObject = new SequenceQuestion(question);
+                    $answers = questionObject.createAnswers(getAnswersData(question));
+                    question['_object'] = questionObject;
+                    break;
                 default:
                     $answers = createAnswers(getAnswersData(question), question);
             }
-
             $answers.appendTo($question);
 
             if (showQuestionImage && question.image) {
-
                 var $image = $('<img/>')
                     .attr("src", question.image)
                     .css('max-width', '330px');
-
                 var originalImageExists = question['original_image'] === undefined ? true : question['original_image'];
                 if (originalImageExists) {
                     $image
@@ -871,9 +869,9 @@ var WikidsStoryTest = (function() {
                             showOriginalImage($(this).attr('src'));
                         });
                 }
-
                 $image.appendTo($(".question-image", $question));
             }
+
             $questions.append($question);
         });
 
@@ -1068,23 +1066,35 @@ var WikidsStoryTest = (function() {
             correct = correctAnswerSteps(steps, answer);
         }
         else {
-            correctAnswers = correctAnswers.map(correctAnswersCallback);
-            var answerCheckCallback = function (value, index) {
-                if (convertAnswerToInt) {
-                    value = parseInt(value)
+            if (questionViewSequence(question)) {
+                correct = checkAnswersCorrect(question, answer);
+            }
+            else {
+                correctAnswers = correctAnswers.map(correctAnswersCallback);
+                var answerCheckCallback = function (value, index) {
+                    if (convertAnswerToInt) {
+                        value = parseInt(value)
+                    }
+                    return value === correctAnswers.sort()[index];
+                };
+                if (answer.length === correctAnswers.length && answer.sort().every(answerCheckCallback)) {
+                    correctAnswersNumber++;
+                    correct = true;
                 }
-                return value === correctAnswers.sort()[index];
-            };
-
-            if (answer.length === correctAnswers.length && answer.sort().every(answerCheckCallback)) {
-                correctAnswersNumber++;
-                correct = true;
             }
         }
         return correct;
     }
 
-    function answerQuestion(element, answer, correctAnswersCallback, convertAnswerToInt) {
+    function getQuestionView(question) {
+        return question['view'] ? question.view : '';
+    }
+
+    function questionViewSequence(question) {
+        return getQuestionView(question) === 'sequence';
+    }
+
+    /*function answerQuestion(element, answer, correctAnswersCallback, convertAnswerToInt) {
         console.debug('WikidsStoryTest.answerQuestion');
         var questionID = element.attr("data-question-id");
         var question = getQuestionsData().filter(function(elem) {
@@ -1100,19 +1110,35 @@ var WikidsStoryTest = (function() {
             correct = correctAnswerSteps(steps, answer);
         }
         else {
-            correctAnswers = correctAnswers.map(correctAnswersCallback);
-            var answerCheckCallback = function(value, index) {
-                if (convertAnswerToInt) {
-                    value = parseInt(value)
+            if (questionViewSequence(question)) {
+                correct = checkAnswersCorrect(question, answer);
+            }
+            else {
+                correctAnswers = correctAnswers.map(correctAnswersCallback);
+                var answerCheckCallback = function(value, index) {
+                    if (convertAnswerToInt) {
+                        value = parseInt(value)
+                    }
+                    return value === correctAnswers.sort()[index];
+                };
+                if (answer.length === correctAnswers.length && answer.sort().every(answerCheckCallback)) {
+                    correctAnswersNumber++;
+                    correct = true;
                 }
-                return value === correctAnswers.sort()[index];
-            };
-            if (answer.length === correctAnswers.length && answer.sort().every(answerCheckCallback)) {
-                correctAnswersNumber++;
-                correct = true;
             }
         }
         return correct;
+    }*/
+
+    function checkAnswersCorrect(question, userAnswers) {
+        var correctAnswers = getCorrectAnswers(question);
+        correctAnswers.sort(function(a, b) {
+            return a.order - b.order;
+        });
+        correctAnswers = correctAnswers.map(function(answer) {
+            return parseInt(answer.id);
+        });
+        return (JSON.stringify(correctAnswers) === JSON.stringify(userAnswers));
     }
 
     function getQuestionAnswers(element) {
@@ -1254,10 +1280,6 @@ var WikidsStoryTest = (function() {
                 case 'input':
                     answer = getInputQuestionAnswers($activeQuestion);
                     break;
-                /*case 'recognition':
-                    answer = getRecognitionQuestionAnswers($activeQuestion);
-                    answerTypeRecording.resetResult();
-                    break;*/
                 default:
                     answer = getQuestionAnswers($activeQuestion);
             }
@@ -1293,7 +1315,8 @@ var WikidsStoryTest = (function() {
 
         var rememberAnswer = getQuestionRememberAnswers(currentQuestion);
         if (!rememberAnswer) {
-            answerIsCorrect = answerQuestion($activeQuestion, answer, correctAnswersCallback, convertAnswerToInt);
+            //answerIsCorrect = answerQuestion($activeQuestion, answer, correctAnswersCallback, convertAnswerToInt);
+            answerIsCorrect = checkAnswerCorrect(currentQuestion, answer, correctAnswersCallback, convertAnswerToInt);
         }
         else {
             changeQuestionRememberAnswers(currentQuestion, answer);
@@ -1484,6 +1507,14 @@ var WikidsStoryTest = (function() {
             $('.wikids-test-answers', currentQuestionElement)
                 .empty()
                 .append(createAnswers(getAnswersData(currentQuestion), currentQuestion)
+                    .find('.wikids-test-answers > div'));
+        }
+
+        if (questionViewSequence(currentQuestion)) {
+            console.log(currentQuestion['_object'].createAnswers(getAnswersData(currentQuestion)));
+            $('.wikids-test-answers', currentQuestionElement)
+                .empty()
+                .append(currentQuestion['_object'].createAnswers(getAnswersData(currentQuestion))
                     .find('.wikids-test-answers > div'));
         }
 
@@ -2779,5 +2810,79 @@ var TestSpeech = function(options) {
 
             synthesis.speak(utterance);
         }
+    }
+}
+
+var SequenceQuestion = function(question) {
+
+    var $list = $('<div/>', {
+        class: 'list-group'
+    });
+
+    function checkResult(result) {
+        return WikidsStoryTest.checkAnswerCorrect(WikidsStoryTest.getCurrentQuestion(), result);
+    }
+
+    Sortable.create($list[0], {
+        ghostClass: 'wikids-sortable-ghost',
+        handle: '.wikids-sortable-handle',
+        onUpdate: function(e) {
+            var answers = getAnswerIDs(e.srcElement);
+            if (checkResult(answers)) {
+                WikidsStoryTest.nextQuestion(answers);
+            }
+        }
+    });
+
+    function shuffle(array) {
+        var counter = array.length;
+        // While there are elements in the array
+        while (counter > 0) {
+            // Pick a random index
+            var index = Math.floor(Math.random() * counter);
+            // Decrease counter by 1
+            counter--;
+            // And swap the last element with it
+            var temp = array[counter];
+            array[counter] = array[index];
+            array[index] = temp;
+        }
+        return array;
+    }
+
+    function createAnswer(answers) {
+        $list.empty();
+        answers = shuffle(answers);
+        answers.forEach(function(answer) {
+            var move = $('<i/>', {
+                class: 'glyphicon glyphicon-move wikids-sortable-handle'
+            });
+            $('<div/>', {
+                'class': 'list-group-item',
+                'text': answer.name,
+                'data-answer-id': answer.id
+            }).prepend(move).appendTo($list);
+        });
+        return $list;
+    }
+
+    function getAnswerIDs(list) {
+        return $(list).find('[data-answer-id]').map(function() {
+            return parseInt($(this).attr('data-answer-id'));
+        }).get();
+    }
+
+    function createAnswers(answers) {
+        var $answers = $('<div/>', {
+            'class': 'wikids-test-answers'
+        });
+        $answers.append(createAnswer(answers));
+        var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-4 col-md-offset-4 question-wrapper"></div></div>');
+        $wrapper.find(".question-wrapper").append($answers);
+        return $wrapper;
+    }
+
+    return {
+        createAnswers: createAnswers
     }
 }

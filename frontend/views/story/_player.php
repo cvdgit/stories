@@ -5,6 +5,7 @@ use common\widgets\Reveal\Plugins\Video;
 use common\widgets\RevealButtons\BackgroundButton;
 use frontend\assets\PlyrAsset;
 use frontend\assets\RecorderAsset;
+use frontend\assets\SortableJsAsset;
 use frontend\widgets\FrontendRevealWidget;
 use yii\helpers\Json;
 use yii\helpers\Url;
@@ -70,6 +71,7 @@ echo FrontendRevealWidget::widget([
     'assets' => [
         PlyrAsset::class,
         RecorderAsset::class,
+        SortableJsAsset::class,
     ],
     'plugins' => $plugins,
 ]);

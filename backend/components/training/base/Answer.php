@@ -20,13 +20,17 @@ class Answer
     /** @var mixed|string */
     private $regionID;
 
-    public function __construct(int $id, string $name, bool $correct, $regionID = '', $image = null)
+    /** @var int|null */
+    private $order;
+
+    public function __construct(int $id, string $name, bool $correct, $regionID = '', $image = null, $order = null)
     {
         $this->id = $id;
         $this->name = $name;
         $this->correct = $correct;
         $this->regionID = $regionID;
         $this->image = $image;
+        $this->order = $order;
     }
 
     /**
@@ -75,6 +79,11 @@ class Answer
     public function setRegionID($regionID): void
     {
         $this->regionID = $regionID;
+    }
+
+    public function getOrder()
+    {
+        return $this->order;
     }
 
 }

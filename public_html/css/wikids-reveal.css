@@ -2268,3 +2268,13 @@ p.wikids-test-description {
 	color: #FFFFFF;
 	font-size: 0.8em;
 }
+
+.wikids-sortable-ghost {
+	opacity: .5;
+	background: #C8EBFB;
+}
+
+.wikids-sortable-handle {
+	cursor: grab;
+	margin-right: 6px;
+}

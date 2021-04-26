@@ -94,7 +94,7 @@ class QuestionController extends Controller
         }
 
         if ($test->isSourceTest()) {
-            $collection = (new TestBuilder($test, $test->getQuestionData(), $test->getQuestionDataCount(), $userStars))
+            $collection = (new TestBuilder($test, $test->getQuestionData($userHistory), $test->getQuestionDataCount(), $userStars))
                 ->build();
             return (new Serializer())
                 ->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount);

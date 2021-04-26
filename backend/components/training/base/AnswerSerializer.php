@@ -22,6 +22,7 @@ class AnswerSerializer
             'region_id' => $this->answer->getRegionID(),
             'image' => $this->answer->getImage(),
             'original_image' => false,
+            'order' => (int) $this->answer->getOrder(),
         ];
     }
 

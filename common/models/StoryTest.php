@@ -267,12 +267,18 @@ class StoryTest extends ActiveRecord
         return (int) $this->answer_type === AnswerType::MISSING_WORDS;
     }
 
-    public function getQuestionData()
+    public function getQuestionData($filter = null): array
     {
-        return StoryTestQuestion::find()
+        $query = StoryTestQuestion::find()
             ->where('story_test_id = :id', [':id' => $this->id])
-            ->with('storyTestAnswers')
-            ->all();
+            ->with('storyTestAnswers');
+        if ($filter !== null) {
+            $ids = array_map(static function($item) {
+                return $item['entity_id'];
+            }, $filter);
+            $query->andFilterWhere(['not in', 'id', $ids]);
+        }
+        return $query->all();
     }
 
     public function getQuestionDataCount()
