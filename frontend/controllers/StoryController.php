@@ -258,11 +258,11 @@ class StoryController extends Controller
         if ($studentId !== null) {
             $userQuestionHistoryModel = new UserQuestionHistoryModel();
             $userQuestionHistoryModel->student_id = $studentId;
-            //$userHistory = $userQuestionHistoryModel->getUserQuestionHistory($test->id);
+            $userHistory = $userQuestionHistoryModel->getUserQuestionHistoryLocal($test->id);
             $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStarsLocal($test->id);
             $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCountLocal($test->id);
         }
-        $collection = (new TestBuilder($test, $test->getQuestionData(), $test->getQuestionDataCount(), $userStars))
+        $collection = (new TestBuilder($test, $test->getQuestionData($userHistory), $test->getQuestionDataCount(), $userStars))
             ->build();
         return (new Serializer())
             ->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount);

@@ -41,12 +41,15 @@ var TestSlide = (function() {
             "dataType": "json"
         });
 
-        WikidsStoryTest.setDataParams(config.action + "/" + test_id + "?t=" + Math.random())
+        var test = WikidsStoryTest.create(container, {
+            'dataUrl': config.action + "/" + test_id + "?t=" + Math.random(),
+            'forSlide': true
+        });
         promise.done(function(data) {
 
-            WikidsStoryTest.init(false, true, data, container);
-            WikidsStoryTest.addEventListener("finish", storyTestResults);
-            WikidsStoryTest.addEventListener("backToStory", backToStory);
+            test.init(data);
+            test.addEventListener("finish", storyTestResults);
+            test.addEventListener("backToStory", backToStory);
 
             Reveal.sync();
             Reveal.slide(0);
@@ -127,11 +130,20 @@ var Education = (function() {
         if (!elem.length) {
             return;
         }
-        elem.html($('<img/>').attr('src', '/img/loading.gif').css('marginTop', '22%'));
-        WikidsStoryTest.setDataParams('/question/get', elem.data());
+        /*elem.html(
+            $('<img/>')
+                .attr('src', '/img/loading.gif')
+                .css('marginTop', '22%')
+        );*/
+
+        var test = WikidsStoryTest.create(elem, {
+            'dataUrl': '/question/get',
+            'dataParams': elem.data(),
+            'forSlide': false
+        });
         initQuestions(elem.data()).done(function(response) {
             StoryBackground.setBackgroundColor('light');
-            WikidsStoryTest.init(response.test.remote, false, response, elem);
+            test.init(response);
         });
     }
 

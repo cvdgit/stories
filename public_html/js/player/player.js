@@ -202,10 +202,14 @@ var WikidsPlayer = (function(document, $) {
             }
         },
         "right": function() {
+            console.debug('WikidsPlayer.right')
             if (Reveal.isLastSlide() && window["TransitionSlide"]) {
                 TransitionSlide.backToStory();
             }
             else {
+                //if (window['WikidsStoryTest'] && WikidsStoryTest.isTestSlide()) {
+                //    console.log('test');
+                //}
                 Reveal.next();
             }
         },
