@@ -130,12 +130,13 @@ var Education = (function() {
         if (!elem.length) {
             return;
         }
+        var params = elem.data();
         var test = WikidsStoryTest.create(elem, {
             'dataUrl': '/question/get',
-            'dataParams': elem.data(),
+            'dataParams': params,
             'forSlide': false
         });
-        initQuestions(elem.data()).done(function(response) {
+        initQuestions(params).done(function(response) {
             StoryBackground.setBackgroundColor('light');
             test.init(response);
             test.addEventListener("finish", function() {

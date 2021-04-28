@@ -84,13 +84,14 @@ $('#run-test-modal').on('shown.bs.modal', function() {
         params = params || {};
         return $.getJSON("/question/init", params);
     }
-    var elem = $("div.new-questions", this);
+    var elem = $("div.new-questions", this),
+        params = elem.data();
     var test = WikidsStoryTest.create(elem, {
         'dataUrl': '/question/get',
-        'dataParams': elem.data(),
+        'dataParams': params,
         'forSlide': false
     });
-    initQuestions(elem.data()).done(function(response) {
+    initQuestions(params).done(function(response) {
         test.init(response);
     });
 });

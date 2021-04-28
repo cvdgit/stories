@@ -17,5 +17,6 @@ class TestAsset extends AssetBundle
     ];
     public $depends = [
         'yii\web\YiiAsset',
+        SortableJsAsset::class,
     ];
 }
