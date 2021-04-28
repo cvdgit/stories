@@ -85,9 +85,13 @@ $('#run-test-modal').on('shown.bs.modal', function() {
         return $.getJSON("/question/init", params);
     }
     var elem = $("div.new-questions", this);
-    WikidsStoryTest.setDataParams('/question/get', elem.data());
+    var test = WikidsStoryTest.create(elem, {
+        'dataUrl': '/question/get',
+        'dataParams': elem.data(),
+        'forSlide': false
+    });
     initQuestions(elem.data()).done(function(response) {
-        WikidsStoryTest.init(response.test.remote, false, response, elem);
+        test.init(response);
     });
 });
 $('#run-test-modal').on('hide.bs.modal', function() {
