@@ -202,14 +202,19 @@ var WikidsPlayer = (function(document, $) {
             }
         },
         "right": function() {
-            console.debug('WikidsPlayer.right')
             if (Reveal.isLastSlide() && window["TransitionSlide"]) {
                 TransitionSlide.backToStory();
             }
             else {
-                //if (window['WikidsStoryTest'] && WikidsStoryTest.isTestSlide()) {
-                //    console.log('test');
-                //}
+                /*if (window['WikidsStoryTest']) {
+                    var test = $(Reveal.getCurrentSlide()).find('div.new-questions');
+                    if (test.length) {
+                        var canNext = test[0]['_wikids_test'].canNext();
+                        if (!canNext) {
+                            return;
+                        }
+                    }
+                }*/
                 Reveal.next();
             }
         },

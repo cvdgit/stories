@@ -130,12 +130,6 @@ var Education = (function() {
         if (!elem.length) {
             return;
         }
-        /*elem.html(
-            $('<img/>')
-                .attr('src', '/img/loading.gif')
-                .css('marginTop', '22%')
-        );*/
-
         var test = WikidsStoryTest.create(elem, {
             'dataUrl': '/question/get',
             'dataParams': elem.data(),
@@ -144,6 +138,9 @@ var Education = (function() {
         initQuestions(elem.data()).done(function(response) {
             StoryBackground.setBackgroundColor('light');
             test.init(response);
+            test.addEventListener("finish", function() {
+                WikidsPlayer.right();
+            });
         });
     }
 

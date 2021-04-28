@@ -170,7 +170,7 @@
         return $html;
     };
 
-    var SlideLoader = (function() {
+    /*var SlideLoader = (function() {
 
         var $element = $('<div/>')
             .addClass('wikids-test-loader')
@@ -189,7 +189,7 @@
             'show': show,
             'hide': hide
         };
-    })();
+    })();*/
 
     var TestLinked = function(data) {
 
@@ -396,80 +396,117 @@
     }
 
     var Morphy = function() {
-
         var API = {};
-
         API.correctResult = function(match, result) {
             return $.post('/morphy/root', {
                 match, result
             });
         }
-
         return API;
     };
 
-    var MissingWords = function(recognition) {
+    function MissingWords(test) {
 
-        var elements = [];
+        var control;
+        this.control = control = new RecognitionControl(test);
+        this.recognition = null;
+        this.test = test;
 
-        recognition.addEventListener('onStart', function() {
-            WikidsStoryTest.hideNextButton();
-            var element = getElement(WikidsStoryTest.getCurrentQuestion().id);
-            setStatus(element, 'Идет запись с микрофона');
-        });
+        this.init = function(question, answer) {
+            var element = $('<div/>', {
+                'class': 'missing-words test-recognition'
+            });
+            var that = this;
+            element.data('correctAnswer', answer.name);
+            element
+                .append($('<p/>', {
+                    'class': 'missing-words-text',
+                    'html': createMaskedString(question.name)
+                }));
+            element.on('click', 'span.label', function (e) {
+                that.start(e, question.id, $(this).attr('data-match'));
+            });
+            element
+                .append($('<div/>')
+                    .addClass('recognition-result-wrapper')
+                    .append($('<span/>').addClass('recognition-result').css('background-color', 'inherit'))
+                    .append($('<span/>').addClass('recognition-result-interim'))
+                );
+            $('<div/>')
+                .addClass('wikids-test-loader')
+                .append($('<img/>')
+                    .attr('src', '/img/loading.gif')
+                    .attr('width', '60px')
+                )
+                .hide()
+                .appendTo(element);
+            element
+                .append($('<p/>').addClass('recognition-status'));
+            $('<a/>')
+                .attr('href', '#')
+                .attr('title', 'Остановить')
+                .addClass('recognition-stop')
+                .on('click', function(e) {
+                    e.preventDefault();
+                    that.recognition.stop();
+                })
+                .append($('<i/>').addClass('glyphicon glyphicon-stop'))
+                .hide()
+                .appendTo(element);
+            return element;
+        };
 
-        recognition.addEventListener('onResult', function(event) {
-            var args = event.args;
-            var elem = $(args.target);
-            var match = elem.attr('data-match')
-            var result = $.trim(args.result);
-            elem.text(result);
-            if (result.length >= match.length) {
-                recognition.stop();
+        this.addRecognitionListeners = function() {
+            if (this.recognition === null) {
+                return;
             }
-        });
+            var that = this;
+            this.recognition.addEventListener('onStart', function() {
+                test.hideNextButton();
+                control.setStatus('Идет запись с микрофона');
+            });
+            this.recognition.addEventListener('onResult', function(event) {
+                var args = event.args;
+                var elem = $(args.target);
+                var match = elem.attr('data-match')
+                var result = $.trim(args.result);
+                elem.text(result);
+                if (result.length >= match.length) {
+                    that.recognition.stop();
+                }
+            });
+            this.recognition.addEventListener('onEnd', function(event) {
+                control.hideLoader();
+                control.hideStopButton();
+                control.setStatus();
+                var args = event.args,
+                    elem = $(args.target),
+                    match = elem.attr('data-match');
+                var result = control.getMissingWordsText();
+                if (checkResult(result)) {
+                    that.resetMatchElements();
+                    test.nextQuestion([result]);
+                }
+                else {
+                    correctResult(match, args.result).done(function(response) {
+                        elem.text(response.result);
+                        result = control.getMissingWordsText();
+                        if (checkResult(result)) {
+                            that.resetMatchElements();
+                            test.nextQuestion([result]);
+                        }
+                        else {
+                            test.showNextButton();
+                        }
+                    });
+                }
+            });
+        }
 
         function correctResult(match, result) {
             return $.post('/morphy/root', {
                 match, result
             });
-        }
-
-        recognition.addEventListener('onEnd', function(event) {
-
-            var element = getElement(WikidsStoryTest.getCurrentQuestion().id);
-            hideLoader(element);
-            hideStopButton(element);
-            setStatus(element);
-
-            var args = event.args,
-                elem = $(args.target),
-                match = elem.attr('data-match');
-
-            var result = getMissingWordsText(element);
-            if (checkResult(result)) {
-                resetMatchElements();
-                WikidsStoryTest.nextQuestion([result]);
-            }
-            else {
-                correctResult(match, args.result).done(function(response) {
-                    elem.text(response.result);
-                    result = getMissingWordsText(element);
-                    if (checkResult(result)) {
-                        resetMatchElements();
-                        WikidsStoryTest.nextQuestion([result]);
-                    }
-                    else {
-                        WikidsStoryTest.showNextButton();
-                    }
-                });
-            }
-        });
-
-        function createRepeatString(string) {
-            return string.split(' ').map(function(word) {
-                return '*'.repeat(word.length);
-            }).join('_');
         }
 
         function createMaskedString(string) {
@@ -481,129 +518,54 @@
             return string;
         }
 
-        function resetMatchElements() {
-            var element = getElement(WikidsStoryTest.getCurrentQuestion().id);
-            $('.missing-words-text', element).find('span.label').each(function() {
+        function createRepeatString(string) {
+            return string.split(' ').map(function(word) {
+                return '*'.repeat(word.length);
+            }).join('_');
+        }
+
+        this.resetMatchElements = function() {
+            control.getMissingWordsElement().find('span.label').each(function() {
                 var match = $(this).attr('data-match');
                 $(this).text(createRepeatString(match));
             });
-        }
-
-        function init(question, answer) {
-
-            var element = $('<div/>', {
-                'class': 'missing-words test-recognition'
-            });
-
-            element.data('correctAnswer', answer.name);
-
-            element
-                .append($('<p/>', {
-                    'class': 'missing-words-text',
-                    'html': createMaskedString(question.name)
-                }));
-
-            element.on('click', 'span.label', function (e) {
-                start(e, question.id, $(this).attr('data-match'));
-            });
-
-            element
-                .append($('<div/>')
-                    .addClass('recognition-result-wrapper')
-                    .append($('<span/>').addClass('recognition-result').css('background-color', 'inherit'))
-                    .append($('<span/>').addClass('recognition-result-interim'))
-                );
-
-            $('<div/>')
-                .addClass('wikids-test-loader')
-                .append($('<img/>')
-                    .attr('src', '/img/loading.gif')
-                    .attr('width', '60px')
-                )
-                .hide()
-                .appendTo(element);
-
-            element
-                .append($('<p/>').addClass('recognition-status'));
-
-            $('<a/>')
-                .attr('href', '#')
-                .attr('title', 'Остановить')
-                .addClass('recognition-stop')
-                .on('click', function(e) {
-                    e.preventDefault();
-                    recognition.stop();
-                })
-                .append($('<i/>').addClass('glyphicon glyphicon-stop'))
-                .hide()
-                .appendTo(element);
-
-            elements[question.id] = element;
-            return element;
-        }
-
-        function getElement(id) {
-            return elements[id];
-        }
-
-        function showLoader(element) {
-            element.find('.wikids-test-loader').show();
-        }
-
-        function hideLoader(element) {
-            element.find('.wikids-test-loader').hide();
-        }
-
-        function setStatus(element, status) {
-            status = status || '';
-            element.find('.recognition-status').text(status);
-        }
-
-        function showStopButton(element) {
-            element.find('.recognition-stop').show();
-        }
-
-        function hideStopButton(element) {
-            element.find('.recognition-stop').hide();
-        }
+        };
 
         function checkResult(result) {
-            return WikidsStoryTest.checkAnswerCorrect(
-                WikidsStoryTest.getCurrentQuestion(),
+            return test.checkAnswerCorrect(
+                test.getCurrentQuestion(),
                 [result],
                 function(elem) {
                     return elem.name.toLowerCase();
                 },
                 false);
         }
+    }
 
-        function getMissingWordsText(element) {
-            return $.trim(element.find('.missing-words-text').text()).toLowerCase();
+    MissingWords.prototype = {
+        start: function(event, questionID, match) {
+            this.control.setStatus();
+            this.control.showLoader();
+            this.control.showStopButton();
+            this.recognition.start(event, match);
+        },
+        getResult: function() {
+            return this.control.getMissingWordsText();
+        },
+        setRecognition: function(recognition) {
+            this.recognition = recognition;
+            this.addRecognitionListeners();
         }
-
-        function start(event, questionID, match) {
-            var element = getElement(questionID);
-            setStatus(element);
-            showLoader(element);
-            showStopButton(element);
-            recognition.start(event, match);
-        }
-
-        return {
-            'init': init,
-            'start': start,
-            'getResult': function() {
-                var element = getElement(WikidsStoryTest.getCurrentQuestion().id);
-                return getMissingWordsText(element);
-            },
-            'resetMatchElements': resetMatchElements
-        };
     };
 
-    var RecognitionControl = function() {
+    _extends(MissingWords, {
+        pluginName: 'missingWords'
+    });
+
+    var RecognitionControl = function(test) {
 
         function getElement() {
-            return WikidsStoryTest.getCurrentQuestionElement();
+            return test.getCurrentQuestionElement();
         }
 
         var API = {}
@@ -675,7 +637,7 @@
         };
 
         API.getCurrentCorrectAnswer = function() {
-            return WikidsStoryTest.getCorrectAnswer(WikidsStoryTest.getCurrentQuestion())
+            return test.getCorrectAnswer(test.getCurrentQuestion())
                 .map(function(elem) {
                     return $.trim(elem.name);
                 })
@@ -686,18 +648,97 @@
             getElement().find('.recognition-result').focus();
         };
 
+        API.getMissingWordsText = function() {
+            return $.trim(getElement().find('.missing-words-text').text()).toLowerCase();
+        }
+
+        API.getMissingWordsElement = function() {
+            return getElement().find('.missing-words-text');
+        }
+
         return API;
     }
 
-    var RecordingAnswer = function(recognition) {
+    function RecordingAnswer(test) {
 
-        var control = new RecognitionControl();
+        var control;
+        this.control = control = new RecognitionControl(test);
+        this.recognition = null;
+        this.test = test;
 
-        function create(question, answer) {
+        function checkResultLength(result, match) {
+            return result.length >= match.replaceAll(/(\d+)#([\wа-яА-ЯёЁ]+)/uig, "$1").length;
+        }
 
+        this.addRecognitionListeners = function() {
+            if (this.recognition === null) {
+                return;
+            }
+            this.recognition.addEventListener('onStart', function() {
+                test.hideNextButton();
+                control.setStatus('Идет запись с микрофона');
+                control.showStopButton();
+                control.disableResult();
+            });
+
+            var that = this;
+            this.recognition.addEventListener('onEnd', function() {
+                control.hideLoader();
+                control.hideStopButton();
+                control.setStatus();
+                control.enableResult();
+
+                var result = that.getResult();
+                if (result.length === 0) {
+                    control.repeatButtonShow();
+                    control.resultSetFocus();
+                    return;
+                }
+
+                if (that.checkResult(result)) {
+                    that.resetResult();
+                    test.nextQuestion([result]);
+                }
+                else {
+                    var morphy = new Morphy();
+                    morphy.correctResult(control.getCurrentCorrectAnswer(), result).done(function(response) {
+                        result = response.result;
+                        control.setResult(result);
+                        if (that.checkResult(result)) {
+                            that.resetResult();
+                            test.nextQuestion([result]);
+                        }
+                        else {
+                            test.showNextButton();
+                        }
+                    })
+                    control.repeatButtonShow();
+                    control.resultSetFocus();
+                }
+            });
+
+            this.recognition.addEventListener('onError', function(event) {
+                control.hideLoader();
+                control.setStatus(event.args.error);
+            });
+
+            this.recognition.addEventListener('onResult', function(event) {
+                var args = event.args;
+                var result = $.trim(args.result);
+                control.setResult(result);
+                var match = control.getCurrentCorrectAnswer();
+                if (checkResultLength(result, match)) {
+                    that.recognition.stop();
+                }
+            });
+        };
+    }
+
+    RecordingAnswer.prototype = {
+        create: function (question, answer) {
+            var that = this;
             var element = $('<div/>');
             element.addClass('test-recognition');
-
             element
                 .append($('<div/>')
                     .addClass('recognition-result-wrapper')
@@ -705,48 +746,25 @@
                         $('<div/>')
                             .prop('contenteditable', true)
                             .addClass('recognition-result')
-                            .on('input', function(e) {
+                            .on('input', function (e) {
                                 var value = $(this).text();
                                 value.length > 0
-                                    ? WikidsStoryTest.showNextButton()
-                                    : WikidsStoryTest.hideNextButton();
+                                    ? that.test.showNextButton()
+                                    : that.test.hideNextButton();
                             })
-                            .on('keydown', function(e) {
+                            .on('keydown', function (e) {
                                 if (e.key === "Enter") {
                                     e.preventDefault();
                                     var value = $(this).text();
                                     if (value.length > 0) {
-                                        resetResult();
-                                        WikidsStoryTest.nextQuestion([value]);
+                                        that.resetResult();
+                                        that.test.nextQuestion([value]);
                                     }
                                 }
                             })
                     )
                     .append($('<span/>').addClass('recognition-result-interim'))
                 );
-
-            /*
-            element.append(
-                $('<div/>')
-                    .css('text-align', 'center')
-                    .append(
-                        $('<a/>')
-                            .attr('href', '#')
-                            .attr('title', 'Повторить фрагмент')
-                            .on('click', function(e) {
-                                e.preventDefault();
-                                var range = window.getSelection().getRangeAt(0);
-                                if (!range.toString().length) {
-                                    return;
-                                }
-                                startFragment(range, e);
-                            })
-                            .hide()
-                            .addClass('recognition-repeat-word')
-                            .append($('<i/>').addClass('glyphicon glyphicon-refresh'))
-                    )
-            );*/
-
             $('<div/>')
                 .addClass('wikids-test-loader')
                 .append($('<img/>')
@@ -755,148 +773,73 @@
                 )
                 .hide()
                 .appendTo(element);
-
             element
                 .append($('<p/>').addClass('recognition-status'));
-
             $('<a/>')
                 .attr('href', '#')
                 .attr('title', 'Повторить ввод с микрофона')
                 .addClass('recognition-repeat')
-                .on('click', function(e) {
+                .on('click', function (e) {
                     e.preventDefault();
-                    start(e);
+                    that.start(e);
                 })
                 .append($('<i/>').addClass('glyphicon glyphicon-refresh'))
                 .hide()
                 .appendTo(element);
-
             $('<a/>')
                 .attr('href', '#')
                 .attr('title', 'Остановить')
                 .addClass('recognition-stop')
-                .on('click', function(e) {
+                .on('click', function (e) {
                     e.preventDefault();
-                    recognition.stop();
+                    that.recognition.stop();
                 })
                 .append($('<i/>').addClass('glyphicon glyphicon-stop'))
                 .hide()
                 .appendTo(element);
-
             return element;
-        }
-
-        function start(event) {
-            control.setStatus();
-            control.setResult();
-            control.repeatButtonHide();
-            control.showLoader();
-            recognition.start(event);
-        }
-
-        function autoStart(event, timeout) {
-            control.setStatus();
-            control.repeatButtonHide();
+        },
+        autoStart: function (event, timeout) {
+            this.control.setStatus();
+            this.control.repeatButtonHide();
             timeout = timeout || 1000;
+            var that = this;
             setTimeout(function() {
-                control.showLoader();
-                recognition.start(event);
+                that.control.showLoader();
+                that.recognition.start(event);
             }, timeout);
-        }
-
-        function startFragment(range, event) {
-            control.showStopButton();
-            recognition.start(event);
-        }
-
-        recognition.addEventListener('onStart', function() {
-            WikidsStoryTest.hideNextButton();
-            control.setStatus('Идет запись с микрофона');
-            control.showStopButton();
-            control.disableResult();
-        });
-
-        function checkResult(result) {
-            return WikidsStoryTest.checkAnswerCorrect(
-                WikidsStoryTest.getCurrentQuestion(),
+        },
+        setRecognition: function(recognition) {
+            this.recognition = recognition;
+            this.addRecognitionListeners();
+        },
+        getResult: function() {
+            return this.control.getResult();
+        },
+        resetResult: function() {
+            this.control.setResult();
+        },
+        start: function(event) {
+            this.control.setStatus();
+            this.control.setResult();
+            this.control.repeatButtonHide();
+            this.control.showLoader();
+            this.recognition.start(event);
+        },
+        checkResult: function(result) {
+            return this.test.checkAnswerCorrect(
+                this.test.getCurrentQuestion(),
                 [result],
                 function(elem) {
                     return elem.name.toLowerCase();
                 },
                 false);
         }
-
-        function getResult() {
-            return control.getResult();
-        }
-
-        function resetResult() {
-            control.setResult();
-        }
-
-        recognition.addEventListener('onEnd', function() {
-
-            control.hideLoader();
-            control.hideStopButton();
-            control.setStatus();
-            control.enableResult();
-            var result = getResult();
-
-            if (result.length === 0) {
-                control.repeatButtonShow();
-                control.resultSetFocus();
-                return;
-            }
-
-            if (checkResult(result)) {
-                resetResult();
-                WikidsStoryTest.nextQuestion([result]);
-            }
-            else {
-                var morphy = new Morphy();
-                morphy.correctResult(control.getCurrentCorrectAnswer(), result).done(function(response) {
-                    result = response.result;
-                    control.setResult(result);
-                    if (checkResult(result)) {
-                        resetResult();
-                        WikidsStoryTest.nextQuestion([result]);
-                    }
-                    else {
-                        WikidsStoryTest.showNextButton();
-                    }
-                })
-                control.repeatButtonShow();
-                control.resultSetFocus();
-            }
-        });
-
-        recognition.addEventListener('onError', function(event) {
-            control.hideLoader();
-            control.setStatus(event.args.error);
-        });
-
-        function checkResultLength(result, match) {
-            return result.length >= match.replaceAll(/(\d+)#([\wа-яА-ЯёЁ]+)/uig, "$1").length;
-        }
-
-        recognition.addEventListener('onResult', function(event) {
-            var args = event.args;
-            var result = $.trim(args.result);
-            control.setResult(result);
-            var match = control.getCurrentCorrectAnswer();
-            if (checkResultLength(result, match)) {
-                recognition.stop();
-            }
-        });
-
-        return {
-            'create': create,
-            'start': start,
-            'autoStart': autoStart,
-            'getResult': getResult,
-            'resetResult': resetResult
-        };
     };
+
+    _extends(RecordingAnswer, {
+        pluginName: 'recordingAnswer'
+    });
 
     var MissingWordsRecognition = function(config) {
 
@@ -1083,14 +1026,14 @@
         }
     }
 
-    var SequenceQuestion = function(question) {
+    function SequenceQuestion(test) {
 
         var $list = $('<div/>', {
             class: 'list-group'
         });
 
         function checkResult(result) {
-            return WikidsStoryTest.checkAnswerCorrect(WikidsStoryTest.getCurrentQuestion(), result);
+            return test.checkAnswerCorrect(test.getCurrentQuestion(), result);
         }
 
         Sortable.create($list[0], {
@@ -1099,12 +1042,12 @@
             onUpdate: function(e) {
                 var answers = getAnswerIDs(e.srcElement);
                 if (checkResult(answers)) {
-                    WikidsStoryTest.nextQuestion(answers);
+                    test.nextQuestion(answers);
                 }
             }
         });
 
-        function createAnswer(answers) {
+        this.createAnswer = function(answers) {
             $list.empty();
             answers = shuffle(answers);
             answers.forEach(function(answer) {
@@ -1125,28 +1068,87 @@
                 return parseInt($(this).attr('data-answer-id'));
             }).get();
         }
+    }
 
-        function createAnswers(answers) {
+    SequenceQuestion.prototype = {
+        createAnswers: function(answers) {
             var $answers = $('<div/>', {
                 'class': 'wikids-test-answers'
             });
-            $answers.append(createAnswer(answers));
+            $answers.append(this.createAnswer(answers));
             var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-4 col-md-offset-4 question-wrapper"></div></div>');
             $wrapper.find(".question-wrapper").append($answers);
             return $wrapper;
         }
+    };
 
-        return {
-            createAnswers: createAnswers
-        }
+    _extends(SequenceQuestion, {
+        pluginName: 'sequenceQuestion'
+    });
+
+    function _extends() {
+        _extends = Object.assign || function (target) {
+            for (var i = 1; i < arguments.length; i++) {
+                var source = arguments[i];
+                for (var key in source) {
+                    if (Object.prototype.hasOwnProperty.call(source, key)) {
+                        target[key] = source[key];
+                    }
+                }
+            }
+            return target;
+        };
+        return _extends.apply(this, arguments);
     }
 
+    var plugins = [];
+    var defaults = {
+        initializeByDefault: true
+    };
+    var PluginManager = {
+        mount: function mount(plugin) {
+            // Set default static properties
+            for (var option in defaults) {
+                if (defaults.hasOwnProperty(option) && !(option in plugin)) {
+                    plugin[option] = defaults[option];
+                }
+            }
+            plugins.forEach(function (p) {
+                if (p.pluginName === plugin.pluginName) {
+                    throw "WikidsStoryTest: Cannot mount plugin ".concat(plugin.pluginName, " more than once");
+                }
+            });
+            plugins.push(plugin);
+        },
+        initializePlugins: function initializePlugins(test, el, defaults, options) {
+            plugins.forEach(function (plugin) {
+                var pluginName = plugin.pluginName;
+                //if (!test.options[pluginName] && !plugin.initializeByDefault) return;
+                if (!plugin.initializeByDefault) return;
+                var initialized = new plugin(test, el, {});
+                initialized.test = test;
+                initialized.options = {};
+                test[pluginName] = initialized; // Add default options from plugin
+                _extends(defaults, initialized.defaults);
+            });
+        }
+    };
 
+    var tests = [];
 
     function WikidsStoryTest(el, options) {
 
         options = options || {};
-        options = Object.assign({}, options);
+        this.options = Object.assign({}, options);
+
+        var that = this;
+
+        el[0]['_wikids_test'] = this;
+
+        this.recordingAnswer = null;
+        this.recognition = null;
+        this.sequenceQuestion = null;
+        this.missingWords = null;
 
         setElementHtml(createLoader('Инициализация'));
 
@@ -1279,7 +1281,7 @@
         }
 
         function createContainer() {
-            if (options.forSlide) {
+            if (that.options.forSlide) {
                 setElementHtml($("<section/>")
                     .attr("data-background-color", "#ffffff")
                     .append(dom.wrapper));
@@ -1323,13 +1325,8 @@
         var showAnswerImage = true,
             showAnswerText = true,
             showQuestionImage = true;
-
         var numPad;
         var linked;
-        var missingWords,
-            missingWordsRecognition,
-            recordingAnswer;
-
         var speech;
 
         function initQuestions() {
@@ -1359,19 +1356,9 @@
             console.debug('WikidsStoryTest.load');
 
             questionSuccess = new QuestionSuccess();
-
             testData = data[0];
-
             questions = getQuestionsData();
-            //console.log(questions);
-
             numQuestions = questions.length;
-            //if (numQuestions === 0) {
-                //initQuestions();
-                //return;
-            //}
-
-            //console.log(skipQuestion);
 
             if (testData['test']) {
                 incorrectAnswerText = testData['test']['incorrectAnswerText'] || '';
@@ -1385,40 +1372,34 @@
 
             testConfig = new TestConfig(testData['test']);
             linked = new TestLinked(testData['stories']);
-
             questionsRepeat = new QuestionsRepeat(questions, 5);
             testProgress = new TestProgress(getProgressData());
-
             numPad = new AnswerTypeNumPad();
-
             speech = new TestSpeech();
 
             if (testConfig.answerTypeIsMissingWords()) {
-                missingWordsRecognition = new MissingWordsRecognition(testConfig);
-                missingWords = new MissingWords(missingWordsRecognition);
+                that.missingWords.setRecognition(new MissingWordsRecognition(testConfig));
             }
 
             if (testConfig.answerTypeIsRecording()) {
-                recordingAnswer = RecordingAnswer(new MissingWordsRecognition(testConfig))
+                that.recordingAnswer.setRecognition(new MissingWordsRecognition(testConfig));
             }
 
             makeTestQuestions();
-            //console.log(testQuestions);
-
             setupDOM();
             addEventListeners();
 
             if (testConfig.answerTypeIsMissingWords()) {
                 dom.nextButton.off("click").on("click", function() {
-                    var result = missingWords.getResult();
-                    missingWords.resetMatchElements();
+                    var result = that.missingWords.getResult();
+                    that.missingWords.resetMatchElements();
                     nextQuestion([result]);
                 });
             }
             if (testConfig.answerTypeIsRecording()) {
                 dom.nextButton.off("click").on("click", function() {
-                    var result = recordingAnswer.getResult();
-                    recordingAnswer.resetResult();
+                    var result = that.recordingAnswer.getResult();
+                    that.recordingAnswer.resetResult();
                     nextQuestion([result]);
                 });
             }
@@ -1439,12 +1420,11 @@
             console.debug('WikidsStoryTest.loadData');
 
             setElementHtml(createLoader());
-
-            var dataParams = Object.assign(options.dataParams || {}, {studentId: currentStudent.id});
-            $.getJSON(options.dataUrl, dataParams)
+            var dataParams = Object.assign(that.options.dataParams || {}, {studentId: currentStudent.id});
+            $.getJSON(that.options.dataUrl, dataParams)
                 .done(function(response) {
                     load(response);
-                    if (options.forSlide) {
+                    if (that.options.forSlide) {
                         Reveal.sync();
                         Reveal.slide(0);
                     }
@@ -1829,7 +1809,7 @@
         }
 
         function createRecordingAnswer(question, answer) {
-            return recordingAnswer.create(question, answer);
+            return that.recordingAnswer.create(question, answer);
         }
 
         function createRegionAnswer(question, answers) {
@@ -1856,7 +1836,7 @@
         }
 
         function createMissingWordsAnswer(question, answer) {
-            return missingWords.init(question, answer);
+            return that.missingWords.init(question, answer);
         }
 
         function createMissingWordsAnswers(question, answers) {
@@ -1994,9 +1974,9 @@
                         $answers = createMissingWordsAnswers(question, getAnswersData(question));
                         break;
                     case 'sequence':
-                        var questionObject = new SequenceQuestion(question);
-                        $answers = questionObject.createAnswers(getAnswersData(question));
-                        question['_object'] = questionObject;
+                        // var questionObject = new SequenceQuestion(question);
+                        $answers = that.sequenceQuestion.createAnswers(getAnswersData(question));
+                        //question['_object'] = questionObject;
                         break;
                     default:
                         $answers = createAnswers(getAnswersData(question), question);
@@ -2104,6 +2084,8 @@
                 .append("<h2>Тест пройден</h2>")
                 .append(linked.getHtml())
                 .show();
+
+            currentStudent['finish'] = true;
 
             dispatchEvent("finish", {
                 "testID": getTestData().id,
@@ -2604,7 +2586,7 @@
             if (questionViewSequence(currentQuestion)) {
                 $('.wikids-test-answers', currentQuestionElement)
                     .empty()
-                    .append(currentQuestion['_object'].createAnswers(getAnswersData(currentQuestion))
+                    .append(that.sequenceQuestion.createAnswers(getAnswersData(currentQuestion))
                         .find('.wikids-test-answers > div'));
             }
 
@@ -2622,7 +2604,6 @@
                 var text = getAnswersData(nextQuestion)[0].name;
                 var q = $('.wikids-test-active-question .answer-input', dom.questions);
                 setTimeout(function () {
-                    //testSpeech.ReadText(text);
                     speech.readText(text, testConfig.getInputVoice());
                     q.focus();
                 }, 500);
@@ -2647,12 +2628,12 @@
                     var text = currentQuestion.name;
                     setTimeout(function() {
                         speech.readText(text, testConfig.getAskQuestionLang(), function () {
-                            recordingAnswer.autoStart(new Event('autoStart'), 500);
+                            that.recordingAnswer.autoStart(new Event('autoStart'), 500);
                         });
                     }, 500);
                 }
                 else {
-                    recordingAnswer.autoStart(new Event('autoStart'));
+                    that.recordingAnswer.autoStart(new Event('autoStart'));
                 }
             }
         }
@@ -2792,7 +2773,7 @@
                     }
                 }
                 else {
-                    if (testConfig.sourceIsLocal()) {
+                    if (that.options.forSlide) {
                         dispatchEvent("backToStory", {});
                     }
                     else {
@@ -2839,6 +2820,36 @@
             elem.html(dom.wrapper);
         }
 
+        PluginManager.initializePlugins(this, el, {});
+
+        this.getCurrentQuestionElement = function() {
+            return currentQuestionElement;
+        }
+
+        this.getCorrectAnswer = function(question) {
+            return getCorrectAnswers(question);
+        };
+
+        this.getCurrentQuestion = getCurrentQuestion;
+
+        this.hideNextButton = function() {
+            dom.nextButton.hide();
+        };
+
+        this.showNextButton = function() {
+            dom.nextButton.show();
+        };
+
+        this.nextQuestion = nextQuestion;
+
+        this.checkAnswerCorrect = checkAnswerCorrect;
+
+        tests.push(el);
+
+        this.canNext = function() {
+            return currentStudent && (currentStudent.progress === 100 || currentStudent['finish']);
+        };
+
         return {
             "init": init,
             "load": load,
@@ -2848,23 +2859,8 @@
                     dom.wrapper[0].addEventListener(type, listener, useCapture);
                 }
             },
-            "getCurrentQuestion": getCurrentQuestion,
-            "nextQuestion": nextQuestion,
-            "getCurrentQuestionElement": function() {
-                return currentQuestionElement;
-            },
-            "showNextButton": function() {
-                dom.nextButton.show();
-            },
-            "hideNextButton": function() {
-                dom.nextButton.hide();
-            },
-            "checkAnswerCorrect": checkAnswerCorrect,
             "getTestConfig": function() {
                 return testConfig;
-            },
-            "getCorrectAnswer": function(question) {
-                return getCorrectAnswers(question);
             },
             "isTestSlide": function() {
                 return ($('[data-test-id]', Reveal.getCurrentSlide()).length > 0);
@@ -2875,6 +2871,27 @@
     WikidsStoryTest.create = function(el, options) {
         return new WikidsStoryTest(el, options);
     };
+
+    WikidsStoryTest.mount = function () {
+        for (var _len = arguments.length, plugins = new Array(_len), _key = 0; _key < _len; _key++) {
+            plugins[_key] = arguments[_key];
+        }
+        if (plugins[0].constructor === Array) plugins = plugins[0];
+        plugins.forEach(function (plugin) {
+            if (!plugin.prototype || !plugin.prototype.constructor) {
+                throw "WikidsStoryTest: Mounted plugin must be a constructor function, not ".concat({}.toString.call(plugin));
+            }
+            PluginManager.mount(plugin);
+        });
+    };
+
+    WikidsStoryTest.mount(RecordingAnswer);
+    WikidsStoryTest.mount(SequenceQuestion);
+    WikidsStoryTest.mount(MissingWords);
+
+    WikidsStoryTest.getTests = function() {
+        return tests;
+    }
 
     return WikidsStoryTest;
 }));
