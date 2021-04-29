@@ -11,9 +11,13 @@ class QuestionCollection
     /** @var BaseQuestion[] */
     private $questions = [];
 
-    public function __construct(int $total)
+    /** @var bool */
+    private $fastMode;
+
+    public function __construct(int $total, bool $fastMode = false)
     {
         $this->total = $total;
+        $this->fastMode = $fastMode;
     }
 
     public function getQuestions(): array
@@ -36,8 +40,11 @@ class QuestionCollection
         if ($shuffle) {
             shuffle($this->questions);
         }
-        return array_map(static function($item) {
-            return $item->serialize();
+        $total = $this->fastMode ? 1 : 5;
+        return array_map(static function($item) use ($total) {
+            $value = $item->serialize();
+            $value['stars']['total'] = $total;
+            return $value;
         }, $this->questions);
     }
 

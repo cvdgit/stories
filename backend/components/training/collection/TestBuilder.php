@@ -13,12 +13,12 @@ class TestBuilder
     private $stars;
     private $collection;
 
-    public function __construct(StoryTest $test, $data, $dataCount, $stars)
+    public function __construct(StoryTest $test, $data, $dataCount, $stars, bool $fastMode = false)
     {
         $this->test = $test;
         $this->data = $data;
         $this->stars = $stars;
-        $this->collection = new QuestionCollection($dataCount);
+        $this->collection = new QuestionCollection($dataCount, $fastMode);
     }
 
     public function build()

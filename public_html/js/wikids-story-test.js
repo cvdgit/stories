@@ -1313,7 +1313,8 @@
 
         function makeTestQuestions() {
             var end = false;
-            while (!end && testQuestions.length < 5) {
+            var max = getQuestionRepeat();
+            while (!end && testQuestions.length < max) {
                 end = questions.length === 0;
                 if (!end) {
                     testQuestions.push(questions.shift());
@@ -1352,6 +1353,10 @@
             createContainer(false);
         }
 
+        function getQuestionRepeat() {
+            return that.options.fastMode ? 1 : 5;
+        }
+
         function load(data) {
             console.debug('WikidsStoryTest.load');
 
@@ -1372,7 +1377,7 @@
 
             testConfig = new TestConfig(testData['test']);
             linked = new TestLinked(testData['stories']);
-            questionsRepeat = new QuestionsRepeat(questions, 5);
+            questionsRepeat = new QuestionsRepeat(questions, getQuestionRepeat());
             testProgress = new TestProgress(getProgressData());
             numPad = new AnswerTypeNumPad();
             speech = new TestSpeech();
@@ -1420,7 +1425,10 @@
             console.debug('WikidsStoryTest.loadData');
 
             setElementHtml(createLoader());
-            var dataParams = Object.assign(that.options.dataParams || {}, {studentId: currentStudent.id});
+            var dataParams = Object.assign(that.options.dataParams || {}, {
+                studentId: currentStudent.id,
+                fastMode: that.options.fastMode
+            });
             $.getJSON(that.options.dataUrl, dataParams)
                 .done(function(response) {
                     load(response);
@@ -1467,15 +1475,30 @@
                 .addClass('btn wikids-test-begin')
                 .text('Начать тест')
                 .on('click', function() {
+                    var fastMode = $('#test-fast-mode').is(':checked');
+                    that.options.fastMode = fastMode;
                     loadData();
                 });
+
+            var $options = $('<div/>', {
+                class: 'wikids-test-begin-page-options'
+            });
+            $options.append('<label for="test-fast-mode"><input id="test-fast-mode" type="checkbox" /> быстрый режим</label>');
+
+            var $col = $('<div/>').addClass('col-md-6')
+                .append($('<h3/>').text('Выберите ученика:'))
+                .append($listGroup);
+
+            if (App.userIsModerator()) {
+                $col.append($options);
+            }
+
+            $col.append($beginButton);
+
             return $('<div/>')
                 .addClass('wikids-test-begin-page row')
                 .append($('<h3/>').text(testResponse.test.header))
-                .append($('<div/>').addClass('col-md-6')
-                    .append($('<h3/>').text('Выберите ученика:'))
-                    .append($listGroup)
-                    .append($beginButton))
+                .append($col)
                 .append($('<div/>').addClass('col-md-6')
                     .append($('<p/>').addClass('wikids-test-description').html(testResponse.test.description)));
         }
@@ -1866,7 +1889,7 @@
             var $elem = $('<p/>');
             $elem.addClass('question-stars');
             $elem.css('textAlign', 'right');
-            appendStars($elem, 5, stars.current);
+            appendStars($elem, getQuestionRepeat(), stars.current);
             return $elem;
         }
 
@@ -2280,7 +2303,7 @@
 
         function updateStars($question, current) {
             var $stars = $('.question-stars', $question);
-            appendStars($stars, 5, current);
+            appendStars($stars, getQuestionRepeat(), current);
         }
 
         function answerByID(question, id) {
@@ -2440,7 +2463,7 @@
             //console.log(questions);
             //console.log(currentQuestion);
 
-            if (!App.userIsGuest()) {
+            if (!App.userIsGuest() && !that.options.fastMode) {
                 var answerParams = {};
                 var answerList = [];
                 if (testConfig.sourceIsNeo()) {
@@ -2554,7 +2577,7 @@
                 }
             }
             else {
-                if (done) {
+                if (done && !that.options.fastMode) {
                     showQuestionSuccessPage(answer);
                 }
                 else {

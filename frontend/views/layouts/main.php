@@ -33,7 +33,8 @@ AppAsset::register($this);
     <script>
         var WikidsConfig = {
             'user': {
-                'isGuest': <?= Json::encode(Yii::$app->user->isGuest) ?>
+                'isGuest': <?= Json::encode(Yii::$app->user->isGuest) ?>,
+                'isModerator': <?= Json::encode(Yii::$app->user->can(UserRoles::ROLE_MODERATOR)) ?>
             }
         };
     </script>

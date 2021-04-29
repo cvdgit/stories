@@ -65,7 +65,7 @@ class QuestionController extends Controller
         return $result;
     }
 
-    public function actionGet(int $testId, int $studentId = null, $question_params = null)
+    public function actionGet(int $testId, int $studentId = null, $question_params = null, bool $fastMode = false)
     {
 
         $test = $this->findTestModel($testId);
@@ -74,7 +74,7 @@ class QuestionController extends Controller
         $userHistory = [];
         $userStars = [];
         $userStarsCount = 0;
-        if ($studentId !== null) {
+        if ($studentId !== null && !$fastMode) {
             $userQuestionHistoryModel = new UserQuestionHistoryModel();
             $userQuestionHistoryModel->student_id = $studentId;
             $userHistory = $userQuestionHistoryModel->getUserQuestionHistoryLocal($test->id);
@@ -84,20 +84,21 @@ class QuestionController extends Controller
 
         if ($test->isSourceWordList()) {
             $wordListModel = $this->findWordListModel($test->word_list_id);
-            $collection = (new WordTestBuilder($test, $wordListModel->getTestWordsData($test->id, $studentId, $userHistory), $wordListModel->getTestWordsCount(), $userStars))->build();
+            $collection = (new WordTestBuilder($test, $wordListModel->getTestWordsData($test->id, $studentId, $userHistory), $wordListModel->getTestWordsCount(), $userStars, $fastMode))->build();
             return (new Serializer())->serialize(
                 $test,
                 $collection,
                 $this->getStudents($test->id),
                 $userStarsCount,
+                $fastMode,
                 $wordListModel->getLinkedStories());
         }
 
         if ($test->isSourceTest()) {
-            $collection = (new TestBuilder($test, $test->getQuestionData($userHistory), $test->getQuestionDataCount(), $userStars))
+            $collection = (new TestBuilder($test, $test->getQuestionData($userHistory), $test->getQuestionDataCount(), $userStars, $fastMode))
                 ->build();
             return (new Serializer())
-                ->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount);
+                ->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount, $fastMode);
         }
 
         $curl = new Curl();
@@ -208,7 +209,7 @@ class QuestionController extends Controller
             'test' => [
                 'id' => $test->id,
                 'progress' => [
-                    'total' => $numberQuestions * 5,
+                    'total' => $numberQuestions * ($fastMode ? 1 : 5),
                     'current' => (int)$userStarsCount,
                 ],
                 'incorrectAnswerText' => $test->incorrect_answer_text,

@@ -1828,7 +1828,7 @@
 
 .wikids-test-begin-page .list-group {
 	max-width: 400px;
-	margin: 0 auto 30px;
+	margin: 0 auto 15px;
 }
 
 .wikids-test-student-info {
@@ -2277,4 +2277,18 @@ p.wikids-test-description {
 .wikids-sortable-handle {
 	cursor: grab;
 	margin-right: 6px;
+}
+
+.wikids-test-begin-page-options label {
+	font-size: 2rem;
+	font-weight: normal;
+}
+
+.wikids-test-begin-page-options input[type=checkbox] {
+	transform: scale(1.5);
+	margin-right: 4px;
+}
+
+.wikids-test-begin {
+	margin-top: 15px;
 }

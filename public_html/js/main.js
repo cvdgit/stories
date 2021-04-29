@@ -17,11 +17,18 @@ var App = (function() {
 	'use strict';
 
 	return {
-		'getConfig': function() {
-			return WikidsConfig;
+		getConfig: function() {
+			return WikidsConfig || {};
 		},
-		'userIsGuest': function() {
-			return WikidsConfig.user.isGuest;
+		getConfigUser: function() {
+			var config = this.getConfig();
+			return config.user || {};
+		},
+		userIsGuest: function() {
+			return this.getConfigUser().isGuest;
+		},
+		userIsModerator: function() {
+			return this.getConfigUser().isModerator;
 		}
 	};
 })();

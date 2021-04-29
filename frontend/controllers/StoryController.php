@@ -239,7 +239,7 @@ class StoryController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
-    public function actionGetStoryTest(int $id, int $studentId = null)
+    public function actionGetStoryTest(int $id, int $studentId = null, bool $fastMode = false)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
@@ -255,7 +255,7 @@ class StoryController extends Controller
         $userHistory = [];
         $userStars = [];
         $userStarsCount = 0;
-        if ($studentId !== null) {
+        if ($studentId !== null && !$fastMode) {
             $userQuestionHistoryModel = new UserQuestionHistoryModel();
             $userQuestionHistoryModel->student_id = $studentId;
             $userHistory = $userQuestionHistoryModel->getUserQuestionHistoryLocal($test->id);
@@ -265,7 +265,7 @@ class StoryController extends Controller
         $collection = (new TestBuilder($test, $test->getQuestionData($userHistory), $test->getQuestionDataCount(), $userStars))
             ->build();
         return (new Serializer())
-            ->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount);
+            ->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount, $fastMode);
     }
 
     protected function getStudents(int $testID)

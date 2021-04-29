@@ -7,7 +7,12 @@ use common\models\StoryTest;
 class Serializer
 {
 
-    public function serialize(StoryTest $test, QuestionCollection $collection, $students, $userStarsCount, $stories = []): array
+    public function serialize(StoryTest $test,
+                              QuestionCollection $collection,
+                              $students,
+                              int $userStarsCount,
+                              bool $fastMode = false,
+                              $stories = []): array
     {
         return [
             0 => [
@@ -15,8 +20,8 @@ class Serializer
                 'test' => [
                     'id' => $test->id,
                     'progress' => [
-                        'total' => $collection->getTotal() * 5,
-                        'current' => (int) $userStarsCount,
+                        'total' => $collection->getTotal() * ($fastMode ? 1 : 5),
+                        'current' => $userStarsCount,
                     ],
                     'showAnswerImage' => true,
                     'showAnswerText' => true,
