@@ -18,7 +18,7 @@ class WordListFormatter
         return implode(PHP_EOL, $texts);
     }
 
-    private function createWord(string $name, string $correct = ''): array
+    private function createWord(string $name, $correct = ''): array
     {
         $name = trim(preg_replace('/\s{2,}/', ' ', $name));
         $correct = trim(preg_replace('/\s{2,}/', ' ', $correct));
@@ -48,7 +48,7 @@ class WordListFormatter
         return preg_match_all('/(\\d+)#([\\w]+)/ui', $text, $matches);
     }
 
-    public function createOne(string $name, string $correct = ''): array
+    public function createOne(string $name, $correct = ''): array
     {
         return $this->createWord($name, $correct);
     }
