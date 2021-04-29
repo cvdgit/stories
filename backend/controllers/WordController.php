@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\components\WordListFormatter;
 use backend\models\CreateWordForm;
 use backend\models\UpdateWordForm;
 use common\models\TestWord;
@@ -16,6 +17,14 @@ use yii\web\Response;
 
 class WordController extends Controller
 {
+
+    private $wordFormatter;
+
+    public function __construct($id, $module, WordListFormatter $wordFormatter, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->wordFormatter = $wordFormatter;
+    }
 
     public function behaviors()
     {
@@ -43,7 +52,7 @@ class WordController extends Controller
         $model = new CreateWordForm($listModel);
         if ($model->load(Yii::$app->request->post())) {
             try {
-                $model->createWord();
+                $model->createWord($this->wordFormatter);
                 return Json::encode(['success' => true, 'params' => $model->getTestWordsAsArray()]);
             }
             catch (\Exception $ex) {
@@ -90,7 +99,7 @@ class WordController extends Controller
         $updateForm = new UpdateWordForm($model);
         if ($updateForm->load(Yii::$app->request->post())) {
             try {
-                $updateForm->updateWord();
+                $updateForm->updateWord($this->wordFormatter);
                 return Json::encode(['success' => true, 'params' => $model->wordList->getTestWordsAsArray()]);
             }
             catch (\Exception $ex) {
@@ -120,7 +129,7 @@ class WordController extends Controller
         $updateForm = new UpdateWordForm($model);
         if ($updateForm->load(Yii::$app->request->post())) {
             try {
-                $updateForm->copyWord();
+                $updateForm->copyWord($this->wordFormatter);
                 return Json::encode(['success' => true, 'params' => $model->wordList->getTestWordsAsArray()]);
             }
             catch (\Exception $ex) {

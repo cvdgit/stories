@@ -2,6 +2,7 @@
 
 namespace backend\models;
 
+use backend\components\WordListFormatter;
 use common\models\TestWord;
 use common\models\TestWordList;
 use DomainException;
@@ -43,12 +44,14 @@ class CreateWordForm extends Model
         return $this->list->getTestWordsAsArray();
     }
 
-    public function createWord()
+    public function createWord(WordListFormatter $wordFormatter): void
     {
         if (!$this->validate()) {
             throw new DomainException('Model not valid');
         }
-        $model = TestWord::create($this->name, $this->list->id, 1, $this->correct_answer);
+
+        $word = $wordFormatter->createOne($this->name, $this->correct_answer);
+        $model = TestWord::create($word['name'], $this->list->id, 1, $word['correct_answer']);
         $model->save();
     }
 

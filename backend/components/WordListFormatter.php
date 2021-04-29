@@ -18,7 +18,18 @@ class WordListFormatter
         return implode(PHP_EOL, $texts);
     }
 
-    public function create(array $texts)
+    private function createWord(string $name, string $correct = ''): array
+    {
+        $name = trim(preg_replace('/\s{2,}/', ' ', $name));
+        $correct = trim(preg_replace('/\s{2,}/', ' ', $correct));
+        $correct = trim(preg_replace('/[^\w\-\s.,#]/u', '', $correct));
+        return [
+            'name' => $name,
+            'correct_answer' => $correct,
+        ];
+    }
+
+    public function create(array $texts): array
     {
         $texts = array_filter($texts, function($value) {
             if (strpos($value, '|') !== false) {
@@ -26,20 +37,20 @@ class WordListFormatter
             }
             return !is_null($value) && $value !== '';
         });
-        return array_map(static function($row) {
+        return array_map(function($row) {
             @list($text, $correctAnswer) = explode('|', $row);
-            // $text = trim(preg_replace('/[^\w\-\s.,!?+-]/u', '', $text));
-            $correctAnswer = trim(preg_replace('/[^\w\-\s.,#]/u', '', $correctAnswer));
-            return [
-                'name' => $text,
-                'correct_answer' => $correctAnswer,
-            ];
+            return $this->createWord($text, $correctAnswer);
         }, $texts);
     }
 
     public function haveMatches(string $text, &$matches)
     {
         return preg_match_all('/(\\d+)#([\\w]+)/ui', $text, $matches);
+    }
+
+    public function createOne(string $name, string $correct = ''): array
+    {
+        return $this->createWord($name, $correct);
     }
 
 }
