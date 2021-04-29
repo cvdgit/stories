@@ -205,6 +205,9 @@
         init();
 
         function getHtml() {
+            if (!stories.length) {
+                return '';
+            }
             var $wrapper = $('<div/>')
                 .addClass('test-linked-stories-wrapper');
             $wrapper.append($('<p/>').text('Посмотрите историю'))
@@ -1548,12 +1551,12 @@
                 .text('Закончить тест')
                 .appendTo($(".wikids-test-buttons", dom.controls));
             dom.restartButton = $("<button/>")
-                .addClass("wikids-test-reset")
+                .addClass("btn wikids-test-reset")
                 .hide()
                 .text('Пройти еще раз')
                 .appendTo($(".wikids-test-buttons", dom.controls));
             dom.backToStoryButton = $("<button/>")
-                .addClass("wikids-test-back")
+                .addClass("btn wikids-test-back")
                 .hide()
                 .text('Вернуться к истории')
                 .appendTo($(".wikids-test-buttons", dom.controls));
@@ -1561,6 +1564,11 @@
                 .addClass("wikids-test-continue")
                 .hide()
                 .text('Продолжить')
+                .appendTo($(".wikids-test-buttons", dom.controls));
+            dom.nextSlideButton = $("<button/>")
+                .addClass("btn wikids-test-next-slide")
+                .hide()
+                .html('Продолжить <i class="icomoon-chevron-right"></i>')
                 .appendTo($(".wikids-test-buttons", dom.controls));
             dom.results = createResults();
             dom.correctAnswerPage = createCorrectAnswerPage();
@@ -1585,6 +1593,7 @@
             dom.restartButton.off("click").on("click", restart);
             dom.backToStoryButton.off("click").on("click", backToStory);
             dom.continueButton.off("click").on("click", continueTestAction);
+            dom.nextSlideButton.off("click").on("click", nextSlideAction);
         }
 
         function showOriginalImage(url, elem) {
@@ -2068,6 +2077,25 @@
             }
         }
 
+        function setTestResults(title) {
+            title = title || 'Тест пройден';
+            dom.results
+                .empty()
+                .append("<h2>" + title + "</h2>");
+            var linkedStories = linked.getHtml();
+            console.log(linkedStories);
+            if (linkedStories.length) {
+                dom.results.append(linkedStories);
+            }
+            return dom.results.show();
+        }
+
+        function nextSlideAction() {
+            dispatchEvent("nextSlide", {
+                "testID": getTestData().id
+            });
+        }
+
         function start() {
             console.debug('WikidsStoryTest.start');
 
@@ -2076,17 +2104,14 @@
 
             if (numQuestions === 0) {
                 if (currentStudent.progress === 100) {
-                    dom.results
-                        .empty()
-                        .append("<h2>Тест пройден</h2>")
-                        .show();
-                    dom.backToStoryButton.show();
+                    setTestResults();
+                    if (that.options.forSlide) {
+                        dom.backToStoryButton.show();
+                    }
+                    dom.nextSlideButton.show();
                 }
                 else {
-                    dom.results
-                        .empty()
-                        .append("<h2>В тесте нет вопросов</h2>")
-                        .show();
+                    setTestResults('В тесте нет вопросов');
                 }
                 return;
             }
@@ -2098,18 +2123,10 @@
         }
 
         function finish() {
-
             $('.wikids-test-active-question').hide().removeClass('wikids-test-active-question');
             dom.finishButton.hide();
-
-            dom.results
-                .empty()
-                .append("<h2>Тест пройден</h2>")
-                .append(linked.getHtml())
-                .show();
-
+            setTestResults();
             currentStudent['finish'] = true;
-
             dispatchEvent("finish", {
                 "testID": getTestData().id,
                 "correctAnswers": correctAnswersNumber
@@ -2117,8 +2134,7 @@
         }
 
         function restart() {
-
-            var nextQuestion = testQuestions.shift();
+/*            var nextQuestion = testQuestions.shift();
             $('.wikids-test-question[data-question-id=' + nextQuestion.id + ']', dom.questions)
                 .find('input[type=checkbox],input[type=radio]').prop('checked', false).end()
                 .addClass('wikids-test-active-question');
@@ -2129,7 +2145,7 @@
             dom.nextButton.show();
             dom.restartButton.hide();
             dom.backToStoryButton.hide();
-            dom.continueButton.hide();
+            dom.continueButton.hide();*/
         }
 
         function backToStory() {

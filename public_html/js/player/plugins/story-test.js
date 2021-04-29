@@ -142,6 +142,9 @@ var Education = (function() {
             test.addEventListener("finish", function() {
                 WikidsPlayer.right();
             });
+            test.addEventListener("nextSlide", function() {
+                WikidsPlayer.right();
+            });
         });
     }
 
