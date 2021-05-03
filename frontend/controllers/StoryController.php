@@ -262,7 +262,7 @@ class StoryController extends Controller
             $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStarsLocal($test->id);
             $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCountLocal($test->id);
         }
-        $collection = (new TestBuilder($test, $test->getQuestionData($userHistory), $test->getQuestionDataCount(), $userStars))
+        $collection = (new TestBuilder($test, $test->getQuestionData($userHistory), $test->getQuestionDataCount(), $userStars, $fastMode))
             ->build();
         return (new Serializer())
             ->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount, $fastMode);
