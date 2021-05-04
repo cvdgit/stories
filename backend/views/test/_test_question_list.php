@@ -8,16 +8,19 @@ use yii\helpers\Url;
 /** @var $dataProvider yii\data\ActiveDataProvider */
 ?>
 <div>
-    <div class="dropdown">
-        <button type="button" data-toggle="dropdown" class="btn btn-primary">
-            Создать вопрос
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            <li><?= Html::a('По умолчанию', ['test/create-question', 'test_id' => $model->id]) ?></li>
-            <li><?= Html::a('Выбор области', ['question/create', 'test_id' => $model->id, 'type' => QuestionType::REGION]) ?></li>
-            <li><?= Html::a('Последовательность', ['test/question-sequence/create', 'test_id' => $model->id]) ?></li>
-        </ul>
+    <div class="clearfix">
+        <div class="dropdown" style="display: inline-block">
+            <button type="button" data-toggle="dropdown" class="btn btn-primary">
+                Создать вопрос
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><?= Html::a('По умолчанию', ['test/create-question', 'test_id' => $model->id]) ?></li>
+                <li><?= Html::a('Выбор области', ['question/create', 'test_id' => $model->id, 'type' => QuestionType::REGION]) ?></li>
+                <li><?= Html::a('Последовательность', ['test/question-sequence/create', 'test_id' => $model->id]) ?></li>
+            </ul>
+        </div>
+        <?= Html::a('Импортировать вопросы из списка слов', ['test/import/from-word-list', 'test_id' => $model->id], ['class' => 'btn btn-default', 'style' => 'margin-left: 20px', 'id' => 'import-from-word-list']) ?>
     </div>
     <h4>Вопросы теста</h4>
     <?= GridView::widget([
@@ -68,3 +71,16 @@ use yii\helpers\Url;
         ],
     ]) ?>
 </div>
+<div class="modal remote fade" id="import-from-word-list-modal">
+    <div class="modal-dialog">
+        <div class="modal-content"></div>
+    </div>
+</div>
+<?php
+$js = <<< JS
+$('#import-from-word-list').on('click', function(e) {
+    e.preventDefault();
+    $('#import-from-word-list-modal').modal({'remote': $(this).attr('href')});
+});
+JS;
+$this->registerJs($js);

@@ -39,10 +39,10 @@ class StoryTestAnswer extends ActiveRecord
     public function rules()
     {
         return [
-            [['story_question_id', 'name'], 'required'],
-            [['story_question_id', 'order', 'is_correct'], 'integer'],
+            [['name'], 'required'],
+            [['order', 'is_correct'], 'integer'],
             [['name', 'image'], 'string', 'max' => 255],
-            [['story_question_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTestQuestion::class, 'targetAttribute' => ['story_question_id' => 'id']],
+            //[['story_question_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTestQuestion::class, 'targetAttribute' => ['story_question_id' => 'id']],
         ];
     }
 
@@ -94,6 +94,14 @@ class StoryTestAnswer extends ActiveRecord
         if ($image !== null) {
             $model->image = $image;
         }
+        return $model;
+    }
+
+    public static function createFromRelation(string $name, int $isCorrect): self
+    {
+        $model = new self();
+        $model->name = $name;
+        $model->is_correct = $isCorrect;
         return $model;
     }
 

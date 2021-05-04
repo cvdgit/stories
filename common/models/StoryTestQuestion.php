@@ -4,6 +4,7 @@ namespace common\models;
 
 use backend\models\question\QuestionType;
 use DomainException;
+use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -32,6 +33,25 @@ class StoryTestQuestion extends ActiveRecord
 
     public $answer_number;
     public $correct_answer_number;
+
+    public function behaviors()
+    {
+        return [
+            'saveRelations' => [
+                'class' => SaveRelationsBehavior::class,
+                'relations' => [
+                    'storyTestAnswers',
+                ],
+            ],
+        ];
+    }
+
+    public function transactions()
+    {
+        return [
+            self::SCENARIO_DEFAULT => self::OP_ALL,
+        ];
+    }
 
     /**
      * {@inheritdoc}
