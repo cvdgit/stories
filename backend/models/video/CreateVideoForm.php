@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\models\video;
-
 
 use common\models\SlideVideo;
 use yii\base\Model;
@@ -18,6 +16,7 @@ class CreateVideoForm extends Model
         return [
             [['video_id', 'title'], 'required'],
             [['video_id', 'title'], 'string', 'max' => 255],
+            ['video_id', 'unique', 'targetClass' => SlideVideo::class, 'targetAttribute' => 'video_id'],
         ];
     }
 
@@ -31,8 +30,11 @@ class CreateVideoForm extends Model
 
     public function createVideo()
     {
+        if (!$this->validate()) {
+            throw new \DomainException('Model not valid');
+        }
         $model = SlideVideo::create($this->title, $this->video_id);
-        return $model->save();
+        $model->save();
     }
 
 }
