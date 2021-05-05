@@ -1146,7 +1146,7 @@
 
         var that = this;
 
-        el[0]['_wikids_test'] = this;
+        //el[0]['_wikids_test'] = this;
 
         this.recordingAnswer = null;
         this.recognition = null;

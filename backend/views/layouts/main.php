@@ -7,6 +7,7 @@ use common\widgets\ToastrFlash;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\helpers\Html;
+use yii\helpers\Json;
 AppAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
@@ -19,6 +20,14 @@ AppAsset::register($this);
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
+    <script>
+        var WikidsConfig = {
+            'user': {
+                'isGuest': <?= Json::encode(Yii::$app->user->isGuest) ?>,
+                'isModerator': <?= Json::encode(Yii::$app->user->can(UserRoles::ROLE_MODERATOR)) ?>
+            }
+        };
+    </script>
 </head>
 <body>
 <?php $this->beginBody() ?>
