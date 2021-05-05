@@ -161,7 +161,11 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
             }
         }
 
-        $block->setText(implode('<br>', $paragraphText));
+        $text = implode('<br>', $paragraphText);
+        if ($block->getType() === AbstractBlock::TYPE_TEXT) {
+            $text = '<p>' . $text . '</p>';
+        }
+        $block->setText($text);
         $slide->addBlock($block);
     }
 
