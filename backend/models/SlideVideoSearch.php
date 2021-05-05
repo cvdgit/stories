@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\models;
-
 
 use common\models\SlideVideo;
 use yii\base\Model;
@@ -11,12 +9,17 @@ use yii\data\ActiveDataProvider;
 class SlideVideoSearch extends Model
 {
 
+    public $title;
     public $video_id;
+    public $created_at;
+    public $status;
 
     public function rules()
     {
         return [
-            ['video_id', 'string'],
+            [['video_id', 'title'], 'string'],
+            ['created_at', 'safe'],
+            ['status', 'integer'],
         ];
     }
 
@@ -27,7 +30,7 @@ class SlideVideoSearch extends Model
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => 50,
+                'pageSize' => 100,
             ],
             'sort' => [
                 'defaultOrder' => ['created_at' => SORT_DESC],
@@ -39,6 +42,11 @@ class SlideVideoSearch extends Model
         }
 
         $query->andFilterWhere(['like', 'video_id', $this->video_id]);
+        $query->andFilterWhere(['like', 'title', $this->title]);
+        $query->andFilterWhere([
+            "DATE_FORMAT(FROM_UNIXTIME(created_at), '%d.%m.%Y')" => $this->created_at,
+            'status' => $this->status,
+        ]);
 
         return $dataProvider;
     }

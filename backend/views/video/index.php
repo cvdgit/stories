@@ -1,5 +1,6 @@
 <?php
 
+use backend\widgets\WikidsDatePicker;
 use yii\grid\ActionColumn;
 use yii\grid\SerialColumn;
 use yii\grid\GridView;
@@ -22,7 +23,12 @@ $this->title = 'Видео';
             ['class' => SerialColumn::class],
             'title',
             'video_id',
-            'created_at:datetime',
+            [
+                'attribute' => 'created_at',
+                'value' => 'created_at',
+                'format' => 'datetime',
+                'filter' => WikidsDatePicker::widget(['model' => $searchModel, 'attribute' => 'created_at']),
+            ],
             [
                 'attribute' => 'status',
                 'value' => function(\common\models\SlideVideo $model) {
@@ -35,6 +41,7 @@ $this->title = 'Видео';
                     return Html::tag('i', '', ['class' => "glyphicon glyphicon-$className", 'style' => "color: $color"]);
                 },
                 'format' => 'raw',
+                'filter' => ['Успешно', 'Ошибка'],
             ],
             [
                 'class' => ActionColumn::class,
