@@ -3,7 +3,6 @@
 namespace backend\models\test\import;
 
 use backend\components\import\WordListAdapter;
-use backend\models\question\QuestionType;
 use common\models\StoryTest;
 use common\models\StoryTestAnswer;
 use common\models\StoryTestQuestion;
@@ -16,12 +15,14 @@ class ImportFromWordList extends Model
 
     public $test_id;
     public $word_list_id;
+    public $number_answers;
 
     public function rules()
     {
         return [
-            [['test_id', 'word_list_id'], 'required'],
+            [['test_id', 'word_list_id', 'number_answers'], 'required'],
             [['test_id', 'word_list_id'], 'integer'],
+            ['number_answers', 'integer', 'max' => 10, 'min' => 2],
             ['test_id', 'exist', 'targetClass' => StoryTest::class, 'targetAttribute' => ['test_id' => 'id']],
             ['word_list_id', 'exist', 'targetClass' => TestWordList::class, 'targetAttribute' => ['word_list_id' => 'id']],
         ];
@@ -32,10 +33,12 @@ class ImportFromWordList extends Model
         return [
             'word_list_id' => 'Список слов',
             'test_id' => 'Тест',
+            'number_answers' => 'Количество ответов',
         ];
     }
 
-    public function import() {
+    public function import(): void {
+
         if (!$this->validate()) {
             throw new DomainException('Model not valid');
         }
@@ -47,7 +50,7 @@ class ImportFromWordList extends Model
             ->one();
 
         $wordListAdapter = new WordListAdapter($wordList);
-        $questions = $wordListAdapter->create();
+        $questions = $wordListAdapter->create($this->number_answers);
 
         foreach ($questions as $question) {
             $model = StoryTestQuestion::create($this->test_id, $question['name'], $question['type']);

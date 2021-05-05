@@ -16,6 +16,7 @@ use yii\widgets\ActiveForm;
 ]); ?>
 <div class="modal-body">
     <?= $form->field($model, 'word_list_id')->widget(SelectWordListWidget::class) ?>
+    <?= $form->field($model, 'number_answers')->textInput() ?>
 </div>
 <div class="modal-footer">
     <?= Html::submitButton('Импортировать', ['class' => 'btn btn-success']) ?>
