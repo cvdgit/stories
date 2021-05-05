@@ -27,6 +27,14 @@ class ImportFromWordList extends Model
         ];
     }
 
+    public function attributeLabels()
+    {
+        return [
+            'word_list_id' => 'Список слов',
+            'test_id' => 'Тест',
+        ];
+    }
+
     public function import() {
         if (!$this->validate()) {
             throw new DomainException('Model not valid');
@@ -35,6 +43,7 @@ class ImportFromWordList extends Model
         $wordList = TestWordList::find()
             ->where('id = :id', [':id' => $this->word_list_id])
             ->with('testWords')
+            ->orderBy(['name' => SORT_ASC])
             ->one();
 
         $wordListAdapter = new WordListAdapter($wordList);

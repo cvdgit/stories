@@ -33,7 +33,7 @@ class WordListAdapter
     private function createIncorrectAnswers(TestWord $current): array
     {
         $incorrect = array_filter($this->words, static function(TestWord $item) use ($current) {
-            return $item->id !== $current->id && empty($item->correct_answer);
+            return $item->id !== $current->id || empty($item->correct_answer);
         });
         return array_map(function(TestWord $item) {
             return $this->createAnswer($item->correct_answer, false);
