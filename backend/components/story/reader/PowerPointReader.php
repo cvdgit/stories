@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\components\story\reader;
-
 
 use backend\components\story\AbstractBlock;
 use backend\components\story\ImageBlock;
@@ -157,15 +155,12 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
         foreach ($powerPointShape->getParagraphs() as $paragraph) {
             $text = $paragraph->getPlainText();
             if ($text !== '') {
-                $paragraphText[] = $text;
+                $paragraphText[] = '<p>' . $text . '</p>';
             }
         }
-
-        $text = implode('<br>', $paragraphText);
-        if ($block->getType() === AbstractBlock::TYPE_TEXT) {
-            $text = '<p>' . $text . '</p>';
-        }
+        $text = implode('', $paragraphText);
         $block->setText($text);
+
         $slide->addBlock($block);
     }
 
