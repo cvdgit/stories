@@ -7,12 +7,14 @@ use yii\helpers\Html;
 /** @var $powerPointForm backend\models\SourcePowerPointForm */
 /** @var $wordListModel backend\models\WordListFromStoryForm */
 $this->title = 'История: ' . $model->title;
-$this->params['breadcrumbs'][] = ['label' => 'Истории', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->title, 'url' => Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $model->alias])];
-$this->params['breadcrumbs'][] = 'Изменить';
+$this->params['breadcrumbs'] = [
+    ['label' => 'Список историй', 'url' => ['index']],
+    ['label' => $model->title, 'url' => Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $model->alias]), 'target' => '_blank'],
+    'Изменить',
+];
 $this->params['sidebarMenuItems'] = [
-	['label' => 'Истории', 'url' => ['story/index']],
 	['label' => $model->title, 'url' => ['story/update', 'id' => $model->id]],
+    ['label' => 'Список историй', 'url' => ['story/index']],
 	['label' => 'Редактор', 'url' => ['editor/edit', 'id' => $model->id]],
 	['label' => 'Статистика', 'url' => ['statistics/list', 'id' => $model->id]],
     ['label' => 'Озвучка', 'url' => ['audio/index', 'story_id' => $model->id]],

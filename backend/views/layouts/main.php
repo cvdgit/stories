@@ -8,6 +8,8 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\helpers\Html;
 use yii\helpers\Json;
+use yii\widgets\Breadcrumbs;
+
 AppAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
@@ -74,6 +76,9 @@ AppAsset::register($this);
                 <?php endif ?>
             </div>
             <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                <?= Breadcrumbs::widget([
+                    'links' => $this->params['breadcrumbs'] ?? [],
+                ]) ?>
                 <?= $content ?>
             </div>
         </div>

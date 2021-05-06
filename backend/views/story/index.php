@@ -27,7 +27,13 @@ $this->title = 'Управление историями';
     'columns' => [
         // ['class' => CheckboxColumn::class],
         'id',
-        'title',
+        [
+            'attribute' =>'title',
+            'format' => 'raw',
+            'value' => static function(Story $model) {
+                return Html::a($model->title, ['story/update', 'id' => $model->id], ['title' => 'Перейти к редактированию']);
+            },
+        ],
         [
             'format' => 'raw',
             'attribute' => 'mode',
