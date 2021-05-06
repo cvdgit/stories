@@ -1,16 +1,18 @@
 <?php
-
 use yii\grid\ActionColumn;
 use yii\grid\SerialColumn;
 use yii\grid\GridView;
 use yii\helpers\Html;
-
 /** @var $model common\models\Story */
 /** @var $dataProvider yii\data\ActiveDataProvider */
-
-$this->title = 'Озвучка';
+$this->title = 'Озвучка: ' . $model->title;
+$this->params['breadcrumbs'] = [
+    ['label' => 'Список историй', 'url' => ['index']],
+    ['label' => $model->title, 'url' => Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $model->alias]), 'target' => '_blank'],
+    $this->title,
+];
 $this->params['sidebarMenuItems'] = [
-    ['label' => 'Вернуться к истории', 'url' => ['story/update', 'id' => $model->id]],
+    ['label' => $model->title, 'url' => ['story/update', 'id' => $model->id]],
     ['label' => 'Редактор', 'url' => ['editor/edit', 'id' => $model->id]],
     ['label' => 'Статистика', 'url' => ['statistics/list', 'id' => $model->id]],
     ['label' => 'Озвучка', 'url' => ['audio/index', 'story_id' => $model->id]],

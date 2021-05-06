@@ -1,23 +1,20 @@
 <?php
-
 use yii\helpers\Html;
-use yii\grid\GridView;
 use yii\web\JsExpression;
 use yii\helpers\Url;
-
 use dosamigos\chartjs\ChartJs;
-
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\CategorySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-
+/** @var $model common\models\Story */
 $this->title = 'Статистика: ' . $model->title;
-$this->params['breadcrumbs'][] = ['label' => 'Истории', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->title, 'url' => ['update', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = $this->title;
-
+$this->params['breadcrumbs'] = [
+    ['label' => 'Список историй', 'url' => ['index']],
+    ['label' => $model->title, 'url' => Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $model->alias]), 'target' => '_blank'],
+    $this->title,
+];
 $this->params['sidebarMenuItems'] = [
-    ['label' => 'История', 'url' => ['story/update', 'id' => $model->id]],
+    ['label' => $model->title, 'url' => ['story/update', 'id' => $model->id]],
     ['label' => 'Редактор', 'url' => ['editor/edit', 'id' => $model->id]],
     ['label' => 'Статистика', 'url' => ['statistics/list', 'id' => $model->id]],
     ['label' => 'Озвучка', 'url' => ['audio/index', 'story_id' => $model->id]],

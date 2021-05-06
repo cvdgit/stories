@@ -1,5 +1,5 @@
 <?php
-
+use backend\assets\CropperAsset;
 use backend\assets\StoryEditorAsset;
 use backend\widgets\BackendRevealWidget;
 use common\widgets\Reveal\Plugins\Video;
@@ -8,16 +8,19 @@ use yii\bootstrap\ButtonDropdown;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
-
 /** @var $this yii\web\View */
 StoryEditorAsset::register($this);
 PlyrAsset::register($this);
-\backend\assets\CropperAsset::register($this);
-
+CropperAsset::register($this);
 /** @var $model common\models\Story */
-$this->title = 'Редактор историй' . $model->title;
+$this->title = 'Редактор: ' . $model->title;
+$this->params['breadcrumbs'] = [
+    ['label' => 'Список историй', 'url' => ['index']],
+    ['label' => $model->title, 'url' => Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $model->alias]), 'target' => '_blank'],
+    $this->title,
+];
 $this->params['sidebarMenuItems'] = [
-    ['label' => 'История', 'url' => ['story/update', 'id' => $model->id]],
+    ['label' => $model->title, 'url' => ['story/update', 'id' => $model->id]],
     ['label' => 'Редактор', 'url' => ['editor/edit', 'id' => $model->id]],
     ['label' => 'Статистика', 'url' => ['statistics/list', 'id' => $model->id]],
     ['label' => 'Озвучка', 'url' => ['audio/index', 'story_id' => $model->id]],
