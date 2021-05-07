@@ -343,7 +343,7 @@ class EditorController extends Controller
             $this->storyLinksService->createTestLink($story_id, $test->id);
         }
         catch (\Exception $ex) {
-            return ['success' => false, 'error' => $ex->getMessage()];
+            return ['success' => false, 'error' => $ex->getMessage(), 'id' => $slideID];
         }
         return ['success' => true, 'id' => $slideID];
     }

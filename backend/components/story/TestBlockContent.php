@@ -12,7 +12,7 @@ class TestBlockContent
     /** @var false|mixed */
     private $required;
 
-    public function __construct(int $testID, $required)
+    public function __construct(int $testID, $required = 0)
     {
         $this->testID = $testID;
         $this->required = $required;
