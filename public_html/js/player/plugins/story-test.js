@@ -41,7 +41,7 @@ var TestSlide = (function() {
             "dataType": "json"
         });
 
-        var test = WikidsStoryTest.create(container, {
+        var test = WikidsStoryTest.create(container[0], {
             'dataUrl': config.action + "/" + test_id + "?t=" + Math.random(),
             'forSlide': true
         });
@@ -131,7 +131,7 @@ var Education = (function() {
             return;
         }
         var params = elem.data();
-        var test = WikidsStoryTest.create(elem, {
+        var test = WikidsStoryTest.create(elem[0], {
             'dataUrl': '/question/get',
             'dataParams': params,
             'forSlide': false,

@@ -79,14 +79,15 @@ $('#test-list').on('click', '.run-test', function(e) {
         .modal({'remote': $(this).attr('href')});
 });
 
+function initQuestions(params) {
+    params = params || {};
+    return $.getJSON("/question/init", params);
+}
+
 $('#run-test-modal').on('shown.bs.modal', function() {
-    function initQuestions(params) {
-        params = params || {};
-        return $.getJSON("/question/init", params);
-    }
     var elem = $("div.new-questions", this),
         params = elem.data();
-    var test = WikidsStoryTest.create(elem, {
+    var test = WikidsStoryTest.create(elem[0], {
         'dataUrl': '/question/get',
         'dataParams': params,
         'forSlide': false

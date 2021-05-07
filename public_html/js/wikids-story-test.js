@@ -1141,12 +1141,16 @@
 
     function WikidsStoryTest(el, options) {
 
+        if (!(el && el.nodeType && el.nodeType === 1)) {
+            throw "Element must be an HTMLElement, not ".concat({}.toString.call(el));
+        }
+
         options = options || {};
         this.options = Object.assign({}, options);
 
         var that = this;
 
-        el[0]['_wikids_test'] = this;
+        el['_wikids_test'] = this;
 
         this.recordingAnswer = null;
         this.recognition = null;
