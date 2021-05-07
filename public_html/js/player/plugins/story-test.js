@@ -134,7 +134,8 @@ var Education = (function() {
         var test = WikidsStoryTest.create(elem, {
             'dataUrl': '/question/get',
             'dataParams': params,
-            'forSlide': false
+            'forSlide': false,
+            'required': params.testRequired
         });
         initQuestions(params).done(function(response) {
             StoryBackground.setBackgroundColor('light');

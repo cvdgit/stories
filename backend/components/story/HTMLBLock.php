@@ -10,11 +10,13 @@ class HTMLBLock extends AbstractBlock
     protected $type = AbstractBlock::TYPE_HTML;
 
     /** @var string */
-    protected $content;
+    private $content;
+
+    private $test_id;
+    private $required;
 
     public function update($form)
     {
-
     }
 
     /**
@@ -41,6 +43,15 @@ class HTMLBLock extends AbstractBlock
         $block->setLeft('10px');
         $block->setTop('4px');
         return $block;
+    }
+
+    public function getValues(): array
+    {
+        $content = TestBlockContent::createFromHtml($this->content);
+        return array_merge([
+            'test_id' => $content->getTestID(),
+            'required' => $content->getRequired(),
+        ], parent::getValues());
     }
 
 }

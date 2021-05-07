@@ -206,7 +206,7 @@ var WikidsPlayer = (function(document, $) {
                 TransitionSlide.backToStory();
             }
             else {
-                /*if (window['WikidsStoryTest']) {
+                if (window['WikidsStoryTest']) {
                     var test = $(Reveal.getCurrentSlide()).find('div.new-questions');
                     if (test.length) {
                         var canNext = test[0]['_wikids_test'].canNext();
@@ -214,7 +214,7 @@ var WikidsPlayer = (function(document, $) {
                             return;
                         }
                     }
-                }*/
+                }
                 Reveal.next();
             }
         },

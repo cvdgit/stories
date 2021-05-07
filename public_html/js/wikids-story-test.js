@@ -1146,7 +1146,7 @@
 
         var that = this;
 
-        //el[0]['_wikids_test'] = this;
+        el[0]['_wikids_test'] = this;
 
         this.recordingAnswer = null;
         this.recognition = null;
@@ -1281,6 +1281,10 @@
 
         function setElementHtml(html) {
             $(el).html(html);
+        }
+
+        function testIsRequired() {
+            return parseInt(that.options.required) === 1;
         }
 
         function createContainer() {
@@ -2886,7 +2890,8 @@
         tests.push(el);
 
         this.canNext = function() {
-            return currentStudent && (currentStudent.progress === 100 || currentStudent['finish']);
+            var canNext = currentStudent && (currentStudent.progress === 100 || currentStudent['finish']);
+            return (testIsRequired() && canNext) || (!testIsRequired());
         };
 
         return {

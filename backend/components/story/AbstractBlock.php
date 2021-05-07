@@ -168,4 +168,9 @@ abstract class AbstractBlock
         return $this->type === self::TYPE_TEST;
     }
 
+    public function isHtmlTest(): bool
+    {
+        return $this->type === self::TYPE_HTML;
+    }
+
 }

@@ -8,6 +8,7 @@ use backend\components\story\HTMLBLock;
 use backend\components\story\ImageBlock;
 use backend\components\story\reader\HTMLReader;
 use backend\components\story\reader\HtmlSlideReader;
+use backend\components\story\TestBlockContent;
 use backend\components\story\writer\HTMLWriter;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
@@ -245,12 +246,12 @@ class StoryEditorService
         /** @var HTMLBLock $block */
         $block = $slide->createBlock(HTMLBLock::class);
 
-        $options = ['class' => 'new-questions'];
+/*        $options = ['class' => 'new-questions'];
         foreach ($params as $paramName => $paramValue) {
             $options['data-' . $paramName] = $paramValue;
         }
-        $content = Html::tag('div', '', $options);
-        $block->setContent($content);
+        $content = Html::tag('div', '', $options);*/
+        $block->setContent((new TestBlockContent($params['test-id']))->render());
         $slide->addBlock($block);
 
         $writer = new HTMLWriter();
@@ -310,7 +311,12 @@ class StoryEditorService
             $this->uploadImage($form, $storyModel);
         }
 
-        $block->update($form);
+        if ($block->isHtmlTest()) {
+            $block->setContent((new TestBlockContent($form->test_id, $form->required))->render());
+        }
+        else {
+            $block->update($form);
+        }
 
         if ($block->isTest()) {
             try {

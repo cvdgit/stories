@@ -36,7 +36,8 @@ class SlideRenderer
     {
         $html = '<section data-id="" data-background-color="#000000" data-slide-view="' . $this->slide->getView() . '" data-audio-src="' . $this->slide->getAudioFile() . '">';
         foreach ($this->slide->getBlocks() as $block) {
-            if (get_class($block) === TextBlock::class) {
+            $className = get_class($block);
+            if ($className === TextBlock::class) {
                 if ($block->getType() === AbstractBlock::TYPE_HEADER) {
                     $html .= (new HeaderBlockMarkup($block))->markup();
                 }
@@ -44,22 +45,22 @@ class SlideRenderer
                     $html .= (new ParagraphBlockMarkup($block))->markup();
                 }
             }
-            if (get_class($block) === ButtonBlock::class) {
+            if ($className === ButtonBlock::class) {
                 $html .= (new ButtonBlockMarkup($block))->markup();
             }
-            if (get_class($block) === TransitionBlock::class) {
+            if ($className === TransitionBlock::class) {
                 $html .= (new TransitionBlockMarkup($block))->markup();
             }
-            if (get_class($block) === TestBlock::class) {
+            if ($className === TestBlock::class) {
                 $html .= (new TestBlockMarkup($block))->markup();
             }
-            if (get_class($block) === ImageBlock::class) {
+            if ($className === ImageBlock::class) {
                 $html .= (new ImageBlockMarkup($block))->markup();
             }
-            if (get_class($block) === HTMLBLock::class) {
+            if ($className === HTMLBLock::class) {
                 $html .= (new HTMLBlockMarkup($block))->markup();
             }
-            if (get_class($block) === VideoBlock::class) {
+            if ($className === VideoBlock::class) {
                 $html .= (new VideoBlockMarkup($block))->markup();
             }
         }
