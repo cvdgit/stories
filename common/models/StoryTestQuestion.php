@@ -187,8 +187,10 @@ class StoryTestQuestion extends ActiveRecord
     {
         parent::afterDelete();
         if ($this->typeIsRegion()) {
-            $path = $this->getImagesPath() . $this->image;
-            FileHelper::unlink($path);
+            if (!empty($this->image)) {
+                $path = $this->getImagesPath() . $this->image;
+                FileHelper::unlink($path);
+            }
         }
     }
 
