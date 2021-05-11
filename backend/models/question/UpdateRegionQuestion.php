@@ -44,12 +44,14 @@ class UpdateRegionQuestion extends RegionQuestion
         if (!$this->validate()) {
             throw new DomainException('Model not valid');
         }
+
         $modelAttributes = $this->model->getAttributes();
         foreach ($this->getAttributes() as $name => $value) {
             if (array_key_exists($name, $modelAttributes)) {
                 $this->model->{$name} = $value;
             }
         }
+
         $this->uploadImage($this->model);
 
         $regions = Json::decode($this->model->regions);

@@ -3,6 +3,7 @@
 namespace common\models;
 
 use backend\models\question\QuestionType;
+use backend\models\question\region\RegionImage;
 use DomainException;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use Yii;
@@ -33,6 +34,15 @@ class StoryTestQuestion extends ActiveRecord
 
     public $answer_number;
     public $correct_answer_number;
+
+    /** @var RegionImage */
+    private $regionImage;
+
+    public function init()
+    {
+        parent::init();
+        $this->regionImage = new RegionImage($this);
+    }
 
     public function behaviors()
     {
@@ -183,13 +193,25 @@ class StoryTestQuestion extends ActiveRecord
         return (new QuestionType($this->type))->isSequence();
     }
 
+    public function deleteRegionImages(): void
+    {
+        $images = [
+            $this->regionImage->getImagePath(),
+            $this->regionImage->getOriginalImagePath(),
+        ];
+        array_map(static function($path) {
+            if (file_exists($path)) {
+                FileHelper::unlink($path);
+            }
+        }, $images);
+    }
+
     public function afterDelete()
     {
         parent::afterDelete();
         if ($this->typeIsRegion()) {
             if (!empty($this->image)) {
-                $path = $this->getImagesPath() . $this->image;
-                FileHelper::unlink($path);
+                $this->deleteRegionImages();
             }
         }
     }
@@ -198,6 +220,11 @@ class StoryTestQuestion extends ActiveRecord
     {
         $path = $this->getImagesPath() . $this->image;
         FileHelper::unlink($path);
+    }
+
+    public function getRegionImage(): RegionImage
+    {
+        return $this->regionImage;
     }
 
 }

@@ -23,7 +23,7 @@ TestQuestionAsset::register($this);
                 <?php if ($model->hasImage()): ?>
                 <div id="image-region" style="position: relative; height: 480px; width: 640px; margin-bottom: 40px">
                     <div style="position: absolute; left: 0; top: 0">
-                        <?= Html::img($model->getImageUrl(), ['width' => '100%', 'height' => '100%']) ?>
+                        <?= Html::img($model->getImageUrl() . '?t=' . time(), ['width' => '100%', 'height' => '100%']) ?>
                     </div>
                 </div>
                 <?php endif ?>

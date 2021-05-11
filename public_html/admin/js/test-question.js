@@ -232,7 +232,7 @@ var RegionTable = function() {
     }
 
     function getRows() {
-        return $('tbody tr', $table).map(function() {
+        return $('tbody tr:not(.empty-row)', $table).map(function() {
             var elem = $(this);
             return {
                 'id': elem.attr('id'),

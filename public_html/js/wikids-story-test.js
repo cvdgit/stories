@@ -257,7 +257,7 @@
 
         var $img = $('<img/>')
             .attr('src', question.params.image)
-            .css({'position': 'absolute', 'left': 0, 'top': 0, 'width': '100%'});
+            .css({'position': 'absolute', 'left': 0, 'top': 0});
 
         function getRelativeCoordinates(event, target) {
             var position = {
@@ -279,7 +279,7 @@
         var that = this;
         var $wrapper = $('<div/>')
             .addClass('question-region')
-            .css({'width': '640px', 'height': '480px', 'position': 'relative'})
+            .css({'width': '640px', 'height': '480px', 'position': 'relative', 'margin': '0 auto'})
             .on('click', function(e) {
                 var rect = getRelativeCoordinates(e, $wrapper[0]);
                 $('<span/>')

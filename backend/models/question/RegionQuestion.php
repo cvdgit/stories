@@ -2,10 +2,13 @@
 
 namespace backend\models\question;
 
+use backend\models\question\region\RegionImageFile;
 use common\models\StoryTestQuestion;
+use Imagine\Image\ManipulatorInterface;
 use Yii;
 use yii\base\Model;
 use yii\helpers\FileHelper;
+use yii\imagine\Image;
 use yii\web\UploadedFile;
 
 class RegionQuestion extends Model
@@ -42,15 +45,24 @@ class RegionQuestion extends Model
         ];
     }
 
-    protected function uploadImage(StoryTestQuestion $model)
+    protected function uploadImage(StoryTestQuestion $model): void
     {
         $uploadedFile = UploadedFile::getInstance($this, 'imageFile');
         if ($uploadedFile !== null) {
-            $fileName = Yii::$app->security->generateRandomString() . '.' . $uploadedFile->extension;
-            $folder = $model->getImagesPath();
-            FileHelper::createDirectory($folder);
-            $uploadedFile->saveAs($folder . $fileName);
-            $model->image = $fileName;
+
+            $model->deleteRegionImages();
+
+            $regionImageFile = new RegionImageFile($uploadedFile->extension);
+
+            $folder = $model->getRegionImage()->getImagesPath();
+            $imagePath = $regionImageFile->createImageFileName($folder, false);
+            $uploadedFile->saveAs($imagePath);
+
+            $miniImagePath = $regionImageFile->createImageFileName($folder);
+            Image::resize($imagePath, 640, 480, true)
+                ->save($miniImagePath, ['jpeg_quality' => 100]);
+
+            $model->image = $regionImageFile->getFileName();
         }
     }
 
