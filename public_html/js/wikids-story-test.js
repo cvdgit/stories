@@ -229,10 +229,9 @@
         return API;
     }
 
-    var RegionQuestion = function(question, questionAnswers) {
+    function RegionQuestion(test) {
 
-        this.question = question;
-        this.questionAnswers = questionAnswers;
+        this.test = test;
 
         var answers = [];
         this.addAnswer = function(answer) {
@@ -247,33 +246,30 @@
             answers = [];
         }
 
-        this.getAnswerByRegion = function(region) {
+        this.getAnswerByRegion = function(questionAnswers, region) {
             return questionAnswers.filter(function(answer) {
                 return answer.region_id === region;
             });
         };
     }
-    RegionQuestion.prototype.create = function() {
+
+    RegionQuestion.prototype.create = function(question, questionAnswers) {
 
         var $img = $('<img/>')
-            .attr('src', this.question.params.image)
+            .attr('src', question.params.image)
             .css({'position': 'absolute', 'left': 0, 'top': 0, 'width': '100%'});
 
         function getRelativeCoordinates(event, target) {
-
-            const position = {
+            var position = {
                 x: event.clientX,
                 y: event.clientY
             };
             var container = $('.reveal .slides')[0]
-
             var scaleX = parseFloat(target.offsetWidth  / target.getBoundingClientRect().width).toFixed(2);
             var scaleY = parseFloat(target.offsetHeight  / target.getBoundingClientRect().height).toFixed(2);
-
             var offset = $(target).offset();
             var canvasOffsetLeft = offset.left;
             var canvasOffsetTop = offset.top;
-
             return {
                 x: (position.x - canvasOffsetLeft + $(window).scrollLeft()) / Reveal.getScale(),
                 y: (position.y - canvasOffsetTop + $(window).scrollTop()) / Reveal.getScale()
@@ -285,9 +281,7 @@
             .addClass('question-region')
             .css({'width': '640px', 'height': '480px', 'position': 'relative'})
             .on('click', function(e) {
-
                 var rect = getRelativeCoordinates(e, $wrapper[0]);
-
                 $('<span/>')
                     .addClass('answer-point')
                     .css({
@@ -306,23 +300,22 @@
                 var isRect = $target[0].tagName === 'DIV' && $target.hasClass('answer-rect');
 
                 setTimeout(function() {
-
                     if (isRect) {
                         var regionID = $target.attr('data-answer-id');
-                        var answer = that.getAnswerByRegion(regionID);
+                        var answer = that.getAnswerByRegion(questionAnswers, regionID);
                         that.addAnswer(answer[0].id);
                     }
                     else {
                         that.addAnswer('no correct');
                     }
-                    WikidsStoryTest.nextQuestion(that.getAnswers());
+                    that.test.nextQuestion(that.getAnswers());
                     that.resetAnswers();
                     $wrapper.find('span.answer-point').remove();
                 }, 500);
             })
             .append($img);
 
-        this.question.params.regions.forEach(function(region) {
+        question.params.regions.forEach(function(region) {
             $('<div/>')
                 .addClass('answer-rect')
                 .attr('data-answer-id', region.id)
@@ -337,6 +330,10 @@
         });
         return $wrapper;
     };
+
+    _extends(RegionQuestion, {
+        pluginName: 'regionQuestion'
+    });
 
     var TestConfig = function(data) {
 
@@ -1156,6 +1153,7 @@
         this.recognition = null;
         this.sequenceQuestion = null;
         this.missingWords = null;
+        this.regionQuestion = null;
 
         setElementHtml(createLoader('Инициализация'));
 
@@ -1853,8 +1851,7 @@
         }
 
         function createRegionAnswer(question, answers) {
-            var regionQuestion = new RegionQuestion(question, answers);
-            return regionQuestion.create();
+            return that.regionQuestion.create(question, answers);
         }
 
         function createRecordingAnswers(question, answers) {
@@ -2936,6 +2933,7 @@
     WikidsStoryTest.mount(RecordingAnswer);
     WikidsStoryTest.mount(SequenceQuestion);
     WikidsStoryTest.mount(MissingWords);
+    WikidsStoryTest.mount(RegionQuestion);
 
     WikidsStoryTest.getTests = function() {
         return tests;
