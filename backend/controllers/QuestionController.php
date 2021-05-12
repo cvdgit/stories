@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use backend\models\question\CreateRegionQuestion;
 use backend\models\question\UpdateRegionQuestion;
+use common\models\StoryTest;
 use common\models\StoryTestAnswer;
 use common\models\StoryTestQuestion;
 use common\rbac\UserRoles;
@@ -40,6 +41,7 @@ class QuestionController extends Controller
 
     public function actionCreate(int $test_id, int $type)
     {
+        $testModel = $this->findTestModel($test_id);
         $model = new CreateRegionQuestion();
         $model->test_id = $test_id;
         if ($model->load(Yii::$app->request->post())) {
@@ -53,6 +55,7 @@ class QuestionController extends Controller
             }
         }
         return $this->render('create', [
+            'testModel' => $testModel,
             'model' => $model,
         ]);
     }
@@ -83,7 +86,7 @@ class QuestionController extends Controller
         return $this->redirect(['test/update', 'id' => $model->story_test_id]);
     }
 
-    protected function findModel($id)
+    private function findModel($id)
     {
         if (($model = StoryTestQuestion::findOne($id)) !== null) {
             return $model;
@@ -91,9 +94,17 @@ class QuestionController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
-    protected function findAnswerModel($id)
+    private function findAnswerModel($id)
     {
         if (($model = StoryTestAnswer::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    private function findTestModel($id)
+    {
+        if (($model = StoryTest::findOne($id)) !== null) {
             return $model;
         }
         throw new NotFoundHttpException('The requested page does not exist.');

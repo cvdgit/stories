@@ -4,6 +4,7 @@ namespace backend\controllers\test;
 
 use backend\models\question\sequence\CreateSequenceQuestion;
 use backend\models\question\sequence\UpdateSequenceQuestion;
+use common\models\StoryTest;
 use common\models\StoryTestQuestion;
 use common\rbac\UserRoles;
 use Yii;
@@ -38,6 +39,7 @@ class QuestionSequenceController extends Controller
 
     public function actionCreate(int $test_id)
     {
+        $testModel = $this->findTestModel($test_id);
         $model = new CreateSequenceQuestion($test_id);
         if ($model->load(Yii::$app->request->post())) {
             try {
@@ -50,6 +52,7 @@ class QuestionSequenceController extends Controller
             }
         }
         return $this->render('create', [
+            'testModel' => $testModel,
             'model' => $model,
         ]);
     }
@@ -70,6 +73,7 @@ class QuestionSequenceController extends Controller
         }
         return $this->render('update', [
             'model' => $form,
+            'testModel' => $model->storyTest,
         ]);
     }
 
@@ -83,6 +87,14 @@ class QuestionSequenceController extends Controller
     protected function findModel($id)
     {
         if (($model = StoryTestQuestion::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    protected function findTestModel($id)
+    {
+        if (($model = StoryTest::findOne($id)) !== null) {
             return $model;
         }
         throw new NotFoundHttpException('The requested page does not exist.');

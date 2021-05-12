@@ -5,8 +5,13 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model backend\models\question\sequence\UpdateSequenceQuestion */
+/* @var $testModel common\models\StoryTest */
 $this->title = 'Изменить вопрос';
-$this->params['sidebarMenuItems'] = [];
+$this->params['breadcrumbs'] = [
+    ['label' => 'Все тесты', 'url' => ['test/index', 'source' => $testModel->source]],
+    ['label' => $testModel->title, 'url' => ['test/update', 'id' => $testModel->id]],
+    $this->title,
+];
 SortableJsAsset::register($this);
 ?>
 <div class="story-test-question-update">

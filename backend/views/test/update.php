@@ -5,8 +5,9 @@ use yii\helpers\Html;
 /* @var $model common\models\StoryTest */
 /** @var $dataProvider yii\data\ActiveDataProvider */
 $this->title = 'Изменить тест';
-$this->params['sidebarMenuItems'] = [
-    ['label' => 'Все тесты', 'url' => ['test/index']],
+$this->params['breadcrumbs'] = [
+    ['label' => 'Все тесты', 'url' => ['test/index', 'source' => $model->source]],
+    $this->title,
 ];
 TestAsset::register($this);
 ?>

@@ -147,6 +147,7 @@ class TestController extends Controller
         return $this->render('update_question', [
             'model' => $model,
             'dataProvider' => $model->getAnswersDataProvider(),
+            'testModel' => $question->storyTest,
         ]);
     }
 

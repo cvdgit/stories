@@ -5,8 +5,10 @@ use yii\helpers\Html;
 /* @var $model common\models\StoryTestQuestion */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 $this->title = 'Создать вопрос';
-$this->params['sidebarMenuItems'] = [
+$this->params['breadcrumbs'] = [
+    ['label' => 'Все тесты', 'url' => ['test/index', 'source' => $testModel->source]],
     ['label' => $testModel->title, 'url' => ['test/update', 'id' => $testModel->id]],
+    $this->title,
 ];
 ?>
 <div class="story-test-question-create">

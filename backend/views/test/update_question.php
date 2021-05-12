@@ -2,10 +2,13 @@
 use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\StoryTestQuestion */
-/** @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $testModel common\models\StoryTest */
 $this->title = 'Изменить вопрос';
-$this->params['sidebarMenuItems'] = [
-    //['label' => $model->storyTest->title, 'url' => ['test/update', 'id' => $model->storyTest->id]],
+$this->params['breadcrumbs'] = [
+    ['label' => 'Тесты', 'url' => ['test/index', 'source' => $testModel->source]],
+    ['label' => $testModel->title, 'url' => ['test/update', 'id' => $testModel->id]],
+    $this->title,
 ];
 ?>
 <div class="story-test-question-update">
