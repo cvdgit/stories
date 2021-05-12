@@ -170,17 +170,14 @@ class StoryTestQuestion extends ActiveRecord
         return self::create($testID, $name, QuestionType::SEQUENCE, $order, 1);
     }
 
-    public function getImagesPath()
+    public function getImagesPath(): string
     {
-        return Yii::getAlias('@public') . Yii::$app->params['test.question.images'] . '/' . $this->story_test_id . '/';
+        return $this->regionImage->getImagesPath();
     }
 
     public function getImageUrl(): string
     {
-        if (empty($this->image)) {
-            return '';
-        }
-        return Yii::$app->params['test.question.images'] . '/' . $this->story_test_id . '/' . $this->image;
+        return $this->regionImage->getImageUrl();
     }
 
     public function typeIsRegion(): bool
@@ -195,15 +192,17 @@ class StoryTestQuestion extends ActiveRecord
 
     public function deleteRegionImages(): void
     {
-        $images = [
-            $this->regionImage->getImagePath(),
-            $this->regionImage->getOriginalImagePath(),
-        ];
-        array_map(static function($path) {
-            if (file_exists($path)) {
-                FileHelper::unlink($path);
+        if (!empty($this->image)) {
+            $name = pathinfo($this->image, PATHINFO_FILENAME);
+            if (!empty($name)) {
+                $imagesPath = $this->regionImage->getImagesPath();
+                array_map(static function($path) use ($imagesPath) {
+                    if (file_exists($path) && rtrim($imagesPath, DIRECTORY_SEPARATOR) === dirname($path)) {
+                        FileHelper::unlink($path);
+                    }
+                }, glob($imagesPath . $name . '*.*'));
             }
-        }, $images);
+        }
     }
 
     public function afterDelete()

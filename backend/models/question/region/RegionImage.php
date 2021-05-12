@@ -8,7 +8,6 @@ use Yii;
 class RegionImage
 {
 
-    private $prefix = '_mini';
     private $model;
 
     public function __construct(StoryTestQuestion $model)
@@ -35,14 +34,6 @@ class RegionImage
             return '';
         }
         return $this->getImagesPath() . $this->model->image;
-    }
-
-    public function getOriginalImagePath(): string
-    {
-        if (empty($this->model->image)) {
-            return '';
-        }
-        return $this->getImagesPath() . str_replace($this->prefix, '', $this->model->image);
     }
 
 }

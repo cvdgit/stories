@@ -4,30 +4,46 @@ namespace backend\models\question\region;
 
 use Yii;
 use yii\helpers\FileHelper;
+use yii\web\UploadedFile;
 
 class RegionImageFile
 {
 
-    private $extension;
-    private $name;
-    private $prefix = '_mini';
+    public const ORIGINAL = '_orig';
 
-    public function __construct(string $extension)
+    private $uploadedFile;
+    private $regionImage;
+    private $name;
+
+    public function __construct(UploadedFile $uploadedFile, RegionImage $regionImage)
     {
-        $this->extension = $extension;
+        $this->uploadedFile = $uploadedFile;
+        $this->regionImage = $regionImage;
         $this->name = Yii::$app->security->generateRandomString();
     }
 
-    public function createImageFileName(string $folder, bool $withPrefix = true): string
+    public function save(string $prefix = ''): string
     {
-        FileHelper::createDirectory($folder);
-
-        return $folder . $this->getFileName($withPrefix);
+        $imagePath = $this->createImageFileName($prefix);
+        $this->uploadedFile->saveAs($imagePath);
+        return $imagePath;
     }
 
-    public function getFileName(bool $withPrefix = true): string
+    public function saveOriginal(): string
     {
-        return $this->name . ($withPrefix ? $this->prefix : '') . '.' . $this->extension;
+        return $this->save(self::ORIGINAL);
+    }
+
+    public function createImageFileName(string $prefix = ''): string
+    {
+        $folder = $this->regionImage->getImagesPath();
+        FileHelper::createDirectory($folder);
+        return $folder . $this->getFileName($prefix);
+    }
+
+    public function getFileName(string $prefix = ''): string
+    {
+        return $this->name . $prefix . '.' . $this->uploadedFile->extension;
     }
 
 }

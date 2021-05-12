@@ -4,10 +4,7 @@ namespace backend\models\question;
 
 use backend\models\question\region\RegionImageFile;
 use common\models\StoryTestQuestion;
-use Imagine\Image\ManipulatorInterface;
-use Yii;
 use yii\base\Model;
-use yii\helpers\FileHelper;
 use yii\imagine\Image;
 use yii\web\UploadedFile;
 
@@ -52,15 +49,11 @@ class RegionQuestion extends Model
 
             $model->deleteRegionImages();
 
-            $regionImageFile = new RegionImageFile($uploadedFile->extension);
+            $regionImageFile = new RegionImageFile($uploadedFile, $model->getRegionImage());
+            $imagePath = $regionImageFile->saveOriginal();
 
-            $folder = $model->getRegionImage()->getImagesPath();
-            $imagePath = $regionImageFile->createImageFileName($folder, false);
-            $uploadedFile->saveAs($imagePath);
-
-            $miniImagePath = $regionImageFile->createImageFileName($folder);
             Image::resize($imagePath, 640, 480, true)
-                ->save($miniImagePath, ['jpeg_quality' => 100]);
+                ->save($regionImageFile->createImageFileName(), ['jpeg_quality' => 100]);
 
             $model->image = $regionImageFile->getFileName();
         }
