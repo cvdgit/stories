@@ -259,6 +259,14 @@
             .attr('src', question.params.image)
             .css({'position': 'absolute', 'left': 0, 'top': 0});
 
+        function getScale() {
+            var scale = 1;
+            if (window['Reveal']) {
+                scale = Reveal.getScale();
+            }
+            return scale;
+        }
+
         function getRelativeCoordinates(event, target) {
             var position = {
                 x: event.clientX,
@@ -271,8 +279,8 @@
             var canvasOffsetLeft = offset.left;
             var canvasOffsetTop = offset.top;
             return {
-                x: (position.x - canvasOffsetLeft + $(window).scrollLeft()) / Reveal.getScale(),
-                y: (position.y - canvasOffsetTop + $(window).scrollTop()) / Reveal.getScale()
+                x: (position.x - canvasOffsetLeft + $(window).scrollLeft()) / getScale(),
+                y: (position.y - canvasOffsetTop + $(window).scrollTop()) / getScale()
             };
         }
 
