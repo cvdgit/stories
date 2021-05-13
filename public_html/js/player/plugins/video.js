@@ -36,10 +36,8 @@ function WikidsVideoPlayer(elemID, options) {
     player.on("statechange", function(event) {
         if (event.detail.code === 1 && !done) {
             var timeout = options.duration - (player.currentTime - options.seekTo);
-            if (timeout > 0) {
-                console.log('statechange', player.currentTime, timeout);
-                pauseTimeoutID = setTimeout(pauseVideo, timeout * 1000);
-            }
+            console.log('statechange', player.currentTime, timeout);
+            pauseTimeoutID = setTimeout(pauseVideo, timeout * 1000);
         }
     });
 
@@ -126,7 +124,7 @@ var WikidsVideo = (function() {
             var options = {
                 videoID: elem.attr("data-video-id"),
                 seekTo: parseFloat(elem.attr("data-seek-to") || 0),
-                duration: parseInt(elem.attr("data-video-duration")),
+                duration: parseInt(elem.attr("data-video-duration") || 0),
                 mute: elem.attr("data-mute") === "true",
                 toNextSlide: elem.attr("data-to-next-slide") === "true",
                 speed: parseInt(elem.attr("data-speed") || 1),
