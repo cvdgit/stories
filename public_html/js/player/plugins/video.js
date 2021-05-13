@@ -47,13 +47,10 @@ function WikidsVideoPlayer(elemID, options) {
         if (pauseTimeoutID) {
             clearTimeout(pauseTimeoutID);
         }
-        if (window["TransitionSlide"] && TransitionSlide.getInTransition()) {
-            TransitionSlide.backToStory(function () {
-                if (window['WikidsSeeAlso'] && WikidsSeeAlso.autoplay()) {
-                    setTimeout(RevealAudioSlideshow.playCurrentAudio, 1000);
-                }
-            });
-        }
+    });
+
+    player.on("end", function() {
+        console.log('stop');
     });
 
     player.on("play", function() {
@@ -67,11 +64,28 @@ function WikidsVideoPlayer(elemID, options) {
         console.log('pauseVideo');
         player.pause();
         done = true;
-        if (options.toNextSlide) {
-            setTimeout(function () {
-                WikidsPlayer.right();
-            }, 1500);
+        if (inTransition()) {
+            backToStory();
         }
+        else {
+            if (options.toNextSlide) {
+                setTimeout(function () {
+                    WikidsPlayer.right();
+                }, 1500);
+            }
+        }
+    }
+
+    function inTransition() {
+        return window["TransitionSlide"] && TransitionSlide.getInTransition();
+    }
+
+    function backToStory() {
+        TransitionSlide.backToStory(function () {
+            if (window['WikidsSeeAlso'] && WikidsSeeAlso.autoplay()) {
+                setTimeout(RevealAudioSlideshow.playCurrentAudio, 1000);
+            }
+        });
     }
 
     return player;
@@ -112,7 +126,7 @@ var WikidsVideo = (function() {
             var options = {
                 videoID: elem.attr("data-video-id"),
                 seekTo: parseFloat(elem.attr("data-seek-to") || 0),
-                duration: parseInt(elem.attr("data-video-duration") || 0),
+                duration: parseInt(elem.attr("data-video-duration")),
                 mute: elem.attr("data-mute") === "true",
                 toNextSlide: elem.attr("data-to-next-slide") === "true",
                 speed: parseInt(elem.attr("data-speed") || 1),

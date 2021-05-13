@@ -45,6 +45,7 @@ var TransitionSlide = (function() {
 
             if (slide_index === 0 && window["WikidsVideo"]) {
                 // Если переход происходит с первого (0) слайда, то событие slidechanged не генерится
+                WikidsVideo.reset();
                 WikidsVideo.createPlayer();
             }
 
@@ -76,9 +77,9 @@ var TransitionSlide = (function() {
                     if (state.slide_index === 0 && window["WikidsVideo"]) {
                         WikidsVideo.createPlayer();
                     }
-                    if (WikidsPlayer.isTestSlide()) {
-                        WikidsStoryTest.restore();
-                    }
+                    //if (WikidsPlayer.isTestSlide()) {
+                    //    WikidsStoryTest.restore();
+                    //}
                     if (typeof callback === 'function') {
                         callback();
                     }
