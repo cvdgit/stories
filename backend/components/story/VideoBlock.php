@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\components\story;
-
 
 class VideoBlock extends AbstractBlock
 {
@@ -11,22 +9,25 @@ class VideoBlock extends AbstractBlock
     public const DEFAULT_VOLUME = 0.8;
 
     /** @var string */
-    protected $video_id;
+    private $video_id;
 
     /** @var int */
-    protected $seek_to;
+    private $seek_to;
 
     /** @var int */
-    protected $duration;
+    private $duration;
 
     /** @var int */
-    protected $mute;
+    private $mute;
 
     /** @var int */
-    protected $speed;
+    private $speed;
 
     /** @var int */
-    protected $volume;
+    private $volume;
+
+    /** @var int */
+    private $to_next_slide;
 
     public function update($form)
     {
@@ -37,6 +38,7 @@ class VideoBlock extends AbstractBlock
         $this->mute = $form->mute;
         $this->speed = $form->speed;
         $this->volume = $form->volume;
+        $this->to_next_slide = $form->to_next_slide;
     }
 
     public function create()
@@ -91,6 +93,7 @@ class VideoBlock extends AbstractBlock
             'mute' => $this->mute,
             'speed' => $this->speed,
             'volume' => $this->volume,
+            'to_next_slide' => $this->to_next_slide,
         ], parent::getValues());
     }
 
@@ -161,6 +164,16 @@ class VideoBlock extends AbstractBlock
     public function setVolume($volume): void
     {
         $this->volume = $volume;
+    }
+
+    public function getToNextSlide()
+    {
+        return $this->to_next_slide;
+    }
+
+    public function setToNextSlide($value)
+    {
+        $this->to_next_slide = $value;
     }
 
 }

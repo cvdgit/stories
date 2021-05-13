@@ -248,7 +248,7 @@ function onSlideMouseDown(e) {
         $target[0].tagName === "AUDIO" ||
         $target.hasClass("story-controls") ||
         ($target.hasClass("wikids-recorder") || $target.parents(".wikids-recorder").length) ||
-        (($target.hasClass("plyr") || $target.parents(".plyr").length)) && window["WikidsVideo"] && WikidsVideo.showControls())  {
+        (($target.hasClass("plyr") || $target.parents(".plyr").length)) && window["WikidsVideo"])  {
         return;
     }
     switch (e.which) {

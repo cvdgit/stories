@@ -41,10 +41,10 @@ var StoryEditor = (function() {
         });
     }
 
-    function init() {
+/*    function init() {
         console.log("StoryEditor.init");
         Reveal.initialize(WikidsRevealConfig);
-    }
+    }*/
 
     var $list = $("#slide-block-list");
 
@@ -348,7 +348,7 @@ var StoryEditor = (function() {
         });
     }
 
-    init();
+    //init();
 
     function previewContainerSetHeight() {
         var height = parseInt($('.story-container').css('height'));

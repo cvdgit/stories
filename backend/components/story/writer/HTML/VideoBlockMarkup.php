@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\components\story\writer\HTML;
-
 
 use backend\components\story\AbstractBlock;
 use backend\components\story\VideoBlock;
@@ -26,6 +24,7 @@ class VideoBlockMarkup extends AbstractMarkup
             'data-seek-to' => $block->getSeekTo(),
             'data-video-duration' => $block->getDuration(),
             'data-mute' => var_export((bool)$block->getMute(), true),
+            'data-to-next-slide' => var_export((bool)$block->getToNextSlide(), true),
             'data-speed' => $block->getSpeed(),
             'data-volume' => $block->getVolume(),
         ]);

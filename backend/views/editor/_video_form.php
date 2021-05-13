@@ -1,8 +1,6 @@
 <?php
-
 /** @var $form yii\widgets\ActiveForm */
 /** @var $model backend\models\editor\VideoForm */
-
 $form->action = ['/editor/update-video'];
 ?>
 <div class="row">
@@ -26,6 +24,9 @@ $form->action = ['/editor/update-video'];
 <div class="row">
     <div class="col-xs-6">
         <?= $form->field($model, 'mute', ['inputOptions' => ['class' => 'form-control input-sm']])->checkbox() ?>
+        <?= $form->field($model, 'to_next_slide', ['inputOptions' => ['class' => 'form-control input-sm']])
+            ->checkbox()
+            ->hint('После завершения воспроизведения') ?>
     </div>
     <div class="col-xs-6">
         <?= $form->field($model, 'volume', ['inputOptions' => ['class' => 'form-control input-sm']])

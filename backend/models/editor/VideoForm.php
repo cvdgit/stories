@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\models\editor;
-
 
 class VideoForm extends BaseForm
 {
@@ -13,31 +11,29 @@ class VideoForm extends BaseForm
     public $mute;
     public $speed = 1;
     public $volume = 0.8;
+    public $to_next_slide;
 
     public function rules(): array
     {
-        $rules = parent::rules();
-        $rules = array_merge($rules, [
+        return array_merge([
             ['video_id', 'string'],
             ['video_id', 'string'],
             [['seek_to', 'duration', 'speed', 'volume'], 'double'],
-            [['mute'], 'integer'],
-        ]);
-        return $rules;
+            [['mute', 'to_next_slide'], 'integer'],
+        ], parent::rules());
     }
 
     public function attributeLabels(): array
     {
-        $labels = parent::attributeLabels();
-        $labels = array_merge($labels, [
+        return array_merge([
             'video_id' => 'Видео',
             'seek_to' => 'Начать с (сек)',
             'duration' => 'Продолжительность (сек)',
             'mute' => 'Отключить звук',
             'speed' => 'Скорость воспроизведения',
             'volume' => 'Громкость',
-        ]);
-        return $labels;
+            'to_next_slide' => 'Автоматический переход на следующий слайд',
+        ], parent::attributeLabels());
     }
 
     public static function videoSpeedArray(): array

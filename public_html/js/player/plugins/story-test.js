@@ -138,7 +138,7 @@ var Education = (function() {
             'required': params.testRequired
         });
         initQuestions(params).done(function(response) {
-            StoryBackground.setBackgroundColor('light');
+            //StoryBackground.setBackgroundColor('light');
             test.init(response);
             test.addEventListener("finish", function() {
                 WikidsPlayer.right();
