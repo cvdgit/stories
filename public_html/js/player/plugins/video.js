@@ -148,6 +148,9 @@ var WikidsVideo = (function() {
         "setEndVideo": function(el, beginElementID) {
             var beginTime = parseFloat($("#" + beginElementID).val());
             $(el).parent().parent().find("input[type=text]").val(player.currentTime - beginTime);
+        },
+        "reset": function() {
+            loaded = [];
         }
     };
 })();

@@ -233,6 +233,7 @@ var StoryEditor = (function() {
                 if (loadBlocks) {
                     loadSlideBlocks();
                 }
+                WikidsVideo.reset();
                 WikidsVideo.createPlayer();
             })
             .fail(function(data) {
