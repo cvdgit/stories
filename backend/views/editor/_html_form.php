@@ -5,7 +5,7 @@ $form->action = ['/editor/update-html'];
 ?>
 <div class="row">
     <div class="col-xs-6">
-        <?= $form->field($model, 'test_id', ['inputOptions' => ['class' => 'form-control input-sm']])->dropDownList(\common\models\StoryTest::getLocalTestArray(), ['prompt' => 'Выберите тест']) ?>
+        <?= $form->field($model, 'test_id', ['inputOptions' => ['class' => 'form-control input-sm']])->dropDownList(\common\models\StoryTest::getTestArray(), ['readonly' => true]) ?>
     </div>
 </div>
 <div class="row">

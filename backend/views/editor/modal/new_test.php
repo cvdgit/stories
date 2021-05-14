@@ -1,5 +1,6 @@
 <?php
-use yii\helpers\Html;
+use yii\widgets\ActiveForm;
+/** @var $model backend\models\editor\LocalTestForm */
 ?>
 <div class="modal fade" id="new-test-modal">
     <div class="modal-dialog">
@@ -9,12 +10,14 @@ use yii\helpers\Html;
                 <h4 class="modal-title">Слайд с тестом</h4>
             </div>
             <div class="modal-body">
+                <?php $form = ActiveForm::begin(); ?>
                 <div class="row">
                     <div class="col-md-12">
-                        <?= Html::label('Тест:', 'test-list') ?>
-                        <?= Html::dropDownList('', null, \common\models\StoryTest::getLocalTestArray(), ['prompt' => 'Выберите тест', 'class' => 'form-control', 'id' => 'test-list']) ?>
+                        <?= $form->field($model, 'test_id', ['inputOptions' => ['class' => 'form-control input-sm']])
+                            ->widget(\backend\widgets\SelectLocalTestWidget::class) ?>
                     </div>
                 </div>
+                <?php ActiveForm::end(); ?>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary" id="create-test">Создать слайд с тестом</button>
@@ -27,7 +30,7 @@ use yii\helpers\Html;
 $js = <<< JS
 (function() {
     
-    function resetSelect(select, emptyText) {
+    /*function resetSelect(select, emptyText) {
         select.empty();
         $('<option/>').text(emptyText).val('').appendTo(select);
     }
@@ -43,10 +46,10 @@ $js = <<< JS
             }
             item.appendTo(select);
         });
-    }
+    }*/
     
     var modal = $("#new-test-modal");
-    var questionList = $('#test-list');
+    var questionList = $('#localtestform-test_id');
 
     $('#create-test', modal).on('click', function() {
         var questionID = questionList.val();

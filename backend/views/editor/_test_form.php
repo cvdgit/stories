@@ -1,6 +1,7 @@
 <?php
 /** @var $form yii\widgets\ActiveForm */
 /** @var $model backend\models\editor\TestForm */
+use backend\widgets\SelectTestWidget;
 $form->action = ['/editor/update-test'];
 ?>
 <div class="row">
@@ -13,6 +14,6 @@ $form->action = ['/editor/update-test'];
 </div>
 <div class="row">
     <div class="col-xs-6">
-        <?= $form->field($model, 'test_id', ['inputOptions' => ['class' => 'form-control input-sm']])->dropDownList(\common\models\StoryTest::getTestArray()) ?>
+        <?= $form->field($model, 'test_id', ['inputOptions' => ['class' => 'form-control input-sm']])->widget(SelectTestWidget::class) ?>
     </div>
 </div>

@@ -9,6 +9,8 @@ use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
 /** @var $this yii\web\View */
+/** @var $localTestForm backend\models\editor\LocalTestForm */
+/** @var $remoteTestForm backend\models\editor\RemoteTestForm */
 StoryEditorAsset::register($this);
 PlyrAsset::register($this);
 CropperAsset::register($this);
@@ -319,11 +321,11 @@ $options = [
 </div>
 
 <?php
-echo $this->render('modal/questions');
+echo $this->render('modal/questions', ['model' => $remoteTestForm]);
 echo $this->render('modal/relations', ['model' => new \backend\models\NeoSlideRelationsForm()]);
 echo $this->render('modal/crop');
 echo $this->render('modal/new_image');
 echo $this->render('modal/image_from_file', ['imageModel' => $imageModel]);
 echo $this->render('modal/image_from_story');
 echo $this->render('modal/image_from_url', ['imageModel' => $imageFromUrlModel]);
-echo $this->render('modal/new_test');
+echo $this->render('modal/new_test', ['model' => $localTestForm]);

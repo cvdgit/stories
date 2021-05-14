@@ -15,7 +15,9 @@ use backend\components\story\writer\HTMLWriter;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
 use backend\models\editor\ImageFromUrlForm;
+use backend\models\editor\LocalTestForm;
 use backend\models\editor\QuestionForm;
+use backend\models\editor\RemoteTestForm;
 use backend\models\editor\SlideSourceForm;
 use backend\models\editor\TestForm;
 use backend\models\editor\TextForm;
@@ -78,6 +80,8 @@ class EditorController extends Controller
             'model' => $model,
             'imageModel' => $imageForm,
             'imageFromUrlModel' => $imageFromUrlForm,
+            'localTestForm' => new LocalTestForm(),
+            'remoteTestForm' => new RemoteTestForm(),
 		]);
 	}
 

@@ -127,31 +127,52 @@ class StoryTest extends ActiveRecord
         return $this->hasMany(StoryTestQuestion::class, ['story_test_id' => 'id']);
     }
 
-    public static function getTestArray(): array
-    {
-        return ArrayHelper::map(self::find()->orderBy(['title' => SORT_ASC])->all(), 'id', 'title');
-    }
-
-    public static function getRemoteTestArray(): array
+    private static function createRemoteTestQuery(): Query
     {
         $subQuery = (new Query())
             ->select('t3.parent_id')
             ->from(['t3' => self::tableName()])
             ->where('t3.source = :source', [':source' => SourceType::NEO])
             ->andWhere('t3.parent_id > 0');
-        $query = (new Query())
+        return (new Query())
             ->select(['t.id AS id', "CASE WHEN t2.title IS NULL THEN t.title ELSE CONCAT(t.title, ' (', t2.title, ')') END AS title"])
             ->from(['t' => self::tableName()])
             ->leftJoin(['t2' => self::tableName()], 't2.id = t.parent_id')
             ->where('t.source = :source', [':source' => SourceType::NEO])
-            ->andWhere(['not in', 't.id', $subQuery])
+            ->andWhere(['not in', 't.id', $subQuery]);
+    }
+
+    private static function createLocalTestQuery(): Query
+    {
+        return (new Query())
+            ->select(['id', 'title'])
+            ->from(self::tableName())
+            ->where(['in', 'source', [SourceType::TEST, SourceType::LIST]]);
+    }
+
+    public static function getTestArray(): array
+    {
+        $query = self::createLocalTestQuery();
+        $query->union(self::createRemoteTestQuery());
+        $mainQuery = (new Query())
+            ->select(['t.id AS id', 't.title AS title'])
+            ->from(['t' => $query])
+            ->orderBy(['t.title' => SORT_ASC]);
+        return ArrayHelper::map($mainQuery->all(), 'id', 'title');
+    }
+
+    public static function getRemoteTestArray(): array
+    {
+        $query = self::createRemoteTestQuery()
             ->orderBy(['IFNULL(t.title, t2.title)' => SORT_ASC]);
         return ArrayHelper::map($query->all(), 'id', 'title');
     }
 
     public static function getLocalTestArray(): array
     {
-        return ArrayHelper::map(self::find()->where(['in', 'source', [SourceType::TEST, SourceType::LIST]])->orderBy(['title' => SORT_ASC])->all(), 'id', 'title');
+        $query = self::createLocalTestQuery()
+            ->orderBy(['title' => SORT_ASC]);
+        return ArrayHelper::map($query->all(), 'id', 'title');
     }
 
     public static function findModel($id): self
