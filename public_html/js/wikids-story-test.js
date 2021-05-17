@@ -1040,25 +1040,27 @@
             class: 'list-group'
         });
 
-        function checkResult(result) {
+/*        function checkResult(result) {
             return test.checkAnswerCorrect(test.getCurrentQuestion(), result);
-        }
+        }*/
 
         Sortable.create($list[0], {
             ghostClass: 'wikids-sortable-ghost',
-            handle: '.wikids-sortable-handle',
-            onUpdate: function(e) {
+            handle: '.wikids-sortable-handle'
+/*            onUpdate: function(e) {
                 var answers = getAnswerIDs(e.srcElement);
                 if (checkResult(answers)) {
                     test.nextQuestion(answers);
                 }
-            }
+            }*/
         });
 
         this.createAnswer = function(answers) {
             $list.empty();
-            answers = shuffle(answers);
-            answers.forEach(function(answer) {
+            var _answers = [];
+            _extends(_answers, answers);
+            _answers = shuffle(_answers);
+            _answers.forEach(function(answer) {
                 var move = $('<i/>', {
                     class: 'glyphicon glyphicon-move wikids-sortable-handle'
                 });
@@ -1071,8 +1073,8 @@
             return $list;
         }
 
-        function getAnswerIDs(list) {
-            return $(list).find('[data-answer-id]').map(function() {
+        this.getAnswerIDs = function() {
+            return $list.find('[data-answer-id]').map(function() {
                 return parseInt($(this).attr('data-answer-id'));
             }).get();
         }
@@ -1411,21 +1413,6 @@
             setupDOM();
             addEventListeners();
 
-            if (testConfig.answerTypeIsMissingWords()) {
-                dom.nextButton.off("click").on("click", function() {
-                    var result = that.missingWords.getResult();
-                    that.missingWords.resetMatchElements();
-                    nextQuestion([result]);
-                });
-            }
-            if (testConfig.answerTypeIsRecording()) {
-                dom.nextButton.off("click").on("click", function() {
-                    var result = that.recordingAnswer.getResult();
-                    that.recordingAnswer.resetResult();
-                    nextQuestion([result]);
-                });
-            }
-
             start();
             createContainer();
         }
@@ -1584,6 +1571,7 @@
                 .hide()
                 .html('Продолжить <i class="icomoon-chevron-right"></i>')
                 .appendTo($(".wikids-test-buttons", dom.controls));
+            dom.questions = createQuestions(getQuestionsData());
             dom.results = createResults();
             dom.correctAnswerPage = createCorrectAnswerPage();
             dom.wrapper
@@ -1602,7 +1590,7 @@
         }
 
         function addEventListeners() {
-            dom.nextButton.off("click").on("click", nextQuestion);
+            //dom.nextButton.off("click").on("click", nextQuestion);
             dom.finishButton.off("click").on("click", finish);
             dom.restartButton.off("click").on("click", restart);
             dom.backToStoryButton.off("click").on("click", backToStory);
@@ -2019,9 +2007,7 @@
                         $answers = createMissingWordsAnswers(question, getAnswersData(question));
                         break;
                     case 'sequence':
-                        // var questionObject = new SequenceQuestion(question);
                         $answers = that.sequenceQuestion.createAnswers(getAnswersData(question));
-                        //question['_object'] = questionObject;
                         break;
                     default:
                         $answers = createAnswers(getAnswersData(question), question);
@@ -2437,7 +2423,6 @@
 
             var rememberAnswer = getQuestionRememberAnswers(currentQuestion);
             if (!rememberAnswer) {
-                //answerIsCorrect = answerQuestion($activeQuestion, answer, correctAnswersCallback, convertAnswerToInt);
                 answerIsCorrect = checkAnswerCorrect(currentQuestion, answer, correctAnswersCallback, convertAnswerToInt);
             }
             else {
@@ -2474,7 +2459,6 @@
             }
             updateProgress();
 
-            //console.log(answerIsCorrect, questionsRepeat.done(currentQuestion));
             var done = false;
             if (!answerIsCorrect) {
                 testQuestions.unshift(currentQuestion);
@@ -2488,9 +2472,6 @@
                     testQuestions.push(currentQuestion);
                 }
             }
-
-            //console.log(questions);
-            //console.log(currentQuestion);
 
             if (!App.userIsGuest() && !that.options.fastMode) {
                 var answerParams = {};
@@ -2588,6 +2569,7 @@
                 .removeClass('wikids-test-active-question');
 
             dom.nextButton.hide();
+
             if (!answerIsCorrect) {
                 if (testConfig.sourceIsWord()
                     && !testConfig.answerTypeIsNumPad()
@@ -2619,14 +2601,16 @@
 
             console.debug('WikidsStoryTest.showNextQuestion');
 
-            var nextQuestion = testQuestions.shift();
-            currentQuestion = nextQuestion;
+            var nextQuestionObj = testQuestions.shift();
+            currentQuestion = nextQuestionObj;
 
-            if (nextQuestion === undefined) {
+            if (nextQuestionObj === undefined) {
                 return;
             }
 
-            currentQuestionElement = $('.wikids-test-question[data-question-id=' + nextQuestion.id + ']', dom.questions);
+            dom.nextButton.off("click").on("click", nextQuestion);
+
+            currentQuestionElement = $('.wikids-test-question[data-question-id=' + nextQuestionObj.id + ']', dom.questions);
 
             if (getQuestionView(currentQuestion) !== 'svg' && testConfig.sourceIsNeo()) {
                 $('.wikids-test-answers', currentQuestionElement)
@@ -2640,6 +2624,26 @@
                     .empty()
                     .append(that.sequenceQuestion.createAnswers(getAnswersData(currentQuestion))
                         .find('.wikids-test-answers > div'));
+
+                dom.nextButton.off("click").on("click", function() {
+                    var result = that.sequenceQuestion.getAnswerIDs();
+                    nextQuestion(result);
+                });
+            }
+
+            if (testConfig.answerTypeIsMissingWords()) {
+                dom.nextButton.off("click").on("click", function() {
+                    var result = that.missingWords.getResult();
+                    that.missingWords.resetMatchElements();
+                    nextQuestion([result]);
+                });
+            }
+            if (testConfig.answerTypeIsRecording()) {
+                dom.nextButton.off("click").on("click", function() {
+                    var result = that.recordingAnswer.getResult();
+                    that.recordingAnswer.resetResult();
+                    nextQuestion([result]);
+                });
             }
 
             currentQuestionElement
@@ -2647,13 +2651,13 @@
                 .slideDown()
                 .addClass('wikids-test-active-question');
 
-            if (testConfig.sourceIsWord() || questionViewSequence(currentQuestion)) {
+            if (testConfig.sourceIsWord()) {
                 dom.nextButton.hide();
             }
 
             if (testConfig.answerTypeIsInput()) {
 
-                var text = getAnswersData(nextQuestion)[0].name;
+                var text = getAnswersData(nextQuestionObj)[0].name;
                 var q = $('.wikids-test-active-question .answer-input', dom.questions);
                 setTimeout(function () {
                     speech.readText(text, testConfig.getInputVoice());
@@ -2670,7 +2674,6 @@
                     .off('click')
                     .on('click', function (e) {
                         e.preventDefault();
-                        //testSpeech.ReadText(text);
                         speech.readText(text, testConfig.getInputVoice());
                     });
             }
@@ -2743,7 +2746,6 @@
                                 .css('font-size', '3rem')
                                 .on('click', function(e) {
                                     e.preventDefault();
-                                    //testSpeech.ReadText(questionAnswer.name);
                                     speech.readText(questionAnswer.name, testConfig.getInputVoice());
                                 })
                                 .html('<i class="glyphicon glyphicon-volume-up" style="left: 10px; top: 6px"></i>')
@@ -2790,8 +2792,8 @@
         }
 
         function showNextButton() {
-            //if (!testConfig.answerTypeIsNumPad() && !testConfig.answerTypeIsInput() && !testConfig.answerTypeIsRecording()) {
-            if (!testConfig.sourceIsWord() && !questionViewSequence(currentQuestion)) {
+            //  && !questionViewSequence(currentQuestion)
+            if (!testConfig.sourceIsWord()) {
                 dom.nextButton.show();
             }
         }
