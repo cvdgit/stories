@@ -348,18 +348,20 @@
             .css({'width': '640px', 'height': '480px', 'position': 'relative', 'margin': '0 auto'})
             .append($img);
         question.params.regions.forEach(function(region) {
-            $('<div/>')
-                .addClass('answer-rect')
-                .css({
-                    'position': 'absolute',
-                    'left': parseInt(region.rect.left) + 'px',
-                    'top': parseInt(region.rect.top) + 'px',
-                    'width': parseInt(region.rect.width) + 'px',
-                    'height': parseInt(region.rect.height) + 'px',
-                    'backgroundColor': 'rgba(153, 205, 80, 0.3)',
-                    'border': '3px #808080 solid'
-                })
-                .appendTo($wrapper);
+            if (region.correct) {
+                $('<div/>')
+                    .addClass('answer-rect')
+                    .css({
+                        'position': 'absolute',
+                        'left': parseInt(region.rect.left) + 'px',
+                        'top': parseInt(region.rect.top) + 'px',
+                        'width': parseInt(region.rect.width) + 'px',
+                        'height': parseInt(region.rect.height) + 'px',
+                        'backgroundColor': 'rgba(153, 205, 80, 0.3)',
+                        'border': '3px #808080 solid'
+                    })
+                    .appendTo($wrapper);
+            }
         });
         return $wrapper;
     };
