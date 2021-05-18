@@ -2082,7 +2082,7 @@ p.wikids-test-description {
 }
 
 .wikids-test-correct-answer-answers {
-	height: 500px;
+	/*height: 500px;*/
 	text-align: left;
 }
 
@@ -2291,4 +2291,8 @@ p.wikids-test-description {
 
 .wikids-test-begin {
 	margin-top: 15px;
+}
+
+.wikids-test-correct-answer-answers .question-region {
+	cursor: default;
 }

@@ -339,6 +339,31 @@
         return $wrapper;
     };
 
+    RegionQuestion.prototype.createSuccess = function(question) {
+        var $img = $('<img/>')
+            .attr('src', question.params.image)
+            .css({'position': 'absolute', 'left': 0, 'top': 0});
+        var $wrapper = $('<div/>')
+            .addClass('question-region')
+            .css({'width': '640px', 'height': '480px', 'position': 'relative', 'margin': '0 auto'})
+            .append($img);
+        question.params.regions.forEach(function(region) {
+            $('<div/>')
+                .addClass('answer-rect')
+                .css({
+                    'position': 'absolute',
+                    'left': parseInt(region.rect.left) + 'px',
+                    'top': parseInt(region.rect.top) + 'px',
+                    'width': parseInt(region.rect.width) + 'px',
+                    'height': parseInt(region.rect.height) + 'px',
+                    'backgroundColor': 'rgba(153, 205, 80, 0.3)',
+                    'border': '3px #808080 solid'
+                })
+                .appendTo($wrapper);
+        });
+        return $wrapper;
+    };
+
     _extends(RegionQuestion, {
         pluginName: 'regionQuestion'
     });
@@ -2246,6 +2271,18 @@
             return getQuestionView(question) === 'sequence';
         }
 
+        function questionViewDefault(question) {
+            return getQuestionView(question) === 'default';
+        }
+
+        function questionViewSvg(question) {
+            return getQuestionView(question) === 'svg';
+        }
+
+        function questionViewRegion(question) {
+            return getQuestionView(question) === 'region';
+        }
+
         function checkAnswersCorrect(question, userAnswers) {
             var correctAnswers = getCorrectAnswers(question);
             correctAnswers.sort(function(a, b) {
@@ -2715,72 +2752,74 @@
             text = text.replace('{1}', question.entity_name);
             $elements.append($('<h4/>').text(text + ':'));
 
-            var $element;
-            var answerText = '';
-            var userAnswer = answer[0];
-            getAnswersData(question).forEach(function(questionAnswer) {
-                $element = $('<div/>').addClass('row');
-                var $content = $('<div/>').addClass('col-md-offset-3 col-md-9');
-                if (parseInt(questionAnswer.is_correct) === 1) {
+            if (questionViewRegion(question)) {
+                $elements.append(that.regionQuestion.createSuccess(question));
+            }
+            else {
+                var $element;
+                var answerText = '';
+                var userAnswer = answer[0];
+                getAnswersData(question).forEach(function (questionAnswer) {
+                    $element = $('<div/>').addClass('row');
+                    var $content = $('<div/>').addClass('col-md-offset-3 col-md-9');
+                    if (parseInt(questionAnswer.is_correct) === 1) {
 
-                    answerText = questionAnswer.name;
+                        answerText = questionAnswer.name;
 
-                    if (questionAnswer.image) {
-                        var $image = $('<img/>')
-                            .attr("src", questionAnswer.image)
-                            .attr("width", 180)
-                            .css('cursor', 'zoom-in')
-                            .on('click', function() {
-                                showOriginalImage($(this).attr('src'));
-                            });
-                        $content.append($image);
-                    }
+                        if (questionAnswer.image) {
+                            var $image = $('<img/>')
+                                .attr("src", questionAnswer.image)
+                                .attr("width", 180)
+                                .css('cursor', 'zoom-in')
+                                .on('click', function () {
+                                    showOriginalImage($(this).attr('src'));
+                                });
+                            $content.append($image);
+                        }
 
-                    var $answerElement;
-                    if (testConfig.answerTypeIsRecording()) {
-                        $answerElement = $('<p/>')
-                            .append($('<span/>').text(answerText))
-                            .append($('<a/>')
-                                .attr('href', '#')
-                                .attr('title', 'Прослушать')
-                                .css('font-size', '3rem')
-                                .on('click', function(e) {
-                                    e.preventDefault();
-                                    speech.readText(questionAnswer.name, testConfig.getInputVoice());
-                                })
-                                .html('<i class="glyphicon glyphicon-volume-up" style="left: 10px; top: 6px"></i>')
-                            );
-                    }
-                    else {
+                        var $answerElement;
+                        if (testConfig.answerTypeIsRecording()) {
+                            $answerElement = $('<p/>')
+                                .append($('<span/>').text(answerText))
+                                .append($('<a/>')
+                                    .attr('href', '#')
+                                    .attr('title', 'Прослушать')
+                                    .css('font-size', '3rem')
+                                    .on('click', function (e) {
+                                        e.preventDefault();
+                                        speech.readText(questionAnswer.name, testConfig.getInputVoice());
+                                    })
+                                    .html('<i class="glyphicon glyphicon-volume-up" style="left: 10px; top: 6px"></i>')
+                                );
+                        } else {
+                            if (testConfig.answerTypeIsInput()) {
+                                $answerElement = $('<p/>').html(textDiff(answerText, userAnswer));
+                            } else {
+                                $answerElement = $('<p/>').text(answerText);
+                            }
+                        }
+                        $content.append($answerElement);
+
                         if (testConfig.answerTypeIsInput()) {
-                            $answerElement = $('<p/>').html(textDiff(answerText, userAnswer));
+                            $('<p/>').html('&nbsp;').appendTo($content);
+                            $('<p/>')
+                                .text('Ваш ответ:')
+                                .appendTo($content);
+                            $('<p/>')
+                                .html(userAnswer)
+                                .appendTo($content);
                         }
-                        else {
-                            $answerElement = $('<p/>').text(answerText);
-                        }
-                    }
-                    $content.append($answerElement);
 
-                    if (testConfig.answerTypeIsInput()) {
-                        $('<p/>').html('&nbsp;').appendTo($content);
-                        $('<p/>')
-                            .text('Ваш ответ:')
-                            .appendTo($content);
-                        $('<p/>')
-                            .html(userAnswer)
-                            .appendTo($content);
+                        $elements.append($element.append($content));
                     }
-
-                    $elements.append($element.append($content));
-                }
-            });
+                });
+            }
 
             if (testConfig.answerTypeIsRecording()) {
                 dom.correctAnswerPage.find('.correct-answer-page-next').hide();
             }
 
             dom.correctAnswerPage
-                //.find('.wikids-test-correct-answer-page-header').text(question.name).end()
                 .find('.wikids-test-correct-answer-answers').empty().html($elements[0].childNodes).end()
                 .show();
 
@@ -2792,8 +2831,11 @@
         }
 
         function showNextButton() {
-            //  && !questionViewSequence(currentQuestion)
-            if (!testConfig.sourceIsWord()) {
+            if (!testConfig.sourceIsWord()
+                && !questionViewDefault(currentQuestion)
+                && !questionViewSvg(currentQuestion)
+                && !questionViewRegion(currentQuestion)
+                && !testConfig.sourceIsNeo()) {
                 dom.nextButton.show();
             }
         }
