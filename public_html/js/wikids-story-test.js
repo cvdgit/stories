@@ -316,9 +316,12 @@
                     else {
                         that.addAnswer('no correct');
                     }
-                    that.test.nextQuestion(that.getAnswers());
-                    that.resetAnswers();
-                    $wrapper.find('span.answer-point').remove();
+
+                    if (that.getAnswers().length === parseInt(question.correct_number)) {
+                        that.test.nextQuestion(that.getAnswers());
+                        that.resetAnswers();
+                        $wrapper.find('span.answer-point').remove();
+                    }
                 }, 500);
             })
             .append($img);

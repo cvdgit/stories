@@ -203,10 +203,10 @@ var RegionTable = function() {
         });
     });
 
-    $table.on('click', 'input[type=checkbox]', function() {
+/*    $table.on('click', 'input[type=checkbox]', function() {
         $table.find('input[type=checkbox]').prop('checked', false);
         this.checked = true;
-    });
+    });*/
 
     function create() {
         return $table;
