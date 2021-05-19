@@ -38,9 +38,9 @@ class StoryTestQuestion extends ActiveRecord
     /** @var RegionImage */
     private $regionImage;
 
-    public function init()
+    public function afterFind()
     {
-        parent::init();
+        parent::afterFind();
         $this->regionImage = new RegionImage($this);
     }
 
@@ -178,6 +178,11 @@ class StoryTestQuestion extends ActiveRecord
     public function getImageUrl(): string
     {
         return $this->regionImage->getImageUrl();
+    }
+
+    public function getImagePath(): string
+    {
+        return $this->regionImage->getImagePath();
     }
 
     public function typeIsRegion(): bool

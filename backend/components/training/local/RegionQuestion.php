@@ -34,6 +34,8 @@ class RegionQuestion extends Question
             'params' => [
                 'regions' => Json::decode($this->question->regions),
                 'image' => $this->question->getImageUrl(),
+                'imageWidth' => $this->question->getRegionImage()->getWidth(),
+                'imageHeight' => $this->question->getRegionImage()->getHeight(),
             ],
         ], parent::serialize());
     }

@@ -255,9 +255,11 @@
 
     RegionQuestion.prototype.create = function(question, questionAnswers) {
 
+        var params = question.params;
+
         var $img = $('<img/>')
-            .attr('src', question.params.image)
-            .css({'position': 'absolute', 'left': 0, 'top': 0});
+            .attr('src', params.image)
+            .css({'position': 'absolute', 'left': 0, 'top': 0, 'width': '100%', 'height': '100%'});
 
         function getScale() {
             var scale = 1;
@@ -287,7 +289,7 @@
         var that = this;
         var $wrapper = $('<div/>')
             .addClass('question-region')
-            .css({'width': '640px', 'height': '480px', 'position': 'relative', 'margin': '0 auto'})
+            .css({'width': params.imageWidth + 'px', 'height': params.imageHeight + 'px', 'position': 'relative', 'margin': '0 auto'})
             .on('click', function(e) {
                 var rect = getRelativeCoordinates(e, $wrapper[0]);
                 $('<span/>')
@@ -343,14 +345,15 @@
     };
 
     RegionQuestion.prototype.createSuccess = function(question) {
+        var params = question.params;
         var $img = $('<img/>')
-            .attr('src', question.params.image)
-            .css({'position': 'absolute', 'left': 0, 'top': 0});
+            .attr('src', params.image)
+            .css({'position': 'absolute', 'left': 0, 'top': 0, 'width': '100%', 'height': '100%'});
         var $wrapper = $('<div/>')
             .addClass('question-region')
-            .css({'width': '640px', 'height': '480px', 'position': 'relative', 'margin': '0 auto'})
+            .css({'width': params.imageWidth + 'px', 'height': params.imageHeight + 'px', 'position': 'relative', 'margin': '0 auto'})
             .append($img);
-        question.params.regions.forEach(function(region) {
+        params.regions.forEach(function(region) {
             if (region.correct) {
                 $('<div/>')
                     .addClass('answer-rect')

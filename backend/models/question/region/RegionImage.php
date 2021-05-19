@@ -10,9 +10,19 @@ class RegionImage
 
     private $model;
 
+    /** @var int */
+    private $width = 0;
+    /** @var int */
+    private $height = 0;
+
     public function __construct(StoryTestQuestion $model)
     {
         $this->model = $model;
+
+        $imagePath = $this->getImagePath();
+        if ($imagePath !== '') {
+            [$this->width, $this->height] = getimagesize($imagePath);
+        }
     }
 
     public function getImagesPath(bool $abs = true): string
@@ -34,6 +44,16 @@ class RegionImage
             return '';
         }
         return $this->getImagesPath() . $this->model->image;
+    }
+
+    public function getWidth(): int
+    {
+        return $this->width;
+    }
+
+    public function getHeight(): int
+    {
+        return $this->height;
     }
 
 }

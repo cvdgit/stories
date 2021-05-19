@@ -76,6 +76,7 @@ class QuestionController extends Controller
         }
         return $this->render('update', [
             'model' => $form,
+            'testModel' => $model->storyTest,
         ]);
     }
 

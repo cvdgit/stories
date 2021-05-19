@@ -34,6 +34,16 @@ class UpdateRegionQuestion extends RegionQuestion
         return $this->model->getImageUrl();
     }
 
+    public function getImageWidth(): int
+    {
+        return $this->model->getRegionImage()->getWidth();
+    }
+
+    public function getImageHeight(): int
+    {
+        return $this->model->getRegionImage()->getHeight();
+    }
+
     public function hasImage()
     {
         return !empty($this->model->image);
