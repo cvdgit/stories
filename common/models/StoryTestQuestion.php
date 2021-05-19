@@ -44,6 +44,12 @@ class StoryTestQuestion extends ActiveRecord
         $this->regionImage = new RegionImage($this);
     }
 
+    public function init()
+    {
+        parent::init();
+        $this->regionImage = new RegionImage($this);
+    }
+
     public function behaviors()
     {
         return [
