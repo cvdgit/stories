@@ -62,6 +62,9 @@ class VideoBlock extends AbstractBlock
     public function setSource($value): void
     {
         $this->source = $value;
+        if ($this->source === null) {
+            $this->source = VideoSource::YOUTUBE;
+        }
     }
 
     public function getSource(): int
