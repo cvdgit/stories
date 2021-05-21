@@ -41,18 +41,18 @@ function WikidsVideoPlayer(elemID, options) {
 
     var pauseTimeoutID;
 
-    if (sourceIsYouTube) {
+    if (sourceIsFile) {
+        player.on('playing', function (event) {
+            var timeout = options.duration - (player.currentTime - options.seekTo);
+            pauseTimeoutID = setTimeout(pauseVideo, timeout * 1000);
+        });
+    }
+    else {
         player.on("statechange", function (event) {
             if (event.detail.code === 1 && !done) {
                 var timeout = options.duration - (player.currentTime - options.seekTo);
                 pauseTimeoutID = setTimeout(pauseVideo, timeout * 1000);
             }
-        });
-    }
-    if (sourceIsFile) {
-        player.on('playing', function (event) {
-            var timeout = options.duration - (player.currentTime - options.seekTo);
-            pauseTimeoutID = setTimeout(pauseVideo, timeout * 1000);
         });
     }
 
@@ -145,13 +145,6 @@ var WikidsVideo = (function() {
 
             var elemID = "video" + new Date().getTime();
 
-            if (sourceIsYouTube) {
-                elem.attr("id", elemID);
-                elem.addClass("plyr__video-embed");
-                elem.attr("data-plyr-provider", "youtube");
-                elem.attr("data-plyr-embed-id", options.videoID);
-            }
-
             if (sourceIsFile) {
                 var $video = $('<video/>', {
                     id: elemID,
@@ -160,6 +153,12 @@ var WikidsVideo = (function() {
                     type: 'video/mp4'
                 });
                 elem.replaceWith($video);
+            }
+            else {
+                elem.attr("id", elemID);
+                elem.addClass("plyr__video-embed");
+                elem.attr("data-plyr-provider", "youtube");
+                elem.attr("data-plyr-embed-id", options.videoID);
             }
 
             loaded[$(currentSlide).attr('data-id')] = true;
