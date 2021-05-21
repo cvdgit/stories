@@ -192,7 +192,7 @@ class QuestionController extends Controller
                 'topic_name' => $resultItem['question_topic_name'],
                 'correct_number' => $resultItem['correct_number'],
                 'stars' => [
-                    'total' => 5,
+                    'total' => ($fastMode ? 1 : 5),
                     'current' => (int)$stars,
                 ],
                 'view' => $svg ? 'svg' : '',
