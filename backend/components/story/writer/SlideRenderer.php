@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\components\story\writer;
-
 
 use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
@@ -12,6 +10,7 @@ use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
 use backend\components\story\TransitionBlock;
 use backend\components\story\VideoBlock;
+use backend\components\story\VideoFileBlock;
 use backend\components\story\writer\HTML\ButtonBlockMarkup;
 use backend\components\story\writer\HTML\HeaderBlockMarkup;
 use backend\components\story\writer\HTML\HTMLBlockMarkup;
@@ -60,7 +59,7 @@ class SlideRenderer
             if ($className === HTMLBLock::class) {
                 $html .= (new HTMLBlockMarkup($block))->markup();
             }
-            if ($className === VideoBlock::class) {
+            if ($className === VideoBlock::class || $className === VideoFileBlock::class) {
                 $html .= (new VideoBlockMarkup($block))->markup();
             }
         }

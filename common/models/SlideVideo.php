@@ -2,7 +2,10 @@
 
 namespace common\models;
 
+use backend\components\FileBehavior;
 use backend\components\queue\ChangeVideoJob;
+use backend\models\video\VideoFolder;
+use backend\models\video\VideoSource;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -18,6 +21,7 @@ use yii\web\NotFoundHttpException;
  * @property int $created_at
  * @property int $updated_at
  * @property int $status
+ * @property int $source;
  */
 class SlideVideo extends ActiveRecord
 {
@@ -37,6 +41,12 @@ class SlideVideo extends ActiveRecord
     {
         return [
             TimestampBehavior::class,
+            [
+                'class' => '\yiidreamteam\upload\FileUploadBehavior',
+                'attribute' => 'video_id',
+                'filePath' => '@public'.Yii::$app->params['slides.videos'].'/[[pk]].[[extension]]',
+                'fileUrl' => Yii::$app->params['slides.videos'].'/[[pk]].[[extension]]',
+            ]
         ];
     }
 
@@ -47,7 +57,7 @@ class SlideVideo extends ActiveRecord
     {
         return [
             [['status'], 'integer'],
-            [['video_id'], 'unique'],
+            //['video_id', 'file'],
         ];
     }
 
@@ -58,24 +68,36 @@ class SlideVideo extends ActiveRecord
     {
         return [
             'id' => 'ID',
-            'video_id' => 'ИД видео Youtube',
+            'video_id' => 'Видео',
             'title' => 'Название',
             'created_at' => 'Дата добавления',
             'updated_at' => 'Updated At',
             'status' => 'Статус',
+            'source' => 'Источник',
         ];
     }
 
     public static function videoArray(): array
     {
-        return ArrayHelper::map(self::find()->orderBy(['updated_at' => SORT_DESC])->all(), 'video_id', 'title');
+        return ArrayHelper::map(self::find()->orderBy(['updated_at' => SORT_DESC])->where('source = :source', [':source' => VideoSource::YOUTUBE])->all(), 'video_id', 'title');
     }
 
-    public static function create(string $title, string $video_id): SlideVideo
+    public static function videoFileArray(): array
+    {
+        $models = self::find()->orderBy(['updated_at' => SORT_DESC])->where('source = :source', [':source' => VideoSource::FILE])->all();
+        $array = [];
+        foreach ($models as $model) {
+            $array[$model->getUploadedFileUrl('video_id')] = $model->title;
+        }
+        return $array;
+    }
+
+    public static function create(string $title, string $video_id, int $source): SlideVideo
     {
         $model = new self();
         $model->title = $title;
         $model->video_id = $video_id;
+        $model->source = $source;
         return $model;
     }
 

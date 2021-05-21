@@ -1,21 +1,20 @@
 <?php
+/** @var $model backend\models\video\CreateFileVideoForm */
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-/** @var $this yii\web\View */
-/** @var $model backend\models\video\CreateVideoForm */
-$this->title = 'Новое видео';
+$this->title = 'Новое видео из файла';
 $this->params['breadcrumbs'] = [
-    ['label' => 'Видео', 'url' => ['video/index']],
+    ['label' => 'Видео', 'url' => ['video/index', 'source' => $model->source]],
     $this->title,
 ];
 ?>
 <div>
+    <h1><?= Html::encode($this->title) ?></h1>
     <div class="row">
         <div class="col-md-6">
-            <h1><?= Html::encode($this->title) ?></h1>
             <?php $form = ActiveForm::begin(); ?>
             <?= $form->field($model, 'title')->textInput() ?>
-            <?= $form->field($model, 'video_id')->textInput() ?>
+            <?= $form->field($model, 'videoFile')->fileInput() ?>
             <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']) ?>
             <?php ActiveForm::end(); ?>
         </div>

@@ -2,6 +2,8 @@
 
 namespace backend\models\editor;
 
+use backend\models\video\VideoSource;
+
 class VideoForm extends BaseForm
 {
 
@@ -13,13 +15,15 @@ class VideoForm extends BaseForm
     public $volume = 0.8;
     public $to_next_slide;
 
+    public $source;
+
     public function rules(): array
     {
         return array_merge([
             ['video_id', 'string'],
             ['video_id', 'string'],
             [['seek_to', 'duration', 'speed', 'volume'], 'double'],
-            [['mute', 'to_next_slide'], 'integer'],
+            [['mute', 'to_next_slide', 'source'], 'integer'],
         ], parent::rules());
     }
 
@@ -49,4 +53,13 @@ class VideoForm extends BaseForm
         ];
     }
 
+    public function sourceIsFile(): bool
+    {
+        return (int) $this->source === VideoSource::FILE;
+    }
+
+    public function sourceIsYouTube(): bool
+    {
+        return (int) $this->source === VideoSource::YOUTUBE;
+    }
 }

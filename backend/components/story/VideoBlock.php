@@ -2,6 +2,8 @@
 
 namespace backend\components\story;
 
+use backend\models\video\VideoSource;
+
 class VideoBlock extends AbstractBlock
 {
 
@@ -29,6 +31,9 @@ class VideoBlock extends AbstractBlock
     /** @var int */
     private $to_next_slide;
 
+    /** @var int */
+    private $source;
+
     public function update($form)
     {
         $this->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
@@ -39,6 +44,7 @@ class VideoBlock extends AbstractBlock
         $this->speed = $form->speed;
         $this->volume = $form->volume;
         $this->to_next_slide = $form->to_next_slide;
+        //$this->source = $form->source;
     }
 
     public function create()
@@ -49,7 +55,21 @@ class VideoBlock extends AbstractBlock
         $block->setLeft(0);
         $block->setTop(0);
         $block->setDuration(0);
+        $block->setSource(VideoSource::YOUTUBE);
         return $block;
+    }
+
+    public function setSource(int $value): void
+    {
+        $this->source = $value;
+    }
+
+    public function getSource(): int
+    {
+        if ($this->source === null) {
+            $this->source = VideoSource::YOUTUBE;
+        }
+        return $this->source;
     }
 
     /**
@@ -94,6 +114,7 @@ class VideoBlock extends AbstractBlock
             'speed' => $this->speed,
             'volume' => $this->volume,
             'to_next_slide' => $this->to_next_slide,
+            'source' => $this->getSource(),
         ], parent::getValues());
     }
 

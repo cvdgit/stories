@@ -65,6 +65,7 @@ class HtmlSlideReader implements ReaderInterface
                     $this->loadBlockHtml($htmlBlock);
                     break;
                 case AbstractBlock::TYPE_VIDEO:
+                case AbstractBlock::TYPE_VIDEOFILE:
                     $this->loadBlockVideo($htmlBlock);
                     break;
                 default:
@@ -233,6 +234,7 @@ class HtmlSlideReader implements ReaderInterface
         $block->setDuration(pq($element)->attr('data-video-duration'));
         $block->setMute(pq($element)->attr('data-mute') === 'true' ? 1 : 0);
         $block->setToNextSlide(pq($element)->attr('data-to-next-slide') === 'true' ? 1 : 0);
+        $block->setSource(pq($element)->attr('data-source'));
         $volume = pq($element)->attr('data-volume');
         if (empty($volume)) {
             $volume = VideoBlock::DEFAULT_VOLUME;

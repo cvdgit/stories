@@ -10,10 +10,12 @@ use backend\components\story\writer\HTMLWriter;
 use backend\models\SlideVideoSearch;
 use backend\models\video\CreateVideoForm;
 use backend\models\video\UpdateVideoForm;
+use backend\models\video\VideoSource;
 use backend\services\VideoService;
 use common\models\SlideVideo;
 use common\models\Story;
 use common\rbac\UserRoles;
+use Exception;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -46,13 +48,16 @@ class VideoController extends Controller
         ];
     }
 
-    public function actionIndex()
+    public function actionIndex(int $source = VideoSource::YOUTUBE)
     {
         $model = new SlideVideoSearch();
-        $dataProvider = $model->search(Yii::$app->request->queryParams);
+        $params = array_merge([], Yii::$app->request->queryParams);
+        $params['SlideVideoSearch']['source'] = $source;
+        $dataProvider = $model->search($params);
         return $this->render('index', [
             'searchModel' => $model,
             'dataProvider' => $dataProvider,
+            'source' => $source,
         ]);
     }
 
@@ -73,8 +78,14 @@ class VideoController extends Controller
         $model = new UpdateVideoForm($id);
         $model->loadModel();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $model->saveVideo();
-            return $this->refresh();
+            try {
+                $id = $model->saveVideo();
+                Yii::$app->session->addFlash('success', 'Видео успешно изменено');
+                return $this->redirect(['update', 'id' => $id]);
+            }
+            catch (Exception $ex) {
+                Yii::$app->session->addFlash('error', $ex->getMessage());
+            }
         }
         return $this->render('update', [
             'model' => $model,

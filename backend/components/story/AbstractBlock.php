@@ -13,6 +13,7 @@ abstract class AbstractBlock
     const TYPE_TEST = 'test';
     const TYPE_HTML = 'html';
     const TYPE_VIDEO = 'video';
+    const TYPE_VIDEOFILE = 'videofile';
 
     protected $width;
     protected $height;

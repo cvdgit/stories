@@ -19,36 +19,47 @@ function WikidsVideoPlayer(elemID, options) {
     player = new Plyr('#' + elemID, {
         autoplay: true,
         controls: controls,
-        clickToPlay: false,
+        clickToPlay: true,
         keyboard: false
     });
 
+    var sourceIsYouTube = options.source === 1,
+        sourceIsFile = options.source === 2;
+
     player.on("ready", function(event) {
-        console.log('player.ready');
         player.play();
         player.speed = options.speed;
         player.currentTime = options.seekTo;
         player.volume = options.volume;
     });
 
+    if (sourceIsFile) {
+        player.once('canplay', function (event) {
+            player.currentTime = options.seekTo;
+        });
+    }
+
     var pauseTimeoutID;
 
-    player.on("statechange", function(event) {
-        if (event.detail.code === 1 && !done) {
+    if (sourceIsYouTube) {
+        player.on("statechange", function (event) {
+            if (event.detail.code === 1 && !done) {
+                var timeout = options.duration - (player.currentTime - options.seekTo);
+                pauseTimeoutID = setTimeout(pauseVideo, timeout * 1000);
+            }
+        });
+    }
+    if (sourceIsFile) {
+        player.on('playing', function (event) {
             var timeout = options.duration - (player.currentTime - options.seekTo);
-            console.log('statechange', player.currentTime, timeout);
             pauseTimeoutID = setTimeout(pauseVideo, timeout * 1000);
-        }
-    });
+        });
+    }
 
     player.on("pause", function() {
         if (pauseTimeoutID) {
             clearTimeout(pauseTimeoutID);
         }
-    });
-
-    player.on("end", function() {
-        console.log('stop');
     });
 
     player.on("play", function() {
@@ -59,7 +70,6 @@ function WikidsVideoPlayer(elemID, options) {
     });
 
     function pauseVideo() {
-        console.log('pauseVideo');
         player.pause();
         done = true;
         if (inTransition()) {
@@ -116,9 +126,6 @@ var WikidsVideo = (function() {
         }
 
         var elem = $("div.wikids-video-player", currentSlide);
-        var elemID = "video" + new Date().getTime();
-        elem.attr("id", elemID);
-
         if (elem.length) {
 
             var options = {
@@ -129,12 +136,31 @@ var WikidsVideo = (function() {
                 toNextSlide: elem.attr("data-to-next-slide") === "true",
                 speed: parseInt(elem.attr("data-speed") || 1),
                 volume: parseFloat(elem.attr("data-volume") || 0.8),
-                showControls: config.showControls || false
+                showControls: config.showControls || false,
+                source: parseInt(elem.attr('data-source'))
             };
 
-            elem.addClass("plyr__video-embed");
-            elem.attr("data-plyr-provider", "youtube");
-            elem.attr("data-plyr-embed-id", options.videoID);
+            var sourceIsYouTube = options.source === 1,
+                sourceIsFile = options.source === 2;
+
+            var elemID = "video" + new Date().getTime();
+
+            if (sourceIsYouTube) {
+                elem.attr("id", elemID);
+                elem.addClass("plyr__video-embed");
+                elem.attr("data-plyr-provider", "youtube");
+                elem.attr("data-plyr-embed-id", options.videoID);
+            }
+
+            if (sourceIsFile) {
+                var $video = $('<video/>', {
+                    id: elemID,
+                    controls: true,
+                    src: options.videoID,
+                    type: 'video/mp4'
+                });
+                elem.replaceWith($video);
+            }
 
             loaded[$(currentSlide).attr('data-id')] = true;
             player = WikidsVideoPlayer(elemID, options);

@@ -1,10 +1,22 @@
 <?php
+use common\models\SlideVideo;
 /** @var $form yii\widgets\ActiveForm */
 /** @var $model backend\models\editor\VideoForm */
 $form->action = ['/editor/update-video'];
 ?>
 <div class="row">
-    <div class="col-xs-6"><?= $form->field($model, 'video_id', ['inputOptions' => ['class' => 'form-control input-sm']])->dropDownList(common\models\SlideVideo::videoArray(), ['prompt' => 'Выбрать видео']) ?></div>
+    <div class="col-xs-6">
+        <?php
+        $items = [];
+        if ($model->sourceIsYouTube()) {
+            $items = SlideVideo::videoArray();
+        }
+        if ($model->sourceIsFile()) {
+            $items = SlideVideo::videoFileArray();
+        }
+        ?>
+        <?= $form->field($model, 'video_id', ['inputOptions' => ['class' => 'form-control input-sm']])->dropDownList($items, ['prompt' => 'Выбрать видео']) ?>
+    </div>
     <div class="col-xs-6">
         <?= $form->field($model, 'speed', ['inputOptions' => ['class' => 'form-control input-sm']])->dropDownList(\backend\models\editor\VideoForm::videoSpeedArray()) ?>
     </div>

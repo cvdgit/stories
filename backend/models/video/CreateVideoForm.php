@@ -10,13 +10,21 @@ class CreateVideoForm extends Model
 
     public $title;
     public $video_id;
+    public $source;
+
+    public function init()
+    {
+        parent::init();
+        $this->source = VideoSource::YOUTUBE;
+    }
 
     public function rules()
     {
         return [
-            [['video_id', 'title'], 'required'],
+            [['video_id', 'title', 'source'], 'required'],
             [['video_id', 'title'], 'string', 'max' => 255],
-            ['video_id', 'unique', 'targetClass' => SlideVideo::class, 'targetAttribute' => 'video_id'],
+            [['source'], 'integer'],
+            ['source', 'in', 'range' => VideoSource::getTypes()],
         ];
     }
 
@@ -33,7 +41,7 @@ class CreateVideoForm extends Model
         if (!$this->validate()) {
             throw new \DomainException('Model not valid');
         }
-        $model = SlideVideo::create($this->title, $this->video_id);
+        $model = SlideVideo::create($this->title, $this->video_id, $this->source);
         $model->save();
     }
 

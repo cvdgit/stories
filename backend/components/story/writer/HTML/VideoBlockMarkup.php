@@ -27,6 +27,7 @@ class VideoBlockMarkup extends AbstractMarkup
             'data-to-next-slide' => var_export((bool)$block->getToNextSlide(), true),
             'data-speed' => $block->getSpeed(),
             'data-volume' => $block->getVolume(),
+            'data-source' => $block->getSource(),
         ]);
     }
 

@@ -1,17 +1,11 @@
 <?php
 
-
 namespace backend\models\video;
 
-
 use common\models\SlideVideo;
-use yii\base\Model;
 
-class UpdateVideoForm extends Model
+class UpdateVideoForm extends YouTubeVideoForm
 {
-
-    public $title;
-    public $video_id;
 
     public $model_id;
 
@@ -25,6 +19,7 @@ class UpdateVideoForm extends Model
 
     public function attributeLabels()
     {
+
         return [
             'title' => 'Название',
             'video_id' => 'ИД видео Youtube',
@@ -36,6 +31,8 @@ class UpdateVideoForm extends Model
         return [
             [['video_id', 'title'], 'required'],
             [['video_id', 'title'], 'string', 'max' => 255],
+            [['source'], 'integer'],
+            ['source', 'in', 'range' => VideoSource::getTypes()],
         ];
     }
 
@@ -59,7 +56,8 @@ class UpdateVideoForm extends Model
         $model = $this->getModel();
         $model->title = $this->title;
         $model->video_id = $this->video_id;
-        return $model->save();
+        $model->save();
+        return $model->id;
     }
 
 }

@@ -38,4 +38,5 @@ return [
     ],
 
     'test.question.images' => '/test_images/question',
+    'slides.videos' => '/slides_video',
 ];

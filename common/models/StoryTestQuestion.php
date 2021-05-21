@@ -6,7 +6,6 @@ use backend\models\question\QuestionType;
 use backend\models\question\region\RegionImage;
 use DomainException;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
-use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
@@ -37,18 +36,6 @@ class StoryTestQuestion extends ActiveRecord
 
     /** @var RegionImage */
     private $regionImage;
-
-    public function afterFind()
-    {
-        parent::afterFind();
-        $this->regionImage = new RegionImage($this);
-    }
-
-    public function init()
-    {
-        parent::init();
-        $this->regionImage = new RegionImage($this);
-    }
 
     public function behaviors()
     {
@@ -178,17 +165,17 @@ class StoryTestQuestion extends ActiveRecord
 
     public function getImagesPath(): string
     {
-        return $this->regionImage->getImagesPath();
+        return $this->getRegionImage()->getImagesPath();
     }
 
     public function getImageUrl(): string
     {
-        return $this->regionImage->getImageUrl();
+        return $this->getRegionImage()->getImageUrl();
     }
 
     public function getImagePath(): string
     {
-        return $this->regionImage->getImagePath();
+        return $this->getRegionImage()->getImagePath();
     }
 
     public function typeIsRegion(): bool
@@ -206,7 +193,7 @@ class StoryTestQuestion extends ActiveRecord
         if (!empty($this->image)) {
             $name = pathinfo($this->image, PATHINFO_FILENAME);
             if (!empty($name)) {
-                $imagesPath = $this->regionImage->getImagesPath();
+                $imagesPath = $this->getRegionImage()->getImagesPath();
                 array_map(static function($path) use ($imagesPath) {
                     if (file_exists($path) && rtrim($imagesPath, DIRECTORY_SEPARATOR) === dirname($path)) {
                         FileHelper::unlink($path);
@@ -234,6 +221,9 @@ class StoryTestQuestion extends ActiveRecord
 
     public function getRegionImage(): RegionImage
     {
+        if ($this->regionImage === null) {
+            $this->regionImage = new RegionImage($this->owner);
+        }
         return $this->regionImage;
     }
 

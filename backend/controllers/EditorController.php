@@ -11,6 +11,7 @@ use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
 use backend\components\story\TransitionBlock;
 use backend\components\story\VideoBlock;
+use backend\components\story\VideoFileBlock;
 use backend\components\story\writer\HTMLWriter;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
@@ -279,6 +280,9 @@ class EditorController extends Controller
             ],
             AbstractBlock::TYPE_IMAGE => [
                 'class' => ImageBlock::class,
+            ],
+            AbstractBlock::TYPE_VIDEOFILE => [
+                'class' => VideoFileBlock::class,
             ],
         ];
         if (!isset($types[$block_type])) {

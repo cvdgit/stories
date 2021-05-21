@@ -1,15 +1,16 @@
 <?php
-
 use common\helpers\Url;
+use frontend\assets\PlyrAsset;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-
 /** @var $this yii\web\View */
 /** @var $model backend\models\video\UpdateVideoForm */
-
-\frontend\assets\PlyrAsset::register($this);
-
+PlyrAsset::register($this);
 $this->title = 'Изменить видео';
+$this->params['breadcrumbs'] = [
+    ['label' => 'Видео', 'url' => ['video/index']],
+    $this->title,
+];
 ?>
 <div class="row">
     <div class="col-md-6">
