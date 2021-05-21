@@ -59,7 +59,7 @@ class VideoBlock extends AbstractBlock
         return $block;
     }
 
-    public function setSource(int $value): void
+    public function setSource($value): void
     {
         $this->source = $value;
     }
