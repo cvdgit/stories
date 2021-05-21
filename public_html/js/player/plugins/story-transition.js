@@ -74,9 +74,14 @@ var TransitionSlide = (function() {
                     syncReveal(data.html, state.slide_index);
                     currentStoryID = state.story_id;
                     inTransitionStory = false;
-                    if (state.slide_index === 0 && window["WikidsVideo"]) {
-                        WikidsVideo.createPlayer();
+                    if (window["WikidsVideo"]) {
+                        WikidsVideo.pauseLastPlayer();
+                        WikidsVideo.reset();
+                        if (state.slide_index === 0) {
+                            WikidsVideo.createPlayer();
+                        }
                     }
+
                     //if (WikidsPlayer.isTestSlide()) {
                     //    WikidsStoryTest.restore();
                     //}

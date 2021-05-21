@@ -117,6 +117,8 @@ function WikidsVideoPlayer(elemID, options) {
 var WikidsVideo = (function() {
     "use strict";
 
+    console.log('WikidsVideo');
+
     function getCurrentSlide() {
         return Reveal.getCurrentSlide();
     }
@@ -124,6 +126,7 @@ var WikidsVideo = (function() {
     var loaded = [];
     var config = Reveal.getConfig().video;
     var player;
+    var players = [];
 
     function createPlayer(currentSlide) {
         console.log("createPlayer");
@@ -177,6 +180,7 @@ var WikidsVideo = (function() {
 
             loaded[$(currentSlide).attr('data-id')] = true;
             player = WikidsVideoPlayer(elemID, options);
+            players.push(player);
         }
     }
 
@@ -204,6 +208,15 @@ var WikidsVideo = (function() {
         },
         "reset": function() {
             loaded = [];
+        },
+        "pauseLastPlayer": function() {
+            if (players.length === 0) {
+                return;
+            }
+            var player = players.pop();
+            if (player !== undefined) {
+                player.pause();
+            }
         }
     };
 })();
