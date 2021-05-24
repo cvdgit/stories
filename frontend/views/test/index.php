@@ -84,7 +84,7 @@ function initQuestions(params) {
     return $.getJSON("/question/init", params);
 }
 
-$('#run-test-modal').on('shown.bs.modal', function() {
+$('#run-test-modal').on('loaded.bs.modal', function() {
     var elem = $("div.new-questions", this),
         params = elem.data();
     var test = WikidsStoryTest.create(elem[0], {
