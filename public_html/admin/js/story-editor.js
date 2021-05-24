@@ -4,6 +4,7 @@ var StoryEditor = (function() {
 
     var $editor = $('#story-editor');
     var $previewContainer = $('#preview-container');
+    var $formContainer = $("#form-container");
 
     var config = {
         storyID: "",
@@ -95,6 +96,8 @@ var StoryEditor = (function() {
 
     function setActiveBlock(blockID) {
         if (blockID === activeBlockID) {
+            selectActiveBlock(blockID);
+            console.log('this');
             return;
         }
         activeBlockID = blockID;
@@ -110,7 +113,6 @@ var StoryEditor = (function() {
             "type": "GET",
             "dataType": "json"
         });
-        var $formContainer = $("#form-container");
         $("#slide-block-params").show();
         promise.done(function(data) {
             $formContainer.html(data);
@@ -182,10 +184,18 @@ var StoryEditor = (function() {
 
         send(slideID)
             .done(function(data) {
+
                 setActiveSlide(data);
                 updateLinkCounter(data.blockNumber);
+
                 $(".slides", $editor).empty().append(data.data);
-                $('section', '#story-editor').css({'height': '720px', 'width': '1280px'}).attr('id', 'slide-container');
+
+                if (activeBlockID !== undefined) {
+                    setActiveBlock(activeBlockID);
+                }
+
+                //$('section', '#story-editor').css({'height': '720px', 'width': '1280px'}).attr('id', 'slide-container');
+
                 $(".sl-block", ".reveal").draggable({
                     //containment: '#slide-container',
                     start: function(event) {
@@ -200,8 +210,8 @@ var StoryEditor = (function() {
                             left: (event.clientX - click.x + original.left) / zoom,
                             top:  (event.clientY - click.y + original.top ) / zoom
                         };
-                        $("input.editor-top").val(Math.round(ui.position.top) + "px");
-                        $("input.editor-left").val(Math.round(ui.position.left) + "px");
+                        setFormTop(Math.round(ui.position.top) + "px");
+                        setFormLeft(Math.round(ui.position.left) + "px");
                     }
                 });
                 $(".sl-block", ".reveal").resizable({
@@ -224,8 +234,8 @@ var StoryEditor = (function() {
                         if (pt + ost !== opt + ost) { //top side
                             ui.position.top = opt + (ost - ui.size.height);
                         }
-                        $("input.editor-width").val(Math.round(ui.size.width) + "px");
-                        $("input.editor-height").val(Math.round(ui.size.height) + "px");
+                        setFormWidth(Math.round(ui.size.width) + "px");
+                        setFormHeight(Math.round(ui.size.height) + "px");
                     }
                 });
                 Reveal.sync();
@@ -446,6 +456,60 @@ var StoryEditor = (function() {
         });
     }
 
+    function findBlockElement(blockID) {
+        return $editor.find('section > div.sl-block[data-block-id=' + blockID + ']');
+    }
+
+    function setBlockAlign(align, blockID) {
+        var element = findBlockElement(blockID === undefined ? activeBlockID : blockID);
+        switch (align) {
+            case 'left':
+                setFormLeft('0px', element);
+                break;
+            case 'right':
+                setFormLeft(1280 - parseInt(element.css('width')) + 'px', element);
+                break;
+            case 'top':
+                setFormTop('0px', element);
+                break;
+            case 'bottom':
+                setFormTop(720 - parseInt(element.css('height')) + 'px', element);
+                break;
+            case 'horizontal_center':
+                setFormLeft((1280 - parseInt(element.css('width'))) / 2 + 'px', element);
+                break;
+            case 'vertical_center':
+                setFormTop((720 - parseInt(element.css('height'))) / 2 + 'px', element);
+                break;
+            case 'slide_center':
+                setFormLeft((1280 - parseInt(element.css('width'))) / 2 + 'px', element);
+                setFormTop((720 - parseInt(element.css('height'))) / 2 + 'px', element);
+                break;
+        }
+    }
+
+    function getBlockForm() {
+        return $formContainer.find('form:eq(0)');
+    }
+
+    function setFormLeft(value, element) {
+        element && element.css('left', value);
+        getBlockForm().find('input.editor-left').val(value);
+    }
+
+    function setFormTop(value, element) {
+        element && element.css('top', value);
+        getBlockForm().find('input.editor-top').val(value);
+    }
+
+    function setFormWidth(value) {
+        getBlockForm().find('input.editor-width').val(value);
+    }
+
+    function setFormHeight(value) {
+        getBlockForm().find('input.editor-height').val(value);
+    }
+
     return {
         "initialize": initialize,
         "loadSlides": loadSlides,
@@ -468,7 +532,28 @@ var StoryEditor = (function() {
         "getStoryID": function() {
             return getConfigValue('storyID');
         },
-        "saveSlidesOrder": saveSlidesOrder
+        "saveSlidesOrder": saveSlidesOrder,
+        "setBlockAlignLeft": function() {
+            setBlockAlign('left');
+        },
+        "setBlockAlignRight": function() {
+            setBlockAlign('right');
+        },
+        "setBlockAlignTop": function() {
+            setBlockAlign('top');
+        },
+        "setBlockAlignBottom": function() {
+            setBlockAlign('bottom');
+        },
+        "setBlockAlignHorizontalCenter": function() {
+            setBlockAlign('horizontal_center');
+        },
+        "setBlockAlignVerticalCenter": function() {
+            setBlockAlign('vertical_center');
+        },
+        "setBlockAlignSlideCenter": function() {
+            setBlockAlign('slide_center');
+        }
     };
 })();
 

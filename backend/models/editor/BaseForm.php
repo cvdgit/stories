@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\models\editor;
-
 
 use yii\base\Model;
 
@@ -11,20 +9,20 @@ class BaseForm extends Model
 
     public $slide_id;
     public $block_id;
-
     public $left;
     public $top;
     public $width;
     public $height;
-
     public $view;
+    public $align;
+    public $stretch;
 
     public function rules(): array
     {
         return [
-            //[['slide_id'], 'required'],
             [['slide_id'], 'integer'],
             [['block_id', 'left', 'top', 'width', 'height'], 'string'],
+            [['align', 'stretch'], 'integer'],
         ];
     }
 
@@ -35,6 +33,8 @@ class BaseForm extends Model
             'top' => 'Верхний отступ',
             'width' => 'Ширина',
             'height' => 'Высота',
+            'align' => 'Расположение',
+            'stretch' => 'Растянуть',
         ];
     }
 
