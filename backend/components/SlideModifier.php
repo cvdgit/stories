@@ -20,7 +20,7 @@ class SlideModifier
                 if (strpos($block->getFilePath(), $delimiter) !== false) {
                     $delimiter = '&';
                 }
-                $block->setFilePath($block->getFilePath() . $delimiter . 't=' . time());
+                $block->setFilePath($block->getFilePath() . $delimiter . 't=' . microtime());
             }
         }
         $writer = new HTMLWriter();
