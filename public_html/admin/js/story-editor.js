@@ -1,4 +1,12 @@
 
+function DataModifier() {
+    this.timeout = undefined;
+}
+
+DataModifier.prototype.add = function() {
+
+};
+
 var StoryEditor = (function() {
     "use strict";
 
@@ -97,7 +105,6 @@ var StoryEditor = (function() {
     function setActiveBlock(blockID) {
         if (blockID === activeBlockID) {
             selectActiveBlock(blockID);
-            console.log('this');
             return;
         }
         activeBlockID = blockID;
@@ -165,6 +172,10 @@ var StoryEditor = (function() {
         $("#slide-links").text("Ссылки" + (count > 0 ? " (" + count + ")" : ""));
     }
 
+    function updateBlock(blockID, values) {
+        $.post('/admin/index.php?r=editor/blocks/save', values);
+    }
+
     function loadSlide(slideID, loadBlocks) {
         loadBlocks = loadBlocks || false;
         currentSlideID = slideID;
@@ -194,8 +205,9 @@ var StoryEditor = (function() {
                     setActiveBlock(activeBlockID);
                 }
 
-                //$('section', '#story-editor').css({'height': '720px', 'width': '1280px'}).attr('id', 'slide-container');
+                $('section', '#story-editor').css({'height': '720px', 'width': '1280px'}).attr('id', 'slide-container');
 
+                var dragTimeout;
                 $(".sl-block", ".reveal").draggable({
                     //containment: '#slide-container',
                     start: function(event) {
@@ -210,8 +222,16 @@ var StoryEditor = (function() {
                             left: (event.clientX - click.x + original.left) / zoom,
                             top:  (event.clientY - click.y + original.top ) / zoom
                         };
+                    },
+                    stop: function(event, ui) {
                         setFormTop(Math.round(ui.position.top) + "px");
                         setFormLeft(Math.round(ui.position.left) + "px");
+/*                        if (dragTimeout !== undefined) {
+                            clearTimeout(dragTimeout);
+                        }
+                        dragTimeout = setTimeout(function() {
+                            console.log(Math.round(ui.position.top) + "px", Math.round(ui.position.left) + "px")
+                        }, 1000);*/
                     }
                 });
                 $(".sl-block", ".reveal").resizable({
