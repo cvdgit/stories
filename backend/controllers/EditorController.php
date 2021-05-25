@@ -302,7 +302,7 @@ class EditorController extends Controller
         $model->data = $html;
         $model->save(false, ['data']);
 
-        return ['success' => true];
+        return ['success' => true, 'block_id' => $block->getId()];
     }
 
     public function actionCreateSlide(int $story_id, int $current_slide_id = -1)

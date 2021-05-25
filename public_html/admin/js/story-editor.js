@@ -48,6 +48,11 @@ var StoryEditor = (function() {
     var $previewContainer = $('#preview-container');
     var $formContainer = $("#form-container");
 
+    $editor.on('click', 'div.sl-block', function(e) {
+        var currentBlockID = $(this).attr('data-block-id');
+        setActiveBlock(currentBlockID, currentBlockID === activeBlockID);
+    });
+
     var config = {
         storyID: "",
         getSlideAction: "",
@@ -66,7 +71,7 @@ var StoryEditor = (function() {
 
     var currentSlideIndex = 0,
         currentSlideID,
-        activeBlockID;
+        activeBlockID = null;
 
     function initialize(params) {
         config = params;
@@ -123,7 +128,7 @@ var StoryEditor = (function() {
                     elem.append(deleteElem);
                     elem.appendTo($list);
                 });
-                setActiveBlock($list.find("a").attr("data-block-id"));
+                setActiveBlock(activeBlockID || $list.find("a").attr("data-block-id"));
             }
             else {
                 $("#slide-block-params").hide();
@@ -136,16 +141,15 @@ var StoryEditor = (function() {
         $(".reveal .slides").find("div[data-block-id=" + blockID + "]").addClass("wikids-active-block");
     }
 
-    function setActiveBlock(blockID) {
-        if (blockID === activeBlockID) {
-            selectActiveBlock(blockID);
-            return;
-        }
+    function setActiveBlock(blockID, doNotLoadForm) {
         activeBlockID = blockID;
+        doNotLoadForm = doNotLoadForm || false;
         $("a", $list).removeClass("active");
         $("a[data-block-id=" + blockID + "]", $list).addClass("active");
         selectActiveBlock(blockID);
-        loadBlockForm(blockID);
+        if (!doNotLoadForm) {
+            loadBlockForm(blockID);
+        }
     }
 
     function loadBlockForm(blockID) {
@@ -166,8 +170,11 @@ var StoryEditor = (function() {
             "type": "GET",
             "dataType": "json"
         });
-        promise.done(function() {
-            loadSlide(currentSlideID, true);
+        promise.done(function(response) {
+            if (response && response.success) {
+                activeBlockID = response.block_id;
+                loadSlide(currentSlideID, true);
+            }
         });
     }
 
@@ -188,6 +195,10 @@ var StoryEditor = (function() {
             "dataType": "json"
         });
         promise.done(function() {
+            var deleteCurrentBlock = (blockID === activeBlockID);
+            if (deleteCurrentBlock) {
+                activeBlockID = null;
+            }
             loadSlide(currentSlideID, true);
         });
     }
@@ -223,12 +234,14 @@ var StoryEditor = (function() {
     var modifier = new DataModifier(updateBlock);
 
     function loadSlide(slideID, loadBlocks) {
+
         loadBlocks = loadBlocks || false;
         currentSlideID = slideID;
         var click = {
             x: 0,
             y: 0
         };
+
         EditorActions.reset();
 
         function getContainment($box, $drag, space) {
@@ -247,16 +260,17 @@ var StoryEditor = (function() {
 
                 $(".slides", $editor).empty().append(data.data);
 
-                if (activeBlockID !== undefined) {
-                    setActiveBlock(activeBlockID);
+                if (activeBlockID !== null && !loadBlocks) {
+                    setActiveBlock(activeBlockID, true);
                 }
 
-                $('section', '#story-editor').css({'height': '720px', 'width': '1280px'}).attr('id', 'slide-container');
+                $('section', '#story-editor')
+                    .css({'height': '720px', 'width': '1280px'})
+                    .attr('id', 'slide-container');
 
                 $(".sl-block", ".reveal").draggable({
-                    //containment: '#slide-container',
                     start: function(event) {
-                        setActiveBlock($(event.target).attr("data-block-id"));
+                        //setActiveBlock($(event.target).attr("data-block-id"));
                         click.x = event.clientX;
                         click.y = event.clientY;
                     },
@@ -355,6 +369,8 @@ var StoryEditor = (function() {
                         .attr("data-link-slide-id", slide.linkSlideID)
                         .html(slideIcon(slide) + " слайд " + slide.slideNumber)
                         .on("click", function () {
+                            activeBlockID = null;
+                            currentSlideID = null;
                             loadSlide(slide.id, true);
                             return false;
                         });
