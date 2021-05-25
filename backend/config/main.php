@@ -19,6 +19,9 @@ return [
         'request' => [
             'csrfParam' => '_csrf-wikids',
             'cookieValidationKey' => $params['cookieValidationKey'],
+            'parsers' => [
+                'application/json' => 'yii\web\JsonParser',
+            ],
         ],
         'user' => [
             'identityClass' => 'common\models\User',
