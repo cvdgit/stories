@@ -526,7 +526,7 @@ body {
     margin-top: 35px;
 }
 
-#story-editor .btn {
+.story-container .btn {
     border: none;
     color: #ffffff;
     font-size: 1.8rem;
@@ -545,7 +545,7 @@ body {
     line-height: 1;
 }
 
-#story-editor .btn:focus {
+.story-container .btn:focus {
     outline: 0 none;
     outline-offset: 0;
 }
