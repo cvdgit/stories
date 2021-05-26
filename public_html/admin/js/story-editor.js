@@ -265,7 +265,8 @@ var StoryEditor = (function() {
 
                 $(".sl-block", ".reveal").draggable({
                     start: function(event) {
-                        setActiveBlock($(event.target).attr("data-block-id"));
+                        var blockID = $(event.target).attr("data-block-id");
+                        setActiveBlock(blockID, blockID === activeBlockID);
                         click.x = event.clientX;
                         click.y = event.clientY;
                     },
