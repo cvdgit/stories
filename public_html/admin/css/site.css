@@ -488,6 +488,10 @@ body {
     pointer-events: auto !important;
 }
 
+#story-editor section button {
+    pointer-events: none !important;
+}
+
 #crop-image-container {
     min-height: 500px;
 }

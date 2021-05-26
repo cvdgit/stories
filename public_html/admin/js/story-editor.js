@@ -89,11 +89,6 @@ var StoryEditor = (function() {
         });
     }
 
-/*    function init() {
-        console.log("StoryEditor.init");
-        Reveal.initialize(WikidsRevealConfig);
-    }*/
-
     var $list = $("#slide-block-list");
 
     function loadSlideBlocks() {
@@ -270,7 +265,7 @@ var StoryEditor = (function() {
 
                 $(".sl-block", ".reveal").draggable({
                     start: function(event) {
-                        //setActiveBlock($(event.target).attr("data-block-id"));
+                        setActiveBlock($(event.target).attr("data-block-id"));
                         click.x = event.clientX;
                         click.y = event.clientY;
                     },
