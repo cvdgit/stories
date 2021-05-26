@@ -110,7 +110,7 @@ class TestWordList extends ActiveRecord
     {
         $data = $this->getWordsQuery($filter)->all();
 
-/*        $rememberData = TestRememberAnswer::getTestRememberAnswerData($testID, $studentID);
+        $rememberData = TestRememberAnswer::getTestRememberAnswerData($testID, $studentID);
         foreach ($rememberData as $row) {
             foreach ($data as $key => $value) {
                 if ((int)$value['id'] === (int)$row['entity_id']) {
@@ -118,7 +118,7 @@ class TestWordList extends ActiveRecord
                     break;
                 }
             }
-        }*/
+        }
 
         return $data;
     }
