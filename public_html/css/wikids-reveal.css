@@ -1674,13 +1674,15 @@
 .reveal.has-light-background section p,
 .reveal.has-light-background section h1,
 .reveal.has-light-background section h3,
+.reveal.has-light-background section h4,
 .reveal.has-light-background section div.slide-paragraph {
-	color: #000000 !important;
+	color: #38405d !important;
 }
 
 .reveal.has-dark-background section p,
 .reveal.has-dark-background section h1,
 .reveal.has-dark-background section h3,
+.reveal.has-dark-background section h4,
 .reveal.has-dark-background section div.slide-paragraph {
 	color: #ffffff !important;
 }
@@ -1803,6 +1805,10 @@
 
 .wikids-test-begin-page {
 
+}
+
+.wikids-test-begin-page .list-group a.active h4 {
+	color: white !important;
 }
 
 .wikids-test-begin-page p {
