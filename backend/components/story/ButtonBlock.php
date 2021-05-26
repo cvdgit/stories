@@ -41,8 +41,8 @@ class ButtonBlock extends TextBlock
     public function create()
     {
         $block = new self();
-        $block->setWidth('290px');
-        $block->setHeight('50px');
+        $block->setWidth('auto');
+        $block->setHeight('auto');
         $block->setTop('500px');
         $block->setLeft('990px');
         $block->setText('Название');

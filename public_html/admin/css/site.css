@@ -1,10 +1,11 @@
-/*
-html,
-body {
-    height: 100%;
-    overflow: auto;
+html {
+    font-size: 10px;
 }
-*/
+
+body {
+    font-size: 18px;
+    font-family: 'Roboto', Arial, sans-serif;
+}
 
 .wrap {
     min-height: 100%;
@@ -523,4 +524,28 @@ body {
 
 .wrong-answer-list .delete-wrong-answer-row {
     margin-top: 35px;
+}
+
+#story-editor .btn {
+    border: none;
+    color: #ffffff;
+    font-size: 1.8rem;
+    -webkit-box-shadow: 0 0.5rem 2rem 0.5rem rgba(153, 205, 80, 0.35);
+    box-shadow: 0 0.5rem 2rem 0.5rem rgba(153, 205, 80, 0.35);
+    -webkit-border-radius: 3rem;
+    border-radius: 3rem;
+    background-color: #99cd50;
+    padding: 2rem 4rem;
+    display: inline-block;
+    -webkit-transition: .5s;
+    transition: .5s;
+    font-weight: 700;
+    text-decoration: none;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+#story-editor .btn:focus {
+    outline: 0 none;
+    outline-offset: 0;
 }
