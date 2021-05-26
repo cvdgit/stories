@@ -42,7 +42,9 @@ var TestSlide = (function() {
         });
 
         var test = WikidsStoryTest.create(container[0], {
-            'dataUrl': config.action + "/" + test_id + "?t=" + Math.random(),
+            //'dataUrl': config.action + "/" + test_id + "?t=" + Math.random(),
+            'dataUrl': '/question/get',
+            'dataParams': {'testId': test_id},
             'forSlide': true
         });
         promise.done(function(data) {
