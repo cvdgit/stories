@@ -13,15 +13,15 @@ var StoryBackground = (function () {
 
     function init() {
         console.log('StoryBackground.init');
-        var background = localStorage.getItem(backgroundStorageItemName) || "dark";
-        if (WikidsPlayer.isTestSlide()) {
+        /*var background = localStorage.getItem(backgroundStorageItemName) || "dark";
+        if (WikidsPlayer.isTestSlide()) {*/
             setBackgroundColor('light');
-        }
+        /*}
         else {
             if (background !== "dark") {
                 setBackgroundColor(background);
             }
-        }
+        }*/
         Reveal.sync();
     }
 

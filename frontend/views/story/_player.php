@@ -37,7 +37,6 @@ $plugins = [
             new \common\widgets\RevealButtons\LeftButton(),
             new \common\widgets\RevealButtons\RightButton(),
             new \common\widgets\RevealButtons\FullscreenButton(),
-            new BackgroundButton(),
             new \common\widgets\RevealButtons\FeedbackButton(),
         ],
         'rightButtons' => []

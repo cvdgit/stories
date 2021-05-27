@@ -178,8 +178,6 @@ $options = [
 		</div>
         <div class="clearfix">
             <div class="editor-slide-actions pull-left">
-                <?= Html::a('Ссылки', '#', ['id' => 'slide-links', 'style' => 'font-size: 18px']) ?>
-                <?= Html::a('Связи', '#neo-relation-modal', ['data-toggle' => 'modal', 'style' => 'font-size: 18px']) ?>
                 <?= ButtonDropdown::widget([
                     'encodeLabel' => false,
                     'label' => '<span class="glyphicon glyphicon-resize-full" style="margin-right: 10px"></span>',
@@ -210,16 +208,47 @@ $options = [
                 ]) ?>
             </div>
             <div class="editor-slide-actions pull-right">
-                <a href="#" id="slide-copy" title="Копировать слайд"><i class="glyphicon glyphicon-copy"></i></a>
-                <a href="#" id="slide-source" title="Код слайда"><i class="glyphicon glyphicon-fire"></i></a>
+                <?= ButtonDropdown::widget([
+                    'encodeLabel' => false,
+                    'label' => '<span class="glyphicon glyphicon-option-vertical" style="margin-right: 10px"></span>',
+                    'options' => [
+                        'class' => 'btn-sm btn-default',
+                        'title' => 'Дополнительно',
+                    ],
+                    'dropdown' => [
+                        'options' => ['class' => 'dropdown-menu-right'],
+                        'items' => [
+                            [
+                                'label' => 'Изображения',
+                                'url' => '#story-images-modal',
+                                'linkOptions' => ['data-toggle' => 'modal'],
+                            ],
+                            [
+                                'label' => 'Ссылки',
+                                'url' => '#',
+                                'linkOptions' => ['id' => 'slide-links'],
+                            ],
+                            [
+                                'label' => 'Связи Neo4j',
+                                'url' => '#neo-relation-modal',
+                                'linkOptions' => ['data-toggle' => 'modal'],
+                            ],
+                            [
+                                'label' => 'Копировать слайд',
+                                'url' => '#',
+                                'linkOptions' => ['id' => 'slide-copy'],
+                            ],
+                            [
+                                'label' => 'Разметка слайда',
+                                'url' => '#',
+                                'linkOptions' => ['id' => 'slide-source'],
+                            ],
+                        ],
+                    ],
+                ]) ?>
             </div>
         </div>
 	</div>
-</div>
-<div class="row">
-    <div class="col-md-3 text-center">
-        <?= Html::a('Изображения', '#', ['class' => 'btn btn-primary', 'data-toggle' => 'modal', 'data-target' => '#story-images-modal']) ?>
-    </div>
 </div>
 <div class="row">
     <div class="col-lg-3">

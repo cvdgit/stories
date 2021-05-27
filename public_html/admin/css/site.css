@@ -459,12 +459,11 @@ body {
 }
 
 .editor-slide-actions {
-    margin: 10px;
+    margin: 10px 0 10px 0;
 }
 
 .editor-slide-actions a {
-    margin-right: 10px;
-    font-size: 28px;
+    font-size: 2rem;
 }
 
 .reveal .slides {
