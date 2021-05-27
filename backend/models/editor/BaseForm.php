@@ -14,15 +14,12 @@ class BaseForm extends Model
     public $width;
     public $height;
     public $view;
-    public $align;
-    public $stretch;
 
     public function rules(): array
     {
         return [
             [['slide_id'], 'integer'],
             [['block_id', 'left', 'top', 'width', 'height'], 'string'],
-            [['align', 'stretch'], 'integer'],
         ];
     }
 
@@ -33,8 +30,6 @@ class BaseForm extends Model
             'top' => 'Верхний отступ',
             'width' => 'Ширина',
             'height' => 'Высота',
-            'align' => 'Расположение',
-            'stretch' => 'Растянуть',
         ];
     }
 

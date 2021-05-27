@@ -180,6 +180,34 @@ $options = [
             <div class="editor-slide-actions pull-left">
                 <?= Html::a('Ссылки', '#', ['id' => 'slide-links', 'style' => 'font-size: 18px']) ?>
                 <?= Html::a('Связи', '#neo-relation-modal', ['data-toggle' => 'modal', 'style' => 'font-size: 18px']) ?>
+                <?= ButtonDropdown::widget([
+                    'encodeLabel' => false,
+                    'label' => '<span class="glyphicon glyphicon-resize-full" style="margin-right: 10px"></span>',
+                    'options' => [
+                        'class' => 'btn-sm btn-default',
+                        'title' => 'Растянуть блок',
+                    ],
+                    'dropdown' => [
+                        'items' => [
+                            [
+                                'label' => 'Растянуть на весь слайд',
+                                'url' => '#',
+                                'linkOptions' => ['onclick' => "StoryEditor.stretchToSlide(); return false;"],
+                            ],
+                        ],
+                    ],
+                ]) ?>
+                <?= ButtonDropdown::widget([
+                    'encodeLabel' => false,
+                    'label' => '<span class="glyphicon glyphicon-align-center" style="margin-right: 10px"></span>',
+                    'options' => [
+                        'class' => 'btn-sm btn-default',
+                        'title' => 'Расположение блока',
+                    ],
+                    'dropdown' => [
+                        'items' => \backend\models\editor\base\BlockAlign::asDropdownItems(),
+                    ],
+                ]) ?>
             </div>
             <div class="editor-slide-actions pull-right">
                 <a href="#" id="slide-copy" title="Копировать слайд"><i class="glyphicon glyphicon-copy"></i></a>

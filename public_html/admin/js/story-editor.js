@@ -591,6 +591,7 @@ var StoryEditor = (function() {
     function setFormWidth(value, element) {
         getBlockForm().find('input.editor-width').val(value);
         if (element) {
+            element.css('width', value);
             modifier.add(getModifyKey(element), {'width': value});
         }
     }
@@ -598,6 +599,7 @@ var StoryEditor = (function() {
     function setFormHeight(value, element) {
         getBlockForm().find('input.editor-height').val(value);
         if (element) {
+            element.css('height', value);
             modifier.add(getModifyKey(element), {'height': value});
         }
     }
@@ -645,6 +647,22 @@ var StoryEditor = (function() {
         },
         "setBlockAlignSlideCenter": function() {
             setBlockAlign('slide_center');
+        },
+        "stretchToSlide": function() {
+            if (activeBlockID === null) {
+                return;
+            }
+            var element = findBlockElement(activeBlockID);
+            setFormLeft('0px', element);
+            setFormTop('0px', element);
+            setFormWidth('1280px', element);
+            setFormHeight('720px', element);
+        },
+        "stretchToWidth": function() {
+
+        },
+        "stretchToHeight": function() {
+
         }
     };
 })();
