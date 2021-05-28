@@ -263,6 +263,7 @@ var StoryEditor = (function() {
             return [x1, y1, x2, y2];
         }
 
+        $formContainer.empty();
         send(slideID)
             .done(function(data) {
 
