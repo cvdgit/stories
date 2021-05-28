@@ -48,9 +48,19 @@ var StoryEditor = (function() {
     var $previewContainer = $('#preview-container');
     var $formContainer = $("#form-container");
 
-    $editor.on('click', 'div.sl-block', function(e) {
-        var currentBlockID = $(this).attr('data-block-id');
-        setActiveBlock(currentBlockID, currentBlockID === activeBlockID);
+    $(document).on('mousedown', function(e) {
+        var $target = $(e.target);
+        if ($target.hasClass('sl-block') || $target.parents('.sl-block').length) {
+            var $block = $target.parents('.sl-block');
+            var currentBlockID = $block.attr('data-block-id');
+            setActiveBlock(currentBlockID, currentBlockID === activeBlockID);
+        }
+        else {
+            $("a", $list).removeClass("active");
+            $(".reveal .slides div[data-block-id]").removeClass("wikids-active-block");
+            $(".reveal .slides div.sl-block").find('.sl-block-transform').remove();
+            $formContainer.empty();
+        }
     });
 
     $editor.on({
