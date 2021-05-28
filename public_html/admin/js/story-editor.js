@@ -395,6 +395,7 @@ var StoryEditor = (function() {
                         .on("click", function () {
                             activeBlockID = null;
                             currentSlideID = null;
+                            $formContainer.empty();
                             loadSlide(slide.id, true);
                             return false;
                         });
