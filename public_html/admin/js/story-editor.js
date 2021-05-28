@@ -57,7 +57,15 @@ var StoryEditor = (function() {
         }
         else {
             $("a", $list).removeClass("active");
-            $(".reveal .slides div[data-block-id]").removeClass("wikids-active-block");
+
+            $(".reveal .slides div[data-block-id]").each(function() {
+                var $block = $(this);
+                $block.removeClass("wikids-active-block");
+                if ($block.data('ui-resizable')) {
+                    $block.resizable('destroy');
+                }
+            })
+
             $(".reveal .slides div.sl-block").find('.sl-block-transform').remove();
             $formContainer.empty();
             activeBlockID = null;
@@ -153,13 +161,76 @@ var StoryEditor = (function() {
         });
     }
 
+    var BlockResizable = function() {
+
+        var resizeHandler = function(event, ui) {
+            var zoomScale = Reveal.getScale();
+            var opl = ui.originalPosition.left, opt = ui.originalPosition.top,
+                pl = ui.position.left, pt = ui.position.top,
+                osl = ui.originalSize.width, ost = ui.originalSize.height,
+                sl = ui.size.width, st = ui.size.height;
+            ui.size.width = osl + (sl - osl) / zoomScale;
+            if (pl + osl !== opl + osl) { //left side
+                ui.position.left = opl + (osl - ui.size.width);
+            }
+            ui.size.height = ost + (st - ost) / zoomScale;
+            if (pt + ost !== opt + ost) { //top side
+                ui.position.top = opt + (ost - ui.size.height);
+            }
+        };
+
+        var resizableOptions = {
+            resize: resizeHandler,
+            stop: function(event, ui) {
+                var $element = $(event.target);
+                setFormLeft(Math.round(ui.position.left) + "px", $element);
+                setFormTop(Math.round(ui.position.top) + "px", $element);
+                setFormWidth(Math.round(ui.size.width) + "px", $element);
+                setFormHeight(Math.round(ui.size.height) + "px", $element);
+            }
+        }
+
+        var defaultResizableOptions = {
+            handles: 'all',
+            aspectRatio: true
+        };
+        var textResizableOptions = {
+            handles: 'e, w',
+            aspectRatio: false,
+        };
+
+        return {
+            'optionsDefault': function() {
+                return $.extend(resizableOptions, defaultResizableOptions);
+            },
+            'optionsText': function() {
+                return $.extend(resizableOptions, textResizableOptions);
+            }
+        }
+    };
+    var blockResizable = new BlockResizable();
+
     function selectActiveBlock(blockID) {
+
         $(".reveal .slides div[data-block-id]").removeClass("wikids-active-block");
         $(".reveal .slides div.sl-block").find('.sl-block-transform').remove();
+
         var $wrapper = $('<div/>', {'class': 'sl-block-transform'})
             .append($('<div/>', {'class': 'sl-block-border-active'}));
-        $(".reveal .slides").find("div[data-block-id=" + blockID + "]")
-            .addClass("wikids-active-block")
+
+        var $block = $(".reveal .slides").find("div[data-block-id=" + blockID + "]");
+
+        var blockType = $block.attr('data-block-type');
+        if ($.inArray(blockType, ['transition']) === -1) {
+            if (blockType === 'text') {
+                $block.resizable(blockResizable.optionsText());
+            }
+            else {
+                $block.resizable(blockResizable.optionsDefault());
+            }
+        }
+
+        $block.addClass("wikids-active-block")
             .append($wrapper);
     }
 
@@ -311,7 +382,7 @@ var StoryEditor = (function() {
                         setFormLeft(Math.round(ui.position.left) + "px", $(event.target));
                     }
                 });
-                $(".sl-block", ".reveal").resizable({
+                /*$(".sl-block", ".reveal").resizable({
                     handles: 'all',
                     aspectRatio: true,
                     start: function(event) {
@@ -336,7 +407,7 @@ var StoryEditor = (function() {
                         setFormWidth(Math.round(ui.size.width) + "px", $(event.target));
                         setFormHeight(Math.round(ui.size.height) + "px", $(event.target));
                     }
-                });
+                });*/
                 Reveal.sync();
                 Reveal.slide(0);
                 if (loadBlocks) {
