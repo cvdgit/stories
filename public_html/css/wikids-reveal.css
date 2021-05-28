@@ -1927,7 +1927,67 @@ p.wikids-test-description {
 }
 
 .wikids-active-block {
-	border: 6px #0b58a2 solid;
+	/*border: 6px #0b58a2 solid;*/
+}
+
+.sl-block-transform {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	/*visibility: hidden;*/
+	z-index: 255;
+	font-size: 10px;
+	direction: ltr;
+	pointer-events: none !important;
+	visibility: inherit;
+}
+
+.sl-block-transform-hover {
+
+}
+
+.sl-block-transform-active {
+
+}
+
+#story-editor .sl-block .sl-block-content {
+	cursor: pointer;
+}
+
+#story-editor section:before {
+	content: '';
+	display: block;
+	border: 1px dashed rgba(150,150,150,0.5);
+	box-sizing: border-box;
+	-webkit-transform: translateZ(1px);
+	transform: translateZ(1px);
+	z-index: 2000;
+	pointer-events: none;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+}
+
+.sl-block-border {
+	border: 2px solid #1baee1;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+}
+
+.sl-block-border-active {
+	border: 1px solid #1baee1;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
 }
 
 .autoplay-overlay {
@@ -2271,7 +2331,7 @@ p.wikids-test-description {
 }
 
 .reveal section .slide-paragraph {
-	color: #FFFFFF;
+	/*color: #FFFFFF;*/
 	font-size: 0.8em;
 }
 

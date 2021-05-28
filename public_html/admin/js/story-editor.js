@@ -53,6 +53,17 @@ var StoryEditor = (function() {
         setActiveBlock(currentBlockID, currentBlockID === activeBlockID);
     });
 
+    $editor.on({
+        mouseenter: function(e) {
+            var $wrapper = $('<div/>', {'class': 'sl-block-transform sl-block-transform-hover'})
+                .append($('<div/>', {'class': 'sl-block-border'}));
+            $(e.target).parents('div.sl-block').append($wrapper);
+        },
+        mouseleave: function(e) {
+            $(e.target).parents('div.sl-block').find('div.sl-block-transform-hover').remove();
+        }
+    }, 'div.sl-block:not(.wikids-active-block)');
+
     var config = {
         storyID: "",
         getSlideAction: "",
@@ -123,7 +134,7 @@ var StoryEditor = (function() {
                     elem.append(deleteElem);
                     elem.appendTo($list);
                 });
-                setActiveBlock(activeBlockID || $list.find("a").attr("data-block-id"));
+                //setActiveBlock(activeBlockID || $list.find("a").attr("data-block-id"));
             }
             else {
                 $("#slide-block-params").hide();
@@ -133,7 +144,12 @@ var StoryEditor = (function() {
 
     function selectActiveBlock(blockID) {
         $(".reveal .slides div[data-block-id]").removeClass("wikids-active-block");
-        $(".reveal .slides").find("div[data-block-id=" + blockID + "]").addClass("wikids-active-block");
+        $(".reveal .slides div.sl-block").find('.sl-block-transform').remove();
+        var $wrapper = $('<div/>', {'class': 'sl-block-transform'})
+            .append($('<div/>', {'class': 'sl-block-border-active'}));
+        $(".reveal .slides").find("div[data-block-id=" + blockID + "]")
+            .addClass("wikids-active-block")
+            .append($wrapper);
     }
 
     function setActiveBlock(blockID, doNotLoadForm) {
@@ -255,9 +271,9 @@ var StoryEditor = (function() {
 
                 $(".slides", $editor).empty().append(data.data);
 
-                if (activeBlockID !== null && !loadBlocks) {
+/*                if (activeBlockID !== null && !loadBlocks) {
                     setActiveBlock(activeBlockID, true);
-                }
+                }*/
 
                 $('section', '#story-editor')
                     .css({'height': '720px', 'width': '1280px'})
@@ -284,8 +300,8 @@ var StoryEditor = (function() {
                     }
                 });
                 $(".sl-block", ".reveal").resizable({
-                    //containment: '.slides',
                     handles: 'all',
+                    aspectRatio: true,
                     start: function(event) {
                         setActiveBlock($(event.target).attr("data-block-id"));
                     },
