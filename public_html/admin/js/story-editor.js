@@ -183,10 +183,16 @@ var StoryEditor = (function() {
             resize: resizeHandler,
             stop: function(event, ui) {
                 var $element = $(event.target);
+                var blockType = $element.attr('data-block-type');
                 setFormLeft(Math.round(ui.position.left) + "px", $element);
                 setFormTop(Math.round(ui.position.top) + "px", $element);
                 setFormWidth(Math.round(ui.size.width) + "px", $element);
-                setFormHeight(Math.round(ui.size.height) + "px", $element);
+                if (blockType === 'text') {
+                    setFormHeight('auto', $element);
+                }
+                else {
+                    setFormHeight(Math.round(ui.size.height) + "px", $element);
+                }
             }
         }
 
