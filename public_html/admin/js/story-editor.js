@@ -55,12 +55,12 @@ var StoryEditor = (function() {
             var currentBlockID = $block.attr('data-block-id');
             setActiveBlock(currentBlockID, currentBlockID === activeBlockID);
         }
-        else {
+        /*else {
             $("a", $list).removeClass("active");
             $(".reveal .slides div[data-block-id]").removeClass("wikids-active-block");
             $(".reveal .slides div.sl-block").find('.sl-block-transform').remove();
             $formContainer.empty();
-        }
+        }*/
     });
 
     $editor.on({
