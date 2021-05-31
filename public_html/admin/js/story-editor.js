@@ -51,7 +51,10 @@ var StoryEditor = (function() {
     $editor.on('mousedown', function(e) {
         var $target = $(e.target);
         if ($target.hasClass('sl-block') || $target.parents('.sl-block').length) {
-            var $block = $target.parents('.sl-block');
+            var $block = $(e.target);
+            if (!$block.hasClass('sl-block')) {
+                $block = $(e.target).parents('div.sl-block');
+            }
             var currentBlockID = $block.attr('data-block-id');
             setActiveBlock(currentBlockID, currentBlockID === activeBlockID);
         }
@@ -76,10 +79,14 @@ var StoryEditor = (function() {
         mouseenter: function(e) {
             var $wrapper = $('<div/>', {'class': 'sl-block-transform sl-block-transform-hover'})
                 .append($('<div/>', {'class': 'sl-block-border'}));
-            $(e.target).parents('div.sl-block').append($wrapper);
+            var $block = $(e.target);
+            if (!$block.hasClass('sl-block')) {
+                $block = $(e.target).parents('div.sl-block');
+            }
+            $block.append($wrapper);
         },
         mouseleave: function(e) {
-            $(e.target).parents('div.sl-block').find('div.sl-block-transform-hover').remove();
+            $(".reveal .slides div.sl-block:not(.wikids-active-block)").find('.sl-block-transform').remove();
         }
     }, 'div.sl-block:not(.wikids-active-block)');
 
