@@ -234,7 +234,7 @@ var StoryEditor = (function() {
         var $block = $(".reveal .slides").find("div[data-block-id=" + blockID + "]");
 
         var blockType = $block.attr('data-block-type');
-        if ($.inArray(blockType, ['transition']) === -1) {
+        if ($.inArray(blockType, ['transition', 'test']) === -1) {
             if (blockType === 'text') {
                 $block.resizable(blockResizable.optionsText());
             }
@@ -320,7 +320,12 @@ var StoryEditor = (function() {
     }
 
     function updateLinkCounter(count) {
-        $("#slide-links").text("Ссылки" + (count > 0 ? " (" + count + ")" : ""));
+        if (parseInt(count) > 0) {
+            $("#slide-links").parent().addClass('set-in');
+        }
+        else {
+            $("#slide-links").parent().removeClass('set-in');
+        }
     }
 
     function updateBlock(data) {
@@ -362,8 +367,9 @@ var StoryEditor = (function() {
         send(slideID)
             .done(function(data) {
 
-                setActiveSlide(data);
                 updateLinkCounter(data.blockNumber);
+
+                setActiveSlide(data);
 
                 $(".slides", $editor).empty().append(data.data);
 
@@ -395,32 +401,7 @@ var StoryEditor = (function() {
                         setFormLeft(Math.round(ui.position.left) + "px", $(event.target));
                     }
                 });
-                /*$(".sl-block", ".reveal").resizable({
-                    handles: 'all',
-                    aspectRatio: true,
-                    start: function(event) {
-                        setActiveBlock($(event.target).attr("data-block-id"));
-                    },
-                    resize: function(event, ui) {
-                        var zoomScale = Reveal.getScale();
-                        var opl = ui.originalPosition.left, opt = ui.originalPosition.top,
-                            pl = ui.position.left, pt = ui.position.top,
-                            osl = ui.originalSize.width, ost = ui.originalSize.height,
-                            sl = ui.size.width, st = ui.size.height;
-                        ui.size.width = osl + (sl - osl) / zoomScale;
-                        if (pl + osl !== opl + osl) { //left side
-                            ui.position.left = opl + (osl - ui.size.width);
-                        }
-                        ui.size.height = ost + (st - ost) / zoomScale;
-                        if (pt + ost !== opt + ost) { //top side
-                            ui.position.top = opt + (ost - ui.size.height);
-                        }
-                    },
-                    stop: function(event, ui) {
-                        setFormWidth(Math.round(ui.size.width) + "px", $(event.target));
-                        setFormHeight(Math.round(ui.size.height) + "px", $(event.target));
-                    }
-                });*/
+
                 Reveal.sync();
                 Reveal.slide(0);
                 if (loadBlocks) {
@@ -428,6 +409,8 @@ var StoryEditor = (function() {
                 }
                 WikidsVideo.reset();
                 WikidsVideo.createPlayer();
+
+                slideMenuSetPosition();
             })
             .fail(function(data) {
                 $editor.text(data);
@@ -455,7 +438,7 @@ var StoryEditor = (function() {
             '<i class="glyphicon glyphicon-link"></i>' :
             slide.isQuestion ?
                 '<i class="glyphicon glyphicon-question-sign"></i>' :
-                '#';
+                '<i class="glyphicon glyphicon-folder-close"></i>';
     }
 
     function loadSlides(activeSlideID) {
@@ -470,12 +453,14 @@ var StoryEditor = (function() {
             if (data.length > 0) {
                 data.forEach(function (slide) {
 
-                    var $element = $("<a/>")
-                        .attr("href", "#")
-                        .addClass("list-group-item")
+                    // slideIcon(slide) + " " +
+                    var $element = $("<li/>")
+                        .addClass("list-group-item slides-container-item")
                         .attr("data-slide-id", slide.id)
                         .attr("data-link-slide-id", slide.linkSlideID)
-                        .html(slideIcon(slide) + " слайд " + slide.slideNumber)
+                        .append($('<span/>').addClass('slide-number').text(slide.slideNumber))
+                        .append($('<span/>').addClass('slide-move').html('<i class="glyphicon glyphicon-move"></i>'))
+                        //.html(slide.slideNumber)
                         .on("click", function () {
                             activeBlockID = null;
                             currentSlideID = null;
@@ -484,7 +469,7 @@ var StoryEditor = (function() {
                             return false;
                         });
 
-                    $('<span/>')
+                    /*$('<span/>')
                         .addClass('delete-slide glyphicon glyphicon-trash')
                         .attr({'title': 'Удалить слайд'})
                         .on('click', function(e) {
@@ -492,9 +477,9 @@ var StoryEditor = (function() {
                             e.stopPropagation();
                             deleteSlide(slide.id);
                         })
-                        .appendTo($element);
+                        .appendTo($element);*/
 
-                    $('<span/>')
+                    /*$('<span/>')
                         .addClass('toggle-slide-visible glyphicon glyphicon-eye-' + (slide.isHidden ? 'close' : 'open'))
                         .attr('title', (slide.isHidden ? 'Показать' : 'Скрыть') + ' слайд')
                         .on('click', function(e) {
@@ -508,7 +493,7 @@ var StoryEditor = (function() {
                                     }
                                 });
                         })
-                        .appendTo($element);
+                        .appendTo($element);*/
 
                     $element.appendTo($container);
                 });
@@ -554,9 +539,30 @@ var StoryEditor = (function() {
         var height = parseInt($('.story-container').css('height'));
         $previewContainer.css('height', height + 'px');
     }
-
     previewContainerSetHeight();
-    window.addEventListener('resize', previewContainerSetHeight);
+
+    function slideMenuSetPosition() {
+        var slidesRect = $editor.find('.slides')[0].getBoundingClientRect();
+        var height = $editor.height(),
+            slidesHeight = slidesRect.height,
+            top = ((height - slidesHeight) / 2) - $('.slide-menu').height() + 'px';
+        var width = $editor.width(),
+            slidesWidth = slidesRect.width,
+            w = width - slidesWidth;
+        if (w < 0) {
+            w = slidesWidth;
+        }
+        else {
+            w = w / 2;
+        }
+        var left = slidesWidth + w - $('.slide-menu').width() + 'px';
+        $('.slide-menu').css({'left': left, 'top': top});
+    }
+
+    window.addEventListener('resize', function() {
+        previewContainerSetHeight();
+        slideMenuSetPosition();
+    });
 
     function getQueryHash() {
         var query = {};
@@ -776,6 +782,9 @@ var StoryEditor = (function() {
         },
         "stretchToHeight": function() {
 
+        },
+        "getUpdateBlockUrl": function(blockID) {
+            return config.getBlockFormAction + "&slide_id=" + currentSlideID + "&block_id=" + blockID;
         }
     };
 })();

@@ -2,7 +2,6 @@
 use backend\assets\CropperAsset;
 use backend\assets\StoryEditorAsset;
 use backend\widgets\BackendRevealWidget;
-use common\widgets\Reveal\Plugins\Video;
 use frontend\assets\PlyrAsset;
 use yii\bootstrap\ButtonDropdown;
 use yii\helpers\Html;
@@ -17,7 +16,7 @@ CropperAsset::register($this);
 /** @var $model common\models\Story */
 $this->title = 'Редактор: ' . $model->title;
 $this->params['breadcrumbs'] = [
-    ['label' => 'Список историй', 'url' => ['index']],
+    ['label' => 'Список историй', 'url' => ['story/index']],
     ['label' => $model->title, 'url' => Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $model->alias]), 'target' => '_blank'],
     $this->title,
 ];
@@ -105,7 +104,7 @@ $this->registerJs($js);
 
 $options = [
     'encodeLabel' => false,
-    'label' => '<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>',
+    'label' => '<span class="glyphicon glyphicon-plus"></span> Новый слайд&nbsp;',
     'options' => [
         'class' => 'btn-sm btn-default',
         'title' => 'Добавить слайд',
@@ -122,11 +121,6 @@ $options = [
                 'url' => '#',
                 'linkOptions' => ['onclick' => 'StoryEditor.createSlideLink(); return false;'],
             ],
-            /*[
-                'label' => 'Новый вопрос',
-                'url' => '#',
-                'linkOptions' => ['onclick' => 'StoryEditor.createSlideQuestion(); return false;'],
-            ],*/
             [
                 'label' => 'Тест из neo4j',
                 'url' => '#slide-new-question-modal',
@@ -142,126 +136,67 @@ $options = [
 ];
 
 ?>
-<div class="row">
-	<div class="col-lg-3">
-        <h4>Слайды <a href="#" id="save-slides-order"><i class="glyphicon glyphicon-floppy-disk"></i></a> <div class="pull-right"><?= ButtonDropdown::widget($options) ?></div></h4>
-        <div class="list-group" id="preview-container" style="margin-top: 20px"></div>
-	</div>
-	<div class="col-lg-9">
-		<div class="story-container">
-			<div class="story-container-inner">
-		    <?= BackendRevealWidget::widget([
-		    		'id' => 'story-editor',
-		    		'initializeReveal' => true,
-		    		'canViewStory' => true,
-                    'options' => [
-                        'history' => false,
-                        'hash' => false,
-                        'progress' => false,
-                        'slideNumber' => false,
-                    ],
-                    'assets' => [
-                        \backend\assets\RevealAsset::class,
-                        \backend\assets\WikidsRevealAsset::class,
-                    ],
-		    		'plugins' => [
-                        [
-                            'class' => \common\widgets\Reveal\Plugins\CustomControls::class,
-                            'buttons' => [
-                                new \common\widgets\RevealButtons\FullscreenButton(),
-                            ],
-                        ],
-                        ['class' => Video::class, 'showControls' => true],
-					],
-		    	]) ?>
-		    </div>
-		</div>
-        <div class="clearfix">
-            <div class="editor-slide-actions pull-left">
-                <?= ButtonDropdown::widget([
-                    'encodeLabel' => false,
-                    'label' => '<span class="glyphicon glyphicon-resize-full" style="margin-right: 10px"></span>',
-                    'options' => [
-                        'class' => 'btn-sm btn-default',
-                        'title' => 'Растянуть блок',
-                    ],
-                    'dropdown' => [
-                        'items' => [
-                            [
-                                'label' => 'Растянуть на весь слайд',
-                                'url' => '#',
-                                'linkOptions' => ['onclick' => "StoryEditor.stretchToSlide(); return false;"],
-                            ],
-                        ],
-                    ],
-                ]) ?>
-                <?= ButtonDropdown::widget([
-                    'encodeLabel' => false,
-                    'label' => '<span class="glyphicon glyphicon-align-center" style="margin-right: 10px"></span>',
-                    'options' => [
-                        'class' => 'btn-sm btn-default',
-                        'title' => 'Расположение блока',
-                    ],
-                    'dropdown' => [
-                        'items' => \backend\models\editor\base\BlockAlign::asDropdownItems(),
-                    ],
-                ]) ?>
+
+    <div class="wrap-editor">
+        <div class="slides-sidebar">
+            <div class="slides-actions">
+                <button id="create-slide-action">Новый слайд</button>
+                <button id="slide-copy">Копировать</button>
             </div>
-            <div class="editor-slide-actions pull-right">
-                <?= ButtonDropdown::widget([
-                    'encodeLabel' => false,
-                    'label' => '<span class="glyphicon glyphicon-option-vertical" style="margin-right: 10px"></span>',
-                    'options' => [
-                        'class' => 'btn-sm btn-default',
-                        'title' => 'Дополнительно',
-                    ],
-                    'dropdown' => [
-                        'options' => ['class' => 'dropdown-menu-right'],
-                        'items' => [
-                            [
-                                'label' => 'Изображения',
-                                'url' => '#story-images-modal',
-                                'linkOptions' => ['data-toggle' => 'modal'],
-                            ],
-                            [
-                                'label' => 'Ссылки',
-                                'url' => '#',
-                                'linkOptions' => ['id' => 'slide-links'],
-                            ],
-                            [
-                                'label' => 'Связи Neo4j',
-                                'url' => '#neo-relation-modal',
-                                'linkOptions' => ['data-toggle' => 'modal'],
-                            ],
-                            [
-                                'label' => 'Копировать слайд',
-                                'url' => '#',
-                                'linkOptions' => ['id' => 'slide-copy'],
-                            ],
-                            [
-                                'label' => 'Разметка слайда',
-                                'url' => '#',
-                                'linkOptions' => ['id' => 'slide-source'],
-                            ],
-                        ],
-                    ],
-                ]) ?>
+            <div class="list-group slides-container" id="preview-container"></div>
+        </div>
+        <div class="wrap-editor-main">
+            <div class="reveal-viewport">
+                <?= BackendRevealWidget::widget(['id' => 'story-editor']) ?>
+            </div>
+            <div class="slide-menu">
+                <ul style="margin: 0; padding: 0; list-style: none">
+                    <li class="slide-menu-item">
+                        <span class="toggle-slide-visible glyphicon glyphicon-eye-open" data-toggle="tooltip" title="Показать слайд"></span>
+                    </li><!--
+                    --><li class="slide-menu-item">
+                        <span class="delete-slide glyphicon glyphicon-trash" data-toggle="tooltip" title="Удалить слайд"></span>
+                    </li><!--
+                    --><li class="slide-menu-item">
+                        <span class="glyphicon glyphicon-picture" data-toggle="modal" title="Изображения истории" data-target="#story-images-modal"></span>
+                    </li><!--
+                    --><li class="slide-menu-item">
+                        <span class="glyphicon glyphicon-link" id="slide-links" title="Ссылки"></span>
+                    </li><!--
+                    --><li class="slide-menu-item">
+                        <span class="glyphicon glyphicon-transfer" data-toggle="modal" data-target="#neo-relation-modal" title="Связи Neo4j"></span>
+                    </li><!--
+                    --><li class="slide-menu-item">
+                        <span class="glyphicon glyphicon-wrench" id="slide-source" title="Исходный код слайда"></span>
+                    </li>
+                </ul>
             </div>
         </div>
-	</div>
-</div>
-<div class="row">
-    <div class="col-lg-3">
-        <div id="slide-blocks">
-            <?= $this->render('_blocks') ?>
-        </div>
     </div>
-    <div class="col-lg-9">
-        <div id="slide-block-params">
-            <div id="form-container"></div>
-        </div>
+    <div class="blocks-sidebar">
+        <ul style="padding-left: 0; list-style: none">
+            <li class="blocks-sidebar-item">
+                <span class="glyphicon glyphicon-text-size blocks-sidebar-item-icon"></span>
+                <span class="blocks-sidebar-item-text">Текст</span>
+            </li>
+            <li class="blocks-sidebar-item">
+                <span class="glyphicon glyphicon-picture blocks-sidebar-item-icon"></span>
+                <span class="blocks-sidebar-item-text">Картинка</span>
+            </li>
+            <li class="blocks-sidebar-item" data-block-type="video">
+                <span class="glyphicon glyphicon-facetime-video blocks-sidebar-item-icon"></span>
+                <span class="blocks-sidebar-item-text">Видео</span>
+            </li>
+            <li class="blocks-sidebar-item">
+                <span class="glyphicon glyphicon-education blocks-sidebar-item-icon"></span>
+                <span class="blocks-sidebar-item-text">Тест</span>
+            </li>
+            <li class="blocks-sidebar-item" data-block-type="button">
+                <span class="glyphicon glyphicon-play blocks-sidebar-item-icon"></span>
+                <span class="blocks-sidebar-item-text">Кнопка</span>
+            </li>
+        </ul>
     </div>
-</div>
 
 <div class="modal remote fade" id="slide-source-modal">
     <div class="modal-dialog modal-lg">
@@ -377,6 +312,12 @@ $options = [
     </div>
 </div>
 
+<div class="modal remote fade" id="update-block-modal">
+    <div class="modal-dialog">
+        <div class="modal-content"></div>
+    </div>
+</div>
+
 <?php
 echo $this->render('modal/questions', ['model' => $remoteTestForm]);
 echo $this->render('modal/relations', ['model' => new \backend\models\NeoSlideRelationsForm()]);
@@ -386,3 +327,106 @@ echo $this->render('modal/image_from_file', ['imageModel' => $imageModel]);
 echo $this->render('modal/image_from_story');
 echo $this->render('modal/image_from_url', ['imageModel' => $imageFromUrlModel]);
 echo $this->render('modal/new_test', ['model' => $localTestForm]);
+
+$js = <<< JS
+
+function EditorPopover() {
+    
+    this.popoverConfig = {
+        'content': '',
+        'html': true,
+        'sanitize': false
+    };
+    
+    function itemsTemplate(items) {
+        return $('<div/>', {'class': 'prompt-wrapper'}).append(items);
+    }
+    
+    function itemTemplate(item) {
+        return $('<div/>', {'class': 'prompt-item'})
+            .attr('data-action-name', item.name)
+            .append(
+                $('<div/>', {'class': 'prompt-item-inner'})
+                    .append($('<span/>', {'class': 'title'}).text(item.title))
+            );
+    }
+    
+    function createContent(items) {
+        var fragment = $(document.createDocumentFragment());
+        items.forEach(function(item) {
+            fragment.append(itemTemplate(item));
+        });
+        return itemsTemplate(fragment);
+    }
+    
+    var that = this;
+    function createOptions(options, items) {
+        options = $.extend(that.popoverConfig, options);
+        options.content = createContent(items)[0].outerHTML;
+        return options;
+    }
+    
+    return {
+        'attach': function(selector, options, items) {
+            return $(selector)
+                .popover(createOptions(options, items))
+                .on('shown.bs.popover', function() {
+                    var that = this;
+                    items.forEach(function(item) {
+                        $('[data-action-name=' + item.name + ']').on('click', function() {
+                            item.click();
+                            $(that).popover('hide');
+                        });
+                    });
+                });
+        }
+    };
+}
+
+var editorPopover = new EditorPopover();
+
+editorPopover.attach('li[data-block-type=video]', {'placement': 'left'}, [
+    {'name': 'youtube', 'title': 'YouTube', 'click': function() {alert('youtube')}},
+    {'name': 'file', 'title': 'Из файла', 'click': function() {alert('file')}}
+]);
+
+editorPopover.attach('li[data-block-type=button]', {'placement': 'left'}, [
+    {'name': 'test', 'title': 'Тест', 'click': function() {alert('test')}},
+    {'name': 'transition', 'title': 'Переход', 'click': function() {alert('transition')}}
+]);
+
+editorPopover.attach('#create-slide-action', {'placement': 'right'}, [
+    {'name': 'slide', 'title': 'Пустой слайд', 'click': StoryEditor.createSlide},
+    {'name': 'link', 'title': 'Ссылка на слайд', 'click': StoryEditor.createSlideLink}
+]);
+
+$('body')
+.on('click', function(e) {
+    $('[data-original-title]').each(function() {
+        if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+            var popoverElement = $(this).data('bs.popover').tip();
+            var popoverWasVisible = popoverElement.is(':visible');
+            if (popoverWasVisible) {
+                $(this).popover('hide');
+                $(this).click();
+            }
+        }
+    });
+}).on('hidden.bs.popover', function(e) {
+    $(e.target).data("bs.popover").inState = {click: false, hover: false, focus: false};
+});
+
+$('#story-editor').on('dblclick', 'div.sl-block', function(e) {
+    var type = $(this).attr('data-block-type'),
+        id = $(this).attr('data-block-id');
+    $('#update-block-modal')
+        .modal({'remote': StoryEditor.getUpdateBlockUrl(id)});
+});
+
+$('#update-block-modal').on('hide.bs.modal', function() {
+    $(this).removeData('bs.modal');
+    $(this).find('.modal-content').html('');
+});
+
+JS;
+$this->registerJs($js);

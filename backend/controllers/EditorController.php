@@ -72,6 +72,7 @@ class EditorController extends Controller
 
 	public function actionEdit($id)
 	{
+	    $this->layout = 'editor';
         $model = Story::findModel($id);
         $imageForm = new ImageForm();
         $imageForm->story_id = $model->id;
@@ -197,7 +198,7 @@ class EditorController extends Controller
 
     public function actionForm(int $slide_id, string $block_id)
     {
-        Yii::$app->response->format = Response::FORMAT_JSON;
+        //Yii::$app->response->format = Response::FORMAT_JSON;
 
         $model = StorySlide::findSlide($slide_id);
         $slide = (new HtmlSlideReader($model->data))->load();
@@ -253,7 +254,7 @@ class EditorController extends Controller
             $form->transition_story_id = $model->story_id;
         }
 
-        return $this->renderAjax('_form', [
+        return $this->renderAjax('update', [
             'model' => $form,
         ]);
     }

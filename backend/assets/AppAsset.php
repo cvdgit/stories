@@ -2,6 +2,7 @@
 
 namespace backend\assets;
 
+use yii\bootstrap\BootstrapPluginAsset;
 use yii\web\AssetBundle;
 use yii\web\YiiAsset;
 use yii\bootstrap\BootstrapAsset;
@@ -22,6 +23,7 @@ class AppAsset extends AssetBundle
     public $depends = [
         YiiAsset::class,
         BootstrapAsset::class,
+        BootstrapPluginAsset::class,
         ToastrAsset::class,
     ];
 }
