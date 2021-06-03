@@ -44,7 +44,7 @@ function WikidsVideoPlayer(elemID, options) {
     if (sourceIsFile) {
         player.on('playing', function (event) {
             if (!pauseTimeoutID) {
-                console.log('PLAYING');
+                //console.log('PLAYING');
                 var timeout = options.duration - (player.currentTime - options.seekTo);
                 pauseTimeoutID = setTimeout(pauseVideo, timeout * 1000);
             }
@@ -54,9 +54,9 @@ function WikidsVideoPlayer(elemID, options) {
         player.on("statechange", function (event) {
             if (event.detail.code === 1 && !done) {
                 if (!pauseTimeoutID) {
-                    console.log('STATECHANGE');
+                    //console.log('STATECHANGE');
                     var timeout = options.duration - (player.currentTime - options.seekTo);
-                    console.log(options.duration);
+                    //console.log(options.duration);
                     pauseTimeoutID = setTimeout(pauseVideo, timeout * 1000);
                 }
             }
@@ -64,15 +64,16 @@ function WikidsVideoPlayer(elemID, options) {
     }
 
     player.on("pause", function() {
-        console.log('PAUSE');
+        //console.log('PAUSE');
         if (pauseTimeoutID) {
-            console.log('CLEAR TIMEOUT ' + options.videoID, pauseTimeoutID);
+            //console.log('CLEAR TIMEOUT ' + options.videoID, pauseTimeoutID);
             clearTimeout(pauseTimeoutID);
+            pauseTimeoutID = null;
         }
     });
 
     player.on("end", function() {
-        console.log('END');
+        //console.log('END');
     });
 
     player.on("play", function() {
@@ -83,7 +84,7 @@ function WikidsVideoPlayer(elemID, options) {
     });
 
     function pauseVideo() {
-        console.log('PAUSE VIDEO');
+        //console.log('PAUSE VIDEO');
         player.pause();
         done = true;
         if (inTransition()) {
