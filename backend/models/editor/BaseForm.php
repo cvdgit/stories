@@ -14,6 +14,7 @@ class BaseForm extends Model
     public $width;
     public $height;
     public $view;
+    public $action;
 
     public function rules(): array
     {

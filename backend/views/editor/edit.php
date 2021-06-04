@@ -173,29 +173,31 @@ $options = [
             </div>
         </div>
     </div>
-    <div class="blocks-sidebar">
-        <ul style="padding-left: 0; list-style: none">
-            <li class="blocks-sidebar-item">
-                <span class="glyphicon glyphicon-text-size blocks-sidebar-item-icon"></span>
-                <span class="blocks-sidebar-item-text">Текст</span>
-            </li>
-            <li class="blocks-sidebar-item">
-                <span class="glyphicon glyphicon-picture blocks-sidebar-item-icon"></span>
-                <span class="blocks-sidebar-item-text">Картинка</span>
-            </li>
-            <li class="blocks-sidebar-item" data-block-type="video">
-                <span class="glyphicon glyphicon-facetime-video blocks-sidebar-item-icon"></span>
-                <span class="blocks-sidebar-item-text">Видео</span>
-            </li>
-            <li class="blocks-sidebar-item">
-                <span class="glyphicon glyphicon-education blocks-sidebar-item-icon"></span>
-                <span class="blocks-sidebar-item-text">Тест</span>
-            </li>
-            <li class="blocks-sidebar-item" data-block-type="button">
-                <span class="glyphicon glyphicon-play blocks-sidebar-item-icon"></span>
-                <span class="blocks-sidebar-item-text">Кнопка</span>
-            </li>
-        </ul>
+    <div class="blocks-sidebars">
+        <div class="blocks-sidebar visible">
+            <ul>
+                <li class="blocks-sidebar-item" data-block-type="text">
+                    <span class="glyphicon glyphicon-text-size icon"></span>
+                    <span class="text">Текст</span>
+                </li>
+                <li class="blocks-sidebar-item">
+                    <span class="glyphicon glyphicon-picture icon"></span>
+                    <span class="text">Картинка</span>
+                </li>
+                <li class="blocks-sidebar-item" id="create-video-block">
+                    <span class="glyphicon glyphicon-facetime-video icon"></span>
+                    <span class="text">Видео</span>
+                </li>
+                <li class="blocks-sidebar-item">
+                    <span class="glyphicon glyphicon-education icon"></span>
+                    <span class="text">Тест</span>
+                </li>
+                <li class="blocks-sidebar-item" data-block-type="button">
+                    <span class="glyphicon glyphicon-play icon"></span>
+                    <span class="text">Кнопка</span>
+                </li>
+            </ul>
+        </div>
     </div>
 
 <div class="modal remote fade" id="slide-source-modal">
@@ -312,6 +314,12 @@ $options = [
     </div>
 </div>
 
+<div class="modal remote fade" id="create-block-modal">
+    <div class="modal-dialog">
+        <div class="modal-content"></div>
+    </div>
+</div>
+
 <div class="modal remote fade" id="update-block-modal">
     <div class="modal-dialog">
         <div class="modal-content"></div>
@@ -330,62 +338,9 @@ echo $this->render('modal/new_test', ['model' => $localTestForm]);
 
 $js = <<< JS
 
-function EditorPopover() {
-    
-    this.popoverConfig = {
-        'content': '',
-        'html': true,
-        'sanitize': false
-    };
-    
-    function itemsTemplate(items) {
-        return $('<div/>', {'class': 'prompt-wrapper'}).append(items);
-    }
-    
-    function itemTemplate(item) {
-        return $('<div/>', {'class': 'prompt-item'})
-            .attr('data-action-name', item.name)
-            .append(
-                $('<div/>', {'class': 'prompt-item-inner'})
-                    .append($('<span/>', {'class': 'title'}).text(item.title))
-            );
-    }
-    
-    function createContent(items) {
-        var fragment = $(document.createDocumentFragment());
-        items.forEach(function(item) {
-            fragment.append(itemTemplate(item));
-        });
-        return itemsTemplate(fragment);
-    }
-    
-    var that = this;
-    function createOptions(options, items) {
-        options = $.extend(that.popoverConfig, options);
-        options.content = createContent(items)[0].outerHTML;
-        return options;
-    }
-    
-    return {
-        'attach': function(selector, options, items) {
-            return $(selector)
-                .popover(createOptions(options, items))
-                .on('shown.bs.popover', function() {
-                    var that = this;
-                    items.forEach(function(item) {
-                        $('[data-action-name=' + item.name + ']').on('click', function() {
-                            item.click();
-                            $(that).popover('hide');
-                        });
-                    });
-                });
-        }
-    };
-}
-
 var editorPopover = new EditorPopover();
 
-editorPopover.attach('li[data-block-type=video]', {'placement': 'left'}, [
+editorPopover.attach('#create-video-block', {'placement': 'left'}, [
     {'name': 'youtube', 'title': 'YouTube', 'click': function() {alert('youtube')}},
     {'name': 'file', 'title': 'Из файла', 'click': function() {alert('file')}}
 ]);
@@ -423,9 +378,14 @@ $('#story-editor').on('dblclick', 'div.sl-block', function(e) {
         .modal({'remote': StoryEditor.getUpdateBlockUrl(id)});
 });
 
-$('#update-block-modal').on('hide.bs.modal', function() {
+$('#create-block-modal, #update-block-modal').on('hide.bs.modal', function() {
     $(this).removeData('bs.modal');
     $(this).find('.modal-content').html('');
+});
+
+$('.blocks-sidebar').on('click', '[data-block-type]', function() {
+    $('#create-block-modal')
+        .modal({'remote': StoryEditor.getCreateBlockUrl($(this).attr('data-block-type'))});
 });
 
 JS;

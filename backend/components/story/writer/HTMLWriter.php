@@ -1,9 +1,8 @@
 <?php
 
-
 namespace backend\components\story\writer;
 
-
+use backend\components\story\AbstractBlock;
 use backend\components\story\Slide;
 use backend\components\story\Story;
 
@@ -18,6 +17,11 @@ class HTMLWriter implements WriterInterface
     public function renderSlide(Slide $slide): string
     {
         return (new SlideRenderer($slide))->render();
+    }
+
+    public function renderBlock(AbstractBlock $block): string
+    {
+
     }
 
 }

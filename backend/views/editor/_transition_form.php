@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 
 /** @var $form yii\widgets\ActiveForm */
-$form->action = ['/editor/update-transition'];
+$form->action = ['editor/update-block/transition'];
 
 /** @var $model backend\models\editor\TransitionForm */
 $actionStoryFieldID = Html::getInputId($model, 'transition_story_id');

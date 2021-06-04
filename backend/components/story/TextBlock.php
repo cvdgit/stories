@@ -58,7 +58,7 @@ class TextBlock extends AbstractBlock
      */
     public function update($form)
     {
-        $this->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
+        //$this->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
         $this->text = $form->text; //nl2br($form->text);
         $this->fontSize = $form->text_size;
     }

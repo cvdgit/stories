@@ -23,7 +23,7 @@ JS;
 $this->registerJs($js);
 
 /** @var $form yii\widgets\ActiveForm */
-$form->action = ['/editor/update-image'];
+$form->action = ['editor/update-block/image'];
 
 echo $form->field($model, 'image', ['inputOptions' => ['class' => 'form-control']])->fileInput();
 echo $form->field($model, 'action', ['inputOptions' => ['class' => 'form-control input-sm']])->checkbox();

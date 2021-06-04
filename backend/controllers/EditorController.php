@@ -119,81 +119,54 @@ class EditorController extends Controller
         return $slide->getBlocksArray();
     }
 
-    public function actionUpdateText()
+    public function actionFormCreate(int $slide_id, string $block_type)
     {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $form = new TextForm();
-        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-            $this->editorService->updateBlock($form);
-            return ['success' => true];
+        $model = StorySlide::findSlide($slide_id);
+        $types = [
+            AbstractBlock::TYPE_HEADER => [
+                'class' => TextForm::class,
+                'view' => '_text_form',
+            ],
+            AbstractBlock::TYPE_TEXT => [
+                'class' => TextForm::class,
+                'view' => '_text_form',
+            ],
+            AbstractBlock::TYPE_IMAGE => [
+                'class' => ImageForm::class,
+                'view' => '_image_form',
+            ],
+            AbstractBlock::TYPE_BUTTON => [
+                'class' => ButtonForm::class,
+                'view' => '_button_form',
+            ],
+            AbstractBlock::TYPE_TRANSITION => [
+                'class' => TransitionForm::class,
+                'view' => '_transition_form',
+            ],
+            AbstractBlock::TYPE_TEST => [
+                'class' => TestForm::class,
+                'view' => '_test_form',
+            ],
+            AbstractBlock::TYPE_HTML => [
+                'class' => QuestionForm::class,
+                'view' => '_html_form',
+            ],
+            AbstractBlock::TYPE_VIDEO => [
+                'class' => VideoForm::class,
+                'view' => '_video_form',
+            ],
+        ];
+        if (!isset($types[$block_type])) {
+            throw new DomainException($block_type . ' - Unknown block type');
         }
-        return $form->getErrors();
-    }
+        $form = Yii::createObject($types[$block_type]);
+        $form->slide_id = $model->id;
+        //$form->block_id = $block_id;
 
-    public function actionUpdateImage()
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $form = new ImageForm();
-        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-            $this->editorService->updateBlock($form);
-            return ['success' => true];
-        }
-        return $form->getErrors();
-    }
-
-    public function actionUpdateButton()
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $form = new ButtonForm();
-        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-            $this->editorService->updateBlock($form);
-            return ['success' => true];
-        }
-        return $form->getErrors();
-    }
-
-    public function actionUpdateTransition()
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $form = new TransitionForm();
-        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-            $this->editorService->updateBlock($form);
-            return ['success' => true];
-        }
-        return $form->getErrors();
-    }
-
-    public function actionUpdateTest()
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $form = new TestForm();
-        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-            $this->editorService->updateBlock($form);
-            return ['success' => true];
-        }
-        return $form->getErrors();
-    }
-
-    public function actionUpdateVideo()
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $form = new VideoForm();
-        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-            $this->editorService->updateBlock($form);
-            return ['success' => true];
-        }
-        return $form->getErrors();
-    }
-
-    public function actionUpdateHtml()
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $form = new QuestionForm();
-        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-            $this->editorService->updateBlock($form);
-            return ['success' => true];
-        }
-        return $form->getErrors();
+        return $this->renderAjax('create', [
+            'model' => $form,
+            'action' => ['editor/create-block/' . $block_type],
+        ]);
     }
 
     public function actionForm(int $slide_id, string $block_id)
@@ -256,6 +229,7 @@ class EditorController extends Controller
 
         return $this->renderAjax('update', [
             'model' => $form,
+            'action' => ['editor/update-block/' . $block_type],
         ]);
     }
 

@@ -2,7 +2,7 @@
 /** @var $form yii\widgets\ActiveForm */
 /** @var $model backend\models\editor\TestForm */
 use backend\widgets\SelectTestWidget;
-$form->action = ['/editor/update-test'];
+$form->action = ['editor/update-block/test'];
 ?>
 <div class="row">
     <div class="col-xs-6">

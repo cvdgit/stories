@@ -218,4 +218,10 @@ class StorySlide extends ActiveRecord
         return (int) $this->status === self::STATUS_HIDDEN;
     }
 
+    public function updateData(string $data): void
+    {
+        $this->data = $data;
+        $this->save(false);
+    }
+
 }

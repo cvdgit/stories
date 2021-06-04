@@ -118,7 +118,7 @@ class ImageBlock extends AbstractBlock
      */
     public function update($form)
     {
-        $this->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
+        //$this->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
         if (!empty($form->fullImagePath)) {
             $this->setImageSize($form->fullImagePath);
         }

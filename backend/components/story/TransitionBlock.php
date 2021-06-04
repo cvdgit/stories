@@ -81,7 +81,7 @@ class TransitionBlock extends ButtonBlock
      */
     public function update($form)
     {
-        $this->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
+        //$this->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
         $this->text = $form->text;
         $this->fontSize = $form->text_size;
         $this->transition_story_id = $form->transition_story_id;

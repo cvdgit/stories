@@ -36,7 +36,7 @@ class VideoBlock extends AbstractBlock
 
     public function update($form)
     {
-        $this->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
+        //$this->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
         $this->video_id = $form->video_id;
         $this->seek_to = $form->seek_to;
         $this->duration = $form->duration;

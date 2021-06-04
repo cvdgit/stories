@@ -2,7 +2,7 @@
 
 /** @var $form yii\widgets\ActiveForm */
 /** @var $model backend\models\editor\ButtonForm */
-$form->action = ['/editor/update-button'];
+$form->action = ['editor/update-block/button'];
 ?>
 <div class="row">
     <div class="col-xs-6"><?= $form->field($model, 'text_size', ['inputOptions' => ['class' => 'form-control input-sm']])->textInput() ?></div>

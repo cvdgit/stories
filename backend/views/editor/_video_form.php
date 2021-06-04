@@ -2,7 +2,7 @@
 use common\models\SlideVideo;
 /** @var $form yii\widgets\ActiveForm */
 /** @var $model backend\models\editor\VideoForm */
-$form->action = ['/editor/update-video'];
+$form->action = ['editor/update-block/video'];
 ?>
 <div class="row">
     <div class="col-xs-6">

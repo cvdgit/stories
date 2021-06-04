@@ -2,29 +2,18 @@
 function DataModifier(action) {
 
     this.timeout = undefined;
+    this.saved = true;
     this.data = {};
-
-    function formatValues(values) {
-        var result = [];
-        for (var prop in values) {
-            if (values.hasOwnProperty(prop)) {
-                result.push($.extend({'key': prop}, values[prop]));
-            }
-        }
-        return result;
-    }
 
     this.startTimeout = function() {
         if (this.timeout !== undefined) {
             clearTimeout(this.timeout);
         }
-        if (!this.data) {
-            return;
-        }
         var that = this;
         this.timeout = setTimeout(function() {
-            action(formatValues(that.data));
-            that.data = {};
+            action().done(function() {
+                that.saved = true;
+            });
         }, 2000);
     }
 }
@@ -39,6 +28,64 @@ DataModifier.prototype.clearTimeout = function() {
         return;
     }
     clearTimeout(this.timeout);
+}
+
+DataModifier.prototype.change = function() {
+    this.saved = false;
+    this.startTimeout();
+};
+
+function EditorPopover() {
+
+    this.popoverConfig = {
+        'content': '',
+        'html': true,
+        'sanitize': false
+    };
+
+    function itemsTemplate(items) {
+        return $('<div/>', {'class': 'prompt-wrapper'}).append(items);
+    }
+
+    function itemTemplate(item) {
+        return $('<div/>', {'class': 'prompt-item'})
+            .attr('data-action-name', item.name)
+            .append(
+                $('<div/>', {'class': 'prompt-item-inner'})
+                    .append($('<span/>', {'class': 'title'}).text(item.title))
+            );
+    }
+
+    function createContent(items) {
+        var fragment = $(document.createDocumentFragment());
+        items.forEach(function(item) {
+            fragment.append(itemTemplate(item));
+        });
+        return itemsTemplate(fragment);
+    }
+
+    var that = this;
+    function createOptions(options, items) {
+        options = $.extend(that.popoverConfig, options);
+        options.content = createContent(items)[0].outerHTML;
+        return options;
+    }
+
+    return {
+        'attach': function(selector, options, items) {
+            return $(selector)
+                .popover(createOptions(options, items))
+                .on('shown.bs.popover', function() {
+                    var that = this;
+                    items.forEach(function(item) {
+                        $('[data-action-name=' + item.name + ']').on('click', function() {
+                            item.click();
+                            $(that).popover('hide');
+                        });
+                    });
+                });
+        }
+    };
 }
 
 var StoryEditor = (function() {
@@ -72,6 +119,8 @@ var StoryEditor = (function() {
             $(".reveal .slides div.sl-block").find('.sl-block-transform').remove();
             $formContainer.empty();
             activeBlockID = null;
+
+            blockToolbar.remove();
         }
     });
 
@@ -128,7 +177,7 @@ var StoryEditor = (function() {
 
     var $list = $("#slide-block-list");
 
-    function loadSlideBlocks() {
+    /*function loadSlideBlocks() {
         var promise = $.ajax({
             "url": config.getSlideBlocksAction + "&slide_id=" + currentSlideID,
             "type": "GET",
@@ -166,7 +215,7 @@ var StoryEditor = (function() {
                 $("#slide-block-params").hide();
             }
         });
-    }
+    }*/
 
     var BlockResizable = function() {
 
@@ -223,6 +272,34 @@ var StoryEditor = (function() {
     };
     var blockResizable = new BlockResizable();
 
+    function makeDraggable(element) {
+        var click = {
+            x: 0,
+            y: 0
+        };
+        var config = {
+            start: function(event) {
+                var blockID = $(event.target).attr("data-block-id");
+                setActiveBlock(blockID, blockID === activeBlockID);
+                click.x = event.clientX;
+                click.y = event.clientY;
+            },
+            drag: function(event, ui) {
+                var zoom = Reveal.getScale();
+                var original = ui.originalPosition;
+                ui.position = {
+                    left: (event.clientX - click.x + original.left) / zoom,
+                    top:  (event.clientY - click.y + original.top) / zoom
+                };
+            },
+            stop: function(event, ui) {
+                setFormTop(Math.round(ui.position.top) + "px", $(event.target));
+                setFormLeft(Math.round(ui.position.left) + "px", $(event.target));
+            }
+        };
+        element.draggable(config);
+    }
+
     function selectActiveBlock(blockID) {
 
         $(".reveal .slides div[data-block-id]").removeClass("wikids-active-block");
@@ -249,14 +326,61 @@ var StoryEditor = (function() {
 
     function setActiveBlock(blockID, doNotLoadForm) {
         activeBlockID = blockID;
-        doNotLoadForm = doNotLoadForm || false;
+        //doNotLoadForm = doNotLoadForm || false;
         $("a", $list).removeClass("active");
         $("a[data-block-id=" + blockID + "]", $list).addClass("active");
         selectActiveBlock(blockID);
-        if (!doNotLoadForm) {
-            loadBlockForm(blockID);
+        //if (!doNotLoadForm) {
+        //    loadBlockForm(blockID);
+        //}
+        blockToolbar.create();
+    }
+
+    var editorPopover = new EditorPopover();
+
+    function BlockToolbar() {
+
+        this.container = $('.blocks-sidebars');
+
+        function createToolbar() {
+            var $list = $('<ul/>');
+
+            $('<li/>', {'class': 'blocks-sidebar-item'})
+                .on('click', stretchToSlide)
+                .append($('<span/>', {'class': 'glyphicon glyphicon-resize-full icon'}))
+                .append($('<span/>', {'class': 'text', 'text': 'Растянуть'}))
+                .appendTo($list);
+
+            $('<li/>', {'class': 'blocks-sidebar-item', 'id': 'block-align'})
+                .append($('<span/>', {'class': 'glyphicon glyphicon-align-center icon'}))
+                .append($('<span/>', {'class': 'text', 'text': 'Положение'}))
+                .appendTo($list);
+
+            return $('<div/>', {'class': 'blocks-sidebar'}).append($list);
+        }
+        this.toolbar = createToolbar();
+    }
+    BlockToolbar.prototype = {
+        'create': function() {
+            this.container.find('.blocks-sidebar.visible').removeClass('visible');
+            this.container.append(this.toolbar.addClass('visible'));
+
+            editorPopover.attach('#block-align', {'placement': 'left'},[
+                {'name': 'left', 'title': 'По левому краю', 'click': function() { setBlockAlign('left'); }},
+                {'name': 'right', 'title': 'По правому краю', 'click': function() { setBlockAlign('right'); }},
+                {'name': 'top', 'title': 'По верху', 'click': function() { setBlockAlign('top'); }},
+                {'name': 'bottom', 'title': 'По низу', 'click': function() { setBlockAlign('bottom'); }},
+                {'name': 'horizontal_center', 'title': 'По центру (горизонтально)', 'click': function() { setBlockAlign('horizontal_center'); }},
+                {'name': 'vertical_center', 'title': 'По центру (вертикально)', 'click': function() { setBlockAlign('vertical_center'); }},
+                {'name': 'slide_center', 'title': 'По центру слайда', 'click': function() { setBlockAlign('slide_center'); }}
+            ]);
+        },
+        'remove': function() {
+            this.toolbar.remove();
+            this.container.find('.blocks-sidebar').addClass('visible');
         }
     }
+    var blockToolbar = new BlockToolbar();
 
     function loadBlockForm(blockID) {
         var promise = $.ajax({
@@ -292,10 +416,7 @@ var StoryEditor = (function() {
     }
 
     function deleteBlock(blockID) {
-        if (!confirm("Удалить блок?")) {
-            return;
-        }
-        var promise = $.ajax({
+        /*var promise = $.ajax({
             "url": config.deleteBlockAction + "&slide_id=" + currentSlideID + "&block_id=" + blockID,
             "type": "GET",
             "dataType": "json"
@@ -306,7 +427,13 @@ var StoryEditor = (function() {
                 activeBlockID = null;
             }
             loadSlide(currentSlideID, true);
-        });
+        });*/
+        findBlockElement(blockID).remove();
+        modifier.change();
+    }
+
+    function getSlideHtml() {
+        return $editor.find('section')[0].outerHTML
     }
 
     function setActiveSlide(slide) {
@@ -329,11 +456,11 @@ var StoryEditor = (function() {
     }
 
     function updateBlock(data) {
-        $.ajax({
-            url: '/admin/index.php?r=editor/blocks/save',
+        return $.ajax({
+            url: '/admin/index.php?r=editor/slide/save&id=' + currentSlideID,
             type: 'POST',
-            data: JSON.stringify(data),
-            contentType: 'application/json; charset=utf-8',
+            data: getSlideHtml(),
+            contentType: 'text/html; charset=utf-8',
             dataType: 'json',
             processData: false
         }).done(function(response) {
@@ -346,24 +473,20 @@ var StoryEditor = (function() {
 
     function loadSlide(slideID, loadBlocks) {
 
-        loadBlocks = loadBlocks || false;
+        //loadBlocks = loadBlocks || false;
         currentSlideID = slideID;
-        var click = {
-            x: 0,
-            y: 0
-        };
 
         EditorActions.reset();
 
-        function getContainment($box, $drag, space) {
+        /*function getContainment($box, $drag, space) {
             var x1 = $box.offset().left + space;
             var y1 = $box.offset().top + space;
             var x2 = $box.offset().left + $box.width() - $drag.width() - space;
             var y2 = $box.offset().top + $box.height() - $drag.height() - space;
             return [x1, y1, x2, y2];
-        }
-
+        }*/
         //$formContainer.empty();
+
         send(slideID)
             .done(function(data) {
 
@@ -373,40 +496,15 @@ var StoryEditor = (function() {
 
                 $(".slides", $editor).empty().append(data.data);
 
-/*                if (activeBlockID !== null && !loadBlocks) {
-                    setActiveBlock(activeBlockID, true);
-                }*/
-
                 $('section', '#story-editor')
                     .css({'height': '720px', 'width': '1280px'})
                     .attr('id', 'slide-container');
 
-                $(".sl-block", ".reveal").draggable({
-                    start: function(event) {
-                        var blockID = $(event.target).attr("data-block-id");
-                        setActiveBlock(blockID, blockID === activeBlockID);
-                        click.x = event.clientX;
-                        click.y = event.clientY;
-                    },
-                    drag: function(event, ui) {
-                        var zoom = Reveal.getScale();
-                        var original = ui.originalPosition;
-                        ui.position = {
-                            left: (event.clientX - click.x + original.left) / zoom,
-                            top:  (event.clientY - click.y + original.top ) / zoom
-                        };
-                    },
-                    stop: function(event, ui) {
-                        setFormTop(Math.round(ui.position.top) + "px", $(event.target));
-                        setFormLeft(Math.round(ui.position.left) + "px", $(event.target));
-                    }
-                });
+                makeDraggable($(".sl-block", ".reveal"));
 
                 Reveal.sync();
                 Reveal.slide(0);
-                if (loadBlocks) {
-                    loadSlideBlocks();
-                }
+
                 WikidsVideo.reset();
                 WikidsVideo.createPlayer();
 
@@ -497,7 +595,7 @@ var StoryEditor = (function() {
 
                     $element.appendTo($container);
                 });
-                loadSlide(activeSlideID, true);
+                loadSlide(activeSlideID);
                 $container.sortable();
             }
             else {
@@ -723,6 +821,24 @@ var StoryEditor = (function() {
         }
     }
 
+    function stretchToSlide() {
+        if (activeBlockID === null) {
+            return;
+        }
+        var element = findBlockElement(activeBlockID);
+        var type = element.attr('data-block-type');
+        if (type === 'text') {
+            setFormLeft('0px', element);
+            setFormWidth('1280px', element);
+        }
+        else {
+            setFormLeft('0px', element);
+            setFormTop('0px', element);
+            setFormWidth('1280px', element);
+            setFormHeight('720px', element);
+        }
+    }
+
     return {
         "initialize": initialize,
         "loadSlides": loadSlides,
@@ -785,6 +901,14 @@ var StoryEditor = (function() {
         },
         "getUpdateBlockUrl": function(blockID) {
             return config.getBlockFormAction + "&slide_id=" + currentSlideID + "&block_id=" + blockID;
+        },
+        "getCreateBlockUrl": function(blockType) {
+            return '/admin/index.php?r=editor/form-create&slide_id=' + currentSlideID + '&block_type=' + blockType;
+        },
+        "addSlideBlock": function(html) {
+            var $block = $(html);
+            $(".slides > section", $editor).append($block);
+            makeDraggable($block);
         }
     };
 })();

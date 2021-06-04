@@ -56,7 +56,7 @@ class ButtonBlock extends TextBlock
      */
     public function update($form)
     {
-        $this->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
+        //$this->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
         $this->text = $form->text;
         $this->fontSize = $form->text_size;
         $this->url = $form->url;
