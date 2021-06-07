@@ -240,14 +240,14 @@ var StoryEditor = (function() {
             stop: function(event, ui) {
                 var $element = $(event.target);
                 var blockType = $element.attr('data-block-type');
-                setFormLeft(Math.round(ui.position.left) + "px", $element);
-                setFormTop(Math.round(ui.position.top) + "px", $element);
-                setFormWidth(Math.round(ui.size.width) + "px", $element);
+                blockModifier.setLeft($element, Math.round(ui.position.left) + "px");
+                blockModifier.setTop($element, Math.round(ui.position.top) + "px");
+                blockModifier.setWidth($element, Math.round(ui.size.width) + "px");
                 if (blockType === 'text') {
-                    setFormHeight('auto', $element);
+                    blockModifier.setHeight($element, 'auto');
                 }
                 else {
-                    setFormHeight(Math.round(ui.size.height) + "px", $element);
+                    blockModifier.setHeight($element, Math.round(ui.size.height) + "px");
                 }
             }
         }
@@ -293,8 +293,8 @@ var StoryEditor = (function() {
                 };
             },
             stop: function(event, ui) {
-                setFormTop(Math.round(ui.position.top) + "px", $(event.target));
-                setFormLeft(Math.round(ui.position.left) + "px", $(event.target));
+                blockModifier.setTop($(event.target), Math.round(ui.position.top) + "px");
+                blockModifier.setLeft($(event.target), Math.round(ui.position.left) + "px");
             }
         };
         element.draggable(config);
@@ -324,15 +324,32 @@ var StoryEditor = (function() {
             .append($wrapper);
     }
 
-    function setActiveBlock(blockID, doNotLoadForm) {
+    var activeBlock = (function() {
+
+        var activeBlockElement = null;
+
+        return {
+            'setElement': function(element) {
+                activeBlockElement = element;
+            },
+            'getID': function() {
+                return activeBlockElement.attr('data-block-id');
+            },
+            'getType': function() {
+                return activeBlockElement.attr('data-block-type');
+            },
+            'getElement': function() {
+                return activeBlockElement;
+            }
+        }
+    })();
+
+    function setActiveBlock(blockID) {
         activeBlockID = blockID;
-        //doNotLoadForm = doNotLoadForm || false;
+        activeBlock.setElement(findBlockElement(blockID));
         $("a", $list).removeClass("active");
         $("a[data-block-id=" + blockID + "]", $list).addClass("active");
         selectActiveBlock(blockID);
-        //if (!doNotLoadForm) {
-        //    loadBlockForm(blockID);
-        //}
         blockToolbar.create();
     }
 
@@ -366,13 +383,13 @@ var StoryEditor = (function() {
             this.container.append(this.toolbar.addClass('visible'));
 
             editorPopover.attach('#block-align', {'placement': 'left'},[
-                {'name': 'left', 'title': 'По левому краю', 'click': function() { setBlockAlign('left'); }},
-                {'name': 'right', 'title': 'По правому краю', 'click': function() { setBlockAlign('right'); }},
-                {'name': 'top', 'title': 'По верху', 'click': function() { setBlockAlign('top'); }},
-                {'name': 'bottom', 'title': 'По низу', 'click': function() { setBlockAlign('bottom'); }},
-                {'name': 'horizontal_center', 'title': 'По центру (горизонтально)', 'click': function() { setBlockAlign('horizontal_center'); }},
-                {'name': 'vertical_center', 'title': 'По центру (вертикально)', 'click': function() { setBlockAlign('vertical_center'); }},
-                {'name': 'slide_center', 'title': 'По центру слайда', 'click': function() { setBlockAlign('slide_center'); }}
+                {'name': 'left', 'title': 'По левому краю', 'click': function() { blockAlignment.left(activeBlock.getElement()); }},
+                {'name': 'right', 'title': 'По правому краю', 'click': function() { blockAlignment.right(activeBlock.getElement()); }},
+                {'name': 'top', 'title': 'По верху', 'click': function() { blockAlignment.top(activeBlock.getElement()); }},
+                {'name': 'bottom', 'title': 'По низу', 'click': function() { blockAlignment.bottom(activeBlock.getElement()); }},
+                {'name': 'horizontal_center', 'title': 'По центру (горизонтально)', 'click': function() { blockAlignment.horizontalCenter(activeBlock.getElement()); }},
+                {'name': 'vertical_center', 'title': 'По центру (вертикально)', 'click': function() { blockAlignment.verticalCenter(activeBlock.getElement()); }},
+                {'name': 'slide_center', 'title': 'По центру слайда', 'click': function() { blockAlignment.slideCenter(activeBlock.getElement()); }}
             ]);
         },
         'remove': function() {
@@ -455,11 +472,26 @@ var StoryEditor = (function() {
         }
     }
 
-    function updateBlock(data) {
+    function updateBlock() {
+        var data = $editor.find('section').clone();
+        $('#save-container').empty().append(data);
+
+        var section = $('#save-container').find('section');
+        var attributes = $.map(section[0].attributes, function(item) {
+            return item.name;
+        });
+        $.each(attributes, function(i, item) {
+            section.removeAttr(item);
+        });
+
+        data.find('.sl-block-transform').remove();
+        data.find('.ui-resizable-handle').remove();
+        data.find('.sl-block.wikids-active-block')
+            .removeClass('wikids-active-block ui-draggable ui-draggable-handle ui-resizable');
         return $.ajax({
             url: '/admin/index.php?r=editor/slide/save&id=' + currentSlideID,
             type: 'POST',
-            data: getSlideHtml(),
+            data: data[0].outerHTML,
             contentType: 'text/html; charset=utf-8',
             dataType: 'json',
             processData: false
@@ -753,89 +785,100 @@ var StoryEditor = (function() {
         return $editor.find('section > div.sl-block[data-block-id=' + blockID + ']');
     }
 
-    function setBlockAlign(align, blockID) {
-        var element = findBlockElement(blockID === undefined ? activeBlockID : blockID);
-        switch (align) {
-            case 'left':
-                setFormLeft('0px', element);
-                break;
-            case 'right':
-                setFormLeft(1280 - parseInt(element.css('width')) + 'px', element);
-                break;
-            case 'top':
-                setFormTop('0px', element);
-                break;
-            case 'bottom':
-                setFormTop(720 - parseInt(element.css('height')) + 'px', element);
-                break;
-            case 'horizontal_center':
-                setFormLeft((1280 - parseInt(element.css('width'))) / 2 + 'px', element);
-                break;
-            case 'vertical_center':
-                setFormTop((720 - parseInt(element.css('height'))) / 2 + 'px', element);
-                break;
-            case 'slide_center':
-                setFormLeft((1280 - parseInt(element.css('width'))) / 2 + 'px', element);
-                setFormTop((720 - parseInt(element.css('height'))) / 2 + 'px', element);
-                break;
+    function BlockModifier() {
+
+        function css(element, name, value) {
+            element.css(name, value);
+            modifier.change();
         }
+
+        this.setLeft = function(element, left) {
+            css(element,'left', left);
+        };
+        this.setTop = function(element, top) {
+            css(element, 'top', top);
+        };
+        this.setWidth = function(element, width) {
+            css(element, 'width', width);
+        };
+        this.setHeight = function(element, height) {
+            css(element, 'height', height);
+        };
     }
 
-    function getBlockForm() {
-        return $formContainer.find('form:eq(0)');
-    }
+    var blockModifier = new BlockModifier();
 
-    function getModifyKey(blockElement) {
-        return currentSlideID + ':' + blockElement.attr('data-block-id');
-    }
+    function BlockAlignment(modifier) {
 
-    function setFormLeft(value, element) {
-        getBlockForm().find('input.editor-left').val(value);
-        if (element) {
-            element.css('left', value);
-            modifier.add(getModifyKey(element), {'left': value});
+        var slideWidth = 1280,
+            slideHeight = 720;
+
+        function setBlockAlign(element, align) {
+            switch (align) {
+                case 'left':
+                    modifier.setLeft(element, '0px');
+                    break;
+                case 'right':
+                    modifier.setLeft(element, slideWidth - parseInt(element.css('width')) + 'px');
+                    break;
+                case 'top':
+                    modifier.setTop(element, '0px');
+                    break;
+                case 'bottom':
+                    modifier.setTop(element, slideHeight - parseInt(element.css('height')) + 'px');
+                    break;
+                case 'horizontal_center':
+                    modifier.setLeft(element, (slideWidth - parseInt(element.css('width'))) / 2 + 'px');
+                    break;
+                case 'vertical_center':
+                    modifier.setTop(element, (slideHeight - parseInt(element.css('height'))) / 2 + 'px');
+                    break;
+                case 'slide_center':
+                    modifier.setLeft(element, (slideWidth - parseInt(element.css('width'))) / 2 + 'px');
+                    modifier.setTop(element, (slideHeight - parseInt(element.css('height'))) / 2 + 'px');
+                    break;
+            }
         }
+
+        this.left = function(element) {
+            setBlockAlign(element, 'left');
+        };
+        this.right = function(element) {
+            setBlockAlign(element, 'right');
+        };
+        this.top = function(element) {
+            setBlockAlign(element, 'top');
+        }
+        this.bottom = function(element) {
+            setBlockAlign(element, 'bottom');
+        };
+        this.horizontalCenter = function(element) {
+            setBlockAlign(element, 'horizontal_center');
+        };
+        this.verticalCenter = function(element) {
+            setBlockAlign(element, 'vertical_center');
+        };
+        this.slideCenter = function(element) {
+            setBlockAlign(element, 'slide_center');
+        };
     }
 
-    function setFormTop(value, element) {
-        getBlockForm().find('input.editor-top').val(value);
-        if (element) {
-            element.css('top', value);
-            modifier.add(getModifyKey(element), {'top': value});
-        }
-    }
-
-    function setFormWidth(value, element) {
-        getBlockForm().find('input.editor-width').val(value);
-        if (element) {
-            element.css('width', value);
-            modifier.add(getModifyKey(element), {'width': value});
-        }
-    }
-
-    function setFormHeight(value, element) {
-        getBlockForm().find('input.editor-height').val(value);
-        if (element) {
-            element.css('height', value);
-            modifier.add(getModifyKey(element), {'height': value});
-        }
-    }
+    var blockAlignment = new BlockAlignment(blockModifier);
 
     function stretchToSlide() {
-        if (activeBlockID === null) {
+        var element = activeBlock.getElement();
+        if (element === null) {
             return;
         }
-        var element = findBlockElement(activeBlockID);
-        var type = element.attr('data-block-type');
-        if (type === 'text') {
-            setFormLeft('0px', element);
-            setFormWidth('1280px', element);
+        if (activeBlock.getType() === 'text') {
+            blockModifier.setLeft(element, '0px');
+            blockModifier.setWidth(element, '1280px');
         }
         else {
-            setFormLeft('0px', element);
-            setFormTop('0px', element);
-            setFormWidth('1280px', element);
-            setFormHeight('720px', element);
+            blockModifier.setLeft(element, '0px');
+            blockModifier.setTop(element, '0px');
+            blockModifier.setWidth(element, '1280px');
+            blockModifier.setHeight(element, '720px');
         }
     }
 
@@ -862,43 +905,6 @@ var StoryEditor = (function() {
             return getConfigValue('storyID');
         },
         "saveSlidesOrder": saveSlidesOrder,
-        "setBlockAlignLeft": function() {
-            setBlockAlign('left');
-        },
-        "setBlockAlignRight": function() {
-            setBlockAlign('right');
-        },
-        "setBlockAlignTop": function() {
-            setBlockAlign('top');
-        },
-        "setBlockAlignBottom": function() {
-            setBlockAlign('bottom');
-        },
-        "setBlockAlignHorizontalCenter": function() {
-            setBlockAlign('horizontal_center');
-        },
-        "setBlockAlignVerticalCenter": function() {
-            setBlockAlign('vertical_center');
-        },
-        "setBlockAlignSlideCenter": function() {
-            setBlockAlign('slide_center');
-        },
-        "stretchToSlide": function() {
-            if (activeBlockID === null) {
-                return;
-            }
-            var element = findBlockElement(activeBlockID);
-            setFormLeft('0px', element);
-            setFormTop('0px', element);
-            setFormWidth('1280px', element);
-            setFormHeight('720px', element);
-        },
-        "stretchToWidth": function() {
-
-        },
-        "stretchToHeight": function() {
-
-        },
         "getUpdateBlockUrl": function(blockID) {
             return config.getBlockFormAction + "&slide_id=" + currentSlideID + "&block_id=" + blockID;
         },

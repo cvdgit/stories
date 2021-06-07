@@ -101,40 +101,6 @@ $('[data-toggle="tooltip"]').tooltip();
 	});
 JS;
 $this->registerJs($js);
-
-$options = [
-    'encodeLabel' => false,
-    'label' => '<span class="glyphicon glyphicon-plus"></span> Новый слайд&nbsp;',
-    'options' => [
-        'class' => 'btn-sm btn-default',
-        'title' => 'Добавить слайд',
-    ],
-    'dropdown' => [
-        'items' => [
-            [
-                'label' => 'Новый слайд',
-                'url' => '#',
-                'linkOptions' => ['onclick' => 'StoryEditor.createSlide(); return false;'],
-            ],
-            [
-                'label' => 'Ссылка на слайд',
-                'url' => '#',
-                'linkOptions' => ['onclick' => 'StoryEditor.createSlideLink(); return false;'],
-            ],
-            [
-                'label' => 'Тест из neo4j',
-                'url' => '#slide-new-question-modal',
-                'linkOptions' => ['data-toggle' => 'modal'],
-            ],
-            [
-                'label' => 'Тест',
-                'url' => '#new-test-modal',
-                'linkOptions' => ['data-toggle' => 'modal'],
-            ],
-        ],
-    ]
-];
-
 ?>
 
     <div class="wrap-editor">
@@ -142,6 +108,9 @@ $options = [
             <div class="slides-actions">
                 <button id="create-slide-action">Новый слайд</button>
                 <button id="slide-copy">Копировать</button>
+                <button id="save-data">
+                    <i class="glyphicon glyphicon-ok"></i>
+                </button>
             </div>
             <div class="list-group slides-container" id="preview-container"></div>
         </div>
@@ -198,6 +167,10 @@ $options = [
                 </li>
             </ul>
         </div>
+    </div>
+
+    <div class="hide" id="save-container">
+
     </div>
 
 <div class="modal remote fade" id="slide-source-modal">
