@@ -11,7 +11,8 @@ function WikidsVideoPlayer(elemID, options) {
     var player,
         done = false;
 
-    var controls = ['play', 'current-time', 'mute', 'volume'];
+    //var controls = ['play', 'current-time', 'mute', 'volume'];
+    var controls = [];
     if (options.showControls) {
         controls = ['play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'];
     }

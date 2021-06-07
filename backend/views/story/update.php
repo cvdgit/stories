@@ -70,7 +70,7 @@ $this->params['sidebarMenuItems'] = [
 		    'fileUploadForm' => $fileUploadForm,
 		]) ?>
 	</div>
-	<div class="col-xs-6" style="padding-top: 69px">
+	<div class="col-xs-6">
 		<?= $this->render('_form_powerpoint', ['story' => $model, 'source' => $powerPointForm, 'wordListModel' => $wordListModel]) ?>
 	</div>
 </div>

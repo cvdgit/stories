@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use backend\components\book\BookStoryGenerator;
+use backend\models\StoryAccessByLinkForm;
 use backend\models\StoryBatchCommandForm;
 use backend\models\WordListFromStoryForm;
 use backend\services\StoryEditorService;
@@ -354,4 +355,20 @@ class StoryController extends Controller
         return $this->redirect(['update', 'id' => $model->id]);
     }
 
+    public function actionGrantAccessByLink(int $id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $storyModel = $this->findModel($id);
+        $storyModel->grantLinkAccess();
+        $accessForm = new StoryAccessByLinkForm($storyModel);
+        return ['success' => true, 'accessLink' => $accessForm->access_link];
+    }
+
+    public function actionRevokeAccessByLink(int $id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $storyModel = $this->findModel($id);
+        $storyModel->revokeLinkAccess();
+        return ['success' => true];
+    }
 }

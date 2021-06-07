@@ -30,6 +30,7 @@ echo $form->field($source, 'storyId')->hiddenInput()->label(false);
                     ['label' => 'Текст истории', 'url' => ['/story/text', 'id' => $story->id]],
                     ['label' => 'Создать список слов (по предложениям)', 'url' => ['/word-list/make-from-story-by-proposals', 'story_id' => $story->id], 'linkOptions' => ['class' => 'story-text']],
                     ['label' => 'Создать список слов (по словам)', 'url' => ['/word-list/make-from-story-by-words', 'story_id' => $story->id], 'linkOptions' => ['class' => 'story-text']],
+                    ['label' => 'Доступ по ссылке', 'url' => '#access-by-link-modal', 'linkOptions' => ['data-toggle' => 'modal']]
                 ],
             ]);
             ?>
@@ -62,6 +63,8 @@ echo $form->field($source, 'storyId')->hiddenInput()->label(false);
         </div>
     </div>
 </div>
+
+<?= $this->render('_access_by_link', ['story' => $story]) ?>
 
 <?php
 $js = <<< JS

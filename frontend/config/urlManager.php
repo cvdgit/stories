@@ -77,5 +77,7 @@ return [
 
         'test/<id:\d+>' => 'test/view',
         'tests/<category_id:\d+>' => 'test/index',
+
+        'preview/<alias:[\w\-]+>' => 'preview/view',
     ],
 ];

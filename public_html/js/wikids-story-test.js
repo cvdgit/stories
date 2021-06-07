@@ -1348,7 +1348,14 @@
 
             reset();
             dom.wrapper = $("<div/>").addClass("wikids-test");
-            dom.beginPage = createBeginPage(testResponse);
+
+            if (App.userIsGuest()) {
+                dom.beginPage = createGuestBeginPage(testResponse);
+            }
+            else {
+                dom.beginPage = createBeginPage(testResponse);
+            }
+
             dom.wrapper.append(dom.beginPage);
             createContainer();
         }
@@ -1381,29 +1388,6 @@
         var numPad;
         var linked;
         var speech;
-
-        function initQuestions() {
-
-            $('.wikids-test-active-question').hide().removeClass('wikids-test-active-question');
-            dom.finishButton.hide();
-
-            dom.results
-                .empty()
-                .append("<h2>Тест пройден</h2>")
-                .append(linked.getHtml())
-                .show();
-
-            if (currentStudent.progress === 100) {
-
-            }
-            else {
-
-            }
-
-            dom.wrapper = $("<div/>").addClass("wikids-test");
-            dom.wrapper.append();
-            createContainer(false);
-        }
 
         function getQuestionRepeat() {
             return that.options.fastMode ? 1 : 5;
@@ -1463,7 +1447,7 @@
 
             setElementHtml(createLoader());
             var dataParams = Object.assign(that.options.dataParams || {}, {
-                studentId: currentStudent.id,
+                studentId: activeStudent.getID(),
                 fastMode: that.options.fastMode
             });
             $.getJSON(that.options.dataUrl, dataParams)
@@ -1480,15 +1464,59 @@
         }
 
         var currentStudent;
+        var activeStudent = (function() {
+            var stud = {};
+            return {
+                'set': function(student) {
+                    stud = student;
+                },
+                'getID': function() {
+                    return stud['id'] || null;
+                },
+                'getName': function() {
+                    return stud.name;
+                },
+                'getProgress': function() {
+                    return stud.progress;
+                }
+            }
+        })();
 
         function setActiveStudentElement(element) {
             element.siblings().removeClass('active');
             element.addClass('active');
             currentStudent = element.data('student');
+            activeStudent.set(element.data('student'));
             $('.wikids-test-student-info', dom.header).text(currentStudent.name);
         }
 
+        function createGuestBeginPage(testResponse) {
+
+            var $beginButton = $('<button/>')
+                .addClass('btn wikids-test-begin')
+                .text('Начать тест')
+                .on('click', function() {
+                    that.options.fastMode = $('#test-fast-mode').is(':checked');
+                    loadData();
+                });
+
+            var $options = $('<div/>', {
+                class: 'wikids-test-begin-page-options'
+            });
+            $options.append('<label for="test-fast-mode"><input id="test-fast-mode" type="checkbox" /> быстрый режим</label>');
+
+            var $col = $('<div/>').addClass('col-md-12');
+            $col.append($('<p/>', {'class': 'wikids-test-description'}).html(testResponse.test.description));
+            $col.append($beginButton);
+
+            return $('<div/>')
+                .addClass('wikids-test-begin-page row')
+                .append($('<div/>', {'class': 'col-md-12'}).append($('<h3/>').text(testResponse.test.header)))
+                .append($col);
+        }
+
         function createBeginPage(testResponse) {
+
             var $listGroup = $('<div/>').addClass('list-group');
             $listGroup.on('click', 'a', function(e) {
                 e.preventDefault();
@@ -1508,6 +1536,7 @@
                 $item.appendTo($listGroup);
             });
             setActiveStudentElement($listGroup.find('a:eq(0)'));
+
             var $beginButton = $('<button/>')
                 .addClass('btn wikids-test-begin')
                 .text('Начать тест')
@@ -2092,9 +2121,10 @@
             if (test.description) {
                 $header.append($("<p/>").text(test.description));
             }
-            $header
-                .append(createStudentInfo())
-                .append(createProgress());
+            if (!App.userIsGuest()) {
+                $header.append(createStudentInfo());
+            }
+            $header.append(createProgress());
 
             $('[data-toggle="tooltip"]', $header).tooltip();
 

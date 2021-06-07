@@ -44,6 +44,7 @@ use yii\db\ActiveQuery;
  * @property int $video
  * @property int $published_at
  * @property int $have_neo_relation
+ * @property int $access_by_link;
  *
  * @property User $author
  * @property Tag[] $tags
@@ -112,7 +113,7 @@ class Story extends ActiveRecord
             [['title'], 'trim'],
             [['body', 'cover', 'story_file', 'source_dropbox', 'source_powerpoint'], 'string'],
             [['user_id', 'sub_access', 'source_id', 'views_number', 'slides_number', 'audio', 'published_at'], 'integer'],
-            [['video', 'user_audio', 'episode'], 'integer'],
+            [['video', 'user_audio', 'episode', 'access_by_link'], 'integer'],
             [['title', 'alias'], 'string', 'max' => 255],
             [['alias'], 'unique'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
@@ -152,6 +153,7 @@ class Story extends ActiveRecord
             'episode' => 'Эпизод',
             'story_playlists' => 'Плейлисты',
             'published_at' => 'Дата публикации истории',
+            'access_by_link' => 'Доступ по ссылке',
         ];
     }
 
@@ -371,7 +373,15 @@ class Story extends ActiveRecord
         $data = '';
         foreach ($slides as $slide) {
             $data .= $slide['link_data'] ?? $slide['data'];
-            $data = str_replace('data-id=""', 'data-id="' . $slide['id'] . '"', $data);
+            $search = [
+                'data-id=""',
+                'data-background-color="#000000"',
+            ];
+            $replace = [
+                'data-id="' . $slide['id'] . '"',
+                'data-background-color="#fff"',
+            ];
+            $data = str_replace($search, $replace, $data);
         }
         return '<div class="slides">' . $data . '</div>';
     }
@@ -614,5 +624,27 @@ class Story extends ActiveRecord
         $this->status = StoryStatus::DRAFT;
         $this->published_at = null;
         $this->save(false, ['status', 'published_at']);
+    }
+
+    public function linkAccessAllowed(): bool
+    {
+        return $this->access_by_link === 1;
+    }
+
+    public function grantLinkAccess(): string
+    {
+        $this->access_by_link = 1;
+        return $this->save(false);
+    }
+
+    public function revokeLinkAccess(): string
+    {
+        $this->access_by_link = 0;
+        return $this->save(false);
+    }
+
+    public function getPreviewUrl()
+    {
+        return Yii::$app->urlManagerFrontend->createUrl(['preview/view', 'alias' => $this->alias]);
     }
 }
