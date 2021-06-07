@@ -1500,19 +1500,22 @@
                     loadData();
                 });
 
-            var $options = $('<div/>', {
-                class: 'wikids-test-begin-page-options'
-            });
-            $options.append('<label for="test-fast-mode"><input id="test-fast-mode" type="checkbox" /> быстрый режим</label>');
+            var $rowWrapper = $('<div/>', {'class': 'row-wrapper'});
 
-            var $col = $('<div/>').addClass('col-md-12');
-            $col.append($('<p/>', {'class': 'wikids-test-description'}).html(testResponse.test.description));
-            $col.append($beginButton);
+            if (testResponse.test.description.length) {
+                var $row = $('<div/>', {'class': 'row'})
+                    .append(
+                        $('<div/>', {'class': 'col-md-8 col-md-offset-2'})
+                            .append($('<p/>', {'class': 'wikids-test-description'}).html(testResponse.test.description))
+                    );
+                $rowWrapper.append($row);
+            }
 
             return $('<div/>')
-                .addClass('wikids-test-begin-page row')
-                .append($('<div/>', {'class': 'col-md-12'}).append($('<h3/>').text(testResponse.test.header)))
-                .append($col);
+                .addClass('wikids-test-begin-page')
+                .append($('<h3/>').text(testResponse.test.header))
+                .append($rowWrapper)
+                .append($beginButton);
         }
 
         function createBeginPage(testResponse) {
@@ -1979,6 +1982,7 @@
                 .addClass('wikids-progress')
                 .attr('title', getCurrentProgressStateText())
                 .attr('data-toggle', 'tooltip')
+                .attr('data-placement', 'bottom')
                 .append(
                     $('<div/>')
                         .addClass('progress-bar progress-bar-info')

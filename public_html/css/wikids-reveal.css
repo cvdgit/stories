@@ -1720,7 +1720,14 @@
 
 .wikids-test-questions .question-title {
 	text-align: center;
-	font-weight: 500;
+	font-weight: 700;
+	line-height: 3.5rem;
+	font-size: 2.5rem;
+	margin: 10px 0 20px 0;
+}
+
+.wikids-test-questions .question-stars {
+	margin: 0;
 }
 
 .wikids-test-questions .question-image {
@@ -1782,6 +1789,8 @@
 	font-size: 24px;
 	user-select: none;
 	vertical-align: top;
+	font-weight: 500;
+	line-height: 2.8rem;
 }
 
 .wikids-test-answer input[type=checkbox],
@@ -1805,12 +1814,21 @@
 
 }
 
+.wikids-test-begin-page h3 {
+	font-size: 3rem;
+}
+
 .wikids-test-begin-page .list-group a.active h4 {
 	color: white !important;
 }
 
 .wikids-test-begin-page p {
 	margin: 20px 0;
+}
+
+.wikids-test-begin-page .row-wrapper {
+	min-height: 200px;
+	padding: 20px 0;
 }
 
 .wikids-test-students-help {
