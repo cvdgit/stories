@@ -1399,7 +1399,6 @@
             questionSuccess = new QuestionSuccess();
             testData = data[0];
             questions = getQuestionsData();
-            console.log(questions);
             numQuestions = questions.length;
 
             if (testData['test']) {
@@ -1503,7 +1502,7 @@
                 .addClass('btn wikids-test-begin')
                 .text('Начать тест')
                 .on('click', function() {
-                    that.options.fastMode = $('#test-fast-mode').is(':checked');
+                    that.options.fastMode = true;
                     loadData();
                 });
 
