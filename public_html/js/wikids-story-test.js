@@ -257,8 +257,10 @@
 
         var params = question.params;
 
+        var regionMapName = 'regions-' + question.id;
         var $img = $('<img/>')
             .attr('src', params.image)
+            .attr('usemap', '#' + regionMapName)
             .css({'position': 'absolute', 'left': 0, 'top': 0, 'width': '100%', 'height': '100%'});
 
         function getScale() {
@@ -269,29 +271,44 @@
             return scale;
         }
 
-        function getRelativeCoordinates(event, target) {
-            var position = {
-                x: event.clientX,
-                y: event.clientY
-            };
-            var container = $('.reveal .slides')[0]
-            var scaleX = parseFloat(target.offsetWidth  / target.getBoundingClientRect().width).toFixed(2);
-            var scaleY = parseFloat(target.offsetHeight  / target.getBoundingClientRect().height).toFixed(2);
-            var offset = $(target).offset();
-            var canvasOffsetLeft = offset.left;
-            var canvasOffsetTop = offset.top;
-            return {
-                x: (position.x - canvasOffsetLeft + $(window).scrollLeft()) / getScale(),
-                y: (position.y - canvasOffsetTop + $(window).scrollTop()) / getScale()
-            };
+        var that = this;
+
+        function processRegionAnswer(target) {
+            var regionID = target.attr('data-answer-id');
+            if (regionID) {
+                var answer = that.getAnswerByRegion(questionAnswers, regionID);
+                that.addAnswer(answer[0].id);
+            }
+            else {
+                that.addAnswer('no_correct_' + new Date().getTime());
+            }
+            if (that.getAnswers().length === parseInt(question.correct_number)) {
+                setTimeout(function() {
+                    that.test.nextQuestion(that.getAnswers());
+                    that.resetAnswers();
+                    $wrapper.find('span.answer-point').remove();
+                }, 500);
+            }
         }
 
-        var that = this;
         var $wrapper = $('<div/>')
             .addClass('question-region')
             .css({'width': params.imageWidth + 'px', 'height': params.imageHeight + 'px', 'position': 'relative', 'margin': '0 auto'})
+            .append($img)
             .on('click', function(e) {
-                var rect = getRelativeCoordinates(e, $wrapper[0]);
+                var elem = $(e.target).parent()[0];
+                var zoom = getScale();
+                var clientRect = elem.getBoundingClientRect();
+                var x, y;
+                if (zoom > 1) {
+                    x = e.offsetX / zoom;
+                    y = e.offsetY / zoom;
+                }
+                else {
+                    x = (e.clientX - clientRect.left) / zoom;
+                    y = (e.clientY - clientRect.top) / zoom;
+                }
+                var rect = {x, y};
                 $('<span/>')
                     .addClass('answer-point')
                     .css({
@@ -301,46 +318,39 @@
                         'shape-outside': 'circle()',
                         'clip-path': 'circle()',
                         'background': 'orangered',
-                        'width': '3rem',
-                        'height': '3rem'
+                        'width': '2rem',
+                        'height': '2rem',
+                        'pointer-events': 'none'
                     })
                     .appendTo(this);
+            });
 
-                var $target  = $(e.target);
-                var isRect = $target[0].tagName === 'DIV' && $target.hasClass('answer-rect');
+        var $map = $('<map/>', {'name': regionMapName});
+        $map.on('click', 'area', function() {
+            processRegionAnswer($(this));
+        });
 
-                setTimeout(function() {
-                    if (isRect) {
-                        var regionID = $target.attr('data-answer-id');
-                        var answer = that.getAnswerByRegion(questionAnswers, regionID);
-                        that.addAnswer(answer[0].id);
-                    }
-                    else {
-                        that.addAnswer('no correct');
-                    }
-
-                    if (that.getAnswers().length === parseInt(question.correct_number)) {
-                        that.test.nextQuestion(that.getAnswers());
-                        that.resetAnswers();
-                        $wrapper.find('span.answer-point').remove();
-                    }
-                }, 500);
-            })
-            .append($img);
+        function createArea(coords, id) {
+            var attrs = {
+                'shape': 'rect',
+                'coords': coords
+            };
+            if (id) {
+                attrs['data-answer-id'] = id;
+            }
+            return $('<area/>', attrs);
+        }
 
         question.params.regions.forEach(function(region) {
-            $('<div/>')
-                .addClass('answer-rect')
-                .attr('data-answer-id', region.id)
-                .css({
-                    'position': 'absolute',
-                    'left': parseInt(region.rect.left) + 'px',
-                    'top': parseInt(region.rect.top) + 'px',
-                    'width': parseInt(region.rect.width) + 'px',
-                    'height': parseInt(region.rect.height) + 'px'
-                })
-                .appendTo($wrapper);
+            var x = parseInt(region.rect.left),
+                y = parseInt(region.rect.top);
+            createArea([x, y, parseInt(region.rect.width) + x, parseInt(region.rect.height) + y].join(','), region.id)
+                .appendTo($map);
         });
+        createArea([0, 0, params.imageWidth, params.imageHeight].join(','))
+            .appendTo($map);
+        $map.appendTo($wrapper);
+
         return $wrapper;
     };
 
