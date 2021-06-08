@@ -308,7 +308,7 @@
                     x = (e.clientX - clientRect.left) / zoom;
                     y = (e.clientY - clientRect.top) / zoom;
                 }
-                var rect = {x, y};
+                var rect = {x: x - 10, y: y - 10};
                 $('<span/>')
                     .addClass('answer-point')
                     .css({
@@ -318,8 +318,8 @@
                         'shape-outside': 'circle()',
                         'clip-path': 'circle()',
                         'background': 'orangered',
-                        'width': '2rem',
-                        'height': '2rem',
+                        'width': '20px',
+                        'height': '20px',
                         'pointer-events': 'none'
                     })
                     .appendTo(this);
