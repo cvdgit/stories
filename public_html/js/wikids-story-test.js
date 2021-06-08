@@ -1399,6 +1399,7 @@
             questionSuccess = new QuestionSuccess();
             testData = data[0];
             questions = getQuestionsData();
+            console.log(questions);
             numQuestions = questions.length;
 
             if (testData['test']) {
@@ -1474,10 +1475,16 @@
                     return stud['id'] || null;
                 },
                 'getName': function() {
-                    return stud.name;
+                    return stud['name'] || '';
                 },
                 'getProgress': function() {
-                    return stud.progress;
+                    return stud['progress'] || 0;
+                },
+                'setFinish': function(finish) {
+                    stud['finish'] = finish;
+                },
+                'getFinish': function() {
+                    return stud['finish'] || false;
                 }
             }
         })();
@@ -2189,10 +2196,13 @@
         }
 
         function finish() {
-            $('.wikids-test-active-question').hide().removeClass('wikids-test-active-question');
+            $('.wikids-test-active-question', el).hide().removeClass('wikids-test-active-question');
             dom.finishButton.hide();
             setTestResults();
-            currentStudent['finish'] = true;
+            if (currentStudent) {
+                currentStudent['finish'] = true;
+            }
+            activeStudent.setFinish(true);
             dispatchEvent("finish", {
                 "testID": getTestData().id,
                 "correctAnswers": correctAnswersNumber
@@ -2439,7 +2449,7 @@
             }
             preparedAnswers = preparedAnswers || false;
 
-            var $activeQuestion = $('.wikids-test-active-question');
+            var $activeQuestion = $('.wikids-test-active-question', el);
             currentQuestion = $activeQuestion.data('question');
 
             var view = currentQuestion['view'] ? currentQuestion.view : '';
@@ -2985,7 +2995,8 @@
         tests.push(el);
 
         this.canNext = function() {
-            var canNext = currentStudent && (currentStudent.progress === 100 || currentStudent['finish']);
+            //var canNext = currentStudent && (currentStudent.progress === 100 || currentStudent['finish']);
+            var canNext = activeStudent.getProgress() === 100 || activeStudent.getFinish();
             return (testIsRequired() && canNext) || (!testIsRequired());
         };
 
