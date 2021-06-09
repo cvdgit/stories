@@ -42,4 +42,19 @@ class QuestionType
     {
         return $this->type === self::SEQUENCE;
     }
+
+    public function isSingle(): bool
+    {
+        return $this->type === self::ONE;
+    }
+
+    public function isMultiple(): bool
+    {
+        return $this->type === self::MANY;
+    }
+
+    public function getTypeName(): string
+    {
+        return self::asArray()[$this->type];
+    }
 }

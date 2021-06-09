@@ -227,4 +227,9 @@ class StoryTestQuestion extends ActiveRecord
         return $this->regionImage;
     }
 
+    public function getQuestionType(): QuestionType
+    {
+        return new QuestionType($this->type);
+    }
+
 }

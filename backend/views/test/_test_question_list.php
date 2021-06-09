@@ -1,5 +1,6 @@
 <?php
 use backend\models\question\QuestionType;
+use common\models\StoryTestQuestion;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\helpers\Html;
@@ -10,10 +11,7 @@ use yii\helpers\Url;
 <div>
     <div class="clearfix">
         <div class="dropdown" style="display: inline-block">
-            <button type="button" data-toggle="dropdown" class="btn btn-primary">
-                Создать вопрос
-                <span class="caret"></span>
-            </button>
+            <button type="button" data-toggle="dropdown" class="btn btn-primary">Создать вопрос <span class="caret"></span></button>
             <ul class="dropdown-menu">
                 <li><?= Html::a('По умолчанию', ['test/create-question', 'test_id' => $model->id]) ?></li>
                 <li><?= Html::a('Выбор области', ['question/create', 'test_id' => $model->id, 'type' => QuestionType::REGION]) ?></li>
@@ -27,18 +25,36 @@ use yii\helpers\Url;
         'dataProvider' => $dataProvider,
         'options' => ['class' => 'table-responsive'],
         'columns' => [
+            [
+                'format' => 'raw',
+                'value' => static function(StoryTestQuestion $model) {
+                    $type = $model->getQuestionType();
+                    $class = 'glyphicon ';
+                    if ($type->isSingle()) {
+                        $class .= 'glyphicon-record';
+                    }
+                    if ($type->isMultiple()) {
+                        $class .= 'glyphicon-check';
+                    }
+                    if ($type->isRegion()) {
+                        $class .= 'glyphicon-picture';
+                    }
+                    if ($type->isSequence()) {
+                        $class .= 'glyphicon-tasks';
+                    }
+                    return Html::tag('i', '', ['class' => $class, 'title' => $type->getTypeName()]);
+                },
+            ],
             'name',
             [
-                'attribute' => 'answer_number',
-                'value' => function($model) {
-                    return count($model->storyTestAnswers);
-                }
-            ],
-            [
-                'attribute' => 'correct_answer_number',
-                'value' => function($model) {
-                    return count($model->getCorrectAnswers());
-                }
+                'label' => 'Ответов',
+                'value' => static function(StoryTestQuestion $model) {
+                    $value = count($model->storyTestAnswers);
+                    if (($correctCount = count($model->getCorrectAnswers())) > 0) {
+                        $value .= ' (' . $correctCount . ')';
+                    }
+                    return $value;
+                },
             ],
             [
                 'class' => ActionColumn::class,
