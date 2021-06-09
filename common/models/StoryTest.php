@@ -375,4 +375,9 @@ class StoryTest extends ActiveRecord
             ->all();
     }
 
+    public function getQuestionsNumber(): int
+    {
+        return count($this->storyTestQuestions);
+    }
+
 }

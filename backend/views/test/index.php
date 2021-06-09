@@ -12,9 +12,6 @@ use yii\grid\GridView;
 /* @var $source int */
 /* @var $sourceRecordsTotal int */
 $this->title = 'Тесты';
-$this->params['sidebarMenuItems'] = [
-    ['label' => 'Результаты тестов', 'url' => ['test/results']],
-];
 ?>
 <h1 class="page-header"><?= Html::encode($this->title) ?></h1>
 <p>
@@ -31,10 +28,6 @@ if (Yii::$app->user->can('admin') && $searchModel->isNeoTest()) {
         'div',
         Html::a('Очистить историю по всем тестам (' . ($sourceRecordsTotal === 0 ? 'нет записей' : $sourceRecordsTotal) . ')', ['history/clear-all-by-source', 'source' => $source], ['class' => 'btn btn-danger pull-right']),
         ['class' => 'clearfix', 'style' => 'padding: 20px 0 0 0']);
-    $js = <<< JS
-
-JS;
-    $this->registerJs($js);
 }
 
 $columns = [];
@@ -57,6 +50,12 @@ if ($searchModel->isNeoTest()) {
         'label' => 'Количество вариантов',
     ];
 }
+if (!$searchModel->isNeoTest() && !$searchModel->isWordList()) {
+    $columns[] = [
+        'attribute' => 'questionsNumber',
+        'label' => 'Вопросов',
+    ];
+}
 if (!$searchModel->isNeoTest()) {
     $columns[] = [
         'attribute' => 'answer_type',
@@ -65,6 +64,7 @@ if (!$searchModel->isNeoTest()) {
         },
         'filter' => AnswerType::asArray(),
     ];
+
 }
 $columns[] = [
     'attribute' => 'created_at',
