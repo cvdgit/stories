@@ -1,5 +1,4 @@
 <?php
-
 use common\helpers\Url;
 use common\models\StoryTest;
 use common\models\test\AnswerType;
