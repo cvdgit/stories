@@ -113,14 +113,14 @@ $columns[] = [
                 $urlParam['id'] = $model->parent_id;
                 $urlParam['#'] = $model->id;
             }
-            return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $urlParam);
+            return (new \backend\widgets\grid\UpdateButton($urlParam))();
         },
         'delete' => function($url, $model) {
             $id = $model->id;
             if ($model->isVariant()) {
                 $id = $model->parent_id;
             }
-            return Html::a('<span class="glyphicon glyphicon-trash"></span>', ['test/delete', 'id' => $id]);
+            return (new \backend\widgets\grid\DeleteButton(['test/delete', 'id' => $id]))();
         }
     ],
 ];

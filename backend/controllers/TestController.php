@@ -10,6 +10,7 @@ use common\models\StoryTest;
 use common\models\StoryTestAnswer;
 use common\models\StoryTestQuestion;
 use common\models\StoryTestResult;
+use common\models\test\SourceType;
 use common\rbac\UserRoles;
 use common\services\TestHistoryService;
 use Yii;
@@ -53,7 +54,7 @@ class TestController extends Controller
         ];
     }
 
-    public function actionIndex(int $source)
+    public function actionIndex(int $source = SourceType::TEST)
     {
         $searchModel = new TestSearch();
         $params = array_merge([], Yii::$app->request->queryParams);
