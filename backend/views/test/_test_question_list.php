@@ -49,7 +49,7 @@ use yii\helpers\Url;
                 'attribute' =>'name',
                 'format' => 'raw',
                 'value' => static function(StoryTestQuestion $model) {
-                    return Html::a($model->name, ['test/update-question', 'question_id' => $model->id], ['title' => 'Перейти к редактированию']);
+                    return Html::a($model->name, $model->getUpdateRoute(), ['title' => 'Перейти к редактированию']);
                 },
             ],
             [
@@ -68,14 +68,7 @@ use yii\helpers\Url;
                 'urlCreator' => function($action, $model, $key, $index) {
                     $url = '';
                     if ($action === 'update') {
-                        $route = ['test/update-question', 'question_id' => $model->id];
-                        if ($model->typeIsRegion()) {
-                            $route = ['question/update', 'id' => $model->id];
-                        }
-                        if ($model->typeIsSequence()) {
-                            $route = ['test/question-sequence/update', 'id' => $model->id];
-                        }
-                        $url = Url::to($route);
+                        $url = Url::to($model->getUpdateRoute());
                     }
                     if ($action === 'delete') {
                         $route = ['test/delete-question', 'question_id' => $model->id];
