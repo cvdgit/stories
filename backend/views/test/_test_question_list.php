@@ -45,7 +45,13 @@ use yii\helpers\Url;
                     return Html::tag('i', '', ['class' => $class, 'title' => $type->getTypeName()]);
                 },
             ],
-            'name',
+            [
+                'attribute' =>'name',
+                'format' => 'raw',
+                'value' => static function(StoryTestQuestion $model) {
+                    return Html::a($model->name, ['test/update-question', 'question_id' => $model->id], ['title' => 'Перейти к редактированию']);
+                },
+            ],
             [
                 'label' => 'Ответов',
                 'value' => static function(StoryTestQuestion $model) {

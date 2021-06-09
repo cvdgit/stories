@@ -43,7 +43,13 @@ $isNewRecord = $model instanceof \backend\models\question\CreateQuestion;
                         'dataProvider' => $dataProvider,
                         'options' => ['class' => 'table-responsive'],
                         'columns' => [
-                            'name',
+                            [
+                                'attribute' =>'name',
+                                'format' => 'raw',
+                                'value' => static function($model) {
+                                    return Html::a($model->name, ['test/update-answer', 'answer_id' => $model->id], ['title' => 'Перейти к редактированию']);
+                                },
+                            ],
                             'is_correct',
                             [
                                 'class' => ActionColumn::class,

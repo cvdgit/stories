@@ -1,4 +1,6 @@
 <?php
+
+use common\helpers\Url;
 use common\models\StoryTest;
 use common\models\test\AnswerType;
 use common\models\test\SourceType;
@@ -106,23 +108,25 @@ if (!$searchModel->isNeoTest()) {
 $columns[] = [
     'class' => 'yii\grid\ActionColumn',
     'template' => '{update} {delete}',
-    'buttons' => [
-        'update' => function($url, $model) {
+    'urlCreator' => static function($action, $model, $key, $index) {
+        $url = '';
+        if ($action === 'update') {
             $urlParam = ['test/update', 'id' => $model->id];
             if ($model->isVariant()) {
                 $urlParam['id'] = $model->parent_id;
                 $urlParam['#'] = $model->id;
             }
-            return (new \backend\widgets\grid\UpdateButton($urlParam))();
-        },
-        'delete' => function($url, $model) {
+            $url = Url::to($urlParam);
+        }
+        if ($action === 'delete') {
             $id = $model->id;
             if ($model->isVariant()) {
                 $id = $model->parent_id;
             }
-            return (new \backend\widgets\grid\DeleteButton(['test/delete', 'id' => $id]))();
+            $url = Url::to(['test/delete', 'id' => $id]);
         }
-    ],
+        return $url;
+    },
 ];
 
 echo GridView::widget([
