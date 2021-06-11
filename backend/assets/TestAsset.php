@@ -21,5 +21,6 @@ class TestAsset extends AssetBundle
         AppAsset::class,
         'yii\web\YiiAsset',
         SortableJsAsset::class,
+        MaphilightAsset::class,
     ];
 }
