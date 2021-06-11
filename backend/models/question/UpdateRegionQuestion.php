@@ -65,6 +65,19 @@ class UpdateRegionQuestion extends RegionQuestion
         $this->uploadImage($this->model);
 
         $regions = Json::decode($this->model->regions);
+
+        $regionWithAnswerID = array_filter($regions, static function($region) {
+            return isset($region['answer_id']) && !empty($region['answer_id']);
+        });
+        $answerIDs = array_map(static function($region) {
+            return $region['answer_id'];
+        }, $regionWithAnswerID);
+        foreach ($this->model->storyTestAnswers as $answer) {
+            if (!in_array($answer->id, $answerIDs, true)) {
+                $answer->delete();
+            }
+        }
+
         foreach ($regions as $i => $region) {
             $create = !isset($region['answer_id']) || empty($region['answer_id']);
             if ($create) {

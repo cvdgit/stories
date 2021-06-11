@@ -251,51 +251,79 @@
                 return answer.region_id === region;
             });
         };
+
+        this.createImageWrapper = function(imageParams, mapName) {
+            var $img = $('<img/>')
+                .attr('src', imageParams.image)
+                .attr('usemap', '#' + mapName)
+                .css({'position': 'absolute', 'left': 0, 'top': 0, 'width': '100%', 'height': '100%'});
+            return $('<div/>')
+                .addClass('question-region')
+                .css({'width': imageParams.imageWidth + 'px', 'height': imageParams.imageHeight + 'px', 'position': 'relative', 'margin': '0 auto'})
+                .append($img);
+        }
+
+        this.createMap = function(mapName) {
+            return $('<map/>', {'name': mapName});
+        }
+
+        this.createRegionsMap = function(regions, map, addIncorrectArea, width, height) {
+
+            addIncorrectArea = addIncorrectArea || false;
+
+            function createArea(shape, coords, id) {
+                var attrs = {
+                    'shape': shape,
+                    'coords': coords
+                };
+                if (id) {
+                    attrs['data-answer-id'] = id;
+                }
+                if (!addIncorrectArea) {
+                    attrs['data-maphilight'] = '{"strokeColor":"99cd50","strokeWidth":5,"fillColor":"99cd50","fillOpacity":0.2}';
+                }
+                return $('<area/>', attrs);
+            }
+
+            regions.forEach(function(region) {
+                var area;
+                if (region.type === 'rect' || !region['type']) {
+                    var x = parseInt(region.rect.left),
+                        y = parseInt(region.rect.top);
+                    area = createArea('rect', [x, y, parseInt(region.rect.width) + x, parseInt(region.rect.height) + y].join(','), region.id);
+                }
+                if (region.type === 'polyline') {
+                    var coords = [];
+                    region.polyline.forEach(function(point) {
+                        coords.push(point.join(','));
+                    });
+                    area = createArea('poly', coords.join(','), region.id);
+                }
+                if (region.type === 'circle') {
+                    area = createArea('circle', [region.circle.cx, region.circle.cy, region.circle.r].join(','), region.id)
+                }
+                area.appendTo(map);
+            });
+
+            if (addIncorrectArea) {
+                createArea('rect', [0, 0, width, height].join(',')).appendTo(map);
+            }
+        }
     }
 
     RegionQuestion.prototype.create = function(question, questionAnswers) {
-
         var params = question.params;
-
         var regionMapName = 'regions-' + question.id;
-        var $img = $('<img/>')
-            .attr('src', params.image)
-            .attr('usemap', '#' + regionMapName)
-            .css({'position': 'absolute', 'left': 0, 'top': 0, 'width': '100%', 'height': '100%'});
-
-        function getScale() {
-            var scale = 1;
-            if (window['Reveal']) {
-                scale = Reveal.getScale();
-            }
-            return scale;
-        }
-
         var that = this;
-
-        function processRegionAnswer(target) {
-            var regionID = target.attr('data-answer-id');
-            if (regionID) {
-                var answer = that.getAnswerByRegion(questionAnswers, regionID);
-                that.addAnswer(answer[0].id);
-            }
-            else {
-                that.addAnswer('no_correct_' + new Date().getTime());
-            }
-            if (that.getAnswers().length === parseInt(question.correct_number)) {
-                setTimeout(function() {
-                    that.test.nextQuestion(that.getAnswers());
-                    that.resetAnswers();
-                    $wrapper.find('span.answer-point').remove();
-                }, 500);
-            }
-        }
-
-        var $wrapper = $('<div/>')
-            .addClass('question-region')
-            .css({'width': params.imageWidth + 'px', 'height': params.imageHeight + 'px', 'position': 'relative', 'margin': '0 auto'})
-            .append($img)
+        var $wrapper = this.createImageWrapper(params, regionMapName)
             .on('click', function(e) {
+                function getScale() {
+                    var scale = 1;
+                    if (window['Reveal']) {
+                        scale = Reveal.getScale();
+                    }
+                    return scale;
+                }
                 var elem = $(e.target).parent()[0];
                 var zoom = getScale();
                 var clientRect = elem.getBoundingClientRect();
@@ -317,68 +345,48 @@
                         'top': rect.y,
                         'shape-outside': 'circle()',
                         'clip-path': 'circle()',
-                        'background': 'orangered',
+                        'background-color': '#3c763d',
                         'width': '20px',
                         'height': '20px',
                         'pointer-events': 'none'
                     })
                     .appendTo(this);
             });
-
-        var $map = $('<map/>', {'name': regionMapName});
-        $map.on('click', 'area', function() {
-            processRegionAnswer($(this));
-        });
-
-        function createArea(coords, id) {
-            var attrs = {
-                'shape': 'rect',
-                'coords': coords
-            };
-            if (id) {
-                attrs['data-answer-id'] = id;
-            }
-            return $('<area/>', attrs);
-        }
-
-        question.params.regions.forEach(function(region) {
-            var x = parseInt(region.rect.left),
-                y = parseInt(region.rect.top);
-            createArea([x, y, parseInt(region.rect.width) + x, parseInt(region.rect.height) + y].join(','), region.id)
-                .appendTo($map);
-        });
-        createArea([0, 0, params.imageWidth, params.imageHeight].join(','))
-            .appendTo($map);
-        $map.appendTo($wrapper);
-
+        var $map = this.createMap(regionMapName)
+            .appendTo($wrapper)
+            .on('click', 'area', function() {
+                var target = $(this);
+                var regionID = target.attr('data-answer-id');
+                if (regionID) {
+                    var answer = that.getAnswerByRegion(questionAnswers, regionID);
+                    that.addAnswer(answer[0].id);
+                }
+                else {
+                    that.addAnswer('no_correct_' + new Date().getTime());
+                }
+                if (that.getAnswers().length === parseInt(question.correct_number)) {
+                    setTimeout(function() {
+                        that.test.nextQuestion(that.getAnswers());
+                        that.resetAnswers();
+                        $wrapper.find('span.answer-point').remove();
+                    }, 500);
+                }
+            });
+        this.createRegionsMap(params.regions, $map, true, params.imageWidth, params.imageHeight);
         return $wrapper;
     };
 
     RegionQuestion.prototype.createSuccess = function(question) {
         var params = question.params;
-        var $img = $('<img/>')
-            .attr('src', params.image)
-            .css({'position': 'absolute', 'left': 0, 'top': 0, 'width': '100%', 'height': '100%'});
-        var $wrapper = $('<div/>')
-            .addClass('question-region')
-            .css({'width': params.imageWidth + 'px', 'height': params.imageHeight + 'px', 'position': 'relative', 'margin': '0 auto'})
-            .append($img);
-        params.regions.forEach(function(region) {
-            if (region.correct) {
-                $('<div/>')
-                    .addClass('answer-rect')
-                    .css({
-                        'position': 'absolute',
-                        'left': parseInt(region.rect.left) + 'px',
-                        'top': parseInt(region.rect.top) + 'px',
-                        'width': parseInt(region.rect.width) + 'px',
-                        'height': parseInt(region.rect.height) + 'px',
-                        'backgroundColor': 'rgba(153, 205, 80, 0.3)',
-                        'border': '3px #808080 solid'
-                    })
-                    .appendTo($wrapper);
-            }
+        var regionMapName = 'correct-regions-' + question.id;
+        var $wrapper = this.createImageWrapper(params, regionMapName);
+        var $map = this.createMap(regionMapName).appendTo($wrapper);
+
+        $wrapper.find('img').one('load', function(e) {
+            $(this).maphilight({alwaysOn: true});
         });
+
+        this.createRegionsMap(params.regions, $map);
         return $wrapper;
     };
 

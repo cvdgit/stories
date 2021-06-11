@@ -1,5 +1,4 @@
 <?php
-use backend\assets\TestQuestionAsset;
 use backend\models\question\QuestionType;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -12,7 +11,19 @@ $this->params['breadcrumbs'] = [
     ['label' => $testModel->title, 'url' => ['test/update', 'id' => $testModel->id]],
     $this->title,
 ];
-TestQuestionAsset::register($this);
+$css = <<< CSS
+.image-wrapper {
+    background-color: #f5f5f5;
+    padding: 10px;
+}
+.image-wrapper img:hover {
+    cursor: pointer;
+}
+.story-test-question-update .form-group {
+    margin-top: 20px;
+}
+CSS;
+$this->registerCss($css);
 ?>
 <div class="story-test-question-update">
     <h1><?= Html::encode($this->title) ?></h1>
@@ -25,22 +36,15 @@ TestQuestionAsset::register($this);
                 <?= $form->field($model, 'type')->dropDownList(QuestionType::asArray(), ['readonly' => true]) ?>
                 <?= $form->field($model, 'imageFile')->fileInput() ?>
                 <?= $form->field($model, 'regions')->hiddenInput()->label(false) ?>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
                 <?php if ($model->hasImage()): ?>
-                    <div id="image-region" style="position: relative; margin-bottom: 40px; width: <?= $model->getImageWidth() ?>px; height: <?= $model->getImageHeight() ?>px">
-                        <div style="position: absolute; left: 0; top: 0">
-                            <?= Html::img($model->getImageUrl() . '?t=' . time(), ['width' => '100%', 'height' => '100%']) ?>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="image-wrapper">
+                            <?= Html::img($model->getImageUrl() . '?t=' . time(), ['width' => '100%', 'data-toggle' => 'modal', 'data-target' => '#regions-modal']) ?>
                         </div>
                     </div>
+                </div>
                 <?php endif ?>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div id="region-table"></div>
                 <div class="form-group">
                     <?= Html::submitButton('Изменить вопрос', ['class' => 'btn btn-success']) ?>
                 </div>
@@ -49,8 +53,10 @@ TestQuestionAsset::register($this);
         <?php ActiveForm::end(); ?>
     </div>
 </div>
+<?= $this->render('_regions_modal', ['model' => $model]) ?>
 <?php
 $js = <<< JS
+/*
 var element = $('#updateregionquestion-regions');
 RegionQuestion.init(element.val());
 $('#update-region-question-form').on('beforeSubmit', function() {
@@ -64,6 +70,6 @@ RegionQuestion.addEventListener('onDeleteRegion', function(args) {
                 $('#update-region-question-form').submit();
             });
     }
-});
+});*/
 JS;
-$this->registerJs($js);
+//$this->registerJs($js);
