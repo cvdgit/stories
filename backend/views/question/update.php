@@ -38,6 +38,9 @@ $this->registerCss($css);
                 <?= $form->field($model, 'regions')->hiddenInput()->label(false) ?>
                 <?php if ($model->hasImage()): ?>
                 <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-info" role="alert" style="font-size:1.5rem;margin-bottom:2px">Кликните на изображение для перехода к редактированию областей</div>
+                    </div>
                     <div class="col-md-6">
                         <div class="image-wrapper">
                             <?= Html::img($model->getImageUrl() . '?t=' . time(), ['width' => '100%', 'data-toggle' => 'modal', 'data-target' => '#regions-modal']) ?>
@@ -54,22 +57,3 @@ $this->registerCss($css);
     </div>
 </div>
 <?= $this->render('_regions_modal', ['model' => $model]) ?>
-<?php
-$js = <<< JS
-/*
-var element = $('#updateregionquestion-regions');
-RegionQuestion.init(element.val());
-$('#update-region-question-form').on('beforeSubmit', function() {
-    element.val(RegionQuestion.getRegionsJson());
-    return true;
-});
-RegionQuestion.addEventListener('onDeleteRegion', function(args) {
-    if (args.answerID) {
-        $.get('/admin/index.php?r=question/delete-answer', {'id': args.answerID})
-            .done(function(response) {
-                $('#update-region-question-form').submit();
-            });
-    }
-});*/
-JS;
-//$this->registerJs($js);

@@ -160,6 +160,7 @@ function RegionsSVG(id, imageFile, shapeType, regions) {
                 if (currentShape) {
                     that.delete(currentShape.attr('id'));
                     that.resetCurrentShape().remove();
+                    currentShape = null;
                 }
             }
         };
@@ -235,13 +236,12 @@ function RegionsSVG(id, imageFile, shapeType, regions) {
         that.shapes.add(shape);
     });
 
-
     var currentShape = null;
 
     function addEventListeners() {
         that.draw
             .on('mousedown', function(event) {
-                console.log('mousedown');
+                //console.log('mousedown');
                 var target = SVG.adopt(event.target);
                 that.shapes.resetCurrentShape();
                 if (target.type === 'rect' || target.type === 'circle' || target.type === 'polyline') {
@@ -254,12 +254,12 @@ function RegionsSVG(id, imageFile, shapeType, regions) {
             })
             .on('mousemove', function(event) {
                 if (that.shapeType.isPolyline() && currentShape) {
-                    console.log('mousemove');
+                    //console.log('mousemove');
                     currentShape.draw('point', event);
                 }
             })
             .on('mouseup', function(event) {
-                console.log('mouseup');
+                //console.log('mouseup');
 
                 if (currentShape === null) {
                     return;

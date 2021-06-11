@@ -19,6 +19,7 @@ body .modal-dialog {
 }
 .image-container-wrapper {
     min-height: 500px;
+    min-width: 800px;
 }
 CSS;
 $this->registerCss($css);
@@ -34,7 +35,7 @@ TestQuestionAsset::register($this);
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <div class="btn-group" id="select-shapes" data-toggle="buttons" style="margin-bottom: 20px">
                             <label class="btn btn-default active">
                                 <input type="radio" name="shape" value="rect" autocomplete="off" checked> Прямоугольник
@@ -46,6 +47,9 @@ TestQuestionAsset::register($this);
                                 <input type="radio" name="shape" value="polyline" autocomplete="off"> Линия
                             </label>
                         </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="alert alert-info" role="alert" style="font-size:1.5rem;margin-bottom:2px">Для удаления области, выделите ее и нажмите DEL</div>
                     </div>
                 </div>
                 <div class="image-container-wrapper">
@@ -114,6 +118,7 @@ $js = <<< JS
     $('#save-regions', modal).on('click', function() {
         modal.modal('hide');
         element.val(JSON.stringify(regionSVG.getRegions()));
+        $('#update-region-question-form').submit();
     });
 JS;
 $this->registerJs($js);
