@@ -13,6 +13,7 @@ class SvgAsset extends AssetBundle
         'svg.draw.js',
         'svg.select.js',
         'svg.resize.js',
+        'svg.draggable.min.js',
     ];
     public $css = [
         'svg.select.css',

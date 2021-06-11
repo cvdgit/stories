@@ -168,14 +168,17 @@ function RegionsSVG(id, imageFile, shapeType, regions) {
             currentShape = shape;
             currentShape
                 .selectize({rotationPoint: false})
-                .resize();
+                .resize()
+                .draggable();
             document.addEventListener('keydown', deleteCurrentShapeListener);
         };
         this.resetCurrentShape = function() {
             if (currentShape === null) {
                 return;
             }
-            currentShape.selectize(false);
+            currentShape
+                .selectize(false)
+                .draggable(false);
             document.removeEventListener('keydown', deleteCurrentShapeListener);
             return currentShape;
         };
