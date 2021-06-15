@@ -5,6 +5,7 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model backend\models\question\UpdateRegionQuestion */
 /** @var $testModel common\models\StoryTest */
+/** @var $errorText string */
 $this->title = 'Изменить вопрос';
 $this->params['breadcrumbs'] = [
     ['label' => 'Тесты', 'url' => ['test/index', 'source' => $testModel->source]],
@@ -27,6 +28,14 @@ $this->registerCss($css);
 ?>
 <div class="story-test-question-update">
     <h1><?= Html::encode($this->title) ?></h1>
+    <?php if ($errorText !== ''): ?>
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span>&times;</span>
+            </button>
+            <?= Html::encode($errorText) ?>
+        </div>
+    <?php endif ?>
     <div class="story-test-form">
         <?php $form = ActiveForm::begin(['id' => 'update-region-question-form']); ?>
         <div class="row">

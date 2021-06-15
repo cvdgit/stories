@@ -74,6 +74,7 @@ class QuestionSequenceController extends Controller
         return $this->render('update', [
             'model' => $form,
             'testModel' => $model->storyTest,
+            'errorText' => $model->getAnswersErrorText(),
         ]);
     }
 

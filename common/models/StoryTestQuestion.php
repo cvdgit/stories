@@ -244,4 +244,48 @@ class StoryTestQuestion extends ActiveRecord
         return $route;
     }
 
+    public function checkAnswersData(): bool
+    {
+        $answers = $this->storyTestAnswers;
+        if (count($answers) === 0) {
+            throw new DomainException('В вопросе нет ответов');
+        }
+        $correctAnswers = $this->getCorrectAnswers();
+        if (count($correctAnswers) === 0) {
+            throw new DomainException('В вопросе нет правильных ответов');
+        }
+
+        $questionType = $this->getQuestionType();
+        if ($questionType->isSingle() && count($correctAnswers) > 1) {
+            throw new DomainException('В вопросе должен быть только один правильный ответ');
+        }
+        if ($questionType->isMultiple() && count($correctAnswers) === 1) {
+            throw new DomainException('Тип вопроса должен быть "Один ответ"');
+        }
+        return true;
+    }
+
+    public function isCorrectData(): bool
+    {
+        try {
+            $this->checkAnswersData();
+            return true;
+        }
+        catch (\Exception $ex) {
+
+        }
+        return false;
+    }
+
+    public function getAnswersErrorText(): string
+    {
+        try {
+            $this->checkAnswersData();
+        }
+        catch (\Exception $ex) {
+            return $ex->getMessage();
+        }
+        return '';
+    }
+
 }

@@ -4,7 +4,7 @@ use yii\helpers\Html;
 /** @var $model common\models\StoryTestAnswer */
 /** @var $answerImageModel backend\models\AnswerImageUploadForm */
 $this->title = 'Изменить ответ';
-$this->params['sidebarMenuItems'] = [
+$this->params['breadcrumbs'] = [
     ['label' => $model->storyQuestion->storyTest->title, 'url' => ['test/update', 'id' => $model->storyQuestion->storyTest->id]],
     ['label' => $model->storyQuestion->name, 'url' => ['test/update-question', 'question_id' => $model->storyQuestion->id]],
 ];

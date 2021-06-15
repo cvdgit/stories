@@ -24,6 +24,13 @@ use yii\helpers\Url;
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'options' => ['class' => 'table-responsive'],
+        'rowOptions' => static function(StoryTestQuestion $model, $key, $index, $grid) {
+            $options = [];
+            if (!$model->isCorrectData()) {
+                $options['class'] = 'danger';
+            }
+            return $options;
+        },
         'columns' => [
             [
                 'format' => 'raw',

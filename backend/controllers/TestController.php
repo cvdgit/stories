@@ -157,6 +157,7 @@ class TestController extends Controller
             'model' => $model,
             'dataProvider' => $model->getAnswersDataProvider(),
             'testModel' => $question->storyTest,
+            'errorText' => $question->getAnswersErrorText(),
         ]);
     }
 
