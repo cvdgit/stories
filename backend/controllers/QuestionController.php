@@ -138,4 +138,17 @@ class QuestionController extends Controller
         return $this->redirect(['test/update-question', 'question_id' => $model->id]);
     }
 
+    public function actionCopy(int $id)
+    {
+        $question = $this->findModel($id);
+        $copyQuestion = new StoryTestQuestion();
+        $copyQuestion->attributes = $question->attributes;
+        if ($copyQuestion->typeIsRegion()) {
+            $copyQuestion->regions = null;
+        }
+        $copyQuestion->save();
+        Yii::$app->session->addFlash('success', 'Вопрос успешно скопирован');
+        return $this->redirect(['test/update-question', 'question_id' => $copyQuestion->id]);
+    }
+
 }

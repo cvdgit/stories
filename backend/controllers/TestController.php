@@ -140,6 +140,14 @@ class TestController extends Controller
     public function actionUpdateQuestion(int $question_id)
     {
         $question = StoryTestQuestion::findModel($question_id);
+
+        if ($question->typeIsRegion()) {
+            return $this->redirect(['question/update', 'id' => $question->id]);
+        }
+        if ($question->typeIsSequence()) {
+            return $this->redirect(['test/question-sequence/update', 'id' => $question->id]);
+        }
+
         $model = new UpdateQuestion($question);
         if ($model->load(Yii::$app->request->post())) {
             $model->update();

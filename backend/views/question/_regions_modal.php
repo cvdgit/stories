@@ -21,6 +21,9 @@ body .modal-dialog {
     min-height: 500px;
     min-width: 800px;
 }
+#regions-modal .alert {
+    padding: 6px;
+}
 CSS;
 $this->registerCss($css);
 SvgAsset::register($this);
@@ -35,7 +38,7 @@ TestQuestionAsset::register($this);
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-5">
                         <div class="btn-group" id="select-shapes" data-toggle="buttons" style="margin-bottom: 20px">
                             <label class="btn btn-default active">
                                 <input type="radio" name="shape" value="rect" autocomplete="off" checked> Прямоугольник
@@ -48,7 +51,7 @@ TestQuestionAsset::register($this);
                             </label>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-7">
                         <div class="alert alert-info" role="alert" style="font-size:1.5rem;margin-bottom:2px">Для удаления области, выделите ее и нажмите DEL</div>
                     </div>
                 </div>

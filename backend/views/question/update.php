@@ -50,6 +50,7 @@ $this->registerCss($css);
                 <?php endif ?>
                 <div class="form-group">
                     <?= Html::submitButton('Изменить вопрос', ['class' => 'btn btn-success']) ?>
+                    <?= Html::a('Копировать вопрос', ['question/copy', 'id' => $model->getModelID()], ['class' => 'btn btn-default', 'style' => 'margin-left: 20px']) ?>
                 </div>
             </div>
         </div>

@@ -235,12 +235,12 @@ class StoryTestQuestion extends ActiveRecord
     public function getUpdateRoute(): array
     {
         $route = ['test/update-question', 'question_id' => $this->id];
-        if ($this->typeIsRegion()) {
+        /*if ($this->typeIsRegion()) {
             $route = ['question/update', 'id' => $this->id];
         }
         if ($this->typeIsSequence()) {
             $route = ['test/question-sequence/update', 'id' => $this->id];
-        }
+        }*/
         return $route;
     }
 
