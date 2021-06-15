@@ -10,6 +10,7 @@ $this->params['breadcrumbs'] = [
     $this->title,
 ];
 TestAsset::register($this);
+//SortableJsAsset::register($this);
 ?>
 <div class="story-test-update">
     <?php $runTestLink = Html::a('<i class="glyphicon glyphicon-expand"></i>', Yii::$app->urlManagerFrontend->createAbsoluteUrl(['test/view', 'id' => $model->id]), ['id' => 'run-test', 'title' => 'Запустить тест']) ?>
@@ -101,5 +102,19 @@ $('#run-test-modal').on('hide.bs.modal', function() {
     $(this).removeData('bs.modal');
     $(this).find('.modal-content').html('');
 });
+
+Sortable.create($('#questions-grid tbody')[0], {
+    ghostClass: 'wikids-sortable-ghost',
+    handle: 'tr',
+    onUpdate: function() {
+        var ids = [];
+        $('#questions-grid tbody tr[data-key]').each(function(i, elem) {
+            ids.push($(elem).data('key'));
+        });
+        $('#storytest-sortable').val(ids.join(','));
+    }
+});
+
+
 JS;
 $this->registerJs($js);

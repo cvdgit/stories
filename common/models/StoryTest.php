@@ -56,6 +56,8 @@ class StoryTest extends ActiveRecord
     public $question_list = [];
     public $question_number;
 
+    public $sortable;
+
     /**
      * {@inheritdoc}
      */
@@ -82,7 +84,7 @@ class StoryTest extends ActiveRecord
             [['shuffle_word_list'], 'integer'],
             [['title', 'question_list_name', 'header', 'question_params', 'incorrect_answer_text', 'input_voice', 'recording_lang', 'ask_question_lang'], 'string', 'max' => 255],
             [['description_text'], 'string'],
-            [['question_list'], 'safe'],
+            [['question_list', 'sortable'], 'safe'],
         ];
     }
 
@@ -124,7 +126,8 @@ class StoryTest extends ActiveRecord
      */
     public function getStoryTestQuestions()
     {
-        return $this->hasMany(StoryTestQuestion::class, ['story_test_id' => 'id']);
+        return $this->hasMany(StoryTestQuestion::class, ['story_test_id' => 'id'])
+            ->orderBy(['order' => SORT_ASC]);
     }
 
     private static function createRemoteTestQuery(): Query
@@ -299,6 +302,7 @@ class StoryTest extends ActiveRecord
             }, $filter);
             $query->andFilterWhere(['not in', 'id', $ids]);
         }
+        $query->orderBy(['order' => SORT_ASC]);
         return $query->all();
     }
 
@@ -378,6 +382,15 @@ class StoryTest extends ActiveRecord
     public function getQuestionsNumber(): int
     {
         return count($this->storyTestQuestions);
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        if ($this->sortable !== null) {
+            StoryTestQuestion::updateQuestionsOrder($this->id, explode(',', $this->sortable));
+        }
+
+        parent::afterSave($insert, $changedAttributes);
     }
 
 }

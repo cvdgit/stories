@@ -23,7 +23,7 @@ use yii\helpers\Url;
     <h4>Вопросы теста</h4>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
-        'options' => ['class' => 'table-responsive'],
+        'options' => ['class' => 'table-responsive', 'id' => 'questions-grid'],
         'rowOptions' => static function(StoryTestQuestion $model, $key, $index, $grid) {
             $options = [];
             if (!$model->isCorrectData()) {
@@ -71,12 +71,9 @@ use yii\helpers\Url;
             ],
             [
                 'class' => ActionColumn::class,
-                'template' => '{update} {delete}',
+                'template' => '{delete}',
                 'urlCreator' => function($action, $model, $key, $index) {
                     $url = '';
-                    if ($action === 'update') {
-                        $url = Url::to($model->getUpdateRoute());
-                    }
                     if ($action === 'delete') {
                         $route = ['test/delete-question', 'question_id' => $model->id];
                         if ($model->typeIsRegion()) {

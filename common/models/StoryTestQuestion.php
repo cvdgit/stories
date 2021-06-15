@@ -6,6 +6,7 @@ use backend\models\question\QuestionType;
 use backend\models\question\region\RegionImage;
 use DomainException;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
+use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
@@ -286,6 +287,20 @@ class StoryTestQuestion extends ActiveRecord
             return $ex->getMessage();
         }
         return '';
+    }
+
+    public static function updateQuestionsOrder(int $testID, array $orders): void
+    {
+        if (count($orders) === 0) {
+            return;
+        }
+        $command = Yii::$app->db->createCommand();
+        $order = 1;
+        foreach ($orders as $questionID) {
+            $command->update(self::tableName(), ['order' => $order], 'id = :id AND story_test_id = :test', [':id' => $questionID, ':test' => $testID]);
+            $command->execute();
+            $order++;
+        }
     }
 
 }

@@ -42,6 +42,7 @@ use yii\widgets\ActiveForm;
     </div>
 
     <div class="form-group">
+        <?= $form->field($model, 'sortable')->hiddenInput()->label(false) ?>
         <?= Html::submitButton(($model->isNewRecord ? 'Создать' : 'Изменить') . ' тест', ['class' => 'btn btn-success']) ?>
         <?= Html::a('История прохождения', ['/history/list', 'test_id' => $model->id], ['class' => 'btn']) ?>
     </div>
