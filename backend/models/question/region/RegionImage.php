@@ -20,7 +20,7 @@ class RegionImage
         $this->model = $model;
 
         $imagePath = $this->getImagePath();
-        if ($imagePath !== '') {
+        if ($imagePath !== '' && file_exists($imagePath)) {
             [$this->width, $this->height] = getimagesize($imagePath);
         }
     }
