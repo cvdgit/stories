@@ -1,4 +1,5 @@
 <?php
+use common\models\test\AnswerType;
 use common\models\test\SourceType;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -26,20 +27,24 @@ use yii\widgets\ActiveForm;
         <?= $form->field($model, 'shuffle_word_list')->checkbox() ?>
     </div>
 
-    <?= $form->field($model, 'answer_type')->dropDownList(\common\models\test\AnswerType::asArray()) ?>
+    <?= $form->field($model, 'answer_type')->dropDownList(AnswerType::asArray()) ?>
 
-    <div class="answer-block" data-block-type="<?= \common\models\test\AnswerType::INPUT ?>" style="display: <?= $model->isAnswerTypeInput() ? 'block' : 'none' ?>">
-        <?= $form->field($model, 'strict_answer')->checkbox() ?>
-        <?= $form->field($model, 'input_voice')->dropDownList(\backend\models\test\InputVoice::asArray()) ?>
-    </div>
+    <?php
+    $options = ['disabled' => true];
+    $askQuestionField = $form->field($model, 'ask_question')->checkbox($options);
+    $askQuestionLangField = $form->field($model, 'ask_question_lang')->dropDownList(\backend\models\test\InputVoice::asArray(), $options);
+    $strictAnswerField = $form->field($model, 'strict_answer')->checkbox($options);
+    $inputVoiceField = $form->field($model, 'input_voice')->dropDownList(\backend\models\test\InputVoice::asArray(), $options);
+    $recordingLangField = $form->field($model, 'recording_lang')->dropDownList(\backend\models\test\RecorderLang::asArray(), $options);
+    $rememberAnswersField = $form->field($model, 'remember_answers')->checkbox($options);
+    $answerBlockOptions = static function(string $type) {
+        return ['class' => 'answer-block hide', 'data-block-type' => $type];
+    }
+    ?>
 
-    <div class="answer-block" data-block-type="<?= \common\models\test\AnswerType::RECORDING ?>" style="display: <?= $model->isAnswerTypeRecording() ? 'block' : 'none' ?>">
-        <?= $form->field($model, 'recording_lang')->dropDownList(\backend\models\test\RecorderLang::asArray()) ?>
-        <?= $form->field($model, 'input_voice')->dropDownList(\backend\models\test\InputVoice::asArray()) ?>
-        <?= $form->field($model, 'remember_answers')->checkbox() ?>
-        <?= $form->field($model, 'ask_question')->checkbox() ?>
-        <?= $form->field($model, 'ask_question_lang')->dropDownList(\backend\models\test\InputVoice::asArray()) ?>
-    </div>
+    <?= Html::tag('div', $askQuestionField . $askQuestionLangField, $answerBlockOptions(AnswerType::DEFAULT)) ?>
+    <?= Html::tag('div', $strictAnswerField . $inputVoiceField, $answerBlockOptions(AnswerType::INPUT)) ?>
+    <?= Html::tag('div', $recordingLangField . $inputVoiceField . $rememberAnswersField . $askQuestionField . $askQuestionLangField, $answerBlockOptions(AnswerType::RECORDING)) ?>
 
     <div class="form-group">
         <?= $form->field($model, 'sortable')->hiddenInput()->label(false) ?>
@@ -115,11 +120,17 @@ $('#storytest-question_list').on('change', function() {
 });
 
 $('#storytest-answer_type').on('change', function() {
+    $('.answer-block')
+        .addClass('hide')
+        .find('input, select')
+        .prop('disabled', true);
     var block = $('div[data-block-type=' + this.value + ']');
-    $('.answer-block').hide();
     if (block.length) {
-        block.show();
+        block
+            .removeClass('hide')
+            .find('input, select')
+            .prop('disabled', false);
     }
-});
+}).change();
 JS;
 $this->registerJs($js);

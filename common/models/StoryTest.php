@@ -276,6 +276,11 @@ class StoryTest extends ActiveRecord
         return (int) $this->answer_type === AnswerType::NUMPAD;
     }
 
+    public function isAnswerTypeDefault(): bool
+    {
+        return $this->answer_type === AnswerType::DEFAULT;
+    }
+
     public function isAnswerTypeInput()
     {
         return (int) $this->answer_type === AnswerType::INPUT;

@@ -1091,19 +1091,9 @@
             class: 'list-group'
         });
 
-/*        function checkResult(result) {
-            return test.checkAnswerCorrect(test.getCurrentQuestion(), result);
-        }*/
-
         Sortable.create($list[0], {
             ghostClass: 'wikids-sortable-ghost',
             handle: '.wikids-sortable-handle'
-/*            onUpdate: function(e) {
-                var answers = getAnswerIDs(e.srcElement);
-                if (checkResult(answers)) {
-                    test.nextQuestion(answers);
-                }
-            }*/
         });
 
         this.createAnswer = function(answers) {
@@ -2043,6 +2033,28 @@
                 .addClass('question-title')
                 .append(questionName);
 
+            if (testConfig.answerTypeIsDefault() && testConfig.isAskQuestion()) {
+                $('<span/>', {'css': {'line-height': '3.5rem', 'margin-left': '10px', 'color': '#000', 'cursor': 'pointer'}, 'title': 'Прослушать'})
+                    .on('click', function() {
+                        var $this = $(this);
+                        if ($this.data('process')) {
+                            return false;
+                        }
+                        $this.data('process', true);
+                        var text = question.name;
+                        var i = $(this).find('i');
+                        i.removeClass('glyphicon-volume-up').addClass('glyphicon-option-horizontal');
+                        setTimeout(function() {
+                            speech.readText(text, testConfig.getAskQuestionLang(), function() {
+                                i.removeClass('glyphicon-option-horizontal').addClass('glyphicon-volume-up');
+                                $this.data('process', false);
+                            });
+                        }, 500);
+                    })
+                    .append($('<i/>', {'class': 'glyphicon glyphicon-volume-up'}))
+                    .appendTo(titleElement);
+            }
+
             var stars = '';
             if (question['stars']) {
                 stars = createStars(question.stars);
@@ -2795,6 +2807,15 @@
                 }
                 else {
                     that.recordingAnswer.autoStart(new Event('autoStart'));
+                }
+            }
+
+            if (testConfig.answerTypeIsDefault()) {
+                if (testConfig.isAskQuestion()) {
+                    var text = currentQuestion.name;
+                    setTimeout(function() {
+                        speech.readText(text, testConfig.getAskQuestionLang());
+                    }, 500);
                 }
             }
         }
