@@ -2,6 +2,7 @@
 
 namespace backend\controllers\editor;
 
+use backend\components\BaseController;
 use backend\models\editor\BaseForm;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
@@ -11,14 +12,15 @@ use backend\models\editor\TextForm;
 use backend\models\editor\TransitionForm;
 use backend\models\editor\VideoForm;
 use backend\services\StoryEditorService;
+use common\models\StorySlide;
 use common\rbac\UserRoles;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
-use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
-class UpdateBlockController extends Controller
+class UpdateBlockController extends BaseController
 {
 
     private $editorService;
@@ -94,10 +96,11 @@ class UpdateBlockController extends Controller
     private function updateBlock(BaseForm $form)
     {
         if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-            $this->editorService->updateBlock($form);
-            return ['success' => true, 'slide_id' => $form->slide_id];
+            $slideModel = $this->findModel(StorySlide::class, $form->slide_id);
+            $html = $this->editorService->updateBlock($form);
+            $form->afterUpdate($slideModel);
+            return ['success' => true, 'block_id' => $form->block_id, 'html' => $html];
         }
         return $form->getErrors();
     }
-
 }

@@ -1,9 +1,6 @@
 <?php
 
-
 namespace backend\components\story\writer\HTML\elements;
-
-
 
 class HeaderElement extends AbstractElement
 {
@@ -12,5 +9,4 @@ class HeaderElement extends AbstractElement
     protected $attributes = [
         'style' => 'font-size: 3em;',
     ];
-
 }

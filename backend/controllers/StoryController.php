@@ -9,6 +9,7 @@ use backend\services\StoryEditorService;
 use Exception;
 use Yii;
 use yii\db\Query;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -81,21 +82,7 @@ class StoryController extends Controller
                 $model->cover = $coverUploadForm->upload($model->cover);
             }
 
-            if ($model->source_id == Story::SOURCE_SLIDESCOM) {
-                $model->story_file = $model->source_dropbox;
-            }
-
-            if ($model->source_id == Story::SOURCE_POWERPOINT) {
-                $fileUploadForm->storyFile = UploadedFile::getInstance($fileUploadForm, 'storyFile');
-                if ($fileUploadForm->storyFile !== null) {
-                    if ($fileUploadForm->upload()) {
-                        $model->story_file = $fileUploadForm->storyFile;
-                    }
-                    else {
-                        print_r($fileUploadForm->getErrors());
-                    }
-                }
-            }
+            $fileUploadForm->uploadFile($model);
 
             $model->categories = explode(',', $model->story_categories);
             if ($model->story_playlists) {
@@ -155,10 +142,6 @@ class StoryController extends Controller
         $powerPointForm->storyFile = $model->story_file;
         $powerPointForm->slidesNumber = $model->slides_number;
 
-        $dropboxForm = new SourceDropboxForm();
-        $dropboxForm->storyId = $model->id;
-        $dropboxForm->storyFile = $model->story_file;
-
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 
             $coverUploadForm->coverFile = UploadedFile::getInstance($coverUploadForm, 'coverFile');
@@ -166,21 +149,7 @@ class StoryController extends Controller
                 $model->cover = $coverUploadForm->upload($model->cover);
             }
 
-            if ($model->source_id == Story::SOURCE_SLIDESCOM) {
-                $model->story_file = $model->source_dropbox;
-            }
-
-            if ($model->source_id == Story::SOURCE_POWERPOINT) {
-                $fileUploadForm->storyFile = UploadedFile::getInstance($fileUploadForm, 'storyFile');
-                if ($fileUploadForm->storyFile !== null) {
-                    if ($fileUploadForm->upload()) {
-                        $model->story_file = $fileUploadForm->storyFile;
-                    }
-                    else {
-                        print_r($fileUploadForm->getErrors());
-                    }
-                }
-            }
+            $fileUploadForm->uploadFile($model);
 
             $model->categories = explode(',', $model->story_categories);
 
@@ -191,19 +160,20 @@ class StoryController extends Controller
             $model->save(false);
             Yii::$app->session->setFlash('success', 'Изменения успешно сохранены');
 
-            $powerPointForm->storyFile = $model->story_file;
-            $dropboxForm->storyFile = $model->story_file;
+            //$powerPointForm->storyFile = $model->story_file;
+            return $this->refresh();
         }
 
         $wordListModel = new WordListFromStoryForm();
         $wordListModel->story_id = $model->id;
+
+        Yii::$app->getUser()->setReturnUrl(Url::canonical());
 
         return $this->render('update', [
             'model' => $model,
             'coverUploadForm' => $coverUploadForm,
             'fileUploadForm' => $fileUploadForm,
             'powerPointForm' => $powerPointForm,
-            'dropboxForm' => $dropboxForm,
             'wordListModel' => $wordListModel,
         ]);
     }
@@ -245,18 +215,24 @@ class StoryController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
         $model = new SourcePowerPointForm();
         if ($model->load(Yii::$app->request->post())) {
-            $this->service->importStoryFromPowerPoint($model);
+            $storyModel = $this->findModel($model->storyId);
+            $this->service->importStoryFromPowerPoint($storyModel);
         }
         return ['success' => true];
     }
 
     public function actionDownload($id)
     {
-        $model = $this->findModel($id);
-        // TODO: перенести определение пути до файла в сервис
-        $file = Yii::getAlias('@public') . '/slides_file/' . $model->story_file;
-        if (file_exists($file)) {
-            Yii::$app->response->sendFile($file);
+        try {
+            $model = $this->findModel($id);
+            $file = $model->getStoryFilePath();
+            if (file_exists($file)) {
+                Yii::$app->response->sendFile($file);
+            }
+        }
+        catch (Exception $ex) {
+            Yii::$app->session->setFlash('error', $ex->getMessage());
+            return $this->goBack();
         }
     }
 

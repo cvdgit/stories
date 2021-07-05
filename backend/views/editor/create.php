@@ -3,6 +3,7 @@ use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 /** @var $model backend\models\editor\BaseForm */
 /** @var $action array */
+/** @var $widgetStoryModel common\models\Story */
 ?>
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -10,7 +11,7 @@ use yii\helpers\Html;
 </div>
 <?php $form = ActiveForm::begin(['id' => 'block-form', 'action' => $action]); ?>
 <div class="modal-body">
-    <?= $this->render($model->view, ['form' => $form, 'model' => $model]) ?>
+    <?= $this->render($model->view, ['form' => $form, 'model' => $model, 'widgetStoryModel' => $widgetStoryModel]) ?>
 </div>
 <div class="modal-footer">
     <?= $form->field($model, 'slide_id')->hiddenInput()->label(false) ?>
@@ -34,7 +35,7 @@ $('#block-form')
         })
         .done(function(response) {
             if (response && response.success) {
-                StoryEditor.addSlideBlock(response.html);
+                StoryEditor.createSlideBlock(response.html);
             }
             else {
                 toastr.error(response.errors);
@@ -43,7 +44,6 @@ $('#block-form')
         .always(function() {
             $('#create-block-modal').modal('hide');
         });
- 
         return false;
     })
     .on('submit', function(e) {

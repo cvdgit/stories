@@ -1,30 +1,22 @@
 <?php
 
-
 namespace backend\models\editor;
 
-
-use yii\base\Model;
-
-class ImageFromUrlForm extends Model
+class ImageFromUrlForm extends ImageForm
 {
-
-    public $url;
-    public $story_id;
 
     public function rules()
     {
-        return [
+        return array_merge(parent::rules(), [
+            ['url', 'required'],
             ['url', 'url'],
-            ['story_id', 'integer'],
-        ];
+        ]);
     }
 
     public function attributeLabels()
     {
-        return [
+        return array_merge(parent::attributeLabels(), [
             'url' => 'Ссылка на изображение',
-        ];
+        ]);
     }
-
 }

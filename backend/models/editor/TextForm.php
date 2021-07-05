@@ -1,33 +1,24 @@
 <?php
 
-
 namespace backend\models\editor;
-
 
 class TextForm extends BaseForm
 {
 
     public $text;
-    public $text_size;
 
-    public function rules(): array
+    public function rules()
     {
-        $rules = parent::rules();
-        $rules = array_merge($rules, [
-            //[['text', 'text_size'], 'required'],
-            [['text', 'text_size'], 'string'],
+        return array_merge(parent::rules(), [
+            [['text'], 'required'],
+            [['text'], 'string'],
         ]);
-        return $rules;
     }
 
-    public function attributeLabels(): array
+    public function attributeLabels()
     {
-        $labels = parent::attributeLabels();
-        $labels = array_merge($labels, [
+        return array_merge(parent::attributeLabels(), [
             'text' => 'Текст слайда',
-            'text_size' => 'Размер шрифта',
         ]);
-        return $labels;
     }
-
 }

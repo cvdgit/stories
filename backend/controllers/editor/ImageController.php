@@ -1,17 +1,17 @@
 <?php
 
-
 namespace backend\controllers\editor;
 
-
+use backend\components\BaseController;
+use backend\components\image\EditorImage;
 use backend\components\story\AbstractBlock;
 use backend\components\story\ImageBlock;
 use backend\components\story\reader\HTMLReader;
 use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\writer\HTMLWriter;
 use backend\models\editor\CropImageForm;
+use backend\models\editor\ImageForm;
 use backend\models\editor\ImageFromUrlForm;
-use backend\models\ImageForm;
 use backend\services\ImageService;
 use backend\services\StoryEditorService;
 use common\helpers\StoryHelper;
@@ -19,14 +19,16 @@ use common\models\Story;
 use common\models\StorySlide;
 use common\models\StorySlideImage;
 use common\rbac\UserRoles;
+use Imagine\Image\ManipulatorInterface;
 use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\FileHelper;
-use yii\web\Controller;
+use yii\imagine\Image;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\UploadedFile;
 
-class ImageController extends Controller
+class ImageController extends BaseController
 {
 
     protected $imageService;
@@ -60,7 +62,7 @@ class ImageController extends Controller
         return parent::beforeAction($action);
     }
 
-    public function actionList(int $story_id)
+    /*public function actionList(int $story_id)
     {
         $model = Story::findModel($story_id);
         $reader = new HTMLReader($model->slidesData(true));
@@ -74,30 +76,27 @@ class ImageController extends Controller
             }
         }
         return $images;
-    }
+    }*/
 
+    /**
     public function actionCreate(int $slide_id, string $image)
     {
-
         $model = StorySlide::findSlide($slide_id);
         $reader = new HtmlSlideReader($model->data);
         $slide = $reader->load();
-
-        /** @var $block ImageBlock */
         $block = $slide->createBlock(['class' => ImageBlock::class]);
         $block->setFilePath($image);
         $slide->addBlock($block);
-
         $writer = new HTMLWriter();
         $html = $writer->renderSlide($slide);
-
         $model->data = $html;
         $model->save(false, ['data']);
-
         return ['success' => true];
     }
+     */
 
-    public function actionSet()
+
+    /*public function actionSet()
     {
         $form = new ImageForm();
         $result = ['success' => false, 'errors' => [], 'image' => []];
@@ -121,30 +120,16 @@ class ImageController extends Controller
         }
 
         return $result;
-    }
+    }*/
 
-    public function actionGetUsedCollections(int $story_id)
+    /*public function actionGetUsedCollections(int $story_id)
     {
         $model = Story::findModel($story_id);
         return [
             'success' => true,
             'result' => StorySlideImage::usedCollections($model->id),
         ];
-    }
-
-    public function actionUpdate(int $id)
-    {
-        Yii::$app->response->format = Response::FORMAT_HTML;
-        $model = new ImageForm();
-        $model->loadModel($id);
-        //if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-        //    $model->saveVideo();
-        //    return $this->refresh();
-        //}
-        return $this->render('update', [
-            'model' => $model,
-        ]);
-    }
+    }*/
 
     public function actionDelete(int $id)
     {
@@ -159,10 +144,30 @@ class ImageController extends Controller
 
     public function actionGetImages(int $story_id)
     {
-        $model = Story::findModel($story_id);
+        $model = $this->findModel(Story::class, $story_id);
+        $imageIDs = array_map(static function($item) {
+            return $item['id'];
+        }, StorySlideImage::storyImages($model->id));
+        $models = StorySlideImage::findAll(['id' => $imageIDs]);
+        $result = [];
+        foreach ($models as $model) {
+            $thumbUrl = $model->getImageThumbPath();
+            $thumbPath = $model->getImageThumbPath(true);
+            if (!file_exists($thumbPath)) {
+                Image::thumbnail($model->getImagePath(), 200, 200, ManipulatorInterface::THUMBNAIL_INSET)
+                    ->save($thumbPath, ['quality' => 100]);
+            }
+            $resultItem = [
+                'id' => $model->id,
+                'url' => $model->imageUrl(),
+                'thumb_url' => $thumbUrl,
+                'label' => $model->getImageName(),
+            ];
+            $result[] = $resultItem;
+        }
         return [
             'success' => true,
-            'result' => StorySlideImage::storyImages($model->id),
+            'result' => $result,
         ];
     }
 
@@ -242,23 +247,37 @@ class ImageController extends Controller
         return ['success' => true];
     }
 
+    /**
+     * @param integer $id
+     * @return Story the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findStoryModel($id)
+    {
+        if (($model = Story::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('Страница не найдена.');
+    }
+
     public function actionUploadImage()
     {
         $result = ['success' => false, 'errors' => [], 'image' => []];
-        $form = new \backend\models\editor\ImageForm();
+        $form = new ImageForm();
+        $editorImage = new EditorImage();
         if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+
+            $storyModel = $this->findStoryModel($form->story_id);
+
+            $imagesFolder = $storyModel->getSlideImagesPath();
+            FileHelper::createDirectory(Yii::getAlias('@public') . $imagesFolder);
+
             $form->image = UploadedFile::getInstance($form, 'image');
             if ($form->image !== null) {
 
-                $image = $this->imageService->createImage(
-                    '',
-                    '',
-                    '',
-                    '',
-                    ''
-                );
+                $form->upload($imagesFolder . DIRECTORY_SEPARATOR . $form->image->getBaseName());
 
-                $form->upload($image->getFullPath());
+                //$image = $editorImage->
 
                 $result['image'] = [
                     'url' => $image->imageUrl(),
@@ -266,6 +285,7 @@ class ImageController extends Controller
                 ];
                 $result['success'] = true;
             }
+
         }
         else {
             $result['errors'] = $form->errors;
@@ -275,7 +295,7 @@ class ImageController extends Controller
 
     public function actionSave()
     {
-        $form = new \backend\models\editor\ImageForm();
+        $form = new ImageForm();
         if ($form->load(Yii::$app->request->post(), '') && $form->validate()) {
             $block = new ImageBlock();
 

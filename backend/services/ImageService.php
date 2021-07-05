@@ -43,8 +43,10 @@ class ImageService
         return $command->execute();
     }
 
-    public function downloadImage(string $url, string $imageName, string $imagePath)
+    public function downloadImage(string $url, string $savePath): string
     {
+        $savePath = FileHelper::normalizePath($savePath);
+        FileHelper::createDirectory($savePath);
 
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -70,10 +72,8 @@ class ImageService
             $ext = $ext[1];
         }
 
-        $imageFileName = $imageName . '.' . $ext;
-        $path = $imagePath;
-        FileHelper::createDirectory($path);
-        $path .= '/' . $imageFileName;
+        $imageFileName = md5(random_int(0, 9999) . time() . random_int(0, 9999)) . '.' . $ext;
+        $path = $savePath . DIRECTORY_SEPARATOR . $imageFileName;
 
         $fp = fopen($path, 'xb');
         fwrite($fp, $raw);

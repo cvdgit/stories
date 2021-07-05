@@ -1,15 +1,16 @@
 <?php
 
-
 namespace backend\components\story;
 
-
-use backend\components\story\writer\HTML\ParagraphBlockMarkup;
+use backend\components\image\SlideImage;
 use backend\models\editor\ImageForm;
 use Yii;
 
 class ImageBlock extends AbstractBlock
 {
+
+    protected $type = AbstractBlock::TYPE_IMAGE;
+
     /** @var string */
     protected $filePath;
 
@@ -61,17 +62,17 @@ class ImageBlock extends AbstractBlock
 
         if ($imageHeight > 0) {
 
-            $ratio = $imageWidth / $imageHeight;
+            /*$ratio = $imageWidth / $imageHeight;
             if (self::DEFAULT_IMAGE_WIDTH / self::DEFAULT_IMAGE_HEIGHT > $ratio) {
                 $imageWidth = self::DEFAULT_IMAGE_HEIGHT * $ratio;
                 $imageHeight = self::DEFAULT_IMAGE_HEIGHT;
             } else {
                 $imageHeight = self::DEFAULT_IMAGE_WIDTH / $ratio;
                 $imageWidth = self::DEFAULT_IMAGE_WIDTH;
-            }
-
-            $this->width = $imageWidth . 'px';
-            $this->height = $imageHeight . 'px';
+            }*/
+            $size = (new SlideImage($imagePath))->getEditorImageSize();
+            $this->width = $size->getWidth() . 'px';
+            $this->height = $size->getHeight() . 'px';
         }
     }
 
@@ -118,9 +119,9 @@ class ImageBlock extends AbstractBlock
      */
     public function update($form)
     {
-        //$this->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
         if (!empty($form->fullImagePath)) {
             $this->setImageSize($form->fullImagePath);
+            $this->setNaturalImageSizeFromFile($form->fullImagePath);
         }
         if (!empty($form->imagePath)) {
             $this->setFilePath($form->imagePath);
@@ -129,6 +130,9 @@ class ImageBlock extends AbstractBlock
         $this->setActionStoryID($form->actionStoryID);
         $this->setActionSlideID($form->actionSlideID);
         $this->back_to_next_slide = $form->back_to_next_slide;
+        if (!empty($form->url)) {
+            $this->setImageSource(parse_url($form->url, PHP_URL_HOST));
+        }
     }
 
     public function create()

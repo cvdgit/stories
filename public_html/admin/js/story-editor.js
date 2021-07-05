@@ -1,39 +1,117 @@
 
-function DataModifier(action) {
+;(function($) {
+    var slice = [].slice;
+    $.whenAll = function(array) {
+        var
+            resolveValues = arguments.length == 1 && $.isArray(array)
+                ? array
+                : slice.call(arguments)
+            ,length = resolveValues.length
+            ,remaining = length
+            ,deferred = $.Deferred()
+            ,i = 0
+            ,failed = 0
+            ,rejectContexts = Array(length)
+            ,rejectValues = Array(length)
+            ,resolveContexts = Array(length)
+            ,value
+        ;
+        function updateFunc (index, contexts, values) {
+            return function() {
+                !(values === resolveValues) && failed++;
+                deferred.notifyWith(
+                    contexts[index] = this
+                    ,values[index] = slice.call(arguments)
+                );
+                if (!(--remaining)) {
+                    deferred[(!failed ? 'resolve' : 'reject') + 'With'](contexts, values);
+                }
+            };
+        }
+        for (; i < length; i++) {
+            if ((value = resolveValues[i]) && $.isFunction(value.promise)) {
+                value.promise()
+                    .done(updateFunc(i, resolveContexts, resolveValues))
+                    .fail(updateFunc(i, rejectContexts, rejectValues))
+                ;
+            }
+            else {
+                deferred.notifyWith(this, value);
+                --remaining;
+            }
+        }
+        if (!remaining) {
+            deferred.resolveWith(resolveContexts, resolveValues);
+        }
+        return deferred.promise();
+    };
+})(jQuery);
 
-    this.timeout = undefined;
+function DataModifier(slideManager, cleaner) {
+
+    this.slideManager = slideManager;
+    this.cleaner = cleaner;
+
     this.saved = true;
     this.data = {};
 
-    this.startTimeout = function() {
-        if (this.timeout !== undefined) {
-            clearTimeout(this.timeout);
+    var indicator = $('#save-data');
+
+    function haveChanges() {
+        indicator.find('i')
+            .removeClass('glyphicon-ok')
+            .addClass('glyphicon-floppy-disk')
+    }
+
+    function changesSaved() {
+        indicator.find('i')
+            .removeClass('glyphicon-floppy-disk')
+            .addClass('glyphicon-ok')
+    }
+
+    function action(content) {
+        return $.ajax({
+            url: '/admin/index.php?r=editor/slide/save',
+            type: 'POST',
+            data: content,
+            contentType: 'text/html; charset=utf-8',
+            dataType: 'json',
+            processData: false
+        }).done(function(response) {
+            if (response && response.success) {
+                toastr.success('Изменения успешно сохранены');
+            }
+        });
+    }
+
+    var that = this;
+    var timeout = undefined;
+
+    function startTimeout() {
+        if (timeout !== undefined) {
+            clearTimeout(timeout);
         }
-        var that = this;
-        this.timeout = setTimeout(function() {
-            action().done(function() {
-                that.saved = true;
+        timeout = setTimeout(function() {
+            var deferreds = []
+            Object.keys(that.data).forEach(function(key) {
+                deferreds.push(action(that.data[key]).done(function() {
+                    delete that.data[key];
+                }));
             });
-        }, 2000);
+            $.whenAll(deferreds).then(function() {
+                that.saved = true;
+                changesSaved();
+            });
+        }, 1000);
+    }
+
+    this.change = function() {
+        this.saved = false;
+        this.data[slideManager.getCurrentSlideID()] = cleaner.cleanSlideContent(true);
+        startTimeout();
+        haveChanges();
     }
 }
-
-DataModifier.prototype.add = function(key, values) {
-    this.data[key] = $.extend(true, this.data[key], values);
-    this.startTimeout();
-};
-
-DataModifier.prototype.clearTimeout = function() {
-    if (this.timeout === undefined) {
-        return;
-    }
-    clearTimeout(this.timeout);
-}
-
-DataModifier.prototype.change = function() {
-    this.saved = false;
-    this.startTimeout();
-};
 
 function EditorPopover() {
 
@@ -84,7 +162,419 @@ function EditorPopover() {
                         });
                     });
                 });
+        },
+        'detach': function(selector) {
+            $(selector).popover('dispose');
         }
+    };
+}
+
+function SlideManager(options) {
+
+    this.options = options;
+    this.$slidesList = $('#slides-list');
+
+    function SlideWrapper(element) {
+        this.element = element;
+    }
+    SlideWrapper.prototype = {
+        'getID': function() {
+            return this.element.attr('data-id');
+        },
+        'getElement': function() {
+            return this.element;
+        },
+        'delete': function() {
+            this.element.remove();
+            this.element = null;
+        },
+    }
+
+    var currentSlide = null;
+    this.setActiveSlide = function(element) {
+        currentSlide = new SlideWrapper(element);
+    }
+    this.unsetActiveSlide = function() {
+        currentSlide = null;
+    }
+    this.getActiveSlide = function() {
+        return currentSlide;
+    }
+    this.getCurrentSlideID = function() {
+        if (currentSlide === null) {
+            return;
+        }
+        return currentSlide.getID();
+    }
+
+    this.modeIcons = {
+        'hidden': {'class': 'glyphicon glyphicon-eye-close', 'title': 'Слайд скрыт'},
+        'test': {'class': 'glyphicon glyphicon-question-sign', 'title': 'Слайд с тестом'},
+        'link': {'class': 'glyphicon glyphicon-link', 'title': 'Ссылка на слайд'}
+    }
+}
+
+SlideManager.prototype = {
+    'saveSlidesOrder': function() {
+        var formData = new FormData();
+        formData.append('SlidesOrder[story_id]', this.options['story_id']);
+        this.$slidesList.find('[data-slide-id]').each(function(i) {
+            formData.append('SlidesOrder[slides][' + i + ']', $(this).attr('data-slide-id'));
+            formData.append('SlidesOrder[order][' + i + ']', (++i).toString());
+        });
+        return $.ajax({
+            'url': '/admin/index.php?r=editor/slide/save-order',
+            'type': 'POST',
+            'data': formData,
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    },
+    'addModeIcon': function(mode, slideID) {
+        slideID = slideID || this.getCurrentSlideID();
+        var icon = this.modeIcons[mode];
+        this.$slidesList
+            .find('li[data-slide-id=' + slideID + '] span.slide-mode')
+            .append($('<i/>', {
+                'class': icon.class,
+                'title': icon.title,
+                'data-slide-mode': mode
+            }));
+    },
+    'removeModeIcon': function(mode, slideID) {
+        slideID = slideID || this.getCurrentSlideID();
+        this.$slidesList
+            .find('li[data-slide-id=' + slideID + '] span.slide-mode i[data-slide-mode=' + mode + ']')
+            .remove();
+    },
+    'loadSlidesList': function(toSetActiveSlideID, itemCallback) {
+
+        this.$slidesList.empty();
+        if (this.$slidesList.data('ui-sortable')) {
+            this.$slidesList.sortable('destroy');
+        }
+        //this.unsetActiveSlide();
+
+        var that = this;
+
+        function setActiveSlideItem(slideID) {
+            that.$slidesList.find('[data-slide-id]').removeClass('active');
+            that.$slidesList.find('[data-slide-id=' + slideID + ']').addClass("active");
+        }
+
+        return $.ajax({
+            'url': '/admin/index.php?r=editor/slides&story_id=' + this.options['story_id'],
+            'type': 'GET',
+            'dataType': 'json'
+        }).done(function(data) {
+
+            if (data.length === 0) {
+                $('<div/>', {'class': 'no-slides'}).text('Нет слайдов').appendTo(that.$slidesList);
+                return;
+            }
+
+            data.forEach(function(slide) {
+
+                var $element = $('<li/>', {
+                    'class': 'list-group-item slides-container-item',
+                    'data-slide-id': slide.id,
+                    'data-link-slide-id': slide.linkSlideID
+                })
+                    .append($('<span/>').addClass('slide-number').text(slide.slideNumber))
+                    .append($('<span/>').addClass('slide-mode').html(''))
+                    .append($('<span/>').addClass('slide-move').html('<i class="glyphicon glyphicon-resize-vertical"></i>'))
+                    .on("click", function () {
+                        setActiveSlideItem(slide.id);
+                        itemCallback(slide.id);
+                        return false;
+                    });
+
+                $element.appendTo(that.$slidesList);
+
+                if (slide.isLink) {
+                    that.addModeIcon('link', slide.id);
+                }
+                else {
+                    if (slide.isQuestion) {
+                        that.addModeIcon('test', slide.id);
+                    }
+                }
+                if (slide.isHidden) {
+                    that.addModeIcon('hidden', slide.id);
+                }
+            });
+
+            that.$slidesList.sortable({
+                over: function(event, ui) {
+                    var cl = ui.item.attr('class');
+                    $('.ui-state-highlight').addClass(cl);
+                },
+                placeholder: 'ui-state-highlight',
+                handle: '.slide-move',
+                update: function() {
+                    that.saveSlidesOrder()
+                        .done(function(data) {
+                            if (data) {
+                                if (data.success) {
+                                    toastr.success('Порядок слайдов успешно изменен');
+                                    var i = 1;
+                                    that.$slidesList.find('li > .slide-number').each(function() {
+                                        $(this).text(i);
+                                        i++;
+                                    });
+                                }
+                                else {
+                                    toastr.error(JSON.stringify(data.errors));
+                                }
+                            }
+                            else {
+                                toastr.error('Неизвестная ошибка');
+                            }
+                        })
+                        .fail(function(data) {
+                            toastr.error(data.responseJSON.message);
+                        });
+                }
+            }).disableSelection();
+
+            if (toSetActiveSlideID) {
+                that.$slidesList.find('li[data-slide-id=' + toSetActiveSlideID + ']').click();
+            }
+            else {
+                that.$slidesList.find('li:eq(0)').click();
+            }
+        });
+    },
+    'loadSlide': function(slideID) {
+        return $.getJSON('/admin/index.php', {
+            'r': 'editor/load-slide',
+            'story_id': this.options['story_id'],
+            'slide_id': slideID
+        });
+    },
+    'createSlide': function() {
+        return $.getJSON('/admin/index.php', {
+            'r': 'editor/slide/create',
+            'story_id': this.options['story_id'],
+            'current_slide_id': this.getCurrentSlideID()
+        });
+    },
+    'deleteSlide': function() {
+        return $.getJSON('/admin/index.php', {
+            'r': 'editor/slide/delete',
+            'slide_id': this.getCurrentSlideID()
+        });
+    },
+    'copySlide': function() {
+
+        return $.getJSON('/admin/index.php', {
+            'r': 'editor/slide/copy',
+            'slide_id': this.getCurrentSlideID()
+        });
+    },
+    'toggleVisible': function() {
+        return $.getJSON('/admin/index.php', {
+            'r': 'editor/slide/toggle-visible',
+            'slide_id': this.getCurrentSlideID()
+        });
+    }
+}
+
+function BlockModifier(modifier) {
+
+    this.modifier = modifier;
+    var that = this;
+
+    function css(element, name, value) {
+        element.css(name, value);
+        that.modifier.change();
+        console.log('mod');
+    }
+
+    this.setLeft = function(element, left) {
+        css(element,'left', left);
+    };
+    this.setTop = function(element, top) {
+        css(element, 'top', top);
+    };
+    this.setWidth = function(element, width) {
+        css(element, 'width', width);
+    };
+    this.setHeight = function(element, height) {
+        css(element, 'height', height);
+    };
+    this.change = function() {
+        this.modifier.change();
+    }
+}
+
+function BlockAlignment(modifier) {
+
+    var slideWidth = 1280,
+        slideHeight = 720;
+
+    function setBlockAlign(element, align) {
+        switch (align) {
+            case 'left':
+                modifier.setLeft(element, '0px');
+                break;
+            case 'right':
+                modifier.setLeft(element, slideWidth - parseInt(element.css('width')) + 'px');
+                break;
+            case 'top':
+                modifier.setTop(element, '0px');
+                break;
+            case 'bottom':
+                modifier.setTop(element, slideHeight - parseInt(element.css('height')) + 'px');
+                break;
+            case 'horizontal_center':
+                modifier.setLeft(element, (slideWidth - parseInt(element.css('width'))) / 2 + 'px');
+                break;
+            case 'vertical_center':
+                modifier.setTop(element, (slideHeight - parseInt(element.css('height'))) / 2 + 'px');
+                break;
+            case 'slide_center':
+                modifier.setLeft(element, (slideWidth - parseInt(element.css('width'))) / 2 + 'px');
+                modifier.setTop(element, (slideHeight - parseInt(element.css('height'))) / 2 + 'px');
+                break;
+        }
+    }
+
+    this.left = function(element) {
+        setBlockAlign(element, 'left');
+    };
+    this.right = function(element) {
+        setBlockAlign(element, 'right');
+    };
+    this.top = function(element) {
+        setBlockAlign(element, 'top');
+    }
+    this.bottom = function(element) {
+        setBlockAlign(element, 'bottom');
+    };
+    this.horizontalCenter = function(element) {
+        setBlockAlign(element, 'horizontal_center');
+    };
+    this.verticalCenter = function(element) {
+        setBlockAlign(element, 'vertical_center');
+    };
+    this.slideCenter = function(element) {
+        setBlockAlign(element, 'slide_center');
+    };
+}
+
+function BlockToolbar(options) {
+
+    this.container = $('.blocks-sidebars');
+    this.options = options;
+
+    function createToolbar() {
+
+        function createToolbarItem(title, icon, action) {
+            return $('<li/>', {'class': 'blocks-sidebar-item', 'data-toolbar-action': action})
+                .append($('<span/>', {'class': 'glyphicon glyphicon-' + icon + ' icon'}))
+                .append($('<span/>', {'class': 'text', 'text': title}));
+        }
+
+        var $list = $('<ul/>');
+        $list.append(createToolbarItem('Изменить', 'pencil', 'edit'));
+        $list.append(createToolbarItem('Растянуть', 'resize-full', 'stretch'));
+        $list.append(createToolbarItem('Положение', 'align-center','align'));
+        $list.append(createToolbarItem('Удалить', 'trash', 'delete'));
+        $list.append(createToolbarItem('Копировать', 'duplicate', 'duplicate'));
+
+        return $('<div/>', {'class': 'blocks-sidebar'}).append($list);
+    }
+    this.toolbar = createToolbar();
+}
+BlockToolbar.prototype = {
+    'create': function() {
+        this.container.find('.blocks-sidebar.visible').removeClass('visible');
+        this.container.append(this.toolbar.addClass('visible'));
+        var that = this;
+        this.container.find('[data-toolbar-action]').each(function() {
+            var $elem = $(this);
+            $elem.on('click', that.options.actions[$elem.attr('data-toolbar-action')]);
+        });
+        this.options.onCreate();
+    },
+    'remove': function() {
+        this.toolbar.find('[data-toolbar-action]').each(function() {
+            $(this).off('click');
+        });
+        this.toolbar.remove();
+        this.container.find('.blocks-sidebar').addClass('visible');
+        this.options.onRemove();
+    },
+    'show': function() {
+        this.container.find('.blocks-sidebar').removeClass('hide');
+    },
+    'hide': function() {
+        this.container.find('.blocks-sidebar').addClass('hide');
+    }
+}
+
+function ContentCleaner(editor) {
+
+    this.editor = editor;
+
+    this.cleanSlideContent = function(save) {
+        save = save || false;
+        var data = this.editor.find('section').clone();
+        $('#save-container').empty().append(data);
+        var section = $('#save-container').find('section');
+        var attributes = $.map(section[0].attributes, function(item) {
+            return item.name;
+        });
+        $.each(attributes, function(i, item) {
+            if ($.inArray(item, ['data-id', 'data-slide-view', 'data-audio-src']) === -1) {
+                section.removeAttr(item);
+            }
+        });
+        data.find('.sl-block-transform').remove();
+        data.find('.ui-resizable-handle').remove();
+        data.find('.sl-block.wikids-active-block')
+            .removeClass('wikids-active-block');
+        data.find('.sl-block')
+            .removeClass('ui-draggable ui-draggable-handle ui-resizable');
+        if (save) {
+            data.find('img').each(function () {
+                var $elem = $(this);
+                var src = $elem.attr('src');
+                $elem.removeAttr('src');
+                src = src.replace(/[&|\?]+t=[0-9\.]+/g, '');
+                $elem.attr('data-src', src);
+            });
+        }
+        return data[0].outerHTML;
+    }
+
+    this.cleanSlideBlock = function(block) {
+        var cloneBlock = block.clone();
+        $('#save-container').empty().append(cloneBlock);
+        cloneBlock.find('.sl-block-transform').remove();
+        cloneBlock.find('.ui-resizable-handle').remove();
+        cloneBlock
+            .removeClass('wikids-active-block ui-draggable ui-draggable-handle ui-resizable');
+        return cloneBlock[0].outerHTML;
+    }
+}
+
+function BlockID() {
+
+    function dec2hex(dec) {
+        return dec.toString(16).padStart(2, '0');
+    }
+
+    function generateId(len) {
+        var arr = new Uint8Array((len || 40) / 2);
+        window.crypto.getRandomValues(arr);
+        return Array.from(arr, dec2hex).join('');
+    }
+
+    this.generate = function() {
+        return generateId(10);
     };
 }
 
@@ -92,35 +582,24 @@ var StoryEditor = (function() {
     "use strict";
 
     var $editor = $('#story-editor');
-    var $previewContainer = $('#preview-container');
-    var $formContainer = $("#form-container");
 
     $editor.on('mousedown', function(e) {
         var $target = $(e.target);
         if ($target.hasClass('sl-block') || $target.parents('.sl-block').length) {
+
             var $block = $(e.target);
             if (!$block.hasClass('sl-block')) {
                 $block = $(e.target).parents('div.sl-block');
             }
-            var currentBlockID = $block.attr('data-block-id');
-            setActiveBlock(currentBlockID, currentBlockID === activeBlockID);
+
+            if (blockManager.getActive() && $block.data('blockId') !== blockManager.getActive().getID()) {
+                unsetActiveBlock();
+            }
+
+            setActiveBlock($block);
         }
         else {
-            $("a", $list).removeClass("active");
-
-            $(".reveal .slides div[data-block-id]").each(function() {
-                var $block = $(this);
-                $block.removeClass("wikids-active-block");
-                if ($block.data('ui-resizable')) {
-                    $block.resizable('destroy');
-                }
-            })
-
-            $(".reveal .slides div.sl-block").find('.sl-block-transform').remove();
-            $formContainer.empty();
-            activeBlockID = null;
-
-            blockToolbar.remove();
+            unsetActiveBlock();
         }
     });
 
@@ -135,7 +614,8 @@ var StoryEditor = (function() {
             $block.append($wrapper);
         },
         mouseleave: function(e) {
-            $(".reveal .slides div.sl-block:not(.wikids-active-block)").find('.sl-block-transform').remove();
+            $(".reveal .slides div.sl-block:not(.wikids-active-block)")
+                .find('.sl-block-transform').remove();
         }
     }, 'div.sl-block:not(.wikids-active-block)');
 
@@ -155,71 +635,96 @@ var StoryEditor = (function() {
         storyImagesAction: ""
     };
 
-    var currentSlideIndex = 0,
-        currentSlideID,
-        activeBlockID = null;
+    var slidesManager,
+        slideMenu,
+        blockModifier,
+        blockAlignment,
+        blockToolbar,
+        contentCleaner,
+        blockID;
 
+    /**
+     * Инициализация редактора и всех компонентов
+     * @param params
+     */
     function initialize(params) {
+
         config = params;
-        loadSlides(readUrl() || -1);
-    }
 
-    function send(slideID) {
-        var part = [
-            'slide_id=' + slideID
-        ];
-        return $.ajax({
-            url: config.getSlideAction + '&' + part.join('&'),
-            type: 'GET',
-            dataType: 'json'
-        });
-    }
+        slideMenu = new SlideMenu($editor);
+        slidesManager = new SlideManager({'story_id': params['storyID']});
+        contentCleaner = new ContentCleaner($editor);
+        blockModifier = new BlockModifier(new DataModifier(slidesManager, contentCleaner));
+        blockAlignment = new BlockAlignment(blockModifier);
+        blockID = new BlockID();
 
-    var $list = $("#slide-block-list");
-
-    /*function loadSlideBlocks() {
-        var promise = $.ajax({
-            "url": config.getSlideBlocksAction + "&slide_id=" + currentSlideID,
-            "type": "GET",
-            "dataType": "json"
-        });
-        $("#slide-blocks").show();
-        promise.done(function(data) {
-            $list.empty();
-            if (data.length > 0) {
-                data.forEach(function (block) {
-                    var elem = $("<a>")
-                        .attr("href", "#")
-                        .addClass("list-group-item")
-                        .text(block.type)
-                        .attr("data-block-id", block.id);
-                    elem.on("click", function (e) {
-                        e.preventDefault();
-                        setActiveBlock(block.id);
-                    });
-                    var deleteElem = $('<span/>')
-                        .addClass('glyphicon glyphicon-trash')
-                        .css({'float': 'right', 'color': 'red', 'fontWeight': '500'})
-                        .attr({'title': 'Удалить блок'});
-                    deleteElem.on('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        deleteBlock(block.id);
-                    });
-                    elem.append(deleteElem);
-                    elem.appendTo($list);
-                });
-                //setActiveBlock(activeBlockID || $list.find("a").attr("data-block-id"));
-            }
-            else {
-                $("#slide-block-params").hide();
+        var editorPopover = new EditorPopover();
+        blockToolbar = new BlockToolbar({
+            'onCreate': function() {
+                editorPopover.attach('li[data-toolbar-action=align]', {'placement': 'left'},[
+                    {'name': 'left', 'title': 'По левому краю', 'click': function() { blockAlignment.left(blockManager.getActive().getElement()); }},
+                    {'name': 'right', 'title': 'По правому краю', 'click': function() { blockAlignment.right(blockManager.getActive().getElement()); }},
+                    {'name': 'top', 'title': 'По верху', 'click': function() { blockAlignment.top(blockManager.getActive().getElement()); }},
+                    {'name': 'bottom', 'title': 'По низу', 'click': function() { blockAlignment.bottom(blockManager.getActive().getElement()); }},
+                    {'name': 'horizontal_center', 'title': 'По центру (горизонтально)', 'click': function() { blockAlignment.horizontalCenter(blockManager.getActive().getElement()); }},
+                    {'name': 'vertical_center', 'title': 'По центру (вертикально)', 'click': function() { blockAlignment.verticalCenter(blockManager.getActive().getElement()); }},
+                    {'name': 'slide_center', 'title': 'По центру слайда', 'click': function() { blockAlignment.slideCenter(blockManager.getActive().getElement()); }}
+                ]);
+            },
+            'onRemove': function() {
+                editorPopover.detach('li[data-toolbar-action=align]');
+            },
+            'actions': {
+                'stretch': function() {
+                    stretchToSlide();
+                },
+                'delete': function() {
+                    deleteBlockAction();
+                },
+                'duplicate': function() {
+                    copyBlockAction();
+                },
+                'edit': function() {
+                    config.onBlockUpdate(blockManager.getActive(), getUpdateBlockUrl(), contentCleaner.cleanSlideBlock(blockManager.getActive().getElement()));
+                }
             }
         });
-    }*/
 
-    var BlockResizable = function() {
+        loadSlides().done(function() {
 
-        var resizeHandler = function(event, ui) {
+        });
+
+        config.onInit();
+    }
+
+    function makeDraggable(element) {
+        var containmentArea = $editor.find('section');
+        var config = {
+            start: function(event) {
+                setActiveBlock($(event.target));
+            },
+            drag: function(event, ui) {
+                var zoom = Reveal.getScale();
+                var contWidth = containmentArea.width(),
+                    contHeight = containmentArea.height();
+                ui.position.left = Math.max(0, Math.min(ui.position.left / zoom , contWidth - ui.helper.width()));
+                ui.position.top = Math.max(0, Math.min(ui.position.top  / zoom,  contHeight- ui.helper.height()));
+            },
+            stop: function(event, ui) {
+                blockModifier.setTop($(event.target), Math.round(ui.position.top) + "px");
+                blockModifier.setLeft($(event.target), Math.round(ui.position.left) + "px");
+            },
+            grid: [5, 5],
+            snap: true,
+            snapMode: "outer",
+            snapTolerance: 4
+        };
+        element.draggable(config);
+    }
+
+    function makeResizable(element, forText) {
+        forText = forText || false;
+        function resizeHandler(event, ui) {
             var zoomScale = Reveal.getScale();
             var opl = ui.originalPosition.left, opt = ui.originalPosition.top,
                 pl = ui.position.left, pt = ui.position.top,
@@ -233,468 +738,279 @@ var StoryEditor = (function() {
             if (pt + ost !== opt + ost) { //top side
                 ui.position.top = opt + (ost - ui.size.height);
             }
-        };
-
+        }
+        function stopHandler(event, ui) {
+            var $element = $(event.target);
+            var blockType = $element.attr('data-block-type');
+            blockModifier.setLeft($element, Math.round(ui.position.left) + "px");
+            blockModifier.setTop($element, Math.round(ui.position.top) + "px");
+            blockModifier.setWidth($element, Math.round(ui.size.width) + "px");
+            if (blockType === 'text') {
+                blockModifier.setHeight($element, 'auto');
+            }
+            else {
+                blockModifier.setHeight($element, Math.round(ui.size.height) + "px");
+            }
+        }
         var resizableOptions = {
-            resize: resizeHandler,
-            stop: function(event, ui) {
-                var $element = $(event.target);
-                var blockType = $element.attr('data-block-type');
-                blockModifier.setLeft($element, Math.round(ui.position.left) + "px");
-                blockModifier.setTop($element, Math.round(ui.position.top) + "px");
-                blockModifier.setWidth($element, Math.round(ui.size.width) + "px");
-                if (blockType === 'text') {
-                    blockModifier.setHeight($element, 'auto');
-                }
-                else {
-                    blockModifier.setHeight($element, Math.round(ui.size.height) + "px");
-                }
-            }
+                resize: resizeHandler,
+                stop: stopHandler
+            },
+            defaultResizableOptions = {
+                handles: 'all',
+                aspectRatio: true
+            },
+            textResizableOptions = {
+                handles: 'e, w',
+                aspectRatio: false,
+            };
+
+        if (forText) {
+            resizableOptions = $.extend(resizableOptions, textResizableOptions);
         }
-
-        var defaultResizableOptions = {
-            handles: 'all',
-            aspectRatio: true
-        };
-        var textResizableOptions = {
-            handles: 'e, w',
-            aspectRatio: false,
-        };
-
-        return {
-            'optionsDefault': function() {
-                return $.extend(resizableOptions, defaultResizableOptions);
-            },
-            'optionsText': function() {
-                return $.extend(resizableOptions, textResizableOptions);
-            }
+        else {
+            resizableOptions = $.extend(resizableOptions, defaultResizableOptions);
         }
-    };
-    var blockResizable = new BlockResizable();
+        element.resizable(resizableOptions);
+    }
 
-    function makeDraggable(element) {
-        var click = {
-            x: 0,
-            y: 0
-        };
-        var config = {
-            start: function(event) {
-                var blockID = $(event.target).attr("data-block-id");
-                setActiveBlock(blockID, blockID === activeBlockID);
-                click.x = event.clientX;
-                click.y = event.clientY;
-            },
-            drag: function(event, ui) {
-                var zoom = Reveal.getScale();
-                var original = ui.originalPosition;
-                ui.position = {
-                    left: (event.clientX - click.x + original.left) / zoom,
-                    top:  (event.clientY - click.y + original.top) / zoom
-                };
-            },
-            stop: function(event, ui) {
-                blockModifier.setTop($(event.target), Math.round(ui.position.top) + "px");
-                blockModifier.setLeft($(event.target), Math.round(ui.position.left) + "px");
-            }
-        };
-        element.draggable(config);
+    function makeResizableBlock(block) {
+        makeResizable(block.getElement(), block.getType() === 'text');
     }
 
     function selectActiveBlock(blockID) {
-
-        $(".reveal .slides div[data-block-id]").removeClass("wikids-active-block");
-        $(".reveal .slides div.sl-block").find('.sl-block-transform').remove();
-
-        var $wrapper = $('<div/>', {'class': 'sl-block-transform'})
-            .append($('<div/>', {'class': 'sl-block-border-active'}));
-
-        var $block = $(".reveal .slides").find("div[data-block-id=" + blockID + "]");
-
-        var blockType = $block.attr('data-block-type');
-        if ($.inArray(blockType, ['transition', 'test']) === -1) {
-            if (blockType === 'text') {
-                $block.resizable(blockResizable.optionsText());
-            }
-            else {
-                $block.resizable(blockResizable.optionsDefault());
-            }
+        $editor.find("div[data-block-id]").removeClass("wikids-active-block");
+        $editor.find("div.sl-block").find('.sl-block-transform').remove();
+        var block = blockManager.find(blockID);
+        if ($.inArray(block.getType(), ['transition', 'test']) === -1) {
+            makeResizableBlock(block);
         }
-
-        $block.addClass("wikids-active-block")
-            .append($wrapper);
+        var $wrapper = $('<div/>', {'class': 'sl-block-transform'}).append($('<div/>', {'class': 'sl-block-border-active'}));
+        block.getElement().addClass("wikids-active-block").append($wrapper);
     }
 
-    var activeBlock = (function() {
+    function unselectActiveBlock() {
+        console.log('unselect');
+        $editor.find("div[data-block-id]").each(function() {
+            var $block = $(this);
+            $block.removeClass("wikids-active-block");
+            if ($block.data('ui-resizable')) {
+                $block.resizable('destroy');
+            }
+        })
+        $editor.find('div.sl-block .sl-block-transform').remove();
+    }
 
-        var activeBlockElement = null;
+    var blockManager = (function(editor) {
 
-        return {
-            'setElement': function(element) {
-                activeBlockElement = element;
+        function BlockWrapper(element) {
+            this.element = element;
+        }
+        BlockWrapper.prototype = {
+            'getType': function() {
+                return this.element.attr('data-block-type');
             },
             'getID': function() {
-                return activeBlockElement.attr('data-block-id');
+                return this.element.attr('data-block-id');
             },
-            'getType': function() {
-                return activeBlockElement.attr('data-block-type');
+            'delete': function() {
+                this.element.remove();
+                this.element = null;
+            },
+            'typeIsImage': function() {
+                return this.getType() === 'image';
+            },
+            'typeIsVideo': function() {
+                return this.getType() === 'video';
+            },
+            'typeIsHtml': function() {
+                return this.getType() === 'html';
             },
             'getElement': function() {
-                return activeBlockElement;
+                return this.element;
             }
         }
-    })();
 
-    function setActiveBlock(blockID) {
-        activeBlockID = blockID;
-        activeBlock.setElement(findBlockElement(blockID));
-        $("a", $list).removeClass("active");
-        $("a[data-block-id=" + blockID + "]", $list).addClass("active");
-        selectActiveBlock(blockID);
+        var activeBlock = null;
+
+        return {
+            'find': function(id) {
+                var element = editor.find('section > div.sl-block[data-block-id=' + id + ']');
+                return new BlockWrapper(element);
+            },
+            'append': function(element) {
+                editor.find('section').append(element);
+                return new BlockWrapper(element);
+            },
+            'setActive': function(element) {
+                activeBlock = new BlockWrapper(element);
+            },
+            'getActive': function() {
+                return activeBlock;
+            },
+            'unsetActive': function() {
+                activeBlock = null;
+            },
+            'deleteBlock': function(slideID, data) {
+                return $.ajax({
+                    url: '/admin/index.php?r=editor/block/delete&slide_id=' + slideID,
+                    type: 'POST',
+                    data: data,
+                    contentType: 'text/html; charset=utf-8',
+                    dataType: 'json',
+                    processData: false
+                });
+            }
+        }
+    }($editor));
+
+    function setActiveBlock(element) {
+
+        if (blockManager.getActive()) {
+            if (element.data('blockId') === blockManager.getActive().getID()) {
+                return;
+            } else {
+                unsetActiveBlock();
+            }
+        }
+
+        console.log('set active block');
+        blockManager.setActive(element);
         blockToolbar.create();
+        selectActiveBlock(blockManager.getActive().getID());
     }
 
-    var editorPopover = new EditorPopover();
-
-    function BlockToolbar() {
-
-        this.container = $('.blocks-sidebars');
-
-        function createToolbar() {
-            var $list = $('<ul/>');
-
-            $('<li/>', {'class': 'blocks-sidebar-item'})
-                .on('click', stretchToSlide)
-                .append($('<span/>', {'class': 'glyphicon glyphicon-resize-full icon'}))
-                .append($('<span/>', {'class': 'text', 'text': 'Растянуть'}))
-                .appendTo($list);
-
-            $('<li/>', {'class': 'blocks-sidebar-item', 'id': 'block-align'})
-                .append($('<span/>', {'class': 'glyphicon glyphicon-align-center icon'}))
-                .append($('<span/>', {'class': 'text', 'text': 'Положение'}))
-                .appendTo($list);
-
-            return $('<div/>', {'class': 'blocks-sidebar'}).append($list);
-        }
-        this.toolbar = createToolbar();
+    function unsetActiveBlock() {
+        unselectActiveBlock();
+        blockManager.unsetActive();
+        blockToolbar.remove();
     }
-    BlockToolbar.prototype = {
-        'create': function() {
-            this.container.find('.blocks-sidebar.visible').removeClass('visible');
-            this.container.append(this.toolbar.addClass('visible'));
 
-            editorPopover.attach('#block-align', {'placement': 'left'},[
-                {'name': 'left', 'title': 'По левому краю', 'click': function() { blockAlignment.left(activeBlock.getElement()); }},
-                {'name': 'right', 'title': 'По правому краю', 'click': function() { blockAlignment.right(activeBlock.getElement()); }},
-                {'name': 'top', 'title': 'По верху', 'click': function() { blockAlignment.top(activeBlock.getElement()); }},
-                {'name': 'bottom', 'title': 'По низу', 'click': function() { blockAlignment.bottom(activeBlock.getElement()); }},
-                {'name': 'horizontal_center', 'title': 'По центру (горизонтально)', 'click': function() { blockAlignment.horizontalCenter(activeBlock.getElement()); }},
-                {'name': 'vertical_center', 'title': 'По центру (вертикально)', 'click': function() { blockAlignment.verticalCenter(activeBlock.getElement()); }},
-                {'name': 'slide_center', 'title': 'По центру слайда', 'click': function() { blockAlignment.slideCenter(activeBlock.getElement()); }}
-            ]);
-        },
-        'remove': function() {
-            this.toolbar.remove();
-            this.container.find('.blocks-sidebar').addClass('visible');
-        }
-    }
-    var blockToolbar = new BlockToolbar();
-
-    function loadBlockForm(blockID) {
-        var promise = $.ajax({
-            "url": config.getBlockFormAction + "&slide_id=" + currentSlideID + "&block_id=" + blockID,
-            "type": "GET",
-            "dataType": "json"
-        });
-        $("#slide-block-params").show();
-        promise.done(function(data) {
-            $formContainer.html(data);
+    function createSlideAction() {
+        slidesManager.createSlide().done(function(data) {
+            toastr.success('Слайд успешно создан');
+            loadSlides(data.id);
         });
     }
 
-    function createBlock(type) {
-        var promise = $.ajax({
-            "url": config.createBlockAction + "&slide_id=" + currentSlideID + "&block_type=" + type,
-            "type": "GET",
-            "dataType": "json"
-        });
-        promise.done(function(response) {
-            if (response && response.success) {
-                activeBlockID = response.block_id;
-                loadSlide(currentSlideID, true);
-            }
-        });
+    function deleteBlock(block) {
+        unsetActiveBlock();
+        block.delete();
+        blockModifier.change();
     }
 
-    function createSlide() {
-        $.getJSON(config.createSlideAction, {"current_slide_id": currentSlideID})
-            .done(function(data) {
-                loadSlides(data.id);
-            });
-    }
-
-    function deleteBlock(blockID) {
-        /*var promise = $.ajax({
-            "url": config.deleteBlockAction + "&slide_id=" + currentSlideID + "&block_id=" + blockID,
-            "type": "GET",
-            "dataType": "json"
-        });
-        promise.done(function() {
-            var deleteCurrentBlock = (blockID === activeBlockID);
-            if (deleteCurrentBlock) {
-                activeBlockID = null;
-            }
-            loadSlide(currentSlideID, true);
-        });*/
-        findBlockElement(blockID).remove();
-        modifier.change();
-    }
-
-    function getSlideHtml() {
-        return $editor.find('section')[0].outerHTML
-    }
-
-    function setActiveSlide(slide) {
-        currentSlideID = slide.id;
-        currentSlideIndex = slide.number - 1;
-        $("[data-slide-id]", $previewContainer).each(function() {
-            $(this).removeClass("active");
-        });
-        $("[data-slide-id=" + slide.id + "]", $previewContainer).addClass("active");
-        setSlideUrl();
-    }
-
-    function updateLinkCounter(count) {
-        if (parseInt(count) > 0) {
-            $("#slide-links").parent().addClass('set-in');
+    function deleteBlockAction(blockID) {
+        var block = blockID ? blockManager.find(blockID) : blockManager.getActive();
+        if (block.typeIsImage() || block.typeIsVideo() || block.typeIsHtml()) {
+            blockManager.deleteBlock(slidesManager.getCurrentSlideID(), contentCleaner.cleanSlideBlock(block.getElement()))
+                .done(function(response) {
+                    deleteBlock(block);
+                });
         }
         else {
-            $("#slide-links").parent().removeClass('set-in');
+            deleteBlock(block);
         }
     }
 
-    function updateBlock() {
-        var data = $editor.find('section').clone();
-        $('#save-container').empty().append(data);
-
-        var section = $('#save-container').find('section');
-        var attributes = $.map(section[0].attributes, function(item) {
-            return item.name;
-        });
-        $.each(attributes, function(i, item) {
-            section.removeAttr(item);
-        });
-
-        data.find('.sl-block-transform').remove();
-        data.find('.ui-resizable-handle').remove();
-        data.find('.sl-block.wikids-active-block')
-            .removeClass('wikids-active-block ui-draggable ui-draggable-handle ui-resizable');
-        return $.ajax({
-            url: '/admin/index.php?r=editor/slide/save&id=' + currentSlideID,
-            type: 'POST',
-            data: data[0].outerHTML,
-            contentType: 'text/html; charset=utf-8',
-            dataType: 'json',
-            processData: false
-        }).done(function(response) {
-            if (response && response.success) {
-                toastr.success('Изменения успешно сохранены');
-            }
-        });
+    function copyBlock(block) {
+        var copyBlock = $(contentCleaner.cleanSlideBlock(block.getElement()));
+        copyBlock.css({'left': (50 + parseInt(copyBlock.css('left'))) + 'px', 'top': (50 + parseInt(copyBlock.css('top'))) + 'px'});
+        copyBlock.attr('data-block-id', blockID.generate());
+        appendBlock(copyBlock);
     }
-    var modifier = new DataModifier(updateBlock);
 
-    function loadSlide(slideID, loadBlocks) {
-
-        //loadBlocks = loadBlocks || false;
-        currentSlideID = slideID;
-
-        EditorActions.reset();
-
-        /*function getContainment($box, $drag, space) {
-            var x1 = $box.offset().left + space;
-            var y1 = $box.offset().top + space;
-            var x2 = $box.offset().left + $box.width() - $drag.width() - space;
-            var y2 = $box.offset().top + $box.height() - $drag.height() - space;
-            return [x1, y1, x2, y2];
-        }*/
-        //$formContainer.empty();
-
-        send(slideID)
-            .done(function(data) {
-
-                updateLinkCounter(data.blockNumber);
-
-                setActiveSlide(data);
-
-                $(".slides", $editor).empty().append(data.data);
-
-                $('section', '#story-editor')
-                    .css({'height': '720px', 'width': '1280px'})
-                    .attr('id', 'slide-container');
-
-                makeDraggable($(".sl-block", ".reveal"));
-
-                Reveal.sync();
-                Reveal.slide(0);
-
-                WikidsVideo.reset();
-                WikidsVideo.createPlayer();
-
-                slideMenuSetPosition();
-            })
-            .fail(function(data) {
-                $editor.text(data);
+    function copyBlockAction(blockID) {
+        var block = blockID ? blockManager.find(blockID) : blockManager.getActive();
+        if (block.typeIsImage() || block.typeIsVideo() || block.typeIsHtml()) {
+            $.ajax({
+                url: '/admin/index.php?r=editor/block/copy&slide_id=' + slidesManager.getCurrentSlideID(),
+                type: 'POST',
+                data: contentCleaner.cleanSlideBlock(block.getElement()),
+                contentType: 'text/html; charset=utf-8',
+                dataType: 'json',
+                processData: false
+            }).done(function(response) {
+                copyBlock(block);
             });
-    }
-
-    function deleteSlide(slideID) {
-        if (!confirm("Удалить слайд?")) {
-            return;
         }
-        var promise = $.ajax({
-            "url": config.deleteSlideAction + "&slide_id=" + slideID,
-            "type": "GET",
-            "dataType": "json"
-        });
-        promise.done(function(data) {
-            if (data && data.success) {
-                loadSlides(-1);
-            }
+        else {
+            copyBlock(block);
+        }
+    }
+
+    /**
+     * Загрузка слайда
+     * @param slideID
+     */
+    function loadSlide(slideID) {
+        return slidesManager.loadSlide(slideID).done(function(data) {
+            $('.slides', $editor).html(data.data);
+            Reveal.sync();
+            Reveal.slide(0);
+            slidesManager.setActiveSlide($editor.find('section'));
+            slideMenu.init(data);
+            makeDraggable($editor.find('.sl-block'));
+        }).fail(function(data) {
+            $editor.text(JSON.stringify(data));
         });
     }
 
-    function slideIcon(slide) {
-        return slide.isLink ?
-            '<i class="glyphicon glyphicon-link"></i>' :
-            slide.isQuestion ?
-                '<i class="glyphicon glyphicon-question-sign"></i>' :
-                '<i class="glyphicon glyphicon-folder-close"></i>';
-    }
-
-    function loadSlides(activeSlideID) {
-        var $container = $("#preview-container");
-        $container.empty();
-        var promise = $.ajax({
-            "url": config.currentSlidesAction,
-            "type": "GET",
-            "dataType": "json"
-        });
-        promise.done(function(data) {
-            if (data.length > 0) {
-                data.forEach(function (slide) {
-
-                    // slideIcon(slide) + " " +
-                    var $element = $("<li/>")
-                        .addClass("list-group-item slides-container-item")
-                        .attr("data-slide-id", slide.id)
-                        .attr("data-link-slide-id", slide.linkSlideID)
-                        .append($('<span/>').addClass('slide-number').text(slide.slideNumber))
-                        .append($('<span/>').addClass('slide-move').html('<i class="glyphicon glyphicon-move"></i>'))
-                        //.html(slide.slideNumber)
-                        .on("click", function () {
-                            activeBlockID = null;
-                            currentSlideID = null;
-                            $formContainer.empty();
-                            loadSlide(slide.id, true);
-                            return false;
-                        });
-
-                    /*$('<span/>')
-                        .addClass('delete-slide glyphicon glyphicon-trash')
-                        .attr({'title': 'Удалить слайд'})
-                        .on('click', function(e) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            deleteSlide(slide.id);
-                        })
-                        .appendTo($element);*/
-
-                    /*$('<span/>')
-                        .addClass('toggle-slide-visible glyphicon glyphicon-eye-' + (slide.isHidden ? 'close' : 'open'))
-                        .attr('title', (slide.isHidden ? 'Показать' : 'Скрыть') + ' слайд')
-                        .on('click', function(e) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            var that = this;
-                            toggleSlideVisible(slide.id)
-                                .done(function(data) {
-                                    if (data && data.success) {
-                                        changeSlideVisibleIcon($(that), data.status);
-                                    }
-                                });
-                        })
-                        .appendTo($element);*/
-
-                    $element.appendTo($container);
-                });
-                loadSlide(activeSlideID);
-                $container.sortable();
+    /**
+     * Загрузка списка слайдов
+     * @param toSetActiveSlideID
+     */
+    function loadSlides(toSetActiveSlideID) {
+        return slidesManager.loadSlidesList(toSetActiveSlideID, function(slideID) {
+            unsetActiveBlock();
+            loadSlide(slideID);
+        }).done(function(data) {
+            if (data.length) {
+                blockToolbar.show();
+                slideMenu.show();
             }
             else {
-                $("<span/>").text("Нет слайдов").appendTo($container);
-                $("#slide-blocks").hide();
-                $("#slide-block-params").hide();
+                blockToolbar.hide();
+                slideMenu.hide();
             }
         });
     }
 
-    function onBeforeSubmit() {
-        var $form = $(this),
-            button = $("button[type=submit]", $form);
-        button.button("loading");
+    function deleteSlide() {
+        var slide = slidesManager.getActiveSlide();
+        slide.delete();
+        slidesManager.unsetActiveSlide();
+    }
 
-        modifier.clearTimeout();
-
-        $.ajax({
-            url: $form.attr("action"),
-            type: $form.attr("method"),
-            data: new FormData($form[0]),
-            cache: false,
-            contentType: false,
-            processData: false,
-            success: function(data) {
-                loadSlide(currentSlideID);
-            },
-            error: function(data) {
-                console.log(data);
+    function deleteSlideAction() {
+        return slidesManager.deleteSlide().done(function(data) {
+            if (data && data.success) {
+                deleteSlide();
+                loadSlides();
             }
-        }).always(function() {
-            button.button("reset");
         });
     }
 
-    //init();
+    function copySlideAction() {
+        slidesManager.copySlide().done(function(data) {
+            if (data && data.success) {
+                loadSlides(data.id);
+            }
+        }).fail(function() {
+            toastr.error('Не удалось скопировать слайд');
+        });
+    }
 
-    function previewContainerSetHeight() {
+    /*function previewContainerSetHeight() {
         var height = parseInt($('.story-container').css('height'));
         $previewContainer.css('height', height + 'px');
     }
-    previewContainerSetHeight();
-
-    function slideMenuSetPosition() {
-        var slidesRect = $editor.find('.slides')[0].getBoundingClientRect();
-        var height = $editor.height(),
-            slidesHeight = slidesRect.height,
-            top = ((height - slidesHeight) / 2) - $('.slide-menu').height() + 'px';
-        var width = $editor.width(),
-            slidesWidth = slidesRect.width,
-            w = width - slidesWidth;
-        if (w < 0) {
-            w = slidesWidth;
-        }
-        else {
-            w = w / 2;
-        }
-        var left = slidesWidth + w - $('.slide-menu').width() + 'px';
-        $('.slide-menu').css({'left': left, 'top': top});
-    }
+    previewContainerSetHeight();*/
 
     window.addEventListener('resize', function() {
-        previewContainerSetHeight();
-        slideMenuSetPosition();
+        slideMenu.setPosition();
     });
 
-    function getQueryHash() {
+    /*function getQueryHash() {
         var query = {};
         location.search.replace( /[A-Z0-9]+?=([\w\.%-]*)/gi, function(a) {
             query[ a.split( '=' ).shift() ] = a.split( '=' ).pop();
@@ -704,173 +1020,122 @@ var StoryEditor = (function() {
             query[ i ] = deserialize( unescape( value ) );
         }
         return query;
-    }
+    }*/
 
-    function readUrl() {
+    /*function readUrl() {
         var hash = window.location.hash;
         var bits = hash.slice( 2 ).split( '/' ),
             name = hash.replace( /#|\//gi, '' );
         return name;
-    }
+    }*/
 
-    function locationHash() {
+    /*function locationHash() {
         return "#slide=" + currentSlideIndex;
-    }
+    }*/
 
-    function setSlideUrl() {
+    /*function setSlideUrl() {
         window.location.hash = locationHash();
+    }*/
+
+    function SlideMenu($ed) {
+        "use strict";
+
+        this.$slideMenu = $('.slide-menu');
+        this.$slideMenuList = this.$slideMenu.find('ul');
+
+        this.init = function(slideData) {
+            this.setPosition();
+            this.$slideMenu.show();
+            this.slideVisibleToggleAction(slideData.status);
+            setLinksIn(slideData.haveLinks);
+            setRelationsIn(slideData.haveNeoRelations);
+        }
+
+        var that = this;
+        function setLinksIn(haveLinks) {
+            var element = that.getActionElement('links');
+            haveLinks
+                ? element.addClass('set-in')
+                : element.removeClass('set-in');
+        }
+
+        function setRelationsIn(haveNeoRelations) {
+            var element = that.getActionElement('relation');
+            haveNeoRelations
+                ? element.addClass('set-in')
+                : element.removeClass('set-in');
+        }
+
+        this.setPosition = function() {
+            var slidesRect = $ed.find('.slides')[0].getBoundingClientRect();
+            var height = $ed.height(),
+                slidesHeight = slidesRect.height,
+                top = ((height - slidesHeight) / 2) - this.$slideMenu.height() + 'px';
+            var width = $ed.width(),
+                slidesWidth = slidesRect.width,
+                w = width - slidesWidth;
+            if (w < 0) {
+                w = slidesWidth;
+            }
+            else {
+                w = w / 2;
+            }
+            var left = slidesWidth + w - this.$slideMenu.width() + 1 + 'px';
+            this.$slideMenu.css({'left': left, 'top': top});
+        }
+
+        this.getActionElement = function(name) {
+            return this.$slideMenuList.find('li[data-slide-action=' + name + ']');
+        }
+
+        this.slideVisibleToggle = function(element, visible) {
+            element.data('visible', visible);
+            const OPEN = 'glyphicon-eye-open';
+            const CLOSE = 'glyphicon-eye-close';
+            var $el = element.find('span');
+            visible === 1 && $el.removeClass(CLOSE).addClass(OPEN) && element.removeClass('set-in');
+            visible === 2 && $el.removeClass(OPEN).addClass(CLOSE) && element.addClass('set-in');
+        }
+
+        this.slideVisibleToggleAction = function(visible) {
+            this.slideVisibleToggle(this.getActionElement('visible'), visible);
+        }
+
+        this.hide = function() {
+            this.$slideMenu.addClass('hide');
+        }
+        this.show = function() {
+            this.$slideMenu.removeClass('hide');
+        }
     }
 
-    function toggleSlideVisible(slideID) {
-        slideID = slideID || currentSlideID;
-        return $.ajax({
-            "url": config.slideVisibleAction + "&slide_id=" + slideID,
-            "type": "GET",
-            "dataType": "json"
+    function slideVisibleToggleAction() {
+        return slidesManager.toggleVisible().done(function(data) {
+            if (data && data.success) {
+                slideMenu.slideVisibleToggleAction(data.status);
+                if (data.status === 2) {
+                    slidesManager.addModeIcon('hidden');
+                }
+                else {
+                    slidesManager.removeModeIcon('hidden');
+                }
+            }
+            else {
+                toastr.error('slideVisibleToggleAction error');
+            }
         });
-    }
-
-    function changeSlideVisibleIcon(element, status) {
-        element.removeClass('glyphicon-eye-open glyphicon-eye-close');
-        if (status === 1) {
-            element.addClass('glyphicon-eye-open');
-        }
-        else {
-            element.addClass('glyphicon-eye-close');
-        }
-    }
-
-    function slideSourceModal(url) {
-        $("#slide-source-modal").modal({"remote": url + "&slide_id=" + currentSlideID});
     }
 
     function getConfigValue(value) {
         return config[value];
     }
 
-    function saveSlidesOrder() {
-        var formData = new FormData();
-        formData.append('SlidesOrder[story_id]', config.storyID);
-        $('#preview-container a').each(function(i) {
-            formData.append('SlidesOrder[slides][' + i + ']', $(this).attr('data-slide-id'));
-            formData.append('SlidesOrder[order][' + i + ']', ++i);
-        });
-        var promise = $.ajax({
-            'url': '/admin/index.php?r=slide/save-order',
-            'type': 'POST',
-            'data': formData,
-            cache: false,
-            contentType: false,
-            processData: false
-        });
-        promise.done(function(data) {
-            if (data) {
-                if (data.success) {
-                    toastr.success('Порядок слайдов успешно изменен');
-                }
-                else {
-                    toastr.error(JSON.stringify(data.errors));
-                }
-            }
-            else {
-                toastr.error('Неизвестная ошибка');
-            }
-        });
-        promise.fail(function(data) {
-            toastr.error(data.responseJSON.message);
-        });
-    }
-
-    function findBlockElement(blockID) {
-        return $editor.find('section > div.sl-block[data-block-id=' + blockID + ']');
-    }
-
-    function BlockModifier() {
-
-        function css(element, name, value) {
-            element.css(name, value);
-            modifier.change();
-        }
-
-        this.setLeft = function(element, left) {
-            css(element,'left', left);
-        };
-        this.setTop = function(element, top) {
-            css(element, 'top', top);
-        };
-        this.setWidth = function(element, width) {
-            css(element, 'width', width);
-        };
-        this.setHeight = function(element, height) {
-            css(element, 'height', height);
-        };
-    }
-
-    var blockModifier = new BlockModifier();
-
-    function BlockAlignment(modifier) {
-
-        var slideWidth = 1280,
-            slideHeight = 720;
-
-        function setBlockAlign(element, align) {
-            switch (align) {
-                case 'left':
-                    modifier.setLeft(element, '0px');
-                    break;
-                case 'right':
-                    modifier.setLeft(element, slideWidth - parseInt(element.css('width')) + 'px');
-                    break;
-                case 'top':
-                    modifier.setTop(element, '0px');
-                    break;
-                case 'bottom':
-                    modifier.setTop(element, slideHeight - parseInt(element.css('height')) + 'px');
-                    break;
-                case 'horizontal_center':
-                    modifier.setLeft(element, (slideWidth - parseInt(element.css('width'))) / 2 + 'px');
-                    break;
-                case 'vertical_center':
-                    modifier.setTop(element, (slideHeight - parseInt(element.css('height'))) / 2 + 'px');
-                    break;
-                case 'slide_center':
-                    modifier.setLeft(element, (slideWidth - parseInt(element.css('width'))) / 2 + 'px');
-                    modifier.setTop(element, (slideHeight - parseInt(element.css('height'))) / 2 + 'px');
-                    break;
-            }
-        }
-
-        this.left = function(element) {
-            setBlockAlign(element, 'left');
-        };
-        this.right = function(element) {
-            setBlockAlign(element, 'right');
-        };
-        this.top = function(element) {
-            setBlockAlign(element, 'top');
-        }
-        this.bottom = function(element) {
-            setBlockAlign(element, 'bottom');
-        };
-        this.horizontalCenter = function(element) {
-            setBlockAlign(element, 'horizontal_center');
-        };
-        this.verticalCenter = function(element) {
-            setBlockAlign(element, 'vertical_center');
-        };
-        this.slideCenter = function(element) {
-            setBlockAlign(element, 'slide_center');
-        };
-    }
-
-    var blockAlignment = new BlockAlignment(blockModifier);
-
     function stretchToSlide() {
-        var element = activeBlock.getElement();
+        var element = blockManager.getActive().getElement();
         if (element === null) {
             return;
         }
-        if (activeBlock.getType() === 'text') {
+        if (blockManager.getActive().getType() === 'text') {
             blockModifier.setLeft(element, '0px');
             blockModifier.setWidth(element, '1280px');
         }
@@ -882,95 +1147,64 @@ var StoryEditor = (function() {
         }
     }
 
+    function appendBlock(blockHtml) {
+        if (!(blockHtml instanceof jQuery)) {
+            blockHtml = $(blockHtml);
+        }
+        var block = blockManager.append(blockHtml);
+        makeDraggable(blockHtml);
+        return block;
+    }
+
+    function createBlock(blockHtml) {
+        var block = appendBlock(blockHtml);
+        blockAlignment.slideCenter(block.getElement());
+    }
+
+    function updateBlock(blockID, blockHtml) {
+        var block = blockManager.find(blockID);
+        unsetActiveBlock();
+        block.delete();
+        appendBlock(blockHtml);
+    }
+
+    function getUpdateBlockUrl() {
+        return config.getBlockFormAction + "&slide_id=" + slidesManager.getCurrentSlideID() + "&block_id=" + blockManager.getActive().getID();
+    }
+
     return {
-        "initialize": initialize,
-        "loadSlides": loadSlides,
-        "loadSlide": loadSlide,
-        "onBeforeSubmit": onBeforeSubmit,
-        "getCurrentSlideIndex": function() {
-            return currentSlideIndex;
-        },
-        "getCurrentSlideID": function() {
-            return currentSlideID;
-        },
-        "readUrl": readUrl,
-        "setSlideUrl": setSlideUrl,
-        "createBlock": createBlock,
+        initialize,
+
         "deleteBlock": deleteBlock,
-        "deleteSlide": deleteSlide,
-        "createSlide": createSlide,
-        "slideSourceModal": slideSourceModal,
+
+        'deleteSlide': deleteSlideAction,
+        'createSlide': createSlideAction,
+        'copySlide': copySlideAction,
+        'slideVisibleToggle': slideVisibleToggleAction,
+
         "getConfigValue": getConfigValue,
-        "getStoryID": function() {
+
+
+        'getCreateBlockUrl': function(blockType) {
+            return '/admin/index.php?r=editor/form-create&slide_id=' + slidesManager.getCurrentSlideID() + '&block_type=' + blockType;
+        },
+        'createSlideBlock': createBlock,
+        'updateSlideBlock': updateBlock,
+        "getNormalizedSlideContent": function() {
+            return contentCleaner.cleanSlideContent();
+        },
+
+        'getStoryID': function() {
             return getConfigValue('storyID');
         },
-        "saveSlidesOrder": saveSlidesOrder,
-        "getUpdateBlockUrl": function(blockID) {
-            return config.getBlockFormAction + "&slide_id=" + currentSlideID + "&block_id=" + blockID;
+        'getCurrentSlideID': function() {
+            return slidesManager.getCurrentSlideID();
         },
-        "getCreateBlockUrl": function(blockType) {
-            return '/admin/index.php?r=editor/form-create&slide_id=' + currentSlideID + '&block_type=' + blockType;
-        },
-        "addSlideBlock": function(html) {
-            var $block = $(html);
-            $(".slides > section", $editor).append($block);
-            makeDraggable($block);
-        }
+        loadSlides
     };
 })();
 
-
-
-(function(editor, $, console) {
-    "use strict";
-
-    editor.createSlideLink = function() {
-        $("#slide-link-modal").modal("show");
-    };
-
-    editor.changeStory = function(obj, listID, defaultValue) {
-        var $slides = $("#" + listID);
-        $slides.empty();
-        var storyID = $(obj).val();
-        if (storyID) {
-            var promise = $.ajax({
-                "url": editor.getConfigValue("slidesAction") + "&story_id=" + storyID,
-                "type": "GET",
-                "dataType": "json"
-            });
-            promise.done(function (data) {
-                data.forEach(function (slide) {
-                    var $option = $("<option />")
-                        .val(slide.id)
-                        .text("Слайд " + slide.slideNumber + (slide.isHidden ? ' (скрытый)' : ''));
-                    if (slide.id === defaultValue) {
-                        $option.attr("selected", "selected");
-                    }
-                    $option.appendTo($slides);
-                });
-            });
-        }
-    };
-
-    editor.link = function() {
-        var promise = $.ajax({
-            "url": editor.getConfigValue("createSlideLinkAction") + "&link_slide_id=" + $("#story-link-slides").val() + '&current_slide_id=' + editor.getCurrentSlideID(),
-            "type": "GET",
-            "dataType": "json"
-        });
-        promise.done(function(data) {
-            if (data.success) {
-                editor.loadSlides(data.id);
-            }
-            else {
-                toastr.error(data.error);
-            }
-            $("#slide-link-modal").modal("hide");
-        });
-    };
-
-})(StoryEditor, jQuery, console);
-
+/*
 (function(editor, $, console) {
     "use strict";
 
@@ -994,8 +1228,9 @@ var StoryEditor = (function() {
         });
         $modal.modal("hide");
     };
-})(StoryEditor, jQuery, console);
+})(StoryEditor, jQuery, console);*/
 
+/*
 (function(editor, $, console) {
     "use strict";
 
@@ -1011,23 +1246,10 @@ var StoryEditor = (function() {
         });
     };
 
-})(StoryEditor, jQuery, console);
-
-(function(editor, $, console) {
-    "use strict";
-
-    editor.copySlide = function() {
-        $.getJSON(editor.getConfigValue("copySlideAction"), {
-            "slide_id": editor.getCurrentSlideID()
-        }).done(function(data) {
-            editor.loadSlides(data.id);
-        });
-    };
-
-})(StoryEditor, jQuery, console);
+})(StoryEditor, jQuery, console);*/
 
 /** Blocks */
-(function(editor, $, console) {
+/*(function(editor, $, console) {
     "use strict";
 
     editor.newCreateBlock = function() {
@@ -1039,19 +1261,10 @@ var StoryEditor = (function() {
         });
     };
 
-})(StoryEditor, jQuery, console);
-
-/** Youtube block */
-(function(editor, $, console) {
-    "use strict";
-
-    editor.createVideoBlock = function() {
-
-    };
-
-})(StoryEditor, jQuery, console);
+})(StoryEditor, jQuery, console);*/
 
 /** Images */
+/*
 var ImageFromStory = (function(editor, $, console) {
     "use strict";
 
@@ -1107,8 +1320,10 @@ var ImageFromStory = (function(editor, $, console) {
         },
     };
 })(StoryEditor, jQuery, console);
+*/
 
 /** Collections */
+/*
 (function(editor, $, console) {
     "use strict";
 
@@ -1357,8 +1572,10 @@ var ImageFromStory = (function(editor, $, console) {
     }
 
 })(StoryEditor, jQuery, console);
+*/
 
 /** Cropper */
+/*
 var ImageCropper = (function(editor, $) {
 
     var $modal = $('#image-crop-modal'),
@@ -1395,7 +1612,7 @@ var ImageCropper = (function(editor, $) {
         $('#crop-image-container', this).find('img').remove();
     });
 
-    /** Обрезать и сохранить изображение */
+    // Обрезать и сохранить изображение
     function crop() {
         cropper.getCroppedCanvas().toBlob(function (blob) {
             var formData = new FormData(),
@@ -1424,7 +1641,7 @@ var ImageCropper = (function(editor, $) {
         });
     }
 
-    /** Сохранение изображения без обрезки */
+    // Сохранение изображения без обрезки
     function save() {
 
         var formData = new FormData();
@@ -1454,86 +1671,9 @@ var ImageCropper = (function(editor, $) {
         'save': save
     };
 })(StoryEditor, jQuery);
+*/
 
-/** Story Images */
-(function(editor, $, console) {
-    "use strict";
-
-    var $modal = $("#story-images-modal");
-
-    function elementWrapper() {
-        return $('<div class="media">' +
-                    '<div class="media-left"></div>' +
-                    '<div class="media-body">' +
-                        '<a href="#" class="add-backup-image">Добавить резервное изображение</a>' +
-                        '<br>' +
-                        '<a href="#" class="backup-images">Резервные изображения <span></span></a>' +
-                        '<br>' +
-                        '<a href="#" class="delete-image">Удалить из истории</a>' +
-                    '</div>' +
-                '</div>');
-    }
-
-    function backupImages(imageID) {
-        editor.slideCollectionsBackupModal(imageID);
-    }
-
-    function deleteImageFromStory(imageID, slideID, blockID, elem) {
-        return $.ajax({
-            "url": "/admin/index.php?r=editor/image/delete-from-story&image_id=" + imageID + '&slide_id=' + slideID + '&block_id=' + blockID,
-            "type": "GET",
-            "dataType": "json"
-        });
-    }
-
-    $modal.on('show.bs.modal', function() {
-        var $imagesList = $(".story-images-list", this);
-        $imagesList.empty();
-        var promise = $.ajax({
-            "url": "/admin/index.php?r=editor/image/get-images&story_id=" + editor.getConfigValue('storyID'),
-            "type": "GET",
-            "dataType": "json"
-        });
-        promise.done(function(data) {
-            if (data && data.success) {
-                if (!data.result.length) {
-                }
-                else {
-                    data.result.forEach(function(image) {
-                        var $img = $('<img/>')
-                            .attr("src", "/image/view?id=" + image.hash)
-                            .attr("width", 200);
-                        elementWrapper()
-                            .find(".media-left").append($img).end()
-                            .find(".add-backup-image").on("click", function(e) {
-                                e.preventDefault();
-                                backupImages(image.id);
-                            }).end()
-                            .find(".backup-images").attr("href", "/admin/index.php?r=editor/image/update&id=" + image.id).end()
-                            .find(".backup-images span").text(" (" + image.link_image_count + ")").end()
-                            .find(".delete-image").on("click", function(e) {
-                                e.preventDefault();
-                                if (!confirm("Удалить изображение?")) {
-                                    return;
-                                }
-                                var $link = $(this);
-                                deleteImageFromStory(image.id, image.slide_id, image.block_id)
-                                    .done(function(data) {
-                                        if (data && data.success) {
-                                            $link.parent().parent().remove();
-                                            editor.loadSlide(editor.getCurrentSlideID(), true);
-                                        }
-                                    });
-                            }).end()
-                            .appendTo($imagesList);
-                    });
-                }
-            }
-        });
-    });
-
-})(StoryEditor, jQuery, console);
-
+/*
 var EditorImage = (function($, editor) {
 
     var element,
@@ -1677,8 +1817,9 @@ var EditorImage = (function($, editor) {
         },
         'destroy': destroy
     };
-})(jQuery, StoryEditor);
+})(jQuery, StoryEditor);*/
 
+/*
 var EditorImageDialog = (function(editor, $, console) {
     "use strict";
 
@@ -1712,9 +1853,9 @@ var EditorImageDialog = (function(editor, $, console) {
             dialog.modal('hide');
         }
     };
-})(StoryEditor, jQuery, console);
+})(StoryEditor, jQuery, console);*/
 
-var ImageFromFile = (function() {
+/*var ImageFromFile = (function() {
     "use strict";
 
     var dialog = $('#image-from-file-modal');
@@ -1731,8 +1872,9 @@ var ImageFromFile = (function() {
             dialog.modal('hide');
         }
     };
-})();
+})();*/
 
+/*
 var ImageFromStoryDialog = (function(module, $, editor) {
     "use strict";
 
@@ -1776,7 +1918,9 @@ var ImageFromStoryDialog = (function(module, $, editor) {
         }
     };
 })(ImageFromStory, jQuery, StoryEditor);
+*/
 
+/*
 var EditorImageUploader = (function(editor) {
     "use strict";
 
@@ -1794,8 +1938,9 @@ var EditorImageUploader = (function(editor) {
     return {
         'uploadImageHandler': uploadImageHandler
     };
-})(StoryEditor);
+})(StoryEditor);*/
 
+/*
 var SlideImageUploader = (function(uploader, editor, dialog) {
     "use strict";
 
@@ -1812,12 +1957,15 @@ var SlideImageUploader = (function(uploader, editor, dialog) {
     return {
         'uploadHandler': uploadHandler
     };
-})(EditorImageUploader, StoryEditor, ImageFromFile);
+})(EditorImageUploader, StoryEditor);
+*/
 
-var StoryImageFromUrl = (function() {
+/*var StoryImageFromUrl = (function() {
 
-})();
+})();*/
 
+
+/*
 function StoryDialog(selector, options) {
     "use strict";
 
@@ -1846,7 +1994,9 @@ StoryDialog.prototype.hide = function() {
 
     this.dialog.modal('hide');
 };
+*/
 
+/*
 var imageFromUrlDialog = new StoryDialog('#image-from-url-modal', {
     'onShow': function() {
         $('input[type=text]:eq(0)', this).val('');
@@ -1882,5 +2032,5 @@ var imageFromUrlDialog = new StoryDialog('#image-from-url-modal', {
             toastr.error(data.responseJSON.message);
         });
     }
-});
+});*/
 

@@ -1,4 +1,5 @@
 <?php
+use backend\widgets\WikidsDatePicker;
 use common\models\Category;
 use common\models\story\StoryStatus;
 use yii\grid\ActionColumn;
@@ -6,7 +7,6 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use common\helpers\UserHelper;
 use common\models\Story;
-use dosamigos\datepicker\DatePicker;
 use yii\widgets\Menu;
 use yii\widgets\Pjax;
 /** @var $this yii\web\View */
@@ -25,7 +25,6 @@ $this->title = 'Управление историями';
     'filterModel' => $searchModel,
     'options' => ['class' => 'table-responsive'],
     'columns' => [
-        // ['class' => CheckboxColumn::class],
         'id',
         [
             'attribute' =>'title',
@@ -37,7 +36,7 @@ $this->title = 'Управление историями';
         [
             'format' => 'raw',
             'attribute' => 'mode',
-            'value' => function($model) {
+            'value' => static function($model) {
                 $mode = '';
                 if ($model->isAudioStory()) {
                     $mode = '<i class="glyphicon glyphicon-volume-up" data-toggle="popover" title="Озвучено" style="font-size: 20px; color: #d9534f"></i>';
@@ -55,8 +54,8 @@ $this->title = 'Управление историями';
         ],
         [
             'attribute' => 'story_categories',
-            'value' => function($model) {
-                return implode(', ', array_map(function($item){
+            'value' => static function($model) {
+                return implode(', ', array_map(static function($item){
                     return $item->name;
                 }, $model->categories));
             },
@@ -67,28 +66,18 @@ $this->title = 'Управление историями';
             'attribute' => 'created_at',
             'value' => 'created_at',
             'format' => 'datetime',
-            'filter' => DatePicker::widget([
+            'filter' => WikidsDatePicker::widget([
                 'model' => $searchModel,
                 'attribute' => 'created_at',
-                'language' => 'ru',
-                'clientOptions' => [
-                    'autoclose' => true,
-                    'format' => 'dd.mm.yyyy'
-                ]
             ]),
         ],
         [
             'attribute' => 'updated_at',
             'value' => 'updated_at',
             'format' => 'datetime',
-            'filter' => DatePicker::widget([
+            'filter' => WikidsDatePicker::widget([
                 'model' => $searchModel,
                 'attribute' => 'updated_at',
-                'language' => 'ru',
-                'clientOptions' => [
-                    'autoclose' => true,
-                    'format' => 'dd.mm.yyyy'
-                ]
             ]),
         ],
         [
@@ -97,13 +86,6 @@ $this->title = 'Управление историями';
                 return StoryStatus::asText($model->status);
             },
             'filter' => StoryStatus::asArray(),
-        ],
-        [
-            'attribute' => 'sub_access',
-            'value' => function($model) {
-                return $model->getSubAccessText();
-            },
-            'filter' => Story::getSubAccessArray(),
         ],
         'views_number',
         [

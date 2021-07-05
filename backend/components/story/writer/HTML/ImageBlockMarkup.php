@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\components\story\writer\HTML;
-
 
 use backend\components\story\AbstractBlock;
 use backend\components\story\ImageBlock;

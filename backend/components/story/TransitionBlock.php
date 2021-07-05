@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\components\story;
-
 
 use backend\models\editor\TransitionForm;
 
@@ -56,7 +54,6 @@ class TransitionBlock extends ButtonBlock
     {
         return array_merge([
             'text' => $this->text,
-            'text_size' => $this->fontSize,
             'transition_story_id' => $this->transition_story_id,
             'slides' => $this->slides,
             'back_to_next_slide' => $this->back_to_next_slide,
@@ -70,8 +67,7 @@ class TransitionBlock extends ButtonBlock
         $block->setHeight('auto');
         $block->setTop('600px');
         $block->setLeft('990px');
-        $block->setText('Название');
-        $block->setFontSize('1em');
+        $block->setText('Переход к истории');
         $block->setUrl('#');
         return $block;
     }
@@ -81,9 +77,7 @@ class TransitionBlock extends ButtonBlock
      */
     public function update($form)
     {
-        //$this->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
         $this->text = $form->text;
-        $this->fontSize = $form->text_size;
         $this->transition_story_id = $form->transition_story_id;
         $this->slides = $form->slides;
         $this->back_to_next_slide = $form->back_to_next_slide;
@@ -104,5 +98,4 @@ class TransitionBlock extends ButtonBlock
     {
         $this->back_to_next_slide = $back_to_next_slide;
     }
-
 }

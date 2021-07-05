@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\components\story\writer\HTML;
-
 
 use backend\components\story\AbstractBlock;
 use backend\components\story\TextBlock;
@@ -24,7 +22,6 @@ class ParagraphBlockMarkup extends TextBlockMarkup
 
         $element = $this->getElement();
         $elementAttributes = $element->getAttributes();
-        //$elementAttributes['style'] = $this->setStyleValue($elementAttributes['style'], 'font-size', $block->getFontSize());
         $elementTag = Html::tag($element->getTagName(), $block->getText(), $elementAttributes);
 
         $contentBlockAttributes = array_merge($this->getContentBlockAttributes(), [
@@ -41,11 +38,8 @@ class ParagraphBlockMarkup extends TextBlockMarkup
                 'height' => $block->getHeight(),
                 'left' => $block->getLeft(),
                 'top' => $block->getTop(),
-                'min-width' => '30px',
-                'min-height' => '30px',
             ]),
         ]);
         return Html::tag('div', $contentBlockTag, $blockAttributes);
     }
-
 }

@@ -2362,3 +2362,8 @@ p.wikids-test-description {
 .wikids-test-correct-answer-answers .question-region {
 	cursor: default;
 }
+
+#story-editor section {
+	height: 100%;
+	padding: 0;
+}

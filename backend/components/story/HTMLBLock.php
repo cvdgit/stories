@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\components\story;
-
 
 class HTMLBLock extends AbstractBlock
 {
@@ -53,5 +51,4 @@ class HTMLBLock extends AbstractBlock
             'required' => $content->getRequired(),
         ], parent::getValues());
     }
-
 }

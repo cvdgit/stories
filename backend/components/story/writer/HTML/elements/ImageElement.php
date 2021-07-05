@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\components\story\writer\HTML\elements;
-
 
 class ImageElement extends AbstractElement
 {
@@ -13,5 +11,4 @@ class ImageElement extends AbstractElement
         'data-natural-width' => 1459,
         'data-natural-height' => 1080,
     ];
-
 }

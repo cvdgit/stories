@@ -22,6 +22,9 @@ use yii\db\Query;
  * @property int $created_at
  * @property int $updated_at
  * @property int $status
+ * @property string $filename
+ * @property int $root_folder_id
+ * @property string $mime_type
  *
  * @property StorySlide[] $slides
  * @property StorySlideImage[] $linkImages
@@ -31,6 +34,12 @@ class StorySlideImage extends ActiveRecord
 
     const STATUS_SUCCESS = 0;
     const STATUS_ERROR = 1;
+
+    public function init()
+    {
+        $this->hash = Yii::$app->security->generateRandomString();
+        parent::init();
+    }
 
     /**
      * {@inheritdoc}
@@ -104,16 +113,18 @@ class StorySlideImage extends ActiveRecord
         throw new DomainException('Изображение не найдено');
     }
 
-    public static function createImage(string $collectionAccount, string $collectionID, string $collectionName, string $hash, string $folder, string $contentUrl, string $sourceUrl): StorySlideImage
+    public static function createImage(int $rootFolderID, string $folder, $filename = null, $mimeType = null, $contentUrl = null, $sourceUrl = null, $collectionAccount = null, $collectionID = null, $collectionName = null): StorySlideImage
     {
         $image = new self;
+        $image->root_folder_id = $rootFolderID;
+        $image->folder = $folder;
+        $image->filename = $filename;
+        $image->mime_type = $mimeType;
+        $image->content_url = $contentUrl;
+        $image->source_url = $sourceUrl;
         $image->collection_account = $collectionAccount;
         $image->collection_id = $collectionID;
         $image->collection_name = $collectionName;
-        $image->hash = $hash;
-        $image->folder = $folder;
-        $image->content_url = $contentUrl;
-        $image->source_url = $sourceUrl;
         return $image;
     }
 
@@ -181,4 +192,23 @@ class StorySlideImage extends ActiveRecord
         return '/' . $this->folder . '/' . $this->hash . '.jpeg';
     }
 
+    public function getImageName(): string
+    {
+        if (!empty($this->filename)) {
+            return $this->filename;
+        }
+        return $this->hash . '.jpeg';
+    }
+
+    public function getImagePath(bool $abs = true): string
+    {
+        $rootFolder = Yii::$app->params['images.root'][$this->root_folder_id];
+        return ($abs ? Yii::getAlias('@public') : '') . $rootFolder . $this->folder . '/' . $this->getImageName();
+    }
+
+    public function getImageThumbPath(bool $abs = false): string
+    {
+        $imagePath = $this->getImagePath($abs);
+        return str_replace(basename($imagePath), 'thumb_' . basename($imagePath), $imagePath);
+    }
 }

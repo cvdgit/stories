@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\components\story\writer\HTML;
-
 
 use backend\components\story\AbstractBlock;
 use backend\components\story\TestBlock;
@@ -21,7 +19,6 @@ class TestBlockMarkup extends AbstractMarkup
     {
         $element = $this->getElement();
         $elementAttributes = $element->getAttributes();
-        $elementAttributes['style'] = $this->setStyleValue($elementAttributes['style'], 'font-size', $block->getFontSize());
         $elementAttributes['data-test-id'] = $block->getTestId();
         return Html::tag($element->getTagName(), $block->getText(), $elementAttributes);
     }

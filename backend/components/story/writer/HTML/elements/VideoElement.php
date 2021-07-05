@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\components\story\writer\HTML\elements;
-
 
 class VideoElement extends AbstractElement
 {
@@ -15,5 +13,4 @@ class VideoElement extends AbstractElement
         'data-mute' => '',
         'data-speed' => '',
     ];
-
 }

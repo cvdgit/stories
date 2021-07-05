@@ -1,28 +1,24 @@
 <?php
 
-
 namespace backend\components\story\writer;
-
 
 use backend\components\story\Story;
 
 class StoryRenderer
 {
 
-    protected $story;
+    private $slideRenderer;
 
-    public function __construct(Story $story)
+    public function __construct()
     {
-        $this->story = $story;
+        $this->slideRenderer = new SlideRenderer();
     }
 
-    public function getElements(): array {}
-
-    public function render(): string
+    public function render(Story $story): string
     {
         $html = '<div class="slides">';
-        foreach ($this->story->getSlides() as $slide) {
-            $html .= (new SlideRenderer($slide))->render();
+        foreach ($story->getSlides() as $slide) {
+            $html .= $this->slideRenderer->render($slide);
         }
         $html .= '</div>';
         return $html;

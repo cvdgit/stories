@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\components\story\writer\HTML;
-
 
 use backend\components\story\AbstractBlock;
 use backend\components\story\HTMLBLock;
@@ -19,8 +17,6 @@ class HTMLBlockMarkup extends AbstractMarkup
 
     private function getElementMarkup(HTMLBLock $block): string
     {
-        //$element = $this->getElement();
-        //return Html::tag($element->getTagName(), $block->getContent());
         return $block->getContent();
     }
 

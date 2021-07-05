@@ -39,7 +39,7 @@ function WikidsVideoPlayer(elemID, options) {
         });
     }
 
-    var pauseTimeoutID;
+    var pauseTimeoutID = null;
 
     if (sourceIsFile) {
         player.on('playing', function (event) {
@@ -51,14 +51,22 @@ function WikidsVideoPlayer(elemID, options) {
         });
     }
     else {
+        var playTimeout;
         player.on("statechange", function (event) {
             if (event.detail.code === 1 && !done) {
-                if (!pauseTimeoutID) {
-                    console.log('STATECHANGE');
-                    var timeout = options.duration - (player.currentTime - options.seekTo);
-                    console.log(options.duration);
-                    pauseTimeoutID = setTimeout(pauseVideo, timeout * 1000);
-                }
+                playTimeout = setInterval(function() {
+                    if (!pauseTimeoutID) {
+                        console.log('STATECHANGE');
+                        //console.log('currentTime', player.currentTime);
+                        var timeout = options.duration - (player.currentTime - options.seekTo);
+                        //console.log('duration', options.duration);
+                        //console.log('timeout', timeout * 1000);
+                        pauseTimeoutID = setTimeout(pauseVideo, timeout * 1000);
+                    }
+                }, 100);
+            }
+            else {
+                clearInterval(playTimeout);
             }
         });
     }
@@ -68,6 +76,7 @@ function WikidsVideoPlayer(elemID, options) {
         if (pauseTimeoutID) {
             console.log('CLEAR TIMEOUT ' + options.videoID, pauseTimeoutID);
             clearTimeout(pauseTimeoutID);
+            pauseTimeoutID = null;
         }
     });
 
@@ -87,10 +96,12 @@ function WikidsVideoPlayer(elemID, options) {
         player.pause();
         done = true;
         if (inTransition()) {
+            console.log('backToStory');
             backToStory();
         }
         else {
             if (options.toNextSlide) {
+                console.log('toNextSlide');
                 setTimeout(function () {
                     WikidsPlayer.right();
                 }, 1500);
@@ -208,6 +219,11 @@ var WikidsVideo = (function() {
         },
         "reset": function() {
             loaded = [];
+        },
+        "destroyPlayers": function() {
+            players.forEach(function(player) {
+                player.destroy();
+            });
         },
         "pauseLastPlayer": function() {
             if (players.length === 0) {

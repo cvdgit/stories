@@ -52,9 +52,7 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
     {
         $folder = $this->getRootImagesPath();
         if (!file_exists($folder)) {
-            if (!mkdir($concurrentDirectory = $folder) && !is_dir($concurrentDirectory)) {
-                throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
-            }
+            throw new RuntimeException(sprintf('Directory "%s" was not created', $folder));
         }
         else {
             array_map('unlink', glob($folder . DIRECTORY_SEPARATOR . '*.*'));
@@ -121,7 +119,6 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
 
         $shapeImageFilePath = $this->getRootImagesPath() . '/' . $powerPointShape->getIndexedFilename();
         file_put_contents($shapeImageFilePath, $powerPointShape->getContents());
-
         $imageFilePath = $this->convertImage($shapeImageFilePath);
 
         $block->setFilePath($this->getImagesPath() . '/' . $imageFilePath);
@@ -140,7 +137,6 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
             $block->setHeight('auto');
             $block->setLeft('14px');
             $block->setTop('294px');
-            $block->setFontSize('3em');
         }
         else {
             $block->setType(AbstractBlock::TYPE_TEXT);
@@ -148,7 +144,6 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
             $block->setHeight('auto');
             $block->setLeft($powerPointShape->getOffsetX() . 'px');
             $block->setTop($powerPointShape->getOffsetY() . 'px');
-            $block->setFontSize('0.8em');
         }
 
         $paragraphText = [];
@@ -164,17 +159,23 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
         $slide->addBlock($block);
     }
 
-    protected function convertImage(string $filePath)
+    protected function convertImage(string $filePath): string
     {
         [$imageWidth, $imageHeight, $type] = getimagesize($filePath);
-        if ((int)$type !== IMAGETYPE_PNG) {
-            return $filePath;
+        $percent = 30;
+        $width = (973 / 100) * (100 + $percent);
+        $height = (720 / 100) * (100 + $percent);
+        $path = $filePath;
+        $needSourceFileDelete = false;
+        if ((int)$type === IMAGETYPE_PNG) {
+            $path = str_replace('.png', '.jpg', $filePath);
+            $needSourceFileDelete = true;
         }
-        $newFilePath = str_replace('.png', '.jpg', $filePath);
-        Image::resize($filePath, $imageWidth, $imageHeight)->save($newFilePath, ['jpeg_quality' => 80]);
-        unlink($filePath);
-        return basename($newFilePath);
-        //return basename($filePath);
+        Image::resize($filePath, $width, $height)->save($path, ['quality' => 90]);
+        if ($needSourceFileDelete) {
+            unlink($filePath);
+        }
+        return basename($path);
     }
 
 }
