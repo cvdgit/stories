@@ -6,7 +6,6 @@ use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
 use backend\components\story\HTMLBLock;
 use backend\components\story\ImageBlock;
-use backend\components\story\PictureBlock;
 use backend\components\story\Slide;
 use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
@@ -16,8 +15,8 @@ use backend\components\story\VideoBlock;
 class HtmlSlideReader implements ReaderInterface
 {
 
-    protected $slide;
-    protected $html;
+    private $slide;
+    private $html;
 
     public function __construct($html)
     {
@@ -25,16 +24,17 @@ class HtmlSlideReader implements ReaderInterface
         $this->html = $html;
     }
 
-    public function load()
+    public function load(): Slide
     {
         $htmlSlide = \phpQuery::newDocumentHTML($this->html);
         $this->loadSlide($htmlSlide);
         return $this->slide;
     }
 
-    protected function loadSlide($htmlSlide)
+    private function loadSlide($htmlSlide): void
     {
         $this->slide->setView(pq($htmlSlide)->find('section')->attr('data-slide-view') ?? '');
+        $this->slide->setId(pq($htmlSlide)->find('section')->attr('data-id') ?? '');
         $blocks = pq($htmlSlide)->find('div.sl-block');
         $this->loadSlideBlocks($blocks);
     }
@@ -143,7 +143,6 @@ class HtmlSlideReader implements ReaderInterface
             $style = pq($htmlBlock)->find($selector)->attr('style');
             $text = pq($htmlBlock)->find($selector)->html();
         }
-        $block->setFontSize($this->getStyleValue($style, 'font-size'));
         $block->setText($text);
 
         $this->loadBlockProperties($block, pq($htmlBlock)->attr('style'));
@@ -163,7 +162,6 @@ class HtmlSlideReader implements ReaderInterface
         $buttonBlock->setId(pq($htmlBlock)->attr('data-block-id'));
 
         $style = pq($htmlBlock)->find('a')->attr('style');
-        $buttonBlock->setFontSize($this->getStyleValue($style, 'font-size'));
         $buttonBlock->setUrl(pq($htmlBlock)->find('a')->attr('href'));
         $this->slide->addBlock($buttonBlock);
     }
@@ -181,7 +179,6 @@ class HtmlSlideReader implements ReaderInterface
         $block->setId(pq($htmlBlock)->attr('data-block-id'));
 
         $style = pq($htmlBlock)->find('button')->attr('style');
-        $block->setFontSize($this->getStyleValue($style, 'font-size'));
         $block->setTransitionStoryId(pq($htmlBlock)->find('button')->attr('data-story-id'));
         $block->setSlides(pq($htmlBlock)->find('button')->attr('data-slides'));
         $block->setBackToNextSlide(pq($htmlBlock)->find('button')->attr('data-backtonextslide'));
@@ -201,7 +198,6 @@ class HtmlSlideReader implements ReaderInterface
         $block->setId(pq($htmlBlock)->attr('data-block-id'));
 
         $style = pq($htmlBlock)->find('button')->attr('style');
-        $block->setFontSize($this->getStyleValue($style, 'font-size'));
         $block->setTestId(pq($htmlBlock)->find('button')->attr('data-test-id'));
         $this->slide->addBlock($block);
     }
@@ -210,13 +206,10 @@ class HtmlSlideReader implements ReaderInterface
     {
         $block = new HtmlBlock();
         $block->setType(AbstractBlock::TYPE_HTML);
-
         $element = pq($htmlBlock);
-
         $this->loadBlockProperties($block, $element->attr('style'));
         $block->setId(pq($htmlBlock)->attr('data-block-id'));
-        $block->setContent(pq($htmlBlock)->html());
-
+        $block->setContent(pq($htmlBlock)->find('.sl-block-content:eq(0)')->html());
         $this->slide->addBlock($block);
     }
 

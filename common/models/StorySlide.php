@@ -33,6 +33,7 @@ class StorySlide extends ActiveRecord
     const STATUS_VISIBLE = 1;
     const STATUS_HIDDEN = 2;
 
+    const KIND_SLIDE = 0;
     const KIND_LINK = 1;
     const KIND_QUESTION = 2;
 
@@ -129,6 +130,18 @@ class StorySlide extends ActiveRecord
         return $slide;
     }
 
+    public static function createSlideFull(int $storyID, string $data, int $number, int $status = self::STATUS_VISIBLE, int $kind = self::KIND_SLIDE, $linkSlideID = null): self
+    {
+        $model = new self();
+        $model->story_id = $storyID;
+        $model->data = $data;
+        $model->number = $number;
+        $model->status = $status;
+        $model->kind = $kind;
+        $model->link_slide_id = $linkSlideID;
+        return $model;
+    }
+
     public static function createSlideLink(int $storyID, int $linkSlideID)
     {
         $slide = new self();
@@ -218,4 +231,33 @@ class StorySlide extends ActiveRecord
         return (int) $this->status === self::STATUS_HIDDEN;
     }
 
+    public function updateData(string $data): void
+    {
+        $this->data = $data;
+        $this->save(false);
+    }
+
+    public function toggleVisible(): int
+    {
+        return ($this->status === self::STATUS_VISIBLE) ? self::STATUS_HIDDEN : self::STATUS_VISIBLE;
+    }
+
+    public function updateVisible(int $visible): void
+    {
+        $this->status = $visible;
+        $this->save(false, ['status']);
+    }
+
+    public function setQuestionSlide(): void
+    {
+        $this->kind = self::KIND_QUESTION;
+        $this->save(false, ['kind']);
+    }
+
+    public function setKindSlide(): void
+    {
+        $this->kind = self::KIND_SLIDE;
+        $this->save(false, ['kind']);
+    }
 }
+

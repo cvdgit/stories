@@ -7,6 +7,8 @@ use backend\models\video\VideoSource;
 class VideoBlock extends AbstractBlock
 {
 
+    protected $type = AbstractBlock::TYPE_VIDEO;
+
     public const DEFAULT_SPEED = 1;
     public const DEFAULT_VOLUME = 0.8;
 
@@ -36,7 +38,6 @@ class VideoBlock extends AbstractBlock
 
     public function update($form)
     {
-        $this->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
         $this->video_id = $form->video_id;
         $this->seek_to = $form->seek_to;
         $this->duration = $form->duration;

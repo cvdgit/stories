@@ -30,38 +30,51 @@ function WikidsVideoPlayer(elemID, options) {
     player.on("ready", function(event) {
         player.play();
         player.speed = options.speed;
-        player.currentTime = options.seekTo;
+        if (options.seekTo > 0) {
+            player.currentTime = options.seekTo;
+        }
         player.volume = options.volume;
     });
 
     if (sourceIsFile) {
         player.once('canplay', function (event) {
-            player.currentTime = options.seekTo;
+            if (options.seekTo > 0) {
+                player.currentTime = options.seekTo;
+            }
         });
     }
 
-    var pauseTimeoutID;
+    var pauseTimeoutID = null;
 
     if (sourceIsFile) {
         player.on('playing', function (event) {
-            if (!pauseTimeoutID) {
-                //console.log('PLAYING');
+            if (!pauseTimeoutID && options.duration > 0) {
+                console.log('PLAYING');
                 var timeout = options.duration - (player.currentTime - options.seekTo);
                 pauseTimeoutID = setTimeout(pauseVideo, timeout * 1000);
             }
         });
     }
     else {
-        player.on("statechange", function (event) {
-            if (event.detail.code === 1 && !done) {
-                if (!pauseTimeoutID) {
-                    //console.log('STATECHANGE');
-                    var timeout = options.duration - (player.currentTime - options.seekTo);
-                    //console.log(options.duration);
-                    pauseTimeoutID = setTimeout(pauseVideo, timeout * 1000);
+        var playTimeout;
+        if (options.duration > 0) {
+            player.on("statechange", function (event) {
+                if (event.detail.code === 1 && !done) {
+                    playTimeout = setInterval(function () {
+                        if (!pauseTimeoutID) {
+                            console.log('STATECHANGE');
+                            //console.log('currentTime', player.currentTime);
+                            var timeout = options.duration - (player.currentTime - options.seekTo);
+                            //console.log('duration', options.duration);
+                            //console.log('timeout', timeout * 1000);
+                            pauseTimeoutID = setTimeout(pauseVideo, timeout * 1000);
+                        }
+                    }, 100);
+                } else {
+                    clearInterval(playTimeout);
                 }
-            }
-        });
+            });
+        }
     }
 
     player.on("pause", function() {
@@ -89,10 +102,12 @@ function WikidsVideoPlayer(elemID, options) {
         player.pause();
         done = true;
         if (inTransition()) {
+            console.log('backToStory');
             backToStory();
         }
         else {
             if (options.toNextSlide) {
+                console.log('toNextSlide');
                 setTimeout(function () {
                     WikidsPlayer.right();
                 }, 1500);
@@ -210,6 +225,11 @@ var WikidsVideo = (function() {
         },
         "reset": function() {
             loaded = [];
+        },
+        "destroyPlayers": function() {
+            players.forEach(function(player) {
+                player.destroy();
+            });
         },
         "pauseLastPlayer": function() {
             if (players.length === 0) {

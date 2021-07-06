@@ -1,32 +1,25 @@
 <?php
 
-
 namespace backend\models\editor;
-
 
 class TestForm extends TextForm
 {
 
     public $test_id;
 
-    public function rules(): array
+    public function rules()
     {
-        $rules = parent::rules();
-        $rules = array_merge($rules, [
+        return array_merge(parent::rules(), [
             [['test_id'], 'required'],
             [['test_id'], 'integer'],
         ]);
-        return $rules;
     }
 
-    public function attributeLabels(): array
+    public function attributeLabels()
     {
-        $labels = parent::attributeLabels();
-        $labels = array_merge($labels, [
+        return array_merge(parent::attributeLabels(), [
             'text' => 'Заголовок',
             'test_id' => 'Тест',
         ]);
-        return $labels;
     }
-
 }

@@ -20,8 +20,8 @@ $this->params['sidebarMenuItems'] = [
 ];
 ?>
 <div class="row">
-	<div class="col-xs-6">
-        <?php if ($model->isPublished()): ?>
+    <div class="col-md-8">
+    <?php if ($model->isPublished()): ?>
         <div class="alert alert-success">
             <div class="clearfix">
                 <div class="pull-left" style="line-height: 34px">История опубликована <?= Yii::$app->formatter->asDate($model->published_at) ?></div>
@@ -40,37 +40,46 @@ $this->params['sidebarMenuItems'] = [
             ]);
             ?>
         <?php endif ?>
-        <?php else: ?>
-            <div class="alert alert-warning">
-                <div class="clearfix">
-                    <?php if ($model->isForPublication()): ?>
+    <?php else: ?>
+        <div class="alert alert-warning">
+            <div class="clearfix">
+                <?php if ($model->isForPublication()): ?>
                     <div class="pull-left" style="line-height: 34px">История отправлена на публикацию</div>
                     <div class="pull-right">
                         <?= Html::beginForm(['/story/cancel-publication', 'id' => $model->id]) ?>
                         <?= Html::submitButton('Отменить', ['class' => 'btn btn-primary']) ?>
                         <?= Html::endForm() ?>
                     </div>
-                    <?php else: ?>
+                <?php else: ?>
                     <div class="pull-left" style="line-height: 34px">История не опубликована</div>
                     <div class="pull-right">
                         <?= Html::beginForm(['/story/publish', 'id' => $model->id]) ?>
                         <?php if ($model->submitPublicationTask()): ?>
-                        <?= Html::checkbox('sendNotification', true, ['id' => 'send-notification']) . ' ' . Html::label('Запустить рассылку', 'send-notification') ?>
+                            <?= Html::checkbox('sendNotification', true, ['id' => 'send-notification']) . ' ' . Html::label('Запустить рассылку', 'send-notification') ?>
                         <?php endif ?>
                         <?= Html::submitButton('Опубликовать', ['class' => 'btn btn-primary']) ?>
                         <?= Html::endForm() ?>
                     </div>
-                    <?php endif ?>
-                </div>
+                <?php endif ?>
             </div>
-        <?php endif ?>
+        </div>
+    <?php endif ?>
+    </div>
+    <div class="col-md-4">
+        <?= $this->render('_slide_actions', ['model' => $model, 'wordListModel' => $wordListModel]) ?>
+    </div>
+</div>
+<div class="row">
+	<div class="col-md-6">
 		<?= $this->render('_form', [
 		    'model' => $model,
 		    'coverUploadForm' => $coverUploadForm,
 		    'fileUploadForm' => $fileUploadForm,
 		]) ?>
 	</div>
-	<div class="col-xs-6">
-		<?= $this->render('_form_powerpoint', ['story' => $model, 'source' => $powerPointForm, 'wordListModel' => $wordListModel]) ?>
+	<div class="col-md-6">
+		<?= $this->render('_form_powerpoint', [
+            'source' => $powerPointForm,
+        ]) ?>
 	</div>
 </div>

@@ -7,6 +7,8 @@ use backend\models\video\VideoSource;
 class VideoFileBlock extends VideoBlock
 {
 
+    protected $type = AbstractBlock::TYPE_VIDEOFILE;
+
     public function create()
     {
         $block = new self();
@@ -18,5 +20,4 @@ class VideoFileBlock extends VideoBlock
         $block->setSource(VideoSource::FILE);
         return $block;
     }
-
 }

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\models\editor;
-
 
 class TransitionForm extends TextForm
 {
@@ -10,26 +8,22 @@ class TransitionForm extends TextForm
     public $slides;
     public $back_to_next_slide;
 
-    public function rules(): array
+    public function rules()
     {
-        $rules = parent::rules();
-        $rules = array_merge($rules, [
+        return array_merge(parent::rules(), [
             [['transition_story_id'], 'required'],
             [['transition_story_id', 'back_to_next_slide'], 'integer'],
             ['slides', 'string'],
         ]);
-        return $rules;
     }
 
-    public function attributeLabels(): array
+    public function attributeLabels()
     {
-        $labels = parent::attributeLabels();
-        $labels = array_merge($labels, [
+        return array_merge(parent::attributeLabels(), [
             'text' => 'Заголовок',
             'transition_story_id' => 'Перейти к истории',
             'slides' => 'Слайды',
             'back_to_next_slide' => 'Возврат на текущий слайд',
         ]);
-        return $labels;
     }
 }

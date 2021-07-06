@@ -2,66 +2,72 @@
 
 namespace common\services;
 
-use backend\components\queue\PublishStoryJob;
+use backend\components\image\PowerPointImage;
+use backend\components\story\AbstractBlock;
+use backend\components\story\ImageBlock;
 use backend\components\story\reader\PowerPointReader;
 use backend\components\story\writer\HTMLWriter;
-use backend\models\SourcePowerPointForm;
 use common\models\NotificationModel;
 use common\models\Story;
 use common\models\story\StoryStatus;
+use common\models\StorySlide;
 use DirectoryIterator;
 use DomainException;
 use backend\components\notification\NewStoryNotification;
 use yii;
+use yii\db\Query;
+use yii\helpers\FileHelper;
 use yii\helpers\Url;
 
 class StoryService
 {
 
-	protected $dropboxSerivce;
-    protected $powerPointService;
-    protected $notificationService;
+    private $notificationService;
 
 	public function __construct(NotificationService $notificationService)
 	{
 	    $this->notificationService = $notificationService;
-		$this->dropboxSerivce = new StoryDropboxService();
-        $this->powerPointService = new StoryPowerPointService();
 	}
 
-	public function getDropboxSerivce()
-	{
-		return $this->dropboxSerivce;
-	}
-
-    public function getPowerPointSerivce()
+    public function importStoryFromPowerPoint(Story $storyModel): void
     {
-        return $this->powerPointService;
-    }
+        $imagesFolder = $storyModel->getSlideImagesPath(false);
+        FileHelper::createDirectory(Yii::getAlias('@public') . $imagesFolder);
+        $story = (new PowerPointReader($storyModel->getStoryFilePath(), Yii::getAlias('@public'), $imagesFolder))->load();
 
-    public function importStoryFromPowerPoint(SourcePowerPointForm $form): void
-    {
-        $fileName = Yii::getAlias('@public') . '/slides_file/' . $form->storyFile;
-        $imagesFolder = '/slides/' . $form->storyFile;
-        $reader = new PowerPointReader($fileName, Yii::getAlias('@public'), $imagesFolder);
-        $story = $reader->load();
+        $command = Yii::$app->db->createCommand();
+        $imageIDs = array_keys((new Query())
+            ->select('image_id')
+            ->from('{{%image_slide_block}}')
+            ->where(['in', 'slide_id', $storyModel->getSlideIDs()])
+            ->indexBy('image_id')
+            ->all());
+        if (count($imageIDs) > 0) {
+            $command->delete('{{%story_slide_image}}', ['in', 'id', $imageIDs])->execute();
+        }
+        $command->delete('{{%story_slide}}', 'story_id = :story', [':story' => $storyModel->id])->execute();
 
         $writer = new HTMLWriter();
         $slides = $story->getSlides();
-        $command = Yii::$app->db->createCommand();
-        $command->delete('{{%story_slide}}', 'story_id = :story', [':story' => $form->storyId])->execute();
+        $image = new PowerPointImage($storyModel->getSlideImagesFolder());
+
         foreach ($slides as $slide) {
-            $data = $writer->renderSlide($slide);
-            $command->insert('{{%story_slide}}', [
-                'story_id' => $form->storyId,
-                'data' => $data,
-                'number' => $slide->getSlideNumber(),
-                'created_at' => time(),
-                'updated_at' => time(),
-            ])->execute();
+
+            $slideModel = StorySlide::createSlideFull($storyModel->id, 'init', $slide->getSlideNumber());
+            $slideModel->save();
+
+            $slide->setId($slideModel->id);
+            $slideModel->updateData($writer->renderSlide($slide));
+
+            foreach ($slide->getBlocks() as $block) {
+                if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
+                    /** @var $block ImageBlock */
+                    $imageModel = $image->create(Yii::getAlias('@public') . $block->getFilePath());
+                    $image->createSlideBlockLink($imageModel->id, $slide->getId(), $block->getId());
+                }
+            }
         }
 
-        $storyModel = Story::findModel($form->storyId);
         $storyModel->slides_number = count($slides);
         $storyModel->save(false, ['slides_number']);
     }

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\components\story\writer\HTML;
-
 
 use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
@@ -21,7 +19,6 @@ class ButtonBlockMarkup extends AbstractMarkup
     {
         $element = $this->getElement();
         $elementAttributes = $element->getAttributes();
-        $elementAttributes['style'] = $this->setStyleValue($elementAttributes['style'], 'font-size', $block->getFontSize());
         $elementAttributes['href'] = $block->getUrl();
         return Html::tag($element->getTagName(), $block->getText(), $elementAttributes);
     }

@@ -3,8 +3,10 @@ html {
 }
 
 body {
-    font-size: 18px;
+    font-size: 16px;
     font-family: 'Roboto', Arial, sans-serif;
+    padding: 0;
+    margin: 0;
 }
 
 .wrap {
@@ -266,18 +268,20 @@ body {
     color: #5bc0de;
 }
 
+/*
 #preview-container {
     overflow: auto;
 }
 
 #preview-container .active {
-    background-color: #428bca;
+    background-color: #515151;
 }
 
 #preview-container .active a {
     color: white;
-}
+}*/
 
+/*
 .preview-container-item {
     position: relative;
     height: 80px;
@@ -306,7 +310,7 @@ body {
 }
 .preview-container-item a.remove-slide:hover {
     text-decoration: none;
-}
+}*/
 
 
 .post {
@@ -466,10 +470,6 @@ body {
     font-size: 2rem;
 }
 
-.reveal .slides {
-    border: 1px #fff dashed;
-}
-
 .rect {
     position: absolute;
     border: 4px solid rgba(199, 25, 9, 0.64);
@@ -505,10 +505,10 @@ body {
 }
 
 .toggle-slide-visible {
-    float: right;
+    /*float: right;
     color: #555555;
     font-weight: 500;
-    margin-right: 10px;
+    margin-right: 10px;*/
 }
 
 .list-group-item.active .toggle-slide-visible {
@@ -516,16 +516,17 @@ body {
 }
 
 .delete-slide {
-    float: right;
+    /*float: right;
     color: #c7254e;
-    font-weight: 500;
+    font-weight: 500;*/
 }
 
 .wrong-answer-list .delete-wrong-answer-row {
     margin-top: 35px;
 }
 
-.story-container .btn {
+.story-container .btn,
+.reveal-viewport .btn {
     border: none;
     color: #ffffff;
     font-size: 1.8rem;
@@ -607,4 +608,15 @@ body {
         border-radius: 0;
         box-shadow: none;
     }
+}
+
+.reveal p,
+.reveal div.slide-paragraph {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+    /*line-height: 39px;*/
 }

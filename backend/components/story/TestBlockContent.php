@@ -20,7 +20,7 @@ class TestBlockContent
 
     public static function createFromHtml(string $html): self
     {
-        $content = pq($html)->find('div.new-questions');
+        $content = pq($html);
         return new self($content->attr('data-test-id'), $content->attr('data-test-required') ?? false);
     }
 

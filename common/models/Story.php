@@ -70,9 +70,6 @@ class Story extends ActiveRecord
 
     public $playlist_order;
 
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName()
     {
         return '{{%story}}';
@@ -83,9 +80,6 @@ class Story extends ActiveRecord
         return new StoryQuery(static::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function behaviors()
     {
         return [
@@ -103,9 +97,6 @@ class Story extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
@@ -125,9 +116,6 @@ class Story extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
@@ -197,10 +185,10 @@ class Story extends ActiveRecord
         return $this->hasMany(Comment::class, ['story_id' => 'id']);
     }
 
-    public static function findStories()
+    /*public static function findStories()
     {
         return self::find();
-    }
+    }*/
 
     /**
      * @return StoryQuery
@@ -221,7 +209,7 @@ class Story extends ActiveRecord
             1 => 'Да',
             0 => 'Нет',
         ];
-    }    
+    }
 
     public function getSubAccessText()
     {
@@ -244,13 +232,13 @@ class Story extends ActiveRecord
         return self::find()->published()->byRand()->limit(1)->one();
     }
 
-    public static function getSourceList()
+    /*public static function getSourceList()
     {
         return [
             self::SOURCE_SLIDESCOM => 'Slides.com (Dropbox)',
             self::SOURCE_POWERPOINT => 'Файл PowerPoint (PPTX)',
         ];
-    }
+    }*/
 
     public function saveBody($body)
     {
@@ -263,10 +251,10 @@ class Story extends ActiveRecord
         return !empty($this->sub_access);
     }
 
-    public static function findStory($condition)
+    /*public static function findStory($condition)
     {
         return static::findByCondition($condition)->published()->one();
-    }
+    }*/
 
     public static function forSlider($number = 4)
     {
@@ -646,5 +634,40 @@ class Story extends ActiveRecord
     public function getPreviewUrl()
     {
         return Yii::$app->urlManagerFrontend->createUrl(['preview/view', 'alias' => $this->alias]);
+    }
+
+    public function getStoryFilePath(bool $abs = true): string
+    {
+        if (empty($this->story_file)) {
+            throw new DomainException('Story file is empty');
+        }
+        return $this->getStoryFilesFolder($abs) . '/' . $this->story_file;
+    }
+
+    public function getSlideImagesFolder(): string
+    {
+        $folder = $this->id;
+        if (!empty($this->story_file)) {
+            $folder = $this->story_file;
+        }
+        return $folder;
+    }
+
+    public function getSlideImagesPath($abs = true): string
+    {
+        $folder = $this->getSlideImagesFolder();
+        return ($abs ? Yii::getAlias('@public') : '') . '/slides/' . $folder;
+    }
+
+    public function getStoryFilesFolder(bool $abs = true): string
+    {
+        return ($abs ? Yii::getAlias('@public') : '') . '/slides_file';
+    }
+
+    public function getSlideIDs(): array
+    {
+        return array_map(static function(StorySlide $slide) {
+            return $slide->id;
+        }, $this->storySlides);
     }
 }

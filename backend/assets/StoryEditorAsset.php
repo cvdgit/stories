@@ -12,6 +12,9 @@ class StoryEditorAsset extends AssetBundle
         'js/story-editor.js',
         'js/story-image.js',
     ];
+    public $css = [
+        'css/editor.css',
+    ];
     public $depends = [
         RevealAsset::class,
         WikidsRevealAsset::class,

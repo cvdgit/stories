@@ -17,19 +17,19 @@ class VideoForm extends BaseForm
 
     public $source;
 
-    public function rules(): array
+    public function rules()
     {
-        return array_merge([
+        return array_merge(parent::rules(), [
             ['video_id', 'string'],
             ['video_id', 'string'],
             [['seek_to', 'duration', 'speed', 'volume'], 'double'],
             [['mute', 'to_next_slide', 'source'], 'integer'],
-        ], parent::rules());
+        ]);
     }
 
-    public function attributeLabels(): array
+    public function attributeLabels()
     {
-        return array_merge([
+        return array_merge(parent::attributeLabels(), [
             'video_id' => 'Видео',
             'seek_to' => 'Начать с (сек)',
             'duration' => 'Продолжительность (сек)',
@@ -37,7 +37,7 @@ class VideoForm extends BaseForm
             'speed' => 'Скорость воспроизведения',
             'volume' => 'Громкость',
             'to_next_slide' => 'Автоматический переход на следующий слайд',
-        ], parent::attributeLabels());
+        ]);
     }
 
     public static function videoSpeedArray(): array

@@ -2,107 +2,62 @@
 
 namespace backend\services;
 
+use backend\components\image\EditorImage;
+use backend\components\image\PowerPointImage;
+use backend\components\image\SlideImage;
 use backend\components\QuestionHTML;
 use backend\components\story\AbstractBlock;
 use backend\components\story\HTMLBLock;
 use backend\components\story\ImageBlock;
 use backend\components\story\reader\HTMLReader;
 use backend\components\story\reader\HtmlSlideReader;
+use backend\components\story\Slide;
 use backend\components\story\TestBlockContent;
 use backend\components\story\writer\HTMLWriter;
-use backend\models\editor\ButtonForm;
-use backend\models\editor\ImageForm;
-use backend\models\editor\TextForm;
-use backend\models\editor\TransitionForm;
-use common\helpers\StoryHelper;
+use backend\models\editor\BaseForm;
 use common\models\StorySlide;
 use common\models\StorySlideBlock;
-use common\models\StoryStoryTest;
+use common\models\StorySlideImage;
 use common\models\StoryTestQuestion;
 use DomainException;
 use yii;
 use yii\db\Query;
 use yii\helpers\FileHelper;
-use yii\helpers\Html;
 use yii\web\UploadedFile;
 use common\models\Story;
-use backend\components\StoryEditor;
 
 class StoryEditorService
 {
 
-    protected $imageService;
+    private $imageService;
     private $storyLinkService;
+    private $imageResizeService;
 
-    public function __construct(ImageService $imageService, StoryLinksService $storyLinkService)
+    public function __construct(ImageService $imageService, StoryLinksService $storyLinkService, ImageResizeService $imageResizeService)
     {
         $this->imageService = $imageService;
         $this->storyLinkService = $storyLinkService;
+        $this->imageResizeService = $imageResizeService;
     }
 
-    protected function uploadImage(ImageForm $form, $model): string
+    private function uploadImage($form, Story $storyModel): void
     {
         $imageFile = UploadedFile::getInstance($form, 'image');
         if ($imageFile) {
-            //$storyService = new StoryService();
-            //$storyImagesPath = $storyService->getImagesFolderPath($model);
-
-            $storyImagesPath = StoryHelper::getImagesPath($model);
-            FileHelper::createDirectory($storyImagesPath);
-
-            $slideImageFileName = Yii::$app->security->generateRandomString() . '.' . $imageFile->extension;
-            $imagePath = "{$storyImagesPath}/$slideImageFileName";
+            $imagesFolder = $storyModel->getSlideImagesPath();
+            FileHelper::createDirectory($imagesFolder);
+            $slideImageFileName = str_replace([' ', '"', '\'', '&', '/', '\\', '?', '#'], '-', $imageFile->baseName) . '.' . $imageFile->extension;
+            $imagePath = "{$imagesFolder}/$slideImageFileName";
             if ($imageFile->saveAs($imagePath)) {
-                // $form->imagePath = $storyService->getImagesFolderPath($model, true) . '/' . $slideImageFileName;
-                $form->imagePath = StoryHelper::getImagesPath($model, true) . '/' . $slideImageFileName;
-                $form->fullImagePath = Yii::getAlias('@public') . $form->imagePath;
-            	// return $storyService->getImagesFolderPath($model, true) . '/' . $slideImageFileName;
-            	return StoryHelper::getImagesPath($model, true) . '/' . $slideImageFileName;
+                $form->imageModel = (new PowerPointImage($storyModel->getSlideImagesFolder()))
+                    ->create($imagePath);
+                $form->imagePath = $form->imageModel->imageUrl();
+                $form->fullImagePath = $imagePath;
         	}
         }
-        return '';
 	}
 
-	public function updateSlideText(TextForm $form): void
-    {
-        $model = Story::findModel($form->story_id);
-        $editor = new StoryEditor($model->body);
-        $editor->setSlideText($form);
-        $body = $editor->getStoryMarkup();
-        $model->saveBody($body);
-    }
-
-    public function updateSlideImage(ImageForm $form): void
-    {
-        $model = Story::findModel($form->story_id);
-
-        $editor = new StoryEditor($model->body);
-
-        $this->uploadImage($form, $model);
-        $editor->setSlideImage($form);
-
-        $body = $editor->getStoryMarkup();
-        $model->saveBody($body);
-    }
-
-    public function updateSlideButton(ButtonForm $form): void
-    {
-        $model = Story::findModel($form->story_id);
-        $editor = new StoryEditor($model->body);
-        $editor->setSlideButton($form);
-        $body = $editor->getStoryMarkup();
-        $model->saveBody($body);
-    }
-
-    public function updateSlideTransition(TransitionForm $form): void
-    {
-        $model = Story::findModel($form->story_id);
-        $editor = new StoryEditor($model->body);
-        $editor->setSlideTransition($form);
-        $body = $editor->getStoryMarkup();
-        $model->saveBody($body);
-    }
-
+	/**
     public function deleteBlock(int $slideID, string $blockID)
     {
         $model = StorySlide::findSlide($slideID);
@@ -126,8 +81,10 @@ class StoryEditorService
         $haveVideo = $this->haveVideoBlock($model->story_id);
         Story::updateVideo($model->story_id, $haveVideo ? 1 : 0);
     }
+    */
 
-    protected function haveVideoBlock(int $storyID)
+    /**
+	protected function haveVideoBlock(int $storyID)
     {
         $model = Story::findModel($storyID);
         $haveVideo = false;
@@ -146,6 +103,7 @@ class StoryEditorService
         }
         return $haveVideo;
     }
+    */
 
     protected function updateSlideNumbers(int $storyID, int $targetSlideNumber)
     {
@@ -186,19 +144,17 @@ class StoryEditorService
         return $model->id;
     }
 
-    public function createSlideLink(int $storyID, int $linkSlideID, int $currentSlideID = -1): int
+    public function createSlideLink(int $storyID, int $linkSlideID, int $currentSlideID = null): int
     {
         $model = StorySlide::createSlide($storyID);
         $model->kind = StorySlide::KIND_LINK;
         $model->link_slide_id = $linkSlideID;
         $model->data = 'link';
-
-        if ($currentSlideID !== -1) {
+        if ($currentSlideID !== null) {
             $currentSlide = StorySlide::findSlideByID($currentSlideID);
             $this->updateSlideNumbers($storyID, $currentSlide->number);
             $model->number = $currentSlide->number + 1;
         }
-
         if (!$model->save()) {
             throw new DomainException(implode('<br>', $model->firstErrors));
         }
@@ -242,18 +198,10 @@ class StoryEditorService
         $reader = new HtmlSlideReader('');
         $slide = $reader->load();
         $slide->setView('new-question');
-
         /** @var HTMLBLock $block */
         $block = $slide->createBlock(HTMLBLock::class);
-
-/*        $options = ['class' => 'new-questions'];
-        foreach ($params as $paramName => $paramValue) {
-            $options['data-' . $paramName] = $paramValue;
-        }
-        $content = Html::tag('div', '', $options);*/
         $block->setContent((new TestBlockContent($params['test-id']))->render());
         $slide->addBlock($block);
-
         $writer = new HTMLWriter();
         return $writer->renderSlide($slide);
     }
@@ -300,24 +248,23 @@ class StoryEditorService
         $slideModel->delete();
     }
 
-    public function updateBlock($form)
+    public function updateBlock($form): string
     {
         $model = StorySlide::findSlide($form->slide_id);
         $reader = new HtmlSlideReader($model->data);
         $slide = $reader->load();
         $block = $slide->findBlockByID($form->block_id);
+
         if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
             $storyModel = Story::findModel($model->story_id);
             $this->uploadImage($form, $storyModel);
         }
-
         if ($block->isHtmlTest()) {
             $block->setContent((new TestBlockContent($form->test_id, $form->required))->render());
         }
         else {
             $block->update($form);
         }
-
         if ($block->isTest()) {
             try {
                 $this->storyLinkService->createTestLink($model->story_id, $block->getTestID());
@@ -328,9 +275,63 @@ class StoryEditorService
         }
 
         $writer = new HTMLWriter();
-        $html = $writer->renderSlide($slide);
-        $model->data = $html;
-        return $model->save(false);
+        $model->updateData($writer->renderSlide($slide));
+
+        return str_replace('data-src=', 'src=', $writer->renderBlock($block));
+    }
+
+    public function createBlock(StorySlide $slideModel, BaseForm $form, string $blockClassName): string
+    {
+        $slide = (new HtmlSlideReader($slideModel->data))->load();
+        $block = $slide->createBlock($blockClassName);
+
+        if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
+            $storyModel = Story::findModel($slideModel->story_id);
+            if (!empty($form->url)) {
+
+                $image = new EditorImage();
+                $imagePath = $this->imageService->downloadImage($form->url, $image->getImagePath());
+
+                $slideImage = new SlideImage($imagePath);
+                if ($slideImage->needResize()) {
+                    $size = $slideImage->getResizeImageSize();
+                    $imagePath = $this->imageResizeService->resizeSlideImage($imagePath, $size->getWidth(), $size->getHeight());
+                }
+
+                $form->imageModel = $image->create($imagePath);
+                $form->imagePath = $form->imageModel->imageUrl();
+                $form->fullImagePath = $imagePath;
+            }
+            else if (!empty($form->image_id)) {
+                $form->imageModel = StorySlideImage::findModel($form->image_id);
+                $form->imagePath = $form->imageModel->imageUrl();
+                $form->fullImagePath = $form->imageModel->getImagePath();
+            }
+            else {
+                $this->uploadImage($form, $storyModel);
+            }
+        }
+        if ($block->isHtmlTest()) {
+            $block->setContent((new TestBlockContent($form->test_id, $form->required))->render());
+        }
+        else {
+            $block->update($form);
+        }
+        if ($block->isTest()) {
+            try {
+                $this->storyLinkService->createTestLink($slideModel->story_id, $block->getTestID());
+            }
+            catch (\Exception $exception) {
+
+            }
+        }
+
+        $form->block_id = $block->getId();
+
+        $slide->addBlock($block);
+        $writer = new HTMLWriter();
+        $slideModel->updateData($writer->renderSlide($slide));
+        return str_replace('data-src=', 'src=', $writer->renderBlock($block));
     }
 
     public function newUpdateBlock($form)
@@ -374,4 +375,8 @@ class StoryEditorService
         $model->save(false);
     }
 
+    public function processData(string $data): Slide
+    {
+        return (new HtmlSlideReader($data))->load();
+    }
 }

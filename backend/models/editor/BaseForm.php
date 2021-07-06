@@ -2,6 +2,7 @@
 
 namespace backend\models\editor;
 
+use common\models\StorySlide;
 use yii\base\Model;
 
 class BaseForm extends Model
@@ -14,8 +15,9 @@ class BaseForm extends Model
     public $width;
     public $height;
     public $view;
+    public $action;
 
-    public function rules(): array
+    public function rules()
     {
         return [
             [['slide_id'], 'integer'],
@@ -23,7 +25,7 @@ class BaseForm extends Model
         ];
     }
 
-    public function attributeLabels(): array
+    public function attributeLabels()
     {
         return [
             'left' => 'Левый отступ',
@@ -33,4 +35,13 @@ class BaseForm extends Model
         ];
     }
 
+    public function afterCreate(StorySlide $slideModel): void
+    {
+        //
+    }
+
+    public function afterUpdate(StorySlide $slideModel): void
+    {
+        //
+    }
 }

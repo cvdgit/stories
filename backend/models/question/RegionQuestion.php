@@ -52,8 +52,8 @@ class RegionQuestion extends Model
             $regionImageFile = new RegionImageFile($uploadedFile, $model->getRegionImage());
             $imagePath = $regionImageFile->saveOriginal();
 
-            Image::resize($imagePath, 1000, 500, true)
-                ->save($regionImageFile->createImageFileName(), ['jpeg_quality' => 100]);
+            Image::resize($imagePath, 1000, 500)
+                ->save($regionImageFile->createImageFileName(), ['quality' => 100]);
 
             $model->image = $regionImageFile->getFileName();
         }

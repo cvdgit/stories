@@ -3,25 +3,19 @@
 namespace backend\models;
 
 use yii;
-use common\models\Story;
 
 class SourcePowerPointForm extends yii\base\Model
 {
 
     public $storyFile;
-    public $firstSlideTemplate = 1;
-    public $lastSlideTemplate = 1;
-    public $originalSizeImages;
     public $slidesNumber;
     public $storyId;
 
     public function rules()
     {
         return [
-            [['storyFile'], 'string'],
-            [['firstSlideTemplate', 'lastSlideTemplate', 'originalSizeImages'], 'safe'],
+            [['storyFile'], 'string', 'max' => 50],
             [['storyId', 'slidesNumber'], 'integer'],
-            [['storyId'], 'storyExists'],
         ];
     }
 
@@ -35,21 +29,4 @@ class SourcePowerPointForm extends yii\base\Model
             'slidesNumber' => 'Количество слайдов',
         ];
     }
-
-    public function storyExists($attribute, $params)
-    {
-        $id = $this->$attribute;
-        if (Story::findOne($id) !== null) {
-            $this->addError($attribute, 'История не найдена');
-        }
-    }
-
-    public function saveSource($body, $slidesNumber)
-    {
-        $story = Story::findOne($this->storyId);
-        $story->body = $body;
-        $story->slides_number = $slidesNumber;
-        $story->save(false, ['body', 'slides_number']);
-    }
-
 }

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\components\story\writer\HTML\elements;
-
 
 class ButtonElement extends AbstractElement
 {
@@ -12,7 +10,5 @@ class ButtonElement extends AbstractElement
         'href' => '#',
         'target' => '_blank',
         'class' => 'btn',
-        'style' => 'font-size: 1em;',
     ];
-
 }

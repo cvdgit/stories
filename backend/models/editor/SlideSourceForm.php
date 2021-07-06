@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\models\editor;
-
 
 use common\models\StorySlide;
 use yii\base\Model;
@@ -11,32 +9,18 @@ class SlideSourceForm extends Model
 {
 
     public $source;
-    public $slideID;
-
-    public function __construct(int $slideID, $config = [])
-    {
-        $this->slideID = $slideID;
-        parent::__construct($config);
-    }
+    public $slide_id;
 
     public function rules()
     {
         return [
+            ['slide_id', 'integer'],
             ['source', 'safe'],
         ];
     }
 
-    public function loadSlideSource()
+    public function saveSlideSource(StorySlide $slideModel): void
     {
-        $slide = StorySlide::findSlide($this->slideID);
-        $this->source = $slide->data;
+        $slideModel->updateData($this->source);
     }
-
-    public function saveSlideSource()
-    {
-        $slide = StorySlide::findSlide($this->slideID);
-        $slide->data = $this->source;
-        return $slide->save(false, ['data']);
-    }
-
 }

@@ -1,17 +1,22 @@
 <?php
 
-
 namespace backend\controllers\editor;
 
-
-use backend\models\editor\ButtonForm;
+use backend\components\BaseController;
+use backend\components\story\AbstractBlock;
+use backend\components\story\HTMLBLock;
+use backend\components\story\ImageBlock;
+use backend\components\story\reader\HtmlBlockReader;
+use backend\components\story\TestBlockContent;
+use backend\models\ImageSlideBlock;
 use backend\services\StoryEditorService;
-use common\models\StorySlideBlock;
+use common\models\StorySlide;
+use common\models\StoryStoryTest;
 use Yii;
-use yii\web\Controller;
+use yii\filters\VerbFilter;
 use yii\web\Response;
 
-class BlockController extends Controller
+class BlockController extends BaseController
 {
 
     protected $editorService;
@@ -22,27 +27,65 @@ class BlockController extends Controller
         $this->editorService = $editorService;
     }
 
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'delete' => ['POST'],
+                ],
+            ],
+        ];
+    }
+
     public function beforeAction($action)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return parent::beforeAction($action);
     }
 
-    public function actionCreate(int $slide_id)
+    public function actionDelete(int $slide_id)
     {
-        $model = StorySlideBlock::create($slide_id, 'New Button');
-        $model->save();
-        return ['success' => true];
-    }
-
-    public function actionUpdate(int $block_id)
-    {
-        $model = StorySlideBlock::findBlock($block_id);
-        $form = new ButtonForm();
-        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-            return ['success' => true, 'result' => $this->editorService->newUpdateBlock($form)];
+        /** @var StorySlide $slideModel */
+        $slideModel = $this->findModel(StorySlide::class, $slide_id);
+        $reader = new HtmlBlockReader(Yii::$app->request->rawBody);
+        $block = $reader->load();
+        if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
+            ImageSlideBlock::deleteImageBlock($slideModel->id, $block->getId());
         }
-        return ['success' => false, 'errors' => $form->errors];
+        if ($block->getType() === AbstractBlock::TYPE_VIDEO) {
+
+        }
+        if ($block->getType() === AbstractBlock::TYPE_HTML) {
+            /** @var HTMLBLock $block */
+            /** @var TestBlockContent $content */
+            $content = $block->getContentObject(TestBlockContent::class);
+            StoryStoryTest::deleteStoryTest($slideModel->story_id, $content->getTestID());
+            $slideModel->setKindSlide();
+        }
+        return ['success' => true, 'block' => $block->getId()];
     }
 
+    public function actionCopy(int $slide_id, string $block_id)
+    {
+        /** @var StorySlide $slideModel */
+        $slideModel = $this->findModel(StorySlide::class, $slide_id);
+        $block = (new HtmlBlockReader(Yii::$app->request->rawBody))->load();
+        if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
+            /** @var $block ImageBlock */
+            $imageID = $block->getBlockAttribute('data-image-id');
+            if ($imageID !== null) {
+                $image = ImageSlideBlock::create($imageID, $slideModel->id, $block_id);
+                $image->save();
+            }
+        }
+        if ($block->getType() === AbstractBlock::TYPE_VIDEO) {
+
+        }
+        if ($block->getType() === AbstractBlock::TYPE_HTML) {
+
+        }
+        return ['success' => true, 'block' => $block->getId()];
+    }
 }

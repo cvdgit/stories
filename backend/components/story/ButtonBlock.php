@@ -33,7 +33,6 @@ class ButtonBlock extends TextBlock
     {
         return array_merge([
             'text' => $this->text,
-            'text_size' => $this->fontSize,
             'url' => $this->url,
         ], parent::getValues());
     }
@@ -45,8 +44,7 @@ class ButtonBlock extends TextBlock
         $block->setHeight('auto');
         $block->setTop('500px');
         $block->setLeft('990px');
-        $block->setText('Название');
-        $block->setFontSize('1em');
+        $block->setText('Кнопка');
         $block->setUrl('#');
         return $block;
     }
@@ -56,10 +54,7 @@ class ButtonBlock extends TextBlock
      */
     public function update($form)
     {
-        $this->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
         $this->text = $form->text;
-        $this->fontSize = $form->text_size;
         $this->url = $form->url;
     }
-
 }

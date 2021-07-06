@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\components\BaseController;
 use backend\components\SlideModifier;
 use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
@@ -15,29 +16,28 @@ use backend\components\story\VideoFileBlock;
 use backend\components\story\writer\HTMLWriter;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
-use backend\models\editor\ImageFromUrlForm;
-use backend\models\editor\LocalTestForm;
 use backend\models\editor\QuestionForm;
-use backend\models\editor\RemoteTestForm;
+use backend\models\editor\SlideLinkForm;
 use backend\models\editor\SlideSourceForm;
 use backend\models\editor\TestForm;
 use backend\models\editor\TextForm;
 use backend\models\editor\TransitionForm;
 use backend\models\editor\VideoForm;
+use backend\models\video\VideoSource;
 use backend\services\StoryLinksService;
 use common\models\StorySlide;
 use common\models\StoryTest;
 use DomainException;
+use Exception;
 use Yii;
 use yii\filters\AccessControl;
 use common\models\Story;
 use common\services\StoryService;
 use common\rbac\UserRoles;
 use backend\services\StoryEditorService;
-use yii\web\Controller;
 use yii\web\Response;
 
-class EditorController extends Controller
+class EditorController extends BaseController
 {
 
     protected $storyService;
@@ -72,17 +72,10 @@ class EditorController extends Controller
 
 	public function actionEdit($id)
 	{
-        $model = Story::findModel($id);
-        $imageForm = new ImageForm();
-        $imageForm->story_id = $model->id;
-        $imageFromUrlForm = new ImageFromUrlForm();
-        $imageFromUrlForm->story_id = $model->id;
+        $model = $this->findModel(Story::class, $id);
+	    $this->layout = 'editor';
         return $this->render('edit', [
             'model' => $model,
-            'imageModel' => $imageForm,
-            'imageFromUrlModel' => $imageFromUrlForm,
-            'localTestForm' => new LocalTestForm(),
-            'remoteTestForm' => new RemoteTestForm(),
 		]);
 	}
 
@@ -99,162 +92,112 @@ class EditorController extends Controller
             $linkSlide = StorySlide::findSlideByID($model->link_slide_id);
             $model->data = $linkSlide->data;
         }
-        $slideData = (new SlideModifier())->addImageParams($model->data);
+        $slideData = (new SlideModifier($model->id, $model->data))
+            ->addImageId()
+            ->addImageParams()
+            ->render();
         return [
             'id' => $model->id,
             'status' => $model->status,
             'data' => $slideData,
-            'blockNumber' => count($model->storySlideBlocks),
+            'haveLinks' => (count($model->storySlideBlocks) > 0),
             'number' => $model->number,
+            'haveNeoRelations' => (count($model->neoSlideRelations) > 0),
         ];
     }
 
-    public function actionSlideBlocks(int $slide_id)
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $model = StorySlide::findSlide($slide_id);
-        $reader = new HtmlSlideReader($model->data);
-        $slide = $reader->load();
-        return $slide->getBlocksArray();
-    }
+    private $types = [
+        AbstractBlock::TYPE_HEADER => [
+            'class' => TextForm::class,
+            'view' => '_text_form',
+        ],
+        AbstractBlock::TYPE_TEXT => [
+            'class' => TextForm::class,
+            'view' => '_text_form',
+        ],
+        AbstractBlock::TYPE_IMAGE => [
+            'class' => ImageForm::class,
+            'view' => '_image_form',
+        ],
+        AbstractBlock::TYPE_BUTTON => [
+            'class' => ButtonForm::class,
+            'view' => '_button_form',
+        ],
+        AbstractBlock::TYPE_TRANSITION => [
+            'class' => TransitionForm::class,
+            'view' => '_transition_form',
+        ],
+        AbstractBlock::TYPE_TEST => [
+            'class' => TestForm::class,
+            'view' => '_test_form',
+        ],
+        AbstractBlock::TYPE_HTML => [
+            'class' => QuestionForm::class,
+            'view' => '_html_form',
+        ],
+        AbstractBlock::TYPE_VIDEO => [
+            'class' => VideoForm::class,
+            'view' => '_video_form',
+            'source' => VideoSource::YOUTUBE,
+        ],
+        AbstractBlock::TYPE_VIDEOFILE => [
+            'class' => VideoForm::class,
+            'view' => '_video_form',
+            'source' => VideoSource::FILE,
+        ],
+    ];
 
-    public function actionUpdateText()
+    public function actionFormCreate(int $slide_id, string $block_type)
     {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $form = new TextForm();
-        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-            $this->editorService->updateBlock($form);
-            return ['success' => true];
+        /** @var StorySlide $model */
+        $model = $this->findModel(StorySlide::class, $slide_id);
+        if (!isset($this->types[$block_type])) {
+            throw new DomainException($block_type . ' - Unknown block type');
         }
-        return $form->getErrors();
-    }
-
-    public function actionUpdateImage()
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $form = new ImageForm();
-        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-            $this->editorService->updateBlock($form);
-            return ['success' => true];
-        }
-        return $form->getErrors();
-    }
-
-    public function actionUpdateButton()
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $form = new ButtonForm();
-        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-            $this->editorService->updateBlock($form);
-            return ['success' => true];
-        }
-        return $form->getErrors();
-    }
-
-    public function actionUpdateTransition()
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $form = new TransitionForm();
-        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-            $this->editorService->updateBlock($form);
-            return ['success' => true];
-        }
-        return $form->getErrors();
-    }
-
-    public function actionUpdateTest()
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $form = new TestForm();
-        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-            $this->editorService->updateBlock($form);
-            return ['success' => true];
-        }
-        return $form->getErrors();
-    }
-
-    public function actionUpdateVideo()
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $form = new VideoForm();
-        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-            $this->editorService->updateBlock($form);
-            return ['success' => true];
-        }
-        return $form->getErrors();
-    }
-
-    public function actionUpdateHtml()
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $form = new QuestionForm();
-        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-            $this->editorService->updateBlock($form);
-            return ['success' => true];
-        }
-        return $form->getErrors();
+        $form = Yii::createObject($this->types[$block_type]);
+        $form->slide_id = $model->id;
+        return $this->renderAjax('create', [
+            'model' => $form,
+            'action' => ['editor/create-block/' . $block_type],
+            'widgetStoryModel' => $model->story,
+        ]);
     }
 
     public function actionForm(int $slide_id, string $block_id)
     {
-        Yii::$app->response->format = Response::FORMAT_JSON;
+        /** @var StorySlide $slideModel */
+        $slideModel = $this->findModel(StorySlide::class, $slide_id);
 
-        $model = StorySlide::findSlide($slide_id);
-        $slide = (new HtmlSlideReader($model->data))->load();
+        $slide = (new HtmlSlideReader($slideModel->data))->load();
         $block = $slide->findBlockByID($block_id);
-
-        $types = [
-            AbstractBlock::TYPE_HEADER => [
-                'class' => TextForm::class,
-                'view' => '_text_form',
-            ],
-            AbstractBlock::TYPE_TEXT => [
-                'class' => TextForm::class,
-                'view' => '_text_form',
-            ],
-            AbstractBlock::TYPE_IMAGE => [
-                'class' => ImageForm::class,
-                'view' => '_image_form',
-            ],
-            AbstractBlock::TYPE_BUTTON => [
-                'class' => ButtonForm::class,
-                'view' => '_button_form',
-            ],
-            AbstractBlock::TYPE_TRANSITION => [
-                'class' => TransitionForm::class,
-                'view' => '_transition_form',
-            ],
-            AbstractBlock::TYPE_TEST => [
-                'class' => TestForm::class,
-                'view' => '_test_form',
-            ],
-            AbstractBlock::TYPE_HTML => [
-                'class' => QuestionForm::class,
-                'view' => '_html_form',
-            ],
-            AbstractBlock::TYPE_VIDEO => [
-                'class' => VideoForm::class,
-                'view' => '_video_form',
-            ],
-        ];
         $block_type = $block->getType();
-        if (!isset($types[$block_type])) {
+        if (!isset($this->types[$block_type])) {
             throw new DomainException($block_type . ' - Unknown block type');
         }
 
-        $form = Yii::createObject($types[$block_type]);
-        $form->slide_id = $model->id;
+        $form = Yii::createObject($this->types[$block_type]);
+        $form->slide_id = $slideModel->id;
         $form->block_id = $block_id;
 
         $values = $block->getValues();
         $form->load($values, '');
 
-        if (($block->getType() === AbstractBlock::TYPE_TRANSITION) && $form->transition_story_id === null) {
-            $form->transition_story_id = $model->story_id;
+        $widgetStoryModel = $slideModel->story;
+
+        if ($block->getType() === AbstractBlock::TYPE_TRANSITION && $form->transition_story_id === null) {
+            $form->transition_story_id = $slideModel->story_id;
+            $widgetStoryModel = $this->findModel(Story::class, $form->transition_story_id);
         }
 
-        return $this->renderAjax('_form', [
+        if ($block->getType() === AbstractBlock::TYPE_IMAGE && $form->actionStoryID !== null) {
+            $widgetStoryModel = $this->findModel(Story::class, $form->actionStoryID);
+        }
+
+        $view = ($block->getType() === AbstractBlock::TYPE_VIDEO || $block->getType() === AbstractBlock::TYPE_VIDEOFILE) ? 'update_video' : 'update';
+        return $this->renderAjax($view, [
             'model' => $form,
+            'action' => ['editor/update-block/' . $block_type],
+            'widgetStoryModel' => $widgetStoryModel,
         ]);
     }
 
@@ -305,23 +248,21 @@ class EditorController extends Controller
         return ['success' => true, 'block_id' => $block->getId()];
     }
 
-    public function actionCreateSlide(int $story_id, int $current_slide_id = -1)
+    public function actionCreateSlideLink()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $slideID = $this->editorService->createSlide($story_id, $current_slide_id);
-        return ['success' => true, 'id' => $slideID];
-    }
-
-    public function actionCreateSlideLink(int $story_id, int $link_slide_id, int $current_slide_id = -1)
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        try {
-            $linkSlideID = $this->editorService->createSlideLink($story_id, $link_slide_id, $current_slide_id);
+        $form = new SlideLinkForm();
+        $response = ['success' => false];
+        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+            try {
+                $response['id'] = $this->editorService->createSlideLink($form->story_id, $form->link_slide_id, $form->slide_id);
+                $response['success'] = true;
+            }
+            catch (Exception $ex) {
+                $response['error'] = $ex->getMessage();
+            }
         }
-        catch (\Exception $ex) {
-            return ['success' => false, 'error' => $ex->getMessage()];
-        }
-        return ['success' => true, 'id' => $linkSlideID];
+        return $response;
     }
 
     public function actionCreateSlideQuestion(int $story_id, int $question_id, int $current_slide_id = -1)
@@ -330,7 +271,7 @@ class EditorController extends Controller
         try {
             $slideID = $this->editorService->createSlideQuestion($story_id, $question_id, $current_slide_id);
         }
-        catch (\Exception $ex) {
+        catch (Exception $ex) {
             return ['success' => false, 'error' => $ex->getMessage()];
         }
         return ['success' => true, 'id' => $slideID];
@@ -350,20 +291,8 @@ class EditorController extends Controller
             $slideID = $this->editorService->newCreateSlideQuestion($story_id, $params);
             $this->storyLinksService->createTestLink($story_id, $test->id);
         }
-        catch (\Exception $ex) {
+        catch (Exception $ex) {
             return ['success' => false, 'error' => $ex->getMessage(), 'id' => $slideID];
-        }
-        return ['success' => true, 'id' => $slideID];
-    }
-
-    public function actionCopySlide(int $slide_id)
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        try {
-            $slideID = $this->editorService->copySlide($slide_id);
-        }
-        catch (\Exception $ex) {
-            return ['success' => false, 'error' => $ex->getMessage()];
         }
         return ['success' => true, 'id' => $slideID];
     }
@@ -374,14 +303,7 @@ class EditorController extends Controller
         try {
             $this->editorService->deleteBlock($slide_id, $block_id);
         }
-        catch (\Exception $ex) {}
-        return ['success' => true];
-    }
-
-    public function actionDeleteSlide(int $slide_id)
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $this->editorService->deleteSlide($slide_id);
+        catch (Exception $ex) {}
         return ['success' => true];
     }
 
@@ -401,30 +323,16 @@ class EditorController extends Controller
         }, $model->storySlides);
     }
 
-    public function actionSlideVisible(int $slide_id)
+    public function actionSaveSlideSource()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $model = StorySlide::findSlide($slide_id);
-        if ($model->status === StorySlide::STATUS_VISIBLE) {
-            $model->status = StorySlide::STATUS_HIDDEN;
-        }
-        else {
-            $model->status = StorySlide::STATUS_VISIBLE;
-        }
-        $model->save(false, ['status']);
-        return ['success' => true, 'status' => $model->status];
-    }
-
-    public function actionSlideSource(int $slide_id)
-    {
-        $model = new SlideSourceForm($slide_id);
+        $model = new SlideSourceForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $model->saveSlideSource();
+            $slideModel = $this->findModel(StorySlide::class, $model->slide_id);
+            $model->saveSlideSource($slideModel);
+            return ['success' => true, 'id' => $slideModel->id];
         }
-        else {
-            $model->loadSlideSource();
-        }
-        return $this->renderAjax('_slide_source', ['model' => $model]);
+        return ['success' => false];
     }
-
 }
+

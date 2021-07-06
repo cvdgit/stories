@@ -40,4 +40,9 @@ return [
 
     'test.question.images' => '/test_images/question',
     'slides.videos' => '/slides_video',
+
+    'images.root' => [
+        1 => '/admin/upload/',
+        2 => '/slides/',
+    ],
 ];

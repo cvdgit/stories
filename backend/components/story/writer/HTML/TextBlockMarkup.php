@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\components\story\writer\HTML;
-
 
 class TextBlockMarkup extends AbstractMarkup
 {

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\components\story\writer\HTML\elements;
-
 
 abstract class AbstractElement
 {
@@ -26,5 +24,4 @@ abstract class AbstractElement
     {
         return $this->attributes;
     }
-
 }

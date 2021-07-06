@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\components\story;
-
 
 use Yii;
 
@@ -127,6 +125,16 @@ class Slide
     public function setAudioFile(string $audioFile): void
     {
         $this->audioFile = $audioFile;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function setId($id): void
+    {
+        $this->id = $id;
     }
 
 }

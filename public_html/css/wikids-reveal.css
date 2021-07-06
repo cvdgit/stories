@@ -2379,7 +2379,11 @@ p.wikids-test-description {
 	cursor: default;
 }
 
-
 .answer-rect {
 	pointer-events: none;
+}
+
+#story-editor section {
+	height: 100%;
+	padding: 0;
 }

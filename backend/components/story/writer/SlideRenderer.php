@@ -2,66 +2,23 @@
 
 namespace backend\components\story\writer;
 
-use backend\components\story\AbstractBlock;
-use backend\components\story\ButtonBlock;
-use backend\components\story\HTMLBLock;
-use backend\components\story\ImageBlock;
-use backend\components\story\TestBlock;
-use backend\components\story\TextBlock;
-use backend\components\story\TransitionBlock;
-use backend\components\story\VideoBlock;
-use backend\components\story\VideoFileBlock;
-use backend\components\story\writer\HTML\ButtonBlockMarkup;
-use backend\components\story\writer\HTML\HeaderBlockMarkup;
-use backend\components\story\writer\HTML\HTMLBlockMarkup;
-use backend\components\story\writer\HTML\ImageBlockMarkup;
 use backend\components\story\Slide;
-use backend\components\story\writer\HTML\ParagraphBlockMarkup;
-use backend\components\story\writer\HTML\TestBlockMarkup;
-use backend\components\story\writer\HTML\TransitionBlockMarkup;
-use backend\components\story\writer\HTML\VideoBlockMarkup;
 
 class SlideRenderer
 {
 
-    protected $slide;
+    private $blockRenderer;
 
-    public function __construct(Slide $slide)
+    public function __construct()
     {
-        $this->slide = $slide;
+        $this->blockRenderer = new BlockRenderer();
     }
 
-    public function render(): string
+    public function render(Slide $slide): string
     {
-        $html = '<section data-id="" data-background-color="#000000" data-slide-view="' . $this->slide->getView() . '" data-audio-src="' . $this->slide->getAudioFile() . '">';
-        foreach ($this->slide->getBlocks() as $block) {
-            $className = get_class($block);
-            if ($className === TextBlock::class) {
-                if ($block->getType() === AbstractBlock::TYPE_HEADER) {
-                    $html .= (new HeaderBlockMarkup($block))->markup();
-                }
-                else {
-                    $html .= (new ParagraphBlockMarkup($block))->markup();
-                }
-            }
-            if ($className === ButtonBlock::class) {
-                $html .= (new ButtonBlockMarkup($block))->markup();
-            }
-            if ($className === TransitionBlock::class) {
-                $html .= (new TransitionBlockMarkup($block))->markup();
-            }
-            if ($className === TestBlock::class) {
-                $html .= (new TestBlockMarkup($block))->markup();
-            }
-            if ($className === ImageBlock::class) {
-                $html .= (new ImageBlockMarkup($block))->markup();
-            }
-            if ($className === HTMLBLock::class) {
-                $html .= (new HTMLBlockMarkup($block))->markup();
-            }
-            if ($className === VideoBlock::class || $className === VideoFileBlock::class) {
-                $html .= (new VideoBlockMarkup($block))->markup();
-            }
+        $html = '<section data-id="' . $slide->getId() . '" data-slide-view="' . $slide->getView() . '" data-audio-src="' . $slide->getAudioFile() . '">';
+        foreach ($slide->getBlocks() as $block) {
+            $html .= $this->blockRenderer->render($block);
         }
         $html .= '</section>';
         return $html;

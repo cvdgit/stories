@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\components\story\writer\HTML;
-
 
 use backend\components\story\AbstractBlock;
 use backend\components\story\TransitionBlock;
@@ -21,7 +19,6 @@ class TransitionBlockMarkup extends AbstractMarkup
     {
         $element = $this->getElement();
         $elementAttributes = $element->getAttributes();
-        $elementAttributes['style'] = $this->setStyleValue($elementAttributes['style'], 'font-size', $block->getFontSize());
         $elementAttributes['data-story-id'] = $block->getTransitionStoryId();
         $elementAttributes['data-slides'] = $block->getSlides();
         $elementAttributes['data-backtonextslide'] = $block->getBackToNextSlide();

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\components\story;
-
 
 use backend\models\editor\TestForm;
 
@@ -34,7 +32,6 @@ class TestBlock extends ButtonBlock
     {
         return array_merge([
             'text' => $this->text,
-            'text_size' => $this->fontSize,
             'test_id' => $this->testID,
         ], parent::getValues());
     }
@@ -47,7 +44,6 @@ class TestBlock extends ButtonBlock
         $block->setTop('600px');
         $block->setLeft('990px');
         $block->setText('Тест');
-        $block->setFontSize('1em');
         $block->setUrl('#');
         return $block;
     }
@@ -57,10 +53,7 @@ class TestBlock extends ButtonBlock
      */
     public function update($form)
     {
-        $this->setSizeAndPosition($form->width, $form->height, $form->left, $form->top);
         $this->text = $form->text;
-        $this->fontSize = $form->text_size;
         $this->testID = $form->test_id;
     }
-
 }
