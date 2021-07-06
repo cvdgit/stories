@@ -3,6 +3,7 @@
 namespace backend\controllers\editor;
 
 use backend\components\BaseController;
+use backend\components\story\AbstractBlock;
 use backend\models\SlidesOrder;
 use backend\services\StoryEditorService;
 use common\models\StorySlide;
@@ -55,6 +56,11 @@ class SlideController extends BaseController
     {
         $data = Yii::$app->request->rawBody;
         $slide = $this->editorService->processData($data);
+        foreach ($slide->getBlocks() as $block) {
+            if ($block->getType() === AbstractBlock::TYPE_HTML) {
+                $data = str_replace('data-slide-view=""', 'data-slide-view="new-question"', $data);
+            }
+        }
         /** @var StorySlide $model */
         $model = $this->findModel(StorySlide::class, $slide->getId());
         $model->updateData($data);
