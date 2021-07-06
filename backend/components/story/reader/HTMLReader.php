@@ -142,7 +142,6 @@ class HTMLReader extends AbstractReader implements ReaderInterface
             $style = pq($htmlBlock)->find('p')->attr('style');
             $text = pq($htmlBlock)->find('p')->html();
         }
-        $block->setFontSize($this->getStyleValue($style, 'font-size'));
         $block->setText($text);
 
         $this->loadBlockProperties($block, pq($htmlBlock)->attr('style'));
@@ -162,7 +161,6 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         $buttonBlock->setId(pq($htmlBlock)->attr('data-block-id'));
 
         $style = pq($htmlBlock)->find('a')->attr('style');
-        $buttonBlock->setFontSize($this->getStyleValue($style, 'font-size'));
         $buttonBlock->setUrl(pq($htmlBlock)->find('a')->attr('href'));
         $slide->addBlock($buttonBlock);
     }
@@ -180,7 +178,6 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         $block->setId(pq($htmlBlock)->attr('data-block-id'));
 
         $style = pq($htmlBlock)->find('button')->attr('style');
-        $block->setFontSize($this->getStyleValue($style, 'font-size'));
         $block->setTransitionStoryId(pq($htmlBlock)->find('button')->attr('data-story-id'));
         $block->setSlides(pq($htmlBlock)->find('button')->attr('data-slides'));
         $block->setBackToNextSlide(pq($htmlBlock)->find('button')->attr('data-backtonextslide'));
@@ -200,7 +197,6 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         $block->setId(pq($htmlBlock)->attr('data-block-id'));
 
         $style = pq($htmlBlock)->find('button')->attr('style');
-        $block->setFontSize($this->getStyleValue($style, 'font-size'));
         $block->setTestID(pq($htmlBlock)->find('button')->attr('data-test-id'));
         $slide->addBlock($block);
     }

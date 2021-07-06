@@ -105,9 +105,17 @@ class StorySlideImage extends ActiveRecord
         throw new DomainException('Изображение не найдено');
     }
 
-    public static function findByHash(string $hash)
+    public static function findByHash(string $hash): ?StorySlideImage
     {
         if (($model = self::findOne(['hash' => $hash])) !== null) {
+            return $model;
+        }
+        throw new DomainException('Изображение не найдено');
+    }
+
+    public static function findByPath(string $folder, string $fileName): ?StorySlideImage
+    {
+        if (($model = self::findOne(['folder' => $folder, 'filename' => $fileName])) !== null) {
             return $model;
         }
         throw new DomainException('Изображение не найдено');
@@ -152,10 +160,11 @@ class StorySlideImage extends ActiveRecord
             ->where('story_id = :story', [':story' => $storyID]);
         return (new Query())
             ->select([
-                '{{%story_slide_image}}.*',
-                '(SELECT COUNT(image_link.image_id) FROM image_link WHERE image_link.image_id = image_slide_block.image_id) AS link_image_count',
-                '{{%image_slide_block}}.slide_id',
-                '{{%image_slide_block}}.block_id',
+                'DISTINCT {{%image_slide_block}}.image_id',
+                //'{{%story_slide_image}}.*',
+                //'(SELECT COUNT(image_link.image_id) FROM image_link WHERE image_link.image_id = image_slide_block.image_id) AS link_image_count',
+                //'{{%image_slide_block}}.slide_id',
+                //'{{%image_slide_block}}.block_id',
             ])
             ->from('{{%image_slide_block}}')
             ->where(['in', 'slide_id', $storySlidesQuery])

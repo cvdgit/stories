@@ -253,5 +253,11 @@ class StorySlide extends ActiveRecord
         $this->kind = self::KIND_QUESTION;
         $this->save(false, ['kind']);
     }
+
+    public function setKindSlide(): void
+    {
+        $this->kind = self::KIND_SLIDE;
+        $this->save(false, ['kind']);
+    }
 }
 

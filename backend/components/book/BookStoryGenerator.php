@@ -40,16 +40,12 @@ class BookStoryGenerator
 
     public function generate(Story $model)
     {
-
         $storyLinks = $model->slideBlocksData();
-
         $story = (new HTMLReader($model->slidesData()))->load();
         $html = '';
         foreach ($story->getSlides() as $slide) {
-
             $slideBlocks = new SlideBlocks();
             foreach ($slide->getBlocks() as $block) {
-
                 switch ($block->getType()) {
                     case AbstractBlock::TYPE_TEXT:
                         /** @var $block TextBlock */
@@ -76,22 +72,17 @@ class BookStoryGenerator
                         $slideBlocks->createVideos($block->getVideoId());
                 }
             }
-
             $slideLinks = $this->getSlideLinks($slide->id, $storyLinks);
             if (count($slideLinks) > 0) {
                 foreach ($slideLinks as $link) {
                     $slideBlocks->createLinks($link['title'], $link['href']);
                 }
             }
-
             if ($slideBlocks->isEmpty()) {
                 continue;
             }
-
             $html .= $this->render('@backend/components/book/views/slide', ['manager' => $slideBlocks]);
         }
-
         return $html;
     }
-
 }

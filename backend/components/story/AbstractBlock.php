@@ -26,6 +26,8 @@ abstract class AbstractBlock
     /** @var string */
     protected $id;
 
+    private $blockAttributes = [];
+
     public function __construct()
     {
         $this->id = $this->generateID();
@@ -174,4 +176,23 @@ abstract class AbstractBlock
         return $this->type === self::TYPE_HTML;
     }
 
+    public function setBlockAttribute(string $name, $value): void
+    {
+        $this->blockAttributes[$name] = $value;
+    }
+
+    public function getBlockAttribute(string $name)
+    {
+        return $this->blockAttributes[$name];
+    }
+
+    public function getBlockAttributes(): array
+    {
+        return $this->blockAttributes;
+    }
+
+    public function setBlockAttributes(array $attrs): void
+    {
+        $this->blockAttributes = $attrs;
+    }
 }

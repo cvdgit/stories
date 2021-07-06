@@ -7,6 +7,7 @@ use backend\components\story\ImageBlock;
 use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\Slide;
 use backend\components\story\writer\HTMLWriter;
+use common\models\StorySlideImage;
 
 class SlideModifier
 {
@@ -30,6 +31,37 @@ class SlideModifier
                     $delimiter = '&';
                 }
                 $block->setFilePath($block->getFilePath() . $delimiter . 't=' . str_replace(' ', '', microtime()));
+            }
+        }
+        return $this;
+    }
+
+    public function addImageId(): self
+    {
+        foreach ($this->slide->getBlocks() as $block) {
+            if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
+                /** @var $block ImageBlock */
+
+                $path = $block->getFilePath();
+                $image = null;
+                if (strpos($path, '://') !== false) {
+                    $query = parse_url($path, PHP_URL_QUERY);
+                    parse_str($query, $result);
+                    $imageHash = $result['id'];
+                    try {
+                        $image = StorySlideImage::findByHash($imageHash);
+                    }
+                    catch (\Exception $ex) {}
+                }
+                else {
+                    try {
+                        $image = StorySlideImage::findByPath(basename(dirname($path)), basename($path));
+                    }
+                    catch (\Exception $ex) {}
+                }
+                if ($image !== null) {
+                    $block->setBlockAttribute('data-image-id', $image->id);
+                }
             }
         }
         return $this;

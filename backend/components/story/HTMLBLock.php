@@ -51,4 +51,9 @@ class HTMLBLock extends AbstractBlock
             'required' => $content->getRequired(),
         ], parent::getValues());
     }
+
+    public function getContentObject(string $className)
+    {
+        return $className::createFromHtml($this->getContent());
+    }
 }

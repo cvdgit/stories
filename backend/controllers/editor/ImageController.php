@@ -146,7 +146,7 @@ class ImageController extends BaseController
     {
         $model = $this->findModel(Story::class, $story_id);
         $imageIDs = array_map(static function($item) {
-            return $item['id'];
+            return $item['image_id'];
         }, StorySlideImage::storyImages($model->id));
         $models = StorySlideImage::findAll(['id' => $imageIDs]);
         $result = [];

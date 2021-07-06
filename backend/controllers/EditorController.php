@@ -27,7 +27,6 @@ use backend\models\video\VideoSource;
 use backend\services\StoryLinksService;
 use common\models\StorySlide;
 use common\models\StoryTest;
-use common\models\test\AnswerType;
 use DomainException;
 use Exception;
 use Yii;
@@ -94,6 +93,7 @@ class EditorController extends BaseController
             $model->data = $linkSlide->data;
         }
         $slideData = (new SlideModifier($model->id, $model->data))
+            ->addImageId()
             ->addImageParams()
             ->render();
         return [
@@ -323,16 +323,16 @@ class EditorController extends BaseController
         }, $model->storySlides);
     }
 
-    public function actionSlideSource(int $slide_id)
+    public function actionSaveSlideSource()
     {
-        $model = new SlideSourceForm($slide_id);
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $model = new SlideSourceForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $model->saveSlideSource();
+            $slideModel = $this->findModel(StorySlide::class, $model->slide_id);
+            $model->saveSlideSource($slideModel);
+            return ['success' => true, 'id' => $slideModel->id];
         }
-        else {
-            $model->loadSlideSource();
-        }
-        return $this->renderAjax('_slide_source', ['model' => $model]);
+        return ['success' => false];
     }
 }
 

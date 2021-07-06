@@ -39,11 +39,8 @@ $this->title = 'Редактор: ' . $model->title;
         </div>
         <div class="slide-menu" style="display: none">
             <ul style="margin: 0; padding: 0; list-style: none">
-                <li class="slide-menu-item" data-slide-action="visible" title="Показать слайд">
+                <li class="slide-menu-item" data-slide-action="visible" title="Показать/Скрыть слайд">
                     <span class="toggle-slide-visible glyphicon glyphicon-eye-open"></span>
-                </li><!--
-                --><li class="slide-menu-item" data-slide-action="delete" title="Удалить слайд">
-                    <span class="delete-slide glyphicon glyphicon-trash"></span>
                 </li><!--
                 --><li class="slide-menu-item" data-slide-action="images" title="Изображения истории">
                     <span class="glyphicon glyphicon-picture"></span>
@@ -53,6 +50,9 @@ $this->title = 'Редактор: ' . $model->title;
                 </li><!--
                 --><li class="slide-menu-item" data-slide-action="relation" title="Связи Neo4j">
                     <span class="glyphicon glyphicon-transfer"></span>
+                </li><!--
+                --><li class="slide-menu-item" data-slide-action="delete" title="Удалить слайд">
+                    <span class="delete-slide glyphicon glyphicon-trash"></span>
                 </li><!--
                 --><li class="slide-menu-item" data-slide-action="source" title="Исходный код слайда">
                     <span class="glyphicon glyphicon-wrench"></span>

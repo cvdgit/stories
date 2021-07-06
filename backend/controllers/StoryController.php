@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\components\BaseController;
 use backend\components\book\BookStoryGenerator;
 use backend\models\StoryBatchCommandForm;
 use backend\models\WordListFromStoryForm;
@@ -10,7 +11,6 @@ use Exception;
 use Yii;
 use yii\db\Query;
 use yii\helpers\Url;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\UploadedFile;
@@ -22,9 +22,8 @@ use common\rbac\UserRoles;
 use backend\models\StoryCoverUploadForm;
 use backend\models\StoryFileUploadForm;
 use backend\models\SourcePowerPointForm;
-use backend\models\SourceDropboxForm;
 
-class StoryController extends Controller
+class StoryController extends BaseController
 {
     
     public $service;
@@ -123,7 +122,7 @@ class StoryController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $model = $this->findModel(Story::class, $id);
         $model->fillStoryCategories();
         $model->fillStoryPlaylists();
 
@@ -187,27 +186,10 @@ class StoryController extends Controller
      */
     public function actionDelete($id)
     {
-        $model = $this->findModel($id);
-        
+        $model = $this->findModel(Story::class, $id);
         $this->service->deleteStoryFiles($model);
         $model->delete();
-
         return $this->redirect(['index']);
-    }
-
-    /**
-     * Finds the Story model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return Story the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = Story::findOne($id)) !== null) {
-            return $model;
-        }
-        throw new NotFoundHttpException('Страница не найдена.');
     }
 
     public function actionImportFromPowerPoint()
@@ -215,7 +197,7 @@ class StoryController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
         $model = new SourcePowerPointForm();
         if ($model->load(Yii::$app->request->post())) {
-            $storyModel = $this->findModel($model->storyId);
+            $storyModel = $this->findModel(Story::class, $model->storyId);
             $this->service->importStoryFromPowerPoint($storyModel);
         }
         return ['success' => true];
@@ -224,7 +206,7 @@ class StoryController extends Controller
     public function actionDownload($id)
     {
         try {
-            $model = $this->findModel($id);
+            $model = $this->findModel(Story::class, $id);
             $file = $model->getStoryFilePath();
             if (file_exists($file)) {
                 Yii::$app->response->sendFile($file);
@@ -290,7 +272,7 @@ class StoryController extends Controller
     public function actionReadonly(int $id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $model = Story::findModel($id);
+        $model = $this->findModel(Story::class, $id);
         $html = $this->bookStoryGenerator->generate($model);
         $model->body = $html;
         $model->save(false, ['body']);
@@ -319,7 +301,7 @@ class StoryController extends Controller
 
     public function actionCancelPublication($id)
     {
-        $model = $this->findModel($id);
+        $model = $this->findModel(Story::class, $id);
         try {
             $model->cancelPublication();
             Yii::$app->session->setFlash('success', 'Публикация отменена');

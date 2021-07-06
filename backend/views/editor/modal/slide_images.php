@@ -82,9 +82,9 @@ function changeStoryImages() {
                         .append(
                             $('<div/>', {'class': 'thumbnail', 'data-image-id': image.id, 'style': 'background-image: url("' + image.thumb_url + '");'})
                                 .append($('<div/>', {'class': 'thumbnail-inner'})
-                                    .append(
-                                        $('<span/>', {'class': 'glyphicon glyphicon-trash delete-image'})
-                                    )
+                                    //.append(
+                                    //    $('<span/>', {'class': 'glyphicon glyphicon-trash delete-image'})
+                                    //)
                                 )
                         )
                         .appendTo(list);

@@ -206,13 +206,10 @@ class HtmlSlideReader implements ReaderInterface
     {
         $block = new HtmlBlock();
         $block->setType(AbstractBlock::TYPE_HTML);
-
         $element = pq($htmlBlock);
-
         $this->loadBlockProperties($block, $element->attr('style'));
         $block->setId(pq($htmlBlock)->attr('data-block-id'));
-        $block->setContent(pq($htmlBlock)->find('.sl-block-content')->html());
-
+        $block->setContent(pq($htmlBlock)->find('.sl-block-content:eq(0)')->html());
         $this->slide->addBlock($block);
     }
 

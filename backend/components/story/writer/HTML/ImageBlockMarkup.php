@@ -44,7 +44,8 @@ class ImageBlockMarkup extends AbstractMarkup
                 'z-index' => 11,
             ]),
         ]);
-        return Html::tag('div', $contentBlockTag, [
+
+        $options = [
             'class' => 'sl-block',
             'data-block-id' => $block->getId(),
             'data-block-type' => 'image',
@@ -56,6 +57,7 @@ class ImageBlockMarkup extends AbstractMarkup
                 'left' => $block->getLeft(),
                 'top' => $block->getTop(),
             ]),
-        ]);
+        ];
+        return Html::tag('div', $contentBlockTag, array_merge($options, $block->getBlockAttributes()));
     }
 }

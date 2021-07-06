@@ -389,7 +389,6 @@ function BlockModifier(modifier) {
     function css(element, name, value) {
         element.css(name, value);
         that.modifier.change();
-        console.log('mod');
     }
 
     this.setLeft = function(element, left) {
@@ -523,6 +522,7 @@ function ContentCleaner(editor) {
         save = save || false;
         var data = this.editor.find('section').clone();
         $('#save-container').empty().append(data);
+
         var section = $('#save-container').find('section');
         var attributes = $.map(section[0].attributes, function(item) {
             return item.name;
@@ -532,12 +532,12 @@ function ContentCleaner(editor) {
                 section.removeAttr(item);
             }
         });
+
         data.find('.sl-block-transform').remove();
         data.find('.ui-resizable-handle').remove();
-        data.find('.sl-block.wikids-active-block')
-            .removeClass('wikids-active-block');
-        data.find('.sl-block')
-            .removeClass('ui-draggable ui-draggable-handle ui-resizable');
+        data.find('.sl-block.wikids-active-block').removeClass('wikids-active-block');
+        data.find('.sl-block').removeClass('ui-draggable ui-draggable-handle ui-resizable');
+
         if (save) {
             data.find('img').each(function () {
                 var $elem = $(this);
@@ -545,6 +545,14 @@ function ContentCleaner(editor) {
                 $elem.removeAttr('src');
                 src = src.replace(/[&|\?]+t=[0-9\.]+/g, '');
                 $elem.attr('data-src', src);
+            });
+
+            var blockAttrNames = ['data-image-id'];
+            data.find('.sl-block').each(function() {
+                var $elem = $(this);
+                blockAttrNames.forEach(function(blockAttrName) {
+                    $elem.removeAttr(blockAttrName);
+                });
             });
         }
         return data[0].outerHTML;
@@ -641,7 +649,7 @@ var StoryEditor = (function() {
         blockAlignment,
         blockToolbar,
         contentCleaner,
-        blockID;
+        blockIDGenerator;
 
     /**
      * Инициализация редактора и всех компонентов
@@ -656,7 +664,7 @@ var StoryEditor = (function() {
         contentCleaner = new ContentCleaner($editor);
         blockModifier = new BlockModifier(new DataModifier(slidesManager, contentCleaner));
         blockAlignment = new BlockAlignment(blockModifier);
-        blockID = new BlockID();
+        blockIDGenerator = new BlockID();
 
         var editorPopover = new EditorPopover();
         blockToolbar = new BlockToolbar({
@@ -754,7 +762,11 @@ var StoryEditor = (function() {
         }
         var resizableOptions = {
                 resize: resizeHandler,
-                stop: stopHandler
+                stop: stopHandler,
+                grid: [5, 5],
+                snap: true,
+                snapMode: "outer",
+                snapTolerance: 4
             },
             defaultResizableOptions = {
                 handles: 'all',
@@ -790,7 +802,6 @@ var StoryEditor = (function() {
     }
 
     function unselectActiveBlock() {
-        console.log('unselect');
         $editor.find("div[data-block-id]").each(function() {
             var $block = $(this);
             $block.removeClass("wikids-active-block");
@@ -865,7 +876,6 @@ var StoryEditor = (function() {
     }($editor));
 
     function setActiveBlock(element) {
-
         if (blockManager.getActive()) {
             if (element.data('blockId') === blockManager.getActive().getID()) {
                 return;
@@ -873,8 +883,6 @@ var StoryEditor = (function() {
                 unsetActiveBlock();
             }
         }
-
-        console.log('set active block');
         blockManager.setActive(element);
         blockToolbar.create();
         selectActiveBlock(blockManager.getActive().getID());
@@ -912,29 +920,31 @@ var StoryEditor = (function() {
         }
     }
 
-    function copyBlock(block) {
+    function copyBlock(block, id) {
         var copyBlock = $(contentCleaner.cleanSlideBlock(block.getElement()));
         copyBlock.css({'left': (50 + parseInt(copyBlock.css('left'))) + 'px', 'top': (50 + parseInt(copyBlock.css('top'))) + 'px'});
-        copyBlock.attr('data-block-id', blockID.generate());
+        copyBlock.attr('data-block-id', id);
         appendBlock(copyBlock);
+        blockModifier.change();
     }
 
     function copyBlockAction(blockID) {
         var block = blockID ? blockManager.find(blockID) : blockManager.getActive();
+        var copyBlockID = blockIDGenerator.generate();
         if (block.typeIsImage() || block.typeIsVideo() || block.typeIsHtml()) {
             $.ajax({
-                url: '/admin/index.php?r=editor/block/copy&slide_id=' + slidesManager.getCurrentSlideID(),
+                url: '/admin/index.php?r=editor/block/copy&slide_id=' + slidesManager.getCurrentSlideID() + '&block_id=' + copyBlockID,
                 type: 'POST',
                 data: contentCleaner.cleanSlideBlock(block.getElement()),
                 contentType: 'text/html; charset=utf-8',
                 dataType: 'json',
                 processData: false
             }).done(function(response) {
-                copyBlock(block);
+                copyBlock(block, copyBlockID);
             });
         }
         else {
-            copyBlock(block);
+            copyBlock(block, copyBlockID);
         }
     }
 
@@ -1191,7 +1201,7 @@ var StoryEditor = (function() {
         'createSlideBlock': createBlock,
         'updateSlideBlock': updateBlock,
         "getNormalizedSlideContent": function() {
-            return contentCleaner.cleanSlideContent();
+            return contentCleaner.cleanSlideContent(true);
         },
 
         'getStoryID': function() {
@@ -1200,7 +1210,9 @@ var StoryEditor = (function() {
         'getCurrentSlideID': function() {
             return slidesManager.getCurrentSlideID();
         },
-        loadSlides
+
+        loadSlides,
+        loadSlide
     };
 })();
 

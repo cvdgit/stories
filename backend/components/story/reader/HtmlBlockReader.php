@@ -5,6 +5,7 @@ namespace backend\components\story\reader;
 use backend\components\story\AbstractBlock;
 use backend\components\story\reader\blocks\ImageReader;
 use backend\components\story\reader\blocks\VideoReader;
+use backend\components\story\reader\blocks\HtmlReader;
 
 class HtmlBlockReader implements ReaderInterface
 {
@@ -15,6 +16,7 @@ class HtmlBlockReader implements ReaderInterface
         AbstractBlock::TYPE_IMAGE => ImageReader::class,
         AbstractBlock::TYPE_VIDEO => VideoReader::class,
         AbstractBlock::TYPE_VIDEOFILE => VideoReader::class,
+        AbstractBlock::TYPE_HTML => HtmlReader::class,
     ];
 
     public function __construct(string $html)
