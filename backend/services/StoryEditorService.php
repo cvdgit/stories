@@ -285,6 +285,10 @@ class StoryEditorService
         $slide = (new HtmlSlideReader($slideModel->data))->load();
         $block = $slide->createBlock($blockClassName);
 
+        if ($block->getType() === AbstractBlock::TYPE_HTML) {
+            $slide->setView('new-question');
+        }
+
         if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
             $storyModel = Story::findModel($slideModel->story_id);
             if (!empty($form->url)) {
