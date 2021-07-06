@@ -25,6 +25,7 @@ use yii\db\Query;
 use yii\helpers\FileHelper;
 use yii\web\UploadedFile;
 use common\models\Story;
+use function MongoDB\Driver\Monitoring\removeSubscriber;
 
 class StoryEditorService
 {
@@ -46,9 +47,18 @@ class StoryEditorService
         if ($imageFile) {
             $imagesFolder = $storyModel->getSlideImagesPath();
             FileHelper::createDirectory($imagesFolder);
-            $slideImageFileName = str_replace([' ', '"', '\'', '&', '/', '\\', '?', '#'], '-', $imageFile->baseName) . '.' . $imageFile->extension;
+            $slideImageFileName = md5(random_int(0, 9999) . time() . random_int(0, 9999)) . '.' . $imageFile->extension;
             $imagePath = "{$imagesFolder}/$slideImageFileName";
             if ($imageFile->saveAs($imagePath)) {
+
+                if ($imagePath !== '') {
+                    $slideImage = new SlideImage($imagePath);
+                    if ($slideImage->needResize()) {
+                        $size = $slideImage->getResizeImageSize();
+                        $imagePath = $this->imageResizeService->resizeSlideImage($imagePath, $size->getWidth(), $size->getHeight());
+                    }
+                }
+
                 $form->imageModel = (new PowerPointImage($storyModel->getSlideImagesFolder()))
                     ->create($imagePath);
                 $form->imagePath = $form->imageModel->imageUrl();
