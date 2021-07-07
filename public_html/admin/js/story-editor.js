@@ -554,6 +554,8 @@ function ContentCleaner(editor) {
                     $elem.removeAttr(blockAttrName);
                 });
             });
+            data.find('div.new-questions').text('');
+            data.find('div.wikids-video-player').text('');
         }
         return data[0].outerHTML;
     }
@@ -563,8 +565,7 @@ function ContentCleaner(editor) {
         $('#save-container').empty().append(cloneBlock);
         cloneBlock.find('.sl-block-transform').remove();
         cloneBlock.find('.ui-resizable-handle').remove();
-        cloneBlock
-            .removeClass('wikids-active-block ui-draggable ui-draggable-handle ui-resizable');
+        cloneBlock.removeClass('wikids-active-block ui-draggable ui-draggable-handle ui-resizable');
         return cloneBlock[0].outerHTML;
     }
 }

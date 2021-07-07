@@ -24,7 +24,7 @@ class TestBlockContent
         return new self($content->attr('data-test-id'), $content->attr('data-test-required') ?? false);
     }
 
-    public function render(array $params = []): string
+    public function render(array $params = [], string $content = ''): string
     {
         $options = [
             'class' => 'new-questions',
@@ -34,7 +34,7 @@ class TestBlockContent
         foreach ($params as $paramName => $paramValue) {
             $options['data-' . $paramName] = $paramValue;
         }
-        return Html::tag('div', '', $options);
+        return Html::tag('div', $content, $options);
     }
 
     /**

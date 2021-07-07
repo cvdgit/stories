@@ -95,6 +95,7 @@ class EditorController extends BaseController
         $slideData = (new SlideModifier($model->id, $model->data))
             ->addImageId()
             ->addImageParams()
+            ->addDescription()
             ->render();
         return [
             'id' => $model->id,

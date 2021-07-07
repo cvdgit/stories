@@ -36,6 +36,9 @@ class VideoBlock extends AbstractBlock
     /** @var int */
     private $source;
 
+    /** @var string */
+    private $content;
+
     public function update($form)
     {
         $this->video_id = $form->video_id;
@@ -57,6 +60,7 @@ class VideoBlock extends AbstractBlock
         $block->setTop(0);
         $block->setDuration(0);
         $block->setSource(VideoSource::YOUTUBE);
+        $block->setType(AbstractBlock::TYPE_VIDEO);
         return $block;
     }
 
@@ -201,4 +205,13 @@ class VideoBlock extends AbstractBlock
         $this->to_next_slide = $value;
     }
 
+    public function getContent(): string
+    {
+        return (string) $this->content;
+    }
+
+    public function setContent(string $content): void
+    {
+        $this->content = $content;
+    }
 }

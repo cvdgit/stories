@@ -18,6 +18,7 @@ class VideoFileBlock extends VideoBlock
         $block->setTop(0);
         $block->setDuration(0);
         $block->setSource(VideoSource::FILE);
+        $block->setType(AbstractBlock::TYPE_VIDEOFILE);
         return $block;
     }
 }

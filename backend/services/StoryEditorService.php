@@ -7,14 +7,18 @@ use backend\components\image\PowerPointImage;
 use backend\components\image\SlideImage;
 use backend\components\QuestionHTML;
 use backend\components\story\AbstractBlock;
+use backend\components\story\BlockType;
 use backend\components\story\HTMLBLock;
 use backend\components\story\ImageBlock;
 use backend\components\story\reader\HTMLReader;
 use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\Slide;
 use backend\components\story\TestBlockContent;
+use backend\components\story\VideoBlock;
 use backend\components\story\writer\HTMLWriter;
 use backend\models\editor\BaseForm;
+use backend\models\video\VideoSource;
+use common\models\SlideVideo;
 use common\models\StorySlide;
 use common\models\StorySlideBlock;
 use common\models\StorySlideImage;
@@ -284,6 +288,19 @@ class StoryEditorService
             }
         }
 
+        if (BlockType::isVideo($block) || BlockType::isVideoFile($block)) {
+            /** @var VideoBlock $block */
+            if ($block->getSource() === VideoSource::YOUTUBE) {
+                $videoModel = SlideVideo::findModelByVideoID($block->getVideoId());
+            }
+            else {
+                $videoModel = SlideVideo::findModel(pathinfo($block->getVideoId(), PATHINFO_FILENAME));
+            }
+            if ($videoModel !== null) {
+                $block->setContent($videoModel->title);
+            }
+        }
+
         $writer = new HTMLWriter();
         $model->updateData($writer->renderSlide($slide));
 
@@ -337,6 +354,19 @@ class StoryEditorService
             }
             catch (\Exception $exception) {
 
+            }
+        }
+
+        if (BlockType::isVideo($block) || BlockType::isVideoFile($block)) {
+            /** @var VideoBlock $block */
+            if ($block->getSource() === VideoSource::YOUTUBE) {
+                $videoModel = SlideVideo::findModelByVideoID($block->getVideoId());
+            }
+            else {
+                $videoModel = SlideVideo::findModel(pathinfo($block->getVideoId(), PATHINFO_FILENAME));
+            }
+            if ($videoModel !== null) {
+                $block->setContent($videoModel->title);
             }
         }
 

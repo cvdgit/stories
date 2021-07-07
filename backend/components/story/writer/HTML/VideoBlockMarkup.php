@@ -18,7 +18,7 @@ class VideoBlockMarkup extends AbstractMarkup
     private function getElementMarkup(VideoBlock $block): string
     {
         $element = $this->getElement();
-        return Html::tag($element->getTagName(), '', [
+        return Html::tag($element->getTagName(), $block->getContent(), [
             'class' => 'wikids-video-player',
             'data-video-id' => $block->getVideoId(),
             'data-seek-to' => $block->getSeekTo(),
@@ -46,7 +46,7 @@ class VideoBlockMarkup extends AbstractMarkup
         return Html::tag('div', $contentBlockTag, [
             'class' => 'sl-block',
             'data-block-id' => $block->getId(),
-            'data-block-type' => 'video',
+            'data-block-type' => $block->getType(),
             'style' => $this->arrayToStyle([
                 'min-width' => '4px',
                 'min-height' => '4px',
