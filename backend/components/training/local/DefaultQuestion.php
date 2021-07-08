@@ -18,7 +18,9 @@ class DefaultQuestion extends Question
             true,
             $question->mix_answers,
             $question->type,
-            $question->getImageUrl());
+            $question->getImageUrl(),
+            $question->getOrigImageUrl()
+        );
         $this->stars = $stars;
         $this->question = $question;
     }

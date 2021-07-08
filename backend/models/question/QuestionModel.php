@@ -7,6 +7,7 @@ use common\models\StoryTestQuestion;
 use Yii;
 use yii\base\Model;
 use yii\helpers\FileHelper;
+use yii\imagine\Image;
 use yii\web\UploadedFile;
 
 class QuestionModel extends Model
@@ -45,11 +46,30 @@ class QuestionModel extends Model
     {
         $uploadedFile = UploadedFile::getInstance($this, 'imageFile');
         if ($uploadedFile !== null) {
-            $fileName = Yii::$app->security->generateRandomString() . '.' . $uploadedFile->extension;
+
             $folder = $model->getImagesPath();
             FileHelper::createDirectory($folder);
-            $uploadedFile->saveAs($folder . $fileName);
-            $model->image = $fileName;
+
+            $oldImageFileName = $model->image;
+
+            $fileName = Yii::$app->security->generateRandomString() . '.' . $uploadedFile->extension;
+            $imagePath = $folder . $fileName;
+            $uploadedFile->saveAs($imagePath);
+
+            $thumbImagePath = $folder . 'thumb_' . $fileName;
+            Image::resize($imagePath, 330, 500)->save($thumbImagePath, ['quality' => 100]);
+
+            $oldImages = [
+                $folder . $oldImageFileName,
+                $folder . 'thumb_' . $oldImageFileName,
+            ];
+            foreach ($oldImages as $oldImagePath) {
+                if (file_exists($oldImagePath)) {
+                    FileHelper::unlink($oldImagePath);
+                }
+            }
+
+            $model->image = 'thumb_' . $fileName;
         }
     }
 

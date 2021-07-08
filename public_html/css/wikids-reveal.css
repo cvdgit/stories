@@ -1698,7 +1698,7 @@
 }
 
 .wikids-test {
-
+	height: 100%;
 }
 
 .wikids-test-header {
@@ -1716,6 +1716,7 @@
 .wikids-test-questions {
 	margin-top: 10px;
 	text-align: left;
+	height: 100%;
 }
 
 .wikids-test-questions .question-title {
@@ -1744,6 +1745,10 @@
 
 .wikids-test-answers {
 	margin-top: 10px;
+}
+
+.wikids-test-question {
+	height: 100%;
 }
 
 .wikids-test-answer {

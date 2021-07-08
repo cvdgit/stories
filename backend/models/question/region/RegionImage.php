@@ -38,6 +38,14 @@ class RegionImage
         return $this->getImagesPath(false) . $this->model->image;
     }
 
+    public function getOrigImageUrl(): string
+    {
+        if (empty($this->model->image)) {
+            return '';
+        }
+        return $this->getImagesPath(false) . str_replace('thumb_', '', $this->model->image);
+    }
+
     public function getImagePath(): string
     {
         if (empty($this->model->image)) {

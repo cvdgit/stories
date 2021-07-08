@@ -14,17 +14,20 @@ class BaseQuestion
     /** @var mixed|null */
     private $image;
 
+    private $origImage;
+
     /** @var bool */
     private $lastAnswerIsCorrect;
 
     /** @var Answer[] */
     private $answers = [];
 
-    public function __construct(int $id, string $name, bool $lastAnswerIsCorrect, $image = null)
+    public function __construct(int $id, string $name, bool $lastAnswerIsCorrect, $image = null, $origImage = null)
     {
         $this->id = $id;
         $this->name = $name;
         $this->image = $image;
+        $this->origImage = $origImage;
         $this->lastAnswerIsCorrect = $lastAnswerIsCorrect;
     }
 
@@ -107,4 +110,8 @@ class BaseQuestion
         }, $this->answers);
     }
 
+    public function getOrigImage(): string
+    {
+        return (string)$this->origImage;
+    }
 }

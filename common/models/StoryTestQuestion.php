@@ -174,6 +174,11 @@ class StoryTestQuestion extends ActiveRecord
         return $this->getRegionImage()->getImageUrl();
     }
 
+    public function getOrigImageUrl(): string
+    {
+        return $this->getRegionImage()->getOrigImageUrl();
+    }
+
     public function getImagePath(): string
     {
         return $this->getRegionImage()->getImagePath();

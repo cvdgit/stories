@@ -1678,6 +1678,7 @@
         }
 
         function showOriginalImage(url, elem) {
+            url = url.indexOf('neo.wikids.ru') === -1 ? url : url + '/original';
             $('<div/>')
                 .addClass('wikids-test-image-original')
                 .append(
@@ -1691,7 +1692,7 @@
                         })
                         .append(
                             $('<img/>')
-                                .attr('src', url + '/original')
+                                .attr('src', url)
                                 .on('load', function() {
                                     $(this).parent().removeClass('image-loader');
                                     $(this).show();
@@ -2121,11 +2122,12 @@
                         .attr("src", question.image)
                         .css('max-width', '330px');
                     var originalImageExists = question['original_image'] === undefined ? true : question['original_image'];
-                    if (originalImageExists) {
+                    if (originalImageExists || question['orig_image']) {
                         $image
                             .css('cursor', 'zoom-in')
                             .on('click', function () {
-                                showOriginalImage($(this).attr('src'));
+                                console.log(question['orig_image'], question['orig_image'] || $(this).attr('src'));
+                                showOriginalImage(question['orig_image'] || $(this).attr('src'));
                             });
                     }
                     $image.appendTo($(".question-image", $question));
