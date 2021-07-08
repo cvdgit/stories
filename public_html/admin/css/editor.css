@@ -251,6 +251,17 @@ body {
     user-select: none;
 }
 
+.blocks-sidebar-item.group {
+    padding: 0;
+    height: 50px;
+}
+
+.blocks-sidebar-item.group .group-item {
+    width: 50px;
+    display: inline-block;
+    height: 100%;
+}
+
 .blocks-sidebars .popover {
     color: #333333;
 }
@@ -273,6 +284,14 @@ body {
 }
 
 .blocks-sidebars li.blocks-sidebar-item:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.blocks-sidebars li.blocks-sidebar-item.group:hover {
+    background-color: transparent;
+}
+
+.blocks-sidebars li.blocks-sidebar-item .group-item:hover {
     background-color: rgba(255,255,255,0.1);
 }
 

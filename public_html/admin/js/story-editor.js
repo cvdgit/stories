@@ -464,31 +464,12 @@ function BlockAlignment(modifier) {
 }
 
 function BlockToolbar(options) {
-
     this.container = $('.blocks-sidebars');
     this.options = options;
-
-    function createToolbar() {
-
-        function createToolbarItem(title, icon, action) {
-            return $('<li/>', {'class': 'blocks-sidebar-item', 'data-toolbar-action': action})
-                .append($('<span/>', {'class': 'glyphicon glyphicon-' + icon + ' icon'}))
-                .append($('<span/>', {'class': 'text', 'text': title}));
-        }
-
-        var $list = $('<ul/>');
-        $list.append(createToolbarItem('Изменить', 'pencil', 'edit'));
-        $list.append(createToolbarItem('Растянуть', 'resize-full', 'stretch'));
-        $list.append(createToolbarItem('Положение', 'align-center','align'));
-        $list.append(createToolbarItem('Удалить', 'trash', 'delete'));
-        $list.append(createToolbarItem('Копировать', 'duplicate', 'duplicate'));
-
-        return $('<div/>', {'class': 'blocks-sidebar'}).append($list);
-    }
-    this.toolbar = createToolbar();
 }
 BlockToolbar.prototype = {
     'create': function() {
+        this.toolbar = this.options.createToolbar();
         this.container.find('.blocks-sidebar.visible').removeClass('visible');
         this.container.append(this.toolbar.addClass('visible'));
         var that = this;
@@ -499,6 +480,9 @@ BlockToolbar.prototype = {
         this.options.onCreate();
     },
     'remove': function() {
+        if (!this.toolbar) {
+            return;
+        }
         this.toolbar.find('[data-toolbar-action]').each(function() {
             $(this).off('click');
         });
@@ -667,8 +651,43 @@ var StoryEditor = (function() {
         blockAlignment = new BlockAlignment(blockModifier);
         blockIDGenerator = new BlockID();
 
+        function createToolbar() {
+
+            function createToolbarItem(title, icon, action) {
+                return $('<li/>', {'class': 'blocks-sidebar-item', 'data-toolbar-action': action})
+                    .append($('<span/>', {'class': 'glyphicon glyphicon-' + icon + ' icon'}))
+                    .append($('<span/>', {'class': 'text', 'text': title}));
+            }
+
+            function createToolbarItemGroup(actions) {
+                var $group = $('<li/>', {'class': 'blocks-sidebar-item group'});
+                actions.forEach(function(action) {
+                    $group.append(
+                        $('<span/>', {'class': 'group-item', 'data-toolbar-action': action.action})
+                            .append($('<span/>', {'class': 'text', 'text': action.title}))
+                    )
+                })
+                return $group;
+            }
+
+            var $list = $('<ul/>');
+            $list.append(createToolbarItem('Изменить', 'pencil', 'edit'));
+            if (blockManager.getActive().typeIsImage() || blockManager.getActive().typeIsVideo() || blockManager.getActive().typeIsHtml()) {
+                $list.append(createToolbarItem('Растянуть', 'resize-full', 'stretch'));
+            }
+            if (blockManager.getActive().typeIsImage()) {
+                $list.append(createToolbarItemGroup([{'title': '1:1', 'action': 'natural-size'}]));
+            }
+            $list.append(createToolbarItem('Положение', 'align-center','align'));
+            $list.append(createToolbarItem('Удалить', 'trash', 'delete'));
+            $list.append(createToolbarItem('Копировать', 'duplicate', 'duplicate'));
+
+            return $('<div/>', {'class': 'blocks-sidebar'}).append($list);
+        }
+
         var editorPopover = new EditorPopover();
         blockToolbar = new BlockToolbar({
+            createToolbar,
             'onCreate': function() {
                 editorPopover.attach('li[data-toolbar-action=align]', {'placement': 'left'},[
                     {'name': 'left', 'title': 'По левому краю', 'click': function() { blockAlignment.left(blockManager.getActive().getElement()); }},
@@ -695,6 +714,9 @@ var StoryEditor = (function() {
                 },
                 'edit': function() {
                     config.onBlockUpdate(blockManager.getActive(), getUpdateBlockUrl(), contentCleaner.cleanSlideBlock(blockManager.getActive().getElement()));
+                },
+                'natural-size': function() {
+                    naturalSize();
                 }
             }
         });
@@ -1141,21 +1163,25 @@ var StoryEditor = (function() {
         return config[value];
     }
 
-    function stretchToSlide() {
+    function stretchToSlide(element) {
+        element = element || blockManager.getActive().getElement();
+        if (element === null) {
+            return;
+        }
+        blockModifier.setLeft(element, '0px');
+        blockModifier.setTop(element, '0px');
+        blockModifier.setWidth(element, '1280px');
+        blockModifier.setHeight(element, '720px');
+    }
+
+    function naturalSize() {
         var element = blockManager.getActive().getElement();
         if (element === null) {
             return;
         }
-        if (blockManager.getActive().getType() === 'text') {
-            blockModifier.setLeft(element, '0px');
-            blockModifier.setWidth(element, '1280px');
-        }
-        else {
-            blockModifier.setLeft(element, '0px');
-            blockModifier.setTop(element, '0px');
-            blockModifier.setWidth(element, '1280px');
-            blockModifier.setHeight(element, '720px');
-        }
+        blockModifier.setWidth(element, element.find('img').attr('data-natural-width') + 'px');
+        blockModifier.setHeight(element, element.find('img').attr('data-natural-height') + 'px');
+        blockAlignment.slideCenter(element);
     }
 
     function appendBlock(blockHtml) {
@@ -1169,7 +1195,12 @@ var StoryEditor = (function() {
 
     function createBlock(blockHtml) {
         var block = appendBlock(blockHtml);
-        blockAlignment.slideCenter(block.getElement());
+        if (block.typeIsVideo() || blockModifier.typeIsHtml()) {
+            stretchToSlide(block.getElement());
+        }
+        else {
+            blockAlignment.slideCenter(block.getElement());
+        }
     }
 
     function updateBlock(blockID, blockHtml) {
