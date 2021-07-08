@@ -174,25 +174,27 @@ function SlideManager(options) {
     this.options = options;
     this.$slidesList = $('#slides-list');
 
-    function SlideWrapper(element) {
+    function SlideWrapper(element, data) {
         this.element = element;
-    }
-    SlideWrapper.prototype = {
-        'getID': function() {
+        this.data = data;
+        this.getID = function() {
             return this.element.attr('data-id');
-        },
-        'getElement': function() {
+        };
+        this.getElement = function() {
             return this.element;
-        },
-        'delete': function() {
+        };
+        this.getNumber = function() {
+            return this.data.number;
+        };
+        this.delete = function() {
             this.element.remove();
             this.element = null;
-        },
+        };
     }
 
     var currentSlide = null;
-    this.setActiveSlide = function(element) {
-        currentSlide = new SlideWrapper(element);
+    this.setActiveSlide = function(element, data) {
+        currentSlide = new SlideWrapper(element, data);
     }
     this.unsetActiveSlide = function() {
         currentSlide = null;
@@ -980,7 +982,7 @@ var StoryEditor = (function() {
             $('.slides', $editor).html(data.data);
             Reveal.sync();
             Reveal.slide(0);
-            slidesManager.setActiveSlide($editor.find('section'));
+            slidesManager.setActiveSlide($editor.find('section'), data);
             slideMenu.init(data);
             makeDraggable($editor.find('.sl-block'));
         }).fail(function(data) {
@@ -1195,7 +1197,7 @@ var StoryEditor = (function() {
 
     function createBlock(blockHtml) {
         var block = appendBlock(blockHtml);
-        if (block.typeIsVideo() || blockModifier.typeIsHtml()) {
+        if (block.typeIsVideo() || block.typeIsHtml()) {
             stretchToSlide(block.getElement());
         }
         else {
@@ -1244,7 +1246,19 @@ var StoryEditor = (function() {
         },
 
         loadSlides,
-        loadSlide
+        loadSlide,
+
+        'getSlidePreviewUrl': function() {
+            var url = getConfigValue('storyUrl') + '#/';
+            var activeSlide = slidesManager.getActiveSlide();
+            if (activeSlide) {
+                var number = parseInt(activeSlide.getNumber());
+                if (number > 1) {
+                    url += number;
+                }
+            }
+            return url;
+        }
     };
 })();
 

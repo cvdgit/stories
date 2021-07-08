@@ -552,3 +552,14 @@ body {
     left: 0;
     top: 0;
 }
+
+/*
+.reveal p,
+.reveal div.slide-paragraph {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}*/

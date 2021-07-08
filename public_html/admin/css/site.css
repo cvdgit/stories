@@ -609,14 +609,3 @@ body {
         box-shadow: none;
     }
 }
-
-.reveal p,
-.reveal div.slide-paragraph {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    font-size: 100%;
-    font: inherit;
-    vertical-align: baseline;
-    /*line-height: 39px;*/
-}

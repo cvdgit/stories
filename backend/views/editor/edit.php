@@ -23,7 +23,7 @@ $this->title = 'Редактор: ' . $model->title;
                 ]) ?>
                 <?= Html::button('<i class="glyphicon glyphicon-eye-open"></i>', [
                     'title' => 'Просмотр истории',
-                    'onclick' => 'window.open("' . Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $model->alias]) . '", "target=_blank")'
+                    'data-editor-show' => 'slide',
                 ]) ?>
             </div>
             <button id="create-slide-action">Новый слайд</button>
@@ -104,16 +104,7 @@ echo $this->render('modal/slide_link', ['storyModel' => $model]);
 echo $this->render('modal/image_from_file', ['storyModel' => $model]);
 echo $this->render('modal/image_from_url', ['storyModel' => $model]);
 echo $this->render('modal/slide_images', ['storyModel' => $model]);
-
-//echo $this->render('modal/slide_question');
-//echo $this->render('modal/slide_collections');
-//echo $this->render('modal/questions', ['model' => $remoteTestForm]);
 echo $this->render('modal/relations');
-//echo $this->render('modal/crop');
-//echo $this->render('modal/new_image');
-//echo $this->render('modal/image_from_story');
-//echo $this->render('modal/new_test', ['model' => $localTestForm]);
-
 echo $this->render('modal/slide_source');
 
 $storyID = $model->id;
@@ -135,6 +126,7 @@ $config = [
     'createNewSlideQuestionAction' => Url::to(['editor/new-create-slide-question']),
     'copySlideAction' => Url::to(['editor/copy-slide']),
     'storyImagesAction' => Url::to(['editor/image/list']),
+    'storyUrl' => Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $model->alias]),
 ];
 $configJSON = Json::htmlEncode($config);
 
@@ -307,6 +299,10 @@ $js = <<< JS
         else {
             elem.prop('data-process', false);
         }
+    });
+    
+    $('[data-editor-show=slide').on('click', function() {
+        window.open(StoryEditor.getSlidePreviewUrl(), 'target=_blank');
     });
 })();
 JS;
