@@ -184,6 +184,11 @@ class StoryTestQuestion extends ActiveRecord
         return $this->getRegionImage()->getImagePath();
     }
 
+    public function getOrigImagePath(): string
+    {
+        return $this->getRegionImage()->getOrigImagePath();
+    }
+
     public function typeIsRegion(): bool
     {
         return $this->type === QuestionType::REGION;
@@ -221,8 +226,15 @@ class StoryTestQuestion extends ActiveRecord
 
     public function deleteImage(): void
     {
-        $path = $this->getImagesPath() . $this->image;
-        FileHelper::unlink($path);
+        $images = [
+            $this->getImagePath(),
+            $this->getOrigImagePath(),
+        ];
+        foreach ($images as $imagePath) {
+            if (!empty($imagePath) && file_exists($imagePath)) {
+                FileHelper::unlink($imagePath);
+            }
+        }
     }
 
     public function getRegionImage(): RegionImage

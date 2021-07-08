@@ -1743,11 +1743,11 @@
                 var $image = $("<img/>")
                     .attr("src", answer.image)
                     .attr('height', 100);
-                if (originalImageExists) {
+                if (originalImageExists || answer['orig_image']) {
                     $image
                         .css('cursor', 'zoom-in')
                         .on('click', function () {
-                            showOriginalImage($(this).attr('src'), this);
+                            showOriginalImage(answer['orig_image'] || $(this).attr('src'), this);
                         });
                 }
                 $answer.append($image);

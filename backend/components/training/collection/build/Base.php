@@ -24,7 +24,7 @@ class Base
         $question = new DefaultQuestion($this->question, $this->stars);
         foreach ($this->question->storyTestAnswers as $answer) {
             /** @var $answer StoryTestAnswer */
-            $question->addAnswer(new Answer($answer->id, $answer->name, $answer->answerIsCorrect(), '', $answer->getImagePath()));
+            $question->addAnswer(new Answer($answer->id, $answer->name, $answer->answerIsCorrect(), '', $answer->getImagePath(), null, $answer->getOrigImagePath()));
         }
         return $question;
     }

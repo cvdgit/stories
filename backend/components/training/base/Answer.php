@@ -14,6 +14,8 @@ class Answer
     /** @var mixed|null */
     private $image;
 
+    private $origImage;
+
     /** @var bool */
     private $correct;
 
@@ -23,7 +25,7 @@ class Answer
     /** @var int|null */
     private $order;
 
-    public function __construct(int $id, string $name, bool $correct, $regionID = '', $image = null, $order = null)
+    public function __construct(int $id, string $name, bool $correct, $regionID = '', $image = null, $order = null, $origImage = null)
     {
         $this->id = $id;
         $this->name = $name;
@@ -31,6 +33,7 @@ class Answer
         $this->regionID = $regionID;
         $this->image = $image;
         $this->order = $order;
+        $this->origImage = $origImage;
     }
 
     /**
@@ -55,6 +58,11 @@ class Answer
     public function getImage()
     {
         return $this->image;
+    }
+
+    public function getOrigImage(): string
+    {
+        return (string) $this->origImage;
     }
 
     /**

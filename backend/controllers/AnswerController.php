@@ -2,15 +2,15 @@
 
 namespace backend\controllers;
 
+use backend\components\BaseController;
 use common\models\StoryTestAnswer;
 use common\rbac\UserRoles;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
-class AnswerController extends Controller
+class AnswerController extends BaseController
 {
 
     public function behaviors()
@@ -34,17 +34,10 @@ class AnswerController extends Controller
         ];
     }
 
-    protected function findModel($id)
-    {
-        if (($model = StoryTestAnswer::findOne($id)) !== null) {
-            return $model;
-        }
-        throw new NotFoundHttpException('The requested page does not exist.');
-    }
-
     public function actionDeleteImage(int $id)
     {
-        $model = $this->findModel($id);
+        /** @var StoryTestAnswer $model */
+        $model = $this->findModel(StoryTestAnswer::class, $id);
         $fileDeleted = false;
         try {
             $model->deleteImage();

@@ -59,13 +59,15 @@ class QuestionModel extends Model
             $thumbImagePath = $folder . 'thumb_' . $fileName;
             Image::resize($imagePath, 330, 500)->save($thumbImagePath, ['quality' => 100]);
 
-            $oldImages = [
-                $folder . $oldImageFileName,
-                $folder . 'thumb_' . $oldImageFileName,
-            ];
-            foreach ($oldImages as $oldImagePath) {
-                if (file_exists($oldImagePath)) {
-                    FileHelper::unlink($oldImagePath);
+            if (!empty($oldImageFileName)) {
+                $oldImages = [
+                    $folder . $oldImageFileName,
+                    $folder . 'thumb_' . $oldImageFileName,
+                ];
+                foreach ($oldImages as $oldImagePath) {
+                    if (file_exists($oldImagePath)) {
+                        FileHelper::unlink($oldImagePath);
+                    }
                 }
             }
 

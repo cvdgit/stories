@@ -176,7 +176,7 @@ class TestController extends Controller
         $answerImageModel = new AnswerImageUploadForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             $answerImageModel->answerImage = UploadedFile::getInstance($answerImageModel, 'answerImage');
-            if ($answerImageModel->upload()) {
+            if ($answerImageModel->upload($model->image)) {
                 $model->image = $answerImageModel->answerImage;
             }
             $model->save();
@@ -195,7 +195,7 @@ class TestController extends Controller
         $answerImageModel = new AnswerImageUploadForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             $answerImageModel->answerImage = UploadedFile::getInstance($answerImageModel, 'answerImage');
-            if ($answerImageModel->upload()) {
+            if ($answerImageModel->upload($model->image)) {
                 $model->image = $answerImageModel->answerImage;
             }
             $model->save();

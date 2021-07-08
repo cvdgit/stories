@@ -1,12 +1,11 @@
 <?php
 
-
 namespace backend\models;
-
 
 use Imagine\Image\ManipulatorInterface;
 use Yii;
 use yii\base\Model;
+use yii\helpers\FileHelper;
 use yii\imagine\Image;
 use yii\web\UploadedFile;
 
@@ -37,15 +36,32 @@ class AnswerImageUploadForm extends Model
         return Yii::getAlias('@public') . '/test_images';
     }
 
-    public function upload()
+    public function upload($oldImageFileName = null)
     {
         if ($this->validate() && $this->answerImage !== null) {
-            $fileName = Yii::$app->security->generateRandomString() . '.' . $this->answerImage->extension;
-            $filePath = $this->testImagesFilePath() . '/' . $fileName;
-            $this->answerImage->saveAs($filePath);
-            $this->answerImage = $fileName;
 
-            Image::thumbnail($filePath, 110, 100)->save($filePath, ['jpeg_quality' => 100], ManipulatorInterface::THUMBNAIL_INSET);
+            $folder = $this->testImagesFilePath() . '/';
+            $fileName = Yii::$app->security->generateRandomString() . '.' . $this->answerImage->extension;
+            $imagePath = $folder . $fileName;
+            $this->answerImage->saveAs($imagePath);
+
+            $thumbImagePath = $folder . 'thumb_' . $fileName;
+            Image::thumbnail($imagePath, 110, 100, ManipulatorInterface::THUMBNAIL_INSET)
+                ->save($thumbImagePath, ['jpeg_quality' => 100]);
+
+            $this->answerImage = 'thumb_' . $fileName;
+
+            if ($oldImageFileName !== null) {
+                $oldImages = [
+                    $folder . $oldImageFileName,
+                    $folder . 'thumb_' . $oldImageFileName,
+                ];
+                foreach ($oldImages as $oldImagePath) {
+                    if (file_exists($oldImagePath)) {
+                        FileHelper::unlink($oldImagePath);
+                    }
+                }
+            }
 
             return true;
         }

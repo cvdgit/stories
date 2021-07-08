@@ -54,6 +54,14 @@ class RegionImage
         return $this->getImagesPath() . $this->model->image;
     }
 
+    public function getOrigImagePath(): string
+    {
+        if (empty($this->model->image)) {
+            return '';
+        }
+        return $this->getImagesPath() . str_replace('thumb_', '', $this->model->image);
+    }
+
     public function getWidth(): int
     {
         return $this->width;

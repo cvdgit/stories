@@ -118,12 +118,20 @@ class StoryTestAnswer extends ActiveRecord
         return !empty($this->image);
     }
 
-    public function getImagePath()
+    public function getImagePath(): string
     {
         if ($this->image === null) {
-            return;
+            return '';
         }
         return '/test_images/' . $this->image;
+    }
+
+    public function getOrigImagePath(): string
+    {
+        if ($this->image === null) {
+            return '';
+        }
+        return '/test_images/' . str_replace('thumb_', '', $this->image);
     }
 
     public function getImagesPath()
@@ -133,8 +141,15 @@ class StoryTestAnswer extends ActiveRecord
 
     public function deleteImage(): void
     {
-        $path = $this->getImagesPath() . $this->image;
-        FileHelper::unlink($path);
+        $images = [
+            $this->getImagePath(),
+            $this->getOrigImagePath(),
+        ];
+        foreach ($images as $imagePath) {
+            if (!empty($imagePath) && (file_exists($path = Yii::getAlias('@public') . $imagePath))) {
+                FileHelper::unlink($path);
+            }
+        }
     }
 
     public static function createSequenceAnswer(int $questionID, string $name, int $order): self
