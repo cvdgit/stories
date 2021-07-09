@@ -18,7 +18,7 @@ class QuestionForm extends BaseForm
         return array_merge(parent::rules(), [
             [['story_id', 'test_id'], 'required'],
             [['story_id', 'test_id'], 'integer'],
-            [['story_id', 'test_id'], 'unique', 'targetClass' => StoryStoryTest::class, 'message' => 'Невозможно добавить т.к. этот тест в эту историю уже добавлен'],
+            [['story_id', 'test_id'], 'unique', 'targetAttribute' => ['story_id', 'test_id'], 'targetClass' => StoryStoryTest::class, 'message' => 'Невозможно добавить т.к. этот тест в эту историю уже добавлен'],
         ]);
     }
 
