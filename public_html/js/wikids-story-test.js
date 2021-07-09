@@ -2126,7 +2126,6 @@
                         $image
                             .css('cursor', 'zoom-in')
                             .on('click', function () {
-                                console.log(question['orig_image'], question['orig_image'] || $(this).attr('src'));
                                 showOriginalImage(question['orig_image'] || $(this).attr('src'));
                             });
                     }
@@ -2864,7 +2863,7 @@
                                 .attr("width", 180)
                                 .css('cursor', 'zoom-in')
                                 .on('click', function () {
-                                    showOriginalImage($(this).attr('src'));
+                                    showOriginalImage(questionAnswer['orig_image'] || $(this).attr('src'));
                                 });
                             $content.append($image);
                         }
