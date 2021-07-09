@@ -348,15 +348,6 @@ class StoryEditorService
         else {
             $block->update($form);
         }
-        if ($block->isTest()) {
-            try {
-                $this->storyLinkService->createTestLink($slideModel->story_id, $block->getTestID());
-            }
-            catch (\Exception $exception) {
-
-            }
-        }
-
         if (BlockType::isVideo($block) || BlockType::isVideoFile($block)) {
             /** @var VideoBlock $block */
             if ($block->getSource() === VideoSource::YOUTUBE) {

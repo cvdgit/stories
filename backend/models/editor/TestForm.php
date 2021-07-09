@@ -2,6 +2,10 @@
 
 namespace backend\models\editor;
 
+use common\models\StorySlide;
+use common\models\StoryStoryTest;
+use DomainException;
+
 class TestForm extends TextForm
 {
 
@@ -21,5 +25,15 @@ class TestForm extends TextForm
             'text' => 'Заголовок',
             'test_id' => 'Тест',
         ]);
+    }
+
+    public function afterCreate(StorySlide $slideModel): void
+    {
+        parent::afterCreate($slideModel);
+        $model = StoryStoryTest::create($slideModel->story_id, $this->test_id);
+        if (!$model->validate()) {
+            throw new DomainException('Model not valid');
+        }
+        $model->save(false);
     }
 }

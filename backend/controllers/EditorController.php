@@ -157,6 +157,7 @@ class EditorController extends BaseController
         }
         $form = Yii::createObject($this->types[$block_type]);
         $form->slide_id = $model->id;
+        $form->story_id = $model->story_id;
         return $this->renderAjax('create', [
             'model' => $form,
             'action' => ['editor/create-block/' . $block_type],

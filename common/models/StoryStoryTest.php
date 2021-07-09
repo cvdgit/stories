@@ -31,9 +31,9 @@ class StoryStoryTest extends ActiveRecord
         return [
             [['story_id', 'test_id'], 'required'],
             [['story_id', 'test_id'], 'integer'],
-            [['story_id', 'test_id'], 'unique', 'targetAttribute' => ['story_id', 'test_id']],
-            [['story_id'], 'exist', 'skipOnError' => true, 'targetClass' => Story::class, 'targetAttribute' => ['story_id' => 'id']],
-            [['test_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTest::class, 'targetAttribute' => ['test_id' => 'id']],
+            [['story_id', 'test_id'], 'unique', 'skipOnEmpty' => false, 'targetAttribute' => ['story_id', 'test_id']],
+            //[['story_id'], 'exist', 'skipOnError' => true, 'targetClass' => Story::class, 'targetAttribute' => ['story_id' => 'id']],
+            //[['test_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTest::class, 'targetAttribute' => ['test_id' => 'id']],
         ];
     }
 
@@ -77,9 +77,12 @@ class StoryStoryTest extends ActiveRecord
         self::deleteAll(['story_id' => $storyID]);
     }
 
-    public static function deleteStoryTest(int $storyID, int $testID)
+    public static function deleteStoryTest(int $storyID, int $testID): void
     {
-        self::findOne(['story_id' => $storyID, 'test_id' => $testID])->delete();
+        $model = self::findOne(['story_id' => $storyID, 'test_id' => $testID]);
+        if ($model !== null) {
+            $model->delete();
+        }
     }
 
 }

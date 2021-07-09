@@ -14,6 +14,7 @@ use yii\helpers\Html;
     <?= $this->render($model->view, ['form' => $form, 'model' => $model, 'widgetStoryModel' => $widgetStoryModel]) ?>
 </div>
 <div class="modal-footer">
+    <?= $form->field($model, 'story_id')->hiddenInput()->label(false) ?>
     <?= $form->field($model, 'slide_id')->hiddenInput()->label(false) ?>
     <?= $form->field($model, 'block_id', ['inputOptions' => ['class' => 'editor-block-id']])->hiddenInput()->label(false) ?>
     <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary', 'style' => 'margin-right: 20px']) ?>

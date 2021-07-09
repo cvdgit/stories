@@ -24,10 +24,10 @@ use backend\models\editor\VideoForm;
 use backend\services\StoryEditorService;
 use common\models\StorySlide;
 use common\rbac\UserRoles;
+use Exception;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class CreateBlockController extends BaseController
@@ -122,10 +122,15 @@ class CreateBlockController extends BaseController
     {
         if ($form->load(Yii::$app->request->post()) && $form->validate()) {
             $slideModel = $this->findModel(StorySlide::class, $form->slide_id);
-            $html = $this->editorService->createBlock($slideModel, $form, $blockClassName);
-            $form->afterCreate($slideModel);
-            return ['success' => true, 'html' => $html];
+            try {
+                $form->afterCreate($slideModel);
+                $html = $this->editorService->createBlock($slideModel, $form, $blockClassName);
+                return ['success' => true, 'html' => $html];
+            }
+            catch(Exception $ex) {
+                return ['success' => false, 'errors' => $ex->getMessage()];
+            }
         }
-        return $form->getErrors();
+        return ['success' => false, 'errors' => implode('<br/>', $form->getErrorSummary(true))];
     }
 }

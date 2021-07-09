@@ -4,6 +4,7 @@ namespace backend\models\editor;
 
 use common\models\StorySlide;
 use common\models\StoryStoryTest;
+use DomainException;
 
 class QuestionForm extends BaseForm
 {
@@ -15,7 +16,9 @@ class QuestionForm extends BaseForm
     public function rules(): array
     {
         return array_merge(parent::rules(), [
-            [['test_id', 'required'], 'integer'],
+            [['story_id', 'test_id'], 'required'],
+            [['story_id', 'test_id'], 'integer'],
+            [['story_id', 'test_id'], 'unique', 'targetClass' => StoryStoryTest::class, 'message' => 'Невозможно добавить т.к. этот тест в эту историю уже добавлен'],
         ]);
     }
 
@@ -29,12 +32,12 @@ class QuestionForm extends BaseForm
 
     public function afterCreate(StorySlide $slideModel): void
     {
+        parent::afterCreate($slideModel);
         $model = StoryStoryTest::create($slideModel->story_id, $this->test_id);
         if (!$model->validate()) {
             throw new \DomainException('Model not valid');
         }
         $model->save(false);
-
         $slideModel->setQuestionSlide();
     }
 }

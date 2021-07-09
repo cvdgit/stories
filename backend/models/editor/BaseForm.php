@@ -8,6 +8,7 @@ use yii\base\Model;
 class BaseForm extends Model
 {
 
+    public $story_id;
     public $slide_id;
     public $block_id;
     public $left;
@@ -20,7 +21,7 @@ class BaseForm extends Model
     public function rules()
     {
         return [
-            [['slide_id'], 'integer'],
+            [['slide_id', 'story_id'], 'integer'],
             [['block_id', 'left', 'top', 'width', 'height'], 'string'],
         ];
     }
