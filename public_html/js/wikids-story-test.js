@@ -1088,11 +1088,13 @@
     function SequenceQuestion(test) {
 
         var $list = $('<div/>', {
-            class: 'list-group'
+            class: 'list-group sequence-question-list'
         });
 
         Sortable.create($list[0], {
             ghostClass: 'wikids-sortable-ghost',
+            cursor: 'move',
+            opacity: 0.6,
             handle: '.wikids-sortable-handle'
         });
 
@@ -1102,14 +1104,11 @@
             _extends(_answers, answers);
             _answers = shuffle(_answers);
             _answers.forEach(function(answer) {
-                var move = $('<i/>', {
-                    class: 'glyphicon glyphicon-move wikids-sortable-handle'
-                });
                 $('<div/>', {
-                    'class': 'list-group-item',
+                    'class': 'list-group-item wikids-sortable-handle',
                     'text': answer.name,
                     'data-answer-id': answer.id
-                }).prepend(move).appendTo($list);
+                }).appendTo($list);
             });
             return $list;
         }
@@ -1127,7 +1126,7 @@
                 'class': 'wikids-test-answers'
             });
             $answers.append(this.createAnswer(answers));
-            var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-4 col-md-offset-4 question-wrapper"></div></div>');
+            var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-6 col-md-offset-3 question-wrapper"></div></div>');
             $wrapper.find(".question-wrapper").append($answers);
             return $wrapper;
         }

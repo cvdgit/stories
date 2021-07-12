@@ -2294,6 +2294,7 @@ p.wikids-test-description {
 .wikids-sortable-ghost {
 	opacity: .5;
 	background: #C8EBFB;
+	cursor: move;
 }
 
 .wikids-sortable-handle {
@@ -2331,4 +2332,14 @@ p.wikids-test-description {
 .sl-block .new-questions {
 	width: 100%;
 	height: 100%;
+}
+
+.sequence-question-list .list-group-item {
+	border: 0 none;
+	cursor: move;
+	user-select: none;
+}
+
+.sequence-question-list .ui-sortable-helper {
+	cursor: move;
 }
