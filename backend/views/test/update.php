@@ -33,6 +33,9 @@ TestAsset::register($this);
                 <?php if ($model->isSourceWordList()): ?>
                     <?= $this->renderFile('@backend/views/word-list/_list.php', ['model' => new \backend\forms\UpdateWordList($model->wordList)]) ?>
                 <?php endif ?>
+                <?php if ($model->isSourceTests()): ?>
+                    <?= $this->render('_test_tests_list', ['testModel' => $model]) ?>
+                <?php endif ?>
             <?php endif ?>
         </div>
     </div>
@@ -102,19 +105,6 @@ $('#run-test-modal').on('hide.bs.modal', function() {
     $(this).removeData('bs.modal');
     $(this).find('.modal-content').html('');
 });
-
-Sortable.create($('#questions-grid tbody')[0], {
-    ghostClass: 'wikids-sortable-ghost',
-    handle: 'tr',
-    onUpdate: function() {
-        var ids = [];
-        $('#questions-grid tbody tr[data-key]').each(function(i, elem) {
-            ids.push($(elem).data('key'));
-        });
-        $('#storytest-sortable').val(ids.join(','));
-    }
-});
-
 
 JS;
 $this->registerJs($js);

@@ -101,6 +101,20 @@ class QuestionController extends Controller
                 ->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount, $fastMode);
         }
 
+        if ($test->isSourceTests()) {
+
+            $questions = [];
+            foreach ($test->relatedTests as $relatedTest) {
+                $questions = array_merge($questions, $relatedTest->getQuestionData());
+            }
+            shuffle($questions);
+
+            $collection = (new TestBuilder($test, $questions, count($questions), $userStars, $fastMode))
+                ->build();
+            return (new Serializer())
+                ->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount, $fastMode);
+        }
+
         $curl = new Curl();
 
         $params = ['id' => $questionId];

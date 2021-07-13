@@ -101,5 +101,18 @@ $('#import-from-word-list').on('click', function(e) {
     e.preventDefault();
     $('#import-from-word-list-modal').modal({'remote': $(this).attr('href')});
 });
+
+Sortable.create($('#questions-grid tbody')[0], {
+    ghostClass: 'wikids-sortable-ghost',
+    handle: 'tr',
+    onUpdate: function() {
+        var ids = [];
+        $('#questions-grid tbody tr[data-key]').each(function(i, elem) {
+            ids.push($(elem).data('key'));
+        });
+        $('#storytest-sortable').val(ids.join(','));
+    }
+});
+
 JS;
 $this->registerJs($js);

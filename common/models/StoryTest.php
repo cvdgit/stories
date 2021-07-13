@@ -7,6 +7,7 @@ use common\models\test\AnswerType;
 use common\models\test\SourceType;
 use DomainException;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
@@ -46,6 +47,7 @@ use yii\helpers\ArrayHelper;
  * @property StoryTestRun[] $storyTestRuns
  * @property StoryTest $parentTest;
  * @property TestWordList $wordList;
+ * @property StoryTest[] $relatedTests;
  */
 class StoryTest extends ActiveRecord
 {
@@ -122,12 +124,18 @@ class StoryTest extends ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getStoryTestQuestions()
     {
         return $this->hasMany(StoryTestQuestion::class, ['story_test_id' => 'id'])
             ->orderBy(['order' => SORT_ASC]);
+    }
+
+    public function getRelatedTests(): ActiveQuery
+    {
+        return $this->hasMany(__CLASS__, ['id' => 'related_test_id'])
+            ->viaTable('related_tests', ['test_id' => 'id']);
     }
 
     private static function createRemoteTestQuery(): Query
@@ -145,12 +153,15 @@ class StoryTest extends ActiveRecord
             ->andWhere(['not in', 't.id', $subQuery]);
     }
 
-    private static function createLocalTestQuery(): Query
+    private static function createLocalTestQuery($source = []): Query
     {
+        if (empty($source)) {
+            $source = [SourceType::TEST, SourceType::LIST, SourceType::TESTS];
+        }
         return (new Query())
             ->select(['id', 'title'])
             ->from(self::tableName())
-            ->where(['in', 'source', [SourceType::TEST, SourceType::LIST]]);
+            ->where(['in', 'source', $source]);
     }
 
     public static function getTestArray(): array
@@ -175,6 +186,16 @@ class StoryTest extends ActiveRecord
     {
         $query = self::createLocalTestQuery()
             ->orderBy(['title' => SORT_ASC]);
+        return ArrayHelper::map($query->all(), 'id', 'title');
+    }
+
+    public static function getLocalTestOnlyArray(array $excludeModels = []): array
+    {
+        $query = self::createLocalTestQuery([SourceType::TEST]);
+        if (count($excludeModels) > 0) {
+            $query->andFilterWhere(['not in', 'id', array_map(static function(StoryTest $item) { return $item->id; }, $excludeModels)]);
+        }
+        $query->orderBy(['title' => SORT_ASC]);
         return ArrayHelper::map($query->all(), 'id', 'title');
     }
 
@@ -271,6 +292,11 @@ class StoryTest extends ActiveRecord
         return (int) $this->source === SourceType::LIST;
     }
 
+    public function isSourceTests(): bool
+    {
+        return $this->source === SourceType::TESTS;
+    }
+
     public function isAnswerTypeNumPad()
     {
         return (int) $this->answer_type === AnswerType::NUMPAD;
@@ -319,7 +345,7 @@ class StoryTest extends ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getStoryStoryTests()
     {
@@ -327,7 +353,7 @@ class StoryTest extends ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getStories()
     {
@@ -335,7 +361,7 @@ class StoryTest extends ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getStoryTestRuns()
     {
