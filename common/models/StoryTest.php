@@ -415,6 +415,11 @@ class StoryTest extends ActiveRecord
         return count($this->storyTestQuestions);
     }
 
+    public function getRelatedTestsNumber(): int
+    {
+        return count($this->relatedTests);
+    }
+
     public function afterSave($insert, $changedAttributes)
     {
         if ($this->sortable !== null) {

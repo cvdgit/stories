@@ -24,14 +24,19 @@ class TestSearch extends Model
         ];
     }
 
-    public function isNeoTest()
+    public function isNeoTest(): bool
     {
         return $this->source === SourceType::NEO;
     }
 
-    public function isWordList()
+    public function isWordList(): bool
     {
         return $this->source === SourceType::LIST;
+    }
+
+    public function isTests(): bool
+    {
+        return $this->source === SourceType::TESTS;
     }
 
     public function search($params)

@@ -51,10 +51,16 @@ if ($searchModel->isNeoTest()) {
         'label' => 'Количество вариантов',
     ];
 }
-if (!$searchModel->isNeoTest() && !$searchModel->isWordList()) {
+if (!$searchModel->isNeoTest() && !$searchModel->isWordList() && !$searchModel->isTests()) {
     $columns[] = [
         'attribute' => 'questionsNumber',
         'label' => 'Вопросов',
+    ];
+}
+if ($searchModel->isTests()) {
+    $columns[] = [
+        'attribute' => 'relatedTestsNumber',
+        'label' => 'Количество тестов',
     ];
 }
 if (!$searchModel->isNeoTest()) {

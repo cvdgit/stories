@@ -1,6 +1,5 @@
 <?php
 use common\helpers\Url;
-use yii\helpers\Html;
 use yii\helpers\Json;
 /** @var $testModel common\models\StoryTest */
 $css = <<<CSS
@@ -48,7 +47,7 @@ $this->registerCss($css);
 </div>
 
 <div class="modal remote fade" id="manage-tests-modal">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content"></div>
     </div>
 </div>

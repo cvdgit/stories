@@ -6,7 +6,6 @@ use yii\widgets\ActiveForm;
 /** @var $this yii\web\View */
 /** @var $model common\models\StoryTest */
 /** @var $form yii\widgets\ActiveForm */
-/** @var $dataProvider yii\data\ActiveDataProvider */
 ?>
 <div class="story-test-form">
     <?php $form = ActiveForm::begin(); ?>
@@ -14,7 +13,7 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'header')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'description_text')->textarea(['rows' => 6]) ?>
     <?= $form->field($model, 'incorrect_answer_text')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'source')->dropDownList(SourceType::asArray()) ?>
+    <?= $form->field($model, 'source')->dropDownList(SourceType::asArray(), ['disabled' => !$model->isNewRecord]) ?>
 
     <div class="remote-questions-block" style="display: <?= $model->isRemote() ? 'block' : 'none' ?>">
         <?= $form->field($model, 'question_list')->dropDownList([], ['prompt' => 'Загрузка...', 'disabled' => true]) ?>

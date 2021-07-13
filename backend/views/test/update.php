@@ -17,10 +17,7 @@ TestAsset::register($this);
     <h1><?= Html::encode($this->title) . ($model->isRemote() ? '' : ' ' . $runTestLink) ?></h1>
     <div class="row">
         <div class="col-md-6">
-            <?= $this->render('_form', [
-                'model' => $model,
-                'dataProvider' => $dataProvider,
-            ]) ?>
+            <?= $this->render('_form', ['model' => $model]) ?>
         </div>
         <div class="col-md-6 test-sidebar">
             <?php if (!$model->isNewRecord && !$model->isVariant()): ?>
