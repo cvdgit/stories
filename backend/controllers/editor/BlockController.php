@@ -60,8 +60,11 @@ class BlockController extends BaseController
         if ($block->getType() === AbstractBlock::TYPE_HTML) {
             /** @var HTMLBLock $block */
             /** @var TestBlockContent $content */
+            // Определить ИД теста из удаляемого блока по содержимому
             $content = $block->getContentObject(TestBlockContent::class);
+            // Удалить связь истории и теста
             StoryStoryTest::deleteStoryTest($slideModel->story_id, $content->getTestID());
+            // Установить для слайда тип по умолчанию вместо слайда с тестом
             $slideModel->setKindSlide();
         }
         return ['success' => true, 'block' => $block->getId()];

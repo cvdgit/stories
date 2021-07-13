@@ -190,6 +190,9 @@ function SlideManager(options) {
             this.element.remove();
             this.element = null;
         };
+        this.setSlideView = function(view) {
+            this.element.attr('data-slide-view', view);
+        }
     }
 
     var currentSlide = null;
@@ -647,6 +650,7 @@ var StoryEditor = (function() {
         config = params;
 
         slideMenu = new SlideMenu($editor);
+
         slidesManager = new SlideManager({'story_id': params['storyID']});
         contentCleaner = new ContentCleaner($editor);
         blockModifier = new BlockModifier(new DataModifier(slidesManager, contentCleaner));
@@ -850,6 +854,7 @@ var StoryEditor = (function() {
                 return this.element.attr('data-block-id');
             },
             'delete': function() {
+                dispatchEvent('onBlockDelete', {'block': this});
                 this.element.remove();
                 this.element = null;
             },
@@ -869,6 +874,20 @@ var StoryEditor = (function() {
 
         var activeBlock = null;
 
+        function extend(a, b) {
+            for (var i in b) {
+                a[i] = b[i];
+            }
+            return a;
+        }
+
+        function dispatchEvent(type, args) {
+            var event = document.createEvent("HTMLEvents", 1, 2);
+            event.initEvent(type, true, true);
+            extend(event, args);
+            editor[0].dispatchEvent(event);
+        }
+
         return {
             'find': function(id) {
                 var element = editor.find('section > div.sl-block[data-block-id=' + id + ']');
@@ -876,7 +895,9 @@ var StoryEditor = (function() {
             },
             'append': function(element) {
                 editor.find('section').append(element);
-                return new BlockWrapper(element);
+                var block = new BlockWrapper(element);
+                dispatchEvent('onBlockCreate', {'block': block});
+                return block;
             },
             'setActive': function(element) {
                 activeBlock = new BlockWrapper(element);
@@ -896,9 +917,28 @@ var StoryEditor = (function() {
                     dataType: 'json',
                     processData: false
                 });
+            },
+            'addEventListener': function(type, listener, useCapture) {
+                if ('addEventListener' in window) {
+                    editor[0].addEventListener(type, listener, useCapture);
+                }
             }
         }
     }($editor));
+
+    blockManager.addEventListener('onBlockDelete', function(e) {
+        if (e.block.typeIsHtml()) {
+            // При удалении блока с тестом, изменить тип слайда с new-question на slide
+            slidesManager.getActiveSlide().setSlideView('slide');
+        }
+    });
+
+    blockManager.addEventListener('onBlockCreate', function(e) {
+        if (e.block.typeIsHtml()) {
+            // При создании блока с тестом, изменить тип слайда с на new-question
+            slidesManager.getActiveSlide().setSlideView('new-question');
+        }
+    });
 
     function setActiveBlock(element) {
         if (blockManager.getActive()) {
