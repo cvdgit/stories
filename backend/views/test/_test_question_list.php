@@ -49,7 +49,11 @@ use yii\helpers\Url;
                     if ($type->isSequence()) {
                         $class .= 'glyphicon-tasks';
                     }
-                    return Html::tag('i', '', ['class' => $class, 'title' => $type->getTypeName()]);
+                    $html = Html::tag('i', '', ['class' => $class, 'title' => $type->getTypeName()]);
+                    if ($model->mix_answers) {
+                        $html .= ' ' . Html::tag('i', '', ['class' => 'glyphicon glyphicon-random', 'title' => 'Перемешивать ответы']);
+                    }
+                    return $html;
                 },
             ],
             [
