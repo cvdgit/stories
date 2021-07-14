@@ -161,6 +161,7 @@ class StorySlideImage extends ActiveRecord
         return (new Query())
             ->select([
                 'DISTINCT {{%image_slide_block}}.image_id',
+                '{{%image_slide_block}}.deleted',
                 //'{{%story_slide_image}}.*',
                 //'(SELECT COUNT(image_link.image_id) FROM image_link WHERE image_link.image_id = image_slide_block.image_id) AS link_image_count',
                 //'{{%image_slide_block}}.slide_id',

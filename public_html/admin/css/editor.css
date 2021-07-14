@@ -60,6 +60,16 @@ body {
     margin: 0 auto 20px;
 }
 
+.story-images-list .thumbnail > .in-story {
+    position: absolute;
+    right: 1px;
+    top: 1px;
+    width: 20px;
+    height: 20px;
+    color: #1baee1;
+    z-index: 3;
+}
+
 .story-images-list .thumbnail:hover {
     border-color: #666;
 }

@@ -123,8 +123,8 @@ class CreateBlockController extends BaseController
         if ($form->load(Yii::$app->request->post()) && $form->validate()) {
             $slideModel = $this->findModel(StorySlide::class, $form->slide_id);
             try {
-                $form->afterCreate($slideModel);
                 $html = $this->editorService->createBlock($slideModel, $form, $blockClassName);
+                $form->afterCreate($slideModel);
                 return ['success' => true, 'html' => $html];
             }
             catch(Exception $ex) {

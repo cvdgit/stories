@@ -86,6 +86,10 @@ function changeStoryImages() {
                                     //    $('<span/>', {'class': 'glyphicon glyphicon-trash delete-image'})
                                     //)
                                 )
+                                .append(
+                                    $('<span/>', {'class': 'in-story', 'title': 'В истории', 'html': '<i class="glyphicon glyphicon-ok"></i>'})
+                                        .addClass(function() { return parseInt(image.deleted) === 1 ? 'hide' : ''; })
+                                )
                         )
                         .appendTo(list);
                 });

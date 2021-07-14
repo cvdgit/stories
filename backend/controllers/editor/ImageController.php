@@ -145,7 +145,9 @@ class ImageController extends BaseController
     public function actionGetImages(int $story_id)
     {
         $model = $this->findModel(Story::class, $story_id);
-        $imageIDs = array_map(static function($item) {
+        $deleted = [];
+        $imageIDs = array_map(static function($item) use (&$deleted) {
+            $deleted[$item['image_id']] = $item['deleted'];
             return $item['image_id'];
         }, StorySlideImage::storyImages($model->id));
         $models = StorySlideImage::findAll(['id' => $imageIDs]);
@@ -162,6 +164,7 @@ class ImageController extends BaseController
                 'url' => $model->imageUrl(),
                 'thumb_url' => $thumbUrl,
                 'label' => $model->getImageName(),
+                'deleted' => $deleted[$model->id],
             ];
             $result[] = $resultItem;
         }
