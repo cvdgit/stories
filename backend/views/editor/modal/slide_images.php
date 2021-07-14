@@ -18,6 +18,9 @@ use backend\widgets\SelectStoryWidget;
                             'id' => 'select-story-images',
                         ]) ?>
                     </div>
+                    <div class="col-md-3">
+                        <button class="btn"><i class="glyphicon glyphicon-refresh"></i></button>
+                    </div>
                 </div>
                 <div class="story-images-list row row-no-gutters"></div>
             </div>
@@ -87,7 +90,7 @@ function changeStoryImages() {
                                     //)
                                 )
                                 .append(
-                                    $('<span/>', {'class': 'in-story', 'title': 'В истории', 'html': '<i class="glyphicon glyphicon-ok"></i>'})
+                                    $('<span/>', {'class': 'in-story', 'title': image.tooltip, 'html': '<i class="glyphicon glyphicon-ok"></i>'})
                                         .addClass(function() { return parseInt(image.deleted) === 1 ? 'hide' : ''; })
                                 )
                         )
