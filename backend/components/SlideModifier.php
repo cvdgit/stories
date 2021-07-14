@@ -48,25 +48,11 @@ class SlideModifier
         foreach ($this->slide->getBlocks() as $block) {
             if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
                 /** @var $block ImageBlock */
-
                 $path = $block->getFilePath();
-                $image = null;
-                if (strpos($path, '://') !== false) {
-                    $query = parse_url($path, PHP_URL_QUERY);
-                    parse_str($query, $result);
-                    $imageHash = $result['id'];
-                    try {
-                        $image = StorySlideImage::findByHash($imageHash);
-                    }
-                    catch (\Exception $ex) {}
+                if (empty($path)) {
+                    continue;
                 }
-                else {
-                    try {
-                        $image = StorySlideImage::findByPath(basename(dirname($path)), basename($path));
-                    }
-                    catch (\Exception $ex) {}
-                }
-                if ($image !== null) {
+                if (($image = StorySlideImage::findImageByPath($path)) !== null) {
                     $block->setBlockAttribute('data-image-id', $image->id);
                 }
             }

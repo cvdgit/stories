@@ -221,4 +221,25 @@ class StorySlideImage extends ActiveRecord
         $imagePath = $this->getImagePath($abs);
         return str_replace(basename($imagePath), 'thumb_' . basename($imagePath), $imagePath);
     }
+
+    public static function findImageByPath(string $path): ?self
+    {
+        $image = null;
+        if (strpos($path, '://') !== false) {
+            $query = parse_url($path, PHP_URL_QUERY);
+            parse_str($query, $result);
+            $imageHash = $result['id'];
+            try {
+                $image = self::findByHash($imageHash);
+            }
+            catch (\Exception $ex) {}
+        }
+        else {
+            try {
+                $image = self::findByPath(basename(dirname($path)), basename($path));
+            }
+            catch (\Exception $ex) {}
+        }
+        return $image;
+    }
 }

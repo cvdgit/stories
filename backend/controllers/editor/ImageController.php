@@ -4,6 +4,7 @@ namespace backend\controllers\editor;
 
 use backend\components\BaseController;
 use backend\components\image\EditorImage;
+use backend\components\image\PowerPointImage;
 use backend\components\story\AbstractBlock;
 use backend\components\story\ImageBlock;
 use backend\components\story\reader\HTMLReader;
@@ -12,6 +13,7 @@ use backend\components\story\writer\HTMLWriter;
 use backend\models\editor\CropImageForm;
 use backend\models\editor\ImageForm;
 use backend\models\editor\ImageFromUrlForm;
+use backend\models\ImageSlideBlock;
 use backend\services\ImageService;
 use backend\services\StoryEditorService;
 use common\helpers\StoryHelper;
@@ -382,4 +384,30 @@ class ImageController extends BaseController
         return $result;
     }
 
+    public function actionReloadStoryImages(int $story_id)
+    {
+        /** @var Story $storyModel */
+        $storyModel = $this->findModel(Story::class, $story_id);
+        foreach ($storyModel->storySlides as $slideModel) {
+            $slide = (new HtmlSlideReader($slideModel->data))->load();
+            foreach ($slide->getBlocks() as $block) {
+                if ($block->isImage()) {
+                    /** @var ImageBlock $block */
+                    $path = $block->getFilePath();
+                    if (empty($path)) {
+                        continue;
+                    }
+                    $image = StorySlideImage::findImageByPath($path);
+                    if ($image === null) {
+                        $image = (new PowerPointImage(basename(dirname($path))))
+                            ->create(Yii::getAlias('@public') . $path);
+                    }
+                    ImageSlideBlock::removeDeletedLink($image->id, $slideModel->id);
+                    $model = ImageSlideBlock::create($image->id, $slideModel->id, $block->getId());
+                    $model->save();
+                }
+            }
+        }
+        return ['success' => true];
+    }
 }

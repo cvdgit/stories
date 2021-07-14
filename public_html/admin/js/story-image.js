@@ -47,6 +47,17 @@
         }
     };
 
+    editor.reloadStoryImage = function(storyID) {
+        if (!storyID) {
+            throw "reloadStoryImage: storyID is null";
+        }
+        return $.getJSON('/admin/index.php', {
+            'r': 'editor/image/reload-story-images',
+            'story_id': storyID
+        });
+    }
+
+
     /*
     var $modal = $("#story-images-modal");
 

@@ -54,6 +54,7 @@ use yii\db\ActiveQuery;
  * @property Playlist[] $playlists
  * @property StoryStoryTest[] $storyStoryTests
  * @property StoryTest[] $tests
+ * @property StorySlide[] $storySlides
  */
 
 class Story extends ActiveRecord

@@ -19,7 +19,7 @@ use backend\widgets\SelectStoryWidget;
                         ]) ?>
                     </div>
                     <div class="col-md-3">
-                        <button class="btn"><i class="glyphicon glyphicon-refresh"></i></button>
+                        <button class="btn" id="reload-story-images"><i class="glyphicon glyphicon-refresh"></i></button>
                     </div>
                 </div>
                 <div class="story-images-list row row-no-gutters"></div>
@@ -101,8 +101,22 @@ function changeStoryImages() {
     
     addEventListeners(list);
 }
-$('#story-images-modal').on('show.bs.modal', function() {
-    changeStoryImages();
-});
+
+(function() {
+    
+    $('#story-images-modal').on('show.bs.modal', function() {
+        changeStoryImages();
+    });
+
+    $('#reload-story-images').on('click', function() {
+        var selectize = $('#select-story-images').data('selectize'),
+            storyID = selectize.getValue();
+        StoryEditor.reloadStoryImage(storyID).done(function(response) {
+            if (response && response.success) {
+                changeStoryImages();
+            }
+        });
+    });
+})();
 JS;
 $this->registerJs($js);

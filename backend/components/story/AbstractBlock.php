@@ -176,6 +176,11 @@ abstract class AbstractBlock
         return $this->type === self::TYPE_HTML;
     }
 
+    public function isImage(): bool
+    {
+        return $this->type === self::TYPE_IMAGE;
+    }
+
     public function setBlockAttribute(string $name, $value): void
     {
         $this->blockAttributes[$name] = $value;
