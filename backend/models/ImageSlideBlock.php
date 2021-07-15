@@ -4,7 +4,6 @@ namespace backend\models;
 
 use common\models\StorySlide;
 use common\models\StorySlideImage;
-use Yii;
 use yii\db\ActiveRecord;
 
 /**
@@ -38,8 +37,8 @@ class ImageSlideBlock extends ActiveRecord
             [['image_id', 'slide_id', 'deleted'], 'integer'],
             [['block_id'], 'string', 'max' => 255],
             [['image_id', 'slide_id', 'block_id'], 'unique', 'targetAttribute' => ['image_id', 'slide_id', 'block_id']],
-            [['image_id'], 'exist', 'skipOnError' => true, 'targetClass' => StorySlideImage::className(), 'targetAttribute' => ['image_id' => 'id']],
-            [['slide_id'], 'exist', 'skipOnError' => true, 'targetClass' => StorySlide::className(), 'targetAttribute' => ['slide_id' => 'id']],
+            [['image_id'], 'exist', 'skipOnError' => true, 'targetClass' => StorySlideImage::class, 'targetAttribute' => ['image_id' => 'id']],
+            [['slide_id'], 'exist', 'skipOnError' => true, 'targetClass' => StorySlide::class, 'targetAttribute' => ['slide_id' => 'id']],
         ];
     }
 
@@ -81,20 +80,16 @@ class ImageSlideBlock extends ActiveRecord
         return $model;
     }
 
-    public static function deleteSlideLink(int $slideID, string $blockID): void
+    public static function deleteImageBlock(int $slideID, string $blockID): void
     {
         self::deleteAll('slide_id = :slide AND block_id = :block', [':slide' => $slideID, ':block' => $blockID]);
     }
 
-    public static function deleteImageBlock(int $slideID, string $blockID): void
+    public static function deleteStoryLinks(array $slideIDs): void
     {
-        $command = Yii::$app->db->createCommand();
-        $command->update(self::tableName(), ['deleted' => 1], 'slide_id = :slide AND block_id = :block', [':slide' => $slideID, ':block' => $blockID]);
-        $command->execute();
-    }
-
-    public static function removeDeletedLink(int $imageID, int $slideID): void
-    {
-        self::deleteAll('slide_id = :slide AND image_id = :image AND deleted = 1', [':slide' => $slideID, ':image' => $imageID]);
+        if (count($slideIDs) === 0) {
+            return;
+        }
+        self::deleteAll(['in', 'slide_id', $slideIDs]);
     }
 }

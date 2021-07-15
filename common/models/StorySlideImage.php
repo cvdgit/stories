@@ -136,7 +136,7 @@ class StorySlideImage extends ActiveRecord
         return $image;
     }
 
-    public static function usedCollections(int $storyID)
+    /*public static function usedCollections(int $storyID)
     {
         $storySlidesQuery = (new Query())
             ->select(['id'])
@@ -150,28 +150,7 @@ class StorySlideImage extends ActiveRecord
             ->innerJoin('{{%story_slide_image}}', '{{%story_slide_image}}.id = {{%image_slide_block}}.image_id')
             ->andWhere('collection_id IS NOT NULL')
             ->all();
-    }
-
-    public static function storyImages(int $storyID)
-    {
-        $storySlidesQuery = (new Query())
-            ->select(['id'])
-            ->from('{{story_slide}}')
-            ->where('story_id = :story', [':story' => $storyID]);
-        return (new Query())
-            ->select([
-                'DISTINCT {{%image_slide_block}}.image_id',
-                '{{%image_slide_block}}.deleted',
-                //'{{%story_slide_image}}.*',
-                //'(SELECT COUNT(image_link.image_id) FROM image_link WHERE image_link.image_id = image_slide_block.image_id) AS link_image_count',
-                //'{{%image_slide_block}}.slide_id',
-                //'{{%image_slide_block}}.block_id',
-            ])
-            ->from('{{%image_slide_block}}')
-            ->where(['in', 'slide_id', $storySlidesQuery])
-            ->innerJoin('{{%story_slide_image}}', '{{%story_slide_image}}.id = {{%image_slide_block}}.image_id')
-            ->all();
-    }
+    }*/
 
     public function isSuccess()
     {

@@ -64,7 +64,6 @@ class ImageForm extends BaseForm
     public function afterCreate(StorySlide $slideModel): void
     {
         if (!empty($this->imagePath)) {
-            ImageSlideBlock::removeDeletedLink($this->imageModel->id, $this->slide_id);
             $model = ImageSlideBlock::create($this->imageModel->id, $this->slide_id, $this->block_id);
             $model->save();
         }

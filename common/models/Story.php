@@ -55,6 +55,7 @@ use yii\db\ActiveQuery;
  * @property StoryStoryTest[] $storyStoryTests
  * @property StoryTest[] $tests
  * @property StorySlide[] $storySlides
+ * @property StorySlideImage[] $storyImages
  */
 
 class Story extends ActiveRecord
@@ -670,5 +671,23 @@ class Story extends ActiveRecord
         return array_map(static function(StorySlide $slide) {
             return $slide->id;
         }, $this->storySlides);
+    }
+
+    public function getStoryImages(): ActiveQuery
+    {
+        return $this->hasMany(StorySlideImage::class, ['id' => 'story_slide_image_id'])
+            ->viaTable('story_story_slide_image', ['story_id' => 'id'])
+            ->orderBy(['story_slide_image.created_at' => SORT_DESC]);
+    }
+
+    public function isStoryImage(StorySlideImage $image): bool
+    {
+        $storySlideIDs = $this->getSlideIDs();
+        foreach ($image->slides as $slide) {
+            if (in_array($slide->id, $storySlideIDs, true)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

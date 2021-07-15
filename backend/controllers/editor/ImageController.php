@@ -5,11 +5,7 @@ namespace backend\controllers\editor;
 use backend\components\BaseController;
 use backend\components\image\EditorImage;
 use backend\components\image\PowerPointImage;
-use backend\components\story\AbstractBlock;
 use backend\components\story\ImageBlock;
-use backend\components\story\reader\HTMLReader;
-use backend\components\story\reader\HtmlSlideReader;
-use backend\components\story\writer\HTMLWriter;
 use backend\models\editor\CropImageForm;
 use backend\models\editor\ImageForm;
 use backend\models\editor\ImageFromUrlForm;
@@ -33,8 +29,8 @@ use yii\web\UploadedFile;
 class ImageController extends BaseController
 {
 
-    protected $imageService;
-    protected $editorService;
+    private $imageService;
+    private $editorService;
 
     public function __construct($id, $module, ImageService $imageService, StoryEditorService $editorService, $config = [])
     {
@@ -148,14 +144,8 @@ class ImageController extends BaseController
     {
         /** @var Story $storyModel */
         $storyModel = $this->findModel(Story::class, $story_id);
-        $deleted = [];
-        $imageIDs = array_map(static function($item) use (&$deleted) {
-            $deleted[$item['image_id']] = $item['deleted'];
-            return $item['image_id'];
-        }, StorySlideImage::storyImages($storyModel->id));
-        $models = StorySlideImage::findAll(['id' => $imageIDs]);
         $result = [];
-        foreach ($models as $model) {
+        foreach ($storyModel->storyImages as $model) {
             $thumbUrl = $model->getImageThumbPath();
             $thumbPath = $model->getImageThumbPath(true);
             if (!file_exists($thumbPath)) {
@@ -167,7 +157,7 @@ class ImageController extends BaseController
                 'url' => $model->imageUrl(),
                 'thumb_url' => $thumbUrl,
                 'label' => $model->getImageName(),
-                'deleted' => (int) $deleted[$model->id],
+                'deleted' => $storyModel->isStoryImage($model) ? 0 : 1,
                 'tooltip' => '',
             ];
             if ($resultItem['deleted'] === 0) {
@@ -384,12 +374,23 @@ class ImageController extends BaseController
         return $result;
     }
 
+    /**
+     * Действие восстанавливает связи изображений и слайдов
+     * Сначала удаляются все связи для истории (для всех слайдов)
+     * Потом определяются все блоки-изображения в истории
+     * Для каждого такого блока выполняются поиск связанной записи в таблице story_slide_image
+     * Если запись не найдена, то она создается
+     * И в конце создается связь изображения и слайда через таблицу image_slide_block
+     *
+     * @param int $story_id
+     */
     public function actionReloadStoryImages(int $story_id)
     {
         /** @var Story $storyModel */
         $storyModel = $this->findModel(Story::class, $story_id);
+        ImageSlideBlock::deleteStoryLinks($storyModel->getSlideIDs());
         foreach ($storyModel->storySlides as $slideModel) {
-            $slide = (new HtmlSlideReader($slideModel->data))->load();
+            $slide = $this->editorService->processData($slideModel->data);
             foreach ($slide->getBlocks() as $block) {
                 if ($block->isImage()) {
                     /** @var ImageBlock $block */
@@ -402,12 +403,19 @@ class ImageController extends BaseController
                         $image = (new PowerPointImage(basename(dirname($path))))
                             ->create(Yii::getAlias('@public') . $path);
                     }
-                    ImageSlideBlock::removeDeletedLink($image->id, $slideModel->id);
                     $model = ImageSlideBlock::create($image->id, $slideModel->id, $block->getId());
                     $model->save();
                 }
             }
         }
         return ['success' => true];
+    }
+
+    public function actionUploadImages()
+    {
+        $form = new ImageForm();
+        if ($form->load(Yii::$app->request->post())) {
+
+        }
     }
 }
