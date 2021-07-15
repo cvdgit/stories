@@ -48,7 +48,7 @@ function WikidsVideoPlayer(elemID, options) {
 
     if (sourceIsFile) {
         player.on('playing', function (event) {
-            if (!pauseTimeoutID && options.duration > 0) {
+            if (!pauseTimeoutID) { //  && options.duration > 0
                 console.log('PLAYING');
                 var timeout = options.duration - (player.currentTime - options.seekTo);
                 pauseTimeoutID = setTimeout(pauseVideo, timeout * 1000);
@@ -57,7 +57,7 @@ function WikidsVideoPlayer(elemID, options) {
     }
     else {
         var playTimeout;
-        if (options.duration > 0) {
+        //if (options.duration > 0) {
             player.on("statechange", function (event) {
                 if (event.detail.code === 1 && !done) {
                     playTimeout = setInterval(function () {
@@ -74,7 +74,7 @@ function WikidsVideoPlayer(elemID, options) {
                     clearInterval(playTimeout);
                 }
             });
-        }
+        //}
     }
 
     player.on("pause", function() {
