@@ -862,7 +862,7 @@ var StoryEditor = (function() {
                 return this.getType() === 'image';
             },
             'typeIsVideo': function() {
-                return this.getType() === 'video';
+                return this.getType() === 'video' || this.getType() === 'videofile';
             },
             'typeIsHtml': function() {
                 return this.getType() === 'html';
