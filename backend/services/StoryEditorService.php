@@ -341,6 +341,9 @@ class StoryEditorService
             else {
                 $this->uploadImage($form, $storyModel);
             }
+            if ($form->imageModel !== null) {
+                $block->setBlockAttribute('data-image-id', $form->imageModel->id);
+            }
         }
         if ($block->isHtmlTest()) {
             $block->setContent((new TestBlockContent($form->test_id, $form->required))->render());
