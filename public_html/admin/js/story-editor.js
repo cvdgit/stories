@@ -582,6 +582,7 @@ var StoryEditor = (function() {
     var $editor = $('#story-editor');
 
     $editor.on('mousedown', function(e) {
+        console.log('mousedown');
         var $target = $(e.target);
         if ($target.hasClass('sl-block') || $target.parents('.sl-block').length) {
 
@@ -616,6 +617,18 @@ var StoryEditor = (function() {
                 .find('.sl-block-transform').remove();
         }
     }, 'div.sl-block:not(.wikids-active-block)');
+
+    /*$editor.on('dblclick', function(e) {
+        console.log('dblclick');
+        var $target = $(e.target);
+        if ($target.hasClass('sl-block') || $target.parents('.sl-block').length) {
+
+            var block = blockManager.getActive();
+            if (block && block.typeIsText()) {
+                console.log('go');
+            }
+        }
+    });*/
 
     var config = {
         storyID: "",
@@ -866,6 +879,9 @@ var StoryEditor = (function() {
             },
             'typeIsHtml': function() {
                 return this.getType() === 'html';
+            },
+            'typeIsText': function() {
+                return this.getType() === 'text';
             },
             'getElement': function() {
                 return this.element;
