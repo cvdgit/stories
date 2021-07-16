@@ -4,7 +4,6 @@ namespace backend\services;
 
 use backend\components\image\EditorImage;
 use backend\components\image\SlideImage;
-use backend\components\QuestionHTML;
 use backend\components\story\AbstractBlock;
 use backend\components\story\BlockType;
 use backend\components\story\HTMLBLock;
@@ -19,12 +18,8 @@ use backend\models\editor\BaseForm;
 use backend\models\video\VideoSource;
 use common\models\SlideVideo;
 use common\models\StorySlide;
-use common\models\StorySlideBlock;
 use common\models\StorySlideImage;
-use common\models\StoryTestQuestion;
 use DomainException;
-use yii;
-use yii\db\Query;
 use common\models\Story;
 
 class StoryEditorService
@@ -89,24 +84,6 @@ class StoryEditorService
     }
     */
 
-    protected function updateSlideNumbers(int $storyID, int $targetSlideNumber)
-    {
-        $slides = (new Query())->from('{{%story_slide}}')
-            ->select(['id', 'number'])
-            ->where('story_id = :story', [':story' => $storyID])
-            ->orderBy(['number' => SORT_ASC])
-            ->indexBy('id')
-            ->all();
-        $command = Yii::$app->db->createCommand();
-        foreach ($slides as $slideID => $slide) {
-            if ($slide['number'] > $targetSlideNumber) {
-                $slides[$slideID]['number']++;
-                $command->update('{{%story_slide}}', ['number' => $slides[$slideID]['number']], 'id = :id', [':id' => $slideID]);
-                $command->execute();
-            }
-        }
-    }
-
     public function createSlide(int $storyID, int $currentSlideID = -1): int
     {
         $reader = new HtmlSlideReader('');
@@ -116,15 +93,12 @@ class StoryEditorService
 
         $model = StorySlide::createSlide($storyID);
         $model->data = $html;
-
         if ($currentSlideID !== -1) {
             $currentSlide = StorySlide::findSlideByID($currentSlideID);
-            $this->updateSlideNumbers($storyID, $currentSlide->number);
             $model->number = $currentSlide->number + 1;
+            Story::insertSlideNumber($storyID, $currentSlide->number);
         }
-
         $model->save(false);
-
         return $model->id;
     }
 
@@ -136,8 +110,8 @@ class StoryEditorService
         $model->data = 'link';
         if ($currentSlideID !== null) {
             $currentSlide = StorySlide::findSlideByID($currentSlideID);
-            $this->updateSlideNumbers($storyID, $currentSlide->number);
             $model->number = $currentSlide->number + 1;
+            Story::insertSlideNumber($storyID, $currentSlide->number);
         }
         if (!$model->save()) {
             throw new DomainException(implode('<br>', $model->firstErrors));
@@ -145,14 +119,13 @@ class StoryEditorService
         return $model->id;
     }
 
-    public function createSlideQuestion(int $storyID, int $questionID, int $currentSlideID = -1)
+    /*public function createSlideQuestion(int $storyID, int $questionID, int $currentSlideID = -1)
     {
 
         $reader = new HtmlSlideReader('');
         $slide = $reader->load();
         $slide->setView('question');
 
-        /** @var HTMLBLock $block */
         $block = $slide->createBlock(HTMLBLock::class);
         $question = StoryTestQuestion::findModel($questionID);
         $content = (new QuestionHTML($question))->loadHTML();
@@ -175,7 +148,7 @@ class StoryEditorService
         $model->save();
 
         return $model->id;
-    }
+    }*/
 
     public function createQuestionBlock(array $params)
     {
@@ -190,7 +163,7 @@ class StoryEditorService
         return $writer->renderSlide($slide);
     }
 
-    public function newCreateSlideQuestion(int $storyID, array $params)
+    /*public function newCreateSlideQuestion(int $storyID, array $params)
     {
         $model = StorySlide::createSlide($storyID);
         $model->kind = StorySlide::KIND_QUESTION;
@@ -199,7 +172,7 @@ class StoryEditorService
         $model->number = 1;
         $model->save();
         return $model->id;
-    }
+    }*/
 
     public function copySlide(int $slideID): int
     {
@@ -212,18 +185,16 @@ class StoryEditorService
         $newSlide = StorySlide::createSlide($slide->story_id);
         $newSlide->data = $data;
 
-        $this->updateSlideNumbers($slide->story_id, $slide->number);
+        Story::insertSlideNumber($slide->story_id, $slide->number);
         $newSlide->number = $slide->number + 1;
 
         $newSlide->save();
         return $newSlide->id;
     }
 
-    public function deleteSlide(int $slideID)
+    public function deleteSlide(StorySlide $slideModel): void
     {
-        $slideModel = StorySlide::findSlide($slideID);
-        $reader = new HtmlSlideReader($slideModel->data);
-        $slide = $reader->load();
+        $slide = $this->processData($slideModel->data);
         foreach ($slide->getBlocks() as $block) {
             if ($block->isVideo()) {
                 Story::updateVideo($slideModel->story_id, false);
@@ -342,13 +313,13 @@ class StoryEditorService
         return str_replace('data-src=', 'src=', $writer->renderBlock($block));
     }
 
-    public function newUpdateBlock($form)
+    /*public function newUpdateBlock($form)
     {
         $model = StorySlideBlock::findBlock($form->block_id);
         $model->title = $form->text;
         $model->href = $form->url;
         return $model->save(false);
-    }
+    }*/
 
     public function textFromStory(Story $model)
     {

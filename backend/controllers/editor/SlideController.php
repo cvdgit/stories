@@ -75,7 +75,8 @@ class SlideController extends BaseController
 
     public function actionDelete(int $slide_id)
     {
-        $this->editorService->deleteSlide($slide_id);
+        $slideModel = $this->findModel(StorySlide::class, $slide_id);
+        $this->editorService->deleteSlide($slideModel);
         return ['success' => true];
     }
 

@@ -198,10 +198,13 @@ class StorySlide extends ActiveRecord
 
     public function afterDelete()
     {
+        // Обновить количество слайдов в истории
         Story::updateSlideNumber($this->story_id);
         if ($this->isQuestion()) {
             StoryStoryTest::deleteStoryTests($this->story_id);
         }
+        // Изменить номера остальных слайдов
+        Story::deleteSlideNumber($this->story_id, $this->number);
         parent::afterDelete();
     }
 

@@ -203,7 +203,7 @@ class EditorController extends BaseController
         ]);
     }
 
-    public function actionCreateBlock(int $slide_id, string $block_type)
+    /*public function actionCreateBlock(int $slide_id, string $block_type)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
@@ -248,7 +248,7 @@ class EditorController extends BaseController
         $model->save(false, ['data']);
 
         return ['success' => true, 'block_id' => $block->getId()];
-    }
+    }*/
 
     public function actionCreateSlideLink()
     {
@@ -267,7 +267,7 @@ class EditorController extends BaseController
         return $response;
     }
 
-    public function actionCreateSlideQuestion(int $story_id, int $question_id, int $current_slide_id = -1)
+    /*public function actionCreateSlideQuestion(int $story_id, int $question_id, int $current_slide_id = -1)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         try {
@@ -277,9 +277,9 @@ class EditorController extends BaseController
             return ['success' => false, 'error' => $ex->getMessage()];
         }
         return ['success' => true, 'id' => $slideID];
-    }
+    }*/
 
-    public function actionNewCreateSlideQuestion(int $story_id, int $id, $question_params = null)
+    /*public function actionNewCreateSlideQuestion(int $story_id, int $id, $question_params = null)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $test = StoryTest::findModel($id);
@@ -297,9 +297,9 @@ class EditorController extends BaseController
             return ['success' => false, 'error' => $ex->getMessage(), 'id' => $slideID];
         }
         return ['success' => true, 'id' => $slideID];
-    }
+    }*/
 
-    public function actionDeleteBlock(int $slide_id, string $block_id)
+    /*public function actionDeleteBlock(int $slide_id, string $block_id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         try {
@@ -307,7 +307,7 @@ class EditorController extends BaseController
         }
         catch (Exception $ex) {}
         return ['success' => true];
-    }
+    }*/
 
     public function actionSlides(int $story_id)
     {

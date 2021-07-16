@@ -690,4 +690,37 @@ class Story extends ActiveRecord
         }
         return false;
     }
+
+    private const ACTION_SLIDE_INSERT = 1;
+    private const ACTION_SLIDE_DELETE = 2;
+
+    private static function updateSlidesOrder(int $action, int $storyID, int $currentNumber): void
+    {
+        $slides = (new Query())
+            ->from('{{%story_slide}}')
+            ->select(['id', 'number'])
+            ->where('story_id = :story', [':story' => $storyID])
+            ->orderBy(['number' => SORT_ASC])
+            ->indexBy('id')
+            ->all();
+        $command = Yii::$app->db->createCommand();
+        $next = $currentNumber + ($action === self::ACTION_SLIDE_INSERT ? 2 : 0);
+        foreach ($slides as $slideID => $slide) {
+            if ($slide['number'] > $currentNumber) {
+                $command->update('{{%story_slide}}', ['number' => $next], 'id = :id', [':id' => $slideID]);
+                $command->execute();
+                $next++;
+            }
+        }
+    }
+
+    public static function insertSlideNumber(int $storyID, int $currentNumber): void
+    {
+        self::updateSlidesOrder(self::ACTION_SLIDE_INSERT, $storyID, $currentNumber);
+    }
+
+    public static function deleteSlideNumber(int $storyID, int $currentNumber): void
+    {
+        self::updateSlidesOrder(self::ACTION_SLIDE_DELETE, $storyID, $currentNumber);
+    }
 }
