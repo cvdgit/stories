@@ -1744,6 +1744,9 @@
 
 .wikids-test-answers {
 	margin-top: 10px;
+	max-height: 455px;
+	overflow: hidden;
+	overflow-y: auto;
 }
 
 .wikids-test-question {

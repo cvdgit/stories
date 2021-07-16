@@ -39,7 +39,7 @@ SortableJsAsset::register($this);
                 <?php ActiveForm::end(); ?>
             </div>
             <div class="col-md-5">
-                <form class="form-inline" style="margin-bottom: 10px">
+                <form class="form-inline" id="create-answers-form" style="margin-bottom: 10px">
                     <div class="form-group">
                         <label for="answerText"></label>
                         <input id="answerText" type="text" class="form-control" autocomplete="off" placeholder="Введите ответ" />
@@ -70,13 +70,17 @@ var sortable = Sortable.create(el, {
     handle: '.handle'
 });
 
-$('#createAnswer').on('click', function() {
+function createAnswer() {
     var text = $('#answerText').val();
     if (!text.length) {
         return;
     }
     Answers.createAnswer({text});
     $('#answerText').val('').focus();
+}
+
+$('#createAnswer').on('click', function() {
+    createAnswer();
 });
 
 var Answers = (function(root) {
@@ -174,6 +178,11 @@ Answers.addEventListener('onDeleteAnswer', function(args) {
                 }
             });
     }
+});
+
+$('#create-answers-form').on('submit', function(e) {
+    e.preventDefault();
+    createAnswer();
 });
 
 JS;
