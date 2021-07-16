@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "61331b3133ea457e963409a32d046efb",
+    "content-hash": "ba7d809a192f3cc9bc41df5167726c36",
     "packages": [
         {
             "name": "2amigos/yii2-chartjs-widget",
@@ -385,12 +385,12 @@
             "version": "v2.9.4",
             "source": {
                 "type": "git",
-                "url": "https://github.com/chartjs/Chart.js.git",
+                "url": "git@github.com:nnnick/Chart.js.git",
                 "reference": "9bd4cf82fda9f50a5fb50b72843e06ab88124278"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/chartjs/Chart.js/zipball/9bd4cf82fda9f50a5fb50b72843e06ab88124278",
+                "url": "https://api.github.com/repos/nnnick/Chart.js/zipball/9bd4cf82fda9f50a5fb50b72843e06ab88124278",
                 "reference": "9bd4cf82fda9f50a5fb50b72843e06ab88124278"
             },
             "type": "bower-asset",
@@ -427,6 +427,27 @@
                 "reference": "803f928cf0f41b409e39c4666bc49d93ca98f791"
             },
             "type": "bower-asset"
+        },
+        {
+            "name": "bower-asset/dm-file-uploader",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:danielm/uploader.git",
+                "reference": "335f1a19cfb1fae552976ea64af4804c7f919bc5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/danielm/uploader/zipball/335f1a19cfb1fae552976ea64af4804c7f919bc5",
+                "reference": "335f1a19cfb1fae552976ea64af4804c7f919bc5"
+            },
+            "require": {
+                "bower-asset/jquery": ">=1.7.0"
+            },
+            "type": "bower-asset",
+            "license": [
+                "MIT"
+            ]
         },
         {
             "name": "bower-asset/fancytree",
@@ -476,7 +497,7 @@
             "version": "2.2.4",
             "source": {
                 "type": "git",
-                "url": "https://github.com/jquery/jquery-dist.git",
+                "url": "git@github.com:jquery/jquery-dist.git",
                 "reference": "c0185ab7c75aab88762c5aae780b9d83b80eda72"
             },
             "dist": {

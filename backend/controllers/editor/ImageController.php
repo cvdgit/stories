@@ -3,7 +3,6 @@
 namespace backend\controllers\editor;
 
 use backend\components\BaseController;
-use backend\components\image\EditorImage;
 use backend\components\image\PowerPointImage;
 use backend\components\story\ImageBlock;
 use backend\models\editor\CropImageForm;
@@ -20,7 +19,6 @@ use common\rbac\UserRoles;
 use Imagine\Image\ManipulatorInterface;
 use Yii;
 use yii\filters\AccessControl;
-use yii\helpers\FileHelper;
 use yii\imagine\Image;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -28,6 +26,8 @@ use yii\web\UploadedFile;
 
 class ImageController extends BaseController
 {
+
+    public $enableCsrfValidation = false;
 
     private $imageService;
     private $editorService;
@@ -140,30 +140,35 @@ class ImageController extends BaseController
         return $this->redirect(['image/index']);
     }
 
+    private function createImageResultRow(Story $storyModel, StorySlideImage $imageModel): array
+    {
+        $thumbUrl = $imageModel->getImageThumbPath();
+        $thumbPath = $imageModel->getImageThumbPath(true);
+        if (!file_exists($thumbPath)) {
+            Image::thumbnail($imageModel->getImagePath(), 200, 200, ManipulatorInterface::THUMBNAIL_INSET)
+                ->save($thumbPath, ['quality' => 100]);
+        }
+        $resultItem = [
+            'id' => $imageModel->id,
+            'url' => $imageModel->imageUrl(),
+            'thumb_url' => $thumbUrl,
+            'label' => $imageModel->getImageName(),
+            'deleted' => $storyModel->isStoryImage($imageModel) ? 0 : 1,
+            'tooltip' => '',
+        ];
+        if ($resultItem['deleted'] === 0) {
+            $resultItem['tooltip'] = 'Добавлена в историю ' . $storyModel->title;
+        }
+        return $resultItem;
+    }
+
     public function actionGetImages(int $story_id)
     {
         /** @var Story $storyModel */
         $storyModel = $this->findModel(Story::class, $story_id);
         $result = [];
         foreach ($storyModel->storyImages as $model) {
-            $thumbUrl = $model->getImageThumbPath();
-            $thumbPath = $model->getImageThumbPath(true);
-            if (!file_exists($thumbPath)) {
-                Image::thumbnail($model->getImagePath(), 200, 200, ManipulatorInterface::THUMBNAIL_INSET)
-                    ->save($thumbPath, ['quality' => 100]);
-            }
-            $resultItem = [
-                'id' => $model->id,
-                'url' => $model->imageUrl(),
-                'thumb_url' => $thumbUrl,
-                'label' => $model->getImageName(),
-                'deleted' => $storyModel->isStoryImage($model) ? 0 : 1,
-                'tooltip' => '',
-            ];
-            if ($resultItem['deleted'] === 0) {
-                $resultItem['tooltip'] = 'Добавлена в историю ' . $storyModel->title;
-            }
-            $result[] = $resultItem;
+            $result[] = $this->createImageResultRow($storyModel, $model);
         }
         return [
             'success' => true,
@@ -258,39 +263,6 @@ class ImageController extends BaseController
             return $model;
         }
         throw new NotFoundHttpException('Страница не найдена.');
-    }
-
-    public function actionUploadImage()
-    {
-        $result = ['success' => false, 'errors' => [], 'image' => []];
-        $form = new ImageForm();
-        $editorImage = new EditorImage();
-        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-
-            $storyModel = $this->findStoryModel($form->story_id);
-
-            $imagesFolder = $storyModel->getSlideImagesPath();
-            FileHelper::createDirectory(Yii::getAlias('@public') . $imagesFolder);
-
-            $form->image = UploadedFile::getInstance($form, 'image');
-            if ($form->image !== null) {
-
-                $form->upload($imagesFolder . DIRECTORY_SEPARATOR . $form->image->getBaseName());
-
-                //$image = $editorImage->
-
-                $result['image'] = [
-                    'url' => $image->imageUrl(),
-                    'id' => $image->hash,
-                ];
-                $result['success'] = true;
-            }
-
-        }
-        else {
-            $result['errors'] = $form->errors;
-        }
-        return $result;
     }
 
     public function actionSave()
@@ -411,11 +383,21 @@ class ImageController extends BaseController
         return ['success' => true];
     }
 
+    /**
+     * Действия для загрузки изображений из менеджера изображений
+     * Загружается картинка в папку истории
+     * Создается связь истории и изображения через таблицу story_story_slide_image
+     */
     public function actionUploadImages()
     {
         $form = new ImageForm();
-        if ($form->load(Yii::$app->request->post())) {
-
+        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+            /** @var Story $storyModel */
+            $storyModel = $this->findModel(Story::class, $form->story_id);
+            $form->uploadImage($storyModel);
+            $form->createStoryImageLink($storyModel->id);
+            return ['success' => true];
         }
+        return ['success' => false, 'errors' => $form->getErrors()];
     }
 }

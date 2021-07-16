@@ -3,7 +3,6 @@
 namespace backend\services;
 
 use backend\components\image\EditorImage;
-use backend\components\image\PowerPointImage;
 use backend\components\image\SlideImage;
 use backend\components\QuestionHTML;
 use backend\components\story\AbstractBlock;
@@ -26,10 +25,7 @@ use common\models\StoryTestQuestion;
 use DomainException;
 use yii;
 use yii\db\Query;
-use yii\helpers\FileHelper;
-use yii\web\UploadedFile;
 use common\models\Story;
-use function MongoDB\Driver\Monitoring\removeSubscriber;
 
 class StoryEditorService
 {
@@ -44,32 +40,6 @@ class StoryEditorService
         $this->storyLinkService = $storyLinkService;
         $this->imageResizeService = $imageResizeService;
     }
-
-    private function uploadImage($form, Story $storyModel): void
-    {
-        $imageFile = UploadedFile::getInstance($form, 'image');
-        if ($imageFile) {
-            $imagesFolder = $storyModel->getSlideImagesPath();
-            FileHelper::createDirectory($imagesFolder);
-            $slideImageFileName = md5(random_int(0, 9999) . time() . random_int(0, 9999)) . '.' . $imageFile->extension;
-            $imagePath = "{$imagesFolder}/$slideImageFileName";
-            if ($imageFile->saveAs($imagePath)) {
-
-                if ($imagePath !== '') {
-                    $slideImage = new SlideImage($imagePath);
-                    if ($slideImage->needResize()) {
-                        $size = $slideImage->getResizeImageSize();
-                        $imagePath = $this->imageResizeService->resizeSlideImage($imagePath, $size->getWidth(), $size->getHeight());
-                    }
-                }
-
-                $form->imageModel = (new PowerPointImage($storyModel->getSlideImagesFolder()))
-                    ->create($imagePath);
-                $form->imagePath = $form->imageModel->imageUrl();
-                $form->fullImagePath = $imagePath;
-        	}
-        }
-	}
 
 	/**
     public function deleteBlock(int $slideID, string $blockID)
@@ -326,7 +296,7 @@ class StoryEditorService
                 $slideImage = new SlideImage($imagePath);
                 if ($slideImage->needResize()) {
                     $size = $slideImage->getResizeImageSize();
-                    $imagePath = $this->imageResizeService->resizeSlideImage($imagePath, $size->getWidth(), $size->getHeight());
+                    $imagePath = $form->resizeSlideImage($imagePath, $size->getWidth(), $size->getHeight());
                 }
 
                 $form->imageModel = $image->create($imagePath);
@@ -339,7 +309,7 @@ class StoryEditorService
                 $form->fullImagePath = $form->imageModel->getImagePath();
             }
             else {
-                $this->uploadImage($form, $storyModel);
+                $form->uploadImage($storyModel);
             }
             if ($form->imageModel !== null) {
                 $block->setBlockAttribute('data-image-id', $form->imageModel->id);
