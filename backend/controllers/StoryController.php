@@ -316,7 +316,7 @@ class StoryController extends BaseController
     public function actionGrantAccessByLink(int $id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $storyModel = $this->findModel($id);
+        $storyModel = $this->findModel(Story::class, $id);
         $storyModel->grantLinkAccess();
         $accessForm = new StoryAccessByLinkForm($storyModel);
         return ['success' => true, 'accessLink' => $accessForm->access_link];
@@ -325,7 +325,7 @@ class StoryController extends BaseController
     public function actionRevokeAccessByLink(int $id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $storyModel = $this->findModel($id);
+        $storyModel = $this->findModel(Story::class, $id);
         $storyModel->revokeLinkAccess();
         return ['success' => true];
     }
