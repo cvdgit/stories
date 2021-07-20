@@ -6,6 +6,7 @@ use common\helpers\Url;
 use common\models\test\AnswerType;
 use common\models\test\SourceType;
 use DomainException;
+use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -40,6 +41,7 @@ use yii\helpers\ArrayHelper;
  * @property int $remember_answers;
  * @property int $ask_question;
  * @property string $ask_question_lang
+ * @property int $created_by
  *
  * @property StoryTestQuestion[] $storyTestQuestions
  * @property Story[] $stories
@@ -48,6 +50,7 @@ use yii\helpers\ArrayHelper;
  * @property StoryTest $parentTest;
  * @property TestWordList $wordList;
  * @property StoryTest[] $relatedTests;
+ * @property User $createdBy;
  */
 class StoryTest extends ActiveRecord
 {
@@ -72,6 +75,10 @@ class StoryTest extends ActiveRecord
     {
         return [
             TimestampBehavior::class,
+            [
+                'class' => BlameableBehavior::class,
+                'updatedByAttribute' => null,
+            ],
         ];
     }
 
@@ -83,7 +90,7 @@ class StoryTest extends ActiveRecord
         return [
             [['title', 'header'], 'required'],
             [['status', 'mix_answers', 'remote', 'question_list_id', 'parent_id', 'source', 'word_list_id', 'answer_type', 'strict_answer', 'remember_answers', 'ask_question'], 'integer'],
-            [['shuffle_word_list'], 'integer'],
+            [['shuffle_word_list', 'created_by'], 'integer'],
             [['title', 'question_list_name', 'header', 'question_params', 'incorrect_answer_text', 'input_voice', 'recording_lang', 'ask_question_lang'], 'string', 'max' => 255],
             [['description_text'], 'string'],
             [['question_list', 'sortable'], 'safe'],
@@ -120,6 +127,7 @@ class StoryTest extends ActiveRecord
             'remember_answers' => 'Запоминать ответы',
             'ask_question' => 'Произносить вопросы',
             'ask_question_lang' => 'Язык синтезатора вопросов',
+            'created_by' => 'Автор',
         ];
     }
 
@@ -130,6 +138,11 @@ class StoryTest extends ActiveRecord
     {
         return $this->hasMany(StoryTestQuestion::class, ['story_test_id' => 'id'])
             ->orderBy(['order' => SORT_ASC]);
+    }
+
+    public function getCreatedBy(): ActiveQuery
+    {
+        return $this->hasOne(User::class, ['id' => 'created_by']);
     }
 
     public function getRelatedTests(): ActiveQuery

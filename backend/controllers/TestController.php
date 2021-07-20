@@ -72,6 +72,7 @@ class TestController extends Controller
     {
         $model = new StoryTest();
         $model->source = $source;
+        $model->created_by = Yii::$app->user->id;
         $dataProvider = new ActiveDataProvider([
             'query' => $model->getStoryTestQuestions(),
         ]);

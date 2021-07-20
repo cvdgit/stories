@@ -1,19 +1,15 @@
 <?php
-
 use common\components\StoryCover;
 use yii\helpers\Html;
-use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 use common\models\User;
 use dosamigos\selectize\SelectizeTextInput;
-
 /** @var $this yii\web\View */
 /** @var $model common\models\Story */
 /** @var $form yii\widgets\ActiveForm */
 /** @var $fileUploadForm backend\models\StoryFileUploadForm */
 /** @var $coverUploadForm backend\models\StoryCoverUploadForm */
 ?>
-
 <?php $form = ActiveForm::begin(); ?>
 <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 <?php if (!$model->isNewRecord): ?>
@@ -29,8 +25,7 @@ use dosamigos\selectize\SelectizeTextInput;
 </div>
 <?php endif ?>
 <?= $form->field($fileUploadForm, 'storyFile')->fileInput() ?>
-<?= $form->field($model, 'user_id')->dropDownList(ArrayHelper::map(User::find()->all(), 'id', 'profileName'),
-                                                          ['prompt' => 'Выбрать', 'readonly' => !Yii::$app->user->can('admin')]) ?>
+<?= $form->field($model, 'user_id')->dropDownList(User::getUserList(), ['prompt' => 'Выбрать', 'disabled' => !Yii::$app->user->can('admin')]) ?>
 <?php
 $values = [];
 foreach ($model->categories as $category) {

@@ -39,6 +39,10 @@ $columns[] = [
         return Html::a($model->title, ['test/update', 'id' => $model->id], ['title' => 'Перейти к редактированию']);
     },
 ];
+$columns[] = [
+    'attribute' => 'createdBy.profileName',
+    'label' => 'Автор',
+];
 if ($searchModel->isWordList()) {
     $columns[] = [
         'attribute' => 'wordList.name',

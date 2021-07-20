@@ -7,6 +7,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\ActiveQuery;
+use yii\helpers\ArrayHelper;
 use yii\web\IdentityInterface;
 
 /**
@@ -424,4 +425,8 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->student()->id;
     }
 
+    public static function getUserList(): array
+    {
+        return ArrayHelper::map(self::find()->all(), 'id', 'profileName');
+    }
 }
