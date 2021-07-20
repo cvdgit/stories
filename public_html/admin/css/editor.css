@@ -605,3 +605,15 @@ body {
 .ui-resizable-handle {
     pointer-events: all !important;
 }
+
+#story-editor section:not(.stack).present .sl-block>* {
+    pointer-events: auto;
+}
+
+#story-editor .sl-block.is-editing .sl-block-content:before {
+    display: none;
+}
+
+#story-editor h1 {
+    color: inherit;
+}

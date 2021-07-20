@@ -9,7 +9,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 ?>
 <div class="site-categories-bg"></div>
 <section class="site-categories">
-    <h2 class="container"><span>Популярные</span> категории</h2>
+    <h2 class="header-h2 container"><span>Популярные</span> категории</h2>
     <div class="container">
         <div class="row">
             <div class="col-xs-offset-1 col-xs-10 col-sm-offset-0 col-sm-6 col-md-offset-0 col-md-6 col-lg-offset-0 col-lg-3">
@@ -18,7 +18,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                         <div class="category-item-image-wrapper">
                             <img src="/img/category_2_mini.jpg" alt="">
                         </div>
-                        <h3>Древнегреческие мифы</h3>
+                        <h3 class="header-h3">Древнегреческие мифы</h3>
                     </a>
                 </div>
             </div>
@@ -28,7 +28,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                         <div class="category-item-image-wrapper">
                             <img src="/img/category_1_mini.jpg" alt="">
                         </div>
-                        <h3>Русские сказки и былины</h3>
+                        <h3 class="header-h3">Русские сказки и былины</h3>
                     </a>
                 </div>
             </div>
@@ -38,7 +38,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                         <div class="category-item-image-wrapper">
                             <img src="/img/category_3_mini.jpg" alt="">
                         </div>
-                        <h3>Познавательные</h3>
+                        <h3 class="header-h3">Познавательные</h3>
                     </a>
                 </div>
             </div>
@@ -48,7 +48,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                         <div class="category-item-image-wrapper">
                             <img src="/img/category_4_mini.jpg" alt="">
                         </div>
-                        <h3>Алтайские народные сказки</h3>
+                        <h3 class="header-h3">Алтайские народные сказки</h3>
                     </a>
                 </div>
             </div>
@@ -62,7 +62,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 <?= \frontend\widgets\Playlists::widget() ?>
 
   <section class="site-about">
-    <h2 class="container">О <span>портале</span></h2>
+    <h2 class="header-h2 container">О <span>портале</span></h2>
     <div class="container">
       <div class="row">
         <div class="col-lg-5 col-md-5 col-sm-2">
@@ -169,7 +169,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
   </section>
 
   <section class="site-stories">
-    <h2 class="container"><span>Новые</span> истории</h2>
+    <h2 class="header-h2 container"><span>Новые</span> истории</h2>
     <div class="container">
         <?= \frontend\widgets\StoryWidget::widget() ?>
     </div>
@@ -179,7 +179,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
   </section>
 
   <section class="site-questions">
-    <h2 class="container">Часто задаваемые <span>вопросы</span></h2>
+    <h2 class="header-h2 container">Часто задаваемые <span>вопросы</span></h2>
     <div class="container">
       <div class="row">
         <div class="col-md-6">

@@ -1,4 +1,5 @@
 <?php
+use backend\assets\CKEditorAsset;
 use backend\assets\CropperAsset;
 use backend\assets\StoryEditorAsset;
 use backend\widgets\BackendRevealWidget;
@@ -10,6 +11,7 @@ use yii\helpers\Url;
 StoryEditorAsset::register($this);
 PlyrAsset::register($this);
 CropperAsset::register($this);
+CKEditorAsset::register($this);
 /** @var $model common\models\Story */
 $this->title = 'Редактор: ' . $model->title;
 ?>
@@ -257,7 +259,14 @@ $js = <<< JS
     }
 
     $('.blocks-sidebar').on('click', '[data-block-type]', function() {
-        showCreateBlockModal($(this).attr('data-block-type'));
+        var type = $(this).attr('data-block-type');
+        if (type === 'text') {
+            var html = StoryEditor.createEmptyBlock(type);
+            StoryEditor.createSlideBlock(html);
+        }
+        else {
+            showCreateBlockModal(type);
+        }
     });
     
     $('.slide-menu').on('click', '[data-slide-action]', function(e) {

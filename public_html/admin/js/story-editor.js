@@ -582,7 +582,7 @@ var StoryEditor = (function() {
     var $editor = $('#story-editor');
 
     $editor.on('mousedown', function(e) {
-        console.log('mousedown');
+
         var $target = $(e.target);
         if ($target.hasClass('sl-block') || $target.parents('.sl-block').length) {
 
@@ -590,6 +590,12 @@ var StoryEditor = (function() {
             if (!$block.hasClass('sl-block')) {
                 $block = $(e.target).parents('div.sl-block');
             }
+
+            //if ($block.hasClass('is-editing')) {
+            //    return;
+            //}
+
+            console.log('mousedown-in');
 
             if (blockManager.getActive() && $block.data('blockId') !== blockManager.getActive().getID()) {
                 unsetActiveBlock();
@@ -618,17 +624,74 @@ var StoryEditor = (function() {
         }
     }, 'div.sl-block:not(.wikids-active-block)');
 
-    /*$editor.on('dblclick', function(e) {
-        console.log('dblclick');
+    $editor.on('dblclick', function(e) {
         var $target = $(e.target);
         if ($target.hasClass('sl-block') || $target.parents('.sl-block').length) {
 
             var block = blockManager.getActive();
-            if (block && block.typeIsText()) {
-                console.log('go');
+            if (!block) {
+                e.preventDefault();
+                return;
             }
+            if (!block.typeIsText()) {
+                e.preventDefault();
+                return;
+            }
+
+            var blockElement = block.getElement(),
+                elem = blockElement.find('.slide-paragraph');
+
+            if (blockElement.hasClass('is-editing')) {
+                e.preventDefault();
+                return;
+            }
+
+            $(blockElement).addClass('is-editing');
+
+            if ($(blockElement).data('ui-draggable')) {
+                $(blockElement).draggable('destroy');
+            }
+
+            elem.prop('contenteditable', true);
+
+            var ed = CKEDITOR.inline(elem[0], {
+                removePlugins: 'showborders,pastefromword',
+                extraPlugins: 'font,justify,horizontalrule,colorbutton',
+                format_tags: 'p;h2;h3;pre',
+                startupFocus: true,
+                forcePasteAsPlainText: true,
+                disableNativeSpellChecker: false,
+                toolbarGroups: [
+                    {name: 'styles', groups: ['styles']},
+                    {name: 'colors', groups: ['colors']},
+                    {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
+                    {name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi', 'paragraph']},
+                    {name: 'links', groups: ['links']},
+                    {name: 'insert', groups: ['insert']}
+                ],
+                removeButtons: 'About,Maximize,ShowBlocks,BGColor,Styles,Font,Image,Flash,Table,Smiley,SpecialChar,PageBreak,Iframe,Anchor,BidiLtr,BidiRtl,Language,Source,Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Find,Replace,SelectAll,Scayt,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,Underline,Subscript,Superscript,CopyFormatting,CreateDiv,Indent,Outdent'
+            });
+
+            var contentIsChanged = false;
+            ed.on('blur', function() {
+                if (!this.getData().length) {
+                    this.setData('<p>Введите текст</p>');
+                }
+                this.destroy();
+                elem.prop('contenteditable', false);
+                $(blockElement).removeClass('is-editing');
+                if (contentIsChanged) {
+                    blockModifier.change();
+                    contentIsChanged = false;
+                }
+                makeDraggable($(blockElement));
+            });
+
+            ed.on('change', function() {
+                contentIsChanged = true;
+            });
         }
-    });*/
+    });
 
     var config = {
         storyID: "",
@@ -1272,6 +1335,31 @@ var StoryEditor = (function() {
         return config.getBlockFormAction + "&slide_id=" + slidesManager.getCurrentSlideID() + "&block_id=" + blockManager.getActive().getID();
     }
 
+    function createEmptyBlock(type) {
+        var block = $('<div/>', {
+            'class': 'sl-block',
+            'data-block-id': blockIDGenerator.generate(),
+            'data-block-type': type,
+            'css': {'width': '290px', 'height': 'auto'}
+        });
+        var blockContent = $('<div/>', {
+            'class': 'sl-block-content',
+            'data-placeholder': 'div',
+            'data-placeholder-text': 'Text',
+            'css': {'z-index': 12, 'text-align': 'left'}
+        });
+
+        $('<div/>', {
+            'class': 'slide-paragraph',
+            'text': 'Введите текст'
+        })
+            .appendTo(blockContent);
+
+        blockContent.appendTo(block);
+
+        return block[0].outerHTML;
+    }
+
     return {
         initialize,
 
@@ -1314,7 +1402,9 @@ var StoryEditor = (function() {
                 }
             }
             return url;
-        }
+        },
+
+        createEmptyBlock
     };
 })();
 

@@ -27,18 +27,18 @@ section {
   padding: 60px 0;
 }
 
-section h2 {
+section h2.header-h2 {
   font-size: 3rem;
   font-weight: 600;
   text-align: center;
   margin: 0;
 }
 
-section h2 span {
+section h2.header-h2 span {
   color: #99cd50;
 }
 
-section h3 {
+section h3.header-h3 {
   font-size: 2.2rem;
 }
 
@@ -2191,7 +2191,7 @@ img.lazy {
     padding: 30px 0;
   }
 
-  section h2 {
+  section h2.header-h2 {
     margin-bottom: 10px;
     font-size: 3rem;
   }
@@ -2396,7 +2396,7 @@ img.lazy {
     padding: 30px 0;
   }
 
-  section h2 {
+  section h2.header-h2 {
     margin-bottom: 10px;
     font-size: 3rem;
   }
