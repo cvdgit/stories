@@ -69,6 +69,7 @@ class Category extends ActiveRecord
             [['description'], 'string'],
             [['name', 'alias'], 'string', 'max' => 255],
             [['sort_field'], 'string', 'max' => 50],
+            ['sort_order', 'default', 'value' => 0],
         ];
     }
 
