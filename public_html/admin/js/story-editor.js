@@ -753,11 +753,14 @@ var StoryEditor = (function() {
             }
 
             var $list = $('<ul/>');
-            $list.append(createToolbarItem('Изменить', 'pencil', 'edit'));
-            if (blockManager.getActive().typeIsImage() || blockManager.getActive().typeIsVideo() || blockManager.getActive().typeIsHtml()) {
+            var activeBlock = blockManager.getActive();
+            if (!activeBlock.typeIsText()) {
+                $list.append(createToolbarItem('Изменить', 'pencil', 'edit'));
+            }
+            if (activeBlock.typeIsImage() || activeBlock.typeIsVideo() || activeBlock.typeIsHtml()) {
                 $list.append(createToolbarItem('Растянуть', 'resize-full', 'stretch'));
             }
-            if (blockManager.getActive().typeIsImage()) {
+            if (activeBlock.typeIsImage()) {
                 $list.append(createToolbarItemGroup([{'title': '1:1', 'action': 'natural-size'}]));
             }
             $list.append(createToolbarItem('Положение', 'align-center','align'));
