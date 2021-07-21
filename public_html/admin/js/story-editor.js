@@ -655,11 +655,11 @@ var StoryEditor = (function() {
             elem.prop('contenteditable', true);
 
             var ed = CKEDITOR.inline(elem[0], {
-                removePlugins: 'showborders', // pastefromword
+                removePlugins: 'showborders,pastefromword',
                 extraPlugins: 'font,justify,horizontalrule,colorbutton',
                 format_tags: 'p;h2;h3;pre',
                 startupFocus: true,
-                //forcePasteAsPlainText: true,
+                forcePasteAsPlainText: true,
                 disableNativeSpellChecker: false,
                 toolbarGroups: [
                     {name: 'styles', groups: ['styles']},
