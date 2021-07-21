@@ -655,7 +655,7 @@ var StoryEditor = (function() {
             elem.prop('contenteditable', true);
 
             var ed = CKEDITOR.inline(elem[0], {
-                removePlugins: 'showborders,pastefromword',
+                removePlugins: 'showborders', // pastefromword
                 extraPlugins: 'font,justify,horizontalrule,colorbutton',
                 format_tags: 'p;h2;h3;pre',
                 startupFocus: true,
@@ -669,7 +669,8 @@ var StoryEditor = (function() {
                     {name: 'links', groups: ['links']},
                     {name: 'insert', groups: ['insert']}
                 ],
-                removeButtons: 'About,Maximize,ShowBlocks,BGColor,Styles,Font,Image,Flash,Table,Smiley,SpecialChar,PageBreak,Iframe,Anchor,BidiLtr,BidiRtl,Language,Source,Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Find,Replace,SelectAll,Scayt,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,Underline,Subscript,Superscript,CopyFormatting,CreateDiv,Indent,Outdent'
+                // Font
+                removeButtons: 'About,Maximize,ShowBlocks,BGColor,Styles,Image,Flash,Table,Smiley,SpecialChar,PageBreak,Iframe,Anchor,BidiLtr,BidiRtl,Language,Source,Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Find,Replace,SelectAll,Scayt,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,Underline,Subscript,Superscript,CopyFormatting,CreateDiv,Indent,Outdent'
             });
 
             var contentIsChanged = false;
