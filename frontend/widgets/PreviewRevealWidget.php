@@ -50,6 +50,7 @@ class PreviewRevealWidget extends RevealWidget
             ['class' => Video::class, 'showControls' => false],
             ['class' => \common\widgets\Reveal\Plugins\Actions::class],
             //['class' => \common\widgets\Reveal\Plugins\SeeAlso::class, 'storyID' => $model->id, 'isPlaylist' => ($playlistID !== null)],
+            ['class' => \common\widgets\Reveal\Plugins\SlideState::class, 'storyID' => $this->model->id],
         ];
         $this->options = [
             'backgroundTransition' => 'none',
