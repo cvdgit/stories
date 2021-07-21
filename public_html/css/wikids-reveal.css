@@ -2361,13 +2361,19 @@ p.wikids-test-description {
 	left: 0;
 	z-index: 1056;
 	background-color: rgba(170, 170, 170, .4);
-	pointer-events: none;
+	pointer-events: auto;
+}
+
+.slide-state-alert-inner {
+	position: absolute;
+	width: 100%;
+	height: 100%;
 }
 
 .slide-state-alert {
-	margin: 20% auto;
-	width: 600px;
-	height: 200px;
+	margin: 18% auto;
+	width: 630px;
+	height: 180px;
 	background-color: #fff;
 	border: 1px solid;
 	border-radius: 6px;
@@ -2376,4 +2382,22 @@ p.wikids-test-description {
 	font-size: 2.5rem;
 	padding: 20px;
 	opacity: 1;
+}
+
+.slide-state-alert .buttons {
+	text-align: center;
+}
+
+.slide-state-alert p {
+	font-size: 2rem;
+	margin: 20px 0 30px
+}
+
+.slide-state-alert .buttons {
+	margin-bottom: 20px;
+}
+
+.slide-state-alert button {
+	min-width: 100px;
+	margin: 0 7px;
 }
