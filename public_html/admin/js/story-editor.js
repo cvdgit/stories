@@ -659,7 +659,7 @@ var StoryEditor = (function() {
                 extraPlugins: 'font,justify,horizontalrule,colorbutton',
                 format_tags: 'p;h2;h3;pre',
                 startupFocus: true,
-                forcePasteAsPlainText: true,
+                //forcePasteAsPlainText: true,
                 disableNativeSpellChecker: false,
                 toolbarGroups: [
                     {name: 'styles', groups: ['styles']},
