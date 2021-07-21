@@ -252,7 +252,9 @@ function onSlideMouseDown(e) {
         $target[0].tagName === "AUDIO" ||
         $target.hasClass("story-controls") ||
         ($target.hasClass("wikids-recorder") || $target.parents(".wikids-recorder").length) ||
-        (($target.hasClass("plyr") || $target.parents(".plyr").length)) && window["WikidsVideo"])  {
+        (($target.hasClass("plyr") || $target.parents(".plyr").length) && window["WikidsVideo"]) ||
+        ($target[0].tagName === "A" && $target.parents('.slide-paragraph').length)
+    )  {
         return;
     }
     switch (e.which) {
