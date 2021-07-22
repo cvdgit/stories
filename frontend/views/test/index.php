@@ -47,6 +47,9 @@ TestAsset::register($this);
 
 <?php
 $css = <<< CSS
+#test-list p a {
+text-decoration: underline;
+}
 .run-test {
     padding: 0;
     text-align: center;
