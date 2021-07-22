@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use backend\models\RelatedTests;
 use common\helpers\Url;
 use common\models\test\AnswerType;
 use common\models\test\SourceType;
@@ -147,8 +148,14 @@ class StoryTest extends ActiveRecord
 
     public function getRelatedTests(): ActiveQuery
     {
-        return $this->hasMany(__CLASS__, ['id' => 'related_test_id'])
-            ->viaTable('related_tests', ['test_id' => 'id']);
+        $query = self::find()
+            ->innerJoin('related_tests', 'related_tests.test_id = story_test.id')
+            ->innerJoin(['t2' => 'story_test'], 't2.id = related_tests.related_test_id')
+            ->where('story_test.id = :test_id', [':test_id' => $this->id])
+            ->select(['t2.*'])
+            ->orderBy(['related_tests.order' => SORT_ASC]);
+        $query->multiple = true;
+        return $query;
     }
 
     private static function createRemoteTestQuery(): Query

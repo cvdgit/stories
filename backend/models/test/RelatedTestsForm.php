@@ -26,9 +26,11 @@ class RelatedTestsForm extends Model
             throw new \DomainException('RelatedTestForm is not valid');
         }
         RelatedTests::deleteByTestID($testModel->id);
+        $order = 1;
         foreach ($this->test_ids as $relatedTestID) {
-            $model = RelatedTests::create($testModel->id, $relatedTestID);
+            $model = RelatedTests::create($testModel->id, $relatedTestID, $order);
             $model->save();
+            $order++;
         }
         $testModel->refresh();
     }

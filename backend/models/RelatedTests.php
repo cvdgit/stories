@@ -11,6 +11,7 @@ use yii\db\ActiveRecord;
  *
  * @property int $test_id
  * @property int $related_test_id
+ * @property int $order;
  *
  * @property StoryTest $relatedTest
  * @property StoryTest $test
@@ -32,7 +33,7 @@ class RelatedTests extends ActiveRecord
     {
         return [
             [['test_id', 'related_test_id'], 'required'],
-            [['test_id', 'related_test_id'], 'integer'],
+            [['test_id', 'related_test_id', 'order'], 'integer'],
             [['test_id', 'related_test_id'], 'unique', 'targetAttribute' => ['test_id', 'related_test_id']],
             [['related_test_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTest::class, 'targetAttribute' => ['related_test_id' => 'id']],
             [['test_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTest::class, 'targetAttribute' => ['test_id' => 'id']],
@@ -55,7 +56,7 @@ class RelatedTests extends ActiveRecord
      */
     public function getRelatedTest()
     {
-        return $this->hasOne(StoryTest::class, ['id' => 'related_test_id']);
+        return $this->hasOne(StoryTest::class, ['id' => 'related_test_id'])->orderBy(['order' => SORT_ASC]);
     }
 
     /**
@@ -66,11 +67,12 @@ class RelatedTests extends ActiveRecord
         return $this->hasOne(StoryTest::class, ['id' => 'test_id']);
     }
 
-    public static function create(int $testID, int $relatedTestID): self
+    public static function create(int $testID, int $relatedTestID, int $order = 1): self
     {
         $model = new self();
         $model->test_id = $testID;
         $model->related_test_id = $relatedTestID;
+        $model->order = $order;
         return $model;
     }
 

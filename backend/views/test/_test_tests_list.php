@@ -37,7 +37,7 @@ $css = <<<CSS
 CSS;
 $this->registerCss($css);
 ?>
-<button class="btn btn-primary" type="button" id="manage-tests">Выбрать тесты</button>
+<h4>Список тестов <span class="pull-right"><button class="btn btn-primary" type="button" id="manage-tests">Выбрать тесты</button></span></h4>
 <div style="margin-top: 20px">
     <ul class="list-group tests-manage-test-list" id="tests-lists-preview" style="height: auto; max-height: none; min-height: auto; overflow: hidden">
         <li class="list-group-item">
@@ -64,8 +64,9 @@ $js = <<<JS
 
     function createTestsList() {
         var list = $('#tests-lists-preview');
-        if (tests.length > 0) {
-            list.empty();
+        list.empty();
+        if (tests.length === 0) {
+            list.append('<li class="list-group-item"><span class="text-wrapper" title="Список тестов пуст">Список тестов пуст</span></li>')
         }
         tests.forEach(function(item) {
             $('<li/>', {'class': 'list-group-item'}).append(
@@ -109,6 +110,11 @@ $js = <<<JS
                 .addClass('glyphicon-plus')
                 .end()
                 .appendTo(allTestsList);
+        });
+        
+        Sortable.create(selectedTestsList[0], {
+            ghostClass: 'wikids-sortable-ghost',
+            handle: 'li'
         });
         
         modal.find('#save-selected-tests').on('click', function() {
