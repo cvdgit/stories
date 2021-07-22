@@ -14,7 +14,7 @@ use yii\helpers\Html;
         <?php foreach($model->tests as $test): ?>
         <p>Прогресс (<?= $student->getStudentName() ?>): <?= $student->getProgress($test->id) ?>%</p>
         <p>
-            <?= Html::a('<i class="glyphicon glyphicon-play-circle"></i> Запустить тест',
+            <?= Html::a('<i class="glyphicon glyphicon-play-circle"></i> ' . $test->title,
                 $test->getRunUrl(),
                 ['class' => 'run-test']) ?>
             | <?= Html::a('<i class="glyphicon glyphicon-picture"></i> Перейти к истории',
