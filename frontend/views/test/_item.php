@@ -12,17 +12,19 @@ use yii\helpers\Html;
     <div class="col-lg-7 col-md-9 col-sm-9 clearfix">
         <h3 style="margin-top:0"><?= $model->title ?></h3>
         <?php foreach($model->tests as $test): ?>
-        <p>Прогресс (<?= $student->getStudentName() ?>): <?= $student->getProgress($test->id) ?>%</p>
-        <p>
-            <?= Html::a('<i class="glyphicon glyphicon-play-circle"></i> ' . $test->header,
-                $test->getRunUrl(),
-                ['class' => 'run-test']) ?>
-        </p>
-        <p>
-            <?= Html::a('<i class="glyphicon glyphicon-picture"></i> Перейти к истории',
-                $model->getStoryUrl()) ?>
-            | <?= Html::a('Очистить историю', ['test/clear-history', 'category_id' => $category->id, 'student_id' => $student->id, 'test_id' => $test->id]) ?>
-        </p>
+        <div style="margin-bottom: 10px">
+            <p>Прогресс (<?= $student->getStudentName() ?>): <?= $student->getProgress($test->id) ?>%</p>
+            <p>
+                <?= Html::a('<i class="glyphicon glyphicon-play-circle"></i> ' . $test->header,
+                    $test->getRunUrl(),
+                    ['class' => 'run-test']) ?>
+            </p>
+            <p>
+                <?= Html::a('<i class="glyphicon glyphicon-picture"></i> Перейти к истории',
+                    $model->getStoryUrl()) ?>
+                | <?= Html::a('Очистить историю', ['test/clear-history', 'category_id' => $category->id, 'student_id' => $student->id, 'test_id' => $test->id]) ?>
+            </p>
+        </div>
         <?php endforeach ?>
     </div>
 </div>
