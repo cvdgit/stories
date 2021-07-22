@@ -39,7 +39,7 @@ $this->registerCss($css);
 ?>
 <button class="btn btn-primary" type="button" id="manage-tests">Выбрать тесты</button>
 <div style="margin-top: 20px">
-    <ul class="list-group tests-manage-test-list" id="tests-lists-preview">
+    <ul class="list-group tests-manage-test-list" id="tests-lists-preview" style="height: auto; max-height: none; min-height: auto; overflow: hidden">
         <li class="list-group-item">
             <span class="text-wrapper" title="Список тестов пуст">Список тестов пуст</span>
         </li>
