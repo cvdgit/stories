@@ -32,13 +32,13 @@ class StorySearch extends Model
     public function search($params): ActiveDataProvider
     {
         $query = Story::find()->joinWith(['author', 'categories']);
+        $query->distinct();
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
                 'pageSize' => 50,
             ],
         ]);
-
         $sortParams = [
             'defaultOrder' => ['created_at' => SORT_DESC],
             'attributes' => [
@@ -69,11 +69,9 @@ class StorySearch extends Model
         ];
         $sort = new Sort($sortParams);
         $dataProvider->setSort($sort);
-
         if (!($this->load($params) && $this->validate())) {
             return $dataProvider;
         }
-
         $query->andFilterWhere(['like', 'title', $this->title]);
         $query->andFilterWhere([
             'story.id' => $this->id,
@@ -86,8 +84,6 @@ class StorySearch extends Model
         if (!empty($this->category_id)) {
             $query->andFilterWhere(['in', 'category.id', explode(',', $this->category_id)]);
         }
-
         return $dataProvider;
     }
-
 }

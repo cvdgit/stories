@@ -45,14 +45,14 @@ class TestController extends Controller
     public function actionIndex(int $category_id, $student_id = null)
     {
         $model = $this->findCategoryModel($category_id);
-
-        $query = Story::findPublishedStories();
-        $query->innerJoinWith(['categories', 'tests']);
-        $query->andFilterWhere(['in', 'category.id', $model->subCategories()]);
+        $query = Story::findPublishedStories()
+            ->innerJoinWith(['categories', 'tests'])
+            ->distinct()
+            ->andFilterWhere(['in', 'category.id', $model->subCategories()]);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => 40,
+                'pageSize' => 20,
             ],
             'sort' => [
                 'defaultOrder' => ['published_at' => SORT_DESC],
