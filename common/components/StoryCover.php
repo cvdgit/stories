@@ -12,14 +12,16 @@ class StoryCover
 	public static function createListThumbnail($filePath)
 	{
 		$thumbnailFilePath = Yii::getAlias('@public') . self::getListThumbPath(basename($filePath));
-		Image::thumbnail($filePath, 330, 245)->save($thumbnailFilePath, ['jpeg_quality' => 100], ManipulatorInterface::THUMBNAIL_INSET);
+		Image::thumbnail($filePath, 330, 245, ManipulatorInterface::THUMBNAIL_INSET)
+            ->save($thumbnailFilePath, ['quality' => 100]);
 		return $thumbnailFilePath;
 	}
 
 	public static function createStoryThumbnail($filePath)
 	{
 		$thumbnailFilePath = Yii::getAlias('@public') . self::getStoryThumbPath(basename($filePath));
-		Image::thumbnail($filePath, 973, 720)->save($thumbnailFilePath, ['jpeg_quality' => 100], ManipulatorInterface::THUMBNAIL_INSET);
+		Image::thumbnail($filePath, 973, 720, ManipulatorInterface::THUMBNAIL_INSET)
+            ->save($thumbnailFilePath, ['quality' => 100]);
 		return $thumbnailFilePath;
 	}
 
@@ -64,5 +66,4 @@ class StoryCover
 	{
 		return self::getCoverFolderPath($absolute) . '/story/' . $cover;
 	}
-
 }
