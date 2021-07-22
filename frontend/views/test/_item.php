@@ -17,7 +17,9 @@ use yii\helpers\Html;
             <?= Html::a('<i class="glyphicon glyphicon-play-circle"></i> ' . $test->header,
                 $test->getRunUrl(),
                 ['class' => 'run-test']) ?>
-            | <?= Html::a('<i class="glyphicon glyphicon-picture"></i> Перейти к истории',
+        </p>
+        <p>
+            <?= Html::a('<i class="glyphicon glyphicon-picture"></i> Перейти к истории',
                 $model->getStoryUrl()) ?>
             | <?= Html::a('Очистить историю', ['test/clear-history', 'category_id' => $category->id, 'student_id' => $student->id, 'test_id' => $test->id]) ?>
         </p>
