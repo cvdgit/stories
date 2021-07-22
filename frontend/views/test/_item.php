@@ -9,22 +9,26 @@ use yii\helpers\Html;
     <div class="col-lg-2 col-md-3 col-sm-3 info">
         <?= Html::img(StoryCover::getListThumbPath($model->cover), ['style' => 'max-width: 100%; height: auto']) ?>
     </div>
-    <div class="col-lg-7 col-md-9 col-sm-9 clearfix">
-        <h3 style="margin-top:0"><?= $model->title ?></h3>
-        <?php foreach($model->tests as $test): ?>
-        <div style="margin-bottom: 10px">
-            <p>Прогресс (<?= $student->getStudentName() ?>): <?= $student->getProgress($test->id) ?>%</p>
-            <p>
-                <?= Html::a('<i class="glyphicon glyphicon-play-circle"></i> ' . $test->header,
-                    $test->getRunUrl(),
-                    ['class' => 'run-test']) ?>
-            </p>
-            <p>
-                <?= Html::a('<i class="glyphicon glyphicon-picture"></i> Перейти к истории',
-                    $model->getStoryUrl()) ?>
-                | <?= Html::a('Очистить историю', ['test/clear-history', 'category_id' => $category->id, 'student_id' => $student->id, 'test_id' => $test->id]) ?>
-            </p>
+    <div class="col-lg-10 col-md-9 col-sm-9 clearfix">
+        <div class="row row-no-gutters">
+            <div class="col-md-7">
+                <h3 style="margin-top:0"><?= Html::a($model->title, $model->getStoryUrl()) ?></h3>
+                <?php foreach($model->tests as $test): ?>
+                    <div style="margin-bottom: 10px">
+                        <p>
+                            <?= Html::a('<i class="glyphicon glyphicon-play-circle"></i> ' . $test->header, $test->getRunUrl(), ['class' => 'run-test']) ?>
+                        </p>
+                        <div class="clearfix">
+                            <?= Html::a('<i class="glyphicon glyphicon-trash"></i>', ['test/clear-history', 'category_id' => $category->id, 'student_id' => $student->id, 'test_id' => $test->id], ['title' => 'Очистить прогресс', 'style' => 'float: right']) ?>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: <?= $student->getProgress($test->id) ?>%;min-width: 20px">
+                                    <?= $student->getProgress($test->id) ?>%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach ?>
+            </div>
         </div>
-        <?php endforeach ?>
     </div>
 </div>
