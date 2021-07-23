@@ -793,6 +793,9 @@ var StoryEditor = (function() {
                     stretchToSlide();
                 },
                 'delete': function() {
+                    if (!confirm('Удалить блок?')) {
+                        return;
+                    }
                     deleteBlockAction();
                 },
                 'duplicate': function() {
