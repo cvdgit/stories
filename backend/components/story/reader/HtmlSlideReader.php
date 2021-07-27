@@ -139,9 +139,12 @@ class HtmlSlideReader implements ReaderInterface
             $selector = 'p';
             if (pq($htmlBlock)->find('div.slide-paragraph')->length > 0) {
                 $selector = 'div.slide-paragraph';
+                $text = pq($htmlBlock)->find($selector)->html();
+            }
+            else {
+                $text = '<p>' . pq($htmlBlock)->find($selector)->html() . '</p>';
             }
             $style = pq($htmlBlock)->find($selector)->attr('style');
-            $text = pq($htmlBlock)->find($selector)->html();
         }
         $block->setText($text);
 
