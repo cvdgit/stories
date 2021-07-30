@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "762636f7c9feaf06c7f2859019f25fe5",
+    "content-hash": "4ef98c7b8bfa3580a7a291060033d1d0",
     "packages": [
         {
             "name": "2amigos/yii2-chartjs-widget",
@@ -654,21 +654,18 @@
         },
         {
             "name": "bower-asset/reveal.js",
-            "version": "3.9.2",
+            "version": "4.0.2",
             "source": {
                 "type": "git",
                 "url": "git@github.com:hakimel/reveal.js.git",
-                "reference": "94d98ff7d89e35c7d5b289ba387cdb0d42b30793"
+                "reference": "bd19860b4d6e85ff98067546faa4ffd87527a0ba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hakimel/reveal.js/zipball/94d98ff7d89e35c7d5b289ba387cdb0d42b30793",
-                "reference": "94d98ff7d89e35c7d5b289ba387cdb0d42b30793"
+                "url": "https://api.github.com/repos/hakimel/reveal.js/zipball/bd19860b4d6e85ff98067546faa4ffd87527a0ba",
+                "reference": "bd19860b4d6e85ff98067546faa4ffd87527a0ba"
             },
-            "type": "bower-asset",
-            "license": [
-                "MIT"
-            ]
+            "type": "bower-asset"
         },
         {
             "name": "bower-asset/selectize",
@@ -5944,6 +5941,7 @@
                     "type": "github"
                 }
             ],
+            "abandoned": true,
             "time": "2020-11-30T07:30:19+00:00"
         },
         {

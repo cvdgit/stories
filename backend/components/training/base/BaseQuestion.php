@@ -22,6 +22,9 @@ class BaseQuestion
     /** @var Answer[] */
     private $answers = [];
 
+    /** @var bool */
+    private $haveSlides = false;
+
     public function __construct(int $id, string $name, bool $lastAnswerIsCorrect, $image = null, $origImage = null)
     {
         $this->id = $id;
@@ -113,5 +116,15 @@ class BaseQuestion
     public function getOrigImage(): string
     {
         return (string)$this->origImage;
+    }
+
+    public function setHaveSlides(bool $value): void
+    {
+        $this->haveSlides = $value;
+    }
+
+    public function getHaveSlides(): bool
+    {
+        return $this->haveSlides;
     }
 }

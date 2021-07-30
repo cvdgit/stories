@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\components\training\base;
-
 
 class BaseQuestionSerializer
 {
@@ -23,16 +21,17 @@ class BaseQuestionSerializer
 
     public function serialize(): array
     {
+        $q = $this->question;
         return [
-            'id' => $this->question->getId(),
-            'name' => $this->question->getName(),
-            'image' => $this->question->getImage(),
-            'orig_image' => $this->question->getOrigImage(),
-            'original_image' => $this->question->getOrigImage() !== '',
-            'correct_number' => $this->question->getCorrectAnswerNumber(),
-            'storyTestAnswers' => $this->createAnswers($this->question->getAnswers()),
-            'lastAnswerIsCorrect' => $this->question->isLastAnswerIsCorrect(),
+            'id' => $q->getId(),
+            'name' => $q->getName(),
+            'image' => $q->getImage(),
+            'orig_image' => $q->getOrigImage(),
+            'original_image' => $q->getOrigImage() !== '',
+            'correct_number' => $q->getCorrectAnswerNumber(),
+            'storyTestAnswers' => $this->createAnswers($q->getAnswers()),
+            'lastAnswerIsCorrect' => $q->isLastAnswerIsCorrect(),
+            'haveSlides' => $q->getHaveSlides(),
         ];
     }
-
 }

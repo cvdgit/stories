@@ -11,7 +11,7 @@ class RevealAsset extends AssetBundle
         //'css/reveal.css',
     ];
     public $js = [
-        'js/reveal.js',
+        'dist/reveal.js',
     ];
     public $depends = [
         AppAsset::class,

@@ -348,6 +348,39 @@ class Story extends ActiveRecord
         return $this->hasMany(StorySlide::class, ['story_id' => 'id'])->orderBy(['number' => SORT_ASC]);
     }
 
+    private static function modifySlideData(int $id, string $data): string
+    {
+        $search = [
+            'data-id=""',
+            'data-background-color="#000000"',
+        ];
+        $replace = [
+            'data-id="' . $id . '"',
+            'data-background-color="#fff"',
+        ];
+        return str_replace($search, $replace, $data);
+    }
+
+    public function getSlidesForQuestion(): array
+    {
+        $models = $this->getStorySlides()
+            ->where('kind = :kind', [':kind' => StorySlide::KIND_SLIDE])
+            ->orderBy(['number' => SORT_ASC])
+            ->all();
+        return self::modifySlides($models);
+    }
+
+    public static function modifySlides(array $models): array
+    {
+        return array_map(static function(StorySlide $slide) {
+            return [
+                'id' => $slide->id,
+                'slideNumber' => $slide->number,
+                'data' => self::modifySlideData($slide->id, $slide->data),
+            ];
+        }, $models);
+    }
+
     public function slidesData(bool $withoutQuestions = false): string
     {
         $slides = (new Query())->from('{{%story_slide}} AS t1')

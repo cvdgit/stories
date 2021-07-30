@@ -313,7 +313,7 @@ class EditorController extends BaseController
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $model = Story::findModel($story_id);
-        return array_map(function(StorySlide $slide) {
+        return array_map(static function(StorySlide $slide) {
             return [
                 'id' => $slide->id,
                 'slideNumber' => $slide->number,
@@ -321,6 +321,7 @@ class EditorController extends BaseController
                 'isQuestion' => $slide->isQuestion(),
                 'linkSlideID' => $slide->link_slide_id,
                 'isHidden' => $slide->isHidden(),
+                'data' => $slide->data,
             ];
         }, $model->storySlides);
     }

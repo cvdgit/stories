@@ -2,6 +2,7 @@
 
 namespace backend\models\question;
 
+use common\models\StorySlide;
 use common\models\StoryTestQuestion;
 use DomainException;
 use yii\data\ActiveDataProvider;
@@ -65,4 +66,14 @@ class UpdateQuestion extends QuestionModel
         return !empty($this->model->image);
     }
 
+    public function getStorySlides(): array
+    {
+        return array_map(static function(StorySlide $slideModel) {
+            return [
+                'id' => $slideModel->id,
+                'story' => $slideModel->story->title,
+                'number' => $slideModel->number,
+            ];
+        }, $this->model->getStorySlides()->with('story')->all());
+    }
 }

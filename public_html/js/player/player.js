@@ -254,7 +254,8 @@ function onSlideMouseDown(e) {
         ($target.hasClass("wikids-recorder") || $target.parents(".wikids-recorder").length) ||
         (($target.hasClass("plyr") || $target.parents(".plyr").length) && window["WikidsVideo"]) ||
         ($target[0].tagName === "A" && $target.parents('.slide-paragraph').length) ||
-        ($target.hasClass("slide-state-alert-wrapper") || $target.parents(".slide-state-alert-wrapper").length)
+        ($target.hasClass("slide-state-alert-wrapper") || $target.parents(".slide-state-alert-wrapper").length) ||
+        ($target.hasClass("slide-hints-wrapper") || $target.parents(".slide-hints-wrapper").length)
     )  {
         return;
     }

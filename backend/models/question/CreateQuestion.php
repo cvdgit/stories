@@ -26,4 +26,8 @@ class CreateQuestion extends QuestionModel
         return $model->id;
     }
 
+    public function getStorySlides()
+    {
+        return [];
+    }
 }

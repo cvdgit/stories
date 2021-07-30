@@ -1974,11 +1974,70 @@
             }
         }
 
-        function createStars(stars) {
-            var $elem = $('<p/>');
-            $elem.addClass('question-stars');
-            $elem.css('textAlign', 'right');
-            appendStars($elem, getQuestionRepeat(), stars.current);
+        function appendHints($elem, questionID) {
+            $elem.empty();
+            $('<a/>', {
+                'href': '#',
+                'text': 'Подсказка'
+            })
+                .on('click', function() {
+
+                    var $hintWrapper = $('<div/>', {'class': 'slide-hints-wrapper'});
+                    var $hintBackground = $('<div/>', {'class': 'slide-hints-background'});
+                    var $hintInner = $('<div/>', {'class': 'slide-hints-inner'});
+                    var $hint = $('<div/>', {'class': 'slide-hints'});
+
+                    $hintBackground.appendTo($hintWrapper);
+                    $hintInner.appendTo($hintWrapper);
+
+                    $('<header/>', {'class': 'slide-hints-header'})
+                        .append(
+                            $('<div/>', {'class': 'header-actions'})
+                                .append(
+                                    $('<button/>', {
+                                        'class': 'hints-close',
+                                        'html': '&times;'
+                                    })
+                                        .on('click', function() {
+                                            $hintWrapper.hide();
+                                            $(this).remove();
+                                            $('.reveal .story-controls').show();
+                                        })
+                                )
+                        )
+                        .appendTo($hintInner);
+
+                    $('<iframe>', {
+                        'src': '/question-hints/view?question_id=' + questionID,
+                        'frameborder': 0,
+                        'scrolling': 'no',
+                        'width': '100%',
+                        'height': '100%'
+                    }).appendTo($hint);
+
+                    $hint.appendTo($hintInner);
+
+                    $('.reveal .story-controls').hide();
+                    $('.reveal .slides section.present').append($hintWrapper);
+                })
+                .appendTo($elem);
+        }
+
+        function createStars(questionID, stars, haveHints) {
+            var $elem = $('<div/>', {
+                'class': 'row row-no-gutters question-stars'
+            })
+                .append(
+                    $('<div/>', {'class': 'col-md-6 hints'})
+                )
+                .append(
+                    $('<div/>', {'class': 'col-md-6 stars'})
+                );
+            appendStars($elem.find('.stars'), getQuestionRepeat(), stars.current);
+            haveHints = haveHints || false;
+            if (haveHints) {
+                appendHints($elem.find('.hints'), questionID);
+            }
             return $elem;
         }
 
@@ -2057,7 +2116,7 @@
 
             var stars = '';
             if (question['stars']) {
-                stars = createStars(question.stars);
+                stars = createStars(question.id, question.stars, question['haveSlides']);
             }
             return $("<div/>")
                 .hide()
@@ -2435,7 +2494,7 @@
         }
 
         function updateStars($question, current) {
-            var $stars = $('.question-stars', $question);
+            var $stars = $('.question-stars .stars', $question);
             appendStars($stars, getQuestionRepeat(), current);
         }
 

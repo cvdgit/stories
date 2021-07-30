@@ -7,6 +7,7 @@ use backend\models\question\region\RegionImage;
 use DomainException;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
@@ -97,21 +98,34 @@ class StoryTestQuestion extends ActiveRecord
         ];
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStoryTestAnswers()
+    public function getStoryTestAnswers(): ActiveQuery
     {
         return $this->hasMany(StoryTestAnswer::class, ['story_question_id' => 'id'])
             ->orderBy(['order' => SORT_ASC]);
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStoryTest()
+    public function getStoryTest(): ActiveQuery
     {
         return $this->hasOne(StoryTest::class, ['id' => 'story_test_id']);
+    }
+
+    public function getStoryTestQuestionStorySlides(): ActiveQuery
+    {
+        return $this->hasMany(StoryTestQuestionStorySlide::class, ['story_test_question_id' => 'id']);
+    }
+
+    public function getStorySlides(): ActiveQuery
+    {
+        return $this->hasMany(StorySlide::class, ['id' => 'story_slide_id'])
+            ->viaTable('story_test_question_story_slide', ['story_test_question_id' => 'id'])
+            ->innerJoin('story_test_question_story_slide', 'story_test_question_story_slide.story_slide_id = story_slide.id')
+            ->andWhere('story_test_question_story_slide.story_test_question_id = :question', [':question' => $this->id])
+            ->orderBy(['story_test_question_story_slide.sort_order' => SORT_ASC]);
+    }
+
+    public function getStoryTestResults(): ActiveQuery
+    {
+        return $this->hasMany(StoryTestResult::class, ['question_id' => 'id']);
     }
 
     public static function findModel($id): self
@@ -320,4 +334,8 @@ class StoryTestQuestion extends ActiveRecord
         }
     }
 
+    public function getModifiedSlides(): array
+    {
+        return Story::modifySlides($this->storySlides);
+    }
 }
