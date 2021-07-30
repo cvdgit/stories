@@ -1980,7 +1980,8 @@
                 'href': '#',
                 'text': 'Подсказка'
             })
-                .on('click', function() {
+                .on('click', function(e) {
+                    e.preventDefault();
 
                     var $hintWrapper = $('<div/>', {'class': 'slide-hints-wrapper'});
                     var $hintBackground = $('<div/>', {'class': 'slide-hints-background'});
