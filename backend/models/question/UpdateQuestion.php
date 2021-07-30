@@ -68,12 +68,6 @@ class UpdateQuestion extends QuestionModel
 
     public function getStorySlides(): array
     {
-        return array_map(static function(StorySlide $slideModel) {
-            return [
-                'id' => $slideModel->id,
-                'story' => $slideModel->story->title,
-                'number' => $slideModel->number,
-            ];
-        }, $this->model->getStorySlides()->with('story')->all());
+        return $this->model->getStorySlidesForList();
     }
 }

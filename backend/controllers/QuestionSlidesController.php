@@ -35,7 +35,7 @@ class QuestionSlidesController extends BaseController
             /** @var StoryTestQuestion $questionModel */
             $questionModel = $this->findModel(StoryTestQuestion::class, $model->question_id);
             $model->create($questionModel);
-            return ['success' => true, 'slides' => $questionModel->storySlides];
+            return ['success' => true, 'slides' => $questionModel->getStorySlidesForList()];
         }
         return ['success' => false];
     }

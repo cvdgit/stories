@@ -338,4 +338,15 @@ class StoryTestQuestion extends ActiveRecord
     {
         return Story::modifySlides($this->storySlides);
     }
+
+    public function getStorySlidesForList(): array
+    {
+        return array_map(static function(StorySlide $slideModel) {
+            return [
+                'id' => $slideModel->id,
+                'story' => $slideModel->story->title,
+                'number' => $slideModel->number,
+            ];
+        }, $this->getStorySlides()->with('story')->all());
+    }
 }
