@@ -142,7 +142,7 @@ $questionID = $isNewRecord ? '' : $model->getModelID();
 $remote = Url::to(['question-slides/manage', 'question_id' => $model->getModelID()]);
 $questionSlides = Json::encode($model->getStorySlides());
 $js = <<< JS
-function createQuestionSlideList(slides) {
+window['createQuestionSlideList'] = function(slides) {
     var list = $('#question-slides-list tbody');
     list.empty();
     if (slides.length === 0) {
@@ -155,7 +155,7 @@ function createQuestionSlideList(slides) {
             .append($('<td/>').text(item.number))
             .appendTo(list);
     });
-}
+};
 (function() {
     "use strict";
     

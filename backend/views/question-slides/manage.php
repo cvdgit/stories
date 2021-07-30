@@ -243,7 +243,7 @@ function onStoryChange(storyID) {
         .done(function(response) {
             if (response && response.success) {
                 toastr.success('Изменения успешно сохранены');
-                createQuestionSlideList(response.slides);
+                window.createQuestionSlideList(response.slides);
             }
         })
         .fail(function(response) {
