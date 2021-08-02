@@ -139,7 +139,10 @@ $this->registerCss($css);
 
 <?php
 $questionID = $isNewRecord ? '' : $model->getModelID();
-$remote = Url::to(['question-slides/manage', 'question_id' => $model->getModelID()]);
+$remote = '';
+if (!$isNewRecord) {
+    $remote = Url::to(['question-slides/manage', 'question_id' => $model->getModelID()]);
+}
 $questionSlides = Json::encode($model->getStorySlides());
 $js = <<< JS
 window['createQuestionSlideList'] = function(slides) {
