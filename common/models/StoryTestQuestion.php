@@ -336,7 +336,7 @@ class StoryTestQuestion extends ActiveRecord
 
     public function getModifiedSlides(): array
     {
-        return Story::modifySlides($this->storySlides);
+        return Story::modifySlides($this->getStorySlides()->with('story')->all());
     }
 
     public function getStorySlidesForList(): array

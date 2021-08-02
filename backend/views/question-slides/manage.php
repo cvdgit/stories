@@ -43,13 +43,20 @@ $css = <<<CSS
     z-index: 101;
     visibility: hidden;
 }
+.thumb-reveal-info {
+    position: absolute;
+    right: 6px;
+    top: 6px;
+    z-index: 101;
+}
 .thumb-reveal-wrapper:hover .thumb-reveal-options {
     visibility: visible;
 }
 .thumb-reveal-wrapper:hover .thumb-reveal-inner {
     border-color: #666;
 }
-.thumb-reveal-options > .option {
+.thumb-reveal-options > .option,
+.thumb-reveal-info > .option {
     display: block;
     float: right;
     width: 26px;
@@ -105,6 +112,9 @@ $this->registerCss($css);
                             </div>
                             <div class="thumb-reveal-options">
                                 <div class="option delete-slide" data-slide-id="<?= $slide['id'] ?>"><i class="glyphicon glyphicon-minus"></i></div>
+                            </div>
+                            <div class="thumb-reveal-info">
+                                <div class="option slide-number" title="<?= $slide['story'] ?>"><?= $slide['slideNumber'] ?></div>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -171,6 +181,14 @@ function onStoryChange(storyID) {
                                 'class': 'option append-slide',
                                 'data-slide-id': slide.id,
                                 'html': '<i class="glyphicon glyphicon-plus"></i>'
+                            }))
+                    )
+                    .append(
+                        $('<div/>', {'class': 'thumb-reveal-info'})
+                            .append($('<div/>', {
+                                'class': 'option slide-number',
+                                'text': slide.slideNumber,
+                                'title': slide.story
                             }))
                     );
                 list.append(item);

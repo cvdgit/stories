@@ -2,7 +2,6 @@
 
 namespace backend\models\question;
 
-use common\models\StorySlide;
 use common\models\StoryTestQuestion;
 use DomainException;
 use yii\data\ActiveDataProvider;

@@ -23,6 +23,7 @@ class QuestionSlidesController extends BaseController
     public function actionSlides(int $story_id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
+        /** @var Story $model */
         $model = $this->findModel(Story::class, $story_id);
         return $model->getSlidesForQuestion();
     }

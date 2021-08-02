@@ -1,7 +1,7 @@
 <?php
 use yii\helpers\Html;
 /* @var $this yii\web\View */
-/* @var $model common\models\StoryTestQuestion */
+/* @var $model backend\models\question\UpdateQuestion */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $testModel common\models\StoryTest */
 /** @var $errorText string */
@@ -16,7 +16,7 @@ $this->params['breadcrumbs'] = [
     <h1><?= Html::encode($this->title) ?></h1>
     <?php if ($errorText !== ''): ?>
         <div class="alert alert-danger alert-dismissible">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <button type="button" class="close" data-dismiss="alert">
                 <span>&times;</span>
             </button>
             <?= Html::encode($errorText) ?>

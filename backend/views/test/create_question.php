@@ -2,7 +2,7 @@
 use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $testModel common\models\StoryTest */
-/* @var $model common\models\StoryTestQuestion */
+/* @var $model backend\models\question\CreateQuestion */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 $this->title = 'Создать вопрос';
 $this->params['breadcrumbs'] = [

@@ -364,6 +364,7 @@ class Story extends ActiveRecord
     public function getSlidesForQuestion(): array
     {
         $models = $this->getStorySlides()
+            ->with('story')
             ->where('kind = :kind', [':kind' => StorySlide::KIND_SLIDE])
             ->orderBy(['number' => SORT_ASC])
             ->all();
@@ -377,6 +378,7 @@ class Story extends ActiveRecord
                 'id' => $slide->id,
                 'slideNumber' => $slide->number,
                 'data' => self::modifySlideData($slide->id, $slide->data),
+                'story' => $slide->isRelationPopulated('story') ? $slide->story->title : ''
             ];
         }, $models);
     }
