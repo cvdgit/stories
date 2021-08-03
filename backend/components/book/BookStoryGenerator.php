@@ -65,7 +65,10 @@ class BookStoryGenerator
                         break;
                     case AbstractBlock::TYPE_TEST:
                         /** @var $block TestBlock */
-                        $slideBlocks->createTests($block->getTestID());
+                        $testID = $block->getTestID();
+                        if ($testID !== null) {
+                            $slideBlocks->createTests($testID);
+                        }
                         break;
                     case AbstractBlock::TYPE_VIDEO:
                         /** @var $block VideoBlock */
