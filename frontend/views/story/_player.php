@@ -45,7 +45,7 @@ $plugins = [
     ['class' => \common\widgets\Reveal\Plugins\Statistics::class, 'storyID' => $model->id],
     ['class' => \common\widgets\Reveal\Plugins\Transition::class, 'storyID' => $model->id],
     ['class' => \common\widgets\Reveal\Plugins\Test::class, 'storyID' => $model->id],
-    //['class' => \common\widgets\Reveal\Plugins\Background::class],
+    ['class' => \common\widgets\Reveal\Plugins\Background::class],
     ['class' => SlideLinks::class, 'storyID' => $model->id, 'links' => $model->slideBlocksData()],
     ['class' => Video::class, 'showControls' => \common\rbac\UserRoles::isModerator(Yii::$app->user->id)],
     ['class' => \common\widgets\Reveal\Plugins\Actions::class],

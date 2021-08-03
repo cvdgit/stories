@@ -13,7 +13,7 @@ use yii\helpers\Url;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 \frontend\assets\LazyAsset::register($this);
-\frontend\assets\MaphilightAsset::register($this);
+//\frontend\assets\MaphilightAsset::register($this);
 
 $title = $model->title;
 $this->setMetaTags($title,
