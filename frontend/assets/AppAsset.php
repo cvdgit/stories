@@ -22,7 +22,6 @@ class AppAsset extends AssetBundle
         'js/main.js',
     ];
     public $depends = [
-        BootstrapAsset::class,
         YiiAsset::class,
         BootstrapPluginAsset::class,
     ];

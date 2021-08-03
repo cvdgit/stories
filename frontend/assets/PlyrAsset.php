@@ -1,8 +1,6 @@
 <?php
 
-
 namespace frontend\assets;
-
 
 use yii\web\AssetBundle;
 
@@ -15,5 +13,4 @@ class PlyrAsset extends AssetBundle
     public $js = [
         'plyr.min.js',
     ];
-    public $depends = [];
 }

@@ -77,8 +77,7 @@ $css = <<<CSS
 }
 CSS;
 $this->registerCss($css);
-\backend\assets\OnlyRevealAsset::register($this);
-\backend\assets\OnlyWikidsRevealAsset::register($this);
+\backend\assets\WikidsRevealAsset::register($this);
 ?>
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">&times;</button>

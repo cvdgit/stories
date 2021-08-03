@@ -16,7 +16,8 @@ class TestAsset extends AssetBundle
         'js/PatienceDiff.js',
     ];
     public $depends = [
-        'yii\web\YiiAsset',
+        AppAsset::class,
         SortableJsAsset::class,
+        MaphilightAsset::class,
     ];
 }

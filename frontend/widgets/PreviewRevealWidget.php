@@ -6,12 +6,11 @@ use common\models\Story;
 use common\widgets\Reveal\Plugins\SlideLinks;
 use common\widgets\Reveal\Plugins\Video;
 use common\widgets\RevealWidget;
+use frontend\assets\MaphilightAsset;
 use frontend\assets\PlyrAsset;
 use frontend\assets\RecorderAsset;
-use frontend\assets\RevealAsset;
 use frontend\assets\SortableJsAsset;
 use frontend\assets\WikidsRevealAsset;
-use Yii;
 
 class PreviewRevealWidget extends RevealWidget
 {
@@ -20,7 +19,6 @@ class PreviewRevealWidget extends RevealWidget
     public $model;
 
     protected $defaultAssets = [
-        RevealAsset::class,
         WikidsRevealAsset::class,
     ];
 
@@ -33,6 +31,7 @@ class PreviewRevealWidget extends RevealWidget
             PlyrAsset::class,
             RecorderAsset::class,
             SortableJsAsset::class,
+            MaphilightAsset::class,
         ];
         $this->plugins = [
             [

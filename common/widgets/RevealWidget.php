@@ -100,7 +100,7 @@ class RevealWidget extends Widget
             $this->config['dependencies'] = array_merge($this->config['dependencies'], $plugin->dependencies());
             $this->config += $plugin->pluginConfig();
             foreach ($plugin->pluginCssFiles() as $cssFile) {
-                $view->registerCssFile($cssFile, ['depends' => $this->defaultAssets[1]]);
+                $view->registerCssFile($cssFile, ['depends' => $this->defaultAssets[0]]);
             }
         }
     }

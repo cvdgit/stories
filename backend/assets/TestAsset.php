@@ -19,7 +19,6 @@ class TestAsset extends AssetBundle
     ];
     public $depends = [
         AppAsset::class,
-        'yii\web\YiiAsset',
         SortableJsAsset::class,
         MaphilightAsset::class,
     ];

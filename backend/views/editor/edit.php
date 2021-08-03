@@ -1,17 +1,11 @@
 <?php
-use backend\assets\CKEditorAsset;
-use backend\assets\CropperAsset;
 use backend\assets\StoryEditorAsset;
 use backend\widgets\BackendRevealWidget;
-use frontend\assets\PlyrAsset;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
 /** @var $this yii\web\View */
 StoryEditorAsset::register($this);
-PlyrAsset::register($this);
-CropperAsset::register($this);
-CKEditorAsset::register($this);
 /** @var $model common\models\Story */
 $this->title = 'Редактор: ' . $model->title;
 ?>

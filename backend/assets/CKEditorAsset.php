@@ -3,7 +3,6 @@
 namespace backend\assets;
 
 use yii\web\AssetBundle;
-use yii\web\YiiAsset;
 use yii\web\JqueryAsset;
 
 class CKEditorAsset extends AssetBundle
@@ -14,7 +13,6 @@ class CKEditorAsset extends AssetBundle
         'adapters/jquery.js',
     ];
     public $depends = [
-        YiiAsset::class,
         JqueryAsset::class,
     ];
 }

@@ -9,7 +9,6 @@ use yii\bootstrap\NavBar;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\widgets\Breadcrumbs;
-
 AppAsset::register($this);
 ?>
 <?php $this->beginPage() ?>

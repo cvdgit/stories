@@ -10,7 +10,6 @@ $this->params['breadcrumbs'] = [
     $this->title,
 ];
 TestAsset::register($this);
-//SortableJsAsset::register($this);
 ?>
 <div class="story-test-update">
     <?php $runTestLink = Html::a('<i class="glyphicon glyphicon-expand"></i>', Yii::$app->urlManagerFrontend->createAbsoluteUrl(['test/view', 'id' => $model->id]), ['id' => 'run-test', 'title' => 'Запустить тест']) ?>

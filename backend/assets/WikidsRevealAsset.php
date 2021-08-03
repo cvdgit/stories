@@ -3,6 +3,7 @@
 namespace backend\assets;
 
 use yii\web\AssetBundle;
+use common\assets\RevealAsset;
 
 class WikidsRevealAsset extends AssetBundle
 {

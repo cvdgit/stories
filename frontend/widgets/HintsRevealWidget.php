@@ -4,7 +4,6 @@ namespace frontend\widgets;
 
 use common\models\Story;
 use common\widgets\RevealWidget;
-use frontend\assets\RevealAsset;
 use frontend\assets\WikidsRevealAsset;
 
 class HintsRevealWidget extends RevealWidget
@@ -14,7 +13,6 @@ class HintsRevealWidget extends RevealWidget
     public $model;
 
     protected $defaultAssets = [
-        RevealAsset::class,
         WikidsRevealAsset::class,
     ];
 

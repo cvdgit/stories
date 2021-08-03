@@ -2,6 +2,8 @@
 
 namespace backend\assets;
 
+use frontend\assets\PlyrAsset;
+use yii\jui\JuiAsset;
 use yii\web\AssetBundle;
 
 class StoryEditorAsset extends AssetBundle
@@ -16,7 +18,9 @@ class StoryEditorAsset extends AssetBundle
         'css/editor.css',
     ];
     public $depends = [
-        RevealAsset::class,
-        WikidsRevealAsset::class,
+        AppAsset::class,
+        JuiAsset::class,
+        PlyrAsset::class,
+        CKEditorAsset::class,
     ];
 }
