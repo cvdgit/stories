@@ -68,8 +68,9 @@ function DataModifier(slideManager, cleaner) {
             .removeClass('glyphicon-floppy-disk')
             .addClass('glyphicon-ok')
     }
+    var that = this;
 
-    function action(content) {
+    function action(content, key) {
         return $.ajax({
             url: '/admin/index.php?r=editor/slide/save',
             type: 'POST',
@@ -84,7 +85,6 @@ function DataModifier(slideManager, cleaner) {
         });
     }
 
-    var that = this;
     var timeout = undefined;
 
     function startTimeout() {
@@ -94,7 +94,8 @@ function DataModifier(slideManager, cleaner) {
         timeout = setTimeout(function() {
             var deferreds = []
             Object.keys(that.data).forEach(function(key) {
-                deferreds.push(action(that.data[key]).done(function() {
+                deferreds.push(action(that.data[key], key).done(function() {
+                    that.slideManager.updateSlideData(key, that.data[key]);
                     delete that.data[key];
                 }));
             });
@@ -217,6 +218,8 @@ function SlideManager(options) {
         'test': {'class': 'glyphicon glyphicon-question-sign', 'title': 'Слайд с тестом'},
         'link': {'class': 'glyphicon glyphicon-link', 'title': 'Ссылка на слайд'}
     }
+    this.decks = [];
+    this.slides = [];
 }
 
 SlideManager.prototype = {
@@ -236,22 +239,15 @@ SlideManager.prototype = {
             processData: false
         });
     },
-    'addModeIcon': function(mode, slideID) {
-        slideID = slideID || this.getCurrentSlideID();
-        var icon = this.modeIcons[mode];
-        this.$slidesList
-            .find('li[data-slide-id=' + slideID + '] span.slide-mode')
-            .append($('<i/>', {
-                'class': icon.class,
-                'title': icon.title,
-                'data-slide-mode': mode
-            }));
-    },
-    'removeModeIcon': function(mode, slideID) {
-        slideID = slideID || this.getCurrentSlideID();
-        this.$slidesList
-            .find('li[data-slide-id=' + slideID + '] span.slide-mode i[data-slide-mode=' + mode + ']')
-            .remove();
+    'toggleSlideVisible': function(hidden, id) {
+        id = id || this.getCurrentSlideID();
+        var $elem = this.$slidesList.find('div[data-slide-id=' + id + '].thumb-reveal-wrapper');
+        if (hidden) {
+            $elem.addClass('slide-hidden');
+        }
+        else {
+            $elem.removeClass('slide-hidden');
+        }
     },
     'loadSlidesList': function(toSetActiveSlideID, itemCallback) {
 
@@ -268,6 +264,26 @@ SlideManager.prototype = {
             that.$slidesList.find('[data-slide-id=' + slideID + ']').addClass("active");
         }
 
+        function makeReveal(elem) {
+            var deck = new Reveal(elem, {
+                embedded: true
+            });
+            deck.initialize({
+                'width': 1280,
+                'height': 720,
+                'margin': 0.01,
+                'transition': 'none',
+                'disableLayout': true,
+                'controls': false,
+                'progress': false,
+                'slideNumber': false
+            });
+            return deck;
+        }
+
+        this.decks = [];
+        this.slides = [];
+
         return $.ajax({
             'url': '/admin/index.php?r=editor/slides&story_id=' + this.options['story_id'],
             'type': 'GET',
@@ -279,8 +295,50 @@ SlideManager.prototype = {
                 return;
             }
 
-            data.forEach(function(slide) {
+            var $element;
+            data.forEach(function(slide, i) {
 
+                that.slides[slide.id] = slide;
+
+                $element = $('<div/>', {
+                    'class': 'thumb-reveal-wrapper' + (slide.isHidden ? ' slide-hidden' : ''),
+                    'data-slide-id': slide.id
+                })
+                    .on('click', function() {
+                        setActiveSlideItem(slide.id);
+                        itemCallback(slide);
+                        return false;
+                    })
+                    .append(
+                        $('<div/>', {'class': 'thumb-reveal-inner'})
+                            .append(
+                                $('<div/>', {
+                                    'class': 'thumb-reveal reveal',
+                                    'css': {'width': '1280px', 'height': '720px', 'transform': 'scale(0.1298)'}
+                                })
+                                    .append(
+                                        $('<div/>', {'class': 'slides'})
+                                            .append(slide.data)
+                                    )
+                            )
+                    )
+                    .append(
+                        $('<div/>', {'class': 'thumb-reveal-options'})
+                            .append($('<div/>', {
+                                'class': 'option slide-number',
+                                'text': slide.slideNumber
+                            }))
+                    )
+                    .append(
+                        $('<div/>', {'class': 'thumb-reveal-visible'})
+                            .append($('<div/>', {
+                                'class': 'option slide-visible',
+                                'html': '<i class="glyphicon glyphicon-eye-close"></i>',
+                                'title': 'Слайд скрыт'
+                            }))
+                    );
+
+                /*
                 var $element = $('<li/>', {
                     'class': 'list-group-item slides-container-item',
                     'data-slide-id': slide.id,
@@ -294,20 +352,11 @@ SlideManager.prototype = {
                         itemCallback(slide.id);
                         return false;
                     });
+                */
 
                 $element.appendTo(that.$slidesList);
 
-                if (slide.isLink) {
-                    that.addModeIcon('link', slide.id);
-                }
-                else {
-                    if (slide.isQuestion) {
-                        that.addModeIcon('test', slide.id);
-                    }
-                }
-                if (slide.isHidden) {
-                    that.addModeIcon('hidden', slide.id);
-                }
+                that.decks[slide.id] = makeReveal($element.find('.reveal')[0]);
             });
 
             that.$slidesList.sortable({
@@ -316,7 +365,7 @@ SlideManager.prototype = {
                     $('.ui-state-highlight').addClass(cl);
                 },
                 placeholder: 'ui-state-highlight',
-                handle: '.slide-move',
+                //handle: '.slide-move',
                 update: function() {
                     that.saveSlidesOrder()
                         .done(function(data) {
@@ -324,7 +373,7 @@ SlideManager.prototype = {
                                 if (data.success) {
                                     toastr.success('Порядок слайдов успешно изменен');
                                     var i = 1;
-                                    that.$slidesList.find('li > .slide-number').each(function() {
+                                    that.$slidesList.find('div.thumb-reveal-wrapper > .thumb-reveal-options > .slide-number').each(function() {
                                         $(this).text(i);
                                         i++;
                                     });
@@ -344,10 +393,10 @@ SlideManager.prototype = {
             }).disableSelection();
 
             if (toSetActiveSlideID) {
-                that.$slidesList.find('li[data-slide-id=' + toSetActiveSlideID + ']').click();
+                that.$slidesList.find('div[data-slide-id=' + toSetActiveSlideID + '].thumb-reveal-wrapper').click();
             }
             else {
-                that.$slidesList.find('li:eq(0)').click();
+                that.$slidesList.find('div.thumb-reveal-wrapper:eq(0)').click();
             }
         });
     },
@@ -383,6 +432,13 @@ SlideManager.prototype = {
             'r': 'editor/slide/toggle-visible',
             'slide_id': this.getCurrentSlideID()
         });
+    },
+    'updateSlideData': function(id, data) {
+        this.slides[id] = data;
+        this.$slidesList
+            .find('div[data-slide-id=' + id + '].thumb-reveal-wrapper .reveal .slides')
+            .html(data);
+        this.decks[id].sync();
     }
 }
 
@@ -393,7 +449,7 @@ function BlockModifier(modifier) {
 
     function css(element, name, value) {
         element.css(name, value);
-        that.modifier.change();
+        that.change();
     }
 
     this.setLeft = function(element, left) {
@@ -410,7 +466,7 @@ function BlockModifier(modifier) {
     };
     this.change = function() {
         this.modifier.change();
-    }
+    };
 }
 
 function BlockAlignment(modifier) {
@@ -1116,14 +1172,23 @@ var StoryEditor = (function() {
         });
     }
 
+    function loadSlideWithData(slideData) {
+        $('.slides', $editor).html(slideData.data);
+        Reveal.sync();
+        Reveal.slide(0);
+        slidesManager.setActiveSlide($editor.find('section'), slideData);
+        slideMenu.init(slideData);
+        makeDraggable($editor.find('.sl-block'));
+    }
+
     /**
      * Загрузка списка слайдов
      * @param toSetActiveSlideID
      */
     function loadSlides(toSetActiveSlideID) {
-        return slidesManager.loadSlidesList(toSetActiveSlideID, function(slideID) {
+        return slidesManager.loadSlidesList(toSetActiveSlideID, function(slideData) {
             unsetActiveBlock();
-            loadSlide(slideID);
+            loadSlideWithData(slideData);
         }).done(function(data) {
             if (data.length) {
                 blockToolbar.show();
@@ -1274,12 +1339,7 @@ var StoryEditor = (function() {
         return slidesManager.toggleVisible().done(function(data) {
             if (data && data.success) {
                 slideMenu.slideVisibleToggleAction(data.status);
-                if (data.status === 2) {
-                    slidesManager.addModeIcon('hidden');
-                }
-                else {
-                    slidesManager.removeModeIcon('hidden');
-                }
+                slidesManager.toggleSlideVisible(data.status === 2)
             }
             else {
                 toastr.error('slideVisibleToggleAction error');

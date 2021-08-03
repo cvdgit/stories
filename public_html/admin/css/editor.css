@@ -422,6 +422,7 @@ body {
     position: relative;
     overflow: auto;
     overflow-x: hidden;
+    padding-left: 8px;
 }
 
 .slides-container .ui-state-highlight {
@@ -468,7 +469,8 @@ body {
     border: 0 none;
 }
 
-.wrap-editor-main .sl-block .new-questions {
+.wrap-editor-main .sl-block .new-questions,
+.slides-container .sl-block .new-questions {
     background-image: url(/img/education.png);
     background-size: auto;
     background-color: #222;
@@ -483,7 +485,8 @@ body {
     font-weight: 500;
 }
 
-.wrap-editor-main .sl-block .wikids-video-player {
+.wrap-editor-main .sl-block .wikids-video-player,
+.slides-container .sl-block .wikids-video-player {
     background-image: url(/img/youtube.png);
     background-size: auto;
     background-color: #222;
@@ -616,4 +619,78 @@ body {
 
 #story-editor h1 {
     color: inherit;
+}
+
+.thumb-reveal-wrapper {
+    position: relative;
+    height: 120px;
+    width: 160px;
+    margin-bottom: 6px;
+}
+
+.thumb-reveal {
+    position: relative;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    -webkit-transform-origin: 0% 0%;
+    transform-origin: 0% 0%;
+}
+.thumb-reveal section {
+    border: 0 !important;
+    outline: 0 !important;
+    display: block !important;
+}
+
+.thumb-reveal-inner {
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid #666;
+    height: 120px;
+}
+.thumb-reveal-wrapper:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 10;
+    cursor: pointer;
+}
+.thumb-reveal-options {
+    position: absolute;
+    left: 70px;
+    bottom: 0;
+    z-index: 101;
+}
+.thumb-reveal-visible {
+    position: absolute;
+    left: 3px;
+    bottom: 0;
+    z-index: 101;
+    visibility: hidden;
+}
+
+.thumb-reveal-wrapper.active .thumb-reveal-inner,
+.thumb-reveal-wrapper:hover .thumb-reveal-inner {
+    border-color: #eee;
+}
+.thumb-reveal-options > .option,
+.thumb-reveal-visible > .option {
+    display: block;
+    float: right;
+    width: 26px;
+    height: 26px;
+    line-height: 26px;
+    border-radius: 26px;
+    font-size: 15px;
+    color: #fff;
+    text-align: center;
+    opacity: 1;
+    cursor: pointer;
+}
+
+.thumb-reveal-wrapper.slide-hidden .thumb-reveal-visible {
+    visibility: visible;
 }

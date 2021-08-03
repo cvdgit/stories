@@ -312,8 +312,13 @@ class EditorController extends BaseController
     public function actionSlides(int $story_id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $model = Story::findModel($story_id);
+        $model = $this->findModel(Story::class, $story_id);
         return array_map(static function(StorySlide $slide) {
+            $slideData = (new SlideModifier($slide->id, $slide->data))
+                ->addImageId()
+                //->addImageParams()
+                ->addDescription()
+                ->render();
             return [
                 'id' => $slide->id,
                 'slideNumber' => $slide->number,
@@ -321,7 +326,11 @@ class EditorController extends BaseController
                 'isQuestion' => $slide->isQuestion(),
                 'linkSlideID' => $slide->link_slide_id,
                 'isHidden' => $slide->isHidden(),
-                'data' => $slide->data,
+                'data' => $slideData,
+                'status' => $slide->status,
+                'haveLinks' => (count($slide->storySlideBlocks) > 0),
+                'number' => $slide->number,
+                'haveNeoRelations' => (count($slide->neoSlideRelations) > 0),
             ];
         }, $model->storySlides);
     }
