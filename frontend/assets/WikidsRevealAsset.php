@@ -3,7 +3,6 @@
 namespace frontend\assets;
 
 use yii\web\AssetBundle;
-use common\assets\RevealAsset;
 
 class WikidsRevealAsset extends AssetBundle
 {
@@ -18,6 +17,6 @@ class WikidsRevealAsset extends AssetBundle
         'js/PatienceDiff.js',
     ];
     public $depends = [
-        RevealAsset::class
+        FrontendRevealAsset::class
     ];
 }

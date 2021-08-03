@@ -2,7 +2,6 @@
 
 namespace common\assets;
 
-use frontend\assets\AppAsset;
 use yii\web\AssetBundle;
 
 class RevealAsset extends AssetBundle
@@ -13,8 +12,5 @@ class RevealAsset extends AssetBundle
     ];
     public $js = [
         'dist/reveal.js',
-    ];
-    public $depends = [
-        AppAsset::class,
     ];
 }
