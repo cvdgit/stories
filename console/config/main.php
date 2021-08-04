@@ -37,6 +37,12 @@ return [
         'log' => [
             'targets' => [
                 [
+                    'class' => 'notamedia\sentry\SentryTarget',
+                    'dsn' => $params['sentry.dsn'],
+                    'levels' => ['error', 'warning'],
+                    'context' => true,
+                ],
+                [
                     'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning'],
                 ],
