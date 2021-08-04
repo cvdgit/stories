@@ -47,7 +47,7 @@ return [
         ]),
         'urlManagerFrontend' => $params['components.urlManagerFrontend'],
         'unisender' => [
-            'class' => \matperez\yii2unisender\UniSender::class,
+            'class' => \common\components\unisender\UniSenderComponent::class,
             'apiConfig' => [
                 'apiKey' => $params['unisenderKey'],
                 'retryCount' => 3,

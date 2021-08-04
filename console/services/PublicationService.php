@@ -44,10 +44,13 @@ class PublicationService
             throw new \DomainException($response->getError()->getMessage());
         }
         $result = $response->getResult();
-        $this->sender->createCampaign(new UniSenderCampaign(
+        $response = $this->sender->createCampaign(new UniSenderCampaign(
             $result['message_id'],
             1,
             1
         ));
+        if (!$response->isSuccess()) {
+            throw new \DomainException($response->getError()->getMessage());
+        }
     }
 }

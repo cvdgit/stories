@@ -126,7 +126,7 @@ return [
             'class' => 'alexandernst\devicedetect\DeviceDetect',
         ],
         'unisender' => [
-            'class' => \matperez\yii2unisender\UniSender::class,
+            'class' => \common\components\unisender\UniSenderComponent::class,
             'apiConfig' => [
                 'apiKey' => $params['unisenderKey'],
             ],

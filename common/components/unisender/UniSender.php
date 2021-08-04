@@ -8,7 +8,7 @@ use omgdef\unisender\UniSenderWrapper;
 class UniSender
 {
 
-    /** @var \matperez\yii2unisender\UniSender */
+    /** @var UniSenderComponent */
     private $uniSender;
 
     public function __construct()
