@@ -13,6 +13,7 @@ return [
     'bootstrap' => [
         'log',
         'common\bootstrap\Bootstrap',
+        'sentry',
     ],
     'modules' => [],
     'components' => [
@@ -40,9 +41,20 @@ return [
                 'domain' => $params['cookieDomain'],
             ],
         ],
+        'sentry' => $params['components.sentry'],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
+                [
+                    'class' => 'mito\sentry\Target',
+                    'except' =>
+                        [
+                            'yii\web\HttpException:404',
+                            'yii\web\HttpException:403',
+                            'yii\validators\FileValidator::getSizeLimit'
+                        ],
+                    'levels' => ['error', 'warning'],
+                ],
                 [
                     'class' => 'yii\log\FileTarget',
                     'except' =>
