@@ -210,10 +210,10 @@ class StoryEditorService
         $slide = $reader->load();
         $block = $slide->findBlockByID($form->block_id);
 
-        if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
-            $storyModel = Story::findModel($model->story_id);
-            $this->uploadImage($form, $storyModel);
-        }
+        //if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
+            //$storyModel = Story::findModel($model->story_id);
+            //$this->uploadImage($form, $storyModel);
+        //}
         if ($block->isHtmlTest()) {
             $block->setContent((new TestBlockContent($form->test_id, $form->required))->render());
         }
