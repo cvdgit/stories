@@ -13,7 +13,6 @@ return [
     'bootstrap' => [
         'log',
         'common\bootstrap\Bootstrap',
-        'sentry',
     ],
     'modules' => [],
     'components' => [
@@ -41,19 +40,14 @@ return [
                 'domain' => $params['cookieDomain'],
             ],
         ],
-        'sentry' => $params['components.sentry'],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
                 [
-                    'class' => 'mito\sentry\Target',
-                    'except' =>
-                        [
-                            'yii\web\HttpException:404',
-                            'yii\web\HttpException:403',
-                            'yii\validators\FileValidator::getSizeLimit'
-                        ],
+                    'class' => 'notamedia\sentry\SentryTarget',
+                    'dsn' => $params['sentry.dsn'],
                     'levels' => ['error', 'warning'],
+                    'context' => true,
                 ],
                 [
                     'class' => 'yii\log\FileTarget',
