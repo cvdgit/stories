@@ -34,18 +34,18 @@ $js = <<< JS
     var form = $('#image-from-file-form', modal);
     var fileLoading = $('.file-loading', modal);
     modal
-        .on('shown.bs.modal', function() {
+        .on('show.bs.modal', function() {
             form[0].reset();
         })
-        .on('hidden.bs.modal', function() {
+        .on('hide.bs.modal', function() {
             fileLoading.hide();
         });
     form.find('#imagefromfileform-image').on('change', function() {
-        fileLoading.show();
         form.submit();
     });
     form.on('beforeSubmit', function(e) {
         e.preventDefault();
+        fileLoading.show();
         $.ajax({
             url: $(this).attr('action'),
             type: $(this).attr('method'),

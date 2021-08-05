@@ -41,7 +41,7 @@ class ImageForm extends BaseForm
     public function rules()
     {
         return array_merge(parent::rules(), [
-            ['image', 'image', 'maxSize' => 50 * 1024 * 1024],
+            ['image', 'image', 'maxSize' => 7 * 1024 * 1024, 'skipOnError' => false, 'extensions' => ['bmp', 'gif', 'jpg', 'jpeg', 'png']],
             [['action', 'actionSlideID', 'actionStoryID', 'back_to_next_slide', 'story_id', 'image_id'], 'integer'],
             [['imagePath', 'what', 'imageID'], 'string'],
         ]);
@@ -82,13 +82,16 @@ class ImageForm extends BaseForm
 
     public function uploadImage(Story $storyModel): void
     {
-        $imageFile = UploadedFile::getInstance($this, 'image');
-        if ($imageFile) {
+        $this->image = UploadedFile::getInstance($this, 'image');
+        if ($this->image) {
+            if (!$this->validate()) {
+                throw new \DomainException('Image is not valid.');
+            }
             $imagesFolder = $storyModel->getSlideImagesPath();
             FileHelper::createDirectory($imagesFolder);
-            $slideImageFileName = md5(random_int(0, 9999) . time() . random_int(0, 9999)) . '.' . $imageFile->extension;
+            $slideImageFileName = md5(random_int(0, 9999) . time() . random_int(0, 9999)) . '.' . $this->image->extension;
             $imagePath = "{$imagesFolder}/$slideImageFileName";
-            if ($imageFile->saveAs($imagePath)) {
+            if ($this->image->saveAs($imagePath)) {
                 if ($imagePath !== '') {
                     $slideImage = new SlideImage($imagePath);
                     if ($slideImage->needResize()) {
