@@ -255,7 +255,6 @@ SlideManager.prototype = {
         if (this.$slidesList.data('ui-sortable')) {
             this.$slidesList.sortable('destroy');
         }
-        //this.unsetActiveSlide();
 
         var that = this;
 
@@ -289,17 +288,13 @@ SlideManager.prototype = {
             'type': 'GET',
             'dataType': 'json'
         }).done(function(data) {
-
             if (data.length === 0) {
                 $('<div/>', {'class': 'no-slides'}).text('Нет слайдов').appendTo(that.$slidesList);
                 return;
             }
-
             var $element;
             data.forEach(function(slide, i) {
-
                 that.slides[slide.id] = slide;
-
                 $element = $('<div/>', {
                     'class': 'thumb-reveal-wrapper' + (slide.isHidden ? ' slide-hidden' : ''),
                     'data-slide-id': slide.id
@@ -337,25 +332,7 @@ SlideManager.prototype = {
                                 'title': 'Слайд скрыт'
                             }))
                     );
-
-                /*
-                var $element = $('<li/>', {
-                    'class': 'list-group-item slides-container-item',
-                    'data-slide-id': slide.id,
-                    'data-link-slide-id': slide.linkSlideID
-                })
-                    .append($('<span/>').addClass('slide-number').text(slide.slideNumber))
-                    .append($('<span/>').addClass('slide-mode').html(''))
-                    .append($('<span/>').addClass('slide-move').html('<i class="glyphicon glyphicon-resize-vertical"></i>'))
-                    .on("click", function () {
-                        setActiveSlideItem(slide.id);
-                        itemCallback(slide.id);
-                        return false;
-                    });
-                */
-
                 $element.appendTo(that.$slidesList);
-
                 that.decks[slide.id] = makeReveal($element.find('.reveal')[0]);
             });
 
@@ -434,7 +411,7 @@ SlideManager.prototype = {
         });
     },
     'updateSlideData': function(id, data) {
-        this.slides[id] = data;
+        this.slides[id].data = data;
         this.$slidesList
             .find('div[data-slide-id=' + id + '].thumb-reveal-wrapper .reveal .slides')
             .html(data);
@@ -815,6 +792,7 @@ var StoryEditor = (function() {
                 $list.append(createToolbarItem('Изменить', 'pencil', 'edit'));
             }
             if (activeBlock.typeIsImage() || activeBlock.typeIsVideo() || activeBlock.typeIsHtml()) {
+                $list.append(createToolbarItem('Заменить', 'circle-arrow-down', 'replace'));
                 $list.append(createToolbarItem('Растянуть', 'resize-full', 'stretch'));
             }
             if (activeBlock.typeIsImage()) {
@@ -862,6 +840,9 @@ var StoryEditor = (function() {
                 },
                 'natural-size': function() {
                     naturalSize();
+                },
+                'replace': function() {
+                    config.onImageReplace(blockManager.getActive().getID());
                 }
             }
         });
@@ -1011,6 +992,12 @@ var StoryEditor = (function() {
             },
             'getElement': function() {
                 return this.element;
+            },
+            'getWidth': function() {
+                return parseInt(this.element.css('width'));
+            },
+            'getHeight': function() {
+                return parseInt(this.element.css('height'));
             }
         }
 
@@ -1064,6 +1051,31 @@ var StoryEditor = (function() {
                 if ('addEventListener' in window) {
                     editor[0].addEventListener(type, listener, useCapture);
                 }
+            },
+            'replaceBlockImage': function(blockID, imageProps) {
+
+                var block = this.find(blockID),
+                    blockElement = block.getElement();
+
+                blockElement.attr('data-image-id', imageProps.id);
+
+                var imageLeft = 0;
+                if (block.getWidth() < imageProps.width) {
+                    imageLeft = (imageProps.width - block.getWidth()) / 2;
+                }
+
+                blockElement.find('img')
+                    .attr({
+                        'src': imageProps.url,
+                        'data-natural-width': imageProps.natural_width,
+                        'data-natural-height': imageProps.natural_height
+                    })
+                    .css({
+                        'width': imageProps.width + 'px',
+                        'height': imageProps.height + 'px',
+                        'top': 0,
+                        'left': -imageLeft + 'px'
+                    });
             }
         }
     }($editor));
@@ -1471,7 +1483,13 @@ var StoryEditor = (function() {
             return url;
         },
 
-        createEmptyBlock
+        createEmptyBlock,
+        'findBlockByID': function(id) {
+            return blockManager.find(id);
+        },
+        'replaceBlockImage': function(blockID, imageProps) {
+            blockManager.replaceBlockImage(blockID, imageProps);
+        }
     };
 })();
 
