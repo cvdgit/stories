@@ -72,6 +72,7 @@ echo FrontendRevealWidget::widget([
         PlyrAsset::class,
         RecorderAsset::class,
         SortableJsAsset::class,
+        \frontend\assets\MaphilightAsset::class,
     ],
     'plugins' => $plugins,
 ]);
