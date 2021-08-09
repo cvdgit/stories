@@ -23,6 +23,7 @@ class GuestStoryController extends Controller
 
     public function actionGenerate()
     {
+        /*
         $time = time() - (60 * 30);
 
         $query = (new Query())
@@ -52,6 +53,7 @@ class GuestStoryController extends Controller
             }
         }
         //$this->stdout('Done!' . PHP_EOL);
+        */
     }
 
     public function actionReset()
@@ -64,6 +66,7 @@ class GuestStoryController extends Controller
 
     public function actionGenerateAll()
     {
+        /*
         $query = (new Query())
             ->select(['id AS storyID'])
             ->from(Story::tableName())
@@ -82,6 +85,7 @@ class GuestStoryController extends Controller
                 $model->save(false, ['body']);
             }
         }
+        */
     }
 
 }

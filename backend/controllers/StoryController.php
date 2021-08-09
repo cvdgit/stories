@@ -3,7 +3,7 @@
 namespace backend\controllers;
 
 use backend\components\BaseController;
-use backend\components\book\BookStoryGenerator;
+//use backend\components\book\BookStoryGenerator;
 use backend\models\StoryAccessByLinkForm;
 use backend\models\StoryBatchCommandForm;
 use backend\models\WordListFromStoryForm;
@@ -29,18 +29,18 @@ class StoryController extends BaseController
     
     public $service;
     protected $editorService;
-    private $bookStoryGenerator;
+    //private $bookStoryGenerator;
 
     public function __construct($id,
                                 $module,
                                 StoryService $service,
                                 StoryEditorService $editorService,
-                                BookStoryGenerator $bookStoryGenerator,
+                                //BookStoryGenerator $bookStoryGenerator,
                                 $config = [])
     {
         $this->service = $service;
         $this->editorService = $editorService;
-        $this->bookStoryGenerator = $bookStoryGenerator;
+        //$this->bookStoryGenerator = $bookStoryGenerator;
         parent::__construct($id, $module, $config);
     }
 
@@ -270,7 +270,7 @@ class StoryController extends BaseController
         return $this->redirect(['update', 'id' => $model->id]);
     }
 
-    public function actionReadonly(int $id)
+    /*public function actionReadonly(int $id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $model = $this->findModel(Story::class, $id);
@@ -278,7 +278,7 @@ class StoryController extends BaseController
         $model->body = $html;
         $model->save(false, ['body']);
         return ['success' => true];
-    }
+    }*/
 
     public function actionText(int $id)
     {

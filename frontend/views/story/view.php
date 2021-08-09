@@ -1,28 +1,22 @@
 <?php
-
 use frontend\widgets\StoryFavorites;
 use frontend\widgets\StoryLikeWidget;
 use yii\bootstrap\Tabs;
 use yii\helpers\Html;
 use yii\helpers\Url;
-
 /* @var $this yii\web\View */
 /* @var $model common\models\Story */
 /* @var $userCanViewStory bool */
 /* @var $commentForm frontend\models\CommentForm */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-
+/** @var $guestStoryBody string */
 \frontend\assets\LazyAsset::register($this);
-//\frontend\assets\MaphilightAsset::register($this);
-
 $title = $model->title;
 $this->setMetaTags($title,
                    $model->description,
                    $model->title . ', ' . $model->title . ' сказка на ночь',
                    $title);
-
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
-
 $actionParams = array_merge(['story/init-story-player', 'id' => $model->id], Yii::$app->request->queryParams);
 $action = Url::to($actionParams);
 
@@ -138,7 +132,7 @@ $isBookView = $storyDefaultView === 'book';
                     ],
                     [
                         'label' => 'Режим чтения',
-                        'content' => $this->render('_tab_book', ['model' => $model]),
+                        'content' => $this->render('_tab_book', ['model' => $model, 'guestStoryBody' => $guestStoryBody]),
                         'active' => $isBookView,
                         'options' => ['id' => 'tab-book'],
                     ],

@@ -13,7 +13,7 @@ use yii\widgets\ActiveForm;
     echo Dropdown::widget([
         'items' => [
             ['label' => 'Выгрузить файл', 'url' => ['/story/download', 'id' => $model->id]],
-            ['label' => 'Read only история', 'url' => ['/story/readonly', 'id' => $model->id], 'linkOptions' => ['id' => 'readonly-story']],
+            //['label' => 'Read only история', 'url' => ['/story/readonly', 'id' => $model->id], 'linkOptions' => ['id' => 'readonly-story']],
             ['label' => 'Текст истории', 'url' => ['/story/text', 'id' => $model->id]],
             ['label' => 'Создать список слов (по предложениям)', 'url' => ['/word-list/make-from-story-by-proposals', 'story_id' => $model->id], 'linkOptions' => ['class' => 'story-text']],
             ['label' => 'Создать список слов (по словам)', 'url' => ['/word-list/make-from-story-by-words', 'story_id' => $model->id], 'linkOptions' => ['class' => 'story-text']],

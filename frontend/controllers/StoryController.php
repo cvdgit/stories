@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use backend\components\book\BookStoryGenerator;
 use backend\components\training\base\Serializer;
 use backend\components\training\collection\TestBuilder;
 use common\helpers\UserHelper;
@@ -65,6 +66,7 @@ class StoryController extends Controller
     protected $favoritesService;
     protected $questionsService;
     protected $audioService;
+    private $bookStoryGenerator;
 
     public function __construct($id,
                                 $module,
@@ -74,6 +76,7 @@ class StoryController extends Controller
                                 StoryFavoritesService $favoritesService,
                                 QuestionsService $questionsService,
                                 StoryAudioService $audioService,
+                                BookStoryGenerator $bookStoryGenerator,
                                 $config = [])
     {
         $this->storyService = $storyService;
@@ -82,6 +85,7 @@ class StoryController extends Controller
         $this->favoritesService = $favoritesService;
         $this->questionsService = $questionsService;
         $this->audioService = $audioService;
+        $this->bookStoryGenerator = $bookStoryGenerator;
         parent::__construct($id, $module, $config);
     }
 
@@ -169,13 +173,21 @@ class StoryController extends Controller
         $this->countersService->updateCounters($model);
 
         $commentForm = new CommentForm($model->id);
+
+        $storyDefaultView = $this->storyService->getDefaultStoryView();
+        $guestStoryBody = '';
+        if ($storyDefaultView === 'book') {
+            $guestStoryBody = $this->bookStoryGenerator->generate($model);
+        }
+
         return $this->render('view', [
             'model' => $model,
-            'storyDefaultView' => $this->storyService->getDefaultStoryView(),
+            'storyDefaultView' => $storyDefaultView,
             'commentForm' => $commentForm,
             'dataProvider' => $dataProvider,
             'trackID' => $track_id,
             'playlist' => $playlist,
+            'guestStoryBody' => $guestStoryBody,
         ]);
     }
 
