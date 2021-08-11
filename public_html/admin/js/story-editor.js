@@ -556,6 +556,7 @@ function ContentCleaner(editor) {
         });
 
         data.find('.sl-block-transform').remove();
+        data.find('.sl-block-image-controls').remove();
         data.find('.ui-resizable-handle').remove();
         data.find('.sl-block.wikids-active-block').removeClass('wikids-active-block');
         data.find('.sl-block').removeClass('ui-draggable ui-draggable-handle ui-resizable');
@@ -567,6 +568,7 @@ function ContentCleaner(editor) {
                 $elem.removeAttr('src');
                 src = src.replace(/[&|\?]+t=[0-9\.]+/g, '');
                 $elem.attr('data-src', src);
+                $elem.removeAttr('data-lazy-loaded');
             });
 
             var blockAttrNames = ['data-image-id'];
@@ -586,6 +588,7 @@ function ContentCleaner(editor) {
         var cloneBlock = block.clone();
         $('#save-container').empty().append(cloneBlock);
         cloneBlock.find('.sl-block-transform').remove();
+        cloneBlock.find('.sl-block-image-controls').remove();
         cloneBlock.find('.ui-resizable-handle').remove();
         cloneBlock.removeClass('wikids-active-block ui-draggable ui-draggable-handle ui-resizable');
         return cloneBlock[0].outerHTML;
@@ -628,18 +631,87 @@ var StoryEditor = (function() {
             //    return;
             //}
 
-            console.log('mousedown-in');
-
             if (blockManager.getActive() && $block.data('blockId') !== blockManager.getActive().getID()) {
                 unsetActiveBlock();
             }
-
             setActiveBlock($block);
         }
         else {
             unsetActiveBlock();
         }
     });
+
+    var imageMoved = false;
+    var imageOffset = [0, 0];
+    var imageMousePosition = {};
+
+    $editor
+        .on('mouseup', function(e) {
+            imageMoved = false;
+            var $block = $(e.target).parents('div.sl-block:eq(0)');
+            $block.removeClass('is-panning');
+            blockModifier.change();
+        });
+    $(document).on('mousemove', function(e) {
+        if (imageMoved) {
+            imageMousePosition = {
+                x : e.clientX,
+                y : e.clientY
+            };
+            var $blockElement = blockManager.getActive().getElement();
+            var $img = $blockElement.find('img');
+
+            var imgLeft = parseInt($img.css('left')),
+                imgTop = parseInt($img.css('top'));
+            var imgWidth = parseInt($img.css('width')),
+                imgHeight = parseInt($img.css('height'));
+
+            var left = imgLeft + (imageMousePosition.x - imageOffset[0] - $img[0].offsetLeft);
+            if (left > 0) {
+                left = 0;
+            }
+            var maxLeft = -(parseInt($img.css('width')) - parseInt($blockElement.css('width')));
+            if (left < maxLeft) {
+                left = maxLeft;
+            }
+            $img.css('left', left + 'px');
+            $img.attr('data-crop-x', (Math.abs(left) / imgWidth).toFixed(6));
+
+            var top = imgTop + (imageMousePosition.y - imageOffset[1] - $img[0].offsetTop);
+            if (top > 0) {
+                top = 0;
+            }
+            var maxTop = -(parseInt($img.css('height')) - parseInt($blockElement.css('height')));
+            if (top < maxTop) {
+                top = maxTop;
+            }
+            $img.css('top', top + 'px');
+            $img.attr('data-crop-y', (Math.abs(top) / imgHeight).toFixed(6));
+        }
+    });
+
+    $editor.on({
+        mousedown: function(e) {
+            imageMoved = true;
+            var $block = $(e.target).parents('div.sl-block:eq(0)');
+            $block.addClass('is-panning');
+            var $img = $block.find('img');
+            imageOffset = [
+                e.clientX - $img[0].offsetLeft,
+                e.clientY - $img[0].offsetTop
+            ];
+        }
+    }, '.sl-block-image-control');
+
+    function createImageBlockControls() {
+        return $('<div/>', {'class': 'sl-block-image-controls'})
+            .append(
+                $('<div/>', {
+                    'class': 'sl-block-image-control button glyphicon glyphicon-move image-move',
+                    'title': 'Кликни и двигай'
+                })
+            );
+    }
 
     $editor.on({
         mouseenter: function(e) {
@@ -656,6 +728,22 @@ var StoryEditor = (function() {
                 .find('.sl-block-transform').remove();
         }
     }, 'div.sl-block:not(.wikids-active-block)');
+
+    $editor.on({
+        mouseenter: function(e) {
+            var $block = $(e.target);
+            if (!$block.hasClass('sl-block')) {
+                $block = $(e.target).parents('div.sl-block');
+            }
+            if ($block.attr('data-block-type') === 'image' && blockManager.isCropped($block)) {
+                $block.append(createImageBlockControls());
+            }
+        },
+        mouseleave: function() {
+            $(".reveal .slides div.sl-block")
+                .find('.sl-block-image-controls').remove();
+        }
+    }, 'div.sl-block');
 
     $editor.on('dblclick', function(e) {
         var $target = $(e.target);
@@ -874,7 +962,8 @@ var StoryEditor = (function() {
             grid: [5, 5],
             snap: true,
             snapMode: "outer",
-            snapTolerance: 4
+            snapTolerance: 4,
+            cancel: '.sl-block-image-controls'
         };
         element.draggable(config);
     }
@@ -895,6 +984,37 @@ var StoryEditor = (function() {
             if (pt + ost !== opt + ost) { //top side
                 ui.position.top = opt + (ost - ui.size.height);
             }
+
+            var $element = $(event.target);
+            if (blockManager.isCropped($element)) {
+                var $img = $element.find('img');
+                if (img.height > img.width) {
+                    var widthOffset = ui.size.width - img.width;
+                    var imageHeight = img.height + (widthOffset * img.ratioH);
+                    blockManager.updateImageSize($img, ui.size.width, imageHeight);
+                }
+                else {
+                    var heightOffset = ui.size.height - img.height;
+                    var imageWidth = img.width + (heightOffset * img.ratioW);
+                    blockManager.updateImageSize($img, imageWidth, ui.size.height);
+                }
+                var left = img.left * (imageWidth / img.width);
+                var top = img.top * (imageHeight / img.height);
+                blockManager.updateImagePosition($element.find('img'), left, top);
+            }
+        }
+        var img = {};
+        function startHandler(event, ui) {
+            var $element = $(event.target);
+            if (blockManager.isCropped($element)) {
+                var $img = $element.find('img');
+                img.width = parseInt($img.css('width'));
+                img.height = parseInt($img.css('height'));
+                img.ratioW = (img.width / img.height).toFixed(6);
+                img.ratioH = (img.height / img.width).toFixed(6);
+                img.left = parseInt($img.css('left'));
+                img.top = parseInt($img.css('top'));
+            }
         }
         function stopHandler(event, ui) {
             var $element = $(event.target);
@@ -911,6 +1031,7 @@ var StoryEditor = (function() {
         }
         var resizableOptions = {
                 resize: resizeHandler,
+                start: startHandler,
                 stop: stopHandler,
                 grid: [5, 5],
                 snap: true,
@@ -1053,28 +1174,69 @@ var StoryEditor = (function() {
                 }
             },
             'replaceBlockImage': function(blockID, imageProps) {
-
                 var block = this.find(blockID),
                     blockElement = block.getElement();
-
                 blockElement.attr('data-image-id', imageProps.id);
-
-                var imageLeft = 0;
-                if (block.getWidth() < imageProps.width) {
-                    imageLeft = (imageProps.width - block.getWidth()) / 2;
+                this.updateImageAttributes(blockElement.find('img'), imageProps, {
+                    'width': block.getWidth(),
+                    'height': block.getHeight()
+                });
+                blockModifier.change();
+            },
+            'isCropped': function(blockElement) {
+                var $img = blockElement.find('img');
+                if (!$img.length) {
+                    return false;
                 }
-
-                blockElement.find('img')
+                return $img.attr('data-crop-x') !== undefined
+                       || $img.attr('data-crop-y') !== undefined
+                       || $img.attr('data-crop-width') !== undefined
+                       || $img.attr('data-crop-height') !== undefined;
+            },
+            'updateImageAttributes': function(imageElement, imageProps, blockProps) {
+                imageElement
                     .attr({
                         'src': imageProps.url,
                         'data-natural-width': imageProps.natural_width,
                         'data-natural-height': imageProps.natural_height
-                    })
+                    });
+                this.updateImageSize(imageElement, imageProps.width, imageProps.height)
+
+                var calcInitPosition = function(sizeA, sizeB) {
+                    var pos = 0;
+                    if (sizeA < sizeB) {
+                        pos = (sizeB - sizeA) / 2;
+                        pos = -Math.abs(pos);
+                    }
+                    return pos;
+                }
+                this.updateImagePosition(imageElement, calcInitPosition(blockProps.width, imageProps.width), calcInitPosition(blockProps.height, imageProps.height));
+
+                this.updateCropImageAttributes(imageElement, imageProps, blockProps);
+            },
+            'updateImagePosition': function(imageElement, left, top) {
+                imageElement
                     .css({
-                        'width': imageProps.width + 'px',
-                        'height': imageProps.height + 'px',
-                        'top': 0,
-                        'left': -imageLeft + 'px'
+                        'left': left + 'px',
+                        'top': top + 'px'
+                    });
+            },
+            'updateImageSize': function(imageElement, width, height) {
+                imageElement
+                    .css({
+                        'width': width + 'px',
+                        'height': height + 'px'
+                    });
+            },
+            'updateCropImageAttributes': function(imageElement, imageProps, blockProps) {
+                var imageLeft = Math.abs(parseInt(imageElement.css('left')));
+                var imageTop = Math.abs(parseInt(imageElement.css('top')));
+                imageElement
+                    .attr({
+                        'data-crop-x': (imageLeft / imageProps.width).toFixed(6),
+                        'data-crop-y': (imageTop / imageProps.height).toFixed(6),
+                        'data-crop-width': (blockProps.width / imageProps.width).toFixed(6),
+                        'data-crop-height': (blockProps.height / imageProps.height).toFixed(6)
                     });
             }
         }
@@ -1379,8 +1541,64 @@ var StoryEditor = (function() {
         if (element === null) {
             return;
         }
-        blockModifier.setWidth(element, element.find('img').attr('data-natural-width') + 'px');
-        blockModifier.setHeight(element, element.find('img').attr('data-natural-height') + 'px');
+        var $img = element.find('img');
+        if (blockManager.isCropped(element)) {
+
+            function getImageOptions(blockProps, imageProps) {
+                var imageRatioH = (imageProps.height / imageProps.width);
+                var widthOffset = blockProps.width - imageProps.width;
+                var imageHeight = imageProps.height + (widthOffset * imageRatioH);
+                var imageRatioW = (imageProps.width / imageProps.height);
+                var heightOffset = blockProps.height - imageProps.height;
+                var imageWidth = imageProps.width + (heightOffset * imageRatioW);
+                var width, height;
+                if (imageProps.height > imageProps.width) {
+                    width = blockProps.width;
+                    height = imageHeight;
+                }
+                else {
+                    width = imageWidth;
+                    height = blockProps.height;
+                }
+                var left = imageProps.left * (imageWidth / imageProps.width);
+                if (left > 0) {
+                    left = 0;
+                }
+                var maxLeft = -(imageWidth - blockProps.width);
+                if (left < maxLeft) {
+                    left = maxLeft;
+                }
+                return {
+                    width,
+                    height,
+                    left,
+                    top: imageProps.top * (imageHeight / imageProps.height)
+                }
+            }
+
+            var height = parseInt($img.attr('data-natural-height'));
+            var ratio = parseFloat(element.css('width')) / parseFloat(element.css('height'));
+            var width = (height * ratio).toFixed(6);
+
+            blockModifier.setWidth(element, width + "px");
+            blockModifier.setHeight(element, height + "px");
+
+            var blockProps = {width, height};
+            var imageProps = {
+                width: parseInt($img.attr('data-natural-width')),
+                height: parseInt($img.attr('data-natural-height')),
+                left: parseFloat($img.css('left')),
+                top: parseFloat($img.css('top'))
+            };
+            var imageOptions = getImageOptions(blockProps, imageProps);
+
+            blockManager.updateImageSize($img, imageOptions.width, imageOptions.height);
+            blockManager.updateImagePosition($img, imageOptions.left, imageOptions.top);
+        }
+        else {
+            blockModifier.setWidth(element, $img.attr('data-natural-width') + 'px');
+            blockModifier.setHeight(element, $img.attr('data-natural-height') + 'px');
+        }
         blockAlignment.slideCenter(element);
     }
 

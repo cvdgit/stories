@@ -18,15 +18,15 @@ class ImageBlockMarkup extends AbstractMarkup
     private function getElementMarkup(ImageBlock $block): string
     {
         $element = $this->getElement();
-        return Html::tag($element->getTagName(), '', [
-            'data-src' => $block->getFilePath(),
-            'data-natural-width' => $block->getNaturalWidth(),
-            'data-natural-height' => $block->getNaturalHeight(),
-            'data-action' => $block->getAction(),
-            'data-action-story' => $block->getActionStoryID(),
-            'data-action-slide' => $block->getActionSlideID(),
-            'data-backtonextslide' => $block->getBackToNextSlide(),
-        ]);
+        $options = $block->getElementAttributes();
+        $options['data-src'] = $block->getFilePath();
+        $options['data-natural-width'] = $block->getNaturalWidth();
+        $options['data-natural-height'] = $block->getNaturalHeight();
+        $options['data-action'] = $block->getAction();
+        $options['data-action-story'] = $block->getActionStoryID();
+        $options['data-action-slide'] = $block->getActionSlideID();
+        $options['data-backtonextslide'] = $block->getBackToNextSlide();
+        return Html::tag($element->getTagName(), '', $options);
     }
 
     public function markup(): string

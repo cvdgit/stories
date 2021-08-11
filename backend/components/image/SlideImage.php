@@ -48,6 +48,19 @@ class SlideImage
         return new ImageSize($imageWidth, $imageHeight);
     }
 
+    public function getBlockImageSize(int $blockWidth, int $blockHeight): ImageSize
+    {
+        $ratio = $this->imageWidth / $this->imageHeight;
+        if ($blockWidth / $blockHeight > $ratio) {
+            $imageHeight = $blockWidth / $ratio;
+            $imageWidth = $blockWidth;
+        } else {
+            $imageWidth = $blockHeight * $ratio;
+            $imageHeight = $blockHeight;
+        }
+        return new ImageSize($imageWidth, $imageHeight);
+    }
+
     public function getResizeImageSize(): ImageSize
     {
         if (!$this->needResize()) {

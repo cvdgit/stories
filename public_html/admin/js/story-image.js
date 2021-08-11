@@ -55,8 +55,25 @@
             'r': 'editor/image/reload-story-images',
             'story_id': storyID
         });
-    }
+    };
 
+    editor.replaceImage = function(imageID, blockID) {
+        if (!imageID) {
+            throw "replaceImage: imageID is null";
+        }
+        if (!blockID) {
+            throw "replaceImage: blockID is null";
+        }
+        var block = editor.findBlockByID(blockID);
+        return $.getJSON('/admin/index.php', {
+            'r': 'editor/image/replace-image',
+            'slide_id': editor.getCurrentSlideID(),
+            'image_id': imageID,
+            'block_id': blockID,
+            'width': block.getWidth(),
+            'height': block.getHeight()
+        });
+    };
 
     /*
     var $modal = $("#story-images-modal");

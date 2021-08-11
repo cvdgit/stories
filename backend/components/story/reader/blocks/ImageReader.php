@@ -16,6 +16,7 @@ class ImageReader extends AbstractBlockReader implements BlockReaderInterface
         $block->setBlockAttributes($this->pqBlock->attr('*'));
 
         $element = $this->pqBlock->find('img');
+        $block->setElementAttributes($element->attr('*'));
         $block->setFilePath($element->attr('data-src'));
         $block->setAction($element->attr('data-action'));
         $block->setActionStoryID($element->attr('data-action-story'));

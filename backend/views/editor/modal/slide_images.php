@@ -58,16 +58,34 @@ use backend\widgets\SelectStoryWidget;
 <?php
 $js = <<< JS
 
-function changeStoryImages() {
+function changeStoryImages(replaceBlockID) {
     
     function addEventListeners(list) {
         list
             .off('click')
             .on('click', '[data-image-id]', function() {
                 var imageID = $(this).data('imageId');
-                StoryEditor.addImage(imageID).always(function() {
-                    $('#story-images-modal').modal('hide');
-                });
+                if (replaceBlockID) {
+                    StoryEditor.replaceImage(imageID, replaceBlockID)
+                        .done(function(response) {
+                            StoryEditor.replaceBlockImage(replaceBlockID, {
+                                id: imageID,
+                                url: response.image_path,
+                                width: response.width,
+                                height: response.height,
+                                natural_width: response.natural_width,
+                                natural_height: response.natural_height
+                            })
+                        })
+                        .always(function() {
+                            $('#story-images-modal').modal('hide');
+                        });
+                }
+                else {
+                    StoryEditor.addImage(imageID).always(function() {
+                        $('#story-images-modal').modal('hide');
+                    });
+                }
             })
             .on('click', '.delete-image', function(e) {
                 e.stopPropagation();
@@ -132,18 +150,25 @@ function changeStoryImages() {
 
 (function() {
     
+    var replaceBlockID;
+    
     function getCurrentStoryID() {
         return $('#select-story-images').data('selectize').getValue();
     }
     
-    $('#story-images-modal').on('show.bs.modal', function() {
-        changeStoryImages();
-    });
+    $('#story-images-modal')
+        .on('show.bs.modal', function() {
+            replaceBlockID = $(this).data('blockId');
+            changeStoryImages(replaceBlockID);
+        })
+        .on('hide.bs.modal', function() {
+            $(this).removeData('blockId');
+        });
 
     $('#reload-story-images').on('click', function() {
         StoryEditor.reloadStoryImage(getCurrentStoryID()).done(function(response) {
             if (response && response.success) {
-                changeStoryImages();
+                changeStoryImages(replaceBlockID);
             }
         });
     });

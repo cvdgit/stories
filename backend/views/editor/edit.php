@@ -161,6 +161,11 @@ $js = <<< JS
             });
         modal.modal({'remote': action});
     };
+    editorConfig.onImageReplace = function(blockID) {
+        $('#story-images-modal')
+            .data('blockId', blockID)
+            .modal('show');
+    }
     editorConfig.onInit = function() {
     }
     StoryEditor.initialize(editorConfig);

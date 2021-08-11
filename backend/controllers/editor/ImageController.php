@@ -4,6 +4,7 @@ namespace backend\controllers\editor;
 
 use backend\components\BaseController;
 use backend\components\image\PowerPointImage;
+use backend\components\image\SlideImage;
 use backend\components\story\ImageBlock;
 use backend\models\editor\CropImageForm;
 use backend\models\editor\ImageForm;
@@ -394,10 +395,39 @@ class ImageController extends BaseController
         if ($form->load(Yii::$app->request->post()) && $form->validate()) {
             /** @var Story $storyModel */
             $storyModel = $this->findModel(Story::class, $form->story_id);
-            $form->uploadImage($storyModel);
-            $form->createStoryImageLink($storyModel->id);
-            return ['success' => true];
+            try {
+                $form->uploadImage($storyModel);
+                $form->createStoryImageLink($storyModel->id);
+                return ['success' => true];
+            }
+            catch (\Exception $ex) {
+                return ['success' => false, 'errors' => $form->getErrors()];
+            }
         }
         return ['success' => false, 'errors' => $form->getErrors()];
+    }
+
+    public function actionReplaceImage(int $slide_id, int $image_id, string $block_id, int $width, int $height)
+    {
+        /** @var StorySlide $slideModel */
+        $slideModel = $this->findModel(StorySlide::class, $slide_id);
+        /** @var StorySlideImage $imageModel */
+        $imageModel = $this->findModel(StorySlideImage::class, $image_id);
+
+        ImageSlideBlock::deleteImageBlock($slideModel->id, $block_id);
+        $imageSlideBlockModel = ImageSlideBlock::create($imageModel->id, $slideModel->id, $block_id);
+        $imageSlideBlockModel->save();
+
+        $image = new SlideImage($imageModel->getImagePath());
+        $imageSize = $image->getBlockImageSize($width, $height);
+
+        return [
+            'success' => true,
+            'image_path' => $imageModel->imageUrl(),
+            'width' => $imageSize->getWidth(),
+            'height' => $imageSize->getHeight(),
+            'natural_width' => $image->getNaturalSize()->getWidth(),
+            'natural_height' => $image->getNaturalSize()->getHeight(),
+        ];
     }
 }

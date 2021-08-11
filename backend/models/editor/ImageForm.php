@@ -41,7 +41,7 @@ class ImageForm extends BaseForm
     public function rules()
     {
         return array_merge(parent::rules(), [
-            ['image', 'image', 'maxSize' => 7 * 1024 * 1024, 'skipOnError' => false, 'extensions' => ['bmp', 'gif', 'jpg', 'jpeg', 'png']],
+            ['image', 'file', 'maxSize' => 7 * 1024 * 1024, 'skipOnError' => false, 'mimeTypes' => ['image/*'], 'extensions' => ['bmp', 'gif', 'jpg', 'jpeg', 'png']],
             [['action', 'actionSlideID', 'actionStoryID', 'back_to_next_slide', 'story_id', 'image_id'], 'integer'],
             [['imagePath', 'what', 'imageID'], 'string'],
         ]);

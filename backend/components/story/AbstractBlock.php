@@ -28,6 +28,8 @@ abstract class AbstractBlock
 
     private $blockAttributes = [];
 
+    private $elementAttributes = [];
+
     public function __construct()
     {
         $this->id = $this->generateID();
@@ -199,5 +201,25 @@ abstract class AbstractBlock
     public function setBlockAttributes(array $attrs): void
     {
         $this->blockAttributes = $attrs;
+    }
+
+    public function setElementAttributes(array $attrs): void
+    {
+        $this->elementAttributes = $attrs;
+    }
+
+    public function setElementAttribute(string $name, $value): void
+    {
+        $this->elementAttributes[$name] = $value;
+    }
+
+    public function getElementAttribute(string $name)
+    {
+        return $this->elementAttributes[$name] ?? null;
+    }
+
+    public function getElementAttributes(): array
+    {
+        return $this->elementAttributes;
     }
 }

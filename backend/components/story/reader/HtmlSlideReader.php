@@ -99,6 +99,7 @@ class HtmlSlideReader implements ReaderInterface
         $block->setType(AbstractBlock::TYPE_IMAGE);
 
         $element = pq($htmlBlock)->find('img');
+        $block->setElementAttributes($element->attr('*'));
         $block->setFilePath($element->attr('data-src'));
 
         $block->setAction($element->attr('data-action'));
