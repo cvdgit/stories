@@ -650,7 +650,7 @@ var StoryEditor = (function() {
             imageMoved = false;
             var $block = $(e.target).parents('div.sl-block:eq(0)');
             $block.removeClass('is-panning');
-            blockModifier.change();
+            //blockModifier.change();
         });
     $(document).on('mousemove', function(e) {
         if (imageMoved) {
