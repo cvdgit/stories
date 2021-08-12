@@ -647,10 +647,12 @@ var StoryEditor = (function() {
 
     $editor
         .on('mouseup', function(e) {
+            if (imageMoved) {
+                blockModifier.change();
+            }
             imageMoved = false;
             var $block = $(e.target).parents('div.sl-block:eq(0)');
             $block.removeClass('is-panning');
-            //blockModifier.change();
         });
     $(document).on('mousemove', function(e) {
         if (imageMoved) {
