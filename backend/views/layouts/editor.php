@@ -50,6 +50,12 @@ JS;
 </head>
 <body>
 <?php $this->beginBody() ?>
+<div class="page-loader">
+    <div class="page-loader-inner">
+        <div class="page-loader-spinner"></div>
+        <p class="page-loader-message">Загрузка редактора</p>
+    </div>
+</div>
 <?= $content ?>
 <?php $this->endBody() ?>
 </body>

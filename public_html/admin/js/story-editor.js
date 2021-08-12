@@ -938,7 +938,7 @@ var StoryEditor = (function() {
         });
 
         loadSlides().done(function() {
-
+            config.onReady();
         });
 
         config.onInit();

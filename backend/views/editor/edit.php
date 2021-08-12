@@ -168,6 +168,9 @@ $js = <<< JS
     }
     editorConfig.onInit = function() {
     }
+    editorConfig.onReady = function() {
+        $('.page-loader').addClass('loaded');
+    }
     StoryEditor.initialize(editorConfig);
     
     function initSelectStoryWidget(root) {
