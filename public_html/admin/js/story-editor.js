@@ -880,7 +880,9 @@ var StoryEditor = (function() {
                 $list.append(createToolbarItem('Изменить', 'pencil', 'edit'));
             }
             if (activeBlock.typeIsImage() || activeBlock.typeIsVideo() || activeBlock.typeIsHtml()) {
-                $list.append(createToolbarItem('Заменить', 'circle-arrow-down', 'replace'));
+                if (activeBlock.typeIsImage()) {
+                    $list.append(createToolbarItem('Заменить', 'circle-arrow-down', 'replace'));
+                }
                 $list.append(createToolbarItem('Растянуть', 'resize-full', 'stretch'));
             }
             if (activeBlock.typeIsImage()) {
