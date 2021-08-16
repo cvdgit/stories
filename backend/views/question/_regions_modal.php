@@ -4,17 +4,17 @@ use backend\assets\TestQuestionAsset;
 /** @var $model backend\models\question\UpdateRegionQuestion */
 /** @var $this yii\web\View */
 $css = <<< CSS
-body .modal-dialog {
+#regions-modal .modal-dialog {
     max-width: 100%;
     width: auto !important;
     display: inline-block;
 }
-.modal {
+#regions-modal {
   z-index: -1;
   display: flex !important;
   justify-content: center;
 }
-.modal-open .modal {
+.modal-open #regions-modal {
    z-index: 1050;
 }
 .image-container-wrapper {

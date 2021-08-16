@@ -1,6 +1,7 @@
 <?php
 use backend\assets\SortableJsAsset;
 use backend\models\question\QuestionType;
+use backend\widgets\QuestionSlidesWidget;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
@@ -27,18 +28,19 @@ SortableJsAsset::register($this);
     <?php endif ?>
     <div class="story-test-form">
         <div class="row">
-            <div class="col-md-7">
+            <div class="col-md-6">
                 <?php $form = ActiveForm::begin(['id' => 'update-sequence-question-form']); ?>
                 <?= $form->field($model, 'story_test_id')->hiddenInput()->label(false) ?>
                 <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
                 <?= $form->field($model, 'type')->dropDownList(QuestionType::asArray(), ['disabled' => true]) ?>
                 <?= $form->field($model, 'answers')->hiddenInput()->label(false) ?>
+                <?= QuestionSlidesWidget::widget(['model' => $model->getModel()]) ?>
                 <div class="form-group">
                     <?= Html::submitButton('Изменить вопрос', ['class' => 'btn btn-success']) ?>
                 </div>
                 <?php ActiveForm::end(); ?>
             </div>
-            <div class="col-md-5">
+            <div class="col-md-6">
                 <form class="form-inline" id="create-answers-form" style="margin-bottom: 10px">
                     <div class="form-group">
                         <label for="answerText"></label>

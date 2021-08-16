@@ -20,6 +20,8 @@ class QuestionModel extends Model
     public $mix_answers;
     public $imageFile;
 
+    private $model;
+
     public function rules()
     {
         return [
@@ -75,4 +77,8 @@ class QuestionModel extends Model
         }
     }
 
+    public function getModel(): ?StoryTestQuestion
+    {
+        return $this->model;
+    }
 }

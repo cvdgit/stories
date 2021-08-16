@@ -1,5 +1,6 @@
 <?php
 use backend\models\question\QuestionType;
+use backend\widgets\QuestionSlidesWidget;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
@@ -39,12 +40,13 @@ $this->registerCss($css);
     <div class="story-test-form">
         <?php $form = ActiveForm::begin(['id' => 'update-region-question-form']); ?>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-8">
                 <?= $form->field($model, 'test_id')->hiddenInput()->label(false) ?>
                 <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
                 <?= $form->field($model, 'type')->dropDownList(QuestionType::asArray(), ['readonly' => true]) ?>
                 <?= $form->field($model, 'imageFile')->fileInput() ?>
                 <?= $form->field($model, 'regions')->hiddenInput()->label(false) ?>
+                <?= QuestionSlidesWidget::widget(['model' => $model->getModel()]) ?>
                 <?php if ($model->hasImage()): ?>
                 <div class="row">
                     <div class="col-md-12">

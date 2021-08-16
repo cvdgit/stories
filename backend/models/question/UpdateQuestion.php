@@ -28,6 +28,11 @@ class UpdateQuestion extends QuestionModel
         }
     }
 
+    public function getModel(): StoryTestQuestion
+    {
+        return $this->model;
+    }
+
     public function getModelID()
     {
         return $this->model->id;

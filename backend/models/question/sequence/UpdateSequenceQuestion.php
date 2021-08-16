@@ -77,4 +77,8 @@ class UpdateSequenceQuestion extends SequenceQuestion
         }
     }
 
+    public function getModel(): ?StoryTestQuestion
+    {
+        return $this->model;
+    }
 }

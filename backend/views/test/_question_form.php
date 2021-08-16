@@ -1,25 +1,15 @@
 <?php
+use backend\widgets\QuestionSlidesWidget;
 use common\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\helpers\Html;
-use yii\helpers\Json;
 use yii\widgets\ActiveForm;
 /** @var $this yii\web\View */
 /** @var $model backend\models\question\QuestionModel */
 /** @var $form yii\widgets\ActiveForm */
 /** @var $dataProvider yii\data\ActiveDataProvider */
 $isNewRecord = $model instanceof \backend\models\question\CreateQuestion;
-$css = <<<CSS
-.question-slides-block {
-    margin: 30px 0;
-}
-.question-slides-block h4 {
-    height: 35px;
-    line-height: 35px;
-}
-CSS;
-$this->registerCss($css);
 ?>
 <div class="story-test-form">
     <div class="row">
@@ -39,23 +29,7 @@ $this->registerCss($css);
             </div>
             <?php endif ?>
             <?php if (!$isNewRecord): ?>
-                <div class="question-slides-block">
-                    <h4>Связанные слайды <span class="pull-right"><button class="btn btn-primary" type="button" id="manage-slides">Выбрать слайды</button></span></h4>
-                    <table class="table table-bordered" id="question-slides-list">
-                        <thead>
-                        <tr>
-                            <th>№</th>
-                            <th>История</th>
-                            <th>Слайд</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td colspan="3">Пусто</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <?= QuestionSlidesWidget::widget(['model' => $model->getModel()]) ?>
             <?php endif ?>
             <div class="form-group">
                 <?= Html::submitButton(($isNewRecord ? 'Создать' : 'Изменить') . ' вопрос', ['class' => 'btn btn-success']) ?>
@@ -130,51 +104,11 @@ $this->registerCss($css);
         </div>
     </div>
 </div-->
-
-<div class="modal remote fade" id="manage-question-slides-modal">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content"></div>
-    </div>
-</div>
-
 <?php
 $questionID = $isNewRecord ? '' : $model->getModelID();
-$remote = '';
-if (!$isNewRecord) {
-    $remote = Url::to(['question-slides/manage', 'question_id' => $model->getModelID()]);
-}
-$questionSlides = Json::encode($model->getStorySlides());
 $js = <<< JS
-window['createQuestionSlideList'] = function(slides) {
-    var list = $('#question-slides-list tbody');
-    list.empty();
-    if (slides.length === 0) {
-        list.append('<tr><td colspan="3">Пусто</td></tr>')
-    }
-    slides.forEach(function(item, i) {
-        $('<tr/>')
-            .append($('<td/>').text(++i))
-            .append($('<td/>').text(item.story))
-            .append($('<td/>').text(item.number))
-            .appendTo(list);
-    });
-};
 (function() {
     "use strict";
-    
-    var questionSlides = $questionSlides;
-    createQuestionSlideList(questionSlides);
-    
-    var modal = $('#manage-question-slides-modal');
-    
-    $('#manage-slides').on('click', function() {
-        modal.modal({'remote': '$remote'});
-    });
-    
-    modal.on('loaded.bs.modal', function() {
-
-    });
-    
     /*
     var questionID = '$questionID';
     
