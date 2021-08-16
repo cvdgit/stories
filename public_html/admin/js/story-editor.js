@@ -789,6 +789,10 @@ var StoryEditor = (function() {
                 $(blockElement).draggable('destroy');
             }
 
+            if ($(blockElement).data('ui-resizable')) {
+                $(blockElement).resizable('destroy');
+            }
+
             elem.prop('contenteditable', true);
 
             var ed = CKEDITOR.inline(elem[0], {
@@ -1002,11 +1006,6 @@ var StoryEditor = (function() {
 
     function makeResizable(element, config) {
 
-        function calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {
-            var ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
-            return { width: srcWidth*ratio, height: srcHeight*ratio };
-        }
-
         function resizeHandler(event, ui) {
             var zoomScale = Reveal.getScale();
             var opl = ui.originalPosition.left, opt = ui.originalPosition.top,
@@ -1024,14 +1023,11 @@ var StoryEditor = (function() {
 
             var $element = $(event.target);
             if (blockManager.isCropped($element)) {
-
                 var $img = $element.find('img');
-
                 var widthOffset = ui.size.width - img.width;
                 var heightOffset = ui.size.height - img.height;
                 var imageHeight = img.height + (widthOffset * img.ratioH);
                 var imageWidth = img.width + (heightOffset * img.ratioW);
-
                 if (imageHeight > imageWidth) {
                     blockManager.updateImageSize($img, ui.size.width, imageHeight);
                 }
