@@ -58,13 +58,15 @@ use backend\widgets\SelectStoryWidget;
 <?php
 $js = <<< JS
 
-function changeStoryImages(replaceBlockID) {
+function changeStoryImages() {
     
     function addEventListeners(list) {
         list
             .off('click')
             .on('click', '[data-image-id]', function() {
                 var imageID = $(this).data('imageId');
+                var replaceBlockID = $('#story-images-modal').data('blockId');
+                var placeholderBlockID = $('#story-images-modal').data('placeholderId');
                 if (replaceBlockID) {
                     StoryEditor.replaceImage(imageID, replaceBlockID)
                         .done(function(response) {
@@ -75,16 +77,25 @@ function changeStoryImages(replaceBlockID) {
                                 height: response.height,
                                 natural_width: response.natural_width,
                                 natural_height: response.natural_height
-                            })
+                            });
                         })
                         .always(function() {
                             $('#story-images-modal').modal('hide');
                         });
                 }
                 else {
-                    StoryEditor.addImage(imageID).always(function() {
-                        $('#story-images-modal').modal('hide');
-                    });
+                    StoryEditor.addImage(imageID)
+                        .done(function(response) {
+                            if (response && response.success) {
+                                StoryEditor.createSlideBlock(response.html, placeholderBlockID);
+                            }
+                            else {
+                                toastr.error(response.errors);
+                            }
+                        })
+                        .always(function() {
+                            $('#story-images-modal').modal('hide');
+                        });
                 }
             })
             .on('click', '.delete-image', function(e) {
@@ -149,26 +160,34 @@ function changeStoryImages(replaceBlockID) {
 }
 
 (function() {
-    
-    var replaceBlockID;
-    
+
     function getCurrentStoryID() {
         return $('#select-story-images').data('selectize').getValue();
     }
     
     $('#story-images-modal')
         .on('show.bs.modal', function() {
-            replaceBlockID = $(this).data('blockId');
-            changeStoryImages(replaceBlockID);
+            changeStoryImages();
+        })
+        .on('shown.bs.modal', function() {
+            var mode = $(this).data('mode');
+            if (mode === 'insert') {
+                var html = StoryEditor.createImagePlaceholder();
+                var placeholderID = StoryEditor.createSlideBlock(html);
+                $(this).data('placeholderId', placeholderID);
+            }
         })
         .on('hide.bs.modal', function() {
-            $(this).removeData('blockId');
+            $(this)
+                .removeData('blockId')
+                .removeData('placeholderId')
+                .removeData('mode');
         });
 
     $('#reload-story-images').on('click', function() {
         StoryEditor.reloadStoryImage(getCurrentStoryID()).done(function(response) {
             if (response && response.success) {
-                changeStoryImages(replaceBlockID);
+                changeStoryImages();
             }
         });
     });

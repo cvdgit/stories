@@ -97,28 +97,29 @@ class HtmlSlideReader implements ReaderInterface
     {
         $block = new ImageBlock();
         $block->setType(AbstractBlock::TYPE_IMAGE);
+        $block->setId(pq($htmlBlock)->attr('data-block-id'));
+        $block->setBlockAttributes(pq($htmlBlock)->attr('*'));
 
         $element = pq($htmlBlock)->find('img');
-        $block->setElementAttributes($element->attr('*'));
-        $block->setFilePath($element->attr('data-src'));
-
-        $block->setAction($element->attr('data-action'));
-        $block->setActionStoryID($element->attr('data-action-story'));
-        $block->setActionSlideID($element->attr('data-action-slide'));
-
-        $block->setBackToNextSlide($element->attr('data-backtonextslide'));
-
-        $block->setId(pq($htmlBlock)->attr('data-block-id'));
-
         $style = pq($htmlBlock)->attr('style');
-        $width = str_replace('px', '', $this->getStyleValue($style, 'width'));
-        $height = str_replace('px', '', $this->getStyleValue($style, 'height'));
-        $block->setImageSize($element->attr('data-src'), $width, $height);
-        $block->setNaturalImageSize($element->attr('data-natural-width'), $element->attr('data-natural-height'));
+        if ($element->length > 0) {
 
-        $imageSourceElement = pq($htmlBlock)->find('span');
-        if ($imageSourceElement->length > 0) {
-            $block->setImageSource($imageSourceElement->text());
+            $block->setElementAttributes($element->attr('*'));
+            $block->setFilePath($element->attr('data-src'));
+            $block->setAction($element->attr('data-action'));
+            $block->setActionStoryID($element->attr('data-action-story'));
+            $block->setActionSlideID($element->attr('data-action-slide'));
+            $block->setBackToNextSlide($element->attr('data-backtonextslide'));
+            $block->setNaturalImageSize($element->attr('data-natural-width'), $element->attr('data-natural-height'));
+
+            $width = str_replace('px', '', $this->getStyleValue($style, 'width'));
+            $height = str_replace('px', '', $this->getStyleValue($style, 'height'));
+            $block->setImageSize($element->attr('data-src'), $width, $height);
+
+            $imageSourceElement = pq($htmlBlock)->find('span');
+            if ($imageSourceElement->length > 0) {
+                $block->setImageSource($imageSourceElement->text());
+            }
         }
 
         $this->loadBlockProperties($block, $style);

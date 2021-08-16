@@ -218,6 +218,11 @@ $js = <<< JS
                     $('#imagefromurlform-slide_id', this).val(StoryEditor.getCurrentSlideID());
                 })
                 .modal('show');
+        }},
+        {'name': 'manager', 'title': 'Менеджер', 'click': function() {
+            $('#story-images-modal')
+                .data('mode', 'insert')
+                .modal('show');
         }}
     ]);
 

@@ -46,6 +46,7 @@ class StoryService
             $command->delete('{{%story_slide_image}}', ['in', 'id', $imageIDs])->execute();
         }
         $command->delete('{{%story_slide}}', 'story_id = :story', [':story' => $storyModel->id])->execute();
+        $command->delete('{{%story_story_slide_image}}', 'story_id = :story', [':story' => $storyModel->id])->execute();
 
         $writer = new HTMLWriter();
         $slides = $story->getSlides();

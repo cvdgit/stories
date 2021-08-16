@@ -17,9 +17,12 @@ class ImageBlockMarkup extends AbstractMarkup
 
     private function getElementMarkup(ImageBlock $block): string
     {
+        if (($filePath = $block->getFilePath()) === null) {
+            return '';
+        }
         $element = $this->getElement();
         $options = $block->getElementAttributes();
-        $options['data-src'] = $block->getFilePath();
+        $options['data-src'] = $filePath;
         $options['data-natural-width'] = $block->getNaturalWidth();
         $options['data-natural-height'] = $block->getNaturalHeight();
         $options['data-action'] = $block->getAction();

@@ -796,3 +796,20 @@ body {
     color: #bbb;
     font-family: Helvetica, sans-serif;
 }
+
+.reveal .sl-block .sl-block-placeholder {
+    background-image: url(/img/image-placeholder-white.svg);
+    background-size: contain;
+    background-color: #222;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    opacity: 0.9;
+}
+
+.reveal .sl-block .sl-block-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+}

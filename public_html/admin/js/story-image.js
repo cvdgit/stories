@@ -27,15 +27,7 @@
             cache: false,
             contentType: false,
             processData: false
-        })
-            .done(function(response) {
-                if (response && response.success) {
-                    editor.createSlideBlock(response.html);
-                }
-                else {
-                    toastr.error(response.errors);
-                }
-            });
+        });
     };
 
     editor.deleteImage = function(imageID) {

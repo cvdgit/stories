@@ -316,7 +316,6 @@ class EditorController extends BaseController
         return array_map(static function(StorySlide $slide) {
             $slideData = (new SlideModifier($slide->id, $slide->data))
                 ->addImageId()
-                //->addImageParams()
                 ->addDescription()
                 ->render();
             return [

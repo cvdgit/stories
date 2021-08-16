@@ -54,6 +54,7 @@ function DataModifier(slideManager, cleaner) {
 
     this.saved = true;
     this.data = {};
+    this.editorData = {};
 
     var indicator = $('#save-data');
 
@@ -92,10 +93,10 @@ function DataModifier(slideManager, cleaner) {
             clearTimeout(timeout);
         }
         timeout = setTimeout(function() {
-            var deferreds = []
+            var deferreds = [];
             Object.keys(that.data).forEach(function(key) {
                 deferreds.push(action(that.data[key], key).done(function() {
-                    that.slideManager.updateSlideData(key, that.data[key]);
+                    that.slideManager.updateSlideData(key, that.editorData[key]);
                     delete that.data[key];
                 }));
             });
@@ -109,6 +110,7 @@ function DataModifier(slideManager, cleaner) {
     this.change = function() {
         this.saved = false;
         this.data[slideManager.getCurrentSlideID()] = cleaner.cleanSlideContent(true);
+        this.editorData[slideManager.getCurrentSlideID()] = cleaner.cleanSlideContent();
         startTimeout();
         haveChanges();
     }
@@ -280,6 +282,18 @@ SlideManager.prototype = {
             return deck;
         }
 
+        function modifySlide(data) {
+            var $data = $(data);
+            $data.find('div[data-block-type=image].sl-block')
+                .each(function() {
+                    if (!$(this).find('img').length) {
+                        $('<div/>', {'class': 'sl-block-overlay sl-block-placeholder'})
+                            .appendTo($(this).find('div.sl-block-content'));
+                    }
+                });
+            return $data[0].outerHTML;
+        }
+
         this.decks = [];
         this.slides = [];
 
@@ -294,7 +308,11 @@ SlideManager.prototype = {
             }
             var $element;
             data.forEach(function(slide, i) {
+
+                slide.data = modifySlide(slide.data);
+
                 that.slides[slide.id] = slide;
+
                 $element = $('<div/>', {
                     'class': 'thumb-reveal-wrapper' + (slide.isHidden ? ' slide-hidden' : ''),
                     'data-slide-id': slide.id
@@ -559,7 +577,7 @@ function ContentCleaner(editor) {
         data.find('.sl-block-image-controls').remove();
         data.find('.ui-resizable-handle').remove();
         data.find('.sl-block.wikids-active-block').removeClass('wikids-active-block');
-        data.find('.sl-block').removeClass('ui-draggable ui-draggable-handle ui-resizable');
+        data.find('.sl-block').removeClass('ui-draggable ui-draggable-handle ui-draggable-dragging ui-resizable');
 
         if (save) {
             data.find('img').each(function () {
@@ -577,6 +595,9 @@ function ContentCleaner(editor) {
                 blockAttrNames.forEach(function(blockAttrName) {
                     $elem.removeAttr(blockAttrName);
                 });
+                if ($elem.find('.sl-block-placeholder').length) {
+                    $elem.find('.sl-block-placeholder').remove();
+                }
             });
             data.find('div.new-questions').text('');
             data.find('div.wikids-video-player').text('');
@@ -618,19 +639,12 @@ var StoryEditor = (function() {
     var $editor = $('#story-editor');
 
     $editor.on('mousedown', function(e) {
-
         var $target = $(e.target);
         if ($target.hasClass('sl-block') || $target.parents('.sl-block').length) {
-
             var $block = $(e.target);
             if (!$block.hasClass('sl-block')) {
                 $block = $(e.target).parents('div.sl-block');
             }
-
-            //if ($block.hasClass('is-editing')) {
-            //    return;
-            //}
-
             if (blockManager.getActive() && $block.data('blockId') !== blockManager.getActive().getID()) {
                 unsetActiveBlock();
             }
@@ -878,21 +892,32 @@ var StoryEditor = (function() {
 
             var $list = $('<ul/>');
             var activeBlock = blockManager.getActive();
-            if (!activeBlock.typeIsText()) {
+
+            if (!activeBlock.typeIsText() && !activeBlock.isPlaceholder()) {
                 $list.append(createToolbarItem('Изменить', 'pencil', 'edit'));
             }
+
+            if (activeBlock.isPlaceholder()) {
+                $list.append(createToolbarItem('Выбрать', 'picture', 'select-image'));
+            }
+
             if (activeBlock.typeIsImage() || activeBlock.typeIsVideo() || activeBlock.typeIsHtml()) {
-                if (activeBlock.typeIsImage()) {
+                if (activeBlock.typeIsImage() && !activeBlock.isPlaceholder()) {
                     $list.append(createToolbarItem('Заменить', 'circle-arrow-down', 'replace'));
                 }
                 $list.append(createToolbarItem('Растянуть', 'resize-full', 'stretch'));
             }
-            if (activeBlock.typeIsImage()) {
+
+            if (activeBlock.typeIsImage() && !activeBlock.isPlaceholder()) {
                 $list.append(createToolbarItemGroup([{'title': '1:1', 'action': 'natural-size'}]));
             }
+
             $list.append(createToolbarItem('Положение', 'align-center','align'));
             $list.append(createToolbarItem('Удалить', 'trash', 'delete'));
-            $list.append(createToolbarItem('Копировать', 'duplicate', 'duplicate'));
+
+            if (!activeBlock.isPlaceholder()) {
+                $list.append(createToolbarItem('Копировать', 'duplicate', 'duplicate'));
+            }
 
             return $('<div/>', {'class': 'blocks-sidebar'}).append($list);
         }
@@ -935,6 +960,9 @@ var StoryEditor = (function() {
                 },
                 'replace': function() {
                     config.onImageReplace(blockManager.getActive().getID());
+                },
+                'select-image': function() {
+                    config.onImageReplace(blockManager.getActive().getID());
                 }
             }
         });
@@ -972,8 +1000,13 @@ var StoryEditor = (function() {
         element.draggable(config);
     }
 
-    function makeResizable(element, forText) {
-        forText = forText || false;
+    function makeResizable(element, config) {
+
+        function calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {
+            var ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
+            return { width: srcWidth*ratio, height: srcHeight*ratio };
+        }
+
         function resizeHandler(event, ui) {
             var zoomScale = Reveal.getScale();
             var opl = ui.originalPosition.left, opt = ui.originalPosition.top,
@@ -991,15 +1024,18 @@ var StoryEditor = (function() {
 
             var $element = $(event.target);
             if (blockManager.isCropped($element)) {
+
                 var $img = $element.find('img');
-                if (img.height > img.width) {
-                    var widthOffset = ui.size.width - img.width;
-                    var imageHeight = img.height + (widthOffset * img.ratioH);
+
+                var widthOffset = ui.size.width - img.width;
+                var heightOffset = ui.size.height - img.height;
+                var imageHeight = img.height + (widthOffset * img.ratioH);
+                var imageWidth = img.width + (heightOffset * img.ratioW);
+
+                if (imageHeight > imageWidth) {
                     blockManager.updateImageSize($img, ui.size.width, imageHeight);
                 }
                 else {
-                    var heightOffset = ui.size.height - img.height;
-                    var imageWidth = img.width + (heightOffset * img.ratioW);
                     blockManager.updateImageSize($img, imageWidth, ui.size.height);
                 }
                 var left = img.left * (imageWidth / img.width);
@@ -1040,28 +1076,29 @@ var StoryEditor = (function() {
                 grid: [5, 5],
                 snap: true,
                 snapMode: "outer",
-                snapTolerance: 4
-            },
-            defaultResizableOptions = {
+                snapTolerance: 4,
                 handles: 'all',
                 aspectRatio: true
-            },
-            textResizableOptions = {
-                handles: 'e, w',
-                aspectRatio: false,
             };
-
-        if (forText) {
-            resizableOptions = $.extend(resizableOptions, textResizableOptions);
-        }
-        else {
-            resizableOptions = $.extend(resizableOptions, defaultResizableOptions);
-        }
-        element.resizable(resizableOptions);
+        var conf = $.extend(resizableOptions, config);
+        element.resizable(conf);
     }
 
     function makeResizableBlock(block) {
-        makeResizable(block.getElement(), block.getType() === 'text');
+        var config = {};
+        if (block.typeIsText()) {
+            config = {
+                handles: 'e, w',
+                aspectRatio: false,
+            };
+        }
+        if (block.isPlaceholder()) {
+            config = {
+                handles: 'all',
+                aspectRatio: false
+            };
+        }
+        makeResizable(block.getElement(), config);
     }
 
     function selectActiveBlock(blockID) {
@@ -1105,6 +1142,9 @@ var StoryEditor = (function() {
             },
             'typeIsImage': function() {
                 return this.getType() === 'image';
+            },
+            'isPlaceholder': function() {
+                return (this.typeIsImage() && !this.getElement().find('img').length);
             },
             'typeIsVideo': function() {
                 return this.getType() === 'video' || this.getType() === 'videofile';
@@ -1153,6 +1193,13 @@ var StoryEditor = (function() {
                 dispatchEvent('onBlockCreate', {'block': block});
                 return block;
             },
+            'replace': function(element, placeholderBlockID) {
+                var placeholder = this.find(placeholderBlockID).getElement();
+                placeholder.replaceWith(element);
+                var block = new BlockWrapper(element);
+                dispatchEvent('onBlockCreate', {'block': block});
+                return block;
+            },
             'setActive': function(element) {
                 activeBlock = new BlockWrapper(element);
             },
@@ -1181,6 +1228,11 @@ var StoryEditor = (function() {
                 var block = this.find(blockID),
                     blockElement = block.getElement();
                 blockElement.attr('data-image-id', imageProps.id);
+                if (!blockElement.find('img').length) {
+                    blockElement.find('div.sl-block-content')
+                        .empty()
+                        .append($('<img/>'));
+                }
                 this.updateImageAttributes(blockElement.find('img'), imageProps, {
                     'width': block.getWidth(),
                     'height': block.getHeight()
@@ -1556,7 +1608,7 @@ var StoryEditor = (function() {
                 var heightOffset = blockProps.height - imageProps.height;
                 var imageWidth = imageProps.width + (heightOffset * imageRatioW);
                 var width, height;
-                if (imageProps.height > imageProps.width) {
+                if (imageHeight > imageWidth) {
                     width = blockProps.width;
                     height = imageHeight;
                 }
@@ -1606,23 +1658,30 @@ var StoryEditor = (function() {
         blockAlignment.slideCenter(element);
     }
 
-    function appendBlock(blockHtml) {
+    function appendBlock(blockHtml, placeholderBlockID) {
         if (!(blockHtml instanceof jQuery)) {
             blockHtml = $(blockHtml);
         }
-        var block = blockManager.append(blockHtml);
+        var block;
+        if (placeholderBlockID) {
+            block = blockManager.replace(blockHtml, placeholderBlockID);
+        }
+        else {
+            block = blockManager.append(blockHtml);
+        }
         makeDraggable(blockHtml);
         return block;
     }
 
-    function createBlock(blockHtml) {
-        var block = appendBlock(blockHtml);
+    function createBlock(blockHtml, placeholderBlockID) {
+        var block = appendBlock(blockHtml, placeholderBlockID);
         if (block.typeIsVideo() || block.typeIsHtml()) {
             stretchToSlide(block.getElement());
         }
         else {
             blockAlignment.slideCenter(block.getElement());
         }
+        return block.getID();
     }
 
     function updateBlock(blockID, blockHtml) {
@@ -1659,6 +1718,24 @@ var StoryEditor = (function() {
         blockContent.appendTo(block);
 
         return block[0].outerHTML;
+    }
+
+    function createImagePlaceholder() {
+        var block = $('<div/>', {
+            'class': 'sl-block',
+            'data-block-id': blockIDGenerator.generate(),
+            'data-block-type': 'image',
+            'css': {'width': '800px', 'height': '600px'}
+        });
+        var blockContent = $('<div/>', {
+            'class': 'sl-block-content',
+            'css': {'z-index': 11}
+        });
+        var placeholder = $('<div/>', {
+            'class': 'sl-block-overlay sl-block-placeholder',
+            'css': {'z-index': 11}
+        });
+        return block.append(blockContent.append(placeholder))[0].outerHTML;
     }
 
     return {
@@ -1711,7 +1788,9 @@ var StoryEditor = (function() {
         },
         'replaceBlockImage': function(blockID, imageProps) {
             blockManager.replaceBlockImage(blockID, imageProps);
-        }
+        },
+
+        createImagePlaceholder
     };
 })();
 

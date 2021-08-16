@@ -252,5 +252,4 @@ class ImageBlock extends AbstractBlock
             catch (\Exception $ex) {}
         }
     }
-
 }
