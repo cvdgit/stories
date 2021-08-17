@@ -141,7 +141,7 @@ class CategoryController extends BaseController
         $categoryModel = $this->findModel(Category::class, $category_id);
         $searchModel = new StorySearch();
         $searchModel->setPageSize(false);
-        if ($categoryModel->sort_field !== null) {
+        if (!empty($categoryModel->sort_field)) {
             $searchModel->defaultSortField = $categoryModel->sort_field;
             $searchModel->defaultSortOrder = $categoryModel->sort_order ?? SORT_ASC;
         }

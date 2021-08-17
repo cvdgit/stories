@@ -118,7 +118,7 @@ class StoryController extends Controller
     {
         $model = Category::findModelByAlias($category);
         $searchModel = new StorySearch();
-        if ($model->sort_field !== null) {
+        if (!empty($model->sort_field)) {
             $searchModel->defaultSortField = $model->sort_field;
             $searchModel->defaultSortOrder = $model->sort_order ?? SORT_ASC;
         }
