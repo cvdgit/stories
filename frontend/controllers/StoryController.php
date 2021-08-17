@@ -157,6 +157,10 @@ class StoryController extends Controller
      */
     public function actionView($alias, $track_id = null)
     {
+        $model = Story::findModelByAlias($alias);
+        if (Yii::$app->user->isGuest && !$model->isPublished()) {
+            throw new NotFoundHttpException('История не найдена');
+        }
 
         $playlistID = Yii::$app->request->get('list');
         $playlist = null;
@@ -164,7 +168,6 @@ class StoryController extends Controller
             $playlist = Playlist::findModel((int)$playlistID);
         }
 
-        $model = Story::findModelByAlias($alias);
         $dataProvider = Comment::getCommentDataProvider($model->id);
         if (Yii::$app->request->isPjax) {
             return $this->renderAjax('_comment_list', ['dataProvider' => $dataProvider]);
