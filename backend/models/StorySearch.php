@@ -19,6 +19,9 @@ class StorySearch extends Model
     public $status;
     public $sub_access;
 
+    public $defaultSortField;
+    public $defaultSortOrder;
+
     public function rules()
     {
         return [
@@ -39,8 +42,12 @@ class StorySearch extends Model
                 'pageSize' => 50,
             ],
         ]);
+        $defaultOrder = ['created_at' => SORT_DESC];
+        if ($this->defaultSortField !== null) {
+            $defaultOrder = [$this->defaultSortField => $this->defaultSortOrder];
+        }
         $sortParams = [
-            'defaultOrder' => ['created_at' => SORT_DESC],
+            'defaultOrder' => $defaultOrder,
             'attributes' => [
                 'id' => [
                     'asc' => ['id' => SORT_ASC],
@@ -65,11 +72,15 @@ class StorySearch extends Model
                 'status',
                 'sub_access',
                 'views_number',
+                'published_at',
+                'episode',
             ],
         ];
         $sort = new Sort($sortParams);
         $dataProvider->setSort($sort);
-        if (!($this->load($params) && $this->validate())) {
+
+        $this->load($params);
+        if (!$this->validate()) {
             return $dataProvider;
         }
         $query->andFilterWhere(['like', 'title', $this->title]);

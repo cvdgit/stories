@@ -59,6 +59,9 @@ class StoryCover
 
 	public static function getListThumbPath($cover, $absolute = false): string
 	{
+	    if (empty($cover)) {
+	        return '/img/story-1.jpg';
+        }
 		return self::getCoverFolderPath($absolute) . '/list/' . $cover;
 	}
 

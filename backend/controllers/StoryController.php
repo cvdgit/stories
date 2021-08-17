@@ -3,9 +3,9 @@
 namespace backend\controllers;
 
 use backend\components\BaseController;
-//use backend\components\book\BookStoryGenerator;
 use backend\models\StoryAccessByLinkForm;
 use backend\models\StoryBatchCommandForm;
+use backend\models\StoryEpisodeOrderForm;
 use backend\models\WordListFromStoryForm;
 use backend\services\StoryEditorService;
 use Exception;
@@ -29,18 +29,15 @@ class StoryController extends BaseController
     
     public $service;
     protected $editorService;
-    //private $bookStoryGenerator;
 
     public function __construct($id,
                                 $module,
                                 StoryService $service,
                                 StoryEditorService $editorService,
-                                //BookStoryGenerator $bookStoryGenerator,
                                 $config = [])
     {
         $this->service = $service;
         $this->editorService = $editorService;
-        //$this->bookStoryGenerator = $bookStoryGenerator;
         parent::__construct($id, $module, $config);
     }
 
@@ -270,16 +267,6 @@ class StoryController extends BaseController
         return $this->redirect(['update', 'id' => $model->id]);
     }
 
-    /*public function actionReadonly(int $id)
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $model = $this->findModel(Story::class, $id);
-        $html = $this->bookStoryGenerator->generate($model);
-        $model->body = $html;
-        $model->save(false, ['body']);
-        return ['success' => true];
-    }*/
-
     public function actionText(int $id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
@@ -327,6 +314,16 @@ class StoryController extends BaseController
         Yii::$app->response->format = Response::FORMAT_JSON;
         $storyModel = $this->findModel(Story::class, $id);
         $storyModel->revokeLinkAccess();
+        return ['success' => true];
+    }
+
+    public function actionSaveEpisodeOrder()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $form = new StoryEpisodeOrderForm();
+        if ($form->load(Yii::$app->request->post())) {
+            $form->saveEpisodeOrder();
+        }
         return ['success' => true];
     }
 }
