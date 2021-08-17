@@ -120,7 +120,7 @@ class StoryController extends Controller
         $searchModel = new StorySearch();
         if (!empty($model->sort_field)) {
             $searchModel->defaultSortField = $model->sort_field;
-            $searchModel->defaultSortOrder = $model->sort_order ?? SORT_ASC;
+            $searchModel->defaultSortOrder = !empty($model->sort_order) ? $model->sort_order : SORT_ASC;
         }
         $searchModel->category_id = $model->subCategories();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
