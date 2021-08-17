@@ -22,6 +22,8 @@ class StorySearch extends Model
     public $defaultSortField;
     public $defaultSortOrder;
 
+    private $pageSize = 40;
+
     public function rules()
     {
         return [
@@ -39,7 +41,7 @@ class StorySearch extends Model
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => 50,
+                'pageSize' => $this->pageSize,
             ],
         ]);
         $defaultOrder = ['created_at' => SORT_DESC];
@@ -96,5 +98,10 @@ class StorySearch extends Model
             $query->andFilterWhere(['in', 'category.id', explode(',', $this->category_id)]);
         }
         return $dataProvider;
+    }
+
+    public function setPageSize($size): void
+    {
+        $this->pageSize = $size;
     }
 }
