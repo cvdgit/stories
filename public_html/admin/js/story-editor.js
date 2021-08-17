@@ -1224,7 +1224,9 @@ var StoryEditor = (function() {
                 var block = this.find(blockID),
                     blockElement = block.getElement();
                 blockElement.attr('data-image-id', imageProps.id);
+                var isPlaceholder = false;
                 if (!blockElement.find('img').length) {
+                    isPlaceholder = true;
                     blockElement.find('div.sl-block-content')
                         .empty()
                         .append($('<img/>'));
@@ -1234,6 +1236,10 @@ var StoryEditor = (function() {
                     'height': block.getHeight()
                 });
                 blockModifier.change();
+                if (isPlaceholder) {
+                    blockToolbar.remove();
+                    blockToolbar.create();
+                }
             },
             'isCropped': function(blockElement) {
                 var $img = blockElement.find('img');
@@ -1306,6 +1312,7 @@ var StoryEditor = (function() {
             // При создании блока с тестом, изменить тип слайда с на new-question
             slidesManager.getActiveSlide().setSlideView('new-question');
         }
+        setActiveBlock(e.block.getElement());
     });
 
     function setActiveBlock(element) {
@@ -1707,7 +1714,7 @@ var StoryEditor = (function() {
 
         $('<div/>', {
             'class': 'slide-paragraph',
-            'text': 'Введите текст'
+            'html': '<p>Введите текст</p>'
         })
             .appendTo(blockContent);
 
