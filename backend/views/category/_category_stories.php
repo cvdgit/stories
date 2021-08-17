@@ -4,6 +4,19 @@ use backend\assets\SortableJsAsset;
 use common\components\StoryCover;
 use yii\helpers\Html;
 SortableJsAsset::register($this);
+$css = <<<CSS
+#manage-slides-list {
+    min-height: 400px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+#manage-slides-list .selected {
+    background-color: #f9c7c8;
+    border: solid red 1px !important;
+    z-index: 1 !important;
+}
+CSS;
+$this->registerCss($css);
 ?>
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -40,9 +53,11 @@ SortableJsAsset::register($this);
 $js = <<<JS
 (function() {
     'use strict';
-    
+
     Sortable.create($('#manage-slides-list')[0], {
-        handle: '.media-left'
+        handle: '.media-left',
+        multiDrag: true,
+        selectedClass: 'selected'
     });
     
     $('#save-story-order').on('click', function() {
