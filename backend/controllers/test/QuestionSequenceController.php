@@ -2,19 +2,32 @@
 
 namespace backend\controllers\test;
 
+use backend\components\BaseController;
+use backend\models\AnswerImageUploadForm;
 use backend\models\question\sequence\CreateSequenceQuestion;
+use backend\models\question\sequence\SequenceAnswerForm;
 use backend\models\question\sequence\UpdateSequenceQuestion;
 use common\models\StoryTest;
+use common\models\StoryTestAnswer;
 use common\models\StoryTestQuestion;
 use common\rbac\UserRoles;
+use common\services\TransactionManager;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
-use yii\web\Controller;
-use yii\web\NotFoundHttpException;
+use yii\web\Response;
+use yii\web\UploadedFile;
 
-class QuestionSequenceController extends Controller
+class QuestionSequenceController extends BaseController
 {
+
+    private $transactionManager;
+
+    public function __construct($id, $module, TransactionManager $transactionManager, $config = [])
+    {
+        $this->transactionManager = $transactionManager;
+        parent::__construct($id, $module, $config);
+    }
 
     public function behaviors()
     {
@@ -39,7 +52,8 @@ class QuestionSequenceController extends Controller
 
     public function actionCreate(int $test_id)
     {
-        $testModel = $this->findTestModel($test_id);
+        /** @var StoryTest $testModel */
+        $testModel = $this->findModel(StoryTest::class, $test_id);
         $model = new CreateSequenceQuestion($test_id);
         if ($model->load(Yii::$app->request->post())) {
             try {
@@ -59,8 +73,9 @@ class QuestionSequenceController extends Controller
 
     public function actionUpdate(int $id)
     {
-        $model = $this->findModel($id);
-        $form = new UpdateSequenceQuestion($model);
+        /** @var StoryTestQuestion $model */
+        $model = $this->findModel(StoryTestQuestion::class, $id);
+        $form = new UpdateSequenceQuestion($model, $this->transactionManager);
         if ($form->load(Yii::$app->request->post())) {
             try {
                 $form->updateQuestion();
@@ -80,25 +95,44 @@ class QuestionSequenceController extends Controller
 
     public function actionDelete(int $id)
     {
-        $model = $this->findModel($id);
+        $model = $this->findModel(StoryTestQuestion::class, $id);
         $model->delete();
         return $this->redirect(['test/update', 'id' => $model->story_test_id]);
     }
 
-    protected function findModel($id)
+    public function actionImage()
     {
-        if (($model = StoryTestQuestion::findOne($id)) !== null) {
-            return $model;
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $form = new AnswerImageUploadForm();
+        if ($form->load(Yii::$app->request->post())) {
+            $form->answerImage = UploadedFile::getInstance($form, 'answerImage');
+            if ($form->validate()) {
+                /** @var StoryTestAnswer $answerModel */
+                $answerModel = $this->findModel(StoryTestAnswer::class, $form->answer_id);
+                if ($form->upload($answerModel->image)) {
+                    $answerModel->image = $form->answerImage;
+                    $answerModel->save();
+                    return ['success' => true, 'image_path' => $answerModel->getImagePath()];
+                }
+            }
         }
-        throw new NotFoundHttpException('The requested page does not exist.');
+        return ['success' => false];
     }
 
-    protected function findTestModel($id)
+    public function actionCreateAnswer(int $question_id)
     {
-        if (($model = StoryTest::findOne($id)) !== null) {
-            return $model;
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        /** @var StoryTestQuestion $questionModel */
+        $questionModel = $this->findModel(StoryTestQuestion::class, $question_id);
+        $answerModel = new SequenceAnswerForm();
+        if ($answerModel->load(Yii::$app->request->post())) {
+            $answerModel->createAnswer($questionModel->id);
+            return [
+                'success' => true,
+                'html' => $this->renderPartial('_answer_item', ['answerModel' => $answerModel]),
+                'answer_id' => $answerModel->id,
+            ];
         }
-        throw new NotFoundHttpException('The requested page does not exist.');
+        return ['success' => false];
     }
-
 }

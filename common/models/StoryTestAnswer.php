@@ -5,6 +5,7 @@ namespace common\models;
 use DomainException;
 use Yii;
 use yii\db\ActiveRecord;
+use yii\db\Query;
 use yii\helpers\FileHelper;
 
 /**
@@ -152,9 +153,21 @@ class StoryTestAnswer extends ActiveRecord
         }
     }
 
-    public static function createSequenceAnswer(int $questionID, string $name, int $order): self
+    public static function createSequenceAnswer(int $questionID, string $name, int $order = null): self
     {
+        if ($order === null) {
+            $max = (new Query())
+                ->from(self::tableName())
+                ->where('story_question_id = :id', [':id' => $questionID])
+                ->max('`order`');
+            $order = 1 + $max;
+        }
         return self::create($questionID, $name, true, $order);
     }
 
+    public function afterDelete()
+    {
+        $this->deleteImage();
+        parent::afterDelete();
+    }
 }

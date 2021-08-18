@@ -24,7 +24,7 @@ class Sequence
         $question = new SequenceQuestion($this->question, $this->stars);
         foreach ($this->question->storyTestAnswers as $answer) {
             /** @var $answer StoryTestAnswer */
-            $question->addAnswer(new Answer($answer->id, $answer->name, $answer->answerIsCorrect(), $answer->region_id, $answer->getImagePath(), $answer->order));
+            $question->addAnswer(new Answer($answer->id, $answer->name, $answer->answerIsCorrect(), $answer->region_id, $answer->getImagePath(), $answer->order, $answer->getOrigImagePath()));
         }
         return $question;
     }

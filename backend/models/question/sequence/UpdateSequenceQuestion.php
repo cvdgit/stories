@@ -4,36 +4,39 @@ namespace backend\models\question\sequence;
 
 use common\models\StoryTestAnswer;
 use common\models\StoryTestQuestion;
+use common\services\TransactionManager;
 use DomainException;
+use Yii;
 use yii\helpers\Json;
 
 class UpdateSequenceQuestion extends SequenceQuestion
 {
 
     public $answers;
-    private $model;
+    public $sortable;
 
-    public function __construct(StoryTestQuestion $model, $config = [])
+    private $model;
+    private $transactionManager;
+
+    public function __construct(StoryTestQuestion $model, TransactionManager $transactionManager, $config = [])
     {
-        parent::__construct($config);
         $this->model = $model;
+        $this->transactionManager = $transactionManager;
         $this->loadModelAttributes();
 
         $answers = [];
         foreach ($this->model->storyTestAnswers as $answer) {
-            $answers[] = [
-                'id' => $answer->id,
-                'text' => $answer->name,
-                'order' => $answer->order,
-            ];
+            $answers[] = SequenceAnswerForm::create($answer->name, $answer->order, $answer->getImagePath(), $answer->id);
         }
-        $this->answers = Json::encode($answers);
+        $this->answers = $answers;
+
+        parent::__construct($config);
     }
 
     public function rules()
     {
         return array_merge([
-            ['answers', 'safe'],
+            [['answers', 'sortable'], 'safe'],
         ], parent::rules());
     }
 
@@ -61,19 +64,19 @@ class UpdateSequenceQuestion extends SequenceQuestion
         }
         $this->model->save();
 
-        $currentAnswers = Json::decode($this->answers);
-        foreach ($currentAnswers as $answer) {
-            $id = $answer['id'] ?? null;
-            $create = empty($id);
-            if ($create) {
-                $model = StoryTestAnswer::createSequenceAnswer($this->model->id, $answer['text'], $answer['order']);
+        if ($this->sortable !== null) {
+            $answerIDs = explode(',', $this->sortable);
+            if (count($answerIDs) > 0) {
+                $command = Yii::$app->db->createCommand();
+                $this->transactionManager->wrap(function () use ($command, $answerIDs) {
+                    $order = 1;
+                    foreach ($answerIDs as $answerID) {
+                        $command->update(StoryTestAnswer::tableName(), ['order' => $order], 'id = :id', [':id' => $answerID]);
+                        $command->execute();
+                        $order++;
+                    }
+                });
             }
-            else {
-                $model = StoryTestAnswer::findModel($id);
-                $model->name = $answer['text'];
-                $model->order = $answer['order'];
-            }
-            $model->save();
         }
     }
 

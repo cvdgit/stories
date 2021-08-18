@@ -12,6 +12,7 @@ use yii\web\UploadedFile;
 class AnswerImageUploadForm extends Model
 {
 
+    public $answer_id;
     /**
      * @var UploadedFile
      */
@@ -20,6 +21,7 @@ class AnswerImageUploadForm extends Model
     public function rules()
     {
         return [
+            ['answer_id', 'integer'],
             ['answerImage', 'image', 'skipOnEmpty' => true],
         ];
     }

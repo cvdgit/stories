@@ -541,7 +541,9 @@ p.wikids-test-description {
 }
 
 .wikids-test-correct-answer-answers {
-	/*height: 500px;*/
+	max-height: 586px;
+	overflow: hidden;
+	overflow-y: auto;
 	text-align: left;
 }
 
@@ -565,7 +567,7 @@ p.wikids-test-description {
 }
 
 .wikids-test-correct-answer-answers p {
-	margin-left: 200px;
+	margin-left: 150px;
 	font-size: 2.5rem;
 }
 
@@ -776,10 +778,19 @@ p.wikids-test-description {
 	height: 100%;
 }
 
-.sequence-question-list .list-group-item {
+.sequence-question-list .list-group-item,
+.sequence-question-list .media {
 	border: 0 none;
-	cursor: move;
 	user-select: none;
+	margin-top: 5px;
+}
+
+.sequence-question-list .media {
+	min-height: 50px;
+}
+
+.sequence-question-list .media:first-child {
+	margin-top: 0;
 }
 
 .sequence-question-list .ui-sortable-helper {

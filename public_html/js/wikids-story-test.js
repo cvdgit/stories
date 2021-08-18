@@ -1088,7 +1088,7 @@
     function SequenceQuestion(test) {
 
         var $list = $('<div/>', {
-            class: 'list-group sequence-question-list'
+            class: 'sequence-question-list'
         });
 
         Sortable.create($list[0], {
@@ -1104,11 +1104,37 @@
             _extends(_answers, answers);
             _answers = shuffle(_answers);
             _answers.forEach(function(answer) {
-                $('<div/>', {
-                    'class': 'list-group-item wikids-sortable-handle',
-                    'text': answer.name,
+                var item = $('<div/>', {
+                    'class': 'media',
                     'data-answer-id': answer.id
-                }).appendTo($list);
+                });
+                $('<div/>', {
+                    'class': 'media-left media-middle wikids-sortable-handle',
+                    'html': '<i class="glyphicon glyphicon-move handle"></i>'
+                })
+                    .appendTo(item);
+                if (answer.image) {
+                    $('<div/>', {
+                        'class': 'media-left',
+                        'css': {'cursor': 'zoom-in'}
+                    })
+                        .on('click', function () {
+                            test.showOrigImage(answer['orig_image'] || $(this).attr('src'));
+                        })
+                        .append(
+                            $('<img/>', {
+                                'class': 'media-object',
+                                'src': answer.image
+                            })
+                        )
+                        .appendTo(item);
+                }
+                $('<div/>', {'class': 'media-body'})
+                    .append(
+                        $('<h4/>', {'class': 'media-heading'}).text(answer.name)
+                    )
+                    .appendTo(item);
+                item.appendTo($list);
             });
             return $list;
         }
@@ -2919,7 +2945,7 @@
                         if (questionAnswer.image) {
                             var $image = $('<img/>')
                                 .attr("src", questionAnswer.image)
-                                .attr("width", 180)
+                                .attr("width", 110)
                                 .css('cursor', 'zoom-in')
                                 .on('click', function () {
                                     showOriginalImage(questionAnswer['orig_image'] || $(this).attr('src'));
@@ -3097,6 +3123,8 @@
             var canNext = activeStudent.getProgress() === 100 || activeStudent.getFinish();
             return (testIsRequired() && canNext) || (!testIsRequired());
         };
+
+        this.showOrigImage = showOriginalImage;
 
         return {
             "init": init,
