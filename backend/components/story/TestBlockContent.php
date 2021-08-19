@@ -21,6 +21,9 @@ class TestBlockContent
     public static function createFromHtml(string $html): self
     {
         $content = pq($html);
+        if ($content->attr('data-test-id') === null) {
+            $content = $content->find('.new-questions');
+        }
         return new self($content->attr('data-test-id'), $content->attr('data-test-required') ?? false);
     }
 
