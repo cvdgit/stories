@@ -982,4 +982,5 @@ p.wikids-test-description {
 .story-container-inner .reveal .sl-block button.btn {
 	box-shadow: none;
 	-webkit-box-shadow: none;
+	font-size: 1.8rem !important;
 }
