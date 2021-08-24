@@ -977,5 +977,4 @@ p.wikids-test-description {
 .story-container-inner .reveal .sl-block[data-block-type=transition],
 .story-container-inner .reveal .sl-block[data-block-type=test] {
 	height: auto !important;
-	width: auto !important;
 }
