@@ -978,3 +978,8 @@ p.wikids-test-description {
 .story-container-inner .reveal .sl-block[data-block-type=test] {
 	height: auto !important;
 }
+
+.story-container-inner .reveal .sl-block button.btn {
+	box-shadow: none;
+	-webkit-box-shadow: none;
+}
