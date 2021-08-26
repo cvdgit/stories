@@ -4,19 +4,6 @@ use backend\assets\TestQuestionAsset;
 /** @var $model backend\models\question\UpdateRegionQuestion */
 /** @var $this yii\web\View */
 $css = <<< CSS
-#regions-modal .modal-dialog {
-    max-width: 100%;
-    width: auto !important;
-    display: inline-block;
-}
-#regions-modal {
-  z-index: -1;
-  display: flex !important;
-  justify-content: center;
-}
-.modal-open #regions-modal {
-   z-index: 1050;
-}
 .image-container-wrapper {
     min-height: 500px;
     min-width: 800px;
@@ -30,7 +17,7 @@ SvgAsset::register($this);
 TestQuestionAsset::register($this);
 ?>
 <div class="modal fade" id="regions-modal" data-backdrop="static">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
