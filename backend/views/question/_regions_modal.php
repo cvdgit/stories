@@ -4,12 +4,29 @@ use backend\assets\TestQuestionAsset;
 /** @var $model backend\models\question\UpdateRegionQuestion */
 /** @var $this yii\web\View */
 $css = <<< CSS
+#regions-modal .modal-dialog {
+    max-width: 100%;
+    width: auto !important;
+    display: inline-block;
+}
+#regions-modal {
+  z-index: -1;
+  display: flex !important;
+  justify-content: center;
+  margin: 0 auto;
+}
+.modal-open .in#regions-modal {
+   z-index: 1050;
+}
 .image-container-wrapper {
     min-height: 500px;
     min-width: 800px;
 }
 #regions-modal .alert {
     padding: 6px;
+}
+.modal-lg {
+    max-width: 80% !important;
 }
 CSS;
 $this->registerCss($css);
