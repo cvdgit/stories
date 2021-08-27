@@ -70,11 +70,6 @@ class StoryController extends Controller
     protected $audioService;
     private $bookStoryGenerator;
 
-    private $section;
-    private $searchModel;
-    private $emptyText = 'Список историй пуст';
-    private $category;
-
     public function __construct($id,
                                 $module,
                                 StoryService $storyService,
@@ -96,19 +91,6 @@ class StoryController extends Controller
         parent::__construct($id, $module, $config);
     }
 
-
-    private function getRenderParams($searchModel, $dataProvider, $action, $category = null, $emptyText = 'Список историй пуст')
-    {
-        return [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'action' => $action,
-            'emptyText' => $emptyText,
-            'category' => $category,
-            'section' => null,
-        ];
-    }
-
     private function findSectionModel(string $alias): ?SiteSection
     {
         if (($model = SiteSection::findOne(['alias' => $alias])) !== null && $model->isVisible()) {
@@ -127,13 +109,13 @@ class StoryController extends Controller
 
     public function actionIndex(string $section)
     {
-        $section = $this->findSectionModel($section);
-        $this->getView()->setMetaTags($section->title, $section->description, $section->keywords, $section->h1);
+        $sectionModel = $this->findSectionModel($section);
+        $this->getView()->setMetaTags($sectionModel->title, $sectionModel->description, $sectionModel->keywords, $sectionModel->h1);
 
         $searchModel = new StorySearch();
-        $searchModel->category_id = $section->getSectionCategories();
+        $searchModel->category_id = $sectionModel->getSectionCategories();
         return $this->render('index', (new StoryRenderParams())
-            ->setSectionModel($section)
+            ->setSectionModel($sectionModel)
             ->setSearchModel($searchModel, Yii::$app->request->queryParams)
             ->asArray()
         );
@@ -141,7 +123,7 @@ class StoryController extends Controller
 
     public function actionCategory(string $section, string $category)
     {
-        $section = $this->findSectionModel($section);
+        $sectionModel = $this->findSectionModel($section);
         $model = $this->findCategoryModel($category);
 
         $this->getView()->setMetaTags(
@@ -158,7 +140,7 @@ class StoryController extends Controller
         }
         $searchModel->category_id = $model->subCategories();
         return $this->render('index', (new StoryRenderParams())
-            ->setSectionModel($section)
+            ->setSectionModel($sectionModel)
             ->setCategoryModel($model)
             ->setSearchModel($searchModel, Yii::$app->request->queryParams)
             ->asArray()
@@ -445,14 +427,18 @@ class StoryController extends Controller
 
     public function actionBedtimeStories()
     {
+        $sectionModel = $this->findSectionModel('stories');
         $this->getView()->setMetaTags(
             'Сказки на ночь для детей',
             'Сказки на ночь для детей',
             'wikids, сказки, сказки на ночь, истории, каталог историй, сказки на ночь для детей',
             'Сказки на ночь для детей'
         );
+        $searchModel = new StorySearch();
+        $searchModel->category_id = $sectionModel->getSectionCategories();
         return $this->render('index', (new StoryRenderParams())
-            ->setSearchModel(new StorySearch(), Yii::$app->request->queryParams)
+            ->setSectionModel($sectionModel)
+            ->setSearchModel($searchModel, Yii::$app->request->queryParams)
             ->setSearchAction(['/story/index'])
             ->asArray()
         );
@@ -460,6 +446,7 @@ class StoryController extends Controller
 
     public function actionAudioStories()
     {
+        $sectionModel = $this->findSectionModel('stories');
         $this->getView()->setMetaTags(
             'Аудио сказки для детей',
             'Аудио сказки для детей',
@@ -467,8 +454,10 @@ class StoryController extends Controller
             'Аудио сказки для детей'
         );
         $searchModel = new StorySearch();
+        $searchModel->category_id = $sectionModel->getSectionCategories();
         $searchModel->audio = 1;
         return $this->render('index', (new StoryRenderParams())
+            ->setSectionModel($sectionModel)
             ->setSearchModel($searchModel, Yii::$app->request->queryParams)
             ->setSearchAction(['/story/index'])
             ->asArray()
