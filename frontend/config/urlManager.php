@@ -68,6 +68,7 @@ return [
         'question/<param:[\w\s\d]+>/<value:[\w\d\s]+>' => 'question/get',
 
         'students' => 'student/index',
+        'training' => 'training/index',
 
         'test/<id:\d+>' => 'test/view',
         'tests/<category_id:\d+>' => 'test/index',
