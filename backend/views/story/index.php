@@ -59,7 +59,7 @@ $this->title = 'Управление историями';
                     return $item->name;
                 }, $model->categories));
             },
-            'filter' => Html::a('Категории', '#filter-categories-modal', ['data-toggle' => 'modal'])
+            'filter' => Html::a('Категории', '#select-categories-modal', ['data-toggle' => 'modal'])
                         . Html::activeHiddenInput($searchModel, 'category_id')
         ],
         [
@@ -100,29 +100,7 @@ $this->title = 'Управление историями';
 ]) ?>
 <?php Pjax::end(); ?>
 
-<div class="modal fade" id="filter-categories-modal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-                <h4 class="modal-title">Категории</h4>
-            </div>
-            <div class="modal-body">
-                <div id="category-list">
-                    <?= Menu::widget([
-                        'items' => Category::categoryArray(),
-                        'encodeLabels' => false,
-                        'linkTemplate' => '<label><input type="checkbox" value="{url}"> {label}</label>',
-                    ]) ?>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" id="do-category-filter">Применить</button>
-                <button class="btn btn-default" data-dismiss="modal">Отмена</button>
-            </div>
-        </div>
-    </div>
-</div>
+<?= $this->render('_categories', ['treeID' => null, 'selectInputID' => 'storysearch-category_id']) ?>
 
 <?php
 $css = <<< CSS
@@ -132,6 +110,26 @@ $css = <<< CSS
 CSS;
 $this->registerCss($css);
 $js = <<< JS
+$('#save-categories').off('click').on('click', function() {
+    var list = $('#selected-category-list'),
+        id = 'storysearch-category_id',
+        ids = [];
+    list.empty();
+    $('#category-list input[type=checkbox]').each(function() {
+        var el = $(this);
+        if (el.is(':checked')) {
+            $('<span>')
+              .addClass('label label-default')
+              .text($.trim(el.parent().text()))
+              .appendTo(list);
+            list.append(' ');
+            ids.push(el.val());
+        }
+    });
+    $('#' + id).val(ids.join(',')).trigger('change');
+    $('#select-categories-modal').modal('hide');
+});
+/*
 $('#filter-categories-modal').on('show.bs.modal', function() {
     var list = $('#category-list'),
         id = 'storysearch-category_id';
@@ -161,7 +159,7 @@ $('#do-category-filter').on('click', function() {
     });
     $('#' + id).val(ids.join(',')).trigger('change');
     $('#filter-categories-modal').modal('hide');
-});
+});*/
 JS;
 $this->registerJs($js);
 ?>

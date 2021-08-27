@@ -14,7 +14,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
         <div class="row">
             <div class="col-xs-offset-1 col-xs-10 col-sm-offset-0 col-sm-6 col-md-offset-0 col-md-6 col-lg-offset-0 col-lg-3">
                 <div class="category-item">
-                    <a href="<?= Url::toRoute(['/story/category', 'category' => 'drevnegrecheskie-mify']) ?>">
+                    <a href="<?= Url::toRoute(['/story/category', 'section' => 'stories', 'category' => 'drevnegrecheskie-mify']) ?>">
                         <div class="category-item-image-wrapper">
                             <img src="/img/category_2_mini.jpg" alt="">
                         </div>
@@ -24,7 +24,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
             </div>
             <div class="col-xs-offset-1 col-xs-10 col-sm-offset-0 col-sm-6 col-md-offset-0 col-md-6 col-lg-offset-0 col-lg-3">
                 <div class="category-item">
-                    <a href="<?= Url::toRoute(['/story/category', 'category' => 'russkie-skazki-i-byliny']) ?>">
+                    <a href="<?= Url::toRoute(['/story/category', 'section' => 'stories', 'category' => 'russkie-skazki-i-byliny']) ?>">
                         <div class="category-item-image-wrapper">
                             <img src="/img/category_1_mini.jpg" alt="">
                         </div>
@@ -34,7 +34,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
             </div>
             <div class="col-xs-offset-1 col-xs-10 col-sm-offset-0 col-sm-6 col-md-offset-0 col-md-6 col-lg-offset-0 col-lg-3">
                 <div class="category-item">
-                    <a href="<?= Url::toRoute(['/story/category', 'category' => 'poznavatelnye']) ?>">
+                    <a href="<?= Url::toRoute(['/story/category', 'section' => 'stories', 'category' => 'poznavatelnye']) ?>">
                         <div class="category-item-image-wrapper">
                             <img src="/img/category_3_mini.jpg" alt="">
                         </div>
@@ -44,7 +44,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
             </div>
             <div class="col-xs-offset-1 col-xs-10 col-sm-offset-0 col-sm-6 col-md-offset-0 col-md-6 col-lg-offset-0 col-lg-3">
                 <div class="category-item">
-                    <a href="<?= Url::toRoute(['/story/category', 'category' => 'altayskie-narodnye-skazki']) ?>">
+                    <a href="<?= Url::toRoute(['/story/category', 'section' => 'stories', 'category' => 'altayskie-narodnye-skazki']) ?>">
                         <div class="category-item-image-wrapper">
                             <img src="/img/category_4_mini.jpg" alt="">
                         </div>
@@ -55,7 +55,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
         </div>
     </div>
     <div class="container site-stories-controls">
-        <?= Html::a('Все категории', ['/story/index'], ['class' => 'btn']) ?>
+        <?= Html::a('Все категории', ['/story/index', 'section' => 'stories'], ['class' => 'btn']) ?>
     </div>
 </section>
 
@@ -174,7 +174,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
         <?= \frontend\widgets\StoryWidget::widget() ?>
     </div>
     <div class="container site-stories-controls">
-      <?= Html::a('Посмотреть все истории', ['/story/index'], ['class' => 'btn']) ?>
+      <?= Html::a('Посмотреть все истории', ['/story/index', 'section' => 'stories'], ['class' => 'btn']) ?>
     </div>
   </section>
 

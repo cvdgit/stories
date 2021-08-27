@@ -34,16 +34,10 @@ return [
 
         'stories/history' => 'story/history',
         'stories/liked' => 'story/liked',
-
         'stories/favorites' => 'story/favorites',
         'favorites/add/<story_id:\d+>' => 'story/add-favorites',
-
         'stories/skazki-na-noch' => 'story/bedtime-stories',
         'stories/audio' => 'story/audio-stories',
-
-        'stories/tag/<tag:[\w\s\-]+>' => 'story/tag',
-        'stories/category/<category:[\w\-]+>' => 'story/category',
-        'stories' => 'story/index',
 
         'story/random' => 'story/random',
         'story/like' => 'story/like',
@@ -79,5 +73,9 @@ return [
         'tests/<category_id:\d+>' => 'test/index',
 
         'preview/<alias:[\w\-]+>' => 'preview/view',
+
+        'stories/tag/<tag:[\w\s\-]+>' => 'story/tag',
+        '<section:\w+>/category/<category:[\w\-]+>' => 'story/category',
+        '<section:\w+>' => 'story/index',
     ],
 ];

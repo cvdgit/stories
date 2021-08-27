@@ -1,17 +1,13 @@
 <?php
 
-
 namespace frontend\models;
 
-
 use common\models\Story;
-use common\rbac\UserRoles;
 use frontend\components\StorySorter as Sort;
-use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
-class StorySearch extends Model
+class StorySearch extends Model implements StorySearchInterface
 {
 
     public $title;
@@ -26,6 +22,7 @@ class StorySearch extends Model
     public function rules()
     {
         return [
+            //['category_id', 'required'],
             [['title', 'description'], 'string'],
             [['tag_id', 'audio'], 'integer'],
             ['category_id', 'each', 'rule' => ['integer']],
@@ -41,13 +38,7 @@ class StorySearch extends Model
      */
     public function search($params): ActiveDataProvider
     {
-        //if (UserRoles::canModerator()) {
-            //$query = Story::findPublishedStoriesModerator();
-        //}
-        //else {
-            $query = Story::findPublishedStories();
-        //}
-
+        $query = Story::findPublishedStories();
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
@@ -87,9 +78,10 @@ class StorySearch extends Model
             return $dataProvider;
         }
 
-        if (!empty($this->category_id)) {
+        //if (!empty($this->category_id)) {
+            $query->distinct('{{%story}}.id');
             $query->joinWith(['categories']);
-        }
+        //}
 
         if (!empty($this->tag_id)) {
             $query->joinWith(['tags']);

@@ -7,7 +7,7 @@ use yii\helpers\Html;
     <div class="story-description">
         <div class="story-categories">
             <?php foreach ($model->categories as $category): ?>
-                <?= Html::a($category->name, ['story/category', 'category' => $category->alias]) ?>
+                <?= Html::a($category->name, $category->getCategoryUrl()) ?>
             <?php endforeach ?>
         </div>
         <?php if (!empty($model->description)): ?>

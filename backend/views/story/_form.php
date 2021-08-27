@@ -28,7 +28,9 @@ use dosamigos\selectize\SelectizeTextInput;
 <?= $form->field($model, 'user_id')->dropDownList(User::getUserList(), ['prompt' => 'Выбрать', 'disabled' => !Yii::$app->user->can('admin')]) ?>
 <?php
 $values = [];
+$treeID = null;
 foreach ($model->categories as $category) {
+    $treeID = \common\models\Category::findRootByTree($category->tree);
     $values[] = '<span class="label label-default">' . $category->name . '</span>';
 }
 $values = implode("\n", $values);
@@ -36,9 +38,12 @@ $values = implode("\n", $values);
 <?php $input = '<div id="selected-category-list" style="margin: 10px 0">' . $values . '</div>'; ?>
 <?= $form->field($model, 'story_categories', ['template' => "{label}\n{$input}\n{input}\n{hint}\n{error}"])
     ->hiddenInput()
-    ->hint($this->render('_categories', [
-        'selectInputID' => Html::getInputId($model, 'story_categories')
-    ]), ['class' => false]) ?>
+    ->hint('<button data-toggle="modal" data-target="#select-categories-modal" type="button" class="btn btn-default">Выбрать категории</button>', ['class' => false]) ?>
+
+<?= $this->render('_categories', [
+    'selectInputID' => Html::getInputId($model, 'story_categories'),
+    'treeID' => $treeID,
+]) ?>
 
 <?= $form->field($model, 'sub_access')->checkBox() ?>
 <?= $form->field($model, 'tagNames')->widget(SelectizeTextInput::class, [

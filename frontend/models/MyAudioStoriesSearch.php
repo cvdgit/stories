@@ -1,8 +1,6 @@
 <?php
 
-
 namespace frontend\models;
-
 
 use common\models\StoryAudioTrack;
 use common\models\User;
@@ -11,7 +9,7 @@ use yii\base\Model;
 use yii\data\SqlDataProvider;
 use yii\db\Query;
 
-class MyAudioStoriesSearch extends Model
+class MyAudioStoriesSearch extends Model implements StorySearchInterface
 {
 
     public $user_id;
@@ -86,5 +84,4 @@ class MyAudioStoriesSearch extends Model
 
         return $dataProvider;
     }
-
 }

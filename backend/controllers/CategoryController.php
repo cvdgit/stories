@@ -3,12 +3,15 @@
 namespace backend\controllers;
 
 use backend\components\BaseController;
+use backend\models\category\CreateCategoryForm;
+use backend\models\category\UpdateCategoryForm;
 use backend\models\StorySearch;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use common\models\Category;
 use common\rbac\UserRoles;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
@@ -38,69 +41,72 @@ class CategoryController extends BaseController
         ];
     }
 
-    public function actionIndex($id = 1)
+    /**
+     * @throws NotFoundHttpException
+     */
+    private function findRootCategoryByTree(int $tree): ?Category
     {
-        $categoryModel = $this->findModel(Category::class, $id);
+        if (($model = Category::findRootByTree($tree)) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    public function actionIndex(int $tree = 0)
+    {
+        $rootCategory = $this->findRootCategoryByTree($tree);
         return $this->render('tree', [
-            'data' => $categoryModel->categoryArray2(),
+            'rootCategory' => $rootCategory,
+            'treeItems' => Category::getTreeItems($rootCategory->tree),
+            'data' => Category::categoryArray2($rootCategory->id),
         ]);
     }
 
-    public function actionView($id)
+    public function actionCreate(int $tree = 0, int $parent_id = null)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
+        $treeCategory = $this->findRootCategoryByTree($tree);
 
-    public function actionCreate()
-    {
-        $model = new Category();
+        $model = new CreateCategoryForm();
+        $model->tree = $treeCategory->tree;
+
+        if (!empty($parent_id)) {
+            /** @var Category $categoryModel */
+            $parentCategoryModel = $this->findModel(Category::class, $parent_id);
+            $model->parent = $parentCategoryModel->id;
+        }
+
         if ($model->load(Yii::$app->request->post())) {
-            if ($model->parentNode === null) {
-                $model->makeRoot();
-            }
-            else {
-                $parent = Category::findOne($model->parentNode);
-                $model->appendTo($parent);
-            }
-            if ($model->save()) {
-                return $this->redirect(['update', 'id' => $model->id]);
-            }
+            $model->createCategory();
+            Yii::$app->session->setFlash('success', 'Категория успешно создана');
+            return $this->redirect(['index', 'tree' => $model->tree]);
         }
         return $this->render('create', [
             'model' => $model,
         ]);
     }
 
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel(Category::class, $id);
-        $parent = $model->parents(1)->one();
-        if ($parent !== null) {
-            $model->parentNode = $parent->id;
-        }
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
-        }
-        return $this->render('update', [
-            'model' => $model,
-        ]);
-    }
-
     public function actionUpdateAjax($id)
     {
-        $model = $this->findModel(Category::class, $id);
-        $parent = $model->parents(1)->one();
-        if ($parent !== null) {
-            $model->parentNode = $parent->id;
+        /** @var Category $model */
+        $categoryModel = $this->findModel(Category::class, $id);
+
+        $model = new UpdateCategoryForm($categoryModel);
+        $model->tree = $categoryModel->tree;
+
+        if ($model->load(Yii::$app->request->post())) {
+            $model->updateCategory();
+            Yii::$app->session->setFlash('success', 'Категория успешно обновлена');
+            return $this->redirect(['index', 'tree' => $model->tree]);
         }
+
         return $this->renderAjax('_form', [
+            'category' => $categoryModel,
             'model' => $model,
+            'treeItems' => Category::getMoveTreeItems($categoryModel->id, $model->tree),
         ]);
     }
 
-    public function actionMove($item, $action, $second)
+    public function actionMove(int $item, string $action, int $second)
     {
         $itemModel = $this->findModel(Category::class, $item);
         $secondModel = $this->findModel(Category::class, $second);
@@ -115,13 +121,19 @@ class CategoryController extends BaseController
                 $itemModel->appendTo($secondModel);
                 break;
         }
-        return $itemModel->save();
+        if (Yii::$app->request->isAjax) {
+            return $itemModel->save();
+        }
+        return $this->redirect(['index', 'tree' => $secondModel->tree]);
     }
 
     public function actionDelete($id)
     {
-        $this->findModel(Category::class, $id)->delete();
-        return $this->redirect(['index']);
+        /** @var Category $categoryModel */
+        $categoryModel = $this->findModel(Category::class, $id);
+        $categoryModel->delete();
+        Yii::$app->session->setFlash('success', 'Категория успешно удалена');
+        return $this->redirect(['index', 'tree' => $categoryModel->tree]);
     }
 
     public function actionList($query)
@@ -151,4 +163,16 @@ class CategoryController extends BaseController
             'models' => $dataProvider->getModels(),
         ]);
     }
+
+    /*public function actionCreateRoot()
+    {
+        $model = new Category();
+        $model->tree = 1;
+        $model->name = 'new root';
+        $model->alias = 'new-root';
+        $model->makeRoot();
+        $model->save();
+        Yii::$app->session->setFlash('success', 'ok');
+        return $this->goBack();
+    }*/
 }

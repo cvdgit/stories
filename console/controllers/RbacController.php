@@ -4,6 +4,7 @@ namespace console\controllers;
 use Yii;
 use yii\console\Controller;
 use common\rbac\UserRoles;
+use yii\rbac\ManagerInterface;
 
 class RbacController extends Controller
 {
@@ -169,5 +170,22 @@ $moderatorRole = $auth->getRole('moderator');
         $auth->assign($author, 1);
         $auth->assign($admin, 2);
         */
+    }
+
+    private function initSectionPermission(ManagerInterface $auth)
+    {
+        $manageSectionsPermission = $auth->createPermission(UserRoles::PERMISSION_MANAGE_SECTIONS);
+        $manageSectionsPermission->description = 'Управление разделами';
+        $auth->add($manageSectionsPermission);
+
+        $adminRole = $auth->getRole('admin');
+        $auth->addChild($adminRole, $manageSectionsPermission);
+    }
+
+    public function actionInitSection()
+    {
+        $auth = Yii::$app->authManager;
+        $this->initSectionPermission($auth);
+        $this->stdout('Done!');
     }
 }

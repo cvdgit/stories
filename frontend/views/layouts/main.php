@@ -1,23 +1,19 @@
 <?php
-
 /* @var $this yii\web\View */
 /* @var $content string */
-
 use common\rbac\UserRoles;
 use common\widgets\ToastrFlash;
 use frontend\assets\AppAsset;
 use frontend\widgets\ContactWidget;
 use frontend\widgets\LoginWidget;
+use frontend\widgets\MainMenuWidget;
 use frontend\widgets\SignupWidget;
 use frontend\widgets\StorySlider;
 use yii\bootstrap\Dropdown;
 use yii\helpers\Html;
 use yii\helpers\Json;
-use yii\widgets\Menu;
 use common\helpers\Url;
-
 AppAsset::register($this);
-
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -49,10 +45,12 @@ AppAsset::register($this);
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-3">
                     <?php
                     $options = ['class' => 'site-logo', 'alt' => 'wikids', 'title' => 'wikids'];
-                    if (Url::isHome())
-                      echo Html::img('/img/wikids.png', $options);
-                    else
-                      echo Html::a(Html::img('/img/wikids-mini.png', $options), ['/site/index']);
+                    if (Url::isHome()) {
+                        echo Html::img('/img/wikids.png', $options);
+                    }
+                    else {
+                        echo Html::a(Html::img('/img/wikids-mini.png', $options), ['/site/index']);
+                    }
                     ?>
                         <div style="position: relative; float: right">
                             <button type="button" class="navbar-toggle navbar-user" data-toggle="collapse" data-target=".user-menu-wrapper"></button>
@@ -66,20 +64,7 @@ AppAsset::register($this);
                     </div>
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
                         <div class="menu-wrapper">
-                        <?php
-                        $menuItems = [
-                          ['label' => 'Главная', 'url' => ['/site/index']],
-                          ['label' => 'Истории', 'url' => ['/story/index'], 'active' => Yii::$app->controller->id === 'story'],
-                          ['label' => 'Блог', 'url' => ['news/index'], 'active' => Yii::$app->controller->id === 'news'],
-                          ['label' => 'Подписки', 'url' => ['/rate/index']],
-                          ['label' => 'Контакты', 'url' => '#', 'template'=> '<a href="{url}" data-toggle="modal" data-target="#wikids-feedback-modal">{label}</a>'],
-                        ];
-                        echo Menu::widget([
-                          'encodeLabels' => false,
-                          'items' => $menuItems,
-                          'options' => ['class' => 'site-menu site-main-menu horizontal-nav collapse'],
-                        ]);
-                        ?>
+                            <?= MainMenuWidget::widget() ?>
                         </div>
                     </div>
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-3">
@@ -146,7 +131,7 @@ AppAsset::register($this);
                         <li>ссылки на дополнительные обучающие курсы</li>
                     </ul>
                     <div class="text-center">
-                        <?= Html::a('Каталог историй', ['/story/index'], ['class' => 'btn']) ?>
+                        <?= Html::a('Каталог историй', ['/story/index', 'section' => 'stories'], ['class' => 'btn']) ?>
                     </div>
                 <?php endif ?>
         </div>

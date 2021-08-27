@@ -7,6 +7,7 @@ use backend\components\training\base\Serializer;
 use backend\components\training\collection\TestBuilder;
 use common\helpers\UserHelper;
 use common\models\Playlist;
+use common\models\SiteSection;
 use common\models\StorySlide;
 use common\models\StoryTest;
 use common\models\UserQuestionHistoryModel;
@@ -16,6 +17,7 @@ use common\services\StoryAudioService;
 use common\services\StoryFavoritesService;
 use common\services\StoryLikeService;
 use common\services\QuestionsService;
+use frontend\components\StoryRenderParams;
 use frontend\models\CreateStoryTestRun;
 use frontend\models\MyAudioStoriesSearch;
 use frontend\models\StoryFavoritesSearch;
@@ -68,6 +70,11 @@ class StoryController extends Controller
     protected $audioService;
     private $bookStoryGenerator;
 
+    private $section;
+    private $searchModel;
+    private $emptyText = 'Список историй пуст';
+    private $category;
+
     public function __construct($id,
                                 $module,
                                 StoryService $storyService,
@@ -98,54 +105,84 @@ class StoryController extends Controller
             'action' => $action,
             'emptyText' => $emptyText,
             'category' => $category,
+            'section' => null,
         ];
     }
 
-    public function actionIndex()
+    private function findSectionModel(string $alias): ?SiteSection
     {
-        $this->getView()->setMetaTags(
-            'Истории для детей',
-            'Истории для детей',
-            'Истории для детей, wikids, сказки, истории',
-            'Истории для детей'
-        );
-        $searchModel = new StorySearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        return $this->render('index', $this->getRenderParams($searchModel, $dataProvider, ['/story/index']));
+        if (($model = SiteSection::findOne(['alias' => $alias])) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('Страница не найдена');
     }
 
-    public function actionCategory($category)
+    private function findCategoryModel(string $alias): ?Category
     {
-        $model = Category::findModelByAlias($category);
+        if (($model = Category::findOne(['alias' => $alias])) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('Страница не найдена');
+    }
+
+    public function actionIndex(string $section)
+    {
+        $section = $this->findSectionModel($section);
+        $this->getView()->setMetaTags($section->title, $section->description, $section->keywords, $section->h1);
+
+        $searchModel = new StorySearch();
+        $searchModel->category_id = $section->getSectionCategories();
+        return $this->render('index', (new StoryRenderParams())
+            ->setSectionModel($section)
+            ->setSearchModel($searchModel, Yii::$app->request->queryParams)
+            ->asArray()
+        );
+    }
+
+    public function actionCategory(string $section, string $category)
+    {
+        $section = $this->findSectionModel($section);
+        $model = $this->findCategoryModel($category);
+
+        $this->getView()->setMetaTags(
+            $model->name . ' - каталог историй',
+            $model->name,
+            'wikids, сказки, истории, каталог историй',
+            $model->name
+        );
+
         $searchModel = new StorySearch();
         if (!empty($model->sort_field)) {
             $searchModel->defaultSortField = $model->sort_field;
             $searchModel->defaultSortOrder = !empty($model->sort_order) ? $model->sort_order : SORT_ASC;
         }
         $searchModel->category_id = $model->subCategories();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $this->getView()->setMetaTags(
-            $model->name . ' - каталог историй',
-            $model->name,
-            'wikids, сказки, истории, каталог историй',
-            $model->name
+        return $this->render('index', (new StoryRenderParams())
+            ->setSectionModel($section)
+            ->setCategoryModel($model)
+            ->setSearchModel($searchModel, Yii::$app->request->queryParams)
+            ->asArray()
         );
-        return $this->render('index', $this->getRenderParams($searchModel, $dataProvider, ['/story/category', 'category' => $model->alias], $model));
     }
 
     public function actionTag($tag)
     {
         $model = Tag::findModelByName($tag);
-        $searchModel = new StorySearch();
-        $searchModel->tag_id = $model->id;
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
         $this->getView()->setMetaTags(
             $model->name . ' - каталог историй',
             $model->name,
             'wikids, сказки, истории, каталог историй',
             $model->name
         );
-        return $this->render('index', $this->getRenderParams($searchModel, $dataProvider, ['/story/tag', 'tag' => $model->name]));
+
+        $searchModel = new StorySearch();
+        $searchModel->tag_id = $model->id;
+        return $this->render('index', (new StoryRenderParams())
+            ->setSearchModel($searchModel, Yii::$app->request->queryParams)
+            ->setSearchAction(['/story/tag', 'tag' => $model->name])
+            ->asArray()
+        );
     }
 
     /**
@@ -155,7 +192,7 @@ class StoryController extends Controller
      * @return mixed
      * @throws \yii\web\NotFoundHttpException
      */
-    public function actionView($alias, $track_id = null)
+    public function actionView(string $alias, $track_id = null)
     {
         $model = Story::findModelByAlias($alias);
         if (Yii::$app->user->isGuest && !$model->isPublished()) {
@@ -342,17 +379,23 @@ class StoryController extends Controller
     public function actionHistory()
     {
         $this->getView()->setMetaTags('История просмотра', 'История просмотра', 'История просмотра', 'История просмотра');
-        $searchModel = new UserStorySearch(Yii::$app->user->id);
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        return $this->render('index', $this->getRenderParams($searchModel, $dataProvider, ['/story/history'], null, 'В этом разделе будут отображаться истории, которые были просмотрены вами'));
+        return $this->render('index', (new StoryRenderParams())
+            ->setSearchModel(new UserStorySearch(Yii::$app->user->id), Yii::$app->request->queryParams)
+            ->setEmptyText('В этом разделе будут отображаться истории, которые были просмотрены вами')
+            ->setSearchAction(['/story/history'])
+            ->asArray()
+        );
     }
 
     public function actionLiked()
     {
         $this->getView()->setMetaTags('Понравившиеся истории', 'Понравившиеся истории', 'Понравившиеся истории', 'Понравившиеся истории');
-        $searchModel = new StoryLikeSearch(Yii::$app->user->id);
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        return $this->render('index', $this->getRenderParams($searchModel, $dataProvider, ['/story/liked'], null, 'В этом разделе будут отображаться понравившиеся вам истории'));
+        return $this->render('index', (new StoryRenderParams())
+            ->setSearchModel(new StoryLikeSearch(Yii::$app->user->id), Yii::$app->request->queryParams)
+            ->setEmptyText('В этом разделе будут отображаться понравившиеся вам истории')
+            ->setSearchAction(['/story/liked'])
+            ->asArray()
+        );
     }
 
     public function actionLike()
@@ -386,9 +429,12 @@ class StoryController extends Controller
     public function actionFavorites()
     {
         $this->getView()->setMetaTags('Избранные истории', 'Избранные истории', 'Избранные истории', 'Избранные истории');
-        $searchModel = new StoryFavoritesSearch(Yii::$app->user->id);
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        return $this->render('index', $this->getRenderParams($searchModel, $dataProvider, ['/story/favorites'], null, 'В этом разделе будут отображаться истории, добавленные вами в избранное'));
+        return $this->render('index', (new StoryRenderParams())
+            ->setSearchModel(new StoryFavoritesSearch(Yii::$app->user->id), Yii::$app->request->queryParams)
+            ->setEmptyText('В этом разделе будут отображаться истории, добавленные вами в избранное')
+            ->setSearchAction(['/story/favorites'])
+            ->asArray()
+        );
     }
 
     public function actionRandom()
@@ -405,9 +451,11 @@ class StoryController extends Controller
             'wikids, сказки, сказки на ночь, истории, каталог историй, сказки на ночь для детей',
             'Сказки на ночь для детей'
         );
-        $searchModel = new StorySearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        return $this->render('index', $this->getRenderParams($searchModel, $dataProvider, ['/story/index']));
+        return $this->render('index', (new StoryRenderParams())
+            ->setSearchModel(new StorySearch(), Yii::$app->request->queryParams)
+            ->setSearchAction(['/story/index'])
+            ->asArray()
+        );
     }
 
     public function actionAudioStories()
@@ -420,15 +468,21 @@ class StoryController extends Controller
         );
         $searchModel = new StorySearch();
         $searchModel->audio = 1;
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        return $this->render('index', $this->getRenderParams($searchModel, $dataProvider, ['/story/index']));
+        return $this->render('index', (new StoryRenderParams())
+            ->setSearchModel($searchModel, Yii::$app->request->queryParams)
+            ->setSearchAction(['/story/index'])
+            ->asArray()
+        );
     }
 
     public function actionMyaudio()
     {
         $this->getView()->setMetaTags('Моя озвучка', 'Моя озвучка', 'Моя озвучка', 'Моя озвучка');
-        $searchModel = new MyAudioStoriesSearch(Yii::$app->user->id);
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        return $this->render('index', $this->getRenderParams($searchModel, $dataProvider, ['/story/myaudio'], null, 'В этом разделе будут отображаться истории, озвученные вами'));
+        return $this->render('index', (new StoryRenderParams())
+            ->setSearchModel(new MyAudioStoriesSearch(Yii::$app->user->id), Yii::$app->request->queryParams)
+            ->setEmptyText('В этом разделе будут отображаться истории, озвученные вами')
+            ->setSearchAction(['/story/myaudio'])
+            ->asArray()
+        );
     }
 }

@@ -132,11 +132,11 @@ section h3.header-h3 {
 }
 
 .site-header .menu-wrapper {
-  margin-top: 38px;
+  margin-top: 24px; /*38px;*/
 }
 
 .site-header-mini .menu-wrapper {
-  padding: 14px 0;
+  /*padding: 14px 0;*/
 }
 
 .site-header .site-nav {
@@ -171,6 +171,7 @@ section h3.header-h3 {
 .site-main-menu li {
   text-transform: uppercase;
   margin-left: 30px;
+  padding: 14px 0;
 }
 
 .site-main-menu li:first-child {
@@ -1003,6 +1004,10 @@ section h3.header-h3 {
 .story-list-filter {
   font-size: .889em;
   margin-bottom: 16px;
+}
+
+.story-list-filter .summary {
+  display: inline-block;
 }
 
 
@@ -2315,9 +2320,32 @@ img.lazy {
 
   .site-main-menu li a {
     line-height: 45px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    /*padding-top: 10px;
+    padding-bottom: 10px;*/
     display: block;
+  }
+
+  .site-main-menu .sub-dropdown-content {
+    visibility: visible;
+    position: relative;
+    opacity: 1;
+    margin-top: 0;
+    box-shadow: none;
+    background-color: inherit;
+  }
+
+  .site-main-menu .sub-dropdown-content li {
+    margin-top: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .site-main-menu li.sub-dropdown {
+    padding: 0;
+  }
+
+  .site-main-menu .sub-dropdown > span {
+    display: none;
   }
 
   .site-header .site-nav {
@@ -2616,4 +2644,54 @@ img.lazy {
 
 .slides-readonly a {
   text-decoration: underline;
+}
+
+.sub-dropdown {
+  position: relative;
+}
+
+.sub-dropdown-content {
+  visibility: hidden;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: auto;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  margin-top: 10px;
+  white-space: nowrap;
+  opacity: 0;
+}
+
+.sub-dropdown:hover .sub-dropdown-content {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 300ms ease-in-out;
+  z-index: 1050;
+}
+
+.sub-dropdown:hover > span {
+  text-decoration: none;
+  color: #99cd50;
+}
+
+ul.sub-dropdown-content {
+  padding-left: 0;
+  list-style: none;
+  min-width: 220px;
+}
+
+.sub-dropdown-content li {
+  padding: 14px 0;
+  display: block;
+  margin: 0 20px;
+}
+
+.sub-dropdown-content li:first-child {
+  margin-top: 10px;
+  margin-left: 20px;
+}
+
+li.sub-dropdown>span {
+  cursor: pointer;
+  user-select: none;
 }

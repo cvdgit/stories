@@ -59,6 +59,7 @@ AppAsset::register($this);
                     'items' => [
                         ['label' => 'Главная', 'url' => ['/site/index']],
                         ['label' => 'Истории', 'url' => ['/story/index']],
+                        ['label' => 'Разделы', 'url' => ['/section']],
                         ['label' => 'Категории', 'url' => ['/category/index'], 'active' => Yii::$app->controller->id === 'category'],
                         ['label' => 'Пользователи', 'url' => ['/user/index']],
                         ['label' => 'Опечатки', 'url' => ['/feedback/index']],

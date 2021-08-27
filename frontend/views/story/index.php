@@ -1,18 +1,17 @@
 <?php
-use asu\tagcloud\TagCloud;
-use common\models\Tag;
+use common\models\SiteSection;
 use common\rbac\UserRoles;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ListView;
 use yii\widgets\ActiveForm;
 use yii\widgets\Menu;
-use common\models\Category;
 /** @var $this yii\web\View */
 /** @var $searchModel frontend\models\StorySearch */
 /** @var $dataProvider yii\data\ActiveDataProvider */
 /** @var $action array */
 /** @var $emptyText string */
+/** @var $section common\models\SiteSection */
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 ?>
 <div class="container">
@@ -23,7 +22,6 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
             </div>
             <div class="site-sidebar-wrapper">
                 <?php $form = ActiveForm::begin([
-                  'action' => $action,
                   'method' => 'GET',
                   'options' => ['class' => 'story-form'],
                 ]); ?>
@@ -46,32 +44,28 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                     'options' => ['class' => 'story-category-list'],
                 ]) ?>
                 <?php endif ?>
-                <h2>Категории</h2>
+                <?php if ($section === null): ?>
+                <h2>Разделы</h2>
                 <?= Menu::widget([
-                    'items' => Category::getCategoriesForMenu(),
+                    'items' => SiteSection::allVisibleForMenu(),
                     'submenuTemplate' => "\n<ul class=\"story-category-list story-sub-category-list\">\n{items}\n</ul>\n",
                     'options' => ['class' => 'story-category-list'],
                 ]) ?>
-                <!--h2>Облако тегов</h2-->
-                <!--noindex-->
-                <?php /* TagCloud::widget([
-                    'beginColor' => '38405d',
-                    'endColor' => '000000',
-                    'minFontSize' => 8,
-                    'maxFontSize' => 15,
-                    'displayWeight' => false,
-                    'tags' => Tag::getPopularTags(),
-                    'options' => [
-                        'style' => 'word-wrap: break-word;'
-                    ],
-                ]) */ ?>
-                <!--/noindex-->
+                <?php else: ?>
+                <h2>Категории</h2>
+                <?= Menu::widget([
+                    'items' => $section->getCategoriesForMenu(),
+                    'submenuTemplate' => "\n<ul class=\"story-category-list story-sub-category-list\">\n{items}\n</ul>\n",
+                    'options' => ['class' => 'story-category-list'],
+                ]) ?>
+                <?php endif ?>
             </div>
         </nav>
         <main class="col-xs-12 col-sm-12 col-md-12 col-lg-9 site-main" style="margin-top: 0">
             <h1 style="margin-top: 0; margin-bottom: 20px"><?= $this->getHeader() ?></h1>
             <div class="story-popular-categories row row-no-gutters">
                 <div class="col-md-6">
+                    <?php if (SiteSection::isStories($section)): ?>
                     <?= Menu::widget([
                         'items' => [
                             ['label' => '#АудиоСказки', 'url' => ['/story/audio-stories'], 'active' => Yii::$app->controller->id === 'story' && Yii::$app->controller->action->id === 'audio-stories'],
@@ -79,12 +73,15 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                         ],
                         'options' => ['class' => 'list-inline'],
                     ]) ?>
+                    <?php endif ?>
                 </div>
                 <div class="col-md-6 text-right">
                     <?php if ($category !== null && UserRoles::canModerator()): ?>
                     <?= Html::a('Тесты', ['/test/index', 'category_id' => $category->id]) ?> |
                     <?php endif ?>
+                    <?php if (SiteSection::isStories($section)): ?>
                     <?= Html::a('Случайная сказка', ['/story/random'], ['style' => 'color: #d9534f']) ?>
+                    <?php endif ?>
                 </div>
             </div>
             <?php

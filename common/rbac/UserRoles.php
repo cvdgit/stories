@@ -22,6 +22,7 @@ class UserRoles
     const PERMISSION_MANAGE_COMMENTS = 'manageComments';
     const PERMISSION_MANAGE_NEWS = 'manageNews';
     const PERMISSION_MANAGE_TEST = 'manageTest';
+    const PERMISSION_MANAGE_SECTIONS = 'manageSections';
 
     public static function isModerator($userID)
     {

@@ -1,24 +1,71 @@
 <?php
-
 use common\helpers\Url;
+use wbraganca\fancytree\FancytreeWidget;
 use yii\helpers\Html;
 use yii\web\JsExpression;
-
+/** @var $treeItems array */
+/** @var $data array */
+/** @var $rootCategory common\models\Category */
 $this->title = 'Категории';
-$this->params['breadcrumbs'][] = $this->title;
+$css = <<<CSS
+ul.fancytree-container {
+    border: 0 none;
+}
+.category-index .page-header {
+    margin-top: 0;
+    margin-bottom: 0;
+    border-color: #ddd;
+}
+.category-index .tree-control {
+    padding: 10px;
+    background-color: #eee;
+    margin-bottom: 10px;
+}
+#form-container {
+    border: 1px #ddd solid;
+    padding: 10px;
+    min-height: 500px;
+}
+#form-container.form-loading {
+    background-image: url("/img/loading.gif");
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+}
+CSS;
+$this->registerCss($css);
 ?>
 <div class="category-index">
     <h1 class="page-header"><?= Html::encode($this->title) ?></h1>
-    <p>
-        <?= Html::a('Создать категорию', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+    <div class="row row-no-gutters tree-control">
+        <div class="col-md-1">
+            Дерево:
+        </div>
+        <div class="col-md-4">
+            <div class="dropdown">
+                <a href="#" data-toggle="dropdown" class="dropdown-toggle btn btn-default"><?= Html::encode($rootCategory->name) ?> <b class="caret"></b></a>
+                <?= \yii\bootstrap\Dropdown::widget([
+                    'items' => $treeItems,
+                ]) ?>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <a href="#" class="btn btn-link">Создать дерево</a>
+            <?= Html::a('Создать категорию', ['create', 'tree' => $rootCategory->tree], ['class' => 'btn btn-success']) ?>
+        </div>
+    </div>
     <div class="row">
-        <div class="col-md-6">
-            <?= \wbraganca\fancytree\FancytreeWidget::widget([
+        <div class="col-md-4">
+            <?php if (count($data) === 0): ?>
+            <p>
+                <?= Html::a('Создать категорию', ['create', 'tree' => $rootCategory->tree], ['class' => 'btn btn-success']) ?>
+            </p>
+            <?php else: ?>
+            <h4>Дерево категорий</h4>
+            <?= FancytreeWidget::widget([
                 'options' =>[
                     'source' => $data,
                     'extensions' => ['dnd'],
-                    'minExpandLevel' => 999,
+                    'minExpandLevel' => 2,
                     'dnd' => [
                         'preventVoidMoves' => true,
                         'preventRecursiveMoves' => true,
@@ -32,21 +79,35 @@ $this->params['breadcrumbs'][] = $this->title;
                         'dragDrop' => new JsExpression('function(node, data) {
                             $.get("' . Url::to(['category/move']) . '", {item: data.otherNode.data.url, action: data.hitMode, second: data.node.data.url}, function() {
                                 data.otherNode.moveTo(node, data.hitMode);
+                                toastr.success("Успешно");
                             });
 			            }'),
                     ],
-                    'activate' => new JsExpression('function(event, data) {
-                        var title = data.node.title;
-                        var id = data.node.data.url;
-                        $.get("' . Url::to(['category/update-ajax']) . '", {id: id}, function(data) {
-                            $("#form-container").html(data);
-                        });
-                    }'),
+                    'activate' => new JsExpression('treeItemActivate'),
                 ]
             ]) ?>
+            <?php endif ?>
         </div>
-        <div class="col-md-6">
-            <div id="form-container"></div>
+        <div class="col-md-8">
+            <div id="form-container" style="display: none"></div>
         </div>
     </div>
 </div>
+<?php
+$url = Url::to(['category/update-ajax']);
+$js = <<<JS
+function treeItemActivate(event, data) {
+    var title = data.node.title;
+    var id = data.node.data.url;
+    $("#form-container")
+        .empty()
+        .fadeIn()
+        .addClass('form-loading')
+    $.get('$url', {id: id}, function(data) {
+        $("#form-container")
+            .removeClass('form-loading')
+            .html(data);
+    });
+}
+JS;
+$this->registerJs($js);

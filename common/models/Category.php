@@ -98,9 +98,9 @@ class Category extends ActiveRecord
         return new CategoryQuery(get_called_class());
     }
 
-    public static function getCategoryArray()
+    public static function getCategoryArray(int $tree)
     {
-        return ArrayHelper::map(self::find()->all(), 'id', 'name');
+        return ArrayHelper::map(self::find()->where('tree = :tree', [':tree' => $tree])->all(), 'id', 'name');
     }
 
     /**
@@ -182,7 +182,7 @@ class Category extends ActiveRecord
             return [];
         }
         
-        $rootItem = ['label' => 'Все категории', 'url' => ['/story/index']];
+        $rootItem = ['label' => 'Все категории', 'url' => ['/story/index', 'section' => 'stories']];
 
         $storyNumbers = (new Query())
             ->select('COUNT({{%story_category}}.story_id) AS stories_in_category, {{%story_category}}.category_id')
@@ -213,33 +213,31 @@ class Category extends ActiveRecord
         return $items;
     }
 
-    public static function categoryArray()
+    public static function categoryArray(int $rootID): array
     {
-        $root = self::findOne(1);
+        $root = self::findOne($rootID);
         if ($root === null) {
             return [];
         }
-        $items = $root->toNestedArray(null, 'items', function($node) {
+        return $root->toNestedArray(null, 'items', function($node) {
             return [
                 'label' => $node->name,
                 'url' => $node->id,
                 'depth' => $node->depth
             ];
         });
-        return $items;
     }
 
-    public static function categoryArray2()
+    public static function categoryArray2(int $rootID): array
     {
-        $root = self::findOne(1);
-        $items = $root->toNestedArray(null, 'children', function($node) {
+        $root = self::findOne($rootID);
+        return $root->toNestedArray(null, 'children', function($node) {
             return [
                 'title' => $node->name,
                 'url' => $node->id,
                 'depth' => $node->depth
             ];
         });
-        return $items;
     }
 
     /**
@@ -276,9 +274,60 @@ class Category extends ActiveRecord
         }, $categories), [$this->id]);
     }
 
-    public function getCategoryUrl()
+    public function getCategoryUrl(): string
     {
-        return Url::to(['story/category', 'category' => $this->alias]);
+        $root = self::findRootByTree($this->tree);
+        $section = SiteSection::findByCategory($root->id);
+        return Url::to(['story/category', 'section' => $section->alias, 'category' => $this->alias]);
     }
 
+    public static function getTreeModels(): array
+    {
+        return self::find()->where('lft = 1 AND depth = 0')->all();
+    }
+
+    public static function getTreeArray(): array
+    {
+        return ArrayHelper::map(self::getTreeModels(), 'id', 'name');
+    }
+
+    public static function getTreeItems(int $currentTree = 0): array
+    {
+        return array_map(static function(self $item) use ($currentTree) {
+            return [
+                'label' => $item->name,
+                'url' => ['category/index', 'tree' => $item->tree],
+                'options' => ['class' => ($item->tree === $currentTree ? 'active' : '')],
+            ];
+        }, self::find()->where('lft = 1 AND depth = 0')->all());
+    }
+
+    public static function getMoveTreeItems(int $categoryID, int $currentTree): array
+    {
+        return array_map(static function(self $item) use ($categoryID) {
+            return [
+                'label' => $item->name,
+                'url' => ['category/move', 'item' => $categoryID, 'action' => 'over', 'second' => $item->id],
+            ];
+        }, self::find()->where('tree <> :tree', [':tree' => $currentTree])->andWhere('lft = 1 AND depth = 0')->all());
+    }
+
+    public static function create(string $name, string $alias, string $description, string $sortField, int $sortOrder): self
+    {
+        $model = new self();
+        $model->name = $name;
+        $model->alias = $alias;
+        $model->description = $description;
+        $model->sort_field = $sortField;
+        $model->sort_order = $sortOrder;
+        return $model;
+    }
+
+    public static function findRootByTree(int $tree): ?Category
+    {
+        return self::find()
+            ->where('lft = 1 AND depth = 0')
+            ->andWhere('tree = :tree', [':tree' => $tree])
+            ->one();
+    }
 }

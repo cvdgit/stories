@@ -1,8 +1,6 @@
 <?php
 
-
 namespace frontend\models;
-
 
 use common\models\User;
 use frontend\components\StorySorter as Sort;
@@ -10,7 +8,7 @@ use yii\base\Model;
 use yii\data\SqlDataProvider;
 use yii\db\Query;
 
-class StoryLikeSearch extends Model
+class StoryLikeSearch extends Model implements StorySearchInterface
 {
     public $user_id;
     public $title;
