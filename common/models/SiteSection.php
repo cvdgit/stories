@@ -19,6 +19,7 @@ use yii\helpers\Url;
  * @property string $description
  * @property string $keywords
  * @property string $h1
+ * @property int $visible
  *
  * @property Category $category
  */
@@ -161,5 +162,10 @@ class SiteSection extends ActiveRecord
             return false;
         }
         return ($section->alias === 'stories');
+    }
+
+    public function isVisible(): bool
+    {
+        return $this->visible === 1;
     }
 }

@@ -111,7 +111,7 @@ class StoryController extends Controller
 
     private function findSectionModel(string $alias): ?SiteSection
     {
-        if (($model = SiteSection::findOne(['alias' => $alias])) !== null) {
+        if (($model = SiteSection::findOne(['alias' => $alias])) !== null && $model->isVisible()) {
             return $model;
         }
         throw new NotFoundHttpException('Страница не найдена');
