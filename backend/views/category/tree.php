@@ -49,8 +49,8 @@ $this->registerCss($css);
             </div>
         </div>
         <div class="col-md-7">
-            <a href="#" class="btn btn-link">Создать дерево</a>
             <?= Html::a('Создать категорию', ['create', 'tree' => $rootCategory->tree], ['class' => 'btn btn-success']) ?>
+            <a href="#create-tree-modal" data-toggle="modal" class="btn btn-link">Создать дерево</a>
         </div>
     </div>
     <div class="row">
@@ -93,6 +93,7 @@ $this->registerCss($css);
         </div>
     </div>
 </div>
+<?= $this->render('_tree_form') ?>
 <?php
 $url = Url::to(['category/update-ajax']);
 $js = <<<JS

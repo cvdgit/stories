@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use backend\components\BaseController;
 use backend\models\category\CreateCategoryForm;
+use backend\models\category\CreateTreeForm;
 use backend\models\category\UpdateCategoryForm;
 use backend\models\StorySearch;
 use Yii;
@@ -164,15 +165,15 @@ class CategoryController extends BaseController
         ]);
     }
 
-    /*public function actionCreateRoot()
+    public function actionCreateRoot()
     {
-        $model = new Category();
-        $model->tree = 1;
-        $model->name = 'new root';
-        $model->alias = 'new-root';
-        $model->makeRoot();
-        $model->save();
-        Yii::$app->session->setFlash('success', 'ok');
-        return $this->goBack();
-    }*/
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $form = new CreateTreeForm();
+        if ($form->load(Yii::$app->request->post())) {
+            $form->createTree();
+            Yii::$app->session->setFlash('success', 'Новое дерево успешно создано');
+            return ['success' => true];
+        }
+        return ['success' => false];
+    }
 }

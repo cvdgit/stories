@@ -119,11 +119,16 @@ class Category extends ActiveRecord
         return $this->hasMany(Story::class, ['id' => 'story_id'])->viaTable('story_category', ['category_id' => 'id']);
     }
 
+    public static function createAlias(string $name): string
+    {
+        return str_replace(' ', '-', strtolower(Translit::translit($name)));
+    }
+
     public function beforeValidate()
     {
         if (parent::beforeValidate()) {
             if (empty($this->alias)) {
-                $this->alias = str_replace(' ', '-', strtolower(Translit::translit($this->name)));
+                $this->alias = self::createAlias($this->name);
             }
             return true;
         }
@@ -312,7 +317,7 @@ class Category extends ActiveRecord
         }, self::find()->where('tree <> :tree', [':tree' => $currentTree])->andWhere('lft = 1 AND depth = 0')->all());
     }
 
-    public static function create(string $name, string $alias, string $description, string $sortField, int $sortOrder): self
+    public static function create(string $name, string $alias, string $description = '', string $sortField = null, int $sortOrder = 0): self
     {
         $model = new self();
         $model->name = $name;
