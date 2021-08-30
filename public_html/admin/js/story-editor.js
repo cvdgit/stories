@@ -327,7 +327,7 @@ SlideManager.prototype = {
                             .append(
                                 $('<div/>', {
                                     'class': 'thumb-reveal reveal',
-                                    'css': {'width': '1280px', 'height': '720px', 'transform': 'scale(0.1298)'}
+                                    'css': {'width': '1280px', 'height': '720px', 'transform': 'scale(0.1228)'}
                                 })
                                     .append(
                                         $('<div/>', {'class': 'slides'})
