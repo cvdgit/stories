@@ -29,7 +29,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                         <?php endforeach ?>
                         <!--/noindex-->
                     </div>
-                    <div class="story-date"><span>Опубликована:</span> <?= \common\helpers\SmartDate::dateSmart($model->created_at, true) ?></div>
+                    <div class="story-date"><span>Опубликована:</span> <?= \common\helpers\SmartDate::dateSmart($model->published_at, true) ?></div>
                 </div>
                 <div class="col-lg-5 col-md-5 col-sm-12">
                 </div>
