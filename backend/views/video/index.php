@@ -79,14 +79,10 @@ $this->title = 'Видео';
         $actionColumn['template'] = '{update} {delete}';
         $actionColumn['buttons'] = [
             'update' => static function($url, $model) {
-                return Html::a(
-                    '<span class="glyphicon glyphicon-pencil"></span>',
-                    ['video/file/update', 'id' => $model->id]);
+                return (new \backend\widgets\grid\UpdateButton(['video/file/update', 'id' => $model->id]))();
             },
             'delete' => static function($url, $model) {
-                return Html::a(
-                    '<span class="glyphicon glyphicon-trash"></span>',
-                    ['video/file/delete', 'id' => $model->id]);
+                return (new \backend\widgets\grid\DeleteButton(['video/file/delete', 'id' => $model->id]))();
             }
         ];
     }

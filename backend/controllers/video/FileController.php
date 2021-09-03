@@ -4,6 +4,7 @@ namespace backend\controllers\video;
 
 use backend\models\video\CreateFileVideoForm;
 use backend\models\video\UpdateFileVideoForm;
+use backend\models\video\VideoSource;
 use common\models\SlideVideo;
 use common\rbac\UserRoles;
 use Exception;
@@ -83,5 +84,12 @@ class FileController extends Controller
             return $model;
         }
         throw new NotFoundHttpException('Видео не найдено.');
+    }
+
+    public function actionDelete(int $id)
+    {
+        $model = $this->findModel($id);
+        $model->delete();
+        return $this->redirect(['video/index', 'source' => VideoSource::FILE]);
     }
 }

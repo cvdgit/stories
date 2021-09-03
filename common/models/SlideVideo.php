@@ -10,6 +10,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -134,4 +135,14 @@ class SlideVideo extends ActiveRecord
         parent::afterSave($insert, $changedAttributes);
     }
 
+    public function afterDelete()
+    {
+        if (VideoSource::isFile($this)) {
+            $filePath = $this->getUploadedFileUrl('video_id');
+            if (file_exists($filePath)) {
+                FileHelper::unlink($filePath);
+            }
+        }
+        parent::afterDelete();
+    }
 }
