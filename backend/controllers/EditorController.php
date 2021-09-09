@@ -314,7 +314,11 @@ class EditorController extends BaseController
         Yii::$app->response->format = Response::FORMAT_JSON;
         $model = $this->findModel(Story::class, $story_id);
         return array_map(static function(StorySlide $slide) {
-            $slideData = (new SlideModifier($slide->id, $slide->data))
+            $slideData = $slide->data;
+            if ($slide->isLink()) {
+                $slideData = StorySlide::getSlideData($slide->link_slide_id);
+            }
+            $slideData = (new SlideModifier($slide->id, $slideData))
                 ->addImageId()
                 ->addDescription()
                 ->render();

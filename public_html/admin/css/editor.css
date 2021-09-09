@@ -549,6 +549,10 @@ body {
     top: 0;
 }
 
+#story-editor section.is-link:before {
+    pointer-events: auto !important;
+}
+
 .sl-block-border {
     border: 2px solid #1baee1;
     position: absolute;
@@ -672,6 +676,13 @@ body {
     visibility: hidden;
 }
 
+.thumb-reveal-is-link {
+    position: absolute;
+    right: 3px;
+    bottom: 2px;
+    z-index: 101;
+}
+
 .thumb-reveal-wrapper.active .thumb-reveal-inner,
 .thumb-reveal-wrapper:hover .thumb-reveal-inner {
     border-color: #eee;
@@ -685,7 +696,8 @@ body {
 }
 
 .thumb-reveal-options > .option,
-.thumb-reveal-visible > .option {
+.thumb-reveal-visible > .option,
+.thumb-reveal-is-link > .option {
     display: block;
     float: right;
     width: 26px;

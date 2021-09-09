@@ -195,7 +195,10 @@ function SlideManager(options) {
         };
         this.setSlideView = function(view) {
             this.element.attr('data-slide-view', view);
-        }
+        };
+        this.isSlideLink = function() {
+            return this.data.isLink;
+        };
     }
 
     var currentSlide = null;
@@ -350,6 +353,18 @@ SlideManager.prototype = {
                                 'title': 'Слайд скрыт'
                             }))
                     );
+
+                if (slide.isLink) {
+                    $element.append(
+                        $('<div/>', {'class': 'thumb-reveal-is-link'})
+                            .append($('<div/>', {
+                                'class': 'option slide-is-link',
+                                'html': '<i class="glyphicon glyphicon-share-alt"></i>',
+                                'title': 'Ссылка на слайд'
+                            }))
+                    );
+                }
+
                 $element.appendTo(that.$slidesList);
                 that.decks[slide.id] = makeReveal($element.find('.reveal')[0]);
             });
@@ -1410,6 +1425,15 @@ var StoryEditor = (function() {
         Reveal.sync();
         Reveal.slide(0);
         slidesManager.setActiveSlide($editor.find('section'), slideData);
+        if (slideData.isLink) {
+            $editor.find('section').addClass('is-link');
+            blockToolbar.hide();
+            slideMenu.hide();
+        }
+        else {
+            blockToolbar.show();
+            slideMenu.show();
+        }
         slideMenu.init(slideData);
         makeDraggable($editor.find('.sl-block'));
     }
@@ -1423,7 +1447,7 @@ var StoryEditor = (function() {
             unsetActiveBlock();
             loadSlideWithData(slideData);
         }).done(function(data) {
-            if (data.length) {
+            if (data.length && !slidesManager.getActiveSlide().isSlideLink()) {
                 blockToolbar.show();
                 slideMenu.show();
             }
