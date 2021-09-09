@@ -186,6 +186,41 @@ $moderatorRole = $auth->getRole('moderator');
     {
         $auth = Yii::$app->authManager;
         $this->initSectionPermission($auth);
-        $this->stdout('Done!');
+        $this->stdout('Done!' . PHP_EOL);
+    }
+
+    public function actionCreateStudentRole()
+    {
+        $auth = Yii::$app->authManager;
+        $studentRole = $auth->createRole('student');
+        $studentRole->description = 'Ученик';
+        $auth->add($studentRole);
+
+        $userRole = $auth->getRole('user');
+        $auth->addChild($studentRole, $userRole);
+        $this->stdout('Done!' . PHP_EOL);
+    }
+
+    public function actionInitStudy()
+    {
+        $auth = Yii::$app->authManager;
+        $teacherRole = $auth->createRole(UserRoles::ROLE_TEACHER);
+        $teacherRole->description = 'Учитель';
+        $auth->add($teacherRole);
+
+        $manageStudyPermission = $auth->createPermission(UserRoles::PERMISSION_MANAGE_STUDY);
+        $manageStudyPermission->description = 'Управление обучением';
+        $auth->add($manageStudyPermission);
+
+        $auth->addChild($teacherRole, $manageStudyPermission);
+
+        $moderatorRole = $auth->getRole(UserRoles::ROLE_MODERATOR);
+        $auth->addChild($teacherRole, $moderatorRole);
+
+        $adminRole = $auth->getRole(UserRoles::ROLE_ADMIN);
+        $auth->removeChild($adminRole, $moderatorRole);
+        $auth->addChild($adminRole, $teacherRole);
+
+        $this->stdout('Done!' . PHP_EOL);
     }
 }

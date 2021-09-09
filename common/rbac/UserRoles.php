@@ -6,9 +6,11 @@ use Yii;
 
 class UserRoles
 {
-    const ROLE_USER = 'user';
-    const ROLE_MODERATOR = 'moderator';
-    const ROLE_ADMIN = 'admin';
+    public const ROLE_USER = 'user';
+    public const ROLE_MODERATOR = 'moderator';
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_STUDENT = 'student';
+    public const ROLE_TEACHER = 'teacher';
 
 	const PERMISSION_ADMIN_PANEL = 'adminPanel';
 	const PERMISSION_MANAGE_CATEGORIES = 'manageCategories';
@@ -23,6 +25,7 @@ class UserRoles
     const PERMISSION_MANAGE_NEWS = 'manageNews';
     const PERMISSION_MANAGE_TEST = 'manageTest';
     const PERMISSION_MANAGE_SECTIONS = 'manageSections';
+    const PERMISSION_MANAGE_STUDY = 'manageStudy';
 
     public static function isModerator($userID)
     {
