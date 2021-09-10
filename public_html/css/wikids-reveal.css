@@ -976,6 +976,10 @@ p.wikids-test-description {
 	height: auto !important;
 }
 
+.story-container-inner .reveal .sl-block[data-block-type=text] > .sl-block-content {
+	overflow: auto !important;
+}
+
 .story-container-inner .reveal .sl-block[data-block-type=transition],
 .story-container-inner .reveal .sl-block[data-block-type=test] {
 	height: auto !important;
