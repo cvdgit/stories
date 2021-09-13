@@ -3,6 +3,7 @@
 namespace backend\models;
 
 use common\models\Story;
+use common\models\story\StoryStatus;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\data\Sort;
@@ -31,6 +32,8 @@ class StorySearch extends Model
             [['id', 'user_id', 'status', 'sub_access'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             ['category_id', 'string'],
+            ['status', 'in', 'range' => StoryStatus::all()],
+            ['status', 'default', 'value' => StoryStatus::DRAFT],
         ];
     }
 

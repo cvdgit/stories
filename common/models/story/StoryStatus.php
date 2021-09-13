@@ -2,12 +2,16 @@
 
 namespace common\models\story;
 
-class StoryStatus
+use common\components\BaseStatus;
+use common\models\Story;
+
+class StoryStatus extends BaseStatus
 {
 
     public const DRAFT = 0;
     public const PUBLISHED = 1;
     public const FOR_PUBLICATION = 2;
+    public const TASK = 3;
 
     public static function asArray(): array
     {
@@ -15,12 +19,12 @@ class StoryStatus
             self::DRAFT => 'Черновик',
             self::PUBLISHED => 'Опубликован',
             self::FOR_PUBLICATION => 'На публикацию',
+            self::TASK => 'Задание',
         ];
     }
 
-    public static function asText(string $status): string
+    public static function isTask(Story $story): bool
     {
-        $values = self::asArray();
-        return $values[$status] ?? 'Unknown status';
+        return $story->status === self::TASK;
     }
 }
