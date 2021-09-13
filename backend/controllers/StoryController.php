@@ -8,6 +8,7 @@ use backend\models\StoryBatchCommandForm;
 use backend\models\StoryEpisodeOrderForm;
 use backend\models\WordListFromStoryForm;
 use backend\services\StoryEditorService;
+use common\models\story\StoryStatus;
 use Exception;
 use Yii;
 use yii\db\Query;
@@ -101,13 +102,15 @@ class StoryController extends BaseController
         ]);
     }
 
-    public function actionIndex()
+    public function actionIndex(int $status = StoryStatus::DRAFT)
     {
         $searchModel = new StorySearch();
+        $searchModel->status = $status;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'status' => $status,
         ]);
     }
 

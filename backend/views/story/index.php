@@ -2,6 +2,7 @@
 use backend\widgets\WikidsDatePicker;
 use common\models\Category;
 use common\models\story\StoryStatus;
+use yii\bootstrap\Nav;
 use yii\grid\ActionColumn;
 use yii\helpers\Html;
 use yii\grid\GridView;
@@ -13,12 +14,30 @@ use yii\widgets\Pjax;
 /** @var $dataProvider yii\data\ActiveDataProvider */
 /** @var $searchModel backend\models\StorySearch */
 /** @var $batchForm backend\models\StoryBatchCommandForm */
+/** @var $status int */
 $this->title = 'Управление историями';
 ?>
 <h1 class="page-header"><?= Html::encode($this->title) ?></h1>
 <p>
     <?= Html::a('Создать историю', ['create'], ['class' => 'btn btn-success']) ?>
 </p>
+
+<?= Nav::widget([
+    'options' => ['class' => 'nav nav-tabs material-tabs'],
+    'items' => [
+        [
+            'label' => 'Черновики',
+            'url' => ['story/index', 'status' => StoryStatus::DRAFT],
+            'active' => $status === StoryStatus::DRAFT,
+        ],
+        [
+            'label' => 'Опубликованные',
+            'url' => ['story/index', 'status' => StoryStatus::PUBLISHED],
+            'active' => $status === StoryStatus::PUBLISHED,
+        ],
+    ],
+]) ?>
+
 <?php Pjax::begin(['id' => 'pjax-stories']) ?>
 <?= GridView::widget([
     'dataProvider' => $dataProvider,
@@ -80,13 +99,13 @@ $this->title = 'Управление историями';
                 'attribute' => 'updated_at',
             ]),
         ],
-        [
+/*        [
             'attribute' => 'status',
             'value' => static function(Story $model) {
                 return StoryStatus::asText($model->status);
             },
             'filter' => StoryStatus::asArray(),
-        ],
+        ],*/
         'views_number',
         [
             'class' => ActionColumn::class,
@@ -129,37 +148,5 @@ $('#save-categories').off('click').on('click', function() {
     $('#' + id).val(ids.join(',')).trigger('change');
     $('#select-categories-modal').modal('hide');
 });
-/*
-$('#filter-categories-modal').on('show.bs.modal', function() {
-    var list = $('#category-list'),
-        id = 'storysearch-category_id';
-    $('input[type=checkbox]', list).prop('checked', false);
-    var value = $('#' + id).val();
-    if (value) {
-        value.split(',').forEach(function(value) {
-            $('input[value=' + value + ']', list).prop('checked', true);
-        });
-    }
-});
-$('#do-category-filter').on('click', function() {
-    var list = $('#selected-category-list'),
-        id = 'storysearch-category_id',
-        ids = [];
-    list.empty();
-    $('#category-list input[type=checkbox]').each(function() {
-        var el = $(this);
-        if (el.is(':checked')) {
-            $('<span>')
-              .addClass('label label-default')
-              .text($.trim(el.parent().text()))
-              .appendTo(list);
-            list.append(' ');
-            ids.push(el.val());
-        }
-    });
-    $('#' + id).val(ids.join(',')).trigger('change');
-    $('#filter-categories-modal').modal('hide');
-});*/
 JS;
 $this->registerJs($js);
-?>
