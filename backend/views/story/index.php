@@ -35,6 +35,11 @@ $this->title = 'Управление историями';
             'url' => ['story/index', 'status' => StoryStatus::PUBLISHED],
             'active' => $status === StoryStatus::PUBLISHED,
         ],
+        [
+            'label' => 'На публикацию',
+            'url' => ['story/index', 'status' => StoryStatus::FOR_PUBLICATION],
+            'active' => $status === StoryStatus::FOR_PUBLICATION,
+        ],
     ],
 ]) ?>
 
