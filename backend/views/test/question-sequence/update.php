@@ -80,13 +80,12 @@ $this->registerCss($css);
                 <?= $form->field($model, 'type')->dropDownList(QuestionType::asArray(), ['disabled' => true]) ?>
                 <?= $form->field($model, 'sortable')->hiddenInput()->label(false) ?>
                 <?= QuestionSlidesWidget::widget(['model' => $model->getModel()]) ?>
-                <div class="form-group">
+                <div class="form-group form-group-controls">
                     <?= Html::submitButton('Изменить вопрос', ['class' => 'btn btn-success']) ?>
                 </div>
                 <?php ActiveForm::end(); ?>
             </div>
             <div class="col-md-6">
-
                 <?php
                 $createAnswerForm = ActiveForm::begin([
                     'action' => ['test/question-sequence/create-answer', 'question_id' => $model->getModel()->id],
@@ -217,123 +216,5 @@ $js = <<< JS
             e.preventDefault();
         });
 })();
-
-/*
-function createAnswer() {
-    var text = $('#answerText').val();
-    if (!text.length) {
-        return;
-    }
-    Answers.createAnswer({text});
-    $('#answerText').val('').focus();
-}
-
-$('#createAnswer').on('click', function() {
-    createAnswer();
-});
-
-var Answers = (function(root) {
-    
-    function createAnswerElement(props) {
-        var move = $('<i/>', {
-            class: 'glyphicon glyphicon-move handle'
-        });
-        var del = $('<a/>', {
-            html: '<i class="glyphicon glyphicon-trash"></i>',
-            href: '#',
-            class: 'delete-answer pull-right'
-        });
-        return $('<div/>', {
-            text: props.text,
-            class: 'list-group-item',
-            'data-id': props.id
-        }).prepend(move).append(del);
-    }
-    
-    function createAnswer(props) {
-        root.append(createAnswerElement(props));
-    }
-    
-    function asJson() {
-        return root.find('div.list-group-item').map(function(index) {
-            return {
-                id: $(this).attr('data-id'),
-                text: $(this).text(),
-                order: index
-            };
-        }).get();
-    }
-    
-    function init(data) {
-        data = data || [];
-        if (typeof data === 'string') {
-            data = JSON.parse(data);
-        }
-        data.forEach(function(item) {
-            createAnswer(item);
-        });
-    }
-    
-    function extend(a, b) {
-        for (var i in b) {
-            a[i] = b[i];
-        }
-        return a;
-    }
-    
-    function dispatchEvent(type, args) {
-        var event = document.createEvent("HTMLEvents", 1, 2);
-        event.initEvent(type, true, true);
-        extend(event, args);
-        document.dispatchEvent(event);
-    }
-    
-    root.on('click', '.delete-answer', function(e) {
-        e.preventDefault();
-        var element = $(this).parent();
-        var id = element.attr('data-id');
-        element.remove();
-        dispatchEvent('onDeleteAnswer', {
-            'id': id
-        });
-    });
-    
-    return {
-        'init': init,
-        'createAnswer': createAnswer,
-        'asJson': asJson,
-        'addEventListener': function(type, listener, useCapture) {
-            if ('addEventListener' in window) {
-                document.addEventListener(type, listener, useCapture);
-            }
-        }
-    };
-})($('#answers'));
-
-
-
-var element = $('#updatesequencequestion-answers');
-Answers.init(element.val());
-$('#update-sequence-question-form').on('beforeSubmit', function() {
-    element.val(JSON.stringify(Answers.asJson()));
-    return true;
-});
-Answers.addEventListener('onDeleteAnswer', function(args) {
-    if (args.id) {
-        $.get('/admin/index.php?r=test/answer-sequence/delete', {'id': args.id})
-            .done(function(response) {
-                if (response && response.success) {
-                    toastr.success('Ответ успешно удален');
-                }
-            });
-    }
-});
-
-$('#create-answers-form').on('submit', function(e) {
-    e.preventDefault();
-    createAnswer();
-});
-*/
-
 JS;
 $this->registerJs($js);

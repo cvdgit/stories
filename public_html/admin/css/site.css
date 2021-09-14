@@ -609,3 +609,9 @@ body {
         box-shadow: none;
     }
 }
+
+.form-group-controls {
+    background-color: #eee;
+    border-top: 1px #ddd solid;
+    padding: 20px;
+}

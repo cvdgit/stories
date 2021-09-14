@@ -23,7 +23,7 @@ $this->params['breadcrumbs'] = [
                 <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
                 <?= $form->field($model, 'type')->dropDownList(QuestionType::asArray(), ['readonly' => true]) ?>
                 <?= $form->field($model, 'imageFile')->fileInput() ?>
-                <div class="form-group">
+                <div class="form-group form-group-controls">
                     <?= Html::submitButton('Создать вопрос', ['class' => 'btn btn-success']) ?>
                 </div>
                 <?php ActiveForm::end(); ?>

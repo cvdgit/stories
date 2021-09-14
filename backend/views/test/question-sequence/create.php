@@ -21,7 +21,7 @@ $this->params['breadcrumbs'] = [
                 <?= $form->field($model, 'story_test_id')->hiddenInput()->label(false) ?>
                 <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
                 <?= $form->field($model, 'type')->dropDownList(QuestionType::asArray(), ['disabled' => true]) ?>
-                <div class="form-group">
+                <div class="form-group form-group-controls">
                     <?= Html::submitButton('Создать вопрос', ['class' => 'btn btn-success']) ?>
                 </div>
                 <?php ActiveForm::end(); ?>

@@ -110,7 +110,7 @@ class Story extends ActiveRecord
             [['title', 'alias'], 'string', 'max' => 255],
             [['alias'], 'unique'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
-            ['status', 'in', 'range' => [StoryStatus::DRAFT, StoryStatus::PUBLISHED, StoryStatus::FOR_PUBLICATION]],
+            ['status', 'in', 'range' => StoryStatus::all()],
             ['status', 'default', 'value' => StoryStatus::DRAFT],
             [['tagNames', 'story_playlists', 'story_categories'], 'safe'],
             [['description'], 'string', 'max' => 1024],
@@ -236,14 +236,6 @@ class Story extends ActiveRecord
         return self::find()->published()->byRand()->limit(1)->one();
     }
 
-    /*public static function getSourceList()
-    {
-        return [
-            self::SOURCE_SLIDESCOM => 'Slides.com (Dropbox)',
-            self::SOURCE_POWERPOINT => 'Файл PowerPoint (PPTX)',
-        ];
-    }*/
-
     public function saveBody($body)
     {
         $this->body = $body;
@@ -271,6 +263,11 @@ class Story extends ActiveRecord
             return $model;
         }
         throw new DomainException('История не найдена');
+    }
+
+    public static function findStory(string $alias): ?self
+    {
+        return self::findOne(['alias' => $alias]);
     }
 
     /**
@@ -363,14 +360,28 @@ class Story extends ActiveRecord
         return str_replace($search, $replace, $data);
     }
 
-    public function getSlidesForQuestion(): array
+    public function getStorySlidesWidget(): array
     {
-        $models = $this->getStorySlides()
+        return $this->getStorySlides()
             ->with('story')
-            ->where('kind = :kind', [':kind' => StorySlide::KIND_SLIDE])
-            ->orderBy(['number' => SORT_ASC])
+            ->where('{{%story_slide}}.kind <> :kind', [':kind' => StorySlide::KIND_LINK])
+            ->andWhere('{{%story_slide}}.status = :status', [':status' => StorySlide::STATUS_VISIBLE])
             ->all();
-        return self::modifySlides($models);
+    }
+
+    public function getStorySlidesWidgetSelected(): array
+    {
+        /** @var StorySlide[] $slides */
+        $slides = $this->getStorySlides()
+            ->with('story')
+            ->andWhere('{{%story_slide}}.status = :status', [':status' => StorySlide::STATUS_VISIBLE])
+            ->all();
+        foreach ($slides as $i => $slide) {
+            if ($slide->kind === StorySlide::KIND_LINK) {
+                $slides[$i]->data = StorySlide::getSlideData($slide->link_slide_id);
+            }
+        }
+        return $slides;
     }
 
     public static function modifySlides(array $models): array
@@ -593,6 +604,20 @@ class Story extends ActiveRecord
         $model->source_id = self::SOURCE_POWERPOINT;
         $model->story_categories = implode(',', $categories);
         $model->categories = $categories;
+        return $model;
+    }
+
+    public static function createStudy(string $title, string $alias, int $userID): self
+    {
+        $model = new self();
+        $model->loadDefaultValues();
+        $model->category_id = 1;
+        $model->title = $title;
+        $model->alias = $alias;
+        $model->user_id = $userID;
+        $model->source_id = self::SOURCE_POWERPOINT;
+        $model->status = StoryStatus::TASK;
+        $model->story_categories = '60';
         return $model;
     }
 

@@ -89,7 +89,6 @@ $js = <<< JS
         }
         list
             .append($('#all-trees').find('#tree' + treeID)[0].innerHTML);
-        
         fillSelectedValue(list, values);
     }
     
@@ -98,7 +97,6 @@ $js = <<< JS
         if (values.length === 0) {
             return;
         }
-        console.log(values);
         values.forEach(function(value) {
             $('input[value=' + value + ']', list).prop('checked', true);
         });
@@ -111,4 +109,3 @@ $js = <<< JS
 })();
 JS;
 $this->registerJs($js);
-?>

@@ -42,7 +42,7 @@ class StorySlide extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'story_slide';
+        return '{{%story_slide}}';
     }
 
     public function behaviors()
@@ -142,13 +142,14 @@ class StorySlide extends ActiveRecord
         return $model;
     }
 
-    public static function createSlideLink(int $storyID, int $linkSlideID)
+    public static function createSlideLink(int $storyID, int $linkSlideID): self
     {
         $slide = new self();
         $slide->story_id = $storyID;
         $slide->kind = self::KIND_LINK;
         $slide->number = (new Query())->from(self::tableName())->where('story_id = :story', [':story' => $storyID])->max('number') + 1;
         $slide->link_slide_id = $linkSlideID;
+        $slide->data = 'link';
         return $slide;
     }
 
@@ -261,6 +262,20 @@ class StorySlide extends ActiveRecord
     {
         $this->kind = self::KIND_SLIDE;
         $this->save(false, ['kind']);
+    }
+
+    public static function getSlideData(int $id): string
+    {
+        $slide = self::findOne($id);
+        if ($slide === null) {
+            throw new DomainException('Slide not found');
+        }
+        return $slide->data;
+    }
+
+    public static function deleteAllLinkSlides(int $storyID): void
+    {
+        self::deleteAll('story_id = :story AND kind = :kind', [':story' => $storyID, ':kind' => self::KIND_LINK]);
     }
 }
 

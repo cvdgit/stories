@@ -1,9 +1,11 @@
 <?php
-/** @var $slides string */
-/** @var $remote string */
+use backend\widgets\SelectStorySlidesWidget;
+use yii\helpers\Json;
+/** @var $slides array */
+/** @var $questionID int */
 $css = <<<CSS
 .question-slides-block {
-    margin: 30px 0;
+    margin: 20px 0;
 }
 .question-slides-block h4 {
     height: 35px;
@@ -13,28 +15,30 @@ CSS;
 $this->registerCss($css);
 ?>
 <div class="question-slides-block">
-    <h4>Связанные слайды <span class="pull-right"><button class="btn btn-primary" type="button" id="manage-slides">Выбрать слайды</button></span></h4>
+    <h4>Связанные слайды</h4>
     <table class="table table-bordered" id="question-slides-list">
         <thead>
-        <tr>
-            <th>№</th>
-            <th>История</th>
-            <th>Слайд</th>
-        </tr>
+            <tr>
+                <th>№</th>
+                <th>История</th>
+                <th>Слайд</th>
+            </tr>
         </thead>
         <tbody>
-        <tr>
-            <td colspan="3">Пусто</td>
-        </tr>
+            <tr>
+                <td colspan="3">Пусто</td>
+            </tr>
         </tbody>
     </table>
-</div>
-<div class="modal remote fade" id="manage-question-slides-modal">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content"></div>
-    </div>
+    <?= SelectStorySlidesWidget::widget([
+        'slidesAction' => 'story/widget/slides',
+        'onSave' => 'onSaveSlides',
+        'selectedSlides' => $slides,
+        'buttonTitle' => 'Выбрать слайды'
+    ]) ?>
 </div>
 <?php
+$slidesJson = Json::encode($slides);
 $js = <<< JS
 window['createQuestionSlideList'] = function(slides) {
     var list = $('#question-slides-list tbody');
@@ -46,22 +50,68 @@ window['createQuestionSlideList'] = function(slides) {
         $('<tr/>')
             .append($('<td/>').text(++i))
             .append($('<td/>').text(item.story))
-            .append($('<td/>').text(item.number))
+            .append($('<td/>').text(item.slideNumber))
             .appendTo(list);
     });
 };
+function onSaveSlides(selected, modal, targetElement) {
+
+    var formData = new FormData();
+    formData.append('QuestionSlidesForm[question_id]', $questionID);
+    selected.forEach(function(slideID) {
+        formData.append('QuestionSlidesForm[slide_ids][]', slideID);
+    });
+
+    var button = $(targetElement);
+    button.button("loading");
+    $.ajax({
+        url: '/admin/index.php?r=question-slides/create',
+        type: 'POST',
+        data: formData,
+        dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false
+    })
+    .done(function(response) {
+        if (response && response.success) {
+            toastr.success('Изменения успешно сохранены');
+            window.createQuestionSlideList(response.slides);
+        }
+    })
+    .fail(function(response) {
+        toastr.error(response.responseJSON.type, response.responseJSON.message);
+    })
+    .always(function() {
+        button.button('reset');
+        modal.modal('hide');
+    });
+    
+    
+    /*var list = $('#story-slides').find('.selected-slides');
+    list.empty();
+    
+    selected = selected || [];
+    if (selected.length > 0) {
+        $('<p/>', {'text': 'Слайды выбраны. История будет создана после сохранения.'})
+            .appendTo(list);
+    }
+    
+    var modelName = '';
+    selected.forEach(function(slideID) {
+        list.append($('<input/>', {
+            'type': 'hidden',
+            'name': modelName + '[slide_ids][]',
+            'value': slideID
+        }));
+    });
+    modal.modal('hide');*/
+}
 (function() {
     "use strict";
     
-    var questionSlides = $slides;
+    var questionSlides = $slidesJson;
     createQuestionSlideList(questionSlides);
-    var modal = $('#manage-question-slides-modal');
-    $('#manage-slides').on('click', function() {
-        modal.modal({'remote': '$remote'});
-    });
-    modal.on('loaded.bs.modal', function() {
-
-    });
 })();
 JS;
 $this->registerJs($js);

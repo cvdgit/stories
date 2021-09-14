@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use backend\helpers\SelectSlideWidgetHelper;
 use backend\models\question\QuestionType;
 use backend\models\question\region\RegionImage;
 use DomainException;
@@ -341,12 +342,6 @@ class StoryTestQuestion extends ActiveRecord
 
     public function getStorySlidesForList(): array
     {
-        return array_map(static function(StorySlide $slideModel) {
-            return [
-                'id' => $slideModel->id,
-                'story' => $slideModel->story->title,
-                'number' => $slideModel->number,
-            ];
-        }, $this->getStorySlides()->with('story')->all());
+        return SelectSlideWidgetHelper::getSlides($this->getStorySlides()->with('story')->all());
     }
 }

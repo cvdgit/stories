@@ -282,7 +282,7 @@ class StoryController extends BaseController
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return (new Query())
-            ->select(['title', 'id', "CONCAT('/slides_cover/list/', cover) AS cover"])
+            ->select(['title', 'id', "IF(cover IS NULL, '/img/story-1.jpg', CONCAT('/slides_cover/list/', cover)) AS cover"])
             ->from(Story::tableName())
             ->where(['like', 'title', $query])
             ->orderBy(['title' => SORT_ASC])

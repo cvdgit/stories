@@ -140,3 +140,33 @@ var Neo = (function(jQuery) {
         "getQuestionValues": getQuestionValues
     };
 })(jQuery);
+
+
+function yiiModalFormInit(formElement, doneCallback, failCallback, alwaysCallback) {
+    formElement.on('beforeSubmit', function(e) {
+        e.preventDefault();
+        var $btn = $(this).find('button[type=submit]');
+        $btn.button('loading');
+        $.ajax({
+            url: $(this).attr('action'),
+            type: $(this).attr('method'),
+            data: new FormData(this),
+            dataType: 'json',
+            cache: false,
+            contentType: false,
+            processData: false
+        })
+            .done(doneCallback)
+            .fail(failCallback)
+            .always(function() {
+                $btn.button('reset');
+                if (typeof alwaysCallback === 'function') {
+                    alwaysCallback();
+                }
+            });
+        return false;
+    })
+        .on('submit', function(e) {
+            e.preventDefault();
+        });
+}
