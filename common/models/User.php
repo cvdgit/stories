@@ -2,8 +2,10 @@
 
 namespace common\models;
 
+use common\services\RoleManager;
 use DomainException;
 use Yii;
+use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\ActiveQuery;
@@ -47,17 +49,19 @@ class User extends ActiveRecord implements IdentityInterface
 
     public $active_payment;
 
-    /**
-     * {@inheritdoc}
-     */
+    private $roleManager;
+
+    public function __construct($config = [])
+    {
+        $this->roleManager = Yii::createObject(RoleManager::class);
+        parent::__construct($config);
+    }
+
     public static function tableName()
     {
         return '{{%user}}';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function behaviors()
     {
         return [
@@ -70,9 +74,6 @@ class User extends ActiveRecord implements IdentityInterface
         return new UserQuery(static::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
@@ -86,17 +87,11 @@ class User extends ActiveRecord implements IdentityInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function findIdentity($id)
     {
         return static::findOne(['id' => $id]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function findIdentityByAccessToken($token, $type = null)
     {
         throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
@@ -111,6 +106,11 @@ class User extends ActiveRecord implements IdentityInterface
     public static function findByUsername($username)
     {
         return static::findOne(['username' => $username]);
+    }
+
+    public static function findByEmail(string $email): ?self
+    {
+        return static::findOne(['email' => $email]);
     }
 
     /**
@@ -148,25 +148,16 @@ class User extends ActiveRecord implements IdentityInterface
         return $timestamp + $expire >= time();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getId()
     {
         return $this->getPrimaryKey();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthKey()
     {
         return $this->auth_key;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validateAuthKey($authKey)
     {
         return $this->getAuthKey() === $authKey;
@@ -428,5 +419,30 @@ class User extends ActiveRecord implements IdentityInterface
     public static function getUserList(): array
     {
         return ArrayHelper::map(self::find()->all(), 'id', 'profileName');
+    }
+
+    public static function createUsername(): string
+    {
+        return 'user' . sprintf("%06d", random_int(1, 999999));
+    }
+
+    public static function createPassword(): string
+    {
+        return Yii::$app->security->generateRandomString();
+    }
+
+    public function afterDelete()
+    {
+        $this->roleManager->revoke($this->id);
+        parent::afterDelete();
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStudyGroups()
+    {
+        return $this->hasMany(StudyGroup::class, ['id' => 'study_group_id'])
+            ->viaTable('study_group_user', ['user_id' => 'id']);
     }
 }

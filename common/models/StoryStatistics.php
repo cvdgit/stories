@@ -27,9 +27,6 @@ class StoryStatistics extends ActiveRecord
 
     public $slide_time = 0;
 
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName()
     {
         return 'story_statistics';
@@ -45,21 +42,15 @@ class StoryStatistics extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
+/*    public function rules()
     {
         return [
             [['story_id', 'slide_id', 'begin_time', 'end_time', 'chars', 'session'], 'required'],
             [['story_id', 'slide_number', 'begin_time', 'end_time', 'chars', 'slide_id', 'user_id'], 'integer'],
             [['session'], 'string', 'max' => 50],
         ];
-    }
+    }*/
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
@@ -96,4 +87,17 @@ class StoryStatistics extends ActiveRecord
         return self::find()->andWhere(['{{%story_statistics}}.story_id' => $story_id]);
     }
 
+    public static function create(int $storyID, int $slideID, string $session, int $slideNumber, int $beginTime, int $endTime, int $chars, int $userID = null): self
+    {
+        $model = new self;
+        $model->story_id = $storyID;
+        $model->slide_id = $slideID;
+        $model->session = $session;
+        $model->slide_number = $slideNumber;
+        $model->begin_time = $beginTime;
+        $model->end_time = $endTime;
+        $model->chars = $chars;
+        $model->user_id = $userID;
+        return $model;
+    }
 }

@@ -16,7 +16,6 @@ var StoryRevealStatistics = window.StoryRevealStatistics || (function() {
 	    session = makeSessionID();
 
 	function send(data) {
-		console.log("send statistics");
 		$.ajax({
 			url: config.action,
 			type: 'POST',
@@ -33,12 +32,15 @@ var StoryRevealStatistics = window.StoryRevealStatistics || (function() {
 		var stat = {};
 		if (ev.previousSlide) {
 			stat = {
+				story_id: config.story_id,
 				slide_number: ev.indexh,
 				begin_time: start_time_ts,
 				end_time: toUnixTS(ev.timeStamp),
 				chars: ev.previousSlide.innerText.split(' ').length,
 				session: session,
-				slide_id: $(ev.previousSlide).attr("data-id")
+				slide_id: $(ev.previousSlide).attr("data-id"),
+				study_task_id: config.study_task_id,
+				last_slide: Reveal.isLastSlide() ? 1 : 0
 			};
 		}
 		return stat;

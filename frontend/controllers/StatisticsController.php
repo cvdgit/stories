@@ -2,17 +2,17 @@
 
 namespace frontend\controllers;
 
+use common\models\study_task\StudyTaskProgressStatus;
 use common\services\story\CountersService;
+use frontend\models\SlideStatForm;
 use Yii;
-use common\models\Story;
-use common\models\StoryStatistics;
 use yii\web\Controller;
 use yii\web\Response;
 
 class StatisticsController extends Controller
 {
 
-    protected $countersService;
+    private $countersService;
 
     public function __construct($id, $module, CountersService $countersService, $config = [])
     {
@@ -20,24 +20,32 @@ class StatisticsController extends Controller
         parent::__construct($id, $module, $config);
     }
 
-    public function actionWrite($id)
+    public function actionWrite()
 	{
         Yii::$app->response->format = Response::FORMAT_JSON;
         $storeStatistics = $this->countersService->needUpdateCounters();
         if ($storeStatistics) {
-            $story = Story::findModel($id);
-            $model = new StoryStatistics();
-            $model->story_id = $story->id;
-            $model->user_id = Yii::$app->user->id;
-            if ($model->load(Yii::$app->request->post(), '') && $model->validate()) {
-                $model->save();
+
+            $model = new SlideStatForm();
+            if ($model->load(Yii::$app->request->post(), '')) {
+
+                $model->saveStat(Yii::$app->user->getId());
+
                 if (!Yii::$app->user->isGuest) {
-                    $this->countersService->calculateStoryHistoryPercentage(Yii::$app->user->id, $story->id, $story->slides_number);
+                    if ($model->needUpdateStudyTaskStatus()) {
+                        $status = StudyTaskProgressStatus::PROGRESS;
+                        if ($model->isLastSlide()) {
+                            $status = StudyTaskProgressStatus::DONE;
+                        }
+                        StudyTaskProgressStatus::setStatus($model->study_task_id, Yii::$app->user->getId(), $status);
+                    }
+                    else {
+                        $this->countersService->calculateStoryHistoryPercentage(Yii::$app->user->id, $model->story_id);
+                    }
                 }
                 return ['success' => true];
             }
         }
         return ['success' => false];
 	}
-
 }

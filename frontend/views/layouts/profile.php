@@ -10,17 +10,31 @@
             </div-->
             <?= \yii\widgets\Menu::widget([
                 'items' => [
-                    ['label' => '<i class="glyphicon glyphicon-cog"></i> Основная информация', 'url' => ['/profile'], 'active' => Yii::$app->controller->id === 'profile'],
+                    [
+                        'label' => '<i class="glyphicon glyphicon-cog"></i> Основная информация',
+                        'url' => ['/profile'],
+                        'active' => Yii::$app->controller->id === 'profile',
+                    ],
                     [
                         'label' => '<i class="glyphicon glyphicon-education"></i> Обучение',
                         'url' => ['/training'],
                         'active' => Yii::$app->controller->id === 'training',],
-
-                            ['label' => '<i class="glyphicon glyphicon-user"></i> Ученики',
-                            'url' => ['/student/index'],
-                            'active' => Yii::$app->controller->id === 'student',],
-
-                    ['label' => '<i class="glyphicon glyphicon-ruble"></i> Подписки', 'url' => ['/payment/index'], 'active' => Yii::$app->controller->id === 'payment'],
+                    [
+                        'label' => '<i class="glyphicon glyphicon-education"></i> Задания',
+                        'url' => ['/study/index'],
+                        'active' => Yii::$app->controller->id === 'study',
+                        'visible' => Yii::$app->user->can('student'),
+                    ],
+                    [
+                        'label' => '<i class="glyphicon glyphicon-user"></i> Ученики',
+                        'url' => ['/student/index'],
+                        'active' => Yii::$app->controller->id === 'student',
+                    ],
+                    [
+                        'label' => '<i class="glyphicon glyphicon-ruble"></i> Подписки',
+                        'url' => ['/payment/index'],
+                        'active' => Yii::$app->controller->id === 'payment',
+                    ],
                 ],
                 'options' => ['class' => 'profile-menu'],
                 'encodeLabels' => false,

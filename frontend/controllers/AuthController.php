@@ -1,18 +1,18 @@
 <?php
 
-
 namespace frontend\controllers;
 
-use common\models\Auth;
-use common\services\auth\SignupService;
+use common\models\StudyTask;
+use common\models\UserToken;
 use common\services\WelcomeUserService;
+use Exception;
 use Yii;
 use yii\filters\VerbFilter;
-use yii\helpers\Url;
 use yii\web\Controller;
 use common\models\LoginForm;
 use common\services\auth\AuthService;
 use frontend\components\AuthHandler;
+use yii\web\NotFoundHttpException;
 
 class AuthController extends Controller
 {
@@ -98,4 +98,40 @@ class AuthController extends Controller
         return $this->goHome();
     }
 
+    private function goToTask($task)
+    {
+        if (($task !== null) && ($taskModel = StudyTask::findTask($task)) !== null) {
+            return $this->redirect($taskModel->getStudyTaskUrl());
+        }
+        return $this->goHome();
+    }
+
+    public function actionToken(string $token, $task = null)
+    {
+        if (!Yii::$app->user->isGuest) {
+            return $this->goToTask($task);
+        }
+        $tokenModel = UserToken::findByToken($token);
+        if ($tokenModel === null) {
+            throw new NotFoundHttpException('Страница не найдена');
+        }
+        if ($tokenModel->isExpired()) {
+            throw new NotFoundHttpException('Истекший токен');
+        }
+        if (($user = $tokenModel->user) === null) {
+            throw new NotFoundHttpException('Ошибка пользователя');
+        }
+
+        Yii::$app->user->login($user, Yii::$app->params['user.rememberMeDuration']);
+        $tokenModel->resetToken();
+
+        try {
+            $this->welcomeUserService->addJob($user->id);
+        }
+        catch (Exception $e) {
+            Yii::$app->errorHandler->logException($e);
+        }
+
+        return $this->goToTask($task);
+    }
 }

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace common\services\story;
-
 
 use common\models\Story;
 use common\models\StorySlide;
@@ -13,18 +11,23 @@ use yii\db\Query;
 class CountersService
 {
 
-    public function needUpdateCounters()
+    public function needUpdateCounters(): bool
     {
-        if (Yii::$app->user->isGuest) {
+        return true;
+/*        if (Yii::$app->user->isGuest) {
             return true;
         }
         $role = Yii::$app->authManager->getRolesByUser(Yii::$app->user->id);
         $role = array_shift($role);
-        return $role->name === UserRoles::ROLE_USER || $role->name === UserRoles::ROLE_ADMIN;
+        return in_array($role->name, [UserRoles::ROLE_USER, UserRoles::ROLE_STUDENT, UserRoles::ROLE_ADMIN], true);*/
     }
 
-    public function calculateStoryHistoryPercentage(int $userID, int $storyID, int $slideNumber)
+    public function calculateStoryHistoryPercentage(int $userID, int $storyID): void
     {
+        $storyModel = Story::findOne($storyID);
+        if ($storyModel === null) {
+            return;
+        }
         $viewedSlidesNumber = (new Query())
             ->select('slide_id')
             ->from('{{%story_statistics}}')
@@ -39,7 +42,7 @@ class CountersService
             ->where('story_id = :story', [':story' => $storyID])
             ->andWhere('status = :status', [':status' => StorySlide::STATUS_VISIBLE])
             ->count();
-        $numberOfSlides--; // отнять последнй слайд - Конец
+        $numberOfSlides--; // отнять последний слайд - Конец
         if ($viewedSlidesNumber > 0 && $numberOfSlides > 0) {
             $percent = round($viewedSlidesNumber * 100 / $numberOfSlides);
             if ($percent > 100) {
@@ -84,5 +87,4 @@ class CountersService
             }
         }
     }
-
 }

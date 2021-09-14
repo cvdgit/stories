@@ -3,6 +3,7 @@
 namespace common\models;
 
 use yii\db\ActiveRecord;
+use yii\db\Query;
 
 /**
  * This is the model class for table "story_story_test".
@@ -85,4 +86,15 @@ class StoryStoryTest extends ActiveRecord
         }
     }
 
+    public static function findTestIdsBySlideId(int $slideId): array
+    {
+        $testIds = (new Query())
+            ->select(['tid' => 't2.test_id'])
+            ->from(['t' => StorySlide::tableName()])
+            ->innerJoin(['t2' => self::tableName()], 't2.story_id = t.story_id')
+            ->where('t.id = :slide', [':slide' => $slideId])
+            ->indexBy('tid')
+            ->all();
+        return array_keys($testIds);
+    }
 }

@@ -1,11 +1,11 @@
 <?php
 
-
 namespace common\services;
 
 use backend\models\UserCreateForm;
 use backend\models\UserUpdateForm;
 use common\models\User;
+use common\rbac\UserRoles;
 use common\services\auth\SignupService;
 use Exception;
 use Yii;
@@ -119,4 +119,53 @@ class UserService
         });
     }
 
+    public function createFromGroup(array $data): array
+    {
+
+        $forCreate = [];
+        $result = [];
+
+        foreach ($data as $userData) {
+            $user = User::findByEmail($userData->email);
+            if ($user === null) {
+                $forCreate[] = $userData;
+            }
+            else {
+                $result[] = $user->id;
+                if (!$this->roleManager->canUser($user->id, UserRoles::ROLE_STUDENT)) {
+                    $this->roleManager->revoke($user->id);
+                    $this->roleManager->assign($user->id, UserRoles::ROLE_STUDENT);
+                }
+                if (!empty($userData->firstname) && !empty($userData->lastname)) {
+                    $user->updateProfile($userData->firstname, $userData->lastname);
+                }
+            }
+        }
+
+        foreach ($forCreate as $userData) {
+
+            $this->transaction->wrap(function() use ($userData, &$result) {
+
+                $user = User::create(
+                    User::createUsername(),
+                    $userData->email,
+                    User::createPassword()
+                );
+                $user->save();
+
+                $this->roleManager->assign($user->id, UserRoles::ROLE_STUDENT);
+
+                $user->createMainStudent();
+
+                //if (!empty($userData->firstname) && !empty($userData->lastname)) {
+                    $profile = $user->updateProfile($userData->firstname, $userData->lastname);
+                    $profile->save();
+                //}
+
+                $result[] = $user->id;
+            });
+        }
+
+        return $result;
+    }
 }

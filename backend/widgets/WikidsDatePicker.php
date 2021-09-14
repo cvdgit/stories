@@ -19,7 +19,10 @@ class WikidsDatePicker extends InputWidget
             'language' => 'ru',
             'clientOptions' => [
                 'autoclose' => true,
-                'format' => 'dd.mm.yyyy'
+                'format' => 'dd.mm.yyyy',
+            ],
+            'options' => [
+                'autocomplete' => 'off',
             ]
         ]);
     }

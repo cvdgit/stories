@@ -35,6 +35,7 @@ return [
             'blog/<slug:[\w\d\-]+>' => 'news/view',
             'test/<id:\d+>' => 'test/view',
             'preview/<alias:[\w\-]+>' => 'preview/view',
+            'study/task/<id:\d+>' => 'study/task',
             '<section:\w+>' => 'story/index',
         ],
     ],

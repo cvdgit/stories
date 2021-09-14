@@ -1,8 +1,6 @@
 <?php
 
-
 namespace common\services;
-
 
 use DomainException;
 use yii\rbac\ManagerInterface;
@@ -24,5 +22,15 @@ class RoleManager
         }
         $this->manager->revokeAll($userId);
         $this->manager->assign($role, $userId);
+    }
+
+    public function revoke(int $userID): bool
+    {
+        return $this->manager->revokeAll($userID);
+    }
+
+    public function canUser(int $userId, string $permissionName, $params = []): bool
+    {
+        return $this->manager->checkAccess($userId, $permissionName, $params);
     }
 }

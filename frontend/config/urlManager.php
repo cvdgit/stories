@@ -19,6 +19,7 @@ return [
         'login' => 'auth/login',
         'auth' => 'auth/auth',
         'logout' => 'auth/logout',
+        'token/<token:[A-Za-z0-9_-]+>' => 'auth/token',
 
         'signup' => 'signup/request',
         'signup-confirm/<token>' => 'signup/signup-confirm',
@@ -74,6 +75,8 @@ return [
         'tests/<category_id:\d+>' => 'test/index',
 
         'preview/<alias:[\w\-]+>' => 'preview/view',
+        'study/task/<id:\d+>' => 'study/task',
+        'study' => 'study/index',
 
         'stories/tag/<tag:[\w\s\-]+>' => 'story/tag',
         '<section:\w+>/category/<category:[\w\-]+>' => 'story/category',
