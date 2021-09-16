@@ -3,6 +3,7 @@
 namespace common\models;
 
 use backend\models\NeoSlideRelations;
+use common\models\slide\SlideKind;
 use DomainException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -37,9 +38,6 @@ class StorySlide extends ActiveRecord
     const KIND_LINK = 1;
     const KIND_QUESTION = 2;
 
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName()
     {
         return '{{%story_slide}}';
@@ -52,9 +50,6 @@ class StorySlide extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
@@ -65,9 +60,6 @@ class StorySlide extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
@@ -122,6 +114,14 @@ class StorySlide extends ActiveRecord
         return $this->hasMany(StoryStatistics::class, ['slide_id' => 'id']);
     }
 
+    public static function getNextSlideNumber(int $storyID): int
+    {
+        return (new Query())
+            ->from(self::tableName())
+            ->where('story_id = :story', [':story' => $storyID])
+            ->max('number') + 1;
+    }
+
     public static function createSlide(int $storyID)
     {
         $slide = new self();
@@ -130,11 +130,14 @@ class StorySlide extends ActiveRecord
         return $slide;
     }
 
-    public static function createSlideFull(int $storyID, string $data, int $number, int $status = self::STATUS_VISIBLE, int $kind = self::KIND_SLIDE, $linkSlideID = null): self
+    public static function createSlideFull(int $storyID, string $data, int $number = null, int $status = self::STATUS_VISIBLE, int $kind = self::KIND_SLIDE, $linkSlideID = null): self
     {
         $model = new self();
         $model->story_id = $storyID;
         $model->data = $data;
+        if ($number === null) {
+            $number = self::getNextSlideNumber($storyID);
+        }
         $model->number = $number;
         $model->status = $status;
         $model->kind = $kind;
@@ -275,7 +278,11 @@ class StorySlide extends ActiveRecord
 
     public static function deleteAllLinkSlides(int $storyID): void
     {
-        self::deleteAll('story_id = :story AND kind = :kind', [':story' => $storyID, ':kind' => self::KIND_LINK]);
+        self::deleteAll('story_id = :story AND (kind = :kind_link OR kind = :kind_final OR kind = :kind_question)', [
+            ':story' => $storyID,
+            ':kind_link' => SlideKind::LINK,
+            ':kind_final' => SlideKind::FINAL_SLIDE,
+            ':kind_question' => SlideKind::QUESTION,
+        ]);
     }
 }
-

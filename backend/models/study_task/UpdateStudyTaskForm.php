@@ -2,7 +2,6 @@
 
 namespace backend\models\study_task;
 
-use backend\components\SlideModifier;
 use backend\helpers\SelectSlideWidgetHelper;
 use common\models\StorySlide;
 use common\models\StudyTask;
@@ -63,11 +62,9 @@ class UpdateStudyTaskForm extends BaseStudyTaskForm
             $this->transactionManager->wrap(function() use ($storyID, $slideIDs) {
                 StorySlide::deleteAllLinkSlides($storyID);
                 foreach ($slideIDs as $slideID) {
-                    $slideLinkModel = StorySlide::createSlideLink($storyID, $slideID);
-                    if (!$slideLinkModel->save()) {
-                        throw new \Exception('Can\'t be saved StorySlide model. Errors: '. implode(', ', $slideLinkModel->getFirstErrors()));
-                    }
+                    $this->createSlide($storyID, $slideID, false);
                 }
+                $this->createFinalSlide($storyID);
             });
         }
     }

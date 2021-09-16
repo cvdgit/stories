@@ -37,6 +37,7 @@ $('#block-form')
         .done(function(response) {
             if (response && response.success) {
                 StoryEditor.createSlideBlock(response.html);
+                toastr.success('Блок успешно создан');
             }
             else {
                 toastr.error(response.errors);

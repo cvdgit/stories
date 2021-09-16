@@ -285,6 +285,7 @@ class StoryController extends BaseController
             ->select(['title', 'id', "IF(cover IS NULL, '/img/story-1.jpg', CONCAT('/slides_cover/list/', cover)) AS cover"])
             ->from(Story::tableName())
             ->where(['like', 'title', $query])
+            ->andWhere('status <> :status', [':status' => StoryStatus::TASK])
             ->orderBy(['title' => SORT_ASC])
             ->limit(30)
             ->all();

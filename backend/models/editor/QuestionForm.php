@@ -13,12 +13,19 @@ class QuestionForm extends BaseForm
     public $required;
     public $content;
 
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios['update'] = ['story_id', 'slide_id', 'test_id', 'block_id', 'required'];
+        return $scenarios;
+    }
+
     public function rules(): array
     {
         return array_merge(parent::rules(), [
             [['story_id', 'test_id'], 'required'],
-            [['story_id', 'test_id'], 'integer'],
-            [['story_id', 'test_id'], 'unique', 'targetAttribute' => ['story_id', 'test_id'], 'targetClass' => StoryStoryTest::class, 'message' => 'Невозможно добавить т.к. этот тест в эту историю уже добавлен'],
+            [['story_id', 'test_id', 'required'], 'integer'],
+            [['story_id', 'test_id'], 'unique', 'targetAttribute' => ['story_id', 'test_id'], 'targetClass' => StoryStoryTest::class, 'message' => 'Невозможно добавить т.к. этот тест в эту историю уже добавлен', 'on' => 'default'],
         ]);
     }
 

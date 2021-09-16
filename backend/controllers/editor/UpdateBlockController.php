@@ -90,7 +90,7 @@ class UpdateBlockController extends BaseController
 
     public function actionHtml()
     {
-        return $this->updateBlock(new QuestionForm());
+        return $this->updateBlock(new QuestionForm(['scenario' => 'update']));
     }
 
     private function updateBlock(BaseForm $form)

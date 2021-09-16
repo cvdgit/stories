@@ -15,6 +15,7 @@ use yii\helpers\Html;
 </div>
 <div class="modal-footer">
     <?= $form->field($model, 'slide_id')->hiddenInput()->label(false) ?>
+    <?= $form->field($model, 'story_id')->hiddenInput()->label(false) ?>
     <?= $form->field($model, 'block_id', ['inputOptions' => ['class' => 'editor-block-id']])->hiddenInput()->label(false) ?>
     <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']) ?>
 </div>
@@ -37,6 +38,7 @@ form
         .done(function(response) {
             if (response && response.success) {
                 StoryEditor.updateSlideBlock(response.block_id, response.html);
+                toastr.success('Блок успешно изменен');
             }
             else {
                 toastr.error(response.errors);

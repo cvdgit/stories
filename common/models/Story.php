@@ -5,6 +5,7 @@ namespace common\models;
 use backend\models\links\BlockType;
 use common\components\StoryCover;
 use common\helpers\Url;
+use common\models\slide\SlideKind;
 use common\models\story\StoryStatus;
 use DomainException;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
@@ -364,7 +365,7 @@ class Story extends ActiveRecord
     {
         return $this->getStorySlides()
             ->with('story')
-            ->where('{{%story_slide}}.kind <> :kind', [':kind' => StorySlide::KIND_LINK])
+            ->where(['not in', '{{%story_slide}}.kind', [SlideKind::LINK, SlideKind::FINAL_SLIDE]])
             ->andWhere('{{%story_slide}}.status = :status', [':status' => StorySlide::STATUS_VISIBLE])
             ->all();
     }
@@ -374,6 +375,7 @@ class Story extends ActiveRecord
         /** @var StorySlide[] $slides */
         $slides = $this->getStorySlides()
             ->with('story')
+            ->where('{{%story_slide}}.kind <> :kind', [':kind' => SlideKind::FINAL_SLIDE])
             ->andWhere('{{%story_slide}}.status = :status', [':status' => StorySlide::STATUS_VISIBLE])
             ->all();
         foreach ($slides as $i => $slide) {

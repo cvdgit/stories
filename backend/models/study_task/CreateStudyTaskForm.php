@@ -3,8 +3,6 @@
 namespace backend\models\study_task;
 
 use common\models\Story;
-use common\models\StorySlide;
-use common\models\StoryStoryTest;
 use common\models\StudyTask;
 
 class CreateStudyTaskForm extends BaseStudyTaskForm
@@ -24,18 +22,9 @@ class CreateStudyTaskForm extends BaseStudyTaskForm
             }
 
             foreach ($this->slide_ids as $slideID) {
-                $slideModel = StorySlide::createSlideLink($storyModel->id, $slideID);
-                if (!$slideModel->save()) {
-                    throw new \Exception('Can\'t be saved StorySlide model. Errors: '. implode(', ', $slideModel->getFirstErrors()));
-                }
-                $testIds = StoryStoryTest::findTestIdsBySlideId($slideID);
-                if (count($testIds) > 0) {
-                    foreach ($testIds as $testId) {
-                        $storyTestModel = StoryStoryTest::create($storyModel->id, $testId);
-                        $storyTestModel->save();
-                    }
-                }
+                $this->createSlide($storyModel->id, $slideID, true);
             }
+            $this->createFinalSlide($storyModel->id);
 
             $taskModel = StudyTask::create($this->title, $storyModel->id, $this->status, $this->description);
             $taskModel->save();

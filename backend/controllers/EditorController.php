@@ -180,6 +180,7 @@ class EditorController extends BaseController
         $form = Yii::createObject($this->types[$block_type]);
         $form->slide_id = $slideModel->id;
         $form->block_id = $block_id;
+        $form->story_id = $slideModel->story_id;
 
         $values = $block->getValues();
         $form->load($values, '');
