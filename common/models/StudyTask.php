@@ -146,7 +146,7 @@ class StudyTask extends ActiveRecord
             ->viaTable('study_task_assign', ['study_task_id' => 'id']);
     }
 
-    public static function findTask(int $id): self
+    public static function findTask(int $id): ?self
     {
         return self::findOne($id);
     }
