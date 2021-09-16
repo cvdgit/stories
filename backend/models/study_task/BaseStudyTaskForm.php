@@ -69,7 +69,7 @@ class BaseStudyTaskForm extends Model
         return false;
     }
 
-    public function createSlide(int $storyID, int $slideID, bool $isNewRecord): void
+    public function createSlide(int $storyID, int $slideID): void
     {
         $slideModel = StorySlide::findSlide($slideID);
         $slideWrapper = new SlideWrapper($slideModel->data);
@@ -86,12 +86,7 @@ class BaseStudyTaskForm extends Model
             $testForm->test_id = $testId;
             $testForm->required = 1;
             $this->editorService->createBlock($newSlideModel, $testForm, HTMLBLock::class);
-            if ($isNewRecord) {
-                $testForm->afterCreate($newSlideModel);
-            }
-            else {
-                $testForm->afterUpdate($newSlideModel);
-            }
+            $testForm->afterCreate($newSlideModel);
         }
         else {
             // Если теста нет, то создаем ссылку на слайд

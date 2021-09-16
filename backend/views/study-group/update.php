@@ -9,12 +9,9 @@ $this->params['breadcrumbs'][] = ['label' => 'Группы', 'url' => ['index']]
 $this->params['breadcrumbs'][] = 'Редактировать';
 ?>
 <div class="study-group-update">
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1 class="page-header"><?= Html::encode($this->title) ?></h1>
     <div class="row">
         <div class="col-md-8">
-            <div style="margin:20px 0">
-                <?= Html::a('Назначить задание', '#', ['class' => 'btn btn-primary']) ?>
-            </div>
             <div class="study-group-form">
                 <?php $form = ActiveForm::begin(); ?>
                 <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>

@@ -22,7 +22,7 @@ class CreateStudyTaskForm extends BaseStudyTaskForm
             }
 
             foreach ($this->slide_ids as $slideID) {
-                $this->createSlide($storyModel->id, $slideID, true);
+                $this->createSlide($storyModel->id, $slideID);
             }
             $this->createFinalSlide($storyModel->id);
 

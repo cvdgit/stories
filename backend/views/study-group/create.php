@@ -8,7 +8,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Группы', 'url' => ['index']]
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="study-group-create">
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1 class="page-header"><?= Html::encode($this->title) ?></h1>
     <div class="row">
         <div class="col-md-8 study-group-form">
             <?php $form = ActiveForm::begin(); ?>

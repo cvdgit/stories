@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use backend\components\SlideWrapper;
 use backend\models\NeoSlideRelations;
 use common\models\slide\SlideKind;
 use DomainException;
@@ -205,7 +206,10 @@ class StorySlide extends ActiveRecord
         // Обновить количество слайдов в истории
         Story::updateSlideNumber($this->story_id);
         if ($this->isQuestion()) {
-            StoryStoryTest::deleteStoryTests($this->story_id);
+            $slideWrapper = new SlideWrapper($this->data);
+            if (($testId = $slideWrapper->findTestId()) !== null) {
+                StoryStoryTest::deleteStoryTest($this->story_id, $testId);
+            }
         }
         // Изменить номера остальных слайдов
         Story::deleteSlideNumber($this->story_id, $this->number);
@@ -276,13 +280,8 @@ class StorySlide extends ActiveRecord
         return $slide->data;
     }
 
-    public static function deleteAllLinkSlides(int $storyID): void
+    public static function deleteAllFinalSlides(int $storyID): void
     {
-        self::deleteAll('story_id = :story AND (kind = :kind_link OR kind = :kind_final OR kind = :kind_question)', [
-            ':story' => $storyID,
-            ':kind_link' => SlideKind::LINK,
-            ':kind_final' => SlideKind::FINAL_SLIDE,
-            ':kind_question' => SlideKind::QUESTION,
-        ]);
+        self::deleteAll('story_id = :story AND kind = :kind_final', [':story' => $storyID, ':kind_final' => SlideKind::FINAL_SLIDE]);
     }
 }
