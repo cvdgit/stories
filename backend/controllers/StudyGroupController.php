@@ -177,7 +177,7 @@ class StudyGroupController extends StudyController
             throw new NotFoundHttpException('Not found');
         }
         $timeQuery = (new Query())
-            ->select(['SEC_TO_TIME(SUM(time_stat.begin_time + time_stat.end_time))'])
+            ->select(['SEC_TO_TIME(SUM(time_stat.end_time - time_stat.begin_time))'])
             ->from(['time_stat' => StoryStatistics::tableName()])
             ->where('time_stat.story_id = t5.story_id AND time_stat.user_id = t3.id');
         $testMistakesQuery = (new Query())
