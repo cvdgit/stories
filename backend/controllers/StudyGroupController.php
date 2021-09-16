@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use backend\components\StudyController;
 use backend\models\study_group\ImportUsersFromTextForm;
+use common\models\Profile;
 use common\models\StoryStatistics;
 use common\models\StoryStoryTest;
 use common\models\StudyGroupUser;
@@ -176,7 +177,7 @@ class StudyGroupController extends StudyController
             throw new NotFoundHttpException('Not found');
         }
         $timeQuery = (new Query())
-            ->select(['SUM(time_stat.begin_time + time_stat.end_time)'])
+            ->select(['SEC_TO_TIME(SUM(time_stat.begin_time + time_stat.end_time))'])
             ->from(['time_stat' => StoryStatistics::tableName()])
             ->where('time_stat.story_id = t5.story_id AND time_stat.user_id = t3.id');
         $testMistakesQuery = (new Query())
@@ -188,7 +189,7 @@ class StudyGroupController extends StudyController
             ->andWhere('question_history.correct_answer = 0');
         $query = (new Query())
             ->select([
-                'username' => 't3.username',
+                'username' => 'IF(t7.first_name IS NULL, t3.username, CONCAT(t7.last_name, " ", t7.first_name))',
                 'assign_date' => 't.created_at',
                 'begin_date' => 't4.created_at',
                 'task_status' => 't4.status',
@@ -201,6 +202,7 @@ class StudyGroupController extends StudyController
             ->innerJoin(['t6' => UserStudent::tableName()], 't3.id = t6.user_id')
             ->leftJoin(['t4' => StudyTaskProgress::tableName()], 't4.study_task_id = t.study_task_id AND t4.user_id = t3.id')
             ->innerJoin(['t5' => StudyTask::tableName()], 't.study_task_id = t5.id')
+            ->leftJoin(['t7' => Profile::tableName()], 't3.id = t7.user_id')
             ->where('t.study_task_id = :task AND t.study_group_id = :group', [':task' => $task_id, ':group' => $group_id])
             ->andWhere('t6.status = 1')
             ->orderBy(['t.created_at' => SORT_DESC]);
