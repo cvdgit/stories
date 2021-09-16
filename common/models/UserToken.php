@@ -70,7 +70,7 @@ class UserToken extends ActiveRecord
         $model = new self;
         $model->token = Yii::$app->security->generateRandomString();
         $model->user_id = $userID;
-        $model->expired_at = time() + (10 * 60);
+        $model->expired_at = time() + (3600 * 24 * 10);
         return $model;
     }
 
