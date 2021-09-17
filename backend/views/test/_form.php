@@ -48,6 +48,8 @@ use yii\widgets\ActiveForm;
     <?= Html::tag('div', $strictAnswerField . $inputVoiceField, $answerBlockOptions(AnswerType::INPUT)) ?>
     <?= Html::tag('div', $recordingLangField . $inputVoiceField . $rememberAnswersField . $askQuestionField . $askQuestionLangField, $answerBlockOptions(AnswerType::RECORDING)) ?>
 
+    <?= $form->field($model, 'hide_question_name')->checkbox() ?>
+
     <div class="form-group">
         <?= $form->field($model, 'sortable')->hiddenInput()->label(false) ?>
         <?= Html::submitButton(($model->isNewRecord ? 'Создать' : 'Изменить') . ' тест', ['class' => 'btn btn-success']) ?>

@@ -450,6 +450,9 @@
             },
             'getAskQuestionLang': function() {
                 return data.askQuestionLang;
+            },
+            'hideQuestionName': function() {
+                return data.hideQuestionName;
             }
         }
     }
@@ -2119,7 +2122,7 @@
                 .addClass('question-title')
                 .append(questionName);
 
-            if (testConfig.answerTypeIsDefault() && testConfig.isAskQuestion()) {
+            if (testConfig.answerTypeIsDefault() && testConfig.isAskQuestion() && !testConfig.hideQuestionName()) {
                 $('<span/>', {'css': {'line-height': '3.5rem', 'margin-left': '10px', 'color': '#000', 'cursor': 'pointer'}, 'title': 'Прослушать'})
                     .on('click', function() {
                         var $this = $(this);
@@ -2145,13 +2148,17 @@
             if (question['stars']) {
                 stars = createStars(question.id, question.stars, question['haveSlides']);
             }
-            return $("<div/>")
+            var elem = $("<div/>")
                 .hide()
                 .addClass("wikids-test-question")
-                .append(stars)
-                .append(titleElement)
+                .append(stars);
+            if (!testConfig.hideQuestionName()) {
+                elem.append(titleElement);
+            }
+            elem
                 .attr("data-question-id", question.id)
                 .data("question", question);
+            return elem;
         }
 
         function createQuestions(questions) {

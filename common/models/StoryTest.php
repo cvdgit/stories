@@ -2,7 +2,6 @@
 
 namespace common\models;
 
-use backend\models\RelatedTests;
 use common\helpers\Url;
 use common\models\test\AnswerType;
 use common\models\test\SourceType;
@@ -43,6 +42,7 @@ use yii\helpers\ArrayHelper;
  * @property int $ask_question;
  * @property string $ask_question_lang
  * @property int $created_by
+ * @property int $hide_question_name
  *
  * @property StoryTestQuestion[] $storyTestQuestions
  * @property Story[] $stories
@@ -64,9 +64,6 @@ class StoryTest extends ActiveRecord
 
     public $sortable;
 
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName()
     {
         return 'story_test';
@@ -83,24 +80,18 @@ class StoryTest extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
             [['title', 'header'], 'required'],
             [['status', 'mix_answers', 'remote', 'question_list_id', 'parent_id', 'source', 'word_list_id', 'answer_type', 'strict_answer', 'remember_answers', 'ask_question'], 'integer'],
-            [['shuffle_word_list', 'created_by'], 'integer'],
+            [['shuffle_word_list', 'created_by', 'hide_question_name'], 'integer'],
             [['title', 'question_list_name', 'header', 'question_params', 'incorrect_answer_text', 'input_voice', 'recording_lang', 'ask_question_lang'], 'string', 'max' => 255],
             [['description_text'], 'string'],
             [['question_list', 'sortable'], 'safe'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
@@ -129,6 +120,7 @@ class StoryTest extends ActiveRecord
             'ask_question' => 'Произносить вопросы',
             'ask_question_lang' => 'Язык синтезатора вопросов',
             'created_by' => 'Автор',
+            'hide_question_name' => 'Скрывать текст вопроса',
         ];
     }
 

@@ -34,6 +34,7 @@ class Serializer
                     'rememberAnswers' => filter_var($test->remember_answers, FILTER_VALIDATE_BOOLEAN),
                     'askQuestion' => filter_var($test->ask_question, FILTER_VALIDATE_BOOLEAN),
                     'askQuestionLang' => $test->ask_question_lang,
+                    'hideQuestionName' => filter_var($test->hide_question_name, FILTER_VALIDATE_BOOLEAN),
                 ],
                 'students' => $students,
                 'stories' => $stories,
