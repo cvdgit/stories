@@ -1,8 +1,6 @@
 <?php
 
-
 namespace frontend\controllers;
-
 
 use common\models\Auth;
 use common\models\User;
@@ -41,13 +39,14 @@ class SignupController extends Controller
             $model = new SignupForm();
             if ($model->load(Yii::$app->request->post()) && $model->validate()) {
                 try {
-                    $this->service->signup($model->username, $model->email, $model->password);
+                    $username = User::createUsername();
+                    $this->service->signup($username, $model->email, $model->password);
                 }
                 catch (Exception $ex) {
                     Yii::$app->errorHandler->logException($ex);
                     return ['success' => false, 'message' => [$ex->getMessage()]];
                 }
-                $user = User::findByUsername($model->username);
+                $user = User::findByEmail($model->email);
                 if ($user !== null) {
                     try {
                         $this->service->sentEmailConfirm($user);
@@ -85,7 +84,7 @@ class SignupController extends Controller
                 Yii::$app->errorHandler->logException($e);
             }
         }
-        return $this->goHome();
+        return $this->redirect(['profile/update']);
     }
 
     public function actionEmail()

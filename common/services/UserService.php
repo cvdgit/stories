@@ -84,7 +84,7 @@ class UserService
     public function create(UserCreateForm $form): User
     {
         $user = User::create(
-            $form->username,
+            User::createUsername(),
             $form->email,
             $form->password
         );

@@ -1,8 +1,8 @@
 <?php
 namespace frontend\models;
 
+use yii\base\InvalidArgumentException;
 use yii\base\Model;
-use yii\base\InvalidParamException;
 use common\models\User;
 
 /**
@@ -10,10 +10,11 @@ use common\models\User;
  */
 class ResetPasswordForm extends Model
 {
+
     public $password;
 
     /**
-     * @var \common\models\User
+     * @var User
      */
     private $_user;
 
@@ -23,16 +24,16 @@ class ResetPasswordForm extends Model
      *
      * @param string $token
      * @param array $config name-value pairs that will be used to initialize the object properties
-     * @throws \yii\base\InvalidParamException if token is empty or not valid
+     * @throws InvalidArgumentException if token is empty or not valid
      */
     public function __construct($token, $config = [])
     {
         if (empty($token) || !is_string($token)) {
-            throw new InvalidParamException('Маркер сброса пароля не может быть пустым.');
+            throw new InvalidArgumentException('Маркер сброса пароля не может быть пустым.');
         }
         $this->_user = User::findByPasswordResetToken($token);
         if (!$this->_user) {
-            throw new InvalidParamException('Неверный ключ сброса пароля.');
+            throw new InvalidArgumentException('Неверный ключ сброса пароля.');
         }
         parent::__construct($config);
     }
@@ -63,12 +64,11 @@ class ResetPasswordForm extends Model
      *
      * @return bool if password was reset.
      */
-    public function resetPassword()
+    public function resetPassword(): bool
     {
         $user = $this->_user;
         $user->setPassword($this->password);
         $user->removePasswordResetToken();
-
         return $user->save(false);
     }
 }

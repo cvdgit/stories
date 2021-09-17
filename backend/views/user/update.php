@@ -1,17 +1,18 @@
 <?php
-
 use yii\bootstrap\Tabs;
 use yii\helpers\Html;
-
 /** @var $this yii\web\View */
 /** @var $model common\models\User */
 /** @var $dataProvider yii\data\ActiveDataProvider */
 /** @var $historyDataProvider yii\data\ActiveDataProvider */
 /** @var $questionHistoryDataProvider yii\data\ActiveDataProvider */
-
 $this->title = 'Пользователь: ' . $model->username;
 $this->params['sidebarMenuItems'] = [
 	['label' => $model->username, 'url' => ['/user/update', 'id' => $model->id]],
+];
+$this->params['breadcrumbs'] = [
+    ['label' => 'Все пользователи', 'url' => ['user/index']],
+    $this->title,
 ];
 ?>
 <div class="row">

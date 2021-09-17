@@ -8,11 +8,6 @@ use frontend\models\SignupForm;
 class SignupWidget extends Widget
 {
 
-	public function init()
-	{
-		parent::init();
-	}
-
 	public function run()
 	{
 		$model = new SignupForm();
@@ -20,5 +15,4 @@ class SignupWidget extends Widget
 			'model' => $model,
 		]);
 	}
-
 }

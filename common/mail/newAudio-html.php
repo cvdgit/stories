@@ -1,8 +1,6 @@
 <?php
-
 use common\components\StoryCover;
 use yii\helpers\Html;
-
 /** @var $story common\models\Story */
 ?>
 <center style="width:100%;background-color:#ffffff">

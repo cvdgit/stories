@@ -1,8 +1,9 @@
 <?php
 namespace frontend\controllers;
 
+use Exception;
 use Yii;
-use yii\base\InvalidParamException;
+use yii\base\InvalidArgumentException;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\Response;
@@ -57,7 +58,7 @@ class SiteController extends Controller
                     $model->sendEmail(Yii::$app->params['contactEmail']);
                     return ['success' => true, 'message' => 'Благодарим Вас за обращение к нам. Мы ответим вам как можно скорее'];
                 }
-                catch (\Exception $ex) {
+                catch (Exception $ex) {
                     Yii::$app->errorHandler->logException($ex);
                     return ['success' => false, 'message' => ['При отправке вашего сообщения произошла ошибка']];
                 }
@@ -97,11 +98,11 @@ class SiteController extends Controller
      * @return mixed
      * @throws BadRequestHttpException
      */
-    public function actionResetPassword($token)
+    public function actionResetPassword(string $token)
     {
         try {
             $model = new ResetPasswordForm($token);
-        } catch (InvalidParamException $e) {
+        } catch (InvalidArgumentException $e) {
             throw new BadRequestHttpException($e->getMessage());
         }
         if ($model->load(Yii::$app->request->post()) && $model->validate() && $model->resetPassword()) {
@@ -122,5 +123,4 @@ class SiteController extends Controller
     {
         return $this->render('copyright');
     }
-
 }

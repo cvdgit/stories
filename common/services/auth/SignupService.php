@@ -1,11 +1,8 @@
 <?php
 
-
 namespace common\services\auth;
 
 use common\helpers\EmailHelper;
-use common\services\UserPaymentService;
-use common\services\UserService;
 use Exception;
 use frontend\components\queue\UnisenderAddJob;
 use RuntimeException;
@@ -51,7 +48,7 @@ class SignupService
 
     public function sentEmailConfirm(User $user): void
     {
-        $response = EmailHelper::sendEmail($user->email, 'Подтверждение регистрации', 'userSignupComfirm-html', ['user' => $user]);
+        $response = EmailHelper::sendEmail($user->email, 'Для завершения регистрации подтвердите свой email', 'userSignupComfirm-html', ['user' => $user]);
         if (!$response->isSuccess()) {
             throw new RuntimeException('Confirm email sent error - ' . $response->getError()->getMessage());
         }

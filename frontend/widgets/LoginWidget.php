@@ -8,11 +8,6 @@ use common\models\LoginForm;
 class LoginWidget extends Widget
 {
 
-	public function init()
-	{
-		parent::init();
-	}
-
 	public function run()
 	{
 		$model = new LoginForm();
@@ -20,5 +15,4 @@ class LoginWidget extends Widget
 			'model' => $model,
 		]);
 	}
-
 }

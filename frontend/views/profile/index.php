@@ -10,7 +10,6 @@ $this->setMetaTags($title,
                    $title);
 ?>
 <h1><span>Основная</span> информация</h1>
-<p><strong>Пользователь:</strong> <?= Html::encode($model->username) ?></p>
 <p><strong>Email:</strong> <?= Html::encode($model->email) ?></p>
 <p class="text-center" style="margin: 40px 0">
     <?= Html::a('Редактировать профиль', ['/profile/update'], ['class' => 'btn btn-small']) ?>

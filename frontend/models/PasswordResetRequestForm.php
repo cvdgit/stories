@@ -1,8 +1,8 @@
 <?php
+
 namespace frontend\models;
 
 use common\helpers\EmailHelper;
-use RuntimeException;
 use Yii;
 use yii\base\Model;
 use common\models\User;
@@ -12,12 +12,9 @@ use common\models\User;
  */
 class PasswordResetRequestForm extends Model
 {
+
     public $email;
 
-
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
@@ -25,7 +22,7 @@ class PasswordResetRequestForm extends Model
             ['email', 'required'],
             ['email', 'email'],
             ['email', 'exist',
-                'targetClass' => '\common\models\User',
+                'targetClass' => User::class,
                 'filter' => ['status' => User::STATUS_ACTIVE],
                 'message' => 'Нет пользователя с этим адресом электронной почты.'
             ],

@@ -1,9 +1,9 @@
 <?php
-
 use yii\authclient\widgets\AuthChoice;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-
+use yii\web\View;
+/** @var $model frontend\models\SignupForm */
 ?>
 <div class="modal fade site-dialog" id="wikids-signup-modal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
@@ -27,29 +27,25 @@ use yii\bootstrap\ActiveForm;
             ],
           ],
         ]);
-        $fieldTemplate = "<div class='input-wrapper'>\n{icon}\n{input}\n</div>\n{hint}\n{error}";
-        echo $form->field($model, 'username', [
-          'inputOptions' => ['placeholder' => 'Имя пользователя'],
-          'parts' => ['{icon}' => '<span class="input-group-addon icon icon-username"></span>'],
-          'template' => $fieldTemplate,
-        ])->label(false);
-        echo $form->field($model, 'email', [
+        $fieldTemplate = "<div class='input-wrapper'>\n{icon}\n{input}\n</div>\n{hint}\n{error}"; ?>
+        <?= $form->field($model, 'email', [
           'inputOptions' => ['placeholder' => 'Email'],
           'parts' => ['{icon}' => '<span class="input-group-addon icon icon-email"></span>'],
           'template' => $fieldTemplate,
-        ])->label(false);
-        echo $form->field($model, 'password', [
+        ])->label(false) ?>
+        <?= $form->field($model, 'password', [
           'inputOptions' => ['placeholder' => 'Пароль'],
           'parts' => ['{icon}' => '<span class="input-group-addon icon icon-password"></span>'],
           'template' => $fieldTemplate,
-        ])->passwordInput()->label(false);
-        echo Html::submitButton('Зарегистрироваться', ['class' => 'btn', 'style' => 'margin-top: 20px', 'data-loading-text' => 'Регистрация...']);
-        ActiveForm::end();
-        ?>
+        ])->passwordInput()->label(false) ?>
         <div class="signup-agreement">
-          <span class="icon icon-agreement"></span>
-          Я принимаю <?= Html::a('пользовательское соглашение', ['/policy'], ['target' => '_blank']) ?>
+              <?= $form->field($model, 'agree', [
+                  'parts' => ['{hint}' => Html::a('пользовательское соглашение', ['/policy'], ['target' => '_blank'])],
+                  'checkboxTemplate' => "<div class=\"checkbox\">\n{beginLabel}\n{input}\n{labelTitle}\n{endLabel}\n{hint}\n</div>",
+              ])->checkbox() ?>
         </div>
+        <?= Html::submitButton('Зарегистрироваться', ['class' => 'btn', 'style' => 'margin:20px 0', 'data-loading-text' => 'Регистрация...']) ?>
+        <?php ActiveForm::end(); ?>
         <div class="social-signup">
             <p>Авторизуйтесь через соцсети:</p>
             <?= AuthChoice::widget([
@@ -119,5 +115,4 @@ $('#signup-form')
       e.preventDefault();
   });
 JS;
-$this->registerJs($js, \yii\web\View::POS_READY);
-?>
+$this->registerJs($js, View::POS_READY);

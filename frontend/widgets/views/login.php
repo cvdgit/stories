@@ -1,14 +1,13 @@
 <?php
-
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-
+/** @var $model common\models\LoginForm */
 ?>
 <div class="modal fade site-dialog" id="wikids-login-modal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
         <h4 class="modal-title">Вход<br><span>в личный кабинет</span></h4>
       </div>
       <div class="modal-body">
@@ -27,9 +26,9 @@ use yii\bootstrap\ActiveForm;
           ],
         ]);
         $fieldTemplate = "<div class='input-wrapper'>\n{icon}\n{input}\n</div>\n{hint}\n{error}";
-        echo $form->field($model, 'username', [
-          'inputOptions' => ['placeholder' => 'Имя пользователя'],
-          'parts' => ['{icon}' => '<span class="input-group-addon icon icon-username"></span>'],
+        echo $form->field($model, 'email', [
+          'inputOptions' => ['placeholder' => 'email'],
+          'parts' => ['{icon}' => '<span class="input-group-addon icon icon-email"></span>'],
           'template' => $fieldTemplate,
         ])->label(false);
         echo $form->field($model, 'password', [
@@ -41,7 +40,7 @@ use yii\bootstrap\ActiveForm;
         ActiveForm::end();
         ?>
         <div class="password-request">
-          <?= Html::a('Забыли логин или пароль?', ['/site/request-password-reset']) ?>
+          <?= Html::a('Забыли пароль?', ['/site/request-password-reset']) ?>
         </div>
         <div class="social-signup">
           Авторизуйтесь через соцсети:
@@ -112,4 +111,3 @@ $('#login-form')
   });
 JS;
 $this->registerJs($js, \yii\web\View::POS_READY);
-?>

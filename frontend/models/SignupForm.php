@@ -12,22 +12,19 @@ use common\models\User;
  */
 class SignupForm extends Model
 {
-    public $username;
+    //public $username;
     public $email;
     public $password;
+    public $agree;
 
-
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
-            ['username', 'trim'],
+/*            ['username', 'trim'],
             ['username', 'required'],
             ['username', 'match', 'pattern' => '/^[^А-Яа-я\s]+$/u', 'message' => 'Имя пользователя не может содержать кириллические символы'],
             ['username', 'unique', 'targetClass' => User::class, 'message' => 'Пользователь с таким именем уже существует'],
-            ['username', 'string', 'min' => 2, 'max' => 255],
+            ['username', 'string', 'min' => 2, 'max' => 255],*/
 
             ['email', 'trim'],
             ['email', 'required'],
@@ -37,18 +34,19 @@ class SignupForm extends Model
 
             ['password', 'required'],
             ['password', 'string', 'min' => 6],
+
+            ['agree', 'required', 'requiredValue' => 1],
+            ['agree', 'boolean'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
-            'username' => 'Имя пользователя',
+            //'username' => 'Имя пользователя',
             'email' => 'Email',
             'password' => 'Пароль',
+            'agree' => 'Я принимаю',
         ];
     }
 
@@ -110,5 +108,4 @@ class SignupForm extends Model
 
         return $user;
     }
-
 }

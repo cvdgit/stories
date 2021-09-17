@@ -1,14 +1,9 @@
 <?php
-
-use yii\helpers\Html;
-
 /* @var $user common\models\User */
-
 ?>
 <div>
-    <p>Привет <?= Html::encode($user->username) ?>,</p>
-    <p>Спасибо за регистрацию. Добро пожаловать на Wikids!</p>
-    <p>___</p>
+    <p>Добро пожаловать на Wikids!</p>
+    <p></p>
     <p>Популярные категории:</p>
     <div style="margin: 20px 0">
         <ul>

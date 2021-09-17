@@ -13,6 +13,7 @@ use common\models\LoginForm;
 use common\services\auth\AuthService;
 use frontend\components\AuthHandler;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 class AuthController extends Controller
 {
@@ -64,7 +65,7 @@ class AuthController extends Controller
         if (!Yii::$app->user->isGuest && !Yii::$app->request->isAjax) {
             return $this->goHome();
         }
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        Yii::$app->response->format = Response::FORMAT_JSON;
         //if (Yii::$app->request->isAjax) {
             $form = new LoginForm();
             if ($form->load(Yii::$app->request->post()) && $form->validate()) {

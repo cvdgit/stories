@@ -1,8 +1,6 @@
 <?php
 
-
 namespace backend\models;
-
 
 use Yii;
 use yii\base\Model;
@@ -12,7 +10,6 @@ use yii\helpers\ArrayHelper;
 class UserCreateForm extends Model
 {
 
-    public $username;
     public $email;
     public $password;
     public $role;
@@ -20,10 +17,10 @@ class UserCreateForm extends Model
     public function rules(): array
     {
         return [
-            [['username', 'email', 'role'], 'required'],
+            [['email', 'role'], 'required'],
             ['email', 'email'],
-            [['username', 'email'], 'string', 'max' => 255],
-            [['username', 'email'], 'unique', 'targetClass' => User::class],
+            [['email'], 'string', 'max' => 255],
+            [['email'], 'unique', 'targetClass' => User::class],
             ['password', 'string', 'min' => 6],
         ];
     }
@@ -31,7 +28,6 @@ class UserCreateForm extends Model
     public function attributeLabels()
     {
         return [
-            'username' => 'Имя пользователя',
             'email' => 'Email',
             'password' => 'Пароль',
         ];

@@ -8,32 +8,29 @@ use yii\base\Model;
  */
 class LoginForm extends Model
 {
-    public $username;
+
+    public $email;
     public $password;
     public $rememberMe = true;
 
     // private $_user;
 
-
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
-            [['username', 'password'], 'required'],
+            ['email', 'trim'],
+            ['email', 'email'],
+            [['email', 'password'], 'required'],
+            ['email', 'string', 'max' => 255],
             ['rememberMe', 'boolean'],
             // ['password', 'validatePassword'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
-            'username' => 'Имя пользователя',
+            'email' => 'Email',
             'rememberMe' => 'Запомнить',
             'password' => 'Пароль',
         ];
