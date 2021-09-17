@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c8b1a0e5c136a6d025bccc74926f2b67",
+    "content-hash": "f92e86980735f250ad459b601030e8c2",
     "packages": [
         {
             "name": "2amigos/yii2-chartjs-widget",
@@ -343,7 +343,7 @@
             "version": "v3.4.1",
             "source": {
                 "type": "git",
-                "url": "git@github.com:twbs/bootstrap.git",
+                "url": "https://github.com/twbs/bootstrap.git",
                 "reference": "68b0d231a13201eb14acd3dc84e51543d16e5f7e"
             },
             "dist": {
@@ -385,12 +385,12 @@
             "version": "v2.9.4",
             "source": {
                 "type": "git",
-                "url": "git@github.com:nnnick/Chart.js.git",
+                "url": "https://github.com/chartjs/Chart.js.git",
                 "reference": "9bd4cf82fda9f50a5fb50b72843e06ab88124278"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nnnick/Chart.js/zipball/9bd4cf82fda9f50a5fb50b72843e06ab88124278",
+                "url": "https://api.github.com/repos/chartjs/Chart.js/zipball/9bd4cf82fda9f50a5fb50b72843e06ab88124278",
                 "reference": "9bd4cf82fda9f50a5fb50b72843e06ab88124278"
             },
             "type": "bower-asset",
@@ -494,7 +494,7 @@
             "version": "3.3.11",
             "source": {
                 "type": "git",
-                "url": "git@github.com:RobinHerbots/Inputmask.git",
+                "url": "https://github.com/RobinHerbots/Inputmask.git",
                 "reference": "5e670ad62f50c738388d4dcec78d2888505ad77b"
             },
             "dist": {
@@ -1902,16 +1902,16 @@
         },
         {
             "name": "masterexploder/phpthumb",
-            "version": "2.1",
+            "version": "2.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/masterexploder/PHPThumb.git",
-                "reference": "01f6aa65aa3d136e175f67da2b4ea3e316770d02"
+                "url": "https://github.com/monter08/PHPThumb.git",
+                "reference": "d12c4834acd1f7fe460b7179e037ba7d4ec387e9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/masterexploder/PHPThumb/zipball/01f6aa65aa3d136e175f67da2b4ea3e316770d02",
-                "reference": "01f6aa65aa3d136e175f67da2b4ea3e316770d02",
+                "url": "https://api.github.com/repos/monter08/PHPThumb/zipball/d12c4834acd1f7fe460b7179e037ba7d4ec387e9",
+                "reference": "d12c4834acd1f7fe460b7179e037ba7d4ec387e9",
                 "shasum": ""
             },
             "require": {
@@ -1924,18 +1924,17 @@
                     "PHPThumb\\Tests": "tests"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
             "authors": [
                 {
-                    "name": "Jarrod Nettles",
-                    "email": "jarrod.nettles@icloud.com"
-                },
-                {
                     "name": "Ian Selby",
                     "email": "ian@gxdlabs.com"
+                },
+                {
+                    "name": "Jarrod Nettles",
+                    "email": "jarrod.nettles@icloud.com"
                 }
             ],
             "description": "A library for manipulating images in PHP.",
@@ -1945,7 +1944,10 @@
                 "resize",
                 "rotate"
             ],
-            "time": "2015-09-08T22:55:44+00:00"
+            "support": {
+                "source": "https://github.com/monter08/PHPThumb/tree/2.2"
+            },
+            "time": "2019-07-15T09:39:01+00:00"
         },
         {
             "name": "matperez/yii2unisender",
