@@ -2122,7 +2122,11 @@
                 .addClass('question-title')
                 .append(questionName);
 
-            if (testConfig.answerTypeIsDefault() && testConfig.isAskQuestion() && !testConfig.hideQuestionName()) {
+            if (testConfig.hideQuestionName()) {
+                titleElement.text('');
+            }
+
+            if (testConfig.answerTypeIsDefault() && testConfig.isAskQuestion()) {
                 $('<span/>', {'css': {'line-height': '3.5rem', 'margin-left': '10px', 'color': '#000', 'cursor': 'pointer'}, 'title': 'Прослушать'})
                     .on('click', function() {
                         var $this = $(this);
@@ -2148,17 +2152,13 @@
             if (question['stars']) {
                 stars = createStars(question.id, question.stars, question['haveSlides']);
             }
-            var elem = $("<div/>")
+            return $("<div/>")
                 .hide()
                 .addClass("wikids-test-question")
-                .append(stars);
-            if (!testConfig.hideQuestionName()) {
-                elem.append(titleElement);
-            }
-            elem
+                .append(stars)
+                .append(titleElement)
                 .attr("data-question-id", question.id)
                 .data("question", question);
-            return elem;
         }
 
         function createQuestions(questions) {
