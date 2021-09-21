@@ -415,6 +415,9 @@
             'sourceIsWord': function() {
                 return getSource() === 3;
             },
+            'sourceIsTests': function() {
+                return getSource() === 4;
+            },
             'answerTypeIsDefault': function() {
                 return getAnswerType() === 0;
             },
@@ -2751,7 +2754,7 @@
                     };
                     $.post('/question/answer', answerParams);
                 }
-                if (testConfig.sourceIsLocal()) {
+                if (testConfig.sourceIsLocal() || testConfig.sourceIsTests()) {
                     answerList = answer.map(function (entity_id) {
                         var answer = answerByID(currentQuestion, entity_id);
                         return {
