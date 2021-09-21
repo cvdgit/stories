@@ -105,7 +105,7 @@ class QuestionController extends Controller
 
             $questions = [];
             foreach ($test->relatedTests as $relatedTest) {
-                $questions = array_merge($questions, $relatedTest->getQuestionData());
+                $questions = array_merge($questions, $relatedTest->getQuestionData($userHistory));
             }
 
             $collection = (new TestBuilder($test, $questions, count($questions), $userStars, $fastMode))
