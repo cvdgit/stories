@@ -275,7 +275,7 @@ class QuestionController extends Controller
             if ($model->isSourceNeo()) {
                 $userQuestionHistoryID = $model->createUserQuestionHistory();
             }
-            if ($model->isSourceWordList() || $model->isSourceTest()) {
+            if ($model->isSourceWordList() || $model->isSourceTest() || $model->isSourceTests()) {
                 $userQuestionHistoryID = $model->createWordListQuestionHistory();
             }
             $createdModels = $model->createUserQuestionAnswers($userQuestionHistoryID);

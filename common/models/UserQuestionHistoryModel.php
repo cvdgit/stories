@@ -286,6 +286,11 @@ class UserQuestionHistoryModel extends Model
         return (int) $this->source === SourceType::TEST;
     }
 
+    public function isSourceTests(): bool
+    {
+        return (int) $this->source === SourceType::TESTS;
+    }
+
     public function isSourceWordList()
     {
         return (int) $this->source === SourceType::LIST;
