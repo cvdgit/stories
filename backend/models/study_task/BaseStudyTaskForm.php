@@ -9,7 +9,9 @@ use backend\models\editor\QuestionForm;
 use backend\services\StoryEditorService;
 use common\models\slide\SlideKind;
 use common\models\slide\SlideStatus;
+use common\models\Story;
 use common\models\StorySlide;
+use common\models\study_task\StudyTaskStatus;
 use common\services\TransactionManager;
 use DomainException;
 use Yii;
@@ -22,6 +24,7 @@ class BaseStudyTaskForm extends Model
     public $description;
     public $status;
     public $slide_ids = [];
+    public $story_id;
 
     protected $transactionManager;
     private $editorService;
@@ -38,7 +41,7 @@ class BaseStudyTaskForm extends Model
         return [
             [['title'], 'required'],
             [['description'], 'string'],
-            [['status'], 'integer'],
+            [['status', 'story_id'], 'integer'],
             ['status', 'default', 'value' => 0],
             [['title'], 'string', 'max' => 255],
             ['slide_ids', 'each', 'rule' => ['integer']],
@@ -51,7 +54,13 @@ class BaseStudyTaskForm extends Model
             'title' => 'Название',
             'description' => 'Описание',
             'status' => 'Статус',
+            'story_id' => 'История',
         ];
+    }
+
+    public function getStudyTaskStatusesAsArray(): array
+    {
+        return StudyTaskStatus::asArray();
     }
 
     public function isNewRecord(): bool
@@ -66,7 +75,7 @@ class BaseStudyTaskForm extends Model
 
     public function haveStory(): bool
     {
-        return false;
+        return !empty($this->story_id);
     }
 
     public function createSlide(int $storyID, int $slideID): void
@@ -102,5 +111,10 @@ class BaseStudyTaskForm extends Model
         $html = StudyTaskFinalSlide::create();
         $finalSlide = StorySlide::createSlideFull($storyID, $html, null, SlideStatus::VISIBLE, SlideKind::FINAL_SLIDE);
         $finalSlide->save();
+    }
+
+    public function getStory(): ?Story
+    {
+        return null;
     }
 }

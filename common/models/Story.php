@@ -363,16 +363,22 @@ class Story extends ActiveRecord
 
     public function getStorySlidesWidget(): array
     {
-        return $this->getStorySlides()
+        /** @var StorySlide[] $slides */
+        $slides = $this->getStorySlides()
             ->with('story')
-            ->where(['not in', '{{%story_slide}}.kind', [SlideKind::LINK, SlideKind::FINAL_SLIDE]])
+            ->where(['not in', '{{%story_slide}}.kind', [SlideKind::FINAL_SLIDE]])
             ->andWhere('{{%story_slide}}.status = :status', [':status' => StorySlide::STATUS_VISIBLE])
             ->all();
+        foreach ($slides as $i => $slide) {
+            if ($slide->kind === StorySlide::KIND_LINK) {
+                $slides[$i]->data = StorySlide::getSlideData($slide->link_slide_id);
+            }
+        }
+        return $slides;
     }
 
-    public function getStorySlidesWidgetSelected(): array
+    /*public function getStorySlidesWidgetSelected(): array
     {
-        /** @var StorySlide[] $slides */
         $slides = $this->getStorySlides()
             ->with('story')
             ->where('{{%story_slide}}.kind <> :kind', [':kind' => SlideKind::FINAL_SLIDE])
@@ -384,7 +390,7 @@ class Story extends ActiveRecord
             }
         }
         return $slides;
-    }
+    }*/
 
     public static function modifySlides(array $models): array
     {

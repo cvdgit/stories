@@ -84,7 +84,7 @@ $this->registerCss($css);
 \backend\assets\WikidsRevealAsset::register($this);
 /** @var $buttonTitle string */
 ?>
-<button class="btn btn-primary" type="button" id="select-slides"><?= Html::encode($buttonTitle) ?></button>
+<button class="btn btn-primary btn-sm" type="button" id="select-slides"><?= Html::encode($buttonTitle) ?></button>
 <div class="modal fade" id="select-slides-modal">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -98,6 +98,7 @@ $this->registerCss($css);
                         <?= SelectStoryWidget::widget([
                             'id' => 'select-story-slides',
                             'onChange' => 'onStoryChange',
+                            'storyModel' => $stories,
                         ]) ?>
                     </div>
                 </div>
@@ -158,11 +159,19 @@ function onStoryChange(storyID) {
             list.empty();
             var item;
             var decks = [];
+            var haveSlides = false;
             data.forEach(function(slide, i) {
                 item = createListItem(slide, 'append');
                 list.append(item);
                 decks[i] = makeReveal(item.find('.reveal')[0]);
+                haveSlides = true;
             });
+            if (haveSlides) {
+                $('#use-current-story').show();
+            }
+            else {
+                $('#use-current-story').hide();
+            }
         });
 }
 function createListItem(slideItem, action) {

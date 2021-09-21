@@ -2,10 +2,11 @@
 
 namespace backend\models\study_task;
 
+use common\models\Story;
 use backend\helpers\SelectSlideWidgetHelper;
+use common\models\story\StoryStatus;
 use common\models\StorySlide;
 use common\models\StudyTask;
-use yii\helpers\ArrayHelper;
 
 class UpdateStudyTaskForm extends BaseStudyTaskForm
 {
@@ -80,6 +81,7 @@ class UpdateStudyTaskForm extends BaseStudyTaskForm
         $this->model->title = $this->title;
         $this->model->description = $this->description;
         $this->model->status = $this->status;
+        $this->model->story_id = $this->story_id;
         $this->model->save();
 
         if (count($this->slide_ids) > 0) {
@@ -120,11 +122,6 @@ class UpdateStudyTaskForm extends BaseStudyTaskForm
         }
     }
 
-    public function haveStory(): bool
-    {
-        return ($this->model->story !== null);
-    }
-
     public function getModel(): StudyTask
     {
         return $this->model;
@@ -132,17 +129,33 @@ class UpdateStudyTaskForm extends BaseStudyTaskForm
 
     public function getStorySlides(): array
     {
-        if (($storyModel = $this->model->story) === null) {
+        if (($storyModel = $this->getStory()) === null) {
             return [];
         }
-        return SelectSlideWidgetHelper::getSlides($storyModel->getStorySlidesWidgetSelected());
+        return SelectSlideWidgetHelper::getSlides($storyModel->getStorySlidesWidget());
     }
 
     public function getStoryID(): ?int
     {
-        if (($storyModel = $this->model->story) === null) {
+        if (($storyModel = $this->getStory()) === null) {
             return null;
         }
         return $storyModel->id;
+    }
+
+    public function getStory(): ?Story
+    {
+        if (($model = $this->model) !== null) {
+            return $model->story;
+        }
+        return null;
+    }
+
+    public function isTaskStory(): bool
+    {
+        if (($storyModel = $this->getStory()) === null) {
+            return false;
+        }
+        return StoryStatus::isTask($storyModel);
     }
 }

@@ -14,20 +14,29 @@ class CreateStudyTaskForm extends BaseStudyTaskForm
             throw new \DomainException('CreateStudyTaskForm not valid');
         }
 
-        $this->transactionManager->wrap(function() use ($userID) {
-
-            $storyModel = Story::createStudy($this->title, 'story' . time(), $userID);
-            if (!$storyModel->save()) {
-                throw new \Exception('Can\'t be saved Story model. Errors: '. implode(', ', $storyModel->getFirstErrors()));
-            }
-
-            foreach ($this->slide_ids as $slideID) {
-                $this->createSlide($storyModel->id, $slideID);
-            }
-            $this->createFinalSlide($storyModel->id);
-
-            $taskModel = StudyTask::create($this->title, $storyModel->id, $this->status, $this->description);
+        if (!empty($this->story_id)) {
+            $taskModel = StudyTask::create($this->title, $this->story_id, $this->status, $this->description);
             $taskModel->save();
-        });
+        }
+        else {
+            if (count($this->slide_ids) === 0) {
+                return;
+            }
+            $this->transactionManager->wrap(function () use ($userID) {
+
+                $storyModel = Story::createStudy($this->title, 'story' . time(), $userID);
+                if (!$storyModel->save()) {
+                    throw new \Exception('Can\'t be saved Story model. Errors: ' . implode(', ', $storyModel->getFirstErrors()));
+                }
+
+                foreach ($this->slide_ids as $slideID) {
+                    $this->createSlide($storyModel->id, $slideID);
+                }
+                $this->createFinalSlide($storyModel->id);
+
+                $taskModel = StudyTask::create($this->title, $storyModel->id, $this->status, $this->description);
+                $taskModel->save();
+            });
+        }
     }
 }

@@ -22,6 +22,8 @@ class SelectStoryWidget extends Widget
 
     public $onChange = '{}';
 
+    public $loadUrl = ['story/autocomplete/select'];
+
     private $widgetOptions;
     private $clientOptions = [
         'valueField' => 'id',
@@ -44,14 +46,14 @@ class SelectStoryWidget extends Widget
             'id' => $this->id,
             'model' => $this->model,
             'attribute' => $this->attribute,
-            'loadUrl' => ['story/autocomplite'],
+            'loadUrl' => $this->loadUrl,
         ];
         if ($this->storyModel !== null) {
             $this->widgetOptions['items'] = [$this->storyModel->id => $this->storyModel->title];
             $this->widgetOptions['options'] = [
                 'options' => [
                     $this->storyModel->id => [
-                        'data-data' => $this->getOptionData($this->storyModel->id, $this->storyModel->title, StoryCover::getStoryThumbPath($this->storyModel->cover)),
+                        'data-data' => $this->getOptionData($this->storyModel->id, $this->storyModel->title, StoryCover::getListThumbPath($this->storyModel->cover)),
                     ],
                 ],
             ];

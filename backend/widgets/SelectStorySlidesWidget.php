@@ -11,8 +11,9 @@ class SelectStorySlidesWidget extends Widget
 
     public $slidesAction;
     public $onSave;
-    public $selectedSlides;
+    public $selectedSlides = [];
     public $buttonTitle = 'Выбрать слайды';
+    public $stories;
 
     public function run()
     {
@@ -22,6 +23,7 @@ class SelectStorySlidesWidget extends Widget
         $this->registerClientScript();
         return $this->render('story-slides', [
             'buttonTitle' => $this->buttonTitle,
+            'stories' => $this->stories,
         ]);
     }
 

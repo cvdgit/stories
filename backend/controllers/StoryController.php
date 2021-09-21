@@ -11,7 +11,6 @@ use backend\services\StoryEditorService;
 use common\models\story\StoryStatus;
 use Exception;
 use Yii;
-use yii\db\Query;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -278,7 +277,7 @@ class StoryController extends BaseController
         Yii::$app->response->sendContentAsFile($text, $model->alias. '.txt');
     }
 
-    public function actionAutocomplite(string $query)
+/*    public function actionAutocomplite(string $query)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return (new Query())
@@ -289,7 +288,7 @@ class StoryController extends BaseController
             ->orderBy(['title' => SORT_ASC])
             ->limit(30)
             ->all();
-    }
+    }*/
 
     public function actionCancelPublication($id)
     {
