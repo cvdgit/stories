@@ -1,16 +1,12 @@
 <?php
-
 use backend\helpers\SummaryHelper;
 use common\models\Payment;
 use dosamigos\chartjs\ChartJs;
-use yii\grid\GridView;
 use yii\helpers\Html;
-
 /** @var $this yii\web\View */
 /** @var $dataProvider yii\data\ActiveDataProvider */
 /** @var $readOnlyDataProvider yii\data\ActiveDataProvider */
 /** @var $statDateFrom int */
-
 $this->title = 'Панель управления';
 ?>
 <div class="site-index">
@@ -67,53 +63,6 @@ $this->title = 'Панель управления';
                         ]
                     ]) ?>
                 </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-6">
-                <h4>Просмотры историй (в режиме обучения)</h4>
-                <p>Начиная с <?= Yii::$app->formatter->asDatetime($statDateFrom) ?></p>
-                <?= GridView::widget([
-                    'dataProvider' => $dataProvider,
-                    'summary' => false,
-                    'columns' => [
-                        [
-                            'attribute' => 'title',
-                            'label' => 'История',
-                        ],
-                        [
-                            'attribute' => 'views_number',
-                            'label' => 'Количество просмотров',
-                        ],
-                        [
-                            'attribute' => 'story_done',
-                            'label' => '% завершенных просмотров',
-                        ],
-                    ],
-                ]) ?>
-            </div>
-            <div class="col-xs-6">
-                <h4>Просмотры историй (в режиме чтения)</h4>
-                <p>Начиная с <?= Yii::$app->formatter->asDatetime($statDateFrom) ?></p>
-                <?= GridView::widget([
-                    'dataProvider' => $readOnlyDataProvider,
-                    'summary' => false,
-                    'columns' => [
-                        [
-                            'attribute' => 'title',
-                            'label' => 'История',
-                        ],
-                        [
-                            'attribute' => 'views_number',
-                            'label' => 'Количество просмотров',
-                        ],
-                    ],
-                ]) ?>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-12">
-
             </div>
         </div>
     </div>
