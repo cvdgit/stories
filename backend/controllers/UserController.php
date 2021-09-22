@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use backend\models\ChangePasswordForm;
+use backend\models\user\SelectUserForm;
 use backend\models\UserCreateForm;
 use backend\models\UserQuestionHistorySearch;
 use backend\models\UserSearch;
@@ -178,4 +179,9 @@ class UserController extends Controller
         ]);
     }
 
+    public function actionUserList()
+    {
+        $model = new SelectUserForm();
+        return $this->renderAjax('user-list', ['model' => $model]);
+    }
 }

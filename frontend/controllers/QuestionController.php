@@ -5,9 +5,11 @@ namespace frontend\controllers;
 use backend\components\training\base\Serializer;
 use backend\components\training\collection\TestBuilder;
 use backend\components\training\collection\WordTestBuilder;
+use common\helpers\UserHelper;
 use common\models\StoryTest;
 use common\models\TestRememberAnswer;
 use common\models\TestWordList;
+use common\models\User;
 use common\models\UserQuestionHistoryModel;
 use linslin\yii2\curl\Curl;
 use Yii;
@@ -20,16 +22,20 @@ use yii\web\NotFoundHttpException;
 class QuestionController extends Controller
 {
 
-    public function actionInit(int $testId)
+    public function actionInit(int $testId, int $userId = null)
     {
         $test = StoryTest::findModel($testId);
+        $user = User::findOne($userId);
+        if ($user === null && !Yii::$app->user->isGuest) {
+            $user = Yii::$app->user->identity;
+        }
         return [
             'test' => [
                 'header' => $test->header,
                 'description' => $test->description_text,
                 'remote' => $test->isRemote(),
             ],
-            'students' => $this->getStudents($testId),
+            'students' => UserHelper::getUserStudents($test, $user),
         ];
     }
 

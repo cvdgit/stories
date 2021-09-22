@@ -105,18 +105,17 @@ class TestController extends Controller
     public function actionView(int $id)
     {
         $model = $this->findTestModel($id);
-/*        $params = [
-            'storyId' => $model->id,
-            'data' => '<div class="slides">' . $this->storyEditorService->createQuestionBlock(['test-id' => $model->id]) . '</div>',
-            'canViewStory' => true,
-            'plugins' => [
-                ['class' => \common\widgets\Reveal\Plugins\Test::class, 'storyID' => 123],
-                ['class' => \common\widgets\Reveal\Plugins\Background::class],
-            ]
-        ];*/
         return $this->renderAjax('view', [
             'model' => $model,
         ]);
     }
 
+    public function actionViewByUser(int $id, int $user_id)
+    {
+        $model = $this->findTestModel($id);
+        return $this->renderAjax('view-by-user', [
+            'model' => $model,
+            'userId' => $user_id,
+        ]);
+    }
 }

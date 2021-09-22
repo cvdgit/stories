@@ -2,6 +2,7 @@
 
 namespace common\helpers;
 
+use common\models\StoryTest;
 use common\models\UserStudent;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -71,4 +72,20 @@ class UserHelper
         return $students;
     }
 
+    public static function getUserStudents(StoryTest $test, User $user = null): array
+    {
+        $students = [];
+        if ($user === null) {
+            return $students;
+        }
+        foreach ($user->students as $student) {
+            /** @var $student UserStudent */
+            $students[] = [
+                'id' => $student->id,
+                'name' => $student->isMain() ? $student->user->getProfileName() : $student->name,
+                'progress' => (int)$student->getProgress($test->id),
+            ];
+        }
+        return $students;
+    }
 }

@@ -13,6 +13,7 @@ TestAsset::register($this);
 ?>
 <div class="story-test-update">
     <?php $runTestLink = Html::a('<i class="glyphicon glyphicon-expand"></i>', Yii::$app->urlManagerFrontend->createAbsoluteUrl(['test/view', 'id' => $model->id]), ['id' => 'run-test', 'title' => 'Запустить тест']) ?>
+    <?php $runTestLink .= ' ' . Html::a('<i class="glyphicon glyphicon-expand"></i>', ['user/user-list'], ['data-toggle' => 'modal', 'data-target' => '#select-user-modal', 'title' => 'Запустить тест от пользователя']) ?>
     <h1><?= Html::encode($this->title) . ($model->isRemote() ? '' : ' ' . $runTestLink) ?></h1>
     <div class="row">
         <div class="col-md-6">
@@ -39,6 +40,12 @@ TestAsset::register($this);
 
 <div class="modal remote fade modal-fullscreen" id="run-test-modal">
     <div class="modal-dialog modal-lg">
+        <div class="modal-content"></div>
+    </div>
+</div>
+
+<div class="modal remote fade" id="select-user-modal">
+    <div class="modal-dialog">
         <div class="modal-content"></div>
     </div>
 </div>
@@ -73,6 +80,8 @@ $css = <<< CSS
 }
 CSS;
 $this->registerCss($css);
+
+$link = Yii::$app->urlManagerFrontend->createAbsoluteUrl(['test/view-by-user', 'id' => $model->id]);
 $js = <<< JS
 $('#run-test').on('click', function(e) {
     e.preventDefault();
@@ -102,5 +111,23 @@ $('#run-test-modal').on('hide.bs.modal', function() {
     $(this).find('.modal-content').html('');
 });
 
+$('#select-user-modal').on('loaded.bs.modal', function() {
+
+    $('#select-user-form', this).on('beforeSubmit', function(e) {
+        e.preventDefault();
+        
+        $('#select-user-modal').modal('hide');
+        
+        var userId = $(this).find('#selectuserform-user_id').val();
+        var link = '$link' + '&user_id=' + userId;
+        $('#run-test-modal')
+            .modal({'remote': link});
+        
+        return false;
+    })
+        .on('submit', function(e) {
+            e.preventDefault();
+        });
+});
 JS;
 $this->registerJs($js);
