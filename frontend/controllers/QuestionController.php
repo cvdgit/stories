@@ -110,11 +110,13 @@ class QuestionController extends Controller
         if ($test->isSourceTests()) {
 
             $questions = [];
+            $questionsTotal = 0;
             foreach ($test->relatedTests as $relatedTest) {
+                $questionsTotal += $relatedTest->getQuestionDataCount();
                 $questions = array_merge($questions, $relatedTest->getQuestionData($userHistory));
             }
 
-            $collection = (new TestBuilder($test, $questions, count($questions), $userStars, $fastMode))
+            $collection = (new TestBuilder($test, $questions, $questionsTotal, $userStars, $fastMode))
                 ->build();
             return (new Serializer())
                 ->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount, $fastMode);
