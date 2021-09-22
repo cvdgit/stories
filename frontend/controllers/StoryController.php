@@ -355,6 +355,7 @@ class StoryController extends Controller
             'userCanViewStory' => true,
             'audioTrackPath' => $audioTrackPath,
             'playlistID' => Yii::$app->request->get('list'),
+            'saveStat' => $this->countersService->needUpdateCounters(),
         ]);
     }
 

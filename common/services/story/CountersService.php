@@ -13,13 +13,12 @@ class CountersService
 
     public function needUpdateCounters(): bool
     {
-        return true;
-/*        if (Yii::$app->user->isGuest) {
+        if (Yii::$app->user->isGuest) {
             return true;
         }
         $role = Yii::$app->authManager->getRolesByUser(Yii::$app->user->id);
         $role = array_shift($role);
-        return in_array($role->name, [UserRoles::ROLE_USER, UserRoles::ROLE_STUDENT, UserRoles::ROLE_ADMIN], true);*/
+        return in_array($role->name, [UserRoles::ROLE_USER, UserRoles::ROLE_STUDENT, UserRoles::ROLE_ADMIN], true);
     }
 
     public function calculateStoryHistoryPercentage(int $userID, int $storyID): void

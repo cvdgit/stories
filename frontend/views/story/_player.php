@@ -1,18 +1,16 @@
 <?php
-
 use common\widgets\Reveal\Plugins\SlideLinks;
 use common\widgets\Reveal\Plugins\Video;
-use common\widgets\RevealButtons\BackgroundButton;
 use frontend\assets\PlyrAsset;
 use frontend\assets\RecorderAsset;
 use frontend\assets\SortableJsAsset;
 use frontend\widgets\FrontendRevealWidget;
 use yii\helpers\Json;
 use yii\helpers\Url;
-
 /* @var $this yii\web\View */
 /* @var $model common\models\Story */
 /* @var $userCanViewStory bool */
+/* @var $saveStat bool */
 
 $config = [
     'setSlideAudioAction' => Url::to(['player/set-slide-audio']),
@@ -42,7 +40,6 @@ $plugins = [
         'rightButtons' => []
     ],
     ['class' => \common\widgets\Reveal\Plugins\Feedback::class, 'storyID' => $model->id],
-    ['class' => \common\widgets\Reveal\Plugins\Statistics::class, 'storyID' => $model->id],
     ['class' => \common\widgets\Reveal\Plugins\Transition::class, 'storyID' => $model->id],
     ['class' => \common\widgets\Reveal\Plugins\Test::class, 'storyID' => $model->id],
     ['class' => \common\widgets\Reveal\Plugins\Background::class],
@@ -53,6 +50,10 @@ $plugins = [
     ['class' => \common\widgets\Reveal\Plugins\Recorder::class, 'story' => $model],
     ['class' => \common\widgets\Reveal\Plugins\SlideState::class, 'storyID' => $model->id],
 ];
+
+if ($saveStat) {
+    $plugins[] = ['class' => \common\widgets\Reveal\Plugins\Statistics::class, 'storyID' => $model->id];
+}
 
 /** @var $audioTrackPath string */
 if (($model->isAudioStory() || $model->isUserAudioStory(Yii::$app->user->id)) && $audioTrackPath !== '') {

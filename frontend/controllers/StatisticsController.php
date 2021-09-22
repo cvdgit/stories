@@ -23,28 +23,22 @@ class StatisticsController extends Controller
     public function actionWrite()
 	{
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $storeStatistics = $this->countersService->needUpdateCounters();
-        if ($storeStatistics) {
-
-            $model = new SlideStatForm();
-            if ($model->load(Yii::$app->request->post(), '')) {
-
-                $model->saveStat(Yii::$app->user->getId());
-
-                if (!Yii::$app->user->isGuest) {
-                    if ($model->needUpdateStudyTaskStatus()) {
-                        $status = StudyTaskProgressStatus::PROGRESS;
-                        if ($model->isLastSlide()) {
-                            $status = StudyTaskProgressStatus::DONE;
-                        }
-                        StudyTaskProgressStatus::setStatus($model->study_task_id, Yii::$app->user->getId(), $status);
+        $model = new SlideStatForm();
+        if ($model->load(Yii::$app->request->post(), '')) {
+            $model->saveStat(Yii::$app->user->getId());
+            if (!Yii::$app->user->isGuest) {
+                if ($model->needUpdateStudyTaskStatus()) {
+                    $status = StudyTaskProgressStatus::PROGRESS;
+                    if ($model->isLastSlide()) {
+                        $status = StudyTaskProgressStatus::DONE;
                     }
-                    else {
-                        $this->countersService->calculateStoryHistoryPercentage(Yii::$app->user->id, $model->story_id);
-                    }
+                    StudyTaskProgressStatus::setStatus($model->study_task_id, Yii::$app->user->getId(), $status);
                 }
-                return ['success' => true];
+                else {
+                    $this->countersService->calculateStoryHistoryPercentage(Yii::$app->user->id, $model->story_id);
+                }
             }
+            return ['success' => true];
         }
         return ['success' => false];
 	}
