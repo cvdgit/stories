@@ -3,6 +3,7 @@ use common\helpers\Url;
 use common\models\StoryTest;
 use common\models\test\AnswerType;
 use common\models\test\SourceType;
+use common\models\test\TestStatus;
 use dosamigos\datepicker\DatePicker;
 use yii\bootstrap\Nav;
 use yii\helpers\Html;
@@ -20,7 +21,7 @@ $this->title = 'Тесты';
 </p>
 <?= Nav::widget([
     'options' => ['class' => 'nav nav-tabs material-tabs'],
-    'items' => SourceType::asNavItems($source),
+    'items' => array_merge(SourceType::asNavItems($source), TestStatus::templatesNavItem()),
 ]) ?>
 <?php
 
@@ -55,7 +56,7 @@ if ($searchModel->isNeoTest()) {
         'label' => 'Количество вариантов',
     ];
 }
-if (!$searchModel->isNeoTest() && !$searchModel->isWordList() && !$searchModel->isTests()) {
+if (!$searchModel->isNeoTest() && !$searchModel->isWordList() && !$searchModel->isTests() && !$searchModel->isTemplate()) {
     $columns[] = [
         'attribute' => 'questionsNumber',
         'label' => 'Вопросов',
@@ -91,7 +92,7 @@ $columns[] = [
         ]
     ]),
 ];
-if (!$searchModel->isNeoTest()) {
+if (!$searchModel->isNeoTest() && !$searchModel->isTemplate()) {
     $columns[] = [
         'attribute' => 'transition',
         'label' => 'Переход',

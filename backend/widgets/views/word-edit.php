@@ -19,19 +19,23 @@ use yii\widgets\ActiveForm;
                 'validateOnSubmit' => false,
             ]); ?>
             <div class="modal-body">
-                <div>
-                    <a href="#" id="split-text" class="btn">Разбить по предложениям</a>
-                    <a href="#" id="split-text-by-word" class="btn">Разбить по словам</a>
-                    <a href="#" id="missing-words" class="btn">Вставить пропуск</a>
+                <div style="margin-bottom:8px">
+                    <a href="#" id="split-text" class="btn btn-primary btn-sm">Разбить по предложениям</a>
+                    <a href="#" id="split-text-by-word" class="btn btn-primary btn-sm">Разбить по словам</a>
+                    <a href="#" id="missing-words" class="btn btn-primary btn-sm">Вставить пропуск</a>
                 </div>
-                <div class="alert alert-info text-left">Можно использовать альтернативные значения слов для тестов с вводом ответа с микрофона. Пример: 5#пять</div>
-                <?= $wordListForm->field($model, 'text')->textarea(['cols' => 30, 'rows' => 18]) ?>
-                <?= $wordListForm->field($model, 'word_list_id')->hiddenInput()->label(false) ?>
+                <?= $wordListForm->field($model, 'text')
+                    ->textarea(['cols' => 30, 'rows' => 18])
+                    ->label(false)
+                    ->hint('Можно использовать альтернативные значения слов для тестов с вводом ответа с микрофона. Пример: 5#пять') ?>
+                <?= $wordListForm->field($model, 'word_list_id')->hiddenInput()->hint(false)->label(false) ?>
             </div>
             <div class="modal-footer">
-                <div class="alert alert-danger text-left">Будет очищена история прохождения тестов, в которых указан текущий список слов</div>
-                <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']) ?>
-                <button class="btn btn-default" data-dismiss="modal">Отмена</button>
+                <div class="clearfix">
+                    <div class="alert alert-danger text-left" style="float:left; margin-bottom:0; font-size:14px; padding:5px 15px">Будет очищена история прохождения тестов, в которых указан текущий список слов</div>
+                    <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
+                    <button class="btn btn-default" data-dismiss="modal">Отмена</button>
+                </div>
             </div>
             <?php ActiveForm::end(); ?>
         </div>

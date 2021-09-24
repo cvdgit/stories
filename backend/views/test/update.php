@@ -20,7 +20,7 @@ TestAsset::register($this);
             <?= $this->render('_form', ['model' => $model]) ?>
         </div>
         <div class="col-md-6 test-sidebar">
-            <?php if (!$model->isNewRecord && !$model->isVariant()): ?>
+            <?php if (!$model->isNewRecord && !$model->isVariant() && !$model->isTemplate()): ?>
                 <?php if ($model->isRemote()): ?>
                     <?= $this->render('_test_children_list', ['model' => $model]) ?>
                 <?php endif ?>

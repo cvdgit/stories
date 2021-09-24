@@ -14,8 +14,11 @@ use backend\components\story\Slide;
 use backend\components\story\TestBlockContent;
 use backend\components\story\VideoBlock;
 use backend\components\story\writer\HTMLWriter;
+use backend\components\StudyTaskFinalSlide;
 use backend\models\editor\BaseForm;
 use backend\models\video\VideoSource;
+use common\models\slide\SlideKind;
+use common\models\slide\SlideStatus;
 use common\models\SlideVideo;
 use common\models\StorySlide;
 use common\models\StorySlideImage;
@@ -357,5 +360,11 @@ class StoryEditorService
     public function processData(string $data): Slide
     {
         return (new HtmlSlideReader($data))->load();
+    }
+
+    public function createFinalSlide(int $storyId): StorySlide
+    {
+        $html = StudyTaskFinalSlide::create();
+        return StorySlide::createSlideFull($storyId, $html, null, SlideStatus::VISIBLE, SlideKind::FINAL_SLIDE);
     }
 }

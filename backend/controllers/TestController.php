@@ -11,6 +11,7 @@ use common\models\StoryTestAnswer;
 use common\models\StoryTestQuestion;
 use common\models\StoryTestResult;
 use common\models\test\SourceType;
+use common\models\test\TestStatus;
 use common\rbac\UserRoles;
 use common\services\TestHistoryService;
 use Yii;
@@ -65,6 +66,20 @@ class TestController extends Controller
             'dataProvider' => $dataProvider,
             'source' => $source,
             'sourceRecordsTotal' => $this->historyService->getRecordsCountBySource($source),
+        ]);
+    }
+
+    public function actionTemplates()
+    {
+        $searchModel = new TestSearch();
+        $params = array_merge([], Yii::$app->request->queryParams);
+        $params['TestSearch']['status'] = TestStatus::TEMPLATE;
+        $dataProvider = $searchModel->search($params);
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'source' => 123,
+            'sourceRecordsTotal' => 0,
         ]);
     }
 

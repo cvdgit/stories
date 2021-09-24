@@ -19,10 +19,19 @@ $isNewRecord = $model instanceof CreateWordList;
         <?php endif ?>
     </div>
     <?php ActiveForm::end(); ?>
+    <?php if (!$isNewRecord): ?>
+        <?= Html::a('Создать из шаблона', ['test-template/create-tests', 'word_list_id' => $model->id], ['class' => 'btn btn-default', 'data-toggle' => 'modal', 'data-target' => '#create-from-template-modal']) ?>
+    <?php endif ?>
 </div>
 
 <div class="modal remote fade" id="create-test-and-story-modal">
     <div class="modal-dialog">
+        <div class="modal-content"></div>
+    </div>
+</div>
+
+<div class="modal remote fade" id="create-from-template-modal">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content"></div>
     </div>
 </div>

@@ -5,6 +5,7 @@ namespace common\models;
 use common\helpers\Url;
 use common\models\test\AnswerType;
 use common\models\test\SourceType;
+use common\models\test\TestStatus;
 use DomainException;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
@@ -43,6 +44,7 @@ use yii\helpers\ArrayHelper;
  * @property string $ask_question_lang
  * @property int $created_by
  * @property int $hide_question_name
+ * @property int $is_template
  *
  * @property StoryTestQuestion[] $storyTestQuestions
  * @property Story[] $stories
@@ -286,6 +288,24 @@ class StoryTest extends ActiveRecord
         return $model;
     }
 
+    public static function createTemplate(string $title, self $sourceModel): self
+    {
+        $model = new self();
+        $model->attributes = $sourceModel->attributes;
+        $model->title = $title;
+        $model->status = TestStatus::TEMPLATE;
+        return $model;
+    }
+
+    public static function createFromTemplate(self $templateModel): self
+    {
+        $model = new self();
+        $model->attributes = $templateModel->attributes;
+        $model->status = TestStatus::DEFAULT;
+        $model->source = SourceType::TEST;
+        return $model;
+    }
+
     public function getParent()
     {
         if ((int) $this->parent_id === 0) {
@@ -441,4 +461,15 @@ class StoryTest extends ActiveRecord
         parent::afterSave($insert, $changedAttributes);
     }
 
+    public function isTemplate(): bool
+    {
+        return $this->status === TestStatus::TEMPLATE;
+    }
+
+    public static function getTestTemplates(): array
+    {
+        return self::find()->where('status = :status', [':status' => TestStatus::TEMPLATE])
+            ->orderBy(['title' => SORT_ASC])
+            ->all();
+    }
 }

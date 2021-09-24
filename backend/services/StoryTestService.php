@@ -8,7 +8,7 @@ use common\models\test\SourceType;
 class StoryTestService
 {
 
-    public function createFromWordList(string $title, int $wordListID, int $answerType, int $shuffleWordList, int $strictAnswer)
+    public function createFromWordList(string $title, int $wordListID, int $answerType, int $shuffleWordList, int $strictAnswer): StoryTest
     {
         $model = StoryTest::create($title, $title, '', '', StoryTest::LOCAL, SourceType::LIST);
         $model->word_list_id = $wordListID;
@@ -18,4 +18,9 @@ class StoryTestService
         return $model;
     }
 
+    public function createFromTemplate(int $testTemplateId): StoryTest
+    {
+        $templateModel = StoryTest::findOne($testTemplateId);
+        return StoryTest::createFromTemplate($templateModel);
+    }
 }

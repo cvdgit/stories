@@ -1,4 +1,5 @@
 <?php
+use backend\widgets\CreateTestTemplateWidget;
 use common\models\test\AnswerType;
 use common\models\test\SourceType;
 use common\models\User;
@@ -56,6 +57,11 @@ use yii\widgets\ActiveForm;
         <?= Html::a('История прохождения', ['/history/list', 'test_id' => $model->id], ['class' => 'btn']) ?>
     </div>
     <?php ActiveForm::end(); ?>
+    <?php if (!$model->isNewRecord && !$model->isTemplate() && ($model->isSourceWordList() || $model->isSourceTest())): ?>
+    <div class="form-group">
+        <?= CreateTestTemplateWidget::widget(['testId' => $model->id]) ?>
+    </div>
+    <?php endif ?>
 </div>
 
 <?php
