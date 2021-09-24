@@ -44,7 +44,16 @@ class TestTemplateController extends BaseController
         $model->word_list_id = $wordListModel->id;
         $model->story_name = $wordListModel->name;
 
-        $items = [new TestItemForm(), new TestItemForm()];
+        $items = [];
+        $defaultItems = Yii::$app->params['tests.template'];
+        if (!empty($defaultItems)) {
+            foreach ($defaultItems as $defaultItem) {
+                $testItem = new TestItemForm();
+                $testItem->template_id = $defaultItem['template_id'];
+                $testItem->word_list_processing = $defaultItem['word_list_processing'];
+                $items[] = $testItem;
+            }
+        }
 
         if ($model->load(Yii::$app->request->post())) {
 
