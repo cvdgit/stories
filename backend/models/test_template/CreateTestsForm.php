@@ -13,7 +13,9 @@ use yii\helpers\ArrayHelper;
 class CreateTestsForm extends Model
 {
 
+    public $new_story;
     public $story_name;
+    public $story_id;
     public $word_list_id;
 
     /** @var TestItemForm[] */
@@ -30,16 +32,18 @@ class CreateTestsForm extends Model
     public function rules()
     {
         return [
-            ['story_name', 'required'],
+            ['new_story', 'boolean'],
             ['story_name', 'string', 'max' => 255],
-            ['word_list_id', 'integer'],
+            [['word_list_id', 'story_id'], 'integer'],
         ];
     }
 
     public function attributeLabels()
     {
         return [
-            'story_name' => 'Название истории',
+            'story_id' => 'Выбрать историю',
+            'story_name' => 'Название новой истории',
+            'new_story' => 'Новая история',
         ];
     }
 
@@ -58,10 +62,16 @@ class CreateTestsForm extends Model
         ];
     }
 
-    public function create()
+    public function create(): void
     {
         if (!$this->validate()) {
             throw new DomainException('CreateTestsForm not valid');
+        }
+        if ($this->new_story === '0' && empty($this->story_id)) {
+            throw new DomainException('Необходимо выбрать историю');
+        }
+        if ($this->new_story === '1' && empty($this->story_name)) {
+            throw new DomainException('Необходимо указать название новой истории');
         }
 
         if (count($this->items) === 0) {
@@ -74,6 +84,11 @@ class CreateTestsForm extends Model
             ->orderBy(['name' => SORT_ASC])
             ->one();
 
-        $this->wordListService->createFromTemplate(Yii::$app->user->getId(), $this->story_name, $this->items, $wordList->testWords);
+        if ($this->new_story === '1') {
+            $this->wordListService->createFromTemplate(Yii::$app->user->getId(), $this->story_name, $this->items, $wordList->testWords);
+        }
+        else {
+            $this->wordListService->createFromTemplateExistsStory($this->story_id, $this->items, $wordList->testWords);
+        }
     }
 }

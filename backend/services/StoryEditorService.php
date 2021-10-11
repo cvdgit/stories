@@ -367,4 +367,9 @@ class StoryEditorService
         $html = StudyTaskFinalSlide::create();
         return StorySlide::createSlideFull($storyId, $html, null, SlideStatus::VISIBLE, SlideKind::FINAL_SLIDE);
     }
+
+    public function deleteFinalSlide(int $storyId): void
+    {
+        StorySlide::deleteAll('story_id = :story AND kind = :kind', [':story' => $storyId, ':kind' => SlideKind::FINAL_SLIDE]);
+    }
 }

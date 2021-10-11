@@ -1,5 +1,6 @@
 <?php
 use backend\models\test_template\CreateTestsForm;
+use backend\widgets\SelectStoryWidget;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 /** @var $model backend\models\test_template\CreateTestsForm */
@@ -12,7 +13,15 @@ use yii\helpers\Html;
 <?php $form = ActiveForm::begin(['id' => 'create-tests-form']); ?>
 <div class="modal-body">
     <div>
-        <?= $form->field($model, 'story_name')->textInput(['maxlength' => true]) ?>
+        <?= $form->field($model, 'story_id')->widget(SelectStoryWidget::class) ?>
+        <div class="row">
+            <div class="col-md-3" style="padding-top: 30px">
+                <?= $form->field($model, 'new_story')->checkbox() ?>
+            </div>
+            <div class="col-md-9">
+                <?= $form->field($model, 'story_name')->textInput(['maxlength' => true]) ?>
+            </div>
+        </div>
         <div id="field-item-list">
             <?php foreach ($items as $index => $item): ?>
                 <div class="row fields-row">
@@ -22,14 +31,14 @@ use yii\helpers\Html;
                     <div class="col-md-4">
                         <?= $form->field($item, "[$index]word_list_processing")->dropDownList(CreateTestsForm::getProcessingList(), ['prompt' => '']) ?>
                     </div>
-                    <div class="col-md-1">
+                    <div class="col-md-1" style="display: inline-block; margin-top: 34px">
                         <a href="#" class="delete-fields-row"><i class="glyphicon glyphicon-trash"></i></a>
                     </div>
                 </div>
             <?php endforeach ?>
         </div>
         <div>
-            <button type="button" class="btn btn-default btn-sm" id="add-fields-row">Добавить</button>
+            <button type="button" class="btn btn-primary btn-sm" id="add-fields-row">Добавить</button>
         </div>
     </div>
     <?= $form->field($model, 'word_list_id')->hiddenInput()->label(false) ?>

@@ -5,6 +5,7 @@ namespace backend\services;
 use backend\components\import\WordListModifierBuilder;
 use backend\models\question\QuestionType;
 use backend\models\test\CreateStoryForm;
+use common\models\Story;
 use common\models\StorySlide;
 use common\models\StoryTestAnswer;
 use common\models\StoryTestQuestion;
@@ -58,6 +59,39 @@ class WordListService
         });
     }
 
+    private function processItems(int $storyId, array $items, array $words): void
+    {
+        foreach ($items as $item) {
+
+            $test = $this->storyTestService->createFromTemplate($item->template_id);
+            if (!$test->save()) {
+                throw new Exception('Can\'t be saved StoryTest model. Errors: '. implode(', ', $test->getFirstErrors()));
+            }
+
+            $modifier = WordListModifierBuilder::build($item->word_list_processing, $words);
+            $questionsData = $modifier->modify();
+
+            foreach ($questionsData as $question) {
+                $questionModel = StoryTestQuestion::create($test->id, $question->getName(), QuestionType::ONE);
+                $questionAnswers = [];
+                foreach ($question->getAnswers() as $answer) {
+                    $questionAnswers[] = StoryTestAnswer::createFromRelation($answer->getName(), $answer->isCorrect());
+                }
+                $questionModel->storyTestAnswers = $questionAnswers;
+                if (!$questionModel->save()) {
+                    throw new Exception('Can\'t be saved StoryTestQuestion model. Errors: '. implode(', ', $questionModel->getFirstErrors()));
+                }
+            }
+
+            $data = $this->storyEditorService->createQuestionBlock(['test-id' => $test->id]);
+            $slide = $this->storySlideService->create($storyId, $data, StorySlide::KIND_QUESTION);
+            if (!$slide->save()) {
+                throw new Exception('Can\'t be saved StorySlide model. Errors: '. implode(', ', $slide->getFirstErrors()));
+            }
+            $this->storyLinksService->createTestLink($storyId, $test->id);
+        }
+    }
+
     public function createFromTemplate(int $userId, string $storyName, array $items, array $words): void
     {
 
@@ -97,6 +131,22 @@ class WordListService
                 }
                 $this->storyLinksService->createTestLink($story->id, $test->id);
             }
+
+            $finalSlide = $this->storyEditorService->createFinalSlide($story->id);
+            if (!$finalSlide->save()) {
+                throw new Exception('Can\'t be saved StorySlide model. Errors: '. implode(', ', $finalSlide->getFirstErrors()));
+            }
+        });
+    }
+
+    public function createFromTemplateExistsStory(int $storyId, array $items, array $words): void
+    {
+        $this->transactionManager->wrap(function() use ($storyId, $items, $words) {
+
+            $story = Story::findModel($storyId);
+            $this->storyEditorService->deleteFinalSlide($story->id);
+
+            $this->processItems($story->id, $items, $words);
 
             $finalSlide = $this->storyEditorService->createFinalSlide($story->id);
             if (!$finalSlide->save()) {
