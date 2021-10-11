@@ -13,13 +13,13 @@ use yii\helpers\Html;
 <?php $form = ActiveForm::begin(['id' => 'create-tests-form']); ?>
 <div class="modal-body">
     <div>
-        <?= $form->field($model, 'story_id')->widget(SelectStoryWidget::class) ?>
         <div class="row">
-            <div class="col-md-3" style="padding-top: 30px">
-                <?= $form->field($model, 'new_story')->checkbox() ?>
+            <div class="col-md-7">
+                <?= $form->field($model, 'story_id')->widget(SelectStoryWidget::class) ?>
+                <?= $form->field($model, 'story_name', ['options' => ['style' => 'display:none']])->textInput(['maxlength' => true]) ?>
             </div>
-            <div class="col-md-9">
-                <?= $form->field($model, 'story_name')->textInput(['maxlength' => true]) ?>
+            <div class="col-md-5" style="padding-top:34px">
+                <?= $form->field($model, 'new_story')->checkbox() ?>
             </div>
         </div>
         <div id="field-item-list">
@@ -142,6 +142,19 @@ $js = <<<JS
                 }
             });
         });
+    });
+    
+    var storyIdControl = form.find('.field-createtestsform-story_id'),
+        storyNameControl = form.find('.field-createtestsform-story_name');
+    $('#createtestsform-new_story').on('click', function() {
+        if (this.checked) {
+            storyIdControl.hide();
+            storyNameControl.show();
+        }
+        else {
+            storyIdControl.show();
+            storyNameControl.hide();
+        }
     });
 })();
 JS;

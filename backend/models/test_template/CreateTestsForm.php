@@ -67,6 +67,9 @@ class CreateTestsForm extends Model
         if (!$this->validate()) {
             throw new DomainException('CreateTestsForm not valid');
         }
+        if (empty($this->story_id) && empty($this->story_name)) {
+            throw new DomainException('Не удалось определить историю');
+        }
         if ($this->new_story === '0' && empty($this->story_id)) {
             throw new DomainException('Необходимо выбрать историю');
         }
