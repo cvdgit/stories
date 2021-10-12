@@ -5,6 +5,7 @@ namespace backend\components;
 use backend\components\story\HTMLBLock;
 use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\Slide;
+use backend\components\story\TestBlock;
 use backend\components\story\TestBlockContent;
 use backend\components\story\writer\HTMLWriter;
 
@@ -27,6 +28,17 @@ class SlideWrapper
                 /** @var TestBlockContent $content */
                 $content = $block->getContentObject(TestBlockContent::class);
                 return $content->getTestID();
+            }
+        }
+        return null;
+    }
+
+    public function findTestByActionId(): ?int
+    {
+        foreach ($this->slide->getBlocks() as $block) {
+            if ($block->isTest()) {
+                /** @var TestBlock $block */
+                return $block->getTestID();
             }
         }
         return null;

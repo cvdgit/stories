@@ -6,6 +6,7 @@ use backend\components\SlideWrapper;
 use backend\components\story\HTMLBLock;
 use backend\components\StudyTaskFinalSlide;
 use backend\models\editor\QuestionForm;
+use backend\models\editor\TestForm;
 use backend\services\StoryEditorService;
 use common\models\slide\SlideKind;
 use common\models\slide\SlideStatus;
@@ -102,6 +103,14 @@ class BaseStudyTaskForm extends Model
             $linkSlideModel = StorySlide::createSlideLink($storyID, $slideID);
             if (!$linkSlideModel->save()) {
                 throw new DomainException('Can\'t be saved StorySlide model. Errors: ' . implode(', ', $linkSlideModel->getFirstErrors()));
+            }
+            if (($actionTestId = $slideWrapper->findTestByActionId()) !== null) {
+                $actionTestForm = new TestForm();
+                $actionTestForm->text = 'test';
+                $actionTestForm->test_id = $actionTestId;
+                $actionTestForm->story_id = $storyID;
+                $actionTestForm->slide_id = $linkSlideModel->id;
+                $actionTestForm->afterCreate($linkSlideModel);
             }
         }
     }
