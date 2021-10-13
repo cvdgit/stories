@@ -49,6 +49,7 @@ $plugins = [
     ['class' => \common\widgets\Reveal\Plugins\SeeAlso::class, 'storyID' => $model->id, 'isPlaylist' => ($playlistID !== null)],
     ['class' => \common\widgets\Reveal\Plugins\Recorder::class, 'story' => $model],
     ['class' => \common\widgets\Reveal\Plugins\SlideState::class, 'storyID' => $model->id],
+    ['class' => \common\widgets\Reveal\Plugins\SlideLinksView::class],
 ];
 
 if ($saveStat) {

@@ -2,6 +2,8 @@
 
 namespace frontend\controllers;
 
+use common\models\Story;
+use common\models\StorySlide;
 use common\models\StoryTestQuestion;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -42,6 +44,36 @@ class QuestionHintsController extends Controller
         return $this->renderAjax('player', [
             'model' => $slideModel->story,
             'data' => $data,
+        ]);
+    }
+
+    public function actionViewSlide(string $alias, int $number)
+    {
+        if (($storyModel = Story::findPublishedStory($alias)) === null) {
+            throw new NotFoundHttpException('История не найдена');
+        }
+        if (($slideModel = StorySlide::findSlideByNumber($storyModel->id, $number)) === null) {
+            throw new NotFoundHttpException('Слайд не найден');
+        }
+        $slideData = $slideModel->data;
+        $search = [
+            'data-id=""',
+            'data-background-color="#000000"',
+        ];
+        $replace = [
+            'data-id="' . $slideModel->id . '"',
+            'data-background-color="#fff"',
+        ];
+        $slideData = str_replace($search, $replace, $slideData);
+        $slideData = '<div class="slides">' . $slideData . '</div>';
+
+        if (class_exists('yii\debug\Module')) {
+            $this->view->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 'renderToolbar']);
+        }
+
+        return $this->renderAjax('player', [
+            'model' => $storyModel,
+            'data' => $slideData,
         ]);
     }
 }

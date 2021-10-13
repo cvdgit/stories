@@ -19,4 +19,19 @@ class Url extends \yii\helpers\Url
         return 'https://' . Yii::$app->request->serverName;
     }
 
+    public static function getServerUrl(): string
+    {
+        $serverName = $_SERVER['SERVER_NAME'];
+        if (!in_array($_SERVER['SERVER_PORT'], [80, 443])) {
+            $port = ":$_SERVER[SERVER_PORT]";
+        } else {
+            $port = '';
+        }
+        if (!empty($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) == 'on' || $_SERVER['HTTPS'] == '1')) {
+            $scheme = 'https';
+        } else {
+            $scheme = 'http';
+        }
+        return $scheme . '://' . $serverName . $port;
+    }
 }

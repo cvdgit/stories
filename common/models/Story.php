@@ -284,6 +284,14 @@ class Story extends ActiveRecord
         throw new NotFoundHttpException('История не найдена');
     }
 
+    public static function findPublishedStory(string $alias)
+    {
+        return self::find()
+            ->where('alias = :alias', [':alias' => $alias])
+            ->published()
+            ->one();
+    }
+
     public function fillStoryCategories(): void
     {
         $categories = [];
