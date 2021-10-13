@@ -25,6 +25,9 @@ class Answer
     /** @var int|null */
     private $order;
 
+    /** @var string */
+    private $description;
+
     public function __construct(int $id, string $name, bool $correct, $regionID = '', $image = null, $order = null, $origImage = null)
     {
         $this->id = $id;
@@ -94,4 +97,13 @@ class Answer
         return $this->order;
     }
 
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): void
+    {
+        $this->description = $description;
+    }
 }

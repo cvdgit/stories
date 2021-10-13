@@ -33,11 +33,11 @@ class FirstColumnWordListModifier extends WordListModifier implements WordListMo
         foreach ($this->words as $word) {
 
             $question = $this->createQuestion($word->name);
-            $question->createAnswer($word->name, true);
+            $question->createAnswer($word->name, true, $word->correct_answer);
 
             $max = self::MAX_ANSWER_NUMBER - $question->getAnswersCount();
             foreach ($this->createIncorrectAnswers($word, $max) as $incorrectWord) {
-                $question->createAnswer($incorrectWord->name, false);
+                $question->createAnswer($incorrectWord->name, false, $incorrectWord->correct_answer);
             }
 
             $questions[] = $question->shuffleAnswers();

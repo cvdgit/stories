@@ -23,7 +23,7 @@ class TestBuilder
 
     public function build()
     {
-        (new TestCollection($this->data, $this->stars))
+        (new TestCollection($this->data, $this->stars, $this->test))
             ->build($this->collection);
         return $this->collection;
     }

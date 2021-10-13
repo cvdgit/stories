@@ -18,7 +18,7 @@ class AnswerSerializer
             'id' => $this->answer->getId(),
             'name' => trim($this->answer->getName()),
             'is_correct' => (int) $this->answer->isCorrect(),
-            'description' => '',
+            'description' => $this->answer->getDescription(),
             'region_id' => $this->answer->getRegionID(),
             'image' => $this->answer->getImage(),
             'orig_image' => $this->answer->getOrigImage(),

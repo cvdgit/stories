@@ -7,11 +7,13 @@ class AnswerDto
 
     private $name;
     private $correct;
+    private $description;
 
-    public function __construct(string $name, bool $correct)
+    public function __construct(string $name, bool $correct, string $description = null)
     {
         $this->name = $name;
         $this->correct = $correct;
+        $this->description = $description;
     }
 
     /**
@@ -28,5 +30,13 @@ class AnswerDto
     public function isCorrect(): bool
     {
         return $this->correct;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDescription(): ?string
+    {
+        return $this->description;
     }
 }

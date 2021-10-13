@@ -18,6 +18,7 @@ use yii\helpers\FileHelper;
  * @property int $is_correct
  * @property string $image
  * @property string $region_id
+ * @property string $description
  *
  * @property StoryTestQuestion $storyQuestion
  */
@@ -42,7 +43,7 @@ class StoryTestAnswer extends ActiveRecord
         return [
             [['name'], 'required'],
             [['order', 'is_correct'], 'integer'],
-            [['name', 'image'], 'string', 'max' => 255],
+            [['name', 'image', 'description'], 'string', 'max' => 255],
             //[['story_question_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTestQuestion::class, 'targetAttribute' => ['story_question_id' => 'id']],
         ];
     }
@@ -98,11 +99,12 @@ class StoryTestAnswer extends ActiveRecord
         return $model;
     }
 
-    public static function createFromRelation(string $name, int $isCorrect): self
+    public static function createFromRelation(string $name, int $isCorrect, string $description = null): self
     {
         $model = new self();
         $model->name = $name;
         $model->is_correct = $isCorrect;
+        $model->description = $description;
         return $model;
     }
 

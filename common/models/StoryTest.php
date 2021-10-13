@@ -44,7 +44,7 @@ use yii\helpers\ArrayHelper;
  * @property string $ask_question_lang
  * @property int $created_by
  * @property int $hide_question_name
- * @property int $is_template
+ * @property int $answers_hints
  *
  * @property StoryTestQuestion[] $storyTestQuestions
  * @property Story[] $stories
@@ -87,7 +87,7 @@ class StoryTest extends ActiveRecord
         return [
             [['title', 'header'], 'required'],
             [['status', 'mix_answers', 'remote', 'question_list_id', 'parent_id', 'source', 'word_list_id', 'answer_type', 'strict_answer', 'remember_answers', 'ask_question'], 'integer'],
-            [['shuffle_word_list', 'created_by', 'hide_question_name'], 'integer'],
+            [['shuffle_word_list', 'created_by', 'hide_question_name', 'answers_hints'], 'integer'],
             [['title', 'question_list_name', 'header', 'question_params', 'incorrect_answer_text', 'input_voice', 'recording_lang', 'ask_question_lang'], 'string', 'max' => 255],
             [['description_text'], 'string'],
             [['question_list', 'sortable'], 'safe'],
@@ -123,6 +123,7 @@ class StoryTest extends ActiveRecord
             'ask_question_lang' => 'Язык синтезатора вопросов',
             'created_by' => 'Автор',
             'hide_question_name' => 'Скрывать текст вопроса',
+            'answers_hints' => 'Показывать подсказки к ответам',
         ];
     }
 
@@ -471,5 +472,10 @@ class StoryTest extends ActiveRecord
         return self::find()->where('status = :status', [':status' => TestStatus::TEMPLATE])
             ->orderBy(['title' => SORT_ASC])
             ->all();
+    }
+
+    public function showAnswersHints(): bool
+    {
+        return $this->answers_hints === 1;
     }
 }

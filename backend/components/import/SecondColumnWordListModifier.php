@@ -37,11 +37,11 @@ class SecondColumnWordListModifier extends WordListModifier implements WordListM
             }
 
             $question = $this->createQuestion($word->correct_answer);
-            $question->createAnswer($word->correct_answer, true);
+            $question->createAnswer($word->correct_answer, true, $word->name);
 
             $max = self::MAX_ANSWER_NUMBER - $question->getAnswersCount();
             foreach ($this->createIncorrectAnswers($word, $max) as $incorrectWord) {
-                $question->createAnswer($incorrectWord->correct_answer, false);
+                $question->createAnswer($incorrectWord->correct_answer, false, $incorrectWord->name);
             }
 
             $questions[] = $question->shuffleAnswers();

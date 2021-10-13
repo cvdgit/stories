@@ -26,10 +26,6 @@ class ReverseWordListModifier extends WordListModifier implements WordListModifi
         return array_map(static function($key) use ($incorrect) {
             return $incorrect[$key];
         }, $keys);
-
-        /*        return array_map(function(TestWord $item) {
-                    return $this->createAnswer($item->correct_answer, false);
-                }, $incorrect);*/
     }
 
     public function modify(): array
@@ -42,11 +38,11 @@ class ReverseWordListModifier extends WordListModifier implements WordListModifi
             }
 
             $question = $this->createQuestion($word->correct_answer);
-            $question->createAnswer($word->name, true);
+            $question->createAnswer($word->name, true, $word->correct_answer);
 
             $max = self::MAX_ANSWER_NUMBER - $question->getAnswersCount();
             foreach ($this->createIncorrectAnswers($word, $max) as $incorrectWord) {
-                $question->createAnswer($incorrectWord->name, false);
+                $question->createAnswer($incorrectWord->name, false, $incorrectWord->correct_answer);
             }
 
             $questions[] = $question->shuffleAnswers();

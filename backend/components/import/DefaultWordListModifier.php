@@ -26,10 +26,6 @@ class DefaultWordListModifier extends WordListModifier implements WordListModifi
         return array_map(static function($key) use ($incorrect) {
             return $incorrect[$key];
         }, $keys);
-
-/*        return array_map(function(TestWord $item) {
-            return $this->createAnswer($item->correct_answer, false);
-        }, $incorrect);*/
     }
 
     public function modify(): array
@@ -42,11 +38,11 @@ class DefaultWordListModifier extends WordListModifier implements WordListModifi
             }
 
             $question = $this->createQuestion($word->name);
-            $question->createAnswer($word->correct_answer, true);
+            $question->createAnswer($word->correct_answer, true, $word->name);
 
             $max = self::MAX_ANSWER_NUMBER - $question->getAnswersCount();
             foreach ($this->createIncorrectAnswers($word, $max) as $incorrectWord) {
-                $question->createAnswer($incorrectWord->correct_answer, false);
+                $question->createAnswer($incorrectWord->correct_answer, false, $incorrectWord->name);
             }
 
             $questions[] = $question->shuffleAnswers();

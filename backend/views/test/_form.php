@@ -50,6 +50,7 @@ use yii\widgets\ActiveForm;
     <?= Html::tag('div', $recordingLangField . $inputVoiceField . $rememberAnswersField . $askQuestionField . $askQuestionLangField, $answerBlockOptions(AnswerType::RECORDING)) ?>
 
     <?= $form->field($model, 'hide_question_name')->checkbox() ?>
+    <?= $form->field($model, 'answers_hints')->checkbox() ?>
 
     <div class="form-group">
         <?= $form->field($model, 'sortable')->hiddenInput()->label(false) ?>

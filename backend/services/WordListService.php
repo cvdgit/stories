@@ -75,7 +75,7 @@ class WordListService
                 $questionModel = StoryTestQuestion::create($test->id, $question->getName(), QuestionType::ONE);
                 $questionAnswers = [];
                 foreach ($question->getAnswers() as $answer) {
-                    $questionAnswers[] = StoryTestAnswer::createFromRelation($answer->getName(), $answer->isCorrect());
+                    $questionAnswers[] = StoryTestAnswer::createFromRelation($answer->getName(), $answer->isCorrect(), $answer->getDescription());
                 }
                 $questionModel->storyTestAnswers = $questionAnswers;
                 if (!$questionModel->save()) {
@@ -116,7 +116,7 @@ class WordListService
                     $questionModel = StoryTestQuestion::create($test->id, $question->getName(), QuestionType::ONE);
                     $questionAnswers = [];
                     foreach ($question->getAnswers() as $answer) {
-                        $questionAnswers[] = StoryTestAnswer::createFromRelation($answer->getName(), $answer->isCorrect());
+                        $questionAnswers[] = StoryTestAnswer::createFromRelation($answer->getName(), $answer->isCorrect(), $answer->getDescription());
                     }
                     $questionModel->storyTestAnswers = $questionAnswers;
                     if (!$questionModel->save()) {

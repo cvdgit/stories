@@ -1691,6 +1691,8 @@
                 .append(dom.results)
                 .append(dom.controls)
                 .append(dom.correctAnswerPage);
+
+            $('[data-toggle="tooltip"]', dom.wrapper).tooltip();
         }
 
         function createStudentInfo() {
@@ -1769,6 +1771,13 @@
                     }
                 })
                 .append($element);
+
+            if (answer.description) {
+                $answer
+                    .attr('title', answer.description)
+                    .attr('data-toggle', 'tooltip')
+                    .attr('data-placement', 'auto');
+            }
 
             if (showAnswerImage && answer.image) {
                 var $image = $("<img/>")
@@ -2261,9 +2270,6 @@
                 $header.append(createStudentInfo());
             }
             $header.append(createProgress());
-
-            $('[data-toggle="tooltip"]', $header).tooltip();
-
             return $header;
         }
 

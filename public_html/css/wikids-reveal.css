@@ -183,6 +183,14 @@
 	overflow-y: auto;
 }
 
+
+
+.wikids-test-answers .tooltip-inner {
+	font-size: 20px;
+	width: auto;
+	max-width: 100%;
+}
+
 .wikids-test-question {
 	height: 100%;
 }

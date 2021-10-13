@@ -26,9 +26,9 @@ class QuestionDto
         $this->answers[] = $answer;
     }
 
-    public function createAnswer(string $name, bool $correct): AnswerDto
+    public function createAnswer(string $name, bool $correct, string $description = null): AnswerDto
     {
-        $answer = new AnswerDto($name, $correct);
+        $answer = new AnswerDto($name, $correct, $description);
         $this->addAnswer($answer);
         return $answer;
     }
