@@ -46,10 +46,14 @@ $this->registerCss($css);
     </div>
     <?php endif ?>
     <?php if ($model->haveStory()): ?>
-        <div style="margin-bottom:20px">
+        <div>
             <h4>История - задание создана</h4>
             <?= Html::a('Просмотр задания', $model->getModel()->getStudyTaskUrlBackend(), ['class' => 'btn btn-sm btn-primary', 'target' => '_blank']) ?>
             <?= Html::a('Редактировать историю', ['editor/edit', 'id' => $model->getStoryID()], ['class' => 'btn btn-sm btn-primary', 'target' => '_blank']) ?>
+            <div class="form-group" style="margin-top:10px">
+                <label class="control-label" for="task_url">Ссылка на задание</label>
+                <?= Html::textInput('task_url', $model->getModel()->getStudyTaskUrlBackend(), ['class' => 'form-control', 'readonly' => true]) ?>
+            </div>
         </div>
     <?php endif ?>
 </fieldset>
