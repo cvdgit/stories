@@ -11,7 +11,8 @@
             .each(function() {
                 var linkElement = $(this);
                 var href = linkElement.attr('href');
-                var regex = new RegExp(config.site + '([a-z0-9\\-]+)#\\/(\\d+)', 'i');
+                var site = config.site.replace(/https?:\/\//, '');
+                var regex = new RegExp(site + '([a-z0-9\\-]+)#\\/(\\d+)', 'i');
                 if (regex.test(href)) {
                     var matches = href.match(regex);
                     linkElement
