@@ -27,7 +27,7 @@ class QuestionModel extends Model
         return [
             [['name', 'type', 'story_test_id'], 'required'],
             [['order', 'type', 'mix_answers', 'story_test_id'], 'integer'],
-            [['name'], 'string', 'max' => 255],
+            [['name'], 'string', 'max' => 512],
             [['imageFile'], 'image'],
             [['story_test_id'], 'exist', 'targetClass' => StoryTest::class, 'targetAttribute' => ['story_test_id' => 'id']],
         ];

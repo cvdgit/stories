@@ -75,7 +75,8 @@ class StoryTestQuestion extends ActiveRecord
         return [
             [['story_test_id', 'name', 'type'], 'required'],
             [['story_test_id', 'order', 'type', 'mix_answers'], 'integer'],
-            [['name', 'image'], 'string', 'max' => 255],
+            [['image'], 'string', 'max' => 255],
+            [['name'], 'string', 'max' => 512],
             [['story_test_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTest::class, 'targetAttribute' => ['story_test_id' => 'id']],
             [['regions'], 'safe'],
         ];

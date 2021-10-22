@@ -26,7 +26,7 @@ class RegionQuestion extends Model
             [['name', 'type'], 'required'],
             [['order', 'type', 'mix_answers'], 'integer'],
             [['type'], 'compare', 'compareValue' => QuestionType::REGION, 'type' => 'number'],
-            [['name'], 'string', 'max' => 255],
+            [['name'], 'string', 'max' => 512],
             [['imageFile'], 'image'],
             [['regions'], 'safe'],
         ];

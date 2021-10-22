@@ -16,7 +16,7 @@ class m190812_083013_create_table_story_test_question extends Migration
         $this->createTable($this->tableName, [
             'id' => $this->primaryKey(),
             'story_test_id' => $this->integer()->notNull(),
-            'name' => $this->string()->notNull(),
+            'name' => $this->string(512)->notNull(),
             'order' => $this->smallInteger()->notNull()->defaultValue(0),
             'type' => $this->tinyInteger()->notNull()->defaultValue(0),
         ], $this->tableOptions);
