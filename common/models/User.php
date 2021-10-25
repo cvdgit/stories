@@ -431,6 +431,11 @@ class User extends ActiveRecord implements IdentityInterface
         return Yii::$app->security->generateRandomString();
     }
 
+    public static function createStudentPassword(): string
+    {
+        return Yii::$app->security->generateRandomString(8);
+    }
+
     public function afterDelete()
     {
         $this->roleManager->revoke($this->id);

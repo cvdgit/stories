@@ -215,4 +215,17 @@ class StudyGroupController extends StudyController
             'assignedModel' => $assignModel,
         ]);
     }
+
+    public function actionCreatePasswords(int $group_id)
+    {
+        /** @var StudyGroup $groupModel */
+        $groupModel = $this->findModel(StudyGroup::class, $group_id);
+        $users = $groupModel->users;
+        if (count($users) === 0) {
+            Yii::$app->session->setFlash('error', 'В группе нет пользователей');
+            return $this->redirect(['study-group/update', 'id' => $groupModel->id]);
+        }
+        $text = $this->userService->createUserPasswords($users);
+        Yii::$app->response->sendContentAsFile($text, 'users.txt');
+    }
 }

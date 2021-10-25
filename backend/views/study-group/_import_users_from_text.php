@@ -5,12 +5,6 @@ use yii\widgets\ActiveForm;
 /* @var $groupModel common\models\StudyGroup */
 $model = new ImportUsersFromTextForm();
 $model->study_group_id = $groupModel->id;
-$css = <<<CSS
-.alert-info span {
-    margin: 0 6px;
-}
-CSS;
-$this->registerCss($css);
 ?>
 <div class="modal fade" id="import-users-from-text-modal">
     <div class="modal-dialog modal-lg">
@@ -24,7 +18,7 @@ $this->registerCss($css);
                 'id' => 'import-users-from-text-form'
             ]); ?>
             <div class="modal-body">
-                <div class="alert alert-info text-left">Формат строки: email<span>|</span>Фамилия<span>|</span>Имя</div>
+                <div class="alert alert-info text-left">Формат строки: email|Фамилия|Имя</div>
                 <?= $form->field($model, 'text')->textarea(['cols' => 30, 'rows' => 18])->label(false) ?>
                 <?= $form->field($model, 'study_group_id')->hiddenInput()->label(false) ?>
             </div>

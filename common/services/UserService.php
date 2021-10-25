@@ -2,6 +2,7 @@
 
 namespace common\services;
 
+use backend\components\StudyGroupUsersPassword;
 use backend\models\UserCreateForm;
 use backend\models\UserUpdateForm;
 use common\models\User;
@@ -167,5 +168,12 @@ class UserService
         }
 
         return $result;
+    }
+
+    public function createUserPasswords(array $users): string
+    {
+        $passwords = new StudyGroupUsersPassword($users);
+        $passwords->create();
+        return implode(PHP_EOL, $passwords->getLines());
     }
 }
