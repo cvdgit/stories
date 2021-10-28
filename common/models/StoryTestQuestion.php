@@ -10,6 +10,7 @@ use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Query;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
 
@@ -157,12 +158,19 @@ class StoryTestQuestion extends ActiveRecord
         }, $this->getCorrectAnswers()));
     }
 
-    public static function create(int $testID, string $name, int $type, int $order = 1, int $mixAnswers = 0, string $image = '', string $regions = '')
+    public static function create(int $testID, string $name, int $type, int $order = null, int $mixAnswers = 0, string $image = '', string $regions = ''): self
     {
         $model = new self();
         $model->story_test_id = $testID;
         $model->name = $name;
         $model->type = $type;
+        if ($order === null) {
+            $order = (new Query())
+                ->from(self::tableName())
+                ->where('story_test_id = :test', [':test' => $testID])
+                ->count();
+            $order++;
+        }
         $model->order = $order;
         $model->mix_answers = $mixAnswers;
         $model->image = $image;
@@ -170,12 +178,12 @@ class StoryTestQuestion extends ActiveRecord
         return $model;
     }
 
-    public static function createRegion(int $testID, string $name, string $regions = '', int $order = 1, int $mixAnswers = 0, string $image = '')
+    public static function createRegion(int $testID, string $name, string $regions = '', int $order = null, int $mixAnswers = 0, string $image = '')
     {
         return self::create($testID, $name, QuestionType::REGION, $order, $mixAnswers, $image, $regions);
     }
 
-    public static function createSequence(int $testID, string $name, int $order = 1): self
+    public static function createSequence(int $testID, string $name, int $order = null): self
     {
         return self::create($testID, $name, QuestionType::SEQUENCE, $order, 1);
     }

@@ -11,7 +11,7 @@ class CreateQuestion extends QuestionModel
     {
         parent::init();
         $this->type = QuestionType::ONE;
-        $this->order = 1;
+        $this->order = null;
         $this->mix_answers = true;
     }
 

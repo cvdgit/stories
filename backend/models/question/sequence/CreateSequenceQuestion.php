@@ -13,7 +13,7 @@ class CreateSequenceQuestion extends SequenceQuestion
     {
         parent::__construct($config);
         $this->story_test_id = $testID;
-        $this->order = 1;
+        $this->order = null;
     }
 
     public function init()
