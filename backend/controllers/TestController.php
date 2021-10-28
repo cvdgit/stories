@@ -204,7 +204,7 @@ class TestController extends Controller
             $action = Yii::$app->request->post('action');
             if ($action === 'save') {
                 Yii::$app->session->addFlash('success', 'Ответ успешно сохранен');
-                $this->redirect(['test/update-answer', 'answer_id' => $model->id]);
+                return $this->redirect(['test/update-answer', 'answer_id' => $model->id]);
             }
             if ($action === 'save-and-create') {
                 Yii::$app->session->addFlash('success', 'Ответ успешно создан');
