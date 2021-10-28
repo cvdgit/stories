@@ -55,7 +55,9 @@ use yii\widgets\ActiveForm;
     <div class="form-group">
         <?= $form->field($model, 'sortable')->hiddenInput()->label(false) ?>
         <?= Html::submitButton(($model->isNewRecord ? 'Создать' : 'Изменить') . ' тест', ['class' => 'btn btn-success']) ?>
+        <?php if (!$model->isNewRecord): ?>
         <?= Html::a('История прохождения', ['/history/list', 'test_id' => $model->id], ['class' => 'btn']) ?>
+        <?php endif ?>
     </div>
     <?php ActiveForm::end(); ?>
     <?php if (!$model->isNewRecord && !$model->isTemplate() && ($model->isSourceWordList() || $model->isSourceTest())): ?>

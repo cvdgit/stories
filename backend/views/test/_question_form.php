@@ -32,7 +32,10 @@ $isNewRecord = $model instanceof \backend\models\question\CreateQuestion;
             <?= QuestionSlidesWidget::widget(['model' => $model->getModel()]) ?>
             <?php endif ?>
             <div class="form-group form-group-controls">
-                <?= Html::submitButton(($isNewRecord ? 'Создать' : 'Изменить') . ' вопрос', ['class' => 'btn btn-success']) ?>
+                <?= Html::submitButton(($isNewRecord ? 'Создать' : 'Сохранить'), ['class' => 'btn btn-success', 'name' => 'action', 'value' => 'save']) ?>
+                <?php if (!$isNewRecord): ?>
+                <?= Html::submitButton('Сохранить и вернуться к тесту', ['class' => 'btn btn-link', 'name' => 'action', 'value' => 'save-and-return']) ?>
+                <?php endif ?>
             </div>
             <?php ActiveForm::end(); ?>
         </div>

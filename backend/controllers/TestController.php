@@ -167,6 +167,11 @@ class TestController extends Controller
         $model = new UpdateQuestion($question);
         if ($model->load(Yii::$app->request->post())) {
             $model->update();
+            $action = Yii::$app->request->post('action');
+            if ($action === 'save') {
+                Yii::$app->session->addFlash('success', 'Вопрос успешно сохранен');
+                return $this->refresh();
+            }
             return $this->redirect(['test/update', 'id' => $model->story_test_id]);
         }
         return $this->render('update_question', [
@@ -196,6 +201,15 @@ class TestController extends Controller
                 $model->image = $answerImageModel->answerImage;
             }
             $model->save();
+            $action = Yii::$app->request->post('action');
+            if ($action === 'save') {
+                Yii::$app->session->addFlash('success', 'Ответ успешно сохранен');
+                return $this->refresh();
+            }
+            if ($action === 'save-and-create') {
+                Yii::$app->session->addFlash('success', 'Ответ успешно создан');
+                return $this->redirect(['test/create-answer', 'question_id' => $questionModel->id]);
+            }
             return $this->redirect(['test/update-question', 'question_id' => $questionModel->id]);
         }
         return $this->render('create_answer', [
@@ -215,6 +229,11 @@ class TestController extends Controller
                 $model->image = $answerImageModel->answerImage;
             }
             $model->save();
+            $action = Yii::$app->request->post('action');
+            if ($action === 'save') {
+                Yii::$app->session->addFlash('success', 'Ответ успешно сохранен');
+                return $this->refresh();
+            }
             return $this->redirect(['test/update-question', 'question_id' => $model->story_question_id]);
         }
         return $this->render('update_answer', [

@@ -23,7 +23,13 @@ use yii\widgets\ActiveForm;
             <?php endif ?>
             <?= $form->field($model, 'is_correct')->checkbox() ?>
             <div class="form-group">
-                <?= Html::submitButton(($model->isNewRecord ? 'Создать' : 'Изменить') . ' ответ', ['class' => 'btn btn-success']) ?>
+                <?= Html::submitButton(($model->isNewRecord ? 'Создать ответ' : 'Сохранить'), ['class' => 'btn btn-success', 'name' => 'action', 'value' => 'save']) ?>
+                <?php if ($model->isNewRecord): ?>
+                    <?= Html::submitButton('Сохранить и создать новый ответ', ['class' => 'btn btn-link btn-sm', 'name' => 'action', 'value' => 'save-and-create']) ?>
+                <?php endif ?>
+
+                <?= Html::submitButton('Сохранить и вернуться к вопросу', ['class' => 'btn btn-link btn-sm', 'name' => 'action', 'value' => 'save-and-return']) ?>
+
             </div>
             <?php ActiveForm::end(); ?>
         </div>
