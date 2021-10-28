@@ -843,8 +843,24 @@ var StoryEditor = (function() {
                 removeButtons: 'About,Maximize,ShowBlocks,BGColor,Styles,Image,Flash,Table,Smiley,SpecialChar,PageBreak,Iframe,Anchor,BidiLtr,BidiRtl,Language,Source,Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Find,Replace,SelectAll,Scayt,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,Underline,Subscript,Superscript,CopyFormatting,CreateDiv,Indent,Outdent'
             });
 
+            var contentIsChanged = false;
+            ed.on('blur', function() {
+                if (!this.getData().length) {
+                    this.setData('<p>Введите текст</p>');
+                }
+                this.destroy();
+                elem.prop('contenteditable', false);
+                $(blockElement).removeClass('is-editing');
+                if (contentIsChanged) {
+                    blockModifier.change();
+                    contentIsChanged = false;
+                }
+                makeDraggable($(blockElement));
+            });
+
             ed.on('change', function() {
-                elem.data('contentIsChanged', true);
+                contentIsChanged = true;
+                //elem.data('contentIsChanged', true);
             });
         }
     });
@@ -1125,13 +1141,14 @@ var StoryEditor = (function() {
     }
 
     function unselectActiveBlock() {
+        //console.log(blockManager.getActive());
         $editor.find("div[data-block-id]").each(function() {
             var $block = $(this);
             $block.removeClass("wikids-active-block");
             if ($block.data('ui-resizable')) {
                 $block.resizable('destroy');
             }
-            if ($block.data('blockType') === 'text') {
+            /*if ($block.data('blockType') === 'text') {
 
                 for (var instance in CKEDITOR.instances) {
 
@@ -1142,7 +1159,8 @@ var StoryEditor = (function() {
                     }
                     editor.destroy();
 
-                    var elem = $block.find('[contenteditable]');
+                    var elem = $block.find('div.slide-paragraph');
+                    console.log($block);
                     elem.prop('contenteditable', false);
                     $block.removeClass('is-editing');
 
@@ -1153,7 +1171,7 @@ var StoryEditor = (function() {
                     }
                     makeDraggable($block);
                 }
-            }
+            }*/
         })
         $editor.find('div.sl-block .sl-block-transform').remove();
     }
