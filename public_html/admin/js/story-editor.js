@@ -648,6 +648,20 @@ function BlockID() {
     };
 }
 
+function UrlManager() {
+    this.location = window.location;
+}
+UrlManager.prototype.getSlideId = function() {
+    var id = this.location.hash.replace(/#|\//gi, '')
+    if (id === '') {
+        id = undefined;
+    }
+    return id;
+}
+UrlManager.prototype.setSlideId = function(id) {
+    this.location.hash = '#' + id;
+}
+
 var StoryEditor = (function() {
     "use strict";
 
@@ -872,7 +886,8 @@ var StoryEditor = (function() {
         blockAlignment,
         blockToolbar,
         contentCleaner,
-        blockIDGenerator;
+        blockIDGenerator,
+        urlManager;
 
     /**
      * Инициализация редактора и всех компонентов
@@ -986,7 +1001,9 @@ var StoryEditor = (function() {
             }
         });
 
-        loadSlides().done(function() {
+        urlManager = new UrlManager();
+
+        loadSlides(urlManager.getSlideId()).done(function() {
             config.onReady();
         });
 
@@ -1446,6 +1463,7 @@ var StoryEditor = (function() {
         return slidesManager.loadSlidesList(toSetActiveSlideID, function(slideData) {
             unsetActiveBlock();
             loadSlideWithData(slideData);
+            urlManager.setSlideId(slideData.id);
         }).done(function(data) {
             if (data.length && !slidesManager.getActiveSlide().isSlideLink()) {
                 blockToolbar.show();
@@ -1492,33 +1510,6 @@ var StoryEditor = (function() {
     window.addEventListener('resize', function() {
         slideMenu.setPosition();
     });
-
-    /*function getQueryHash() {
-        var query = {};
-        location.search.replace( /[A-Z0-9]+?=([\w\.%-]*)/gi, function(a) {
-            query[ a.split( '=' ).shift() ] = a.split( '=' ).pop();
-        } );
-        for( var i in query ) {
-            var value = query[ i ];
-            query[ i ] = deserialize( unescape( value ) );
-        }
-        return query;
-    }*/
-
-    /*function readUrl() {
-        var hash = window.location.hash;
-        var bits = hash.slice( 2 ).split( '/' ),
-            name = hash.replace( /#|\//gi, '' );
-        return name;
-    }*/
-
-    /*function locationHash() {
-        return "#slide=" + currentSlideIndex;
-    }*/
-
-    /*function setSlideUrl() {
-        window.location.hash = locationHash();
-    }*/
 
     function SlideMenu($ed) {
         "use strict";
