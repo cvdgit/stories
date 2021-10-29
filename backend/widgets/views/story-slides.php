@@ -99,6 +99,7 @@ $this->registerCss($css);
                             'id' => 'select-story-slides',
                             'onChange' => 'onStoryChange',
                             'storyModel' => $stories,
+                            'showRecentStories' => true,
                         ]) ?>
                     </div>
                 </div>

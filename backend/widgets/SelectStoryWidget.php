@@ -4,7 +4,9 @@ namespace backend\widgets;
 
 use common\components\StoryCover;
 use common\models\Story;
+use common\models\UserRecentStory;
 use dosamigos\selectize\SelectizeDropDownList;
+use Yii;
 use yii\base\Widget;
 use yii\helpers\Json;
 use yii\web\JsExpression;
@@ -14,6 +16,9 @@ class SelectStoryWidget extends Widget
 
     /** @var Story */
     public $storyModel;
+
+    public $showRecentStories = false;
+
     public $model;
     public $attribute;
 
@@ -48,6 +53,7 @@ class SelectStoryWidget extends Widget
             'attribute' => $this->attribute,
             'loadUrl' => $this->loadUrl,
         ];
+
         if ($this->storyModel !== null) {
             $this->widgetOptions['items'] = [$this->storyModel->id => $this->storyModel->title];
             $this->widgetOptions['options'] = [
@@ -57,6 +63,20 @@ class SelectStoryWidget extends Widget
                     ],
                 ],
             ];
+        }
+        else {
+            if ($this->showRecentStories) {
+                $this->widgetOptions['options']['prompt'] = '';
+                $recentStories = UserRecentStory::getUserRecentStories(Yii::$app->user->id);
+                $options = [];
+                foreach ($recentStories as $storyModel) {
+                    $this->widgetOptions['items'][$storyModel->id] = $storyModel->title;
+                    $options[$storyModel->id] = [
+                        'data-data' => $this->getOptionData($storyModel->id, $storyModel->title, StoryCover::getListThumbPath($storyModel->cover)),
+                    ];
+                }
+                $this->widgetOptions['options']['options'] = $options;
+            }
         }
 
         $this->clientOptions['onChange'] = new JsExpression($this->onChange);
