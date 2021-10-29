@@ -2,6 +2,7 @@
 use backend\widgets\CreateTestTemplateWidget;
 use common\models\test\AnswerType;
 use common\models\test\SourceType;
+use common\models\test\TestTemplateParts;
 use common\models\User;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -12,8 +13,18 @@ use yii\widgets\ActiveForm;
 <div class="story-test-form">
     <?php $form = ActiveForm::begin(); ?>
     <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'header')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'description_text')->textarea(['rows' => 6]) ?>
+    <?php
+    $headerField = $form->field($model, 'header')->textInput(['maxlength' => true]);
+    if ($model->isTemplate()) {
+        $headerField->hint('Подстановки: ' . TestTemplateParts::asText());
+    }
+    echo $headerField;
+    $descriptionField = $form->field($model, 'description_text')->textarea(['rows' => 6]);
+    if ($model->isTemplate()) {
+        $descriptionField->hint('Подстановки: ' . TestTemplateParts::asText());
+    }
+    echo $descriptionField;
+    ?>
     <?= $form->field($model, 'created_by')->dropDownList(User::getUserList(),
         ['prompt' => 'Выбрать', 'disabled' => !Yii::$app->user->can('admin')]) ?>
     <?= $form->field($model, 'incorrect_answer_text')->textInput(['maxlength' => true]) ?>
@@ -55,7 +66,7 @@ use yii\widgets\ActiveForm;
     <div class="form-group">
         <?= $form->field($model, 'sortable')->hiddenInput()->label(false) ?>
         <?= Html::submitButton(($model->isNewRecord ? 'Создать' : 'Изменить') . ' тест', ['class' => 'btn btn-success']) ?>
-        <?php if (!$model->isNewRecord): ?>
+        <?php if (!$model->isNewRecord && !$model->isTemplate()): ?>
         <?= Html::a('История прохождения', ['/history/list', 'test_id' => $model->id], ['class' => 'btn']) ?>
         <?php endif ?>
     </div>

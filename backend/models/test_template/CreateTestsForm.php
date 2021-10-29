@@ -88,10 +88,10 @@ class CreateTestsForm extends Model
             ->one();
 
         if ($this->new_story === '1') {
-            $this->wordListService->createFromTemplate(Yii::$app->user->getId(), $this->story_name, $this->items, $wordList->testWords);
+            $this->wordListService->createFromTemplate(Yii::$app->user->getId(), $this->story_name, $this->items, $wordList);
         }
         else {
-            $this->wordListService->createFromTemplateExistsStory($this->story_id, $this->items, $wordList->testWords);
+            $this->wordListService->createFromTemplateExistsStory($this->story_id, $this->items, $wordList);
         }
     }
 }

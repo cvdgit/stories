@@ -14,7 +14,7 @@ TestAsset::register($this);
 <div class="story-test-update">
     <?php $runTestLink = Html::a('<i class="glyphicon glyphicon-expand"></i>', Yii::$app->urlManagerFrontend->createAbsoluteUrl(['test/view', 'id' => $model->id]), ['id' => 'run-test', 'title' => 'Запустить тест']) ?>
     <?php $runTestLink .= ' ' . Html::a('<i class="glyphicon glyphicon-user"></i>', ['user/user-list'], ['data-toggle' => 'modal', 'data-target' => '#select-user-modal', 'title' => 'Запустить тест от пользователя']) ?>
-    <h1><?= Html::encode($this->title) . ($model->isRemote() ? '' : ' ' . $runTestLink) ?></h1>
+    <h1><?= Html::encode($this->title) . ($model->isRemote() || $model->isTemplate() ? '' : ' ' . $runTestLink) ?></h1>
     <div class="row">
         <div class="col-md-6">
             <?= $this->render('_form', ['model' => $model]) ?>

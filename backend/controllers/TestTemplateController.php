@@ -58,8 +58,8 @@ class TestTemplateController extends BaseController
         if ($model->load(Yii::$app->request->post())) {
 
             $items = [];
-            foreach (Yii::$app->request->post('TestItemForm', []) as $rawModel) {
-                $items[] = new TestItemForm();
+            foreach (Yii::$app->request->post('TestItemForm', []) as $i => $rawModel) {
+                $items[$i] = new TestItemForm();
             }
 
             if (Model::loadMultiple($items, Yii::$app->request->post()) && Model::validateMultiple($items)) {
