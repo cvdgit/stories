@@ -843,8 +843,10 @@ var StoryEditor = (function() {
                 removeButtons: 'About,Maximize,ShowBlocks,BGColor,Styles,Image,Flash,Table,Smiley,SpecialChar,PageBreak,Iframe,Anchor,BidiLtr,BidiRtl,Language,Source,Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Find,Replace,SelectAll,Scayt,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,Underline,Subscript,Superscript,CopyFormatting,CreateDiv,Indent,Outdent'
             });
 
+            elem.data('editorName', ed.name);
+
             var contentIsChanged = false;
-            ed.on('blur', function() {
+/*            ed.on('blur', function() {
                 if (!this.getData().length) {
                     this.setData('<p>Введите текст</p>');
                 }
@@ -856,11 +858,11 @@ var StoryEditor = (function() {
                     contentIsChanged = false;
                 }
                 makeDraggable($(blockElement));
-            });
+            });*/
 
             ed.on('change', function() {
                 contentIsChanged = true;
-                //elem.data('contentIsChanged', true);
+                elem.data('contentIsChanged', true);
             });
         }
     });
@@ -1141,7 +1143,33 @@ var StoryEditor = (function() {
     }
 
     function unselectActiveBlock() {
-        //console.log(blockManager.getActive());
+        var $editingBlock = $editor.find('div[data-block-id].is-editing')
+        if ($editingBlock.length) {
+            var elem = $editingBlock.find('div[contenteditable]');
+            var editorName = elem.data('editorName');
+            for (var instance in CKEDITOR.instances) {
+
+                if (instance === editorName) {
+
+                    var editor = CKEDITOR.instances[instance];
+
+                    if (!editor.getData().length) {
+                        editor.setData('<p>Введите текст</p>');
+                    }
+                    editor.destroy();
+
+                    elem.prop('contenteditable', false);
+                    $editingBlock.removeClass('is-editing');
+
+                    var contentIsChanged = elem.data('contentIsChanged');
+                    if (contentIsChanged) {
+                        blockModifier.change();
+                        elem.removeData('contentIsChanged');
+                    }
+                    makeDraggable($editingBlock);
+                }
+            }
+        }
         $editor.find("div[data-block-id]").each(function() {
             var $block = $(this);
             $block.removeClass("wikids-active-block");
