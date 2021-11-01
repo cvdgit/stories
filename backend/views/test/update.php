@@ -1,5 +1,6 @@
 <?php
 use backend\assets\TestAsset;
+use yii\bootstrap\Dropdown;
 use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\StoryTest */
@@ -12,9 +13,25 @@ $this->params['breadcrumbs'] = [
 TestAsset::register($this);
 ?>
 <div class="story-test-update">
-    <?php $runTestLink = Html::a('<i class="glyphicon glyphicon-expand"></i>', Yii::$app->urlManagerFrontend->createAbsoluteUrl(['test/view', 'id' => $model->id]), ['id' => 'run-test', 'title' => 'Запустить тест']) ?>
-    <?php $runTestLink .= ' ' . Html::a('<i class="glyphicon glyphicon-user"></i>', ['user/user-list'], ['data-toggle' => 'modal', 'data-target' => '#select-user-modal', 'title' => 'Запустить тест от пользователя']) ?>
-    <h1><?= Html::encode($this->title) . ($model->isRemote() || $model->isTemplate() ? '' : ' ' . $runTestLink) ?></h1>
+    <?php if ($model->isRemote() || $model->isTemplate()): ?>
+        <h1><?= Html::encode($this->title) ?></h1>
+    <?php else: ?>
+        <h1>
+            <?= Html::encode($this->title) ?>
+            <div class="dropdown pull-right">
+                <a href="#" data-toggle="dropdown" class="dropdown-toggle btn btn-default">
+                    <i class="glyphicon glyphicon-option-vertical"></i> <b class="caret"></b>
+                </a>
+                <?= Dropdown::widget([
+                    'items' => [
+                        ['label' => 'Запустить тест', 'url' => Yii::$app->urlManagerFrontend->createAbsoluteUrl(['test/view', 'id' => $model->id]), 'linkOptions' => ['id' => 'run-test']],
+                        ['label' => 'Запустить тест от пользователя', 'url' => ['user/user-list'], 'linkOptions' => ['data-toggle' => 'modal', 'data-target' => '#select-user-modal']],
+                        ['label' => 'Печать', 'url' => ['question/print', 'test_id' => $model->id], 'linkOptions' => ['data-toggle' => 'modal', 'data-target' => '#print-questions-modal']],
+                    ],
+                ]) ?>
+            </div>
+        </h1>
+    <?php endif ?>
     <div class="row">
         <div class="col-md-6">
             <?= $this->render('_form', ['model' => $model]) ?>
@@ -45,6 +62,12 @@ TestAsset::register($this);
 </div>
 
 <div class="modal remote fade" id="select-user-modal">
+    <div class="modal-dialog">
+        <div class="modal-content"></div>
+    </div>
+</div>
+
+<div class="modal remote fade" id="print-questions-modal">
     <div class="modal-dialog">
         <div class="modal-content"></div>
     </div>

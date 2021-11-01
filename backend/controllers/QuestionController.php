@@ -152,4 +152,21 @@ class QuestionController extends Controller
         return $this->redirect(['test/update-question', 'question_id' => $copyQuestion->id]);
     }
 
+    public function actionPrint(int $test_id)
+    {
+        $testModel = $this->findTestModel($test_id);
+        $questions = [];
+        if ($testModel->isSourceTests()) {
+            foreach ($testModel->relatedTests as $relatedTest) {
+                $questions = array_merge($questions, $relatedTest->getQuestionData());
+            }
+        }
+        else {
+            $questions = $testModel->storyTestQuestions;
+        }
+        return $this->renderAjax('_print', [
+            'testModel' => $testModel,
+            'questions' => $questions,
+        ]);
+    }
 }
