@@ -204,6 +204,7 @@ class QuestionController extends Controller
                 'mix_answers' => 0,
                 'type' => ((int)$resultItem['correct_number'] > 1 ? 1 : 0),
                 'image' => $resultItem['question_image'],
+                'images' => $resultItem['question_images'],
                 'storyTestAnswers' => $answers,
                 'entity_id' => $resultItem['question_entity_id'],
                 'entity_name' => $resultItem['question_entity_name'],

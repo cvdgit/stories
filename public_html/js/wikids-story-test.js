@@ -2221,19 +2221,38 @@
                 }
                 $answers.appendTo($question);
 
-                if (showQuestionImage && question.image) {
-                    var $image = $('<img/>')
-                        .attr("src", question.image)
-                        .css('max-width', '330px');
-                    var originalImageExists = question['original_image'] === undefined ? true : question['original_image'];
-                    if (originalImageExists || question['orig_image']) {
-                        $image
+                var multipleImages = question['images'] && question.images.length > 0;
+                if (multipleImages) {
+                    var $imageWrapper = $('<div/>', {'class': 'row'});
+                    var $image;
+                    question.images.forEach(function(imageUrl) {
+                        $image = $('<img/>')
+                            .attr("src", imageUrl)
+                            .css('width', '100%')
+                            .css('padding', '10px')
                             .css('cursor', 'zoom-in')
                             .on('click', function () {
-                                showOriginalImage(question['orig_image'] || $(this).attr('src'));
+                                showOriginalImage($(this).attr('src'));
                             });
+                        $image.wrap('<div class="col-md-6"></div>').parent().appendTo($imageWrapper);
+                    });
+                    $imageWrapper.appendTo($(".question-image", $question));
+                }
+                else {
+                    if (showQuestionImage && question.image) {
+                        var $image = $('<img/>')
+                            .attr("src", question.image)
+                            .css('max-width', '330px');
+                        var originalImageExists = question['original_image'] === undefined ? true : question['original_image'];
+                        if (originalImageExists || question['orig_image']) {
+                            $image
+                                .css('cursor', 'zoom-in')
+                                .on('click', function () {
+                                    showOriginalImage(question['orig_image'] || $(this).attr('src'));
+                                });
+                        }
+                        $image.appendTo($(".question-image", $question));
                     }
-                    $image.appendTo($(".question-image", $question));
                 }
 
                 $questions.append($question);
