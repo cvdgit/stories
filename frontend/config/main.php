@@ -82,6 +82,7 @@ return [
             'errorAction' => 'site/error',
         ],
         'urlManager' => $urlManager,
+        'urlManagerBackend' => $params['components.urlManagerBackend'],
         'view' => [
             'as seo' => [
                 'class' => 'frontend\components\SeoViewBehavior',

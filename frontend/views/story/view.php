@@ -143,6 +143,17 @@ $isBookView = $storyDefaultView === 'book';
         <?php else: ?>
         <?= $this->render('_tab_slides', ['model' => $model, 'playlist' => $playlist]) ?>
         <?php endif ?>
+        <?php if (Yii::$app->user->can(\common\rbac\UserRoles::ROLE_MODERATOR)): ?>
+            <div class="panel panel-info" style="margin-top:10px">
+                <div class="panel-body">
+                    <?= $model->isPublished() ? '' : 'История не опубликована' ?>
+                    <div class="pull-right">
+                        <?= Html::a('Изменить', Yii::$app->urlManagerBackend->createAbsoluteUrl(['story/update', 'id' => $model->id]), ['class' => 'btn-link']) ?>
+                        | <?= Html::a('Редактор', Yii::$app->urlManagerBackend->createAbsoluteUrl(['editor/edit', 'id' => $model->id]), ['class' => 'btn-link']) ?>
+                    </div>
+                </div>
+            </div>
+        <?php endif ?>
     </main>
 </div>
 
