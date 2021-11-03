@@ -2225,9 +2225,10 @@
                 if (multipleImages) {
                     var $imageWrapper = $('<div/>', {'class': 'row'});
                     var $image;
-                    question.images.forEach(function(imageUrl) {
+                    question.images.forEach(function(imageItem) {
                         $image = $('<img/>')
-                            .attr("src", imageUrl)
+                            .attr("src", imageItem.url)
+                            .attr('title', imageItem.title)
                             .css('width', '100%')
                             .css('padding', '10px')
                             .css('cursor', 'zoom-in')
