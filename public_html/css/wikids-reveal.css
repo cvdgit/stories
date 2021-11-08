@@ -125,6 +125,10 @@
 
 }
 
+.wikids-test-header .wikids-progress {
+	margin-bottom: 0 !important;
+}
+
 .wikids-test-header h3 {
 	font-size: 4rem;
 }
@@ -306,7 +310,7 @@
 .wikids-test-student-info {
 	text-align: right;
 	font-size: 20px;
-	margin: 10px 0;
+	padding: 10px 0;
 }
 
 .wikids-test-buttons {
