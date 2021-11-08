@@ -201,7 +201,7 @@
 }
 
 .wikids-test-answer {
-	padding: 10px;
+	margin: 10px;
 	cursor: pointer;
 	display: flex;
 }
@@ -210,13 +210,13 @@
 	background-color: #eeeeee;
 }
 
-.wikids-test-answers .wikids-test-answer:first-child {
+/*.wikids-test-answers .wikids-test-answer:first-child {
 	padding-top: 0;
 }
 
 .wikids-test-answers .wikids-test-answer:last-child {
 	padding-bottom: 0;
-}
+}*/
 
 .reveal.has-light-background .wikids-test-answer:hover {
 	background-color: #eeeeee;
