@@ -81,11 +81,11 @@
 
     var QuestionSuccess = function() {
 
-        function create(action, title, image) {
-            var $action = $('<button/>')
+        function create(title, image) {
+            /*var $action = $('<button/>')
                 .addClass('btn')
                 .text('Продолжить')
-                .on('click', action);
+                .on('click', action);*/
             return $('<div/>')
                 .addClass('wikids-test-success-question-page')
                 .hide()
@@ -101,8 +101,12 @@
                         )
                         .append($('<p/>').text(title))
                         .append($('<img/>').attr('src', image))
-                )
-                .append($('<div/>').addClass('wikids-test-success-question-page-action').append($action));
+                );
+/*                .append(
+                    $('<div/>')
+                        .addClass('wikids-test-success-question-page-action')
+                        .append($action)
+                );*/
         }
 
         return {
@@ -2569,17 +2573,27 @@
 
         function showQuestionSuccessPage(answer) {
 
-            var action = function() {
-                $(this).parent().parent().remove();
-                continueTestAction(answer);
-            };
             var text = currentQuestion.name;
             if (testConfig.answerTypeIsInput()) {
                 text = answer[0];
             }
-            var $content = questionSuccess.create(action, text, currentQuestion.image);
+            var image = currentQuestion.image;
+            if (!image) {
+                getCorrectAnswers(currentQuestion).forEach(function(answer) {
+                    if (!image && answer.image) {
+                        image = answer.image;
+                    }
+                });
+            }
+            var $content = questionSuccess.create(text, image);
             dom.wrapper.append($content)
             $content.fadeIn();
+
+            var action = function() {
+                $content.remove();
+                continueTestAction(answer);
+            };
+            setTimeout(action, 2000);
         }
 
         function getQuestionRememberAnswers(question) {
