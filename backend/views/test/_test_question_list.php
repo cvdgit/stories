@@ -115,7 +115,13 @@ Sortable.create($('#questions-grid tbody')[0], {
             ids.push($(elem).data('key'));
         });
         $('#storytest-sortable').val(ids.join(','));
-    }
+    },
+    onStart: function () {
+		$('nav#w2').hide();
+	},
+	onEnd: function () {
+        $('nav#w2').show();
+	}
 });
 
 JS;
