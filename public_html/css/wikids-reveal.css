@@ -750,6 +750,10 @@ p.wikids-test-description {
 	text-decoration: underline;
 }
 
+.reveal section .slide-paragraph a > span {
+	pointer-events: none;
+}
+
 .wikids-sortable-ghost {
 	opacity: .5;
 	background: #C8EBFB;

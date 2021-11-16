@@ -2952,7 +2952,6 @@
             if (testConfig.answerTypeIsDefault()) {
                 if (testConfig.isAskQuestion()) {
                     speech.cancel();
-                    console.log('cancel');
                     var readText = currentQuestion.name;
                     setTimeout(function() {
                         speech.readText(readText, testConfig.getAskQuestionLang());
