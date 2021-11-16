@@ -1091,6 +1091,9 @@
                 }
 
                 synthesis.speak(utterance);
+            },
+            'cancel': function() {
+                synthesis.cancel();
             }
         }
     }
@@ -2934,9 +2937,9 @@
 
             if (testConfig.answerTypeIsRecording()) {
                 if (testConfig.isAskQuestion()) {
-                    var text = currentQuestion.name;
+                    var speechText = currentQuestion.name;
                     setTimeout(function() {
-                        speech.readText(text, testConfig.getAskQuestionLang(), function () {
+                        speech.readText(speechText, testConfig.getAskQuestionLang(), function () {
                             that.recordingAnswer.autoStart(new Event('autoStart'), 500);
                         });
                     }, 500);
@@ -2948,9 +2951,11 @@
 
             if (testConfig.answerTypeIsDefault()) {
                 if (testConfig.isAskQuestion()) {
-                    var text = currentQuestion.name;
+                    speech.cancel();
+                    console.log('cancel');
+                    var readText = currentQuestion.name;
                     setTimeout(function() {
-                        speech.readText(text, testConfig.getAskQuestionLang());
+                        speech.readText(readText, testConfig.getAskQuestionLang());
                     }, 500);
                 }
             }
@@ -2978,8 +2983,45 @@
             text = text.replace('{1}', question.entity_name);
             $elements.append($('<h4/>').text(text + ':'));
 
+            var questionNeoParams = question['params'] || [];
+
             if (questionViewRegion(question)) {
                 $elements.append(that.regionQuestion.createSuccess(question));
+            }
+            else if (testConfig.sourceIsNeo() && questionNeoParams.length > 0) {
+
+                var $elementRow = $('<div/>', {'class': 'row row-no-gutters'});
+                var $elementCol = $('<div/>', {'class': 'col-md-12'});
+                $elementCol.appendTo($elementRow);
+
+
+                var correctAnswers = getCorrectAnswers(question);
+                var answerIsCorrect = function(id) {
+                    var correct = false;
+                    correctAnswers.forEach(function(answer) {
+                        if (parseInt(answer.id) === parseInt(id)) {
+                            correct = true;
+                            return;
+                        }
+                    });
+                    return correct;
+                }
+
+                questionNeoParams.forEach(function(param) {
+                    param.signs.forEach(function(sign) {
+                        var $span = $('<span/>', {'class': 'label wikids-animal-sign'})
+                            .text(sign.name);
+                        if (answerIsCorrect(sign.id)) {
+                            $span.addClass('label-success');
+                        }
+                        else {
+                            $span.addClass('label-default');
+                        }
+                        $span.appendTo($elementCol);
+                    });
+                });
+
+                $elementRow.appendTo($elements);
             }
             else {
                 var $element;

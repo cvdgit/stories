@@ -222,6 +222,7 @@ class QuestionController extends Controller
                 'lastAnswerIsCorrect' => true,
                 'test_id' => $test->id,
                 'answer_number' => $resultItem['answer_number'],
+                'params' => $resultItem['params'] ?? [],
             ];
             $questions[] = $question;
         }

@@ -1003,3 +1003,11 @@ p.wikids-test-description {
 	-webkit-box-shadow: none;
 	font-size: 1.8rem !important;
 }
+
+.wikids-animal-sign {
+	font-size: 22px;
+	/*padding: 2px 6px;*/
+	margin: 2px 6px;
+	display: inline-block;
+	/*line-height: 28px;*/
+}
