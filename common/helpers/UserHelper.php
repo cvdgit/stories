@@ -5,6 +5,7 @@ namespace common\helpers;
 use common\models\StoryTest;
 use common\models\UserStudent;
 use Yii;
+use yii\db\Query;
 use yii\helpers\ArrayHelper;
 use common\models\User;
 
@@ -14,6 +15,15 @@ class UserHelper
     public static function getUserArray()
     {
         return ArrayHelper::map(User::find()->all(), 'id', 'username');
+    }
+
+    public static function getTestCreatorsUserArray(): array
+    {
+        $query = (new Query())
+            ->select('created_by')
+            ->distinct()
+            ->from(StoryTest::tableName());
+        return ArrayHelper::map(User::find()->where(['in', 'id', $query])->all(), 'id', 'profileName');
     }
 
     public static function getStatusArray()

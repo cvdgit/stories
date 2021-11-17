@@ -45,7 +45,7 @@ $columns[] = [
     'attribute' => 'created_by',
     'value' => 'createdBy.profileName',
     'label' => 'Автор',
-    'filter' => UserHelper::getUserArray(),
+    'filter' => UserHelper::getTestCreatorsUserArray(),
 ];
 if ($searchModel->isWordList()) {
     $columns[] = [
