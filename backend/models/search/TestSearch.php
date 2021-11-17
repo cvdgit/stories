@@ -16,6 +16,7 @@ class TestSearch extends Model
     public $source;
     public $answer_type;
     public $status;
+    public $created_by;
 
     public function rules()
     {
@@ -23,7 +24,7 @@ class TestSearch extends Model
             [['title'], 'string', 'max' => 50],
             [['created_at'], 'date'],
             ['status', 'default', 'value' => TestStatus::DEFAULT],
-            [['source', 'answer_type', 'status'], 'integer'],
+            [['source', 'answer_type', 'status', 'created_by'], 'integer'],
             ['status', 'in', 'range' => TestStatus::all()],
         ];
     }
@@ -74,6 +75,7 @@ class TestSearch extends Model
         ]);
         $query->andFilterWhere(['source' => $this->source]);
         $query->andFilterWhere(['answer_type' => $this->answer_type]);
+        $query->andFilterWhere(['created_by' => $this->created_by]);
 
         return $dataProvider;
     }

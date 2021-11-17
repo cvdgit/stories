@@ -1,5 +1,6 @@
 <?php
 use common\helpers\Url;
+use common\helpers\UserHelper;
 use common\models\StoryTest;
 use common\models\test\AnswerType;
 use common\models\test\SourceType;
@@ -41,8 +42,10 @@ $columns[] = [
     },
 ];
 $columns[] = [
-    'attribute' => 'createdBy.profileName',
+    'attribute' => 'created_by',
+    'value' => 'createdBy.profileName',
     'label' => 'Автор',
+    'filter' => UserHelper::getUserArray(),
 ];
 if ($searchModel->isWordList()) {
     $columns[] = [
