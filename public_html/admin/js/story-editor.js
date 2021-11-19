@@ -403,15 +403,33 @@ SlideManager.prototype = {
             }).disableSelection();
 
             if (toSetActiveSlideID) {
-                var el = that.$slidesList
-                    .find('div[data-slide-id=' + toSetActiveSlideID + '].thumb-reveal-wrapper');
-                el.click();
-                that.$slidesList.animate({
-                    scrollTop: el.offset().top
-                }, 'fast');
+                that.$slidesList
+                    .find('div[data-slide-id=' + toSetActiveSlideID + '].thumb-reveal-wrapper')
+                    .click();
             }
             else {
-                that.$slidesList.find('div.thumb-reveal-wrapper:eq(0)').click();
+                that.$slidesList
+                    .find('div.thumb-reveal-wrapper:eq(0)')
+                    .click();
+            }
+
+            if (that.decks.length > 0) {
+                $.whenAll(that.decks).done(function () {
+
+                    if (toSetActiveSlideID) {
+                        var el = that.$slidesList
+                            .find('div[data-slide-id=' + toSetActiveSlideID + '].thumb-reveal-wrapper');
+                        var top = el.offset().top - 151;
+                        if (top < 0) {
+                            top = 0;
+                        }
+                        that.$slidesList.animate({
+                            scrollTop: top
+                        }, 'fast');
+                    }
+
+                    console.log('done');
+                });
             }
         });
     },
