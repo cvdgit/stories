@@ -126,6 +126,10 @@ class StoryController extends Controller
         $sectionModel = $this->findSectionModel($section);
         $model = $this->findCategoryModel($category);
 
+        if (!$sectionModel->isOurCategory($model)) {
+            throw new NotFoundHttpException('Категория не найдена');
+        }
+
         $this->getView()->setMetaTags(
             $model->name . ' - каталог историй',
             $model->name,

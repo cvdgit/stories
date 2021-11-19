@@ -4,7 +4,6 @@ namespace common\models;
 
 use common\helpers\Translit;
 use common\models\story\StoryStatus;
-use Yii;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\Url;
@@ -25,17 +24,12 @@ use yii\helpers\Url;
  */
 class SiteSection extends ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
+
     public static function tableName()
     {
         return 'site_section';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
@@ -48,9 +42,6 @@ class SiteSection extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
@@ -167,5 +158,11 @@ class SiteSection extends ActiveRecord
     public function isVisible(): bool
     {
         return $this->visible === 1;
+    }
+
+    public function isOurCategory(Category $category): bool
+    {
+        $rootCategory = $this->category;
+        return $rootCategory->tree === $category->tree;
     }
 }
