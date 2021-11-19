@@ -22,7 +22,7 @@ class WordListFormatter
     {
         $name = trim(preg_replace('/\s{2,}/', ' ', $name));
         $correct = trim(preg_replace('/\s{2,}/', ' ', $correct));
-        $correct = trim(preg_replace('/[^\w\-\s.,#]/u', '', $correct));
+        $correct = trim(preg_replace('/[^\w\-\s.?,#]/u', '', $correct));
         return [
             'name' => $name,
             'correct_answer' => $correct,
