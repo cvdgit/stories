@@ -2873,7 +2873,7 @@
 
             currentQuestionElement = $('.wikids-test-question[data-question-id=' + nextQuestionObj.id + ']', dom.questions);
 
-            if (getQuestionView(currentQuestion) !== 'svg' && testConfig.sourceIsNeo()) {
+            if (getQuestionView(currentQuestion) !== 'svg' && (testConfig.sourceIsNeo() || testConfig.sourceIsLocal())) {
                 $('.wikids-test-answers', currentQuestionElement)
                     .empty()
                     .append(createAnswers(getAnswersData(currentQuestion), currentQuestion)
