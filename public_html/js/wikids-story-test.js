@@ -2687,6 +2687,8 @@
                 answerIsCorrect = true;
             }
 
+            cancelSpeech();
+
             if (answerIsCorrect) {
                 if (currentQuestion['stars']) {
                     if (currentQuestion.lastAnswerIsCorrect) {
@@ -2865,6 +2867,8 @@
                 return;
             }
 
+            cancelSpeech();
+
             dom.nextButton.off("click").on("click", nextQuestion);
 
             currentQuestionElement = $('.wikids-test-question[data-question-id=' + nextQuestionObj.id + ']', dom.questions);
@@ -2951,12 +2955,17 @@
 
             if (testConfig.answerTypeIsDefault()) {
                 if (testConfig.isAskQuestion()) {
-                    speech.cancel();
                     var readText = currentQuestion.name;
                     setTimeout(function() {
                         speech.readText(readText, testConfig.getAskQuestionLang());
                     }, 500);
                 }
+            }
+        }
+
+        function cancelSpeech() {
+            if (testConfig.isAskQuestion()) {
+                speech.cancel();
             }
         }
 
