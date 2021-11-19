@@ -403,7 +403,12 @@ SlideManager.prototype = {
             }).disableSelection();
 
             if (toSetActiveSlideID) {
-                that.$slidesList.find('div[data-slide-id=' + toSetActiveSlideID + '].thumb-reveal-wrapper').click();
+                var el = that.$slidesList
+                    .find('div[data-slide-id=' + toSetActiveSlideID + '].thumb-reveal-wrapper');
+                el.click();
+                that.$slidesList.animate({
+                    scrollTop: el.offset().top
+                }, 'fast');
             }
             else {
                 that.$slidesList.find('div.thumb-reveal-wrapper:eq(0)').click();
