@@ -1877,7 +1877,7 @@
             }
             else {
                 var mixAnswers = question.mix_answers || 0;
-                if (parseInt(mixAnswers) === 1 || testConfig.sourceIsNeo()) {
+                if (parseInt(mixAnswers) === 1 || testConfig.sourceIsNeo() || testConfig.sourceIsLocal()) {
                     answers = shuffle(answers);
                 }
             }
