@@ -3052,7 +3052,7 @@
 
                 $('<span/>', {
                     'text': 'Все признаки животного',
-                    'class': 'label label-info',
+                    'class': 'label label-primary',
                     'css': {'cursor': 'pointer'}
                 })
                     .on('click', function(e) {
