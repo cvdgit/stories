@@ -560,6 +560,7 @@ p.wikids-test-description {
 	overflow: hidden;
 	overflow-y: auto;
 	text-align: left;
+	min-height: 500px;
 }
 
 .wikids-test-correct-answer-answers > .row {
@@ -570,7 +571,8 @@ p.wikids-test-description {
 	font-size: 3.2rem !important;
 	text-align: center;
 	color: #000000;
-	margin-bottom: 30px;
+	margin-bottom: 20px;
+	margin-top: 25px;
 }
 
 .wikids-test-correct-answer-answers img {
@@ -1010,8 +1012,14 @@ p.wikids-test-description {
 
 .wikids-animal-sign {
 	font-size: 22px;
-	/*padding: 2px 6px;*/
-	margin: 2px 6px;
+	margin: 0 6px;
 	display: inline-block;
-	/*line-height: 28px;*/
+	text-overflow: ellipsis;
+	overflow: hidden;
+	max-width: 820px;
+}
+
+.animal-sign-table > tbody > tr > td {
+	border: 0 none;
+	padding: 2px 8px;
 }

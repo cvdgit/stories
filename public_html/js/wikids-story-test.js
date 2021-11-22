@@ -2999,9 +2999,11 @@
             else if (testConfig.sourceIsNeo() && questionNeoParams.length > 0) {
 
                 var $elementRow = $('<div/>', {'class': 'row row-no-gutters'});
-                var $elementCol = $('<div/>', {'class': 'col-md-12'});
+                var $elementCol = $('<div/>', {'class': 'col-md-8 col-md-offset-2'});
                 $elementCol.appendTo($elementRow);
 
+                var $table = $('<table class="table table-responsive animal-sign-table"><tbody></tbody></table>');
+                $table.appendTo($elementCol);
 
                 var correctAnswers = getCorrectAnswers(question);
                 var answerIsCorrect = function(id) {
@@ -3015,19 +3017,91 @@
                     return correct;
                 }
 
-                questionNeoParams.forEach(function(param) {
-                    param.signs.forEach(function(sign) {
+                $('.wikids-test-question[data-question-id=' + question.id + ']', dom.questions)
+                    .find('.wikids-test-answer').each(function() {
+
                         var $span = $('<span/>', {'class': 'label wikids-animal-sign'})
-                            .text(sign.name);
-                        if (answerIsCorrect(sign.id)) {
+                            .html($(this).find('label').text());
+
+                        var id = $(this).find('input').val();
+                        var correct = ($.inArray(id.toString(), answer) !== -1);
+
+                        if (answerIsCorrect(id)) {
                             $span.addClass('label-success');
                         }
                         else {
                             $span.addClass('label-default');
                         }
-                        $span.appendTo($elementCol);
+
+                        var userPick = '';
+                        if (correct) {
+                            userPick = '<i class="glyphicon glyphicon-check"></i> ';
+                        }
+
+                        $('<tr/>')
+                            .append(
+                                $('<td/>').html(userPick)
+                            )
+                            .append(
+                                $('<td/>').html($span)
+                            )
+                            .appendTo(
+                                $table.find('tbody')
+                            );
                     });
-                });
+
+                $('<span/>', {
+                    'text': 'Все признаки животного',
+                    'class': 'label label-info',
+                    'css': {'cursor': 'pointer'}
+                })
+                    .on('click', function(e) {
+
+                        var $hintWrapper = $('<div/>', {'class': 'slide-hints-wrapper'});
+                        var $hintBackground = $('<div/>', {'class': 'slide-hints-background'});
+                        var $hintInner = $('<div/>', {'class': 'slide-hints-inner'});
+                        var $hint = $('<div/>', {'class': 'slide-hints'});
+
+                        $hintBackground.appendTo($hintWrapper);
+                        $hintInner.appendTo($hintWrapper);
+
+                        $('<header/>', {'class': 'slide-hints-header'})
+                            .append(
+                                $('<div/>', {'class': 'header-actions'})
+                                    .append(
+                                        $('<button/>', {
+                                            'class': 'hints-close',
+                                            'html': '&times;'
+                                        })
+                                            .on('click', function() {
+                                                $hintWrapper.hide();
+                                                $(this).remove();
+                                                $('.reveal .story-controls').show();
+                                            })
+                                    )
+                            )
+                            .appendTo($hintInner);
+
+                        var $elementRow = $('<div/>', {'class': 'row row-no-gutters'});
+                        var $elementCol = $('<div/>', {'class': 'col-md-12', 'css': {'padding': '10px'}});
+                        $elementCol.appendTo($elementRow);
+                        questionNeoParams.forEach(function(param) {
+                            param.signs.forEach(function(sign) {
+                                var $span = $('<span/>', {'class': 'label label-default wikids-animal-sign'})
+                                    .text(sign.name);
+                                $span.appendTo($elementCol);
+                            });
+                        });
+
+                        $elementRow.appendTo($hint);
+                        $hint.appendTo($hintInner);
+
+                        $('.reveal .story-controls').hide();
+                        $('.reveal .slides section.present').append($hintWrapper);
+                    })
+                    .wrap($('<div/>', {'class': 'text-center'}))
+                    .parent()
+                    .appendTo($elementCol);
 
                 $elementRow.appendTo($elements);
             }
