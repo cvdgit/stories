@@ -44,11 +44,19 @@ TestAsset::register($this);
         <div class="modal-content"></div>
     </div>
 </div>
+<div class="modal remote fade" id="test-detail-modal">
+    <div class="modal-dialog">
+        <div class="modal-content"></div>
+    </div>
+</div>
 
 <?php
 $css = <<< CSS
 #test-list p a {
-text-decoration: underline;
+    text-decoration: underline;
+}
+#test-list .progress {
+    cursor: pointer;
 }
 .run-test {
     padding: 0;
@@ -102,6 +110,18 @@ $('#run-test-modal').on('loaded.bs.modal', function() {
 $('#run-test-modal').on('hide.bs.modal', function() {
     $(this).removeData('bs.modal');
     $(this).find('.modal-content').html('');
+});
+
+$('#test-detail-modal').on('hide.bs.modal', function() {
+    $(this).removeData('bs.modal');
+    $(this).find('.modal-content').html('');
+});
+$('#test-list').on('click', '.progress', function() {
+    var bar = $(this).find('.progress-bar');
+    var testId = bar.data('testId');
+    var studentId = bar.data('studentId');
+    $('#test-detail-modal')
+        .modal({'remote': '/test/detail?test_id=' + testId + '&student_id=' + studentId});
 });
 JS;
 $this->registerJs($js);

@@ -21,7 +21,7 @@ use yii\helpers\Html;
                         <div class="clearfix">
                             <?= Html::a('<i class="glyphicon glyphicon-trash"></i>', ['test/clear-history', 'category_id' => $category->id, 'student_id' => $student->id, 'test_id' => $test->id], ['title' => 'Очистить прогресс', 'style' => 'float: right']) ?>
                             <div class="progress">
-                                <div class="progress-bar" role="progressbar" style="width: <?= $student->getProgress($test->id) ?>%;min-width: 20px">
+                                <div data-test-id="<?= $test->id ?>" data-student-id="<?= $student->id ?>" class="progress-bar" role="progressbar" style="width: <?= $student->getProgress($test->id) ?>%;min-width: 20px">
                                     <?= $student->getProgress($test->id) ?>%
                                 </div>
                             </div>

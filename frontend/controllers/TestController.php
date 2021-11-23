@@ -10,21 +10,25 @@ use common\models\StoryTest;
 use common\models\StudentQuestionProgress;
 use common\models\UserQuestionHistory;
 use common\models\UserStudent;
+use common\services\TestDetailService;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 class TestController extends Controller
 {
 
     private $storyEditorService;
+    private $testDetailService;
 
-    public function __construct($id, $module, StoryEditorService $storyEditorService, $config = [])
+    public function __construct($id, $module, StoryEditorService $storyEditorService, TestDetailService $testDetailService, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->storyEditorService = $storyEditorService;
+        $this->testDetailService = $testDetailService;
     }
 
     public function behaviors()
@@ -116,6 +120,15 @@ class TestController extends Controller
         return $this->renderAjax('view-by-user', [
             'model' => $model,
             'userId' => $user_id,
+        ]);
+    }
+
+    public function actionDetail(int $test_id, int $student_id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $rows = $this->testDetailService->getDetail($test_id, $student_id);
+        return $this->renderAjax('_detail', [
+            'rows' => $rows,
         ]);
     }
 }
