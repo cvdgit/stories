@@ -16,7 +16,6 @@ use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\web\Response;
 
 class TestController extends Controller
 {
@@ -125,7 +124,6 @@ class TestController extends Controller
 
     public function actionDetail(int $test_id, int $student_id)
     {
-        Yii::$app->response->format = Response::FORMAT_JSON;
         $rows = $this->testDetailService->getDetail($test_id, $student_id);
         return $this->renderAjax('_detail', [
             'rows' => $rows,
