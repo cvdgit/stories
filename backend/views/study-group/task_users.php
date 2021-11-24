@@ -62,7 +62,7 @@ $this->params['breadcrumbs'] = [
                     if ($errors === 0) {
                         return '';
                     }
-                    return Html::a(Html::tag('span', $errors, ['class' => 'label label-danger']));
+                    return Html::a(Html::tag('span', $errors, ['class' => 'label label-danger']), '#');
                 },
             ],
         ],
