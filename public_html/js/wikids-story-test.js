@@ -2236,6 +2236,7 @@
                         $image = $('<img/>')
                             .attr("src", imageItem.url)
                             .attr('title', imageItem.title)
+                            .attr('data-toggle', 'tooltip')
                             .css('width', '100%')
                             .css('padding', '10px')
                             .css('cursor', 'zoom-in')
