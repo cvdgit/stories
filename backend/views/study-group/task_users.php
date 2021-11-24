@@ -56,6 +56,13 @@ $this->params['breadcrumbs'] = [
             [
                 'attribute' => 'total_mistake',
                 'label' => 'Ошибок в тестах',
+                'value' => static function($item) {
+                    $errors = (int) $item['total_mistake'];
+                    if ($errors === 0) {
+                        return '';
+                    }
+                    return Html::a(Html::tag('span', $errors, ['class' => 'label label-danger']));
+                },
             ],
         ],
     ]) ?>
