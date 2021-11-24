@@ -56,6 +56,7 @@ $this->params['breadcrumbs'] = [
             [
                 'attribute' => 'total_mistake',
                 'label' => 'Ошибок в тестах',
+                'format' => 'raw',
                 'value' => static function($item) {
                     $errors = (int) $item['total_mistake'];
                     if ($errors === 0) {
