@@ -11,7 +11,7 @@ $this->params['breadcrumbs'] = [
     $this->title,
 ];
 ?>
-<div>
+<div id="task-user-list">
     <h1 class="page-header"><?= Html::encode($this->title) ?></h1>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -62,9 +62,30 @@ $this->params['breadcrumbs'] = [
                     if ($errors === 0) {
                         return '';
                     }
-                    return Html::a(Html::tag('span', $errors, ['class' => 'label label-danger']), '#');
+                    return Html::a(Html::tag('span', $errors, ['class' => 'label label-danger']), '#', [
+                        'data-task-id' => $item['task_id'],
+                        'data-student-id' => $item['student_id'],
+                        'class' => 'test-detail',
+                    ]);
                 },
             ],
         ],
     ]) ?>
 </div>
+<div class="modal remote fade" id="test-detail-modal">
+    <div class="modal-dialog">
+        <div class="modal-content"></div>
+    </div>
+</div>
+<?php
+$js = <<<JS
+(function() {
+    $('#task-user-list').on('click', '.test-detail', function() {
+        var taskId = $(this).data('taskId');
+        var studentId = $(this).data('studentId');
+        $('#test-detail-modal')
+            .modal({'remote': '/admin/index.php?r=study-task/test-detail&task_id=' + taskId + '&student_id=' + studentId});
+    });
+})();
+JS;
+$this->registerJs($js);

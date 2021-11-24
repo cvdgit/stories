@@ -6,6 +6,7 @@ use backend\components\StudyController;
 use backend\models\study_task\CreateStudyTaskForm;
 use backend\models\study_task\StudyTaskAssignForm;
 use backend\models\study_task\UpdateStudyTaskForm;
+use common\services\TestDetailService;
 use Yii;
 use common\models\StudyTask;
 use yii\data\ActiveDataProvider;
@@ -18,6 +19,14 @@ use yii\web\Response;
  */
 class StudyTaskController extends StudyController
 {
+
+    private $testDetailService;
+
+    public function __construct($id, $module, TestDetailService $testDetailService, $config = [])
+    {
+        $this->testDetailService = $testDetailService;
+        parent::__construct($id, $module, $config);
+    }
 
     public function behaviors()
     {
@@ -117,5 +126,17 @@ class StudyTaskController extends StudyController
             return ['success' => true];
         }
         return ['success' => false];
+    }
+
+    public function actionTestDetail(int $task_id, int $student_id)
+    {
+        /** @var StudyTask $taskModel */
+        $taskModel = $this->findModel(StudyTask::class, $task_id);
+        $storyModel = $taskModel->story;
+        $testModel = $storyModel->storyStoryTests[0];
+        $rows = $this->testDetailService->getDetail($testModel->id, $student_id);
+        return $this->renderAjax('_test_detail', [
+            'rows' => $rows,
+        ]);
     }
 }

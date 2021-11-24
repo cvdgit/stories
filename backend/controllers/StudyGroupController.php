@@ -195,6 +195,8 @@ class StudyGroupController extends StudyController
                 'task_status' => 't4.status',
                 'total_time' => $timeQuery,
                 'total_mistake' => $testMistakesQuery,
+                'student_id' => 't6.id',
+                'task_id' => 't.study_task_id',
             ])
             ->from(['t' => StudyTaskAssign::tableName()])
             ->innerJoin(['t2' => StudyGroupUser::tableName()], 't.study_group_id = t2.study_group_id')
