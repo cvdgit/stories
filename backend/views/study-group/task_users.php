@@ -86,6 +86,10 @@ $js = <<<JS
         $('#test-detail-modal')
             .modal({'remote': '/admin/index.php?r=study-task/test-detail&task_id=' + taskId + '&student_id=' + studentId});
     });
+    $('#test-detail-modal').on('hide.bs.modal', function() {
+        $(this).removeData('bs.modal');
+        $(this).find('.modal-content').html('');
+    });
 })();
 JS;
 $this->registerJs($js);

@@ -134,7 +134,7 @@ class StudyTaskController extends StudyController
         $taskModel = $this->findModel(StudyTask::class, $task_id);
         $storyModel = $taskModel->story;
         $testModel = $storyModel->storyStoryTests[0];
-        $rows = $this->testDetailService->getDetail($testModel->story_id, $student_id);
+        $rows = $this->testDetailService->getDetail($testModel->test_id, $student_id);
         return $this->renderAjax('_test_detail', [
             'rows' => $rows,
         ]);
