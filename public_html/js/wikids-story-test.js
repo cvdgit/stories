@@ -3101,7 +3101,7 @@
                         });
 
                         for (var signName in signsByGroup) {
-                            var $elementCol = $('<div/>', {'class': 'col-md-6', 'css': {'padding': '10px'}});
+                            var $elementCol = $('<div/>', {'class': 'col-md-6'});
 
                             var $ul = $('<dl/>', {'class': 'dl-horizontal'});
                             $('<dt/>', {'text': signName, 'title': signName})
