@@ -3058,35 +3058,15 @@
                 })
                     .on('click', function(e) {
 
-                        var $hintWrapper = $('<div/>', {'class': 'slide-hints-wrapper'});
-                        var $hintBackground = $('<div/>', {'class': 'slide-hints-background'});
-                        var $hintInner = $('<div/>', {'class': 'slide-hints-inner'});
-                        var $hint = $('<div/>', {'class': 'slide-hints'});
+                        var $elementRow = $('<div/>', {
+                            'class': 'row row-no-gutters',
+                            'css': {'padding-top': '10px', 'background-color': 'white', 'height': '100%'}
+                        });
 
-                        $hintBackground.appendTo($hintWrapper);
-                        $hintInner.appendTo($hintWrapper);
-
-                        $('<header/>', {'class': 'slide-hints-header'})
-                            .append(
-                                $('<div/>', {'class': 'header-actions'})
-                                    .append(
-                                        $('<button/>', {
-                                            'class': 'hints-close',
-                                            'html': '&times;'
-                                        })
-                                            .on('click', function() {
-                                                $hintWrapper.hide();
-                                                $(this).remove();
-                                                $('.reveal .story-controls').show();
-                                            })
-                                    )
-                            )
-                            .appendTo($hintInner);
-
-                        var $elementRow = $('<div/>', {'class': 'row row-no-gutters'});
-
-                        //var $elementCol = $('<div/>', {'class': 'col-md-12', 'css': {'padding': '10px'}});
-                        //$elementCol.appendTo($elementRow);
+                        $elementRow.on('click', '[data-slide-id]', function() {
+                            var slideId = $(this).data('slideId');
+                            alert(slideId);
+                        });
 
                         var signsByGroup = [];
                         questionNeoParams.forEach(function(param) {
@@ -3101,24 +3081,35 @@
                         });
 
                         for (var signName in signsByGroup) {
+
                             var $elementCol = $('<div/>', {'class': 'col-md-6', 'css': {'padding': '10px'}});
 
-                            var $ul = $('<dl/>', {'class': 'dl-horizontal'});
+                            var $dl = $('<dl/>', {'class': 'dl-horizontal'});
                             $('<dt/>', {'text': signName, 'title': signName, 'css': {'width': '200px'}})
-                                .appendTo($ul);
+                                .appendTo($dl);
+
                             signsByGroup[signName].forEach(function(sign) {
-                                var $span = $('<dd/>', {'css': {'margin-left': '220px'}}).text(sign.name);
-                                $span.appendTo($ul);
-                                $ul.appendTo($elementCol);
+
+                                var signItem = sign.name;
+                                if (sign['slide_id']) {
+                                    signItem = $('<span/>', {
+                                        'data-slide-id': sign['slide_id'],
+                                        'text': sign.name,
+                                        'css': {'cursor': 'pointer', 'user-select': 'none', 'text-decoration': 'underline'}
+                                    });
+                                }
+
+                                var $dd = $('<dd/>', {'css': {'margin-left': '220px'}})
+                                    .html(signItem);
+                                $dd.appendTo($dl);
+
+                                $dl.appendTo($elementCol);
                             });
+
                             $elementCol.appendTo($elementRow);
                         }
 
-                        $elementRow.appendTo($hint);
-                        $hint.appendTo($hintInner);
-
-                        $('.reveal .story-controls').hide();
-                        $('.reveal .slides section.present').append($hintWrapper);
+                        createInnerDialog('Признаки - ' + questionNeoParams[0].animal, $elementRow);
                     })
                     .wrap($('<div/>', {'class': 'text-center'}))
                     .parent()
@@ -3285,6 +3276,55 @@
 
             var elem = $("div.new-questions", WikidsPlayer.getCurrentSlide());
             elem.html(dom.wrapper);
+        }
+
+        function createSlideInnerDialog(slideId, title) {
+            title = title || '';
+            var content = $('<iframe>', {
+                'src': '/question-hints/view-slide-by-id?id=' + slideId,
+                'frameborder': 0,
+                'scrolling': 'no',
+                'width': '100%',
+                'height': '100%'
+            });
+            createInnerDialog(title, content);
+        }
+
+        function createInnerDialog(title, content) {
+
+            var $hintWrapper = $('<div/>', {'class': 'slide-hints-wrapper'});
+            var $hintBackground = $('<div/>', {'class': 'slide-hints-background'});
+            var $hintInner = $('<div/>', {'class': 'slide-hints-inner'});
+            var $hint = $('<div/>', {'class': 'slide-hints'});
+
+            $hintBackground.appendTo($hintWrapper);
+            $hintInner.appendTo($hintWrapper);
+
+            $('<header/>', {'class': 'slide-hints-header'})
+                .append(
+                    $('<h3/>').text(title)
+                )
+                .append(
+                    $('<div/>', {'class': 'header-actions'})
+                        .append(
+                            $('<button/>', {
+                                'class': 'hints-close',
+                                'html': '&times;'
+                            })
+                                .on('click', function() {
+                                    $hintWrapper.hide();
+                                    $(this).parents('.slide-hints-wrapper:eq(0)').remove();
+                                    $('.reveal .story-controls').show();
+                                })
+                        )
+                )
+                .appendTo($hintInner);
+
+            $hint.append(content);
+            $hint.appendTo($hintInner);
+
+            $('.reveal .story-controls').hide();
+            $('.reveal .slides section.present').append($hintWrapper);
         }
 
         PluginManager.initializePlugins(this, el, {});

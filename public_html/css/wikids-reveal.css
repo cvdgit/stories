@@ -968,6 +968,7 @@ p.wikids-test-description {
 	background-color: #eee;
 	border-top-left-radius: 4px;
 	border-top-right-radius: 4px;
+	justify-content: center;
 }
 
 .slide-hints-header .header-actions {
