@@ -279,7 +279,7 @@ function createVariantParams(params) {
 }
 
 updateVariantModal
-    .on('shown.bs.modal', function() {
+    .on('loaded.bs.modal', function() {
         
         var id = $('#updateform-neo_question_id').val();
         var params = $('#updateform-question_params').val();
