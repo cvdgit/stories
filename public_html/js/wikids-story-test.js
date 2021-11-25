@@ -3101,13 +3101,13 @@
                         });
 
                         for (var signName in signsByGroup) {
-                            var $elementCol = $('<div/>', {'class': 'col-md-6'});
+                            var $elementCol = $('<div/>', {'class': 'col-md-6', 'css': {'padding': '10px'}});
 
                             var $ul = $('<dl/>', {'class': 'dl-horizontal'});
-                            $('<dt/>', {'text': signName, 'title': signName})
+                            $('<dt/>', {'text': signName, 'title': signName, 'css': {'width': '200px'}})
                                 .appendTo($ul);
                             signsByGroup[signName].forEach(function(sign) {
-                                var $span = $('<dd/>').text(sign.name);
+                                var $span = $('<dd/>', {'css': {'margin-left': '220px'}}).text(sign.name);
                                 $span.appendTo($ul);
                                 $ul.appendTo($elementCol);
                             });
