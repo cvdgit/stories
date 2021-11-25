@@ -3084,15 +3084,35 @@
                             .appendTo($hintInner);
 
                         var $elementRow = $('<div/>', {'class': 'row row-no-gutters'});
-                        var $elementCol = $('<div/>', {'class': 'col-md-12', 'css': {'padding': '10px'}});
-                        $elementCol.appendTo($elementRow);
+
+                        //var $elementCol = $('<div/>', {'class': 'col-md-12', 'css': {'padding': '10px'}});
+                        //$elementCol.appendTo($elementRow);
+
+                        var signsByGroup = [];
                         questionNeoParams.forEach(function(param) {
                             param.signs.forEach(function(sign) {
-                                var $span = $('<span/>', {'class': 'label label-default wikids-animal-sign'})
-                                    .text(sign.name);
-                                $span.appendTo($elementCol);
+                                if (!signsByGroup[sign.group_name]) {
+                                    signsByGroup[sign.group_name] = [sign];
+                                }
+                                else {
+                                    signsByGroup[sign.group_name].push(sign);
+                                }
                             });
                         });
+
+                        for (var signName in signsByGroup) {
+                            var $elementCol = $('<div/>', {'class': 'col-md-6', 'css': {'padding': '10px'}});
+
+                            var $ul = $('<dl/>', {'class': 'dl-horizontal'});
+                            $('<dt/>', {'text': signName, 'title': signName})
+                                .appendTo($ul);
+                            signsByGroup[signName].forEach(function(sign) {
+                                var $span = $('<dd/>').text(sign.name);
+                                $span.appendTo($ul);
+                                $ul.appendTo($elementCol);
+                            });
+                            $elementCol.appendTo($elementRow);
+                        }
 
                         $elementRow.appendTo($hint);
                         $hint.appendTo($hintInner);
