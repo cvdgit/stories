@@ -141,6 +141,8 @@ class QuestionController extends Controller
         $result = $curl
             ->setHeader('Accept', 'application/json')
             ->setOptions([
+                CURLOPT_TIMEOUT => 300,
+                CURLOPT_CONNECTTIMEOUT => 300,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_SSL_VERIFYPEER => false,
                 CURLOPT_SSL_VERIFYHOST => false,
