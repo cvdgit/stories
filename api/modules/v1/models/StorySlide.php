@@ -18,6 +18,7 @@ class StorySlide extends ActiveRecord
     public function fields()
     {
         return [
+            'id',
             'number',
             'data',
             'images' => function() {
