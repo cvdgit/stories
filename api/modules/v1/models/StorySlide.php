@@ -1,8 +1,6 @@
 <?php
 
-
 namespace api\modules\v1\models;
-
 
 use backend\components\story\AbstractBlock;
 use backend\components\story\reader\HtmlSlideReader;
@@ -21,6 +19,7 @@ class StorySlide extends ActiveRecord
     {
         return [
             'number',
+            'data',
             'images' => function() {
                 $images = [];
                 if ($this->data === null) {

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace api\modules\v1\controllers;
 
 use api\modules\v1\models\Story;
