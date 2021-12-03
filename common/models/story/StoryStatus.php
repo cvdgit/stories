@@ -28,7 +28,7 @@ class StoryStatus extends BaseStatus
     {
         return [
             self::DRAFT => 'Черновик',
-            self::PUBLISHED => 'Опубликован',
+            self::PUBLISHED => 'Опубликована',
             self::FOR_PUBLICATION => 'На публикацию',
             self::TASK => 'Задание',
         ];

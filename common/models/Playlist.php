@@ -6,6 +6,7 @@ use common\models\story\StoryStatus;
 use DomainException;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 
@@ -18,12 +19,11 @@ use yii\db\Query;
  * @property int $updated_at
  *
  * @property Story[] $stories
+ * @property Story[] $storiesAdmin
  */
 class Playlist extends ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
+
     public static function tableName()
     {
         return 'playlist';
@@ -43,9 +43,6 @@ class Playlist extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
@@ -54,9 +51,6 @@ class Playlist extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
@@ -67,20 +61,26 @@ class Playlist extends ActiveRecord
         ];
     }
 
-    /**
-     * @return yii\db\ActiveQuery
-     * @throws yii\base\InvalidConfigException
-     */
-    public function getStories()
+    private function createStoriesCondition(): ActiveQuery
     {
         return $this
             ->hasMany(Story::class, ['id' => 'story_id'])
             ->viaTable('story_playlist', ['playlist_id' => 'id'])
             ->innerJoin('{{%story_playlist}}', '{{%story}}.id = {{%story_playlist}}.story_id')
             ->andWhere('{{%story_playlist}}.playlist_id = :playlist', [':playlist' => $this->id])
-            ->andWhere('{{%story}}.status = :status', [':status' => StoryStatus::PUBLISHED])
             ->orderBy(['-{{%story_playlist}}.order' => SORT_DESC, '{{%story_playlist}}.created_at' => SORT_ASC])
             ->select(['{{%story}}.*', '{{%story_playlist}}.order AS playlist_order']);
+    }
+
+    public function getStories(): ActiveQuery
+    {
+        return $this->createStoriesCondition()
+            ->andWhere('{{%story}}.status = :status', [':status' => StoryStatus::PUBLISHED]);
+    }
+
+    public function getStoriesAdmin(): ActiveQuery
+    {
+        return $this->createStoriesCondition();
     }
 
     public static function playlistsArray(): array
@@ -131,5 +131,4 @@ class Playlist extends ActiveRecord
         $command->delete('{{%story_playlist}}', 'playlist_id = :playlist AND story_id = :story', [':playlist' => $playlistID, ':story' => $storyID]);
         return $command->execute();
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+use common\models\story\StoryStatus;
 use yii\helpers\Html;
 use yii\jui\JuiAsset;
 /** @var $model common\models\Playlist */
@@ -10,10 +11,11 @@ $this->title = 'Плейлист: ' . $model->title;
         <div class="col-md-6">
             <table class="table table-bordered table-hover">
                 <tbody id="story-list">
-                <?php foreach ($model->stories as $story): ?>
+                <?php foreach ($model->storiesAdmin as $story): ?>
                     <tr data-story-id="<?= $story['id'] ?>">
                         <td><?= $story['playlist_order'] ?></td>
                         <td><?= $story['title'] ?></td>
+                        <td><?= StoryStatus::asText($story['status']) ?></td>
                         <td>
                             <?= Html::a('Удалить', ['playlist/delete-item', 'playlist_id' => $model->id, 'story_id' => $story['id']], ['class' => 'delete-playlist-item']) ?>
                         </td>
