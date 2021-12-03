@@ -20,7 +20,19 @@ class StorySlide extends ActiveRecord
         return [
             'id',
             'number',
-            'data',
+            'data' => function() {
+                $slideData = $this->data;
+                $search = [
+                    'data-id=""',
+                    'data-background-color="#000000"',
+                ];
+                $replace = [
+                    'data-id="' . $this->id . '"',
+                    'data-background-color="#fff"',
+                ];
+                $slideData = str_replace($search, $replace, $slideData);
+                return $slideData;
+            },
             'images' => function() {
                 $images = [];
                 if ($this->data === null) {
