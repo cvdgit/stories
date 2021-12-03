@@ -14,7 +14,7 @@ use yii\widgets\Pjax;
 /** @var $dataProvider yii\data\ActiveDataProvider */
 /** @var $searchModel backend\models\StorySearch */
 /** @var $batchForm backend\models\StoryBatchCommandForm */
-/** @var $status int */
+/** @var $status StoryStatus */
 $this->title = 'Управление историями';
 ?>
 <h1 class="page-header"><?= Html::encode($this->title) ?></h1>
@@ -28,99 +28,108 @@ $this->title = 'Управление историями';
         [
             'label' => 'Черновики',
             'url' => ['story/index', 'status' => StoryStatus::DRAFT],
-            'active' => $status === StoryStatus::DRAFT,
+            'active' => $status->isDraft(),
         ],
         [
             'label' => 'Опубликованные',
             'url' => ['story/index', 'status' => StoryStatus::PUBLISHED],
-            'active' => $status === StoryStatus::PUBLISHED,
+            'active' => $status->isPublished(),
         ],
         [
             'label' => 'На публикацию',
             'url' => ['story/index', 'status' => StoryStatus::FOR_PUBLICATION],
-            'active' => $status === StoryStatus::FOR_PUBLICATION,
+            'active' => $status->isForPublication(),
         ],
     ],
 ]) ?>
+<?php
+$columns = [
+    'id',
+    [
+        'attribute' =>'title',
+        'format' => 'raw',
+        'value' => static function(Story $model) {
+            return Html::a($model->title, ['story/update', 'id' => $model->id], ['title' => 'Перейти к редактированию']);
+        },
+    ],
+    [
+        'format' => 'raw',
+        'attribute' => 'mode',
+        'value' => static function($model) {
+            $mode = '';
+            if ($model->isAudioStory()) {
+                $mode = '<i class="glyphicon glyphicon-volume-up" data-toggle="popover" title="Озвучено" style="font-size: 20px; color: #d9534f"></i>';
+            }
+            if ($model->hasNeoRelation()) {
+                $mode .= '<i class="glyphicon glyphicon glyphicon-globe" data-toggle="popover" title="Есть связь с Neo4j" style="font-size: 20px; color: #d9534f"></i>';
+            }
+            return $mode;
+        }
+    ],
+    [
+        'attribute' => 'user_id',
+        'value' => 'author.username',
+        'filter' => UserHelper::getUserArray(),
+    ],
+    [
+        'attribute' => 'story_categories',
+        'value' => static function($model) {
+            return implode(', ', array_map(static function($item){
+                return $item->name;
+            }, $model->categories));
+        },
+        'filter' => Html::a('Категории', '#select-categories-modal', ['data-toggle' => 'modal'])
+            . Html::activeHiddenInput($searchModel, 'category_id')
+    ],
+];
+if ($status->isDraft()) {
+    $columns[] = [
+        'attribute' => 'created_at',
+        'value' => 'created_at',
+        'format' => 'datetime',
+        'filter' => WikidsDatePicker::widget([
+            'model' => $searchModel,
+            'attribute' => 'created_at',
+        ]),
+    ];
+    $columns[] = [
+        'attribute' => 'updated_at',
+        'value' => 'updated_at',
+        'format' => 'datetime',
+        'filter' => WikidsDatePicker::widget([
+            'model' => $searchModel,
+            'attribute' => 'updated_at',
+        ]),
+    ];
+}
+if ($status->isPublished()) {
+    $columns[] = [
+        'attribute' => 'published_at',
+        'value' => 'published_at',
+        'format' => 'datetime',
+        'filter' => WikidsDatePicker::widget([
+            'model' => $searchModel,
+            'attribute' => 'published_at',
+        ]),
+    ];
+    $columns[] = 'views_number';
+}
+$columns[] = [
+    'class' => ActionColumn::class,
+    'buttons' => [
+        'view' => static function($url, $model) {
+            return (new \backend\widgets\grid\ViewButton(Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $model->alias])))(['target' => '_blank']);
+        }
+    ],
+];
 
+?>
 <?php Pjax::begin(['id' => 'pjax-stories']) ?>
 <?= GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
     'options' => ['class' => 'table-responsive'],
-    'columns' => [
-        'id',
-        [
-            'attribute' =>'title',
-            'format' => 'raw',
-            'value' => static function(Story $model) {
-                return Html::a($model->title, ['story/update', 'id' => $model->id], ['title' => 'Перейти к редактированию']);
-            },
-        ],
-        [
-            'format' => 'raw',
-            'attribute' => 'mode',
-            'value' => static function($model) {
-                $mode = '';
-                if ($model->isAudioStory()) {
-                    $mode = '<i class="glyphicon glyphicon-volume-up" data-toggle="popover" title="Озвучено" style="font-size: 20px; color: #d9534f"></i>';
-                }
-                if ($model->hasNeoRelation()) {
-                    $mode .= '<i class="glyphicon glyphicon glyphicon-globe" data-toggle="popover" title="Есть связь с Neo4j" style="font-size: 20px; color: #d9534f"></i>';
-                }
-                return $mode;
-            }
-        ],
-        [
-            'attribute' => 'user_id',
-            'value' => 'author.username',
-            'filter' => UserHelper::getUserArray(),
-        ],
-        [
-            'attribute' => 'story_categories',
-            'value' => static function($model) {
-                return implode(', ', array_map(static function($item){
-                    return $item->name;
-                }, $model->categories));
-            },
-            'filter' => Html::a('Категории', '#select-categories-modal', ['data-toggle' => 'modal'])
-                        . Html::activeHiddenInput($searchModel, 'category_id')
-        ],
-        [
-            'attribute' => 'created_at',
-            'value' => 'created_at',
-            'format' => 'datetime',
-            'filter' => WikidsDatePicker::widget([
-                'model' => $searchModel,
-                'attribute' => 'created_at',
-            ]),
-        ],
-        [
-            'attribute' => 'updated_at',
-            'value' => 'updated_at',
-            'format' => 'datetime',
-            'filter' => WikidsDatePicker::widget([
-                'model' => $searchModel,
-                'attribute' => 'updated_at',
-            ]),
-        ],
-/*        [
-            'attribute' => 'status',
-            'value' => static function(Story $model) {
-                return StoryStatus::asText($model->status);
-            },
-            'filter' => StoryStatus::asArray(),
-        ],*/
-        'views_number',
-        [
-            'class' => ActionColumn::class,
-            'buttons' => [
-                'view' => static function($url, $model) {
-                    return (new \backend\widgets\grid\ViewButton(Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $model->alias])))(['target' => '_blank']);
-                }
-            ],
-        ],
-    ],
+    'columns' => $columns,
 ]) ?>
 <?php Pjax::end(); ?>
 

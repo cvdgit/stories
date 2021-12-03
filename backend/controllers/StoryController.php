@@ -104,12 +104,17 @@ class StoryController extends BaseController
     public function actionIndex(int $status = StoryStatus::DRAFT)
     {
         $searchModel = new StorySearch();
-        $searchModel->status = $status;
+        $storyStatus = new StoryStatus($status);
+        if ($storyStatus->isPublished()) {
+            $searchModel->defaultSortField = 'published_at';
+            $searchModel->defaultSortOrder = SORT_DESC;
+        }
+        $searchModel->status = $storyStatus->getStatus();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'status' => $status,
+            'status' => $storyStatus,
         ]);
     }
 

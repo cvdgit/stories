@@ -17,6 +17,7 @@ class StorySearch extends Model
     public $category_id;
     public $created_at;
     public $updated_at;
+    public $published_at;
     public $status;
     public $sub_access;
 
@@ -30,7 +31,7 @@ class StorySearch extends Model
         return [
             [['title'], 'string'],
             [['id', 'user_id', 'status', 'sub_access'], 'integer'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['created_at', 'updated_at', 'published_at'], 'safe'],
             ['category_id', 'string'],
             ['status', 'in', 'range' => StoryStatus::all()],
             ['status', 'default', 'value' => StoryStatus::DRAFT],
@@ -74,6 +75,10 @@ class StorySearch extends Model
                     'asc' => ['updated_at' => SORT_ASC],
                     'desc' => ['updated_at' => SORT_DESC],
                 ],
+                'published_at' => [
+                    'asc' => ['published_at' => SORT_ASC],
+                    'desc' => ['published_at' => SORT_DESC],
+                ],
                 'status',
                 'sub_access',
                 'views_number',
@@ -94,6 +99,7 @@ class StorySearch extends Model
             'user.id' => $this->user_id,
             "DATE_FORMAT(FROM_UNIXTIME(story.created_at), '%d.%m.%Y')" => $this->created_at,
             "DATE_FORMAT(FROM_UNIXTIME(story.updated_at), '%d.%m.%Y')" => $this->updated_at,
+            "DATE_FORMAT(FROM_UNIXTIME(story.published_at), '%d.%m.%Y')" => $this->published_at,
             'story.status' => $this->status,
             'story.sub_access' => $this->sub_access,
         ]);
