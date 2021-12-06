@@ -43,6 +43,21 @@ class SlideModifier
         return $this;
     }
 
+    public function addImageUrl(): self
+    {
+        foreach ($this->slide->getBlocks() as $block) {
+            if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
+                /** @var $block ImageBlock */
+                $path = $block->getFilePath();
+                if (strpos($path, '://') === false) {
+                    $path = 'https://wikids.ru' . $path;
+                }
+                $block->setFilePath($path);
+            }
+        }
+        return $this;
+    }
+
     public function addImageId(): self
     {
         foreach ($this->slide->getBlocks() as $block) {

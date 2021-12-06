@@ -2,6 +2,7 @@
 
 namespace api\modules\v1\models;
 
+use backend\components\SlideModifier;
 use backend\components\story\AbstractBlock;
 use backend\components\story\reader\HtmlSlideReader;
 use common\helpers\Url;
@@ -31,7 +32,9 @@ class StorySlide extends ActiveRecord
                     'data-background-color="#fff"',
                 ];
                 $slideData = str_replace($search, $replace, $slideData);
-                return $slideData;
+                return (new SlideModifier($this->id, $slideData))
+                    ->addImageUrl()
+                    ->render();
             },
             'images' => function() {
                 $images = [];
