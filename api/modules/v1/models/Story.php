@@ -31,7 +31,10 @@ class Story extends ActiveRecord
 
     public function getSlides()
     {
-        return $this->hasMany(StorySlide::class, ['story_id' => 'id'])->orderBy(['number' => SORT_ASC]);
+        return $this
+            ->hasMany(StorySlide::class, ['story_id' => 'id'])
+            ->andWhere(['kind' => \common\models\StorySlide::KIND_SLIDE])
+            ->orderBy(['number' => SORT_ASC]);
     }
 
     public function extraFields()
