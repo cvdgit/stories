@@ -3293,7 +3293,7 @@
         function createInnerDialog(title, content) {
 
             var defIndex = 400;
-            currentQuestionElement.find('.slide-hints-wrapper').each(function() {
+            Reveal.getCurrentSlide().find('.slide-hints-wrapper').each(function() {
                 defIndex++;
             });
             var $hintWrapper = $('<div/>', {'class': 'slide-hints-wrapper', 'css': {'z-index': defIndex}});
