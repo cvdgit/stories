@@ -3318,7 +3318,9 @@
                                 .on('click', function() {
                                     $hintWrapper.hide();
                                     $(this).parents('.slide-hints-wrapper:eq(0)').remove();
-                                    $('.reveal .story-controls').show();
+                                    if (!$(Reveal.getCurrentSlide()).find('.slide-hints-wrapper').length) {
+                                        $('.reveal .story-controls').show();
+                                    }
                                 })
                         )
                 )
