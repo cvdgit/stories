@@ -3060,12 +3060,12 @@
 
                         var $elementRow = $('<div/>', {
                             'class': 'row row-no-gutters',
-                            'css': {'padding-top': '10px', 'background-color': 'white', 'height': '100%'}
+                            'css': {'padding-top': '10px', 'background-color': 'white', 'height': '100%', 'overflow-y': 'auto'}
                         });
 
                         $elementRow.on('click', '[data-slide-id]', function() {
                             var slideId = $(this).data('slideId');
-                            alert(slideId);
+                            createSlideInnerDialog(slideId);
                         });
 
                         var signsByGroup = [];
@@ -3292,7 +3292,11 @@
 
         function createInnerDialog(title, content) {
 
-            var $hintWrapper = $('<div/>', {'class': 'slide-hints-wrapper'});
+            var defIndex = 400;
+            currentQuestionElement.find('.slide-hints-wrapper').each(function() {
+                defIndex++;
+            });
+            var $hintWrapper = $('<div/>', {'class': 'slide-hints-wrapper', 'css': {'z-index': defIndex}});
             var $hintBackground = $('<div/>', {'class': 'slide-hints-background'});
             var $hintInner = $('<div/>', {'class': 'slide-hints-inner'});
             var $hint = $('<div/>', {'class': 'slide-hints'});
