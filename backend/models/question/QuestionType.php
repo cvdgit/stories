@@ -12,6 +12,11 @@ class QuestionType
     public const REGION = 2;
     public const SEQUENCE = 3;
 
+    public const ANSWER_NUMPAD = 4;
+    public const ANSWER_INPUT = 5;
+    public const ANSWER_RECORDING = 6;
+    public const ANSWER_MISSING_WORDS = 7;
+
     private $type;
 
     public function __construct(int $type)
@@ -30,6 +35,10 @@ class QuestionType
             self::MANY => 'Множественный выбор',
             self::REGION => 'Выбор области',
             self::SEQUENCE => 'Последовательность',
+            self::ANSWER_NUMPAD => 'Цифровая клавиатура',
+            self::ANSWER_INPUT => 'Поле для ввода',
+            self::ANSWER_RECORDING => 'Запись с микрофона',
+            self::ANSWER_MISSING_WORDS => 'Пропущенные слова',
         ];
     }
 

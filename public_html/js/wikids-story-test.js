@@ -425,8 +425,8 @@
             'answerTypeIsDefault': function() {
                 return getAnswerType() === 0;
             },
-            'answerTypeIsNumPad': function() {
-                return getAnswerType() === 1;
+            'answerTypeIsNumPad': function(q) {
+                return getAnswerType() === 1 || parseInt(q['type']) === 4;
             },
             'answerTypeIsInput': function() {
                 return getAnswerType() === 2;
@@ -2241,16 +2241,16 @@
                 var $question = createQuestion(question);
 
                 var view = question['view'] ? question.view : '';
-                if (testConfig.answerTypeIsNumPad()) {
+                if (testConfig.answerTypeIsNumPad(question)) {
                     view = 'numpad';
                 }
-                if (testConfig.answerTypeIsInput()) {
+                if (testConfig.answerTypeIsInput(question)) {
                     view = 'input';
                 }
-                if (testConfig.answerTypeIsRecording()) {
+                if (testConfig.answerTypeIsRecording(question)) {
                     view = 'recording';
                 }
-                if (testConfig.answerTypeIsMissingWords()) {
+                if (testConfig.answerTypeIsMissingWords(question)) {
                     view = 'missing_words';
                 }
 
@@ -2685,13 +2685,13 @@
             currentQuestion = $activeQuestion.data('question');
 
             var view = currentQuestion['view'] ? currentQuestion.view : '';
-            if (testConfig.answerTypeIsNumPad()) {
+            if (testConfig.answerTypeIsNumPad(currentQuestion)) {
                 view = 'numpad';
             }
-            if (testConfig.answerTypeIsInput()) {
+            if (testConfig.answerTypeIsInput(currentQuestion)) {
                 view = 'input';
             }
-            if (testConfig.answerTypeIsRecording()) {
+            if (testConfig.answerTypeIsRecording(currentQuestion)) {
                 view = 'recognition';
             }
 
@@ -2895,9 +2895,9 @@
 
             if (!answerIsCorrect) {
                 if (testConfig.sourceIsWord()
-                    && !testConfig.answerTypeIsNumPad()
-                    && !testConfig.answerTypeIsInput()
-                    && !testConfig.answerTypeIsMissingWords()) {
+                    && !testConfig.answerTypeIsNumPad(currentQuestion)
+                    && !testConfig.answerTypeIsInput(currentQuestion)
+                    && !testConfig.answerTypeIsMissingWords(currentQuestion)) {
                     continueTestAction(answer);
                 }
                 else {
@@ -2920,6 +2920,17 @@
             }
         }
 
+        function isShuffleAnswers(q) {
+            return testConfig.sourceIsNeo() || (
+                testConfig.sourceIsLocal()
+                && parseInt(q.mix_answers) === 1
+                && !testConfig.answerTypeIsNumPad(q)
+                && !testConfig.answerTypeIsMissingWords(q)
+                && !testConfig.answerTypeIsRecording(q)
+                && !testConfig.answerTypeIsInput(q)
+            );
+        }
+
         function showNextQuestion() {
 
             console.debug('WikidsStoryTest.showNextQuestion');
@@ -2937,7 +2948,12 @@
 
             currentQuestionElement = $('.wikids-test-question[data-question-id=' + nextQuestionObj.id + ']', dom.questions);
 
-            if (getQuestionView(currentQuestion) !== 'svg' && !questionViewRegion(currentQuestion) && !questionViewSequence(currentQuestion) && (testConfig.sourceIsNeo() || testConfig.sourceIsLocal())) {
+/*            if (getQuestionView(currentQuestion) !== 'svg'
+                && !questionViewRegion(currentQuestion)
+                && !questionViewSequence(currentQuestion)
+                && (testConfig.sourceIsNeo() || (testConfig.sourceIsLocal() && !testConfig.answerTypeIsNumPad(currentQuestion)))) {*/
+
+            if (isShuffleAnswers(currentQuestion)) {
                 $('.wikids-test-answers', currentQuestionElement)
                     .empty()
                     .append(createAnswers(getAnswersData(currentQuestion), currentQuestion)
@@ -3276,10 +3292,10 @@
             var isLastQuestion = (testQuestions.length === 0);
             // var actionRelated = incorrectAnswerActionRelated();
             var showCorrectAnswerPageCondition = testConfig.sourceIsWord()
-                && !testConfig.answerTypeIsNumPad()
-                && !testConfig.answerTypeIsRecording()
-                && !testConfig.answerTypeIsInput()
-                && !testConfig.answerTypeIsMissingWords();
+                && !testConfig.answerTypeIsNumPad(currentQuestion)
+                && !testConfig.answerTypeIsRecording(currentQuestion)
+                && !testConfig.answerTypeIsInput(currentQuestion)
+                && !testConfig.answerTypeIsMissingWords(currentQuestion);
 
             if (isLastQuestion) {
 
