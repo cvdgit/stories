@@ -2154,11 +2154,26 @@
                 .text(progressValue(progress));
         }
 
-        function createQuestion(question) {
+        function createQuestionName(question) {
 
             var questionName = question.name;
-            if (question['correct_number'] && question.correct_number > 1) {
-                questionName += ' (верных ответов: ' + question.correct_number + ')';
+
+            var createQuestionHint = function(name, hint) {
+                hint = hint || '';
+                if (!hint.length) {
+                    return '';
+                }
+                if (name.length) {
+                    return name + ' (подсказка: ' + hint + ')';
+                }
+                return 'Подсказка: ' + hint;
+            };
+
+            questionName = createQuestionHint(questionName, question['hint']);
+
+            var correctNum = parseInt(question.correct_number);
+            if (question['correct_number'] && correctNum > 1) {
+                questionName += ' (верных ответов: ' + correctNum + ')';
             }
 
             if (testConfig.answerTypeIsMissingWords()) {
@@ -2169,13 +2184,20 @@
                 questionName = question.name;
             }
 
+            if (testConfig.hideQuestionName()) {
+                questionName = '';
+                return createQuestionHint(questionName, question['hint']);
+            }
+
+            return questionName;
+        }
+
+        function createQuestion(question) {
+
+            var questionName = createQuestionName(question);
             var titleElement = $('<p/>')
                 .addClass('question-title')
                 .append(questionName);
-
-            if (testConfig.hideQuestionName()) {
-                titleElement.text('');
-            }
 
             if (testConfig.answerTypeIsDefault() && testConfig.isAskQuestion()) {
                 $('<span/>', {'css': {'line-height': '3.5rem', 'margin-left': '10px', 'color': '#000', 'cursor': 'pointer'}, 'title': 'Прослушать'})
@@ -2286,7 +2308,6 @@
                             .css('max-width', '330px');
 
                         var title = getAnimalSignTitle(question);
-                        console.log(title);
                         if (title) {
                             $image.attr({
                                 'title': title,

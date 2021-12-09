@@ -32,6 +32,7 @@ class BaseQuestionSerializer
             'storyTestAnswers' => $this->createAnswers($q->getAnswers()),
             'lastAnswerIsCorrect' => $q->isLastAnswerIsCorrect(),
             'haveSlides' => $q->getHaveSlides(),
+            'hint' => $q->getHint(),
         ];
     }
 }

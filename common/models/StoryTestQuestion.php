@@ -25,6 +25,7 @@ use yii\helpers\FileHelper;
  * @property int $mix_answers
  * @property string $image
  * @property string $regions;
+ * @property string $hint;
  *
  * @property StoryTestAnswer[] $storyTestAnswers
  * @property StoryTest $storyTest
@@ -60,32 +61,23 @@ class StoryTestQuestion extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName()
     {
         return 'story_test_question';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
             [['story_test_id', 'name', 'type'], 'required'],
             [['story_test_id', 'order', 'type', 'mix_answers'], 'integer'],
-            [['image'], 'string', 'max' => 255],
+            [['image', 'hint'], 'string', 'max' => 255],
             [['name'], 'string', 'max' => 512],
             [['story_test_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTest::class, 'targetAttribute' => ['story_test_id' => 'id']],
             [['regions'], 'safe'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [

@@ -19,6 +19,7 @@ class QuestionModel extends Model
     public $order;
     public $mix_answers;
     public $imageFile;
+    public $hint;
 
     private $model;
 
@@ -28,6 +29,7 @@ class QuestionModel extends Model
             [['name', 'type', 'story_test_id'], 'required'],
             [['order', 'type', 'mix_answers', 'story_test_id'], 'integer'],
             [['name'], 'string', 'max' => 512],
+            [['hint'], 'string', 'max' => 255],
             [['imageFile'], 'image'],
             [['story_test_id'], 'exist', 'targetClass' => StoryTest::class, 'targetAttribute' => ['story_test_id' => 'id']],
         ];
@@ -41,6 +43,7 @@ class QuestionModel extends Model
             'type' => 'Тип',
             'imageFile' => 'Изображение',
             'mix_answers' => 'Перемешивать ответы',
+            'hint' => 'Подсказка',
         ];
     }
 

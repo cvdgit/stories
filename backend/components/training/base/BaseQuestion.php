@@ -25,13 +25,16 @@ class BaseQuestion
     /** @var bool */
     private $haveSlides = false;
 
-    public function __construct(int $id, string $name, bool $lastAnswerIsCorrect, $image = null, $origImage = null)
+    private $hint;
+
+    public function __construct(int $id, string $name, bool $lastAnswerIsCorrect, $image = null, $origImage = null, $hint = null)
     {
         $this->id = $id;
         $this->name = $name;
         $this->image = $image;
         $this->origImage = $origImage;
         $this->lastAnswerIsCorrect = $lastAnswerIsCorrect;
+        $this->hint = $hint;
     }
 
     /**
@@ -126,5 +129,15 @@ class BaseQuestion
     public function getHaveSlides(): bool
     {
         return $this->haveSlides;
+    }
+
+    public function setHint(string $hint): void
+    {
+        $this->hint = $hint;
+    }
+
+    public function getHint(): ?string
+    {
+        return $this->hint;
     }
 }

@@ -17,6 +17,7 @@ $isNewRecord = $model instanceof \backend\models\question\CreateQuestion;
             <?php $form = ActiveForm::begin(); ?>
             <?= $form->field($model, 'story_test_id')->hiddenInput()->label(false) ?>
             <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'hint')->textInput(['maxlength' => true]) ?>
             <?= $form->field($model, 'type')->dropDownList(\backend\models\question\QuestionType::asArray()) ?>
             <?= $form->field($model, 'mix_answers')->checkbox() ?>
             <?= $form->field($model, 'imageFile')->fileInput() ?>
