@@ -247,6 +247,11 @@
 	line-height: 2.8rem;
 }
 
+.wikids-test-answer label i {
+	pointer-events: auto;
+	cursor: pointer;
+}
+
 .wikids-test-answer input[type=checkbox],
 .wikids-test-answer input[type=radio] {
 	-ms-transform: scale(1.5);

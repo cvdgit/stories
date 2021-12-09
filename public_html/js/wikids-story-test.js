@@ -1742,6 +1742,21 @@
                 .appendTo(dom.wrapper);
         }
 
+        function getBoundSlideId(question, id) {
+            var questionNeoParams = question['params'] || [];
+            var slideId;
+            if (questionNeoParams.length > 0) {
+                return slideId;
+            }
+            questionNeoParams[0].signs.forEach(function(sign) {
+                if (parseInt(sign.id) === parseInt(id)) {
+                    slideId = sign.slide_id;
+                    return;
+                }
+            });
+            return slideId;
+        }
+
         function createAnswer(answer, question) {
 
             var questionType = question.type;
@@ -1801,9 +1816,18 @@
             }
 
             if (showAnswerText) {
+                var answerName = answer.name;
+                var slideId = getBoundSlideId(question, answer.id);
+                if (slideId) {
+                    answerName = '<i data-bound-slide-id="' + slideId + '" class="glyphicon glyphicon-question-sign"></i> ' + answerName;
+                }
                 var $label = $("<label/>")
                     .attr("for", "answer" + answer.id)
-                    .text(answer.name);
+                    .html(answerName);
+                $label.find('[data-bound-slide-id]').on('click', function() {
+                    var id = $(this).data('boundSlideId');
+                    createSlideInnerDialog(id);
+                });
                 $answer.append($label);
             }
 
