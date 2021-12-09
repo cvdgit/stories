@@ -2161,7 +2161,7 @@
             var createQuestionHint = function(name, hint) {
                 hint = hint || '';
                 if (!hint.length) {
-                    return '';
+                    return name;
                 }
                 if (name.length) {
                     return name + ' (подсказка: ' + hint + ')';
