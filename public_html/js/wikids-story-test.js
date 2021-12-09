@@ -1745,7 +1745,7 @@
         function getBoundSlideId(question, id) {
             var questionNeoParams = question['params'] || [];
             var slideId;
-            if (questionNeoParams.length > 0) {
+            if (questionNeoParams.length === 0) {
                 return slideId;
             }
             questionNeoParams[0].signs.forEach(function(sign) {
@@ -1755,6 +1755,14 @@
                 }
             });
             return slideId;
+        }
+
+        function getAnimalSignTitle(question) {
+            var questionNeoParams = question['params'] || [];
+            if (questionNeoParams.length === 0) {
+                return '';
+            }
+            return questionNeoParams[0]['animal'] || '';
         }
 
         function createAnswer(answer, question) {
@@ -2276,6 +2284,16 @@
                         var $image = $('<img/>')
                             .attr("src", question.image)
                             .css('max-width', '330px');
+
+                        var title = getAnimalSignTitle(question);
+                        console.log(title);
+                        if (title) {
+                            $image.attr({
+                                'title': title,
+                                'data-toggle': 'tooltip'
+                            });
+                        }
+
                         var originalImageExists = question['original_image'] === undefined ? true : question['original_image'];
                         if (originalImageExists || question['orig_image']) {
                             $image
