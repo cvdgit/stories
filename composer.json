@@ -40,7 +40,7 @@
         "bower-asset/jquery-lazy": "^1.7",
         "wbraganca/yii2-fancytree-widget": "*",
         "wokster/yii2-nested-sets-tree-behavior": "*",
-        "bower-asset/plyr": "^3.5",
+        "bower-asset/plyr": "3.5.6",
         "ext-json": "*",
         "linslin/yii2-curl": "*",
         "ext-curl": "*",
