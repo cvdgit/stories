@@ -428,14 +428,16 @@
             'answerTypeIsNumPad': function(q) {
                 return getAnswerType() === 1 || parseInt(q['type']) === 4;
             },
-            'answerTypeIsInput': function() {
-                return getAnswerType() === 2;
+            'answerTypeIsInput': function(q) {
+                return getAnswerType() === 2 || parseInt(q['type']) === 5;
             },
-            'answerTypeIsRecording': function() {
-                return getAnswerType() === 3;
+            'answerTypeIsRecording': function(q) {
+                q = q || {};
+                return getAnswerType() === 3 || parseInt(q['type']) === 6;
             },
-            'answerTypeIsMissingWords': function() {
-                return getAnswerType() === 4;
+            'answerTypeIsMissingWords': function(q) {
+                q = q || {};
+                return getAnswerType() === 4 || parseInt(q['type']) === 7;
             },
             'isStrictAnswer': function() {
                 return parseInt(data.strictAnswer);
@@ -1464,11 +1466,11 @@
             numPad = new AnswerTypeNumPad();
             speech = new TestSpeech();
 
-            if (testConfig.answerTypeIsMissingWords()) {
+            if (testConfig.answerTypeIsMissingWords(questions[0])) {
                 that.missingWords.setRecognition(new MissingWordsRecognition(testConfig));
             }
 
-            if (testConfig.answerTypeIsRecording()) {
+            if (testConfig.answerTypeIsRecording(questions[0])) {
                 that.recordingAnswer.setRecognition(new MissingWordsRecognition(testConfig));
             }
 
@@ -2176,7 +2178,7 @@
                 questionName += ' (верных ответов: ' + correctNum + ')';
             }
 
-            if (testConfig.answerTypeIsMissingWords()) {
+            if (testConfig.answerTypeIsMissingWords(question)) {
                 questionName = 'Заполните пропущенные части';
             }
 
@@ -2641,7 +2643,7 @@
         function showQuestionSuccessPage(answer) {
 
             var text = currentQuestion.name;
-            if (testConfig.answerTypeIsInput()) {
+            if (testConfig.answerTypeIsInput(currentQuestion)) {
                 text = answer[0];
             }
             var image = currentQuestion.image;
@@ -2730,7 +2732,7 @@
                     return parseInt(elem.name);
                 };
             }
-            if (view === 'input' || view === 'recognition' || testConfig.answerTypeIsMissingWords()) {
+        if (view === 'input' || view === 'recognition' || testConfig.answerTypeIsMissingWords(currentQuestion)) {
                 correctAnswersCallback = function(elem) {
                     if (testConfig.isStrictAnswer()) {
                         return elem.name;
@@ -2823,7 +2825,7 @@
                     };
                     $.post('/question/answer', answerParams);
                 }
-                if (testConfig.sourceIsWord() && !testConfig.answerTypeIsInput()) {
+                if (testConfig.sourceIsWord() && !testConfig.answerTypeIsInput(currentQuestion)) {
                     answerList = answer.map(function (answerText) {
                         return {
                             'answer_entity_id': currentQuestion.id,
@@ -2843,7 +2845,7 @@
                     };
                     $.post('/question/answer', answerParams);
                 }
-                if (testConfig.sourceIsWord() && testConfig.answerTypeIsInput()) {
+                if (testConfig.sourceIsWord() && testConfig.answerTypeIsInput(currentQuestion)) {
                     answerList = answer.map(function (answerText) {
                         return {
                             'answer_entity_id': currentQuestion.id,
@@ -2972,14 +2974,14 @@
                 });
             }
 
-            if (testConfig.answerTypeIsMissingWords()) {
+            if (testConfig.answerTypeIsMissingWords(currentQuestion)) {
                 dom.nextButton.off("click").on("click", function() {
                     var result = that.missingWords.getResult();
                     that.missingWords.resetMatchElements();
                     nextQuestion([result]);
                 });
             }
-            if (testConfig.answerTypeIsRecording()) {
+            if (testConfig.answerTypeIsRecording(currentQuestion)) {
                 dom.nextButton.off("click").on("click", function() {
                     var result = that.recordingAnswer.getResult();
                     that.recordingAnswer.resetResult();
@@ -2996,10 +2998,11 @@
                 dom.nextButton.hide();
             }
 
-            if (testConfig.answerTypeIsInput()) {
+            if (testConfig.answerTypeIsInput(currentQuestion)) {
 
                 var text = getAnswersData(nextQuestionObj)[0].name;
                 var q = $('.wikids-test-active-question .answer-input', dom.questions);
+
                 setTimeout(function () {
                     speech.readText(text, testConfig.getInputVoice());
                     q.focus();
@@ -3019,7 +3022,7 @@
                     });
             }
 
-            if (testConfig.answerTypeIsRecording()) {
+            if (testConfig.answerTypeIsRecording(currentQuestion)) {
                 if (testConfig.isAskQuestion()) {
                     var speechText = currentQuestion.name;
                     setTimeout(function() {
@@ -3233,7 +3236,7 @@
                                     .html('<i class="glyphicon glyphicon-volume-up" style="left: 10px; top: 6px"></i>')
                                 );
                         } else {
-                            if (testConfig.answerTypeIsInput()) {
+                            if (testConfig.answerTypeIsInput(question)) {
                                 $answerElement = $('<p/>').html(textDiff(answerText, userAnswer));
                             } else {
                                 $answerElement = $('<p/>').text(answerText);
@@ -3241,7 +3244,7 @@
                         }
                         $content.append($answerElement);
 
-                        if (testConfig.answerTypeIsInput()) {
+                        if (testConfig.answerTypeIsInput(question)) {
                             $('<p/>').html('&nbsp;').appendTo($content);
                             $('<p/>')
                                 .text('Ваш ответ:')
