@@ -1257,7 +1257,8 @@
         var questionHistory = [],
             skipQuestion = [],
             questions = [],
-            questionsRepeat = [];
+            questionsRepeat = [],
+            testParams = {};
 
         var questionAnswers = {};
 
@@ -1448,6 +1449,8 @@
             testData = data[0];
             questions = getQuestionsData();
             numQuestions = questions.length;
+
+            testParams = testData['params'] || {};
 
             if (testData['test']) {
                 incorrectAnswerText = testData['test']['incorrectAnswerText'] || '';
@@ -1744,19 +1747,16 @@
                 .appendTo(dom.wrapper);
         }
 
+        function findAnimalSignItem(id) {
+            var signs = testParams['signs'] || [];
+            return signs.filter(function(sign) {
+                return parseInt(sign.id) === parseInt(id);
+            })[0];
+        }
+
         function getBoundSlideId(question, id) {
-            var questionNeoParams = question['params'] || [];
-            var slideId;
-            if (questionNeoParams.length === 0) {
-                return slideId;
-            }
-            questionNeoParams[0].signs.forEach(function(sign) {
-                if (parseInt(sign.id) === parseInt(id)) {
-                    slideId = sign.slide_id;
-                    return;
-                }
-            });
-            return slideId;
+            var sign = findAnimalSignItem(id);
+            return sign['slide_id'] || null;
         }
 
         function getAnimalSignTitle(question) {
@@ -3152,7 +3152,8 @@
 
                         var signsByGroup = [];
                         questionNeoParams.forEach(function(param) {
-                            param.signs.forEach(function(sign) {
+                            param.signs.forEach(function(signId) {
+                                var sign = findAnimalSignItem(signId);
                                 if (!signsByGroup[sign.group_name]) {
                                     signsByGroup[sign.group_name] = [sign];
                                 }
