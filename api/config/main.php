@@ -44,6 +44,14 @@ return [
                     ],
                     'only' => ['index', 'view'],
                 ],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/slide',
+                    'tokens' => [
+                        '{id}' => '<id:\w+>'
+                    ],
+                    'only' => ['view'],
+                ],
             ]
         ]
     ],
