@@ -1755,7 +1755,7 @@
         }
 
         function getBoundSlideId(question, id) {
-            var sign = findAnimalSignItem(id);
+            var sign = findAnimalSignItem(id) || [];
             return sign['slide_id'] || null;
         }
 
