@@ -2923,7 +2923,7 @@
         }
 
         function isShuffleAnswers(q) {
-            return testConfig.sourceIsNeo() || (
+            return testConfig.sourceIsNeo() && getQuestionView(currentQuestion) !== 'svg' || (
                 testConfig.sourceIsLocal()
                 && parseInt(q.mix_answers) === 1
                 && !testConfig.answerTypeIsNumPad(q)
