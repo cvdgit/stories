@@ -3153,7 +3153,7 @@
                         var signsByGroup = [];
                         questionNeoParams.forEach(function(param) {
                             param.signs.forEach(function(signId) {
-                                var sign = findAnimalSignItem(signId);
+                                var sign = findAnimalSignItem(signId['id']);
                                 if (!signsByGroup[sign.group_name]) {
                                     signsByGroup[sign.group_name] = [sign];
                                 }
