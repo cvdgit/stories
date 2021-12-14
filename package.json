@@ -4,7 +4,8 @@
   "description": "wikids",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "npx webpack --config webpack.dev.js",
+    "prod": "npx webpack --condig webpack.prod.js"
   },
   "repository": {
     "type": "git",

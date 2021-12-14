@@ -78,6 +78,8 @@ return [
         'study/task/<id:\d+>' => 'study/task',
         'study' => 'study/index',
 
+        'test-mobile/<id:\d+>' => 'test-mobile/view',
+
         'stories/tag/<tag:[\w\s\-]+>' => 'story/tag',
         '<section:\w+>/category/<category:[\w\-]+>' => 'story/category',
         '<section:\w+>' => 'story/index',
