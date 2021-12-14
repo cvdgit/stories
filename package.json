@@ -1,0 +1,25 @@
+{
+  "name": "wikids",
+  "version": "1.0.0",
+  "description": "wikids",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cvdgit/stories.git"
+  },
+  "keywords": [],
+  "author": "Alexandr Karachev",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/cvdgit/stories/issues"
+  },
+  "homepage": "https://wikids.ru",
+  "devDependencies": {
+    "mini-css-extract-plugin": "^2.4.5",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1"
+  }
+}

@@ -20,6 +20,8 @@ Thumbs.db
 # composer vendor dir
 /vendor
 
+node_modules
+
 # composer itself is not needed
 composer.phar
 
