@@ -1622,7 +1622,7 @@
             $col.append($beginButton);
 
             return $('<div/>')
-                .addClass('wikids-test-begin-page row')
+                .addClass('wikids-test-begin-page row row-no-gutters')
                 .append($('<h3/>').text(testResponse.test.header))
                 .append($col)
                 .append($('<div/>').addClass('col-md-6')
