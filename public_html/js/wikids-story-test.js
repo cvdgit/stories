@@ -3141,31 +3141,33 @@
                     });
 
                 if (questionNeoParams.length > 0) {
-                    $('<span/>', {
-                        'text': 'Все признаки ' + questionNeoParams[0].animal,
-                        'class': 'label label-primary',
-                        'css': {'cursor': 'pointer'}
-                    })
-                        .on('click', function (e) {
 
-                            var $elementRow = $('<div/>', {
-                                'class': 'row row-no-gutters',
-                                'css': {
-                                    'padding-top': '10px',
-                                    'background-color': 'white',
-                                    'height': '100%',
-                                    'overflow-y': 'auto'
-                                }
-                            });
+                    questionNeoParams.forEach(function(param) {
 
-                            $elementRow.on('click', '[data-slide-id]', function () {
-                                var slideId = $(this).data('slideId');
-                                createSlideInnerDialog(slideId);
-                            });
+                        $('<span/>', {
+                            'text': 'Все признаки ' + param.animal,
+                            'class': 'label label-primary',
+                            'css': {'cursor': 'pointer', 'display': 'inline-block'}
+                        })
+                            .on('click', function (e) {
 
-                            var signsByGroup = [];
-                            questionNeoParams.forEach(function (param) {
-                                param.signs.forEach(function (signId) {
+                                var $elementRow = $('<div/>', {
+                                    'class': 'row row-no-gutters',
+                                    'css': {
+                                        'padding-top': '10px',
+                                        'background-color': 'white',
+                                        'height': '100%',
+                                        'overflow-y': 'auto'
+                                    }
+                                });
+
+                                $elementRow.on('click', '[data-slide-id]', function () {
+                                    var slideId = $(this).data('slideId');
+                                    createSlideInnerDialog(slideId);
+                                });
+
+                                var signsByGroup = [];
+                                param.signs.forEach(function(signId) {
                                     var sign = findAnimalSignItem(signId['id']);
                                     if (!signsByGroup[sign.group_name]) {
                                         signsByGroup[sign.group_name] = [sign];
@@ -3173,46 +3175,46 @@
                                         signsByGroup[sign.group_name].push(sign);
                                     }
                                 });
-                            });
 
-                            for (var signName in signsByGroup) {
+                                for (var signName in signsByGroup) {
 
-                                var $elementCol = $('<div/>', {'class': 'col-md-6', 'css': {'padding': '10px'}});
+                                    var $elementCol = $('<div/>', {'class': 'col-md-6', 'css': {'padding': '10px'}});
 
-                                var $dl = $('<dl/>', {'class': 'dl-horizontal'});
-                                $('<dt/>', {'text': signName, 'title': signName, 'css': {'width': '200px'}})
-                                    .appendTo($dl);
+                                    var $dl = $('<dl/>', {'class': 'dl-horizontal'});
+                                    $('<dt/>', {'text': signName, 'title': signName, 'css': {'width': '200px'}})
+                                        .appendTo($dl);
 
-                                signsByGroup[signName].forEach(function (sign) {
+                                    signsByGroup[signName].forEach(function (sign) {
 
-                                    var signItem = sign.name;
-                                    if (sign['slide_id']) {
-                                        signItem = $('<span/>', {
-                                            'data-slide-id': sign['slide_id'],
-                                            'text': sign.name,
-                                            'css': {
-                                                'cursor': 'pointer',
-                                                'user-select': 'none',
-                                                'text-decoration': 'underline'
-                                            }
-                                        });
-                                    }
+                                        var signItem = sign.name;
+                                        if (sign['slide_id']) {
+                                            signItem = $('<span/>', {
+                                                'data-slide-id': sign['slide_id'],
+                                                'text': sign.name,
+                                                'css': {
+                                                    'cursor': 'pointer',
+                                                    'user-select': 'none',
+                                                    'text-decoration': 'underline'
+                                                }
+                                            });
+                                        }
 
-                                    var $dd = $('<dd/>', {'css': {'margin-left': '220px'}})
-                                        .html(signItem);
-                                    $dd.appendTo($dl);
+                                        var $dd = $('<dd/>', {'css': {'margin-left': '220px'}})
+                                            .html(signItem);
+                                        $dd.appendTo($dl);
 
-                                    $dl.appendTo($elementCol);
-                                });
+                                        $dl.appendTo($elementCol);
+                                    });
 
-                                $elementCol.appendTo($elementRow);
-                            }
+                                    $elementCol.appendTo($elementRow);
+                                }
 
-                            createInnerDialog('Признаки - ' + questionNeoParams[0].animal, $elementRow);
-                        })
-                        .wrap($('<div/>', {'class': 'text-center'}))
-                        .parent()
-                        .appendTo($elementCol);
+                                createInnerDialog('Признаки - ' + param.animal, $elementRow);
+                            })
+                            .wrap($('<div/>', {'class': 'text-center'}))
+                            .parent()
+                            .appendTo($elementCol);
+                    });
                 }
 
                 $elementRow.appendTo($elements);
