@@ -161,6 +161,7 @@ class QuestionController extends Controller
         $showQuestionImage = filter_var($result['showQuestionImage'], FILTER_VALIDATE_BOOLEAN);
 
         $resultParams = $result['params'];
+        $questionCode = $result['code'];
 
         $result = $result['questions'];
 
@@ -249,6 +250,7 @@ class QuestionController extends Controller
             'students' => $this->getStudents($test->id),
             'incorrectAnswerAction' => $incorrectAnswerAction,
             'params' => $resultParams,
+            'code' => $questionCode,
         ]];
     }
 
