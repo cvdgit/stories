@@ -1,0 +1,159 @@
+[
+  {
+    "storyTestQuestions": [
+      {
+        "stars": {
+          "total": 1,
+          "current": 0
+        },
+        "view": "default",
+        "type": 0,
+        "mix_answers": 1,
+        "id": 3578,
+        "name": "1",
+        "image": "",
+        "orig_image": "",
+        "original_image": false,
+        "correct_number": 1,
+        "storyTestAnswers": [
+          {
+            "id": 17778,
+            "name": "1",
+            "is_correct": 1,
+            "description": null,
+            "region_id": "",
+            "image": "/test_images/thumb_3WDkR5mBuM-cu0ozfImxxO2AlWi908K1.jpg",
+            "orig_image": "/test_images/3WDkR5mBuM-cu0ozfImxxO2AlWi908K1.jpg",
+            "original_image": true,
+            "order": 0
+          },
+          {
+            "id": 17779,
+            "name": "2",
+            "is_correct": 0,
+            "description": null,
+            "region_id": "",
+            "image": "",
+            "orig_image": "",
+            "original_image": false,
+            "order": 0
+          },
+          {
+            "id": 17780,
+            "name": "3",
+            "is_correct": 0,
+            "description": null,
+            "region_id": "",
+            "image": "",
+            "orig_image": "",
+            "original_image": false,
+            "order": 0
+          }
+        ],
+        "lastAnswerIsCorrect": true,
+        "haveSlides": false,
+        "hint": null
+      },
+      {
+        "stars": {
+          "total": 1,
+          "current": 0
+        },
+        "view": "default",
+        "type": 0,
+        "mix_answers": 1,
+        "id": 3579,
+        "name": "Вопрос номер 2",
+        "image": "",
+        "orig_image": "",
+        "original_image": false,
+        "correct_number": 1,
+        "storyTestAnswers": [
+          {
+            "id": 17781,
+            "name": "222",
+            "is_correct": 1,
+            "description": null,
+            "region_id": "",
+            "image": "",
+            "orig_image": "",
+            "original_image": false,
+            "order": 0
+          },
+          {
+            "id": 17782,
+            "name": "333",
+            "is_correct": 0,
+            "description": null,
+            "region_id": "",
+            "image": "",
+            "orig_image": "",
+            "original_image": false,
+            "order": 0
+          },
+          {
+            "id": 17783,
+            "name": "444",
+            "is_correct": 0,
+            "description": null,
+            "region_id": "",
+            "image": "",
+            "orig_image": "",
+            "original_image": false,
+            "order": 0
+          }
+        ],
+        "lastAnswerIsCorrect": true,
+        "haveSlides": false,
+        "hint": null
+      }
+    ],
+    "test": {
+      "id": 144,
+      "progress": {
+        "total": 2,
+        "current": 0
+      },
+      "showAnswerImage": true,
+      "showAnswerText": true,
+      "showQuestionImage": true,
+      "source": 1,
+      "answerType": 0,
+      "strictAnswer": 0,
+      "inputVoice": null,
+      "recordingLang": null,
+      "rememberAnswers": false,
+      "askQuestion": false,
+      "askQuestionLang": "Google русский",
+      "hideQuestionName": false
+    },
+    "students": [
+      {
+        "id": 3,
+        "name": "Алексей",
+        "progress": 100
+      },
+      {
+        "id": 4,
+        "name": "Дарья",
+        "progress": 90
+      },
+      {
+        "id": 5,
+        "name": "Александр Карачёв",
+        "progress": 100
+      },
+      {
+        "id": 15,
+        "name": "alex",
+        "progress": 100
+      },
+      {
+        "id": 20,
+        "name": "7887788",
+        "progress": 0
+      }
+    ],
+    "stories": []
+  }
+]
