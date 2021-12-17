@@ -12,39 +12,129 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var _components_Loader__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/Loader */ "./frontend/js/components/Loader.js");
+/* harmony import */ var _question_BaseQuestion__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./question/BaseQuestion */ "./frontend/js/question/BaseQuestion.js");
+
+
+
 class Testing {
+
+    dom = {};
+    testQuestions = [];
+    currentQuestionComp;
 
     /**
      *
      * @param element
-     * @param data
      * @param options
      */
-    constructor(element, data, options) {
+    constructor(element, options) {
 
         if (!(element && element.nodeType && element.nodeType === 1)) {
             throw "Element must be an HTMLElement, not ".concat({}.toString.call(element));
         }
 
         this.element = element;
-        this.options = options = Object.assign({}, options);
+        this.options = Object.assign({}, options);
 
         element['_wikids_test'] = this;
 
-        this.testConfig = data.getTestModel();
+        //this.currentQuestionComp = {};
     }
 
-    setQuestions(questions) {
-        // new Question(question)
+    initialize(testConfig, questionsData) {
+
+        this.testConfig = testConfig;
+        this.questions = questionsData.getQuestions();
+
+        this.load();
+    }
+
+    makeTestQuestions() {
+        let end = false;
+        let max = 1; //getQuestionRepeat();
+        while (!end && this.testQuestions.length < max) {
+            end = this.questions.length === 0;
+            if (!end) {
+                this.testQuestions.push(this.questions.shift());
+            }
+        }
+    }
+
+    load() {
+
+        this.makeTestQuestions();
+        this.setupDOM();
+        this.start();
+        this.addEventListeners();
+
+        this.element.appendChild(this.dom.wrapper);
     }
 
     start() {
 
-        this.setupDOM();
+        this.showNextQuestion();
     }
 
     setupDOM() {
 
+        this.dom.header = document.createElement('div');
+        this.dom.header.classList.add('wikids-test-header');
+
+        this.dom.questions = document.createElement('div');
+        this.dom.questions.classList.add('wikids-test-questions');
+
+        this.dom.controls = document.createElement('div');
+        this.dom.controls.classList.add('wikids-test-controls');
+        const buttonsElement = document.createElement('div');
+        buttonsElement.classList.add('wikids-test-buttons');
+
+        this.dom.nextButton = document.createElement('button');
+        this.dom.nextButton.classList.add('btn');
+        this.dom.nextButton.classList.add('btn-small');
+        this.dom.nextButton.classList.add('btn-test');
+        this.dom.nextButton.classList.add('wikids-test-next');
+        this.dom.nextButton.textContent = 'Следующий вопрос';
+        buttonsElement.appendChild(this.dom.nextButton);
+
+        this.dom.controls.appendChild(buttonsElement);
+
+        this.dom.wrapper = document.createElement('div');
+        this.dom.wrapper.classList.add('wikids-test');
+        this.dom.wrapper.appendChild(this.dom.header);
+        this.dom.wrapper.appendChild(this.dom.questions);
+        this.dom.wrapper.appendChild(this.dom.controls);
+    }
+
+    addEventListeners() {
+        this.dom.nextButton.addEventListener('click', (e) => {
+            this.nextQuestion();
+        }, false);
+    }
+
+    nextQuestion() {
+        console.log(this.currentQuestionComp.getUserAnswers());
+    }
+
+    showNextQuestion() {
+
+        const currentQuestion = this.testQuestions.shift();
+        this.dom.questions.innerHTML = '';
+
+        const questionComp = this.createQuestion(currentQuestion);
+        this.currentQuestionComp = questionComp;
+
+        this.dom.questions.append(questionComp.render());
+    }
+
+    createQuestion(question) {
+
+        let questionComp;
+        switch (question.getType()) {
+            case 0:
+                questionComp = new _question_BaseQuestion__WEBPACK_IMPORTED_MODULE_1__["default"](question);
+        }
+        return questionComp;
     }
 }
 
@@ -52,39 +142,36 @@ class Testing {
 
 /***/ }),
 
-/***/ "./frontend/js/TestingData.js":
-/*!************************************!*\
-  !*** ./frontend/js/TestingData.js ***!
-  \************************************/
+/***/ "./frontend/js/components/Loader.js":
+/*!******************************************!*\
+  !*** ./frontend/js/components/Loader.js ***!
+  \******************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _model_TestModel__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./model/TestModel */ "./frontend/js/model/TestModel.js");
+class Loader {
 
-
-class TestingData {
-
-    /**
-     *
-     * @param data
-     * @param options
-     * @param options.testPropName
-     * @param options.questionsPropName
-     * @param options.answersPropName
-     */
-    constructor(data, options) {
-        this.testModel = new _model_TestModel__WEBPACK_IMPORTED_MODULE_0__["default"](data[options.testPropName], data[options.questionsPropName], options.answersPropName);
+    constructor(text) {
+        this.text = text || 'Загрузка вопросов';
     }
 
-    getTestModel() {
-        return this.testModel;
+    render() {
+        let elem = document.createElement('div');
+        elem.classList.add('wikids-test-loader');
+        let textElem = document.createElement('p');
+        textElem.textContent = this.text;
+        elem.appendChild(textElem);
+        let imgElem = document.createElement('img');
+        imgElem.setAttribute('src', '/img/loading.gif');
+        elem.appendChild(imgElem);
+        return elem;
     }
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (TestingData);
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Loader);
 
 /***/ }),
 
@@ -102,6 +189,14 @@ class AnswerModel {
 
     constructor(data) {
         this.data = data;
+    }
+
+    getId() {
+        return parseInt(this.data.id);
+    }
+
+    getName() {
+        return this.data.name;
     }
 
     isCorrect() {
@@ -129,13 +224,57 @@ __webpack_require__.r(__webpack_exports__);
 class QuestionModel {
 
     constructor(data, answersPropName) {
-        this.id = parseInt(data.id);
-        this.name = data.name;
+        this.data = data;
         this.answers = data[answersPropName].map(answer => new _AnswerModel__WEBPACK_IMPORTED_MODULE_0__["default"](answer));
+    }
+
+    getId() {
+        return parseInt(this.data.id);
+    }
+
+    getName() {
+        return this.data.name;
+    }
+
+    getType() {
+        return parseInt(this.data.type);
+    }
+
+    getAnswers() {
+        return this.answers;
     }
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (QuestionModel);
+
+/***/ }),
+
+/***/ "./frontend/js/model/QuestionsData.js":
+/*!********************************************!*\
+  !*** ./frontend/js/model/QuestionsData.js ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _QuestionModel__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./QuestionModel */ "./frontend/js/model/QuestionModel.js");
+
+
+class QuestionsData {
+
+    constructor(data, answersPropName) {
+        this.data = data;
+        this.questions = data.map(question => new _QuestionModel__WEBPACK_IMPORTED_MODULE_0__["default"](question, answersPropName));
+    }
+
+    getQuestions() {
+        return this.questions;
+    }
+}
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (QuestionsData);
 
 /***/ }),
 
@@ -149,28 +288,137 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _QuestionModel__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./QuestionModel */ "./frontend/js/model/QuestionModel.js");
-
-
 class TestModel {
 
-    constructor(data, questionsData, answersPropName) {
-
-        this.id = parseInt(data.id);
-
-        this.questions = questionsData.map(question => new _QuestionModel__WEBPACK_IMPORTED_MODULE_0__["default"](question, answersPropName));
+    constructor(data) {
+        this.data = data;
     }
 
     getId() {
-        return this.id;
-    }
-
-    getQuestions() {
-        return this.questions;
+        return parseInt(this.data.id);
     }
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (TestModel);
+
+/***/ }),
+
+/***/ "./frontend/js/question/BaseQuestion.js":
+/*!**********************************************!*\
+  !*** ./frontend/js/question/BaseQuestion.js ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+class BaseQuestion {
+
+    constructor(model) {
+        this.model = model;
+        this.userAnswers = new Set();
+    }
+
+    createAnswer(answer) {
+
+        const inputElement = document.createElement('input');
+        let inputId = 'answer' + answer.getId();
+        const singleValue = false;
+        inputElement.setAttribute('type', 'checkbox');
+        inputElement.setAttribute('id', inputId);
+        inputElement.setAttribute('name', 'qwe');
+        inputElement.setAttribute('value', answer.getId());
+
+        const answerElement = document.createElement('div');
+        answerElement.classList.add('wikids-test-answer');
+        answerElement.addEventListener('click', (e) => {
+            let tagName = e.target.tagName;
+            let tags = ['INPUT'];
+            //if (originalImageExists) {
+            //    tags.push('IMG');
+            //}
+            let input = e.target.querySelector('input');
+            if (!tags.includes(tagName)) {
+                input.checked = !input.checked;
+            }
+
+            if (singleValue) {
+                this.userAnswers.clear();
+                this.userAnswers.add(input.value);
+            }
+            else {
+                if (input.checked) {
+                    this.userAnswers.add(input.value);
+                }
+                else {
+                    this.userAnswers.delete(input.value);
+                }
+            }
+        }, false);
+        answerElement.appendChild(inputElement);
+
+        const labelElement = document.createElement('label');
+        labelElement.setAttribute('for', inputId);
+        labelElement.textContent = answer.getName();
+        answerElement.appendChild(labelElement);
+
+        return answerElement;
+    }
+
+    renderAnswers(answers) {
+
+        const mainElement = document.createElement('div');
+        mainElement.innerHTML =
+            `<div class="row row-no-gutters">
+                 <div class="col-md-4 question-image"></div>
+                 <div class="col-md-8 question-wrapper">
+                     <div class="wikids-test-answers"></div>
+                 </div>
+             </div>`;
+
+        const answersElement = mainElement.querySelector('.wikids-test-answers');
+        answers.forEach((answer) => {
+            answersElement.appendChild(this.createAnswer(answer));
+        });
+
+        return mainElement;
+    }
+
+    render() {
+
+        const titleElement = document.createElement('p');
+        titleElement.classList.add('question-title');
+        titleElement.textContent = this.model.getName();
+
+        const questionElement = document.createElement('div');
+        questionElement.classList.add('wikids-test-question');
+        questionElement.setAttribute('data-question-id', this.model.getId());
+        questionElement.appendChild(titleElement);
+
+        questionElement.appendChild(this.renderAnswers(this.model.getAnswers()));
+
+        return questionElement;
+    }
+
+    getUserAnswers() {
+        return Array.from(this.userAnswers);
+    }
+}
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (BaseQuestion);
+
+/***/ }),
+
+/***/ "./frontend/scss/style.scss":
+/*!**********************************!*\
+  !*** ./frontend/scss/style.scss ***!
+  \**********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+// extracted by mini-css-extract-plugin
+
 
 /***/ }),
 
@@ -247,20 +495,21 @@ var __webpack_exports__ = {};
   !*** ./frontend/js/app.js ***!
   \****************************/
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _TestingData__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./TestingData */ "./frontend/js/TestingData.js");
+/* harmony import */ var _scss_style_scss__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../scss/style.scss */ "./frontend/scss/style.scss");
 /* harmony import */ var _Testing__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Testing */ "./frontend/js/Testing.js");
+/* harmony import */ var _model_TestModel__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./model/TestModel */ "./frontend/js/model/TestModel.js");
+/* harmony import */ var _model_QuestionsData__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./model/QuestionsData */ "./frontend/js/model/QuestionsData.js");
 
 
+
+
+
+const testing = new _Testing__WEBPACK_IMPORTED_MODULE_1__["default"](document.getElementById('mobile-testing'), {});
 
 const data = __webpack_require__(/*! ./testing-data.json */ "./frontend/js/testing-data.json");
-const testingData = new _TestingData__WEBPACK_IMPORTED_MODULE_0__["default"](data[0], {
-    testPropName: 'test',
-    questionsPropName: 'storyTestQuestions',
-    answersPropName: 'storyTestAnswers'
-});
-
-const testing = new _Testing__WEBPACK_IMPORTED_MODULE_1__["default"](document.getElementById('mobile-testing'), testingData, {});
-
+const testConfig = new _model_TestModel__WEBPACK_IMPORTED_MODULE_2__["default"](data[0]['test']);
+const questionsData = new _model_QuestionsData__WEBPACK_IMPORTED_MODULE_3__["default"](data[0]['storyTestQuestions'], 'storyTestAnswers');
+testing.initialize(testConfig, questionsData);
 })();
 
 /******/ })()

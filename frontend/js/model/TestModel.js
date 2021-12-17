@@ -1,20 +1,11 @@
-import QuestionModel from "./QuestionModel";
-
 class TestModel {
 
-    constructor(data, questionsData, answersPropName) {
-
-        this.id = parseInt(data.id);
-
-        this.questions = questionsData.map(question => new QuestionModel(question, answersPropName));
+    constructor(data) {
+        this.data = data;
     }
 
     getId() {
-        return this.id;
-    }
-
-    getQuestions() {
-        return this.questions;
+        return parseInt(this.data.id);
     }
 }
 

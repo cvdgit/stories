@@ -10,7 +10,9 @@ class MobileTestAsset extends AssetBundle
 {
     public $basePath = '@webroot';
     public $baseUrl = '@web';
-    public $css = [];
+    public $css = [
+        'build/app.css',
+    ];
     public $js = [
         'build/app.js',
     ];
