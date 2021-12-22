@@ -1700,7 +1700,7 @@
                 .hide()
                 .html('Продолжить <i class="icomoon-chevron-right"></i>')
                 .appendTo($(".wikids-test-buttons", dom.controls));
-            dom.questions = createQuestions(getQuestionsData());
+            //dom.questions = createQuestions(getQuestionsData());
             dom.results = createResults();
             dom.correctAnswerPage = createCorrectAnswerPage();
             dom.wrapper
@@ -1794,7 +1794,7 @@
             var $answer = $("<div/>").addClass("wikids-test-answer")
                 .on("click", function(e) {
                     var tagName = e.target.tagName;
-                    var tags = ['INPUT'];
+                    var tags = ['INPUT', 'I'];
                     if (originalImageExists) {
                         tags.push('IMG');
                     }
@@ -1841,7 +1841,8 @@
                 var $label = $("<label/>")
                     .attr("for", "answer" + answer.id)
                     .html(answerName);
-                $label.find('[data-bound-slide-id]').on('click', function() {
+                $label.find('[data-bound-slide-id]').on('click', function(e) {
+                    e.preventDefault();
                     var id = $(this).data('boundSlideId');
                     createSlideInnerDialog(id);
                 });
