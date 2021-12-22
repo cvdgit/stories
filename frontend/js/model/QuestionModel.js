@@ -1,10 +1,12 @@
 import AnswerModel from "./AnswerModel";
+import StarsModel from "./StarsModel";
 
 class QuestionModel {
 
     constructor(data, answersPropName) {
         this.data = data;
         this.answers = data[answersPropName].map(answer => new AnswerModel(answer));
+        this.stars = new StarsModel(this.data.stars);
     }
 
     getId() {
@@ -21,6 +23,41 @@ class QuestionModel {
 
     getAnswers() {
         return this.answers;
+    }
+
+    getCorrectAnswers() {
+        return this.answers.filter((answer) => {
+            return answer.isCorrect();
+        });
+    }
+
+    getImage() {
+        return this.data.image;
+    }
+
+    haveImage() {
+        const value = this.getImage();
+        return (typeof value !== 'undefined' && value);
+    }
+
+    getOrigImage() {
+        return this.data.orig_image;
+    }
+
+    isMixAnswers() {
+        return parseInt(this.data.mix_answers) === 1;
+    }
+
+    getStars() {
+        return this.stars;
+    }
+
+    lastAnswerIsCorrect() {
+        return Boolean(this.data['lastAnswerIsCorrect']);
+    }
+
+    setLastAnswersIsCorrect(value) {
+        this.data['lastAnswerIsCorrect'] = Boolean(value);
     }
 }
 

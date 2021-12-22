@@ -1,16 +1,33 @@
-class BaseQuestion {
+import Question from "./Question";
+import {shuffle} from "../utils";
+import QuestionStars from "../components/QuestionStars";
 
-    constructor(model) {
+class BaseQuestion extends Question {
+
+    element;
+
+    constructor(model, options) {
+        super();
         this.model = model;
+        this.options = options;
         this.userAnswers = new Set();
+        this.userStars = new QuestionStars(model.getStars(), options.repeatQuestions);
+    }
+
+    getQuestionModel() {
+        return this.model;
     }
 
     createAnswer(answer) {
 
         const inputElement = document.createElement('input');
         let inputId = 'answer' + answer.getId();
-        const singleValue = false;
-        inputElement.setAttribute('type', 'checkbox');
+        const singleValue = true;
+        let type = 'radio';
+        if (this.model.getCorrectAnswers().length > 1) {
+            type = 'checkbox';
+        }
+        inputElement.setAttribute('type', type);
         inputElement.setAttribute('id', inputId);
         inputElement.setAttribute('name', 'qwe');
         inputElement.setAttribute('value', answer.getId());
@@ -40,8 +57,17 @@ class BaseQuestion {
                     this.userAnswers.delete(input.value);
                 }
             }
+
+            this.emit('answerQuestion', this.getUserAnswers());
         }, false);
         answerElement.appendChild(inputElement);
+
+        if (this.options.showAnswerImage && answer.haveImage()) {
+            const answerImageElement = document.createElement('img');
+            answerImageElement.setAttribute('src', answer.getImage());
+            answerImageElement.style.height = '100px';
+            answerElement.appendChild(answerImageElement);
+        }
 
         const labelElement = document.createElement('label');
         labelElement.setAttribute('for', inputId);
@@ -53,21 +79,18 @@ class BaseQuestion {
 
     renderAnswers(answers) {
 
-        const mainElement = document.createElement('div');
-        mainElement.innerHTML =
-            `<div class="row row-no-gutters">
-                 <div class="col-md-4 question-image"></div>
-                 <div class="col-md-8 question-wrapper">
-                     <div class="wikids-test-answers"></div>
-                 </div>
-             </div>`;
+        const answersElement = document.createElement('div');
+        answersElement.classList.add('.wikids-test-answers');
 
-        const answersElement = mainElement.querySelector('.wikids-test-answers');
+        if (this.model.isMixAnswers()) {
+            answers = shuffle(answers);
+        }
+
         answers.forEach((answer) => {
             answersElement.appendChild(this.createAnswer(answer));
         });
 
-        return mainElement;
+        return answersElement;
     }
 
     render() {
@@ -76,18 +99,79 @@ class BaseQuestion {
         titleElement.classList.add('question-title');
         titleElement.textContent = this.model.getName();
 
+        const preTitleElement = document.createElement('p');
+        preTitleElement.classList.add('pre-question-title');
+        preTitleElement.textContent = 'Ответьте на вопрос:';
+
         const questionElement = document.createElement('div');
+        this.element = questionElement;
         questionElement.classList.add('wikids-test-question');
+        questionElement.classList.add('wikids-test-active-question');
         questionElement.setAttribute('data-question-id', this.model.getId());
+
+        questionElement.appendChild(this.userStars.render());
+        questionElement.appendChild(preTitleElement);
         questionElement.appendChild(titleElement);
 
-        questionElement.appendChild(this.renderAnswers(this.model.getAnswers()));
+        const mainElement = document.createElement('div');
+        mainElement.innerHTML =
+            `<div class="row row-no-gutters">
+                 <div class="col-xs-12 col-sm-4 col-md-4 question-image"></div>
+                 <div class="col-xs-12 col-sm-8 col-md-8 question-wrapper"></div>
+             </div>`;
+
+        questionElement.appendChild(mainElement);
+
+        if (this.options.showQuestionImage && this.model.haveImage()) {
+            const questionImageElement = document.createElement('img');
+            questionImageElement.setAttribute('src', this.model.getImage());
+            questionImageElement.style.width = '100%';
+            questionElement.querySelector('.question-image').appendChild(questionImageElement);
+        }
+
+        questionElement.querySelector('.question-wrapper').appendChild(this.renderAnswers(this.model.getAnswers()));
 
         return questionElement;
     }
 
     getUserAnswers() {
         return Array.from(this.userAnswers);
+    }
+
+    hideQuestion() {
+        this.element.style.display = 'none';
+        this.element.classList.remove('wikids-test-active-question');
+    }
+
+    checkAnswerCorrect() {
+        const userAnswers = this.getUserAnswers();
+        const correctAnswers = this.model.getCorrectAnswers().map((item) => item.getId());
+        return userAnswers.length === correctAnswers.length && userAnswers.sort()
+            .every((val, index) => parseInt(val) === correctAnswers.sort()[index]);
+    }
+
+    isShowNextButton() {
+        return false;
+    }
+
+    getCorrectAnswers() {
+        return this.model.getCorrectAnswers();
+    }
+
+    incStars() {
+        this.userStars.inc();
+    }
+
+    decStars() {
+        this.userStars.dec();
+    }
+
+    isDoneStars() {
+        return this.userStars.isDone();
+    }
+
+    getCurrentStars() {
+        return this.userStars.getCurrent();
     }
 }
 

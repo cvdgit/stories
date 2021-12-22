@@ -1,4 +1,6 @@
-class Question {
+const EventEmitter = require('events');
+
+class Question extends EventEmitter {
 
 }
 

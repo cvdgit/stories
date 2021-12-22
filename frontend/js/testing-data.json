@@ -10,10 +10,10 @@
         "type": 0,
         "mix_answers": 1,
         "id": 3578,
-        "name": "1",
-        "image": "",
-        "orig_image": "",
-        "original_image": false,
+        "name": "Название вопроса 1",
+        "image": "/test_images/question/144/thumb_OXS-MSiGgyWidWogjSePfKhrILr_fcEr.png",
+        "orig_image": "/test_images/question/144/OXS-MSiGgyWidWogjSePfKhrILr_fcEr.png",
+        "original_image": true,
         "correct_number": 1,
         "storyTestAnswers": [
           {
@@ -52,7 +52,7 @@
         ],
         "lastAnswerIsCorrect": true,
         "haveSlides": false,
-        "hint": null
+        "hint": ""
       },
       {
         "stars": {
@@ -60,7 +60,7 @@
           "current": 0
         },
         "view": "default",
-        "type": 0,
+        "type": 1,
         "mix_answers": 1,
         "id": 3579,
         "name": "Вопрос номер 2",
@@ -125,7 +125,8 @@
       "rememberAnswers": false,
       "askQuestion": false,
       "askQuestionLang": "Google русский",
-      "hideQuestionName": false
+      "hideQuestionName": false,
+      "repeatQuestions": 5
     },
     "students": [
       {

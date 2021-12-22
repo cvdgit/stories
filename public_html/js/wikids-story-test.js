@@ -2732,7 +2732,7 @@
                     return parseInt(elem.name);
                 };
             }
-        if (view === 'input' || view === 'recognition' || testConfig.answerTypeIsMissingWords(currentQuestion)) {
+            if (view === 'input' || view === 'recognition' || testConfig.answerTypeIsMissingWords(currentQuestion)) {
                 correctAnswersCallback = function(elem) {
                     if (testConfig.isStrictAnswer()) {
                         return elem.name;
