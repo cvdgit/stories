@@ -23,6 +23,39 @@
       }
     }
   }
+  
+  .wikids-test-error-page {
+    text-align: center;
+  }
+
+  .wikids-test-begin-page {
+    text-align: center;
+
+    h3 {
+      margin: 0;
+    }
+
+    button {
+      margin: 0;
+    }
+
+    .row-wrapper {
+      min-height: auto;
+      padding-top: 20px;
+
+      .wikids-test-description {
+        margin: 0 0 20px 0;
+      }
+      
+      .test-actions {
+        text-align: center;
+      }
+
+      .list-group .list-group-item h4 {
+        pointer-events: none;
+      }
+    }
+  }
 }
 
 .wikids-test {
@@ -51,6 +84,11 @@
     .wikids-test-correct-answer-answers {
       max-height: none;
       min-height: auto;
+
+      p {
+        margin-left: 0;
+        text-align: center;
+      }
     }
     
     .wikids-test-correct-answer-page-action {

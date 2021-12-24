@@ -1,8 +1,11 @@
 import Loader from "./components/Loader";
 import BaseQuestion from "./question/BaseQuestion";
 import DefaultWrongAnswer from "./components/DefaultWrongAnswer";
+import TestProgress from "./components/TestProgress";
+import ErrorPage from "./components/ErrorPage";
+import WelcomePage from "./components/WelcomePage";
 
-class Testing {
+export default class Testing {
 
     dom = {};
     testQuestions = [];
@@ -27,6 +30,31 @@ class Testing {
         this.element.innerHTML = '';
         const loader = new Loader();
         this.element.innerHTML = loader.render().outerHTML;
+
+        if (options['welcome'] && typeof options['welcome'] === 'function') {
+            options.welcome(this.welcome.bind(this), this.error.bind(this));
+        }
+    }
+
+    error(params) {
+        this.element.innerHTML = '';
+        const errorPage = new ErrorPage();
+        this.element.innerHTML = errorPage.render().outerHTML;
+    }
+
+    welcome(model) {
+        this.element.innerHTML = '';
+        const welcomePage = new WelcomePage(model);
+        this.element.appendChild(welcomePage.render((activeStudent) => {
+
+            this.student = activeStudent;
+
+            this.element.innerHTML = '';
+            const loader = new Loader();
+            this.element.innerHTML = loader.render().outerHTML;
+
+            this.options.initialize(this.initialize.bind(this), this.error.bind(this));
+        }));
     }
 
     initialize(testConfig, questionsData) {
@@ -73,6 +101,16 @@ class Testing {
 
         this.dom.header = document.createElement('div');
         this.dom.header.classList.add('wikids-test-header');
+
+        if (this.student) {
+            const studentElement = document.createElement('div');
+            studentElement.classList.add('wikids-test-student-info');
+            studentElement.textContent = this.student.getName();
+            this.dom.header.appendChild(studentElement);
+        }
+
+        this.testProgress = new TestProgress(this.testConfig.getProgress());
+        this.dom.header.appendChild(this.testProgress.render());
 
         this.dom.questions = document.createElement('div');
         this.dom.questions.classList.add('wikids-test-questions');
@@ -136,7 +174,10 @@ class Testing {
 
         if (answerIsCorrect) {
             if (currentQuestionModel.lastAnswerIsCorrect()) {
-                this.currentQuestionComp.incStars();
+                let increased = this.currentQuestionComp.incStars();
+                if (increased) {
+                    this.testProgress.inc();
+                }
             }
             else {
                 currentQuestionModel.setLastAnswersIsCorrect(true);
@@ -145,7 +186,10 @@ class Testing {
         else {
             currentQuestionModel.setLastAnswersIsCorrect(false);
             this.currentQuestionComp.decStars();
+            this.testProgress.dec();
         }
+
+        this.testProgress.updateProgress();
 
         let done = false;
         if (!answerIsCorrect) {
@@ -221,7 +265,8 @@ class Testing {
         const options = {
             'showQuestionImage': this.testConfig.isShowQuestionImage(),
             'showAnswerImage': this.testConfig.isShowAnswerImage(),
-            'repeatQuestions': this.testConfig.getRepeatQuestions()
+            'repeatQuestions': this.testConfig.getRepeatQuestions(),
+            'hideQuestionName': this.testConfig.isHideQuestionName()
         }
         switch (question.getType()) {
             case 0:
@@ -241,5 +286,3 @@ class Testing {
         return questionComp;
     }
 }
-
-export default Testing;

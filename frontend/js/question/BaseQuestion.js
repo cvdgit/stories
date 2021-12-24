@@ -93,15 +93,23 @@ class BaseQuestion extends Question {
         return answersElement;
     }
 
+    createQuestionName() {
+        let questionName = this.model.getName();
+        if (this.options.hideQuestionName) {
+            questionName = '';
+        }
+        return questionName;
+    }
+
     render() {
 
         const titleElement = document.createElement('p');
         titleElement.classList.add('question-title');
-        titleElement.textContent = this.model.getName();
+        titleElement.innerHTML = this.createQuestionName();
 
         const preTitleElement = document.createElement('p');
         preTitleElement.classList.add('pre-question-title');
-        preTitleElement.textContent = 'Ответьте на вопрос:';
+        preTitleElement.textContent = this.options.hideQuestionName ? 'Прослушайте вопрос' : 'Ответьте на вопрос:';
 
         const questionElement = document.createElement('div');
         this.element = questionElement;
@@ -159,7 +167,7 @@ class BaseQuestion extends Question {
     }
 
     incStars() {
-        this.userStars.inc();
+        return this.userStars.inc();
     }
 
     decStars() {

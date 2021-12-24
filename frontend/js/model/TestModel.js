@@ -1,7 +1,10 @@
+import ProgressModel from "./ProgressModel";
+
 class TestModel {
 
     constructor(data) {
         this.data = data;
+        this.progress = new ProgressModel(data.progress);
     }
 
     getId() {
@@ -18,6 +21,14 @@ class TestModel {
 
     getRepeatQuestions() {
         return parseInt(this.data.repeatQuestions);
+    }
+
+    getProgress() {
+        return this.progress;
+    }
+
+    isHideQuestionName() {
+        return Boolean(this.data.hideQuestionName);
     }
 }
 

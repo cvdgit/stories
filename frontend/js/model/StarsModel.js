@@ -13,7 +13,10 @@ class StarsModel {
     }
 
     setCurrent(value) {
-        this.data.current = parseInt(value);
+        if (!Number.isInteger(value)) {
+            throw 'StarsModel.setCurrent value is not integer';
+        }
+        this.data.current = value;
     }
 
     incCurrent() {

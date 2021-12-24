@@ -15,7 +15,7 @@ class DefaultWrongAnswer extends WrongAnswer {
             const rowElement = document.createElement('div');
             rowElement.classList.add('row');
             rowElement.innerHTML =
-                `<div class="col-md-offset-3 col-md-9">
+                `<div class="col-xs-12 col-md-offset-3 col-md-9">
                      <p>${answer.getName()}</p>
                  </div>`;
 
