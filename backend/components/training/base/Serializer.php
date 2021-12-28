@@ -35,6 +35,7 @@ class Serializer
                     'askQuestion' => filter_var($test->ask_question, FILTER_VALIDATE_BOOLEAN),
                     'askQuestionLang' => $test->ask_question_lang,
                     'hideQuestionName' => filter_var($test->hide_question_name, FILTER_VALIDATE_BOOLEAN),
+                    'hideAnswersName' => filter_var($test->hide_answers_name, FILTER_VALIDATE_BOOLEAN),
                     'repeatQuestions' => $fastMode ? 1 : 5,
                 ],
                 'students' => $students,

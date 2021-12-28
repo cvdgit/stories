@@ -71,7 +71,9 @@ class BaseQuestion extends Question {
 
         const labelElement = document.createElement('label');
         labelElement.setAttribute('for', inputId);
-        labelElement.textContent = answer.getName();
+        if (!this.options.hideAnswersName) {
+            labelElement.textContent = answer.getName();
+        }
         answerElement.appendChild(labelElement);
 
         return answerElement;

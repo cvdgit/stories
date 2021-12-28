@@ -31,6 +31,10 @@ class TestModel {
         return Boolean(this.data.hideQuestionName);
     }
 
+    isHideAnswersName() {
+        return Boolean(this.data.hideAnswersName);
+    }
+
     isAskQuestion() {
         return Boolean(this.data.askQuestion);
     }

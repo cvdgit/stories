@@ -309,6 +309,7 @@ export default class Testing {
             'showAnswerImage': this.testConfig.isShowAnswerImage(),
             'repeatQuestions': this.testConfig.getRepeatQuestions(),
             'hideQuestionName': this.testConfig.isHideQuestionName(),
+            'hideAnswersName': this.testConfig.isHideAnswersName(),
             'askQuestion': this.testConfig.isAskQuestion(),
             'askQuestionLang': this.testConfig.getAskQuestionLang()
         }
