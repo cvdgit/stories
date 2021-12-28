@@ -3,6 +3,7 @@
 /** @var $student common\models\UserStudent */
 /** @var $category common\models\Category */
 use common\components\StoryCover;
+use common\models\test\SourceType;
 use yii\helpers\Html;
 ?>
 <div class="row" style="padding: 10px 0">
@@ -15,6 +16,11 @@ use yii\helpers\Html;
                 <h3 style="margin-top:0"><?= Html::a($model->title, $model->getStoryUrl()) ?></h3>
                 <?php foreach($model->tests as $test): ?>
                     <div style="margin-bottom: 10px">
+                        <?php if (SourceType::isTest($test)): ?>
+                        <p>
+                            <?= Html::a('<i class="glyphicon glyphicon-phone"></i> Мобильная версия', ['test-mobile/view', 'id' => $test->id]) ?>
+                        </p>
+                        <?php endif ?>
                         <p>
                             <?= Html::a('<i class="glyphicon glyphicon-play-circle"></i> ' . $test->header, $test->getRunUrl(), ['class' => 'run-test']) ?>
                         </p>

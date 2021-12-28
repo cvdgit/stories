@@ -1,0 +1,144 @@
+
+.new-questions {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  min-height: 376px;
+
+  .wikids-test-loader {
+    text-align: center;
+    display: table;
+    width: 100%;
+    height: 100%;
+    margin: unset;
+    padding: 100px 0;
+
+    p {
+      display: table-cell;
+      vertical-align: middle;
+
+      img {
+        margin-top: 20px;
+        width: 100px;
+      }
+    }
+  }
+  
+  .wikids-test-error-page {
+    text-align: center;
+  }
+
+  .wikids-test-begin-page {
+    text-align: center;
+
+    h3 {
+      margin: 0;
+    }
+
+    button {
+      margin: 0;
+    }
+
+    .row-wrapper {
+      min-height: auto;
+      padding-top: 20px;
+
+      .wikids-test-description {
+        margin: 0 0 20px 0;
+      }
+      
+      .test-actions {
+        text-align: center;
+      }
+
+      .list-group .list-group-item h4 {
+        pointer-events: none;
+      }
+    }
+  }
+}
+
+.wikids-test {
+
+  .wikids-test-results {
+
+    .incorrect-text {
+      color: red;
+      font-weight: 500;
+      margin: 0;
+      padding: 10px;
+      text-align: center;
+    }
+
+    h2 {
+      text-align: center;
+    }
+  }
+
+  .wikids-test-correct-answer-page {
+    display: block;
+    position: relative;
+    left: auto;
+    top: auto;
+
+    .wikids-test-correct-answer-answers {
+      max-height: none;
+      min-height: auto;
+
+      p {
+        margin-left: 0;
+        text-align: center;
+      }
+    }
+    
+    .wikids-test-correct-answer-page-action {
+      text-align: center;
+    }
+  }
+
+  .wikids-test-question {
+
+    .question-title {
+      margin-bottom: 0;
+
+      i {
+        pointer-events: none;
+      }
+    }
+
+    .pre-question-title {
+      text-align: center;
+    }
+    
+    .question-image {
+      padding: 10px;
+    }
+
+    .wikids-test-answer {
+      border: 1px #ddd solid;
+      margin: 10px 0 0 0;
+
+      input[type=checkbox] {
+        margin-left: 4px;
+      }
+    }
+
+    .ask-question {
+      line-height: 3.5rem;
+      padding: 10px;
+      color: #000;
+      cursor: pointer;
+    }
+  }
+}
+
+@media (max-width: 992px) {
+
+  .wikids-test {
+
+    .wikids-test-answer {
+      padding-bottom: 20px;
+    }
+
+  }
+}
