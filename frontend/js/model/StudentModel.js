@@ -15,6 +15,10 @@ class StudentModel {
     getProgress() {
         return parseInt(this.data.progress);
     }
+
+    isDone() {
+        return this.getProgress() === 100;
+    }
 }
 
 export default StudentModel;

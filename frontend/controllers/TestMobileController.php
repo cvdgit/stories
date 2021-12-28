@@ -16,7 +16,7 @@ use yii\web\Response;
 class TestMobileController extends BaseController
 {
 
-    public function actionView(int $id)
+    public function actionView(int $id, int $student_id = null)
     {
         if (($model = StoryTest::findOne($id)) === null) {
             throw new NotFoundHttpException('The requested page does not exist.');
@@ -24,6 +24,7 @@ class TestMobileController extends BaseController
 
         return $this->render('view', [
             'model' => $model,
+            'studentId' => $student_id,
         ]);
     }
 

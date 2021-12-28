@@ -51,8 +51,15 @@
         text-align: center;
       }
 
-      .list-group .list-group-item h4 {
-        pointer-events: none;
+      .list-group {
+        .list-group-item {
+          h4 {
+            pointer-events: none;
+          }
+          p {
+            pointer-events: none;
+          }
+        }
       }
     }
   }

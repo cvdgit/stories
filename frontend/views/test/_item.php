@@ -18,7 +18,7 @@ use yii\helpers\Html;
                     <div style="margin-bottom: 10px">
                         <?php if (SourceType::isTest($test)): ?>
                         <p>
-                            <?= Html::a('<i class="glyphicon glyphicon-phone"></i> Мобильная версия', ['test-mobile/view', 'id' => $test->id]) ?>
+                            <?= Html::a('<i class="glyphicon glyphicon-phone"></i> Мобильная версия', ['test-mobile/view', 'id' => $test->id, 'student_id' => $student->id]) ?>
                         </p>
                         <?php endif ?>
                         <p>

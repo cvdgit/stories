@@ -42,26 +42,42 @@ export default class Testing {
     }
 
     error(params) {
+        console.log(params);
         this.element.innerHTML = '';
         const errorPage = new ErrorPage();
         this.element.innerHTML = errorPage.render().outerHTML;
     }
 
-    welcome(model) {
+    renderLoader() {
+        this.element.innerHTML = new Loader().render().outerHTML;
+    }
+
+    welcome(model, studentId) {
         console.log('welcome');
 
         this.element.innerHTML = '';
         const welcomePage = new WelcomePage(model);
-        this.element.appendChild(welcomePage.render((activeStudent) => {
 
-            this.student = activeStudent;
+        if (welcomePage.setActiveStudent(studentId)) {
 
-            this.element.innerHTML = '';
-            const loader = new Loader();
-            this.element.innerHTML = loader.render().outerHTML;
+            this.student = welcomePage.getActiveStudent();
+            if (this.student && this.student.isDone()) {
+                this.student = null;
+            }
 
-            this.options.initialize(this.initialize.bind(this), this.error.bind(this), activeStudent.getId());
-        }));
+            if (this.student) {
+                this.renderLoader();
+                this.options.initialize(this.initialize.bind(this), this.error.bind(this), this.student.getId());
+            }
+        }
+
+        if (!this.student) {
+            this.element.appendChild(welcomePage.render((activeStudent) => {
+                this.student = activeStudent;
+                this.renderLoader();
+                this.options.initialize(this.initialize.bind(this), this.error.bind(this), activeStudent.getId());
+            }));
+        }
     }
 
     /**

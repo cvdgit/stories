@@ -79,6 +79,19 @@ class WelcomePage {
 
         return element;
     }
+
+    setActiveStudent(id) {
+        if (id === undefined || !id) {
+            return false;
+        }
+        id = parseInt(id);
+        this.activeStudent = this.model.getStudents().find(student => student.getId() === id);
+        return this.activeStudent !== undefined;
+    }
+
+    getActiveStudent() {
+        return this.activeStudent;
+    }
 }
 
 export default WelcomePage;

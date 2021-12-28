@@ -6,11 +6,12 @@ import WelcomeModel from "./model/WelcomeModel";
 
 const element = document.getElementById('mobile-testing');
 const testId = element.getAttribute('data-test-id');
+const studentId = element.getAttribute('data-student-id');
 const testing = new Testing(element, {
     welcome: (welcomeCallback, errorCallback) => {
         fetch('/test-mobile/init?test_id=' + testId)
             .then(response => response.json())
-            .then(response => welcomeCallback(new WelcomeModel(response)))
+            .then(response => welcomeCallback(new WelcomeModel(response), studentId))
             .catch(error => errorCallback(error));
     },
     initialize: (initCallback, errorCallback, studentId) => {

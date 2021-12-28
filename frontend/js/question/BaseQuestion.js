@@ -130,7 +130,7 @@ class BaseQuestion extends Question {
         mainElement.classList.add('row');
         mainElement.classList.add('row-no-gutters');
         mainElement.innerHTML =
-            `<div class="col-xs-12 col-sm-4 col-md-4 question-image thumbnail"></div>
+            `<div class="col-xs-12 col-sm-4 col-md-4 question-image"></div>
              <div class="col-xs-12 col-sm-8 col-md-8 question-wrapper"></div>`;
 
         questionElement.appendChild(mainElement);
@@ -139,6 +139,7 @@ class BaseQuestion extends Question {
             const questionImageElement = document.createElement('img');
             questionImageElement.setAttribute('src', this.model.getImage());
             questionImageElement.style.width = '100%';
+            questionElement.querySelector('.question-image').classList.add('thumbnail');
             questionElement.querySelector('.question-image').appendChild(questionImageElement);
         }
 
