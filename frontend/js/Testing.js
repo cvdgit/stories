@@ -4,12 +4,17 @@ import DefaultWrongAnswer from "./components/DefaultWrongAnswer";
 import TestProgress from "./components/TestProgress";
 import ErrorPage from "./components/ErrorPage";
 import WelcomePage from "./components/WelcomePage";
+import TestSpeech from "./components/TestSpeech";
+import AskQuestion from "./question/AskQuestion";
+import HistoryModel from "./model/HistoryModel";
 
 export default class Testing {
 
     dom = {};
     testQuestions = [];
     currentQuestionComp;
+
+    speechSynth;
 
     /**
      *
@@ -43,6 +48,8 @@ export default class Testing {
     }
 
     welcome(model) {
+        console.log('welcome');
+
         this.element.innerHTML = '';
         const welcomePage = new WelcomePage(model);
         this.element.appendChild(welcomePage.render((activeStudent) => {
@@ -53,11 +60,17 @@ export default class Testing {
             const loader = new Loader();
             this.element.innerHTML = loader.render().outerHTML;
 
-            this.options.initialize(this.initialize.bind(this), this.error.bind(this));
+            this.options.initialize(this.initialize.bind(this), this.error.bind(this), activeStudent.getId());
         }));
     }
 
+    /**
+     *
+     * @param {TestModel} testConfig
+     * @param {QuestionsData} questionsData
+     */
     initialize(testConfig, questionsData) {
+        console.log('initialize');
         this.testConfig = testConfig;
         this.questions = questionsData.getQuestions();
         this.load();
@@ -169,6 +182,8 @@ export default class Testing {
             return;
         }
 
+        this.currentQuestionComp.onHideQuestion();
+
         const currentQuestionModel = this.currentQuestionComp.getQuestionModel();
         const answerIsCorrect = this.checkAnswerCorrect();
 
@@ -207,6 +222,24 @@ export default class Testing {
 
         this.currentQuestionComp.hideQuestion();
         this.nextButtonVisible();
+
+        if (this.options['history'] && typeof this.options['history'] === 'function') {
+            const historyModel = new HistoryModel();
+            historyModel
+                .setSource(this.testConfig.getSource())
+                .setTestId(this.testConfig.getId())
+                .setStudentId(this.student.getId())
+                .setEntityId(currentQuestionModel.getId())
+                .setEntityName(currentQuestionModel.getName())
+                .setCorrectAnswer(answerIsCorrect)
+                .setProgress(this.testProgress.calcPercent())
+                .setStars(this.currentQuestionComp.getCurrentStars());
+            userAnswers.map(answerId => {
+                const answer = currentQuestionModel.getAnswerById(parseInt(answerId));
+                historyModel.addAnswer(answer.getId(), answer.getName());
+            });
+            this.options.history(historyModel);
+        }
 
         if (!answerIsCorrect) {
             this.dom.results.style.display = 'block';
@@ -257,6 +290,15 @@ export default class Testing {
 
         this.dom.questions.innerHTML = '';
         this.dom.questions.append(questionComp.render());
+
+        questionComp.onShowQuestion();
+    }
+
+    getSpeechSynth() {
+        if (!this.speechSynth) {
+            this.speechSynth = new TestSpeech();
+        }
+        return this.speechSynth;
     }
 
     createQuestion(question) {
@@ -266,12 +308,23 @@ export default class Testing {
             'showQuestionImage': this.testConfig.isShowQuestionImage(),
             'showAnswerImage': this.testConfig.isShowAnswerImage(),
             'repeatQuestions': this.testConfig.getRepeatQuestions(),
-            'hideQuestionName': this.testConfig.isHideQuestionName()
+            'hideQuestionName': this.testConfig.isHideQuestionName(),
+            'askQuestion': this.testConfig.isAskQuestion(),
+            'askQuestionLang': this.testConfig.getAskQuestionLang()
         }
         switch (question.getType()) {
             case 0:
             case 1:
-                questionComp = new BaseQuestion(question, options);
+                if (this.testConfig.isAskQuestion()) {
+                    questionComp = new AskQuestion(question, options);
+                    const speech = this.getSpeechSynth();
+                    speech.setVoice(this.testConfig.getAskQuestionLang());
+                    questionComp.setSpeech(speech);
+                }
+                else {
+                    questionComp = new BaseQuestion(question, options);
+                }
+                break;
         }
 
         const correctAnswers = question.getCorrectAnswers();

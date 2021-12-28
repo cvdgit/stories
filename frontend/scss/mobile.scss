@@ -98,6 +98,14 @@
 
   .wikids-test-question {
 
+    .question-title {
+      margin-bottom: 0;
+
+      i {
+        pointer-events: none;
+      }
+    }
+
     .pre-question-title {
       text-align: center;
     }
@@ -113,6 +121,13 @@
       input[type=checkbox] {
         margin-left: 4px;
       }
+    }
+
+    .ask-question {
+      line-height: 3.5rem;
+      padding: 10px;
+      color: #000;
+      cursor: pointer;
     }
   }
 }

@@ -30,6 +30,18 @@ class TestModel {
     isHideQuestionName() {
         return Boolean(this.data.hideQuestionName);
     }
+
+    isAskQuestion() {
+        return Boolean(this.data.askQuestion);
+    }
+
+    getAskQuestionLang() {
+        return this.data.askQuestionLang;
+    }
+
+    getSource() {
+        return parseInt(this.data.source);
+    }
 }
 
 export default TestModel;

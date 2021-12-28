@@ -28,14 +28,14 @@ module.exports = {
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        presets: ['@babel/preset-env'],
-                        plugins: ['@babel/plugin-syntax-top-level-await']
+                        presets: ['@babel/preset-env']
+                        //plugins: ['@babel/plugin-syntax-top-level-await']
                     }
                 }
             },
         ],
-    },
-    experiments: {
-        topLevelAwait: true
-    },
+    }
+    //experiments: {
+    //    topLevelAwait: true
+    //},
 };

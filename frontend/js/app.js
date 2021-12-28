@@ -13,8 +13,8 @@ const testing = new Testing(element, {
             .then(response => welcomeCallback(new WelcomeModel(response)))
             .catch(error => errorCallback(error));
     },
-    initialize: (initCallback, errorCallback) => {
-        fetch('/test-mobile/get-data?test_id=' + testId)
+    initialize: (initCallback, errorCallback, studentId) => {
+        fetch('/test-mobile/get-data?test_id=' + testId + '&student_id=' + studentId)
             .then(response => response.json())
             .then(data => {
                 const testConfig = new TestModel(data[0]['test']);
@@ -22,6 +22,22 @@ const testing = new Testing(element, {
                 initCallback(testConfig, questionsData);
             })
             .catch(error => errorCallback(error));
+    },
+    /**
+     *
+     * @param {HistoryModel} history
+     */
+    history: (history) => {
+        fetch('/question/answer', {
+            method: 'post',
+            body: history.asQueryString(),
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        })
+            .then(response => response.json())
+            .then(data => console.log(data));
     }
 });
 

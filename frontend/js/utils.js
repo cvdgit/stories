@@ -10,6 +10,23 @@ function shuffle(a) {
     return a;
 }
 
+function objectToQueryString(toSerialize, prefix) {
+    const keyValuePairs = [];
+    Object.keys(toSerialize).forEach((attribute) => {
+        if (Object.prototype.hasOwnProperty.call(toSerialize, attribute)) {
+            const key = prefix ? `${prefix}[${attribute}]` : attribute;
+            const value = toSerialize[attribute];
+            const toBePushed =
+                value !== null && typeof value === "object"
+                    ? objectToQueryString(value, key)
+                    : `${key}=${value}`;
+            keyValuePairs.push(toBePushed);
+        }
+    });
+    return keyValuePairs.join("&");
+}
+
 export {
-    shuffle
+    shuffle,
+    objectToQueryString
 };

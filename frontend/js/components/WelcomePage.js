@@ -54,10 +54,10 @@ class WelcomePage {
         wrapperElement.classList.add('row-wrapper');
         wrapperElement.innerHTML =
             `<div class="row">
-                 <div class="col-xs-12 col-sm-6 col-md-8 col-md-offset-2">
+                 <div class="col-xs-12 col-sm-6 col-md-8">
                     <p class="wikids-test-description">${this.model.getTestDescription()}</p>
                  </div>
-                 <div class="col-xs-12 col-sm-6 col-md-12 test-actions"></div>
+                 <div class="col-xs-12 col-sm-6 col-md-4 test-actions"></div>
              </div>`;
 
         const studentsHeaderElement = document.createElement('h4');

@@ -8,6 +8,7 @@ use backend\components\training\collection\TestBuilder;
 use common\helpers\UserHelper;
 use common\models\StoryTest;
 use common\models\User;
+use common\models\UserQuestionHistoryModel;
 use Yii;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -26,7 +27,7 @@ class TestMobileController extends BaseController
         ]);
     }
 
-    public function actionGetData(int $test_id)
+    public function actionGetData(int $test_id, int $student_id = null)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
@@ -34,10 +35,23 @@ class TestMobileController extends BaseController
             throw new NotFoundHttpException('The requested page does not exist.');
         }
 
-        $collection = (new TestBuilder($model, $model->getQuestionData(), $model->getQuestionDataCount(), []))
+        $fastMode = false;
+
+        $userHistory = [];
+        $userStars = [];
+        $userStarsCount = 0;
+        if ($student_id !== null && !$fastMode) {
+            $userQuestionHistoryModel = new UserQuestionHistoryModel();
+            $userQuestionHistoryModel->student_id = $student_id;
+            $userHistory = $userQuestionHistoryModel->getUserQuestionHistoryLocal($model->id);
+            $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStarsLocal($model->id);
+            $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCountLocal($model->id);
+        }
+
+        $collection = (new TestBuilder($model, $model->getQuestionData($userHistory), $model->getQuestionDataCount(), $userStars, $fastMode))
             ->build();
         return (new Serializer())
-            ->serialize($model, $collection, [], 0);
+            ->serialize($model, $collection, [], $userStarsCount, $fastMode);
     }
 
     public function actionInit(int $test_id, int $user_id = null)

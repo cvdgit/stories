@@ -25,6 +25,10 @@ class QuestionModel {
         return this.answers;
     }
 
+    getAnswerById(id) {
+        return this.getAnswers().find(element => element.getId() === id);
+    }
+
     getCorrectAnswers() {
         return this.answers.filter((answer) => {
             return answer.isCorrect();
@@ -58,6 +62,10 @@ class QuestionModel {
 
     setLastAnswersIsCorrect(value) {
         this.data['lastAnswerIsCorrect'] = Boolean(value);
+    }
+
+    getCorrectNumber() {
+        return parseInt(this.data.correct_number);
     }
 }
 

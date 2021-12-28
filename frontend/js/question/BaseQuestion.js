@@ -95,17 +95,20 @@ class BaseQuestion extends Question {
 
     createQuestionName() {
         let questionName = this.model.getName();
-        if (this.options.hideQuestionName) {
-            questionName = '';
+        if (this.model.getCorrectNumber() > 1) {
+            questionName += ' (верных ответов: ' + this.model.getCorrectNumber() + ')';
         }
         return questionName;
     }
 
-    render() {
-
+    renderTitle() {
         const titleElement = document.createElement('p');
         titleElement.classList.add('question-title');
-        titleElement.innerHTML = this.createQuestionName();
+        titleElement.innerHTML = this.options.hideQuestionName ? '' : this.createQuestionName();
+        return titleElement;
+    }
+
+    render() {
 
         const preTitleElement = document.createElement('p');
         preTitleElement.classList.add('pre-question-title');
@@ -119,7 +122,7 @@ class BaseQuestion extends Question {
 
         questionElement.appendChild(this.userStars.render());
         questionElement.appendChild(preTitleElement);
-        questionElement.appendChild(titleElement);
+        questionElement.appendChild(this.renderTitle());
 
         const mainElement = document.createElement('div');
         mainElement.innerHTML =

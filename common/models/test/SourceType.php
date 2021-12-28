@@ -2,6 +2,8 @@
 
 namespace common\models\test;
 
+use common\models\StoryTest;
+
 class SourceType
 {
 
@@ -35,5 +37,10 @@ class SourceType
                 'active' => ($source === $key),
             ];
         }, self::asArray(), array_keys(self::asArray()));
+    }
+
+    public static function isTest(StoryTest $storyTest): bool
+    {
+        return (int) $storyTest->source === self::TEST;
     }
 }
