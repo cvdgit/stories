@@ -114,9 +114,13 @@
       padding: 10px;
     }
 
+    .thumbnail {
+      margin-bottom: 10px;
+    }
+
     .wikids-test-answer {
       border: 1px #ddd solid;
-      margin: 10px 0 0 0;
+      margin: 0 10px 10px 10px;
 
       input[type=checkbox] {
         margin-left: 4px;

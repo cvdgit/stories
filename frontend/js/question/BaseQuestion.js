@@ -125,11 +125,11 @@ class BaseQuestion extends Question {
         questionElement.appendChild(this.renderTitle());
 
         const mainElement = document.createElement('div');
+        mainElement.classList.add('row');
+        mainElement.classList.add('row-no-gutters');
         mainElement.innerHTML =
-            `<div class="row row-no-gutters">
-                 <div class="col-xs-12 col-sm-4 col-md-4 question-image"></div>
-                 <div class="col-xs-12 col-sm-8 col-md-8 question-wrapper"></div>
-             </div>`;
+            `<div class="col-xs-12 col-sm-4 col-md-4 question-image thumbnail"></div>
+             <div class="col-xs-12 col-sm-8 col-md-8 question-wrapper"></div>`;
 
         questionElement.appendChild(mainElement);
 
@@ -140,6 +140,10 @@ class BaseQuestion extends Question {
             questionElement.querySelector('.question-image').appendChild(questionImageElement);
         }
 
+        const preAnswersElement = document.createElement('p');
+        preAnswersElement.classList.add('pre-question-title');
+        preAnswersElement.textContent = 'Варианты ответов:';
+        questionElement.querySelector('.question-wrapper').appendChild(preAnswersElement);
         questionElement.querySelector('.question-wrapper').appendChild(this.renderAnswers(this.model.getAnswers()));
 
         return questionElement;
