@@ -372,10 +372,34 @@ class StoryTest extends ActiveRecord
         return $query->all();
     }
 
+    public function getQuestionDataMobile($filter = null): array
+    {
+        $query = StoryTestQuestion::find()
+            ->where('story_test_id = :id', [':id' => $this->id])
+            ->andWhere(['in', 'type', [0, 1]])
+            ->with(['storyTestAnswers']);
+        if ($filter !== null) {
+            $ids = array_map(static function($item) {
+                return $item['entity_id'];
+            }, $filter);
+            $query->andFilterWhere(['not in', 'id', $ids]);
+        }
+        $query->orderBy(['order' => SORT_ASC]);
+        return $query->all();
+    }
+
     public function getQuestionDataCount()
     {
         return StoryTestQuestion::find()
             ->where('story_test_id = :id', [':id' => $this->id])
+            ->count();
+    }
+
+    public function getQuestionDataCountMobile()
+    {
+        return StoryTestQuestion::find()
+            ->where('story_test_id = :id', [':id' => $this->id])
+            ->andWhere(['in', 'type', [0, 1]])
             ->count();
     }
 

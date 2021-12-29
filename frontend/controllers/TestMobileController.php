@@ -47,7 +47,7 @@ class TestMobileController extends BaseController
             $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCountLocal($model->id);
         }
 
-        $collection = (new TestBuilder($model, $model->getQuestionData($userHistory), $model->getQuestionDataCount(), $userStars, $fast_mode))
+        $collection = (new TestBuilder($model, $model->getQuestionDataMobile($userHistory), $model->getQuestionDataCountMobile(), $userStars, $fast_mode))
             ->build();
         return (new Serializer())
             ->serialize($model, $collection, [], $userStarsCount, $fast_mode);
