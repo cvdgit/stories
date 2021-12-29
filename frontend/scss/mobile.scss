@@ -3,7 +3,7 @@
   height: 100%;
   width: 100%;
   position: relative;
-  min-height: 376px;
+  /*min-height: 376px;*/
 
   .wikids-test-loader {
     text-align: center;
@@ -131,6 +131,10 @@
 
       input[type=checkbox] {
         margin-left: 4px;
+      }
+
+      img {
+        pointer-events: none;
       }
     }
 

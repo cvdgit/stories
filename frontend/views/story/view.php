@@ -177,7 +177,6 @@ $isBookView = $storyDefaultView === 'book';
                 <div class="col-lg-5 col-md-5 col-sm-12">
                     <div class="story-share-block">
                         <?= StoryLikeWidget::widget(['storyId' => $model->id]) ?>
-                        <button class="btn-share" title="Поделиться" data-toggle="modal" data-target="#wikids-share-modal"><i class="glyphicon glyphicon-share"></i></button>
                         <?= StoryFavorites::widget(['storyId' => $model->id]) ?>
                     </div>
                 </div>
@@ -204,4 +203,3 @@ $isBookView = $storyDefaultView === 'book';
         <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" title="Нажмите, чтобы подняться на верх" data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span></a>
 	</main>
 </div>
-<?= \frontend\widgets\Share::widget(['story' => $model]) ?>

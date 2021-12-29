@@ -7,6 +7,7 @@ import WelcomePage from "./components/WelcomePage";
 import TestSpeech from "./components/TestSpeech";
 import AskQuestion from "./question/AskQuestion";
 import HistoryModel from "./model/HistoryModel";
+import WelcomeGuestPage from "./components/WelcomeGuestPage";
 
 export default class Testing {
 
@@ -30,47 +31,52 @@ export default class Testing {
         this.element = element;
         this.options = Object.assign({}, options);
 
+        this.numQuestions = 0;
+
         element['_wikids_test'] = this;
 
-        this.element.innerHTML = '';
-        const loader = new Loader();
-        this.element.innerHTML = loader.render().outerHTML;
+        this.renderLoader();
 
-        if (options['welcome'] && typeof options['welcome'] === 'function') {
-            options.welcome(this.welcome.bind(this), this.error.bind(this));
+        if (options['welcomeGuest'] && options.welcomeGuest === true) {
+            this.welcomeGuest();
+        }
+        else {
+            if (options['welcome'] && typeof options['welcome'] === 'function') {
+                options.welcome(this.welcome.bind(this), this.error.bind(this));
+            }
         }
     }
 
     error(params) {
         console.log(params);
-        this.element.innerHTML = '';
-        const errorPage = new ErrorPage();
-        this.element.innerHTML = errorPage.render().outerHTML;
+        this.element.innerHTML = new ErrorPage().render().outerHTML;
     }
 
     renderLoader() {
         this.element.innerHTML = new Loader().render().outerHTML;
     }
 
+    /**
+     *
+     * @param {WelcomeModel} model
+     * @param {?Number} studentId
+     */
     welcome(model, studentId) {
         console.log('welcome');
 
         this.element.innerHTML = '';
+
         const welcomePage = new WelcomePage(model);
-
         if (welcomePage.setActiveStudent(studentId)) {
-
             this.student = welcomePage.getActiveStudent();
             if (this.student && this.student.isDone()) {
                 this.student = null;
             }
-
             if (this.student) {
                 this.renderLoader();
                 this.options.initialize(this.initialize.bind(this), this.error.bind(this), this.student.getId());
             }
         }
-
         if (!this.student) {
             this.element.appendChild(welcomePage.render((activeStudent) => {
                 this.student = activeStudent;
@@ -78,6 +84,18 @@ export default class Testing {
                 this.options.initialize(this.initialize.bind(this), this.error.bind(this), activeStudent.getId());
             }));
         }
+    }
+
+    welcomeGuest() {
+        console.log('welcomeGuest');
+
+        this.element.innerHTML = '';
+
+        const welcomeGuestPage = new WelcomeGuestPage();
+        this.element.appendChild(welcomeGuestPage.render(() => {
+            this.renderLoader();
+            this.options.initialize(this.initialize.bind(this), this.error.bind(this));
+        }));
     }
 
     /**
@@ -89,6 +107,7 @@ export default class Testing {
         console.log('initialize');
         this.testConfig = testConfig;
         this.questions = questionsData.getQuestions();
+        this.numQuestions = this.questions.length;
         this.load();
     }
 
@@ -114,6 +133,13 @@ export default class Testing {
     }
 
     start() {
+
+        if (this.numQuestions === 0) {
+            this.dom.results.style.display = 'block';
+            this.dom.results.innerHTML = '<h2>В тесте нет вопросов</h2>';
+            return;
+        }
+
         this.showNextQuestion();
     }
 

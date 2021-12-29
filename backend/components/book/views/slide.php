@@ -1,7 +1,9 @@
 <?php
 use backend\components\BlockRenderer;
+use frontend\assets\MobileTestAsset;
 use yii\helpers\Html;
 /** @var $manager backend\components\book\SlideBlocks */
+MobileTestAsset::register($this);
 ?>
 <section>
 
@@ -48,15 +50,16 @@ use yii\helpers\Html;
         <?php foreach ($manager->htmltests as $test): ?>
             <?php if (!$test->isEmpty()): ?>
                 <div class="row">
-                    <div class="col-lg-12">
+                    <div class="col-md-12">
                         <h3><?= $test->header ?></h3>
                         <p><?= $test->description ?></p>
-                        <div class="row">
-                            <div class="col-lg-offset-3 col-lg-6">
-                                <div class="alert alert-success to-slides-tab noselect text-center">
-                                    <p>Прохождение теста доступно в режиме обуения</p>
-                                </div>
-                            </div>
+                        <div class="alert noselect text-center">
+                            <?= Html::tag('div', '', [
+                                'data-toggle' => 'mobile-testing',
+                                'class' => 'new-questions',
+                                'data-test-id' => $test->getTestID(),
+                                'data-guest-mode' => '1',
+                            ]) ?>
                         </div>
                     </div>
                 </div>
@@ -75,7 +78,7 @@ use yii\helpers\Html;
                         <div class="row">
                             <div class="col-lg-offset-3 col-lg-6">
                                 <div class="alert alert-success to-slides-tab noselect text-center">
-                                    <p>Прохождение теста доступно в режиме обуения</p>
+                                    <p>Прохождение теста доступно в режиме обучения</p>
                                 </div>
                             </div>
                         </div>

@@ -28,7 +28,7 @@ class TestMobileController extends BaseController
         ]);
     }
 
-    public function actionGetData(int $test_id, int $student_id = null)
+    public function actionGetData(int $test_id, int $student_id = null, bool $fast_mode = false)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
@@ -36,12 +36,10 @@ class TestMobileController extends BaseController
             throw new NotFoundHttpException('The requested page does not exist.');
         }
 
-        $fastMode = false;
-
         $userHistory = [];
         $userStars = [];
         $userStarsCount = 0;
-        if ($student_id !== null && !$fastMode) {
+        if ($student_id !== null && !$fast_mode) {
             $userQuestionHistoryModel = new UserQuestionHistoryModel();
             $userQuestionHistoryModel->student_id = $student_id;
             $userHistory = $userQuestionHistoryModel->getUserQuestionHistoryLocal($model->id);
@@ -49,10 +47,10 @@ class TestMobileController extends BaseController
             $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCountLocal($model->id);
         }
 
-        $collection = (new TestBuilder($model, $model->getQuestionData($userHistory), $model->getQuestionDataCount(), $userStars, $fastMode))
+        $collection = (new TestBuilder($model, $model->getQuestionData($userHistory), $model->getQuestionDataCount(), $userStars, $fast_mode))
             ->build();
         return (new Serializer())
-            ->serialize($model, $collection, [], $userStarsCount, $fastMode);
+            ->serialize($model, $collection, [], $userStarsCount, $fast_mode);
     }
 
     public function actionInit(int $test_id, int $user_id = null)
