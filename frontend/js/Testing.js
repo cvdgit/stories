@@ -259,10 +259,8 @@ export default class Testing {
 
         if (answerIsCorrect) {
             if (currentQuestionModel.lastAnswerIsCorrect()) {
-                let increased = this.currentQuestionComp.incStars();
-                if (increased) {
-                    this.testProgress.inc();
-                }
+                this.currentQuestionComp.incStars();
+                this.testProgress.inc();
             }
             else {
                 currentQuestionModel.setLastAnswersIsCorrect(true);
@@ -270,8 +268,10 @@ export default class Testing {
         }
         else {
             currentQuestionModel.setLastAnswersIsCorrect(false);
-            this.currentQuestionComp.decStars();
-            this.testProgress.dec();
+            let dec = this.currentQuestionComp.decStars();
+            if (dec) {
+                this.testProgress.dec();
+            }
         }
 
         this.testProgress.updateProgress();

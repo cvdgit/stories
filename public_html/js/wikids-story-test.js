@@ -1318,6 +1318,7 @@
             if (question.stars.number > this.starsTotal) {
                 question.stars.number = this.starsTotal;
                 increased = false;
+                console.log('falsesdsldslda')
             }
             return increased;
         };
@@ -2778,11 +2779,13 @@
                 }
             }
             else {
+                console.log('nnononon')
                 currentQuestion.lastAnswerIsCorrect = false;
                 if (currentQuestion['stars']) {
                     var increased = questionsRepeat.inc(currentQuestion);
                     if (increased) {
                         testProgress.dec();
+                        console.log('dec')
                     }
                 }
             }

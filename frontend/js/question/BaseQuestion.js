@@ -177,11 +177,11 @@ class BaseQuestion extends Question {
     }
 
     incStars() {
-        return this.userStars.inc();
+        this.userStars.inc();
     }
 
     decStars() {
-        this.userStars.dec();
+        return this.userStars.dec();
     }
 
     isDoneStars() {

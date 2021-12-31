@@ -16,6 +16,10 @@ class QuestionStars {
             `<div class="col-md-6 hints"></div>
              <div class="col-md-6 stars"></div>`;
 
+        if (this.repeat === 1) {
+            return starsElement;
+        }
+
         for (let i = 0, starElement, className; i < this.repeat; i++) {
             starElement = document.createElement('i');
             className = 'star-empty';
@@ -32,16 +36,19 @@ class QuestionStars {
 
     inc() {
         this.stars.incCurrent();
-        let increased = true;
         if (this.stars.getCurrent() > this.repeat) {
             this.stars.setCurrent(this.repeat);
-            increased = false;
         }
-        return increased;
     }
 
     dec() {
         this.stars.decCurrent();
+        let increased = true;
+        if (this.stars.getCurrent() < this.repeat) {
+            this.stars.setCurrent(0);
+            increased = false;
+        }
+        return increased;
     }
 
     isDone() {
