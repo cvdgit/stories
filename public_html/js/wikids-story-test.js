@@ -1318,7 +1318,6 @@
             if (question.stars.number > this.starsTotal) {
                 question.stars.number = this.starsTotal;
                 increased = false;
-                console.log('falsesdsldslda')
             }
             return increased;
         };
@@ -2389,7 +2388,6 @@
                 .empty()
                 .append("<h2>" + title + "</h2>");
             var linkedStories = linked.getHtml();
-            console.log(linkedStories);
             if (linkedStories.length) {
                 dom.results.append(linkedStories);
             }
@@ -2779,13 +2777,11 @@
                 }
             }
             else {
-                console.log('nnononon')
                 currentQuestion.lastAnswerIsCorrect = false;
                 if (currentQuestion['stars']) {
                     var increased = questionsRepeat.inc(currentQuestion);
                     if (increased) {
                         testProgress.dec();
-                        console.log('dec')
                     }
                 }
             }
