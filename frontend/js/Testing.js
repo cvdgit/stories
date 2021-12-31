@@ -8,6 +8,7 @@ import TestSpeech from "./components/TestSpeech";
 import AskQuestion from "./question/AskQuestion";
 import HistoryModel from "./model/HistoryModel";
 import WelcomeGuestPage from "./components/WelcomeGuestPage";
+import {isMobileDevice} from "./utils";
 
 export default class Testing {
 
@@ -32,6 +33,7 @@ export default class Testing {
         this.options = Object.assign({}, options);
 
         this.numQuestions = 0;
+        this.isMobile = isMobileDevice();
 
         element['_wikids_test'] = this;
 
@@ -130,6 +132,25 @@ export default class Testing {
 
         this.element.innerHTML = '';
         this.element.appendChild(this.dom.wrapper);
+
+        if (this.isMobile) {
+
+            const backdropElement = document.createElement('div');
+            backdropElement.classList.add('modal-backdrop');
+            backdropElement.classList.add('fade');
+            backdropElement.classList.add('in');
+            document.body.appendChild(backdropElement);
+
+            const parentNode = this.dom.wrapper.parentNode;
+            parentNode.classList.add('mobile-testing');
+            parentNode.addEventListener('click', (e) => {
+                if (e.target === e.currentTarget || e.target.closest('button.close')) {
+                    backdropElement.remove();
+                    parentNode.classList.remove('mobile-testing');
+                    this.welcomeGuest();
+                }
+            });
+        }
     }
 
     start() {
@@ -156,6 +177,13 @@ export default class Testing {
 
         this.dom.header = document.createElement('div');
         this.dom.header.classList.add('wikids-test-header');
+
+        if (this.isMobile) {
+            const mobileHeader = document.createElement('div');
+            mobileHeader.classList.add('clearfix');
+            mobileHeader.innerHTML = `<div style="height:50px"><button class="close"><span>×</span></button></div>`;
+            this.dom.header.appendChild(mobileHeader);
+        }
 
         if (this.student) {
             const studentElement = document.createElement('div');

@@ -5,6 +5,36 @@
   position: relative;
   /*min-height: 376px;*/
 
+  &.mobile-testing {
+    display: block;
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1050;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: auto;
+
+    .wikids-test {
+      background-color: #fff;
+      position: relative;
+      width: auto;
+      height: auto;
+      margin: 10px;
+      padding: 10px;
+      transition: transform 0.3s ease-out, -webkit-transform 0.3s ease-out, -o-transform 0.3s ease-out;
+
+      background-clip: padding-box;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 6px;
+      -webkit-box-shadow: 0 3px 9px rgb(0 0 0 / 50%);
+      box-shadow: 0 3px 9px rgb(0 0 0 / 50%);
+      outline: 0;
+    }
+  }
+
   .wikids-test-loader {
     text-align: center;
     display: table;
@@ -143,6 +173,18 @@
       padding: 10px;
       color: #000;
       cursor: pointer;
+    }
+  }
+
+  .wikids-test-header {
+    position: relative;
+
+    .close {
+      width: 42px;
+      height: 42px;
+      background-color: #f0f4f9;
+      border-radius: 50%;
+      opacity: 1;
     }
   }
 }
