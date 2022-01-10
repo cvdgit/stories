@@ -22,9 +22,10 @@ class BaseQuestion extends Question {
 
         const inputElement = document.createElement('input');
         let inputId = 'answer' + answer.getId();
-        const singleValue = true;
+        let singleValue = true;
         let type = 'radio';
         if (this.model.getCorrectAnswers().length > 1) {
+            singleValue = false;
             type = 'checkbox';
         }
         inputElement.setAttribute('type', type);
