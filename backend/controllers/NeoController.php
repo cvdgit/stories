@@ -4,14 +4,24 @@ namespace backend\controllers;
 
 use backend\models\NeoSlideRelations;
 use backend\models\NeoSlideRelationsForm;
+use backend\services\NeoQueryService;
 use common\models\StoryTest;
 use linslin\yii2\curl\Curl;
 use Yii;
 use yii\helpers\Json;
 use yii\rest\Controller;
+use yii\web\NotFoundHttpException;
 
 class NeoController extends Controller
 {
+
+    private $neoQueryService;
+
+    public function __construct($id, $module, NeoQueryService $neoQueryService, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->neoQueryService = $neoQueryService;
+    }
 
     protected function serviceCurl()
     {
@@ -163,4 +173,21 @@ class NeoController extends Controller
         return Json::decode($result);
     }
 
+    public function actionQuestionsView(int $test_id)
+    {
+        if (($model = StoryTest::findOne($test_id)) === null) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+        $questionId = $model->question_list_id;
+
+        $questionParams = null;
+        if ($model->question_params !== null) {
+            $questionParams = base64_encode($model->question_params);
+        }
+        $wrongAnswersParams = null;
+        if (!empty($model->wrong_answers_params)) {
+            $wrongAnswersParams = urlencode(base64_encode($model->wrong_answers_params));
+        }
+        return $this->neoQueryService->query($questionId, $questionParams, $wrongAnswersParams);
+    }
 }

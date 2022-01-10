@@ -35,6 +35,8 @@ use yii\helpers\Url;
     </div>
 </div>
 
+<?= $this->render('_neo_questions_modal', ['testId' => $model->id]) ?>
+
 <?php
 $testVariants = Json::encode($model->getChildrenTestsAsArray());
 $deleteUrl = Url::to(['test-variant/delete']);
@@ -52,8 +54,8 @@ $('#test-variants-table').on('click', '.update-test-variant', function(e) {
 });
 
 updateVariantModal.on('hide.bs.modal', function() {
-    $(this).removeData('bs.modal');
     $(this).find('.modal-content').html('');
+    $(this).removeData('bs.modal');
 });
 
 function showModal(element, remote) {

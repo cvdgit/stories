@@ -80,4 +80,8 @@ class UpdateForm extends BaseVariantModel
         $this->model->save();
     }
 
+    public function getModelId(): int
+    {
+        return $this->model->id;
+    }
 }

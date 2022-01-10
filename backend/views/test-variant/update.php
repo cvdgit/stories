@@ -30,10 +30,12 @@ use yii\widgets\ActiveForm;
         </div>
     </div>
     <div class="modal-footer">
+        <?= Html::a('Список вопросов', ['neo/questions-view', 'test_id' => $model->getModelId()], ['class' => 'btn btn-default', 'data-toggle' => 'modal', 'data-target' => '#neo-questions-modal']) ?>
         <?= Html::submitButton('Изменить вариант теста', ['class' => 'btn btn-success']) ?>
         <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
     </div>
 <?php ActiveForm::end(); ?>
+
 <?php
 $js = <<< JS
 $('#update-test-variant-form')
