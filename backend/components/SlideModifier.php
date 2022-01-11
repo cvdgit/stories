@@ -81,8 +81,13 @@ class SlideModifier
             if (BlockType::isHtml($block)) {
                 /** @var HTMLBLock $block */
                 $content = TestBlockContent::createFromHtml($block->getContent());
-                $testModel = StoryTest::findModel($content->getTestID());
-                $block->setContent($content->render([], $testModel->title));
+                try {
+                    $testModel = StoryTest::findModel($content->getTestID());
+                    $block->setContent($content->render([], $testModel->title));
+                }
+                catch (\Exception $ex) {
+                    $block->setContent($content->render([], $ex->getMessage()));
+                }
             }
             if (BlockType::isVideo($block) || BlockType::isVideoFile($block)) {
                 /** @var VideoBlock $block */
