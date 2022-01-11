@@ -39,15 +39,13 @@ export default class AskQuestion extends BaseQuestion {
         const titleElement = document.createElement('p');
         titleElement.classList.add('question-title');
         if (this.options.hideQuestionName) {
-            if (this.options.askQuestion) {
-                titleElement.appendChild(this.renderReadQuestion());
-            }
-            else {
-                titleElement.innerHTML = '';
-            }
+            titleElement.innerHTML = '';
         }
         else {
             titleElement.innerHTML = this.createQuestionName();
+        }
+        if (this.options.askQuestion) {
+            titleElement.appendChild(this.renderReadQuestion());
         }
         return titleElement;
     }
