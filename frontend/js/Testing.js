@@ -40,7 +40,9 @@ export default class Testing {
 
         this.renderLoader();
 
-        if (options['welcomeGuest'] && options.welcomeGuest === true) {
+        options['welcomeGuest'] = options['welcomeGuest'] || false;
+
+        if (options.welcomeGuest) {
             this.welcomeGuest();
         }
         else {
@@ -135,7 +137,7 @@ export default class Testing {
         this.element.innerHTML = '';
         this.element.appendChild(this.dom.wrapper);
 
-        if (this.isMobile) {
+        if (this.isMobile && this.options.welcomeGuest) {
 
             const backdropElement = document.createElement('div');
             backdropElement.classList.add('modal-backdrop');
