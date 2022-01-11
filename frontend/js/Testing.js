@@ -9,6 +9,7 @@ import AskQuestion from "./question/AskQuestion";
 import HistoryModel from "./model/HistoryModel";
 import WelcomeGuestPage from "./components/WelcomeGuestPage";
 import {isMobileDevice} from "./utils";
+import NeoBaseQuestion from "./question/NeoBaseQuestion";
 
 export default class Testing {
 
@@ -126,6 +127,7 @@ export default class Testing {
 
     load() {
         this.makeTestQuestions();
+
         this.setupDOM();
         this.addEventListeners();
         this.start();
@@ -386,14 +388,18 @@ export default class Testing {
         switch (question.getType()) {
             case 0:
             case 1:
-                if (this.testConfig.isAskQuestion()) {
-                    questionComp = new AskQuestion(question, options);
-                    const speech = this.getSpeechSynth();
-                    speech.setVoice(this.testConfig.getAskQuestionLang());
-                    questionComp.setSpeech(speech);
+                if (this.testConfig.sourceIsNeo()) {
+                    questionComp = new NeoBaseQuestion(question, options);
                 }
                 else {
-                    questionComp = new BaseQuestion(question, options);
+                    if (this.testConfig.isAskQuestion()) {
+                        questionComp = new AskQuestion(question, options);
+                        const speech = this.getSpeechSynth();
+                        speech.setVoice(this.testConfig.getAskQuestionLang());
+                        questionComp.setSpeech(speech);
+                    } else {
+                        questionComp = new BaseQuestion(question, options);
+                    }
                 }
                 break;
         }

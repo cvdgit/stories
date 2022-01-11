@@ -1,5 +1,7 @@
 import ProgressModel from "./ProgressModel";
 
+const SOURCE_NEO = 2;
+
 class TestModel {
 
     constructor(data) {
@@ -45,6 +47,10 @@ class TestModel {
 
     getSource() {
         return parseInt(this.data.source);
+    }
+
+    sourceIsNeo() {
+        return this.getSource() === SOURCE_NEO;
     }
 }
 

@@ -3,6 +3,7 @@ import Testing from './Testing';
 import TestModel from "./model/TestModel";
 import QuestionsData from "./model/QuestionsData";
 import WelcomeModel from "./model/WelcomeModel";
+import NeoQuestionsData from "./model/NeoQuestionsData";
 
 const elements = document.querySelectorAll("[data-toggle='mobile-testing']");
 elements.forEach((element) => {
@@ -24,7 +25,16 @@ elements.forEach((element) => {
                 .then(response => response.json())
                 .then(data => {
                     const testConfig = new TestModel(data[0]['test']);
-                    const questionsData = new QuestionsData(data[0]['storyTestQuestions'], 'storyTestAnswers');
+                    let questionsData;
+                    const modelMap = {
+                        'default': QuestionsData,
+                        'neo': NeoQuestionsData
+                    }
+                    let modelClassName = modelMap.default;
+                    if (testConfig.sourceIsNeo()) {
+                        modelClassName = modelMap.neo;
+                    }
+                    questionsData = new modelClassName(data[0]['storyTestQuestions'], 'storyTestAnswers');
                     initCallback(testConfig, questionsData);
                 })
                 .catch(error => errorCallback(error));

@@ -204,53 +204,6 @@ class EditorController extends BaseController
         ]);
     }
 
-    /*public function actionCreateBlock(int $slide_id, string $block_type)
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-
-        $types = [
-            AbstractBlock::TYPE_BUTTON => [
-                'class' => ButtonBlock::class,
-            ],
-            AbstractBlock::TYPE_TRANSITION => [
-                'class' => TransitionBlock::class,
-            ],
-            AbstractBlock::TYPE_TEXT => [
-                'class' => TextBlock::class,
-            ],
-            AbstractBlock::TYPE_TEST => [
-                'class' => TestBlock::class,
-            ],
-            AbstractBlock::TYPE_VIDEO => [
-                'class' => VideoBlock::class,
-            ],
-            AbstractBlock::TYPE_IMAGE => [
-                'class' => ImageBlock::class,
-            ],
-            AbstractBlock::TYPE_VIDEOFILE => [
-                'class' => VideoFileBlock::class,
-            ],
-        ];
-        if (!isset($types[$block_type])) {
-            throw new DomainException($block_type . ' - Unknown block type');
-        }
-
-        $model = StorySlide::findSlide($slide_id);
-        $slide = (new HtmlSlideReader($model->data))->load();
-        $block = $slide->createBlock($types[$block_type]);
-        $slide->addBlock($block);
-
-        if ($block_type === AbstractBlock::TYPE_VIDEO) {
-            Story::updateVideo($model->story_id, 1);
-        }
-
-        $html = (new HTMLWriter())->renderSlide($slide);
-        $model->data = $html;
-        $model->save(false, ['data']);
-
-        return ['success' => true, 'block_id' => $block->getId()];
-    }*/
-
     public function actionCreateSlideLink()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
@@ -267,48 +220,6 @@ class EditorController extends BaseController
         }
         return $response;
     }
-
-    /*public function actionCreateSlideQuestion(int $story_id, int $question_id, int $current_slide_id = -1)
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        try {
-            $slideID = $this->editorService->createSlideQuestion($story_id, $question_id, $current_slide_id);
-        }
-        catch (Exception $ex) {
-            return ['success' => false, 'error' => $ex->getMessage()];
-        }
-        return ['success' => true, 'id' => $slideID];
-    }*/
-
-    /*public function actionNewCreateSlideQuestion(int $story_id, int $id, $question_params = null)
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $test = StoryTest::findModel($id);
-        $params = [
-            'test-id' => $test->id,
-        ];
-        if ($question_params !== null) {
-            $params['question_params'] = base64_encode($question_params);
-        }
-        try {
-            $slideID = $this->editorService->newCreateSlideQuestion($story_id, $params);
-            $this->storyLinksService->createTestLink($story_id, $test->id);
-        }
-        catch (Exception $ex) {
-            return ['success' => false, 'error' => $ex->getMessage(), 'id' => $slideID];
-        }
-        return ['success' => true, 'id' => $slideID];
-    }*/
-
-    /*public function actionDeleteBlock(int $slide_id, string $block_id)
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        try {
-            $this->editorService->deleteBlock($slide_id, $block_id);
-        }
-        catch (Exception $ex) {}
-        return ['success' => true];
-    }*/
 
     public function actionSlides(int $story_id)
     {

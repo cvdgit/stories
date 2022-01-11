@@ -43,4 +43,9 @@ class SourceType
     {
         return (int) $storyTest->source === self::TEST;
     }
+
+    public static function isNeo(StoryTest $storyTest): bool
+    {
+        return (int) $storyTest->source === self::NEO;
+    }
 }
