@@ -182,7 +182,7 @@ export default class Testing {
         this.dom.header = document.createElement('div');
         this.dom.header.classList.add('wikids-test-header');
 
-        if (this.isMobile) {
+        if (this.isMobile && this.options.welcomeGuest) {
             const mobileHeader = document.createElement('div');
             mobileHeader.classList.add('clearfix');
             mobileHeader.innerHTML = `<div style="height:50px"><button class="close"><span>×</span></button></div>`;
