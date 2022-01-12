@@ -45,6 +45,7 @@ export default class TestSpeech {
         else {
             voiceMapItem = voiceMap[0];
         }
+        console.log(voiceMapItem);
 
         const foundVoice = [];
         for (let i = 0; i < voices.length; i++) {
