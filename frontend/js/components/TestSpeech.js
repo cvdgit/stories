@@ -31,11 +31,11 @@ export default class TestSpeech {
     findVoice(voices, voiceName) {
 
         const voiceMap = [
-            {name: 'Google русский', lang: 'ru-RU'},
-            {name: 'Microsoft Irina Desktop - Russian', lang: 'ru-RU'},
-            {name: 'Google US English', lang: 'en-US'},
-            {name: 'Microsoft Zira Desktop - English (United States)', lang: 'en-US'},
-            {name: 'Microsoft David Desktop - English (United States)', lang: 'en-US'}
+            {name: 'Google русский', lang: 'ru-RU', lang2: 'ru_RU'},
+            {name: 'Microsoft Irina Desktop - Russian', lang: 'ru-RU', lang2: 'ru_RU'},
+            {name: 'Google US English', lang: 'en-US', lang2: 'en_US'},
+            {name: 'Microsoft Zira Desktop - English (United States)', lang: 'en-US', lang2: 'en_US'},
+            {name: 'Microsoft David Desktop - English (United States)', lang: 'en-US', lang2: 'en_US'}
         ];
 
         let voiceMapItem = voiceMap.filter(item => item.name === voiceName);
@@ -50,7 +50,7 @@ export default class TestSpeech {
 
         const foundVoices = [];
         for (let i = 0; i < voices.length; i++) {
-            if (voices[i].lang === voiceMapItem.lang) {
+            if (voices[i].lang === voiceMapItem.lang || voices[i].lang === voiceMapItem.lang2) {
                 foundVoices.push(voices[i]);
             }
         }
