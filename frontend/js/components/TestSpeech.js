@@ -28,6 +28,52 @@ export default class TestSpeech {
         });
     }
 
+    findVoice(voices, voiceName) {
+
+        const voiceMap = [
+            {name: 'Google русский', lang: 'ru-RU'},
+            {name: 'Microsoft Irina Desktop - Russian', lang: 'ru-RU'},
+            {name: 'Google US English', lang: 'en-US'},
+            {name: 'Microsoft Zira Desktop - English (United States)', lang: 'en-US'},
+            {name: 'Microsoft David Desktop - English (United States)', lang: 'en-US'}
+        ];
+
+        let voiceMapItem = voiceMap.filter(item => item.name === voiceName);
+        if (voiceMapItem.length > 0) {
+            voiceMapItem = voiceMapItem[0];
+        }
+        else {
+            voiceMapItem = voiceMap[0];
+        }
+
+        const foundVoice = [];
+        for (let i = 0; i < voices.length; i++) {
+            if (voices[i].lang === voiceMapItem.lang) {
+                foundVoice.push(voices[i]);
+            }
+        }
+
+        if (foundVoice.length === 0) {
+            return;
+        }
+
+        if (foundVoice.length === 1) {
+            return foundVoice[0];
+        }
+
+        let voice;
+        foundVoice.forEach(foundVoice => {
+            if (foundVoice.default) {
+                voice = foundVoice;
+            }
+        });
+        if (voice) {
+            return voice;
+        }
+
+        return foundVoice[0];
+    }
+
     read(voices, text, onEnd) {
 
         const utterance = new SpeechSynthesisUtterance(text);
@@ -36,12 +82,8 @@ export default class TestSpeech {
             utterance[key] = value;
         }
 
-        for (let i = 0; i < voices.length; i++) {
-            if (voices[i].name === this.voice) {
-                utterance.voice = voices[i];
-                break;
-            }
-        }
+        utterance.voice = this.findVoice(voices, this.voice);
+        console.log(utterance.voice)
 
         if (typeof onEnd === 'function') {
             utterance.onend = onEnd;
