@@ -44,7 +44,7 @@ class QuestionStars {
     dec() {
         this.stars.decCurrent();
         let increased = true;
-        if (this.stars.getCurrent() < this.repeat) {
+        if (this.stars.getCurrent() < 0) {
             this.stars.setCurrent(0);
             increased = false;
         }

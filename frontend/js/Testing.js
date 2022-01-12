@@ -117,6 +117,7 @@ export default class Testing {
     }
 
     makeTestQuestions() {
+        //console.log('makeTestQuestions');
         let end = false;
         let max = this.testConfig.getRepeatQuestions();
         while (!end && this.testQuestions.length < max) {
@@ -268,6 +269,10 @@ export default class Testing {
             }
             else {
                 currentQuestionModel.setLastAnswersIsCorrect(true);
+                if (this.testConfig.getRepeatQuestions() === 1) {
+                    this.currentQuestionComp.incStars();
+                    this.testProgress.inc();
+                }
             }
         }
         else {
