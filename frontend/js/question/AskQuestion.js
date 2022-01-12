@@ -6,8 +6,8 @@ export default class AskQuestion extends BaseQuestion {
         //const event = new MouseEvent('click');
         //this.element.querySelector('.ask-question').dispatchEvent(event);
         const element = this.element.querySelector('.ask-question');
-        const i = element.querySelector('i');
-        this.speakQuestion(i);
+        element.click();
+        //this.speakQuestion(i);
     }
 
     onHideQuestion() {
