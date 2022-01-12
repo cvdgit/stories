@@ -16,7 +16,7 @@ use yii\helpers\Html;
                 <h3 style="margin-top:0"><?= Html::a($model->title, $model->getStoryUrl()) ?></h3>
                 <?php foreach($model->tests as $test): ?>
                     <div style="margin-bottom: 10px">
-                        <?php if (SourceType::isTest($test)): ?>
+                        <?php if (SourceType::isForMobile($test)): ?>
                         <p>
                             <?= Html::a('<i class="glyphicon glyphicon-phone"></i> Мобильная версия', ['test-mobile/view', 'id' => $test->id, 'student_id' => $student->id]) ?>
                         </p>

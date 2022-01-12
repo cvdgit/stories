@@ -48,4 +48,9 @@ class SourceType
     {
         return (int) $storyTest->source === self::NEO;
     }
+
+    public static function isForMobile(StoryTest $storyTest): bool
+    {
+        return (int) $storyTest->source === self::TEST || (int) $storyTest->source === self::NEO;
+    }
 }
