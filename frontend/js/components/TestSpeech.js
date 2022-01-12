@@ -46,24 +46,27 @@ export default class TestSpeech {
             voiceMapItem = voiceMap[0];
         }
         console.log(voiceMapItem);
+        console.log(voices);
 
-        const foundVoice = [];
+        const foundVoices = [];
         for (let i = 0; i < voices.length; i++) {
             if (voices[i].lang === voiceMapItem.lang) {
-                foundVoice.push(voices[i]);
+                foundVoices.push(voices[i]);
             }
         }
 
-        if (foundVoice.length === 0) {
+        console.log(foundVoices);
+
+        if (foundVoices.length === 0) {
             return;
         }
 
-        if (foundVoice.length === 1) {
-            return foundVoice[0];
+        if (foundVoices.length === 1) {
+            return foundVoices[0];
         }
 
         let voice;
-        foundVoice.forEach(foundVoice => {
+        foundVoices.forEach(foundVoice => {
             if (foundVoice.default) {
                 voice = foundVoice;
             }
@@ -72,7 +75,7 @@ export default class TestSpeech {
             return voice;
         }
 
-        return foundVoice[0];
+        return foundVoices[0];
     }
 
     read(voices, text, onEnd) {
