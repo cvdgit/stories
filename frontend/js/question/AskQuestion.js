@@ -3,11 +3,9 @@ import BaseQuestion from "./BaseQuestion";
 export default class AskQuestion extends BaseQuestion {
 
     onShowQuestion() {
-        //const event = new MouseEvent('click');
-        //this.element.querySelector('.ask-question').dispatchEvent(event);
         const element = this.element.querySelector('.ask-question');
-        element.click();
-        //this.speakQuestion(i);
+        const i = element.querySelector('i');
+        this.speakQuestion(i);
     }
 
     onHideQuestion() {
@@ -20,13 +18,11 @@ export default class AskQuestion extends BaseQuestion {
 
     speakQuestion(element) {
         if (element.dataset.processing === '1') {
-            console.log('busy');
             return false;
         }
         element.dataset.processing = '1';
         element.classList.replace('glyphicon-volume-up', 'glyphicon-option-horizontal');
         this.speech.readText(this.model.getName(), () => {
-            console.log('readText');
             element.classList.replace('glyphicon-option-horizontal', 'glyphicon-volume-up');
             element.dataset.processing = null;
         });
