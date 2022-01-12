@@ -311,7 +311,9 @@ export default class Testing {
             if (this.testConfig.sourceIsNeo()) {
                 historyModel
                     .setQuestionTopicId(currentQuestionModel.getTopicId())
-                    .setQuestionTopicName(currentQuestionModel.getName());
+                    .setQuestionTopicName(currentQuestionModel.getName())
+                    .setRelationId(currentQuestionModel.getRelationId())
+                    .setRelationName(currentQuestionModel.getRelationName());
             }
             userAnswers.map(answerId => {
                 const answer = currentQuestionModel.getAnswerById(parseInt(answerId));

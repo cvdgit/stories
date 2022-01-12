@@ -103,4 +103,17 @@ export default class HistoryModel {
         this.#setDataValue('question_topic_name', value);
         return this;
     }
+
+    setRelationId(value) {
+        if (!Number.isInteger(value)) {
+            throw 'HistoryModel.relation_id value is not integer';
+        }
+        this.#setDataValue('relation_id', value);
+        return this;
+    }
+
+    setRelationName(value) {
+        this.#setDataValue('relation_name', value);
+        return this;
+    }
 }
