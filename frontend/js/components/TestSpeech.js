@@ -60,7 +60,7 @@ export default class TestSpeech {
         setTimeout(() => {
             console.log('speechSynthesis.speak')
             speechSynthesis.speak(utterance);
-        }, 50);
+        }, 100);
     }
 
     readText(text, onEnd) {
