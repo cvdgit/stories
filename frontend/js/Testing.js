@@ -78,8 +78,15 @@ export default class Testing {
                 this.student = null;
             }
             if (this.student) {
-                this.renderLoader();
-                this.options.initialize(this.initialize.bind(this), this.error.bind(this), this.student.getId());
+
+                const welcomeGuestPage = new WelcomeGuestPage();
+                this.element.appendChild(welcomeGuestPage.render(() => {
+                    this.renderLoader();
+                    this.options.initialize(this.initialize.bind(this), this.error.bind(this), this.student.getId());
+                }));
+
+                //this.renderLoader();
+                //this.options.initialize(this.initialize.bind(this), this.error.bind(this), this.student.getId());
             }
         }
         if (!this.student) {
