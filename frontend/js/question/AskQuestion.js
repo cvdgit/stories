@@ -26,6 +26,7 @@ export default class AskQuestion extends BaseQuestion {
         element.dataset.processing = '1';
         element.classList.replace('glyphicon-volume-up', 'glyphicon-option-horizontal');
         this.speech.readText(this.model.getName(), () => {
+            console.log('readText');
             element.classList.replace('glyphicon-option-horizontal', 'glyphicon-volume-up');
             element.dataset.processing = null;
         });

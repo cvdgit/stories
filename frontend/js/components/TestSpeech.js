@@ -17,18 +17,22 @@ export default class TestSpeech {
     }
 
     getSpeech() {
+        console.log('getSpeech')
         return new Promise(function(resolve, reject) {
             let handle;
             handle = setInterval(function() {
+                console.log('speechSynthesis.getVoices()')
                 if (speechSynthesis.getVoices().length > 0) {
                     resolve(speechSynthesis.getVoices());
                     clearInterval(handle);
+                    console.log('speechSynthesis.getVoices() - done')
                 }
             }, 50);
         });
     }
 
     read(voices, text, onEnd) {
+        console.log('read');
 
         const utterance = new SpeechSynthesisUtterance(text);
 
@@ -54,6 +58,7 @@ export default class TestSpeech {
 
     readText(text, onEnd) {
         if (this.voices.length > 0) {
+            console.log('this.voices.length = 0')
             this.read(this.voices, text, onEnd);
         }
         else {
