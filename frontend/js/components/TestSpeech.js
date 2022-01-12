@@ -51,6 +51,10 @@ export default class TestSpeech {
             utterance.onend = onEnd;
         }
 
+        utterance.onerror = (event) => {
+            console.log('An error has occurred with the speech synthesis: ' + event.error);
+        }
+
         setTimeout(() => {
             console.log('speechSynthesis.speak')
             speechSynthesis.speak(utterance);
@@ -59,7 +63,7 @@ export default class TestSpeech {
 
     readText(text, onEnd) {
         if (this.voices.length > 0) {
-            console.log('this.voices.length = 0')
+            console.log('this.voices.length > 0')
             this.read(this.voices, text, onEnd);
         }
         else {
