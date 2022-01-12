@@ -3,8 +3,11 @@ import BaseQuestion from "./BaseQuestion";
 export default class AskQuestion extends BaseQuestion {
 
     onShowQuestion() {
-        const event = new MouseEvent('click');
-        this.element.querySelector('.ask-question').dispatchEvent(event);
+        //const event = new MouseEvent('click');
+        //this.element.querySelector('.ask-question').dispatchEvent(event);
+        const element = this.element.querySelector('.ask-question');
+        const i = element.querySelector('i');
+        this.speakQuestion(i);
     }
 
     onHideQuestion() {
@@ -15,6 +18,19 @@ export default class AskQuestion extends BaseQuestion {
         this.speech = speech;
     }
 
+    speakQuestion(element) {
+        if (element.dataset.processing === '1') {
+            console.log('busy');
+            return false;
+        }
+        element.dataset.processing = '1';
+        element.classList.replace('glyphicon-volume-up', 'glyphicon-option-horizontal');
+        this.speech.readText(this.model.getName(), () => {
+            element.classList.replace('glyphicon-option-horizontal', 'glyphicon-volume-up');
+            element.dataset.processing = null;
+        });
+    }
+
     renderReadQuestion() {
         const element = document.createElement('div');
         element.classList.add('ask-question');
@@ -22,15 +38,7 @@ export default class AskQuestion extends BaseQuestion {
         element.innerHTML = '<i class="glyphicon glyphicon-volume-up"></i>';
         element.addEventListener('click', (e) => {
             const i = e.target.querySelector('i');
-            if (i.dataset.processing === '1') {
-                return false;
-            }
-            i.dataset.processing = '1';
-            i.classList.replace('glyphicon-volume-up', 'glyphicon-option-horizontal');
-            this.speech.readText(this.model.getName(), () => {
-                i.classList.replace('glyphicon-option-horizontal', 'glyphicon-volume-up');
-                i.dataset.processing = null;
-            });
+            this.speakQuestion(i);
         });
         return element;
     }
