@@ -308,6 +308,11 @@ export default class Testing {
                 .setCorrectAnswer(answerIsCorrect)
                 .setProgress(this.testProgress.calcPercent())
                 .setStars(this.currentQuestionComp.getCurrentStars());
+            if (this.testConfig.sourceIsNeo()) {
+                historyModel
+                    .setQuestionTopicId(currentQuestionModel.getTopicId())
+                    .setQuestionTopicName(currentQuestionModel.getName());
+            }
             userAnswers.map(answerId => {
                 const answer = currentQuestionModel.getAnswerById(parseInt(answerId));
                 historyModel.addAnswer(answer.getId(), answer.getName());

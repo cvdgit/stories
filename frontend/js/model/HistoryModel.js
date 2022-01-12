@@ -90,4 +90,17 @@ export default class HistoryModel {
     asQueryString() {
         return objectToQueryString(this.data);
     }
+
+    setQuestionTopicId(value) {
+        if (!Number.isInteger(value)) {
+            throw 'HistoryModel.question_topic_id value is not integer';
+        }
+        this.#setDataValue('question_topic_id', value);
+        return this;
+    }
+
+    setQuestionTopicName(value) {
+        this.#setDataValue('question_topic_name', value);
+        return this;
+    }
 }
