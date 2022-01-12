@@ -52,7 +52,9 @@ export default class TestSpeech {
         }
 
         utterance.onerror = (event) => {
-            console.log('An error has occurred with the speech synthesis: ' + event.error);
+            if (typeof onEnd === 'function') {
+                onEnd();
+            }
         }
 
         setTimeout(() => {
