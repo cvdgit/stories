@@ -41,7 +41,7 @@ export default class TestSpeech {
         }
 
         for (let i = 0; i < voices.length; i++) {
-            if (voices[i].name === 'русский Россия' /*this.voice*/) {
+            if (voices[i].name === this.voice) {
                 utterance.voice = voices[i];
                 break;
             }
