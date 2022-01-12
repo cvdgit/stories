@@ -52,6 +52,7 @@ export default class TestSpeech {
         }
 
         setTimeout(() => {
+            console.log('speechSynthesis.speak')
             speechSynthesis.speak(utterance);
         }, 50);
     }
@@ -64,6 +65,7 @@ export default class TestSpeech {
         else {
             this.getSpeech().then((voices) => {
                 this.voices = voices;
+                console.log(voices);
                 this.read(voices, text, onEnd);
             });
         }
