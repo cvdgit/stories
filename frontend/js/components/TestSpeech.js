@@ -86,8 +86,11 @@ export default class TestSpeech {
             utterance[key] = value;
         }
 
-        utterance.voice = this.findVoice(voices, this.voice);
-        console.log(utterance.voice)
+        const voice = this.findVoice(voices, this.voice);
+        utterance.voice = voice;
+        utterance.lang = voice.lang;
+        utterance.voiceURI = voice.voiceURI;
+        console.log(utterance.voice);
 
         if (typeof onEnd === 'function') {
             utterance.onend = onEnd;
