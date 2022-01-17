@@ -31,7 +31,7 @@ var lazy = $(".lazy").Lazy({
     scrollDirection: "vertical",
     effect: "fadeIn",
     visibleOnly: true,
-    chainable: false
+    chainable: true
 });
 
 if ($("#story_wrapper").is(":visible")) {
