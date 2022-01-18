@@ -38,9 +38,16 @@ class Story extends ActiveRecord
             ->orderBy(['number' => SORT_ASC]);
     }
 
-    public function extraFields()
+    public function getAllSlides(): \yii\db\ActiveQuery
     {
-        return ['slides'];
+        return $this
+            ->hasMany(StorySlide::class, ['story_id' => 'id'])
+            ->orderBy(['number' => SORT_ASC]);
+    }
+
+    public function extraFields(): array
+    {
+        return ['slides', 'allSlides'];
     }
 
     public function getCategories(): \yii\db\ActiveQuery
