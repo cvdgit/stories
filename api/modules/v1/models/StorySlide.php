@@ -34,6 +34,7 @@ class StorySlide extends ActiveRecord
                 $slideData = str_replace($search, $replace, $slideData);
                 return (new SlideModifier($this->id, $slideData))
                     ->addImageUrl()
+                    ->addVideoUrl()
                     ->render();
             },
             'images' => function() {

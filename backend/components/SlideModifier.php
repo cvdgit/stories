@@ -10,6 +10,7 @@ use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\Slide;
 use backend\components\story\TestBlockContent;
 use backend\components\story\VideoBlock;
+use backend\components\story\VideoFileBlock;
 use backend\components\story\writer\HTMLWriter;
 use backend\models\video\VideoSource;
 use common\models\SlideVideo;
@@ -109,5 +110,20 @@ class SlideModifier
     public function render(): string
     {
         return (new HTMLWriter())->renderSlide($this->slide);
+    }
+
+    public function addVideoUrl(): self
+    {
+        foreach ($this->slide->getBlocks() as $block) {
+            if ($block->getType() === AbstractBlock::TYPE_VIDEOFILE) {
+                /** @var $block VideoFileBlock */
+                $path = $block->getVideoId();
+                if (empty($path)) {
+                    continue;
+                }
+                $block->setVideoId('https://wikids.ru' . $path);
+            }
+        }
+        return $this;
     }
 }
