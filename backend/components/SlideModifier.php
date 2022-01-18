@@ -115,13 +115,15 @@ class SlideModifier
     public function addVideoUrl(): self
     {
         foreach ($this->slide->getBlocks() as $block) {
-            if ($block->getType() === AbstractBlock::TYPE_VIDEOFILE) {
-                /** @var $block VideoFileBlock */
-                $path = $block->getVideoId();
-                if (empty($path)) {
-                    continue;
+            if (($block->getType() === AbstractBlock::TYPE_VIDEO || $block->getType() === AbstractBlock::TYPE_VIDEOFILE)) {
+                /** @var $block VideoBlock */
+                if ($block->getSource() === VideoSource::FILE) {
+                    $path = $block->getVideoId();
+                    if (empty($path)) {
+                        continue;
+                    }
+                    $block->setVideoId('https://wikids.ru' . $path);
                 }
-                $block->setVideoId('https://wikids.ru' . $path);
             }
         }
         return $this;
