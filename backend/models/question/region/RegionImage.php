@@ -2,6 +2,7 @@
 
 namespace backend\models\question\region;
 
+use common\helpers\Url;
 use common\models\StoryTestQuestion;
 use Yii;
 
@@ -35,7 +36,7 @@ class RegionImage
         if (empty($this->model->image)) {
             return '';
         }
-        return $this->getImagesPath(false) . $this->model->image;
+        return Url::homeUrl() . $this->getImagesPath(false) . $this->model->image;
     }
 
     public function getOrigImageUrl(): string
@@ -43,7 +44,7 @@ class RegionImage
         if (empty($this->model->image)) {
             return '';
         }
-        return $this->getImagesPath(false) . str_replace('thumb_', '', $this->model->image);
+        return Url::homeUrl() . $this->getImagesPath(false) . str_replace('thumb_', '', $this->model->image);
     }
 
     public function getImagePath(): string

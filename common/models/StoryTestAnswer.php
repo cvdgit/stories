@@ -2,8 +2,10 @@
 
 namespace common\models;
 
+use common\helpers\Url;
 use DomainException;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\FileHelper;
@@ -30,7 +32,7 @@ class StoryTestAnswer extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'story_test_answer';
     }
@@ -38,20 +40,19 @@ class StoryTestAnswer extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['name'], 'required'],
             [['order', 'is_correct'], 'integer'],
             [['name', 'image', 'description'], 'string', 'max' => 255],
-            //[['story_question_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTestQuestion::class, 'targetAttribute' => ['story_question_id' => 'id']],
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -63,10 +64,7 @@ class StoryTestAnswer extends ActiveRecord
         ];
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStoryQuestion()
+    public function getStoryQuestion(): ActiveQuery
     {
         return $this->hasOne(StoryTestQuestion::class, ['id' => 'story_question_id']);
     }
@@ -79,7 +77,7 @@ class StoryTestAnswer extends ActiveRecord
         throw new DomainException('Ответ не найден');
     }
 
-    public function answerIsCorrect()
+    public function answerIsCorrect(): bool
     {
         return (int)$this->is_correct === self::CORRECT_ANSWER;
     }
@@ -108,7 +106,7 @@ class StoryTestAnswer extends ActiveRecord
         return $model;
     }
 
-    public static function createFromRegion(int $questionID, string $name, int $isCorrect, string $regionID)
+    public static function createFromRegion(int $questionID, string $name, int $isCorrect, string $regionID): int
     {
         $model = self::create($questionID, $name, $isCorrect);
         $model->region_id = $regionID;
@@ -116,7 +114,7 @@ class StoryTestAnswer extends ActiveRecord
         return $model->id;
     }
 
-    public function haveImage()
+    public function haveImage(): bool
     {
         return !empty($this->image);
     }
@@ -129,6 +127,14 @@ class StoryTestAnswer extends ActiveRecord
         return '/test_images/' . $this->image;
     }
 
+    public function getImageUrl(): string
+    {
+        if (($path = $this->getImagePath()) !== '') {
+            return Url::homeUrl() . $path;
+        }
+        return '';
+    }
+
     public function getOrigImagePath(): string
     {
         if ($this->image === null) {
@@ -137,7 +143,15 @@ class StoryTestAnswer extends ActiveRecord
         return '/test_images/' . str_replace('thumb_', '', $this->image);
     }
 
-    public function getImagesPath()
+    public function getOrigImageUrl(): string
+    {
+        if (($path = $this->getOrigImagePath()) !== '') {
+            return Url::homeUrl() . $path;
+        }
+        return '';
+    }
+
+    public function getImagesPath(): string
     {
         return Yii::getAlias('@public') . '/test_images/';
     }
@@ -162,7 +176,7 @@ class StoryTestAnswer extends ActiveRecord
                 ->from(self::tableName())
                 ->where('story_question_id = :id', [':id' => $questionID])
                 ->max('`order`');
-            $order = 1 + $max;
+            $order = 1 + (int)$max;
         }
         return self::create($questionID, $name, true, $order);
     }
