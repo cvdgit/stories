@@ -24,7 +24,7 @@ class UserHelper
         $query = (new Query())
             ->select([
                 'userid' => 't.user_id',
-                'username' => 'IF(t3.first_name IS NULL, t2.email, CONCAT(t3.last_name, " ", t3.first_name))'
+                'username' => 'IF(t3.first_name IS NULL, t2.username, CONCAT(t3.last_name, " ", t3.first_name))'
             ])
             ->distinct()
             ->from(['t' => Story::tableName()])
