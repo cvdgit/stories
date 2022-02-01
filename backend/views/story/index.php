@@ -69,7 +69,7 @@ $columns = [
     [
         'attribute' => 'user_id',
         'value' => 'author.username',
-        'filter' => UserHelper::getUserArray(),
+        'filter' => UserHelper::getStoryAuthorArray(),
     ],
     [
         'attribute' => 'story_categories',

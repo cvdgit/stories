@@ -2,6 +2,8 @@
 
 namespace common\helpers;
 
+use api\modules\v1\models\Story;
+use common\models\Profile;
 use common\models\StoryTest;
 use common\models\UserStudent;
 use Yii;
@@ -15,6 +17,21 @@ class UserHelper
     public static function getUserArray()
     {
         return ArrayHelper::map(User::find()->all(), 'id', 'username');
+    }
+
+    public static function getStoryAuthorArray(): array
+    {
+        $query = (new Query())
+            ->select([
+                'userid' => 't.user_id',
+                'username' => 'IF(t3.first_name IS NULL, t2.email, CONCAT(t3.last_name, " ", t3.first_name))'
+            ])
+            ->distinct()
+            ->from(['t' => Story::tableName()])
+            ->innerJoin(['t2' => User::tableName()], 't.user_id = t2.id')
+            ->leftJoin(['t3' => Profile::tableName()], 't.user_id = t3.user_id')
+            ->orderBy(['username' => SORT_ASC]);
+        return ArrayHelper::map($query->all(), 'userid', 'username');
     }
 
     public static function getTestCreatorsUserArray(): array
