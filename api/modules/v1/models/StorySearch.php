@@ -29,7 +29,11 @@ class StorySearch extends Model
         $query->joinWith(['categories']);
 
         $dataProvider = new ActiveDataProvider([
-            'query' => $query
+            'query' => $query,
+            'sort' => [
+                'defaultOrder' => ['published_at' => SORT_DESC],
+            ],
+            'pagination' => false,
         ]);
 
         $this->load($params, '');
