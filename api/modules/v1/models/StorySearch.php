@@ -2,6 +2,7 @@
 
 namespace api\modules\v1\models;
 
+use common\models\story\StoryStatus;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -27,6 +28,7 @@ class StorySearch extends Model
     {
         $query = Story::find();
         $query->joinWith(['categories']);
+        $query->andWhere(['{{%story}}.status' => StoryStatus::PUBLISHED]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

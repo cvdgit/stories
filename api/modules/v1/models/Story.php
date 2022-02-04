@@ -61,7 +61,9 @@ class Story extends ActiveRecord
                     $url = Url::homeUrl() . '/slides_cover/list/' . $this->cover;
                 }
                 return $url;
-            }
+            },
+            'description',
+            'published_at',
         ];
     }
 
