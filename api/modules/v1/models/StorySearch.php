@@ -27,7 +27,7 @@ class StorySearch extends Model
     public function search($params): ActiveDataProvider
     {
         $query = Story::find();
-        $query->joinWith(['categories']);
+        $query->joinWith(['categories', 'author']);
         $query->andWhere(['{{%story}}.status' => StoryStatus::PUBLISHED]);
 
         $dataProvider = new ActiveDataProvider([

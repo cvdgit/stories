@@ -4,6 +4,8 @@ namespace api\modules\v1\models;
 
 use common\helpers\Url;
 use common\models\Category;
+use common\models\User;
+use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -47,6 +49,11 @@ class Story extends ActiveRecord
         return '{{%story}}';
     }
 
+    public function getAuthor(): ActiveQuery
+    {
+        return $this->hasOne(User::class, ['id' => 'user_id']);
+    }
+
     /**
      * @inheritdoc
      */
@@ -63,7 +70,12 @@ class Story extends ActiveRecord
                 return $url;
             },
             'description',
-            'published_at',
+            'published' => function() {
+                return Yii::$app->formatter->asDate($this->published_at);
+            },
+            'author' => function() {
+                return $this->author->getProfileName();
+            }
         ];
     }
 
