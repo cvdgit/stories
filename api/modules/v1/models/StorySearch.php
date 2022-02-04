@@ -10,16 +10,20 @@ class StorySearch extends Model
 
     public $title;
     public $category_id;
+    public $story_list_id;
 
-    public function rules()
+    /**
+     * @inheritdoc
+     */
+    public function rules(): array
     {
         return [
             ['title', 'safe'],
-            ['category_id', 'integer'],
+            [['category_id', 'story_list_id'], 'integer'],
         ];
     }
 
-    public function search($params)
+    public function search($params): ActiveDataProvider
     {
         $query = Story::find();
         $query->joinWith(['categories']);
@@ -34,6 +38,15 @@ class StorySearch extends Model
         }
 
         $query->andFilterWhere(['like', 'title', $this->title]);
+
+        if (!empty($this->story_list_id)) {
+            if (($listModel = StoryList::findOne($this->story_list_id)) !== null) {
+                $query->andFilterWhere(['in', 'category.id', $listModel->getCategoryIds()]);
+            }
+            else {
+                $query->andWhere('1 = 0');
+            }
+        }
 
         if (!empty($this->category_id)) {
             $query->andFilterWhere(['in', 'category.id', explode(',', $this->category_id)]);

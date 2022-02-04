@@ -116,7 +116,8 @@ class Category extends ActiveRecord
      */
     public function getStories()
     {
-        return $this->hasMany(Story::class, ['id' => 'story_id'])->viaTable('story_category', ['category_id' => 'id']);
+        return $this->hasMany(Story::class, ['id' => 'story_id'])
+            ->viaTable('story_category', ['category_id' => 'id']);
     }
 
     public static function createAlias(string $name): string

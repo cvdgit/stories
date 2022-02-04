@@ -52,6 +52,14 @@ return [
                     ],
                     'only' => ['view'],
                 ],
+                [
+                    'class' => yii\rest\UrlRule::class,
+                    'controller' => 'v1/story-list',
+                    'tokens' => [
+                        '{id}' => '<id:\w+>'
+                    ],
+                    'only' => ['index'],
+                ],
             ]
         ]
     ],
