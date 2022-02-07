@@ -58,4 +58,9 @@ class StoryStatus extends BaseStatus
     {
         return $this->status === self::FOR_PUBLICATION;
     }
+
+    public function statusIisTask(): bool
+    {
+        return $this->status === self::TASK;
+    }
 }

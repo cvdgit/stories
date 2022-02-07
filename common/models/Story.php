@@ -633,7 +633,8 @@ class Story extends ActiveRecord
         $model->user_id = $userID;
         $model->source_id = self::SOURCE_POWERPOINT;
         $model->status = StoryStatus::TASK;
-        $model->story_categories = '60';
+        $model->story_categories = Yii::$app->params['tasks.category.id'];
+        $model->categories = [Yii::$app->params['tasks.category.id']];
         return $model;
     }
 

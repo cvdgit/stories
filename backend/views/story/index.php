@@ -40,6 +40,12 @@ $this->title = 'Управление историями';
             'url' => ['story/index', 'status' => StoryStatus::FOR_PUBLICATION],
             'active' => $status->isForPublication(),
         ],
+        [
+            'label' => 'Задания',
+            'url' => ['story/index', 'status' => StoryStatus::TASK],
+            'active' => $status->statusIisTask(),
+            'visible' => Yii::$app->user->can(common\rbac\UserRoles::ROLE_TEACHER),
+        ],
     ],
 ]) ?>
 <?php
