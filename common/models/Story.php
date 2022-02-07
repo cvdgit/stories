@@ -385,7 +385,7 @@ class Story extends ActiveRecord
         return $slides;
     }
 
-    /*public function getStorySlidesWidgetSelected(): array
+    public function getStorySlidesWidgetSelected(): array
     {
         $slides = $this->getStorySlides()
             ->with('story')
@@ -398,7 +398,7 @@ class Story extends ActiveRecord
             }
         }
         return $slides;
-    }*/
+    }
 
     public static function modifySlides(array $models): array
     {

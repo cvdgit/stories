@@ -58,6 +58,7 @@ $this->registerCss($css);
     <?php endif ?>
 </fieldset>
 <?php
+$className = substr(strrchr(get_class($model), '\\'), 1);
 $js = <<< JS
 function onSaveSlides(selected, modal) {
 
@@ -70,10 +71,11 @@ function onSaveSlides(selected, modal) {
             .appendTo(list);
     }
 
+    var modelName = '$className';
     selected.forEach(function(slideID) {
         list.append($('<input/>', {
             'type': 'hidden',
-            'name': 'CreateStudyTaskForm[slide_ids][]',
+            'name': modelName + '[slide_ids][]',
             'value': slideID
         }));
     });
