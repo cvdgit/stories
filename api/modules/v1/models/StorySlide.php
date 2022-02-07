@@ -6,6 +6,7 @@ use backend\components\SlideModifier;
 use backend\components\story\AbstractBlock;
 use backend\components\story\reader\HtmlSlideReader;
 use common\helpers\Url;
+use common\models\slide\SlideKind;
 use yii\db\ActiveRecord;
 
 class StorySlide extends ActiveRecord
@@ -22,7 +23,12 @@ class StorySlide extends ActiveRecord
             'id',
             'number',
             'data' => function() {
+
                 $slideData = $this->data;
+                if (SlideKind::isLink($this)) {
+                    $slideData = StorySlide::findOne($this->link_slide_id)->data;
+                }
+
                 $search = [
                     'data-id=""',
                     'data-background-color="#000000"',
