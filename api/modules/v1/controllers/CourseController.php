@@ -22,6 +22,7 @@ class CourseController extends Controller
             ->one();
 
         $lessons = [];
+        $items = [];
         foreach ($course->slides as $slide) {
 
             $slideData = $slide->data;
@@ -39,20 +40,23 @@ class CourseController extends Controller
             ];
             $slideData = str_replace($search, $replace, $slideData);
 
-            $items = (new SlideModifier($slide->id, $slideData))
+            $slideItems = (new SlideModifier($slide->id, $slideData))
                 ->addImageUrl()
                 ->forLesson();
-
-            if (count($items) > 0) {
-                $lesson = [
-                    'id' => $slide->id,
-                    'title' => 'Слайд #' . $slide->id,
-                    'type' => 'blocks',
-                    'items' => $items,
-                ];
-                $lessons[] = $lesson;
+            if (count($slideItems) > 0) {
+                foreach ($slideItems as $item) {
+                    $items[] = $item;
+                }
             }
         }
+
+        $lesson = [
+            'id' => 1,
+            'title' => 'Раздел 1',
+            'type' => 'blocks',
+            'items' => $items,
+        ];
+        $lessons[] = $lesson;
 
         return ['course' => [
             'title' => $course->title,
