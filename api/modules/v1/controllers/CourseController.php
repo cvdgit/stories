@@ -39,16 +39,19 @@ class CourseController extends Controller
             ];
             $slideData = str_replace($search, $replace, $slideData);
 
-            $lesson = [
-                'id' => $slide->id,
-                'title' => 'Слайд #' . $slide->id,
-                'type' => 'blocks',
-                'items' => (new SlideModifier($slide->id, $slideData))
-                    ->addImageUrl()
-                    ->forLesson(),
-            ];
+            $items = (new SlideModifier($slide->id, $slideData))
+                ->addImageUrl()
+                ->forLesson();
 
-            $lessons[] = $lesson;
+            if (count($items) > 0) {
+                $lesson = [
+                    'id' => $slide->id,
+                    'title' => 'Слайд #' . $slide->id,
+                    'type' => 'blocks',
+                    'items' => $items,
+                ];
+                $lessons[] = $lesson;
+            }
         }
 
         return ['course' => [
