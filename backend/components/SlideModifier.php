@@ -9,10 +9,12 @@ use backend\components\story\ImageBlock;
 use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\Slide;
 use backend\components\story\TestBlockContent;
+use backend\components\story\TextBlock;
 use backend\components\story\VideoBlock;
 use backend\components\story\VideoFileBlock;
 use backend\components\story\writer\HTMLWriter;
 use backend\models\video\VideoSource;
+use common\helpers\Url;
 use common\models\SlideVideo;
 use common\models\StorySlideImage;
 use common\models\StoryTest;
@@ -51,7 +53,7 @@ class SlideModifier
                 /** @var $block ImageBlock */
                 $path = $block->getFilePath();
                 if (strpos($path, '://') === false) {
-                    $path = 'https://wikids.ru' . $path;
+                    $path = Url::homeUrl() . $path;
                 }
                 $block->setFilePath($path);
             }
@@ -127,5 +129,91 @@ class SlideModifier
             }
         }
         return $this;
+    }
+
+    public function forLesson(): array
+    {
+        $textBlocks = [];
+        $imageBlocks = [];
+        foreach ($this->slide->getBlocks() as $slideBlock) {
+            if (BlockType::isText($slideBlock)) {
+                /** @var $slideBlock TextBlock */
+                $textBlocks[] = $slideBlock;
+            }
+            if (BlockType::isImage($slideBlock)) {
+                /** @var $slideBlock ImageBlock */
+                $imageBlocks[] = $slideBlock;
+            }
+        }
+
+        $blocks = [];
+
+        if (count($textBlocks) === 1 && count($imageBlocks) === 1) {
+            $textBlock = $textBlocks[0];
+            $imageBlock = $imageBlocks[0];
+            $items = [
+                [
+                    'id' => $imageBlock->getId(),
+                    'image' => [
+                        'url' => $imageBlock->getFilePath(),
+                    ],
+                    'caption' => '',
+                    'paragraph' => trim($textBlock->getText()),
+                ],
+            ];
+            $block = [
+                'id' => $imageBlock->getId(),
+                'type' => 'image',
+                'items' => $items,
+                'layout' => 'text-aside',
+                'settings' => [
+                    'imagePosition' => 'left',
+                ],
+            ];
+            $blocks[] = $block;
+        }
+        else {
+            foreach ($this->slide->getBlocks() as $slideBlock) {
+                $block = null;
+                if (BlockType::isText($slideBlock)) {
+                    /** @var $slideBlock TextBlock */
+                    $items = [
+                        [
+                            'id' => $slideBlock->getId(),
+                            'paragraph' => trim($slideBlock->getText()),
+                        ],
+                    ];
+                    $block = [
+                        'id' => $slideBlock->getId(),
+                        'type' => 'text',
+                        'items' => $items,
+                    ];
+                }
+                if (BlockType::isImage($slideBlock)) {
+                    /** @var $slideBlock ImageBlock */
+                    $items = [
+                        [
+                            'id' => $slideBlock->getId(),
+                            'image' => [
+                                'url' => $slideBlock->getFilePath(),
+                            ],
+                            'layout' => 'image',
+                            'caption' => '',
+                            'paragraph' => '',
+                        ],
+                    ];
+                    $block = [
+                        'id' => $slideBlock->getId(),
+                        'type' => 'image',
+                        'items' => $items,
+                    ];
+                }
+                if ($block !== null) {
+                    $blocks[] = $block;
+                }
+            }
+        }
+
+        return $blocks;
     }
 }

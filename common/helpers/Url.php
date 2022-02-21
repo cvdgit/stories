@@ -14,9 +14,10 @@ class Url extends \yii\helpers\Url
         return (($controller->id === $default_controller) && ($controller->action->id === $controller->defaultAction));
     }
 
-    public static function homeUrl()
+    public static function homeUrl(): string
     {
-        return 'https://' . Yii::$app->request->serverName;
+        $port = Yii::$app->request->serverPort;
+        return 'https://' . Yii::$app->request->serverName . ($port && $port !== 80 ? ':' . $port : '');
     }
 
     public static function getServerUrl(): string

@@ -41,6 +41,13 @@ return [
             'rules' => [
                 [
                     'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/course',
+                    'tokens' => [
+                        '{id}' => '<id:\w+>'
+                    ],
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/story',
                     'tokens' => [
                         '{id}' => '<id:\w+>'

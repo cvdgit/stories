@@ -29,4 +29,14 @@ class BlockType
     {
         return $block->getType() === self::TYPE_VIDEOFILE;
     }
+
+    public static function isText(AbstractBlock $block): bool
+    {
+        return $block->getType() === self::TYPE_TEXT;
+    }
+
+    public static function isImage(AbstractBlock $block): bool
+    {
+        return $block->getType() === self::TYPE_IMAGE;
+    }
 }
