@@ -47,7 +47,17 @@ class CourseController extends Controller
                 foreach ($slideItems as $item) {
                     $items[] = $item;
                 }
+                $items[] = [
+                    'id' => 1,
+                    'type' => 'divider',
+                    'items' => [],
+                ];
             }
+        }
+
+        $lastItem = end($items);
+        if ($lastItem['type'] === 'divider') {
+            array_pop($items);
         }
 
         $lesson = [
