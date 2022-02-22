@@ -17,7 +17,7 @@ class CourseController extends Controller
         $this->response->format = Response::FORMAT_JSON;
 
         $course = Story::find()
-            ->with('slides')
+            ->with('allSlides')
             ->where(['id' => $id])
             ->one();
 
@@ -26,7 +26,7 @@ class CourseController extends Controller
         $lessonIndex = 1;
         $currentLesson = null;
 
-        $slides = $course->slides;
+        $slides = $course->allSlides;
         foreach ($slides as $slide) {
 
             $slideData = $slide->data;
@@ -48,7 +48,8 @@ class CourseController extends Controller
                 ->addImageUrl()
                 ->forLesson();
 
-            if (($currentLesson !== null && SlideKind::isQuiz($slide)) || !next($slides)) {
+            $end = next($slides) === false;
+            if (($currentLesson !== null && SlideKind::isQuiz($slide)) || $end) {
                 $lessons[] = $currentLesson;
                 $currentLesson = null;
                 $lessonIndex++;
@@ -75,18 +76,12 @@ class CourseController extends Controller
             }
         }
 
-/*        $lastItem = end($items);
-        if ($lastItem['type'] === 'divider') {
-            array_pop($items);
+        foreach ($lessons as $key => $value) {
+            $lastItem = end($value['items']);
+            if ($lastItem['type'] === 'divider') {
+                array_pop($lessons[$key]['items']);
+            }
         }
-
-        $lesson = [
-            'id' => 1,
-            'title' => 'Раздел 1',
-            'type' => 'blocks',
-            'items' => $items,
-        ];
-        $lessons[] = $lesson;*/
 
         return ['course' => [
             'title' => $course->title,
