@@ -60,14 +60,14 @@ class CourseController extends Controller
             if (SlideKind::isQuiz($slide) && count($slideItems) > 0) {
                 $quizItem = $slideItems[0];
                 $currentLesson = [
-                    'id' => $lessonIndex,
+                    'id' => $quizItem['id'],
                     'title' => $quizItem['title'],
+                    'description' => $quizItem['description'],
                     'type' => 'quiz',
                     'items' => [],
                 ];
                 $lessons[] = $currentLesson;
                 $currentLesson = null;
-                $lessonIndex++;
             }
             else {
 
