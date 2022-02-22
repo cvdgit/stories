@@ -62,32 +62,34 @@ class CourseController extends Controller
                 $currentLesson = [
                     'id' => $lessonIndex,
                     'title' => $quizItem['title'],
-                    'type' => 'blocks',
+                    'type' => 'quiz',
                     'items' => [],
                 ];
                 $lessons[] = $currentLesson;
                 $currentLesson = null;
                 $lessonIndex++;
             }
+            else {
 
-            if ($currentLesson === null) {
-                $currentLesson = [
-                    'id' => $lessonIndex,
-                    'title' => "Раздел $lessonIndex",
-                    'type' => 'blocks',
-                    'items' => [],
-                ];
-            }
-
-            if (count($slideItems) > 0) {
-                foreach ($slideItems as $item) {
-                    $currentLesson['items'][] = $item;
+                if ($currentLesson === null) {
+                    $currentLesson = [
+                        'id' => $lessonIndex,
+                        'title' => "Раздел $lessonIndex",
+                        'type' => 'blocks',
+                        'items' => [],
+                    ];
                 }
-                $currentLesson['items'][] = [
-                    'id' => 1,
-                    'type' => 'divider',
-                    'items' => [],
-                ];
+
+                if (count($slideItems) > 0) {
+                    foreach ($slideItems as $item) {
+                        $currentLesson['items'][] = $item;
+                    }
+                    $currentLesson['items'][] = [
+                        'id' => 1,
+                        'type' => 'divider',
+                        'items' => [],
+                    ];
+                }
             }
         }
 
