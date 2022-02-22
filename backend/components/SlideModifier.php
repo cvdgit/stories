@@ -167,7 +167,7 @@ class SlideModifier
                 'items' => $items,
                 'layout' => 'text-aside',
                 'settings' => [
-                    'imagePosition' => 'left',
+                    'imagePosition' => 'right',
                 ],
             ];
             $blocks[] = $block;
