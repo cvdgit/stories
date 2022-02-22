@@ -22,8 +22,12 @@ class CourseController extends Controller
             ->one();
 
         $lessons = [];
-        $items = [];
-        foreach ($course->slides as $slide) {
+
+        $lessonIndex = 1;
+        $currentLesson = null;
+
+        $slides = $course->slides;
+        foreach ($slides as $slide) {
 
             $slideData = $slide->data;
             if (SlideKind::isLink($slide)) {
@@ -43,11 +47,27 @@ class CourseController extends Controller
             $slideItems = (new SlideModifier($slide->id, $slideData))
                 ->addImageUrl()
                 ->forLesson();
+
+            if (($currentLesson !== null && SlideKind::isQuiz($slide)) || !next($slides)) {
+                $lessons[] = $currentLesson;
+                $currentLesson = null;
+                $lessonIndex++;
+            }
+
+            if ($currentLesson === null) {
+                $currentLesson = [
+                    'id' => $lessonIndex,
+                    'title' => "Раздел $lessonIndex",
+                    'type' => 'blocks',
+                    'items' => [],
+                ];
+            }
+
             if (count($slideItems) > 0) {
                 foreach ($slideItems as $item) {
-                    $items[] = $item;
+                    $currentLesson['items'][] = $item;
                 }
-                $items[] = [
+                $currentLesson['items'][] = [
                     'id' => 1,
                     'type' => 'divider',
                     'items' => [],
@@ -55,7 +75,7 @@ class CourseController extends Controller
             }
         }
 
-        $lastItem = end($items);
+/*        $lastItem = end($items);
         if ($lastItem['type'] === 'divider') {
             array_pop($items);
         }
@@ -66,7 +86,7 @@ class CourseController extends Controller
             'type' => 'blocks',
             'items' => $items,
         ];
-        $lessons[] = $lesson;
+        $lessons[] = $lesson;*/
 
         return ['course' => [
             'title' => $course->title,

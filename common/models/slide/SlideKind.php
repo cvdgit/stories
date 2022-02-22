@@ -14,4 +14,9 @@ class SlideKind
     {
         return (int)$slide->kind === self::LINK;
     }
+
+    public static function isQuiz($slide): bool
+    {
+        return (int)$slide->kind === self::QUESTION;
+    }
 }
