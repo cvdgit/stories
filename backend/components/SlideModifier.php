@@ -135,6 +135,7 @@ class SlideModifier
     {
         $textBlocks = [];
         $imageBlocks = [];
+        $quizBlocks = [];
         foreach ($this->slide->getBlocks() as $slideBlock) {
             if (BlockType::isText($slideBlock)) {
                 /** @var $slideBlock TextBlock */
@@ -143,6 +144,10 @@ class SlideModifier
             if (BlockType::isImage($slideBlock)) {
                 /** @var $slideBlock ImageBlock */
                 $imageBlocks[] = $slideBlock;
+            }
+            if (BlockType::isHtml($slideBlock)) {
+                /** @var HTMLBLock $slideBlock */
+                $quizBlocks[] = $slideBlock;
             }
         }
 
@@ -173,43 +178,59 @@ class SlideModifier
             $blocks[] = $block;
         }
         else {
-            foreach ($this->slide->getBlocks() as $slideBlock) {
-                $block = null;
-                if (BlockType::isText($slideBlock)) {
-                    /** @var $slideBlock TextBlock */
-                    $items = [
-                        [
-                            'id' => $slideBlock->getId(),
-                            'paragraph' => trim($slideBlock->getText()),
-                        ],
-                    ];
-                    $block = [
-                        'id' => $slideBlock->getId(),
-                        'type' => 'text',
-                        'items' => $items,
-                    ];
-                }
-                if (BlockType::isImage($slideBlock)) {
-                    /** @var $slideBlock ImageBlock */
-                    $items = [
-                        [
-                            'id' => $slideBlock->getId(),
-                            'image' => [
-                                'url' => $slideBlock->getFilePath(),
+
+            if (count($quizBlocks) > 0) {
+                $content = TestBlockContent::createFromHtml($quizBlocks[0]->getContent());
+                $testModel = StoryTest::findModel($content->getTestID());
+                $block = [
+                    'id' => $content->getTestID(),
+                    'type' => 'quiz',
+                    'title' => $testModel->title,
+                    'description' => $testModel->description_text,
+                    'items' => [],
+                ];
+                $blocks[] = $block;
+            }
+            else {
+
+                foreach ($this->slide->getBlocks() as $slideBlock) {
+                    $block = null;
+                    if (BlockType::isText($slideBlock)) {
+                        /** @var $slideBlock TextBlock */
+                        $items = [
+                            [
+                                'id' => $slideBlock->getId(),
+                                'paragraph' => trim($slideBlock->getText()),
                             ],
-                            'layout' => 'image',
-                            'caption' => '',
-                            'paragraph' => '',
-                        ],
-                    ];
-                    $block = [
-                        'id' => $slideBlock->getId(),
-                        'type' => 'image',
-                        'items' => $items,
-                    ];
-                }
-                if ($block !== null) {
-                    $blocks[] = $block;
+                        ];
+                        $block = [
+                            'id' => $slideBlock->getId(),
+                            'type' => 'text',
+                            'items' => $items,
+                        ];
+                    }
+                    if (BlockType::isImage($slideBlock)) {
+                        /** @var $slideBlock ImageBlock */
+                        $items = [
+                            [
+                                'id' => $slideBlock->getId(),
+                                'image' => [
+                                    'url' => $slideBlock->getFilePath(),
+                                ],
+                                'layout' => 'image',
+                                'caption' => '',
+                                'paragraph' => '',
+                            ],
+                        ];
+                        $block = [
+                            'id' => $slideBlock->getId(),
+                            'type' => 'image',
+                            'items' => $items,
+                        ];
+                    }
+                    if ($block !== null) {
+                        $blocks[] = $block;
+                    }
                 }
             }
         }
