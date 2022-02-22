@@ -50,7 +50,7 @@ class CourseController extends Controller
 
             $end = next($slides) === false;
             if (($currentLesson !== null && SlideKind::isQuiz($slide)) || $end) {
-                if (count($currentLesson['items']) > 0) {
+                if ($currentLesson && count($currentLesson['items']) > 0) {
                     $lessons[] = $currentLesson;
                 }
                 $currentLesson = null;
