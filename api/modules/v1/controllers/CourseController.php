@@ -6,11 +6,22 @@ use api\modules\v1\models\Story;
 use api\modules\v1\models\StorySlide;
 use backend\components\SlideModifier;
 use common\models\slide\SlideKind;
+use common\models\StoryTest;
+use common\services\QuizService;
 use yii\rest\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class CourseController extends Controller
 {
+
+    private $quizService;
+
+    public function __construct($id, $module, QuizService $quizService, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->quizService = $quizService;
+    }
 
     public function actionView(int $id)
     {
@@ -64,7 +75,13 @@ class CourseController extends Controller
                     'title' => $quizItem['title'],
                     'description' => $quizItem['description'],
                     'type' => 'quiz',
-                    'items' => [],
+                    'items' => [
+                        [
+                            'id' => $quizItem['id'],
+                            'type' => 'quiz',
+                            'items' => $this->getQuizData($quizItem['id']),
+                        ],
+                    ],
                 ];
                 $lessons[] = $currentLesson;
                 $currentLesson = null;
@@ -105,5 +122,22 @@ class CourseController extends Controller
             'id' => $course->id,
             'lessons' => $lessons,
         ]];
+    }
+
+    private function getQuizData(int $quizId): array
+    {
+        $quizModel = $this->findTestModel($quizId);
+        return $this->quizService->getQuizData($quizModel);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    private function findTestModel(int $id): ?StoryTest
+    {
+        if (($model = StoryTest::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('The requested page does not exist.');
     }
 }
