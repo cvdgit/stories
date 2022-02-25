@@ -15,6 +15,10 @@ $css = <<<CSS
     border: solid red 1px !important;
     z-index: 1 !important;
 }
+.media:hover {
+    background-color: #f5f5f5;
+    user-select: none;
+}
 CSS;
 $this->registerCss($css);
 ?>
@@ -28,7 +32,7 @@ $this->registerCss($css);
     <?php else: ?>
     <div id="manage-slides-list">
         <?php foreach($models as $model): ?>
-        <div class="media" data-story-id="<?= $model->id ?>">
+        <div class="media" data-story-id="<?= $model->id ?>" data-episod="<?= $model->episode ?>">
             <div class="media-left">
                 <?= Html::img(StoryCover::getListThumbPath($model->cover), [
                     'class' => 'media-object',
@@ -38,7 +42,9 @@ $this->registerCss($css);
             </div>
             <div class="media-body">
                 <h4 class="media-heading"><?= Html::encode($model->title) ?></h4>
-                <p></p>
+                <?php if (!$model->isPublished()): ?>
+                <p class="text-right"><small><?= \common\models\story\StoryStatus::asText($model->status) ?></small></p>
+                <?php endif ?>
             </div>
         </div>
         <?php endforeach ?>
@@ -55,14 +61,14 @@ $js = <<<JS
     'use strict';
 
     Sortable.create($('#manage-slides-list')[0], {
-        handle: '.media-left',
+        handle: '.media',
         multiDrag: true,
         selectedClass: 'selected'
     });
     
     $('#save-story-order').on('click', function() {
-        var button = $(this);
-            button.button('loading');
+        //var button = $(this);
+        //button.button('loading');
         var formData = new FormData();
         var order = 1;
         $('#manage-slides-list [data-story-id]').each(function() {
@@ -90,7 +96,7 @@ $js = <<<JS
             toastr.error(response.responseJSON.type, response.responseJSON.message);
         })
         .always(function() {
-            button.button('reset');
+            //button.button('reset');
             $('#manage-stories-modal').modal('hide');
         });
     });

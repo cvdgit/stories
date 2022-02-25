@@ -34,7 +34,6 @@ class StorySearch extends Model
             [['created_at', 'updated_at', 'published_at'], 'safe'],
             ['category_id', 'string'],
             ['status', 'in', 'range' => StoryStatus::all()],
-            ['status', 'default', 'value' => StoryStatus::DRAFT],
         ];
     }
 
