@@ -119,6 +119,7 @@ class CourseController extends Controller
 
         return ['course' => [
             'title' => $course->title,
+            'description' => $course->description,
             'id' => $course->id,
             'lessons' => $lessons,
         ]];

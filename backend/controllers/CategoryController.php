@@ -156,7 +156,7 @@ class CategoryController extends BaseController
         $searchModel->setPageSize(false);
         if (!empty($categoryModel->sort_field)) {
             $searchModel->defaultSortField = $categoryModel->sort_field;
-            $searchModel->defaultSortOrder = !empty($categoryModel->sort_order) ? $categoryModel->sort_order : SORT_ASC;;
+            $searchModel->defaultSortOrder = !empty($categoryModel->sort_order) ? $categoryModel->sort_order : SORT_ASC;
         }
         $searchModel->category_id = implode(',', $categoryModel->subCategories());
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
