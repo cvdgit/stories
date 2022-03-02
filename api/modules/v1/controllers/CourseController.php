@@ -35,6 +35,7 @@ class CourseController extends Controller
         $lessons = [];
 
         $lessonIndex = 1;
+        $dividerIndex = 1;
         $currentLesson = null;
 
         $slides = $course->allSlides;
@@ -102,7 +103,7 @@ class CourseController extends Controller
                         $currentLesson['items'][] = $item;
                     }
                     $currentLesson['items'][] = [
-                        'id' => 1,
+                        'id' => $dividerIndex++,
                         'type' => 'divider',
                         'items' => [],
                     ];
