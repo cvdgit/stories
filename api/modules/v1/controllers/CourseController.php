@@ -81,6 +81,9 @@ class CourseController extends Controller
                             'id' => $quizItem['id'],
                             'type' => 'quiz',
                             'items' => $this->getQuizData($quizItem['id']),
+                            'settings' => [
+                                'passToContinue' => false,
+                            ],
                         ],
                     ],
                 ];
@@ -118,7 +121,7 @@ class CourseController extends Controller
             }
         }
 
-        if (count($lessons) > 0) {
+/*        if (count($lessons) > 0) {
             $lessons[] = [
                 'id' => $lessonIndex,
                 'title' => 'Конец',
@@ -136,7 +139,7 @@ class CourseController extends Controller
                     ],
                 ],
             ];
-        }
+        }*/
 
         return ['course' => [
             'title' => $course->title,
