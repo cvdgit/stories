@@ -118,6 +118,26 @@ class CourseController extends Controller
             }
         }
 
+        if (count($lessons) > 0) {
+            $lessons[] = [
+                'id' => $lessonIndex,
+                'title' => 'Конец',
+                'type' => 'blocks',
+                'items' => [
+                    [
+                        'id' => $lessonIndex,
+                        'type' => 'text',
+                        'items' => [
+                            [
+                                'id' => $lessonIndex,
+                                'paragraph' => 'Курс пройден',
+                            ]
+                        ],
+                    ],
+                ],
+            ];
+        }
+
         return ['course' => [
             'title' => $course->title,
             'description' => $course->description,
