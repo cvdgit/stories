@@ -58,6 +58,7 @@ class CourseController extends Controller
 
             $slideItems = (new SlideModifier($slide->id, $slideData))
                 ->addImageUrl()
+                ->addVideoUrl()
                 ->forLesson();
 
             $end = next($slides) === false;

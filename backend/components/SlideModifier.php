@@ -136,6 +136,7 @@ class SlideModifier
         $textBlocks = [];
         $imageBlocks = [];
         $quizBlocks = [];
+        $videoBlocks = [];
         foreach ($this->slide->getBlocks() as $slideBlock) {
             if (BlockType::isText($slideBlock)) {
                 /** @var $slideBlock TextBlock */
@@ -146,13 +147,16 @@ class SlideModifier
                 $imageBlocks[] = $slideBlock;
             }
             if (BlockType::isHtml($slideBlock)) {
-                /** @var HTMLBLock $slideBlock */
+                /** @var $slideBlock HTMLBLock */
                 $quizBlocks[] = $slideBlock;
+            }
+            if (BlockType::isVideo($slideBlock) || BlockType::isVideoFile($slideBlock)) {
+                /** @var $slideBlock VideoBlock */
+                $videoBlocks[] = $slideBlock;
             }
         }
 
         $blocks = [];
-
         if (count($textBlocks) === 1 && count($imageBlocks) === 1) {
             $textBlock = $textBlocks[0];
             $imageBlock = $imageBlocks[0];
@@ -186,6 +190,29 @@ class SlideModifier
                     'id' => $content->getTestID(),
                     'title' => $testModel->title,
                     'description' => $testModel->description_text,
+                ];
+                $blocks[] = $block;
+            }
+            else if (count($videoBlocks) > 0) {
+                $videoBlock = $videoBlocks[0];
+                $block = [
+                    'id' => $videoBlock->getId(),
+                    'type' => 'multimedia',
+                    'items' => [
+                        [
+                            'video' => [
+                                'url' => $videoBlock->getVideoId(),
+                                'video_id' => $videoBlock->getVideoId(),
+                                'seek_to' => (double)$videoBlock->getSeekTo(),
+                                'duration' => (int)$videoBlock->getDuration(),
+                                'mute' => (int)$videoBlock->isMute() === 1,
+                                'speed' => (int)$videoBlock->getSpeed(),
+                                'volume' => (int)$videoBlock->getVolume(),
+                                'source' => $videoBlock->getSource(),
+                            ],
+                        ],
+                    ],
+                    'layout' => 'video',
                 ];
                 $blocks[] = $block;
             }
