@@ -207,7 +207,7 @@ class SlideModifier
                                 'duration' => (int)$videoBlock->getDuration(),
                                 'mute' => (int)$videoBlock->isMute() === 1,
                                 'speed' => (int)$videoBlock->getSpeed(),
-                                'volume' => (int)$videoBlock->getVolume(),
+                                'volume' => (double)$videoBlock->getVolume(),
                                 'source' => $videoBlock->getSource(),
                             ],
                         ],
