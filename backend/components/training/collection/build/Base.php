@@ -27,7 +27,7 @@ class Base
         $question = new DefaultQuestion($this->question, $this->stars);
         foreach ($this->question->storyTestAnswers as $answer) {
             /** @var $answer StoryTestAnswer */
-            $newAnswer = new Answer($answer->id, $answer->name, $answer->answerIsCorrect(), '', $answer->getImagePath(), null, $answer->getOrigImagePath());
+            $newAnswer = new Answer($answer->id, $answer->name, $answer->answerIsCorrect(), '', $answer->getImageUrl(), null, $answer->getOrigImageUrl());
             if ($this->testModel->showAnswersHints()) {
                 $newAnswer->setDescription($answer->description);
             }
