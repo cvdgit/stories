@@ -17,7 +17,7 @@ class Url extends \yii\helpers\Url
     public static function homeUrl(): string
     {
         $port = Yii::$app->request->serverPort;
-        return 'https://' . Yii::$app->request->serverName . ($port && $port !== 80 ? ':' . $port : '');
+        return 'https://' . Yii::$app->request->serverName . ($port && $port !== 80 && $port !== 443 ? ':' . $port : '');
     }
 
     public static function getServerUrl(): string
