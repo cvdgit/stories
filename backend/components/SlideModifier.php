@@ -146,6 +146,7 @@ class SlideModifier
         $links = [];
         $matches = [];
         $result = preg_match_all('~<a [^<>]*href=[\'"]([^\'"]+)[\'"][^<>]*>([^</a>]*)~i', $content, $matches, PREG_SET_ORDER);
+        print_r($matches);
         if ($result !== false && $result > 0) {
             $site = Url::homeUrl();
             $site = preg_replace('/https?:\/\//', '', $site);
