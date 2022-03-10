@@ -153,6 +153,7 @@ class SlideModifier
                 $url = $match[1];
                 $urlMatches = [];
                 $urlMatchResult = preg_match("~$site/story/([a-z0-9\-/]+)#/(\d+)~i", $url, $urlMatches);
+                echo "~$site/story/([a-z0-9\-/]+)#/(\d+)~i";
                 if ($urlMatchResult !== false && $urlMatchResult > 0) {
                     print_r($urlMatches);
                     $links[] = [
