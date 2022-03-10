@@ -39,27 +39,18 @@ class CourseController extends Controller
         $currentLesson = null;
 
         $slides = $course->allSlides;
+        $slideLinks = [];
         foreach ($slides as $slide) {
 
-            $slideData = $slide->data;
-            if (SlideKind::isLink($slide)) {
-                $slideData = StorySlide::findOne($slide->link_slide_id)->data;
-            }
+            $slideData = StorySlide::getSlideData($slide);
 
-            $search = [
-                'data-id=""',
-                'data-background-color="#000000"',
-            ];
-            $replace = [
-                'data-id="' . $this->id . '"',
-                'data-background-color="#fff"',
-            ];
-            $slideData = str_replace($search, $replace, $slideData);
-
-            $slideItems = (new SlideModifier($slide->id, $slideData))
+            $data = (new SlideModifier($slide->id, $slideData))
                 ->addImageUrl()
                 ->addVideoUrl()
                 ->forLesson();
+
+            $slideItems = $data['blocks'];
+            $slideLinks = array_merge($slideLinks, $data['links']);
 
             $end = next($slides) === false;
             if (($currentLesson !== null && SlideKind::isQuiz($slide)) || $end) {
@@ -142,12 +133,36 @@ class CourseController extends Controller
             ];
         }*/
 
-        return ['course' => [
-            'title' => $course->title,
-            'description' => $course->description,
-            'id' => $course->id,
-            'lessons' => $lessons,
-        ]];
+        foreach ($slideLinks as $i => $slideLink) {
+
+            $alias = $slideLink['alias'];
+            $number = $slideLink['number'];
+
+            if (($storyModel = Story::findOne(['alias' => $alias])) !== null) {
+                if (($slideModel = StorySlide::findSlideByNumber($storyModel->id, $number)) !== null) {
+
+                    $slideData = StorySlide::getSlideData($slideModel);
+                    $data = (new SlideModifier($storyModel->id, $slideData))
+                        ->addImageUrl()
+                        ->addVideoUrl()
+                        ->forLesson();
+
+                    $slideItems = $data['blocks'];
+                    unset($slideLinks[$i]['alias'], $slideLinks[$i]['number']);
+                    $slideLinks[$i]['items'] = $slideItems;
+                }
+            }
+        }
+
+        return [
+            'course' => [
+                'title' => $course->title,
+                'description' => $course->description,
+                'id' => $course->id,
+                'lessons' => $lessons,
+            ],
+            'links' => $slideLinks,
+        ];
     }
 
     private function getQuizData(int $quizId): array

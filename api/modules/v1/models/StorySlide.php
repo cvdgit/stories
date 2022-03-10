@@ -9,6 +9,17 @@ use common\helpers\Url;
 use common\models\slide\SlideKind;
 use yii\db\ActiveRecord;
 
+/**
+ * @property int $id [int(11)]
+ * @property int $story_id [int(11)]
+ * @property int $number [smallint(6)]
+ * @property bool $status [tinyint(3)]
+ * @property int $created_at [int(11)]
+ * @property int $updated_at [int(11)]
+ * @property bool $kind [tinyint(3)]
+ * @property int $link_slide_id [int(11)]
+ * @property string $data
+ */
 class StorySlide extends ActiveRecord
 {
 
@@ -69,4 +80,25 @@ class StorySlide extends ActiveRecord
         return [];
     }
 
+    public static function getSlideData(self $model): string
+    {
+        if (SlideKind::isLink($model)) {
+            if (($slideLinkId = $model->link_slide_id) === null) {
+                throw new \DomainException('Slide link ID is null');
+            }
+            if (($slideLinkModel = self::findOne($slideLinkId)) === null) {
+                throw new \DomainException('Linked slide is null');
+            }
+            return $slideLinkModel->id;
+        }
+        return $model->data;
+    }
+
+    public static function findSlideByNumber(int $storyId, int $number)
+    {
+        return self::find()
+            ->where('story_id = :story', [':story' => $storyId])
+            ->andWhere('number = :number', [':number' => $number])
+            ->one();
+    }
 }

@@ -11,7 +11,6 @@ use backend\components\story\Slide;
 use backend\components\story\TestBlockContent;
 use backend\components\story\TextBlock;
 use backend\components\story\VideoBlock;
-use backend\components\story\VideoFileBlock;
 use backend\components\story\writer\HTMLWriter;
 use backend\models\video\VideoSource;
 use common\helpers\Url;
@@ -27,6 +26,17 @@ class SlideModifier
 
     public function __construct(int $slideID, string $slideData)
     {
+
+        $search = [
+            'data-id=""',
+            'data-background-color="#000000"',
+        ];
+        $replace = [
+            'data-id="' . $slideID . '"',
+            'data-background-color="#fff"',
+        ];
+        $slideData = str_replace($search, $replace, $slideData);
+
         $this->slide = (new HtmlSlideReader($slideData))->load();
         $this->slide->setId($slideID);
     }
@@ -131,6 +141,33 @@ class SlideModifier
         return $this;
     }
 
+    private function processTextContent(string $content): array
+    {
+        $links = [];
+        $matches = [];
+        $result = preg_match_all('~<a [^<>]*href=[\'"]([^\'"]+)[\'"][^<>]*>([^</a>]*)~i', $content, $matches, PREG_SET_ORDER);
+        if ($result !== false && $result > 0) {
+            $site = Url::homeUrl();
+            $site = preg_replace('/https?:\/\//', '', $site);
+            foreach ($matches as $match) {
+                $url = $match[1];
+                $urlMatches = [];
+                $urlMatchResult = preg_match("~$site/story/([a-z0-9\-/]+)#/(\d+)~i", $url, $urlMatches);
+                if ($urlMatchResult !== false && $urlMatchResult > 0) {
+                    $links[] = [
+                        'url' => $url,
+                        'alias' => $urlMatches[1],
+                        'number' => $urlMatches[2],
+                    ];
+                }
+            }
+        }
+        return [
+            'paragraph' => $content,
+            'links' => $links,
+        ];
+    }
+
     public function forLesson(): array
     {
         $textBlocks = [];
@@ -157,9 +194,12 @@ class SlideModifier
         }
 
         $blocks = [];
+        $links = [];
         if (count($textBlocks) === 1 && count($imageBlocks) === 1) {
             $textBlock = $textBlocks[0];
             $imageBlock = $imageBlocks[0];
+            $textContent = $this->processTextContent(trim($textBlock->getText()));
+            $links = array_merge($links, $textContent['links']);
             $items = [
                 [
                     'id' => $imageBlock->getId(),
@@ -167,7 +207,7 @@ class SlideModifier
                         'url' => $imageBlock->getFilePath(),
                     ],
                     'caption' => '',
-                    'paragraph' => trim($textBlock->getText()),
+                    'paragraph' => $textContent['paragraph'],
                 ],
             ];
             $block = [
@@ -222,10 +262,12 @@ class SlideModifier
                     $block = null;
                     if (BlockType::isText($slideBlock)) {
                         /** @var $slideBlock TextBlock */
+                        $textContent = $this->processTextContent(trim($slideBlock->getText()));
+                        $links = array_merge($links, $textContent['links']);
                         $items = [
                             [
                                 'id' => $slideBlock->getId(),
-                                'paragraph' => trim($slideBlock->getText()),
+                                'paragraph' => $textContent['paragraph'],
                             ],
                         ];
                         $block = [
@@ -260,6 +302,9 @@ class SlideModifier
             }
         }
 
-        return $blocks;
+        return [
+            'blocks' => $blocks,
+            'links' => $links,
+        ];
     }
 }
