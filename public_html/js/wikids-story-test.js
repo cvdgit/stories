@@ -3223,7 +3223,15 @@
                 var $element;
                 var answerText = '';
                 var userAnswer = answer[0];
-                getAnswersData(question).forEach(function (questionAnswer) {
+
+                var allAnswers = getAnswersData(question);
+                if (questionViewSequence(question)) {
+                    allAnswers.sort(function(a, b) {
+                        return parseInt(a.order) - parseInt(b.order);
+                    });
+                }
+
+                allAnswers.forEach(function (questionAnswer) {
                     $element = $('<div/>').addClass('row');
                     var $content = $('<div/>').addClass('col-md-offset-3 col-md-9');
                     if (parseInt(questionAnswer.is_correct) === 1) {
