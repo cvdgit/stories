@@ -146,7 +146,6 @@ class SlideModifier
         $links = [];
         $matches = [];
         $result = preg_match_all('~<a [^<>]*href=[\'"]([^\'"]+)[\'"][^<>]*>([^</a>]*)~i', $content, $matches, PREG_SET_ORDER);
-        print_r($matches);
         if ($result !== false && $result > 0) {
             $site = Url::homeUrl();
             $site = preg_replace('/https?:\/\//', '', $site);
@@ -155,6 +154,7 @@ class SlideModifier
                 $urlMatches = [];
                 $urlMatchResult = preg_match("~$site/story/([a-z0-9\-/]+)#/(\d+)~i", $url, $urlMatches);
                 if ($urlMatchResult !== false && $urlMatchResult > 0) {
+                    print_r($urlMatches);
                     $links[] = [
                         'url' => $url,
                         'alias' => $urlMatches[1],
