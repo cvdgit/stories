@@ -1,5 +1,6 @@
 <?php
 use backend\widgets\WikidsDatePicker;
+use common\helpers\Url;
 use common\models\Category;
 use common\models\story\StoryStatus;
 use yii\bootstrap\Nav;
@@ -57,6 +58,12 @@ $columns = [
         'value' => static function(Story $model) {
             return Html::a($model->title, ['story/update', 'id' => $model->id], ['title' => 'Перейти к редактированию']);
         },
+    ],
+    [
+        'format' => 'raw',
+        'value' => static function($model) {
+            return Html::a('<span class="label label-info">Курс</span>', Yii::$app->params['study.url'] . '/guest-course/' . $model->id, ['target' => '_blank']);
+        }
     ],
     [
         'format' => 'raw',

@@ -47,4 +47,6 @@ return [
         1 => '/admin/upload/',
         2 => '/slides/',
     ],
+
+    'study.url' => 'https://study.wikids.ru',
 ];
