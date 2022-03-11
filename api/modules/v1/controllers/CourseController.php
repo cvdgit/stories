@@ -67,7 +67,7 @@ class CourseController extends Controller
                 $quizItem = $slideItems[0];
                 $currentLesson = [
                     'id' => $quizItem['id'],
-                    'title' => $quizItem['title'],
+                    'title' => 'Тест (' . $quizItem['title'] . ')',
                     'description' => $quizItem['description'],
                     'type' => 'quiz',
                     'items' => [
