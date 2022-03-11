@@ -5,6 +5,8 @@ namespace api\modules\v1\controllers;
 use api\modules\v1\models\Story;
 use api\modules\v1\models\StorySlide;
 use backend\components\SlideModifier;
+use common\components\StoryCover;
+use common\helpers\Url;
 use common\models\slide\SlideKind;
 use common\models\StoryTest;
 use common\services\QuizService;
@@ -21,11 +23,6 @@ class CourseController extends Controller
     {
         parent::__construct($id, $module, $config);
         $this->quizService = $quizService;
-    }
-
-    private function processQuiz($data)
-    {
-
     }
 
     public function actionView(int $id)
@@ -159,12 +156,20 @@ class CourseController extends Controller
             }
         }
 
+        $coverImage = null;
+        if (!empty($course->cover)) {
+            $coverImage = [
+                'url' => Url::homeUrl() . StoryCover::getStoryThumbPath($course->cover),
+            ];
+        }
+
         return [
             'course' => [
                 'title' => $course->title,
                 'description' => $course->description,
                 'id' => $course->id,
                 'lessons' => $lessons,
+                'coverImage' => $coverImage,
             ],
             'links' => $slideLinks,
         ];
