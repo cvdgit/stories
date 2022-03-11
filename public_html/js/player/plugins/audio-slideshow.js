@@ -30,6 +30,8 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 	var playerOpacity = .05; // opacity when the mouse is far from to the audioplayer
 	var startAtFragment = false; // when moving to a slide, start at the current fragment or at the start of the slide
 	var playerStyle = "position: fixed; bottom: 4px; left: 25%; width: 50%; height:75px; z-index: 33;"; // style used for container of audio controls 
+
+	var audioFiles = [];
 	// ------------------
 
 	var silence;
@@ -169,6 +171,8 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 			if ( config.autoplay != null ) autoplay = config.autoplay;
 			if ( config.playerOpacity != null  ) playerOpacity = config.playerOpacity;
 			if ( config.playerStyle != null ) playerStyle = config.playerStyle;
+			audioFiles = config.files || [];
+			console.log(audioFiles);
 		}
 
 		if ( 'ontouchstart' in window || navigator.msMaxTouchPoints ) {
@@ -320,6 +324,7 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 	}
 
 	function setupAudioElement( container, indices, audioFile, text, videoElement, slideID) {
+
 		var audioElement = document.createElement( 'audio' );
 		audioElement.setAttribute( 'style', "position: relative; top: 20px; left: 10%; width: 80%;" );
 		audioElement.id = "audioplayer-" + indices;
@@ -430,6 +435,16 @@ var RevealAudioSlideshow = window.RevealAudioSlideshow || (function(){
 				audioSource.src = source;
 				audioElement.insertBefore(audioSource, audioElement.firstChild);
 			} );
+		}
+		else if (audioFiles.length > 0) {
+			var exists = audioFiles.filter(function(item) {
+				return item.slide_id === parseInt(slideID);
+			});
+			if (exists.length > 0) {
+				var audioSource = document.createElement('source');
+				audioSource.src = prefix + slideID + suffix + '?' + new Date().getTime();
+				audioElement.insertBefore(audioSource, audioElement.firstChild);
+			}
 		}
 		else if ( defaultAudios ) {
 			var audioExists = false;

@@ -1,10 +1,12 @@
 <?php
 
-
 namespace common\widgets\Reveal\Plugins;
 
-
+use common\models\Story;
+use common\models\StorySlide;
+use common\services\StoryAudioService;
 use common\widgets\Reveal\Dependency;
+use Yii;
 
 class Audio extends AbstractPlugin implements PluginInterface
 {
@@ -16,10 +18,48 @@ class Audio extends AbstractPlugin implements PluginInterface
     public $prefix;
     public $autoplay = false;
 
+    private $audioService;
+
+    public function __construct(StoryAudioService $audioService, $config = [])
+    {
+        $this->audioService = $audioService;
+        parent::__construct($config);
+    }
+
+    private function getAudioFiles(): array
+    {
+        $storyModel = Story::findOne($this->storyID);
+        $slides = StorySlide::find()
+            ->where(['story_id' => $this->storyID])
+            ->indexBy('id')
+            ->all();
+        $track = $this->audioService->getStoryTrack($storyModel, null, Yii::$app->user->id);
+        $files = [];
+        if ($track !== null) {
+            $path = $this->audioService->getAudioFilePath($this->storyID, $track->id);
+            if (file_exists($path)) {
+                $dir = opendir($path);
+                while (false !== ($filename = readdir($dir))) {
+                    if (!in_array($filename, array('.', '..'))) {
+                        $slideId = explode('.', $filename)[0];
+                        if (isset($slides[$slideId])) {
+                            $files[] = [
+                                'slide_id' => (int)$slideId,
+                                'name' => $filename,
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+        return $files;
+    }
+
     public function pluginConfig()
     {
         return [
             $this->configName => [
+                'files' => $this->getAudioFiles(),
                 'prefix' => $this->prefix, 	// audio files are stored in the "audio" folder
 		        'suffix' => '.mp3',		// audio files have the ".ogg" ending
 		        'textToSpeechURL' => null,  // the URL to the text to speech converter

@@ -123,4 +123,8 @@ class StoryAudioService
         $storyModel->save(false, ['audio']);
     }
 
+    public function getAudioFilePath(int $storyId, int $trackId): string
+    {
+        return Yii::getAlias('@public') . '/audio/' . $storyId . DIRECTORY_SEPARATOR . $trackId;
+    }
 }
