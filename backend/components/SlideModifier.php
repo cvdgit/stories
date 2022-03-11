@@ -228,7 +228,7 @@ class SlideModifier
                 $testModel = StoryTest::findModel($content->getTestID());
                 $block = [
                     'id' => $content->getTestID(),
-                    'title' => $testModel->title,
+                    'title' => $testModel->header,
                     'description' => $testModel->description_text,
                 ];
                 $blocks[] = $block;
