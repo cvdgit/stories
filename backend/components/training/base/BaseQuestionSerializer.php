@@ -33,6 +33,7 @@ class BaseQuestionSerializer
             'lastAnswerIsCorrect' => $q->isLastAnswerIsCorrect(),
             'haveSlides' => $q->getHaveSlides(),
             'hint' => $q->getHint(),
+            'slides' => $q->getSlides(),
         ];
     }
 }

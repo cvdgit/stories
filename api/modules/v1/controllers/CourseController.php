@@ -23,6 +23,11 @@ class CourseController extends Controller
         $this->quizService = $quizService;
     }
 
+    private function processQuiz($data)
+    {
+
+    }
+
     public function actionView(int $id)
     {
         $this->response->format = Response::FORMAT_JSON;

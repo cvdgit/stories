@@ -284,4 +284,18 @@ class StorySlide extends ActiveRecord
     {
         self::deleteAll('story_id = :story AND kind = :kind_final', [':story' => $storyID, ':kind_final' => SlideKind::FINAL_SLIDE]);
     }
+
+    public function getSlideOrLinkData(): string
+    {
+        if (SlideKind::isLink($this)) {
+            if (($slideLinkId = $this->link_slide_id) === null) {
+                throw new \DomainException('Slide link ID is null');
+            }
+            if (($slideLinkModel = self::findOne($slideLinkId)) === null) {
+                throw new \DomainException('Linked slide is null');
+            }
+            return $slideLinkModel->id;
+        }
+        return $this->data;
+    }
 }

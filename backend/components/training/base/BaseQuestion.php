@@ -27,6 +27,8 @@ class BaseQuestion
 
     private $hint;
 
+    private $slides;
+
     public function __construct(int $id, string $name, bool $lastAnswerIsCorrect, $image = null, $origImage = null, $hint = null)
     {
         $this->id = $id;
@@ -139,5 +141,15 @@ class BaseQuestion
     public function getHint(): ?string
     {
         return $this->hint;
+    }
+
+    public function setSlides($slides): void
+    {
+        $this->slides = $slides;
+    }
+
+    public function getSlides()
+    {
+        return $this->slides;
     }
 }
