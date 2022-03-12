@@ -21,6 +21,7 @@ class CreateQuestion extends QuestionModel
             throw new DomainException('Model is not valid');
         }
         $model = StoryTestQuestion::create($this->story_test_id, $this->name, $this->type, $this->order, $this->mix_answers);
+        $model->hint = $this->hint;
         $this->uploadImage($model);
         $model->save();
         return $model->id;

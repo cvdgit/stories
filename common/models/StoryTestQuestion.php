@@ -157,7 +157,7 @@ class StoryTestQuestion extends ActiveRecord
         $model->name = $name;
         $model->type = $type;
         if ($order === null) {
-            $order = (new Query())
+            $order = (int)(new Query())
                 ->from(self::tableName())
                 ->where('story_test_id = :test', [':test' => $testID])
                 ->count();
