@@ -7,6 +7,7 @@ use common\models\StorySlide;
 use common\services\StoryAudioService;
 use common\widgets\Reveal\Dependency;
 use Yii;
+use yii\web\JsExpression;
 
 class Audio extends AbstractPlugin implements PluginInterface
 {
@@ -14,7 +15,7 @@ class Audio extends AbstractPlugin implements PluginInterface
     public $configName = 'audio';
     public $storyID;
 
-    public $defaultAudios = true;
+    public $defaultAudios = false;
     public $prefix;
     public $autoplay = false;
 
@@ -84,7 +85,7 @@ class Audio extends AbstractPlugin implements PluginInterface
     public function dependencies()
     {
         return [
-            new Dependency('/js/player/plugins/audio-slideshow.js'),
+            new Dependency('/js/player/plugins/audio-slideshow.js', new JsExpression('function() { return Reveal.getConfig().audio.files.length > 0; }')),
         ];
     }
 }

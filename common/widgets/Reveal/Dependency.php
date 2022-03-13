@@ -1,18 +1,19 @@
 <?php
 
-
 namespace common\widgets\Reveal;
-
 
 use Yii;
 
 class Dependency
 {
-    public $src;
 
-    public function __construct($src)
+    public $src;
+    public $condition;
+
+    public function __construct($src, $condition = null)
     {
         $this->src = $this->appendTimestamp($src);
+        $this->condition = $condition;
     }
 
     protected function appendTimestamp($src)
