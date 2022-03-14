@@ -63,12 +63,19 @@ function getAudioFileData() {
                 processData: false
             })
             .done(function(response) {
-                
-                if (response && response.success) {
-                    var selectize = $('#updatequestion-audio_file_id')[0].selectize;
-                    selectize.addOption({id: response.audio_file_id, name: response.audio_file_name});
-                    selectize.refreshOptions();
-                    selectize.addItem(response.audio_file_id);
+                if (response) {
+                    if (response.success) {
+                        var selectize = $('#updatequestion-audio_file_id')[0].selectize;
+                        selectize.addOption({id: response.audio_file_id, name: response.audio_file_name});
+                        selectize.refreshOptions();
+                        selectize.addItem(response.audio_file_id);
+                    }
+                    else {
+                        toastr.error(response.message);
+                    }
+                } 
+                else {
+                    toastr.error('Неизвестная ошибка');
                 }
                 $('#create-audio-file-modal').modal('hide');
             });
