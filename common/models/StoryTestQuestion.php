@@ -24,11 +24,13 @@ use yii\helpers\FileHelper;
  * @property int $type
  * @property int $mix_answers
  * @property string $image
- * @property string $regions;
- * @property string $hint;
+ * @property string $regions
+ * @property string $hint
+ * @property string $audio_file_id
  *
  * @property StoryTestAnswer[] $storyTestAnswers
  * @property StoryTest $storyTest
+ * @property AudioFile $audioFile
  */
 class StoryTestQuestion extends ActiveRecord
 {
@@ -70,7 +72,7 @@ class StoryTestQuestion extends ActiveRecord
     {
         return [
             [['story_test_id', 'name', 'type'], 'required'],
-            [['story_test_id', 'order', 'type', 'mix_answers'], 'integer'],
+            [['story_test_id', 'order', 'type', 'mix_answers', 'audio_file_id'], 'integer'],
             [['image', 'hint'], 'string', 'max' => 255],
             [['name'], 'string', 'max' => 512],
             [['story_test_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTest::class, 'targetAttribute' => ['story_test_id' => 'id']],
@@ -344,5 +346,24 @@ class StoryTestQuestion extends ActiveRecord
     public function getStorySlidesForList(): array
     {
         return SelectSlideWidgetHelper::getSlides($this->getStorySlides()->with('story')->all());
+    }
+
+    public function getAudioFile(): ActiveQuery
+    {
+        return $this->hasOne(AudioFile::class, ['id' => 'audio_file_id']);
+    }
+
+    public function getAudioFilesPath(bool $url = false): string
+    {
+        return AudioFile::getAudioFilesPath($this->story_test_id, $url);
+    }
+
+    public function getAudioFileUrl(): ?string
+    {
+        $audioFile = $this->audioFile;
+        if (!$audioFile) {
+            return null;
+        }
+        return $this->getAudioFilesPath(true) . '/' . $audioFile->audio_file;
     }
 }

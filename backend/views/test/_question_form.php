@@ -29,9 +29,26 @@ $isNewRecord = $model instanceof \backend\models\question\CreateQuestion;
                 </div>
             </div>
             <?php endif ?>
+
             <?php if (!$isNewRecord): ?>
             <?= QuestionSlidesWidget::widget(['model' => $model->getModel()]) ?>
             <?php endif ?>
+
+            <?php if (!$isNewRecord): ?>
+            <div style="padding-bottom:20px">
+                <?= $form->field($model, 'audio_file_id')
+                    ->widget(\backend\widgets\SelectAudioFileWidget::class, [
+                        'audioFile' => $model->getAudioFile(),
+                    ])
+                    ->hint(Html::button('Создать аудио файл', [
+                        'class' => 'btn btn-xs btn-primary',
+                        'data-toggle' => 'modal',
+                        'data-target' => '#create-audio-file-modal',
+                    ]))
+                ?>
+            </div>
+            <?php endif ?>
+
             <div class="form-group form-group-controls">
                 <?= Html::submitButton(($isNewRecord ? 'Создать' : 'Сохранить'), ['class' => 'btn btn-success', 'name' => 'action', 'value' => 'save']) ?>
                 <?php if (!$isNewRecord): ?>
@@ -39,6 +56,10 @@ $isNewRecord = $model instanceof \backend\models\question\CreateQuestion;
                 <?php endif ?>
             </div>
             <?php ActiveForm::end(); ?>
+
+            <?php if (!$isNewRecord): ?>
+            <?= $this->render('_audio_file_modal', ['updateQuestionModel' => $model]) ?>
+            <?php endif ?>
         </div>
         <div class="col-md-6">
             <?php if (!$isNewRecord): ?>

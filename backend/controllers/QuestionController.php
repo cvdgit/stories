@@ -2,18 +2,22 @@
 
 namespace backend\controllers;
 
+use backend\models\audio_file\CreateAudioFileModel;
 use backend\models\question\CreateRegionQuestion;
 use backend\models\question\UpdateRegionQuestion;
+use common\models\AudioFile;
 use common\models\StoryTest;
 use common\models\StoryTestAnswer;
 use common\models\StoryTestQuestion;
 use common\rbac\UserRoles;
 use Yii;
+use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
+use yii\web\UploadedFile;
 
 class QuestionController extends Controller
 {
@@ -168,5 +172,39 @@ class QuestionController extends Controller
             'testModel' => $testModel,
             'questions' => $questions,
         ]);
+    }
+
+    public function actionAutocomplete(string $query): array
+    {
+        $this->response->format = Response::FORMAT_JSON;
+        return (new Query())
+            ->select(['name', 'id'])
+            ->from(AudioFile::tableName())
+            ->where(['like', 'name', $query])
+            ->orderBy(['name' => SORT_ASC])
+            ->limit(30)
+            ->all();
+    }
+
+    public function actionCreateAudioFile(): array
+    {
+        $this->response->format = Response::FORMAT_JSON;
+        $model = new CreateAudioFileModel();
+        if ($model->load($this->request->post())) {
+
+            $model->audio_file = UploadedFile::getInstance($model, 'audio_file');
+            $questionModel = $this->findModel($model->question_id);
+
+            try {
+                $fileName = $model->uploadAudioFile($questionModel->getAudioFilesPath());
+                $audioFile = $model->createAudioFile($fileName);
+                //$model->updateQuestion($questionModel, $audioFileId);
+                return ['success' => true, 'audio_file_id' => $audioFile->id, 'audio_file_name' => $audioFile->name];
+            }
+            catch (\Exception $ex) {
+                return ['success' => false, 'message' => $ex->getMessage()];
+            }
+        }
+        return ['success' => false, 'message' => 'no data'];
     }
 }

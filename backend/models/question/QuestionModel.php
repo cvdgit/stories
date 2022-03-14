@@ -20,6 +20,7 @@ class QuestionModel extends Model
     public $mix_answers;
     public $imageFile;
     public $hint;
+    public $audio_file_id;
 
     private $model;
 
@@ -27,7 +28,7 @@ class QuestionModel extends Model
     {
         return [
             [['name', 'type', 'story_test_id'], 'required'],
-            [['order', 'type', 'mix_answers', 'story_test_id'], 'integer'],
+            [['order', 'type', 'mix_answers', 'story_test_id', 'audio_file_id'], 'integer'],
             [['name'], 'string', 'max' => 512],
             [['hint'], 'string', 'max' => 255],
             [['imageFile'], 'image'],
@@ -44,6 +45,7 @@ class QuestionModel extends Model
             'imageFile' => 'Изображение',
             'mix_answers' => 'Перемешивать ответы',
             'hint' => 'Подсказка',
+            'audio_file_id' => 'Аудио файл',
         ];
     }
 

@@ -49,4 +49,6 @@ return [
     ],
 
     'study.url' => 'https://study.wikids.ru',
+
+    'folder.question_audio' => 'question_audio',
 ];

@@ -34,6 +34,7 @@ class BaseQuestionSerializer
             'haveSlides' => $q->getHaveSlides(),
             'hint' => $q->getHint(),
             'slides' => $q->getSlides(),
+            'audio_file' => $q->getAudioFile(),
         ];
     }
 }

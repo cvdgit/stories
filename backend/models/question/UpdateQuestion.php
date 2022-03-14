@@ -2,6 +2,7 @@
 
 namespace backend\models\question;
 
+use common\models\AudioFile;
 use common\models\StoryTestQuestion;
 use DomainException;
 use yii\data\ActiveDataProvider;
@@ -18,7 +19,7 @@ class UpdateQuestion extends QuestionModel
         parent::__construct($config);
     }
 
-    private function loadModelAttributes()
+    private function loadModelAttributes(): void
     {
         foreach ($this->getAttributes() as $name => $value) {
             $modelAttributes = $this->model->getAttributes();
@@ -31,6 +32,17 @@ class UpdateQuestion extends QuestionModel
     public function getModel(): StoryTestQuestion
     {
         return $this->model;
+    }
+
+    public function getAudioFile(): ?AudioFile
+    {
+        return $this->model->audioFile;
+    }
+
+    public function getAudioFileUrl(): ?string
+    {
+        $audioFile = $this->model->audioFile;
+        return $audioFile ? $audioFile->getAudioFileUrl($this->model->story_test_id) : null;
     }
 
     public function getModelID()

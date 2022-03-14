@@ -20,7 +20,8 @@ class DefaultQuestion extends Question
             $question->type,
             $question->getImageUrl(),
             $question->getOrigImageUrl(),
-            $question->hint
+            $question->hint,
+            $question->getAudioFileUrl()
         );
         $this->stars = $stars;
         $this->question = $question;

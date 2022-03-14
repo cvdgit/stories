@@ -2220,12 +2220,20 @@
                         var text = question.name;
                         var i = $(this).find('i');
                         i.removeClass('glyphicon-volume-up').addClass('glyphicon-option-horizontal');
-                        setTimeout(function() {
-                            speech.readText(text, testConfig.getAskQuestionLang(), function() {
-                                i.removeClass('glyphicon-option-horizontal').addClass('glyphicon-volume-up');
-                                $this.data('process', false);
-                            });
-                        }, 500);
+
+                        var onSpeechEnd = function() {
+                            i.removeClass('glyphicon-option-horizontal').addClass('glyphicon-volume-up');
+                            $this.data('process', false);
+                        }
+
+                        if (haveAudioFile(question)) {
+                            playAudio(getAudioFile(question), onSpeechEnd);
+                        }
+                        else {
+                            setTimeout(function () {
+                                speech.readText(text, testConfig.getAskQuestionLang(), onSpeechEnd);
+                            }, 500);
+                        }
                     })
                     .append($('<i/>', {'class': 'glyphicon glyphicon-volume-up'}))
                     .appendTo(titleElement);
@@ -2940,6 +2948,22 @@
             );
         }
 
+        function getAudioFile(question) {
+            return question.audio_file;
+        }
+
+        function haveAudioFile(question) {
+            return getAudioFile(question)  !== null;
+        }
+
+        function playAudio(url, onEndCallback) {
+            var audio = new Audio(url);
+            audio.play();
+            if (onEndCallback) {
+                audio.addEventListener('ended', onEndCallback);
+            }
+        }
+
         function showNextQuestion() {
 
             console.debug('WikidsStoryTest.showNextQuestion');
@@ -3045,10 +3069,15 @@
 
             if (testConfig.answerTypeIsDefault()) {
                 if (testConfig.isAskQuestion()) {
-                    var readText = currentQuestion.name;
-                    setTimeout(function() {
-                        speech.readText(readText, testConfig.getAskQuestionLang());
-                    }, 500);
+                    if (haveAudioFile(currentQuestion)) {
+                        playAudio(getAudioFile(currentQuestion));
+                    }
+                    else {
+                        var readText = currentQuestion.name;
+                        setTimeout(function () {
+                            speech.readText(readText, testConfig.getAskQuestionLang());
+                        }, 500);
+                    }
                 }
             }
         }
@@ -3259,7 +3288,12 @@
                                     .css('font-size', '3rem')
                                     .on('click', function (e) {
                                         e.preventDefault();
-                                        speech.readText(questionAnswer.name, testConfig.getInputVoice());
+                                        if (haveAudioFile(question)) {
+                                            playAudio(getAudioFile(question));
+                                        }
+                                        else {
+                                            speech.readText(questionAnswer.name, testConfig.getInputVoice());
+                                        }
                                     })
                                     .html('<i class="glyphicon glyphicon-volume-up" style="left: 10px; top: 6px"></i>')
                                 );
