@@ -107,7 +107,7 @@ $this->registerJs(<<<JS
     $('#play-audio').on('click', function() {
         var selectedId = $('#updatequestion-audio_file_id').find('option:selected').val();
         if (selectedId) {
-            new Audio('/admin/index.php?r=audio/play&id=' + selectedId).play();
+            new Audio('/admin/index.php?r=audio/play&id=' + selectedId + '&t=' + new Date().getTime()).play();
         }
     });
 })();

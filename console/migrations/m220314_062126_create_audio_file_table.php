@@ -18,6 +18,7 @@ class m220314_062126_create_audio_file_table extends Migration
         $this->createTable($this->tableName, [
             'id' => $this->primaryKey(),
             'name' => $this->string()->notNull()->unique(),
+            'folder' => $this->string()->notNull(),
             'audio_file' => $this->string()->notNull(),
             'created_at' => $this->integer()->notNull(),
         ]);

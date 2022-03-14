@@ -4,7 +4,6 @@ use backend\widgets\CreateAudioFileWidget;
 use yii\widgets\ActiveForm;
 /** @var $updateQuestionModel backend\models\question\UpdateQuestion */
 $model = new CreateAudioFileModel();
-$model->question_id = $updateQuestionModel->getModelID();
 ?>
 <div class="modal fade" tabindex="-1" id="create-audio-file-modal">
     <div class="modal-dialog">
@@ -25,7 +24,6 @@ $model->question_id = $updateQuestionModel->getModelID();
                     'callback' => 'audioFileCallback',
                 ]) ?>
                 <?= $form->field($model, 'audio_file_name')->hiddenInput()->label(false) ?>
-                <?= $form->field($model, 'question_id')->hiddenInput()->label(false)->error(false) ?>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary" type="submit">Создать</button>

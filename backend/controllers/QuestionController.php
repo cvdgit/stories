@@ -191,14 +191,10 @@ class QuestionController extends Controller
         $this->response->format = Response::FORMAT_JSON;
         $model = new CreateAudioFileModel();
         if ($model->load($this->request->post())) {
-
             $model->audio_file = UploadedFile::getInstance($model, 'audio_file');
-            $questionModel = $this->findModel($model->question_id);
-
             try {
-                $fileName = $model->uploadAudioFile($questionModel->getAudioFilesPath());
+                $fileName = $model->uploadAudioFile();
                 $audioFile = $model->createAudioFile($fileName);
-                //$model->updateQuestion($questionModel, $audioFileId);
                 return ['success' => true, 'audio_file_id' => $audioFile->id, 'audio_file_name' => $audioFile->name];
             }
             catch (\Exception $ex) {

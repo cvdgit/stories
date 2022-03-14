@@ -13,6 +13,7 @@ use yii\db\ActiveRecord;
  *
  * @property int $id
  * @property string $name
+ * @property string $folder
  * @property string $audio_file
  * @property int $created_at
  *
@@ -45,8 +46,8 @@ class AudioFile extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['name', 'audio_file'], 'required'],
-            [['name', 'audio_file'], 'string', 'max' => 255],
+            [['name', 'folder', 'audio_file'], 'required'],
+            [['name', 'folder', 'audio_file'], 'string', 'max' => 255],
         ];
     }
 
@@ -68,10 +69,11 @@ class AudioFile extends ActiveRecord
         return $this->hasMany(StoryTestQuestion::class, ['audio_file_id' => 'id']);
     }
 
-    public static function create(string $name, string $audioFileName): self
+    public static function create(string $name, string $folder, string $audioFileName): self
     {
         $model = new self();
         $model->name = $name;
+        $model->folder = $folder;
         $model->audio_file = $audioFileName;
         return $model;
     }
@@ -96,12 +98,12 @@ class AudioFile extends ActiveRecord
         return !empty($this->audio_file);
     }
 
-    public function getAudioFilePath(string $folder): ?string
+    public function getAudioFilePath(string $folder, bool $url = false): ?string
     {
         if (!$this->haveAudioFile()) {
             return null;
         }
-        return self::getAudioFilesPath($folder) . '/' . $this->audio_file;
+        return self::getAudioFilesPath($folder, $url) . '/' . $this->audio_file;
     }
 
     public function getAudioFileUrl($folder): ?string

@@ -150,7 +150,7 @@ class AudioController extends Controller
         if ($audioFile === null) {
             throw new NotFoundHttpException('Audio not found');
         }
-        $filePath = $audioFile->storyTestQuestions[0]->getAudioFilesPath() . '/' . $audioFile->audio_file;
+        $filePath = $audioFile->getAudioFilePath($audioFile->folder);
         if (!file_exists($filePath)) {
             throw new RuntimeException('File not found');
         }
