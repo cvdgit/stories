@@ -1,21 +1,21 @@
 <?php
 
-
 namespace backend\controllers;
-
 
 use backend\models\audio\AudioUploadForm;
 use backend\models\audio\CreateAudioForm;
 use backend\models\audio\UpdateAudioForm;
+use common\models\AudioFile;
 use common\models\Story;
 use common\models\StoryAudioTrack;
 use common\rbac\UserRoles;
 use common\services\StoryAudioService;
-use http\Exception;
+use http\Exception\RuntimeException;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\UploadedFile;
 
@@ -144,4 +144,22 @@ class AudioController extends Controller
         return $this->redirect(['story/update', 'id' => $model->id]);
     }
 
+    public function actionPlay(int $id)
+    {
+        $audioFile = AudioFile::findOne($id);
+        if ($audioFile === null) {
+            throw new NotFoundHttpException('Audio not found');
+        }
+        $filePath = $audioFile->storyTestQuestions[0]->getAudioFilesPath() . '/' . $audioFile->audio_file;
+        if (!file_exists($filePath)) {
+            throw new RuntimeException('File not found');
+        }
+        $response = Yii::$app->response;
+        $response->format = Response::FORMAT_RAW;
+        $headers = $response->headers;
+        $headers->removeAll();
+        $headers->add('content-type', 'audio/wav');
+        $response->data = file_get_contents($filePath);
+        return $response;
+    }
 }

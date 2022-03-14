@@ -44,7 +44,7 @@ $isNewRecord = $model instanceof \backend\models\question\CreateQuestion;
                         'class' => 'btn btn-xs btn-primary',
                         'data-toggle' => 'modal',
                         'data-target' => '#create-audio-file-modal',
-                    ]))
+                    ]) . ' ' . Html::button('Прослушать', ['class' => 'btn btn-xs btn-default', 'id' => 'play-audio']))
                 ?>
             </div>
             <?php endif ?>
@@ -101,3 +101,15 @@ $isNewRecord = $model instanceof \backend\models\question\CreateQuestion;
         </div>
     </div>
 </div>
+<?php
+$this->registerJs(<<<JS
+(function() {
+    $('#play-audio').on('click', function() {
+        var selectedId = $('#updatequestion-audio_file_id').find('option:selected').val();
+        if (selectedId) {
+            new Audio('/admin/index.php?r=audio/play&id=' + selectedId).play();
+        }
+    });
+})();
+JS
+);
