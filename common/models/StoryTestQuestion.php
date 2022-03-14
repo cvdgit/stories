@@ -364,6 +364,6 @@ class StoryTestQuestion extends ActiveRecord
         if (!$audioFile) {
             return null;
         }
-        return $this->getAudioFilesPath(true) . '/' . $audioFile->audio_file;
+        return $audioFile->getAudioFileUrl();
     }
 }

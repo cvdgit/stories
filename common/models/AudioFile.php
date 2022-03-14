@@ -106,11 +106,11 @@ class AudioFile extends ActiveRecord
         return self::getAudioFilesPath($folder, $url) . '/' . $this->audio_file;
     }
 
-    public function getAudioFileUrl($folder): ?string
+    public function getAudioFileUrl(): ?string
     {
         if (!$this->haveAudioFile()) {
             return null;
         }
-        return self::getAudioFilesPath($folder, true) . '/' . $this->audio_file;
+        return self::getAudioFilesPath($this->folder, true) . '/' . $this->audio_file;
     }
 }
