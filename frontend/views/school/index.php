@@ -170,8 +170,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 <div class="col-12 col-md-4">
                     <div class="works__wrap">
                         <div class="works">
-                            <img class="works-box__image" src="./img/info.svg" alt="">
-                            <div class="works-box"></div>
+                            <img class="works-box__image" src="./img/how.svg" alt="">
                             <p class="works-box__text">Как&nbsp;это работает?</p>
                         </div>
                     </div>
