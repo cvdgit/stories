@@ -16,7 +16,7 @@ class StoriesTabWidget extends Widget
     public function run(): string
     {
         $categories = Category::find()
-            ->innerJoinWith('storiesWidget')
+            //->innerJoinWith('storiesWidget')
             ->andFilterWhere(['in', 'category.alias', $this->categories])
             ->all();
 
