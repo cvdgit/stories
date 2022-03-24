@@ -2,6 +2,7 @@
 use yii\helpers\Html;
 /** @var $categories common\models\Category[] */
 /** @var $stories common\models\Story[] */
+/** @var $prefix string */
 ?>
 <div class="stories">
     <div class="stories-label">
@@ -11,7 +12,7 @@ use yii\helpers\Html;
         <ul class="categories">
             <?php foreach ($categories as $i => $category): ?>
             <li class="categories-item<?= $i === 0 ? ' active' : '' ?>">
-                <?= Html::a($category->name, '#' . $category->alias, [
+                <?= Html::a($category->name, '#' . $prefix . $category->alias, [
                     'class' => 'categories-item__link nav-link' . ($i === 0 ? ' active' : ''),
                     'data-toggle' => 'tab',
                     'role' => 'tab'
@@ -23,7 +24,7 @@ use yii\helpers\Html;
     <div class="stories-content">
         <div class="stories-content__list tab-content">
             <?php foreach ($categories as $i => $category): ?>
-            <div class="content-items tab-pane<?= $i === 0 ? ' active' : '' ?>" role="tabpanel" id="<?= $category->alias ?>">
+            <div class="content-items tab-pane<?= $i === 0 ? ' active' : '' ?>" role="tabpanel" id="<?= $prefix . $category->alias ?>">
                 <div class="row">
                     <?php foreach ($stories[$category->alias] as $story): ?>
                     <div class="col-lg-3 col-md-4 col-sm-6">

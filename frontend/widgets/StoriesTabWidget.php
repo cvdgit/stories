@@ -11,11 +11,13 @@ class StoriesTabWidget extends Widget
 
     public $categories;
 
+    private $prefix = 'cat-';
+
     public function run(): string
     {
         $categories = Category::find()
-            ->with('storiesWidget')
-            ->andFilterWhere(['in', 'alias', $this->categories])
+            ->innerJoinWith('storiesWidget')
+            ->andFilterWhere(['in', 'category.alias', $this->categories])
             ->all();
 
         $categories = array_filter($categories, static function(Category $category) {
@@ -34,6 +36,7 @@ class StoriesTabWidget extends Widget
         return $this->render('stories_tab', [
             'categories' => $categories,
             'stories' => $stories,
+            'prefix' => $this->prefix,
         ]);
     }
 }
