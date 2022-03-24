@@ -16,7 +16,6 @@ class StoriesTabWidget extends Widget
     public function run(): string
     {
         $categories = Category::find()
-            //->innerJoinWith('storiesWidget')
             ->andFilterWhere(['in', 'category.alias', $this->categories])
             ->all();
 
@@ -26,8 +25,8 @@ class StoriesTabWidget extends Widget
         $categories = array_values($categories);
 
         $stories = [];
-        array_map(static function(Category $category) use (&$stories) {
-            $stories[$category->alias] = $category->storiesWidget;
+        array_map(function(Category $category) use (&$stories) {
+            $stories[$category->alias] = $this->createStoryList($category->storiesWidget);
         }, $categories);
 
         array_unshift($categories, Category::create('Популярные', 'popular'));
@@ -38,5 +37,16 @@ class StoriesTabWidget extends Widget
             'stories' => $stories,
             'prefix' => $this->prefix,
         ]);
+    }
+
+    private function createStoryList(array $models, int $limit = 8): array
+    {
+        if (count($models) <= $limit) {
+            return $models;
+        }
+        $keys = array_rand($models, $limit);
+        return array_map(static function($key) use ($models) {
+            return $models[$key];
+        }, $keys);
     }
 }

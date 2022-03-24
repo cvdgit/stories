@@ -125,8 +125,7 @@ class Category extends ActiveRecord
     {
         return $this->hasMany(Story::class, ['id' => 'story_id'])
             ->viaTable('story_category', ['category_id' => 'id'])
-            ->andWhere('story.status = 1')
-            ->limit(8);
+            ->andWhere('story.status = 1');
     }
 
     public static function createAlias(string $name): string
