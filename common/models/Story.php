@@ -258,6 +258,18 @@ class Story extends ActiveRecord
         return static::find()->published()->withCover()->byRand()->limit($number)->all();
     }
 
+    public static function findPopularStories(int $limit = 8): array
+    {
+        $models = self::find()->published()->withViewsNumber()->all();
+        if (count($models) <= $limit) {
+            return $models;
+        }
+        $keys = array_rand($models, $limit);
+        return array_map(static function($key) use ($models) {
+            return $models[$key];
+        }, $keys);
+    }
+
     public static function findModel($id): self
     {
         if (($model = self::findOne($id)) !== null) {

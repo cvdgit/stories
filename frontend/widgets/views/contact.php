@@ -41,7 +41,7 @@ use yii\captcha\Captcha;
           </div>
           <div class="row">
             <div class="col-md-12">
-              <?= $form->field($model, 'body', ['inputOptions' => ['placeholder' => 'Сообщение']])->label(false)->textArea(['cols' => 30, 'rows' => 10]) ?>
+              <?= $form->field($model, 'body', ['inputOptions' => ['placeholder' => 'Сообщение']])->label(false)->textArea(['cols' => 30, 'rows' => 6]) ?>
             </div>
           </div>
           <?= $form->field($model, 'verifyCode')
@@ -51,8 +51,8 @@ use yii\captcha\Captcha;
                      'options' => ['class'=> 'form-control', 'placeholder' => 'Код подтверждения', 'autocomplete' => 'off'],
                    ]) ?>
           <div class="row">
-            <div class="col-md-6 col-md-offset-3">
-              <?= Html::submitButton('Отправить', ['class' => 'btn', 'data-loading-text' => 'Отправка...']) ?>
+            <div class="col-md-6 col-md-offset-3 offset-md-3">
+              <?= Html::submitButton('Отправить', ['class' => 'btn button', 'data-loading-text' => 'Отправка...']) ?>
             </div>
           </div>
         <?php ActiveForm::end() ?>

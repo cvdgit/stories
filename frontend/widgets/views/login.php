@@ -36,7 +36,7 @@ use yii\bootstrap\ActiveForm;
           'parts' => ['{icon}' => '<span class="input-group-addon icon icon-password"></span>'],
           'template' => $fieldTemplate,
         ])->passwordInput()->label(false);
-        echo Html::submitButton('Войти', ['class' => 'btn', 'style' => 'margin-top: 20px', 'data-loading-text' => 'Вход...']);
+        echo Html::submitButton('Войти', ['class' => 'btn button', 'style' => 'margin-top: 20px', 'data-loading-text' => 'Вход...']);
         ActiveForm::end();
         ?>
         <div class="password-request">

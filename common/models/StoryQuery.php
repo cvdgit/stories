@@ -44,4 +44,8 @@ class StoryQuery extends ActiveQuery
         return $this->andWhere(['{{%story}}.audio' => 1]);
     }
 
+    public function withViewsNumber(int $views = 500): StoryQuery
+    {
+        return $this->andWhere('{{%story}}.views_number > :views', [':views' => $views]);
+    }
 }

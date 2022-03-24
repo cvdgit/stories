@@ -44,7 +44,7 @@ use yii\web\View;
                   'checkboxTemplate' => "<div class=\"checkbox\">\n{beginLabel}\n{input}\n{labelTitle}\n{endLabel}\n{hint}\n</div>",
               ])->checkbox() ?>
         </div>
-        <?= Html::submitButton('Зарегистрироваться', ['class' => 'btn', 'style' => 'margin:20px 0', 'data-loading-text' => 'Регистрация...']) ?>
+        <?= Html::submitButton('Зарегистрироваться', ['class' => 'btn button', 'style' => 'margin:20px 0', 'data-loading-text' => 'Регистрация...']) ?>
         <?php ActiveForm::end(); ?>
         <div class="social-signup">
             <p>Авторизуйтесь через соцсети:</p>
