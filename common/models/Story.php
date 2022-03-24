@@ -657,7 +657,7 @@ class Story extends ActiveRecord
 
     public function getListThumbPath()
     {
-        return empty($model->cover) ? '/img/story-1.jpg' : StoryCover::getListThumbPath($this->cover);
+        return empty($this->cover) ? '/img/story-1.jpg' : StoryCover::getListThumbPath($this->cover);
     }
 
     public static function findWithQuestionSlide(array $ids)
