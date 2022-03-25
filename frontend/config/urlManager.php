@@ -14,7 +14,7 @@ return [
         'copyright' => 'site/copyright',
         'request-password-reset' => 'site/request-password-reset',
 
-        'pricing' => 'rate/index',
+        //'pricing' => 'rate/index',
 
         'login' => 'auth/login',
         'auth' => 'auth/auth',
