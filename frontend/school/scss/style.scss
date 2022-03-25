@@ -1071,6 +1071,7 @@ a {
             padding-left: 2rem;
         }
         @include media-breakpoint-down(sm) {
+            padding-left: 0;
             margin-top: 4rem;
         }
     }
@@ -1307,7 +1308,7 @@ a {
     max-width: 100%;
     //width: 31.1vw;
     //height: 30.8vw;
-    @include media-breakpoint-down(md) {
+    @include media-breakpoint-down(lg) {
         position: relative;
         display: block;
         top: auto;
@@ -1572,6 +1573,10 @@ a {
             padding-left: 0;
             margin-left: 2rem;
             margin-right: 2rem;
+        }
+        @include media-breakpoint-down(sm) {
+            padding-right: 0;
+            margin-top: 0;
         }
     }
 }
