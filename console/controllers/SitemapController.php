@@ -80,7 +80,7 @@ class SitemapController extends Controller
             $sitemap->addItem($urlManager->createAbsoluteUrl(['story/view', 'alias' => $story['alias']]), $story['published_at'], Sitemap::MONTHLY, 0.9);
         }
 
-        $sitemap->addItem($urlManager->createAbsoluteUrl(['rate/index']), null, Sitemap::MONTHLY, 0.9);
+        //$sitemap->addItem($urlManager->createAbsoluteUrl(['rate/index']), null, Sitemap::MONTHLY, 0.9);
 
         $lastModified = (new Query())->from('{{%news}}')->max('created_at');
         $sitemap->addItem($urlManager->createAbsoluteUrl(['news/index']), $lastModified, Sitemap::DAILY, 1);

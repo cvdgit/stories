@@ -18,7 +18,7 @@ use common\rbac\UserRoles;
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
-    <?php // Yii::$app->params['metrica'] ?>
+    <?= Yii::$app->params['metrica'] ?>
     <script>
         var WikidsConfig = {
             'user': {
@@ -35,7 +35,7 @@ use common\rbac\UserRoles;
             <div class="container-lg p-0">
                 <nav class="navbar navbar-dark navbar-expand-lg">
                     <div class="logo mr-auto">
-                        <a class="logo__link" href="/"><img class="logo__image" src="./img/logo.svg" alt="logo"> Wikids</a>
+                        <a class="logo__link" href="/"><img class="logo__image" src="/school/img/logo.svg" alt="logo"> Wikids</a>
                     </div>
                     <button class="navbar-toggler collapsed" data-toggle="collapse" data-target="#main-menu">
                         <span class="menu-icon"></span>
@@ -53,7 +53,7 @@ use common\rbac\UserRoles;
                                 'submenuTemplate' => "\n<ul class='dropdown-menu'>\n{items}\n</ul>\n",
                             ],
                             ['label' => 'Блог', 'url' => ['news/index'], 'active' => Yii::$app->controller->id === 'news'],
-                            ['label' => 'Подписки', 'url' => ['/rate/index']],
+                            //['label' => 'Подписки', 'url' => ['/rate/index']],
                             ['label' => 'Контакты', 'url' => '#', 'template'=> '<a class="menu-item__link" href="{url}" data-toggle="modal" data-target="#wikids-feedback-modal">{label}</a>'],
                         ];
                         if (Yii::$app->user->isGuest) {
@@ -115,7 +115,7 @@ use common\rbac\UserRoles;
                             <div class="col-12 col-md-6">
                                 <div class="footer-left">
                                     <div class="logo">
-                                        <a class="logo__link" href="/"><img class="logo__image" src="./img/logo.svg" alt="logo"> Wikids</a>
+                                        <a class="logo__link" href="/"><img class="logo__image" src="/school/img/logo.svg" alt="logo"> Wikids</a>
                                     </div>
                                     <div class="contact-row">
                                         <a class="contact-row__phone" href="tel:+74997033525">+7 (926) 207−41−46</a>
@@ -128,14 +128,14 @@ use common\rbac\UserRoles;
                             <div class="col-12 col-md-6">
                                 <div class="footer-right">
                                     <div class="social-row">
-                                        <a target="_blank" class="social-row__link" href="https://vk.com/club184614838"><img src="./img/vk-social.svg" alt="vk"></a>
-                                        <a target="_blank" class="social-row__link" href="https://zen.yandex.ru/id/5c975a093bbd5d00b3568680"><img src="./img/zen-social.svg" alt="zen"></a>
+                                        <a target="_blank" class="social-row__link" href="https://vk.com/club184614838"><img src="/school/img/vk-social.svg" alt="vk"></a>
+                                        <a target="_blank" class="social-row__link" href="https://zen.yandex.ru/id/5c975a093bbd5d00b3568680"><img src="/school/img/zen-social.svg" alt="zen"></a>
                                     </div>
                                     <div class="contact-row">
                                         <p class="contact-row__text">© 2018–<?= date('Y') ?>, Wikids</p>
                                     </div>
                                     <div class="contact-row contact-row--no-mb">
-                                        <p class="contact-row__text">ИП Муталов Артур Сагадеевич</p>
+                                        <p class="contact-row__text">ООО Центр внедрения документооборота</p>
                                     </div>
                                 </div>
                             </div>

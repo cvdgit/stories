@@ -37,7 +37,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
             <div class="col-lg-5"></div>
             <div class="col-12 col-lg">
                 <div class="main-image__wrap">
-                    <img src="./img/main.png" class="main-image" alt="main">
+                    <img src="/school/img/main.png" class="main-image" alt="main">
                 </div>
             </div>
         </div>
@@ -58,7 +58,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-3">
                     <div class="box box__1-1">
                         <div class="box-image">
-                            <img src="./img/icon_1.png" alt="icon">
+                            <img src="/school/img/icon_1.png" alt="icon">
                         </div>
                         <div class="box-text">
                             <p>Индивидуальный подход к каждому ученику</p>
@@ -86,7 +86,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-3">
                     <div class="box box__3-1">
                         <div class="box-image">
-                            <img src="./img/icon_2.png" alt="icon">
+                            <img src="/school/img/icon_2.png" alt="icon">
                         </div>
                         <div class="box-text box-text--divider">
                             <p>Ребёнок занимается по нашим учебным пособиям</p>
@@ -116,7 +116,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                             <p>Мы разработали свою уникальную систему тестирования. Тесты не проверочные, а обучающие. Они сразу дают обратную связь ребёнку.</p>
                         </div>
                         <div class="box-image">
-                            <img src="./img/icon_3.png" alt="icon">
+                            <img src="/school/img/icon_3.png" alt="icon">
                         </div>
                     </div>
                 </div>
@@ -170,7 +170,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 <div class="col-12 col-lg-4">
                     <div class="works__wrap">
                         <div class="works">
-                            <img class="works-box__image" src="./img/how.svg" alt="how">
+                            <img class="works-box__image" src="/school/img/how.svg" alt="how">
                             <p class="works-box__text">Как&nbsp;это работает?</p>
                         </div>
                     </div>
@@ -215,7 +215,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                     <div class="plan-image__wrap">
                         <div class="plan-image__inner">
                             <div class="plan-image__circle"></div>
-                            <img class="plan-image__image" src="./img/plan.png" alt="plan">
+                            <img class="plan-image__image" src="/school/img/plan.png" alt="plan">
                         </div>
                     </div>
                     <div class="fragment fragment__14 fragment--triangle-blue"></div>
@@ -254,7 +254,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                         <div class="price-image__wrap">
                             <h2 class="section-header__header">Стоимость обучения</h2>
                             <div class="price-image">
-                                <img src="./img/child.png" alt="child" class="price-image__image">
+                                <img src="/school/img/child.png" alt="child" class="price-image__image">
                             </div>
                         </div>
                     </div>
@@ -306,13 +306,13 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                         <div class="discount-rows">
                             <div class="discount-row">
                                 <div class="discount-row__icon">
-                                    <img src="./img/zoom.svg" alt="zoom">
+                                    <img src="/school/img/zoom.svg" alt="zoom">
                                 </div>
                                 <p class="discount-row__text">Проведем вводное онлайн занятие в ZOOM или Skype</p>
                             </div>
                             <div class="discount-row">
                                 <div class="discount-row__icon">
-                                    <img src="./img/comment.svg" alt="comment">
+                                    <img src="/school/img/comment.svg" alt="comment">
                                 </div>
                                 <p class="discount-row__text">Проконсультируем вас и дадим советы и рекомендации</p>
                             </div>
@@ -329,7 +329,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 </div>
                 <div class="col-12 col-xl-6">
                     <div class="discount-image__wrap">
-                        <img class="discount-image" src="./img/discount.png" alt="discount">
+                        <img class="discount-image" src="/school/img/discount.png" alt="discount">
                     </div>
                 </div>
             </div>
@@ -398,7 +398,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                                 <p class="ask-text__text">Не нашли ответ на свой вопрос? Свяжитесь с нами любым удобным способом, мы с радостью ответим на все интересующие вопросы.</p>
                             </div>
                             <div class="ask-social">
-                                <a target="_blank" class="ask-social__link" href="https://vk.com/club184614838"><img src="./img/vk.svg" alt="vk"></a>
+                                <a target="_blank" class="ask-social__link" href="https://vk.com/club184614838"><img src="/school/img/vk.svg" alt="vk"></a>
                                 <!--a class="ask-social__link" href="#"><img src="./img/wa.svg" alt="wa"></a>
                                 <a class="ask-social__link" href="#"><img src="./img/telegram.svg" alt="tg"></a-->
                             </div>
@@ -426,7 +426,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                             <div class="license-card">
                                 <div class="license-image__wrap">
                                     <div class="license-image__inner">
-                                        <img class="license-image" src="./img/license-1-small.jpg" alt="license">
+                                        <img class="license-image" src="/school/img/license-1-small.jpg" alt="license">
                                     </div>
                                 </div>
                                 <div class="license-text">
@@ -438,7 +438,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                             <div class="license-card">
                                 <div class="license-image__wrap">
                                     <div class="license-image__inner">
-                                        <img class="license-image" src="./img/license-2-small.jpg" alt="license">
+                                        <img class="license-image" src="/school/img/license-2-small.jpg" alt="license">
                                     </div>
                                 </div>
                                 <div class="license-text">
@@ -471,7 +471,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                         </div>
                         <div class="contact-block__wrap">
                             <div class="contact-social">
-                                <a target="_blank" class="contact-social__link" href="https://vk.com/club184614838"><img src="./img/vk_white.svg" alt="vk"></a>
+                                <a target="_blank" class="contact-social__link" href="https://vk.com/club184614838"><img src="/school/img/vk_white.svg" alt="vk"></a>
                                 <!--a class="contact-social__link" href="#"><img src="./img/wa_white.svg" alt="wa"></a>
                                 <a class="contact-social__link" href="#"><img src="./img/tg_white.svg" alt="tg"></a-->
                             </div>

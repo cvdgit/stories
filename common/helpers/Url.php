@@ -35,4 +35,9 @@ class Url extends \yii\helpers\Url
         }
         return $scheme . '://' . $serverName . $port;
     }
+
+    public static function homeRoute(): array
+    {
+        return ['/school/index'];
+    }
 }

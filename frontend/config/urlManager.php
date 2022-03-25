@@ -6,7 +6,7 @@ return [
     'showScriptName' => false,
     //'enableStrictParsing' => true,
     'rules' => [
-        '' => 'site/index',
+        '' => 'school/index',
 
         'contacts' => 'site/contact',
         'captcha' => 'site/captcha',

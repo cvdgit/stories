@@ -49,7 +49,7 @@ AppAsset::register($this);
                         echo Html::img('/img/wikids.png', $options);
                     }
                     else {
-                        echo Html::a(Html::img('/img/wikids-mini.png', $options), ['/site/index']);
+                        echo Html::a(Html::img('/img/wikids-mini.png', $options), Url::homeRoute());
                     }
                     ?>
                         <div style="position: relative; float: right">
