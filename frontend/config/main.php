@@ -100,12 +100,12 @@ return [
                     'clientSecret' => $params['googleClientSecret'],
                     'returnUrl' => 'https://wikids.ru/auth?authclient=google',
                 ],
-                'facebook' => [
+                /*'facebook' => [
                     'class' => 'yii\authclient\clients\Facebook',
                     'clientId' => $params['fbClientId'],
                     'clientSecret' => $params['fbClientSecret'],
                     'returnUrl' => 'https://wikids.ru/auth?authclient=facebook',
-                ],
+                ],*/
                 'vkontakte' => [
                     'class' => 'yii\authclient\clients\VKontakte',
                     'clientId' => $params['vkClientId'],

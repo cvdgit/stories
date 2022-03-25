@@ -58,7 +58,7 @@ use yii\web\View;
       <div class="modal-footer">
         <div class="modal-footer-inner">
           <div>Уже зарегистрированы?</div>
-          <a href="#" data-toggle="modal" data-target="#wikids-login-modal">Войти</a>
+          <a href="#" data-toggle="modal" data-dismiss="modal" data-target="#wikids-login-modal">Войти</a>
         </div>
       </div>
     </div>

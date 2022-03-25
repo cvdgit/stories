@@ -54,7 +54,7 @@ use yii\bootstrap\ActiveForm;
       <div class="modal-footer">
         <div class="modal-footer-inner">
           <div>Еще не зарегистрированы?</div>
-          <a href="#" data-toggle="modal" data-target="#wikids-signup-modal">Зарегистрироваться</a>
+          <a href="#" data-toggle="modal" data-dismiss="modal" data-target="#wikids-signup-modal">Зарегистрироваться</a>
         </div>
       </div>
     </div>
