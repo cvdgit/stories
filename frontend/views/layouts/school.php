@@ -35,7 +35,7 @@ use common\rbac\UserRoles;
             <div class="container-lg p-0">
                 <nav class="navbar navbar-dark navbar-expand-lg">
                     <div class="logo mr-auto">
-                        <a class="logo__link" href="/"><img class="logo__image" src="./img/logo.svg" alt=""> Wikids</a>
+                        <a class="logo__link" href="/"><img class="logo__image" src="./img/logo.svg" alt="logo"> Wikids</a>
                     </div>
                     <button class="navbar-toggler collapsed" data-toggle="collapse" data-target="#main-menu">
                         <span class="menu-icon"></span>
@@ -73,7 +73,7 @@ use common\rbac\UserRoles;
                                 'label' => '<div class="profile-row dropdown-toggle" data-toggle="dropdown">
                                         <div class="profile-row__name">' . Yii::$app->user->identity->getProfileName() . '</div>
                                         <div class="profile-row__image">
-                                            ' . Html::img(Yii::$app->user->identity->getProfilePhoto(), ['class' => 'profile-image']) . '
+                                            ' . Html::img(Yii::$app->user->identity->getProfilePhoto(), ['class' => 'profile-image', 'alt' => 'pic']) . '
                                         </div>
                                     </div>',
                                 'items' => [
@@ -109,13 +109,13 @@ use common\rbac\UserRoles;
     <footer class="footer">
         <div class="container-fluid p-0">
             <div class="container-lg p-0">
-                <main class="footer-main">
+                <div class="footer-main">
                     <div class="footer-row">
                         <div class="row no-gutters">
                             <div class="col-12 col-md-6">
                                 <div class="footer-left">
                                     <div class="logo">
-                                        <a class="logo__link" href="/"><img class="logo__image" src="./img/logo.svg" alt=""> Wikids</a>
+                                        <a class="logo__link" href="/"><img class="logo__image" src="./img/logo.svg" alt="logo"> Wikids</a>
                                     </div>
                                     <div class="contact-row">
                                         <a class="contact-row__phone" href="tel:+74997033525">+7 (499) 703−35−25</a>
@@ -128,8 +128,8 @@ use common\rbac\UserRoles;
                             <div class="col-12 col-md-6">
                                 <div class="footer-right">
                                     <div class="social-row">
-                                        <a target="_blank" class="social-row__link" href="https://vk.com/club184614838"><img src="./img/vk-social.svg" alt=""></a>
-                                        <a target="_blank" class="social-row__link" href="https://zen.yandex.ru/id/5c975a093bbd5d00b3568680"><img src="./img/zen-social.svg" alt=""></a>
+                                        <a target="_blank" class="social-row__link" href="https://vk.com/club184614838"><img src="./img/vk-social.svg" alt="vk"></a>
+                                        <a target="_blank" class="social-row__link" href="https://zen.yandex.ru/id/5c975a093bbd5d00b3568680"><img src="./img/zen-social.svg" alt="zen"></a>
                                     </div>
                                     <div class="contact-row">
                                         <p class="contact-row__text">© 2018–<?= date('Y') ?>, Wikids</p>
@@ -145,7 +145,7 @@ use common\rbac\UserRoles;
                         <?= Html::a('Политика конфиденциальности', ['site/policy'], ['class' => 'footer-links__link']) ?>
                         <?= Html::a('Правообладателям', ['site/copyright'], ['class' => 'footer-links__link']) ?>
                     </div>
-                </main>
+                </div>
             </div>
         </div>
     </footer>

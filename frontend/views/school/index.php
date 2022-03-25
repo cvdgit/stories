@@ -37,7 +37,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
             <div class="col-lg-5"></div>
             <div class="col-12 col-lg">
                 <div class="main-image__wrap">
-                    <img src="./img/main.png" class="main-image">
+                    <img src="./img/main.png" class="main-image" alt="main">
                 </div>
             </div>
         </div>
@@ -53,12 +53,12 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 </div>
             </div>
         </div>
-        <main class="box-list">
+        <div class="box-list">
             <div class="row no-gutters">
                 <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-3">
                     <div class="box box__1-1">
                         <div class="box-image">
-                            <img src="./img/icon_1.png" alt="">
+                            <img src="./img/icon_1.png" alt="icon">
                         </div>
                         <div class="box-text">
                             <p>Индивидуальный подход к каждому ученику</p>
@@ -86,7 +86,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-3">
                     <div class="box box__3-1">
                         <div class="box-image">
-                            <img src="./img/icon_2.png" alt="">
+                            <img src="./img/icon_2.png" alt="icon">
                         </div>
                         <div class="box-text box-text--divider">
                             <p>Ребёнок занимается по нашим учебным пособиям</p>
@@ -116,12 +116,12 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                             <p>Мы разработали свою уникальную систему тестирования. Тесты не проверочные, а обучающие. Они сразу дают обратную связь ребёнку.</p>
                         </div>
                         <div class="box-image">
-                            <img src="./img/icon_3.png" alt="">
+                            <img src="./img/icon_3.png" alt="icon">
                         </div>
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
     <div class="fragment fragment__1 fragment--circle-blue"></div>
     <div class="fragment fragment__2 fragment--circle-green"></div>
@@ -133,7 +133,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
         <div class="section-header">
             <div class="row no-gutters">
                 <div class="col-12 col-lg-8 col-xl-8 col-xxl-6">
-                    <h2 class="section-header__header"">Мы разработали более 1200 электронных учебников</h2>
+                    <h2 class="section-header__header">Мы разработали более 1200 электронных учебников</h2>
                 </div>
             </div>
             <div class="row no-gutters">
@@ -143,7 +143,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 </div>
             </div>
         </div>
-        <main>
+        <div>
             <?= \frontend\widgets\StoriesTabWidget::widget([
                 'categories' => [
                     'obuchenie-chteniyu-s-pomoschyu-testov',
@@ -160,17 +160,17 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                     'zhivaya-priroda',
                 ],
             ]) ?>
-        </main>
+        </div>
     </div>
 </section>
 <section class="section">
     <div class="container-lg p-0">
-        <main class="works-main">
+        <div class="works-main">
             <div class="row no-gutters">
                 <div class="col-12 col-lg-4">
                     <div class="works__wrap">
                         <div class="works">
-                            <img class="works-box__image" src="./img/how.svg" alt="">
+                            <img class="works-box__image" src="./img/how.svg" alt="how">
                             <p class="works-box__text">Как&nbsp;это работает?</p>
                         </div>
                     </div>
@@ -192,7 +192,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
     <div class="fragment fragment__8 fragment--circle-green"></div>
     <div class="fragment fragment__10 fragment--circle-blue"></div>
@@ -202,20 +202,20 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
         <div class="section-header plan-header">
             <div class="row no-gutters">
                 <div class="col-12 col-lg-8 col-xl-8 col-xxl-6">
-                    <h2 class="section-header__header"">Индивидуальный план&nbsp;обучения</h2>
+                    <h2 class="section-header__header">Индивидуальный план&nbsp;обучения</h2>
                 </div>
                 <div class="col col-lg-4 col-xl-4 col-xxl-6">
                     <div class="fragment fragment__16 fragment--triangle-green"></div>
                 </div>
             </div>
         </div>
-        <main class="plan-main">
+        <div class="plan-main">
             <div class="row no-gutters">
                 <div class="col-12 col-lg-6">
                     <div class="plan-image__wrap">
                         <div class="plan-image__inner">
                             <div class="plan-image__circle"></div>
-                            <img class="plan-image__image" src="./img/plan.png" alt="">
+                            <img class="plan-image__image" src="./img/plan.png" alt="plan">
                         </div>
                     </div>
                     <div class="fragment fragment__14 fragment--triangle-blue"></div>
@@ -239,7 +239,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                     <div class="fragment fragment__17 fragment--circle-blue"></div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
     <div class="fragment fragment__11 fragment--circle-blue"></div>
     <div class="fragment fragment__12 fragment--circle-green"></div>
@@ -248,13 +248,13 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 <section class="section price-section">
     <div class="container-fluid p-0">
         <div class="container-lg p-0">
-            <main class="price-main">
+            <div class="price-main">
                 <div class="row no-gutters">
                     <div class="col-12 col-xl-4">
                         <div class="price-image__wrap">
                             <h2 class="section-header__header">Стоимость обучения</h2>
                             <div class="price-image">
-                                <img src="./img/child.png" alt="" class="price-image__image">
+                                <img src="./img/child.png" alt="child" class="price-image__image">
                             </div>
                         </div>
                     </div>
@@ -292,13 +292,13 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                         </div>
                     </div>
                 </div>
-            </main>
+            </div>
         </div>
     </div>
 </section>
 <section class="section discount-section">
     <div class="container-lg p-0">
-        <main class="discount-main">
+        <div class="discount-main">
             <div class="row no-gutters">
                 <div class="col-12 col-xl-6">
                     <div class="discount__wrap">
@@ -306,13 +306,13 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                         <div class="discount-rows">
                             <div class="discount-row">
                                 <div class="discount-row__icon">
-                                    <img src="./img/zoom.svg" alt="">
+                                    <img src="./img/zoom.svg" alt="zoom">
                                 </div>
                                 <p class="discount-row__text">Проведем вводное онлайн занятие в ZOOM или Skype</p>
                             </div>
                             <div class="discount-row">
                                 <div class="discount-row__icon">
-                                    <img src="./img/comment.svg" alt="">
+                                    <img src="./img/comment.svg" alt="comment">
                                 </div>
                                 <p class="discount-row__text">Проконсультируем вас и дадим советы и рекомендации</p>
                             </div>
@@ -329,17 +329,17 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 </div>
                 <div class="col-12 col-xl-6">
                     <div class="discount-image__wrap">
-                        <img class="discount-image" src="./img/discount.png" alt="">
+                        <img class="discount-image" src="./img/discount.png" alt="discount">
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
 </section>
 <section class="section section-ask">
     <div class="container-fluid p-0">
         <div class="container-lg p-0">
-            <main class="ask-main">
+            <div class="ask-main">
                 <h2 class="section-header__header">Ответы на популярные вопросы</h2>
                 <div class="row no-gutters">
                     <div class="col-12 order-lg-second col-lg-7">
@@ -411,13 +411,13 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                         </div>
                     </div>
                 </div>
-            </main>
+            </div>
         </div>
     </div>
 </section>
 <section class="section section-license">
     <div class="container-lg p-0">
-        <main class="license-main">
+        <div class="license-main">
             <h2 class="section-header__header">Лицензии нашей школы домашнего обучения</h2>
             <div class="row no-gutters">
                 <div class="col-12 order-xl-second col-xl-6">
@@ -426,7 +426,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                             <div class="license-card">
                                 <div class="license-image__wrap">
                                     <div class="license-image__inner">
-                                        <img class="license-image" src="./img/license-1-small.jpg" alt="">
+                                        <img class="license-image" src="./img/license-1-small.jpg" alt="license">
                                     </div>
                                 </div>
                                 <div class="license-text">
@@ -438,7 +438,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                             <div class="license-card">
                                 <div class="license-image__wrap">
                                     <div class="license-image__inner">
-                                        <img class="license-image" src="./img/license-2-small.jpg" alt="">
+                                        <img class="license-image" src="./img/license-2-small.jpg" alt="license">
                                     </div>
                                 </div>
                                 <div class="license-text">
@@ -456,12 +456,12 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
 </section>
 <section class="section section-contact">
     <div class="container-lg p-0">
-        <main class="contact-main">
+        <div class="contact-main">
             <div class="row no-gutters">
                 <div class="col-12 col-lg-6">
                     <div class="contact__wrap">
@@ -490,7 +490,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
 </section>
 
