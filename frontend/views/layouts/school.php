@@ -118,7 +118,7 @@ use common\rbac\UserRoles;
                                         <a class="logo__link" href="/"><img class="logo__image" src="./img/logo.svg" alt="logo"> Wikids</a>
                                     </div>
                                     <div class="contact-row">
-                                        <a class="contact-row__phone" href="tel:+74997033525">+7 (499) 703−35−25</a>
+                                        <a class="contact-row__phone" href="tel:+74997033525">+7 (926) 207−41−46</a>
                                     </div>
                                     <div class="contact-row contact-row--no-mb">
                                         <a class="contact-row__email" href="mailto:info@wikids.ru">info@wikids.ru</a>

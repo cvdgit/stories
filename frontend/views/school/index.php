@@ -369,7 +369,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                                     </a>
                                     <div id="rowTwo" class="collapse">
                                         <div class="ask-card-content">
-                                            <p>2</p>
+                                            <p></p>
                                         </div>
                                     </div>
                                     <div class="ask-card-header__icon">
@@ -382,7 +382,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                                     </a>
                                     <div id="rowThree" class="collapse">
                                         <div class="ask-card-content">
-                                            <p>3</p>
+                                            <p></p>
                                         </div>
                                     </div>
                                     <div class="ask-card-header__icon">
@@ -403,7 +403,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                                 <a class="ask-social__link" href="#"><img src="./img/telegram.svg" alt="tg"></a-->
                             </div>
                             <div class="ask-contact">
-                                <a class="ask-contact__phone" href="tel:+74997033525">+7 (499) 703−35−25</a>
+                                <a class="ask-contact__phone" href="tel:+74997033525">+7 (926) 207−41−46</a>
                             </div>
                             <div class="ask-contact ask-contact--no-mb">
                                 <a class="ask-contact__email" href="mailto:info@wikids.ru">info@wikids.ru</a>
@@ -476,7 +476,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                                 <a class="contact-social__link" href="#"><img src="./img/tg_white.svg" alt="tg"></a-->
                             </div>
                             <div class="contact-contact">
-                                <a class="contact-contact__phone" href="tel:+74997033525">+7 (499) 703−35−25</a>
+                                <a class="contact-contact__phone" href="tel:+74997033525">+7 (926) 207−41−46</a>
                             </div>
                             <div class="contact-contact contact-contact--no-mb">
                                 <a class="contact-contact__email" href="mailto:info@wikids.ru">info@wikids.ru</a>

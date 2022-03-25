@@ -924,6 +924,9 @@ a {
     &__more {
         text-align: center;
         margin-bottom: 8rem;
+        @include media-breakpoint-down(md) {
+            margin-bottom: 4rem;
+        }
     }
 }
 
@@ -2008,6 +2011,12 @@ a {
     &__1 {
         left: 175.7rem;
         top: 22rem;
+        @include media-breakpoint-down(xs) {
+            left: 2rem;
+            top: 7.5rem;
+            display: block !important;
+            transition: display .3s;
+        }
     }
     &__2 {
         left: 170.6rem;
@@ -2020,10 +2029,24 @@ a {
     &__4 {
         right: 155rem;
         top: 70rem;
+        @include media-breakpoint-down(xs) {
+            right: 3rem;
+            bottom: 2rem;
+            top: auto;
+            display: block !important;
+            transition: display .3s;
+        }
     }
     &__5 {
         right: 3rem;
         top: 0;
+        @include media-breakpoint-down(xs) {
+            right: 5rem;
+            bottom: 8rem;
+            top: auto;
+            display: block !important;
+            transition: display .3s;
+        }
     }
     &__6 {
         left: 8rem;
@@ -2032,6 +2055,13 @@ a {
     &__7 {
         right: 20rem;
         bottom: 3rem;
+        @include media-breakpoint-down(xs) {
+            right: auto;
+            bottom: 1rem;
+            left: 1rem;
+            display: block !important;
+            transition: display .3s;
+        }
     }
     &__8 {
         left: 170rem;
@@ -2056,14 +2086,35 @@ a {
     &__13 {
         left: 176.8rem;
         bottom: 28rem;
+        @include media-breakpoint-down(xs) {
+            right: 0rem;
+            left: auto;
+            bottom: -2rem;
+            display: block !important;
+            transition: display .3s;
+        }
     }
     &__14 {
         left: 6rem;
         bottom: 0;
+        @include media-breakpoint-down(xs) {
+            left: 1rem;
+            bottom: 1rem;
+            display: block !important;
+            background: url(../../../public_html/school/img/triangle-green.svg);
+            transition: display .3s;
+        }
     }
     &__15 {
         right: 12rem;
         top: 0;
+        @include media-breakpoint-down(xs) {
+            right: 1rem;
+            top: auto;
+            bottom: -4rem;
+            display: block !important;
+            transition: display .3s;
+        }
     }
     &__16 {
         right: 20rem;
@@ -2072,6 +2123,13 @@ a {
     &__17 {
         right: 13rem;
         bottom: 25rem;
+        @include media-breakpoint-down(xs) {
+            right: 5rem;
+            bottom: 12rem;
+            display: block !important;
+            background: url(../../../public_html/school/img/circle-green.svg) !important;
+            transition: display .3s;
+        }
     }
 }
 
