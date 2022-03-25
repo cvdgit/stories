@@ -47,7 +47,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
     <div class="container-lg p-0">
         <div class="section-header">
             <div class="row no-gutters">
-                <div class="col-12 col-lg-8 col-xl-8 col-xxl-6">
+                <div class="col-12 col-lg-8 col-xl-8 col-xxl-7">
                     <h2 class="section-header__header">Преимущества нашей школы
                         домашнего обучения</h2>
                 </div>
@@ -167,7 +167,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
     <div class="container-lg p-0">
         <main class="works-main">
             <div class="row no-gutters">
-                <div class="col-12 col-md-4">
+                <div class="col-12 col-lg-4">
                     <div class="works__wrap">
                         <div class="works">
                             <img class="works-box__image" src="./img/how.svg" alt="">
@@ -178,14 +178,14 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                     <div class="fragment fragment__6 fragment--triangle-blue"></div>
                     <div class="fragment fragment__7 fragment--circle-blue"></div>
                 </div>
-                <div class="col-12 col-md-4">
+                <div class="col-12 col-lg-4">
                     <div class="box box__works">
                         <h3 class="box-header box-header--works">Задачи родителя</h3>
                         <div class="box-text box-text--text-left">Цель родителя — приучить ребёнка учиться самостоятельно. Без родителя. Это реально и вполне достижимо. Родитель получает всё необходимое, чтоб понять материал самому и при необходимости объяснить ребёнку. На первом этапе для ребёнка важна моральная поддержка от родителя.</div>
                     </div>
                     <div class="fragment fragment__9 fragment--circle-green"></div>
                 </div>
-                <div class="col-12 col-md-4">
+                <div class="col-12 col-lg-4">
                     <div class="box box__works">
                         <h3 class="box-header box-header--works">Задачи школы</h3>
                         <div class="box-text box-text--text-left">Мы разрабатываем учебные материалы и тесты.Высылаем задания и контролируем процесс обучения. Обеспечиваем индивидуальный подход к обучению каждого ребёнка. По результатам тестов назначаем темы для проработки учебного материала.</div>
@@ -211,15 +211,17 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
         </div>
         <main class="plan-main">
             <div class="row no-gutters">
-                <div class="col-12 col-md-6">
+                <div class="col-12 col-lg-6">
                     <div class="plan-image__wrap">
-                        <div class="plan-image__circle"></div>
-                        <img class="plan-image__image" src="./img/plan.png" alt="">
+                        <div class="plan-image__inner">
+                            <div class="plan-image__circle"></div>
+                            <img class="plan-image__image" src="./img/plan.png" alt="">
+                        </div>
                     </div>
                     <div class="fragment fragment__14 fragment--triangle-blue"></div>
                     <div class="fragment fragment__15 fragment--circle-blue"></div>
                 </div>
-                <div class="col-12 col-md-6">
+                <div class="col-12 col-lg-6">
                     <div class="plan-content__wrap">
                         <div class="plan-content-item">
                             <h3 class="plan-content-item__title">Раннее развитие</h3>
@@ -248,7 +250,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
         <div class="container-lg p-0">
             <main class="price-main">
                 <div class="row no-gutters">
-                    <div class="col-12 col-lg-4">
+                    <div class="col-12 col-xl-4">
                         <div class="price-image__wrap">
                             <h2 class="section-header__header">Стоимость обучения</h2>
                             <div class="price-image">
@@ -256,7 +258,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-lg-8">
+                    <div class="col-12 col-xl-8">
                         <div class="price-blocks">
                             <div class="box box__price">
                                 <h2 class="box-header box-header--price">Основной<br>курс</h2>
@@ -298,7 +300,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
     <div class="container-lg p-0">
         <main class="discount-main">
             <div class="row no-gutters">
-                <div class="col-12 col-md-6">
+                <div class="col-12 col-xl-6">
                     <div class="discount__wrap">
                         <h2 class="section-header__header section-header__header--white">Получите вводный онлайн урок с 50% скидкой</h2>
                         <div class="discount-rows">
@@ -316,14 +318,16 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                             </div>
                         </div>
                         <div class="discount-controls">
-                            <?= Html::a('Записаться на занятие', ['contact/create'], ['class' => 'button contact-request']) ?>
-                            <div class="discount-agree">
-                                <p class="discount-agree__text">Нажимая на кнопку вы принимаете<br><?= Html::a('пользовательское соглашение', ['site/policy'], ['class' => 'discount-agree__link']) ?></p>
+                            <div class="discount-controls__wrap">
+                                <?= Html::a('Записаться на занятие', ['contact/create'], ['class' => 'button contact-request']) ?>
+                                <div class="discount-agree">
+                                    <p class="discount-agree__text">Нажимая на кнопку вы принимаете<br><?= Html::a('пользовательское соглашение', ['site/policy'], ['class' => 'discount-agree__link']) ?></p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-md-6">
+                <div class="col-12 col-xl-6">
                     <div class="discount-image__wrap">
                         <img class="discount-image" src="./img/discount.png" alt="">
                     </div>
@@ -338,7 +342,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
             <main class="ask-main">
                 <h2 class="section-header__header">Ответы на популярные вопросы</h2>
                 <div class="row no-gutters">
-                    <div class="col-12 order-md-second col-md-7">
+                    <div class="col-12 order-lg-second col-lg-7">
                         <div class="box box__ask">
                             <div class="accordion">
                                 <div class="ask-card">
@@ -388,7 +392,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 order-md-first col-md-5">
+                    <div class="col-12 order-lg-first col-lg-5">
                         <div class="ask__wrap">
                             <div class="ask-text">
                                 <p class="ask-text__text">Не нашли ответ на свой вопрос? Свяжитесь с нами любым удобным способом, мы с радостью ответим на все интересующие вопросы.</p>
@@ -416,37 +420,35 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
         <main class="license-main">
             <h2 class="section-header__header">Лицензии нашей школы домашнего обучения</h2>
             <div class="row no-gutters">
-                <div class="col-12 order-md-second col-md-6">
-                    <div>
-                        <div class="row no-gutters">
-                            <div class="col-12 col-md-6">
-                                <div class="license-card">
-                                    <div class="license-image__wrap">
-                                        <div class="license-image__inner">
-                                            <img class="license-image" src="./img/license.png" alt="">
-                                        </div>
-                                    </div>
-                                    <div class="license-text">
-                                        <p class="license-text__text">Образовательная лицензия СОШ «Пенаты»</p>
+                <div class="col-12 order-xl-second col-xl-6">
+                    <div class="row no-gutters">
+                        <div class="col-12 col-md-6">
+                            <div class="license-card">
+                                <div class="license-image__wrap">
+                                    <div class="license-image__inner">
+                                        <img class="license-image" src="./img/license-1-small.jpg" alt="">
                                     </div>
                                 </div>
+                                <div class="license-text">
+                                    <p class="license-text__text">Образовательная лицензия СОШ «Пенаты»</p>
+                                </div>
                             </div>
-                            <div class="col-12 col-md-6">
-                                <div class="license-card">
-                                    <div class="license-image__wrap">
-                                        <div class="license-image__inner">
-                                            <img class="license-image" src="./img/license.png" alt="">
-                                        </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="license-card">
+                                <div class="license-image__wrap">
+                                    <div class="license-image__inner">
+                                        <img class="license-image" src="./img/license-2-small.jpg" alt="">
                                     </div>
-                                    <div class="license-text">
-                                        <p class="license-text__text">Образовательная лицензия ООО «ЦВД»</p>
-                                    </div>
+                                </div>
+                                <div class="license-text">
+                                    <p class="license-text__text">Образовательная лицензия ООО «ЦВД»</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-12 order-md-first col-md-6">
+                <div class="col-12 order-xl-first col-xl-6">
                     <div class="license__wrap">
                         <div class="license-info">
                             <p class="license-info__text">Мы работаем ради результатов детей, школа домашнего обучения Wikids – это образовательный проект, призванный организовать процесс домашнего обучения вашего ребёнка. Мы оказываем методическую и консультативную помощь родителям. Школа домашнего обучения Wikids обладает всеми необходимыми образовательными лицензиями.</p>
@@ -461,9 +463,9 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
     <div class="container-lg p-0">
         <main class="contact-main">
             <div class="row no-gutters">
-                <div class="col-12 col-md-6">
+                <div class="col-12 col-lg-6">
                     <div class="contact__wrap">
-                        <h2 class="section-header__header">У&nbsp;вас&nbsp;остались&nbsp;вопросы? Свяжитесь с нами!</h2>
+                        <h2 class="section-header__header">У&nbsp;вас остались вопросы? Свяжитесь с нами!</h2>
                         <div class="contact-text">
                             <p class="contact-text__text">Свяжитесь с нами, оставьте свой вопрос в форме или свяжитесь с нами удобным для вас способом.</p>
                         </div>
@@ -482,7 +484,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-md-6">
+                <div class="col-12 col-lg-6">
                     <div id="contact-request-block" class="contact-form__wrap">
                         <?= $this->render('_request_form', ['model' => $contactRequestModel]) ?>
                     </div>

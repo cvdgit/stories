@@ -598,7 +598,7 @@ a {
         margin-right: 8rem;
         height: 100%;
         @include media-breakpoint-down(md) {
-            margin-right: 2rem;
+            margin-right: 0;
             margin-bottom: 4rem;
             padding: 2.7rem 2.7rem 3.4rem 2.9rem;
             height: auto;
@@ -942,9 +942,17 @@ a {
     padding-left: 2rem;
     padding-right: 5rem;
     position: relative;
+    @include media-breakpoint-down(md) {
+        padding-right: 8rem;
+        padding-left: 0;
+    }
     &__wrap {
         height: 100%;
         min-height: 30rem;
+        @include media-breakpoint-down(md) {
+            min-height: auto;
+            margin-bottom: 3rem;
+        }
     }
 }
 
@@ -968,14 +976,38 @@ a {
         margin: 0;
         color: var(--white);
         position: absolute;
-        left: 4vmax;
-        top: 2vmax;
+        left: 5vmax;
+        top: 3vmax;
         font-size: 4.8rem;
         line-height: 6.72rem;
         font-weight: 700;
+        width: 70%;
+        @include media-breakpoint-down(xl) {
+            font-size: 4rem;
+            line-height: 5rem;
+        }
+        @include media-breakpoint-down(lg) {
+            top: 3vw;
+            font-size: 4rem;
+            line-height: 5rem;
+            width: 48%;
+        }
+        @include media-breakpoint-down(md) {
+            top: 6vw;
+            font-size: 4.8rem;
+            line-height: 6.72rem;
+            width: 40%;
+        }
+        @include media-breakpoint-down(xs) {
+            padding-right: 5rem;
+            font-size: 3rem;
+            line-height: 4.2rem;
+            width: auto;
+            top: 15%;
+        }
     }
     &__image {
-        width: 100%;
+        max-width: 100%;
     }
 }
 
@@ -993,24 +1025,36 @@ a {
             padding: 0;
         }
     }
+    &__inner {
+        @include media-breakpoint-down(md) {
+            display: flex;
+            justify-content: center;
+        }
+    }
     &__circle {
         background-color: var(--grey);
         border-radius: 50%;
-        width: 31.2vw;
-        height: 31.2vw;
+        width: 31.2vmax;
+        height: 31.2vmax;
         @include media-breakpoint-down(md) {
             position: absolute;
-            width: 100%;
+            //width: 100%;
             height: 100%;
+        }
+        @include media-breakpoint-down(sm) {
+            width: 100%;
         }
     }
     &__image {
         position: absolute;
         left: 0;
         top: 0;
-        width: 31.2vw;
+        width: 31.2vmax;
         @include media-breakpoint-down(md) {
             position: relative;
+            max-width: 100%;
+        }
+        @include media-breakpoint-down(sm) {
             width: 100%;
         }
     }
@@ -1078,6 +1122,9 @@ a {
 .price-main {
     padding-top: 7.5rem;
     padding-left: 7.5rem;
+    @include media-breakpoint-down(xl) {
+        padding-left: 0;
+    }
     @include media-breakpoint-down(md) {
         padding-top: 0;
         padding-left: 0;
@@ -1098,7 +1145,7 @@ a {
     &__image {
 
     }
-    @include media-breakpoint-down(md) {
+    @include media-breakpoint-down(lg) {
         display: none;
     }
 }
@@ -1138,6 +1185,9 @@ a {
 .price-blocks {
     display: flex;
     flex-wrap: nowrap;
+    @include media-breakpoint-down(xl) {
+        padding-bottom: 6rem;
+    }
     @include media-breakpoint-down(md) {
         margin-left: -2rem;
         margin-right: -2rem;
@@ -1192,8 +1242,8 @@ a {
     color: var(--white);
     margin-bottom: 2rem;
     &__icon {
-        width: 4.2vw;
-        height: 4.2vw;
+        //width: 4.2vw;
+        //height: 4.2vw;
         margin-right: 3.8rem;
         @include media-breakpoint-down(md) {
             width: 80px;
@@ -1215,11 +1265,14 @@ a {
 
 .discount-controls {
     margin-bottom: 3.1rem;
-    width: 18vw;
+    display: flex;
     .button {
         padding: 1.5rem 3.9rem 1.6rem 4rem;
         box-shadow: none;
         margin-bottom: 1.5rem;
+    }
+    &__wrap {
+        margin-right: auto;
     }
     @include media-breakpoint-down(md) {
         width: 100%;
@@ -1251,14 +1304,17 @@ a {
     position: absolute;
     right: 2rem;
     top: -20px;
-    width: 31.1vw;
-    height: 30.8vw;
+    max-width: 100%;
+    //width: 31.1vw;
+    //height: 30.8vw;
     @include media-breakpoint-down(md) {
         position: relative;
+        display: block;
         top: auto;
+        right: auto;
         height: auto;
-        width: 100%;
-        //margin-top: auto;
+        width: auto;
+        margin: 0 auto;
     }
     @include media-breakpoint-down(xs) {
         position: relative;
@@ -1267,6 +1323,7 @@ a {
         top: 0;
         right: auto;
         left: -10px;
+        max-width: none;
     }
     &__wrap {
         position: relative;
@@ -1456,14 +1513,23 @@ a {
 
 .section-license {
     background-image: url(../../../public_html/school/img/wave.svg);
-    background-position: top 40% right 0px;
+    background-position: top 40% left 105%;
     background-repeat: no-repeat;
     background-attachment: scroll;
-    @include media-breakpoint-down(xs) {
+    @include media-breakpoint-down(xxl) {
+        background-position: top 35% left 125%;
+    }
+    @include media-breakpoint-down(xl) {
+        background-position: top 50% left 140%;
+    }
+    @include media-breakpoint-down(lg) {
+        background-position: top 37% left 100%;
+
+    }
+    @include media-breakpoint-down(sm) {
         margin-left: 0;
         margin-right: 0;
-        background-position: top 17% left -63px;
-        background-size: auto 8.6rem;
+        background-position: top 17% left 0;
     }
 }
 
@@ -1475,20 +1541,20 @@ a {
         margin-top: 3.5rem;
         margin-bottom: 6.4rem;
     }
-    @include media-breakpoint-down(xs) {
+    @include media-breakpoint-down(sm) {
         background-image: url(../../../public_html/school/img/wave.svg);
-        background-position: top 56% left -102px;
+        background-position: top 56% left 0;
         background-repeat: no-repeat;
         background-attachment: scroll;
-        background-size: auto 8.6rem;
     }
     .section-header__header {
         position: absolute;
-        width: 29vw;
+        width: 56rem;
         left: 6rem;
         z-index: 10;
-        @include media-breakpoint-down(md) {
-            width: 100%;
+        @include media-breakpoint-down(xl) {
+            position: relative;
+            //width: 55rem;
             margin-bottom: 4.7rem;
         }
     }
@@ -1499,10 +1565,11 @@ a {
         padding-left: 6rem;
         padding-right: 11rem;
         margin-top: 15rem;
+        @include media-breakpoint-down(xl) {
+            margin-top: 5rem;
+        }
         @include media-breakpoint-down(md) {
-            margin-top: 0;
             padding-left: 0;
-            padding-right: 1rem;
             margin-left: 2rem;
             margin-right: 2rem;
         }
@@ -1526,6 +1593,7 @@ a {
     z-index: 20;
     margin: .8rem auto;
     display: block;
+    max-width: 100%;
     &__inner {
         background: linear-gradient(146.47deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 43.3%);
         &:after {
@@ -1546,12 +1614,14 @@ a {
         position: relative;
         border: 2px #c4c4c4 solid;
         margin-bottom: 3.6rem;
+        background-color: var(--grey);
     }
 }
 
 .license-card {
-    width: 13.7vw;
+    width: 25.2rem;
     padding: 0 .5rem;
+    margin: 0 auto;
     @include media-breakpoint-down(md) {
         width: 252px;
         margin: 0 auto;
@@ -1592,6 +1662,9 @@ a {
     &__wrap {
         padding-left: 7.8rem;
         padding-right: 6rem;
+        @include media-breakpoint-down(xl) {
+            padding-right: 0;
+        }
         @include media-breakpoint-down(md) {
             padding-left: 0;
             padding-right: 0;
@@ -1667,6 +1740,9 @@ a {
         margin-right: 8rem;
         margin-left: 14rem;
         height: 100%;
+        @include media-breakpoint-down(xl) {
+            margin-left: 0;
+        }
         @include media-breakpoint-down(md) {
             margin-left: 0;
             margin-right: 0;
@@ -1780,7 +1856,7 @@ a {
 .footer-right {
     text-align: right;
     margin-top: 2rem;
-    @include media-breakpoint-down(md) {
+    @include media-breakpoint-down(sm) {
         text-align: left;
     }
 }
