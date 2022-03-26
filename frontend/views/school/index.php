@@ -369,7 +369,12 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                                     </a>
                                     <div id="rowTwo" class="collapse">
                                         <div class="ask-card-content">
-                                            <p></p>
+                                            <ul>
+                                                <li>Заявление</li>
+                                                <li>Свидетельство о рождении</li>
+                                                <li>Согласие на обработку персональных данных</li>
+                                                <li>Личное дело ученика</li>
+                                            </ul>
                                         </div>
                                     </div>
                                     <div class="ask-card-header__icon">
