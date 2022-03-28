@@ -195,9 +195,9 @@ class TrainingController extends UserController
                 $model[] = $value;
             }
 
-            if (!$noTimes) {
+            //if (!$noTimes) {
                 $models[] = $model;
-            }
+            //}
         }
 
         return $this->render('index_new', [
