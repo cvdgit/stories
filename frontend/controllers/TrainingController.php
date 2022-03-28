@@ -47,6 +47,7 @@ class TrainingController extends UserController
                 $filterForm->setDatePrev();
             }
             $targetDate = $filterForm->getFormattedDate();
+            die(var_dump($targetDate));
         }
 
         $storyBeginDate = new Expression("UNIX_TIMESTAMP('$targetDate 00:00:00')");
