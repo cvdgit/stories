@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use common\models\User;
+use common\models\UserStudent;
 use frontend\components\learning\form\HistoryFilterForm;
 use frontend\components\UserController;
 use Yii;
@@ -26,9 +27,10 @@ class TrainingController extends UserController
             $targetStudent = $user->student();
         }
         else {
-            if (($targetStudent = $user->findStudentById($student_id)) === null) {
-                throw new NotFoundHttpException('Студент не найден');
-            }
+            $targetStudent = UserStudent::findOne($student_id);
+            //if (($targetStudent = $user->findStudentById($student_id)) === null) {
+            //    throw new NotFoundHttpException('Студент не найден');
+            //}
         }
 
         $userId = $user->id;
