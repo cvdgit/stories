@@ -72,6 +72,7 @@ class TrainingController extends UserController
         $minTimeHour = 0;
         $maxTimeHour = 0;
 
+        $unsetIndex = [];
         foreach ($stories as $i => $story) {
 
             $storyId = $story['story_id'];
@@ -82,9 +83,10 @@ class TrainingController extends UserController
                 ->where(['t.story_id' => $storyId])
                 ->all();
 
-            //if (count($testRows) === 0) {
-            //    continue;
-            //}
+            if (count($testRows) === 0) {
+                $unsetIndex[] = $i;
+                continue;
+            }
 
             $testIds = array_map(static function($row) {
                 return $row['test_id'];
@@ -123,6 +125,10 @@ class TrainingController extends UserController
                     return $max;
                 }, $storyTimes[0]['hour']);
             }
+        }
+
+        foreach ($unsetIndex as $index) {
+            unset($stories[$index]);
         }
 
         $interval = 60;
