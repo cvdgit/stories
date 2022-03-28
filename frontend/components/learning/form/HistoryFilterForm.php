@@ -26,7 +26,7 @@ class HistoryFilterForm extends Model
     {
         return [
             [['date'], 'required'],
-            [['date'], 'date', 'format' => 'd.m.Y'],
+            [['date'], 'date', 'format' => 'd.m.yyyy'],
             ['action', 'in', 'range' => [self::ACTION_CHANGE, self::ACTION_NEXT, self::ACTION_PREV]],
         ];
     }
