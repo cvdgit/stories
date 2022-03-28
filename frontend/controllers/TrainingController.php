@@ -81,6 +81,11 @@ class TrainingController extends UserController
                 ->from(['t' => 'story_story_test'])
                 ->where(['t.story_id' => $storyId])
                 ->all();
+
+            if (empty($testRows)) {
+                continue;
+            }
+
             $testIds = array_map(static function($row) {
                 return $row['test_id'];
             }, $testRows);
