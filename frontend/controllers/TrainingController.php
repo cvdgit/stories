@@ -118,6 +118,13 @@ class TrainingController extends UserController
 
         $interval = 60;
         $times = [
+            ['time' => '00:00', 'hour' => 0, 'minute_div' => 0 % $interval],
+            ['time' => '01:00', 'hour' => 1, 'minute_div' => 0 % $interval],
+            ['time' => '02:00', 'hour' => 2, 'minute_div' => 0 % $interval],
+            ['time' => '03:00', 'hour' => 3, 'minute_div' => 0 % $interval],
+            ['time' => '04:00', 'hour' => 4, 'minute_div' => 0 % $interval],
+            ['time' => '05:00', 'hour' => 5, 'minute_div' => 0 % $interval],
+            ['time' => '06:00', 'hour' => 6, 'minute_div' => 0 % $interval],
             ['time' => '07:00', 'hour' => 7, 'minute_div' => 0 % $interval],
             ['time' => '08:00', 'hour' => 8, 'minute_div' => 0 % $interval],
             ['time' => '09:00', 'hour' => 9, 'minute_div' => 0 % $interval],
