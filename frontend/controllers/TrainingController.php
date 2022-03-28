@@ -102,6 +102,7 @@ class TrainingController extends UserController
 
             $storyTimes = $query->all();
             $stories[$i]['times'] = $storyTimes;
+            print_r($stories[$i]['times']);
 
             if (count($storyTimes) > 0) {
                 $minTimeHour = array_reduce($storyTimes, static function($min, $item) {
