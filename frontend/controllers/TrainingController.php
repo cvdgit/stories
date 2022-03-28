@@ -82,9 +82,9 @@ class TrainingController extends UserController
                 ->where(['t.story_id' => $storyId])
                 ->all();
 
-            if (count($testRows) === 0) {
-                continue;
-            }
+            //if (count($testRows) === 0) {
+            //    continue;
+            //}
 
             $testIds = array_map(static function($row) {
                 return $row['test_id'];
