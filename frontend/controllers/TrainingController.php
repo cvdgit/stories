@@ -82,7 +82,7 @@ class TrainingController extends UserController
                 ->where(['t.story_id' => $storyId])
                 ->all();
 
-            if (empty($testRows)) {
+            if (count($testRows) === 0) {
                 continue;
             }
 
