@@ -28,6 +28,7 @@ class TrainingController extends UserController
         }
         else {
             $targetStudent = UserStudent::findOne($student_id);
+            $user = $targetStudent->user;
             //if (($targetStudent = $user->findStudentById($student_id)) === null) {
             //    throw new NotFoundHttpException('Студент не найден');
             //}
