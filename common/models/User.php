@@ -416,6 +416,14 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->student()->id;
     }
 
+    public function findStudentById(int $id): ?UserStudent
+    {
+        return $this
+            ->getStudents()
+            ->andWhere(['id' => $id])
+            ->one();
+    }
+
     public static function getUserList(): array
     {
         return ArrayHelper::map(self::find()->all(), 'id', 'profileName');
