@@ -34,7 +34,7 @@ class TrainingController extends UserController
             //}
         }
 
-        $userId = $user->id;
+        //$userId = $user->id;
         $studentId = $targetStudent->id;
 
         $targetDate = date('Y-m-d');
@@ -46,9 +46,83 @@ class TrainingController extends UserController
             if ($filterForm->action === 'prev') {
                 $filterForm->setDatePrev();
             }
+            $filterForm->resetAction();
             $targetDate = $filterForm->getFormattedDate();
         }
 
+        $historyQuery = new Query();
+
+        $hourExpression = new Expression('hour(FROM_UNIXTIME(t.created_at))');
+        $minuteExpression = new Expression('minute(FROM_UNIXTIME(t.created_at)) DIV 60');
+        $historyQuery->select([
+            'story_id' => 't2.story_id',
+            'question_count' => new Expression('COUNT(t.id)'),
+            'hour' => $hourExpression,
+            'minute_div' => $minuteExpression,
+        ]);
+        $historyQuery->from(['t' => 'user_question_history']);
+        $historyQuery->innerJoin(['t2' => 'story_story_test'], 't.test_id = t2.test_id');
+        $historyQuery->where(['t.student_id' => $studentId]);
+
+        $betweenBegin = new Expression("UNIX_TIMESTAMP('$targetDate 00:00:00')");
+        $betweenEnd = new Expression("UNIX_TIMESTAMP('$targetDate 23:59:59')");
+        $historyQuery->andWhere(['between', 't.created_at', $betweenBegin, $betweenEnd]);
+
+        $historyQuery->groupBy([
+            't2.story_id',
+            $hourExpression,
+            $minuteExpression
+        ]);
+
+        $query = new Query();
+        $query->select([
+            'story_id' => 't.story_id',
+            'story_title' => 't2.title',
+            'question_count' => 't.question_count',
+            'hour' => 't.hour',
+            'minute_div' => 't.minute_div',
+        ]);
+        $query->from(['t' => $historyQuery]);
+        $query->innerJoin(['t2' => 'story'], 't.story_id = t2.id');
+
+        $rows = $query->all();
+        $stories = [];
+        foreach ($rows as $row) {
+            $storyId = $row['story_id'];
+            if (!isset($stories[$storyId])) {
+                $stories[$storyId] = [
+                    'story_title' => $row['story_title'],
+                    'times' => [],
+                ];
+            }
+            $stories[$storyId]['times'][] = [
+                'question_count' => $row['question_count'],
+                'hour' => $row['hour'],
+                'minute_div' => $row['minute_div'],
+            ];
+        }
+
+        $minTimeHour = 0;
+        $maxTimeHour = 0;
+        foreach ($stories as $story) {
+            $storyTimes = $story['times'];
+            if (count($storyTimes) > 0) {
+                $minTimeHour = array_reduce($storyTimes, static function($min, $item) {
+                    if ($item['hour'] < $min) {
+                        return $item['hour'];
+                    }
+                    return $min;
+                }, $storyTimes[0]['hour']);
+                $maxTimeHour = array_reduce($storyTimes, static function($max, $item) {
+                    if ($item['hour'] > $max) {
+                        return $item['hour'];
+                    }
+                    return $max;
+                }, $storyTimes[0]['hour']);
+            }
+        }
+
+        /*
         $storyBeginDate = new Expression("UNIX_TIMESTAMP('$targetDate 00:00:00')");
         $storyEndDate = new Expression("UNIX_TIMESTAMP('$targetDate 23:59:59')");
         $stories = (new Query())
@@ -109,7 +183,6 @@ class TrainingController extends UserController
 
             $storyTimes = $query->all();
             $stories[$i]['times'] = $storyTimes;
-            //echo $query->createCommand()->rawSql;
 
             if (count($storyTimes) > 0) {
                 $minTimeHour = array_reduce($storyTimes, static function($min, $item) {
@@ -130,6 +203,7 @@ class TrainingController extends UserController
         foreach ($unsetIndex as $index) {
             unset($stories[$index]);
         }
+        */
 
         $interval = 60;
         $times = [
@@ -181,7 +255,6 @@ class TrainingController extends UserController
                 $story['story_title'],
             ];
 
-            $noTimes = true;
             foreach ($times as $time) {
 
                 $timeHour = (int) $time['hour'];
@@ -200,16 +273,13 @@ class TrainingController extends UserController
                     $minuteDiv = (int) $row['minute_div'];
                     if ($hour === $timeHour && $minuteDiv === $timeMinuteDiv) {
                         $value = $questionCount;
-                        $noTimes = false;
                     }
                 }
 
                 $model[] = $value;
             }
 
-            //if (!$noTimes) {
-                $models[] = $model;
-            //}
+            $models[] = $model;
         }
 
         return $this->render('index_new', [
@@ -220,5 +290,4 @@ class TrainingController extends UserController
             'filterModel' => $filterForm,
         ]);
     }
-
 }

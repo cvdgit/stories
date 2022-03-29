@@ -18,7 +18,7 @@ class HistoryFilterForm extends Model
     public function init(): void
     {
         $this->date = date('d.m.Y');
-        $this->action = self::ACTION_CHANGE;
+        $this->resetAction();
         parent::init();
     }
 
@@ -50,5 +50,10 @@ class HistoryFilterForm extends Model
     public function setDatePrev(): void
     {
         $this->date = (new \DateTimeImmutable($this->date))->add(\DateInterval::createFromDateString('-1 day'))->format('d.m.Y');
+    }
+
+    public function resetAction(): void
+    {
+        $this->action = self::ACTION_CHANGE;
     }
 }

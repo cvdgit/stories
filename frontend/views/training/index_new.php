@@ -53,7 +53,7 @@ CSS
                 <div class="filter-arrow__wrap filter-arrow--left">
                     <?= Html::a('<i class="glyphicon glyphicon-chevron-left"></i>', '#', [
                         'class' => 'filter-arrow__link',
-                        'onclick' => new \yii\web\JsExpression('$("#historyfilterform-action").val("prev"); $("#history-filter-form").submit();'),
+                        'onclick' => new \yii\web\JsExpression('$("#historyfilterform-action").val("prev"); $("#history-filter-form").submit(); return false'),
                     ]) ?>
                 </div>
             </div>
@@ -79,7 +79,7 @@ CSS
                 <div class="filter-arrow__wrap filter-arrow--right">
                     <?= Html::a('<i class="glyphicon glyphicon-chevron-right"></i>', '#', [
                         'class' => 'filter-arrow__link',
-                        'onclick' => new \yii\web\JsExpression('$("#historyfilterform-action").val("next"); $("#history-filter-form").submit();'),
+                        'onclick' => new \yii\web\JsExpression('$("#historyfilterform-action").val("next"); $("#history-filter-form").submit(); return false'),
                     ]) ?>
                 </div>
             </div>
