@@ -143,7 +143,7 @@ use common\rbac\UserRoles;
                                         <p class="contact-row__text">© 2018–<?= date('Y') ?>, Wikids</p>
                                     </div>
                                     <div class="contact-row contact-row--no-mb">
-                                        <p class="contact-row__text">ООО Центр внедрения документооборота</p>
+                                        <p class="contact-row__text">ООО «ЦВД»</p>
                                     </div>
                                 </div>
                             </div>
