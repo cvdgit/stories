@@ -1771,6 +1771,21 @@ a {
 
     .form-group {
         margin-bottom: 2.1rem;
+        &.has-error {
+            .help-block {
+                text-align: center;
+            }
+        }
+    }
+
+    &--inline {
+        .form-group {
+            &.has-error {
+                .help-block {
+                    color: #ffc107;
+                }
+            }
+        }
     }
 }
 

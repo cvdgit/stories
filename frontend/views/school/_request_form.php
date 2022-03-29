@@ -7,7 +7,7 @@ use yii\helpers\Html;
     'action' => ['contact/create'],
     'options' => [
         'id' => 'contact-request-form-bottom',
-        'class' => 'contact-form',
+        'class' => 'contact-form contact-form--inline',
     ],
 ]) ?>
     <div class="contact-form__controls">
