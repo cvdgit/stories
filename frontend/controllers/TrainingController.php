@@ -27,14 +27,11 @@ class TrainingController extends UserController
             $targetStudent = $user->student();
         }
         else {
-            $targetStudent = UserStudent::findOne($student_id);
-            $user = $targetStudent->user;
-            //if (($targetStudent = $user->findStudentById($student_id)) === null) {
-            //    throw new NotFoundHttpException('Студент не найден');
-            //}
+            if (($targetStudent = $user->findStudentById($student_id)) === null) {
+                throw new NotFoundHttpException('Студент не найден');
+            }
         }
 
-        //$userId = $user->id;
         $studentId = $targetStudent->id;
 
         $targetDate = date('Y-m-d');
