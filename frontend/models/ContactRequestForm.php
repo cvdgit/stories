@@ -10,6 +10,7 @@ class ContactRequestForm extends Model
 
     public $name;
     public $phone;
+    public $email;
     public $text;
 
     /**
@@ -18,7 +19,9 @@ class ContactRequestForm extends Model
     public function rules(): array
     {
         return [
-            [['name', 'phone', 'text'], 'required'],
+            [['name', 'phone', 'email', 'text'], 'required'],
+            [['name', 'phone', 'email'], 'string', 'max' => 50],
+            ['email', 'email'],
         ];
     }
 
@@ -31,6 +34,7 @@ class ContactRequestForm extends Model
             'name' => 'ФИО',
             'phone' => 'Номер телефона',
             'text' => 'Вопрос',
+            'email' => 'Email',
         ];
     }
 
@@ -39,7 +43,7 @@ class ContactRequestForm extends Model
         if (!$this->validate()) {
             throw new \DomainException('ContactRequestForm not valid');
         }
-        $model = ContactRequest::create($this->name, $this->phone, $this->text);
+        $model = ContactRequest::create($this->name, $this->phone, $this->email, $this->text);
         if (!$model->save()) {
             throw new \DomainException('ContactRequestForm save exception');
         }

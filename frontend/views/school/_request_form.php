@@ -13,6 +13,7 @@ use yii\helpers\Html;
     <div class="contact-form__controls">
         <?= $form->field($model, 'name')->textInput(['placeholder' => 'Ваше имя', 'autocomplete' => 'off'])->label(false) ?>
         <?= $form->field($model, 'phone')->textInput(['placeholder' => '+7 (999) 999-99-99', 'autocomplete' => 'off'])->label(false) ?>
+        <?= $form->field($model, 'email')->textInput(['placeholder' => 'Ваш email', 'autocomplete' => 'off'])->label(false) ?>
         <?= $form->field($model, 'text')->textarea(['rows' => 6, 'placeholder' => 'Введите ваш вопрос'])->label(false) ?>
     </div>
     <div class="contact-form-submit__wrap">

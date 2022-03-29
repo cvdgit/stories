@@ -12,6 +12,7 @@ use yii\db\ActiveRecord;
  * @property int $id
  * @property string $name
  * @property string $phone
+ * @property string $email
  * @property string $text
  * @property int $created_at
  * @property int $updated_at
@@ -40,32 +41,34 @@ class ContactRequest extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['name', 'phone', 'text'], 'required'],
+            [['name', 'phone', 'email', 'text'], 'required'],
             [['text'], 'string'],
-            [['name', 'phone'], 'string', 'max' => 255],
+            [['name', 'phone', 'email'], 'string', 'max' => 255],
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
             'name' => 'Name',
             'phone' => 'Phone',
             'text' => 'Text',
+            'email' => 'Email',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
     }
 
-    public static function create(string $name, string $phone, string $text): self
+    public static function create(string $name, string $phone, string $email, string $text): self
     {
         $model = new self();
         $model->name = $name;
         $model->phone = $phone;
+        $model->email = $email;
         $model->text = $text;
         return $model;
     }

@@ -181,7 +181,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 <div class="col-12 col-lg-4">
                     <div class="box box__works">
                         <h3 class="box-header box-header--works">Задачи родителя</h3>
-                        <div class="box-text box-text--text-left">Цель родителя — приучить ребёнка учиться самостоятельно. Без родителя. Это реально и вполне достижимо. Родитель получает всё необходимое, чтоб понять материал самому и при необходимости объяснить ребёнку. На первом этапе для ребёнка важна моральная поддержка от родителя.</div>
+                        <div class="box-text box-text--text-left">Цель родителя — приучить ребёнка учиться самостоятельно, без участия родителя. Это реально и вполне достижимо. Родитель получает всё необходимое, чтобы понять материал самому и при необходимости объяснить ребёнку. На первом этапе для ребёнка важна моральная поддержка от родителя.</div>
                     </div>
                     <div class="fragment fragment__9 fragment--circle-green"></div>
                 </div>
@@ -229,7 +229,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                         </div>
                         <div class="plan-content-item">
                             <h3 class="plan-content-item__title">Обучение с опережением</h3>
-                            <p class="plan-content-item__text">Для одарённых детей возможно учиться с опережением стандартного учебного плана. Например, два учебных года за один календарный.</p>
+                            <p class="plan-content-item__text">Для самых устремлённых возможно учиться с опережением стандартного учебного плана. Например, два учебных года за один календарный.</p>
                         </div>
                         <div class="plan-content-item">
                             <h3 class="plan-content-item__title">Обучение в своём темпе</h3>
@@ -264,7 +264,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                                 <h2 class="box-header box-header--price">Основной<br>курс</h2>
                                 <div class="price-content">
                                     <p class="price-content__item">Электронные учебники</p>
-                                    <p class="price-content__item">Персональный проверка заданий</p>
+                                    <p class="price-content__item">Персональная проверка заданий</p>
                                     <p class="price-content__item">Тестирование и рекомендации</p>
                                 </div>
                                 <div class="price">
