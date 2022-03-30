@@ -50,7 +50,7 @@ class TrainingController extends UserController
         $historyQuery = new Query();
 
         $hourExpression = new Expression("hour(convert_tz(FROM_UNIXTIME(t.created_at), 'UTC', '+3:00'))");
-        $minuteExpression = new Expression("minute(convert_tz(FROM_UNIXTIME(t.created_at), 'UTC', '+3:00') DIV 60");
+        $minuteExpression = new Expression("minute(convert_tz(FROM_UNIXTIME(t.created_at), 'UTC', '+3:00')) DIV 60");
         $historyQuery->select([
             'story_id' => 't2.story_id',
             'question_count' => new Expression('COUNT(t.id)'),
