@@ -18,10 +18,10 @@ class TestBuilder
         $this->test = $test;
         $this->data = $data;
         $this->stars = $stars;
-        $this->collection = new QuestionCollection($dataCount, $fastMode);
+        $this->collection = new QuestionCollection($dataCount, $fastMode ? 1 : $test->repeat);
     }
 
-    public function build()
+    public function build(): QuestionCollection
     {
         (new TestCollection($this->data, $this->stars, $this->test))
             ->build($this->collection);

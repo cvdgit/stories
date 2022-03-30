@@ -20,7 +20,7 @@ class Serializer
                 'test' => [
                     'id' => $test->id,
                     'progress' => [
-                        'total' => $collection->getTotal() * ($fastMode ? 1 : 5),
+                        'total' => $collection->getTotal() * ($fastMode ? 1 : $test->repeat),
                         'current' => $userStarsCount,
                     ],
                     'showAnswerImage' => true,
@@ -36,7 +36,7 @@ class Serializer
                     'askQuestionLang' => $test->ask_question_lang,
                     'hideQuestionName' => filter_var($test->hide_question_name, FILTER_VALIDATE_BOOLEAN),
                     'hideAnswersName' => filter_var($test->hide_answers_name, FILTER_VALIDATE_BOOLEAN),
-                    'repeatQuestions' => $fastMode ? 1 : 5,
+                    'repeatQuestions' => $fastMode ? 1 : $test->repeat,
                 ],
                 'students' => $students,
                 'stories' => $stories,

@@ -71,6 +71,10 @@ class QuestionController extends Controller
         return $result;
     }
 
+    /**
+     * @throws NotFoundHttpException
+     * @throws HttpException
+     */
     public function actionGet(int $testId, int $studentId = null, $question_params = null, bool $fastMode = false)
     {
 
@@ -80,10 +84,13 @@ class QuestionController extends Controller
         $userHistory = [];
         $userStars = [];
         $userStarsCount = 0;
+
+        $repeat = $test->calcRepeat($fastMode);
+
         if ($studentId !== null && !$fastMode) {
             $userQuestionHistoryModel = new UserQuestionHistoryModel();
             $userQuestionHistoryModel->student_id = $studentId;
-            $userHistory = $userQuestionHistoryModel->getUserQuestionHistoryLocal($test->id);
+            $userHistory = $userQuestionHistoryModel->getUserQuestionHistoryLocal($test->id, $repeat);
             $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStarsLocal($test->id);
             $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCountLocal($test->id);
         }
@@ -219,7 +226,7 @@ class QuestionController extends Controller
                 'topic_name' => $resultItem['question_topic_name'],
                 'correct_number' => $resultItem['correct_number'],
                 'stars' => [
-                    'total' => ($fastMode ? 1 : 5),
+                    'total' => $repeat,
                     'current' => (int)$stars,
                 ],
                 'view' => $svg ? 'svg' : '',
@@ -237,7 +244,7 @@ class QuestionController extends Controller
             'test' => [
                 'id' => $test->id,
                 'progress' => [
-                    'total' => $numberQuestions * ($fastMode ? 1 : 5),
+                    'total' => $numberQuestions * $repeat,
                     'current' => (int)$userStarsCount,
                 ],
                 'incorrectAnswerText' => $test->incorrect_answer_text,
@@ -246,6 +253,7 @@ class QuestionController extends Controller
                 'showQuestionImage' => $showQuestionImage,
                 'answerType' => 0,
                 'source' => $test->source,
+                'repeatQuestions' => $repeat,
             ],
             'students' => $this->getStudents($test->id),
             'incorrectAnswerAction' => $incorrectAnswerAction,
@@ -332,5 +340,4 @@ class QuestionController extends Controller
         }
         throw new NotFoundHttpException('The requested page does not exist.');
     }
-
 }

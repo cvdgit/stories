@@ -79,34 +79,37 @@
         return diffAnswer;
     }
 
-    var QuestionSuccess = function() {
+    var QuestionSuccess = function(stars) {
+
+        var textMap = new Array();
+        textMap[1] = 'одну зведу';
+        textMap[2] = 'две зведы';
+        textMap[3] = 'три зведы';
+        textMap[4] = 'четыре зведы';
+        textMap[5] = 'пять звед';
 
         function create(title, image) {
-            /*var $action = $('<button/>')
-                .addClass('btn')
-                .text('Продолжить')
-                .on('click', action);*/
-            return $('<div/>')
+
+            var $wrap = $('<div/>')
                 .addClass('wikids-test-success-question-page')
-                .hide()
+                .hide();
+
+            var $content = $('<div/>')
+                .addClass('wikids-test-success-question-page-content');
+
+            for (var $i = 1; $i <= stars; $i++) {
+                $content.append('<i class="glyphicon glyphicon-star"></i>');
+            }
+
+            $content
                 .append(
-                    $('<div/>').addClass('wikids-test-success-question-page-content')
-                        .append('<i class="glyphicon glyphicon-star"></i>')
-                        .append('<i class="glyphicon glyphicon-star"></i>')
-                        .append('<i class="glyphicon glyphicon-star"></i>')
-                        .append('<i class="glyphicon glyphicon-star"></i>')
-                        .append('<i class="glyphicon glyphicon-star"></i>')
-                        .append(
-                            $('<h4/>').text('Вы заработали 5 звезд!')
-                        )
-                        .append($('<p/>').text(title))
-                        .append($('<img/>').attr('src', image))
-                );
-/*                .append(
-                    $('<div/>')
-                        .addClass('wikids-test-success-question-page-action')
-                        .append($action)
-                );*/
+                    $('<h4/>').text('Вы заработали ' + textMap[stars] + '!')
+                )
+                .append($('<p/>').text(title))
+                .append($('<img/>').attr('src', image))
+                .appendTo($wrap);
+
+            return $wrap;
         }
 
         return {
@@ -1438,8 +1441,10 @@
         var linked;
         var speech;
 
+        var repeatQuestions = 5;
+
         function getQuestionRepeat() {
-            return that.options.fastMode ? 1 : 5;
+            return that.options.fastMode ? 1 : repeatQuestions;
         }
 
         var questionCode;
@@ -1451,7 +1456,6 @@
         function load(data) {
             console.debug('WikidsStoryTest.load');
 
-            questionSuccess = new QuestionSuccess();
             testData = data[0];
             questions = getQuestionsData();
             numQuestions = questions.length;
@@ -1467,7 +1471,13 @@
                 showAnswerImage = testData['test']['showAnswerImage'];
                 showAnswerText = testData['test']['showAnswerText'];
                 showQuestionImage = testData['test']['showQuestionImage'];
+
+                if (testData['test']['repeatQuestions']) {
+                    repeatQuestions = testData['test']['repeatQuestions'];
+                }
             }
+
+            questionSuccess = new QuestionSuccess(getQuestionRepeat());
 
             testConfig = new TestConfig(testData['test']);
             linked = new TestLinked(testData['stories']);
@@ -2928,7 +2938,7 @@
                 }
             }
             else {
-                if (done && !that.options.fastMode) {
+                if (done && !that.options.fastMode && getQuestionRepeat() > 1) {
                     showQuestionSuccessPage(answer);
                 }
                 else {

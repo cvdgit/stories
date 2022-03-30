@@ -15,7 +15,7 @@ $this->params['breadcrumbs'] = [
         <div class="col-md-6">
             <?= $this->render('_form', [
                 'model' => $model,
-                'dataProvider' => $dataProvider,
+                'repeatChangeModel' => null,
             ]) ?>
         </div>
     </div>

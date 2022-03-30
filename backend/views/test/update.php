@@ -5,6 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\StoryTest */
 /** @var $dataProvider yii\data\ActiveDataProvider */
+/** @var backend\models\test\ChangeRepeatForm $repeatChangeModel */
 $this->title = 'Изменить тест';
 $this->params['breadcrumbs'] = [
     ['label' => 'Все тесты', 'url' => ['test/index', 'source' => $model->source]],
@@ -27,6 +28,7 @@ TestAsset::register($this);
                         ['label' => 'Запустить тест', 'url' => Yii::$app->urlManagerFrontend->createAbsoluteUrl(['test/view', 'id' => $model->id]), 'linkOptions' => ['id' => 'run-test']],
                         ['label' => 'Запустить тест от пользователя', 'url' => ['user/user-list'], 'linkOptions' => ['data-toggle' => 'modal', 'data-target' => '#select-user-modal']],
                         ['label' => 'Печать', 'url' => ['question/print', 'test_id' => $model->id], 'linkOptions' => ['data-toggle' => 'modal', 'data-target' => '#print-questions-modal']],
+                        ['label' => 'История прохождения', 'url' => ['/history/list', 'test_id' => $model->id], 'visible' => !$model->isTemplate()],
                     ],
                 ]) ?>
             </div>
@@ -34,7 +36,7 @@ TestAsset::register($this);
     <?php endif ?>
     <div class="row">
         <div class="col-md-6">
-            <?= $this->render('_form', ['model' => $model]) ?>
+            <?= $this->render('_form', ['model' => $model, 'repeatChangeModel' => $repeatChangeModel]) ?>
         </div>
         <div class="col-md-6 test-sidebar">
             <?php if (!$model->isNewRecord && !$model->isVariant() && !$model->isTemplate()): ?>

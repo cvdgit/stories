@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use backend\models\test\TestRepeat;
 use common\helpers\Url;
 use common\models\test\AnswerType;
 use common\models\test\SourceType;
@@ -46,6 +47,7 @@ use yii\helpers\ArrayHelper;
  * @property int $hide_question_name
  * @property int $answers_hints
  * @property int $hide_answers_name
+ * @property int $repeat
  *
  * @property StoryTestQuestion[] $storyTestQuestions
  * @property Story[] $stories
@@ -92,6 +94,8 @@ class StoryTest extends ActiveRecord
             [['title', 'question_list_name', 'header', 'question_params', 'incorrect_answer_text', 'input_voice', 'recording_lang', 'ask_question_lang'], 'string', 'max' => 255],
             [['description_text'], 'string'],
             [['question_list', 'sortable'], 'safe'],
+            ['repeat', 'integer'],
+            ['repeat', 'in', 'range' => TestRepeat::getForRange()],
         ];
     }
 
@@ -126,6 +130,7 @@ class StoryTest extends ActiveRecord
             'hide_question_name' => 'Скрывать текст вопроса',
             'answers_hints' => 'Показывать подсказки к ответам',
             'hide_answers_name' => 'Скрывать текст ответов',
+            'repeat' => 'Повторять вопрос',
         ];
     }
 
@@ -260,7 +265,7 @@ class StoryTest extends ActiveRecord
             ->count();
     }
 
-    public static function create(string $title, string $header, string $description, string $incorrectAnswerText, int $remote = self::LOCAL, int $source = SourceType::TEST)
+    public static function create(string $title, string $header, string $description, string $incorrectAnswerText, int $remote = self::LOCAL, int $source = SourceType::TEST): StoryTest
     {
         $model = new self();
         $model->title = $title;
@@ -269,6 +274,7 @@ class StoryTest extends ActiveRecord
         $model->incorrect_answer_text = $incorrectAnswerText;
         $model->remote = $remote;
         $model->source = $source;
+        $model->repeat = TestRepeat::DEFAULT;
         return $model;
     }
 
@@ -297,6 +303,7 @@ class StoryTest extends ActiveRecord
         $model->attributes = $sourceModel->attributes;
         $model->title = $title;
         $model->status = TestStatus::TEMPLATE;
+        $model->repeat = TestRepeat::DEFAULT;
         return $model;
     }
 
@@ -306,6 +313,7 @@ class StoryTest extends ActiveRecord
         $model->attributes = $templateModel->attributes;
         $model->status = TestStatus::DEFAULT;
         $model->source = SourceType::TEST;
+        $model->repeat = TestRepeat::DEFAULT;
         return $model;
     }
 
@@ -503,5 +511,10 @@ class StoryTest extends ActiveRecord
     public function showAnswersHints(): bool
     {
         return $this->answers_hints === 1;
+    }
+
+    public function calcRepeat(bool $fastMode): int
+    {
+        return $fastMode ? 1 : $this->repeat;
     }
 }

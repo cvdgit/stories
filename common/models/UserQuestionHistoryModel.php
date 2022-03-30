@@ -120,7 +120,7 @@ class UserQuestionHistoryModel extends Model
         return $leadQuery->all();
     }
 
-    public function getUserQuestionHistoryLocal(int $testID)
+    public function getUserQuestionHistoryLocal(int $testID, int $repeat): array
     {
         $query = (new Query())
             ->select([
@@ -140,7 +140,7 @@ class UserQuestionHistoryModel extends Model
             ])
             ->from(['tbl' => $query])
             ->innerJoin(['tbl2' => UserQuestionHistory::tableName()], 'tbl2.id = tbl.questionID')
-            ->having('tbl2.stars >= 5');
+            ->having('tbl2.stars >= '  . $repeat);
         return $leadQuery->all();
     }
 
@@ -228,7 +228,7 @@ class UserQuestionHistoryModel extends Model
         return $leadQuery->all();
     }
 
-    public function getUserQuestionHistoryStarsLocal(int $testID)
+    public function getUserQuestionHistoryStarsLocal(int $testID): array
     {
         $query = (new Query())
             ->select([

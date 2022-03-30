@@ -1,4 +1,5 @@
 <?php
+use backend\models\test\TestRepeat;
 use backend\widgets\CreateTestTemplateWidget;
 use common\models\test\AnswerType;
 use common\models\test\SourceType;
@@ -8,7 +9,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 /** @var $this yii\web\View */
 /** @var $model common\models\StoryTest */
-/** @var $form yii\widgets\ActiveForm */
+/** @var backend\models\test\ChangeRepeatForm $repeatChangeModel */
 ?>
 <div class="story-test-form">
     <?php $form = ActiveForm::begin(); ?>
@@ -64,20 +65,43 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'hide_answers_name')->checkbox() ?>
     <?= $form->field($model, 'answers_hints')->checkbox() ?>
 
-    <div class="form-group">
-        <?= $form->field($model, 'sortable')->hiddenInput()->label(false) ?>
-        <?= Html::submitButton(($model->isNewRecord ? 'Создать' : 'Изменить') . ' тест', ['class' => 'btn btn-success']) ?>
-        <?php if (!$model->isNewRecord && !$model->isTemplate()): ?>
-        <?= Html::a('История прохождения', ['/history/list', 'test_id' => $model->id], ['class' => 'btn']) ?>
-        <?php endif ?>
-    </div>
-    <?php ActiveForm::end(); ?>
-    <?php if (!$model->isNewRecord && !$model->isTemplate() && ($model->isSourceWordList() || $model->isSourceTest())): ?>
-    <div class="form-group">
-        <?= CreateTestTemplateWidget::widget(['testId' => $model->id]) ?>
+    <?php if ($model->isNewRecord): ?>
+    <?= $form->field($model, 'repeat')->dropDownList(TestRepeat::getForDropdown()) ?>
+    <?php else: ?>
+    <div style="display: flex; align-items: center">
+        <div style="flex: 1; margin-right: 20px">
+            <?= $form->field($model, 'repeat')->dropDownList(TestRepeat::getForDropdown(), ['disabled' => true]) ?>
+        </div>
+        <div>
+            <button class="btn" type="button" data-toggle="modal" data-target="#change-repeat-modal">Изменить</button>
+        </div>
     </div>
     <?php endif ?>
+
+    <?= $form->field($model, 'sortable')->hiddenInput()->label(false) ?>
+
+    <div class="form-group">
+        <div style="display: flex; flex-direction: row">
+            <div style="margin-right: auto">
+                <?= Html::submitButton(($model->isNewRecord ? 'Создать' : 'Изменить') . ' тест', ['class' => 'btn btn-success']) ?>
+            </div>
+            <div>
+                <?php if (!$model->isNewRecord && !$model->isTemplate() && ($model->isSourceWordList() || $model->isSourceTest())): ?>
+                <?= CreateTestTemplateWidget::widget(['testId' => $model->id]) ?>
+                <?php endif ?>
+            </div>
+        </div>
+    </div>
+    <?php ActiveForm::end(); ?>
 </div>
+
+<?php if ($repeatChangeModel !== null): ?>
+<?= $this->render('_repeat_modal', [
+    'model' => $model,
+    'repeatChangeModel' => $repeatChangeModel,
+    'inputId' => Html::getInputId($model, 'repeat'),
+]) ?>
+<?php endif ?>
 
 <?php
 $selected = strtolower(var_export($model->question_list_id, true));

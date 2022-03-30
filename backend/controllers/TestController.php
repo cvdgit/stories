@@ -6,6 +6,7 @@ use backend\models\AnswerImageUploadForm;
 use backend\models\question\CreateQuestion;
 use backend\models\question\UpdateQuestion;
 use backend\models\search\TestSearch;
+use backend\models\test\ChangeRepeatForm;
 use common\models\StoryTest;
 use common\models\StoryTestAnswer;
 use common\models\StoryTestQuestion;
@@ -114,6 +115,7 @@ class TestController extends Controller
         return $this->render('update', [
             'model' => $model,
             'dataProvider' => $dataProvider,
+            'repeatChangeModel' => new ChangeRepeatForm($model->id, $model->repeat),
         ]);
     }
 
@@ -282,4 +284,24 @@ class TestController extends Controller
         return $result;
     }
 
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionChangeRepeat(int $test_id): array
+    {
+        $this->response->format = Response::FORMAT_JSON;
+        $testModel = $this->findModel($test_id);
+        $model = new ChangeRepeatForm($testModel->id);
+        if ($model->load($this->request->post())) {
+            try {
+                $this->historyService->clearTestHistory($testModel->id);
+                $repeat = $model->updateRepeat();
+                return ['success' => true, 'message' => 'Успешно', 'repeat' => $repeat];
+            }
+            catch (\Exception $ex) {
+                return ['success' => false, 'message' => $ex->getMessage()];
+            }
+        }
+        return ['success' => false, 'message' => 'No data'];
+    }
 }

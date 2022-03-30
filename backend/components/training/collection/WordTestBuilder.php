@@ -18,7 +18,7 @@ class WordTestBuilder
         $this->test = $test;
         $this->data = $data;
         $this->stars = $stars;
-        $this->collection = new QuestionCollection($dataCount, $fastMode);
+        $this->collection = new QuestionCollection($dataCount, $fastMode ? 1 : $test->repeat);
     }
 
     private function create(string $className)

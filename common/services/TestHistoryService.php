@@ -62,4 +62,14 @@ class TestHistoryService
         });
     }
 
+    /**
+     * @throws \Exception
+     */
+    public function clearTestHistory(int $testId): void
+    {
+        $this->transactionManager->wrap(static function() use ($testId) {
+            UserQuestionHistory::clearAllTestHistory($testId);
+            StudentQuestionProgress::resetProgressByTest($testId);
+        });
+    }
 }
