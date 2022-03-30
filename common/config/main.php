@@ -22,7 +22,6 @@ return [
             'timeFormat' => 'HH:mm:ss',
             'locale' => 'ru-RU',
             'defaultTimeZone' => 'Europe/Moscow',
-            'timeZone' => 'MSK',
         ],
     ],
 ];
