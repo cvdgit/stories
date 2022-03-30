@@ -2,6 +2,7 @@
 return [
     'language' => 'ru',
     'sourceLanguage' => 'en',
+    'timeZone' => 'Europe/Moscow',
     'name' => 'Wikids',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
