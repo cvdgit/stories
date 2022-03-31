@@ -8,7 +8,7 @@ use frontend\components\learning\widget\HistoryWidget;
 ?>
 <div class="filter__wrap">
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="filter-arrow__wrap filter-arrow--left">
                 <?= Html::a('<i class="glyphicon glyphicon-chevron-left"></i>', '#', [
                     'class' => 'filter-arrow__link',
@@ -16,25 +16,30 @@ use frontend\components\learning\widget\HistoryWidget;
                 ]) ?>
             </div>
         </div>
-        <div class="col-md-6">
-            <?php $form = ActiveForm::begin(['id' => 'history-filter-form']) ?>
-            <?= $form->field($filterModel, 'date')->widget(\dosamigos\datepicker\DatePicker::class, [
-                'language' => 'ru',
-                'clientOptions' => [
-                    'autoclose' => true,
-                    'format' => 'dd.mm.yyyy',
-                ],
-                'options' => [
-                    'autocomplete' => 'off',
-                ],
-                'clientEvents' => [
-                    'changeDate' => new \yii\web\JsExpression('function() { $("#history-filter-form").submit(); }'),
-                ],
-            ])->label(false) ?>
-            <?= $form->field($filterModel, 'action')->hiddenInput()->label(false) ?>
+        <div class="col-md-8">
+            <?php $form = ActiveForm::begin(['id' => 'history-filter-form', 'options' => ['style' => 'display: flex; margin-right: 3rem']]) ?>
+            <div style="flex: 1; margin-right: 3rem">
+                <?= $form->field($filterModel, 'date')->widget(\dosamigos\datepicker\DatePicker::class, [
+                    'language' => 'ru',
+                    'clientOptions' => [
+                        'autoclose' => true,
+                        'format' => 'dd.mm.yyyy',
+                    ],
+                    'options' => [
+                        'autocomplete' => 'off',
+                    ],
+                    'clientEvents' => [
+                        'changeDate' => new \yii\web\JsExpression('function() { $("#history-filter-form").submit(); }'),
+                    ],
+                ])->label(false) ?>
+            </div>
+            <div>
+                <?= $form->field($filterModel, 'hours')->dropDownList($filterModel->getHoursDropdown())->label(false) ?>
+                <?= $form->field($filterModel, 'action')->hiddenInput()->label(false) ?>
+            </div>
             <?php ActiveForm::end() ?>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="filter-arrow__wrap filter-arrow--right">
                 <?= Html::a('<i class="glyphicon glyphicon-chevron-right"></i>', '#', [
                     'class' => 'filter-arrow__link',
@@ -51,3 +56,12 @@ use frontend\components\learning\widget\HistoryWidget;
     'models' => $models,
 ]) ?>
 </div>
+<?php
+$this->registerJs(<<<JS
+(function() {
+    $('#historyfilterform-hours').on('change', function() {
+        $('#history-filter-form').submit();
+    });
+})();
+JS
+);

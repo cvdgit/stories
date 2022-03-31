@@ -56,55 +56,13 @@ class TrainingController extends UserController
         $targetStudent = $this->getStudent($student_id);
         $studentId = $targetStudent->id;
 
-        $targetDate = date('Y-m-d');
         $filterForm = new HistoryFilterForm();
         if ($this->request->isPost && $filterForm->load($this->request->post()) && $filterForm->validate()) {
-            if ($filterForm->action === 'next') {
-                $filterForm->setDateNext();
-            }
-            if ($filterForm->action === 'prev') {
-                $filterForm->setDatePrev();
-            }
-            $filterForm->resetAction();
-            $targetDate = $filterForm->getFormattedDate();
+            $filterForm->updateDate();
         }
 
-        $historyQuery = new Query();
+        $rows = $filterForm->search($studentId);
 
-        $hourExpression = new Expression("hour(convert_tz(FROM_UNIXTIME(t.created_at), 'UTC', '+3:00'))");
-        $minuteExpression = new Expression("minute(convert_tz(FROM_UNIXTIME(t.created_at), 'UTC', '+3:00')) DIV 60");
-        $historyQuery->select([
-            'story_id' => 't2.story_id',
-            'question_count' => new Expression('COUNT(t.id)'),
-            'hour' => $hourExpression,
-            'minute_div' => $minuteExpression,
-        ]);
-        $historyQuery->from(['t' => 'user_question_history']);
-        $historyQuery->innerJoin(['t2' => 'story_story_test'], 't.test_id = t2.test_id');
-        $historyQuery->where(['t.student_id' => $studentId]);
-
-        $betweenBegin = new Expression("UNIX_TIMESTAMP('$targetDate 00:00:00')");
-        $betweenEnd = new Expression("UNIX_TIMESTAMP('$targetDate 23:59:59')");
-        $historyQuery->andWhere(['between', 't.created_at', $betweenBegin, $betweenEnd]);
-
-        $historyQuery->groupBy([
-            't2.story_id',
-            $hourExpression,
-            $minuteExpression
-        ]);
-
-        $query = new Query();
-        $query->select([
-            'story_id' => 't.story_id',
-            'story_title' => 't2.title',
-            'question_count' => 't.question_count',
-            'hour' => 't.hour',
-            'minute_div' => 't.minute_div',
-        ]);
-        $query->from(['t' => $historyQuery]);
-        $query->innerJoin(['t2' => 'story'], 't.story_id = t2.id');
-
-        $rows = $query->all();
         $stories = [];
         foreach ($rows as $row) {
             $storyId = $row['story_id'];
@@ -126,47 +84,32 @@ class TrainingController extends UserController
         foreach ($stories as $story) {
             $storyTimes = $story['times'];
             if (count($storyTimes) > 0) {
-                $minTimeHour = array_reduce($storyTimes, static function($min, $item) {
+                $min = array_reduce($storyTimes, static function($min, $item) {
                     if ($item['hour'] < $min) {
                         return $item['hour'];
                     }
                     return $min;
                 }, $storyTimes[0]['hour']);
-                $maxTimeHour = array_reduce($storyTimes, static function($max, $item) {
+                if ($minTimeHour === 0) {
+                    $minTimeHour = $min;
+                }
+                if ($min < $minTimeHour) {
+                    $minTimeHour = $min;
+                }
+                $max = array_reduce($storyTimes, static function($max, $item) {
                     if ($item['hour'] > $max) {
                         return $item['hour'];
                     }
                     return $max;
                 }, $storyTimes[0]['hour']);
+                if ($max > $maxTimeHour) {
+                    $maxTimeHour = $max;
+                }
             }
         }
 
-        $interval = 60;
-        $times = [
-            ['time' => '01:00', 'hour' => 1, 'minute_div' => 0 % $interval],
-            ['time' => '02:00', 'hour' => 2, 'minute_div' => 0 % $interval],
-            ['time' => '03:00', 'hour' => 3, 'minute_div' => 0 % $interval],
-            ['time' => '04:00', 'hour' => 4, 'minute_div' => 0 % $interval],
-            ['time' => '05:00', 'hour' => 5, 'minute_div' => 0 % $interval],
-            ['time' => '06:00', 'hour' => 6, 'minute_div' => 0 % $interval],
-            ['time' => '07:00', 'hour' => 7, 'minute_div' => 0 % $interval],
-            ['time' => '08:00', 'hour' => 8, 'minute_div' => 0 % $interval],
-            ['time' => '09:00', 'hour' => 9, 'minute_div' => 0 % $interval],
-            ['time' => '10:00', 'hour' => 10, 'minute_div' => 0 % $interval],
-            ['time' => '11:00', 'hour' => 11, 'minute_div' => 0 % $interval],
-            ['time' => '12:00', 'hour' => 12, 'minute_div' => 0 % $interval],
-            ['time' => '13:00', 'hour' => 13, 'minute_div' => 0 % $interval],
-            ['time' => '14:00', 'hour' => 14, 'minute_div' => 0 % $interval],
-            ['time' => '15:00', 'hour' => 15, 'minute_div' => 0 % $interval],
-            ['time' => '16:00', 'hour' => 16, 'minute_div' => 0 % $interval],
-            ['time' => '17:00', 'hour' => 17, 'minute_div' => 0 % $interval],
-            ['time' => '18:00', 'hour' => 18, 'minute_div' => 0 % $interval],
-            ['time' => '19:00', 'hour' => 19, 'minute_div' => 0 % $interval],
-            ['time' => '20:00', 'hour' => 20, 'minute_div' => 0 % $interval],
-            ['time' => '21:00', 'hour' => 21, 'minute_div' => 0 % $interval],
-            ['time' => '22:00', 'hour' => 22, 'minute_div' => 0 % $interval],
-            ['time' => '23:00', 'hour' => 23, 'minute_div' => 0 % $interval],
-        ];
+        $interval = $filterForm->hours;
+        $times = HistoryFilterForm::createTimes($interval);
 
         $columns = [
             ['label' => 'Истории'],

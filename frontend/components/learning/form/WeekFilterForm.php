@@ -25,7 +25,6 @@ class WeekFilterForm extends Model
     public function init(): void
     {
         $this->week = date('W');
-        //$this->resetAction();
         parent::init();
     }
 
