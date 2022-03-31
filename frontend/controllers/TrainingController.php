@@ -2,9 +2,10 @@
 
 namespace frontend\controllers;
 
+use common\helpers\SmartDate;
 use common\models\User;
-use common\models\UserStudent;
 use frontend\components\learning\form\HistoryFilterForm;
+use frontend\components\learning\form\WeekFilterForm;
 use frontend\components\UserController;
 use Yii;
 use yii\db\Expression;
@@ -17,21 +18,42 @@ class TrainingController extends UserController
     /**
      * @throws NotFoundHttpException
      */
-    public function actionIndex(int $student_id = null): string
+    private function getStudent(int $studentId = null)
     {
-
         /** @var User $user */
         $user = Yii::$app->user->identity;
 
-        if ($student_id === null) {
+        if ($studentId === null) {
             $targetStudent = $user->student();
         }
         else {
-            if (($targetStudent = $user->findStudentById($student_id)) === null) {
+            if (($targetStudent = $user->findStudentById($studentId)) === null) {
                 throw new NotFoundHttpException('Студент не найден');
             }
         }
+        return $targetStudent;
+    }
 
+    private function getNavItems(string $route, array $students, int $activeStudentId): array
+    {
+        $items = [];
+        foreach ($students as $student) {
+            $items[] = [
+                'label' => $student->name,
+                'url' => [$route, 'student_id' => $student->id],
+                'active' => $student->id === $activeStudentId,
+            ];
+        }
+        return $items;
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionIndex(int $student_id = null): string
+    {
+
+        $targetStudent = $this->getStudent($student_id);
         $studentId = $targetStudent->id;
 
         $targetDate = date('Y-m-d');
@@ -119,89 +141,6 @@ class TrainingController extends UserController
             }
         }
 
-        /*
-        $storyBeginDate = new Expression("UNIX_TIMESTAMP('$targetDate 00:00:00')");
-        $storyEndDate = new Expression("UNIX_TIMESTAMP('$targetDate 23:59:59')");
-        $stories = (new Query())
-            ->select([
-                'story_id' => 't2.id',
-                'story_title' => 't2.title',
-            ])
-            ->from(['t' => 'user_story_history'])
-            ->innerJoin(['t2' => 'story'], 't.story_id = t2.id')
-            ->where(['t.user_id' => $userId])
-            ->andWhere(['between', 't.updated_at', $storyBeginDate, $storyEndDate])
-            ->orderBy(['t.updated_at' => SORT_DESC])
-            ->all();
-
-        $betweenBegin = new Expression("UNIX_TIMESTAMP('$targetDate 00:00:00')");
-        $betweenEnd = new Expression("UNIX_TIMESTAMP('$targetDate 23:59:59')");
-
-        $hourExpression = new Expression('hour(FROM_UNIXTIME(created_at))');
-        $minuteExpression = new Expression('minute(FROM_UNIXTIME(created_at)) DIV 60');
-
-        $minTimeHour = 0;
-        $maxTimeHour = 0;
-
-        $unsetIndex = [];
-        foreach ($stories as $i => $story) {
-
-            $storyId = $story['story_id'];
-
-            $testRows = (new Query())
-                ->select(['test_id' => 't.test_id'])
-                ->from(['t' => 'story_story_test'])
-                ->where(['t.story_id' => $storyId])
-                ->all();
-
-            if (count($testRows) === 0) {
-                $unsetIndex[] = $i;
-                continue;
-            }
-
-            $testIds = array_map(static function($row) {
-                return $row['test_id'];
-            }, $testRows);
-
-            $query = (new Query())
-                ->select([
-                    'question_count' => new Expression('COUNT(id)'),
-                    'hour' => $hourExpression,
-                    'minute_div' => $minuteExpression,
-                ])
-                ->from('user_question_history')
-                ->where(['student_id' => $studentId])
-                ->andWhere(['in', 'test_id', $testIds])
-                ->andWhere(['between', 'created_at', $betweenBegin, $betweenEnd])
-                ->groupBy([
-                    $hourExpression,
-                    $minuteExpression
-                ]);
-
-            $storyTimes = $query->all();
-            $stories[$i]['times'] = $storyTimes;
-
-            if (count($storyTimes) > 0) {
-                $minTimeHour = array_reduce($storyTimes, static function($min, $item) {
-                    if ($item['hour'] < $min) {
-                        return $item['hour'];
-                    }
-                    return $min;
-                }, $storyTimes[0]['hour']);
-                $maxTimeHour = array_reduce($storyTimes, static function($max, $item) {
-                    if ($item['hour'] > $max) {
-                        return $item['hour'];
-                    }
-                    return $max;
-                }, $storyTimes[0]['hour']);
-            }
-        }
-
-        foreach ($unsetIndex as $index) {
-            unset($stories[$index]);
-        }
-        */
-
         $interval = 60;
         $times = [
             ['time' => '01:00', 'hour' => 1, 'minute_div' => 0 % $interval],
@@ -280,11 +219,95 @@ class TrainingController extends UserController
         }
 
         return $this->render('index_new', [
-            'students' => $user->students,
-            'activeStudentId' => $targetStudent->id,
-            'columns' => $columns,
-            'models' => $models,
-            'filterModel' => $filterForm,
+            'items' => $this->getNavItems('training/index', Yii::$app->user->identity->students, $targetStudent->id),
+            'view' => 'day',
+            'viewParams' => [
+                'columns' => $columns,
+                'models' => $models,
+                'filterModel' => $filterForm,
+            ],
+        ]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionWeek(int $student_id = null): string
+    {
+
+        $targetStudent = $this->getStudent($student_id);
+        $studentId = $targetStudent->id;
+
+        $filterForm = new WeekFilterForm();
+        if ($filterForm->load($this->request->post())) {
+            $filterForm->updateWeekDates();
+        }
+
+        $rows = $filterForm->search($studentId);
+
+        $stories = [];
+        foreach ($rows as $row) {
+            $storyId = $row['story_id'];
+            if (!isset($stories[$storyId])) {
+                $stories[$storyId] = [
+                    'story_title' => $row['story_title'],
+                    'dates' => [],
+                ];
+            }
+            $stories[$storyId]['dates'][] = [
+                'question_count' => $row['question_count'],
+                'target_date' => $row['target_date'],
+            ];
+        }
+
+        $columns = [
+            ['label' => 'Истории'],
+        ];
+
+        $targetDate = clone $filterForm->getWeekStartDate();
+        $dates = [];
+        while ($targetDate <= $filterForm->getWeekEndDate()) {
+            $currentDate = $targetDate->format('Y-m-d');
+            $columns[] = [
+                'label' => SmartDate::dateSmart(strtotime($currentDate)),
+            ];
+            $dates[] = $currentDate;
+            $targetDate = $targetDate->modify('+1 day');
+        }
+
+        $models = [];
+        foreach ($stories as $story) {
+
+            $model = [
+                $story['story_title'],
+            ];
+
+            foreach ($dates as $currentDate) {
+
+                $value = 0;
+
+                foreach ($story['dates'] as $row) {
+                    $questionCount = (int) $row['question_count'];
+                    $questionDate = $row['target_date'];
+                    if ($questionDate === $currentDate) {
+                        $value = $questionCount;
+                    }
+                }
+
+                $model[] = $value;
+            }
+
+            $models[] = $model;
+        }
+
+        return $this->render('index_new', [
+            'items' => $this->getNavItems('training/week', Yii::$app->user->identity->students, $targetStudent->id),
+            'view' => 'week',
+            'viewParams' => [
+                'filterModel' => $filterForm,
+                'columns' => $columns,
+                'models' => $models,
+            ],
         ]);
     }
 }

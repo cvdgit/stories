@@ -1430,28 +1430,36 @@ section h3.header-h3 {
   margin-top: 14px;
 }
 
+.profile-sub-menu {
+  margin-top: 0;
+  list-style: none;
+  margin-left: 5rem;
+  padding-left: 0;
+}
+
+.profile-sub-menu li {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.profile-sub-menu li a {
+  font-size: 1.6rem;
+}
+
 .profile-menu li {
-  padding: 6px;
+  padding: 6px 0;
 }
 
 .profile-menu i {
   margin: 0 10px;
 }
 
-.profile-menu li:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+.profile-menu li > a:hover {
+  color: #99cd50;
+  transition: .3s;
 }
 
-.profile-menu a:hover {
-  font-weight: bold;
-}
-
-.profile-menu li.active {
-  background-color: rgba(0, 0, 0, 0.1);
-}
-
-.profile-menu li.active a {
-  font-weight: bold;
+.profile-menu li.active > a {
   color: #99cd50;
 }
 

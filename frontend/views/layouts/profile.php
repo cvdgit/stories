@@ -16,9 +16,16 @@
                         'active' => Yii::$app->controller->id === 'profile',
                     ],
                     [
-                        'label' => '<i class="glyphicon glyphicon-education"></i> Обучение',
+                        'label' => '<i class="glyphicon glyphicon-education"></i> История обучения',
                         'url' => ['/training'],
-                        'active' => Yii::$app->controller->id === 'training',],
+                        'active' => Yii::$app->controller->id === 'training' && Yii::$app->controller->action->id === 'index',
+                        'items' => [
+                            [
+                                'label' => 'История за неделю',
+                                'url' => ['/training/week'],
+                            ],
+                        ],
+                    ],
                     [
                         'label' => '<i class="glyphicon glyphicon-education"></i> Задания',
                         'url' => ['/study/index'],
@@ -38,6 +45,7 @@
                 ],
                 'options' => ['class' => 'profile-menu'],
                 'encodeLabels' => false,
+                'submenuTemplate' => "\n<ul class='profile-sub-menu'>\n{items}\n</ul>\n",
             ]) ?>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
