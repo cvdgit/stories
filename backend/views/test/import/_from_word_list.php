@@ -25,10 +25,6 @@ use yii\widgets\ActiveForm;
 <?php ActiveForm::end(); ?>
 <?php
 $js = <<< JS
-$('#import-from-word-list-modal')
-    .on('show.bs.modal', function () {
-        $('#import-from-word-list-form')[0].reset();
-    });
 $('#import-from-word-list-form')
     .on('beforeSubmit', function(e) {
         e.preventDefault();

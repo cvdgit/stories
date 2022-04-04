@@ -1029,3 +1029,25 @@ p.wikids-test-description {
 	border: 0 none;
 	padding: 2px 8px;
 }
+
+.answer-input {
+	min-height: calc(1.5em + 0.75rem + 2px);
+	display: block;
+	width: 100%;
+	padding: 2rem;
+	font-size: inherit;
+	font-weight: 400;
+	line-height: inherit;
+	color: #212529;
+	background-color: #fff;
+	background-clip: padding-box;
+	border: 1px solid #ced4da;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	border-radius: 0.25rem;
+	transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+	resize: vertical;
+	margin: 0 auto;
+	font-family: inherit;
+}

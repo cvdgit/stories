@@ -1,4 +1,6 @@
 <?php
+use backend\models\test\InputVoice;
+use backend\models\test\RecorderLang;
 use backend\models\test\TestRepeat;
 use backend\widgets\CreateTestTemplateWidget;
 use common\models\test\AnswerType;
@@ -7,9 +9,11 @@ use common\models\test\TestTemplateParts;
 use common\models\User;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use backend\components\TestTypeOptions;
 /** @var $this yii\web\View */
 /** @var $model common\models\StoryTest */
 /** @var backend\models\test\ChangeRepeatForm $repeatChangeModel */
+$opt = new TestTypeOptions($model->answer_type);
 ?>
 <div class="story-test-form">
     <?php $form = ActiveForm::begin(); ?>
@@ -44,24 +48,28 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'answer_type')->dropDownList(AnswerType::asArray()) ?>
 
-    <?php
-    $options = ['disabled' => true];
-    $askQuestionField = $form->field($model, 'ask_question')->checkbox($options);
-    $askQuestionLangField = $form->field($model, 'ask_question_lang')->dropDownList(\backend\models\test\InputVoice::asArray(), $options);
-    $strictAnswerField = $form->field($model, 'strict_answer')->checkbox($options);
-    $inputVoiceField = $form->field($model, 'input_voice')->dropDownList(\backend\models\test\InputVoice::asArray(), $options);
-    $recordingLangField = $form->field($model, 'recording_lang')->dropDownList(\backend\models\test\RecorderLang::asArray(), $options);
-    $rememberAnswersField = $form->field($model, 'remember_answers')->checkbox($options);
-    $answerBlockOptions = static function(string $type) {
-        return ['class' => 'answer-block hide', 'data-block-type' => $type];
-    }
-    ?>
+    <?= $form->field($model, 'strict_answer', $opt->forGroup([AnswerType::INPUT]))
+        ->checkbox($opt->forField([AnswerType::INPUT])) ?>
 
-    <?= Html::tag('div', $askQuestionField . $askQuestionLangField, $answerBlockOptions(AnswerType::DEFAULT)) ?>
-    <?= Html::tag('div', $strictAnswerField . $inputVoiceField, $answerBlockOptions(AnswerType::INPUT)) ?>
-    <?= Html::tag('div', $recordingLangField . $inputVoiceField . $rememberAnswersField . $askQuestionField . $askQuestionLangField, $answerBlockOptions(AnswerType::RECORDING)) ?>
+    <?= $form->field($model, 'ask_question', $opt->forGroup([AnswerType::DEFAULT, AnswerType::INPUT, AnswerType::RECORDING]))
+        ->checkbox(array_merge($opt->forField([AnswerType::DEFAULT, AnswerType::INPUT, AnswerType::RECORDING]), ['data-radio' => 'input', 'data-bound' => Html::getInputId($model, 'ask_question_lang')])) ?>
 
-    <?= $form->field($model, 'hide_question_name')->checkbox() ?>
+    <?= $form->field($model, 'ask_question_lang', $opt->forGroup([AnswerType::DEFAULT, AnswerType::INPUT, AnswerType::RECORDING]))
+        ->dropDownList(InputVoice::asArray(), $opt->forField([AnswerType::DEFAULT, AnswerType::INPUT, AnswerType::RECORDING])) ?>
+
+    <?= $form->field($model, 'say_correct_answer', $opt->forGroup([AnswerType::INPUT, AnswerType::RECORDING]))
+        ->checkbox(array_merge($opt->forField([AnswerType::INPUT, AnswerType::RECORDING]), ['data-radio' => 'input', 'data-bound' => Html::getInputId($model, 'input_voice')])) ?>
+
+    <?= $form->field($model, 'input_voice', $opt->forGroup([AnswerType::INPUT, AnswerType::RECORDING]))
+        ->dropDownList(InputVoice::asArray(), $opt->forField([AnswerType::INPUT, AnswerType::RECORDING])) ?>
+
+    <?= $form->field($model, 'recording_lang', $opt->forGroup([AnswerType::RECORDING]))
+        ->dropDownList(RecorderLang::asArray(), $opt->forField([AnswerType::RECORDING])) ?>
+
+    <?= $form->field($model, 'remember_answers', $opt->forGroup([AnswerType::RECORDING]))
+        ->checkbox($opt->forField([AnswerType::RECORDING])) ?>
+
+    <?= $form->field($model, 'hide_question_name', ['options' => ['class' => 'form-group']])->checkbox() ?>
     <?= $form->field($model, 'hide_answers_name')->checkbox() ?>
     <?= $form->field($model, 'answers_hints')->checkbox() ?>
 
@@ -168,18 +176,46 @@ $('#storytest-question_list').on('change', function() {
     $('#storytest-question_list_name').val(name);
 });
 
-$('#storytest-answer_type').on('change', function() {
-    $('.answer-block')
-        .addClass('hide')
-        .find('input, select')
-        .prop('disabled', true);
-    var block = $('div[data-block-type=' + this.value + ']');
-    if (block.length) {
-        block
-            .removeClass('hide')
-            .find('input, select')
-            .prop('disabled', false);
+(function() {
+
+    $('#storytest-answer_type').on('change', function() {
+        var currentType = this.value;
+        $('[data-types]').each(function(i, elem) {
+            $(elem).addClass('hide');
+            $(elem).find('input,select').prop('disabled', true);
+            $(elem).find('input:checkbox').prop('checked', false);
+            var types = $(elem).attr('data-types').split(',');
+            if (types.includes(currentType)) {
+                $(elem).removeClass('hide');
+                $(elem).find('input,select').removeAttr('disabled');
+            }
+        });
+        setControlsState();
+    });
+
+    function setControlsState() {
+        $('[data-bound]').each(function(i, elem) {
+            var id = $(elem).attr('data-bound');
+            var targetElem = $('#' + id);
+            targetElem.attr('disabled', !elem.checked);
+            if (elem.checked) {
+                targetElem.parents('.form-group:eq(0)').removeClass('hide');
+            }
+        });
     }
-}).change();
+
+    setControlsState();
+    
+    $('[data-bound]').on('click', function() {
+        var id = $(this).attr('data-bound');
+        $('#' + id).attr('disabled', !this.checked);
+    });
+    
+    $('[data-radio]').on('click', function() {
+        var group = $(this).attr('data-radio');
+        $('[data-radio=' + group + ']').prop('disabled', this.checked);
+        $(this).prop('disabled', false);
+    });
+})();
 JS;
 $this->registerJs($js);

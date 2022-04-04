@@ -48,6 +48,7 @@ use yii\helpers\ArrayHelper;
  * @property int $answers_hints
  * @property int $hide_answers_name
  * @property int $repeat
+ * @property int $say_correct_answer
  *
  * @property StoryTestQuestion[] $storyTestQuestions
  * @property Story[] $stories
@@ -94,7 +95,7 @@ class StoryTest extends ActiveRecord
             [['title', 'question_list_name', 'header', 'question_params', 'incorrect_answer_text', 'input_voice', 'recording_lang', 'ask_question_lang'], 'string', 'max' => 255],
             [['description_text'], 'string'],
             [['question_list', 'sortable'], 'safe'],
-            ['repeat', 'integer'],
+            [['repeat', 'say_correct_answer'], 'integer'],
             ['repeat', 'in', 'range' => TestRepeat::getForRange()],
         ];
     }
@@ -120,7 +121,7 @@ class StoryTest extends ActiveRecord
             'word_list_id' => 'Список слов',
             'answer_type' => 'Тип ответов',
             'strict_answer' => 'Строгое сравнение ответов',
-            'input_voice' => 'Голос синтезатора',
+            'input_voice' => 'Язык синтезатора ответов',
             'recording_lang' => 'Язык распознавания',
             'shuffle_word_list' => 'Перемешивать элементы списка',
             'remember_answers' => 'Запоминать ответы',
@@ -131,6 +132,7 @@ class StoryTest extends ActiveRecord
             'answers_hints' => 'Показывать подсказки к ответам',
             'hide_answers_name' => 'Скрывать текст ответов',
             'repeat' => 'Повторять вопрос',
+            'say_correct_answer' => 'Произносить правильные ответы',
         ];
     }
 

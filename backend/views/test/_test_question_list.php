@@ -10,15 +10,25 @@ use yii\helpers\Url;
 ?>
 <div>
     <div class="clearfix">
-        <div class="dropdown" style="display: inline-block">
-            <button type="button" data-toggle="dropdown" class="btn btn-primary">Создать вопрос <span class="caret"></span></button>
-            <ul class="dropdown-menu">
-                <li><?= Html::a('По умолчанию', ['test/create-question', 'test_id' => $model->id]) ?></li>
-                <li><?= Html::a('Выбор области', ['question/create', 'test_id' => $model->id, 'type' => QuestionType::REGION]) ?></li>
-                <li><?= Html::a('Последовательность', ['test/question-sequence/create', 'test_id' => $model->id]) ?></li>
-            </ul>
+        <div style="display: flex; justify-content: space-between">
+            <div>
+                <?php if ($model->isAnswerTypeInput()): ?>
+                    <a href="<?= Url::to(['question-input/create', 'test_id' => $model->id]) ?>" data-toggle="modal" data-target="#create-test-question-modal" type="button" class="btn btn-primary">Создать вопрос</a>
+                <?php else: ?>
+                <div class="dropdown" style="display: inline-block">
+                    <button type="button" data-toggle="dropdown" class="btn btn-primary">Создать вопрос <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li><?= Html::a('По умолчанию', ['test/create-question', 'test_id' => $model->id]) ?></li>
+                        <li><?= Html::a('Выбор области', ['question/create', 'test_id' => $model->id, 'type' => QuestionType::REGION]) ?></li>
+                        <li><?= Html::a('Последовательность', ['test/question-sequence/create', 'test_id' => $model->id]) ?></li>
+                    </ul>
+                </div>
+                <?php endif ?>
+            </div>
+            <div>
+                <?= Html::a('Импортировать вопросы из списка слов', ['test/import/from-word-list', 'test_id' => $model->id], ['class' => 'btn btn-default', 'style' => 'margin-left: 20px', 'id' => 'import-from-word-list']) ?>
+            </div>
         </div>
-        <?= Html::a('Импортировать вопросы из списка слов', ['test/import/from-word-list', 'test_id' => $model->id], ['class' => 'btn btn-default', 'style' => 'margin-left: 20px', 'id' => 'import-from-word-list']) ?>
     </div>
     <h4>Вопросы теста</h4>
     <?= GridView::widget([
@@ -99,11 +109,20 @@ use yii\helpers\Url;
         <div class="modal-content"></div>
     </div>
 </div>
+<div class="modal fade" id="create-test-question-modal">
+    <div class="modal-dialog">
+        <div class="modal-content"></div>
+    </div>
+</div>
 <?php
 $js = <<< JS
 $('#import-from-word-list').on('click', function(e) {
     e.preventDefault();
     $('#import-from-word-list-modal').modal({'remote': $(this).attr('href')});
+});
+$('#import-from-word-list-modal').on('hide.bs.modal', function() {
+    $(this).removeData('bs.modal');
+    $(this).find('.modal-content').html('');
 });
 
 Sortable.create($('#questions-grid tbody')[0], {
@@ -124,5 +143,10 @@ Sortable.create($('#questions-grid tbody')[0], {
 	}
 });
 
+$('#create-test-question-modal')
+    .on('hide.bs.modal', function() {
+        $(this).removeData('bs.modal');
+        $(this).find('.modal-content').html('');
+    });
 JS;
 $this->registerJs($js);

@@ -465,6 +465,9 @@
             },
             'hideQuestionName': function() {
                 return data.hideQuestionName;
+            },
+            'isSayCorrectAnswer': function() {
+                return data.sayCorrectAnswer;
             }
         }
     }
@@ -2007,8 +2010,13 @@
         }
 
         function createInputAnswer(question, answer) {
-            var $html = '<a href="#" title="Повторить слово" class="glyphicon glyphicon-repeat synthesis-question" style="top: 5px; right: 10px"><i></i></a>';
-            return $('<div/>').append($html).append(answerTypeInput.create(nextQuestion));
+            var $elem = $('<div/>');
+            if (testConfig.isSayCorrectAnswer()) {
+                var $repeat = '<a href="#" title="Повторить слово" class="glyphicon glyphicon-repeat synthesis-question" style="top: 5px; right: 10px"><i></i></a>';
+                $elem.append($repeat);
+            }
+            $elem.append(answerTypeInput.create(nextQuestion));
+            return $elem;
         }
 
         function createInputAnswers(question, answers) {
@@ -2291,7 +2299,7 @@
                         $answers = createNumPadAnswers(question, getAnswersData(question));
                         break;
                     case 'input':
-                        $answers = createInputAnswers(question, getAnswersData(question));
+                        $answers = createInputAnswers(question, getCorrectAnswers(question));
                         break;
                     case 'recording':
                         $answers = createRecordingAnswers(question, getAnswersData(question));
@@ -2966,8 +2974,9 @@
             return getAudioFile(question)  !== null;
         }
 
+        var audio;
         function playAudio(url, onEndCallback) {
-            var audio = new Audio(url);
+            audio = new Audio(url);
             audio.play();
             if (onEndCallback) {
                 audio.addEventListener('ended', onEndCallback);
@@ -2997,6 +3006,7 @@
                 && (testConfig.sourceIsNeo() || (testConfig.sourceIsLocal() && !testConfig.answerTypeIsNumPad(currentQuestion)))) {*/
 
             if (isShuffleAnswers(currentQuestion)) {
+                console.log('shuffle');
                 $('.wikids-test-answers', currentQuestionElement)
                     .empty()
                     .append(createAnswers(getAnswersData(currentQuestion), currentQuestion)
@@ -3041,26 +3051,25 @@
 
             if (testConfig.answerTypeIsInput(currentQuestion)) {
 
-                var text = getAnswersData(nextQuestionObj)[0].name;
+                if (testConfig.isSayCorrectAnswer()) {
+                    sayCorrectAnswerName(nextQuestionObj);
+                    var text = getCorrectAnswers(nextQuestionObj)[0].name;
+                    $('.wikids-test-active-question .synthesis-question', dom.questions)
+                        .off('click')
+                        .on('click', function (e) {
+                            e.preventDefault();
+                            speech.readText(text, testConfig.getInputVoice());
+                        });
+                }
+
+                if (testConfig.isAskQuestion()) {
+                    sayQuestionName();
+                }
+
                 var q = $('.wikids-test-active-question .answer-input', dom.questions);
-
-                setTimeout(function () {
-                    speech.readText(text, testConfig.getInputVoice());
-                    q.focus();
-                }, 500);
-
                 setTimeout(function() {
-                    q
-                        .val('')
-                        .focus();
+                    q.val('').focus();
                 }, 100);
-
-                $('.wikids-test-active-question .synthesis-question', dom.questions)
-                    .off('click')
-                    .on('click', function (e) {
-                        e.preventDefault();
-                        speech.readText(text, testConfig.getInputVoice());
-                    });
             }
 
             if (testConfig.answerTypeIsRecording(currentQuestion)) {
@@ -3092,9 +3101,34 @@
             }
         }
 
+        function sayQuestionName() {
+            if (haveAudioFile(currentQuestion)) {
+                playAudio(getAudioFile(currentQuestion));
+            }
+            else {
+                var readText = currentQuestion.name;
+                setTimeout(function () {
+                    speech.readText(readText, testConfig.getAskQuestionLang());
+                }, 500);
+            }
+        }
+
+        function sayCorrectAnswerName(question) {
+            var text = getCorrectAnswers(question)[0].name;
+            var q = $('.wikids-test-active-question .answer-input', dom.questions);
+            setTimeout(function () {
+                speech.readText(text, testConfig.getInputVoice());
+                q.focus();
+            }, 500);
+        }
+
         function cancelSpeech() {
             if (testConfig.isAskQuestion()) {
                 speech.cancel();
+            }
+            if (audio) {
+                auido.stop();
+                audio = null;
             }
         }
 
@@ -3308,7 +3342,7 @@
                                     .html('<i class="glyphicon glyphicon-volume-up" style="left: 10px; top: 6px"></i>')
                                 );
                         } else {
-                            if (testConfig.answerTypeIsInput(question)) {
+                            if (testConfig.answerTypeIsInput(question) && testConfig.isStrictAnswer()) {
                                 $answerElement = $('<p/>').html(textDiff(answerText, userAnswer));
                             } else {
                                 $answerElement = $('<p/>').text(answerText);
