@@ -6,9 +6,20 @@ use frontend\models\ContactRequestForm;
 use yii\web\Controller;
 use yii\web\Response;
 use Yii;
+use yii\filters\AjaxFilter;
 
 class ContactController extends Controller
 {
+
+    public function behaviors(): array
+    {
+        return [
+            [
+                'class' => AjaxFilter::class,
+                'only' => ['create'],
+            ],
+        ];
+    }
 
     public function actionCreate()
     {
