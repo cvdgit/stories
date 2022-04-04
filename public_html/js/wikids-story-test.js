@@ -3127,7 +3127,8 @@
                 speech.cancel();
             }
             if (audio) {
-                audio.stop();
+                audio.pause();
+                audio.currentTime = 0;
                 audio = null;
             }
         }
