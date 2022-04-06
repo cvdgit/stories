@@ -4,7 +4,6 @@ namespace backend\widgets;
 
 use common\models\AudioFile;
 use dosamigos\selectize\SelectizeDropDownList;
-use yii\helpers\Json;
 
 class SelectAudioFileWidget extends SelectizeDropDownList
 {
@@ -27,18 +26,6 @@ class SelectAudioFileWidget extends SelectizeDropDownList
             'scrollDuration' => 60,
             'render' => [],
         ];
-        //$this->loadUrl = ['question/autocomplete'];
-
-/*        if ($this->audioFile !== null) {
-            $this->items = [$this->audioFile->id => $this->audioFile->name];
-            $this->options = [
-                'options' => [
-                    $this->audioFile->id => [
-                        'data-data' => $this->getOptionData($this->audioFile->id, $this->audioFile->name),
-                    ],
-                ],
-            ];
-        }*/
 
         array_map(function(AudioFile $audioFile) {
             $this->items[$audioFile->id] = $audioFile->name;
@@ -50,13 +37,5 @@ class SelectAudioFileWidget extends SelectizeDropDownList
     public function run()
     {
         parent::run();
-    }
-
-    private function getOptionData(int $id, string $name): string
-    {
-        return Json::encode([
-            'id' => $id,
-            'name' => $name,
-        ]);
     }
 }
