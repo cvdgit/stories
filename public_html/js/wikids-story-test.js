@@ -2245,7 +2245,9 @@
                         }
 
                         if (haveAudioFile(question)) {
-                            playAudio(getAudioFile(question), onSpeechEnd);
+                            setTimeout(function () {
+                                playAudio(getAudioFile(question), onSpeechEnd);
+                            }, 500);
                         }
                         else {
                             setTimeout(function () {
@@ -3089,7 +3091,9 @@
             if (testConfig.answerTypeIsDefault()) {
                 if (testConfig.isAskQuestion()) {
                     if (haveAudioFile(currentQuestion)) {
-                        playAudio(getAudioFile(currentQuestion));
+                        setTimeout(function () {
+                            playAudio(getAudioFile(currentQuestion));
+                        }, 500);
                     }
                     else {
                         var readText = currentQuestion.name;
@@ -3103,7 +3107,9 @@
 
         function sayQuestionName() {
             if (haveAudioFile(currentQuestion)) {
-                playAudio(getAudioFile(currentQuestion));
+                setTimeout(function () {
+                    playAudio(getAudioFile(currentQuestion));
+                }, 500);
             }
             else {
                 var readText = currentQuestion.name;

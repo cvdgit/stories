@@ -306,6 +306,8 @@ $this->registerJs(<<<JS
             audioBlock.fadeIn();
         }
 
+        callback(blob);
+        
         var wavesurfer = WaveSurfer.create({
             container: '#waveform',
             height: 100,
@@ -315,14 +317,13 @@ $this->registerJs(<<<JS
                 RegionPlugin.create()
             ]
         });
-
+        
         wavesurfer.on('ready', function() {
             wavesurfer.addRegion({
                 id: 'audio',
                 start: 0,
                 end: wavesurfer.getDuration()
             });
-            callback(blob);
         });
 
         wavesurfer.load(url);
@@ -336,9 +337,11 @@ $this->registerJs(<<<JS
             var region = wavesurfer.regions.list['audio'];
             var buf = trimBlob(wavesurfer, region.start, region.end);
             var cutSelection = buf.emptySegment;
-
             var arrayBuffer = bufferToWave(cutSelection, 0, cutSelection.length);
             callback(arrayBuffer);
+            
+            wavesurfer.clearRegions();
+            wavesurfer.load(URL.createObjectURL(arrayBuffer));
         });
     }
     
