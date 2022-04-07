@@ -73,8 +73,8 @@ $this->title = 'Панель управления';
                         <caption>Просмотренные сегодня истории</caption>
                         <thead>
                         <tr>
-                            <td>История</td>
-                            <td>Время</td>
+                            <th>История</th>
+                            <th>Время</th>
                         </tr>
                         </thead>
                         <tbody>
