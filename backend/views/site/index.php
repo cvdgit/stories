@@ -81,7 +81,7 @@ $this->title = 'Панель управления';
                         <?php foreach ($todayStories as $story): ?>
                             <tr>
                                 <td><?= Html::encode($story['story_title']) ?></td>
-                                <td><?= SmartDate::dateSmart($story['viewed_at'], true) ?></td>
+                                <td><?= str_replace('сегодня в ', '', SmartDate::dateSmart($story['viewed_at'], true)) ?></td>
                             </tr>
                         <?php endforeach ?>
                         </tbody>
