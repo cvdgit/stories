@@ -1,11 +1,13 @@
 <?php
 use backend\helpers\SummaryHelper;
+use common\helpers\SmartDate;
 use common\models\Payment;
 use dosamigos\chartjs\ChartJs;
 use yii\helpers\Html;
 /** @var $this yii\web\View */
 /** @var array $labels */
 /** @var array $data */
+/** @var array $todayStories */
 $this->title = 'Панель управления';
 ?>
 <div class="site-index">
@@ -62,6 +64,32 @@ $this->title = 'Панель управления';
                         ]
                     ]) ?>
                 </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <caption>Просмотренные сегодня истории</caption>
+                        <thead>
+                        <tr>
+                            <td>История</td>
+                            <td>Время</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($todayStories as $story): ?>
+                            <tr>
+                                <td><?= Html::encode($story['story_title']) ?></td>
+                                <td><?= SmartDate::dateSmart($story['viewed_at'], true) ?></td>
+                            </tr>
+                        <?php endforeach ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-lg-6">
+
             </div>
         </div>
     </div>

@@ -93,9 +93,50 @@ class SiteController extends Controller
             $i++;
         }
 
+        $todayStories = $this->getStories(date('Y-m-d'));
+
         return $this->render('index', [
             'labels' => $labels,
             'data' => $data,
+            'todayStories' => $todayStories,
         ]);
+    }
+
+    private function getStories(string $date): array
+    {
+
+        $betweenBegin = new Expression("UNIX_TIMESTAMP('$date 00:00:00')");
+        $betweenEnd = new Expression("UNIX_TIMESTAMP('$date 23:59:59')");
+
+        $query = (new Query())
+            ->select([
+                'story_id' => 't.story_id',
+                'viewed_at' => 'MAX(t.created_at)'
+            ])
+            ->from(['t' => '{{%story_statistics}}'])
+            ->where(['between', 't.created_at', $betweenBegin, $betweenEnd])
+            ->groupBy(['t.story_id']);
+
+        $query2 = (new Query())
+            ->select([
+                'story_id' => 't.story_id',
+                'viewed_at' => 'MAX(t.created_at)'
+            ])
+            ->from(['t' => '{{%story_readonly_statistics}}'])
+            ->where(['between', 'created_at', $betweenBegin, $betweenEnd])
+            ->groupBy(['t.story_id']);
+
+        $query->union($query2);
+
+        return (new Query())
+            ->select([
+                'story_title' => 't2.title',
+                'viewed_at' => 'MAX(t.viewed_at)',
+            ])
+            ->from(['t' => $query])
+            ->innerJoin(['t2' => 'story'], 't.story_id = t2.id')
+            ->groupBy(['t.story_id'])
+            ->orderBy(['MAX(t.viewed_at)' => SORT_DESC])
+            ->all();
     }
 }
