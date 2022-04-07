@@ -1,6 +1,6 @@
 <?php
 
-namespace common\components;
+namespace common\helpers;
 
 class EngTextNormalizer
 {
@@ -33,9 +33,9 @@ class EngTextNormalizer
             'м' => 'm',
             'У' => 'Y',
             'у' => 'y',
-            '’' => "'",
-            '“' => '"',
-            '”' => '"',
+            //'’' => "'",
+            //'“' => '"',
+            //'”' => '"',
         ];
         $matches = [];
         if (preg_match_all('/[А-я’“”]/u', $text, $matches, PREG_PATTERN_ORDER)) {
