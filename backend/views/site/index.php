@@ -69,7 +69,7 @@ $this->title = 'Панель управления';
         <div class="row">
             <div class="col-lg-6">
                 <div class="table-responsive">
-                    <table class="table table-condensed">
+                    <table class="table table-condensed table-striped">
                         <caption>Просмотренные сегодня истории</caption>
                         <thead>
                         <tr>
