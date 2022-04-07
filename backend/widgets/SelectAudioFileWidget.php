@@ -31,6 +31,8 @@ class SelectAudioFileWidget extends SelectizeDropDownList
             $this->items[$audioFile->id] = $audioFile->name;
         }, AudioFile::find()->orderBy(['name' => SORT_ASC])->all());
 
+        $this->options['prompt'] = 'Выберите аудио файл';
+
         parent::init();
     }
 
