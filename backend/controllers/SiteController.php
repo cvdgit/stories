@@ -1,8 +1,10 @@
 <?php
 namespace backend\controllers;
 
+use Yii;
+use yii\db\Expression;
+use yii\db\Query;
 use yii\filters\AccessControl;
-use common\models\StoryStatisticsSearch;
 use common\rbac\UserRoles;
 use yii\web\Controller;
 use yii\web\ErrorAction;
@@ -38,7 +40,7 @@ class SiteController extends Controller
     /**
      * {@inheritdoc}
      */
-    public function actions()
+    public function actions(): array
     {
         return [
             'error' => [
@@ -47,17 +49,53 @@ class SiteController extends Controller
         ];
     }
 
-    public function actionIndex()
+    public function actionIndex(): string
     {
-        $statisticsModel = new StoryStatisticsSearch();
-        $dataProvider = $statisticsModel->getChartData4();
+
+        $week = date('W');
+        $year = date('Y');
+        $date = new \DateTime();
+        $date->setISODate($year, $week);
+        $weekStartDate = clone $date;
+        $weekEndDate = clone $date->modify('+6 days');
+
+        $targetDate = clone $weekStartDate;
+        $labels = [];
+        $data = [];
+        $i = 0;
+        while ($targetDate <= $weekEndDate) {
+
+            $labels[$i] = Yii::$app->formatter
+                ->asDate($targetDate->format('d.m.Y'), 'php:d F');
+
+            $formatDate = $targetDate->format('Y-m-d');
+            $betweenBegin = new Expression("UNIX_TIMESTAMP('$formatDate 00:00:00')");
+            $betweenEnd = new Expression("UNIX_TIMESTAMP('$formatDate 23:59:59')");
+
+            $query = (new Query())
+                ->select(['views' => 'COUNT(DISTINCT `session`)'])
+                ->from('{{%story_statistics}}')
+                ->where(['between', 'created_at', $betweenBegin, $betweenEnd]);
+
+            $query2 = (new Query())
+                ->select(['views' => 'COUNT(DISTINCT `story_id`)'])
+                ->from('{{%story_readonly_statistics}}')
+                ->where(['between', 'created_at', $betweenBegin, $betweenEnd]);
+
+            $query->union($query2, true);
+
+            $data[$i] = (new Query())
+                ->select('SUM(a.views)')
+                ->from(['a' => $query])
+                ->scalar();
+
+            $targetDate = $targetDate->modify('+1 day');
+            $i++;
+        }
+
         return $this->render('index', [
-            'dataProvider' => $dataProvider,
-            'storyViewsData' => $statisticsModel->chartStoryViews(),
-            'statDateFrom' => $statisticsModel->statDateFrom(),
-            'readOnlyDataProvider' => $statisticsModel->readOnlyData(),
-            'readOnlyStatDateFrom' => $statisticsModel->readOnlyStatDateFrom(),
+            'labels' => $labels,
+            'data' => $data,
         ]);
     }
-
 }

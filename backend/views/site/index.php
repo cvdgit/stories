@@ -4,9 +4,8 @@ use common\models\Payment;
 use dosamigos\chartjs\ChartJs;
 use yii\helpers\Html;
 /** @var $this yii\web\View */
-/** @var $dataProvider yii\data\ActiveDataProvider */
-/** @var $readOnlyDataProvider yii\data\ActiveDataProvider */
-/** @var $statDateFrom int */
+/** @var array $labels */
+/** @var array $data */
 $this->title = 'Панель управления';
 ?>
 <div class="site-index">
@@ -50,14 +49,14 @@ $this->title = 'Панель управления';
                             ],
                         ],
                         'data' => [
-                            'labels' => $storyViewsData['labels'],
+                            'labels' => $labels,
                             'datasets' => [
                                 [
                                     'label' => "Количество просмотров",
                                     'fill' => false,
                                     'borderColor' => 'rgb(75, 192, 192)',
                                     'lineTension' => 0.1,
-                                    'data' => $storyViewsData['data'],
+                                    'data' => $data,
                                 ],
                             ]
                         ]
