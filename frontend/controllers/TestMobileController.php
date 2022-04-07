@@ -65,11 +65,13 @@ class TestMobileController extends BaseController
             throw new NotFoundHttpException('The requested page does not exist.');
         }
 
+        $repeat = $fast_mode ? 1 : 5;
+
         $userProgress = new UserProgress();
         if ($student_id !== null && !$fast_mode) {
             $userQuestionHistoryModel = new UserQuestionHistoryModel();
             $userQuestionHistoryModel->student_id = $student_id;
-            $userProgress->setHistory($userQuestionHistoryModel->getUserQuestionHistoryLocal($model->id));
+            $userProgress->setHistory($userQuestionHistoryModel->getUserQuestionHistoryLocal($model->id, $repeat));
             $userProgress->setStars($userQuestionHistoryModel->getUserQuestionHistoryStarsLocal($model->id));
             $userProgress->setStarsCount($userQuestionHistoryModel->getUserHistoryStarsCountLocal($model->id));
         }
@@ -87,7 +89,6 @@ class TestMobileController extends BaseController
             }
             $result = $this->neoQueryService->query($questionId, $questionParams, $wrongAnswersParams);
 
-            $repeat = $fast_mode ? 1 : 5;
             $testParams = new TestParams($model->id, $model->source, $model->incorrect_answer_text);
             return (new NeoTestBuilder($result, $userProgress, $repeat))
                 ->build($this->getStudents($model->id), $testParams);
