@@ -11,6 +11,7 @@ use common\models\StoryTest;
 use common\models\StoryTestAnswer;
 use common\models\StoryTestQuestion;
 use common\models\StoryTestResult;
+use common\models\test\AnswerType;
 use common\models\test\SourceType;
 use common\models\test\TestStatus;
 use common\rbac\UserRoles;
@@ -89,6 +90,7 @@ class TestController extends Controller
         $model = new StoryTest();
         $model->source = $source;
         $model->created_by = Yii::$app->user->id;
+        $model->answer_type = AnswerType::DEFAULT;
         $dataProvider = new ActiveDataProvider([
             'query' => $model->getStoryTestQuestions(),
         ]);
