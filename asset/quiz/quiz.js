@@ -1,9 +1,9 @@
-import "../scss/style.scss";
-import Testing from './Testing';
-import TestModel from "./model/TestModel";
-import QuestionsData from "./model/QuestionsData";
-import WelcomeModel from "./model/WelcomeModel";
-import NeoQuestionsData from "./model/NeoQuestionsData";
+import "./src/scss/style.scss";
+import Testing from './src/Testing';
+import TestModel from "./src/model/TestModel";
+import QuestionsData from "./src/model/QuestionsData";
+import WelcomeModel from "./src/model/WelcomeModel";
+import NeoQuestionsData from "./src/model/NeoQuestionsData";
 
 const elements = document.querySelectorAll("[data-toggle='mobile-testing']");
 elements.forEach((element) => {

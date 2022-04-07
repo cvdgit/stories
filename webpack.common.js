@@ -1,25 +1,33 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
 module.exports = {
     entry: {
-        app: path.resolve(__dirname, 'frontend/js/app.js'),
-        audio: path.resolve(__dirname, 'frontend/js/audio.js')
+        quiz: path.resolve(__dirname, 'asset/quiz/quiz.js'),
+        audio: path.resolve(__dirname, 'asset/question/audio.js'),
+        app: path.resolve(__dirname, 'asset/school/app.js')
     },
     output: {
         filename: '[name].js',
         path: path.resolve(__dirname, 'public_html/build'),
     },
-    plugins: [new MiniCssExtractPlugin()],
+    externals: {
+        jquery: 'jQuery',
+    },
+    plugins: [
+        //new CleanWebpackPlugin({
+        //    exclude: /\.gitignore/,
+        //}),
+        new MiniCssExtractPlugin()
+    ],
     module: {
         rules: [
             {
                 test: /\.s[ac]ss$/i,
                 use: [
                     MiniCssExtractPlugin.loader,
-                    // Translates CSS into CommonJS
                     "css-loader",
-                    // Compiles Sass to CSS
                     "sass-loader",
                 ],
             },
@@ -30,13 +38,13 @@ module.exports = {
                     loader: 'babel-loader',
                     options: {
                         presets: ['@babel/preset-env']
-                        //plugins: ['@babel/plugin-syntax-top-level-await']
                     }
                 }
             },
+            {
+                test: /\.css$/,
+                use: [MiniCssExtractPlugin.loader, 'css-loader'],
+            },
         ],
     }
-    //experiments: {
-    //    topLevelAwait: true
-    //},
 };

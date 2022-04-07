@@ -42,7 +42,7 @@ a {
         margin-bottom: 1rem;
     }
     &--background {
-        background-image: url(../../../public_html/school/img/header_bg.svg);
+        background-image: url(./../img/header_bg.svg);
         background-position: bottom 0px left 0px;
         background-repeat: no-repeat;
         background-attachment: scroll;
@@ -55,7 +55,7 @@ a {
 }
 
 .menu-icon {
-    background-image: url(../../../public_html/school/img/menu.svg);
+    background-image: url(./../img/menu.svg);
     background-size: cover;
     background-repeat: no-repeat;
     width: 30px;
@@ -650,7 +650,7 @@ a {
         position: relative;
         &:after {
             content: '';
-            background: url(../../../public_html/school/img/box_divider.svg);
+            background: url(./../img/box_divider.svg);
             background-position: center center;
             background-repeat: no-repeat;
             background-attachment: scroll;
@@ -1517,7 +1517,7 @@ a {
 }
 
 .section-license {
-    background-image: url(../../../public_html/school/img/wave.svg);
+    background-image: url(./../img/wave.svg);
     background-position: top 40% left 105%;
     background-repeat: no-repeat;
     background-attachment: scroll;
@@ -1547,7 +1547,7 @@ a {
         margin-bottom: 6.4rem;
     }
     @include media-breakpoint-down(sm) {
-        background-image: url(../../../public_html/school/img/wave.svg);
+        background-image: url(./../img/wave.svg);
         background-position: top 56% left 0;
         background-repeat: no-repeat;
         background-attachment: scroll;
@@ -1649,7 +1649,7 @@ a {
 }
 
 .section-contact {
-    background-image: url(../../../public_html/school/img/wave.svg);
+    background-image: url(./../img/wave.svg);
     background-position: top 40% left 0px;
     background-repeat: no-repeat;
     background-attachment: scroll;
@@ -2009,20 +2009,20 @@ a {
         display: none;
     }
     &--circle-blue {
-        background: url(../../../public_html/school/img/circle-blue.svg);
+        background: url(./../img/circle-blue.svg);
     }
     &--circle-green {
-        background: url(../../../public_html/school/img/circle-green.svg);
+        background: url(./../img/circle-green.svg);
     }
     &--triangle-green, &--triangle-blue {
         width: 23px;
         height: 31px;
     }
     &--triangle-green {
-        background: url(../../../public_html/school/img/triangle-green.png);
+        background: url(./../img/triangle-green.png);
     }
     &--triangle-blue {
-        background: url(../../../public_html/school/img/triangle-blue.svg);
+        background: url(./../img/triangle-blue.svg);
     }
     &__1 {
         left: 175.7rem;
@@ -2117,7 +2117,7 @@ a {
             left: 1rem;
             bottom: 1rem;
             display: block !important;
-            background: url(../../../public_html/school/img/triangle-green.svg);
+            background: url(./../img/triangle-green.svg);
             transition: display .3s;
         }
     }
@@ -2143,7 +2143,7 @@ a {
             right: 5rem;
             bottom: 12rem;
             display: block !important;
-            background: url(../../../public_html/school/img/circle-green.svg) !important;
+            background: url(./../img/circle-green.svg) !important;
             transition: display .3s;
         }
     }
@@ -2230,7 +2230,7 @@ a {
 
 .site-dialog .icon.icon-agreement {
     float: left;
-    background-image: url('../../../public_html/img/agreement-icon.jpg');
+    background-image: url('./../img/agreement-icon.jpg');
     width: 25px;
     height: 25px;
     margin-left: 13px;
@@ -2361,19 +2361,19 @@ a {
 }
 
 .story-form .icon.icon-username {
-    background-image: url('../../../public_html/img/username-icon.jpg');
+    background-image: url('./../img/username-icon.jpg');
 }
 
 .story-form .icon.icon-email {
-    background-image: url('../../../public_html/img/email-icon.jpg');
+    background-image: url('./../img/email-icon.jpg');
 }
 
 .story-form .icon.icon-password {
-    background-image: url('../../../public_html/img/password-icon.jpg');
+    background-image: url('./../img/password-icon.jpg');
 }
 
 .story-form .icon.icon-search {
-    background-image: url('../../../public_html/img/search-icon.jpg');
+    background-image: url('./../img/search-icon.jpg');
     width: 25px;
     height: 25px;
     position: absolute;

@@ -10,10 +10,10 @@ class SchoolAsset extends AssetBundle
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
-        'build/school/app.css',
+        'build/app.css',
     ];
     public $js = [
-        'build/school/app.js',
+        'build/app.js',
     ];
     public $depends = [
         YiiAsset::class,
