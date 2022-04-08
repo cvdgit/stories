@@ -16,6 +16,11 @@
                         'active' => Yii::$app->controller->id === 'profile',
                     ],
                     [
+                        'label' => '<i class="glyphicon glyphicon-user"></i> Ученики',
+                        'url' => ['/student/index'],
+                        'active' => Yii::$app->controller->id === 'student',
+                    ],
+                    [
                         'label' => '<i class="glyphicon glyphicon-education"></i> История обучения',
                         'url' => ['/training'],
                         'active' => Yii::$app->controller->id === 'training' && Yii::$app->controller->action->id === 'index',
@@ -32,16 +37,11 @@
                         'active' => Yii::$app->controller->id === 'study',
                         'visible' => Yii::$app->user->can('student'),
                     ],
-                    [
-                        'label' => '<i class="glyphicon glyphicon-user"></i> Ученики',
-                        'url' => ['/student/index'],
-                        'active' => Yii::$app->controller->id === 'student',
-                    ],
-                    [
+                    /*[
                         'label' => '<i class="glyphicon glyphicon-ruble"></i> Подписки',
                         'url' => ['/payment/index'],
                         'active' => Yii::$app->controller->id === 'payment',
-                    ],
+                    ],*/
                 ],
                 'options' => ['class' => 'profile-menu'],
                 'encodeLabels' => false,
