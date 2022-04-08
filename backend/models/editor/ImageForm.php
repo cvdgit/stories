@@ -38,12 +38,16 @@ class ImageForm extends BaseForm
 
     public $image_id;
 
+    public $description;
+    public $description_inside;
+
     public function rules()
     {
         return array_merge(parent::rules(), [
             ['image', 'file', 'maxSize' => 7 * 1024 * 1024, 'skipOnError' => false, 'mimeTypes' => ['image/*'], 'extensions' => ['bmp', 'gif', 'jpg', 'jpeg', 'png']],
             [['action', 'actionSlideID', 'actionStoryID', 'back_to_next_slide', 'story_id', 'image_id'], 'integer'],
-            [['imagePath', 'what', 'imageID'], 'string'],
+            [['imagePath', 'what', 'imageID', 'description'], 'string'],
+            [['description_inside'], 'integer'],
         ]);
     }
 
@@ -55,6 +59,8 @@ class ImageForm extends BaseForm
             'actionStoryID' => 'История',
             'actionSlideID' => 'Слайд',
             'back_to_next_slide' => 'Возврат на текущий слайд',
+            'description' => 'Описание',
+            'description_inside' => 'Описание внутри картинки',
         ]);
     }
 

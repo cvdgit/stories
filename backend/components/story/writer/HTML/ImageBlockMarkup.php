@@ -10,7 +10,7 @@ use yii\helpers\Html;
 class ImageBlockMarkup extends AbstractMarkup
 {
 
-    public function __construct(AbstractBlock $block)
+    public function __construct(ImageBlock $block)
     {
         parent::__construct($block, new ImageElement());
     }
@@ -34,19 +34,33 @@ class ImageBlockMarkup extends AbstractMarkup
 
     public function markup(): string
     {
+
         /** @var ImageBlock $block */
         $block = $this->getBlock();
 
-        $elementTag = $this->getElementMarkup($block);
+        $content = [
+            $this->getElementMarkup($block),
+        ];
+
         if ($block->getImageSource() !== '') {
-            $elementTag .= Html::tag('span', $block->getImageSource(), ['class' => 'image-source']);
+            $content[] = Html::tag('span', $block->getImageSource(), ['class' => 'image-source']);
         }
-        $contentBlockTag = Html::tag('div', $elementTag, [
-            'class' => 'sl-block-content',
-            'style' => $this->arrayToStyle([
-                'z-index' => 11,
+
+        $contentBlock = [
+            Html::tag('div', implode("\n", $content), [
+                'class' => 'sl-block-content',
+                'style' => $this->arrayToStyle([
+                    'z-index' => 11,
+                ]),
             ]),
-        ]);
+        ];
+
+        if (($description = $block->getDescription()) !== '') {
+            $contentBlock[] = Html::tag('div', $description, [
+                'class' => 'image-description' . ($block->isDescriptionInside() ? ' image-description--inside' : ''),
+                'data-attribute' => 'image-description',
+            ]);
+        }
 
         $options = [
             'class' => 'sl-block',
@@ -61,6 +75,6 @@ class ImageBlockMarkup extends AbstractMarkup
                 'top' => $block->getTop(),
             ]),
         ];
-        return Html::tag('div', $contentBlockTag, array_merge($options, $block->getBlockAttributes()));
+        return Html::tag('div', implode("\n", $contentBlock), array_merge($options, $block->getBlockAttributes()));
     }
 }

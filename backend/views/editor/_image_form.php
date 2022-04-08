@@ -14,3 +14,6 @@ echo $form->field($model, 'actionStoryID', ['options' => ['class' => 'select-sto
 ]);
 echo $form->field($model, 'actionSlideID', ['inputOptions' => ['class' => 'form-control input-sm']])->dropDownList([], ['prompt' => 'Выбрать слайд']);
 echo $form->field($model, 'back_to_next_slide', ['inputOptions' => ['class' => 'form-control input-sm']])->checkbox();
+?>
+<?= $form->field($model, 'description')->textarea() ?>
+<?= $form->field($model, 'description_inside')->checkbox() ?>

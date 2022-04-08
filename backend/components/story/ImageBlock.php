@@ -33,6 +33,9 @@ class ImageBlock extends AbstractBlock
     const DEFAULT_IMAGE_WIDTH = 973;
     const DEFAULT_IMAGE_HEIGHT = 720;
 
+    private $description = '';
+    private $descriptionInside;
+
     public function setFilePath($filePath): void
     {
         $this->filePath = $filePath;
@@ -111,6 +114,8 @@ class ImageBlock extends AbstractBlock
             'actionStoryID' => $this->actionStoryID,
             'actionSlideID' => $this->actionSlideID,
             'back_to_next_slide' => $this->back_to_next_slide,
+            'description' => $this->getDescription(),
+            'description_inside' => $this->isDescriptionInside(),
         ], parent::getValues());
     }
 
@@ -133,6 +138,8 @@ class ImageBlock extends AbstractBlock
         if (!empty($form->url)) {
             $this->setImageSource(parse_url($form->url, PHP_URL_HOST));
         }
+        $this->setDescription($form->description);
+        $this->setDescriptionInside($form->description_inside);
     }
 
     public function create()
@@ -251,5 +258,25 @@ class ImageBlock extends AbstractBlock
             }
             catch (\Exception $ex) {}
         }
+    }
+
+    public function setDescription($description): void
+    {
+        $this->description = $description ?? '';
+    }
+
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    public function setDescriptionInside($inside): void
+    {
+        $this->descriptionInside = (bool)$inside;
+    }
+
+    public function isDescriptionInside(): bool
+    {
+        return (bool) $this->descriptionInside;
     }
 }

@@ -120,6 +120,12 @@ class HtmlSlideReader implements ReaderInterface
             if ($imageSourceElement->length > 0) {
                 $block->setImageSource($imageSourceElement->text());
             }
+
+            $descriptionElement = pq($htmlBlock)->find('div.image-description');
+            if ($descriptionElement->length > 0) {
+                $block->setDescription($descriptionElement->text());
+                $block->setDescriptionInside($descriptionElement->hasClass('image-description--inside'));
+            }
         }
 
         $this->loadBlockProperties($block, $style);

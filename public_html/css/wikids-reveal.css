@@ -1051,3 +1051,21 @@ p.wikids-test-description {
 	margin: 0 auto;
 	font-family: inherit;
 }
+
+.image-description {
+	font-size: 2rem;
+	text-align: center;
+	padding: .4rem;
+	font-weight: 400;
+	color: #38405d;
+}
+
+.image-description--inside {
+	position: absolute;
+	bottom: 0;
+	z-index: 99;
+	text-align: center;
+	width: 100%;
+	color: #fff;
+	background-color: rgba(0, 0, 0, .5);
+}
