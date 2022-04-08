@@ -99,7 +99,23 @@ class SiteController extends Controller
             'labels' => $labels,
             'data' => $data,
             'todayStories' => $todayStories,
+            'users' => $this->getUsers(date('Y-m-d')),
         ]);
+    }
+
+    private function getUsers(string $date): array
+    {
+        $betweenBegin = new Expression("UNIX_TIMESTAMP('$date 00:00:00')");
+        $betweenEnd = new Expression("UNIX_TIMESTAMP('$date 23:59:59')");
+        $query = (new Query())->select([
+                'user_name' => "IFNULL(CONCAT(t2.last_name, ' ', t2.first_name), t.email)",
+                'user_active_at' => 't.last_activity',
+            ])
+            ->from(['t' => 'user'])
+            ->leftJoin(['t2' => 'profile'], 't2.user_id = t.id')
+            ->where(['between', 't.last_activity', $betweenBegin, $betweenEnd])
+            ->orderBy(['t.last_activity' => SORT_DESC]);
+        return $query->all();
     }
 
     private function getStories(string $date): array

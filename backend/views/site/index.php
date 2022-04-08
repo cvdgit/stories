@@ -8,6 +8,7 @@ use yii\helpers\Html;
 /** @var array $labels */
 /** @var array $data */
 /** @var array $todayStories */
+/** @var array $users */
 $this->title = 'Панель управления';
 ?>
 <div class="site-index">
@@ -89,7 +90,25 @@ $this->title = 'Панель управления';
                 </div>
             </div>
             <div class="col-lg-6">
-
+                <div class="table-responsive" style="max-height: 40vh">
+                    <table class="table table-condensed table-striped">
+                        <caption>Активные сегодня пользователи</caption>
+                        <thead>
+                        <tr>
+                            <th>Пользователь</th>
+                            <th>Время</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($users as $user): ?>
+                            <tr>
+                                <td><?= Html::encode($user['user_name']) ?></td>
+                                <td><?= str_replace('сегодня в ', '', SmartDate::dateSmart($user['user_active_at'], true)) ?></td>
+                            </tr>
+                        <?php endforeach ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
