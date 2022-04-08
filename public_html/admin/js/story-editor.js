@@ -975,9 +975,9 @@ var StoryEditor = (function() {
             $list.append(createToolbarItem('Положение', 'align-center','align'));
             $list.append(createToolbarItem('Удалить', 'trash', 'delete'));
 
-            if (!activeBlock.isPlaceholder()) {
-                $list.append(createToolbarItem('Копировать', 'duplicate', 'duplicate'));
-            }
+            //if (!activeBlock.isPlaceholder()) {
+            $list.append(createToolbarItem('Копировать', 'duplicate', 'duplicate'));
+            //}
 
             return $('<div/>', {'class': 'blocks-sidebar'}).append($list);
         }
@@ -1470,7 +1470,7 @@ var StoryEditor = (function() {
 
     function copyBlock(block, id) {
         var copyBlock = $(contentCleaner.cleanSlideBlock(block.getElement()));
-        copyBlock.css({'left': (50 + parseInt(copyBlock.css('left'))) + 'px', 'top': (50 + parseInt(copyBlock.css('top'))) + 'px'});
+        copyBlock.css({'left': (55 + parseInt(copyBlock.css('left'))) + 'px', 'top': (55 + parseInt(copyBlock.css('top'))) + 'px'});
         copyBlock.attr('data-block-id', id);
         appendBlock(copyBlock);
         blockModifier.change();
@@ -1479,7 +1479,7 @@ var StoryEditor = (function() {
     function copyBlockAction(blockID) {
         var block = blockID ? blockManager.find(blockID) : blockManager.getActive();
         var copyBlockID = blockIDGenerator.generate();
-        if (block.typeIsImage() || block.typeIsVideo() || block.typeIsHtml()) {
+        if ((block.typeIsImage() && !block.isPlaceholder()) || block.typeIsVideo() || block.typeIsHtml()) {
             $.ajax({
                 url: '/admin/index.php?r=editor/block/copy&slide_id=' + slidesManager.getCurrentSlideID() + '&block_id=' + copyBlockID,
                 type: 'POST',
