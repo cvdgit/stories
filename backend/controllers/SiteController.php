@@ -52,18 +52,15 @@ class SiteController extends Controller
     public function actionIndex(): string
     {
 
-        $week = date('W');
-        $year = date('Y');
-        $date = new \DateTime();
-        $date->setISODate($year, $week);
-        $weekStartDate = clone $date;
-        $weekEndDate = clone $date->modify('+6 days');
+        $date = new \DateTime('now');
+        $endDate = clone $date;
+        $startDate = clone $date->modify('-6 days');
 
-        $targetDate = clone $weekStartDate;
+        $targetDate = clone $startDate;
         $labels = [];
         $data = [];
         $i = 0;
-        while ($targetDate <= $weekEndDate) {
+        while ($targetDate <= $endDate) {
 
             $labels[$i] = Yii::$app->formatter
                 ->asDate($targetDate->format('d.m.Y'), 'php:d F');

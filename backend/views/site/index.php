@@ -38,7 +38,7 @@ $this->title = 'Панель управления';
                             'maintainAspectRatio' => false,
                             'title' => [
                                 'display' => true,
-                                'text' => 'Количество просмотров историй по дням',
+                                'text' => 'Просмотры историй',
                             ],
                             'legend' => [
                                 'display' => false,
