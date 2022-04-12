@@ -1521,7 +1521,7 @@ var StoryEditor = (function() {
         if (slideData.isLink) {
             $editor.find('section').addClass('is-link');
             blockToolbar.hide();
-            slideMenu.hide();
+            //slideMenu.hide();
         }
         else {
             blockToolbar.show();
@@ -1541,9 +1541,14 @@ var StoryEditor = (function() {
             loadSlideWithData(slideData);
             urlManager.setSlideId(slideData.id);
         }).done(function(data) {
-            if (data.length && !slidesManager.getActiveSlide().isSlideLink()) {
+            if (data.length) {
+              if (slidesManager.getActiveSlide().isSlideLink()) {
+                blockToolbar.hide();
+              }
+              else {
                 blockToolbar.show();
-                slideMenu.show();
+              }
+              slideMenu.show();
             }
             else {
                 blockToolbar.hide();
