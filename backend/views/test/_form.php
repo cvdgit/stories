@@ -63,8 +63,11 @@ $opt = new TestTypeOptions($model->answer_type);
     <?= $form->field($model, 'input_voice', $opt->forGroup([AnswerType::INPUT, AnswerType::RECORDING]))
         ->dropDownList(InputVoice::asArray(), $opt->forField([AnswerType::INPUT, AnswerType::RECORDING])) ?>
 
-    <?= $form->field($model, 'recording_lang', $opt->forGroup([AnswerType::RECORDING]))
-        ->dropDownList(RecorderLang::asArray(), $opt->forField([AnswerType::RECORDING])) ?>
+    <?= $form->field($model, 'voice_response', $opt->forGroup([AnswerType::DEFAULT, AnswerType::RECORDING]))
+        ->checkbox(array_merge($opt->forField([AnswerType::DEFAULT, AnswerType::RECORDING]), ['data-bound' => Html::getInputId($model, 'recording_lang')])) ?>
+
+    <?= $form->field($model, 'recording_lang', $opt->forGroup([AnswerType::DEFAULT, AnswerType::RECORDING]))
+        ->dropDownList(RecorderLang::asArray(), $opt->forField([AnswerType::DEFAULT, AnswerType::RECORDING])) ?>
 
     <?= $form->field($model, 'remember_answers', $opt->forGroup([AnswerType::RECORDING]))
         ->checkbox($opt->forField([AnswerType::RECORDING])) ?>
@@ -205,12 +208,12 @@ $('#storytest-question_list').on('change', function() {
     }
 
     setControlsState();
-    
+
     $('[data-bound]').on('click', function() {
         var id = $(this).attr('data-bound');
         $('#' + id).attr('disabled', !this.checked);
     });
-    
+
     $('[data-radio]').on('click', function() {
         var group = $(this).attr('data-radio');
         $('[data-radio=' + group + ']').prop('disabled', this.checked);

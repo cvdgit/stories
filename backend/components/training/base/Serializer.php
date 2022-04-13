@@ -38,6 +38,7 @@ class Serializer
                     'hideAnswersName' => filter_var($test->hide_answers_name, FILTER_VALIDATE_BOOLEAN),
                     'repeatQuestions' => $fastMode ? 1 : $test->repeat,
                     'sayCorrectAnswer' => filter_var($test->say_correct_answer, FILTER_VALIDATE_BOOLEAN),
+                    'voiceResponse' => filter_var($test->voice_response, FILTER_VALIDATE_BOOLEAN),
                 ],
                 'students' => $students,
                 'stories' => $stories,

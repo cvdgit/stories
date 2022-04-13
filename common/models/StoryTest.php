@@ -49,6 +49,7 @@ use yii\helpers\ArrayHelper;
  * @property int $hide_answers_name
  * @property int $repeat
  * @property int $say_correct_answer
+ * @property int $voice_response
  *
  * @property StoryTestQuestion[] $storyTestQuestions
  * @property Story[] $stories
@@ -95,7 +96,7 @@ class StoryTest extends ActiveRecord
             [['title', 'question_list_name', 'header', 'question_params', 'incorrect_answer_text', 'input_voice', 'recording_lang', 'ask_question_lang'], 'string', 'max' => 255],
             [['description_text'], 'string'],
             [['question_list', 'sortable'], 'safe'],
-            [['repeat', 'say_correct_answer'], 'integer'],
+            [['repeat', 'say_correct_answer', 'voice_response'], 'integer'],
             ['repeat', 'in', 'range' => TestRepeat::getForRange()],
         ];
     }
@@ -133,6 +134,7 @@ class StoryTest extends ActiveRecord
             'hide_answers_name' => 'Скрывать текст ответов',
             'repeat' => 'Повторять вопрос',
             'say_correct_answer' => 'Произносить правильные ответы',
+            'voice_response' => 'Ввод ответа голосом'
         ];
     }
 

@@ -80,6 +80,7 @@ $css = <<< CSS
 .run-test {
     padding: 0;
     text-align: center;
+    height: 100%;
 }
 .run-test .wikids-test-answer label {
     font-size: 18px;
@@ -140,14 +141,14 @@ $('#select-user-modal').on('loaded.bs.modal', function() {
 
     $('#select-user-form', this).on('beforeSubmit', function(e) {
         e.preventDefault();
-        
+
         $('#select-user-modal').modal('hide');
-        
+
         var userId = $(this).find('#selectuserform-user_id').val();
         var link = '$link' + '&user_id=' + userId;
         $('#run-test-modal')
             .modal({'remote': link});
-        
+
         return false;
     })
         .on('submit', function(e) {
