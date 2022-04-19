@@ -144,19 +144,21 @@ class CourseController extends Controller
                 if (($slideModel = StorySlide::findSlideByNumber($storyModel->id, $number)) !== null) {
 
                     if (SlideKind::isQuiz($slideModel)) {
-                        unset($slideLinks[$i]);
-                        continue;
+                        unset($slideLinks[$i]['alias'], $slideLinks[$i]['number']);
+                        $slideLinks[$i]['items'] = [];
                     }
+                    else {
 
-                    $slideData = StorySlide::getSlideData($slideModel);
-                    $data = (new SlideModifier($storyModel->id, $slideData))
-                        ->addImageUrl()
-                        ->addVideoUrl()
-                        ->forLesson();
+                        $slideData = StorySlide::getSlideData($slideModel);
+                        $data = (new SlideModifier($storyModel->id, $slideData))
+                            ->addImageUrl()
+                            ->addVideoUrl()
+                            ->forLesson();
 
-                    $slideItems = $data['blocks'];
-                    unset($slideLinks[$i]['alias'], $slideLinks[$i]['number']);
-                    $slideLinks[$i]['items'] = $slideItems;
+                        $slideItems = $data['blocks'];
+                        unset($slideLinks[$i]['alias'], $slideLinks[$i]['number']);
+                        $slideLinks[$i]['items'] = $slideItems;
+                    }
                 }
             }
         }
