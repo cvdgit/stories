@@ -89,7 +89,7 @@ class StorySlide extends ActiveRecord
             if (($slideLinkModel = self::findOne($slideLinkId)) === null) {
                 throw new \DomainException('Linked slide is null');
             }
-            return $slideLinkModel->id;
+            return $slideLinkModel->data;
         }
         return $model->data;
     }

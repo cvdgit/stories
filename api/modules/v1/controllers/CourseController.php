@@ -143,6 +143,11 @@ class CourseController extends Controller
             if (($storyModel = Story::findOne(['alias' => $alias])) !== null) {
                 if (($slideModel = StorySlide::findSlideByNumber($storyModel->id, $number)) !== null) {
 
+                    if (SlideKind::isQuiz($slideModel)) {
+                        unset($slideLinks[$i]);
+                        continue;
+                    }
+
                     $slideData = StorySlide::getSlideData($slideModel);
                     $data = (new SlideModifier($storyModel->id, $slideData))
                         ->addImageUrl()
