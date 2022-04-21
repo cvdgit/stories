@@ -3231,6 +3231,7 @@
                         answer: result
                       }).done(function (response) {
                         if (response && response.success) {
+                          console.log(response);
                           var answer = answerByName(currentQuestion, response.output);
                           if (answer) {
                             nextQuestion([answer.id]);
