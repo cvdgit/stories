@@ -68,7 +68,7 @@ class AnswerController extends Controller
         $shortest = -1;
         $match = [];
         foreach ($words as $word) {
-            $lev = levenshtein($input, mb_strtolower($word));
+            $lev = levenshtein($input, mb_strtolower(preg_replace('/[^А-яёЁ\d\s]/u', '', $word)));
             if ($lev === 0) {
                 $match = [$word];
                 $shortest = 0;
