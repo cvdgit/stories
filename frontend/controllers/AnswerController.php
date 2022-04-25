@@ -68,7 +68,8 @@ class AnswerController extends Controller
         $shortest = -1;
         $match = [];
         foreach ($words as $word) {
-            $lev = levenshtein($input, mb_strtolower(preg_replace('/[^А-яёЁ\d\s]/u', '', $word)));
+            $lev = levenshtein($input, mb_strtolower(preg_replace('/[^A-Za-zА-яёЁ\d\s]/u', '', $word)));
+            //$lev = levenshtein($input, mb_strtolower(preg_replace('/[,\-\.!?]/u', '', $word)));
             if ($lev === 0) {
                 $match = [$word];
                 $shortest = 0;
@@ -82,7 +83,7 @@ class AnswerController extends Controller
             }
         }
         if ($shortest > 6) {
-            return '';
+            return $shortest;
         }
         return current($match);
     }
