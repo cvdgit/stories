@@ -82,7 +82,7 @@ class AnswerController extends Controller
                 $match[] = $word;
             }
         }
-        if ($shortest > 6) {
+        if ($shortest > 10) {
             return '';
         }
         return current($match);
