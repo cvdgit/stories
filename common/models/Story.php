@@ -57,6 +57,7 @@ use yii\db\ActiveQuery;
  * @property StoryTest[] $tests
  * @property StorySlide[] $storySlides
  * @property StorySlideImage[] $storyImages
+ * @property Lesson[] $lessons
  */
 
 class Story extends ActiveRecord
@@ -813,5 +814,16 @@ class Story extends ActiveRecord
     public static function deleteSlideNumber(int $storyID, int $currentNumber): void
     {
         self::updateSlidesOrder(self::ACTION_SLIDE_DELETE, $storyID, $currentNumber);
+    }
+
+    public function getLessons(): ActiveQuery
+    {
+        return $this->hasMany(Lesson::class, ['story_id' => 'id'])
+            ->orderBy(['order' => SORT_ASC]);
+    }
+
+    public function haveLessons(): bool
+    {
+        return count($this->lessons) > 0;
     }
 }

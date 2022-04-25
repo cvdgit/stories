@@ -17,6 +17,7 @@ use backend\components\story\writer\HTMLWriter;
 use backend\components\StudyTaskFinalSlide;
 use backend\models\editor\BaseForm;
 use backend\models\video\VideoSource;
+use common\models\LessonBlock;
 use common\models\slide\SlideKind;
 use common\models\slide\SlideStatus;
 use common\models\SlideVideo;
@@ -87,7 +88,7 @@ class StoryEditorService
     }
     */
 
-    public function createSlide(int $storyID, int $currentSlideID = -1): int
+    public function createSlide(int $storyID, int $currentSlideID = -1, int $lessonId = null): int
     {
         $reader = new HtmlSlideReader('');
         $slide = $reader->load();
@@ -102,7 +103,20 @@ class StoryEditorService
             Story::insertSlideNumber($storyID, $currentSlide->number);
         }
         $model->save(false);
+
+        if ($lessonId !== null) {
+            $this->createLessonBlock($lessonId, $model->id);
+        }
+
         return $model->id;
+    }
+
+    private function createLessonBlock(int $lessonId, int $slideId): void
+    {
+        $lessonBlock = LessonBlock::create($lessonId, $slideId);
+        if (!$lessonBlock->save()) {
+            throw new DomainException('LessonBlock save exception');
+        }
     }
 
     public function createSlideLink(int $storyID, int $linkSlideID, int $currentSlideID = null): int
@@ -177,21 +191,26 @@ class StoryEditorService
         return $model->id;
     }*/
 
-    public function copySlide(int $slideID): int
+    public function copySlide(int $slideID, int $lessonId = null): int
     {
+        /** @var StorySlide $slide */
         $slide = StorySlide::findSlide($slideID);
-        $data = $slide->data;
-        if ($slide->isLink()) {
-            $linkSlide = StorySlide::findSlide($slide->link_slide_id);
-            $data = $linkSlide->data;
-        }
+        $data = $slide->getSlideOrLinkData();
+
         $newSlide = StorySlide::createSlide($slide->story_id);
         $newSlide->data = $data;
 
         Story::insertSlideNumber($slide->story_id, $slide->number);
         $newSlide->number = $slide->number + 1;
 
-        $newSlide->save();
+        if (!$newSlide->save()) {
+            throw new DomainException('copySlide exception');
+        }
+
+        if ($lessonId !== null) {
+            $this->createLessonBlock($lessonId, $newSlide->id);
+        }
+
         return $newSlide->id;
     }
 
@@ -249,6 +268,11 @@ class StoryEditorService
         $model->updateData($writer->renderSlide($slide));
 
         return str_replace('data-src=', 'src=', $writer->renderBlock($block));
+    }
+
+    public function createQuizBlock(StorySlide $slideModel, BaseForm $form): string
+    {
+        return $this->createBlock($slideModel, $form, HTMLBLock::class);
     }
 
     public function createBlock(StorySlide $slideModel, BaseForm $form, string $blockClassName): string

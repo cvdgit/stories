@@ -13,6 +13,7 @@ use yii\base\Model;
 class SlidesOrder extends Model
 {
     public $story_id;
+    public $lesson_id;
     public $slides = [];
     public $order = [];
 
@@ -27,26 +28,33 @@ class SlidesOrder extends Model
     public function rules()
     {
         return [
-            ['story_id', 'integer'],
+            [['story_id', 'lesson_id'], 'integer'],
             ['story_id', 'exist', 'targetClass' => Story::class, 'targetAttribute' => ['story_id' => 'id']],
             ['slides', 'each', 'rule' => ['integer']],
             ['order', 'each', 'rule' => ['integer']],
         ];
     }
 
-    public function saveSlidesOrder()
+    public function saveSlidesOrder(): void
     {
-        $slides = $this->slides;
-        $order = $this->order;
-        $this->transactionManager->wrap(function() use ($slides, $order) {
+        $this->transactionManager->wrap(function() {
+
             $command = Yii::$app->db->createCommand();
             $i = 0;
-            foreach ($slides as $slideID) {
-                $command->update(StorySlide::tableName(), ['number' => $order[$i]], 'id = :id', [':id' => $slideID]);
-                $command->execute();
-                $i++;
+            if ($this->lesson_id !== null) {
+                foreach ($this->slides as $slideID) {
+                    $command->update('lesson_block', ['order' => $this->order[$i]], 'lesson_id = :lesson AND slide_id = :slide', [':lesson' => $this->lesson_id, ':slide' => $slideID]);
+                    $command->execute();
+                    $i++;
+                }
+            }
+            else {
+                foreach ($this->slides as $slideID) {
+                    $command->update(StorySlide::tableName(), ['number' => $this->order[$i]], 'id = :id', [':id' => $slideID]);
+                    $command->execute();
+                    $i++;
+                }
             }
         });
     }
-
 }

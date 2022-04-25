@@ -20,7 +20,7 @@ class TestBlockContent
 
     public static function createFromHtml(string $html): self
     {
-        $content = pq($html);
+        $content = \phpQuery::newDocumentHTML($html);
         if ($content->attr('data-test-id') === null) {
             $content = $content->find('.new-questions');
         }

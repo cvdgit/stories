@@ -6,7 +6,9 @@ use backend\components\SlideWrapper;
 use backend\models\NeoSlideRelations;
 use common\models\slide\SlideKind;
 use DomainException;
+use yii\base\InvalidConfigException;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 
@@ -28,6 +30,8 @@ use yii\db\Query;
  * @property Story $story
  * @property StorySlideBlock[] $storySlideBlocks
  * @property StoryStatistics[] $storyStatistics
+ * @property LessonBlock[] $lessonBlocks
+ * @property Lesson[] $lessons
  */
 class StorySlide extends ActiveRecord
 {
@@ -76,7 +80,7 @@ class StorySlide extends ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getStory()
     {
@@ -84,7 +88,7 @@ class StorySlide extends ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getStorySlideBlocks()
     {
@@ -92,7 +96,7 @@ class StorySlide extends ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getNeoSlideRelations()
     {
@@ -100,7 +104,7 @@ class StorySlide extends ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getStoryFeedbacks()
     {
@@ -108,7 +112,7 @@ class StorySlide extends ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getStoryStatistics()
     {
@@ -216,6 +220,28 @@ class StorySlide extends ActiveRecord
         parent::afterDelete();
     }
 
+    /**
+     * Gets query for [[LessonBlocks]].
+     *
+     * @return ActiveQuery
+     */
+    public function getLessonBlocks(): ActiveQuery
+    {
+        return $this->hasMany(LessonBlock::class, ['slide_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Lessons]].
+     *
+     * @return ActiveQuery
+     * @throws InvalidConfigException
+     */
+    public function getLessons(): ActiveQuery
+    {
+        return $this->hasMany(Lesson::class, ['id' => 'lesson_id'])
+            ->viaTable('lesson_block', ['slide_id' => 'id']);
+    }
+
     public function isLink(): bool
     {
         return (int)$this->kind === self::KIND_LINK;
@@ -294,7 +320,7 @@ class StorySlide extends ActiveRecord
             if (($slideLinkModel = self::findOne($slideLinkId)) === null) {
                 throw new \DomainException('Linked slide is null');
             }
-            return $slideLinkModel->id;
+            return $slideLinkModel->data;
         }
         return $this->data;
     }

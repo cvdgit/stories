@@ -3,17 +3,11 @@
 namespace backend\controllers;
 
 use backend\components\BaseController;
+use backend\components\editor\EditorConfig;
+use backend\components\editor\SlideListResponse;
 use backend\components\SlideModifier;
 use backend\components\story\AbstractBlock;
-use backend\components\story\ButtonBlock;
-use backend\components\story\ImageBlock;
 use backend\components\story\reader\HtmlSlideReader;
-use backend\components\story\TestBlock;
-use backend\components\story\TextBlock;
-use backend\components\story\TransitionBlock;
-use backend\components\story\VideoBlock;
-use backend\components\story\VideoFileBlock;
-use backend\components\story\writer\HTMLWriter;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
 use backend\models\editor\QuestionForm;
@@ -25,8 +19,8 @@ use backend\models\editor\TransitionForm;
 use backend\models\editor\VideoForm;
 use backend\models\video\VideoSource;
 use backend\services\StoryLinksService;
+use common\models\Lesson;
 use common\models\StorySlide;
-use common\models\StoryTest;
 use DomainException;
 use Exception;
 use Yii;
@@ -35,6 +29,7 @@ use common\models\Story;
 use common\services\StoryService;
 use common\rbac\UserRoles;
 use backend\services\StoryEditorService;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class EditorController extends BaseController
@@ -70,14 +65,63 @@ class EditorController extends BaseController
         ];
     }
 
+    private function getEditorConfig(Story $story): EditorConfig
+    {
+        $storyID = $story->id;
+        return (new EditorConfig())
+            ->setValue('storyID', $storyID)
+            ->setValue('lessonID')
+            ->setUrlValues([
+                'slidesEndpoint' => ['editor/slides', 'story_id' => $storyID],
+                'getSlideAction' => ['/editor/load-slide', 'story_id' => $storyID],
+                'getSlideBlocksAction' => ['/editor/slide-blocks'],
+                'getBlockFormAction' => ['/editor/form'],
+                'createBlockAction' => ['/editor/create-block'],
+                'newCreateBlockAction' => ['editor/block/create'],
+                'deleteBlockAction' => ['/editor/delete-block'],
+                'deleteSlideAction' => ['editor/delete-slide'],
+                'currentSlidesAction' => ['editor/slides', 'story_id' => $storyID],
+                'slideVisibleAction' => ['editor/slide-visible'],
+                'createSlideAction' => ['editor/create-slide', 'story_id' => $storyID],
+                'createSlideLinkAction' => ['editor/create-slide-link', 'story_id' => $storyID],
+                'slidesAction' => ['editor/slides'],
+                'createSlideQuestionAction' => ['editor/create-slide-question', 'story_id' => $storyID],
+                'createNewSlideQuestionAction' => ['editor/new-create-slide-question'],
+                'copySlideAction' => ['editor/copy-slide'],
+                'storyImagesAction' => ['editor/image/list'],
+            ])
+            ->setValue('storyUrl', Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $story->alias]));
+    }
+
 	public function actionEdit($id)
 	{
         $model = $this->findModel(Story::class, $id);
 	    $this->layout = 'editor';
         return $this->render('edit', [
             'model' => $model,
+            'configJSON' => $this->getEditorConfig($model)->asJson(),
 		]);
 	}
+
+    public function actionLesson(string $uuid): string
+    {
+        $this->layout = 'editor';
+
+        if (($lessonModel = Lesson::findOneByUUID($uuid)) === null) {
+            throw new NotFoundHttpException('Lesson not found');
+        }
+
+        $storyModel = $lessonModel->story;
+        $config = $this->getEditorConfig($storyModel)
+            ->setValue('lessonID', $lessonModel->id)
+            ->setUrlValue('slidesEndpoint', ['lesson/slides', 'id' => $lessonModel->id]);
+
+        return $this->render('lesson', [
+            'model' => $storyModel,
+            'configJSON' => $config->asJson(),
+            'lesson' => $lessonModel,
+        ]);
+    }
 
     public function actionLoadSlide(int $story_id, int $slide_id = -1)
     {
@@ -226,27 +270,7 @@ class EditorController extends BaseController
         Yii::$app->response->format = Response::FORMAT_JSON;
         $model = $this->findModel(Story::class, $story_id);
         return array_map(static function(StorySlide $slide) {
-            $slideData = $slide->data;
-            if ($slide->isLink()) {
-                $slideData = StorySlide::getSlideData($slide->link_slide_id);
-            }
-            $slideData = (new SlideModifier($slide->id, $slideData))
-                ->addImageId()
-                ->addDescription()
-                ->render();
-            return [
-                'id' => $slide->id,
-                'slideNumber' => $slide->number,
-                'isLink' => $slide->isLink(),
-                'isQuestion' => $slide->isQuestion(),
-                'linkSlideID' => $slide->link_slide_id,
-                'isHidden' => $slide->isHidden(),
-                'data' => $slideData,
-                'status' => $slide->status,
-                'haveLinks' => (count($slide->storySlideBlocks) > 0),
-                'number' => $slide->number,
-                'haveNeoRelations' => (count($slide->neoSlideRelations) > 0),
-            ];
+            return (new SlideListResponse($slide))->asArray();
         }, $model->storySlides);
     }
 
@@ -262,4 +286,3 @@ class EditorController extends BaseController
         return ['success' => false];
     }
 }
-

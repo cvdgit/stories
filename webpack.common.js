@@ -6,7 +6,8 @@ module.exports = {
     entry: {
         quiz: path.resolve(__dirname, 'asset/quiz/quiz.js'),
         audio: path.resolve(__dirname, 'asset/question/audio.js'),
-        app: path.resolve(__dirname, 'asset/school/app.js')
+        app: path.resolve(__dirname, 'asset/school/app.js'),
+        course: path.resolve(__dirname, 'asset/course/app.js')
     },
     output: {
         filename: '[name].js',

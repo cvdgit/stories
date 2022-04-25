@@ -67,9 +67,9 @@ class SlideController extends BaseController
         return ['success' => true];
     }
 
-    public function actionCreate(int $story_id, int $current_slide_id = -1)
+    public function actionCreate(int $story_id, int $current_slide_id = -1, int $lesson_id = null): array
     {
-        $slideID = $this->editorService->createSlide($story_id, $current_slide_id);
+        $slideID = $this->editorService->createSlide($story_id, $current_slide_id, $lesson_id);
         return ['success' => true, 'id' => $slideID];
     }
 
@@ -80,10 +80,10 @@ class SlideController extends BaseController
         return ['success' => true];
     }
 
-    public function actionCopy(int $slide_id)
+    public function actionCopy(int $slide_id, int $lesson_id = null): array
     {
         try {
-            $slideID = $this->editorService->copySlide($slide_id);
+            $slideID = $this->editorService->copySlide($slide_id, $lesson_id);
         }
         catch (\Exception $ex) {
             return ['success' => false, 'error' => $ex->getMessage()];
@@ -91,7 +91,7 @@ class SlideController extends BaseController
         return ['success' => true, 'id' => $slideID];
     }
 
-    public function actionSaveOrder()
+    public function actionSaveOrder(): array
     {
         $form = new SlidesOrder();
         $result = ['success' => false, 'errors' => ''];

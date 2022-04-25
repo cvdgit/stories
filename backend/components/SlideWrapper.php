@@ -48,4 +48,23 @@ class SlideWrapper
     {
         return (new HTMLWriter())->renderSlide($this->slide);
     }
+
+    public function getQuizBlock(): ?HTMLBLock
+    {
+        foreach ($this->slide->getBlocks() as $block) {
+            if ($block->isHtmlTest()) {
+                /** @var HTMLBLock $block */
+                return $block;
+            }
+        }
+        return null;
+    }
+
+    public function getQuizBlockId(): ?string
+    {
+        if (($block = $this->getQuizBlock()) !== null) {
+            return $block->getId();
+        }
+        return null;
+    }
 }

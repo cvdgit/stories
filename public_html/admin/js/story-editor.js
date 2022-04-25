@@ -231,6 +231,7 @@ SlideManager.prototype = {
     'saveSlidesOrder': function() {
         var formData = new FormData();
         formData.append('SlidesOrder[story_id]', this.options['story_id']);
+        formData.append('SlidesOrder[lesson_id]', this.options['lesson_id']);
         this.$slidesList.find('[data-slide-id]').each(function(i) {
             formData.append('SlidesOrder[slides][' + i + ']', $(this).attr('data-slide-id'));
             formData.append('SlidesOrder[order][' + i + ']', (++i).toString());
@@ -301,7 +302,7 @@ SlideManager.prototype = {
         this.slides = [];
 
         return $.ajax({
-            'url': '/admin/index.php?r=editor/slides&story_id=' + this.options['story_id'],
+            'url': this.options['endpoint'],
             'type': 'GET',
             'dataType': 'json'
         }).done(function(data) {
@@ -417,9 +418,12 @@ SlideManager.prototype = {
                 $.whenAll(that.decks).done(function () {
 
                     if (toSetActiveSlideID) {
-                        var el = that.$slidesList
+
+                      var el = that.$slidesList
                             .find('div[data-slide-id=' + toSetActiveSlideID + '].thumb-reveal-wrapper');
-                        var top = el.offset().top - 151;
+
+                      var rect = $('.slides-actions')[0].getBoundingClientRect();
+                      var top = el.offset().top - (rect.height + rect.top);
                         if (top < 0) {
                             top = 0;
                         }
@@ -427,8 +431,6 @@ SlideManager.prototype = {
                             scrollTop: top
                         }, 'fast');
                     }
-
-                    console.log('done');
                 });
             }
         });
@@ -444,6 +446,7 @@ SlideManager.prototype = {
         return $.getJSON('/admin/index.php', {
             'r': 'editor/slide/create',
             'story_id': this.options['story_id'],
+            'lesson_id': this.options['lesson_id'],
             'current_slide_id': this.getCurrentSlideID()
         });
     },
@@ -454,10 +457,10 @@ SlideManager.prototype = {
         });
     },
     'copySlide': function() {
-
         return $.getJSON('/admin/index.php', {
-            'r': 'editor/slide/copy',
-            'slide_id': this.getCurrentSlideID()
+          'r': 'editor/slide/copy',
+          'slide_id': this.getCurrentSlideID(),
+          'lesson_id': this.options['lesson_id'],
         });
     },
     'toggleVisible': function() {
@@ -925,7 +928,11 @@ var StoryEditor = (function() {
 
         slideMenu = new SlideMenu($editor);
 
-        slidesManager = new SlideManager({'story_id': params['storyID']});
+        slidesManager = new SlideManager({
+          'story_id': params['storyID'],
+          'endpoint': params['slidesEndpoint'],
+          'lesson_id': params['lessonID']
+        });
         contentCleaner = new ContentCleaner($editor);
         blockModifier = new BlockModifier(new DataModifier(slidesManager, contentCleaner));
         blockAlignment = new BlockAlignment(blockModifier);

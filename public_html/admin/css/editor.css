@@ -404,6 +404,21 @@ body {
     border: 0;
 }
 
+.action-group {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.action-group .button__wrap {
+  flex: 1;
+  margin-right: 2px;
+}
+.action-group .button__wrap:last-child {
+  margin-left: 2px;
+  margin-right: 0;
+}
+
 .slides-actions .action-group button {
     width: 80px;
 }
@@ -832,4 +847,54 @@ body {
     height: 100%;
     left: 0;
     top: 0;
+}
+
+.lesson-bar {
+  background-color: #222;
+  height: 50px;
+  color: #fff;
+  display: flex;
+  flex-direction: row;
+  padding: 6px 8px 0 8px;
+  align-items: center;
+}
+
+.bar-back {
+
+}
+
+.bar-back .button {
+  width: 164px;
+}
+
+.bar-back .button .glyphicon {
+  font-size: 20px;
+}
+
+.bar-content {
+  margin-left: 20px;
+}
+
+.back-content__title {
+  color: #fff;
+  margin: 0;
+}
+
+.button {
+  background: #666;
+  position: relative;
+  margin-top: 3px;
+  font-size: 1.6rem;
+  color: #eee;
+  border-radius: 2px;
+  cursor: pointer;
+  line-height: initial;
+  transition: background 0.12s ease;
+  -webkit-font-smoothing: initial;
+  text-align: center;
+  display: inline-block;
+  height: 40px;
+  padding: 0;
+  margin-bottom: 3px;
+  border: 0;
 }
