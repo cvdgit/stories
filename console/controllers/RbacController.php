@@ -11,7 +11,7 @@ class RbacController extends Controller
     public function actionInit()
     {
         $auth = Yii::$app->authManager;
-        
+
         $auth->removeAll();
 
         $userRole = $auth->createRole('user');
@@ -24,7 +24,7 @@ class RbacController extends Controller
         // $createStory = $auth->createPermission('createStory');
         // $updateStory = $auth->createPermission('updateStory');
         // $deleteStory = $auth->createPermission('deleteStory');
-        
+
         $adminPanelPermission = $auth->createPermission(UserRoles::PERMISSION_ADMIN_PANEL);
         $adminPanelPermission->description = 'Доступ к панели администрирования';
         $auth->add($adminPanelPermission);
@@ -220,6 +220,20 @@ $moderatorRole = $auth->getRole('moderator');
         $adminRole = $auth->getRole(UserRoles::ROLE_ADMIN);
         $auth->removeChild($adminRole, $moderatorRole);
         $auth->addChild($adminRole, $teacherRole);
+
+        $this->stdout('Done!' . PHP_EOL);
+    }
+
+    public function actionInitContactRequest(): void
+    {
+        $auth = Yii::$app->authManager;
+
+        $permission = $auth->createPermission(UserRoles::PERMISSION_MANAGE_CONTACT_REQUESTS);
+        $permission->description = 'Управление заявками с формы';
+        $auth->add($permission);
+
+        $adminRole = $auth->getRole(UserRoles::ROLE_ADMIN);
+        $auth->addChild($adminRole, $permission);
 
         $this->stdout('Done!' . PHP_EOL);
     }

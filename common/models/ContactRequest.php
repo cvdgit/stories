@@ -54,11 +54,11 @@ class ContactRequest extends ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Name',
-            'phone' => 'Phone',
-            'text' => 'Text',
+            'name' => 'Имя',
+            'phone' => 'Номер телефона',
+            'text' => 'Текст',
             'email' => 'Email',
-            'created_at' => 'Created At',
+            'created_at' => 'Дата создания',
             'updated_at' => 'Updated At',
         ];
     }

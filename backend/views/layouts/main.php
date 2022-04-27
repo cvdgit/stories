@@ -58,6 +58,7 @@ AppAsset::register($this);
                     'options' => ['class' => 'nav-sidebar'],
                     'items' => [
                         ['label' => 'Главная', 'url' => ['/site/index']],
+                        ['label' => 'Заявки с формы', 'url' => ['contact-request/index']],
                         ['label' => 'Истории', 'url' => ['/story/index']],
                         ['label' => 'Списки историй', 'url' => ['/story-list/index'], 'active' => Yii::$app->controller->id === 'story-list'],
                         ['label' => 'Разделы', 'url' => ['/section']],
