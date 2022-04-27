@@ -19,11 +19,11 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                     <div class="main-description">
                         <p class="main-description__text">Более 1200 электронных учебников<br>Индивидуальный план обучения<br>Все необходимые лицензии</p>
                     </div>
-                    <div class="main-class">
+                    <!--div class="main-class">
                         <div class="main-class__wrap">
                             <p class="main-class__text">1–4 класс</p>
                         </div>
-                    </div>
+                    </div-->
                 </div>
                 <div class="main__button">
                     <?= Html::a('Оставить заявку', ['contact/create'], ['class' => 'button contact-request']) ?>
@@ -268,7 +268,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                                     <p class="price-content__item">Тестирование и рекомендации</p>
                                 </div>
                                 <div class="price">
-                                    <div class="price__price price__price--sub">30 000 ₽ первоначальный взнос</div>
+                                    <!--div class="price__price price__price--sub">30 000 ₽ первоначальный взнос</div-->
                                     <div class="price__price">4900 ₽/месяц</div>
                                 </div>
                                 <div class="box-controls">
@@ -283,7 +283,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                                     <p class="price-content__item">Проработка отдельных тем</p>
                                 </div>
                                 <div class="price">
-                                    <div class="price__price">2000 ₽/ак. час</div>
+                                    <div class="price__price">&nbsp;</div>
                                 </div>
                                 <div class="box-controls">
                                     <?= Html::a('Записаться', ['contact/create'], ['class' => 'button contact-request']) ?>
