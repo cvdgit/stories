@@ -1,5 +1,7 @@
 <?php
 
+use yii\rest\UrlRule;
+
 $params = array_merge(
     require(__DIR__ . '/../../common/config/params.php'),
     require(__DIR__ . '/../../common/config/params-local.php'),
@@ -40,14 +42,15 @@ return [
             'showScriptName' => false,
             'rules' => [
                 [
-                    'class' => 'yii\rest\UrlRule',
+                    'class' => UrlRule::class,
                     'controller' => 'v1/course',
                     'tokens' => [
                         '{id}' => '<id:\w+>'
                     ],
+                    'only' => ['view'],
                 ],
                 [
-                    'class' => 'yii\rest\UrlRule',
+                    'class' => UrlRule::class,
                     'controller' => 'v1/story',
                     'tokens' => [
                         '{id}' => '<id:\w+>'
@@ -55,7 +58,7 @@ return [
                     'only' => ['index', 'view'],
                 ],
                 [
-                    'class' => 'yii\rest\UrlRule',
+                    'class' => UrlRule::class,
                     'controller' => 'v1/slide',
                     'tokens' => [
                         '{id}' => '<id:\w+>'
@@ -63,7 +66,7 @@ return [
                     'only' => ['view'],
                 ],
                 [
-                    'class' => yii\rest\UrlRule::class,
+                    'class' => UrlRule::class,
                     'controller' => 'v1/story-list',
                     'tokens' => [
                         '{id}' => '<id:\w+>'

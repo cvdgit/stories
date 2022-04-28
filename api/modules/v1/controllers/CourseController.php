@@ -2,17 +2,18 @@
 
 namespace api\modules\v1\controllers;
 
-use api\modules\v1\models\Story;
-use api\modules\v1\models\StorySlide;
-use backend\components\SlideModifier;
+use backend\components\course\builder\course\ApiLessonModifier;
+use backend\components\course\builder\course\CourseLessonBuilder;
+use backend\components\course\builder\ApiCourseBuilder;
 use common\components\StoryCover;
 use common\helpers\Url;
-use common\models\slide\SlideKind;
 use common\models\StoryTest;
 use common\services\QuizService;
 use yii\rest\Controller;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
+use common\models\Story as Course;
 
 class CourseController extends Controller
 {
@@ -25,160 +26,42 @@ class CourseController extends Controller
         $this->quizService = $quizService;
     }
 
-    public function actionView(int $id)
+    /**
+     * @throws NotFoundHttpException
+     * @throws HttpException
+     */
+    public function actionView(int $id): array
     {
         $this->response->format = Response::FORMAT_JSON;
 
-        $course = Story::find()
-            ->with('allSlides')
-            ->where(['id' => $id])
-            ->one();
-
-        $lessons = [];
-
-        $lessonIndex = 1;
-        $dividerIndex = 1;
-        $currentLesson = null;
-
-        $slides = $course->allSlides;
-        $slideLinks = [];
-        foreach ($slides as $slide) {
-
-            $slideData = StorySlide::getSlideData($slide);
-
-            $data = (new SlideModifier($slide->id, $slideData))
-                ->addImageUrl()
-                ->addVideoUrl()
-                ->forLesson();
-
-            $slideItems = $data['blocks'];
-            $slideLinks = array_merge($slideLinks, $data['links']);
-
-            $end = next($slides) === false;
-            if (($currentLesson !== null && SlideKind::isQuiz($slide)) || $end) {
-                if ($currentLesson && count($currentLesson['items']) > 0) {
-                    $lessons[] = $currentLesson;
-                }
-                $currentLesson = null;
-                $lessonIndex++;
-            }
-
-            if (SlideKind::isQuiz($slide) && count($slideItems) > 0) {
-                $quizItem = $slideItems[0];
-                $currentLesson = [
-                    'id' => $quizItem['id'],
-                    'title' => 'Тест (' . $quizItem['title'] . ')',
-                    'description' => $quizItem['description'],
-                    'type' => 'quiz',
-                    'items' => [
-                        [
-                            'id' => $quizItem['id'],
-                            'type' => 'quiz',
-                            'items' => $this->getQuizData($quizItem['id']),
-                            'settings' => [
-                                'passToContinue' => false,
-                            ],
-                        ],
-                    ],
-                ];
-                $lessons[] = $currentLesson;
-                $currentLesson = null;
-            }
-            else {
-
-                if ($currentLesson === null) {
-                    $currentLesson = [
-                        'id' => $lessonIndex,
-                        'title' => "Раздел $lessonIndex",
-                        'type' => 'blocks',
-                        'items' => [],
-                    ];
-                }
-
-                if (count($slideItems) > 0) {
-                    foreach ($slideItems as $item) {
-                        $currentLesson['items'][] = $item;
-                    }
-                    $currentLesson['items'][] = [
-                        'id' => $dividerIndex++,
-                        'type' => 'divider',
-                        'items' => [],
-                    ];
-                }
-            }
+        if (($courseModel = Course::findOne($id)) === null) {
+            throw new NotFoundHttpException('Course not found');
         }
 
-        foreach ($lessons as $key => $value) {
-            $lastItem = end($value['items']);
-            if ($lastItem['type'] === 'divider') {
-                array_pop($lessons[$key]['items']);
-            }
+        if (count($courseModel->lessons) === 0) {
+            throw new HttpException(500, 'Разделы не найдены');
         }
 
-/*        if (count($lessons) > 0) {
-            $lessons[] = [
-                'id' => $lessonIndex,
-                'title' => 'Конец',
-                'type' => 'blocks',
-                'items' => [
-                    [
-                        'id' => $lessonIndex,
-                        'type' => 'text',
-                        'items' => [
-                            [
-                                'id' => $lessonIndex,
-                                'paragraph' => 'Курс пройден',
-                            ]
-                        ],
-                    ],
-                ],
-            ];
-        }*/
-
-        foreach ($slideLinks as $i => $slideLink) {
-
-            $alias = $slideLink['alias'];
-            $number = $slideLink['number'];
-
-            if (($storyModel = Story::findOne(['alias' => $alias])) !== null) {
-                if (($slideModel = StorySlide::findSlideByNumber($storyModel->id, $number)) !== null) {
-
-                    if (SlideKind::isQuiz($slideModel)) {
-                        unset($slideLinks[$i]['alias'], $slideLinks[$i]['number']);
-                        $slideLinks[$i]['items'] = [];
-                    }
-                    else {
-
-                        $slideData = StorySlide::getSlideData($slideModel);
-                        $data = (new SlideModifier($storyModel->id, $slideData))
-                            ->addImageUrl()
-                            ->addVideoUrl()
-                            ->forLesson();
-
-                        $slideItems = $data['blocks'];
-                        unset($slideLinks[$i]['alias'], $slideLinks[$i]['number']);
-                        $slideLinks[$i]['items'] = $slideItems;
-                    }
-                }
-            }
-        }
+        $builder = new CourseLessonBuilder();
+        $apiBuilder = new ApiLessonModifier($builder->build($courseModel->lessons), new ApiCourseBuilder(), $this->quizService);
+        $apiResult = $apiBuilder->build();
 
         $coverImage = null;
-        if (!empty($course->cover)) {
+        if (!empty($courseModel->cover)) {
             $coverImage = [
-                'url' => Url::homeUrl() . StoryCover::getStoryThumbPath($course->cover),
+                'url' => Url::homeUrl() . StoryCover::getStoryThumbPath($courseModel->cover),
             ];
         }
 
         return [
             'course' => [
-                'title' => $course->title,
-                'description' => $course->description,
-                'id' => $course->id,
-                'lessons' => $lessons,
+                'title' => $courseModel->title,
+                'description' => $courseModel->description,
+                'id' => $courseModel->id,
+                'lessons' => $apiResult->getItems(),
                 'coverImage' => $coverImage,
             ],
-            'links' => $slideLinks,
+            'links' => $apiResult->getLinks(),
         ];
     }
 

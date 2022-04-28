@@ -51,4 +51,8 @@ class LessonForm extends Model
         return $model;
     }
 
+    public function typeIsQuiz(): bool
+    {
+        return $this->type === LessonType::QUIZ;
+    }
 }
