@@ -2,8 +2,6 @@
 
 namespace backend\components\course;
 
-use common\models\StoryTest;
-
 class LessonQuizForm extends AbstractLessonBlock
 {
 

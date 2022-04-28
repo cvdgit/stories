@@ -15,7 +15,10 @@ export default class LessonDeleteAction {
     this.renderer.beforeDeleteLesson(this.lesson.getUUID());
 
     const deleteLessonElement = (message) => {
-      this.renderer.deleteLesson(this.lesson.getUUID(), () => {
+      this.renderer.deleteLesson(this.lesson.getUUID(), (noLessons) => {
+        if (noLessons) {
+          location.reload();
+        }
         toastr.success(message || 'Успешно');
         this.renderer.updateLessonOrder();
       });

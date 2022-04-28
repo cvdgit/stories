@@ -2,9 +2,7 @@
 
 namespace backend\components\course\builder;
 
-use backend\components\course\LessonForm;
-
-class LessonCollection
+class LessonCollection implements LessonCollectionInterface
 {
 
     private $lessons = [];
@@ -14,7 +12,7 @@ class LessonCollection
         return $this->lessons;
     }
 
-    public function addLesson(LessonForm $lesson): void
+    public function addLesson($lesson): void
     {
         $this->lessons[] = $lesson;
     }

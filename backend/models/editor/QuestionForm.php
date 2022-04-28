@@ -18,7 +18,7 @@ class QuestionForm extends BaseForm
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios['update'] = ['story_id', 'slide_id', 'test_id', 'block_id', 'required'];
+        $scenarios['update'] = ['story_id', 'slide_id', 'test_id', 'block_id', 'required', 'lesson_id'];
         return $scenarios;
     }
 

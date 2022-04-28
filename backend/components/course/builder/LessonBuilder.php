@@ -7,7 +7,7 @@ use backend\components\course\LessonForm;
 use backend\components\course\LessonQuizForm;
 use backend\components\course\LessonType;
 
-class LessonBuilder
+class LessonBuilder implements LessonBuilderInterface
 {
 
     private function createLesson(int $type, string $uuid, string $name, int $order, int $id = null): LessonForm

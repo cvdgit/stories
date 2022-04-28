@@ -95,4 +95,12 @@ class LessonBlockQuiz extends ActiveRecord
         $model->order = $order;
         return $model;
     }
+
+    public function updateQuizId(int $quizId): void
+    {
+        $this->quiz_id = $quizId;
+        if (!$this->save(false, ['quiz_id'])) {
+            throw new \DomainException('LessonBlockQuiz::updateQuizId exception');
+        }
+    }
 }

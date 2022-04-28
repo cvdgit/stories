@@ -1,7 +1,9 @@
 <?php
 
-namespace backend\components\course\builder;
+namespace backend\components\course\builder\slides;
 
+use backend\components\course\builder\BaseBuilder;
+use backend\components\course\builder\LessonCollectionInterface;
 use backend\components\SlideWrapper;
 use common\models\slide\SlideKind;
 use common\models\StoryTest;
@@ -18,16 +20,16 @@ class SlidesLessonBuilder extends BaseBuilder
         return $quiz;
     }
 
-    public function build(array $slides): void
+    public function build(array $models): LessonCollectionInterface
     {
         $currentLesson = null;
         $lessonIndex = 1;
         $blockIndex = 1;
-        foreach ($slides as $slide) {
+        foreach ($models as $slide) {
 
             $slideData = $slide->getSlideOrLinkData();
 
-            $end = next($slides) === false;
+            $end = next($models) === false;
             if (($currentLesson !== null && SlideKind::isQuiz($slide)) || $end) {
                 if ($currentLesson) {
                     $this->lessonCollection->addLesson($currentLesson);
@@ -61,5 +63,6 @@ class SlidesLessonBuilder extends BaseBuilder
                 $blockIndex++;
             }
         }
+        return $this->lessonCollection;
     }
 }

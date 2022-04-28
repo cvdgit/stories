@@ -2,10 +2,9 @@
 
 namespace backend\controllers;
 
-use backend\components\course\builder\CourseLessonBuilder;
+use backend\components\course\builder\course\CourseLessonBuilder;
 use backend\components\course\builder\LessonBuilder;
-use backend\components\course\builder\LessonCollection;
-use backend\components\course\builder\SlidesLessonBuilder;
+use backend\components\course\builder\slides\SlidesLessonBuilder;
 use backend\components\course\LessonCreateForm;
 use backend\components\course\LessonDeleteForm;
 use backend\components\course\LessonNameForm;
@@ -44,17 +43,8 @@ class CourseController extends Controller
     {
         $storyModel = $this->findModel($id);
 
-        $lessonBuilder = new LessonBuilder();
-        $lessonCollection = new LessonCollection();
-        if ($storyModel->haveLessons()) {
-            $builder = new CourseLessonBuilder($lessonBuilder, $lessonCollection);
-            $builder->build($storyModel->lessons);
-        }
-        else {
-            $builder = new SlidesLessonBuilder($lessonBuilder, $lessonCollection);
-            $builder->build($storyModel->storySlides);
-        }
-        $lessons = $lessonCollection->getLessons();
+        $builder = new CourseLessonBuilder();
+        $lessons = $builder->build($storyModel->lessons)->getLessons();
 
         $course = [
             'story_id' => $storyModel->id,
@@ -64,6 +54,8 @@ class CourseController extends Controller
         return $this->render('update', [
             'storyModel' => $storyModel,
             'course' => Json::encode($course),
+            'haveSlides' => count($storyModel->storySlides) > 0,
+            'haveLessons' => count($lessons) > 0,
         ]);
     }
 
@@ -76,6 +68,25 @@ class CourseController extends Controller
             return $model;
         }
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    public function actionDelete(int $id): Response
+    {
+        $this->lessonService->deleteLessons($id);
+        return $this->redirect(['update', 'id' => $id]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     * @throws \Exception
+     */
+    public function actionCreateFromSlides(int $id): Response
+    {
+        $storyModel = $this->findModel($id);
+        $builder = new SlidesLessonBuilder();
+        $collection = $builder->build($storyModel->storySlides);
+        $this->lessonService->saveLessonCollection($storyModel->id, $collection);
+        return $this->redirect(['update', 'id' => $id]);
     }
 
     public function actionSave(): array
@@ -96,7 +107,28 @@ class CourseController extends Controller
                     ->asArray();
             }
         }
-        return (new JsonResponse())->success()->asArray();
+        return (new JsonResponse())->success(false)->asArray();
+    }
+
+    public function actionLessonsUpdate(): array
+    {
+        $this->response->format = Response::FORMAT_JSON;
+        if ($this->request->isPost) {
+
+            $coursePost = $this->request->post('course');
+
+            try {
+                $this->lessonService->updateLessons($coursePost['lessons']);
+                return (new JsonResponse())->success()->asArray();
+            }
+            catch (\Exception $ex) {
+                return (new JsonResponse())
+                    ->success(false)
+                    ->message($ex->getMessage())
+                    ->asArray();
+            }
+        }
+        return (new JsonResponse())->success(false)->asArray();
     }
 
     /**
@@ -122,10 +154,13 @@ class CourseController extends Controller
     /**
      * @throws NotFoundHttpException
      */
-    public function actionQuizUpdateForm(int $slide_id): string
+    public function actionQuizUpdateForm(int $slide_id, int $lesson_id): string
     {
         if (($slideModel = StorySlide::findOne($slide_id)) === null) {
             throw new NotFoundHttpException('Slide not found');
+        }
+        if (($lessonModel = Lesson::findOne($lesson_id)) === null) {
+            throw new NotFoundHttpException('Lesson not found');
         }
 
         $slideWrapper = new SlideWrapper($slideModel->getSlideOrLinkData());
@@ -138,6 +173,7 @@ class CourseController extends Controller
         $form->slide_id = $slideModel->id;
         $form->block_id = $block->getId();
         $form->story_id = $slideModel->story_id;
+        $form->lesson_id = $lessonModel->id;
 
         $values = $block->getValues();
         $form->load($values, '');
@@ -192,6 +228,7 @@ class CourseController extends Controller
             $this->editorService->updateBlock($form);
             $form->afterUpdate($slideModel);
             $quizModel = StoryTest::findOne($form->test_id);
+            $this->lessonService->updateLessonQuizId($form->lesson_id, $slideModel->id, $quizModel->id);
             return [
                 'success' => true,
                 'block_id' => $form->block_id,
@@ -234,7 +271,7 @@ class CourseController extends Controller
                         $lessonModel->id
                     );
 
-                return ['success' => true, 'lesson' => Json::encode($lesson)];
+                return ['success' => true, 'lesson' => $lesson];
             }
             catch (\Exception $ex) {
                 return ['success' => false, 'message' => $ex->getMessage()];

@@ -11,16 +11,18 @@ export default class CreateLessonAction {
     this.renderer = GlobalContext.renderer;
   }
 
-  action(insertPosition) {
+  action(insertPosition, targetOrder, onSuccess) {
 
     fetchJsonPost('/admin/index.php?r=course/lesson-create', {
       course_id: GlobalContext.courseId,
       insert_position: insertPosition,
-      lesson_order: this.lesson.getOrder()
+      lesson_order: targetOrder
     })
       .then((responseJson) => {
         if (responseJson.success) {
-
+          if (typeof onSuccess === 'function') {
+            onSuccess(responseJson.lesson);
+          }
         }
         else {
           toastr.error(responseJson.message || 'Ошибка');

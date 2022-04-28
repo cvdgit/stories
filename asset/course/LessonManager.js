@@ -70,4 +70,8 @@ export default class LessonManager {
   deleteLesson(uuid) {
     this.getLessons().delete(uuid);
   }
+
+  isEmpty() {
+    return this.lessons.size === 0;
+  }
 }

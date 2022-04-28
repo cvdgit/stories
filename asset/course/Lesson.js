@@ -1,13 +1,12 @@
 import GlobalContext from "./GlobalContext";
 import LessonModel from "./LessonModel";
-import {uuidv4} from "./utils";
 import Modal from "./components/Modal";
-import QuizUpdateModal from "./components/QuizUpdateModal";
 import QuizBlockModel from "./QuizBlockModel";
 import LessonDeleteAction from "./components/lesson/LessonDeleteAction";
 import CreateLessonAction from "./components/lesson/CreateLessonAction";
 import LessonMoveAction from "./components/lesson/LessonMoveAction";
 import LessonNameAction from "./components/lesson/LessonNameAction";
+import UpdateAction from "./components/lesson/UpdateAction";
 
 let moveTimeout;
 
@@ -54,7 +53,7 @@ export default class Lesson {
       e.preventDefault();
 
       if (this.lesson.typeIsQuiz()) {
-        const remote = `/admin/index.php?r=course/quiz-update-form&slide_id=${this.lesson.getQuizSlideId()}`;
+        const remote = `/admin/index.php?r=course/quiz-update-form&slide_id=${this.lesson.getQuizSlideId()}&lesson_id=${this.lesson.getId()}`;
         this.quizUpdateModal.modalRemote(remote, (response) => {
           this.lesson.updateQuiz(response.quiz_id, response.quiz_name, response.block_id);
           this.renderer.updateLesson(this.lesson.getUUID());
@@ -113,6 +112,7 @@ export default class Lesson {
 
       modal.onHide(() => {
         this.renderer.updateLesson(this.lesson.getUUID());
+        new UpdateAction().action();
       });
 
       modal.show();
@@ -218,25 +218,23 @@ export default class Lesson {
     $(wrap).on('click','[data-action=insert-lesson]', (e) => {
 
       const position = e.target.getAttribute('data-position');
-      const createLessonAction = new CreateLessonAction(this.lesson);
-      createLessonAction.action(position);
+      const createLessonAction = new CreateLessonAction();
+      createLessonAction.action(position, this.lesson.getOrder(), (response) => {
 
+        const elem = $(e.target).parents('.lesson-wrap:eq(0)');
 
+        const lesson = new LessonModel(response);
+        lesson.setTypeBlocks();
+        const lessonRender = this.renderer.renderLesson(lesson);
 
-
-      const elem = $(e.target).parents('.lesson-wrap:eq(0)');
-
-      const lesson = new LessonModel({uuid: uuidv4()});
-      lesson.setTypeBlocks();
-      const lessonRender = this.renderer.renderLesson(lesson);
-
-      if (position === 'after') {
-        $(lessonRender).insertAfter(elem);
-      }
-      if (position === 'before') {
-        $(lessonRender).insertBefore(elem);
-      }
-      this.renderer.updateLessonOrder();
+        if (position === 'after') {
+          $(lessonRender).insertAfter(elem);
+        }
+        if (position === 'before') {
+          $(lessonRender).insertBefore(elem);
+        }
+        this.renderer.updateLessonOrder();
+      });
     });
 
     $(wrap).find('.lesson-head__title')

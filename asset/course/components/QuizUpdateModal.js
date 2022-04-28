@@ -6,7 +6,7 @@ export default class {
     this.init();
   }
 
-  init() {
+  init(lessonId) {
     this.$element
       .on('hide.bs.modal', (e) => {
         $(e.target).removeData('bs.modal');

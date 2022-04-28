@@ -104,7 +104,7 @@ export default class CourseDom {
       this.lessons.delete(lessonUUID);
       this.lessonManager.deleteLesson(lessonUUID);
       if (typeof onDelete === 'function') {
-        onDelete();
+        onDelete(this.lessonManager.isEmpty());
       }
     });
   }

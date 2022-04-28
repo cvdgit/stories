@@ -2,16 +2,19 @@
 
 namespace backend\components\course\builder;
 
-abstract class BaseBuilder
+abstract class BaseBuilder implements BuilderInterface
 {
 
     protected $lessonBuilder;
     protected $lessonCollection;
 
-    public function __construct(LessonBuilder $lessonBuilder, LessonCollection $lessonCollection)
+    public function __construct(LessonBuilderInterface $lessonBuilder = null, LessonCollectionInterface $lessonCollection = null)
     {
-        $this->lessonBuilder = $lessonBuilder;
-        $this->lessonCollection = $lessonCollection;
+        if ($lessonBuilder === null) {
+            $this->lessonBuilder = new LessonBuilder();
+        }
+        if ($lessonCollection === null) {
+            $this->lessonCollection = new LessonCollection();
+        }
     }
-
 }

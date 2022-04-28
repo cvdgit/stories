@@ -2,6 +2,7 @@
 
 namespace backend\components\course;
 
+use backend\components\course\builder\LessonCollectionInterface;
 use common\models\Lesson;
 use common\models\LessonBlock;
 use common\models\LessonBlockQuiz;
@@ -19,6 +20,71 @@ class LessonService
     public function __construct(TransactionManager $transactionManager)
     {
         $this->transactionManager = $transactionManager;
+    }
+
+    public function saveLessonCollection(int $storyId, LessonCollectionInterface $collection): void
+    {
+        $this->transactionManager->wrap(static function() use ($storyId, $collection) {
+
+            $db = Yii::$app->db;
+
+            $db->createCommand()
+                ->delete('lesson', 'story_id = :story', [':story' => $storyId])
+                ->execute();
+
+            $blockRows = [];
+            $quizRows = [];
+            foreach ($collection->getLessons() as $lesson) {
+
+                /** @var LessonForm $lesson */
+
+                $lessonRow = [
+                    'type' => $lesson->type,
+                    'uuid' => $lesson->uuid,
+                    'story_id' => $storyId,
+                    'name' => $lesson->name,
+                    'order' => $lesson->order,
+                ];
+                $db->createCommand()
+                    ->insert('lesson', $lessonRow)
+                    ->execute();
+                $lessonId = $db->getLastInsertID();
+
+                $type = (int)$lesson->type;
+
+                foreach ($lesson->blocks as $block) {
+
+                    /** @var AbstractLessonBlock $block */
+
+                    $blockRow = [
+                        'lesson_id' => $lessonId,
+                        'slide_id' => $block->slide_id,
+                        'order' => $block->order,
+                    ];
+
+                    if ($type === LessonType::QUIZ) {
+                        /** @var LessonQuizForm $block */
+                        $blockRow['quiz_id'] = $block->quiz_id;
+                        $quizRows[] = $blockRow;
+                    }
+                    else {
+                        $blockRows[] = $blockRow;
+                    }
+                }
+            }
+
+            if (count($blockRows) > 0) {
+                $db->createCommand()
+                    ->batchInsert('lesson_block', ['lesson_id', 'slide_id', 'order'], $blockRows)
+                    ->execute();
+            }
+
+            if (count($quizRows) > 0) {
+                $db->createCommand()
+                    ->batchInsert('lesson_block_quiz', ['lesson_id', 'slide_id', 'order', 'quiz_id'], $quizRows)
+                    ->execute();
+            }
+        });
     }
 
     /**
@@ -248,5 +314,55 @@ class LessonService
             throw new \DomainException('Lesson not found');
         }
         $lessonModel->updateName($form->lesson_name);
+    }
+
+    public function deleteLessons(int $courseId): void
+    {
+        Lesson::deleteAll(['story_id' => $courseId]);
+    }
+
+    public function updateLessonQuizId(int $lessonId, int $slideId, int $quizId): void
+    {
+        if (($block = LessonBlockQuiz::findOne(['lesson_id' => $lessonId, 'slide_id' => $slideId])) === null) {
+            throw new \DomainException('Lesson Quiz block not found');
+        }
+        $block->updateQuizId($quizId);
+    }
+
+    public function updateLessons(array $lessonsJson): void
+    {
+
+        $this->transactionManager->wrap(function() use ($lessonsJson) {
+
+            $db = Yii::$app->db;
+            foreach ($lessonsJson as $jsonRow) {
+
+                $type = (int)$jsonRow['type'];
+                if ($type === LessonType::QUIZ) {
+                    continue;
+                }
+
+                $lessonId = $jsonRow['id'];
+
+                $db->createCommand()
+                    ->delete('lesson_block', 'lesson_id = :id', [':id' => $lessonId])
+                    ->execute();
+
+                $blocks = [];
+                foreach ($jsonRow['blocks'] as $jsonBlock) {
+                    $blocks[] = [
+                        'lesson_id' => $lessonId,
+                        'slide_id' => $jsonBlock['id'],
+                        'order' => $jsonBlock['order'],
+                    ];
+                }
+
+                if (count($blocks) > 0) {
+                    $db->createCommand()
+                        ->batchInsert('lesson_block', ['lesson_id', 'slide_id', 'order'], $blocks)
+                        ->execute();
+                }
+            }
+        });
     }
 }

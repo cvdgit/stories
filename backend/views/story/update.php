@@ -15,6 +15,7 @@ $this->params['breadcrumbs'] = [
 $this->params['sidebarMenuItems'] = [
     ['label' => $model->title, 'url' => ['story/update', 'id' => $model->id]],
     ['label' => 'Редактор', 'url' => ['editor/edit', 'id' => $model->id]],
+    ['label' => 'Разделы', 'url' => ['course/update', 'id' => $model->id]],
     ['label' => 'Статистика', 'url' => ['statistics/list', 'id' => $model->id]],
     ['label' => 'Озвучка', 'url' => ['audio/index', 'story_id' => $model->id]],
 ];
