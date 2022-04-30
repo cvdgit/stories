@@ -85,9 +85,7 @@ class AuthHandler
                 Yii::$app->user->login($user, Yii::$app->params['user.rememberMeDuration']);
             } else { // signup
                 if ($email !== null && User::find()->where(['email' => $email])->exists()) {
-                    Yii::$app->getSession()->setFlash('error', [
-                        Yii::t('app', "Пользователь, с указанным в аккаунте {client} email уже существует.", ['client' => $this->client->getTitle()]),
-                    ]);
+                    Yii::$app->getSession()->setFlash('error', 'Пользователь, с указанным в аккаунте ' . $this->client->getTitle() . ' email уже существует.');
                 } else {
 
                     $password = Yii::$app->security->generateRandomString(6);
