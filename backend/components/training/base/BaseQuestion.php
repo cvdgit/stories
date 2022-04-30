@@ -75,6 +75,16 @@ class BaseQuestion
      */
     public function getAnswers(): array
     {
+        return array_filter($this->answers, static function(Answer $answer) {
+            return !$answer->isHidden();
+        });
+    }
+
+    /**
+     * @return Answer[]
+     */
+    public function getAnswersWithHidden(): array
+    {
         return $this->answers;
     }
 
@@ -83,9 +93,9 @@ class BaseQuestion
         $this->answers[] = $answer;
     }
 
-    public function getCorrectAnswerNumber()
+    public function getCorrectAnswerNumber(): int
     {
-        return array_reduce($this->answers, function($carry, $item) {
+        return array_reduce($this->getAnswers(), static function($carry, $item) {
             $carry += $item->isCorrect() ? 1 : 0;
             return $carry;
         });
@@ -118,11 +128,11 @@ class BaseQuestion
         return $stars;
     }
 
-    public function getCorrectAnswerIDs()
+    public function getCorrectAnswerIDs(): array
     {
-        return array_map(function(Answer $answer) {
+        return array_map(static function(Answer $answer) {
             return $answer->getId();
-        }, $this->answers);
+        }, $this->getAnswers());
     }
 
     public function getOrigImage(): string

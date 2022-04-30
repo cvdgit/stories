@@ -29,6 +29,7 @@ use yii\helpers\FileHelper;
  * @property string $audio_file_id
  *
  * @property StoryTestAnswer[] $storyTestAnswers
+ * @property StoryTestAnswer[] $storyTestAnswersWithHidden
  * @property StoryTest $storyTest
  * @property AudioFile $audioFile
  */
@@ -96,6 +97,13 @@ class StoryTestQuestion extends ActiveRecord
     }
 
     public function getStoryTestAnswers(): ActiveQuery
+    {
+        return $this->hasMany(StoryTestAnswer::class, ['story_question_id' => 'id'])
+            ->where(['hidden' => 0])
+            ->orderBy(['order' => SORT_ASC]);
+    }
+
+    public function getStoryTestAnswersWithHidden(): ActiveQuery
     {
         return $this->hasMany(StoryTestAnswer::class, ['story_question_id' => 'id'])
             ->orderBy(['order' => SORT_ASC]);

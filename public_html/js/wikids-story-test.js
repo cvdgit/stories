@@ -1125,6 +1125,62 @@
     pluginName: 'voiceResponse'
   });
 
+  var VoiceResponseInfo = function() {
+
+  };
+  VoiceResponseInfo.create = function(content) {
+
+    var $wrap = $(`<div class="quiz-modal-wrapper">
+                     <div class="quiz-modal-background"></div>
+                     <div class="quiz-modal-inner">
+                       <div class="quiz-modal-header">
+                         <div class="quiz-modal-header__title">
+                           <h4>Информация</h4>
+                         </div>
+                         <div class="quiz-modal-actions">
+                           <button type="button" class="quiz-modal-action-close">&times;</button>
+                         </div>
+                       </div>
+                       <div class="quiz-modal-body"></div>
+                     </div>
+                   </div>`);
+
+    $wrap.find('.quiz-modal-action-close').on('click', function() {
+      $(this).parents('.quiz-modal-wrapper:eq(0)').hide().remove();
+    });
+
+    $wrap.find('.quiz-modal-body').append(content);
+
+    return $wrap;
+  }
+
+  VoiceResponseInfo.remove = function(container) {
+    var elem = container.find('.quiz-modal-wrapper');
+    if (elem.length) {
+      elem.fadeOut().remove();
+    }
+  };
+
+  VoiceResponseInfo.setContent = function(container, content) {
+    if (!container.find('.quiz-modal-wrapper').length) {
+      return;
+    }
+    container.find('.quiz-modal-body')
+      .empty()
+      .append(content);
+  }
+
+  VoiceResponseInfo.send = function(question_id, answer, onSuccess) {
+    $.post('/answer/create', {question_id, answer})
+      .done(function(response) {
+        if (response && response.success) {
+          if (typeof onSuccess === 'function') {
+            onSuccess(response);
+          }
+        }
+      });
+  }
+
     var TestSpeech = function(options) {
 
         var defaultOptions = {
@@ -1373,8 +1429,20 @@
         }
 
         function getAnswersData(question) {
-            return question.storyTestAnswers;
+            return question.storyTestAnswers.filter(function(answer) {
+              return !answer['hidden'];
+            });
         }
+
+      function getHiddenAnswersData(question) {
+        return question.storyTestAnswers.filter(function(answer) {
+          return answer['hidden'];
+        });
+      }
+
+      function addQuestionAnswer(question, answer) {
+        question.storyTestAnswers.push(answer);
+      }
 
         function getProgressData() {
             var progress = testData['test'] || {};
@@ -2625,10 +2693,16 @@
         }
 
         function checkAnswerCorrect(question, answer, correctAnswersCallback, convertAnswerToInt) {
-            console.debug('WikidsStoryTest.checkAnswerCorrect');
-            var correctAnswers = getAnswersData(question).filter(function(elem) {
-                return parseInt(elem.is_correct) === 1;
-            });
+          console.debug('WikidsStoryTest.checkAnswerCorrect');
+
+          var correctAnswers = getAnswersData(question).filter(function(elem) {
+            return parseInt(elem.is_correct) === 1;
+          });
+
+          var correctHiddenAnswers = getHiddenAnswersData(question).filter(function(elem) {
+            return parseInt(elem.is_correct) === 1;
+          });
+
             var steps = createAnswerSteps(correctAnswers);
             var correct = false;
             if (steps.length > 0) {
@@ -2639,17 +2713,30 @@
                     correct = checkAnswersCorrect(question, answer);
                 }
                 else {
-                    correctAnswers = correctAnswers.map(correctAnswersCallback);
-                    var answerCheckCallback = function (value, index) {
-                        if (convertAnswerToInt) {
-                            value = parseInt(value)
-                        }
-                        return value === correctAnswers.sort()[index];
-                    };
-                    if (answer.length === correctAnswers.length && answer.sort().every(answerCheckCallback)) {
-                        correctAnswersNumber++;
-                        correct = true;
+
+                  correctAnswers = correctAnswers.map(correctAnswersCallback);
+
+                  var checker = function(values) {
+                    return function(value, index) {
+                      if (convertAnswerToInt) {
+                        value = parseInt(value)
+                      }
+                      return value === values.sort()[index];
                     }
+                  }
+
+                  if (answer.length === correctAnswers.length && answer.sort().every(checker(correctAnswers))) {
+                      correctAnswersNumber++;
+                      correct = true;
+                  }
+
+                  if (!correct && correctHiddenAnswers.length > 0) {
+                    correctHiddenAnswers = correctHiddenAnswers.map(correctAnswersCallback);
+                    if ($.inArray(answer[0], correctHiddenAnswers) > -1) {
+                      correctAnswersNumber++;
+                      correct = true;
+                    }
+                  }
                 }
             }
             return correct;
@@ -2757,9 +2844,10 @@
         }
 
       function answerByName(question, name) {
-        return getAnswersData(question).filter(function(answer) {
-          return answer.name.toLowerCase() === name.toLowerCase();
-        })[0];
+        return $.merge(getAnswersData(question), getHiddenAnswersData(question))
+          .filter(function(answer) {
+            return answer.name.toLowerCase() === name.toLowerCase();
+          })[0];
       }
 
         function showQuestionSuccessPage(answer) {
@@ -3219,9 +3307,10 @@
                   var result = args.result;
                   if (result.length > 0) {
 
-                    var correct = checkAnswerCorrect(currentQuestion, [result], function (elem) {
-                      return elem.name.toLowerCase();
+                    var correct = checkAnswerCorrect(currentQuestion, [result], function(elem) {
+                      return elem.name;
                     }, false);
+
                     if (correct) {
                       var answerId = answerByName(currentQuestion, result).id;
                       nextQuestion([answerId]);
@@ -3231,11 +3320,58 @@
                         answer: result
                       }).done(function (response) {
                         if (response && response.success) {
-                          console.log(response);
-                          var answer = answerByName(currentQuestion, response.output);
-                          if (answer) {
-                            nextQuestion([answer.id]);
+
+                          var output = response.output;
+
+                          var correct = checkAnswerCorrect(currentQuestion, [output], function(elem) {
+                            return elem.name;
+                          }, false);
+
+                          if (correct) {
+                            var answer = answerByName(currentQuestion, output);
+                            if (answer) {
+                              nextQuestion([answer.id]);
+                            }
                           }
+                          else {
+
+                            var $content = $(`<div class="voice-content">
+                                             <div>
+                                               <div class="voice-content-row">
+                                                 <h4 class="voice-content-row__title">Input:</h4>
+                                                 <p class="voice-input">${response.input}</p>
+                                               </div>
+                                               <div class="voice-content-row">
+                                                 <h4 class="voice-content-row__title">Output:</h4>
+                                                 <p class="voice-output">${response.output || 'Пусто'}</p>
+                                               </div>
+                                               <div class="voice-content-row">
+                                                 <h4 class="voice-content-row__title">Расстояние:</h4>
+                                                 <p class="voice-lev">${response.lev}</p>
+                                               </div>
+                                             </div>
+                                             <div class="voice-content-action">
+                                               <button class="voice-add" type="button">Добавить как верный ответ</button>
+                                             </div>
+                                           </div>`);
+
+                            $content.find('.voice-add').on('click', function() {
+                              VoiceResponseInfo.setContent(dom.wrapper, '<div class="voice-result"><p>...</p></div>');
+                              VoiceResponseInfo.send(currentQuestion.id, response.input, function(data) {
+
+                                addQuestionAnswer(currentQuestion, data.answer);
+
+                                VoiceResponseInfo.setContent(dom.wrapper, '<div class="voice-result"><p>Успешно</p></div>');
+                                setTimeout(function() {
+                                  VoiceResponseInfo.remove(dom.wrapper);
+                                }, 1000);
+                              })
+                            });
+
+                            var info = VoiceResponseInfo.create($content);
+                            dom.wrapper.append(info);
+                          }
+
                         }
                       });
                     }

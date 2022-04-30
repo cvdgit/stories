@@ -25,9 +25,10 @@ class Base
     public function build()
     {
         $question = new DefaultQuestion($this->question, $this->stars);
-        foreach ($this->question->storyTestAnswers as $answer) {
+        foreach ($this->question->storyTestAnswersWithHidden as $answer) {
             /** @var $answer StoryTestAnswer */
             $newAnswer = new Answer($answer->id, $answer->name, $answer->answerIsCorrect(), '', $answer->getImageUrl(), null, $answer->getOrigImageUrl());
+            $newAnswer->setHidden($answer->hidden);
             if ($this->testModel->showAnswersHints()) {
                 $newAnswer->setDescription($answer->description);
             }

@@ -21,13 +21,15 @@ use yii\helpers\FileHelper;
  * @property string $image
  * @property string $region_id
  * @property string $description
+ * @property int $hidden
  *
  * @property StoryTestQuestion $storyQuestion
  */
 class StoryTestAnswer extends ActiveRecord
 {
 
-    const CORRECT_ANSWER = 1;
+    public const CORRECT_ANSWER = 1;
+    public const HIDDEN = 1;
 
     /**
      * {@inheritdoc}
@@ -44,7 +46,7 @@ class StoryTestAnswer extends ActiveRecord
     {
         return [
             [['name'], 'required'],
-            [['order', 'is_correct'], 'integer'],
+            [['order', 'is_correct', 'hidden'], 'integer'],
             [['name', 'image', 'description'], 'string', 'max' => 255],
         ];
     }
@@ -185,5 +187,10 @@ class StoryTestAnswer extends ActiveRecord
     {
         $this->deleteImage();
         parent::afterDelete();
+    }
+
+    public function answerSetHidden(): void
+    {
+        $this->hidden = self::HIDDEN;
     }
 }

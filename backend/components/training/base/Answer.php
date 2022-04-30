@@ -28,6 +28,18 @@ class Answer
     /** @var string */
     private $description;
 
+    /** @var int|null */
+    private $hidden;
+
+    /**
+     * @param int $id
+     * @param string $name
+     * @param bool $correct
+     * @param $regionID
+     * @param $image
+     * @param $order
+     * @param $origImage
+     */
     public function __construct(int $id, string $name, bool $correct, $regionID = '', $image = null, $order = null, $origImage = null)
     {
         $this->id = $id;
@@ -105,5 +117,29 @@ class Answer
     public function setDescription(string $description): void
     {
         $this->description = $description;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getHidden(): ?int
+    {
+        return $this->hidden;
+    }
+
+    /**
+     * @param int $hidden
+     */
+    public function setHidden(int $hidden): void
+    {
+        $this->hidden = $hidden;
+    }
+
+    public function isHidden(): bool
+    {
+        if ($this->getHidden() === null) {
+            return false;
+        }
+        return $this->getHidden() === 1;
     }
 }

@@ -7,6 +7,9 @@ class AnswerSerializer
 
     private $answer;
 
+    /**
+     * @param Answer $answer
+     */
     public function __construct(Answer $answer)
     {
         $this->answer = $answer;
@@ -24,6 +27,7 @@ class AnswerSerializer
             'orig_image' => $this->answer->getOrigImage(),
             'original_image' => $this->answer->getOrigImage() !== '',
             'order' => (int) $this->answer->getOrder(),
+            'hidden' => filter_var($this->answer->getHidden(), FILTER_VALIDATE_BOOLEAN),
         ];
     }
 

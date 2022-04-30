@@ -83,7 +83,7 @@ class HistoryController extends Controller
         UserQuestionHistory::clearAllTestHistory($testModel->id);
         StudentQuestionProgress::resetProgressByTest($testModel->id);
         Yii::$app->session->setFlash('success', 'История прохождения теста удалена');
-        return $this->redirect(['list', 'test_id' => $testModel->id]);
+        return $this->redirect(['test/update', 'id' => $testModel->id]);
     }
 
     public function actionList(int $test_id)

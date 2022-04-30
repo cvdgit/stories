@@ -53,7 +53,7 @@ class UpdateQuestion extends QuestionModel
     public function getAnswersDataProvider()
     {
         return new ActiveDataProvider([
-            'query' => $this->model->getStoryTestAnswers(),
+            'query' => $this->model->getStoryTestAnswersWithHidden(),
         ]);
     }
 

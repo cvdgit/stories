@@ -29,7 +29,7 @@ class BaseQuestionSerializer
             'orig_image' => $q->getOrigImage(),
             'original_image' => $q->getOrigImage() !== '',
             'correct_number' => $q->getCorrectAnswerNumber(),
-            'storyTestAnswers' => $this->createAnswers($q->getAnswers()),
+            'storyTestAnswers' => $this->createAnswers($q->getAnswersWithHidden()),
             'lastAnswerIsCorrect' => $q->isLastAnswerIsCorrect(),
             'haveSlides' => $q->getHaveSlides(),
             'hint' => $q->getHint(),
