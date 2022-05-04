@@ -193,4 +193,9 @@ class StoryTestAnswer extends ActiveRecord
     {
         $this->hidden = self::HIDDEN;
     }
+
+    public static function getCreateAnswerRoute(int $questionId): array
+    {
+        return ['test/create-answer', 'question_id' => $questionId];
+    }
 }

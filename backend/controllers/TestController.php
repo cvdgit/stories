@@ -138,9 +138,9 @@ class TestController extends Controller
     public function actionCreateQuestion(int $test_id)
     {
         $testModel = $this->findModel($test_id);
-        $model = new CreateQuestion();
-        $model->story_test_id = $testModel->id;
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+        $model = new CreateQuestion($testModel->id);
+
+        if ($model->load(Yii::$app->request->post())) {
             try {
                 $id = $model->create();
                 Yii::$app->session->setFlash('success', 'Вопрос успешно создан');
@@ -150,16 +150,22 @@ class TestController extends Controller
                 Yii::$app->session->setFlash('error', $ex->getMessage());
             }
         }
-        return $this->render('create_question', [
+
+        return $this->render('question_create', [
             'testModel' => $testModel,
             'model' => $model,
             'dataProvider' => null,
         ]);
     }
 
+    /**
+     * @throws NotFoundHttpException
+     */
     public function actionUpdateQuestion(int $question_id)
     {
-        $question = StoryTestQuestion::findModel($question_id);
+        if (($question = StoryTestQuestion::findOne($question_id)) === null) {
+            throw new NotFoundHttpException('Question not found');
+        }
 
         if ($question->typeIsRegion()) {
             return $this->redirect(['question/update', 'id' => $question->id]);
@@ -178,11 +184,13 @@ class TestController extends Controller
             }
             return $this->redirect(['test/update', 'id' => $model->story_test_id]);
         }
-        return $this->render('update_question', [
+
+        $testModel = $question->storyTest;
+
+        return $this->render('question_update', [
             'model' => $model,
             'dataProvider' => $model->getAnswersDataProvider(),
-            'testModel' => $question->storyTest,
-            'errorText' => $question->getAnswersErrorText(),
+            'testModel' => $testModel,
         ]);
     }
 

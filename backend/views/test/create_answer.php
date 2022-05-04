@@ -1,5 +1,5 @@
 <?php
-use yii\helpers\Html;
+use backend\widgets\AnswerManageWidget;
 /** @var $this yii\web\View */
 /** @var $questionModel common\models\StoryTestQuestion */
 /** @var $model common\models\StoryTestAnswer */
@@ -10,10 +10,7 @@ $this->params['breadcrumbs'] = [
     ['label' => $questionModel->name, 'url' => ['test/update-question', 'question_id' => $questionModel->id]],
 ];
 ?>
-<div class="story-test-answer-create">
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?= $this->render('_answer_form', [
-        'model' => $model,
-        'answerImageModel' => $answerImageModel,
-    ]) ?>
-</div>
+<?= AnswerManageWidget::widget([
+    'questionModel' => $questionModel,
+    'renderData' => $this->render('_answer_form', ['model' => $model, 'answerImageModel' => $answerImageModel]),
+]) ?>

@@ -374,4 +374,19 @@ class StoryTestQuestion extends ActiveRecord
         }
         return $audioFile->getAudioFileUrl();
     }
+
+    public static function getCreateQuestionRoute(int $quizId): array
+    {
+        return ['test/create-question', 'test_id' => $quizId];
+    }
+
+    public static function getCreateRegionQuestionRoute(int $quizId): array
+    {
+        return ['question/create', 'test_id' => $quizId, 'type' => QuestionType::REGION];
+    }
+
+    public static function getCreateSequenceQuestionRoute(int $quizId): array
+    {
+        return ['test/question-sequence/create', 'test_id' => $quizId];
+    }
 }

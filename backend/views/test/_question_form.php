@@ -1,4 +1,6 @@
 <?php
+
+use backend\widgets\QuestionErrorTextWidget;
 use backend\widgets\QuestionSlidesWidget;
 use common\helpers\Url;
 use yii\grid\ActionColumn;
@@ -13,56 +15,60 @@ $isNewRecord = $model instanceof \backend\models\question\CreateQuestion;
 \backend\assets\WaveSurferAsset::register($this);
 ?>
 <div class="story-test-form">
+    <?php if (!$isNewRecord): ?>
+    <?= QuestionErrorTextWidget::widget(['questionModel' => $model->getModel()]) ?>
+    <?php endif ?>
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-lg-6">
             <?php $form = ActiveForm::begin(); ?>
-            <?= $form->field($model, 'story_test_id')->hiddenInput()->label(false) ?>
             <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
             <?= $form->field($model, 'hint')->textInput(['maxlength' => true]) ?>
-            <?= $form->field($model, 'type')->dropDownList(\backend\models\question\QuestionType::asArray()) ?>
+            <?= $form->field($model, 'type')->dropDownList(\backend\models\question\QuestionType::asArray(), ['disabled' => true]) ?>
             <?= $form->field($model, 'mix_answers')->checkbox() ?>
             <?= $form->field($model, 'imageFile')->fileInput() ?>
             <?php if (!$isNewRecord && $model->haveImage()): ?>
-            <div style="padding: 20px 0; text-align: center">
-                <?= Html::img($model->getImageUrl(), ['style' => 'max-width: 330px']) ?>
-                <div>
-                    <?= Html::a('Удалить изображение', ['question/delete-image', 'id' => $model->getModelID()]) ?>
+                <div style="padding: 20px 0; text-align: center">
+                    <?= Html::img($model->getImageUrl(), ['style' => 'max-width: 330px']) ?>
+                    <div>
+                        <?= Html::a('Удалить изображение', ['question/delete-image', 'id' => $model->getModelID()]) ?>
+                    </div>
                 </div>
-            </div>
             <?php endif ?>
 
             <?php if (!$isNewRecord): ?>
-            <?= QuestionSlidesWidget::widget(['model' => $model->getModel()]) ?>
+                <?= QuestionSlidesWidget::widget(['model' => $model->getModel()]) ?>
             <?php endif ?>
 
             <?php if (!$isNewRecord): ?>
-            <div style="padding-bottom:20px">
-                <?= $form->field($model, 'audio_file_id')
-                    ->widget(\backend\widgets\SelectAudioFileWidget::class, [
-                        'audioFile' => $model->getAudioFile(),
-                    ])
-                    ->hint(Html::button('Создать аудио файл', [
-                        'class' => 'btn btn-xs btn-primary',
-                        'data-toggle' => 'modal',
-                        'data-target' => '#create-audio-file-modal',
-                    ]) . ' ' . Html::button('Прослушать', ['class' => 'btn btn-xs btn-default', 'id' => 'play-audio']))
-                ?>
-            </div>
+                <div style="padding-bottom:20px">
+                    <?= $form->field($model, 'audio_file_id')
+                        ->widget(\backend\widgets\SelectAudioFileWidget::class, [
+                            'audioFile' => $model->getAudioFile(),
+                        ])
+                        ->hint(Html::button('Создать аудио файл', [
+                                'class' => 'btn btn-xs btn-primary',
+                                'data-toggle' => 'modal',
+                                'data-target' => '#create-audio-file-modal',
+                            ]) . ' ' . Html::button('Прослушать', ['class' => 'btn btn-xs btn-default', 'id' => 'play-audio']))
+                    ?>
+                </div>
             <?php endif ?>
+
+            <?= $form->field($model, 'story_test_id')->hiddenInput()->label(false) ?>
 
             <div class="form-group form-group-controls">
                 <?= Html::submitButton(($isNewRecord ? 'Создать' : 'Сохранить'), ['class' => 'btn btn-success', 'name' => 'action', 'value' => 'save']) ?>
                 <?php if (!$isNewRecord): ?>
-                <?= Html::submitButton('Сохранить и вернуться к тесту', ['class' => 'btn btn-link', 'name' => 'action', 'value' => 'save-and-return']) ?>
+                    <?= Html::submitButton('Сохранить и вернуться к тесту', ['class' => 'btn btn-link', 'name' => 'action', 'value' => 'save-and-return']) ?>
                 <?php endif ?>
             </div>
             <?php ActiveForm::end(); ?>
 
             <?php if (!$isNewRecord): ?>
-            <?= $this->render('_audio_file_modal', ['updateQuestionModel' => $model]) ?>
+                <?= $this->render('_audio_file_modal', ['updateQuestionModel' => $model]) ?>
             <?php endif ?>
         </div>
-        <div class="col-md-6">
+        <div class="col-lg-6">
             <?php if (!$isNewRecord): ?>
                 <div>
                     <p>

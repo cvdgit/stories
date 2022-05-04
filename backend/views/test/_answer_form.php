@@ -8,7 +8,7 @@ use yii\widgets\ActiveForm;
 ?>
 <div class="story-test-form">
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-lg-8">
             <?php $form = ActiveForm::begin(); ?>
             <?= $form->field($model, 'story_question_id')->hiddenInput()->label(false) ?>
             <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>

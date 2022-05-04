@@ -3,9 +3,16 @@
 namespace backend\models\question;
 
 use common\models\StoryTestQuestion;
+use DomainException;
 
 class CreateQuestion extends QuestionModel
 {
+
+    public function __construct(int $quizId, $config = [])
+    {
+        $this->story_test_id = $quizId;
+        parent::__construct($config);
+    }
 
     public function init()
     {

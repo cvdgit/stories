@@ -10,7 +10,7 @@ use yii\helpers\FileHelper;
 use yii\imagine\Image;
 use yii\web\UploadedFile;
 
-class QuestionModel extends Model
+abstract class QuestionModel extends Model
 {
 
     public $story_test_id;

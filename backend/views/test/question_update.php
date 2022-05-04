@@ -1,9 +1,12 @@
 <?php
+use backend\widgets\QuestionManageWidget;
+use yii\bootstrap\Nav;
 use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model backend\models\question\UpdateQuestion */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $testModel common\models\StoryTest */
+/* @var common\models\StoryTestQuestion[] $questions */
 /** @var $errorText string */
 $this->title = 'Изменить вопрос';
 $this->params['breadcrumbs'] = [
@@ -12,18 +15,8 @@ $this->params['breadcrumbs'] = [
     $this->title,
 ];
 ?>
-<div class="story-test-question-update">
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php if ($errorText !== ''): ?>
-        <div class="alert alert-danger alert-dismissible">
-            <button type="button" class="close" data-dismiss="alert">
-                <span>&times;</span>
-            </button>
-            <?= Html::encode($errorText) ?>
-        </div>
-    <?php endif ?>
-    <?= $this->render('_question_form', [
-        'model' => $model,
-        'dataProvider' => $dataProvider,
-    ]) ?>
-</div>
+<?= QuestionManageWidget::widget([
+    'quizModel' => $testModel,
+    'currentModelId' => $model->getModelID(),
+    'renderData' => $this->render('_question_form', ['model' => $model, 'dataProvider' => $dataProvider]),
+]) ?>

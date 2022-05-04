@@ -1,8 +1,13 @@
 <?php
 use backend\widgets\QuestionManageWidget;
+use yii\bootstrap\Nav;
+use yii\helpers\Html;
 /* @var $this yii\web\View */
-/* @var $model backend\models\question\sequence\CreateSequenceQuestion */
+/* @var $model backend\models\question\UpdateQuestion */
+/* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $testModel common\models\StoryTest */
+/* @var common\models\StoryTestQuestion[] $questions */
+/** @var $errorText string */
 $this->title = 'Создать вопрос';
 $this->params['breadcrumbs'] = [
     ['label' => 'Все тесты', 'url' => ['test/index', 'source' => $testModel->source]],
@@ -12,5 +17,5 @@ $this->params['breadcrumbs'] = [
 ?>
 <?= QuestionManageWidget::widget([
     'quizModel' => $testModel,
-    'renderData' => $this->render('_form_create', ['model' => $model]),
+    'renderData' => $this->render('_question_form', ['model' => $model, 'dataProvider' => $dataProvider]),
 ]) ?>

@@ -192,6 +192,10 @@ body {
   background-color: #428bca;
 }
 
+.nav-sidebar--question {
+  margin-left: 0;
+  margin-right: 0;
+}
 
 /*
  * Main content
@@ -200,12 +204,12 @@ body {
 .main {
   padding: 20px;
 }
-@media (min-width: 768px) {
+/*@media (min-width: 768px) {
   .main {
     padding-right: 40px;
     padding-left: 40px;
   }
-}
+}*/
 .main .page-header {
   margin-top: 0;
 }
