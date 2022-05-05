@@ -81,7 +81,6 @@ class QuestionController extends Controller
         return $this->render('update', [
             'model' => $form,
             'testModel' => $model->storyTest,
-            'errorText' => $model->getAnswersErrorText(),
         ]);
     }
 
@@ -184,23 +183,5 @@ class QuestionController extends Controller
             ->orderBy(['name' => SORT_ASC])
             ->limit(30)
             ->all();
-    }
-
-    public function actionCreateAudioFile(): array
-    {
-        $this->response->format = Response::FORMAT_JSON;
-        $model = new CreateAudioFileModel();
-        if ($model->load($this->request->post())) {
-            $model->audio_file = UploadedFile::getInstance($model, 'audio_file');
-            try {
-                $fileName = $model->uploadAudioFile();
-                $audioFile = $model->createAudioFile($fileName);
-                return ['success' => true, 'audio_file_id' => $audioFile->id, 'audio_file_name' => $audioFile->name];
-            }
-            catch (\Exception $ex) {
-                return ['success' => false, 'message' => $ex->getMessage()];
-            }
-        }
-        return ['success' => false, 'message' => 'no data'];
     }
 }

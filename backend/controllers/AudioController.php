@@ -10,11 +10,11 @@ use common\models\Story;
 use common\models\StoryAudioTrack;
 use common\rbac\UserRoles;
 use common\services\StoryAudioService;
-use http\Exception\RuntimeException;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\Controller;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\UploadedFile;
@@ -144,15 +144,19 @@ class AudioController extends Controller
         return $this->redirect(['story/update', 'id' => $model->id]);
     }
 
+    /**
+     * @throws NotFoundHttpException
+     * @throws HttpException
+     */
     public function actionPlay(int $id)
     {
         $audioFile = AudioFile::findOne($id);
         if ($audioFile === null) {
             throw new NotFoundHttpException('Audio not found');
         }
-        $filePath = $audioFile->getAudioFilePath($audioFile->folder);
+        $filePath = $audioFile->getAudioFilePath();
         if (!file_exists($filePath)) {
-            throw new RuntimeException('File not found');
+            throw new HttpException(500, 'File not found');
         }
         $response = Yii::$app->response;
         $response->format = Response::FORMAT_RAW;

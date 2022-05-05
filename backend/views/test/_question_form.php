@@ -1,5 +1,4 @@
 <?php
-
 use backend\widgets\QuestionErrorTextWidget;
 use backend\widgets\QuestionSlidesWidget;
 use common\helpers\Url;
@@ -12,7 +11,6 @@ use yii\widgets\ActiveForm;
 /** @var $form yii\widgets\ActiveForm */
 /** @var $dataProvider yii\data\ActiveDataProvider */
 $isNewRecord = $model instanceof \backend\models\question\CreateQuestion;
-\backend\assets\WaveSurferAsset::register($this);
 ?>
 <div class="story-test-form">
     <?php if (!$isNewRecord): ?>

@@ -7,6 +7,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\helpers\FileHelper;
 
 /**
  * This is the model class for table "audio_file".
@@ -58,9 +59,9 @@ class AudioFile extends ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Name',
+            'name' => 'Заголовок',
             'audio_file' => 'Audio File',
-            'created_at' => 'Created At',
+            'created_at' => 'Дата создания',
         ];
     }
 
@@ -98,12 +99,12 @@ class AudioFile extends ActiveRecord
         return !empty($this->audio_file);
     }
 
-    public function getAudioFilePath(string $folder, bool $url = false): ?string
+    public function getAudioFilePath(bool $url = false): ?string
     {
         if (!$this->haveAudioFile()) {
             return null;
         }
-        return self::getAudioFilesPath($folder, $url) . '/' . $this->audio_file;
+        return self::getAudioFilesPath($this->folder, $url) . '/' . $this->audio_file;
     }
 
     public function getAudioFileUrl(): ?string
@@ -112,5 +113,18 @@ class AudioFile extends ActiveRecord
             return null;
         }
         return self::getAudioFilesPath($this->folder, true) . '/' . $this->audio_file;
+    }
+
+    public function afterDelete()
+    {
+        if (($path = $this->getAudioFilePath()) !== null && file_exists($path)) {
+            FileHelper::unlink($path);
+        }
+        parent::afterDelete();
+    }
+
+    public function updateName(string $name): void
+    {
+        $this->name = $name;
     }
 }

@@ -75,6 +75,7 @@ AppAsset::register($this);
                         ['label' => 'Списки слов', 'url' => ['/word-list/index'], 'active' => Yii::$app->controller->id === 'word-list'],
                         ['label' => 'Группы', 'url' => ['/study-group/index'], 'active' => Yii::$app->controller->id === 'study-group'],
                         ['label' => 'Задания', 'url' => ['/study-task/index'], 'active' => Yii::$app->controller->id === 'study-task'],
+                        ['label' => 'Аудио файлы', 'url' => ['audio-file/index']],
                     ],
                 ]) ?>
                 <?php endif ?>

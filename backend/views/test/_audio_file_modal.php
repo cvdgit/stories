@@ -9,7 +9,7 @@ $model = new CreateAudioFileModel();
     <div class="modal-dialog">
         <div class="modal-content">
             <?php $form = ActiveForm::begin([
-                'action' => ['question/create-audio-file'],
+                'action' => ['audio-file/create-audio-file'],
                 'id' => 'create-audio-file-form',
             ]) ?>
             <div class="modal-header">
@@ -20,7 +20,7 @@ $model = new CreateAudioFileModel();
                 <?= $form->field($model, 'name')->textInput(['autocomplete' => 'off']) ?>
                 <?= CreateAudioFileWidget::widget([
                     'questionId' => $updateQuestionModel->getModelID(),
-                    'audioFileUrl' => $updateQuestionModel->getAudioFileUrl(),
+                    //'audioFileUrl' => $updateQuestionModel->getAudioFileUrl(),
                     'callback' => 'audioFileCallback',
                 ]) ?>
                 <?= $form->field($model, 'audio_file_name')->hiddenInput()->label(false) ?>
@@ -47,7 +47,7 @@ function getAudioFileData() {
     $('#create-audio-file-form')
         .on('beforeSubmit', function(e) {
             e.preventDefault();
-            
+
             var formData = new FormData(this);
             formData.append('CreateAudioFileModel[audio_file]', getAudioFileData(), $('#createaudiofilemodel-audio_file_name').val());
 
@@ -71,13 +71,13 @@ function getAudioFileData() {
                     else {
                         toastr.error(response.message);
                     }
-                } 
+                }
                 else {
                     toastr.error('Неизвестная ошибка');
                 }
                 $('#create-audio-file-modal').modal('hide');
             });
-            
+
             return false;
         })
         .on('submit', function(e) {

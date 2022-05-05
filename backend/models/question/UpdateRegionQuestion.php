@@ -65,6 +65,9 @@ class UpdateRegionQuestion extends RegionQuestion
         $this->uploadImage($this->model);
 
         $regions = Json::decode($this->model->regions);
+        if ($regions === null) {
+            $regions = [];
+        }
 
         $regionWithAnswerID = array_filter($regions, static function($region) {
             return isset($region['answer_id']) && !empty($region['answer_id']);

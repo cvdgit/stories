@@ -1,7 +1,7 @@
 <?php
 $this->registerCss(<<<CSS
 .question-recorder__wrap {
-    padding: 20px 0 0 0;
+    padding-bottom: 10px;
 }
 .question-recorder__controls {
     display: flex;
@@ -14,7 +14,7 @@ $this->registerCss(<<<CSS
     color: red;
 }
 .question-recorder__audio-list {
-    margin: 20px 0;
+    margin: 0;
 }
 .recorder__status {
     display: flex;
@@ -32,6 +32,7 @@ CSS
 /** @var $questionId int */
 /** @var $existsAudioUrl */
 /** @var $callback */
+/** @var bool $updateMode */
 ?>
 <div class="question-recorder__wrap">
     <div id="recorder-block" style="display: none" class="question-recorder__controls">
@@ -46,6 +47,9 @@ CSS
         <div class="audio-list__wrap" id="audio-list"></div>
         <div id="waveform"></div>
         <p class="text-center" style="margin-top: 10px">
+            <?php if ($updateMode): ?>
+            <button type="button" class="btn btn-xs btn-success" id="wave-record"><i class="glyphicon glyphicon-refresh"></i> Записать заново</button>
+            <?php endif ?>
             <button type="button" class="btn btn-xs btn-primary" id="wave-play"><i class="glyphicon glyphicon-play"></i> Прослушать</button>
             <button type="button" class="btn btn-xs btn-primary" id="wave-cut"><i class="glyphicon glyphicon-floppy-disk"></i> Обрезать</button>
         </p>
@@ -54,28 +58,71 @@ CSS
 <?php
 $this->registerJs(<<<JS
 (function() {
-    
-    var recorderButton = $('#recorder-control');
-    var recorderTimeout;
-    
+
+    var WaveSurferWrapper = function() {
+
+        var wavesurfer = this.wavesurfer = WaveSurfer.create({
+            container: '#waveform',
+            height: 100,
+            scrollParent: true,
+            normalize: true,
+            plugins: [
+                RegionPlugin.create()
+            ]
+        });
+
+        wavesurfer.on('ready', function() {
+            wavesurfer.addRegion({
+                id: 'audio',
+                start: 0,
+                end: wavesurfer.getDuration()
+            });
+        });
+
+        $('#wave-play').on('click', function() {
+            wavesurfer.regions.list['audio'].play();
+        });
+
+        $('#wave-cut').on('click', function() {
+
+            var region = wavesurfer.regions.list['audio'];
+            var buf = trimBlob(wavesurfer, region.start, region.end);
+            var cutSelection = buf.emptySegment;
+            var arrayBuffer = bufferToWave(cutSelection, 0, cutSelection.length);
+            callback(arrayBuffer);
+
+            wavesurfer.clearRegions();
+            wavesurfer.load(URL.createObjectURL(arrayBuffer));
+        });
+    }
+
+    WaveSurferWrapper.prototype.load = function(url) {
+        this.wavesurfer.load(url);
+    }
+
+    WaveSurferWrapper.prototype.destroy = function(callback) {
+        $('#wave-play').off('click');
+        $('#wave-cut').off('click');
+        this.wavesurfer.on('destroy', callback);
+        this.wavesurfer.destroy();
+    }
+
     var statusElement = $('#recorder-status');
     function setStatusText(text) {
         statusElement.text(text);
     }
-    
+
     function disableButton(button) {
         button.prop('disabled', true);
         button.addClass('disabled');
     }
-    
+
     function enableButton(button) {
         button.prop('disabled', false);
         button.removeClass('disabled');
     }
-    
-    var audioBlock = $('#audio-block');
-    
-    var existsAudioUrl = '';
+
+    var existsAudioUrl = '$existsAudioUrl';
     function getAudioFilePath() {
         return existsAudioUrl;
     }
@@ -85,64 +132,99 @@ $this->registerJs(<<<JS
     function audioFileExists() {
         return getAudioFilePath() !== '';
     }
-    
+
     var callback = $callback;
-    
+
+    var recorderBlock = $('#recorder-block');
+    function showRecorderBlock() {
+        recorderBlock.show();
+    }
+    function hideRecorderBlock() {
+        recorderBlock.hide();
+        setStatusText('');
+    }
+
+    var recorderButton = $('#recorder-control');
+
+    var audioBlock = $('#audio-block');
+    function showAudioBlock() {
+        audioBlock.show();
+    }
+    function hideAudioBlock() {
+        audioBlock.hide();
+    }
+
     var audioList = $('#audio-list');
     var saveButton = $('#save-audio');
     var deleteButton = $('#delete-audio');
-    
-    var recorderBlock = $('#recorder-block');
-    
-    if (audioFileExists()) {
-        var audio = createAudioElement(getAudioFilePath());
-        audioList
-            .empty()
-            .append(audio);
-        audioBlock.show();
-        deleteButton.show();
+
+
+    var waveSurfer;
+
+    $('#wave-record').on('click', function() {
+        waveSurfer.destroy(function() {
+            setAudioFilePath('');
+            init();
+        });
+    });
+
+    function init() {
+
+        hideRecorderBlock();
+        hideAudioBlock();
+
+        waveSurfer = new WaveSurferWrapper();
+
+        if (audioFileExists()) {
+            waveSurfer.load(getAudioFilePath());
+            showAudioBlock();
+        }
+        else {
+            showRecorderBlock();
+        }
     }
-    else {
-        recorderBlock.show();
-    }
+
+
+
+    init();
 
     function createSeconds(value) {
         var date = new Date(0);
         date.setSeconds(value);
         return date.toISOString().substr(11, 8);
     }
-    
+
     var seconds = 0;
-    
+    var recorderTimeout;
+
     recorderButton.on('click', function(e) {
-        
+
         if (recorderTimeout) {
             clearInterval(recorderTimeout);
-        }  
-        
+        }
+
         var state = $(this).attr('data-state');
         if (state === 'recording') {
             recorderButton.removeAttr('data-state');
             recorderButton.html('Записать аудио');
             recorderButton.removeClass('recorder__control--recording');
-            //setStatusText('');
             stopRecording();
         }
         else {
-            
+
             setStatusText('...');
             disableButton(recorderButton);
-            
+
             if (audioBlock.is(':visible')) {
                 audioBlock.hide();
             }
-            
+
             seconds = 0;
             recorderTimeout = setInterval(function() {
                 setStatusText(createSeconds(seconds));
                 seconds++;
             }, 1000);
-            
+
             startRecording(function() {
                 recorderButton.addClass('recorder__control--recording');
                 recorderButton.html('<i class="glyphicon glyphicon-record"></i> Остановить');
@@ -151,7 +233,7 @@ $this->registerJs(<<<JS
             });
         }
     });
-    
+
     var AudioContext = window.AudioContext || window.webkitAudioContext;
     var userMediaStream;
     var recorder;
@@ -165,43 +247,43 @@ $this->registerJs(<<<JS
                 userMediaStream = stream;
                 recorder = new Recorder(audioContext.createMediaStreamSource(stream), {numChannels: 1});
                 recorder.record();
-                
+
                 startCallback();
             })
             .catch(function(error) {
                 console.log(error);
             });
     }
-    
+
     function stopRecording() {
         recorder.stop();
         userMediaStream.getAudioTracks()[0].stop();
         recorder.exportWAV(createDownloadLink);
     }
-    
+
     var URL = window.URL || window.webkitURL;
-    
+
     function createAudioElement(src) {
         return $('<audio/>', {
             controls: true,
             src: src
         });
     }
-    
+
     function bufferToWave(abuffer, offset, len) {
-    
+
         var numOfChan = abuffer.numberOfChannels,
             length = len * numOfChan * 2 + 44,
             buffer = new ArrayBuffer(length),
             view = new DataView(buffer),
             channels = [], i, sample,
             pos = 0;
-    
+
         // write WAVE header
         setUint32(0x46464952);                         // "RIFF"
         setUint32(length - 8);                         // file length - 8
         setUint32(0x45564157);                         // "WAVE"
-        
+
         setUint32(0x20746d66);                         // "fmt " chunk
         setUint32(16);                                 // length = 16
         setUint16(1);                                  // PCM (uncompressed)
@@ -210,15 +292,15 @@ $this->registerJs(<<<JS
         setUint32(abuffer.sampleRate * 2 * numOfChan); // avg. bytes/sec
         setUint16(numOfChan * 2);                      // block-align
         setUint16(16);                                 // 16-bit (hardcoded in this demo)
-        
+
         setUint32(0x61746164);                         // "data" - chunk
         setUint32(length - pos - 4);                   // chunk length
-    
+
         // write interleaved data
         for (i = 0; i < abuffer.numberOfChannels; i++) {
             channels.push(abuffer.getChannelData(i));
         }
-    
+
         while (pos < length) {
             for (i = 0; i < numOfChan; i++) {             // interleave channels
                 sample = Math.max(-1, Math.min(1, channels[i][offset])); // clamp
@@ -228,38 +310,38 @@ $this->registerJs(<<<JS
             }
             offset++                                     // next source sample
         }
-    
+
         // create Blob
         //return (URL || webkitURL).createObjectURL(new Blob([buffer], {type: "audio/wav"}));
         return new Blob([buffer], {type: "audio/wav"});
-    
+
         function setUint16(data) {
             view.setUint16(pos, data, true);
             pos += 2;
         }
-        
+
         function setUint32(data) {
             view.setUint32(pos, data, true);
             pos += 4;
         }
     }
-    
+
     function trimBlob(wavesurfer, start, end) {
 
         var originalAudioBuffer = wavesurfer.backend.buffer;
-        
+
         var lengthInSamples = Math.floor((end - start) * originalAudioBuffer.sampleRate);
 
         var offlineAudioContext = wavesurfer.backend.ac;
-        
+
         var emptySegment = offlineAudioContext.createBuffer(
-            originalAudioBuffer.numberOfChannels, 
-            lengthInSamples + 1,
+            originalAudioBuffer.numberOfChannels,
+            lengthInSamples + (start === 0 ? 0 : 1),
             originalAudioBuffer.sampleRate);
-        
+
         var newAudioBuffer = offlineAudioContext.createBuffer(
-            originalAudioBuffer.numberOfChannels, 
-            (start === 0 ? (originalAudioBuffer.length - emptySegment.length) : originalAudioBuffer.length), 
+            originalAudioBuffer.numberOfChannels,
+            (start === 0 ? (originalAudioBuffer.length - emptySegment.length) : originalAudioBuffer.length),
             originalAudioBuffer.sampleRate);
 
         var new_channel_data, empty_segment_data, original_channel_data, before_data, after_data, mid_data;
@@ -268,7 +350,7 @@ $this->registerJs(<<<JS
             new_channel_data = newAudioBuffer.getChannelData(channel);
             empty_segment_data = emptySegment.getChannelData(channel);
             original_channel_data = originalAudioBuffer.getChannelData(channel);
-            
+
             before_data = original_channel_data.subarray(0, start * originalAudioBuffer.sampleRate);
             mid_data = original_channel_data.subarray(start * originalAudioBuffer.sampleRate, end * originalAudioBuffer.sampleRate);
             after_data = original_channel_data.subarray(Math.floor(end * originalAudioBuffer.sampleRate), (originalAudioBuffer.length * originalAudioBuffer.sampleRate));
@@ -288,63 +370,22 @@ $this->registerJs(<<<JS
             emptySegment
         };
     }
-    
+
     function createDownloadLink(blob) {
-        
+
+        hideRecorderBlock();
+
         var url = URL.createObjectURL(blob);
-        
-        /*var audio = createAudioElement(url);
-        audioList
-            .empty()
-            .append(audio);*/
-        
-        /*if (!audioFileExists()) {
-            saveButton.show();
-        }*/
 
         if (!audioBlock.is(':visible')) {
             audioBlock.fadeIn();
         }
 
         callback(blob);
-        
-        var wavesurfer = WaveSurfer.create({
-            container: '#waveform',
-            height: 100,
-            scrollParent: true,
-            normalize: true,
-            plugins: [
-                RegionPlugin.create()
-            ]
-        });
-        
-        wavesurfer.on('ready', function() {
-            wavesurfer.addRegion({
-                id: 'audio',
-                start: 0,
-                end: wavesurfer.getDuration()
-            });
-        });
 
-        wavesurfer.load(url);
-        
-        $('#wave-play').on('click', function() {
-            wavesurfer.regions.list['audio'].play();
-        });
-
-        $('#wave-cut').on('click', function() {
-            
-            var region = wavesurfer.regions.list['audio'];
-            var buf = trimBlob(wavesurfer, region.start, region.end);
-            var cutSelection = buf.emptySegment;
-            var arrayBuffer = bufferToWave(cutSelection, 0, cutSelection.length);
-            callback(arrayBuffer);
-            
-            wavesurfer.clearRegions();
-            wavesurfer.load(URL.createObjectURL(arrayBuffer));
-        });
+        waveSurfer.load(url);
     }
-    
+
     function postForm(url, formData) {
         return $.ajax({
             'url': url,
@@ -355,7 +396,7 @@ $this->registerJs(<<<JS
             'processData': false
         });
     }
-    
+
     function doneCallback(response) {
         if (response) {
             if (response.success) {
@@ -369,8 +410,8 @@ $this->registerJs(<<<JS
             toastr.error('Неизвестная ошибка');
         }
     }
-    
-    var questionId = $questionId;
+
+    var questionId = '$questionId';
     saveButton.on('click', function() {
         var audio = audioList.find('audio:eq(0)');
         if (!audio.length) {
@@ -396,7 +437,7 @@ $this->registerJs(<<<JS
         }
         xhr.send();
     });
-    
+
     deleteButton.on('click', function(e) {
         if (!confirm('Удалить аудио из вопроса?')) {
             return;
