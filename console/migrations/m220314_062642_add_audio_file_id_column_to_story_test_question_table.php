@@ -7,10 +7,10 @@ use yii\db\Migration;
  */
 class m220314_062642_add_audio_file_id_column_to_story_test_question_table extends Migration
 {
-    
+
     private $tableName = '{{%story_test_question}}';
     private $columnName = 'audio_file_id';
-    
+
     /**
      * {@inheritdoc}
      */
@@ -28,7 +28,7 @@ class m220314_062642_add_audio_file_id_column_to_story_test_question_table exten
             'audio_file_id',
             '{{%audio_file}}',
             'id',
-            'CASCADE'
+            'SET NULL'
         );
     }
 

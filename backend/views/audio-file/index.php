@@ -39,7 +39,7 @@ $this->title = 'Аудио файлы';
             'created_at:datetime',
             [
                 'class' => yii\grid\ActionColumn::class,
-                'template' => '{update}',
+                'template' => '{update} {delete}',
             ],
         ],
     ]) ?>
