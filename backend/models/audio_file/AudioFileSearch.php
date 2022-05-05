@@ -22,6 +22,7 @@ class AudioFileSearch extends Model
     public function search(array $params): ActiveDataProvider
     {
         $query = AudioFile::find();
+        $query->distinct();
         $query->joinWith('storyTestQuestions.storyTest');
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

@@ -9,7 +9,6 @@ use backend\services\AudioFileService;
 use common\models\AudioFile;
 use common\rbac\UserRoles;
 use Yii;
-use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
