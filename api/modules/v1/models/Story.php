@@ -4,6 +4,7 @@ namespace api\modules\v1\models;
 
 use common\helpers\Url;
 use common\models\Category;
+use common\models\Lesson;
 use common\models\User;
 use Yii;
 use yii\db\ActiveQuery;
@@ -37,6 +38,8 @@ use yii\db\ActiveRecord;
  * @property-read ActiveQuery $slides
  * @property-read ActiveQuery $allSlides
  * @property bool $access_by_link
+ *
+ * @property Lesson[] $lessons
  */
 class Story extends ActiveRecord
 {
@@ -71,12 +74,20 @@ class Story extends ActiveRecord
             },
             'description',
             'published' => function() {
-                return Yii::$app->formatter->asDate($this->published_at);
+                return $this->formatPublishedAt();
             },
             'author' => function() {
                 return $this->author->getProfileName();
             }
         ];
+    }
+
+    private function formatPublishedAt(): string
+    {
+        if ($this->published_at === null) {
+            return '';
+        }
+        return Yii::$app->formatter->asDate($this->published_at);
     }
 
     public function getSlides(): ActiveQuery
@@ -96,7 +107,7 @@ class Story extends ActiveRecord
 
     public function extraFields(): array
     {
-        return ['slides', 'allSlides', 'tests'];
+        return ['slides', 'allSlides', 'tests', 'lessons'];
     }
 
     public function getCategories(): ActiveQuery
@@ -109,5 +120,11 @@ class Story extends ActiveRecord
     {
         return $this->hasMany(StoryTest::class, ['id' => 'test_id'])
             ->viaTable('story_story_test', ['story_id' => 'id']);
+    }
+
+    public function getLessons(): ActiveQuery
+    {
+        return $this->hasMany(Lesson::class, ['story_id' => 'id'])
+            ->orderBy(['order' => SORT_ASC]);
     }
 }
