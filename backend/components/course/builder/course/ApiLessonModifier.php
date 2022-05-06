@@ -45,13 +45,13 @@ class ApiLessonModifier
             /** @var LessonForm $lessonModel */
             $lesson = null;
             if ($lessonModel->typeIsQuiz()) {
-                $lesson = $this->builder->createQuizLesson($lessonModel->id, $lessonModel->name, 'descr');
+                $lesson = $this->builder->createQuizLesson($lessonModel->uuid, $lessonModel->name, 'descr');
                 $quizBlockModel = $lessonModel->blocks[0];
                 /** @var LessonQuizForm $blockModel */
                 $this->builder->addQuizBlock($lesson, $quizBlockModel->quiz_id, $this->getQuizData($quizBlockModel->quiz_id));
             }
             else {
-                $lesson = $this->builder->createBlocksLesson($lessonModel->id, $lessonModel->name);
+                $lesson = $this->builder->createBlocksLesson($lessonModel->uuid, $lessonModel->name);
                 foreach ($lessonModel->blocks as $blockModel) {
                     /** @var LessonBlockForm $blockModel */
 
