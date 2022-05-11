@@ -42,8 +42,10 @@ class CourseController extends Controller
             throw new HttpException(500, 'Разделы не найдены');
         }
 
+        $onlyLessons = $this->request->post('lessons');
+
         $builder = new CourseLessonBuilder();
-        $apiBuilder = new ApiLessonModifier($builder->build($courseModel->lessons), new ApiCourseBuilder(), $this->quizService);
+        $apiBuilder = new ApiLessonModifier($builder->build($courseModel->getFilteredLessons($onlyLessons)), new ApiCourseBuilder(), $this->quizService);
         $apiResult = $apiBuilder->build();
 
         $coverImage = null;

@@ -826,4 +826,13 @@ class Story extends ActiveRecord
     {
         return count($this->lessons) > 0;
     }
+
+    public function getFilteredLessons(array $uuids = null): array
+    {
+        $query = $this->getLessons();
+        if ($uuids !== null && count($uuids) > 0) {
+            $query->andWhere(['in', 'uuid', $uuids]);
+        }
+        return $query->all();
+    }
 }
