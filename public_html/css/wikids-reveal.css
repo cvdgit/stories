@@ -806,6 +806,75 @@ p.wikids-test-description {
 	height: 100%;
 }
 
+.seq-question {
+
+}
+
+.seq-question__wrap {
+
+}
+
+.seq-answers {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.seq-item {
+  cursor: grab;
+  margin-right: 0;
+}
+
+.seq-item:hover {
+  background-color: #eee;
+}
+
+.seq-item__wrap:last-child {
+  margin-bottom: 0.8rem;
+}
+
+.seq-item__wrap {
+  cursor: grab;
+  margin: 0;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #f7f7f7;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.seq-item-handle {
+  padding-left: 0;
+  margin-right: 11px;
+}
+
+.seq-item-title {
+  font-size: 1.4rem;
+  padding: 0 2.5rem 0 1rem;
+}
+
+.seq-item-image {
+  position: relative;
+  width: 110px;
+  height: 100px;
+  min-width: 110px;
+  min-height: 100px;
+}
+
+.seq-item-image__image {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  border-radius: 0.2rem;
+  background-position: 50% 50%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
 .sequence-question-list .list-group-item,
 .sequence-question-list .media {
 	border: 0 none;

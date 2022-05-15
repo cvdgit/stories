@@ -1257,37 +1257,50 @@
             _extends(_answers, answers);
             _answers = shuffle(_answers);
             _answers.forEach(function(answer) {
-                var item = $('<div/>', {
-                    'class': 'media',
-                    'data-answer-id': answer.id
-                });
-                $('<div/>', {
-                    'class': 'media-left media-middle wikids-sortable-handle',
-                    'html': '<i class="glyphicon glyphicon-move handle"></i>'
-                })
-                    .appendTo(item);
+
+              var item = $('<div/>', {
+                'class': 'seq-item wikids-sortable-handle',
+                'data-answer-id': answer.id
+              });
+
+              var $itemWrap = $('<div/>', {
+                'class': 'seq-item__wrap',
+              });
+
+              $('<span/>', {
+                'class': 'seq-item-handle',
+                'html': '<i class="glyphicon glyphicon-menu-hamburger"></i>',
+              })
+                .appendTo($itemWrap);
+
                 if (answer.image) {
                     $('<div/>', {
-                        'class': 'media-left',
+                        'class': 'seq-item-image',
                         'css': {'cursor': 'zoom-in'}
                     })
                         .on('click', function () {
                             test.showOrigImage(answer['orig_image'] || $(this).attr('src'));
                         })
                         .append(
-                            $('<img/>', {
-                                'class': 'media-object',
-                                'src': answer.image
+                            $('<div/>', {
+                                'class': 'seq-item-image__image',
+                                'css': {
+                                  'background-color': '#99cd50',
+                                  'background-image': 'url(' + answer.image + ')'
+                                }
                             })
                         )
-                        .appendTo(item);
+                        .appendTo($itemWrap);
                 }
-                $('<div/>', {'class': 'media-body'})
-                    .append(
-                        $('<h4/>', {'class': 'media-heading'}).text(answer.name)
-                    )
-                    .appendTo(item);
-                item.appendTo($list);
+
+                $('<div/>', {
+                  'class': 'seq-item-title',
+                  'text': answer.name
+                })
+                    .appendTo($itemWrap);
+
+              $itemWrap.appendTo(item);
+              item.appendTo($list);
             });
             return $list;
         }
@@ -1301,12 +1314,15 @@
 
     SequenceQuestion.prototype = {
         createAnswers: function(answers) {
+
             var $answers = $('<div/>', {
-                'class': 'wikids-test-answers'
+                'class': 'wikids-test-answers seq-answers'
             });
             $answers.append(this.createAnswer(answers));
-            var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-6 col-md-offset-3 question-wrapper"></div></div>');
-            $wrapper.find(".question-wrapper").append($answers);
+
+            var $wrapper = $('<div class="seq-question"><div class="seq-question__wrap"></div></div>');
+
+            $wrapper.find(".seq-question__wrap").append($answers);
             return $wrapper;
         }
     };
@@ -3627,7 +3643,8 @@
                                     })
                                     .html('<i class="glyphicon glyphicon-volume-up" style="left: 10px; top: 6px"></i>')
                                 );
-                        } else {
+                        }
+                        else {
                             if (testConfig.answerTypeIsInput(question) && testConfig.isStrictAnswer()) {
                                 $answerElement = $('<p/>').html(textDiff(answerText, userAnswer));
                             } else {
