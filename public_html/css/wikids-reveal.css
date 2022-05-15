@@ -845,6 +845,8 @@ p.wikids-test-description {
 .seq-item-handle {
   padding-left: 0;
   margin-right: 11px;
+  font-size: 2rem;
+  color: #ccc;
 }
 
 .seq-item-title {
