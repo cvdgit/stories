@@ -47,7 +47,7 @@ class RevealWidget extends Widget
         'dependencies' => [],
         'touch' => true,
         'embedded' => true,
-        'maxScale' => 2.0,
+        'maxScale' => 1.0,
     ];
 
     protected $defaultAssets = [];
