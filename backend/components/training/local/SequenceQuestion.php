@@ -26,6 +26,7 @@ class SequenceQuestion extends Question
                 'current' => $this->makeStars($this->stars, $this),
             ],
             'view' => 'sequence',
+            'sort_view' => $this->question->sort_view,
         ], parent::serialize());
     }
 }

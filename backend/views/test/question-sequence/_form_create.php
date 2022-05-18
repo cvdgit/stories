@@ -11,6 +11,7 @@ use backend\models\question\QuestionType;
             <?= $form->field($model, 'story_test_id')->hiddenInput()->label(false) ?>
             <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
             <?= $form->field($model, 'type')->dropDownList(QuestionType::asArray(), ['disabled' => true]) ?>
+            <?= $form->field($model, 'sort_view')->dropDownList($model->getSortViewValues()) ?>
             <div class="form-group form-group-controls">
                 <?= Html::submitButton('Создать вопрос', ['class' => 'btn btn-success']) ?>
             </div>

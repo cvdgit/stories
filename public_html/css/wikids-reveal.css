@@ -807,11 +807,15 @@ p.wikids-test-description {
 }
 
 .seq-question {
-
+  min-height: 200px;
 }
 
 .seq-question__wrap {
 
+}
+
+.sequence-question-list {
+  text-align: center;
 }
 
 .seq-answers {
@@ -819,9 +823,17 @@ p.wikids-test-description {
   margin: 0 auto;
 }
 
+.seq-answers--large {
+  max-width: 900px;
+}
+
 .seq-item {
   cursor: grab;
   margin-right: 0;
+}
+
+.seq-item--horizontal {
+  display: inline-block;
 }
 
 .seq-item:hover {
@@ -842,6 +854,14 @@ p.wikids-test-description {
   align-items: center;
 }
 
+.seq-item__wrap--horizontal {
+  border: 0 none;
+}
+
+.seq-item__wrap--horizontal:last-child {
+  margin-bottom: 0;
+}
+
 .seq-item-handle {
   padding-left: 0;
   margin-right: 11px;
@@ -852,6 +872,10 @@ p.wikids-test-description {
 .seq-item-title {
   font-size: 1.4rem;
   padding: 0 2.5rem 0 1rem;
+}
+
+.seq-item-title--horizontal {
+  padding: 0;
 }
 
 .seq-item-image {

@@ -63,6 +63,7 @@ $this->registerCss($css);
                     <?= $form->field($model, 'story_test_id')->hiddenInput()->label(false) ?>
                     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
                     <?= $form->field($model, 'type')->dropDownList(QuestionType::asArray(), ['disabled' => true]) ?>
+                    <?= $form->field($model, 'sort_view')->dropDownList($model->getSortViewValues()) ?>
                     <?= $form->field($model, 'sortable')->hiddenInput()->label(false) ?>
                     <?= QuestionSlidesWidget::widget(['model' => $model->getModel()]) ?>
                     <div class="form-group form-group-controls">

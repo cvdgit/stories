@@ -5,6 +5,7 @@ namespace common\models;
 use backend\helpers\SelectSlideWidgetHelper;
 use backend\models\question\QuestionType;
 use backend\models\question\region\RegionImage;
+use backend\models\question\sequence\SortView;
 use DomainException;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use Yii;
@@ -27,6 +28,7 @@ use yii\helpers\FileHelper;
  * @property string $regions
  * @property string $hint
  * @property string $audio_file_id
+ * @property int $sort_view
  *
  * @property StoryTestAnswer[] $storyTestAnswers
  * @property StoryTestAnswer[] $storyTestAnswersWithHidden
@@ -78,6 +80,7 @@ class StoryTestQuestion extends ActiveRecord
             [['name'], 'string', 'max' => 512],
             [['story_test_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTest::class, 'targetAttribute' => ['story_test_id' => 'id']],
             [['regions'], 'safe'],
+            ['sort_view', 'in', 'range' => SortView::values()],
         ];
     }
 

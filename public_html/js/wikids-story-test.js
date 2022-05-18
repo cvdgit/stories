@@ -1238,94 +1238,144 @@
         }
     }
 
-    function SequenceQuestion(test) {
+  function SequenceQuestion(test) {
 
-        var $list = $('<div/>', {
-            class: 'sequence-question-list'
+    this.instances = [];
+
+    this.createAnswer = function (list, answers, isHorizontalView) {
+
+      list.empty();
+
+      var _answers = [];
+      _extends(_answers, answers);
+
+      _answers = shuffle(_answers);
+
+      _answers.forEach(function (answer) {
+
+        var item = $('<div/>', {
+          'class': 'seq-item wikids-sortable-handle' + (isHorizontalView ? ' seq-item--horizontal' : ''),
+          'data-answer-id': answer.id
         });
 
-        Sortable.create($list[0], {
-            ghostClass: 'wikids-sortable-ghost',
-            cursor: 'move',
-            opacity: 0.6,
-            handle: '.wikids-sortable-handle'
+        var $itemWrap = $('<div/>', {
+          'class': 'seq-item__wrap' + (isHorizontalView ? ' seq-item__wrap--horizontal' : ''),
         });
 
-        this.createAnswer = function(answers) {
-            $list.empty();
-            var _answers = [];
-            _extends(_answers, answers);
-            _answers = shuffle(_answers);
-            _answers.forEach(function(answer) {
+        if (!isHorizontalView) {
+          $('<span/>', {
+            'class': 'seq-item-handle',
+            'html': '<i class="glyphicon glyphicon-menu-hamburger"></i>',
+          })
+            .appendTo($itemWrap);
+        }
 
-              var item = $('<div/>', {
-                'class': 'seq-item wikids-sortable-handle',
-                'data-answer-id': answer.id
-              });
-
-              var $itemWrap = $('<div/>', {
-                'class': 'seq-item__wrap',
-              });
-
-              $('<span/>', {
-                'class': 'seq-item-handle',
-                'html': '<i class="glyphicon glyphicon-menu-hamburger"></i>',
-              })
-                .appendTo($itemWrap);
-
-                if (answer.image) {
-                    $('<div/>', {
-                        'class': 'seq-item-image',
-                        'css': {'cursor': 'zoom-in'}
-                    })
-                        .on('click', function () {
-                            test.showOrigImage(answer['orig_image'] || $(this).attr('src'));
-                        })
-                        .append(
-                            $('<div/>', {
-                                'class': 'seq-item-image__image',
-                                'css': {
-                                  'background-color': '#99cd50',
-                                  'background-image': 'url(' + answer.image + ')'
-                                }
-                            })
-                        )
-                        .appendTo($itemWrap);
+        if (answer.image) {
+          $('<div/>', {
+            'class': 'seq-item-image',
+            'css': {'cursor': 'zoom-in'}
+          })
+            .on('click', function () {
+              test.showOrigImage(answer['orig_image'] || $(this).attr('src'));
+            })
+            .append(
+              $('<div/>', {
+                'class': 'seq-item-image__image',
+                'css': {
+                  'background-color': '#99cd50',
+                  'background-image': 'url(' + answer.image + ')'
                 }
+              })
+            )
+            .appendTo($itemWrap);
 
-                $('<div/>', {
-                  'class': 'seq-item-title',
-                  'text': answer.name
-                })
-                    .appendTo($itemWrap);
-
-              $itemWrap.appendTo(item);
-              item.appendTo($list);
-            });
-            return $list;
+          if (!isHorizontalView) {
+            $('<div/>', {'class': 'seq-item-title', 'text': answer.name}).appendTo($itemWrap);
+          }
+        } else {
+          $('<div/>', {
+            'class': 'seq-item-title' + (isHorizontalView ? ' seq-item-title--horizontal' : ''),
+            'text': answer.name
+          })
+            .appendTo($itemWrap);
         }
 
-        this.getAnswerIDs = function() {
-            return $list.find('[data-answer-id]').map(function() {
-                return parseInt($(this).attr('data-answer-id'));
-            }).get();
-        }
+        $itemWrap.appendTo(item);
+        item.appendTo(list);
+      });
+      return list;
     }
 
-    SequenceQuestion.prototype = {
-        createAnswers: function(answers) {
+    this.getAnswerIDs = function(questionId) {
 
-            var $answers = $('<div/>', {
-                'class': 'wikids-test-answers seq-answers'
-            });
-            $answers.append(this.createAnswer(answers));
+      var instance = this.instances.find(function(item) {
+        return parseInt(item.question_id) === parseInt(questionId);
+      });
 
-            var $wrapper = $('<div class="seq-question"><div class="seq-question__wrap"></div></div>');
+      return instance.element.find('[data-answer-id]').map(function () {
+        return parseInt($(this).attr('data-answer-id'));
+      }).get();
+    }
+  }
 
-            $wrapper.find(".seq-question__wrap").append($answers);
-            return $wrapper;
-        }
-    };
+  SequenceQuestion.prototype = {
+
+    createWrapper: function(answers, large) {
+      var $wrapper = $('<div class="seq-question"><div class="seq-question__wrap"></div></div>');
+      var $answers = $('<div/>', {
+        'class': 'wikids-test-answers seq-answers' + (large ? ' seq-answers--large' : '')
+      });
+      if (answers) {
+        $answers.append(answers);
+      }
+      $wrapper.find(".seq-question__wrap").append($answers);
+      return $wrapper;
+    },
+
+    createAnswers: function(question, answers) {
+      var isHorizontalView = parseInt(question['sort_view']) === 1;
+      return this.createWrapper(this.createAnswer(answers, isHorizontalView), isHorizontalView);
+    },
+
+    create: function(question, answers) {
+
+      var instance = this.instances.find(function(item) {
+        return parseInt(item.question_id) === parseInt(question.id);
+      });
+
+      if (instance) {
+        instance.sorter.destroy();
+        instance.element.remove();
+        this.instances = this.instances.filter(function(item) {
+          return parseInt(item.question_id) !== parseInt(instance.question_id);
+        });
+      }
+
+      instance = {
+        question_id: question.id
+      };
+
+      var $list = $('<div/>', {
+        class: 'sequence-question-list'
+      });
+
+      instance.sorter = Sortable.create($list[0], {
+        ghostClass: 'wikids-sortable-ghost',
+        cursor: 'move',
+        opacity: 0.6,
+        handle: '.wikids-sortable-handle'
+      });
+
+      var isHorizontalView = parseInt(question['sort_view']) === 1;
+
+      instance.element = this.createWrapper(this.createAnswer($list, answers, isHorizontalView), isHorizontalView)
+        .find(".seq-question__wrap");
+
+      this.instances.push(instance);
+
+      return instance.element;
+    }
+  };
 
     _extends(SequenceQuestion, {
         pluginName: 'sequenceQuestion'
@@ -2478,7 +2528,7 @@
                         $answers = createMissingWordsAnswers(question, getAnswersData(question));
                         break;
                     case 'sequence':
-                        $answers = that.sequenceQuestion.createAnswers(getAnswersData(question));
+                        $answers = that.sequenceQuestion.createWrapper();
                         break;
                     default:
                         $answers = createAnswers(getAnswersData(question), question);
@@ -3197,8 +3247,7 @@
 
         currentQuestionElement = $('.wikids-test-question[data-question-id=' + nextQuestionObj.id + ']', dom.questions);
 
-        if (isShuffleAnswers(currentQuestion)) {
-          console.log('shuffle');
+        if (isShuffleAnswers(currentQuestion) && !questionViewSequence(currentQuestion)) {
           $('.wikids-test-answers', currentQuestionElement)
             .empty()
             .append(createAnswers(getAnswersData(currentQuestion), currentQuestion)
@@ -3206,13 +3255,13 @@
         }
 
         if (questionViewSequence(currentQuestion)) {
-          $('.wikids-test-answers', currentQuestionElement)
-            .empty()
-            .append(that.sequenceQuestion.createAnswers(getAnswersData(currentQuestion))
-              .find('.wikids-test-answers > div'));
 
-          dom.nextButton.off("click").on("click", function () {
-            var result = that.sequenceQuestion.getAnswerIDs();
+          $('.seq-question', currentQuestionElement)
+            .empty()
+            .append(that.sequenceQuestion.create(currentQuestion, getAnswersData(currentQuestion)));
+
+          dom.nextButton.off("click").on("click", function() {
+            var result = that.sequenceQuestion.getAnswerIDs(currentQuestion.id);
             nextQuestion(result);
           });
         }
