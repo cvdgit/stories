@@ -1359,14 +1359,15 @@
         class: 'sequence-question-list'
       });
 
+      var isHorizontalView = parseInt(question['sort_view']) === 1;
+
       instance.sorter = Sortable.create($list[0], {
         ghostClass: 'wikids-sortable-ghost',
         cursor: 'move',
         opacity: 0.6,
-        handle: '.wikids-sortable-handle'
+        handle: '.wikids-sortable-handle',
+        direction: isHorizontalView ? 'horizontal' : 'vertical'
       });
-
-      var isHorizontalView = parseInt(question['sort_view']) === 1;
 
       instance.element = this.createWrapper(this.createAnswer($list, answers, isHorizontalView), isHorizontalView)
         .find(".seq-question__wrap");
