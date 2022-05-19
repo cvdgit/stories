@@ -2,6 +2,7 @@
 
 namespace backend\components\import;
 
+use backend\components\WordListFormatter;
 use backend\models\question\QuestionType;
 use common\models\TestWord;
 use common\models\TestWordList;
@@ -20,6 +21,15 @@ class WordListAdapter
         if ($this->words === null || count($this->words) === 0) {
             throw new DomainException('Список слов пуст');
         }
+    }
+
+    private function createQuestion(string $name, int $type): array
+    {
+        return [
+            'name' => $name,
+            'type' => $type,
+            'answers' => [],
+        ];
     }
 
     private function createAnswer(string $name, bool $correct): array
@@ -74,4 +84,27 @@ class WordListAdapter
         return $questions;
     }
 
+    public function createSequence(int $type): array
+    {
+        $questions = [];
+        foreach ($this->words as $word) {
+
+            $str = $word->name;
+            if (empty($str)) {
+                continue;
+            }
+
+            $stringWords = WordListFormatter::stringAsWords($str);
+            if (count($stringWords) === 0) {
+                continue;
+            }
+
+            $question = $this->createQuestion($word->name, $type);
+            foreach ($stringWords as $stringWord) {
+                $question['answers'][] = $this->createAnswer($stringWord, true);
+            }
+            $questions[] = $question;
+        }
+        return $questions;
+    }
 }

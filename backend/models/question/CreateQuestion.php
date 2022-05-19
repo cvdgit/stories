@@ -19,7 +19,7 @@ class CreateQuestion extends QuestionModel
         parent::init();
         $this->type = QuestionType::ONE;
         $this->order = null;
-        $this->mix_answers = true;
+        $this->mix_answers = 1;
     }
 
     public function create()

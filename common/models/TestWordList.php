@@ -4,6 +4,7 @@ namespace common\models;
 
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -76,12 +77,10 @@ class TestWordList extends ActiveRecord
         ];
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTestWords()
+    public function getTestWords(): ActiveQuery
     {
-        return $this->hasMany(TestWord::class, ['word_list_id' => 'id']);
+        return $this->hasMany(TestWord::class, ['word_list_id' => 'id'])
+            ->orderBy(['order' => SORT_ASC]);
     }
 
     public function getTestWordsCount()
@@ -136,7 +135,7 @@ class TestWordList extends ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      * @throws \yii\base\InvalidConfigException
      */
     public function getStories()

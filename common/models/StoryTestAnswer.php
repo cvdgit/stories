@@ -108,6 +108,15 @@ class StoryTestAnswer extends ActiveRecord
         return $model;
     }
 
+    public static function createSequenceFromRelation(string $name, int $order): self
+    {
+        $model = new self();
+        $model->name = $name;
+        $model->is_correct = self::CORRECT_ANSWER;
+        $model->order = $order;
+        return $model;
+    }
+
     public static function createFromRegion(int $questionID, string $name, int $isCorrect, string $regionID): int
     {
         $model = self::create($questionID, $name, $isCorrect);

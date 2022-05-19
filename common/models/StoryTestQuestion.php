@@ -188,9 +188,11 @@ class StoryTestQuestion extends ActiveRecord
         return self::create($testID, $name, QuestionType::REGION, $order, $mixAnswers, $image, $regions);
     }
 
-    public static function createSequence(int $testID, string $name, int $order = null): self
+    public static function createSequence(int $testID, string $name, int $order = null, int $view = SortView::VERTICAL): self
     {
-        return self::create($testID, $name, QuestionType::SEQUENCE, $order, 1);
+        $model = self::create($testID, $name, QuestionType::SEQUENCE, $order, 1);
+        $model->sort_view = $view;
+        return $model;
     }
 
     public function getImagesPath(): string

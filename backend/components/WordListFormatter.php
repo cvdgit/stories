@@ -53,4 +53,13 @@ class WordListFormatter
         return $this->createWord($name, $correct);
     }
 
+    public static function stringAsWords(string $string, string $separator = ' '): array
+    {
+        $string = trim(preg_replace('/\s{2,}/', ' ', $string));
+        $result = explode($separator, $string);
+        if ($result === false) {
+            return [];
+        }
+        return $result;
+    }
 }

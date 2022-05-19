@@ -2,7 +2,8 @@
 use backend\widgets\SelectWordListWidget;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-/** @var $model backend\models\test\import\ImportFromWordList */
+use backend\models\test\import\ImportFromWordList;
+/** @var ImportFromWordList $model */
 ?>
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -12,10 +13,11 @@ use yii\widgets\ActiveForm;
     'enableClientValidation' => true,
     'options' => [
         'id' => 'import-from-word-list-form'
-    ]
+    ],
 ]); ?>
 <div class="modal-body">
     <?= $form->field($model, 'word_list_id')->widget(SelectWordListWidget::class) ?>
+    <?= $form->field($model, 'question_type')->dropDownList($model->getQuestionTypes()) ?>
     <?= $form->field($model, 'number_answers')->textInput() ?>
 </div>
 <div class="modal-footer">
@@ -31,7 +33,7 @@ $('#import-from-word-list-form')
         $.ajax({
             url: $(this).attr('action'),
             type: $(this).attr('method'),
-            data: new FormData(this), 
+            data: new FormData(this),
             dataType: 'json',
             cache: false,
             contentType: false,
@@ -48,7 +50,7 @@ $('#import-from-word-list-form')
         .always(function() {
             $('#import-from-word-list-modal').modal('hide');
         });
- 
+
         return false;
     })
     .on('submit', function(e) {
