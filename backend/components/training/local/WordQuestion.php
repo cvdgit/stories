@@ -27,7 +27,7 @@ class WordQuestion extends Question
         ], parent::serialize());
     }
 
-    public function getCorrectAnswerIDs()
+    public function getCorrectAnswerIDs(): array
     {
         return [$this->questionID];
     }
