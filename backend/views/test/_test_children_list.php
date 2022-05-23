@@ -104,10 +104,10 @@ window.fillTestVariantsTable = function(params) {
                     }
                 })
             });
-        
+
         var tr = $('<tr/>');
         tr.append($('<td/>').text(param.title));
-        
+
         var td = $('<td/>');
         if (param.stories.length) {
             param.stories.forEach(function(story) {
@@ -162,32 +162,32 @@ window.loadNeoTaxonValues = function(taxon, element) {
 };
 
 window.loadNeoQuestionValues = function(list, id, selected) {
-    
+
     selected = selected || [];
     function isSelected(name, value) {
         return selected.filter(function(item) {
             return item.name == name && item.value == value;
         }).length > 0;
-    }    
-    
+    }
+
     function addChangeEvent(values, targetParam, relatedParam, valueKey) {
 
         $('select[name=' + targetParam + ']', list).on('change', function() {
-            
+
             var relatedSelect = $('select[name=' + relatedParam + ']', list),
                 currentValue = $(this).find('option:selected').attr('data-id');
-            
+
             relatedSelect.empty();
             $('<option/>')
                 .text('Выберите значение')
                 .val('')
                 .addClass('empty-value')
                 .appendTo(relatedSelect);
-            
+
             if (currentValue === '') {
                 return;
             }
-            
+
             var selectValues = [];
             values.forEach(function(item) {
                 if (item.param == relatedParam) {
@@ -195,7 +195,7 @@ window.loadNeoQuestionValues = function(list, id, selected) {
                     return;
                 }
             });
-            
+
             selectValues
                 .filter(function(value) {
                     return currentValue == value.entity_id;
@@ -211,14 +211,14 @@ window.loadNeoQuestionValues = function(list, id, selected) {
         })
         .trigger('change');
     }
-    
+
     Neo.getQuestionValues(id).done(function(response) {
-        
+
         var values = response.data;
         var form = $('.test-variant-form');
-        
+
         response.data.forEach(function(field) {
-            
+
             var select = $('<select/>')
                 .attr('name', field.param)
                 .addClass('form-control')
@@ -229,12 +229,12 @@ window.loadNeoQuestionValues = function(list, id, selected) {
                 .val('')
                 .addClass('empty-value')
                 .appendTo(select);
-            
+
             $('<div/>').addClass('form-group')
                 .append($('<label/>').addClass('control-label').text(field.title))
                 .append(select)
                 .appendTo(list);
-            
+
             if (field.relation.length) {
                 addChangeEvent(values, field.relation, field.param, field.field);
             }
@@ -282,14 +282,15 @@ function createVariantParams(params) {
 
 updateVariantModal
     .on('loaded.bs.modal', function() {
-        
+
         var id = $('#updateform-neo_question_id').val();
         var params = $('#updateform-question_params').val();
         var list = $('.question-config', this);
         list.empty();
+
         window.loadNeoQuestionValues(list, id, createVariantParams(params));
-       
-        var wrongElementList = $('.wrong-answer-list > .wrong-answer-list-item:visible', updateVariantModal);
+
+        var wrongElementList = $(this).find('.wrong-answer-list > .wrong-answer-list-item');
         wrongElementList.each(function() {
             var elem = $(this).find('.taxon-name-select select'),
                 valueElem = $(this).find('.taxon-value-select select');
