@@ -96,14 +96,15 @@ $opt = new TestTypeOptions($model->answer_type);
             <div style="margin-right: auto">
                 <?= Html::submitButton(($model->isNewRecord ? 'Создать' : 'Изменить') . ' тест', ['class' => 'btn btn-success']) ?>
             </div>
-            <div>
-                <?php if (!$model->isNewRecord && !$model->isTemplate() && ($model->isSourceWordList() || $model->isSourceTest())): ?>
-                <?= CreateTestTemplateWidget::widget(['testId' => $model->id]) ?>
-                <?php endif ?>
-            </div>
         </div>
     </div>
     <?php ActiveForm::end(); ?>
+</div>
+
+<div>
+    <?php if (!$model->isNewRecord && !$model->isTemplate() && ($model->isSourceWordList() || $model->isSourceTest())): ?>
+        <?= CreateTestTemplateWidget::widget(['testId' => $model->id]) ?>
+    <?php endif ?>
 </div>
 
 <?php if ($repeatChangeModel !== null): ?>

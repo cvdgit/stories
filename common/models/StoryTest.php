@@ -307,7 +307,6 @@ class StoryTest extends ActiveRecord
         $model->attributes = $sourceModel->attributes;
         $model->title = $title;
         $model->status = TestStatus::TEMPLATE;
-        $model->repeat = TestRepeat::DEFAULT;
         return $model;
     }
 
@@ -317,7 +316,7 @@ class StoryTest extends ActiveRecord
         $model->attributes = $templateModel->attributes;
         $model->status = TestStatus::DEFAULT;
         $model->source = SourceType::TEST;
-        $model->repeat = TestRepeat::DEFAULT;
+        $model->repeat = $templateModel->repeat;
         return $model;
     }
 
