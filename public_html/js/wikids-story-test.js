@@ -2439,6 +2439,11 @@
         function createQuestion(question) {
 
             var questionName = createQuestionName(question);
+
+            if (testConfig.answerTypeIsInput(question) && questionName === '') {
+              questionName = 'Введите текст';
+            }
+
             var titleElement = $('<p/>')
                 .addClass('question-title')
                 .append(questionName);
