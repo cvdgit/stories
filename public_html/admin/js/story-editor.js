@@ -175,6 +175,9 @@ function EditorPopover() {
 function SlideManager(options) {
 
     this.options = options;
+    this.lessonId = this.options['lesson_id'] === null ? '' : this.options['lesson_id'];
+    this.storyId = this.options['story_id'] === null ? '' : this.options['story_id'];
+
     this.$slidesList = $('#slides-list');
 
     function SlideWrapper(element, data) {
@@ -230,8 +233,8 @@ function SlideManager(options) {
 SlideManager.prototype = {
     'saveSlidesOrder': function() {
         var formData = new FormData();
-        formData.append('SlidesOrder[story_id]', this.options['story_id']);
-        formData.append('SlidesOrder[lesson_id]', this.options['lesson_id']);
+        formData.append('SlidesOrder[story_id]', this.storyId);
+        formData.append('SlidesOrder[lesson_id]', this.lessonId);
         this.$slidesList.find('[data-slide-id]').each(function(i) {
             formData.append('SlidesOrder[slides][' + i + ']', $(this).attr('data-slide-id'));
             formData.append('SlidesOrder[order][' + i + ']', (++i).toString());

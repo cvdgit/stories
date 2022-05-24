@@ -28,7 +28,8 @@ class SlidesOrder extends Model
     public function rules()
     {
         return [
-            [['story_id', 'lesson_id'], 'integer'],
+            [['story_id'], 'integer'],
+            ['lesson_id', 'safe'],
             ['story_id', 'exist', 'targetClass' => Story::class, 'targetAttribute' => ['story_id' => 'id']],
             ['slides', 'each', 'rule' => ['integer']],
             ['order', 'each', 'rule' => ['integer']],
@@ -41,7 +42,7 @@ class SlidesOrder extends Model
 
             $command = Yii::$app->db->createCommand();
             $i = 0;
-            if ($this->lesson_id !== null) {
+            if (!empty($this->lesson_id)) {
                 foreach ($this->slides as $slideID) {
                     $command->update('lesson_block', ['order' => $this->order[$i]], 'lesson_id = :lesson AND slide_id = :slide', [':lesson' => $this->lesson_id, ':slide' => $slideID]);
                     $command->execute();
@@ -49,6 +50,7 @@ class SlidesOrder extends Model
                 }
             }
             else {
+
                 foreach ($this->slides as $slideID) {
                     $command->update(StorySlide::tableName(), ['number' => $this->order[$i]], 'id = :id', [':id' => $slideID]);
                     $command->execute();
