@@ -35,7 +35,7 @@ use yii\helpers\Html;
 <?php
 $this->registerJs(<<<JS
 (function() {
-    
+
     function btnLoading(elem) {
         $(elem).attr("data-original-text", $(elem).html());
         $(elem).prop("disabled", true);
@@ -46,10 +46,11 @@ $this->registerJs(<<<JS
         $(elem).prop("disabled", false);
         $(elem).html($(elem).attr("data-original-text"));
     }
-    
+
     var doneCallback = function(response) {
         if (response && response.success) {
             toastr.success(response['message'] || 'Успешно');
+            ym(53566996,'reachGoal',' zayavka');
         }
         else {
             toastr.error(response['message'] || 'Неизвестная ошибка');
@@ -61,7 +62,7 @@ $this->registerJs(<<<JS
     var alwaysCallback = function() {
         $('#contact-request-modal').modal('hide');
     }
-    
+
     $('#contact-request-form')
         .on('beforeSubmit', function(e) {
             e.preventDefault();
