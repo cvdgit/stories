@@ -45,8 +45,9 @@ class ApiLessonModifier
             /** @var LessonForm $lessonModel */
             $lesson = null;
             if ($lessonModel->typeIsQuiz()) {
-                $lesson = $this->builder->createQuizLesson($lessonModel->uuid, $lessonModel->name, 'descr');
                 $quizBlockModel = $lessonModel->blocks[0];
+                $quizModel = StoryTest::findOne($quizBlockModel->quiz_id);
+                $lesson = $this->builder->createQuizLesson($lessonModel->uuid, $lessonModel->name, $quizModel->description_text);
                 /** @var LessonQuizForm $blockModel */
                 $this->builder->addQuizBlock($lesson, $quizBlockModel->quiz_id, $this->getQuizData($quizBlockModel->quiz_id));
             }

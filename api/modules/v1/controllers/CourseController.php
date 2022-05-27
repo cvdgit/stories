@@ -67,16 +67,10 @@ class CourseController extends Controller
         ];
     }
 
-    private function getQuizData(int $quizId): array
-    {
-        $quizModel = $this->findTestModel($quizId);
-        return $this->quizService->getQuizData($quizModel);
-    }
-
     /**
      * @throws NotFoundHttpException
      */
-    private function findTestModel(int $id): ?StoryTest
+    private function findTestModel(int $id): StoryTest
     {
         if (($model = StoryTest::findOne($id)) !== null) {
             return $model;
