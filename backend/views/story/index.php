@@ -61,12 +61,6 @@ $columns = [
     ],
     [
         'format' => 'raw',
-        'value' => static function($model) {
-            return Html::a('<span class="label label-info">Курс</span>', Yii::$app->params['study.url'] . '/guest-course/' . $model->id, ['target' => '_blank']);
-        }
-    ],
-    [
-        'format' => 'raw',
         'attribute' => 'mode',
         'value' => static function($model) {
             $mode = '';

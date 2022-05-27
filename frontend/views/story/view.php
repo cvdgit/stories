@@ -148,8 +148,7 @@ $isBookView = $storyDefaultView === 'book';
                 <div class="panel-body">
                     <?= $model->isPublished() ? '' : 'История не опубликована' ?>
                     <div class="pull-right">
-                        <?= Html::a('<span class="label label-info">Курс</span>', Yii::$app->params['study.url'] . '/guest-course/' . $model->id, ['target' => '_blank']) ?>
-                        | <?= Html::a('Изменить', Yii::$app->urlManagerBackend->createAbsoluteUrl(['story/update', 'id' => $model->id]), ['class' => 'btn-link']) ?>
+                        <?= Html::a('Изменить', Yii::$app->urlManagerBackend->createAbsoluteUrl(['story/update', 'id' => $model->id]), ['class' => 'btn-link']) ?>
                         | <?= Html::a('Редактор', Yii::$app->urlManagerBackend->createAbsoluteUrl(['editor/edit', 'id' => $model->id]), ['class' => 'btn-link']) ?>
                     </div>
                 </div>
