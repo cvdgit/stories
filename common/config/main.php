@@ -1,4 +1,8 @@
 <?php
+
+use yii\rbac\DbManager;
+use yii\caching\FileCache;
+
 return [
     'language' => 'ru',
     'sourceLanguage' => 'en',
@@ -8,13 +12,14 @@ return [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
     ],
-    'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
+    'vendorPath' => dirname(__DIR__, 2) . '/vendor',
     'components' => [
         'cache' => [
-            'class' => 'yii\caching\FileCache',
+            'class' => FileCache::class,
         ],
-         'authManager' => [
-            'class' => 'yii\rbac\DbManager',
+        'authManager' => [
+            'class' => DbManager::class,
+            'cache' => 'cache',
         ],
         'formatter' => [
             'dateFormat' => 'dd.MM.yyyy',
