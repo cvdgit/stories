@@ -3,7 +3,6 @@ use common\widgets\Reveal\Plugins\SlideLinks;
 use common\widgets\Reveal\Plugins\Video;
 use frontend\assets\PlyrAsset;
 use frontend\assets\RecorderAsset;
-use frontend\assets\SortableJsAsset;
 use frontend\widgets\FrontendRevealWidget;
 use yii\helpers\Json;
 use yii\helpers\Url;
@@ -73,8 +72,6 @@ echo FrontendRevealWidget::widget([
     'assets' => [
         PlyrAsset::class,
         RecorderAsset::class,
-        SortableJsAsset::class,
-        \frontend\assets\MaphilightAsset::class,
     ],
     'plugins' => $plugins,
 ]);

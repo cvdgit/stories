@@ -30,8 +30,8 @@ class PreviewRevealWidget extends RevealWidget
         $this->assets = [
             PlyrAsset::class,
             RecorderAsset::class,
-            SortableJsAsset::class,
-            MaphilightAsset::class,
+            //SortableJsAsset::class,
+            //MaphilightAsset::class,
         ];
         $this->plugins = [
             [

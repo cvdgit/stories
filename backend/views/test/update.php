@@ -1,4 +1,5 @@
 <?php
+use backend\assets\SortableJsAsset;
 use backend\assets\TestAsset;
 use yii\bootstrap\Dropdown;
 use yii\helpers\Html;
@@ -12,6 +13,7 @@ $this->params['breadcrumbs'] = [
     $this->title,
 ];
 TestAsset::register($this);
+SortableJsAsset::register($this);
 ?>
 <div class="story-test-update">
     <?php if ($model->isRemote() || $model->isTemplate()): ?>
