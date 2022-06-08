@@ -1010,8 +1010,8 @@ function WikidsStoryTest(el, options) {
                 $('<div/>')
                     .addClass('progress-bar progress-bar-info')
                     .css('width', progress + '%')
-                    .css('minWidth', '2em')
-                    .text(progressValue(progress))
+                    //.css('minWidth', '2em')
+                    //.text(progressValue(progress))
             )[0].outerHTML;
     }
 
@@ -1019,8 +1019,8 @@ function WikidsStoryTest(el, options) {
         var progress = testProgress.calcPercent();
         $('.wikids-progress', dom.header).attr('title', getCurrentProgressStateText()).tooltip('fixTitle');
         $('.wikids-progress .progress-bar', dom.header)
-            .css('width', progress + '%')
-            .text(progressValue(progress));
+            .css('width', progress + '%');
+            //.text(progressValue(progress));
     }
 
     function createQuestionName(question) {
