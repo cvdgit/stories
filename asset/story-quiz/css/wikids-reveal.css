@@ -222,6 +222,14 @@
   padding: 10px;
 }
 
+.wikids-test-answer:first-child {
+  margin-bottom: 0;
+}
+
+.wikids-test-answer:last-child {
+  margin-top: 0;
+}
+
 .wikids-test-answer:hover {
 	background-color: #eeeeee;
 }
