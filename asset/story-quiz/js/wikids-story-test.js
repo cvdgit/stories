@@ -21,6 +21,7 @@ import VoiceResponseInfo from "./components/VoiceResponseInfo";
 import TestSpeech from "./components/TestSpeech";
 import createSettings from "./components/Settings";
 import {createStar, createStarFill} from "./components/stars";
+import createDescription from "./components/description";
 
 
 var plugins = [];
@@ -421,12 +422,10 @@ function WikidsStoryTest(el, options) {
         var $rowWrapper = $('<div/>', {'class': 'row-wrapper'});
 
         if (testResponse.test.description.length) {
-            var $row = $('<div/>', {'class': 'row'})
-                .append(
-                    $('<div/>', {'class': 'col-md-8 col-md-offset-2'})
-                        .append($('<p/>', {'class': 'wikids-test-description'}).html(testResponse.test.description))
-                );
-            $rowWrapper.append($row);
+          const description = $('<div/>', {class: 'question-description__wrap'}).append(
+            createDescription(testResponse.test.description)
+          );
+          $rowWrapper.append(description);
         }
 
         return $('<div/>')
@@ -482,12 +481,14 @@ function WikidsStoryTest(el, options) {
 
         $col.append($beginButton);
 
-        return $('<div/>')
-            .addClass('wikids-test-begin-page row row-no-gutters')
+        return $('<div/>', {class: 'wikids-test-begin-page row row-no-gutters'})
             .append($('<h3/>').text(testResponse.test.header))
             .append($col)
-            .append($('<div/>').addClass('col-md-6')
-                .append($('<p/>').addClass('wikids-test-description').html(testResponse.test.description)));
+            .append(
+              $('<div/>', {class: 'col-md-6'}).append(
+                createDescription(testResponse.test.description)
+              )
+            );
     }
 
     function createErrorPage() {
@@ -1023,100 +1024,115 @@ function WikidsStoryTest(el, options) {
             //.text(progressValue(progress));
     }
 
-    function createQuestionName(question) {
+  function createQuestionName(question) {
 
-        var questionName = question.name;
+    var questionName = question.name;
 
-        var createQuestionHint = function(name, hint) {
-            hint = hint || '';
-            if (!hint.length) {
-                return name;
-            }
-            if (name.length) {
-                return name + ' (подсказка: ' + hint + ')';
-            }
-            return 'Подсказка: ' + hint;
-        };
+    var createQuestionHint = function(name, hint) {
+      hint = hint || '';
+      if (!hint.length) {
+        return name;
+      }
+      if (name.length) {
+        return name + ' (подсказка: ' + hint + ')';
+      }
+      return 'Подсказка: ' + hint;
+    };
+    questionName = createQuestionHint(questionName, question['hint']);
 
-        questionName = createQuestionHint(questionName, question['hint']);
-
-        var correctNum = parseInt(question.correct_number);
-        if (question['correct_number'] && correctNum > 1) {
-            questionName += ' (верных ответов: ' + correctNum + ')';
-        }
-
-        if (testConfig.answerTypeIsMissingWords(question)) {
-            questionName = 'Заполните пропущенные части';
-        }
-
-        if (questionViewSequence(question)) {
-            questionName = question.name;
-        }
-
-        if (testConfig.hideQuestionName()) {
-            questionName = '';
-            return createQuestionHint(questionName, question['hint']);
-        }
-
-        return questionName;
+    var correctNum = parseInt(question.correct_number);
+    if (question['correct_number'] && correctNum > 1) {
+      questionName += ' (верных: ' + correctNum + ')';
     }
 
-    function createQuestion(question) {
-
-        var questionName = createQuestionName(question);
-
-        if (testConfig.answerTypeIsInput(question) && questionName === '') {
-          questionName = 'Введите текст';
-        }
-
-        var titleElement = $('<p/>')
-            .addClass('question-title')
-            .append(questionName);
-
-        if (testConfig.answerTypeIsDefault() && testConfig.isAskQuestion()) {
-            $('<span/>', {'css': {'line-height': '3.5rem', 'margin-left': '10px', 'color': '#000', 'cursor': 'pointer'}, 'title': 'Прослушать'})
-                .on('click', function() {
-                    var $this = $(this);
-                    if ($this.data('process')) {
-                        return false;
-                    }
-                    $this.data('process', true);
-                    var text = question.name;
-                    var i = $(this).find('i');
-                    i.removeClass('glyphicon-volume-up').addClass('glyphicon-option-horizontal');
-
-                    var onSpeechEnd = function() {
-                        i.removeClass('glyphicon-option-horizontal').addClass('glyphicon-volume-up');
-                        $this.data('process', false);
-                    }
-
-                    if (haveAudioFile(question)) {
-                        setTimeout(function () {
-                            playAudio(getAudioFile(question), onSpeechEnd);
-                        }, 500);
-                    }
-                    else {
-                        setTimeout(function () {
-                            speech.readText(text, testConfig.getAskQuestionLang(), onSpeechEnd);
-                        }, 500);
-                    }
-                })
-                .append($('<i/>', {'class': 'glyphicon glyphicon-volume-up'}))
-                .appendTo(titleElement);
-        }
-
-        var stars = '';
-        if (question['stars']) {
-            stars = createStars(question.id, question.stars, question['haveSlides']);
-        }
-        return $("<div/>")
-            .hide()
-            .addClass("wikids-test-question")
-            .append(stars)
-            .append(titleElement)
-            .attr("data-question-id", question.id)
-            .data("question", question);
+    if (testConfig.answerTypeIsMissingWords(question)) {
+      questionName = 'Заполните пропущенные части';
     }
+
+    if (testConfig.answerTypeIsInput(question)) {
+      questionName = 'Введите текст';
+    }
+
+    if (questionViewSequence(question)) {
+      questionName = question.name;
+    }
+
+    if (testConfig.hideQuestionName()) {
+      questionName = '';
+      return createQuestionHint(questionName, question['hint']);
+    }
+
+    return questionName;
+  }
+
+  function createQuestion(question) {
+
+    const titleElement = $('<p/>', {class: 'question-title'});
+
+    if (testConfig.answerTypeIsDefault() && testConfig.isAskQuestion()) {
+      $('<span/>', {
+        'css': {'line-height': '3.5rem', 'margin-left': '10px', 'color': '#000', 'cursor': 'pointer'},
+        'title': 'Прослушать'
+      })
+        .on('click', function () {
+          var $this = $(this);
+          if ($this.data('process')) {
+            return false;
+          }
+          $this.data('process', true);
+          var text = question.name;
+          var i = $(this).find('i');
+          i.removeClass('glyphicon-volume-up').addClass('glyphicon-option-horizontal');
+
+          var onSpeechEnd = function () {
+            i.removeClass('glyphicon-option-horizontal').addClass('glyphicon-volume-up');
+            $this.data('process', false);
+          }
+
+          if (haveAudioFile(question)) {
+            setTimeout(function () {
+              playAudio(getAudioFile(question), onSpeechEnd);
+            }, 500);
+          } else {
+            setTimeout(function () {
+              speech.readText(text, testConfig.getAskQuestionLang(), onSpeechEnd);
+            }, 500);
+          }
+        })
+        .append($('<i/>', {'class': 'glyphicon glyphicon-volume-up'}))
+        .appendTo(titleElement);
+    } else {
+      const questionName = createQuestionName(question);
+      if (questionName.length === 0) {
+        titleElement.hide();
+      }
+      titleElement.append(questionName);
+    }
+
+    var stars = '';
+    if (question['stars']) {
+      stars = createStars(question.id, question.stars, question['haveSlides']);
+    }
+
+    const questionWrap = $('<div/>')
+      .addClass("wikids-test-question")
+      .hide()
+      .attr("data-question-id", question.id)
+      .data("question", question);
+
+    questionWrap.append(stars);
+    questionWrap.append(titleElement);
+
+    if (testConfig.showDescriptionInQuestions() && testConfig.getDescription().length) {
+      questionWrap.append(
+        $('<div/>', {class: 'question-description__wrap'}).append(
+          createDescription(testConfig.getDescription())
+        )
+      );
+    }
+
+    return questionWrap;
+  }
 
     function createQuestions(questions) {
         var $questions = $("<div/>").addClass("wikids-test-questions");

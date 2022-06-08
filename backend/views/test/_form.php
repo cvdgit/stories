@@ -30,6 +30,7 @@ $opt = new TestTypeOptions($model->answer_type);
     }
     echo $descriptionField;
     ?>
+    <?= $form->field($model, 'show_descr_in_questions')->checkbox() ?>
     <?= $form->field($model, 'created_by')->dropDownList(User::getUserList(),
         ['prompt' => 'Выбрать', 'disabled' => !Yii::$app->user->can('admin')]) ?>
     <?= $form->field($model, 'incorrect_answer_text')->textInput(['maxlength' => true]) ?>

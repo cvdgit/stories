@@ -68,7 +68,9 @@ const TestConfig = function (data) {
     },
     'isVoiceResponse': function () {
       return data.voiceResponse;
-    }
+    },
+    getDescription: () => data.description,
+    showDescriptionInQuestions: () => data.showDescriptionInQuestions
   }
 }
 

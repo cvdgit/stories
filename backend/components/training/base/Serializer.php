@@ -3,6 +3,7 @@
 namespace backend\components\training\base;
 
 use common\models\StoryTest;
+use yii\helpers\HtmlPurifier;
 
 class Serializer
 {
@@ -19,6 +20,7 @@ class Serializer
                 'storyTestQuestions' => $collection->serialize($test->isShuffleQuestions()),
                 'test' => [
                     'id' => $test->id,
+                    'description' => HtmlPurifier::process(nl2br($test->description_text)),
                     'progress' => [
                         'total' => $collection->getTotal() * ($fastMode ? 1 : $test->repeat),
                         'current' => $userStarsCount,
@@ -39,6 +41,7 @@ class Serializer
                     'repeatQuestions' => $fastMode ? 1 : $test->repeat,
                     'sayCorrectAnswer' => filter_var($test->say_correct_answer, FILTER_VALIDATE_BOOLEAN),
                     'voiceResponse' => filter_var($test->voice_response, FILTER_VALIDATE_BOOLEAN),
+                    'showDescriptionInQuestions' => filter_var($test->show_descr_in_questions, FILTER_VALIDATE_BOOLEAN),
                 ],
                 'students' => $students,
                 'stories' => $stories,

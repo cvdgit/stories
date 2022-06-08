@@ -1450,3 +1450,36 @@ p.wikids-test-description {
 .quiz-settings .dropdown-toggle {
   display: block;
 }
+
+.question-description {
+  position: relative;
+}
+
+.question-description__wrap {
+  margin-left: 10%;
+  margin-right: 10%;
+  margin-bottom: 25px;
+}
+
+.question-description__inner {
+  padding-left: 25px;
+}
+
+.question-description__inner:before {
+  background: #99cd50;
+  border-radius: 4px 0 0 4px;
+  bottom: 0;
+  content: "";
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 4px;
+}
+
+.question-description__text {
+  font-size: 17px;
+  font-weight: 400!important;
+  line-height: 1.8;
+  margin: 0;
+  text-align: left;
+}
