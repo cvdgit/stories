@@ -14,6 +14,7 @@ use common\models\UserQuestionHistoryModel;
 use linslin\yii2\curl\Curl;
 use Yii;
 use yii\db\Query;
+use yii\helpers\HtmlPurifier;
 use yii\helpers\Json;
 use yii\rest\Controller;
 use yii\web\HttpException;
@@ -32,7 +33,7 @@ class QuestionController extends Controller
         return [
             'test' => [
                 'header' => $test->header,
-                'description' => $test->description_text,
+                'description' => HTMLPurifier::process(nl2br($test->description_text)),
                 'remote' => $test->isRemote(),
             ],
             'students' => UserHelper::getUserStudents($test, $user),
