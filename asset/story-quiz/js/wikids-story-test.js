@@ -1049,10 +1049,6 @@ function WikidsStoryTest(el, options) {
       questionName = 'Заполните пропущенные части';
     }
 
-    if (testConfig.answerTypeIsInput(question)) {
-      questionName = 'Введите текст';
-    }
-
     if (questionViewSequence(question)) {
       questionName = question.name;
     }
@@ -1102,7 +1098,10 @@ function WikidsStoryTest(el, options) {
         .append($('<i/>', {'class': 'glyphicon glyphicon-volume-up'}))
         .appendTo(titleElement);
     } else {
-      const questionName = createQuestionName(question);
+      let questionName = createQuestionName(question);
+      if (testConfig.answerTypeIsInput(question) && questionName === '') {
+        questionName = 'Введите текст';
+      }
       if (questionName.length === 0) {
         titleElement.hide();
       }
