@@ -16,9 +16,10 @@ abstract class AbstractTest extends Block
 
     public function generate()
     {
-        $test = StoryTest::findModel($this->getTestID());
-        $this->header = $test->header;
-        $this->description = $test->description_text;
+        if (($test = StoryTest::findOne($this->getTestID())) !== null) {
+            $this->header = $test->header;
+            $this->description = $test->description_text;
+        }
     }
 
     public function isInlineTest()
