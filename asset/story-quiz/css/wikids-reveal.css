@@ -217,6 +217,9 @@
 	margin: 10px;
 	cursor: pointer;
 	display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 10px;
 }
 
 .wikids-test-answer:hover {
@@ -272,6 +275,7 @@
 	-webkit-transform: scale(1.5);
 	-o-transform: scale(1.5);
 	transform: scale(1.5);
+  margin-top: 6px;
 }
 
 .wikids-test-results h2 {
