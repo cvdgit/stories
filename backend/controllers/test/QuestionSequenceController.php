@@ -7,6 +7,7 @@ use backend\models\AnswerImageUploadForm;
 use backend\models\question\sequence\CreateSequenceQuestion;
 use backend\models\question\sequence\SequenceAnswerForm;
 use backend\models\question\sequence\UpdateSequenceQuestion;
+use backend\services\SequenceAnswerService;
 use common\models\StoryTest;
 use common\models\StoryTestAnswer;
 use common\models\StoryTestQuestion;
@@ -22,10 +23,12 @@ class QuestionSequenceController extends BaseController
 {
 
     private $transactionManager;
+    private $sequenceAnswerService;
 
-    public function __construct($id, $module, TransactionManager $transactionManager, $config = [])
+    public function __construct($id, $module, TransactionManager $transactionManager, SequenceAnswerService $sequenceAnswerService, $config = [])
     {
         $this->transactionManager = $transactionManager;
+        $this->sequenceAnswerService = $sequenceAnswerService;
         parent::__construct($id, $module, $config);
     }
 
@@ -86,10 +89,12 @@ class QuestionSequenceController extends BaseController
             }
             return $this->refresh();
         }
+        $createAnswerForm = new SequenceAnswerForm();
         return $this->render('update', [
             'model' => $form,
             'testModel' => $model->storyTest,
             'errorText' => $model->getAnswersErrorText(),
+            'createAnswerModel' => $createAnswerForm,
         ]);
     }
 
@@ -122,16 +127,28 @@ class QuestionSequenceController extends BaseController
     public function actionCreateAnswer(int $question_id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
+
         /** @var StoryTestQuestion $questionModel */
         $questionModel = $this->findModel(StoryTestQuestion::class, $question_id);
+
         $answerModel = new SequenceAnswerForm();
-        if ($answerModel->load(Yii::$app->request->post())) {
-            $answerModel->createAnswer($questionModel->id);
-            return [
-                'success' => true,
-                'html' => $this->renderPartial('_answer_item', ['answerModel' => $answerModel]),
-                'answer_id' => $answerModel->id,
-            ];
+        if ($this->request->isPost && $answerModel->load($this->request->post())) {
+            try {
+                $models = $this->sequenceAnswerService->create($questionModel->id, $answerModel);
+                $answers = array_map(function($model) {
+                    return [
+                        'html' => $this->renderPartial('_answer_item', ['answerModel' => $model]),
+                        'answer_id' => $model->id,
+                    ];
+                }, $models);
+                return [
+                    'success' => true,
+                    'answers' => $answers,
+                ];
+            }
+            catch (\Exception $ex) {
+                return ['success' => false, 'message' => $ex->getMessage()];
+            }
         }
         return ['success' => false];
     }

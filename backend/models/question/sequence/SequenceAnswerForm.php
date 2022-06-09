@@ -13,19 +13,21 @@ class SequenceAnswerForm extends Model
     public $name;
     public $order;
     public $imagePath;
+    public $type;
 
-    public function rules()
+    public function rules(): array
     {
         return [
             ['name', 'required'],
             ['name', 'string', 'max' => 50],
+            ['type', 'in', 'range' => ['full', 'words']],
         ];
     }
 
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
-            'name' => 'Ответ',
+            'name' => 'Добавить новый ответ',
         ];
     }
 
@@ -53,5 +55,15 @@ class SequenceAnswerForm extends Model
         $model->save();
 
         $this->id = $model->id;
+    }
+
+    public function typeIsFull(): bool
+    {
+        return $this->type === 'full';
+    }
+
+    public function typeIsWords(): bool
+    {
+        return $this->type === 'words';
     }
 }

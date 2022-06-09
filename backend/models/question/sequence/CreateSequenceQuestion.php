@@ -28,7 +28,7 @@ class CreateSequenceQuestion extends SequenceQuestion
         if (!$this->validate()) {
             throw new DomainException('Model is not valid');
         }
-        $model = StoryTestQuestion::createSequence($this->story_test_id, $this->name, $this->order);
+        $model = StoryTestQuestion::createSequence($this->story_test_id, $this->name, $this->order, $this->sort_view);
         $model->save();
         return $model->id;
     }

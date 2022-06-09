@@ -1,16 +1,14 @@
 <?php
-use backend\assets\DmFileUploaderAsset;
-use backend\assets\SortableJsAsset;
-use backend\models\question\QuestionType;
 use backend\models\question\sequence\SequenceAnswerForm;
+use backend\models\question\sequence\UpdateSequenceQuestion;
 use backend\widgets\QuestionManageWidget;
-use backend\widgets\QuestionSlidesWidget;
-use yii\helpers\Html;
-use yii\widgets\ActiveForm;
-/* @var $this yii\web\View */
-/* @var $model backend\models\question\sequence\UpdateSequenceQuestion */
-/* @var $testModel common\models\StoryTest */
-/** @var $errorText string */
+use common\models\StoryTest;
+use yii\web\View;
+/** @var View $this */
+/** @var UpdateSequenceQuestion $model */
+/** @var StoryTest $testModel */
+/** @var string $errorText */
+/** @var SequenceAnswerForm $createAnswerModel */
 $this->title = 'Изменить вопрос';
 $this->params['breadcrumbs'] = [
     ['label' => 'Все тесты', 'url' => ['test/index', 'source' => $testModel->source]],
@@ -21,5 +19,5 @@ $this->params['breadcrumbs'] = [
 <?= QuestionManageWidget::widget([
     'quizModel' => $testModel,
     'currentModelId' => $model->getModel()->id,
-    'renderData' => $this->render('_form_update', ['model' => $model]),
+    'renderData' => $this->render('_form_update', ['model' => $model, 'createAnswerModel' => $createAnswerModel]),
 ]) ?>
