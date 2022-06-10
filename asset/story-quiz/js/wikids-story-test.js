@@ -1930,6 +1930,16 @@ function WikidsStoryTest(el, options) {
 
     currentQuestionElement = $('.wikids-test-question[data-question-id=' + nextQuestionObj.id + ']', dom.questions);
 
+    currentQuestionElement
+      .find('input[type=checkbox],input[type=radio]')
+      .prop('checked', false);
+
+    currentQuestionElement
+      .addClass('wikids-test-active-question')
+      .fadeIn();
+
+    dom.questions.fadeIn();
+
     if (isShuffleAnswers(currentQuestion) && !questionViewSequence(currentQuestion)) {
       $('.wikids-test-answers', currentQuestionElement)
         .empty()
@@ -2118,16 +2128,6 @@ function WikidsStoryTest(el, options) {
         dom.wrapper.append(elem);
       }
     }
-
-    currentQuestionElement
-      .find('input[type=checkbox],input[type=radio]')
-      .prop('checked', false);
-
-    currentQuestionElement
-      .addClass('wikids-test-active-question')
-      .fadeIn();
-
-    dom.questions.fadeIn();
   }
 
     function sayQuestionName() {
