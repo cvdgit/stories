@@ -19,7 +19,7 @@ class SequenceAnswerForm extends Model
     {
         return [
             ['name', 'required'],
-            ['name', 'string', 'max' => 50],
+            ['name', 'string', 'max' => 255],
             ['type', 'in', 'range' => ['full', 'words']],
         ];
     }

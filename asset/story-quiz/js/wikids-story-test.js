@@ -498,10 +498,10 @@ function WikidsStoryTest(el, options) {
     }
 
     function correctAnswerPageNext() {
-        dom.correctAnswerPage.hide();
-        showNextQuestion();
-        dom.results.hide();
-        showNextButton();
+      dom.correctAnswerPage.hide();
+      dom.results.hide();
+      showNextQuestion();
+      showNextButton();
     }
 
     function createCorrectAnswerPage() {
@@ -1598,6 +1598,12 @@ function WikidsStoryTest(el, options) {
 
     function showQuestionSuccessPage(answer) {
 
+      dom.questions.hide();
+      dom.controls.hide();
+      if (!dom.wrapper.hasClass('wikids-test--no-controls')) {
+        dom.wrapper.addClass('wikids-test--no-controls');
+      }
+
         var text = currentQuestion.name;
         if (testConfig.answerTypeIsInput(currentQuestion)) {
             text = answer[0];
@@ -1849,37 +1855,34 @@ function WikidsStoryTest(el, options) {
         }
 
         $activeQuestion
-            .slideUp()
             .hide()
             .removeClass('wikids-test-active-question');
 
-        dom.nextButton.hide();
-
-        if (!answerIsCorrect) {
-            if (testConfig.sourceIsWord()
-                && !testConfig.answerTypeIsNumPad(currentQuestion)
-                && !testConfig.answerTypeIsInput(currentQuestion)
-                && !testConfig.answerTypeIsMissingWords(currentQuestion)) {
-                continueTestAction(answer);
-            }
-            else {
-                dom.results
-                    .html("<p>Ответ не верный.</p>")
-                    .show()
-                    .delay(1000)
-                    .fadeOut('slow', function () {
-                        continueTestAction(answer);
-                    });
-            }
+      if (!answerIsCorrect) {
+        dom.questions.hide();
+        dom.controls.hide();
+        dom.wrapper.addClass('wikids-test--no-controls');
+        if (testConfig.sourceIsWord()
+          && !testConfig.answerTypeIsNumPad(currentQuestion)
+          && !testConfig.answerTypeIsInput(currentQuestion)
+          && !testConfig.answerTypeIsMissingWords(currentQuestion)) {
+          continueTestAction(answer);
+        } else {
+          dom.results
+            .html("<p>Ответ не верный.</p>")
+            .show()
+            .delay(1000)
+            .fadeOut('slow', function () {
+              continueTestAction(answer);
+            });
         }
-        else {
-            if (done && !that.options.fastMode && getQuestionRepeat() > 1) {
-                showQuestionSuccessPage(answer);
-            }
-            else {
-                continueTestAction(answer);
-            }
+      } else {
+        if (done && !that.options.fastMode && getQuestionRepeat() > 1) {
+          showQuestionSuccessPage(answer);
+        } else {
+          continueTestAction(answer);
         }
+      }
     }
 
     function isShuffleAnswers(q) {
@@ -1961,15 +1964,6 @@ function WikidsStoryTest(el, options) {
       });
     }
 
-    currentQuestionElement
-      .find('input[type=checkbox],input[type=radio]').prop('checked', false).end()
-      .slideDown()
-      .addClass('wikids-test-active-question');
-
-    if (testConfig.sourceIsWord()) {
-      dom.nextButton.hide();
-    }
-
     if (testConfig.answerTypeIsInput(currentQuestion)) {
 
       if (testConfig.isSayCorrectAnswer()) {
@@ -2031,15 +2025,12 @@ function WikidsStoryTest(el, options) {
           var state = $(this).data('state');
           var $that = $(this);
           if (!state) {
-
             setTimeout(function () {
-
               that.voiceResponse.start(new Event('voiceResponseStart'), function () {
                 $that.data('state', 'recording');
                 $that.addClass('recording');
                 $that.before('<div class="pulse-ring"></div>');
               });
-
             }, 500);
           } else {
 
@@ -2127,6 +2118,16 @@ function WikidsStoryTest(el, options) {
         dom.wrapper.append(elem);
       }
     }
+
+    currentQuestionElement
+      .find('input[type=checkbox],input[type=radio]')
+      .prop('checked', false);
+
+    currentQuestionElement
+      .addClass('wikids-test-active-question')
+      .fadeIn();
+
+    dom.questions.fadeIn();
   }
 
     function sayQuestionName() {
@@ -2179,8 +2180,9 @@ function WikidsStoryTest(el, options) {
 
     function showCorrectAnswerPage(question, answer) {
         console.debug('WikidsStoryTest.showCorrectAnswerPage');
-        var $elements = $('<div/>');
 
+
+        var $elements = $('<div/>');
         var text = incorrectAnswerText || 'Правильный ответ';
         text = text.replace('{1}', question.entity_name);
         $elements.append($('<h4/>').text(text + ':'));
@@ -2401,9 +2403,15 @@ function WikidsStoryTest(el, options) {
             dom.correctAnswerPage.find('.correct-answer-page-next').hide();
         }
 
+        //dom.questions.hide();
+        //dom.controls.hide();
+        //dom.wrapper.addClass('wikids-test--no-controls');
         dom.correctAnswerPage
-            .find('.wikids-test-correct-answer-answers').empty().html($elements[0].childNodes).end()
-            .show();
+          .find('.wikids-test-correct-answer-answers')
+          .empty()
+          .html($elements[0].childNodes)
+          .end()
+          .show();
 
         if (testConfig.answerTypeIsRecording()) {
             setTimeout(function() {
@@ -2413,13 +2421,20 @@ function WikidsStoryTest(el, options) {
     }
 
     function showNextButton() {
-        if (!testConfig.sourceIsWord()
-            && !questionViewDefault(currentQuestion)
-            && !questionViewSvg(currentQuestion)
-            && !questionViewRegion(currentQuestion)
-            && !testConfig.sourceIsNeo()) {
-            dom.nextButton.show();
-        }
+      console.debug('showNextButton');
+
+      dom.wrapper.addClass('wikids-test--no-controls');
+      dom.controls.hide();
+
+      if (!testConfig.sourceIsWord()
+        && !questionViewDefault(currentQuestion)
+        && !questionViewSvg(currentQuestion)
+        && !questionViewRegion(currentQuestion)
+        && !testConfig.sourceIsNeo()) {
+        dom.wrapper.removeClass('wikids-test--no-controls');
+        dom.controls.show();
+        dom.nextButton.show();
+      }
     }
 
     function hideNextButton() {
@@ -2430,6 +2445,7 @@ function WikidsStoryTest(el, options) {
         console.debug('continueTestAction');
 
         dom.continueButton.hide();
+
         var isLastQuestion = (testQuestions.length === 0);
         // var actionRelated = incorrectAnswerActionRelated();
         var showCorrectAnswerPageCondition = testConfig.sourceIsWord()
