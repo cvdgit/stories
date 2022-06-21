@@ -1174,6 +1174,10 @@ section h3.header-h3 {
   margin-bottom: 8px;
 }
 
+.comment-body {
+  word-break: break-word;
+}
+
 .comment-header span {
   font-weight: 300;
   font-size: 1.4rem;
