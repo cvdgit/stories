@@ -30,7 +30,7 @@ $plugins = [
     [
         'class' => \common\widgets\Reveal\Plugins\CustomControls::class,
         'buttons' => [
-            new \common\widgets\RevealButtons\RecorderButton(),
+            //new \common\widgets\RevealButtons\RecorderButton(),
             new \common\widgets\RevealButtons\LeftButton(),
             new \common\widgets\RevealButtons\RightButton(),
             new \common\widgets\RevealButtons\FullscreenButton(),
@@ -46,7 +46,7 @@ $plugins = [
     ['class' => Video::class, 'showControls' => \common\rbac\UserRoles::isModerator(Yii::$app->user->id)],
     ['class' => \common\widgets\Reveal\Plugins\Actions::class],
     ['class' => \common\widgets\Reveal\Plugins\SeeAlso::class, 'storyID' => $model->id, 'isPlaylist' => ($playlistID !== null)],
-    ['class' => \common\widgets\Reveal\Plugins\Recorder::class, 'story' => $model],
+    //['class' => \common\widgets\Reveal\Plugins\Recorder::class, 'story' => $model],
     ['class' => \common\widgets\Reveal\Plugins\SlideState::class, 'storyID' => $model->id],
     ['class' => \common\widgets\Reveal\Plugins\SlideLinksView::class],
 ];
