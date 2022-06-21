@@ -8,7 +8,7 @@ use yii\web\View;
 /* @var ActiveDataProvider $dataProvider */
 $this->title = 'Комментарии';
 $this->registerCss(<<<CSS
-.grid-row {
+.grid-col {
     word-break: break-word;
 }
 CSS
@@ -38,6 +38,7 @@ CSS
             'enableSorting' => false,
             'attribute' => 'body',
             'filter' => 'ntext',
+            'contentOptions' => ['class' => 'grid-col'],
         ],
         'created_at:datetime',
         [
