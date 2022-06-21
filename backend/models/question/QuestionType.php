@@ -17,6 +17,8 @@ class QuestionType
     public const ANSWER_RECORDING = 6;
     public const ANSWER_MISSING_WORDS = 7;
 
+    public const PASS_TEST = 8;
+
     private $type;
 
     public function __construct(int $type)
@@ -39,6 +41,7 @@ class QuestionType
             self::ANSWER_INPUT => 'Поле для ввода',
             self::ANSWER_RECORDING => 'Запись с микрофона',
             self::ANSWER_MISSING_WORDS => 'Пропущенные слова',
+            self::PASS_TEST => 'Тест с пропусками',
         ];
     }
 
@@ -65,5 +68,10 @@ class QuestionType
     public function getTypeName(): string
     {
         return self::asArray()[$this->type];
+    }
+
+    public function isPassTest(): bool
+    {
+        return $this->type === self::PASS_TEST;
     }
 }

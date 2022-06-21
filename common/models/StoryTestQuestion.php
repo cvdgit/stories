@@ -230,6 +230,11 @@ class StoryTestQuestion extends ActiveRecord
         return (new QuestionType($this->type))->isSequence();
     }
 
+    public function typeIsPassTest(): bool
+    {
+        return (new QuestionType($this->type))->isPassTest();
+    }
+
     public function deleteRegionImages(): void
     {
         if (!empty($this->image)) {
@@ -393,5 +398,18 @@ class StoryTestQuestion extends ActiveRecord
     public static function getCreateSequenceQuestionRoute(int $quizId): array
     {
         return ['test/question-sequence/create', 'test_id' => $quizId];
+    }
+
+    public function getQuestionUpdateRoute(): ?array
+    {
+        if ($this->isNewRecord) {
+            return null;
+        }
+        $updateQuestionMap = [
+            QuestionType::REGION => ['question/update', 'id' => $this->id],
+            QuestionType::SEQUENCE => ['test/question-sequence/update', 'id' => $this->id],
+            QuestionType::PASS_TEST => ['test/pass-test/update', 'id' => $this->id],
+        ];
+        return $updateQuestionMap[$this->type] ?? null;
     }
 }

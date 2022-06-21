@@ -114,7 +114,7 @@ class Answer
         return $this->description;
     }
 
-    public function setDescription(string $description): void
+    public function setDescription($description): void
     {
         $this->description = $description;
     }

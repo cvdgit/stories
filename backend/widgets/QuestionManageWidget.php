@@ -12,6 +12,8 @@ class QuestionManageWidget extends BaseQuizManageWidget
     /** @var StoryTest */
     public $quizModel;
 
+    public $isCreate = false;
+
     public function init()
     {
         $this->createItemTitle = 'Новый вопрос';
@@ -28,6 +30,7 @@ class QuestionManageWidget extends BaseQuizManageWidget
             'items' => $this->makeNavItems(),
             'renderData' => $this->renderData,
             'createItems' => $this->getCreateQuestionItems(),
+            'isCreate' => $this->isCreate,
         ]);
     }
 

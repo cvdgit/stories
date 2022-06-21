@@ -21,6 +21,7 @@ use yii\helpers\Url;
                         <li><?= Html::a('По умолчанию', ['test/create-question', 'test_id' => $model->id]) ?></li>
                         <li><?= Html::a('Выбор области', ['question/create', 'test_id' => $model->id, 'type' => QuestionType::REGION]) ?></li>
                         <li><?= Html::a('Последовательность', ['test/question-sequence/create', 'test_id' => $model->id]) ?></li>
+                        <li><?= Html::a('Тест с пропусками', ['test/pass-test/create', 'test_id' => $model->id]) ?></li>
                     </ul>
                 </div>
                 <?php endif ?>

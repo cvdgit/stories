@@ -167,11 +167,8 @@ class TestController extends Controller
             throw new NotFoundHttpException('Question not found');
         }
 
-        if ($question->typeIsRegion()) {
-            return $this->redirect(['question/update', 'id' => $question->id]);
-        }
-        if ($question->typeIsSequence()) {
-            return $this->redirect(['test/question-sequence/update', 'id' => $question->id]);
+        if (($route = $question->getQuestionUpdateRoute()) !== null) {
+            return $this->redirect($route);
         }
 
         $model = new UpdateQuestion($question);

@@ -852,6 +852,10 @@ p.wikids-test-description {
   max-width: 900px;
 }
 
+.seq-question__wrap--full {
+  height: 100%;
+}
+
 .sequence-question-list {
   text-align: center;
 }
@@ -1513,4 +1517,82 @@ p.wikids-test-description {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.pass-test-btn {
+  min-width: 100px;
+  min-height: 34px;
+
+  color: #333;
+  background-color: #fff;
+
+  display: inline-block;
+  margin-bottom: 0;
+  font-weight: normal;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  background-image: none;
+  border: 1px solid #ccc;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  border-radius: 4px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.pass-test-btn:hover {
+  color: #333;
+  background-color: #e6e6e6;
+  border-color: #adadad;
+}
+
+.pass-test-question .seq-answers {
+  max-width: none !important;
+}
+
+.pass-test-question__wrap {
+  line-height: 2;
+  font-size: 24px;
+}
+
+.pass-test-question__wrap .highlight {
+  display: inline-block;
+  width: auto;
+  max-width: 200px;
+}
+
+.custom-select {
+  transition: background-color .15s ease-in-out,
+              border-color .15s ease-in-out,
+              box-shadow .15s ease-in-out;
+  display: inline-block;
+  height: calc(1.5em + 14px);
+  padding: 6px 28px 6px 12px;
+  font-weight: 400;
+  font-size: inherit;
+  line-height: 1.5;
+  color: #495057;
+  vertical-align: middle;
+  background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") right 0.75rem center/8px 10px no-repeat;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  word-wrap: normal;
+  text-transform: none;
+}
+
+.custom-select:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgb(0 123 255 / 25%);
 }

@@ -105,6 +105,7 @@ $css = <<< CSS
 }
 .modal-fullscreen .story-container {
     background-color: #fff;
+    padding: 0;
 }
 CSS;
 $this->registerCss($css);

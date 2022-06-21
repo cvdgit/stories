@@ -4,6 +4,7 @@ namespace backend\components\training\collection;
 
 use backend\components\training\base\BaseQuestion;
 use backend\components\training\collection\build\Base;
+use backend\components\training\collection\build\PassTest;
 use backend\components\training\collection\build\Region;
 use backend\components\training\collection\build\Sequence;
 use common\models\StoryTest;
@@ -28,6 +29,9 @@ class TestCollection extends BaseCollection
         }
         else if ($questionData->typeIsSequence()) {
             $question = (new Sequence($questionData, $stars))->build();
+        }
+        else if ($questionData->typeIsPassTest()) {
+            $question = (new PassTest($questionData, $stars))->build();
         }
         else {
             $question = (new Base($questionData, $stars, $this->testModel))->build();

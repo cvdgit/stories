@@ -28,6 +28,7 @@ use yii\helpers\FileHelper;
 class StoryTestAnswer extends ActiveRecord
 {
 
+    public const INCORRECT_ANSWER = 0;
     public const CORRECT_ANSWER = 1;
     public const HIDDEN = 1;
 

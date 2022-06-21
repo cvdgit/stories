@@ -4,11 +4,13 @@ use yii\bootstrap\Html;
 /** @var array $items */
 /** @var string $renderData */
 /** @var array $createItems */
+/** @var bool $isCreate */
 ?>
 <div class="question-manage" style="height: 100%">
     <div class="row">
         <div class="col-lg-3">
             <div style="background-color: #f8f9fa; box-shadow: inset -1px 0 0 rgb(0 0 0 / 10%); padding: 10px; height: 100%">
+                <?php if (!$isCreate): ?>
                 <div style="margin-bottom: 20px">
                     <div class="btn-group btn-block">
                         <div class="dropdown">
@@ -21,6 +23,7 @@ use yii\bootstrap\Html;
                         </div>
                     </div>
                 </div>
+                <?php endif ?>
                 <h4>Список вопросов</h4>
                 <?= Nav::widget([
                     'options' => ['class' => 'nav-sidebar nav-sidebar--question'],
