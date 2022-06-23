@@ -400,6 +400,11 @@ class StoryTestQuestion extends ActiveRecord
         return ['test/question-sequence/create', 'test_id' => $quizId];
     }
 
+    public static function getCreatePassTestQuestionRoute(int $quizId): array
+    {
+        return ['test/pass-test/create', 'test_id' => $quizId];
+    }
+
     public function getQuestionUpdateRoute(): ?array
     {
         if ($this->isNewRecord) {

@@ -55,6 +55,7 @@ class QuestionManageWidget extends BaseQuizManageWidget
             ['label' => 'По умолчанию', 'route' => StoryTestQuestion::getCreateQuestionRoute($quizId)],
             ['label' => 'Выбор области', 'route' => StoryTestQuestion::getCreateRegionQuestionRoute($quizId)],
             ['label' => 'Последовательность', 'route' => StoryTestQuestion::getCreateSequenceQuestionRoute($quizId)],
+            ['label' => 'Тест с пропусками', 'route' => StoryTestQuestion::getCreatePassTestQuestionRoute($quizId)],
         ];
     }
 }
