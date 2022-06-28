@@ -1620,5 +1620,7 @@ p.wikids-test-description {
 }
 
 .drag-words-answers__words button {
-  margin-right: 20px;
+  margin-right: 10px;
+  margin-left: 10px;
+  margin-bottom: 10px;
 }

@@ -307,10 +307,51 @@ $this->registerJs(<<<JS
         characterData: true
     });
 
+
+    function trimRanges(selection) {
+        for (let i = 0, range = selection.getRangeAt(0); i < selection.rangeCount; range = selection.getRangeAt(i++)) {
+
+            const text = selection.toString();
+            const startOffset = text.length - text.trimStart().length;
+            const endOffset = text.length - text.trimEnd().length;
+
+            if (startOffset) {
+                const offset = range.startOffset + startOffset;
+                if (offset < 0) {
+                    // If the range will underflow the current element, then it belongs in the previous element
+                    const start = range.startContainer.parentElement.previousSibling;
+                    range.setStart(start, start.textContent.length + offset);
+                } else if (offset > range.startContainer.textContent.length) {
+                    // If the range will overflow the current element, then it belongs in the next element
+                    const start = range.startContainer.parentElement.nextSibling;
+                    range.setStart(start, offset - range.startContainer.textContent.length);
+                } else {
+                    range.setStart(range.startContainer, offset);
+                }
+            }
+            if (endOffset) {
+                const offset = range.endOffset - endOffset;
+                if (offset < 0) {
+                    // If the range will underflow the current element, then it belongs in the previous element
+                    const end = range.endContainer.parentElement.previousSibling;
+                    range.setEnd(end, end.textContent.length + offset);
+                } else if (offset > range.endContainer.textContent.length) {
+                    // If the range will overflow the current element, then it belongs in the next element
+                    const end = range.endContainer.parentElement.nextSibling;
+                    range.setEnd(end, offset - range.endContainer.textContent.length);
+                } else {
+                    range.setEnd(range.endContainer, offset);
+                }
+            }
+        }
+    }
+
     $('#add').on('click', function() {
         if (window.getSelection) {
             var sel = window.getSelection();
             if (sel.rangeCount > 0) {
+
+                trimRanges(sel);
 
                 var templateElement = document.createElement("span");
                 templateElement.setAttribute('contenteditable', false);
