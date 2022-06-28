@@ -23,6 +23,7 @@ import createSettings from "./components/Settings";
 import {createStar, createStarFill} from "./components/stars";
 import createDescription from "./components/description";
 import PassTest from "./questions/PassTest";
+import DragWords from "./questions/DragWords";
 
 
 var plugins = [];
@@ -80,6 +81,7 @@ function WikidsStoryTest(el, options) {
   this.regionQuestion = null;
   this.voiceResponse = null;
   this.passTestQuestion = null;
+  this.dragWordsQuestion = null;
 
   setElementHtml(createLoader('Инициализация'));
 
@@ -1175,6 +1177,9 @@ function WikidsStoryTest(el, options) {
         case 'pass-test':
           $answers = that.passTestQuestion.createWrapper();
           break;
+        case 'drag-words':
+          $answers = that.dragWordsQuestion.createWrapper();
+          break;
         default:
           $answers = createAnswers(getAnswersData(question), question);
       }
@@ -1494,6 +1499,10 @@ function WikidsStoryTest(el, options) {
     return getQuestionView(question) === 'pass-test';
   }
 
+  function questionViewDragWords(question) {
+    return getQuestionView(question) === 'drag-words';
+  }
+
   function questionViewDefault(question) {
     return getQuestionView(question) === 'default';
   }
@@ -1635,7 +1644,7 @@ function WikidsStoryTest(el, options) {
   }
 
   // Ответ на вопрос
-  function nextQuestion(preparedAnswers) {
+  function nextQuestion(preparedAnswers, checkAnswersCallback) {
 
     console.debug('WikidsStoryTest.nextQuestion');
     if (!Array.isArray(preparedAnswers)) {
@@ -1682,32 +1691,38 @@ function WikidsStoryTest(el, options) {
       return;
     }
 
-    var convertAnswerToInt = true;
-    var correctAnswersCallback = function (elem) {
-      return parseInt(elem.id);
-    };
-    if (view === 'numpad') {
-      correctAnswersCallback = function (elem) {
-        return parseInt(elem.name);
-      };
+    if (typeof checkAnswersCallback === 'function') {
+      answerIsCorrect = checkAnswersCallback(currentQuestion, answer);
     }
-    if (view === 'input' || view === 'recognition' || questionViewPassTest(currentQuestion) || testConfig.answerTypeIsMissingWords(currentQuestion)) {
-      correctAnswersCallback = function (elem) {
-        if (testConfig.isStrictAnswer()) {
-          return elem.name;
-        } else {
-          return elem.name.toLowerCase();
-        }
-      };
-      convertAnswerToInt = false;
-    }
+    else {
 
-    var rememberAnswer = getQuestionRememberAnswers(currentQuestion);
-    if (!rememberAnswer) {
-      answerIsCorrect = checkAnswerCorrect(currentQuestion, answer, correctAnswersCallback, convertAnswerToInt);
-    } else {
-      changeQuestionRememberAnswers(currentQuestion, answer);
-      answerIsCorrect = true;
+      var convertAnswerToInt = true;
+      var correctAnswersCallback = function (elem) {
+        return parseInt(elem.id);
+      };
+      if (view === 'numpad') {
+        correctAnswersCallback = function (elem) {
+          return parseInt(elem.name);
+        };
+      }
+      if (view === 'input' || view === 'recognition' || questionViewPassTest(currentQuestion) || testConfig.answerTypeIsMissingWords(currentQuestion)) {
+        correctAnswersCallback = function (elem) {
+          if (testConfig.isStrictAnswer()) {
+            return elem.name;
+          } else {
+            return elem.name.toLowerCase();
+          }
+        };
+        convertAnswerToInt = false;
+      }
+
+      var rememberAnswer = getQuestionRememberAnswers(currentQuestion);
+      if (!rememberAnswer) {
+        answerIsCorrect = checkAnswerCorrect(currentQuestion, answer, correctAnswersCallback, convertAnswerToInt);
+      } else {
+        changeQuestionRememberAnswers(currentQuestion, answer);
+        answerIsCorrect = true;
+      }
     }
 
     cancelSpeech();
@@ -1931,7 +1946,7 @@ function WikidsStoryTest(el, options) {
 
     dom.questions.fadeIn();
 
-    if (isShuffleAnswers(currentQuestion) && !questionViewSequence(currentQuestion) && !questionViewPassTest(currentQuestion)) {
+    if (isShuffleAnswers(currentQuestion) && !questionViewSequence(currentQuestion) && !questionViewPassTest(currentQuestion) && !questionViewDragWords(currentQuestion)) {
       $('.wikids-test-answers', currentQuestionElement)
         .empty()
         .append(createAnswers(getAnswersData(currentQuestion), currentQuestion)
@@ -1958,6 +1973,16 @@ function WikidsStoryTest(el, options) {
       dom.nextButton.off("click").on("click", function () {
         var answer = that.passTestQuestion.getUserAnswers();
         nextQuestion(answer);
+      });
+    }
+
+    if (questionViewDragWords(currentQuestion)) {
+      $('.drag-words-question', currentQuestionElement).html(that.dragWordsQuestion.create(currentQuestion));
+      dom.nextButton.off("click").on("click", function () {
+        const answer = that.dragWordsQuestion.getUserAnswers();
+        nextQuestion(answer, function(question, userAnswers) {
+          return that.dragWordsQuestion.checkAnswers(question, userAnswers);
+        });
       });
     }
 
@@ -2181,7 +2206,6 @@ function WikidsStoryTest(el, options) {
   function showCorrectAnswerPage(question, answer) {
     console.debug('WikidsStoryTest.showCorrectAnswerPage');
 
-
     var $elements = $('<div/>');
     var text = incorrectAnswerText || 'Правильный ответ';
     text = text.replace('{1}', question.entity_name);
@@ -2194,7 +2218,11 @@ function WikidsStoryTest(el, options) {
     }
     else if (questionViewPassTest(question)) {
       $elements.append(that.passTestQuestion.getContent(question.payload));
-    } else if (testConfig.sourceIsNeo() && neoQuestionWithAnimalSigns()) {
+    }
+    else if (questionViewDragWords(question)) {
+      $elements.append(that.dragWordsQuestion.getContent(question.payload));
+    }
+    else if (testConfig.sourceIsNeo() && neoQuestionWithAnimalSigns()) {
 
       var $elementRow = $('<div/>', {'class': 'row row-no-gutters'});
       var $elementCol = $('<div/>', {'class': 'col-md-8 col-md-offset-2'});
@@ -2636,6 +2664,7 @@ WikidsStoryTest.mount(MissingWords);
 WikidsStoryTest.mount(RegionQuestion);
 WikidsStoryTest.mount(VoiceResponse);
 WikidsStoryTest.mount(PassTest);
+WikidsStoryTest.mount(DragWords);
 
 WikidsStoryTest.getTests = function () {
   return tests;

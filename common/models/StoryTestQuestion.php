@@ -235,6 +235,11 @@ class StoryTestQuestion extends ActiveRecord
         return (new QuestionType($this->type))->isPassTest();
     }
 
+    public function typeIsDragWords(): bool
+    {
+        return (new QuestionType($this->type))->isDragWords();
+    }
+
     public function deleteRegionImages(): void
     {
         if (!empty($this->image)) {
@@ -405,6 +410,11 @@ class StoryTestQuestion extends ActiveRecord
         return ['test/pass-test/create', 'test_id' => $quizId];
     }
 
+    public static function getCreateDragWordsQuestionRoute(int $quizId): array
+    {
+        return ['test/drag-words/create', 'test_id' => $quizId];
+    }
+
     public function getQuestionUpdateRoute(): ?array
     {
         if ($this->isNewRecord) {
@@ -414,6 +424,7 @@ class StoryTestQuestion extends ActiveRecord
             QuestionType::REGION => ['question/update', 'id' => $this->id],
             QuestionType::SEQUENCE => ['test/question-sequence/update', 'id' => $this->id],
             QuestionType::PASS_TEST => ['test/pass-test/update', 'id' => $this->id],
+            QuestionType::DRAG_WORDS => ['test/drag-words/update', 'id' => $this->id],
         ];
         return $updateQuestionMap[$this->type] ?? null;
     }

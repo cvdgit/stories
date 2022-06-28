@@ -4,6 +4,7 @@ namespace backend\components\training\collection;
 
 use backend\components\training\base\BaseQuestion;
 use backend\components\training\collection\build\Base;
+use backend\components\training\collection\build\DragWords;
 use backend\components\training\collection\build\PassTest;
 use backend\components\training\collection\build\Region;
 use backend\components\training\collection\build\Sequence;
@@ -32,6 +33,9 @@ class TestCollection extends BaseCollection
         }
         else if ($questionData->typeIsPassTest()) {
             $question = (new PassTest($questionData, $stars))->build();
+        }
+        else if ($questionData->typeIsDragWords()) {
+            $question = (new DragWords($questionData, $stars))->build();
         }
         else {
             $question = (new Base($questionData, $stars, $this->testModel))->build();

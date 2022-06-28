@@ -18,6 +18,7 @@ class QuestionType
     public const ANSWER_MISSING_WORDS = 7;
 
     public const PASS_TEST = 8;
+    public const DRAG_WORDS = 9;
 
     private $type;
 
@@ -42,6 +43,7 @@ class QuestionType
             self::ANSWER_RECORDING => 'Запись с микрофона',
             self::ANSWER_MISSING_WORDS => 'Пропущенные слова',
             self::PASS_TEST => 'Тест с пропусками',
+            self::DRAG_WORDS => 'Перетаскивание слов',
         ];
     }
 
@@ -73,5 +75,10 @@ class QuestionType
     public function isPassTest(): bool
     {
         return $this->type === self::PASS_TEST;
+    }
+
+    public function isDragWords(): bool
+    {
+        return $this->type === self::DRAG_WORDS;
     }
 }
