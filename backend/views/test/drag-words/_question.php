@@ -380,139 +380,6 @@ $this->registerJs(<<<JS
         }
     });
 
-/*    function fragmentItemTextChanged(fragment_id, item_id, text) {
-        const item = dataWrapper.findFragmentItem(fragment_id, item_id);
-        if (item.correct) {
-            $('#content').find('span[data-fragment-id=' + fragment_id + '] > .highlight').text(text);
-        }
-        item.title = text;
-    }*/
-
-/*    function fragmentItemSetCorrect(fragment_id, item_id) {
-        const item = dataWrapper.setFragmentCorrectItem(fragment_id, item_id);
-        $('#content').find('span[data-fragment-id=' + fragment_id + '] > .highlight').text(item.title);
-    }*/
-
-/*    function fragmentItemRemove(elem, fragment_id, item_id) {
-
-        const item = dataWrapper.findFragmentItem(fragment_id, item_id);
-        if (item.correct) {
-            $('#content').find('span[data-fragment-id=' + fragment_id + '] > .highlight').text('ПУСТО');
-        }
-
-        dataWrapper.removeFragmentItem(fragment_id, item_id);
-        $(elem).parent().parent().hide().remove();
-    }*/
-
-/*    function addFragmentItem(fragment_id) {
-
-        const item = dataWrapper.createFragmentItem(fragment_id, {
-            id: generateUUID(),
-            correct: false,
-            title: ''
-        });
-
-        const elem = createFragmentItemElement(fragment_id, item);
-
-        const createElem = $('#content')
-            .find('span[data-fragment-id=' + fragment_id + '] > .dropdown-menu .divider');
-
-        elem.insertBefore(createElem)
-            .find('.fragment-title__edit')
-            .focus();
-    }*/
-
-    /*function createFragmentItemElement(fragment_id, item) {
-        return $('<li/>', {class: 'fragment-item'})
-            .append(
-                $('<span/>', {class: 'fragment-input'})
-                    .append(
-                        $('<input/>', {
-                            name: fragment_id,
-                            type: 'radio',
-                            checked: item.correct
-                        })
-                            .on('click', function() {
-                                fragmentItemSetCorrect(fragment_id, item.id);
-                            })
-                    )
-            )
-            .append(
-                $('<span/>', {'class': 'fragment-title'})
-                    .append(
-                        $('<a/>', {'href': '#', 'contenteditable': true, class: 'fragment-title__edit'})
-                            .on('input', function() {
-                                fragmentItemTextChanged(fragment_id, item.id, $(this).text());
-                            })
-                            .on('keydown', function(event) {
-                                if (event.key === 'Enter') {
-                                    event.preventDefault();
-                                    return;
-                                }
-                                if (event.key !== ' ') {
-                                    return;
-                                }
-                                event.preventDefault();
-                                document.execCommand("insertText", false, ' ');
-                            })
-                            .text(item.title)
-                    )
-            )
-            .append(
-                $('<span/>', {class: 'fragment-action'})
-                    .append(
-                        $('<a/>', {'href': '#'})
-                            .html('<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>')
-                            .on('click', function(e) {
-                                e.preventDefault();
-                                fragmentItemRemove(this, fragment_id, item.id);
-                                return false;
-                            })
-                    )
-            );
-    }*/
-
-    /*$('#content')
-        .on('hide.bs.dropdown', '.dropdown', function() {
-            $(this).find('.dropdown-menu').empty();
-        })
-        .on('show.bs.dropdown', '.dropdown', function() {
-
-            const fragment_id = $(this).attr('data-fragment-id');
-            const menu = $(this).find('.dropdown-menu');
-            menu.empty();
-
-            dataWrapper.getFragmentItems(fragment_id).forEach(function(item) {
-                const elem = createFragmentItemElement(fragment_id, item);
-                elem.appendTo(menu);
-            });
-
-            $('<li/>', {class: 'divider', role: 'separator'})
-                .appendTo(menu);
-
-            $('<li/>').append(
-                $('<a/>', {'href': '#', 'class': 'add-word'})
-                    .text('Добавить слово')
-                    .on('click', function(e) {
-                        e.preventDefault();
-                        addFragmentItem(fragment_id);
-                    })
-            ).appendTo(menu);
-
-            $('<li/>').append(
-                $('<a/>', {'href': '#', 'class': 'add-word'})
-                    .text('Удалить пропуск')
-                    .on('click', function(e) {
-                        e.preventDefault();
-
-                    })
-            ).appendTo(menu);
-        });
-
-    $('#content').on('click', '.dropdown-menu', function(e) {
-        e.stopPropagation();
-    });*/
-
     const form = $('#drag-words-form');
 
     form.on('beforeValidate', function() {
@@ -524,7 +391,7 @@ $this->registerJs(<<<JS
             return '{' + $(this).attr('data-fragment-id') + '}';
         });
 
-        const content = el[0].outerHTML;
+        const content = el[0].innerHTML;
 
         const fragments = [];
         $('#content').find('[data-fragment-id]').each(function(index, elem) {

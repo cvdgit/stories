@@ -581,7 +581,7 @@ $this->registerJs(<<<JS
             return '{' + $(this).attr('data-fragment-id') + '}';
         });
 
-        const content = el[0].outerHTML;
+        const content = el[0].innerHTML;
 
         const fragments = [];
         $('#content').find('[data-fragment-id]').each(function(index, elem) {

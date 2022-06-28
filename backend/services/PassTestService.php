@@ -74,11 +74,15 @@ class PassTestService
 
         $questionModel->name = $form->name;
         $questionModel->regions = $form->payload;
-        if (!$questionModel->save()) {
-            throw ModelDomainException::create($questionModel);
-        }
 
-        StoryTestAnswer::deleteAll(['story_question_id' => $questionModel->id]);
-        $this->createAnswers($questionModel->id, $form->payload);
+        $this->transactionManager->wrap(function() use ($questionModel, $form) {
+
+            if (!$questionModel->save()) {
+                throw ModelDomainException::create($questionModel);
+            }
+
+            StoryTestAnswer::deleteAll(['story_question_id' => $questionModel->id]);
+            $this->createAnswers($questionModel->id, $form->payload);
+        });
     }
 }
