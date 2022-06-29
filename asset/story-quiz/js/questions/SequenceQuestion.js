@@ -138,6 +138,42 @@ SequenceQuestion.prototype = {
     this.instances.push(instance);
 
     return instance.element;
+  },
+
+  createCorrectPage: function(question, answers, showOriginalImageCallback) {
+
+    const isHorizontalView = parseInt(question['sort_view']) === 1;
+
+    answers.sort((a, b) => parseInt(a.order) - parseInt(b.order));
+
+    const $wrapper = $('<div/>', {
+      class: 'sequence-correct-page',
+      html: '<div class="sequence-correct-page__wrap"></div>'
+    });
+
+    const $answers = $(isHorizontalView ? '<ul/>' : '<ol/>');
+    answers.forEach((answer) => {
+
+      const $elem = $('<li/>');
+
+      if (answer.image) {
+        const $image = $('<img/>')
+          .attr("src", answer.image)
+          .attr("width", 110)
+          .css('cursor', 'zoom-in')
+          .on('click', function() {
+            showOriginalImageCallback(questionAnswer['orig_image'] || $(this).attr('src'));
+          });
+        $elem.append($image);
+      }
+
+      $elem.append('<div class="answer-name">' + answer.name + '</div>');
+      $answers.append($elem);
+    });
+
+    $wrapper.find('.sequence-correct-page__wrap').append($answers);
+
+    return $wrapper;
   }
 };
 

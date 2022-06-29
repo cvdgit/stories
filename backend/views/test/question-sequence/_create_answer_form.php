@@ -197,7 +197,7 @@ $js = <<< JS
                     });
                 }
                 else {
-                    toastr.error(response.errors);
+                    toastr.error(response.message);
                 }
             })
             .always(function() {

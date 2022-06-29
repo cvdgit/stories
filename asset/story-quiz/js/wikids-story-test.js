@@ -2360,69 +2360,68 @@ function WikidsStoryTest(el, options) {
 
       var allAnswers = getAnswersData(question);
       if (questionViewSequence(question)) {
-        allAnswers.sort(function (a, b) {
-          return parseInt(a.order) - parseInt(b.order);
+        $elements.append(that.sequenceQuestion.createCorrectPage(question, allAnswers, showOriginalImage));
+      }
+      else {
+        allAnswers.forEach(function (questionAnswer) {
+          $element = $('<div/>').addClass('row');
+          var $content = $('<div/>').addClass('col-md-offset-3 col-md-9');
+          if (parseInt(questionAnswer.is_correct) === 1) {
+
+            answerText = questionAnswer.name;
+
+            if (questionAnswer.image) {
+              var $image = $('<img/>')
+                .attr("src", questionAnswer.image)
+                .attr("width", 110)
+                .css('cursor', 'zoom-in')
+                .on('click', function () {
+                  showOriginalImage(questionAnswer['orig_image'] || $(this).attr('src'));
+                });
+              $content.append($image);
+            }
+
+            var $answerElement;
+            if (testConfig.answerTypeIsRecording()) {
+              $answerElement = $('<p/>')
+                .append($('<span/>').text(answerText))
+                .append($('<a/>')
+                  .attr('href', '#')
+                  .attr('title', 'Прослушать')
+                  .css('font-size', '3rem')
+                  .on('click', function (e) {
+                    e.preventDefault();
+                    if (haveAudioFile(question)) {
+                      playAudio(getAudioFile(question));
+                    } else {
+                      speech.readText(questionAnswer.name, testConfig.getInputVoice());
+                    }
+                  })
+                  .html('<i class="glyphicon glyphicon-volume-up" style="left: 10px; top: 6px"></i>')
+                );
+            } else {
+              if (testConfig.answerTypeIsInput(question) && testConfig.isStrictAnswer()) {
+                $answerElement = $('<p/>').html(textDiff(answerText, userAnswer));
+              } else {
+                $answerElement = $('<p/>').text(answerText);
+              }
+            }
+            $content.append($answerElement);
+
+            if (testConfig.answerTypeIsInput(question)) {
+              $('<p/>').html('&nbsp;').appendTo($content);
+              $('<p/>')
+                .text('Ваш ответ:')
+                .appendTo($content);
+              $('<p/>')
+                .html(userAnswer)
+                .appendTo($content);
+            }
+
+            $elements.append($element.append($content));
+          }
         });
       }
-
-      allAnswers.forEach(function (questionAnswer) {
-        $element = $('<div/>').addClass('row');
-        var $content = $('<div/>').addClass('col-md-offset-3 col-md-9');
-        if (parseInt(questionAnswer.is_correct) === 1) {
-
-          answerText = questionAnswer.name;
-
-          if (questionAnswer.image) {
-            var $image = $('<img/>')
-              .attr("src", questionAnswer.image)
-              .attr("width", 110)
-              .css('cursor', 'zoom-in')
-              .on('click', function () {
-                showOriginalImage(questionAnswer['orig_image'] || $(this).attr('src'));
-              });
-            $content.append($image);
-          }
-
-          var $answerElement;
-          if (testConfig.answerTypeIsRecording()) {
-            $answerElement = $('<p/>')
-              .append($('<span/>').text(answerText))
-              .append($('<a/>')
-                .attr('href', '#')
-                .attr('title', 'Прослушать')
-                .css('font-size', '3rem')
-                .on('click', function (e) {
-                  e.preventDefault();
-                  if (haveAudioFile(question)) {
-                    playAudio(getAudioFile(question));
-                  } else {
-                    speech.readText(questionAnswer.name, testConfig.getInputVoice());
-                  }
-                })
-                .html('<i class="glyphicon glyphicon-volume-up" style="left: 10px; top: 6px"></i>')
-              );
-          } else {
-            if (testConfig.answerTypeIsInput(question) && testConfig.isStrictAnswer()) {
-              $answerElement = $('<p/>').html(textDiff(answerText, userAnswer));
-            } else {
-              $answerElement = $('<p/>').text(answerText);
-            }
-          }
-          $content.append($answerElement);
-
-          if (testConfig.answerTypeIsInput(question)) {
-            $('<p/>').html('&nbsp;').appendTo($content);
-            $('<p/>')
-              .text('Ваш ответ:')
-              .appendTo($content);
-            $('<p/>')
-              .html(userAnswer)
-              .appendTo($content);
-          }
-
-          $elements.append($element.append($content));
-        }
-      });
     }
 
     if (testConfig.answerTypeIsRecording()) {

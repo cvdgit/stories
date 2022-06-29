@@ -1624,3 +1624,52 @@ p.wikids-test-description {
   margin-left: 10px;
   margin-bottom: 10px;
 }
+
+.sequence-correct-page {
+  display: flex;
+  justify-content: center;
+}
+
+.sequence-correct-page__wrap {
+  max-width: 800px;
+  min-width: 600px;
+}
+
+.sequence-correct-page__wrap ul {
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+  padding-left: 0;
+  margin-bottom: 0;
+  flex-wrap: wrap;
+}
+
+.sequence-correct-page__wrap ol {
+  margin-bottom: 0;
+  counter-reset: section;
+  list-style-type: none;
+}
+
+.sequence-correct-page__wrap ol > li {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+.sequence-correct-page__wrap ul > li {
+  display: flex;
+  margin-right: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.sequence-correct-page__wrap ol > li::before {
+  counter-increment: section;
+  content: counters(section, ".") " ";
+  padding-right: 10px;
+  font-weight: bold;
+}
+
+.sequence-correct-page__wrap li > img {
+  margin-right: 10px;
+}

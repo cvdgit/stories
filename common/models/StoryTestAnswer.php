@@ -183,6 +183,14 @@ class StoryTestAnswer extends ActiveRecord
 
     public static function createSequenceAnswer(int $questionID, string $name, int $order = null): self
     {
+        $answerExists = (new Query())
+            ->from(self::tableName())
+            ->where(['story_question_id' => $questionID])
+            ->andWhere(['name' => $name])
+            ->exists();
+        if ($answerExists) {
+            throw new DomainException('Такой ответ уже добавлен в вопрос');
+        }
         if ($order === null) {
             $max = (new Query())
                 ->from(self::tableName())
