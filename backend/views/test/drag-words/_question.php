@@ -351,7 +351,15 @@ $this->registerJs(<<<JS
             var sel = window.getSelection();
             if (sel.rangeCount > 0) {
 
-                trimRanges(sel);
+                if (sel.isCollapsed) {
+                    return;
+                }
+
+                const selText = sel.toString();
+                const skipTrim = (selText.length === 1) && (selText === ' ');
+                if (!skipTrim) {
+                    trimRanges(sel);
+                }
 
                 var templateElement = document.createElement("span");
                 templateElement.setAttribute('contenteditable', false);
@@ -368,6 +376,10 @@ $this->registerJs(<<<JS
                 while (i--) {
                     range = ranges[i];
                     surroundRangeContents(range, templateElement, function(element, textNode) {
+
+                        if (textNode.textContent === ' ') {
+                            textNode.textContent = '\u00A0';
+                        }
 
                         const id = dataWrapper.createFragment(generateUUID(), textNode.textContent, true);
                         element.setAttribute('data-fragment-id', id);
@@ -391,7 +403,7 @@ $this->registerJs(<<<JS
             return '{' + $(this).attr('data-fragment-id') + '}';
         });
 
-        const content = el[0].innerHTML;
+        const content = el[0].outerHTML;
 
         const fragments = [];
         $('#content').find('[data-fragment-id]').each(function(index, elem) {
@@ -464,7 +476,7 @@ $this->registerJs(<<<JS
             }
         }
         else {
-            toastr.error(response['error'] || 'Неизвестная ошибка');
+            toastr.error(response['message'] || 'Неизвестная ошибка');
         }
     };
 

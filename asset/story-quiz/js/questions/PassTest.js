@@ -1,4 +1,4 @@
-import {_extends} from "../common";
+import {_extends, shuffle} from "../common";
 
 const PassTest = function (test) {
   this.element = null;
@@ -21,14 +21,9 @@ PassTest.prototype.createContent = function (payload) {
     });
     $('<option/>').val('').text('').appendTo(select);
 
-    fragment.items.forEach((item) => {
+    const items = shuffle(fragment.items);
+    items.forEach((item) => {
       $('<option/>').text(item.title).appendTo(select);
-/*      code.find('.dropdown-menu').append(
-        $('<li/>').append(
-          $('<a/>', {href: '#'})
-            .text(item.title)
-        )
-      );*/
     });
 
     const reg = new RegExp('{' + fragment.id + '}');

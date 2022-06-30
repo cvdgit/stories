@@ -46,7 +46,7 @@ class StoryTestAnswer extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['name'], 'required'],
+            //[['name'], 'required'],
             [['order', 'is_correct', 'hidden'], 'integer'],
             [['name', 'image', 'description'], 'string', 'max' => 255],
         ];
