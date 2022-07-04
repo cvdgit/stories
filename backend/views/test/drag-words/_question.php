@@ -6,8 +6,6 @@ use backend\models\drag_words\CreateDragWordsForm;
 /** @var bool $isNewRecord */
 $this->registerCss(<<<CSS
 .highlight {
-    /*color: red;
-    cursor:pointer;*/
     user-select: none;
 }
 .content:focus-visible {
@@ -16,7 +14,7 @@ $this->registerCss(<<<CSS
 .content {
     border: 1px #d0d0d0 solid;
     padding: 10px;
-    min-height: 300px;
+    min-height: 250px;
     line-height: 2.3;
 }
 .content__title label {
@@ -70,6 +68,31 @@ $this->registerCss(<<<CSS
     width: 16px;
     height: 16px;
 }
+.add-words-list {
+    min-height: 70px;
+    max-height: 110px;
+    overflow-y: auto;
+    border: 1px #d0d0d0 solid;
+    padding: 10px;
+    line-height: 2.3;
+}
+.add-words-list > span {
+    display: inline-block;
+    margin-right: 10px;
+}
+.add-words-list .add-word-del {
+    position: relative;
+    width: 24px;
+    height: 24px;
+}
+.add-words-list .add-word-del svg {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: #a94442;
+}
 CSS
 );
 ?>
@@ -84,9 +107,21 @@ CSS
             <button class="btn btn-primary btn-sm" id="add" type="button">Вставить пропуск</button>
         </div>
     </div>
-    <div style="min-height:300px;max-height:300px;overflow-y:auto">
+    <div style="min-height:250px;max-height:250px;overflow-y:auto;margin-bottom:20px">
         <div class="content" id="content" contenteditable="true"></div>
     </div>
+    <div style="margin-bottom:10px;display:flex;flex-direction:row;align-items:center">
+        <div class="content__title">
+            <label for="">Дополнительные слова</label>
+        </div>
+    </div>
+    <div style="margin-bottom:10px;display:flex;flex-direction:row;align-items:center">
+        <div style="width: 100%; margin-right: 10px">
+            <input id="additional-word-input" type="text" autocomplete="off" class="form-control">
+        </div>
+        <div><button type="button" id="add-word" class="btn btn-secondary">Добавить</button></div>
+    </div>
+    <div id="additional-words" class="add-words-list"></div>
     <?= $form->field($model, 'content')->hiddenInput()->label(false) ?>
 </div>
 <div>
@@ -277,17 +312,27 @@ $this->registerJs(<<<JS
 
     const dataWrapper = new Fragments(data);
 
+    const additionalWords = $('#additional-words');
+
     var content = dataWrapper.getContent();
     dataWrapper.getFragments().forEach(function(fragment) {
 
-        var code = $('<span/>', {
-            'contenteditable': false,
-            'data-fragment-id': fragment.id
-        });
-        code.append('<button type="button" class="btn btn-default highlight">' + fragment.title + '</button>');
+        if (fragment.correct) {
 
-        var reg = new RegExp('{' + fragment.id + '}');
-        content = content.replace(reg, code[0].outerHTML);
+            const code = $('<span/>', {
+                'contenteditable': false,
+                'data-fragment-id': fragment.id
+            });
+            code.append('<button type="button" class="btn btn-default highlight">' + fragment.title + '</button>');
+
+            const reg = new RegExp('{' + fragment.id + '}');
+            content = content.replace(reg, code[0].outerHTML);
+        }
+        else {
+            const element = createAdditionalWordElement(fragment.title);
+            element.setAttribute('data-fragment-id', fragment.id);
+            additionalWords.append(element);
+        }
     });
     if (content.length === 0) {
         content = '<div><br></div>';
@@ -346,6 +391,32 @@ $this->registerJs(<<<JS
         }
     }
 
+    function createFragmentElement() {
+        const templateElement = document.createElement("span");
+        templateElement.setAttribute('contenteditable', false);
+        templateElement.innerHTML = '<button type="button" class="btn btn-default highlight"></button>';
+        return templateElement;
+    }
+
+    function createAdditionalWordElement(text) {
+
+        const element = createFragmentElement();
+        element.querySelector('.highlight').textContent = text;
+
+        $(element).append(
+            $('<a/>', {
+                'class': 'btn btn-link add-word-del',
+                'href': '#',
+                'html': '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>'
+            })
+            .on('click', function(e) {
+                e.preventDefault();
+                $(this).parent().fadeOut(500).after($(this).parent().remove());
+            })
+        );
+        return element;
+    }
+
     $('#add').on('click', function() {
         if (window.getSelection) {
             var sel = window.getSelection();
@@ -361,9 +432,7 @@ $this->registerJs(<<<JS
                     trimRanges(sel);
                 }
 
-                var templateElement = document.createElement("span");
-                templateElement.setAttribute('contenteditable', false);
-                templateElement.innerHTML = '<button type="button" class="btn btn-default highlight"></button>';
+                const templateElement = createFragmentElement();
 
                 var ranges = [];
                 var range;
@@ -392,6 +461,22 @@ $this->registerJs(<<<JS
         }
     });
 
+    $('#add-word').on('click', function() {
+
+        const word = $('#additional-word-input').val().trim();
+        if (!word.length) {
+            return;
+        }
+
+        const element = createAdditionalWordElement(word);
+
+        const fragmentId = dataWrapper.createFragment(generateUUID(), word, false);
+        element.setAttribute('data-fragment-id', fragmentId);
+
+        additionalWords.append(element);
+        $('#additional-word-input').val('').focus();
+    });
+
     const form = $('#drag-words-form');
 
     form.on('beforeValidate', function() {
@@ -407,6 +492,14 @@ $this->registerJs(<<<JS
 
         const fragments = [];
         $('#content').find('[data-fragment-id]').each(function(index, elem) {
+            const fragmentId = elem.getAttribute('data-fragment-id');
+            const fragment = dataWrapper.findFragment(fragmentId);
+            if (fragment) {
+                fragments.push(fragment);
+            }
+        });
+
+        additionalWords.find('[data-fragment-id]').each(function(index, elem) {
             const fragmentId = elem.getAttribute('data-fragment-id');
             const fragment = dataWrapper.findFragment(fragmentId);
             if (fragment) {
