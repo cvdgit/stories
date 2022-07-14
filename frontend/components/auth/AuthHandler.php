@@ -1,12 +1,14 @@
 <?php
 
-
-namespace frontend\components;
+namespace frontend\components\auth;
 
 use common\helpers\Translit;
 use common\services\UserPaymentService;
 use common\services\WelcomeUserService;
+use DomainException;
 use Exception;
+use frontend\models\auth\AuthUserForm;
+use frontend\models\SignupForm;
 use Yii;
 use yii\authclient\ClientInterface;
 use yii\helpers\ArrayHelper;
@@ -23,6 +25,7 @@ use yii\helpers\Url;
  */
 class AuthHandler
 {
+
     /**
      * @var ClientInterface
      */
@@ -33,16 +36,12 @@ class AuthHandler
     private $signupService;
     protected $welcomeUserService;
 
-    public function __construct(ClientInterface $client, WelcomeUserService $welcomeUserService)
+    public function __construct(ClientInterface $client)
     {
         $this->client = $client;
-        $this->authService = new AuthService();
-        $this->transactionManager = new TransactionManager();
-        $this->signupService = new SignupService(new TransactionManager());
-        $this->welcomeUserService = $welcomeUserService;
     }
 
-    public function handle(): void
+    public function handle()
     {
         $attributes = $this->client->getUserAttributes();
         $email = ArrayHelper::getValue($attributes, 'email');
@@ -58,6 +57,13 @@ class AuthHandler
             $username = ArrayHelper::getValue($attributes, 'name');
         }
 
+        return new AuthUserForm([
+            'id' => $id,
+            'username' => $username,
+            'email' => $email,
+        ]);
+
+        /*
         $username = Translit::translit($username);
         $username = mb_strtolower($username);
         $username = strtr($username, ['-' => '_']);
@@ -71,7 +77,6 @@ class AuthHandler
             Yii::$app->response->redirect(Url::to('signup/email'));
         }
 
-        /* @var Auth $auth */
         $auth = Auth::find()->where([
             'source' => $this->client->getId(),
             'source_id' => $id,
@@ -79,19 +84,25 @@ class AuthHandler
 
         if (Yii::$app->user->isGuest) {
             if ($auth) { // login
-                /* @var User $user */
+
                 $user = $auth->user;
                 // $this->updateUserInfo($user);
                 Yii::$app->user->login($user, Yii::$app->params['user.rememberMeDuration']);
             } else { // signup
+
                 if ($email !== null && User::find()->where(['email' => $email])->exists()) {
                     Yii::$app->getSession()->setFlash('error', 'Пользователь, с указанным в аккаунте ' . $this->client->getTitle() . ' email уже существует.');
                 } else {
 
                     $password = Yii::$app->security->generateRandomString(6);
+                    $form = new SignupForm([
+                        'email' => $email,
+                        'password' => $password,
+                        'agree' => 1,
+                    ]);
+
                     $this->signupService->signup($username, $email, $password);
 
-                    /** @var User $user */
                     $user = User::findByUsername($username);
                     $user->status = User::STATUS_ACTIVE;
                     $user->save(false, ['status']);
@@ -130,7 +141,6 @@ class AuthHandler
                     'source_id' => (string)$attributes['id'],
                 ]);
                 if ($auth->save()) {
-                    /** @var User $user */
                     $user = $auth->user;
                     //$this->updateUserInfo($user);
                     Yii::$app->getSession()->setFlash('success', [
@@ -154,6 +164,7 @@ class AuthHandler
                 ]);
             }
         }
+        */
     }
 
     /**

@@ -75,14 +75,14 @@ $imagePath = $model->getImageUrl();
 $imageWidth = $model->getImageWidth();
 $imageHeight = $model->getImageHeight();
 $js = <<< JS
-    
+
     var modal = $('#regions-modal');
     var selectShapes = $('#select-shapes');
-    
+
     function ShapeType(type) {
         this.type = type;
     }
-    
+
     ShapeType.prototype = {
         'getType': function() {
             return this.type;
@@ -99,29 +99,29 @@ $js = <<< JS
     selectShapes.on('change', function() {
         shapeType.setType($(this).find("input[name='shape']:checked").val());
     });
-    
+
     var element = $('#updateregionquestion-regions');
-    var regionSVG;    
+    var regionSVG;
 
     modal.on('show.bs.modal', function() {
-        
+
         selectShapes.button('reset');
-        
+
         if (regionSVG === undefined) {
-            
+
             var data = element.val() || [];
             if (typeof data === 'string') {
                 data = JSON.parse(data);
             }
-            
+
             regionSVG = new RegionsSVG(
-                'image-container', 
-                {'path': '$imagePath', 'width': $imageWidth, 'height': $imageHeight}, 
+                'image-container',
+                {'path': '$imagePath', 'width': $imageWidth, 'height': $imageHeight},
                 shapeType,
                 data);
         }
     });
-    
+
     $('#save-regions', modal).on('click', function() {
         modal.modal('hide');
         element.val(JSON.stringify(regionSVG.getRegions()));

@@ -3,6 +3,8 @@
 namespace common\models;
 
 use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "auth".
@@ -14,7 +16,7 @@ use Yii;
  *
  * @property User $user
  */
-class Auth extends \yii\db\ActiveRecord
+class Auth extends ActiveRecord
 {
 
     const AUTH_SESSION_KEY = 'authHandler';
@@ -22,7 +24,7 @@ class Auth extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'auth';
     }
@@ -30,7 +32,7 @@ class Auth extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['user_id', 'source', 'source_id'], 'required'],
@@ -43,7 +45,7 @@ class Auth extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -53,10 +55,7 @@ class Auth extends \yii\db\ActiveRecord
         ];
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUser()
+    public function getUser(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
@@ -70,4 +69,11 @@ class Auth extends \yii\db\ActiveRecord
         return $model;
     }
 
+    public static function findAuth(string $source, string $sourceId): ?self
+    {
+        return self::find()->where([
+            'source' => $source,
+            'source_id' => $sourceId,
+        ])->one();
+    }
 }

@@ -115,4 +115,11 @@ class UserHelper
         }
         return $students;
     }
+
+    public static function formatUsername(string $username): string
+    {
+        $username = Translit::translit(trim($username));
+        $username = mb_strtolower($username);
+        return strtr($username, ['-' => '_']);
+    }
 }

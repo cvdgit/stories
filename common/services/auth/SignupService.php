@@ -2,9 +2,13 @@
 
 namespace common\services\auth;
 
+use common\components\ModelDomainException;
 use common\helpers\EmailHelper;
+use common\rbac\UserRoles;
+use common\services\RoleManager;
 use Exception;
 use frontend\components\queue\UnisenderAddJob;
+use frontend\models\auth\CreateUserForm;
 use RuntimeException;
 use Yii;
 use common\models\User;
@@ -13,11 +17,13 @@ use common\services\TransactionManager;
 class SignupService
 {
 
-    protected $transaction;
+    private $transaction;
+    private $roleManager;
 
-    public function __construct(TransactionManager $transaction)
+    public function __construct(TransactionManager $transaction, RoleManager $roleManager)
     {
         $this->transaction = $transaction;
+        $this->roleManager = $roleManager;
     }
 
     /**
@@ -44,6 +50,33 @@ class SignupService
 
             $user->createMainStudent();
         });
+    }
+
+    public function signupSocial(CreateUserForm $form): User
+    {
+        if (!$form->validate()) {
+            throw ModelDomainException::create($form);
+        }
+
+        $user = User::createSignup(
+            $form->username,
+            $form->email,
+            $form->password
+        );
+        $user->status = User::STATUS_ACTIVE;
+
+        $this->transaction->wrap(function() use ($user) {
+
+            if (!$user->save()) {
+                throw ModelDomainException::create($user);
+            }
+
+            $this->roleManager->assign($user->id, UserRoles::ROLE_USER);
+
+            $user->createMainStudent();
+        });
+
+        return $user;
     }
 
     public function sentEmailConfirm(User $user): void

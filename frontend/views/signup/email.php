@@ -14,7 +14,8 @@ $this->setMetaTags($title,
     $title);
 ?>
 <div class="container">
-    <h1 class="text-center">Завершение регистрации</h1>
+    <h1 class="text-center" style="margin-bottom:40px">Завершение регистрации</h1>
+    <h4 class="text-center">Для завершения регистрации необходимо ввести email</h4>
     <div class="site-reset-password">
         <div class="row">
             <div class="col-md-4 col-md-offset-4">

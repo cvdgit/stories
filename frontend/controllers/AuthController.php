@@ -6,14 +6,18 @@ use common\models\StudyTask;
 use common\models\UserToken;
 use common\services\WelcomeUserService;
 use Exception;
+use frontend\components\NoEmailException;
+use frontend\components\UserAlreadyExistsException;
 use Yii;
+use yii\authclient\ClientInterface;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use common\models\LoginForm;
 use common\services\auth\AuthService;
-use frontend\components\AuthHandler;
+use frontend\components\auth\AuthHandler;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
+use yii\authclient\AuthAction;
 
 class AuthController extends Controller
 {
@@ -44,15 +48,30 @@ class AuthController extends Controller
     {
         return [
             'auth' => [
-                'class' => 'yii\authclient\AuthAction',
+                'class' => AuthAction::class,
                 'successCallback' => [$this, 'onAuthSuccess'],
             ],
         ];
     }
 
-    public function onAuthSuccess($client)
+    public function onAuthSuccess(ClientInterface $client): void
     {
-        (new AuthHandler($client, $this->welcomeUserService))->handle();
+        $handler = new AuthHandler($client);
+        $authUserForm = $handler->handle();
+
+        try {
+            $this->service->socialAuth($client->getId(), $authUserForm);
+        }
+        catch (NoEmailException $noEmailException) {
+            $this->service->noEmailRedirect($client->getId(), $authUserForm);
+        }
+        catch (UserAlreadyExistsException $userAlreadyExistsException) {
+            Yii::$app->session->setFlash('error', 'Пользователь, с указанным в аккаунте ' . $client->getTitle() . ' email уже существует.');
+        }
+        catch(Exception $exception) {
+            Yii::$app->errorHandler->logException($exception);
+            Yii::$app->session->setFlash('error', $exception->getMessage());
+        }
     }
 
     /**
