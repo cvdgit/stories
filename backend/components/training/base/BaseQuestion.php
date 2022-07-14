@@ -95,7 +95,7 @@ class BaseQuestion
 
     public function getCorrectAnswerNumber(): int
     {
-        return array_reduce($this->getAnswers(), static function($carry, $item) {
+        return (int) array_reduce($this->getAnswers(), static function($carry, $item) {
             $carry += $item->isCorrect() ? 1 : 0;
             return $carry;
         });
