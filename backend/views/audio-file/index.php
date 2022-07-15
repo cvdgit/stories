@@ -1,4 +1,5 @@
 <?php
+use backend\widgets\WikidsDatePicker;
 use common\helpers\Url;
 use common\models\AudioFile;
 use yii\bootstrap\Html;
@@ -36,7 +37,14 @@ $this->title = 'Аудио файлы';
                     }
                 }
             ],
-            'created_at:datetime',
+            [
+                'attribute' => 'created_at',
+                'format' => 'datetime',
+                'filter' => WikidsDatePicker::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'created_at',
+                ]),
+            ],
             [
                 'class' => yii\grid\ActionColumn::class,
                 'template' => '{update} {delete}',

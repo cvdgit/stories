@@ -11,11 +11,13 @@ class AudioFileSearch extends Model
 
     public $name;
     public $path;
+    public $created_at;
 
     public function rules(): array
     {
         return [
             [['name', 'path'], 'string', 'max' => 255],
+            ['created_at', 'datetime', 'format' => 'php:d.m.Y'],
         ];
     }
 
@@ -27,17 +29,18 @@ class AudioFileSearch extends Model
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'sort' => [
-                'defaultOrder' => ['created_at' => SORT_DESC],
+                'defaultOrder' => ['audio_file.created_at' => SORT_DESC],
             ],
         ]);
         if (!($this->load($params) && $this->validate())) {
             return $dataProvider;
         }
-        $query->andFilterWhere(['like', 'name', $this->name]);
+        $query->andFilterWhere(['like', 'audio_file.name', $this->name]);
         $query->andFilterWhere(['or',
             ['like', 'story_test_question.name', $this->path],
             ['like', 'story_test.title', $this->path]
         ]);
+        $query->andFilterWhere(["DATE_FORMAT(FROM_UNIXTIME(audio_file.created_at), '%d.%m.%Y')" => $this->created_at]);
         return $dataProvider;
     }
 }
