@@ -853,7 +853,7 @@ p.wikids-test-description {
 }
 
 .seq-question__wrap--full {
-  height: 100%;
+  height: 50vh;
 }
 
 .sequence-question-list {
@@ -863,6 +863,10 @@ p.wikids-test-description {
 .seq-answers {
   max-width: 600px;
   margin: 0 auto;
+}
+
+.seq-answers div {
+  height: auto !important;
 }
 
 .seq-answers--large {
@@ -1558,7 +1562,7 @@ p.wikids-test-description {
 }
 
 .pass-test-question__wrap {
-  line-height: 2;
+  line-height: 2.4;
   font-size: 24px;
 }
 
@@ -1608,6 +1612,10 @@ p.wikids-test-description {
   height: 100%;
   min-width: 500px;
   max-width: 900px;
+}
+
+.drag-words-answers {
+  height: 50vh;
 }
 
 .drag-words-answers__content {

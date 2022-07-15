@@ -13,7 +13,7 @@ use yii\web\View;
         <h4 class="modal-title">Регистрация<br><span>в Wikids</span></h4>
       </div>
       <div class="modal-body">
-        <?php 
+        <?php
         $form = ActiveForm::begin([
           'action' => ['/signup/request'],
           'enableClientValidation' => true,
@@ -29,7 +29,7 @@ use yii\web\View;
         ]);
         $fieldTemplate = "<div class='input-wrapper'>\n{icon}\n{input}\n</div>\n{hint}\n{error}"; ?>
         <?= $form->field($model, 'email', [
-          'inputOptions' => ['placeholder' => 'Email'],
+          'inputOptions' => ['placeholder' => 'Email', 'autofocus' => true, 'autocomplete' => 'email'],
           'parts' => ['{icon}' => '<span class="input-group-addon icon icon-email"></span>'],
           'template' => $fieldTemplate,
         ])->label(false) ?>

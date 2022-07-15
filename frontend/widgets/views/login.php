@@ -11,7 +11,7 @@ use yii\bootstrap\ActiveForm;
         <h4 class="modal-title">Вход<br><span>в личный кабинет</span></h4>
       </div>
       <div class="modal-body">
-        <?php 
+        <?php
         $form = ActiveForm::begin([
           'action' => ['/auth/login'],
           'enableClientValidation' => true,
@@ -27,12 +27,12 @@ use yii\bootstrap\ActiveForm;
         ]);
         $fieldTemplate = "<div class='input-wrapper'>\n{icon}\n{input}\n</div>\n{hint}\n{error}";
         echo $form->field($model, 'email', [
-          'inputOptions' => ['placeholder' => 'email'],
+          'inputOptions' => ['autofocus' => true, 'autocomplete' => 'email', 'placeholder' => 'Email'],
           'parts' => ['{icon}' => '<span class="input-group-addon icon icon-email"></span>'],
           'template' => $fieldTemplate,
         ])->label(false);
         echo $form->field($model, 'password', [
-          'inputOptions' => ['placeholder' => 'Пароль'],
+          'inputOptions' => ['placeholder' => 'Пароль', 'autocomplete' => 'current-password'],
           'parts' => ['{icon}' => '<span class="input-group-addon icon icon-password"></span>'],
           'template' => $fieldTemplate,
         ])->passwordInput()->label(false);

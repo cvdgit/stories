@@ -208,7 +208,7 @@ a {
     border: 1.5px solid var(--black1);
     box-sizing: border-box;
     border-radius: 20px;
-    padding: 0.8rem 2.4rem 1.1rem 2.4rem;
+    padding: 1.1rem 2.4rem 1.1rem 2.4rem;
     display: inline-block;
 }
 
@@ -430,7 +430,7 @@ a {
             font-size: 2.4rem;
             line-height: 2.88rem;
             text-align: center;
-            
+
             position: relative !important;
             display: block;
             width: 100% !important;
@@ -739,11 +739,11 @@ a {
     list-style: none;
     margin: 0;
     margin-bottom: 5rem;
-    
+
     &__wrap {
         position: relative;
     }
-    
+
     @include media-breakpoint-down(md) {
         flex-direction: column;
         justify-content: center;
@@ -762,7 +762,7 @@ a {
     display: inline-block;
     margin-right: 2rem;
     margin-bottom: 2rem;
-    
+
     &:not(.active) {
         position: relative;
         top: auto;
@@ -773,7 +773,7 @@ a {
             display: none;
         }
     }
-    
+
     &__link {
         color: var(--black1);
         background-color: var(--grey);
