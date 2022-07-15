@@ -249,11 +249,6 @@ class Story extends ActiveRecord
         return !empty($this->sub_access);
     }
 
-    /*public static function findStory($condition)
-    {
-        return static::findByCondition($condition)->published()->one();
-    }*/
-
     public static function forSlider($number = 4)
     {
         return static::find()->published()->withCover()->byRand()->limit($number)->all();
@@ -439,7 +434,11 @@ class Story extends ActiveRecord
         $slides = $slides->all();
         $data = '';
         foreach ($slides as $slide) {
-            $data .= $slide['link_data'] ?? $slide['data'];
+            $slideData = $slide['link_data'] ?? $slide['data'];
+            if ($slideData === 'link') {
+                continue;
+            }
+            $data .= $slideData;
             $search = [
                 'data-id=""',
                 'data-background-color="#000000"',
@@ -834,5 +833,16 @@ class Story extends ActiveRecord
             $query->andWhere(['in', 'uuid', $uuids]);
         }
         return $query->all();
+    }
+
+    public static function convertLinksToSlides(int $slideId): void
+    {
+        $command = Yii::$app->db->createCommand();
+        $command->update(StorySlide::tableName(),
+            ['link_slide_id' => new Expression('NULL'), 'kind' => StorySlide::KIND_SLIDE],
+            'link_slide_id = :slideId',
+            [':slideId' => $slideId]
+        );
+        $command->execute();
     }
 }

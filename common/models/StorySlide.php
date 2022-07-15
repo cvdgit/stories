@@ -6,10 +6,12 @@ use backend\components\SlideWrapper;
 use backend\models\NeoSlideRelations;
 use common\models\slide\SlideKind;
 use DomainException;
+use Yii;
 use yii\base\InvalidConfigException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
 use yii\db\Query;
 
 /**
@@ -209,14 +211,22 @@ class StorySlide extends ActiveRecord
     {
         // Обновить количество слайдов в истории
         Story::updateSlideNumber($this->story_id);
+
         if ($this->isQuestion()) {
             $slideWrapper = new SlideWrapper($this->data);
             if (($testId = $slideWrapper->findTestId()) !== null) {
                 StoryStoryTest::deleteStoryTest($this->story_id, $testId);
             }
         }
+
         // Изменить номера остальных слайдов
         Story::deleteSlideNumber($this->story_id, $this->number);
+
+        // Если текущий слайд используется как ссылка - обнулить поле в этих слайдах
+        if (!$this->isLink()) {
+            Story::convertLinksToSlides($this->id);
+        }
+
         parent::afterDelete();
     }
 

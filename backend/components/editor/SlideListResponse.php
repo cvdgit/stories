@@ -14,7 +14,16 @@ class SlideListResponse
     public function __construct(StorySlide $slide)
     {
         $this->slide = $slide;
-        $this->slideModifier = new SlideModifier($slide->id, $slide->getSlideOrLinkData());
+
+        $slideData = '';
+        try {
+            $slideData = $slide->getSlideOrLinkData();
+        }
+        catch (\Exception $ex) {
+
+        }
+
+        $this->slideModifier = new SlideModifier($slide->id, $slideData);
     }
 
     public function asArray(): array
