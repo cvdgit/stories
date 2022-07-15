@@ -29,7 +29,7 @@ class AudioFileSearch extends Model
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'sort' => [
-                'defaultOrder' => ['audio_file.created_at' => SORT_DESC],
+                'defaultOrder' => ['created_at' => SORT_DESC],
             ],
         ]);
         if (!($this->load($params) && $this->validate())) {
