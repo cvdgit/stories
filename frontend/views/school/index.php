@@ -375,6 +375,9 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                                                 <li>Согласие на обработку персональных данных</li>
                                                 <li>Личное дело ученика</li>
                                             </ul>
+                                            <div>
+                                                <?= Html::a('Полный перечень документов', ['site/school-files']) ?>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="ask-card-header__icon">
