@@ -139,10 +139,10 @@ return [
             'setParams' => true, // optional, bootstrap initialize requred
         ],
     ],
-    'container' => [
+/*    'container' => [
         'singletons' => [
             UrlManager::class => $urlManager,
         ],
-    ],
+    ],*/
     'params' => $params,
 ];
