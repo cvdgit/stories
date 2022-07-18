@@ -1602,7 +1602,7 @@ p.wikids-test-description {
 }
 
 .drag-words-question {
-  height: calc(100% - 100px);
+/*  height: calc(100% - 100px);*/
   display: flex;
   align-items: center;
   justify-content: center;
