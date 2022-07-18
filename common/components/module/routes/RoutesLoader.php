@@ -4,7 +4,6 @@ namespace common\components\module\routes;
 
 use Yii;
 use yii\base\BootstrapInterface;
-use yii\web\UrlManager;
 
 final class RoutesLoader implements BootstrapInterface
 {
@@ -12,7 +11,7 @@ final class RoutesLoader implements BootstrapInterface
     {
         $container = Yii::$container;
         $fetcher = $container->get(RoutesFetcher::class);
-        $urlManager = $container->get(UrlManager::class);
+        $urlManager = Yii::$app->urlManager;
         $urlManager->addRules($fetcher->getRules());
     }
 }

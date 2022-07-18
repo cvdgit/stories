@@ -12,6 +12,7 @@ return [
         'captcha' => 'site/captcha',
         'policy' => 'site/policy',
         'copyright' => 'site/copyright',
+        'school-files' => 'site/school-files',
         'request-password-reset' => 'site/request-password-reset',
 
         //'pricing' => 'rate/index',

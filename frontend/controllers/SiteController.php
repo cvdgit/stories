@@ -124,4 +124,9 @@ class SiteController extends Controller
     {
         return $this->render('copyright');
     }
+
+    public function actionSchoolFiles(): string
+    {
+        return $this->render('school-files');
+    }
 }
