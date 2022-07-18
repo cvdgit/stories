@@ -76,6 +76,8 @@ AppAsset::register($this);
                         ['label' => 'Группы', 'url' => ['/study-group/index'], 'active' => Yii::$app->controller->id === 'study-group'],
                         ['label' => 'Задания', 'url' => ['/study-task/index'], 'active' => Yii::$app->controller->id === 'study-task'],
                         ['label' => 'Аудио файлы', 'url' => ['audio-file/index']],
+                        ['label' => 'Папки', 'url' => ['/files/study-folder/index']],
+                        ['label' => 'Файлы', 'url' => ['/files/study-file/index']],
                     ],
                 ]) ?>
                 <?php endif ?>

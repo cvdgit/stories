@@ -1,4 +1,7 @@
 <?php
+
+use yii\web\UrlManager;
+
 $params = array_merge(
     require __DIR__ . '/../../common/config/params.php',
     require __DIR__ . '/../../common/config/params-local.php',
@@ -134,6 +137,11 @@ return [
         'crawlerdetect' => [
             'class' => 'alikdex\crawlerdetect\CrawlerDetect',
             'setParams' => true, // optional, bootstrap initialize requred
+        ],
+    ],
+    'container' => [
+        'singletons' => [
+            UrlManager::class => $urlManager,
         ],
     ],
     'params' => $params,
