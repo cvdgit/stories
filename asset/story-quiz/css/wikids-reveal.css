@@ -841,7 +841,7 @@ p.wikids-test-description {
 }
 
 .seq-question {
-  height: calc(100% - 100px);
+  height: calc(100% - 134px);
   display: flex;
   align-items: center;
   justify-content: center;
