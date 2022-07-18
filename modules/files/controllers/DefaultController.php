@@ -36,11 +36,12 @@ class DefaultController extends Controller
                 throw new NotFoundHttpException('Файл не найден');
             }
 
-            try {
-                $this->studyFileService->addOpenHistory(Yii::$app->user->id, $fileModel->id);
-            }
-            catch(Exception $exception) {
-                Yii::$app->errorHandler->logException($exception);
+            if (!Yii::$app->user->isGuest) {
+                try {
+                    $this->studyFileService->addOpenHistory(Yii::$app->user->id, $fileModel->id);
+                } catch (Exception $exception) {
+                    Yii::$app->errorHandler->logException($exception);
+                }
             }
 
             Yii::$app->response->sendFile($filePath, $fileModel->getNameWithExtension());
