@@ -2,9 +2,9 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 /* @var $this yii\web\View */
-$this->setMetaTags('Сервис ускоренного развития речи ребёнка',
-    'Сервис ускоренного развития речи ребёнка',
-    'wikids, сказки, истории');
+$this->setMetaTags('Онлайн школа домашнего обучения',
+    'Онлайн школа домашнего обучения',
+    'домашнее обучение, онлайн школа, обучение детей, wikids, сказки, истории');
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 /** @var $contactRequestModel frontend\models\ContactRequestForm */
 ?>
