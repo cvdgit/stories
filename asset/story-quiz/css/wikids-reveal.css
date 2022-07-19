@@ -306,6 +306,10 @@
 
 }
 
+.wikids-test-begin-page .restart-quiz {
+  font-size: 2rem;
+}
+
 .wikids-test-begin-page h3 {
 	font-size: 3rem;
 }
