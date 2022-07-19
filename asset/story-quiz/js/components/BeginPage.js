@@ -32,13 +32,16 @@ export function createBeginPage(testResponse, options = {canModerate: false, onA
     $item.on('click', function(e) {
       e.preventDefault();
 
-      activeStudent = student;
-      $beginButton.text(progress === 0 ? 'Начать тест' : 'Продолжить тест');
+      const stud = $(this).data('student');
+      const studProgress = parseInt(stud.progress);
+
+      activeStudent = stud;
+      $beginButton.text(studProgress === 0 ? 'Начать тест' : 'Продолжить тест');
 
       $(this).siblings().removeClass('active');
       $(this).addClass('active');
 
-      if (progress === 0) {
+      if (studProgress === 0) {
         $restartQuiz.hide();
       }
       else {
@@ -46,7 +49,7 @@ export function createBeginPage(testResponse, options = {canModerate: false, onA
       }
 
       if (typeof options.onActive === 'function') {
-        options.onActive(student);
+        options.onActive(stud);
       }
     });
 
@@ -92,16 +95,23 @@ export function createBeginPage(testResponse, options = {canModerate: false, onA
       return;
     }
 
+    const that = $(this);
+
     if (typeof options.onRestart === 'function') {
       options.onRestart(activeStudent.id)
         .done((response) => {
           if (response && response.success) {
             toastr.success('Успешно');
 
-            $listGroup
-              .find('a.active')
-              .find('.list-group-item-text')
-              .remove();
+            const active = $listGroup.find('a.active')
+
+            active.find('.list-group-item-text').remove();
+
+            const stud = active.data('student');
+            stud.progress = 0;
+            active.data('student', stud);
+
+            active.click();
           }
           else {
             toastr.error(response['message'] || 'Неизвестная ошибка');
