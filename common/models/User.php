@@ -458,4 +458,12 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->hasMany(StudyGroup::class, ['id' => 'study_group_id'])
             ->viaTable('study_group_user', ['user_id' => 'id']);
     }
+
+    public function isMyStudent(int $studentId): bool
+    {
+        return $this
+            ->getStudents()
+            ->andWhere(['id' => $studentId])
+            ->exists();
+    }
 }

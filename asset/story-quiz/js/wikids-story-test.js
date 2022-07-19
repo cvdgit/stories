@@ -24,6 +24,7 @@ import {createStar, createStarFill} from "./components/stars";
 import createDescription from "./components/description";
 import PassTest from "./questions/PassTest";
 import DragWords from "./questions/DragWords";
+import {createBeginPage} from "./components/BeginPage";
 
 
 var plugins = [];
@@ -244,11 +245,26 @@ function WikidsStoryTest(el, options) {
 
     reset();
     dom.wrapper = $("<div/>").addClass("wikids-test");
-
     if (App.userIsGuest()) {
       dom.beginPage = createGuestBeginPage(testResponse);
     } else {
-      dom.beginPage = createBeginPage(testResponse);
+      dom.beginPage = createBeginPage(testResponse, {
+        canModerate: App.userIsModerator(),
+        onActive: (student) => {
+          currentStudent = student;
+          activeStudent.set(student);
+          $('.wikids-test-student-info', dom.header).text(currentStudent.name);
+        },
+        onStart: (fastMode) => {
+          loadData({fastMode});
+        },
+        onRestart: (studentId) => {
+          return $.getJSON('/question/quiz-restart', {quiz_id: testResponse.test.id, student_id: studentId})
+            .fail(function(response) {
+              toastr.error((response['responseJSON'] && response.responseJSON.message) || 'Произошла ошибка');
+            });
+        }
+      });
     }
 
     dom.wrapper.append(dom.beginPage);
@@ -357,13 +373,16 @@ function WikidsStoryTest(el, options) {
       .append($('<img/>').attr('src', '/img/loading.gif'));
   }
 
-  function loadData() {
+  function loadData(options) {
     console.debug('WikidsStoryTest.loadData');
 
     setElementHtml(createLoader());
+
+    that.options.fastMode = options.fastMode;
+
     var dataParams = Object.assign(that.options.dataParams || {}, {
       studentId: activeStudent.getID(),
-      fastMode: that.options.fastMode
+      fastMode: options.fastMode
     });
     $.getJSON(that.options.dataUrl, dataParams)
       .done(function (response) {
@@ -403,22 +422,13 @@ function WikidsStoryTest(el, options) {
     }
   })();
 
-  function setActiveStudentElement(element) {
-    element.siblings().removeClass('active');
-    element.addClass('active');
-    currentStudent = element.data('student');
-    activeStudent.set(element.data('student'));
-    $('.wikids-test-student-info', dom.header).text(currentStudent.name);
-  }
-
   function createGuestBeginPage(testResponse) {
 
     var $beginButton = $('<button/>')
       .addClass('btn wikids-test-begin')
       .text('Начать тест')
       .on('click', function () {
-        that.options.fastMode = true;
-        loadData();
+        loadData({fastMode: true});
       });
 
     var $rowWrapper = $('<div/>', {'class': 'row-wrapper'});
@@ -437,6 +447,7 @@ function WikidsStoryTest(el, options) {
       .append($beginButton);
   }
 
+  /*
   function createBeginPage(testResponse) {
 
     var $listGroup = $('<div/>').addClass('list-group');
@@ -491,7 +502,7 @@ function WikidsStoryTest(el, options) {
           createDescription(testResponse.test.description)
         )
       );
-  }
+  }*/
 
   function createErrorPage() {
     return $('<div/>')

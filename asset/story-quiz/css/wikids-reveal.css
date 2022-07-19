@@ -819,7 +819,7 @@ p.wikids-test-description {
 }
 
 .wikids-test-begin {
-	margin-top: 15px;
+	margin: 15px 0;
 }
 
 .wikids-test-correct-answer-answers .question-region {

@@ -374,7 +374,7 @@ class StoryTest extends ActiveRecord
     {
         $query = StoryTestQuestion::find()
             ->where('story_test_id = :id', [':id' => $this->id])
-            ->with(['storyTestAnswersWithHidden']);
+            ->with(['storyTestAnswersWithHidden', 'audioFile']);
         if ($filter !== null) {
             $ids = array_map(static function($item) {
                 return $item['entity_id'];

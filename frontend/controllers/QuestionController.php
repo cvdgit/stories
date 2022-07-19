@@ -5,13 +5,17 @@ namespace frontend\controllers;
 use backend\components\training\base\Serializer;
 use backend\components\training\collection\TestBuilder;
 use backend\components\training\collection\WordTestBuilder;
+use backend\services\QuizHistoryService;
 use common\helpers\UserHelper;
 use common\models\StoryTest;
 use common\models\TestRememberAnswer;
 use common\models\TestWordList;
 use common\models\User;
 use common\models\UserQuestionHistoryModel;
+use common\models\UserStudent;
+use Exception;
 use linslin\yii2\curl\Curl;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Yii;
 use yii\db\Query;
 use yii\helpers\HtmlPurifier;
@@ -23,6 +27,14 @@ use yii\web\NotFoundHttpException;
 class QuestionController extends Controller
 {
 
+    private $quizHistoryService;
+
+    public function __construct($id, $module, QuizHistoryService $quizHistoryService, $config = [])
+    {
+        $this->quizHistoryService = $quizHistoryService;
+        parent::__construct($id, $module, $config);
+    }
+
     public function actionInit(int $testId, int $userId = null)
     {
         $test = StoryTest::findModel($testId);
@@ -32,6 +44,7 @@ class QuestionController extends Controller
         }
         return [
             'test' => [
+                'id' => $test->id,
                 'header' => $test->header,
                 'description' => HTMLPurifier::process(nl2br($test->description_text)),
                 'remote' => $test->isRemote(),
@@ -55,7 +68,7 @@ class QuestionController extends Controller
         try {
             $result = Json::decode($result);
         }
-        catch (\Exception $ex) {
+        catch (Exception $ex) {
             throw new HttpException(500, 'Incorrect JSON');
         }
 
@@ -340,5 +353,32 @@ class QuestionController extends Controller
             return $model;
         }
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionQuizRestart(int $quiz_id, int $student_id): array
+    {
+        if (($quizModel = StoryTest::findOne($quiz_id)) === null) {
+            throw new NotFoundHttpException('Тестирование не найдено');
+        }
+        if (($studentModel = UserStudent::findOne($student_id)) === null) {
+            throw new NotFoundHttpException('Студент не найден');
+        }
+
+        /** @var User $currentUser */
+        $currentUser = Yii::$app->user->identity;
+        if (!$currentUser->isMyStudent($studentModel->id)) {
+            throw new AccessDeniedException('Студент не принадлежит пользователю');
+        }
+
+        try {
+            $this->quizHistoryService->clearHistory($quizModel->id, $studentModel->id);
+            return ['success' => true];
+        }
+        catch (Exception $exception) {
+            return ['success' => false, 'message' => $exception->getMessage()];
+        }
     }
 }
