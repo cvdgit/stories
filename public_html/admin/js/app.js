@@ -1,4 +1,10 @@
 
+(function() {
+  $.ajaxSetup({
+    cache: true
+  });
+})();
+
 function queryStringToJSON(qs) {
     var pairs = qs.split('&');
     var result = {};
