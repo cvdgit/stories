@@ -1,6 +1,8 @@
 <?php
+use frontend\assets\TestAsset;
 use yii\helpers\Html;
 /* @var $model common\models\StoryTest */
+TestAsset::register($this);
 ?>
 <div class="modal-body">
     <div class="story-container">

@@ -1,16 +1,15 @@
 <?php
-
-use frontend\assets\TestAsset;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ListView;
-/** @var $this yii\web\View */
-/** @var $dataProvider yii\data\ActiveDataProvider */
-/** @var $students array */
-/** @var $activeStudent common\models\UserStudent */
-/** @var $category common\models\Category */
+/**
+ * @var $this yii\web\View
+ * @var $dataProvider yii\data\ActiveDataProvider
+ * @var $students array
+ * @var $activeStudent common\models\UserStudent
+ * @var $category common\models\Category
+ */
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
-TestAsset::register($this);
 ?>
 <div class="container">
     <div class="row">

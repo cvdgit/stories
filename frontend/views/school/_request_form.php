@@ -45,7 +45,9 @@ $this->registerJs(<<<JS
     var doneCallback = function(response) {
         if (response && response.success) {
             setRequest(response['message'] || 'Успешно');
-            ym(53566996,'reachGoal',' zayavka');
+            if (typeof ym === 'function') {
+                ym(53566996,'reachGoal',' zayavka');
+            }
         }
         else {
             setRequest(response['message'] || 'Неизвестная ошибка');

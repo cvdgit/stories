@@ -127,12 +127,15 @@ class TestController extends Controller
         return $this->redirect(['index']);
     }
 
-    protected function findModel($id)
+    /**
+     * @throws NotFoundHttpException
+     */
+    private function findModel($id): StoryTest
     {
         if (($model = StoryTest::findOne($id)) !== null) {
             return $model;
         }
-        throw new NotFoundHttpException('The requested page does not exist.');
+        throw new NotFoundHttpException('Тестирование не найдено.');
     }
 
     public function actionCreateQuestion(int $test_id)
@@ -310,5 +313,16 @@ class TestController extends Controller
             }
         }
         return ['success' => false, 'message' => 'No data'];
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionRun(int $id): string
+    {
+        $model = $this->findModel($id);
+        return $this->renderAjax('run', [
+            'model' => $model,
+        ]);
     }
 }

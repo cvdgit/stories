@@ -50,7 +50,9 @@ $this->registerJs(<<<JS
     var doneCallback = function(response) {
         if (response && response.success) {
             toastr.success(response['message'] || 'Успешно');
-            ym(53566996,'reachGoal',' zayavka');
+            if (typeof ym === 'function') {
+                ym(53566996,'reachGoal',' zayavka');
+            }
         }
         else {
             toastr.error(response['message'] || 'Неизвестная ошибка');

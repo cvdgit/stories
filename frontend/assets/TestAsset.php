@@ -20,17 +20,4 @@ class TestAsset extends AssetBundle
     public $depends = [
         AppAsset::class,
     ];
-
-/*    public $css = [
-        'css/wikids-reveal.css',
-    ];
-    public $js = [
-        'js/wikids-story-test.js',
-        'js/PatienceDiff.js',
-    ];
-    public $depends = [
-        AppAsset::class,
-        SortableJsAsset::class,
-        MaphilightAsset::class,
-    ];*/
 }

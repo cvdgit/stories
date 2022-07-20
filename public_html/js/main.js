@@ -11,6 +11,9 @@ $(function() {
 	    });
 	});
 
+  $.ajaxSetup({
+    cache: true
+  });
 });
 
 var App = (function() {
@@ -96,7 +99,7 @@ $(function() {
 });
 
 $(document).ready(function() {
-   
+
   $.uploadPreview({
     input_field: "#image-upload",   // По умолчанию: .image-upload
     preview_box: "#image-preview",  // По умолчанию: .image-preview
@@ -106,7 +109,7 @@ $(document).ready(function() {
     no_label: false,                // По умолчанию: false
     success_callback: function() {
 				var formData = new FormData($('#form-upload')[0]);
-				// console.log('formData', formData);    
+				// console.log('formData', formData);
 				$.ajax({
 						type: 'post',
 						url:'/file-avatar',
@@ -115,11 +118,11 @@ $(document).ready(function() {
 						contentType: false,
 						processData: false,
 						success: function(data) {
-								
+
 						}
-				})  
+				})
 				return false;
- 
+
 		}
   });
 });
