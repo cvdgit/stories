@@ -1,7 +1,5 @@
 <?php
 
-use common\components\module\Provider;
-use common\components\module\routes\RoutesLoader;
 use yii\rbac\DbManager;
 use yii\caching\FileCache;
 
@@ -16,8 +14,7 @@ return [
     ],
     'vendorPath' => dirname(__DIR__, 2) . '/vendor',
     'bootstrap' => [
-        Provider::class,
-        RoutesLoader::class,
+
     ],
     'modules' => [
         'files' => ['class' => modules\files\Module::class],

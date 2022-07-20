@@ -1,6 +1,7 @@
 <?php
 
-use yii\web\UrlManager;
+use common\components\module\Provider;
+use common\components\module\routes\RoutesLoader;
 
 $params = array_merge(
     require __DIR__ . '/../../common/config/params.php',
@@ -19,6 +20,8 @@ return [
         'common\bootstrap\Bootstrap',
         'devicedetect',
         'crawlerdetect',
+        Provider::class,
+        RoutesLoader::class,
     ],
     'controllerNamespace' => 'frontend\controllers',
     'on beforeAction' => function($event) {
