@@ -1,4 +1,9 @@
 <?php
+
+use yii\console\controllers\FixtureController;
+use yii\console\controllers\MigrateController;
+use yii\console\controllers\ServeController;
+
 $params = array_merge(
     require __DIR__ . '/../../common/config/params.php',
     require __DIR__ . '/../../common/config/params-local.php',
@@ -19,14 +24,18 @@ return [
     'controllerNamespace' => 'console\controllers',
     'controllerMap' => [
         'fixture' => [
-            'class' => \yii\console\controllers\FixtureController::class,
+            'class' => FixtureController::class,
             'namespace' => 'common\fixtures',
         ],
         'migrate' => [
-            'class' => \yii\console\controllers\MigrateController::class,
+            'class' => MigrateController::class,
             'migrationNamespaces' => [
                 'yii\queue\db\migrations',
             ],
+        ],
+        'serve' => [
+            'class' => ServeController::class,
+            'docroot' => '@public',
         ],
     ],
     'aliases' => [

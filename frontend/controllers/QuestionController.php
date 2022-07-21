@@ -15,12 +15,12 @@ use common\models\UserQuestionHistoryModel;
 use common\models\UserStudent;
 use Exception;
 use linslin\yii2\curl\Curl;
-use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Yii;
 use yii\db\Query;
 use yii\helpers\HtmlPurifier;
 use yii\helpers\Json;
 use yii\rest\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 
@@ -370,7 +370,7 @@ class QuestionController extends Controller
         /** @var User $currentUser */
         $currentUser = Yii::$app->user->identity;
         if (!$currentUser->isMyStudent($studentModel->id)) {
-            throw new AccessDeniedException('Студент не принадлежит пользователю');
+            throw new ForbiddenHttpException('Студент не принадлежит пользователю');
         }
 
         try {

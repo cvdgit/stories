@@ -3,7 +3,9 @@ actor: AcceptanceTester
 modules:
     enabled:
         - WebDriver:
-            url: http://localhost:8080
-            browser: firefox
+              url: https://wikids.test/
+              browser: chrome
+              port: 8443
         - Yii2:
             part: init
+            entryScript: index-test.php
