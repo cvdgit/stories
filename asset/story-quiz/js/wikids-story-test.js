@@ -25,6 +25,7 @@ import createDescription from "./components/description";
 import PassTest from "./questions/PassTest";
 import DragWords from "./questions/DragWords";
 import {createBeginPage} from "./components/BeginPage";
+import createHome from "./components/header/Home";
 
 
 var plugins = [];
@@ -66,6 +67,10 @@ function WikidsStoryTest(el, options) {
 
   if (!(el && el.nodeType && el.nodeType === 1)) {
     throw "Element must be an HTMLElement, not ".concat({}.toString.call(el));
+  }
+
+  if (!options['init'] || typeof options['init'] !== 'function') {
+    throw 'Необходимо определить свойство init';
   }
 
   options = options || {};
@@ -240,11 +245,23 @@ function WikidsStoryTest(el, options) {
     }
   }
 
+  function run() {
+    options.init()
+      .done((response) => {
+        init(response);
+        if (typeof options['onInitialized'] === 'function') {
+          options.onInitialized();
+        }
+      });
+  }
+
   function init(testResponse) {
     console.debug('WikidsStoryTest.init');
 
     reset();
+
     dom.wrapper = $("<div/>").addClass("wikids-test");
+
     if (App.userIsGuest()) {
       dom.beginPage = createGuestBeginPage(testResponse);
     } else {
@@ -446,63 +463,6 @@ function WikidsStoryTest(el, options) {
       .append($rowWrapper)
       .append($beginButton);
   }
-
-  /*
-  function createBeginPage(testResponse) {
-
-    var $listGroup = $('<div/>').addClass('list-group');
-    $listGroup.on('click', 'a', function (e) {
-      e.preventDefault();
-      setActiveStudentElement($(this));
-    });
-    testResponse.students.forEach(function (student) {
-      var $item = $('<a/>')
-        .attr('href', '#')
-        .addClass('list-group-item')
-        .data('student', student)
-        .append($('<h4/>').addClass('list-group-item-heading').text(student.name));
-      if (student['progress'] && student.progress > 0) {
-        $item.append(
-          $('<p/>').addClass('list-group-item-text').text(student.progress + '% завершено')
-        );
-      }
-      $item.appendTo($listGroup);
-    });
-    setActiveStudentElement($listGroup.find('a:eq(0)'));
-
-    var $beginButton = $('<button/>')
-      .addClass('btn wikids-test-begin')
-      .text('Начать тест')
-      .on('click', function () {
-        var fastMode = $('#test-fast-mode').is(':checked');
-        that.options.fastMode = fastMode;
-        loadData();
-      });
-
-    var $options = $('<div/>', {
-      class: 'wikids-test-begin-page-options'
-    });
-    $options.append('<label for="test-fast-mode"><input id="test-fast-mode" type="checkbox" /> быстрый режим</label>');
-
-    var $col = $('<div/>').addClass('col-md-6')
-      .append($('<h3/>').text('Выберите ученика:'))
-      .append($listGroup);
-
-    if (App.userIsModerator()) {
-      $col.append($options);
-    }
-
-    $col.append($beginButton);
-
-    return $('<div/>', {class: 'wikids-test-begin-page row row-no-gutters'})
-      .append($('<h3/>').text(testResponse.test.header))
-      .append($col)
-      .append(
-        $('<div/>', {class: 'col-md-6'}).append(
-          createDescription(testResponse.test.description)
-        )
-      );
-  }*/
 
   function createErrorPage() {
     return $('<div/>')
@@ -1274,7 +1234,10 @@ function WikidsStoryTest(el, options) {
     const $row = $('<div/>', {class: 'quiz-header-row'});
 
     if (!App.userIsGuest()) {
-      $('<div/>', {class: 'quiz-header-col'})
+      $('<div/>', {class: 'quiz-header-col student-col'})
+        .append(createHome(() => {
+          run();
+        }))
         .append(createStudentInfo())
         .appendTo($row);
     }
@@ -2634,7 +2597,7 @@ function WikidsStoryTest(el, options) {
   this.showOrigImage = showOriginalImage;
 
   return {
-    "init": init,
+    run,
     "load": load,
     "restore": restore,
     "addEventListener": function (type, listener, useCapture) {

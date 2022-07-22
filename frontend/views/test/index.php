@@ -89,22 +89,18 @@ $('#test-list').on('click', '.run-test', function(e) {
         .modal({'remote': $(this).attr('href')});
 });
 
-function initQuestions(params) {
-    params = params || {};
-    return $.getJSON("/question/init", params);
-}
-
 $('#run-test-modal').on('loaded.bs.modal', function() {
     var elem = $("div.new-questions", this),
         params = elem.data();
     var test = WikidsStoryTest.create(elem[0], {
         'dataUrl': '/question/get',
         'dataParams': params,
-        'forSlide': false
+        'forSlide': false,
+        init: function() {
+            return $.getJSON('/question/init', params);
+        }
     });
-    initQuestions(params).done(function(response) {
-        test.init(response);
-    });
+    test.run();
 });
 $('#run-test-modal').on('hide.bs.modal', function() {
     $(this).removeData('bs.modal');

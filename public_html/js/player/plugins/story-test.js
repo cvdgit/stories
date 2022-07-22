@@ -35,29 +35,29 @@ var TestSlide = (function() {
         var test_id = $(this).data("testId"),
             slide_index = Reveal.getIndices().h;
 
-        var promise = $.ajax({
-            "url": config.initAction + '?testId=' + test_id,
-            "type": "GET",
-            "dataType": "json"
-        });
-
         var test = WikidsStoryTest.create(container[0], {
-            //'dataUrl': config.action + "/" + test_id + "?t=" + Math.random(),
             'dataUrl': '/question/get',
             'dataParams': {'testId': test_id},
-            'forSlide': true
+            'forSlide': true,
+            init: function() {
+              return $.ajax({
+                "url": config.initAction + '?testId=' + test_id,
+                "type": "GET",
+                "dataType": "json"
+              })
+            },
+            onInitialized: function() {
+
+              test.addEventListener("finish", storyTestResults);
+              test.addEventListener("backToStory", backToStory);
+
+              Reveal.sync();
+              Reveal.slide(0);
+
+              stack.unshift({"story_id": currentStoryID, "slide_index": slide_index});
+            }
         });
-        promise.done(function(data) {
-
-            test.init(data);
-            test.addEventListener("finish", storyTestResults);
-            test.addEventListener("backToStory", backToStory);
-
-            Reveal.sync();
-            Reveal.slide(0);
-
-            stack.unshift({"story_id": currentStoryID, "slide_index": slide_index});
-        });
+        test.run();
     }
 
     function storyTestResults(event) {
@@ -127,29 +127,36 @@ var Education = (function() {
         return $.getJSON("/question/get", params);
     }
 
-    function init() {
-        var elem = $("div.new-questions", getCurrentSlide());
-        if (!elem.length) {
-            return;
-        }
-        var params = elem.data();
-        var test = WikidsStoryTest.create(elem[0], {
-            'dataUrl': '/question/get',
-            'dataParams': params,
-            'forSlide': false,
-            'required': params.testRequired
-        });
-        initQuestions(params).done(function(response) {
-            //StoryBackground.setBackgroundColor('light');
-            test.init(response);
-            test.addEventListener("finish", function() {
-                WikidsPlayer.right();
-            });
-            test.addEventListener("nextSlide", function() {
-                WikidsPlayer.right();
-            });
-        });
+  function init() {
+
+    var elem = $("div.new-questions", getCurrentSlide());
+    if (!elem.length) {
+      return;
     }
+
+    var params = elem.data();
+    var test = WikidsStoryTest.create(elem[0], {
+      'dataUrl': '/question/get',
+      'dataParams': params,
+      'forSlide': false,
+      'required': params.testRequired,
+      init: function() {
+        return $.getJSON('/question/init', params);
+      },
+      onInitialized: function() {
+        test.addEventListener("finish", function () {
+          WikidsPlayer.right();
+        });
+        test.addEventListener("nextSlide", function () {
+          WikidsPlayer.right();
+        });
+      }
+    });
+
+    test.run();
+
+
+  }
 
     function initEducation() {
         var currentSlideID = $(getCurrentSlide()).attr('data-id');

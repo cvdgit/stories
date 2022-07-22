@@ -1684,3 +1684,13 @@ p.wikids-test-description {
 .sequence-correct-page__wrap li > img {
   margin-right: 10px;
 }
+
+.student-col {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.home-icon {
+  margin-right: 10px;
+}
