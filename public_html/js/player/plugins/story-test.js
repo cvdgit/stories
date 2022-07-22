@@ -152,10 +152,7 @@ var Education = (function() {
         });
       }
     });
-
     test.run();
-
-
   }
 
     function initEducation() {

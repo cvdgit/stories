@@ -1235,9 +1235,9 @@ function WikidsStoryTest(el, options) {
 
     if (!App.userIsGuest()) {
       $('<div/>', {class: 'quiz-header-col student-col'})
-/*        .append(createHome(() => {
+        .append(createHome(() => {
           run();
-        }))*/
+        }))
         .append(createStudentInfo())
         .appendTo($row);
     }
