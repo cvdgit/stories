@@ -1,9 +1,14 @@
 <?php
 
-namespace common\models;
+namespace common\models\story_feedback;
 
+use common\models\Story;
+use common\models\StorySlide;
+use common\models\User;
+use frontend\models\feedback\CreateFeedbackForm;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
@@ -17,6 +22,8 @@ use yii\db\ActiveRecord;
  * @property int $status
  * @property int $created_at
  * @property int $slide_id
+ * @property int $testing_id
+ * @property int $question_id
  *
  * @property Story $story
  * @property User $assignUser
@@ -24,18 +31,15 @@ use yii\db\ActiveRecord;
 class StoryFeedback extends ActiveRecord
 {
 
-    const STATUS_NEW = 0;
-    const STATUS_DONE = 1;
-
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'story_feedback';
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             [
@@ -48,12 +52,12 @@ class StoryFeedback extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['story_id', 'assign_user_id', 'slide_number', 'slide_id'], 'required'],
-            [['story_id', 'assign_user_id', 'slide_number', 'status', 'slide_id'], 'integer'],
-            [['text'], 'string', 'max' => 255],
+            [['story_id', 'assign_user_id', 'slide_number', 'status', 'slide_id', 'testing_id', 'question_id'], 'integer'],
+            [['text'], 'string', 'max' => 1024],
             [['story_id'], 'exist', 'skipOnError' => true, 'targetClass' => Story::class, 'targetAttribute' => ['story_id' => 'id']],
             [['assign_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['assign_user_id' => 'id']],
         ];
@@ -62,7 +66,7 @@ class StoryFeedback extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -75,49 +79,36 @@ class StoryFeedback extends ActiveRecord
         ];
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStory()
+    public function getStory(): ActiveQuery
     {
         return $this->hasOne(Story::class, ['id' => 'story_id']);
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getAssignUser()
+    public function getAssignUser(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'assign_user_id']);
     }
 
-    public static function createFeedback(StorySlide $slide)
+    public static function updateStatus($ids): int
     {
-        $model = new self;
-        $model->story_id = $slide->story_id;
-        $model->slide_id = $slide->id;
-        $model->slide_number = $slide->number;
+        return self::updateAll(['status' => StoryFeedbackStatus::STATUS_DONE], ['IN', 'id', $ids]);
+    }
+
+    public function setStatusDone(): void
+    {
+        $this->status = StoryFeedbackStatus::STATUS_DONE;
+    }
+
+    public static function create(CreateFeedbackForm $form): self
+    {
+        $model = new self();
+        $model->story_id = $form->story_id;
+        $model->slide_id = $form->slide_id;
+        $model->slide_number = 1;
         $model->assign_user_id = 1;
-        return $model->save();
+        $model->text = $form->text;
+        $model->testing_id = $form->testing_id;
+        $model->question_id = $form->question_id;
+        return $model;
     }
-
-    public static function getStatusList()
-    {
-        return [
-            self::STATUS_NEW => 'Новая',
-            self::STATUS_DONE => 'Исправлена',
-        ];
-    }
-
-    public function getStatusText()
-    {
-        $arr = self::getStatusList();
-        return $arr[$this->status];
-    }
-
-    public static function updateStatus($ids)
-    {
-        return self::updateAll(['status' => self::STATUS_DONE], ['IN', 'id', $ids]);
-    }
-
 }

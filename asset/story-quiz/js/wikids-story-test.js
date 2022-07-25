@@ -69,12 +69,14 @@ function WikidsStoryTest(el, options) {
     throw "Element must be an HTMLElement, not ".concat({}.toString.call(el));
   }
 
+  options = options || {};
+  this.options = Object.assign({}, options);
+
   if (!options['init'] || typeof options['init'] !== 'function') {
     throw 'Необходимо определить свойство init';
   }
 
-  options = options || {};
-  this.options = Object.assign({}, options);
+  const testingId = options.dataParams.testId;
 
   var that = this;
 
@@ -117,6 +119,7 @@ function WikidsStoryTest(el, options) {
     questionsRepeat = [];
     questionAnswers = {};
     testQuestions = [];
+    currentQuestion = null;
   }
 
   var questionSuccess;
@@ -2535,7 +2538,7 @@ function WikidsStoryTest(el, options) {
 
     $('<header/>', {'class': 'slide-hints-header'})
       .append(
-        $('<h3/>').text(title)
+        $('<h3/>', {class: 'slide-hints-header__title'}).text(title)
       )
       .append(
         $('<div/>', {'class': 'header-actions'})
@@ -2595,6 +2598,14 @@ function WikidsStoryTest(el, options) {
   };
 
   this.showOrigImage = showOriginalImage;
+
+  this.getTestingId = () => {
+    return testingId;
+  };
+
+  this.getCurrentQuestionId = () => {
+    return currentQuestion && currentQuestion.id;
+  };
 
   return {
     run,

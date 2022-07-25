@@ -1112,6 +1112,11 @@ p.wikids-test-description {
 	 */
 }
 
+.slide-hints--feedback {
+  width: 650px;
+  height: 300px;
+}
+
 .slide-hints-header {
 	display: -webkit-box;
 	display: -ms-flexbox;
@@ -1127,9 +1132,13 @@ p.wikids-test-description {
 	justify-content: center;
 }
 
+.slide-hints-header__title {
+  margin: 0;
+}
+
 .slide-hints-header .header-actions {
 	position: absolute;
-	right: 20px;
+	right: 8px;
 	top: 8px;
 }
 
@@ -1693,4 +1702,16 @@ p.wikids-test-description {
 
 .home-icon {
   margin-right: 10px;
+}
+
+.feedback-inner {
+  padding: 20px;
+}
+
+.feedback-row {
+  margin-bottom: 20px;
+}
+
+.feedback-actions {
+  text-align: center;
 }

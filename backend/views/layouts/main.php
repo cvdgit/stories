@@ -64,7 +64,7 @@ AppAsset::register($this);
                         ['label' => 'Разделы', 'url' => ['/section']],
                         ['label' => 'Категории', 'url' => ['/category/index'], 'active' => Yii::$app->controller->id === 'category'],
                         ['label' => 'Пользователи', 'url' => ['/user/index']],
-                        ['label' => 'Опечатки', 'url' => ['/feedback/index']],
+                        ['label' => 'Обратная связь', 'url' => ['/feedback/index']],
                         ['label' => 'Комментарии', 'url' => ['/comment/index']],
                         ['label' => 'Подписки', 'url' => ['/rate/index']],
                         ['label' => 'Блог', 'url' => ['/news/admin', 'status' => \common\models\News::STATUS_PROPOSED], 'active' => Yii::$app->controller->id === 'news'],

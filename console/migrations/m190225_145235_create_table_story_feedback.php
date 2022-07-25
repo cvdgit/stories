@@ -13,7 +13,7 @@ class m190225_145235_create_table_story_feedback extends Migration
     public function safeUp()
     {
         $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
-        
+
         $this->createTable('{{%story_feedback}}', [
             'id' => $this->primaryKey(),
             'story_id' => $this->integer()->notNull(),
@@ -23,7 +23,7 @@ class m190225_145235_create_table_story_feedback extends Migration
             'status' => $this->smallInteger()->notNull()->defaultValue(0),
             'created_at' => $this->integer()->notNull(),
         ], $tableOptions);
-        
+
         $this->addForeignKey(
             'fk_storyfeedback_story_id',
             '{{%story_feedback}}',

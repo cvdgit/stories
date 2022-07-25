@@ -31,16 +31,128 @@ var WikidsStoryFeedback = (function() {
         });
     }
 
+    const findQuizObject = function() {
+      if (window['WikidsStoryTest']) {
+        var elem = $(Reveal.getCurrentSlide()).find('div.new-questions');
+        if (elem.length) {
+          var test = elem[0]['_wikids_test'];
+          if (test !== undefined) {
+            return test;
+          }
+        }
+      }
+    }
+
     function sendFeedback() {
-        var data = {
-            'slide_number': WikidsPlayer.getCurrentSlideID()
+
+      function InnerDialog(title, content) {
+
+        var defIndex = 400;
+        $(Reveal.getCurrentSlide()).find('.slide-hints-wrapper').each(function () {
+          defIndex++;
+        });
+        var $hintWrapper = $('<div/>', {'class': 'slide-hints-wrapper', 'css': {'z-index': defIndex}});
+        var $hintBackground = $('<div/>', {'class': 'slide-hints-background'});
+        var $hintInner = $('<div/>', {'class': 'slide-hints-inner'});
+        var $hint = $('<div/>', {'class': 'slide-hints slide-hints--feedback'});
+
+        $hintBackground.appendTo($hintWrapper);
+        $hintInner.appendTo($hintWrapper);
+
+        $('<header/>', {'class': 'slide-hints-header'})
+          .append(
+            $('<h3/>', {class: 'slide-hints-header__title'}).text(title)
+          )
+          .append(
+            $('<div/>', {'class': 'header-actions'})
+              .append(
+                $('<button/>', {
+                  'class': 'hints-close',
+                  'html': '&times;'
+                })
+                  .on('click', function () {
+                    hideDialog();
+                  })
+              )
+          )
+          .appendTo($hintInner);
+
+        $hint.append(content);
+        $hint.appendTo($hintInner);
+
+        this.show = function() {
+          $('.reveal .story-controls').hide();
+          $('.reveal .slides section.present').append($hintWrapper);
+        }
+
+        function hideDialog() {
+          $hintWrapper.hide().remove();
+          if (!$(Reveal.getCurrentSlide()).find('.slide-hints-wrapper').length) {
+            $('.reveal .story-controls').show();
+          }
+        }
+
+        this.hide = hideDialog;
+      }
+
+      const content = $('<div/>', {class: 'feedback-inner'})
+        .append(
+          $('<form/>', {class: 'feedback-form'})
+            .append(
+              $('<div/>', {class: 'feedback-row'})
+                .append(
+                  $('<textarea/>', {css: {'width': '100%'}, rows: 10})
+                )
+            )
+            .append(
+              $('<div/>', {class: 'feedback-row feedback-actions'})
+                .append(
+                  $('<button/>', {type: 'button', class: 'btn feedback-send'})
+                    .text('Отправить')
+                )
+            )
+        );
+
+      var feedbackDialog = new InnerDialog('Обратная связь', content);
+      feedbackDialog.show();
+
+      content.find('textarea').focus();
+
+      function makePayload(text) {
+
+        var payload = {
+          text
         };
-        send(data)
-            .done(function(response) {
-                if (response.success) {
-                    toastr.success('', 'Спасибо.');
-                }
-            });
+        payload.slide_id = WikidsPlayer.getCurrentSlideID();
+
+        const quiz = findQuizObject();
+        if (quiz) {
+          payload.testing_id = quiz.getTestingId();
+          payload.question_id = quiz.getCurrentQuestionId();
+        }
+        return payload;
+      }
+
+      content.find('.feedback-send').on('click', function() {
+
+        var text = content.find('textarea').val();
+        var payload = makePayload(text);
+
+        send(payload)
+          .done(function(response) {
+            if (response && response.success) {
+              toastr.success('Сообщение успешно отправлено');
+            }
+            else {
+              toastr.error((response && response['message']) || 'Неизвестная ошибка');
+            }
+          })
+          .fail(function(response) {
+            toastr.error((response['responseJSON'] && response.responseJSON.message) || 'Произошла ошибка');
+          });
+
+        feedbackDialog.hide();
+      });
     }
 
     return {
