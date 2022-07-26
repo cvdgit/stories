@@ -8,6 +8,9 @@ class QuestionDto
     private $name;
     private $answers = [];
 
+    /**
+     * @param string $name
+     */
     public function __construct(string $name)
     {
         $this->name = $name;

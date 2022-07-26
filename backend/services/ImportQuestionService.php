@@ -2,6 +2,10 @@
 
 namespace backend\services;
 
+use backend\components\import\AnswerDto;
+use backend\components\import\DefaultWordProcessor;
+use backend\components\import\QuestionDto;
+use backend\components\import\SequenceWordProcessor;
 use backend\components\import\WordListAdapter;
 use backend\models\answer\DefaultAnswerModel;
 use backend\models\answer\SequenceAnswerModel;
@@ -10,9 +14,11 @@ use backend\models\question\sequence\CreateSequenceQuestion;
 use backend\models\question\sequence\SortView;
 use backend\models\test\import\ImportFromWordList;
 use common\models\StoryTest;
+use common\models\TestWord;
 use common\models\TestWordList;
 use common\services\TransactionManager;
 use DomainException;
+use yii\db\Query;
 
 class ImportQuestionService
 {
@@ -34,18 +40,34 @@ class ImportQuestionService
             throw new DomainException(implode(PHP_EOL, $form->getErrorSummary(true)));
         }
 
+        /** @var TestWordList $wordList */
         $wordList = TestWordList::find()
             ->where(['id' => $form->word_list_id])
             ->one();
 
-        $wordListAdapter = new WordListAdapter($wordList);
+        if ($form->isTypeSequence()) {
+            $wordProcessor = new SequenceWordProcessor();
+        }
+        else {
+            $wordIds = (new Query())
+                ->select(['word_id' => 'MIN(id)'])
+                ->from('test_word')
+                ->where(['word_list_id' => $wordList->id])
+                ->groupBy(['correct_answer'])
+                ->indexBy('word_id')
+                ->all();
+            $wordIds = array_keys($wordIds);
+            $words = TestWord::find()->where(['in', 'id', $wordIds])->all();
+            $wordProcessor = new DefaultWordProcessor($words, $form->number_answers);
+        }
+
+        $wordListAdapter = new WordListAdapter($wordList->testWords, $wordProcessor);
+        $questions = $wordListAdapter->process();
 
         if ($form->isTypeSequence()) {
-            $questions = $wordListAdapter->createSequence($form->question_type);
             $this->createSequenceQuestions($quizModel->id, $questions);
         }
         else {
-            $questions = $wordListAdapter->create($form->number_answers);
             $this->createDefaultQuestions($quizModel->id, $questions);
         }
     }
@@ -56,18 +78,19 @@ class ImportQuestionService
             throw new DomainException('Список вопросов пуст');
         }
         foreach ($questions as $questionOrder => $question) {
+            /** @var QuestionDto $question */
 
             $questionForm = new CreateQuestion($quizId);
-            $questionForm->name = $question['name'];
+            $questionForm->name = $question->getName();
             $questionForm->order = $questionOrder;
             $questionModel = $this->questionService->createQuestion($questionForm);
 
             $questionAnswers = [];
-            foreach ($question['answers'] as $answer) {
-
+            foreach ($question->getAnswers() as $answer) {
+                /** @var AnswerDto $answer */
                 $answerModel = new DefaultAnswerModel();
-                $answerModel->name = $answer['name'];
-                $answerModel->correct = $answer['correct'] ? 1 : 0;
+                $answerModel->name = $answer->getName();
+                $answerModel->correct = $answer->isCorrect() ? 1 : 0;
                 $questionAnswers[] = $this->answerService->createAnswer($answerModel);
             }
             $questionModel->storyTestAnswers = $questionAnswers;
@@ -86,17 +109,17 @@ class ImportQuestionService
         $this->transactionManager->wrap(function() use ($quizId, $questions) {
 
             foreach ($questions as $questionOrder => $question) {
-
+                /** @var QuestionDto $question */
                 $questionForm = new CreateSequenceQuestion($quizId);
                 $questionForm->order = $questionOrder;
                 $questionForm->sort_view = SortView::HORIZONTAL;
                 $questionModel = $this->questionService->createSequenceQuestion($questionForm);
 
                 $questionAnswers = [];
-                foreach ($question['answers'] as $answerOrder => $answer) {
-
+                foreach ($question->getAnswers() as $answerOrder => $answer) {
+                    /** @var AnswerDto $answer */
                     $answerModel = new SequenceAnswerModel();
-                    $answerModel->name = $answer['name'];
+                    $answerModel->name = $answer->getName();
                     $answerModel->order = $answerOrder;
                     $questionAnswers[] = $this->answerService->createSequenceAnswer($answerModel);
                 }
@@ -107,6 +130,5 @@ class ImportQuestionService
                 }
             }
         });
-
     }
 }

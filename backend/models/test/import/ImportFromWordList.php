@@ -18,7 +18,7 @@ class ImportFromWordList extends Model
         return [
             [['word_list_id', 'question_type'], 'required'],
             [['word_list_id', 'question_type'], 'integer'],
-            ['number_answers', 'integer', 'max' => 10, 'min' => 2],
+            ['number_answers', 'integer', 'max' => 10, 'min' => 1],
             [
                 'number_answers',
                 'required',
