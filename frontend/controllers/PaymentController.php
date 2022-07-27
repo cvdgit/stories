@@ -22,7 +22,7 @@ use common\models\User;
 class PaymentController extends UserController
 {
 
-    protected $paymentService;
+/*    protected $paymentService;
     protected $userService;
 
     public function __construct($id, $module, UserPaymentService $paymentService, UserService $userService, $config = [])
@@ -30,9 +30,9 @@ class PaymentController extends UserController
         parent::__construct($id, $module, $config);
         $this->paymentService = $paymentService;
         $this->userService = $userService;
-    }
+    }*/
 
-    public function behaviors()
+    /*public function behaviors()
     {
         return [
             'access' => [
@@ -58,28 +58,24 @@ class PaymentController extends UserController
                 ],
             ],
         ];
-    }
+    }*/
 
-    /**
-     * @param $action
-     * @return bool
-     * @throws \yii\web\BadRequestHttpException
-     */
-    public function beforeAction($action)
+/*    public function beforeAction($action)
     {
         if ($action->id === 'notify') {
             $this->enableCsrfValidation = false;
         }
         return parent::beforeAction($action);
-    }
+    }*/
 
-    public function actionIndex()
+/*    public function actionIndex(): string
     {
-        $user = User::findModel(Yii::$app->user->id);
+        // @var User $user
+        $user = Yii::$app->user->identity;
         return $this->render('index', [
             'payments' => $user->payments,
         ]);
-    }
+    }*/
 
     /*
     public function actionCreate()
@@ -121,7 +117,7 @@ class PaymentController extends UserController
     }
     */
 
-    public function actionNotify()
+/*    public function actionNotify()
     {
         $post = Yii::$app->request->getRawBody();
         if (!empty($post)) {
@@ -140,6 +136,6 @@ class PaymentController extends UserController
                 Yii::info($post, 'payment_fail');
             }
         }
-    }
+    }*/
 
 }
