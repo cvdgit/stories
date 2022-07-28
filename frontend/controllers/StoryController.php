@@ -339,10 +339,10 @@ class StoryController extends Controller
         }
         else {
             $model = Story::findModel($id);
-            $userCanViewStory = UserPermissions::canViewStory($model);
+/*            $userCanViewStory = UserPermissions::canViewStory($model);
             if (!$userCanViewStory) {
                 $model = Story::findModel(Yii::$app->params['story.bySubscription.id']);
-            }
+            }*/
         }
 
         $audioTrackPath = '';
