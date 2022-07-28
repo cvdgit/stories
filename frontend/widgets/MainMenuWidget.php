@@ -19,6 +19,7 @@ class MainMenuWidget extends Widget
             ['label' => '<span>Разделы <b class="caret"></b></span>', 'items' => $sectionMenuItems, 'options' => ['class' => 'sub-dropdown']],
             ['label' => 'Блог', 'url' => ['news/index'], 'active' => Yii::$app->controller->id === 'news'],
             //['label' => 'Подписки', 'url' => ['/rate/index']],
+            ['label' => 'Обучение', 'url' => ['/edu/default/index']],
             ['label' => 'Контакты', 'url' => '#', 'template'=> '<a href="{url}" data-toggle="modal" data-target="#wikids-feedback-modal">{label}</a>'],
         ];
         return Menu::widget([

@@ -61,7 +61,7 @@ use common\rbac\UserRoles;
                                 'submenuTemplate' => "\n<ul class='dropdown-menu'>\n{items}\n</ul>\n",
                             ],
                             ['label' => 'Блог', 'url' => ['news/index'], 'active' => Yii::$app->controller->id === 'news'],
-                            //['label' => 'Подписки', 'url' => ['/rate/index']],
+                            ['label' => 'Обучение', 'url' => ['/edu/default/index']],
                             ['label' => 'Контакты', 'url' => '#', 'template'=> '<a class="menu-item__link" href="{url}" data-toggle="modal" data-target="#wikids-feedback-modal">{label}</a>'],
                         ];
                         if (Yii::$app->user->isGuest) {

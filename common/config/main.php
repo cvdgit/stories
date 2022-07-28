@@ -17,7 +17,8 @@ return [
 
     ],
     'modules' => [
-        'files' => ['class' => modules\files\Module::class],
+        'files' => ['class' => \modules\files\Module::class],
+        'edu' => ['class' => \modules\edu\Module::class],
     ],
     'components' => [
         'cache' => [
