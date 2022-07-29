@@ -30,6 +30,8 @@ return [
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-wikids',
+            'enableCookieValidation' => true,
+            'enableCsrfValidation' => true,
             'cookieValidationKey' => $params['cookieValidationKey'],
         ],
         'user' => [

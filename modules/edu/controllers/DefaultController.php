@@ -2,7 +2,10 @@
 
 namespace modules\edu\controllers;
 
+use common\models\User;
 use Ramsey\Uuid\Uuid;
+use Yii;
+use yii\db\Query;
 use yii\web\Controller;
 use yii\web\Cookie;
 
@@ -11,21 +14,86 @@ use yii\web\Cookie;
  */
 class DefaultController extends Controller
 {
-    /**
-     * Renders the index view for the module
-     * @return string
-     */
+
     public function actionIndex()
     {
-        $cookies = $this->response->cookies;
 
-        if ($cookies->get('uid') === null) {
-            $cookies->add(new Cookie([
-                'name' => 'uid',
-                'value' => (string)Uuid::uuid4(),
-            ]));
+        /** @var User $currentUser */
+        $currentUser = Yii::$app->user->identity;
+
+        $students = $currentUser->students;
+        if (count($students) === 0) {
+            return $this->redirect(['/edu/parent/index']);
         }
 
-        return $this->render('index');
+        $readCookies = Yii::$app->request->cookies;
+        $uidCookie = $readCookies->getValue('uid');
+
+        if ($uidCookie === null) {
+
+            $firstStudent = $students[0];
+
+            $writeCookies = $this->response->cookies;
+            $uid = Uuid::uuid4()->toString();
+            $writeCookies->add(new Cookie([
+                'name' => 'uid',
+                'value' => $uid,
+            ]));
+
+            Yii::$app->db->createCommand()
+                ->insert('user_student_session', [
+                    'uid' => $uid,
+                    'user_id' => $currentUser->id,
+                    'student_id' => $firstStudent->id,
+                ])
+                ->execute();
+
+            return $this->redirect(['/edu/student/index']);
+        }
+
+        $sessionRow = (new Query())
+            ->select('*')
+            ->from('user_student_session')
+            ->where('uid = :uid', [':uid' => $uidCookie])
+            ->one();
+
+        if ($sessionRow === false) {
+
+        }
+
+        return $this->redirect(['/edu/student/index']);
+    }
+
+    public function actionSwitchToParent()
+    {
+
+        $readCookies = Yii::$app->request->cookies;
+
+        $writeCookies = $this->response->cookies;
+        if ($writeCookies->has('uid')) {
+            $uidCookie = $writeCookies->get('uid');
+            $writeCookies->remove($uidCookie);
+        }
+
+        $uid = Uuid::uuid4()->toString();
+        $writeCookies->add(new Cookie([
+            'name' => 'uid',
+            'value' => $uid,
+        ]));
+
+        /** @var User $currentUser */
+        $currentUser = Yii::$app->user->identity;
+
+        $mainStudent = $currentUser->student();
+
+        Yii::$app->db->createCommand()
+            ->insert('user_student_session', [
+                'uid' => $uid,
+                'user_id' => $currentUser->id,
+                'student_id' => $mainStudent->id,
+            ])
+            ->execute();
+
+        return $this->redirect(['/edu/parent/index']);
     }
 }

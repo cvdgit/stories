@@ -1,7 +1,13 @@
 <?php
+
+use common\models\LoginForm;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-/** @var $model common\models\LoginForm */
+use yii\web\View;
+/**
+ * @var LoginForm $model
+ * @var View $this
+ */
 ?>
 <div class="modal fade site-dialog" id="wikids-login-modal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
@@ -27,12 +33,12 @@ use yii\bootstrap\ActiveForm;
         ]);
         $fieldTemplate = "<div class='input-wrapper'>\n{icon}\n{input}\n</div>\n{hint}\n{error}";
         echo $form->field($model, 'email', [
-          'inputOptions' => ['autofocus' => true, 'autocomplete' => 'email', 'placeholder' => 'Email'],
+          'inputOptions' => ['autofocus' => true, 'autocomplete' => 'off', 'placeholder' => 'Логин'],
           'parts' => ['{icon}' => '<span class="input-group-addon icon icon-email"></span>'],
           'template' => $fieldTemplate,
         ])->label(false);
         echo $form->field($model, 'password', [
-          'inputOptions' => ['placeholder' => 'Пароль', 'autocomplete' => 'current-password'],
+          'inputOptions' => ['placeholder' => 'Пароль', 'autocomplete' => 'off'],
           'parts' => ['{icon}' => '<span class="input-group-addon icon icon-password"></span>'],
           'template' => $fieldTemplate,
         ])->passwordInput()->label(false);
@@ -61,53 +67,61 @@ use yii\bootstrap\ActiveForm;
   </div>
 </div>
 <?php
-$js = <<< JS
-function loginOnBeforeSubmit(e)
-{
-    e.preventDefault();
-    var form = $(this),
-        submitButton = $('button[type=submit]', form);
-    submitButton.button('loading');
-    $.ajax({
-        url: form.attr("action"),
-        type: form.attr("method"),
-        data: new FormData(form[0]),
-        cache: false,
-        contentType: false,
-        processData: false,
-        dataType: 'json',
-        success: function(data) {
-            if (data) {
-              if (data.success) {
-                document.location.reload();
+$this->registerJs(<<<JS
+(function() {
+
+    function loginOnBeforeSubmit(e) {
+        e.preventDefault();
+
+        var form = $(this),
+            submitButton = $('button[type=submit]', form);
+
+        submitButton.button('loading');
+
+        $.ajax({
+            url: form.attr("action"),
+            type: form.attr("method"),
+            data: new FormData(form[0]),
+            cache: false,
+            contentType: false,
+            processData: false,
+            dataType: 'json',
+            success: function(data) {
+                if (data) {
+                    if (data.success) {
+                        if (data.returnUrl) {
+                            document.location.replace(data.returnUrl);
+                        }
+                        //document.location.reload();
+                    }
+                    else {
+                        $.each(data.message, function(i, message) {
+                            toastr.warning('', message);
+                        });
+                    }
+                }
+                else {
+                    toastr.warning('', 'Произошла неизвестная ошибка');
+                }
+            },
+            error: function(data) {
+              if (data && data.message) {
+                toastr.warning('', data.message);
               }
               else {
-                $.each(data.message, function(i, message) {
-                  toastr.warning('', message);
-                });
+                toastr.warning('', 'Произошла неизвестная ошибка');
               }
             }
-            else {
-              toastr.warning('', 'Произошла неизвестная ошибка');
-            }
-        },
-        error: function(data) {
-          if (data && data.message) {
-            toastr.warning('', data.message);
-          }
-          else {
-            toastr.warning('', 'Произошла неизвестная ошибка');
-          }
-        }
-    }).always(function() {
-      submitButton.button('reset');
-    });
-    return false;
-}
-$('#login-form')
-  .on('beforeSubmit', loginOnBeforeSubmit)
-  .on('submit', function(e) {
-      e.preventDefault();
-  });
-JS;
-$this->registerJs($js, \yii\web\View::POS_READY);
+        }).always(function() {
+          submitButton.button('reset');
+        });
+        return false;
+    }
+    $('#login-form')
+      .on('beforeSubmit', loginOnBeforeSubmit)
+      .on('submit', function(e) {
+          e.preventDefault();
+      });
+})();
+JS
+);

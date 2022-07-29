@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\helpers\Url;
 use common\models\StudyTask;
 use common\models\UserToken;
 use common\services\WelcomeUserService;
@@ -81,26 +82,27 @@ class AuthController extends Controller
      */
     public function actionLogin()
     {
-        if (!Yii::$app->user->isGuest && !Yii::$app->request->isAjax) {
+        if (!Yii::$app->user->isGuest && !$this->request->isAjax) {
             return $this->goHome();
         }
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        //if (Yii::$app->request->isAjax) {
-            $form = new LoginForm();
-            if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-                try {
-                    $user = $this->service->auth($form);
-                    Yii::$app->user->login($user, $form->rememberMe ? Yii::$app->params['user.rememberMeDuration'] : 0);
-                    return ['success' => true, 'message' => ''];
-                } catch (\DomainException $e) {
-                    Yii::$app->errorHandler->logException($e);
-                    return ['success' => false, 'message' => [$e->getMessage()]];
-                }
+
+        $this->response->format = Response::FORMAT_JSON;
+
+        $form = new LoginForm();
+        if ($this->request->isPost && $form->load($this->request->post())) {
+
+            try {
+                $route = $this->service->auth($form);
+                return [
+                    'success' => true,
+                    'message' => [''],
+                    'returnUrl' => Url::to($route),
+                ];
+            } catch (Exception $e) {
+                Yii::$app->errorHandler->logException($e);
+                return ['success' => false, 'message' => [$e->getMessage()]];
             }
-            else {
-                return ['success' => false, 'message' => $form->errors];
-            }
-        //}
+        }
         return ['success' => false, 'message' => ['']];
     }
 

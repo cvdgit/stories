@@ -3,7 +3,9 @@
 namespace common\models;
 
 use DomainException;
+use modules\edu\models\StudentLogin;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
@@ -19,6 +21,7 @@ use yii\db\ActiveRecord;
  *
  * @property UserQuestionHistory[] $userQuestionHistories
  * @property User $user
+ * @property StudentLogin $studentLogin
  */
 class UserStudent extends ActiveRecord
 {
@@ -71,7 +74,7 @@ class UserStudent extends ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getUser()
     {
@@ -79,7 +82,7 @@ class UserStudent extends ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getUserQuestionHistories()
     {
@@ -87,7 +90,7 @@ class UserStudent extends ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getStudentQuestionProgresses()
     {
@@ -148,4 +151,8 @@ class UserStudent extends ActiveRecord
         return $this->isMain() ? $this->user->getProfileName() : $this->name;
     }
 
+    public function getStudentLogin(): ActiveQuery
+    {
+        return $this->hasOne(StudentLogin::class, ['student_id' => 'id']);
+    }
 }

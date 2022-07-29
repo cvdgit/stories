@@ -18,7 +18,10 @@ class Module extends \yii\base\Module
     public function init()
     {
         parent::init();
+    }
 
-        // custom initialization code goes here
+    public function beforeAction($action)
+    {
+        return parent::beforeAction($action);
     }
 }
