@@ -3,6 +3,7 @@
 namespace common\models;
 
 use DomainException;
+use frontend\models\UserStudentForm;
 use modules\edu\models\StudentLogin;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -115,9 +116,9 @@ class UserStudent extends ActiveRecord
         return $model;
     }
 
-    public function userOwned(int $userID)
+    public function userOwned(int $userId): bool
     {
-        return (int)$this->user_id === $userID;
+        return (int)$this->user_id === $userId;
     }
 
     public static function createStudent(int $userID, string $name, string $birth_date)
@@ -154,5 +155,11 @@ class UserStudent extends ActiveRecord
     public function getStudentLogin(): ActiveQuery
     {
         return $this->hasOne(StudentLogin::class, ['student_id' => 'id']);
+    }
+
+    public function updateStudent(UserStudentForm $form): void
+    {
+        $this->name = $form->name;
+        $this->birth_date = $form->birth_date;
     }
 }

@@ -27,7 +27,7 @@ class SelectStoryWidget extends Widget
 
     public $onChange = '{}';
 
-    public $loadUrl = ['story/autocomplete/select'];
+    public $loadUrl = ['/story/autocomplete/select'];
 
     private $widgetOptions;
     private $clientOptions = [

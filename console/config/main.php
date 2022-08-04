@@ -31,6 +31,8 @@ return [
             'class' => MigrateController::class,
             'migrationNamespaces' => [
                 'yii\queue\db\migrations',
+                //'modules\edu\migrations',
+                //'modules\files\migrations',
             ],
         ],
         'serve' => [

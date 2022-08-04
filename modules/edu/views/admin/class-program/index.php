@@ -1,14 +1,12 @@
 <?php
-use yii\data\DataProviderInterface;
+use yii\helpers\Html;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
-use yii\bootstrap\Html;
-use yii\web\View;
-/**
- * @var DataProviderInterface $dataProvider
- * @var View $this
+/* @var $this yii\web\View
+ * @var $searchModel modules\edu\models\EduClassProgramSearch
+ * @var $dataProvider yii\data\ActiveDataProvider
  */
-$this->title = 'Классы';
+$this->title = 'Программы обучения';
 $this->params['breadcrumbs'][] = ['label' => 'Обучение', 'url' => ['/edu/admin/default/index']];
 $this->params['breadcrumbs'][] = $this->title;
 $this->registerCss(<<<CSS
@@ -29,7 +27,7 @@ CSS
     <h1 style="font-size: 32px; margin: 0 0 0.5rem 0; font-weight: 500; line-height: 1.2" class="h2"><?= Html::encode($this->title) ?></h1>
     <div class="btn-toolbar mb-2 mb-md-0">
         <div class="btn-group">
-            <?= Html::a('Создать класс', ['create'], ['class' => 'btn btn-default btn-sm btn-outline-secondary']) ?>
+            <?= Html::a('Создать программу обучения', ['create'], ['class' => 'btn btn-default btn-sm btn-outline-secondary']) ?>
         </div>
     </div>
 </div>
@@ -38,7 +36,8 @@ CSS
     'options' => ['class' => 'table-responsive'],
     'summary' => false,
     'columns' => [
-        'name',
+        'class.name',
+        'program.name',
         ['class' => ActionColumn::class],
     ],
 ]) ?>

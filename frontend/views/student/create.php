@@ -1,7 +1,13 @@
 <?php
+use dosamigos\datepicker\DatePicker;
+use frontend\models\UserStudentForm;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-/* @var $model frontend\models\CreateStudentForm */
+use yii\web\View;
+/**
+ * @var $model UserStudentForm
+ * @var $this View
+ */
 $form = ActiveForm::begin([
     'action' => ['student/create'],
     'enableClientValidation' => true,
@@ -14,7 +20,7 @@ $form = ActiveForm::begin([
     </div>
     <div class="modal-body">
         <?php echo $form->field($model, 'name')->textInput(['maxlength' => true, 'autocomplete' => 'off']) ?>
-        <?php echo $form->field($model, 'birth_date')->widget(\dosamigos\datepicker\DatePicker::class, [
+        <?php echo $form->field($model, 'birth_date')->widget(DatePicker::class, [
             'language' => 'ru',
             'clientOptions' => [
                 'autoclose' => true,
@@ -24,6 +30,7 @@ $form = ActiveForm::begin([
                 'autocomplete' => 'off',
             ],
         ]) ?>
+        <?= $form->field($model, 'class')->dropDownList($model->getClassArray(), ['prompt' => 'Выберите класс']) ?>
     </div>
     <div class="modal-footer">
         <?php echo Html::submitButton('Добавить', ['class' => 'btn btn-small']) ?>
@@ -32,14 +39,14 @@ $form = ActiveForm::begin([
 <?php ActiveForm::end(); ?>
 
 <?php
-$js = <<< JS
+$this->registerJs(<<<JS
 $('#create-child-form').on('beforeSubmit', function (event) {
-    event.preventDefault();            
+    event.preventDefault();
     var form_data = new FormData(this);
     $.ajax({
         url: $(this).attr('action'),
         type: $(this).attr('method'),
-        data: form_data, 
+        data: form_data,
         dataType: 'json',
         cache: false,
         contentType: false,
@@ -59,6 +66,5 @@ $('#create-child-form').on('beforeSubmit', function (event) {
     });
     return false;
 });
-JS;
-/** @var $this yii\web\View */
-$this->registerJs($js);
+JS
+);

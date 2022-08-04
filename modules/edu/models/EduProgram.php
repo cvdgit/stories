@@ -6,19 +6,19 @@ use Yii;
 use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "edu_class".
+ * This is the model class for table "edu_program".
  *
  * @property int $id
  * @property string $name
  */
-class EduClass extends ActiveRecord
+class EduProgram extends ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
-    public static function tableName(): string
+    public static function tableName()
     {
-        return 'edu_class';
+        return 'edu_program';
     }
 
     /**
@@ -35,7 +35,7 @@ class EduClass extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels(): array
+    public function attributeLabels()
     {
         return [
             'id' => 'ID',

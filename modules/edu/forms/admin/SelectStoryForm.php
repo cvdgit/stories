@@ -4,23 +4,23 @@ namespace modules\edu\forms\admin;
 
 use yii\base\Model;
 
-class ClassForm extends Model
+class SelectStoryForm extends Model
 {
 
-    public $name;
+    public $story_id;
 
     public function rules(): array
     {
         return [
-            ['name', 'required'],
-            ['name', 'string', 'max' => 255],
+            ['story_id', 'required'],
+            ['story_id', 'integer'],
         ];
     }
 
     public function attributeLabels(): array
     {
         return [
-            'name' => 'Название',
+            'story_id' => 'История',
         ];
     }
 }

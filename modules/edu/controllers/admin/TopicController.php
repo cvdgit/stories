@@ -2,16 +2,17 @@
 
 namespace modules\edu\controllers\admin;
 
-use modules\edu\models\EduClass;
-use modules\edu\models\EduClassSearch;
+use modules\edu\models\EduTopic;
+use modules\edu\models\EduTopicSearch;
+use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * ClassController implements the CRUD actions for EduClass model.
+ * TopicController implements the CRUD actions for EduTopic model.
  */
-class ClassController extends Controller
+class TopicController extends Controller
 {
     /**
      * @inheritDoc
@@ -32,13 +33,13 @@ class ClassController extends Controller
     }
 
     /**
-     * Lists all EduClass models.
+     * Lists all EduTopic models.
      *
      * @return string
      */
     public function actionIndex()
     {
-        $searchModel = new EduClassSearch();
+        $searchModel = new EduTopicSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
         return $this->render('index', [
@@ -48,13 +49,13 @@ class ClassController extends Controller
     }
 
     /**
-     * Creates a new EduClass model.
+     * Creates a new EduTopic model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return string|\yii\web\Response
      */
     public function actionCreate()
     {
-        $model = new EduClass();
+        $model = new EduTopic();
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
@@ -70,13 +71,13 @@ class ClassController extends Controller
     }
 
     /**
-     * Updates an existing EduClass model.
+     * Updates an existing EduTopic model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param int $id ID
      * @return string|\yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
+    public function actionUpdate(int $id)
     {
         $model = $this->findModel($id);
 
@@ -84,13 +85,19 @@ class ClassController extends Controller
             return $this->refresh();
         }
 
+        $lessonsDataProvider = new ActiveDataProvider([
+            'query' => $model->getEduLessons(),
+            'pagination' => false,
+        ]);
+
         return $this->render('update', [
             'model' => $model,
+            'lessonsDataProvider' => $lessonsDataProvider,
         ]);
     }
 
     /**
-     * Deletes an existing EduClass model.
+     * Deletes an existing EduTopic model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param int $id ID
      * @return \yii\web\Response
@@ -104,15 +111,15 @@ class ClassController extends Controller
     }
 
     /**
-     * Finds the EduClass model based on its primary key value.
+     * Finds the EduTopic model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param int $id ID
-     * @return EduClass the loaded model
+     * @return EduTopic the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = EduClass::findOne(['id' => $id])) !== null) {
+        if (($model = EduTopic::findOne(['id' => $id])) !== null) {
             return $model;
         }
 
