@@ -3,6 +3,7 @@
 namespace modules\edu\models;
 
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
@@ -10,6 +11,10 @@ use yii\db\ActiveRecord;
  *
  * @property int $id
  * @property string $name
+ *
+ * @property EduClassBook[] $eduClassBooks
+ * @property EduClassProgram[] $eduClassPrograms
+ * @property EduProgram[] $programs
  */
 class EduClass extends ActiveRecord
 {
@@ -41,5 +46,21 @@ class EduClass extends ActiveRecord
             'id' => 'ID',
             'name' => 'Название',
         ];
+    }
+
+    public function getEduClassBooks(): ActiveQuery
+    {
+        return $this->hasMany(EduClassBook::class, ['class_id' => 'id']);
+    }
+
+    public function getEduClassPrograms(): ActiveQuery
+    {
+        return $this->hasMany(EduClassProgram::class, ['class_id' => 'id']);
+    }
+
+    public function getPrograms(): ActiveQuery
+    {
+        return $this->hasMany(EduProgram::class, ['id' => 'program_id'])
+            ->viaTable('edu_class_program', ['class_id' => 'id']);
     }
 }

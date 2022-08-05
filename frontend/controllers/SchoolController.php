@@ -4,7 +4,9 @@ namespace frontend\controllers;
 
 use frontend\models\ContactRequestForm;
 use Yii;
+use yii\captcha\CaptchaAction;
 use yii\web\Controller;
+use yii\web\ErrorAction;
 
 class SchoolController extends Controller
 {
@@ -18,10 +20,10 @@ class SchoolController extends Controller
     {
         return [
             'error' => [
-                'class' => \yii\web\ErrorAction::class,
+                'class' => ErrorAction::class,
             ],
             'captcha' => [
-                'class' => \yii\captcha\CaptchaAction::class,
+                'class' => CaptchaAction::class,
                 'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
             ],
         ];

@@ -86,24 +86,25 @@ class AuthController extends Controller
             return $this->goHome();
         }
 
-        $this->response->format = Response::FORMAT_JSON;
+        //$this->response->format = Response::FORMAT_JSON;
 
         $form = new LoginForm();
         if ($this->request->isPost && $form->load($this->request->post())) {
 
-            try {
+            //try {
                 $route = $this->service->auth($form);
-                return [
+                return $this->refresh();
+/*                return [
                     'success' => true,
                     'message' => [''],
                     'returnUrl' => Url::to($route),
-                ];
-            } catch (Exception $e) {
-                Yii::$app->errorHandler->logException($e);
-                return ['success' => false, 'message' => [$e->getMessage()]];
-            }
+                ];*/
+            //} catch (Exception $e) {
+            //    Yii::$app->errorHandler->logException($e);
+                //return ['success' => false, 'message' => [$e->getMessage()]];
+            //}
         }
-        return ['success' => false, 'message' => ['']];
+        //return ['success' => false, 'message' => ['']];
     }
 
     /**

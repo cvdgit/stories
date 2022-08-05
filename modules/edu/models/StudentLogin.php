@@ -56,13 +56,24 @@ class StudentLogin extends ActiveRecord
         return $this->hasOne(UserStudent::class, ['id' => 'student_id']);
     }
 
-    public static function findLogin(string $login): ?self
+    public static function findLogin(string $login, string $password): ?self
     {
-        return self::find()->where(['username' => $login])->one();
+        return self::find()
+            ->where(['username' => $login, 'password' => $password])
+            ->one();
     }
 
     public function validatePassword($password): bool
     {
         return Yii::$app->security->compareString($this->password, $password);
+    }
+
+    public static function create(int $studentId, string $username, string $password): self
+    {
+        $model = new self();
+        $model->student_id = $studentId;
+        $model->username = $username;
+        $model->password = $password;
+        return $model;
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use modules\edu\components\StudentContext;
 use yii\rbac\DbManager;
 use yii\caching\FileCache;
 
@@ -21,6 +22,9 @@ return [
         'edu' => ['class' => \modules\edu\Module::class],
     ],
     'components' => [
+        'studentContext' => [
+            'class' => StudentContext::class,
+        ],
         'cache' => [
             'class' => FileCache::class,
         ],

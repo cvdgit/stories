@@ -14,7 +14,7 @@ class EduClassProgramSearch extends EduClassProgram
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['id', 'class_id', 'program_id'], 'integer'],

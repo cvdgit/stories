@@ -392,12 +392,19 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->hasMany(UserStudent::class, ['user_id' => 'id']);
     }
 
-    public function getStudentsAsArray()
+    public function getStudentsAsArray(): array
     {
-        return $this->getStudents()->andWhere('status = 0')->asArray()->all();
+        return array_map(static function(UserStudent $student) {
+            return [
+                'id' => $student->id,
+                'name' => $student->name,
+                'class' => $student->class->name ?? null,
+                'birth_date' => $student->birth_date,
+            ];
+        }, $this->getStudents()->with('class')->andWhere('status = 0')->all());
     }
 
-    public function createMainStudent()
+    public function createMainStudent(): void
     {
         $student = UserStudent::createMain($this->id, $this->username);
         $student->save();

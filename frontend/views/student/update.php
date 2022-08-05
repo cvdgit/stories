@@ -31,7 +31,7 @@ $form = ActiveForm::begin([
             'autocomplete' => 'off',
         ],
     ]) ?>
-    <?= $form->field($model, 'class')->dropDownList($model->getClassArray(), ['prompt' => 'Выберите класс']) ?>
+    <?= $form->field($model, 'class_id')->dropDownList($model->getClassArray(), ['prompt' => 'Выберите класс']) ?>
 </div>
 <div class="modal-footer">
     <?= Html::submitButton('Изменить', ['class' => 'btn btn-small']) ?>

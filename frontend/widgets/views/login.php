@@ -89,9 +89,9 @@ $this->registerJs(<<<JS
             success: function(data) {
                 if (data) {
                     if (data.success) {
-                        if (data.returnUrl) {
+/*                        if (data.returnUrl) {
                             document.location.replace(data.returnUrl);
-                        }
+                        }*/
                         //document.location.reload();
                     }
                     else {
@@ -117,11 +117,11 @@ $this->registerJs(<<<JS
         });
         return false;
     }
-    $('#login-form')
+/*    $('#login-form')
       .on('beforeSubmit', loginOnBeforeSubmit)
       .on('submit', function(e) {
           e.preventDefault();
-      });
+      });*/
 })();
 JS
 );

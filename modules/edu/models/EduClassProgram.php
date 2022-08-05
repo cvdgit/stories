@@ -4,6 +4,7 @@ namespace modules\edu\models;
 
 use Yii;
 use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -15,13 +16,15 @@ use yii\helpers\ArrayHelper;
  *
  * @property EduClass $class
  * @property EduProgram $program
+ * @property EduTopic[] $eduTopics
  */
-class EduClassProgram extends \yii\db\ActiveRecord
+class EduClassProgram extends ActiveRecord
 {
+
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'edu_class_program';
     }
@@ -29,21 +32,21 @@ class EduClassProgram extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['class_id', 'program_id'], 'required'],
             [['class_id', 'program_id'], 'integer'],
             [['class_id', 'program_id'], 'unique', 'targetAttribute' => ['class_id', 'program_id']],
-            [['class_id'], 'exist', 'skipOnError' => true, 'targetClass' => EduClass::className(), 'targetAttribute' => ['class_id' => 'id']],
-            [['program_id'], 'exist', 'skipOnError' => true, 'targetClass' => EduProgram::className(), 'targetAttribute' => ['program_id' => 'id']],
+            [['class_id'], 'exist', 'skipOnError' => true, 'targetClass' => EduClass::class, 'targetAttribute' => ['class_id' => 'id']],
+            [['program_id'], 'exist', 'skipOnError' => true, 'targetClass' => EduProgram::class, 'targetAttribute' => ['program_id' => 'id']],
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -75,5 +78,17 @@ class EduClassProgram extends \yii\db\ActiveRecord
     public function getEduPath(): string
     {
         return $this->class->name . ' - ' . $this->program->name;
+    }
+
+    public function getEduTopics(): ActiveQuery
+    {
+        return $this->hasMany(EduTopic::class, ['class_program_id' => 'id']);
+    }
+
+    public static function findClassProgram(int $classId, int $programId): ?self
+    {
+        return self::find()
+            ->where(['class_id' => $classId, 'program_id' => $programId])
+            ->one();
     }
 }

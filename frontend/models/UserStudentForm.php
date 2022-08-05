@@ -12,7 +12,7 @@ class UserStudentForm extends Model
 
     public $name;
     public $birth_date;
-    public $class;
+    public $class_id;
 
     /** @var int|null */
     private $id = null;
@@ -25,15 +25,16 @@ class UserStudentForm extends Model
             $this->id = $model->id;
             $this->name = $model->name;
             $this->birth_date = $model->birth_date;
+            $this->class_id = $model->class_id;
         }
     }
 
     public function rules(): array
     {
         return [
-            [['name', 'birth_date', 'class'], 'required'],
+            [['name', 'birth_date', 'class_id'], 'required'],
             ['name', 'string', 'max' => 50],
-            ['class', 'integer'],
+            ['class_id', 'integer'],
             ['birth_date', 'default', 'value' => null],
         ];
     }
@@ -43,7 +44,7 @@ class UserStudentForm extends Model
         return [
             'name' => 'Имя',
             'birth_date' => 'Дата рождения',
-            'class' => 'Класс',
+            'class_id' => 'Класс',
         ];
     }
 

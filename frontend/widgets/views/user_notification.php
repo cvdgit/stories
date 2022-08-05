@@ -1,5 +1,8 @@
 <?php
 /** @var $count integer */
+
+use yii\helpers\Url;
+
 $css = <<< CSS
 .notification-wrapper {
     display: inline-block;
@@ -53,12 +56,12 @@ $this->registerJsFile('/js/smartdate.js');
     </div>
 </div>
 <?php
-$action = \yii\helpers\Url::to(['notification/unread']);
+$action = Url::to(['/notification/unread']);
 $js = <<< JS
 var UserNotification = (function() {
-    
+
     var loaded = false;
-    
+
     function createNotification(notification) {
         var data = JSON.parse(notification.text);
         var a = $('<a/>')
@@ -79,7 +82,7 @@ var UserNotification = (function() {
             );
         return $('<li/>').append(a);
     }
-    
+
     function loadNotifications() {
         var list = $('#user-notifications .dropdown-menu');
         list.empty();
@@ -107,13 +110,13 @@ var UserNotification = (function() {
             }
         });
     }
-    
+
     $('#user-notifications').on('show.bs.dropdown', function () {
-        
+
         var vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
         vh -= 100;
         $('#user-notifications .dropdown-menu').css('height', vh + 'px');
-        
+
         if (!loaded) {
             loaded = true;
             loadNotifications();

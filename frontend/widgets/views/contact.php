@@ -46,9 +46,10 @@ use yii\captcha\Captcha;
           </div>
           <?= $form->field($model, 'verifyCode')
                    ->label(false)
-                   ->widget(Captcha::className(), [
-                     'template' => '<div class="row"><div class="col-md-3">{image}</div><div class="col-md-9">{input}</div></div>',
-                     'options' => ['class'=> 'form-control', 'placeholder' => 'Код подтверждения', 'autocomplete' => 'off'],
+                   ->widget(Captcha::class, [
+                       'captchaAction' => '/site/captcha',
+                       'template' => '<div class="row"><div class="col-md-3">{image}</div><div class="col-md-9">{input}</div></div>',
+                       'options' => ['class'=> 'form-control', 'placeholder' => 'Код подтверждения', 'autocomplete' => 'off'],
                    ]) ?>
           <div class="row">
             <div class="col-md-6 col-md-offset-3 offset-md-3">

@@ -43,6 +43,12 @@ return [
                 'domain' => $params['cookieDomain'],
             ],
             'loginUrl' => ['/'],
+            'on beforeLogout' => static function() {
+                $readCookies = Yii::$app->response->cookies;
+                if ($readCookies->has('uid')) {
+                    $readCookies->remove('uid');
+                }
+            },
         ],
         'session' => [
             'name' => 'wikids',

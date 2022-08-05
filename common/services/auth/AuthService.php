@@ -41,8 +41,8 @@ class AuthService
         $returnRoute = [];
         if ($user === null) {
 
-            $studentLogin = StudentLogin::findLogin($login);
-            if (!$studentLogin || !$studentLogin->validatePassword($form->password)) {
+            $studentLogin = StudentLogin::findLogin($login, $form->password);
+            if (!$studentLogin) {
                 throw new DomainException('Неверное имя пользователя или пароль');
             }
 

@@ -19,7 +19,7 @@ class StudentService
             throw ModelDomainException::create($form);
         }
 
-        $studentModel = UserStudent::createStudent($userId, $form->name, $form->birth_date);
+        $studentModel = UserStudent::createStudent($userId, $form->name, $form->class_id, $form->birth_date);
         if (!$studentModel->save()) {
             throw ModelDomainException::create($studentModel);
         }

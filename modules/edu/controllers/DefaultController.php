@@ -3,6 +3,7 @@
 namespace modules\edu\controllers;
 
 use common\models\User;
+use common\rbac\UserRoles;
 use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\db\Query;
@@ -17,6 +18,14 @@ class DefaultController extends Controller
 
     public function actionIndex()
     {
+
+        if (Yii::$app->user->can(UserRoles::ROLE_TEACHER)) {
+            $student = Yii::$app->studentContext->getStudent();
+            if ($student === null) {
+                return $this->redirect(['/edu/teacher/default/index']);
+            }
+            return $this->redirect(['/edu/student/index']);
+        }
 
         /** @var User $currentUser */
         $currentUser = Yii::$app->user->identity;
