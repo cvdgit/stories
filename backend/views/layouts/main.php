@@ -1,14 +1,22 @@
 <?php
-/* @var $this yii\web\View */
-/* @var $content string */
+
 use backend\assets\AppAsset;
+use common\models\News;
+use common\models\test\SourceType;
 use common\rbac\UserRoles;
 use common\widgets\ToastrFlash;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\helpers\Html;
 use yii\helpers\Json;
+use yii\web\View;
 use yii\widgets\Breadcrumbs;
+
+/**
+ * @var View $this
+ * @var string $content
+ */
+
 AppAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
@@ -58,7 +66,7 @@ AppAsset::register($this);
                     'options' => ['class' => 'nav-sidebar'],
                     'items' => [
                         ['label' => 'Главная', 'url' => ['/site/index']],
-                        ['label' => 'Заявки с формы', 'url' => ['contact-request/index']],
+                        ['label' => 'Заявки с формы', 'url' => ['/contact-request/index']],
                         ['label' => 'Истории', 'url' => ['/story/index']],
                         ['label' => 'Списки историй', 'url' => ['/story-list/index'], 'active' => Yii::$app->controller->id === 'story-list'],
                         ['label' => 'Разделы', 'url' => ['/section']],
@@ -67,15 +75,15 @@ AppAsset::register($this);
                         ['label' => 'Обратная связь', 'url' => ['/feedback/index']],
                         ['label' => 'Комментарии', 'url' => ['/comment/index']],
                         ['label' => 'Подписки', 'url' => ['/rate/index']],
-                        ['label' => 'Блог', 'url' => ['/news/admin', 'status' => \common\models\News::STATUS_PROPOSED], 'active' => Yii::$app->controller->id === 'news'],
-                        ['label' => 'Тесты', 'url' => ['/test/index', 'source' => \common\models\test\SourceType::TEST], 'active' => Yii::$app->controller->id === 'test'],
+                        ['label' => 'Блог', 'url' => ['/news/admin', 'status' => News::STATUS_PROPOSED], 'active' => Yii::$app->controller->id === 'news'],
+                        ['label' => 'Тесты', 'url' => ['/test/index', 'source' => SourceType::TEST], 'active' => Yii::$app->controller->id === 'test'],
                         ['label' => 'Видео', 'url' => ['/video/index'], 'active' => Yii::$app->controller->id === 'video'],
                         ['label' => 'Плейлисты', 'url' => ['/playlist/index'], 'active' => Yii::$app->controller->id === 'playlist'],
                         ['label' => 'Изображения', 'url' => ['/image/index'], 'active' => Yii::$app->controller->id === 'image'],
                         ['label' => 'Списки слов', 'url' => ['/word-list/index'], 'active' => Yii::$app->controller->id === 'word-list'],
                         ['label' => 'Группы', 'url' => ['/study-group/index'], 'active' => Yii::$app->controller->id === 'study-group'],
                         ['label' => 'Задания', 'url' => ['/study-task/index'], 'active' => Yii::$app->controller->id === 'study-task'],
-                        ['label' => 'Аудио файлы', 'url' => ['audio-file/index']],
+                        ['label' => 'Аудио файлы', 'url' => ['/audio-file/index']],
                         ['label' => 'Папки', 'url' => ['/files/study-folder/index']],
                         ['label' => 'Файлы', 'url' => ['/files/study-file/index']],
                     ],

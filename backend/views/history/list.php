@@ -1,21 +1,36 @@
 <?php
-/** @var $test common\models\StoryTest */
-/** @var $students common\models\UserStudent[] */
 
-use backend\models\StudentTestHistory;
 use yii\helpers\Html;
-$this->title =  $test->title . ' - история обучения';
+use yii\web\View;
+
+/**
+ * @var $test common\models\StoryTest
+ * @var $students array
+ * @var View $this
+ */
+
+$this->title = 'История прохождения - ' . $test->title;
+
+$this->registerCss(<<<CSS
+.back-arrow {
+  background-color: #eee;
+  padding: 6px;
+  border-radius: 50%;
+  font-size: 20px;
+}
+CSS
+);
 ?>
-<h1 class="page-header"><?= Html::encode($this->title) ?></h1>
+<h1 class="h2 page-header"><?= Html::a('<i class="glyphicon glyphicon-arrow-left back-arrow"></i>', ['/test/update', 'id' => $test->id]) ?> <?= Html::encode($this->title) ?></h1>
 <div class="row">
     <div class="col-md-12">
         <?php if (!empty($students)): ?>
-            <?= Html::a('Очистить по всем студентам', ['history/clear-all', 'test_id' => $test->id], ['class' => 'btn btn-danger']) ?>
+            <?= Html::a('Очистить по всем студентам', ['/history/clear-all', 'test_id' => $test->id], ['class' => 'btn btn-danger']) ?>
             <?php foreach ($students as $student): ?>
                 <div class="row">
                     <div class="col-md-12">
-                        <h3><?= $student->name ?></h3>
-                        <p><?= (new StudentTestHistory($student->id))->getStudentTestHistoryCount($test->id) ?> записей в истории</p>
+                        <h3><?= $student['student_name'] ?></h3>
+                        <p><?= Html::a($student['items_count'] . ' записей в истории', ['/history/history', 'testing_id' => $test->id, 'student_id' => $student['student_id']]) ?></p>
                         <? //Html::a('Очистить историю', ['history/clear', 'student_id' => $student->id, 'test_id' => $test->id], ['class' => 'btn btn-danger']) ?>
                     </div>
                 </div>

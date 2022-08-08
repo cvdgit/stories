@@ -45,5 +45,4 @@ class StudentTestHistory extends Model
         UserQuestionHistory::clearTestHistory($this->studentID, $testID);
         StudentQuestionProgress::resetProgress($this->studentID, $testID);
     }
-
 }

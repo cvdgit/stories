@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use backend\models\StudentTestHistory;
+use backend\models\testing\TestingHistory;
 use common\models\StoryTest;
 use common\models\StudentQuestionProgress;
 use common\models\UserQuestionHistory;
@@ -20,11 +21,13 @@ class HistoryController extends Controller
 {
 
     private $historyService;
+    private $testingHistory;
 
-    public function __construct($id, $module, TestHistoryService $historyService, $config = [])
+    public function __construct($id, $module, TestHistoryService $historyService, TestingHistory $testingHistory, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->historyService = $historyService;
+        $this->testingHistory = $testingHistory;
     }
 
     public function behaviors()
@@ -35,7 +38,7 @@ class HistoryController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => [UserRoles::PERMISSION_MANAGE_USERS],
+                        'roles' => [UserRoles::ROLE_TEACHER],
                     ],
                 ],
             ],
@@ -52,26 +55,32 @@ class HistoryController extends Controller
         ]);
     }
 
-    protected function findStudentModel($id)
+    /**
+     * @throws NotFoundHttpException
+     */
+    private function findStudentModel($id): UserStudent
     {
         if (($model = UserStudent::findOne($id)) !== null) {
             return $model;
         }
-        throw new NotFoundHttpException('The requested page does not exist.');
+        throw new NotFoundHttpException('Ученик не найден');
     }
 
-    protected function findTestModel($id)
+    /**
+     * @throws NotFoundHttpException
+     */
+    private function findTestingModel($id): StoryTest
     {
         if (($model = StoryTest::findOne($id)) !== null) {
             return $model;
         }
-        throw new NotFoundHttpException('The requested page does not exist.');
+        throw new NotFoundHttpException('Тест не найден');
     }
 
     public function actionClear(int $student_id, int $test_id)
     {
         $studentModel = $this->findStudentModel($student_id);
-        $testModel = $this->findTestModel($test_id);
+        $testModel = $this->findTestingModel($test_id);
         (new StudentTestHistory($studentModel->id))->clearTestHistory($testModel->id);
         Yii::$app->session->setFlash('success', 'История прохождения теста удалена');
         return $this->redirect(['view', 'id' => $student_id]);
@@ -79,27 +88,45 @@ class HistoryController extends Controller
 
     public function actionClearAll(int $test_id)
     {
-        $testModel = $this->findTestModel($test_id);
+        $testModel = $this->findTestingModel($test_id);
         UserQuestionHistory::clearAllTestHistory($testModel->id);
         StudentQuestionProgress::resetProgressByTest($testModel->id);
         Yii::$app->session->setFlash('success', 'История прохождения теста удалена');
         return $this->redirect(['test/update', 'id' => $testModel->id]);
     }
 
-    public function actionList(int $test_id)
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionList(int $test_id): string
     {
-        $testModel = $this->findTestModel($test_id);
-        $students = UserQuestionHistory::getTestStudents($testModel->id);
+        $testModel = $this->findTestingModel($test_id);
+        $students = $this->testingHistory->getTestingStudents($testModel->id);
         return $this->render('list', [
             'test' => $testModel,
             'students' => $students,
         ]);
     }
 
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionHistory(int $testing_id, int $student_id): string
+    {
+        $testing = $this->findTestingModel($testing_id);
+        $student = $this->findStudentModel($student_id);
+        $rows = $this->testingHistory->getDetail($testing->id, $student->id);
+        return $this->render('history', [
+            'testing' => $testing,
+            'student' => $student,
+            'rows' => $rows,
+        ]);
+    }
+
     public function actionDetail(int $student_id, int $test_id)
     {
         $student = $this->findStudentModel($student_id);
-        $test = $this->findTestModel($test_id);
+        $test = $this->findTestingModel($test_id);
         $model = new UserQuestionHistoryModel();
         $model->student_id = $student->id;
         return $this->render('detail', [
