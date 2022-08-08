@@ -85,43 +85,34 @@ $this->registerJs(<<<JS
             cache: false,
             contentType: false,
             processData: false,
-            dataType: 'json',
-            success: function(data) {
-                if (data) {
-                    if (data.success) {
-/*                        if (data.returnUrl) {
-                            document.location.replace(data.returnUrl);
-                        }*/
-                        //document.location.reload();
-                    }
-                    else {
-                        $.each(data.message, function(i, message) {
-                            toastr.warning('', message);
-                        });
-                    }
-                }
-                else {
-                    toastr.warning('', 'Произошла неизвестная ошибка');
-                }
-            },
-            error: function(data) {
-              if (data && data.message) {
-                toastr.warning('', data.message);
+            dataType: 'json'
+        })
+        .then(function(response) {
+            if (response && response.success) {
+              if (response.returnUrl) {
+                document.location.replace(response.returnUrl);
               }
               else {
-                toastr.warning('', 'Произошла неизвестная ошибка');
+                  document.location.reload();
               }
             }
-        }).always(function() {
+            else {
+                toastr.warning((response && response.message) || 'Произошла неизвестная ошибка');
+            }
+        })
+        .fail(function(response) {
+          toastr.error((response && response.message) || 'Произошла неизвестная ошибка');
+        })
+        .always(function() {
           submitButton.button('reset');
         });
         return false;
     }
-/*    $('#login-form')
+    $('#login-form')
       .on('beforeSubmit', loginOnBeforeSubmit)
       .on('submit', function(e) {
           e.preventDefault();
-      });*/
+      });
 })();
 JS
 );

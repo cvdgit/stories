@@ -2,16 +2,17 @@
 
 namespace frontend\controllers;
 
-use common\helpers\Url;
 use common\models\StudyTask;
 use common\models\UserToken;
 use common\services\WelcomeUserService;
+use DomainException;
 use Exception;
 use frontend\components\NoEmailException;
 use frontend\components\UserAlreadyExistsException;
 use Yii;
 use yii\authclient\ClientInterface;
 use yii\filters\VerbFilter;
+use yii\helpers\Url;
 use yii\web\Controller;
 use common\models\LoginForm;
 use common\services\auth\AuthService;
@@ -82,29 +83,31 @@ class AuthController extends Controller
      */
     public function actionLogin()
     {
+        $this->response->format = Response::FORMAT_JSON;
+
         if (!Yii::$app->user->isGuest && !$this->request->isAjax) {
             return $this->goHome();
         }
 
-        //$this->response->format = Response::FORMAT_JSON;
-
         $form = new LoginForm();
         if ($this->request->isPost && $form->load($this->request->post())) {
-
-            //try {
+            try {
                 $route = $this->service->auth($form);
-                return $this->refresh();
-/*                return [
+                return [
                     'success' => true,
-                    'message' => [''],
-                    'returnUrl' => Url::to($route),
-                ];*/
-            //} catch (Exception $e) {
-            //    Yii::$app->errorHandler->logException($e);
-                //return ['success' => false, 'message' => [$e->getMessage()]];
-            //}
+                    'returnUrl' => count($route) > 0 ? Url::to($route) : null,
+                ];
+            } catch (DomainException $e) {
+                return ['success' => false, 'message' => $e->getMessage()];
+            } catch (Exception $e) {
+                return ['success' => false, 'message' => 'Произошла ошибка'];
+            } finally {
+                if (isset($e)) {
+                    Yii::$app->errorHandler->logException($e);
+                }
+            }
         }
-        //return ['success' => false, 'message' => ['']];
+        //return ['success' => false];
     }
 
     /**
