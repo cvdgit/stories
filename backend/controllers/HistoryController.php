@@ -126,7 +126,10 @@ class HistoryController extends Controller
         ]);
     }
 
-    public function actionDetail(int $student_id, int $test_id)
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionDetail(int $student_id, int $test_id): string
     {
         $student = $this->findStudentModel($student_id);
         $test = $this->findTestingModel($test_id);

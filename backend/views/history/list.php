@@ -30,7 +30,7 @@ CSS
                 <div class="row">
                     <div class="col-md-12">
                         <h3><?= $student['student_name'] ?></h3>
-                        <p><?= Html::a($student['items_count'] . ' записей в истории', ['/history/history', 'testing_id' => $test->id, 'student_id' => $student['student_id']]) ?></p>
+                        <p><?= Html::a('История', ['/history/history', 'testing_id' => $test->id, 'student_id' => $student['student_id']]) ?></p>
                         <? //Html::a('Очистить историю', ['history/clear', 'student_id' => $student->id, 'test_id' => $test->id], ['class' => 'btn btn-danger']) ?>
                     </div>
                 </div>
