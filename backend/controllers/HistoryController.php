@@ -30,7 +30,7 @@ class HistoryController extends Controller
         $this->testingHistory = $testingHistory;
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
@@ -45,13 +45,16 @@ class HistoryController extends Controller
         ];
     }
 
-    public function actionView(int $id)
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionView(int $id): string
     {
         $studentModel = $this->findStudentModel($id);
-        $history = new StudentTestHistory($studentModel->id);
+        $rows = $this->testingHistory->getStudentTesting($studentModel->id);
         return $this->render('view', [
             'student' => $studentModel,
-            'history' => $history,
+            'rows' => $rows,
         ]);
     }
 
@@ -147,5 +150,4 @@ class HistoryController extends Controller
         }
         return $this->redirect(['test/index', 'source' => $source]);
     }
-
 }

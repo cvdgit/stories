@@ -25,6 +25,22 @@ class TestingHistory
         return $query->all();
     }
 
+    public function getStudentTesting(int $studentId): array
+    {
+        $query = (new Query())
+            ->select([
+                'test_id' => 't.test_id',
+                'test_name' => 't2.title',
+                'items_count' => 'COUNT(t.id)',
+            ])
+            ->from(['t' => 'user_question_history'])
+            ->innerJoin(['t2' => 'story_test'], 't.test_id = t2.id')
+            ->where(['t.student_id' => $studentId])
+            ->groupBy('t.test_id')
+            ->orderBy(['t2.title' => SORT_ASC]);
+        return $query->all();
+    }
+
     public function getDetail(int $testId, int $studentId): array
     {
         $query = (new Query())
