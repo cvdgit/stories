@@ -1,23 +1,39 @@
 <?php
+
+declare(strict_types=1);
+
+use common\models\StoryTest;
+use common\models\UserStudent;
 use yii\helpers\Html;
-/** @var $detail array */
-/** @var $student common\models\UserStudent */
-/** @var $test common\models\StoryTest */
-$this->title = 'Детализация истории ответов: ' . $student->name . ' - ' . $test->title;
-$this->params['sidebarMenuItems'] = [
-    ['label' => $student->name . ' - история обучения', 'url' => ['view', 'id' => $student->id]],
-];
+
+/**
+ * @var $detail array
+ * @var UserStudent $student
+ * @var StoryTest $test
+ */
+
+$this->title = 'Ученик: ' . $student->name . ' / Тестирование: ' . $test->title;
+
+$this->registerCss(<<<CSS
+.back-arrow {
+  background-color: #eee;
+  padding: 6px;
+  border-radius: 50%;
+  font-size: 20px;
+}
+CSS
+);
 ?>
-<h1 class="page-header"><?= Html::encode($this->title) ?></h1>
+<h1 class="h2 page-header"><?= Html::a('<i class="glyphicon glyphicon-arrow-left back-arrow"></i>', ['/history/view', 'id' => $student->id]) ?> <?= Html::encode($this->title) ?></h1>
 <div class="row">
     <div class="col-md-12">
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>question_id</th>
-                    <th>entity_name</th>
+                    <th>ИД вопроса</th>
+                    <th>Вопрос</th>
                     <th>Ответ пользователя</th>
-                    <th>stars</th>
+                    <th>Кол-во звезд</th>
                 </tr>
             </thead>
             <tbody>
