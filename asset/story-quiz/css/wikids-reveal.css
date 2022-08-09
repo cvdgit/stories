@@ -845,9 +845,9 @@ p.wikids-test-description {
 }
 
 .seq-question {
-  height: calc(100% - 134px);
+  /*height: calc(100% - 183px);*/
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
 }
 
