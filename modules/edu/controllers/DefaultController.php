@@ -6,9 +6,9 @@ use common\models\User;
 use common\rbac\UserRoles;
 use Ramsey\Uuid\Uuid;
 use Yii;
-use yii\db\Query;
 use yii\web\Controller;
 use yii\web\Cookie;
+use yii\web\Response;
 
 /**
  * Default controller for the `edu` module
@@ -16,20 +16,22 @@ use yii\web\Cookie;
 class DefaultController extends Controller
 {
 
-    public function actionIndex()
+    public function actionIndex(): Response
     {
+        $student = Yii::$app->studentContext->getStudent();
 
         if (Yii::$app->user->can(UserRoles::ROLE_TEACHER)) {
-            $student = Yii::$app->studentContext->getStudent();
             if ($student === null) {
                 return $this->redirect(['/edu/teacher/default/index']);
             }
             return $this->redirect(['/edu/student/index']);
         }
 
-        /** @var User $currentUser */
-        $currentUser = Yii::$app->user->identity;
+        if ($student === null) {
+            return $this->redirect(['/edu/parent/index']);
+        }
 
+        /*
         $students = $currentUser->students;
         if (count($students) === 0) {
             return $this->redirect(['/edu/parent/index']);
@@ -68,7 +70,7 @@ class DefaultController extends Controller
 
         if ($sessionRow === false) {
 
-        }
+        }*/
 
         return $this->redirect(['/edu/student/index']);
     }

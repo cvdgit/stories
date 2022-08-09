@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace modules\edu\components;
 
 use common\models\UserStudent;
@@ -16,7 +15,7 @@ class StudentContext extends Component
     private $cookieUid;
     private $student;
 
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -36,14 +35,33 @@ class StudentContext extends Component
             ->where('uid = :uid', [':uid' => $uid])
             ->one();
         if ($sessionRow !== false) {
-            return UserStudent::findOne($sessionRow['student_id']);
+            $studentId = (int)$sessionRow['student_id'];
+            return UserStudent::findOne($studentId);
         }
+        return null;
+    }
+
+    private function checkUserOwnsStudent(int $userId, int $studentId): bool
+    {
+        return (new Query())
+            ->from('user_student')
+            ->where(['id' => $studentId])
+            ->andWhere(['user_id' => $userId])
+            ->exists();
     }
 
     public function getStudent(): ?UserStudent
     {
         if ($this->student === null && $this->haveStudentCookie()) {
-            $this->student = $this->findStudent($this->cookieUid);
+
+            if (($student = $this->findStudent($this->cookieUid)) === null) {
+                return null;
+            }
+
+            $userId = Yii::$app->user->getId();
+            if ($this->checkUserOwnsStudent($userId, $student->id)) {
+                $this->student = $student;
+            }
         }
         return $this->student;
     }
