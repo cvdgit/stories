@@ -28,6 +28,7 @@ class UserRoles
     const PERMISSION_MANAGE_STUDY = 'manageStudy';
 
     public const PERMISSION_MANAGE_CONTACT_REQUESTS = 'manageContactRequests';
+    public const PERMISSION_EDU_ACCESS = 'eduAccess';
 
     public static function isModerator($userID)
     {

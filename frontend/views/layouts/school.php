@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 use common\widgets\ToastrFlash;
 use frontend\assets\SchoolAsset;
 use frontend\widgets\ContactWidget;
 use frontend\widgets\LoginWidget;
+use frontend\widgets\SchoolMainMenuWidget;
 use frontend\widgets\SignupWidget;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use common\rbac\UserRoles;
-use yii\widgets\Menu;
 
 SchoolAsset::register($this);
 
@@ -54,65 +56,7 @@ SchoolAsset::register($this);
                         <span class="menu-icon"></span>
                     </button>
                     <div id="main-menu" class="nav__wrap navbar-collapse collapse">
-                        <?php
-                        $items = [
-                            [
-                                'label' => '<span class="menu-item__link dropdown-toggle">Разделы</span>',
-                                'items' => [
-                                    ['label' => 'Истории для детей', 'url' => ['/story/index', 'section' => 'stories']],
-                                    ['label' => 'DIRECTUM', 'url' => ['/story/index', 'section' => 'directum']]
-                                ],
-                                'options' => ['class' => 'menu-item dropdown'],
-                                'submenuTemplate' => "\n<ul class='dropdown-menu'>\n{items}\n</ul>\n",
-                            ],
-                            ['label' => 'Блог', 'url' => ['/news/index'], 'active' => Yii::$app->controller->id === 'news'],
-                            ['label' => 'Обучение', 'url' => ['/edu/default/index']],
-                            ['label' => 'Контакты', 'url' => '#', 'template'=> '<a class="menu-item__link" href="{url}" data-toggle="modal" data-target="#wikids-feedback-modal">{label}</a>'],
-                        ];
-                        if (Yii::$app->user->isGuest) {
-                            $items[] = [
-                                'label' => 'Войти',
-                                'url' => '#',
-                                'template' => Html::a('{label}', '{url}', ['class' => 'menu-item__link', 'data-toggle' => 'modal', 'data-target' => '#wikids-login-modal']),
-                            ];
-                            $items[] = [
-                                'label' => 'Регистрация',
-                                'url' => '#',
-                                'template' => Html::a('{label}', '{url}', ['class' => 'registration-link', 'data-toggle' => 'modal', 'data-target' => '#wikids-signup-modal']),
-                            ];
-                        }
-                        else {
-                            $items[] = [
-                                'label' => '<div class="profile-row dropdown-toggle" data-toggle="dropdown">
-                                        <div class="profile-row__name">' . Yii::$app->user->identity->getProfileName() . '</div>
-                                        <div class="profile-row__image">
-                                            ' . Html::img(Yii::$app->user->identity->getProfilePhoto(), ['class' => 'profile-image', 'alt' => 'pic']) . '
-                                        </div>
-                                    </div>',
-                                'items' => [
-                                    ['label' => 'Профиль', 'url' => ['/profile/index'], 'template' => Html::a('{label}', '{url}', ['class' => 'dropdown-item menu-item__link'])],
-                                    ['label' => 'История просмотра', 'url' => ['/story/history'], 'template' => Html::a('{label}', '{url}', ['class' => 'dropdown-item menu-item__link'])],
-                                    ['label' => 'Любимые истории', 'url' => ['/story/liked'], 'template' => Html::a('{label}', '{url}', ['class' => 'dropdown-item menu-item__link'])],
-                                    ['label' => 'Избранные истории', 'url' => ['/story/favorites'], 'template' => Html::a('{label}', '{url}', ['class' => 'dropdown-item menu-item__link'])],
-                                    ['label' => 'Панель управления', 'url' => '/admin', 'visible' => Yii::$app->user->can(UserRoles::PERMISSION_ADMIN_PANEL), 'template' => Html::a('{label}', '{url}', ['class' => 'dropdown-item menu-item__link'])],
-                                    ['label' => Html::beginForm(['/auth/logout']) .
-                                        Html::submitButton('Выйти', ['class' => 'dropdown-item menu-item__link']) .
-                                        Html::endForm(),
-                                        'encode' => false,
-                                    ],
-                                ],
-                                'options' => ['class' => 'menu-item'],
-                                'submenuTemplate' => "\n<div class='user-profile dropdown'>\n<ul class='dropdown-menu dropdown-menu-right'>\n{items}\n</ul>\n</div>\n",
-                            ];
-                        }
-                        echo Menu::widget([
-                            'items' => $items,
-                            'options' => ['class' => 'navbar-nav align-items-center'],
-                            'itemOptions' => ['class' => 'menu-item'],
-                            'linkTemplate' => Html::a('{label}', '{url}', ['class' => 'menu-item__link']),
-                            'encodeLabels' => false,
-                        ]);
-                        ?>
+                        <?= SchoolMainMenuWidget::widget() ?>
                     </div>
                 </nav>
             </div>

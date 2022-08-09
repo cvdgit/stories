@@ -4,7 +4,9 @@ namespace modules\edu;
 
 use common\rbac\UserRoles;
 use modules\edu\assets\AppAsset;
+use modules\edu\components\EduAccessChecker;
 use Yii;
+use yii\web\Application as WebApp;
 use yii\filters\AccessControl;
 
 /**
@@ -17,6 +19,14 @@ class Module extends \yii\base\Module
      */
     public $controllerNamespace = 'modules\edu\controllers';
 
+    private $accessChecker;
+
+    public function __construct($id, $parent = null,EduAccessChecker $accessChecker = null, $config = [])
+    {
+        parent::__construct($id, $parent, $config);
+        $this->accessChecker = $accessChecker;
+    }
+
     public function behaviors(): array
     {
         return [
@@ -25,7 +35,9 @@ class Module extends \yii\base\Module
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => [UserRoles::ROLE_USER],
+                        'matchCallback' => function($rule, $action) {
+                            return $this->accessChecker->canUserAccess(Yii::$app->user->getId());
+                        }
                     ]
                 ]
             ]
@@ -37,9 +49,13 @@ class Module extends \yii\base\Module
      */
     public function init()
     {
-        AppAsset::register(Yii::$app->view);
         parent::init();
+
+        if (Yii::$app instanceof WebApp) {
+            AppAsset::register(Yii::$app->view);
+        }
     }
+
 /*
     public function beforeAction($action)
     {

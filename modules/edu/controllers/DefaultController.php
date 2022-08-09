@@ -28,7 +28,7 @@ class DefaultController extends Controller
         }
 
         if ($student === null) {
-            return $this->redirect(['/edu/parent/index']);
+            return $this->redirect(['/edu/parent/default/index']);
         }
 
         /*
