@@ -21,9 +21,13 @@ class AutocompleteController extends BaseController
     public function actionSelect(string $query)
     {
         return (new Query())
-            ->select(['username AS title', 'id', new Expression("'/img/no_avatar.png' AS cover")])
+            ->select(['username AS title', 'email', 'id', new Expression("'/img/no_avatar.png' AS cover")])
             ->from(User::tableName())
-            ->where(['like', 'username', $query])
+            ->where([
+                'or',
+                ['like', 'username', $query],
+                ['like', 'email', $query],
+            ])
             ->andWhere('status = :status', [':status' => User::STATUS_ACTIVE])
             ->orderBy(['username' => SORT_ASC])
             ->limit(30)

@@ -15,14 +15,14 @@ use yii\web\View;
  * @var View $this
  */
 
-$this->title = 'Классы';
+$this->title = 'Доступ к модулю Обучение';
 ?>
 <div>
     <?= AdminToolbarWidget::widget() ?>
 
     <?= AdminHeaderWidget::widget([
         'title' => Html::encode($this->title),
-        'content' => Html::a('Создать класс', ['create'], ['class' => 'btn btn-default btn-sm btn-outline-secondary']),
+        'content' => Html::a('Создать доступ', ['create'], ['class' => 'btn btn-default btn-sm btn-outline-secondary']),
     ]) ?>
 
     <?= GridView::widget([
@@ -30,7 +30,12 @@ $this->title = 'Классы';
         'options' => ['class' => 'table-responsive'],
         'summary' => false,
         'columns' => [
-            'name',
+            [
+                'attribute' => 'user.profileName',
+                'label' => 'Пользователь',
+            ],
+            'status',
+            'created_at:datetime',
             [
                 'class' => ActionColumn::class,
                 'template' => '{update} {delete}',

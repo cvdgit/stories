@@ -4,6 +4,7 @@ namespace modules\edu\models;
 
 use common\models\User;
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -19,6 +20,17 @@ use yii\db\ActiveRecord;
  */
 class EduUserAccess extends ActiveRecord
 {
+
+    public function behaviors(): array
+    {
+        return [
+            [
+                'class' => TimestampBehavior::class,
+                'updatedAtAttribute' => false,
+            ],
+        ];
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -33,8 +45,9 @@ class EduUserAccess extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['user_id', 'created_at'], 'required'],
-            [['user_id', 'status', 'created_at'], 'integer'],
+            [['user_id', 'status'], 'required'],
+            [['user_id', 'status'], 'integer'],
+            ['status', 'in', 'range' => UserAccessStatus::asRange()],
             [['user_id'], 'unique'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
@@ -47,9 +60,9 @@ class EduUserAccess extends ActiveRecord
     {
         return [
             'id' => 'ID',
-            'user_id' => 'User ID',
-            'status' => 'Status',
-            'created_at' => 'Created At',
+            'user_id' => 'Пользователь',
+            'status' => 'Статус',
+            'created_at' => 'Дата создания',
         ];
     }
 

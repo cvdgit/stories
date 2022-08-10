@@ -1,4 +1,6 @@
 <?php
+
+use modules\edu\widgets\AdminToolbarWidget;
 use yii\data\DataProviderInterface;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
@@ -11,11 +13,12 @@ use yii\helpers\Url;
  * @var $lessonsDataProvider DataProviderInterface
  */
 $this->title = 'Тема: ' . $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Темы', 'url' => ['index']];
-$this->params['breadcrumbs'][] = 'Редактировать';
 ?>
 <div>
-    <h1 class="page-header"><?= Html::encode($this->title) ?></h1>
+    <?= AdminToolbarWidget::widget() ?>
+
+    <h1 class="h2 page-header"><?= Html::a('<i class="glyphicon glyphicon-arrow-left back-arrow"></i>', ['/edu/admin/topic/index']) ?> <?= Html::encode($this->title) ?></h1>
+
     <div class="row">
         <div class="col-lg-8">
             <?= $this->render('_form', [

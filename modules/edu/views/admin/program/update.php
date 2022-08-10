@@ -1,21 +1,23 @@
 <?php
 
+use modules\edu\widgets\AdminToolbarWidget;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model modules\edu\models\EduProgram */
 
-$this->title = 'Update Edu Program: ' . $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Edu Programs', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Update';
+$this->title = 'Программа: ' . $model->name;
 ?>
-<div class="edu-program-update">
+<div>
+    <?= AdminToolbarWidget::widget() ?>
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1 class="h2 page-header"><?= Html::a('<i class="glyphicon glyphicon-arrow-left back-arrow"></i>', ['/edu/admin/program/index']) ?> <?= Html::encode($this->title) ?></h1>
 
-    <?= $this->render('_form', [
-        'model' => $model,
-    ]) ?>
-
+    <div class="row">
+        <div class="col-lg-8">
+            <?= $this->render('_form', [
+                'model' => $model,
+            ]) ?>
+        </div>
+    </div>
 </div>

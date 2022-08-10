@@ -1,5 +1,6 @@
 <?php
 use modules\edu\models\EduLesson;
+use modules\edu\widgets\AdminHeaderWidget;
 use yii\data\DataProviderInterface;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
@@ -33,15 +34,16 @@ CSS
             </div>
         </div>
     </div>
+
     <?php Pjax::begin(['id' => 'pjax-stories']) ?>
-    <?= GridView::widget([
-        'dataProvider' => $storiesDataProvider,
-        'summary' => false,
-        'columns' => [
-            'title',
-            ['class' => ActionColumn::class],
-        ],
-    ]) ?>
+        <?= GridView::widget([
+            'dataProvider' => $storiesDataProvider,
+            'summary' => false,
+            'columns' => [
+                'title',
+                ['class' => ActionColumn::class],
+            ],
+        ]) ?>
     <?php Pjax::end() ?>
 </div>
 

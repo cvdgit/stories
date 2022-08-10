@@ -4,6 +4,7 @@ namespace modules\edu\controllers\admin;
 
 use modules\edu\forms\admin\SelectStoryForm;
 use modules\edu\models\EduLesson;
+use modules\edu\models\EduTopic;
 use modules\edu\services\LessonService;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
@@ -43,8 +44,15 @@ class LessonController extends Controller
         );
     }
 
+    /**
+     * @throws NotFoundHttpException
+     */
     public function actionCreate(int $topic_id)
     {
+        if (($topic = EduTopic::findOne($topic_id)) === null) {
+            throw new NotFoundHttpException('Тема не найдена');
+        }
+
         $model = new EduLesson([
             'topic_id' => $topic_id,
         ]);

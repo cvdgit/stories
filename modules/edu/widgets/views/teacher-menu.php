@@ -6,8 +6,7 @@ use yii\bootstrap\Nav;
 
 ?>
 <div class="teacher-toolbar">
-    <?php
-    echo Nav::widget([
+    <?= Nav::widget([
         'options' => ['class' => 'navbar-nav'],
         'items' => [
             [
@@ -18,6 +17,5 @@ use yii\bootstrap\Nav;
             ['label' => 'Задания', 'url' => ['/edu/teacher/home-task/index']],
             ['label' => 'Мои классы', 'url' => ['/edu/teacher/class-book/index']],
         ],
-    ]);
-    ?>
+    ]) ?>
 </div>
