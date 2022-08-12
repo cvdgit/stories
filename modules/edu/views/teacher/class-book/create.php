@@ -29,10 +29,35 @@ $this->title = 'Создать класс';
                 ]) ?>
                 <?= $form->field($formModel, 'name')->textInput(['autofocus' => true, 'autocomplete' => 'off']) ?>
                 <?= $form->field($formModel, 'class_id')->dropDownList($formModel->getClassArray(), ['prompt' => 'Выберите класс']) ?>
-                <?= $form->field($formModel, 'programs')->checkboxList($formModel->getProgramArray()) ?>
+                <?= $form->field($formModel, 'class_programs')->checkboxList([])->label(false) ?>
                 <?= Html::submitButton('Сохранить', ['class' => 'btn']) ?>
                 <?php ActiveForm::end() ?>
             </div>
         </div>
     </div>
 </div>
+<?php
+$this->registerJs(<<<JS
+(function() {
+    $('#classbookform-class_id').on('change', function() {
+
+        var id = $(this).val();
+
+        $('#classbookform-class_programs').empty();
+
+        if (id) {
+
+            $.getJSON('/edu/teacher/class-book/programs', {id})
+                .then(function(response) {
+                    if (response && response.length > 0) {
+                        response.forEach(function(item) {
+                            $('<label><input type="checkbox" name="ClassBookForm[class_programs][]" value="' + item.id + '"> ' + item.name + '</label>')
+                                .appendTo('#classbookform-class_programs')
+                        });
+                    }
+                });
+        }
+    });
+})();
+JS
+);

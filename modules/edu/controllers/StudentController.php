@@ -76,7 +76,7 @@ class StudentController extends Controller
         $classBook = $classBooks[0];
 
         $dataProvider = new ActiveDataProvider([
-            'query' => $classBook->getPrograms(),
+            'query' => $classBook->getClassPrograms(),
         ]);
 
         return $this->render('index', [

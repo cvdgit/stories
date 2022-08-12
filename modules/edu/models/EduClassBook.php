@@ -22,7 +22,7 @@ use yii\db\ActiveRecord;
  * @property EduClass $class
  * @property EduClassBookProgram[] $eduClassBookPrograms
  * @property EduClassBookStudent[] $eduClassBookStudents
- * @property EduProgram[] $programs
+ * @property EduClassProgram[] $classPrograms
  * @property UserStudent[] $students
  * @property User $user
  */
@@ -39,7 +39,7 @@ class EduClassBook extends ActiveRecord
             'saveRelations' => [
                 'class' => SaveRelationsBehavior::class,
                 'relations' => [
-                    'programs',
+                    'classPrograms',
                     'students',
                 ],
             ],
@@ -99,14 +99,16 @@ class EduClassBook extends ActiveRecord
         return $this->hasMany(EduClassBookStudent::class, ['class_book_id' => 'id']);
     }
 
-    public function getPrograms(): ActiveQuery
+    public function getClassPrograms(): ActiveQuery
     {
-        return $this->hasMany(EduProgram::class, ['id' => 'program_id'])->viaTable('edu_class_book_program', ['class_book_id' => 'id']);
+        return $this->hasMany(EduClassProgram::class, ['id' => 'class_program_id'])
+            ->viaTable('edu_class_book_program', ['class_book_id' => 'id']);
     }
 
-    public function getStudents()
+    public function getStudents(): ActiveQuery
     {
-        return $this->hasMany(UserStudent::class, ['id' => 'student_id'])->viaTable('edu_class_book_student', ['class_book_id' => 'id']);
+        return $this->hasMany(UserStudent::class, ['id' => 'student_id'])
+            ->viaTable('edu_class_book_student', ['class_book_id' => 'id']);
     }
 
     public function getUser(): ActiveQuery
@@ -134,13 +136,13 @@ class EduClassBook extends ActiveRecord
         return $model;
     }
 
-    public function addPrograms(array $programIds): void
+    public function addClassPrograms(array $classProgramIds): void
     {
-        $this->programs = array_unique(array_merge(
-            array_map(static function($program) {
-                return $program->id;
-            }, $this->programs),
-            $programIds));
+        $this->classPrograms = array_unique(array_merge(
+            array_map(static function($classProgram) {
+                return $classProgram->id;
+            }, $this->classPrograms),
+            $classProgramIds));
     }
 
     public function addStudent(int $studentId): void
@@ -157,9 +159,9 @@ class EduClassBook extends ActiveRecord
         return self::findOne(['id' => $id, 'user_id' => $userId]);
     }
 
-    public function getProgramIds(): array
+    public function getClassProgramIds(): array
     {
-        return array_column($this->programs, 'id');
+        return array_column($this->classPrograms, 'id');
     }
 
     public static function findTeacherClassBooks(int $userId): ActiveQuery

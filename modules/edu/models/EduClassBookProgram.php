@@ -3,22 +3,24 @@
 namespace modules\edu\models;
 
 use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "edu_class_book_program".
  *
  * @property int $class_book_id
- * @property int $program_id
+ * @property int $class_program_id
  *
  * @property EduClassBook $classBook
- * @property EduProgram $program
+ * @property EduClassProgram $classProgram
  */
-class EduClassBookProgram extends \yii\db\ActiveRecord
+class EduClassBookProgram extends ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'edu_class_book_program';
     }
@@ -26,45 +28,35 @@ class EduClassBookProgram extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            [['class_book_id', 'program_id'], 'required'],
-            [['class_book_id', 'program_id'], 'integer'],
-            [['class_book_id', 'program_id'], 'unique', 'targetAttribute' => ['class_book_id', 'program_id']],
-            [['class_book_id'], 'exist', 'skipOnError' => true, 'targetClass' => EduClassBook::className(), 'targetAttribute' => ['class_book_id' => 'id']],
-            [['program_id'], 'exist', 'skipOnError' => true, 'targetClass' => EduProgram::className(), 'targetAttribute' => ['program_id' => 'id']],
+            [['class_book_id', 'class_program_id'], 'required'],
+            [['class_book_id', 'class_program_id'], 'integer'],
+            [['class_book_id', 'class_program_id'], 'unique', 'targetAttribute' => ['class_book_id', 'class_program_id']],
+            [['class_book_id'], 'exist', 'skipOnError' => true, 'targetClass' => EduClassBook::class, 'targetAttribute' => ['class_book_id' => 'id']],
+            [['class_program_id'], 'exist', 'skipOnError' => true, 'targetClass' => EduProgram::class, 'targetAttribute' => ['class_program_id' => 'id']],
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'class_book_id' => 'Class Book ID',
-            'program_id' => 'Program ID',
+            'class_program_id' => 'Program ID',
         ];
     }
 
-    /**
-     * Gets query for [[ClassBook]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getClassBook()
+    public function getClassBook(): ActiveQuery
     {
-        return $this->hasOne(EduClassBook::className(), ['id' => 'class_book_id']);
+        return $this->hasOne(EduClassBook::class, ['id' => 'class_book_id']);
     }
 
-    /**
-     * Gets query for [[Program]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getProgram()
+    public function getClassProgram(): ActiveQuery
     {
-        return $this->hasOne(EduProgram::className(), ['id' => 'program_id']);
+        return $this->hasOne(EduClassProgram::class, ['id' => 'class_program_id']);
     }
 }

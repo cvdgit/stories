@@ -10,6 +10,7 @@ use yii\bootstrap\Html;
 use yii\data\DataProviderInterface;
 use yii\web\View;
 use yii\widgets\ListView;
+use yii\widgets\Pjax;
 
 /**
  * @var UserStudent $student
@@ -40,6 +41,7 @@ $this->title = $student->name;
 
             <h3 style="margin-top:0"><?= Html::encode($lesson->name) ?></h3>
 
+            <?php Pjax::begin(['id' => 'pjax-stories']) ?>
             <?= ListView::widget([
                 'dataProvider' => $dataProvider,
                 'summary' => false,
@@ -47,7 +49,33 @@ $this->title = $student->name;
                 'itemOptions' => ['tag' => false],
                 'layout' => "{summary}\n<div class=\"story-list\"><div class=\"flex-row row\">{items}</div></div>\n{pager}",
             ]) ?>
-
+            <?php Pjax::end() ?>
         </div>
     </div>
 </div>
+
+<div class="modal remote fade modal-fullscreen" id="run-story-modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content"></div>
+    </div>
+</div>
+
+<?php
+$this->registerJs(<<<JS
+(function() {
+
+$('.story-list').on('click', '.run-story', function(e) {
+    e.preventDefault();
+    $('#run-story-modal')
+        .modal({'remote': $(this).attr('href')});
+});
+
+$('#run-story-modal')
+    .on('hide.bs.modal', function() {
+        $(this).removeData('bs.modal');
+        $(this).find('.modal-content').html('');
+    });
+
+})();
+JS
+);

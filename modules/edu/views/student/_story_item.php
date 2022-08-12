@@ -13,18 +13,13 @@ use yii\helpers\Url;
 ?>
 <div class="col-lg-3 col-md-4 col-sm-6">
     <div class="story-item">
-        <a href="<?= Url::toRoute(['/story/view', 'alias' => $model->alias]) ?>">
+        <a class="run-story" href="<?= Url::toRoute(['/edu-story/view', 'id' => $model->id]) ?>">
             <div class="story-item-image">
                 <div class="story-item-image-overlay">
                     <span></span>
                 </div>
                 <?php $img = empty($model->cover) ? '/img/story-1.jpg' : StoryCover::getListThumbPath($model->cover); ?>
                 <?= Html::img($img) ?>
-                <?php if (($history = $model->userStoryHistories) !== null && $history->percent > 0): ?>
-                    <div class="story-progress-wrapper">
-                        <div class="story-progress" style="width: <?= $history->percent ?>%;"></div>
-                    </div>
-                <?php endif ?>
             </div>
             <div class="story-item-caption">
                 <p class="flex-text"></p>

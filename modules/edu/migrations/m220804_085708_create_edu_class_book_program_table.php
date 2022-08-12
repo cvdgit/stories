@@ -17,8 +17,8 @@ class m220804_085708_create_edu_class_book_program_table extends Migration
     {
         $this->createTable($this->tableName, [
             'class_book_id' => $this->integer()->notNull(),
-            'program_id' => $this->integer()->notNull(),
-            'PRIMARY KEY(class_book_id, program_id)',
+            'class_program_id' => $this->integer()->notNull(),
+            'PRIMARY KEY(class_book_id, class_program_id)',
         ]);
 
         $this->addForeignKey(
@@ -31,10 +31,10 @@ class m220804_085708_create_edu_class_book_program_table extends Migration
         );
 
         $this->addForeignKey(
-            '{{%fk-edu_class_book_program-program_id}}',
+            '{{%fk-edu_class_book_program-class_program_id}}',
             $this->tableName,
-            'program_id',
-            '{{%edu_program}}',
+            'class_program_id',
+            '{{%edu_class_program}}',
             'id',
             'CASCADE'
         );
@@ -45,7 +45,7 @@ class m220804_085708_create_edu_class_book_program_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropForeignKey('{{%fk-edu_class_book_program-program_id}}', $this->tableName);
+        $this->dropForeignKey('{{%fk-edu_class_book_program-class_program_id}}', $this->tableName);
         $this->dropForeignKey('{{%fk-edu_class_book_program-class_book_id}}', $this->tableName);
         $this->dropTable($this->tableName);
     }

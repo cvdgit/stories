@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace modules\edu\services;
 
 use common\components\ModelDomainException;
@@ -20,7 +19,7 @@ class TeacherService
         }
 
         $model = EduClassBook::create($form->name, $userId, (int)$form->class_id);
-        $model->addPrograms($form->programs);
+        $model->addClassPrograms($form->class_programs);
         if (!$model->save()) {
             throw ModelDomainException::create($model);
         }

@@ -54,20 +54,14 @@ class RevealWidget extends Widget
 
     public function run()
 	{
-	    if ($this->canViewStory) {
-            if (empty($this->data)) {
-                $this->data = Html::tag('div', '', ['class' => 'slides']);
-            }
-            echo Html::tag('div', $this->data, ['class' => 'reveal', 'id' => $this->id]);
-            $this->registerClientScript();
+        if (empty($this->data)) {
+            $this->data = Html::tag('div', '', ['class' => 'slides']);
         }
-	    else {
-	        echo Html::tag('div', Html::a('Смотреть по подписке', ['/pricing'], ['class' => 'btn']), ['class' => 'story-no-subscription']);
-	        $this->registerAssets();
-        }
+        echo Html::tag('div', $this->data, ['class' => 'reveal', 'id' => $this->id]);
+        $this->registerClientScript();
 	}
 
-    public function registerClientScript()
+    public function registerClientScript(): void
     {
 
         foreach ($this->options as $optionName => $optionValue) {
@@ -92,7 +86,7 @@ class RevealWidget extends Widget
         }
     }
 
-    protected function registerPlugins()
+    protected function registerPlugins(): void
     {
         $view = $this->getView();
         foreach ($this->plugins as $params) {
@@ -105,7 +99,7 @@ class RevealWidget extends Widget
         }
     }
 
-    protected function registerAssets()
+    protected function registerAssets(): void
     {
         $view = $this->getView();
         foreach (array_merge($this->defaultAssets, $this->assets) as $assetClass) {

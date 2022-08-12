@@ -7,7 +7,6 @@ namespace modules\edu\forms\teacher;
 
 use modules\edu\models\EduClass;
 use modules\edu\models\EduClassBook;
-use modules\edu\models\EduProgram;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 
@@ -16,7 +15,7 @@ class ClassBookForm extends Model
 
     public $name;
     public $class_id;
-    public $programs = [];
+    public $class_programs = [];
 
     /** @var null|int */
     private $id = null;
@@ -28,17 +27,17 @@ class ClassBookForm extends Model
             $this->id = $model->id;
             $this->name = $model->name;
             $this->class_id = $model->class_id;
-            $this->programs = $model->getProgramIds();
+            $this->class_programs = $model->getClassProgramIds();
         }
     }
 
     public function rules(): array
     {
         return [
-            [['name', 'class_id'], 'required'],
+            [['name', 'class_id', 'class_programs'], 'required'],
             ['name', 'string', 'max' => 50],
             ['class_id', 'integer'],
-            ['programs', 'each', 'rule' => ['integer']],
+            ['class_programs', 'each', 'rule' => ['integer']],
         ];
     }
 
@@ -47,18 +46,13 @@ class ClassBookForm extends Model
         return [
             'name' => 'Название',
             'class_id' => 'Класс',
-            'programs' => 'Предметы',
+            'class_programs' => 'Предметы',
         ];
     }
 
     public function getClassArray(): array
     {
         return ArrayHelper::map(EduClass::find()->orderBy(['name' => SORT_ASC])->asArray()->all(), 'id', 'name');
-    }
-
-    public function getProgramArray(): array
-    {
-        return ArrayHelper::map(EduProgram::find()->orderBy(['name' => SORT_ASC])->asArray()->all(), 'id', 'name');
     }
 
     /**

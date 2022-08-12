@@ -7,13 +7,16 @@ namespace modules\edu\controllers\teacher;
 use Exception;
 use modules\edu\forms\teacher\ClassBookForm;
 use modules\edu\forms\student\StudentForm;
+use modules\edu\models\EduClass;
 use modules\edu\models\EduClassBook;
+use modules\edu\models\EduClassProgram;
 use modules\edu\services\StudentService;
 use modules\edu\services\TeacherService;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 class ClassBookController extends Controller
 {
@@ -47,7 +50,8 @@ class ClassBookController extends Controller
         if ($this->request->isPost && $formModel->load($this->request->post())) {
             try {
                 $id = $this->teacherService->createClassBook(Yii::$app->user->getId(), $formModel);
-                return $this->redirect(['update', 'id' => $id]);
+                return $this->redirect(['index']);
+                //return $this->redirect(['update', 'id' => $id]);
             }
             catch (Exception $exception) {
                 Yii::$app->errorHandler->logException($exception);
@@ -131,5 +135,24 @@ class ClassBookController extends Controller
         return $this->render('create-student', [
             'formModel' => $formModel,
         ]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionPrograms(int $id): array
+    {
+        $this->response->format = Response::FORMAT_JSON;
+
+        if (($class = EduClass::findOne($id)) === null) {
+            throw new NotFoundHttpException('Класс не найден');
+        }
+
+        return array_map(static function(EduClassProgram $item) {
+            return [
+                'id' => $item->id,
+                'name' => $item->program->name,
+            ];
+        }, $class->eduClassPrograms);
     }
 }
