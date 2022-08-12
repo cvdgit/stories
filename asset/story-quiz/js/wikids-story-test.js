@@ -1038,6 +1038,12 @@ function WikidsStoryTest(el, options) {
     const titleElement = $('<p/>', {class: 'question-title'});
 
     if (testConfig.answerTypeIsDefault() && testConfig.isAskQuestion()) {
+
+      let questionName = createQuestionName(question);
+      if (questionName.length) {
+        titleElement.append($('<div/>', {text: questionName}));
+      }
+
       $('<span/>', {
         'css': {'line-height': '3.5rem', 'margin-left': '10px', 'color': '#000', 'cursor': 'pointer'},
         'title': 'Прослушать'
