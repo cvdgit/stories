@@ -15,7 +15,7 @@ use frontend\widgets\EduRevealWidget;
         <div class="story-container">
             <div class="story-container-inner" id="story-container">
                 <div class="story-no-subscription">
-                    <?= EduRevealWidget::widget(['model' => $story]) ?>
+                    <?= $this->render('_player', ['model' => $story]) ?>
                 </div>
             </div>
         </div>

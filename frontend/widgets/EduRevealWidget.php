@@ -36,7 +36,7 @@ class EduRevealWidget extends RevealWidget
             SortableJsAsset::class,
             MaphilightAsset::class,
         ];
-
+        */
         $this->plugins = [
             [
                 'class' => \common\widgets\Reveal\Plugins\CustomControls::class,
@@ -47,18 +47,15 @@ class EduRevealWidget extends RevealWidget
                 ],
                 'rightButtons' => [],
             ],
-            ['class' => \common\widgets\Reveal\Plugins\Transition::class, 'storyID' => $this->storyId],
-            ['class' => \common\widgets\Reveal\Plugins\Statistics::class, 'storyID' => $this->storyId],
-            ['class' => \common\widgets\Reveal\Plugins\Test::class, 'storyID' => $this->storyId],
-            ['class' => SlideLinks::class, 'storyID' => $this->storyId, 'links' => $this->model->slideBlocksData()],
-            ['class' => Video::class, 'showControls' => false],
-            ['class' => \common\widgets\Reveal\Plugins\Actions::class],
-            ['class' => \common\widgets\Reveal\Plugins\SlideState::class, 'storyID' => $this->model->id],
+            //['class' => \common\widgets\Reveal\Plugins\Transition::class, 'storyID' => $this->storyId],
+            //['class' => \common\widgets\Reveal\Plugins\Statistics::class, 'storyID' => $this->storyId],
+            //['class' => \common\widgets\Reveal\Plugins\Test::class, 'storyID' => $this->storyId],
+            //['class' => SlideLinks::class, 'storyID' => $this->storyId, 'links' => $this->model->slideBlocksData()],
+            //['class' => Video::class, 'showControls' => false],
+            //['class' => \common\widgets\Reveal\Plugins\Actions::class],
+            //['class' => \common\widgets\Reveal\Plugins\SlideState::class, 'storyID' => $this->model->id],
         ];
-        */
 
-        $this->assets = [];
-        $this->plugins = [];
 
         $this->options = [
             'backgroundTransition' => 'none',

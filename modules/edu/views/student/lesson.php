@@ -54,9 +54,25 @@ $this->title = $student->name;
     </div>
 </div>
 
-<div class="modal remote fade modal-fullscreen" id="run-story-modal">
+<div class="modal fade modal-fullscreen" id="run-story-modal">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content"></div>
+        <div class="modal-content">
+
+            <div class="story-head-container">
+                <main class="site-story-main">
+                    <div class="story-container">
+                        <div class="story-container-inner" id="story-container">
+                            <div class="story-no-subscription">
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+
+        </div>
     </div>
 </div>
 
@@ -70,10 +86,14 @@ $('.story-list').on('click', '.run-story', function(e) {
         .modal({'remote': $(this).attr('href')});
 });
 
+
+
 $('#run-story-modal')
     .on('hide.bs.modal', function() {
         $(this).removeData('bs.modal');
         $(this).find('.modal-content').html('');
+    })
+    .on('loaded.bs.modal', function() {
     });
 
 })();

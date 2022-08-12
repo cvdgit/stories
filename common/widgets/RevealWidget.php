@@ -34,13 +34,13 @@ class RevealWidget extends Widget
         'controlsBackArrows' => 'faded',
         'controlsTutorial' => false,
         'progress' => true,
-        'history' => true,
+        'history' => false,
         'mouseWheel' => false,
         'showNotes' => false,
         'slideNumber' => false,
         'shuffle' => false,
         'loop' => false,
-        'hash' => true,
+        'hash' => false,
         'hashOneBasedIndex' => true,
         'rtl' => false,
         'help' => false,
@@ -81,7 +81,14 @@ class RevealWidget extends Widget
         $this->registerAssets();
 
         if ($this->initializeReveal) {
-            $js = 'Reveal.initialize(WikidsRevealConfig);';
+            $js = <<<JS
+var deck = new Reveal(document.getElementById('$this->id'), {
+    embedded: true
+});
+deck.initialize(WikidsRevealConfig);
+JS;
+
+            //$js = 'Reveal.initialize(WikidsRevealConfig);';
             $view->registerJs($js, View::POS_END);
         }
     }
