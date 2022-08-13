@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use common\models\UserStudent;
+use frontend\assets\SlidesAsset;
 use modules\edu\models\EduLesson;
 use modules\edu\models\EduTopic;
 use modules\edu\widgets\StudentToolbarWidget;
@@ -22,6 +23,8 @@ use yii\widgets\Pjax;
  */
 
 $this->title = $student->name;
+
+SlidesAsset::register($this);
 ?>
 <div class="container">
 
@@ -54,25 +57,9 @@ $this->title = $student->name;
     </div>
 </div>
 
-<div class="modal fade modal-fullscreen" id="run-story-modal">
+<div class="modal remote fade modal-fullscreen" id="run-story-modal">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-
-            <div class="story-head-container">
-                <main class="site-story-main">
-                    <div class="story-container">
-                        <div class="story-container-inner" id="story-container">
-                            <div class="story-no-subscription">
-
-
-
-                            </div>
-                        </div>
-                    </div>
-                </main>
-            </div>
-
-        </div>
+        <div class="modal-content"></div>
     </div>
 </div>
 
@@ -94,6 +81,7 @@ $('#run-story-modal')
         $(this).find('.modal-content').html('');
     })
     .on('loaded.bs.modal', function() {
+        initSlides();
     });
 
 })();

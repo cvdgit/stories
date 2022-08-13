@@ -35,6 +35,7 @@
   "dependencies": {
     "bootstrap": "4.6.x",
     "maphilight": "^1.4.2",
+    "reveal.js": "4.0.2",
     "sortablejs": "^1.15.0",
     "wavesurfer.js": "^6.1.0",
     "webpack-merge": "^5.8.0"
