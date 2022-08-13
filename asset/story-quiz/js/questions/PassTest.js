@@ -85,7 +85,7 @@ PassTest.prototype.getContent = function(payload) {
 
 PassTest.prototype.getUserAnswers = function() {
   return this.element.find('.highlight').map(function(index, elem) {
-    return $(elem).find('option:selected').text().toLowerCase();
+    return $(elem).find('option:selected').text().trim().toLowerCase();
   }).get();
 }
 

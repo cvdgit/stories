@@ -600,6 +600,12 @@ $this->registerJs(<<<JS
             const fragmentId = elem.getAttribute('data-fragment-id');
             const fragment = dataWrapper.findFragment(fragmentId);
             if (fragment) {
+
+                fragment.items = fragment.items.map(item => {
+                    item.title = item.title.trim();
+                    return item;
+                })
+
                 fragments.push(fragment);
             }
         });
