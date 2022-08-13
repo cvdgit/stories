@@ -80,7 +80,7 @@ PassTest.prototype.getContent = function(payload) {
     const reg = new RegExp('{' + fragment.id + '}');
     content = content.replace(reg, correctItemTitle);
   });
-  return '<div style="max-width:600px;margin:0 auto;font-size:24px">' + content + '</div>';
+  return '<div style="max-width:600px;margin:0 auto;font-size:24px">' + content.replace(/\s\s+/g, ' ') + '</div>';
 };
 
 PassTest.prototype.getUserAnswers = function() {
