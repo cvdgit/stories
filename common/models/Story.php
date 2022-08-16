@@ -58,6 +58,7 @@ use yii\db\ActiveQuery;
  * @property StorySlide[] $storySlides
  * @property StorySlideImage[] $storyImages
  * @property Lesson[] $lessons
+ * @property StoryStudentProgress $storyStudentProgress
  */
 
 class Story extends ActiveRecord
@@ -844,5 +845,10 @@ class Story extends ActiveRecord
             [':slideId' => $slideId]
         );
         $command->execute();
+    }
+
+    public function getStoryStudentProgress(): ActiveQuery
+    {
+        return $this->hasOne(StoryStudentProgress::class, ['story_id' => 'id']);
     }
 }

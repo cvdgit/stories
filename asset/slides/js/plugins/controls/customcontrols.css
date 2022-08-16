@@ -1,0 +1,81 @@
+
+.story-controls {
+    height: 40px;
+    position: absolute;
+    z-index: 1055;
+    text-align: center;
+    display: block;
+    right: 30px;
+    bottom: 3px;
+    left: auto;
+    top: auto;
+}
+
+.customcontrols {
+    z-index: 9999;
+    pointer-events: none;
+    font-size: 1rem !important;
+    display: inline-block;
+}
+
+.customcontrols button {
+    position: relative;
+    width: 4em;
+    height: 4em;
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    outline: 0;
+    cursor: pointer;
+    color: #38405d;
+    z-index: 99999;
+    pointer-events: auto;
+}
+
+.customcontrols button i {
+    font-size: 3rem;
+}
+
+.customcontrols .custom-navigate-left {
+
+}
+
+.customcontrols .custom-navigate-right {
+
+}
+
+.customcontrols .custom-controls-arrow {
+	position: relative;
+    width: 1.6em;
+    height: 1.6em;
+}
+
+.customcontrols .custom-navigate-right .custom-controls-arrow {
+
+}
+
+
+.customcontrols-right {
+    position: absolute;
+    right: 30px;
+    top: 0;
+}
+
+
+@media (max-width: 768px) {
+
+    .story-controls {
+        height: 36px;
+    }
+
+    .customcontrols button {
+        position: relative;
+        width: 2.5em;
+        height: 3.5em;
+    }
+
+    .customcontrols button i {
+        font-size: 2.5rem;
+        line-height: 2.5rem;
+    }
+}

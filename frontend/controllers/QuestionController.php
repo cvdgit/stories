@@ -35,13 +35,31 @@ class QuestionController extends Controller
         parent::__construct($id, $module, $config);
     }
 
-    public function actionInit(int $testId, int $userId = null)
+    public function actionInit(int $testId, int $userId = null, int $studentId = null): array
     {
         $test = StoryTest::findModel($testId);
-        $user = User::findOne($userId);
-        if ($user === null && !Yii::$app->user->isGuest) {
-            $user = Yii::$app->user->identity;
+
+        $students = [];
+        if ($studentId === null) {
+
+            $user = User::findOne($userId);
+            if ($user === null && !Yii::$app->user->isGuest) {
+                $user = Yii::$app->user->identity;
+            }
+
+            $students = UserHelper::getUserStudents($test, $user);
         }
+        else {
+            $student = UserStudent::findOne($studentId);
+            if ($student !== null) {
+                $students[] = [
+                    'id' => $student->id,
+                    'name' => $student->isMain() ? $student->user->getProfileName() : $student->name,
+                    'progress' => (int) $student->getProgress($test->id),
+                ];
+            }
+        }
+
         return [
             'test' => [
                 'id' => $test->id,
@@ -49,7 +67,7 @@ class QuestionController extends Controller
                 'description' => HTMLPurifier::process(nl2br($test->description_text)),
                 'remote' => $test->isRemote(),
             ],
-            'students' => UserHelper::getUserStudents($test, $user),
+            'students' => $students,
         ];
     }
 

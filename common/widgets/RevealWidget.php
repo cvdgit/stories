@@ -34,13 +34,13 @@ class RevealWidget extends Widget
         'controlsBackArrows' => 'faded',
         'controlsTutorial' => false,
         'progress' => true,
-        'history' => false,
+        'history' => true,
         'mouseWheel' => false,
         'showNotes' => false,
         'slideNumber' => false,
         'shuffle' => false,
         'loop' => false,
-        'hash' => false,
+        'hash' => true,
         'hashOneBasedIndex' => true,
         'rtl' => false,
         'help' => false,
@@ -54,14 +54,20 @@ class RevealWidget extends Widget
 
     public function run()
 	{
-        if (empty($this->data)) {
-            $this->data = Html::tag('div', '', ['class' => 'slides']);
+	    if ($this->canViewStory) {
+            if (empty($this->data)) {
+                $this->data = Html::tag('div', '', ['class' => 'slides']);
+            }
+            echo Html::tag('div', $this->data, ['class' => 'reveal', 'id' => $this->id]);
+            $this->registerClientScript();
         }
-        echo Html::tag('div', $this->data, ['class' => 'reveal', 'id' => $this->id]);
-        $this->registerClientScript();
+	    else {
+	        echo Html::tag('div', Html::a('Смотреть по подписке', ['/pricing'], ['class' => 'btn']), ['class' => 'story-no-subscription']);
+	        $this->registerAssets();
+        }
 	}
 
-    public function registerClientScript(): void
+    public function registerClientScript()
     {
 
         foreach ($this->options as $optionName => $optionValue) {
@@ -81,19 +87,12 @@ class RevealWidget extends Widget
         $this->registerAssets();
 
         if ($this->initializeReveal) {
-            $js = <<<JS
-var deck = new Reveal(document.getElementById('$this->id'), {
-    embedded: true
-});
-deck.initialize(WikidsRevealConfig);
-JS;
-
-            //$js = 'Reveal.initialize(WikidsRevealConfig);';
+            $js = 'Reveal.initialize(WikidsRevealConfig);';
             $view->registerJs($js, View::POS_END);
         }
     }
 
-    protected function registerPlugins(): void
+    protected function registerPlugins()
     {
         $view = $this->getView();
         foreach ($this->plugins as $params) {
@@ -106,7 +105,7 @@ JS;
         }
     }
 
-    protected function registerAssets(): void
+    protected function registerAssets()
     {
         $view = $this->getView();
         foreach (array_merge($this->defaultAssets, $this->assets) as $assetClass) {

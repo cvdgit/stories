@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use backend\assets\TestAsset;
 use common\models\UserStudent;
 use frontend\assets\SlidesAsset;
 use modules\edu\models\EduLesson;
@@ -24,7 +25,20 @@ use yii\widgets\Pjax;
 
 $this->title = $student->name;
 
+TestAsset::register($this);
 SlidesAsset::register($this);
+
+$this->registerCss(<<<CSS
+#run-story-modal .modal-body {
+    padding: 0;
+}
+@media (min-width: 992px) {
+    #run-story-modal .modal-lg {
+        width: 1300px;
+    }
+}
+CSS
+);
 ?>
 <div class="container">
 
@@ -44,6 +58,8 @@ SlidesAsset::register($this);
 
             <h3 style="margin-top:0"><?= Html::encode($lesson->name) ?></h3>
 
+            <div class="story-list-wrap">
+
             <?php Pjax::begin(['id' => 'pjax-stories']) ?>
             <?= ListView::widget([
                 'dataProvider' => $dataProvider,
@@ -53,11 +69,13 @@ SlidesAsset::register($this);
                 'layout' => "{summary}\n<div class=\"story-list\"><div class=\"flex-row row\">{items}</div></div>\n{pager}",
             ]) ?>
             <?php Pjax::end() ?>
+
+            </div>
         </div>
     </div>
 </div>
 
-<div class="modal remote fade modal-fullscreen" id="run-story-modal">
+<div class="modal remote fade modal-fullscreen" id="run-story-modal" data-backdrop="static">
     <div class="modal-dialog modal-lg">
         <div class="modal-content"></div>
     </div>
@@ -67,21 +85,28 @@ SlidesAsset::register($this);
 $this->registerJs(<<<JS
 (function() {
 
-$('.story-list').on('click', '.run-story', function(e) {
+$('.story-list-wrap').on('click', '.run-story', function(e) {
     e.preventDefault();
     $('#run-story-modal')
         .modal({'remote': $(this).attr('href')});
 });
 
-
+let deck;
 
 $('#run-story-modal')
+    .on('loaded.bs.modal', function() {
+        deck = initSlides();
+    })
     .on('hide.bs.modal', function() {
+
+        if (deck) {
+            deck.destroy();
+        }
+
         $(this).removeData('bs.modal');
         $(this).find('.modal-content').html('');
-    })
-    .on('loaded.bs.modal', function() {
-        initSlides();
+
+        $.pjax.reload({container: '#pjax-stories', async: false});
     });
 
 })();

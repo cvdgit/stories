@@ -39,7 +39,7 @@ const MissingWords = function(test) {
     element
       .append($('<p/>').addClass('recognition-status'));
     $('<a/>')
-      .attr('href', '#')
+      .attr('href', '')
       .attr('title', 'Остановить')
       .addClass('recognition-stop')
       .on('click', function(e) {

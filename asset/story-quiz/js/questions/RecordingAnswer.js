@@ -119,7 +119,7 @@ RecordingAnswer.prototype = {
     element
       .append($('<p/>').addClass('recognition-status'));
     $('<a/>')
-      .attr('href', '#')
+      .attr('href', '')
       .attr('title', 'Повторить ввод с микрофона')
       .addClass('recognition-repeat')
       .on('click', function (e) {
@@ -130,7 +130,7 @@ RecordingAnswer.prototype = {
       .hide()
       .appendTo(element);
     $('<a/>')
-      .attr('href', '#')
+      .attr('href', '')
       .attr('title', 'Остановить')
       .addClass('recognition-stop')
       .on('click', function (e) {

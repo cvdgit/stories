@@ -65,4 +65,9 @@ class StudentContext extends Component
         }
         return $this->student;
     }
+
+    public function getId(): ?int
+    {
+        return $this->getStudent() !== null ? $this->getStudent()->id : null;
+    }
 }
