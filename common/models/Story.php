@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace common\models;
 
 use backend\models\links\BlockType;
@@ -58,7 +60,7 @@ use yii\db\ActiveQuery;
  * @property StorySlide[] $storySlides
  * @property StorySlideImage[] $storyImages
  * @property Lesson[] $lessons
- * @property StoryStudentProgress $storyStudentProgress
+ * @property StoryStudentProgress[] $storyStudentProgresses
  */
 
 class Story extends ActiveRecord
@@ -847,8 +849,15 @@ class Story extends ActiveRecord
         $command->execute();
     }
 
-    public function getStoryStudentProgress(): ActiveQuery
+    public function getStoryStudentProgresses(): ActiveQuery
     {
-        return $this->hasOne(StoryStudentProgress::class, ['story_id' => 'id']);
+        return $this->hasMany(StoryStudentProgress::class, ['story_id' => 'id']);
+    }
+
+    public function findStudentStoryProgress(int $studentId): ?StoryStudentProgress
+    {
+        return $this->getStoryStudentProgresses()
+            ->andWhere(['student_id' => $studentId])
+            ->one();
     }
 }

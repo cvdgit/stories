@@ -18,7 +18,8 @@ $this->title = 'Создать класс';
 <div class="container">
     <?= TeacherMenuWidget::widget() ?>
 
-    <h1 class="text-center">Создать класс</h1>
+    <h1 class="h2 text-center"><?= Html::a('<i class="glyphicon glyphicon-arrow-left back-arrow"></i>', ['/edu/teacher/class-book/index']) ?> Создать класс</h1>
+
     <div style="margin: 20px 0 40px 0; text-align: center">
         <div class="row">
             <div class="col-lg-6 col-lg-offset-3">

@@ -1,36 +1,30 @@
 <?php
 
-use yii\bootstrap\Html;
+use common\models\UserStudent;
+use modules\edu\models\EduClassBook;
+use modules\edu\widgets\StudentToolbarWidget;
 use yii\data\DataProviderInterface;
+use yii\web\View;
 use yii\widgets\ListView;
 
 /**
- * @var string $studentName
+ * @var UserStudent $student
  * @var DataProviderInterface $dataProvider
- * @var int $classId
+ * @var EduClassBook $classBook
+ * @var View $this
  */
 
-$this->title = $studentName;
+$this->title = $student->name;
 ?>
 <div class="container">
-
-    <div style="padding: 20px 0; margin-bottom: 20px">
-        <div style="display: flex">
-            <div style="margin-right: auto">
-                <?= Html::a('Родителю', ['/edu/default/switch-to-parent'], ['class' => 'btn btn-small']) ?>
-            </div>
-            <div>
-                <?= $studentName ?>
-            </div>
-        </div>
-    </div>
+    <?= StudentToolbarWidget::widget(['student' => $student]) ?>
 
     <?= ListView::widget([
         'dataProvider' => $dataProvider,
         'summary' => false,
         'itemView' => '_program_item',
         'itemOptions' => ['tag' => false],
-        'viewParams' => ['classId' => $classId],
+        'viewParams' => ['classId' => $classBook->class_id],
         'layout' => "{summary}\n<div class=\"row\">{items}</div>\n{pager}",
     ]) ?>
 </div>

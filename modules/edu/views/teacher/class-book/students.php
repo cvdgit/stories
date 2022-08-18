@@ -16,11 +16,36 @@ use yii\web\View;
  */
 
 $this->title = 'Редактирование класса';
+
+$this->registerCss(<<<CSS
+.header-block {
+    display: flex;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+CSS
+);
 ?>
 <div class="container">
     <?= TeacherMenuWidget::widget() ?>
 
-    <h1><?= Html::encode($formModel->name) ?></h1>
+    <div class="header-block">
+        <h1 style="font-size: 32px; margin: 0; font-weight: 500; line-height: 1.2" class="h2"><?= Html::a('<i class="glyphicon glyphicon-arrow-left back-arrow"></i>', ['/edu/teacher/class-book/index']) ?> <?= Html::encode($this->title) ?></h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group">
+                <?= Html::a('Добавить ученика', ['/edu/teacher/class-book/create-student', 'id' => $formModel->getId()], ['class' => 'btn btn-small']) ?>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <p class="lead">Класс: <?= Html::encode($formModel->name) ?></p>
+    </div>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -37,8 +62,4 @@ $this->title = 'Редактирование класса';
             ],
         ],
     ]) ?>
-
-    <div style="margin-bottom: 40px">
-        <?= Html::a('Добавить ученика', ['/edu/teacher/class-book/create-student', 'id' => $formModel->getId()], ['class' => 'btn btn-small']) ?>
-    </div>
 </div>

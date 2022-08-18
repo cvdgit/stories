@@ -65,6 +65,7 @@ CSS
                 'dataProvider' => $dataProvider,
                 'summary' => false,
                 'itemView' => '_story_item',
+                'viewParams' => ['studentId' => $student->id],
                 'itemOptions' => ['tag' => false],
                 'layout' => "{summary}\n<div class=\"story-list\"><div class=\"flex-row row\">{items}</div></div>\n{pager}",
             ]) ?>

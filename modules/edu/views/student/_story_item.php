@@ -9,6 +9,7 @@ use yii\helpers\Url;
 
 /**
  * @var Story $model
+ * @var int $studentId
  */
 ?>
 <div class="col-lg-3 col-md-4 col-sm-6">
@@ -20,7 +21,7 @@ use yii\helpers\Url;
                 </div>
                 <?php $img = empty($model->cover) ? '/img/story-1.jpg' : StoryCover::getListThumbPath($model->cover); ?>
                 <?= Html::img($img) ?>
-                <?php if (($progress = $model->storyStudentProgress) !== null && $progress->progress > 0): ?>
+                <?php if (($progress = $model->findStudentStoryProgress($studentId)) !== null && $progress->progress > 0): ?>
                     <div class="story-progress-wrapper">
                         <div class="story-progress" style="width: <?= $progress->progress ?>%;"></div>
                     </div>

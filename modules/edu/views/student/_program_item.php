@@ -14,8 +14,8 @@ use yii\helpers\Url;
     <a href="<?= Url::to($model->createTopicRoute($classId)) ?>" class="thumbnail">
         <div class="caption">
             <h3><?= $model->program->name ?></h3>
-            <p>...</p>
-            <p>...</p>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
         </div>
     </a>
 </div>

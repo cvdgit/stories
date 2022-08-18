@@ -134,6 +134,7 @@ class ClassBookController extends Controller
 
         return $this->render('create-student', [
             'formModel' => $formModel,
+            'classBook' => $model,
         ]);
     }
 

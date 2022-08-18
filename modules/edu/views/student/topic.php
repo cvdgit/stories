@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use common\models\UserStudent;
+use modules\edu\models\EduClassBook;
 use modules\edu\models\EduTopic;
 use modules\edu\widgets\StudentToolbarWidget;
 use yii\bootstrap\Html;
@@ -19,7 +20,6 @@ use yii\widgets\ListView;
 $this->title = $student->name;
 ?>
 <div class="container">
-
     <?= StudentToolbarWidget::widget(['student' => $student]) ?>
 
     <div class="row">

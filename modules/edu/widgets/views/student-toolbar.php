@@ -2,19 +2,32 @@
 
 declare(strict_types=1);
 
-use yii\helpers\Html;
+use common\models\UserStudent;
+use yii\web\View;
 
 /**
- * @var string $studentName
+ * @var UserStudent $student
+ * @var View $this
  */
+
+$this->registerCss(<<<CSS
+.student-toolbar__wrap {
+    padding: 20px 0;
+    margin-bottom: 20px;
+}
+.student-toolbar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+CSS
+);
 ?>
-<div style="padding: 20px 0; margin-bottom: 20px">
-    <div style="display: flex">
-        <div style="margin-right: auto">
-            <?= Html::a('Родителю', ['/edu/default/switch-to-parent'], ['class' => 'btn btn-small']) ?>
-        </div>
+<div class="student-toolbar__wrap">
+    <div class="student-toolbar">
+        <div style="margin-right: auto"></div>
         <div>
-            <?= $studentName ?>
+            <?= $student->name . ' (' . $student->class->name . ')' ?>
         </div>
     </div>
 </div>

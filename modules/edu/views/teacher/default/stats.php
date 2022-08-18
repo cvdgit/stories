@@ -19,9 +19,19 @@ $this->title = 'Статистика';
 <div class="container">
     <?= TeacherMenuWidget::widget() ?>
 
-    <h1 class="h2"><?= Html::encode($classProgram->program->name . ' / ' . $classBook->name) ?></h1>
+    <h1 class="h2"><?= Html::a('<i class="glyphicon glyphicon-arrow-left back-arrow"></i>', ['/edu/teacher/default/index']) ?> <?= Html::encode($classProgram->program->name . ' / ' . $classBook->name) ?></h1>
 
     <div>
+
+        <?php if (count($classBook->students) === 0): ?>
+
+        <div>
+
+            <p class="lead">Нет данных.</p>
+
+        </div>
+
+        <?php else: ?>
 
         <?php foreach ($classBook->students as $student): ?>
 
@@ -32,20 +42,25 @@ $this->title = 'Статистика';
             <div>
                 <?php foreach ($classProgram->eduTopics as $topic): ?>
                 <div>
-                    <h3 class="h4"><?= $topic->name ?></h3>
 
                     <div>
                         <?php foreach ($topic->eduLessons as $lesson): ?>
                         <div>
 
-                            <h4 class="h5"><?= $lesson->name ?></h4>
+                            <h3 class="h4"><?= $topic->name . ' / ' . $lesson->name ?></h3>
 
-                            <table class="table table-hover table-sm">
+                            <table class="table table-hover table-sm table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>История</th>
+                                        <th>Прогресс</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     <?php foreach($lesson->stories as $story): ?>
                                     <tr>
                                         <td><?= $story->title ?></td>
-                                        <td></td>
+                                        <td><?= ($progress = $story->findStudentStoryProgress($student->id)) !== null ? $progress->progress : 'Нет' ?></td>
                                     </tr>
                                     <?php endforeach ?>
                                 </tbody>
@@ -60,5 +75,6 @@ $this->title = 'Статистика';
 
         <?php endforeach ?>
 
+        <?php endif ?>
     </div>
 </div>

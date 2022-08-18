@@ -13,8 +13,8 @@ use yii\helpers\Url;
     <a href="<?= Url::to(['/edu/student/lesson', 'id' => $model->id]) ?>" class="thumbnail">
         <div class="caption">
             <h3><?= $model->name ?></h3>
-            <p>...</p>
-            <p>...</p>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
         </div>
     </a>
 </div>

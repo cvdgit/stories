@@ -23,66 +23,21 @@ class StudentController extends Controller
     {
 
         $student = Yii::$app->studentContext->getStudent();
-
-
-        /** @var User $currentUser */
-        //$currentUser = Yii::$app->user->identity;
-
-/*        $students = $currentUser->students;
-        if (count($students) === 0) {
-            return $this->redirect(['/edu/parent/index']);
-        }*/
-
-        //$readCookies = $this->request->cookies;
-        //$uidCookie = $readCookies->getValue('uid');
-
-/*        if ($uidCookie === null) {
-
-            $writeCookies = $this->response->cookies;
-            $uid = Uuid::uuid4()->toString();
-            $writeCookies->add(new Cookie([
-                'name' => 'uid',
-                'value' => $uid,
-            ]));
-
-            $firstStudent = $currentUser->students[0];
-
-            Yii::$app->db->createCommand()
-                ->insert('user_student_session', [
-                    'uid' => $uid,
-                    'user_id' => $currentUser->id,
-                    'student_id' => $firstStudent->id,
-                ])
-                ->execute();
-
-            $uidCookie = $uid;
-        }*/
-
-/*        $sessionRow = (new Query())
-            ->select('*')
-            ->from('user_student_session')
-            ->where('uid = :uid', [':uid' => $uidCookie])
-            ->one();*/
-
-        //if ($sessionRow !== false) {
-
-            //$student = UserStudent::findOne($sessionRow['student_id']);
-/*            if ($student->isMain()) {
-                return $this->redirect(['/edu/parent/index']);
-            }*/
-        //}
-
         $classBooks = $student->classBooks;
-        $classBook = $classBooks[0];
+
+        $classProgramIds = [];
+        foreach ($classBooks as $classBook) {
+            $classProgramIds = array_merge($classProgramIds, $classBook->getClassProgramIds());
+        }
 
         $dataProvider = new ActiveDataProvider([
-            'query' => $classBook->getClassPrograms(),
+            'query' => EduClassProgram::find()->where(['in', 'id', $classProgramIds]),
         ]);
 
         return $this->render('index', [
-            'studentName' => $student->name,
+            'student' => $student,
             'dataProvider' => $dataProvider,
-            'classId' => $classBook->class_id,
+            'classBook' => $classBook,
         ]);
     }
 
@@ -96,22 +51,15 @@ class StudentController extends Controller
             throw new NotFoundHttpException('Тема не найдена');
         }
 
-        $readCookies = $this->request->cookies;
-        $uidCookie = $readCookies->getValue('uid');
+        $student = Yii::$app->studentContext->getStudent();
 
-        $sessionRow = (new Query())
-            ->select('*')
-            ->from('user_student_session')
-            ->where('uid = :uid', [':uid' => $uidCookie])
-            ->one();
-
-        $student = UserStudent::findOne($sessionRow['student_id']);
-
-        $classBooks = $student->classBooks;
+/*        $classBooks = $student->classBooks;
         $classBook = $classBooks[0];
 
         $classProgram = EduClassProgram::findClassProgram($classBook->class_id, $topic->class_program_id);
-        $topics = $classProgram->eduTopics;
+        $topics = $classProgram->eduTopics;*/
+
+        $classProgram = $topic->classProgram;
 
         $dataProvider = new ActiveDataProvider([
             'query' => $topic->getEduLessons(),
@@ -120,7 +68,7 @@ class StudentController extends Controller
         return $this->render('topic', [
             'classProgramName' => $classProgram->program->name,
             'student' => $student,
-            'topics' => $topics,
+            'topics' => $classProgram->eduTopics,
             'dataProvider' => $dataProvider,
         ]);
     }
