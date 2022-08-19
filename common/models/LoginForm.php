@@ -19,7 +19,7 @@ class LoginForm extends Model
     {
         return [
             ['email', 'trim'],
-            ['email', 'email'],
+            //['email', 'email'],
             [['email', 'password'], 'required'],
             ['email', 'string', 'max' => 255],
             ['rememberMe', 'boolean'],
@@ -30,7 +30,7 @@ class LoginForm extends Model
     public function attributeLabels()
     {
         return [
-            'email' => 'Email',
+            'email' => 'Логин',
             'rememberMe' => 'Запомнить',
             'password' => 'Пароль',
         ];

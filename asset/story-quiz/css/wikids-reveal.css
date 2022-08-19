@@ -347,6 +347,8 @@
 .wikids-test-begin-page .list-group {
 	max-width: 400px;
 	margin: 0 auto 15px;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .wikids-test-student-info {

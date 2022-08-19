@@ -1,6 +1,8 @@
 <?php
+
 /* @var $this yii\web\View */
 /* @var $content string */
+
 use common\rbac\UserRoles;
 use common\widgets\ToastrFlash;
 use frontend\assets\AppAsset;
@@ -9,10 +11,12 @@ use frontend\widgets\LoginWidget;
 use frontend\widgets\MainMenuWidget;
 use frontend\widgets\SignupWidget;
 use frontend\widgets\StorySlider;
+use frontend\widgets\UserNotification;
 use yii\bootstrap\Dropdown;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use common\helpers\Url;
+
 AppAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
@@ -83,7 +87,7 @@ AppAsset::register($this);
                                 <?= Html::a('Войти', '#', ['class' => 'login-item', 'data-toggle' => 'modal', 'data-target' => '#wikids-login-modal']) ?>
                             </div>
                         <?php else: ?>
-                            <?= \frontend\widgets\UserNotification::widget() ?>
+                            <?= UserNotification::widget() ?>
                             <div class="dropdown pull-right">
                                 <div style="cursor: pointer" data-toggle="dropdown" class="dropdown-toggle profile-photo">
                                     <?= Html::img(Yii::$app->user->identity->getProfilePhoto()) ?>
@@ -168,8 +172,8 @@ AppAsset::register($this);
             <div class="row">
                 <div class="col-sm-12 col-md-3 footer-email">Телефон: +7 (499) 703-3525<br>Email: <a href="mailto:info@wikids.ru">info@wikids.ru</a></div>
                 <div class="col-sm-12 col-md-6 footer-links">
-                    <?= Html::a('Политика конфиденциальности', ['site/policy']) ?>
-                    <?= Html::a('Правообладателям', ['site/copyright']) ?>
+                    <?= Html::a('Политика конфиденциальности', ['/site/policy']) ?>
+                    <?= Html::a('Правообладателям', ['/site/copyright']) ?>
                 </div>
                 <div class="col-sm-12 col-md-3">
                     <div class="footer-copyright pull-right text-right">©&nbsp;2018—<?= date('Y') ?>,&nbsp;Wikids<br>ИП Муталов Артур Сагадеевич</div>

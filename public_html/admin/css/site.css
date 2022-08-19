@@ -619,3 +619,18 @@ body {
     border-top: 1px #ddd solid;
     padding: 20px;
 }
+
+.header-block {
+  display: flex;
+  padding-top: 1rem;
+  padding-bottom: 0.5rem;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.header-block h3 {
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.2;
+}

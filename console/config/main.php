@@ -21,6 +21,10 @@ return [
         'common\bootstrap\Bootstrap',
         'queue',
     ],
+    'modules' => [
+        'edu' => ['class' => modules\edu\Module::class],
+        'edu_console' => ['class' => modules\edu\ConsoleModule::class],
+    ],
     'controllerNamespace' => 'console\controllers',
     'controllerMap' => [
         'fixture' => [
@@ -31,6 +35,8 @@ return [
             'class' => MigrateController::class,
             'migrationNamespaces' => [
                 'yii\queue\db\migrations',
+                //'modules\edu\migrations',
+                //'modules\files\migrations',
             ],
         ],
         'serve' => [

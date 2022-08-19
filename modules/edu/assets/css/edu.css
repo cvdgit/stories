@@ -1,0 +1,19 @@
+.back-arrow {
+  background-color: #eee;
+  padding: 6px;
+  border-radius: 50%;
+  font-size: 20px;
+}
+
+.teacher-toolbar {
+  display: flex;
+  justify-content: center;
+  border-bottom: 1px #eee solid;
+  padding-bottom: 10px;
+}
+
+.teacher-toolbar li.active a {
+  color: #99cd50;
+  text-decoration: none;
+  background-color: #eeeeee;
+}

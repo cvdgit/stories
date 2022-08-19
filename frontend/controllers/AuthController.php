@@ -5,12 +5,14 @@ namespace frontend\controllers;
 use common\models\StudyTask;
 use common\models\UserToken;
 use common\services\WelcomeUserService;
+use DomainException;
 use Exception;
 use frontend\components\NoEmailException;
 use frontend\components\UserAlreadyExistsException;
 use Yii;
 use yii\authclient\ClientInterface;
 use yii\filters\VerbFilter;
+use yii\helpers\Url;
 use yii\web\Controller;
 use common\models\LoginForm;
 use common\services\auth\AuthService;
@@ -81,27 +83,31 @@ class AuthController extends Controller
      */
     public function actionLogin()
     {
-        if (!Yii::$app->user->isGuest && !Yii::$app->request->isAjax) {
+        $this->response->format = Response::FORMAT_JSON;
+
+        if (!Yii::$app->user->isGuest && !$this->request->isAjax) {
             return $this->goHome();
         }
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        //if (Yii::$app->request->isAjax) {
-            $form = new LoginForm();
-            if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-                try {
-                    $user = $this->service->auth($form);
-                    Yii::$app->user->login($user, $form->rememberMe ? Yii::$app->params['user.rememberMeDuration'] : 0);
-                    return ['success' => true, 'message' => ''];
-                } catch (\DomainException $e) {
+
+        $form = new LoginForm();
+        if ($this->request->isPost && $form->load($this->request->post())) {
+            try {
+                $route = $this->service->auth($form);
+                return [
+                    'success' => true,
+                    'returnUrl' => count($route) > 0 ? Url::to($route) : null,
+                ];
+            } catch (DomainException $e) {
+                return ['success' => false, 'message' => $e->getMessage()];
+            } catch (Exception $e) {
+                return ['success' => false, 'message' => 'Произошла ошибка'];
+            } finally {
+                if (isset($e)) {
                     Yii::$app->errorHandler->logException($e);
-                    return ['success' => false, 'message' => [$e->getMessage()]];
                 }
             }
-            else {
-                return ['success' => false, 'message' => $form->errors];
-            }
-        //}
-        return ['success' => false, 'message' => ['']];
+        }
+        //return ['success' => false];
     }
 
     /**

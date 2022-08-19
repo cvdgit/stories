@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace common\models;
 
 use backend\models\links\BlockType;
@@ -58,6 +60,7 @@ use yii\db\ActiveQuery;
  * @property StorySlide[] $storySlides
  * @property StorySlideImage[] $storyImages
  * @property Lesson[] $lessons
+ * @property StoryStudentProgress[] $storyStudentProgresses
  */
 
 class Story extends ActiveRecord
@@ -364,7 +367,7 @@ class Story extends ActiveRecord
         return $this->hasMany(StorySlide::class, ['story_id' => 'id'])->orderBy(['number' => SORT_ASC]);
     }
 
-    private static function modifySlideData(int $id, string $data): string
+    public static function modifySlideData(int $id, string $data): string
     {
         $search = [
             'data-id=""',
@@ -844,5 +847,17 @@ class Story extends ActiveRecord
             [':slideId' => $slideId]
         );
         $command->execute();
+    }
+
+    public function getStoryStudentProgresses(): ActiveQuery
+    {
+        return $this->hasMany(StoryStudentProgress::class, ['story_id' => 'id']);
+    }
+
+    public function findStudentStoryProgress(int $studentId): ?StoryStudentProgress
+    {
+        return $this->getStoryStudentProgresses()
+            ->andWhere(['student_id' => $studentId])
+            ->one();
     }
 }

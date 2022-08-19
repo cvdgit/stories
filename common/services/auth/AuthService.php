@@ -12,25 +12,53 @@ use frontend\components\NoEmailException;
 use frontend\components\UserAlreadyExistsException;
 use frontend\models\auth\AuthUserForm;
 use frontend\models\auth\CreateUserForm;
+use modules\edu\components\EduSessionManager;
+use modules\edu\models\StudentLogin;
 use Yii;
 
 class AuthService
 {
 
     private $signupService;
+    private $eduSessionManager;
 
-    public function __construct(SignupService $signupService)
+    public function __construct(SignupService $signupService, EduSessionManager $eduSessionManager)
     {
         $this->signupService = $signupService;
+        $this->eduSessionManager = $eduSessionManager;
     }
 
-    public function auth(LoginForm $form): ?User
+    public function auth(LoginForm $form): array
     {
-        $user = User::findByEmail($form->email);
-        if (!$user || !$user->isActive() || !$user->validatePassword($form->password)) {
-            throw new DomainException('Неверное имя пользователя или пароль');
+        if (!$form->validate()) {
+            throw new DomainException('Некорректные данные');
         }
-        return $user;
+
+        $login = $form->email;
+
+        $user = User::findByEmail($login);
+
+        $returnRoute = [];
+        if ($user === null) {
+
+            $studentLogin = StudentLogin::findLogin($login, $form->password);
+            if (!$studentLogin) {
+                throw new DomainException('Неверное имя пользователя или пароль');
+            }
+
+            $user = $studentLogin->student->user;
+            $returnRoute = ['/edu/student/index'];
+
+            $this->eduSessionManager->switch($user->id, $studentLogin->student->id);
+        }
+        else {
+            if (!$user->isActive() || !$user->validatePassword($form->password)) {
+                throw new DomainException('Неверное имя пользователя или пароль');
+            }
+        }
+
+        Yii::$app->user->login($user, $form->rememberMe ? Yii::$app->params['user.rememberMeDuration'] : 0);
+        return $returnRoute;
     }
 
     /**

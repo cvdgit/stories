@@ -827,7 +827,7 @@ function WikidsStoryTest(el, options) {
   function createInputAnswer(question, answer) {
     var $elem = $('<div/>');
     if (testConfig.isSayCorrectAnswer()) {
-      var $repeat = '<a href="#" title="Повторить слово" class="glyphicon glyphicon-repeat synthesis-question" style="top: 5px; right: 10px"><i></i></a>';
+      var $repeat = '<a href="" title="Повторить слово" class="glyphicon glyphicon-repeat synthesis-question" style="top: 5px; right: 10px"><i></i></a>';
       $elem.append($repeat);
     }
     $elem.append(answerTypeInput.create(nextQuestion));
@@ -899,7 +899,7 @@ function WikidsStoryTest(el, options) {
   function appendHints($elem, questionID) {
     $elem.empty();
     $('<a/>', {
-      'href': '#',
+      'href': '',
       'text': 'Подсказка'
     })
       .on('click', function (e) {
@@ -2369,7 +2369,7 @@ function WikidsStoryTest(el, options) {
               $answerElement = $('<p/>')
                 .append($('<span/>').text(answerText))
                 .append($('<a/>')
-                  .attr('href', '#')
+                  .attr('href', '')
                   .attr('title', 'Прослушать')
                   .css('font-size', '3rem')
                   .on('click', function (e) {

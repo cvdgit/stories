@@ -95,7 +95,7 @@ class PlayerController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $model = StorySlide::findSlide($slide_id);
-        $html = $model->data;
+        $html = Story::modifySlideData($model->id, $model->data);
         return ['html' => $html];
     }
 

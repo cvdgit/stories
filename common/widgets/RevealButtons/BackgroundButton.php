@@ -14,11 +14,7 @@ class BackgroundButton extends Button
         $this->icon = 'glyphicon glyphicon-adjust';
         $this->className = 'background-icon';
         $this->title = 'Светлая тема';
-        $js = <<< JS
-function() {
-    StoryBackground.switchBackground();
-}
-JS;
+        $js = 'function() { StoryBackground.switchBackground(); }';
         $this->action = new JsExpression($js);
     }
 

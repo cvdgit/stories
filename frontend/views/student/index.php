@@ -14,6 +14,7 @@ $this->setMetaTags($title,
     <thead>
     <tr>
         <th>Имя</th>
+        <th>Класс</th>
         <th>Дата рождения</th>
         <th></th>
     </tr>
@@ -69,10 +70,10 @@ window.fillUserStudentsTable = function(students) {
                     });
                 });
             $('<tr/>')
-                .append($('<td/>').attr('width', '55%').text(student.name))
-                .append($('<td/>').attr('width', '30%').text(student.birth_date))
+                .append($('<td/>').text(student.name))
+                .append($('<td/>').text(student.class))
+                .append($('<td/>').text(student.birth_date))
                 .append($('<td/>')
-                    .attr('width', '15%')
                     .addClass('wikids-students-table-actions')
                     .append(editLink)
                     .append(deleteLink)
@@ -82,7 +83,7 @@ window.fillUserStudentsTable = function(students) {
     }
     else {
         $('<tr/>')
-            .append($('<td/>').attr('colspan', 3).text('Ученики не найдены'))
+            .append($('<td/>').attr('colspan', 4).text('Ученики не найдены'))
             .appendTo(table);
     }
 }

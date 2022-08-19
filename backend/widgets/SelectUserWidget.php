@@ -18,13 +18,13 @@ class SelectUserWidget extends Widget
 
     public $onChange = '{}';
 
-    public $loadUrl = ['user/autocomplete/select'];
+    public $loadUrl = ['/user/autocomplete/select'];
 
     private $widgetOptions;
     private $clientOptions = [
         'valueField' => 'id',
         'labelField' => 'title',
-        'searchField' => ['title'],
+        'searchField' => ['title', 'email'],
         'maxItems' => 1,
         'maxOptions' => 30,
         'persist' => false,
@@ -49,7 +49,7 @@ class SelectUserWidget extends Widget
             $this->widgetOptions['options'] = [
                 'options' => [
                     $this->userModel->id => [
-                        'data-data' => $this->getOptionData($this->userModel->id, $this->userModel->username, '/img/no_avatar.png'),
+                        'data-data' => $this->getOptionData($this->userModel->id, $this->userModel->username, $this->userModel->email, '/img/no_avatar.png'),
                     ],
                 ],
             ];
@@ -65,17 +65,19 @@ class SelectUserWidget extends Widget
         return SelectizeDropDownList::widget($this->widgetOptions);
     }
 
-    private function getOptionData(int $id, string $title, $cover = ''): string
+    private function getOptionData(int $id, string $title, string $email, $cover = ''): string
     {
         return Json::encode([
             'id' => $id,
             'title' => $title,
             'cover' => $cover,
+            'email' => $email,
         ]);
     }
 
     private function renderOptionExpression(): JsExpression
     {
+        /** @noinspection SyntaxError */
         return new JsExpression(<<<JS
             function(item, escape) {
                 return "<div class=\"media\" style=\"padding:10px\">" +
@@ -84,6 +86,7 @@ class SelectUserWidget extends Widget
                          "</div>" +
                          "<div class=\"media-body\">" +
                            "<p class=\"media-heading\">" + item.title + "</p>" +
+                           "<p class=\"media-heading\">" + item.email + "</p>" +
                          "</div>" +
                        "</div>";
             }

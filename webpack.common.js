@@ -8,7 +8,8 @@ module.exports = {
       audio: path.resolve(__dirname, 'asset/question/audio.js'),
       app: path.resolve(__dirname, 'asset/school/app.js'),
       course: path.resolve(__dirname, 'asset/course/app.js'),
-      story_quiz: path.resolve(__dirname, 'asset/story-quiz/js/wikids-story-test.js')
+      story_quiz: path.resolve(__dirname, 'asset/story-quiz/js/wikids-story-test.js'),
+      slides: path.resolve(__dirname, 'asset/slides/js/slides.js')
     },
     output: {
         filename: '[name].js',

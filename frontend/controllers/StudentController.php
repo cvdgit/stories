@@ -4,12 +4,11 @@ namespace frontend\controllers;
 
 use common\models\User;
 use common\models\UserStudent;
+use Exception;
 use frontend\components\UserController;
-use frontend\models\CreateStudentForm;
-use frontend\models\UpdateStudentForm;
+use frontend\models\UserStudentForm;
+use frontend\services\StudentService;
 use Yii;
-use yii\filters\AccessControl;
-use yii\helpers\Json;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -17,71 +16,98 @@ use yii\web\Response;
 class StudentController extends UserController
 {
 
-    public function behaviors(): array
+    private $studentService;
+
+    public function __construct($id, $module, StudentService $studentService, $config = [])
     {
-        return [
-            'access' => [
-                'class' => AccessControl::class,
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'roles' => ['user'],
-                    ],
-                ],
-            ],
-        ];
+        parent::__construct($id, $module, $config);
+        $this->studentService = $studentService;
     }
 
     public function actionCreate()
     {
-        $model = new CreateStudentForm(Yii::$app->user->id);
-        if ($model->load(Yii::$app->request->post())) {
+
+        /** @var User $currentUser */
+        $currentUser = Yii::$app->user->identity;
+
+        $studentForm = new UserStudentForm();
+        if ($this->request->isPost && $studentForm->load($this->request->post())) {
+            $this->response->format = Response::FORMAT_JSON;
+
             try {
-                $model->createStudent();
-                $user = User::findModel(Yii::$app->user->id);
-                return Json::encode(['success' => true, 'students' => $user->getStudentsAsArray()]);
+                $this->studentService->create($currentUser->id, $studentForm);
+                return ['success' => true, 'students' => $currentUser->getStudentsAsArray()];
             }
-            catch (\Exception $ex) {
-                return Json::encode(['success' => false, 'errors' => [$ex->getMessage()]]);
+            catch (Exception $ex) {
+                Yii::$app->errorHandler->logException($ex);
+                return ['success' => false, 'message' => 'При создании ученика произошла ошибка'];
             }
         }
         return $this->renderAjax('create', [
-            'model' => $model,
+            'model' => $studentForm,
         ]);
     }
 
-    public function actionDelete(int $id)
+    public function actionDelete(int $id): array
     {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $model = UserStudent::findModel($id);
-        if (!$model->userOwned(Yii::$app->user->id)) {
-            throw new NotFoundHttpException('Пользователь не найден');
+        $this->response->format = Response::FORMAT_JSON;
+        /** @var User $currentUser */
+        $currentUser = Yii::$app->user->identity;
+        try {
+            $this->studentService->delete($id, $currentUser->id);
+            return ['success' => true];
         }
-        $model->delete();
-        return ['success' => true];
+        catch (Exception $exception) {
+            Yii::$app->errorHandler->logException($exception);
+            return ['success' => false];
+        }
     }
 
+    /**
+     * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
+     */
     public function actionUpdate(int $id)
     {
-        $model = new UpdateStudentForm($id);
-        if (!$model->userOwned(Yii::$app->user->id)) {
+
+        if (($studentModel = UserStudent::findOne($id)) === null) {
+            throw new NotFoundHttpException('Ученик не найден');
+        }
+
+        /** @var User $currentUser */
+        $currentUser = Yii::$app->user->identity;
+
+        if (!$this->studentService->isOwnerThisUser($studentModel, $currentUser->id)) {
             throw new ForbiddenHttpException('Отказано в доступе');
         }
-        if ($model->load(Yii::$app->request->post())) {
-            $model->updateStudent();
-            $user = User::findModel(Yii::$app->user->id);
-            return Json::encode(['success' => true, 'students' => $user->getStudentsAsArray()]);
+
+        $studentForm = new UserStudentForm($studentModel);
+        if ($this->request->isPost && $studentForm->load($this->request->post())) {
+            $this->response->format = Response::FORMAT_JSON;
+
+            try {
+                $this->studentService->update($studentModel, $studentForm);
+                return ['success' => true, 'students' => $currentUser->getStudentsAsArray()];
+            }
+            catch (Exception $exception) {
+                Yii::$app->errorHandler->logException($exception);
+                return ['success' => false, 'message' => 'При редактировании ученика произошла ошибка'];
+            }
         }
         return $this->renderAjax('update', [
-            'model' => $model,
+            'updateRoute' => ['student/update', 'id' => $studentModel->id],
+            'model' => $studentForm,
         ]);
     }
 
-    public function actionIndex()
+    public function actionIndex(): string
     {
-        $user = User::findModel(Yii::$app->user->id);
+
+        /** @var User $currentUser */
+        $currentUser = Yii::$app->user->identity;
+
         return $this->render('index', [
-            'students' => $user->getStudentsAsArray(),
+            'students' => $currentUser->getStudentsAsArray(),
         ]);
     }
 

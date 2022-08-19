@@ -13,7 +13,7 @@ export function createBeginPage(testResponse, options = {canModerate: false, onA
   testResponse.students.forEach((student) => {
 
     const $item = $('<a/>')
-      .attr('href', '#')
+      .attr('href', '')
       .addClass('list-group-item')
       .data('student', student)
       .append(
@@ -81,7 +81,7 @@ export function createBeginPage(testResponse, options = {canModerate: false, onA
   $col.append($beginButton);
 
   const $restartQuiz = $('<a/>', {
-    href: '#',
+    href: '',
     text: 'Начать заново',
     class: 'restart-quiz',
     css: {

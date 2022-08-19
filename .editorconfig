@@ -10,6 +10,8 @@ trim_trailing_whitespace = true
 insert_final_newline = true
 
 [*.php]
+ij_php_space_before_short_closure_left_parenthesis = true
+ij_php_space_after_type_cast = true
 tab_width = 4
 indent_size = 4
 
