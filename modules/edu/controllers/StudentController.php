@@ -14,20 +14,37 @@ use yii\data\ActiveDataProvider;
 use yii\db\Query;
 use yii\web\Controller;
 use yii\web\Cookie;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
 class StudentController extends Controller
 {
 
-    public function actionIndex()
+    /**
+     * @throws ForbiddenHttpException
+     */
+    public function actionIndex(): string
     {
 
-        $student = Yii::$app->studentContext->getStudent();
+        if (($student = Yii::$app->studentContext->getStudent()) === null) {
+            throw new ForbiddenHttpException('Доступ запрещен');
+        }
+
         $classBooks = $student->classBooks;
 
         $classProgramIds = [];
-        foreach ($classBooks as $classBook) {
-            $classProgramIds = array_merge($classProgramIds, $classBook->getClassProgramIds());
+        if (count($classBooks) === 0) {
+
+            $class = $student->class;
+            $classProgramIds = array_map(static function($classProgram) {
+                return $classProgram->id;
+            }, $class->eduClassPrograms);
+        }
+        else {
+
+            foreach ($classBooks as $classBook) {
+                $classProgramIds = array_merge($classProgramIds, $classBook->getClassProgramIds());
+            }
         }
 
         $dataProvider = new ActiveDataProvider([
@@ -37,27 +54,23 @@ class StudentController extends Controller
         return $this->render('index', [
             'student' => $student,
             'dataProvider' => $dataProvider,
-            'classBook' => $classBook,
         ]);
     }
 
     /**
      * @throws NotFoundHttpException
+     * @throws ForbiddenHttpException
      */
-    public function actionTopic(int $id)
+    public function actionTopic(int $id): string
     {
 
         if (($topic = EduTopic::findOne($id)) === null) {
             throw new NotFoundHttpException('Тема не найдена');
         }
 
-        $student = Yii::$app->studentContext->getStudent();
-
-/*        $classBooks = $student->classBooks;
-        $classBook = $classBooks[0];
-
-        $classProgram = EduClassProgram::findClassProgram($classBook->class_id, $topic->class_program_id);
-        $topics = $classProgram->eduTopics;*/
+        if (($student = Yii::$app->studentContext->getStudent()) === null) {
+            throw new ForbiddenHttpException('Доступ запрещен');
+        }
 
         $classProgram = $topic->classProgram;
 
@@ -75,22 +88,20 @@ class StudentController extends Controller
 
     /**
      * @throws NotFoundHttpException
+     * @throws ForbiddenHttpException
      */
-    public function actionLesson(int $id)
+    public function actionLesson(int $id): string
     {
         if (($lesson = EduLesson::findOne($id)) === null) {
             throw new NotFoundHttpException('Урок не найден');
         }
 
-        $student = Yii::$app->studentContext->getStudent();
-
-        $classBooks = $student->classBooks;
-        $classBook = $classBooks[0];
+        if (($student = Yii::$app->studentContext->getStudent()) === null) {
+            throw new ForbiddenHttpException('Доступ запрещен');
+        }
 
         $topic = $lesson->topic;
-
-        $classProgram = EduClassProgram::findClassProgram($classBook->class_id, $topic->class_program_id);
-        $topics = $classProgram->eduTopics;
+        $classProgram = $topic->classProgram;
 
         $dataProvider = new ActiveDataProvider([
             'query' => $lesson->getStories(),
@@ -99,7 +110,7 @@ class StudentController extends Controller
         return $this->render('lesson', [
             'classProgramName' => $classProgram->program->name,
             'student' => $student,
-            'topics' => $topics,
+            'topics' => $classProgram->eduTopics,
             'dataProvider' => $dataProvider,
             'lesson' => $lesson,
         ]);

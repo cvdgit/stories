@@ -10,12 +10,27 @@ use yii\widgets\ActiveForm;
  * @var $model EduLesson
  * @var $storiesDataProvider DataProviderInterface
  */
-$this->title = 'Урок: ' . $model->name;
+$this->title = 'Редактировать урок';
+
+$this->params['breadcrumbs'] = [
+    [
+        'label' => $model->topic->classProgram->class->name . ' - ' . $model->topic->classProgram->program->name,
+        'url' => ['/edu/admin/class-program/update', 'id' => $model->topic->classProgram->id],
+    ],
+    [
+        'label' => $model->topic->name,
+        'url' => ['/edu/admin/topic/update', 'id' => $model->topic->id],
+    ],
+    $model->name,
+];
 ?>
 <div>
     <?= AdminToolbarWidget::widget() ?>
 
-    <h1 class="h2 page-header"><?= Html::a('<i class="glyphicon glyphicon-arrow-left back-arrow"></i>', ['/edu/admin/topic/update', 'id' => $model->topic_id]) ?> <?= Html::encode($this->title) ?></h1>
+    <h1 class="h2 page-header">
+        <?= Html::a('<i class="glyphicon glyphicon-arrow-left back-arrow"></i>', ['/edu/admin/topic/update', 'id' => $model->topic_id]) ?>
+        <?= Html::encode($this->title) ?>
+    </h1>
 
     <div class="row">
         <div class="col-lg-6">
@@ -30,7 +45,7 @@ $this->title = 'Урок: ' . $model->name;
             </div>
         </div>
         <div class="col-lg-6">
-            <?= $this->render('_stories', ['storiesDataProvider' => $storiesDataProvider, 'model' => $model]) ?>
+            <?= $this->render('_stories', ['storiesDataProvider' => $storiesDataProvider, 'lessonModel' => $model]) ?>
         </div>
     </div>
 </div>

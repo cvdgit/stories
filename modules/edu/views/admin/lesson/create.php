@@ -1,6 +1,7 @@
 <?php
 
 use modules\edu\models\EduLesson;
+use modules\edu\models\EduTopic;
 use modules\edu\widgets\AdminToolbarWidget;
 use yii\helpers\Html;
 use yii\web\View;
@@ -9,9 +10,22 @@ use yii\widgets\ActiveForm;
 /**
  * @var $this View
  * @var $model EduLesson
+ * @var $topicModel EduTopic
  */
 
 $this->title = 'Создать урок';
+
+$this->params['breadcrumbs'] = [
+    [
+        'label' => $topicModel->classProgram->class->name . ' - ' . $topicModel->classProgram->program->name,
+        'url' => ['/edu/admin/class-program/update', 'id' => $topicModel->classProgram->id],
+    ],
+    [
+        'label' => $topicModel->name,
+        'url' => ['/edu/admin/topic/update', 'id' => $topicModel->id],
+    ],
+    $this->title,
+];
 ?>
 <div>
     <?= AdminToolbarWidget::widget() ?>

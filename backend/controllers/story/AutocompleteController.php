@@ -40,4 +40,16 @@ class AutocompleteController extends BaseController
             ->limit(30)
             ->all();
     }
+
+    public function actionSelectPublished(string $query): array
+    {
+        return (new Query())
+            ->select(['title', 'id', "IF(cover IS NULL, '/img/story-1.jpg', CONCAT('/slides_cover/list/', cover)) AS cover"])
+            ->from(Story::tableName())
+            ->where(['like', 'title', $query])
+            ->andWhere('status = :status', [':status' => StoryStatus::PUBLISHED])
+            ->orderBy(['title' => SORT_ASC])
+            ->limit(30)
+            ->all();
+    }
 }

@@ -11,6 +11,7 @@ import ActionsPlugin from "./plugins/ActionsPlugin";
 import SlideLinksPlugin from "./plugins/slide_links/SlideLinksPlugin";
 import StatPlugin from "./plugins/stat/StatPlugin";
 import SlidesPlayer from "./SlidesPlayer";
+import Background from "./plugins/Background";
 
 function onSlideMouseDown(e, player) {
 
@@ -81,7 +82,8 @@ window.initSlides = function() {
       VideoPlugin,
       ActionsPlugin,
       SlideLinksPlugin,
-      StatPlugin
+      StatPlugin,
+      Background
     ]
   });
 

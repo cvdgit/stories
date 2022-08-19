@@ -2,18 +2,33 @@
 
 namespace modules\edu\controllers\admin;
 
+use Exception;
+use modules\edu\forms\admin\TopicLessonOrderForm;
+use modules\edu\models\EduClassProgram;
 use modules\edu\models\EduTopic;
 use modules\edu\models\EduTopicSearch;
+use modules\edu\services\TopicService;
+use Yii;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  * TopicController implements the CRUD actions for EduTopic model.
  */
 class TopicController extends Controller
 {
+
+    private $topicService;
+
+    public function __construct($id, $module, TopicService $topicService, $config = [])
+    {
+        $this->topicService = $topicService;
+        parent::__construct($id, $module, $config);
+    }
+
     /**
      * @inheritDoc
      */
@@ -49,17 +64,21 @@ class TopicController extends Controller
     }
 
     /**
-     * Creates a new EduTopic model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException
      */
-    public function actionCreate()
+    public function actionCreate(int $class_program_id)
     {
-        $model = new EduTopic();
+        if (($classProgram = EduClassProgram::findOne($class_program_id)) === null) {
+            throw new NotFoundHttpException('Программа обучения не найдена');
+        }
+
+        $model = new EduTopic([
+            'class_program_id' => $class_program_id,
+        ]);
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['index']);
+                return $this->redirect(['update', 'id' => $model->id]);
             }
         } else {
             $model->loadDefaultValues();
@@ -67,21 +86,19 @@ class TopicController extends Controller
 
         return $this->render('create', [
             'model' => $model,
+            'classProgram' => $classProgram,
         ]);
     }
 
     /**
-     * Updates an existing EduTopic model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $id ID
-     * @return string|\yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
+     * @throws NotFoundHttpException
      */
     public function actionUpdate(int $id)
     {
         $model = $this->findModel($id);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            Yii::$app->session->addFlash('success', 'Изменения успешно сохранены');
             return $this->refresh();
         }
 
@@ -91,23 +108,16 @@ class TopicController extends Controller
         ]);
 
         return $this->render('update', [
-            'model' => $model,
+            'topicModel' => $model,
             'lessonsDataProvider' => $lessonsDataProvider,
         ]);
     }
 
-    /**
-     * Deletes an existing EduTopic model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $id ID
-     * @return \yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
+    public function actionDelete(int $id)
     {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
+        $this->response->format = Response::FORMAT_JSON;
+        $this->topicService->delete($id);
+        return ['success' => true];
     }
 
     /**
@@ -124,5 +134,27 @@ class TopicController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionOrder(int $topic_id): array
+    {
+        $this->response->format = Response::FORMAT_JSON;
+
+        $topicModel = $this->findModel($topic_id);
+
+        $form = new TopicLessonOrderForm();
+        if ($this->request->isPost && $form->load($this->request->post(), '')) {
+            try {
+                $this->topicService->saveOrder($topicModel->id, $form);
+                return ['success' => true];
+            }
+            catch (Exception $exception) {
+                return ['success' => false, 'message' => $exception->getMessage()];
+            }
+        }
+        return ['success' => true];
     }
 }

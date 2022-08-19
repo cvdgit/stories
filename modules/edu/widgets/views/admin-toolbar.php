@@ -36,13 +36,15 @@ CSS
             [
                 'label' => 'Программы обучения',
                 'url' => ['/edu/admin/class-program/index'],
-                'active' => Yii::$app->controller->id === 'admin/class-program',
+                'active' => Yii::$app->controller->id === 'admin/class-program'
+                    || Yii::$app->controller->id === 'admin/topic'
+                    || Yii::$app->controller->id === 'admin/lesson',
             ],
-            [
+/*            [
                 'label' => 'Темы',
                 'url' => ['/edu/admin/topic/index'],
                 'active' => Yii::$app->controller->id === 'admin/topic' || Yii::$app->controller->id === 'admin/lesson',
-            ],
+            ],*/
             [
                 'label' => 'Доступ к модулю',
                 'url' => ['/edu/admin/user-access/index'],

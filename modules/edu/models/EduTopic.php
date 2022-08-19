@@ -72,6 +72,12 @@ class EduTopic extends ActiveRecord
 
     public function getEduLessons(): ActiveQuery
     {
-        return $this->hasMany(EduLesson::class, ['topic_id' => 'id']);
+        return $this->hasMany(EduLesson::class, ['topic_id' => 'id'])
+            ->orderBy(['edu_lesson.order' => SORT_ASC]);
+    }
+
+    public function getLessonsCount(): int
+    {
+        return $this->getEduLessons()->count();
     }
 }

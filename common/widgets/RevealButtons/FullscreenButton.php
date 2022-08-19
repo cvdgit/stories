@@ -10,7 +10,8 @@ class FullscreenButton extends Button
 		$this->icon = 'icomoon-arrows';
 		$this->className = 'custom-fullscreen';
 		$this->title = 'Полноэкранный режим';
-		$js = <<< JS
+        /** @noinspection SyntaxError */
+        $js = <<< JS
 function() {
 	WikidsPlayer.toggleFullscreen();
 	var el = $(this).find('i');

@@ -37,6 +37,7 @@ class MainMenuWidget extends Widget
                 'label' => 'Обучение',
                 'url' => ['/edu/default/index'],
                 'visible' => $this->accessChecker->canUserAccess(Yii::$app->user->getId()),
+                'active' => Yii::$app->controller->module->id === 'edu',
             ],
             [
                 'label' => 'Контакты',

@@ -2,10 +2,13 @@
 
 namespace modules\edu\controllers\admin;
 
+use Exception;
+use modules\edu\forms\admin\LessonStoryOrderForm;
 use modules\edu\forms\admin\SelectStoryForm;
 use modules\edu\models\EduLesson;
 use modules\edu\models\EduTopic;
 use modules\edu\services\LessonService;
+use Yii;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -67,22 +70,17 @@ class LessonController extends Controller
 
         return $this->render('create', [
             'model' => $model,
+            'topicModel' => $topic,
         ]);
     }
 
-    /**
-     * Updates an existing EduLesson model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $id ID
-     * @return string|\yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     public function actionUpdate(int $id)
     {
         $model = $this->findModel($id);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            Yii::$app->session->addFlash('success', 'Изменения успешно сохранены');
+            return $this->refresh();
         }
 
         $storiesDataProvider = new ActiveDataProvider([
@@ -95,18 +93,11 @@ class LessonController extends Controller
         ]);
     }
 
-    /**
-     * Deletes an existing EduLesson model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $id ID
-     * @return \yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
+        $this->response->format = Response::FORMAT_JSON;
+        $this->lessonService->delete($id);
+        return ['success' => true];
     }
 
     /**
@@ -140,12 +131,41 @@ class LessonController extends Controller
                 $this->lessonService->addStory($lessonModel, $selectStoryForm);
                 return ['success' => true];
             }
-            catch (\Exception $exception) {
+            catch (Exception $exception) {
                 return ['success' => false, 'message' => $exception->getMessage()];
             }
         }
         return $this->renderAjax('_select_story_dialog', [
             'model' => $selectStoryForm,
         ]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionOrder(int $lesson_id): array
+    {
+        $this->response->format = Response::FORMAT_JSON;
+        if (($lessonModel = EduLesson::findOne($lesson_id)) === null) {
+            throw new NotFoundHttpException('Урок не найден');
+        }
+        $form = new LessonStoryOrderForm();
+        if ($this->request->isPost && $form->load($this->request->post(), '')) {
+            try {
+                $this->lessonService->saveOrder($lessonModel->id, $form);
+                return ['success' => true];
+            }
+            catch (Exception $exception) {
+                return ['success' => false, 'message' => $exception->getMessage()];
+            }
+        }
+        return ['success' => true];
+    }
+
+    public function actionDeleteStory(int $lesson_id, int $story_id): array
+    {
+        $this->response->format = Response::FORMAT_JSON;
+        $this->lessonService->deleteStory($lesson_id, $story_id);
+        return ['success' => true];
     }
 }

@@ -82,7 +82,8 @@ class EduClassProgram extends ActiveRecord
 
     public function getEduTopics(): ActiveQuery
     {
-        return $this->hasMany(EduTopic::class, ['class_program_id' => 'id']);
+        return $this->hasMany(EduTopic::class, ['class_program_id' => 'id'])
+            ->orderBy(['edu_topic.order' => SORT_ASC]);
     }
 
     public static function findClassProgram(int $classId, int $programId): ?self
@@ -99,5 +100,10 @@ class EduClassProgram extends ActiveRecord
             $route['id'] = $classProgram->eduTopics[0]->id;
         }
         return $route;
+    }
+
+    public function getTopicsCount(): int
+    {
+        return $this->getEduTopics()->count();
     }
 }

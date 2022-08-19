@@ -15,7 +15,7 @@ use yii\widgets\ActiveForm;
 $this->title = 'Создание ученика';
 ?>
 <div class="container">
-    <h1 class="text-center">Новый ученик</h1>
+    <h1 class="h2 text-center"><?= Html::a('<i class="glyphicon glyphicon-arrow-left back-arrow"></i>', ['/edu/parent/default/index']) ?> Новый ученик</h1>
 
     <div style="margin: 20px 0 40px 0; text-align: center">
         <div class="row">

@@ -2,17 +2,31 @@
 
 namespace modules\edu\controllers\admin;
 
+use Exception;
+use modules\edu\forms\admin\ClassProgramTopicOrderForm;
 use modules\edu\models\EduClassProgram;
 use modules\edu\models\EduClassProgramSearch;
+use modules\edu\services\ClassProgramService;
+use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  * ClassProgramController implements the CRUD actions for EduClassProgram model.
  */
 class ClassProgramController extends Controller
 {
+
+    private $classProgramService;
+
+    public function __construct($id, $module, ClassProgramService $classProgramService, $config = [])
+    {
+        $this->classProgramService = $classProgramService;
+        parent::__construct($id, $module, $config);
+    }
+
     /**
      * @inheritDoc
      */
@@ -50,7 +64,7 @@ class ClassProgramController extends Controller
     /**
      * Creates a new EduClassProgram model.
      * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|\yii\web\Response
+     * @return string|Response
      */
     public function actionCreate()
     {
@@ -73,10 +87,10 @@ class ClassProgramController extends Controller
      * Updates an existing EduClassProgram model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param int $id ID
-     * @return string|\yii\web\Response
+     * @return string|Response
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
+    public function actionUpdate(int $id)
     {
         $model = $this->findModel($id);
 
@@ -84,8 +98,13 @@ class ClassProgramController extends Controller
             return $this->refresh();
         }
 
+        $topicsDataProvider = new ActiveDataProvider([
+            'query' => $model->getEduTopics(),
+        ]);
+
         return $this->render('update', [
             'model' => $model,
+            'topicsDataProvider' => $topicsDataProvider,
         ]);
     }
 
@@ -93,7 +112,7 @@ class ClassProgramController extends Controller
      * Deletes an existing EduClassProgram model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param int $id ID
-     * @return \yii\web\Response
+     * @return Response
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionDelete($id)
@@ -117,5 +136,27 @@ class ClassProgramController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionOrder(int $class_program_id): array
+    {
+        $this->response->format = Response::FORMAT_JSON;
+
+        $classProgram = $this->findModel($class_program_id);
+
+        $form = new ClassProgramTopicOrderForm();
+        if ($this->request->isPost && $form->load($this->request->post(), '')) {
+            try {
+                $this->classProgramService->saveOrder($classProgram->id, $form);
+                return ['success' => true];
+            }
+            catch (Exception $exception) {
+                return ['success' => false, 'message' => $exception->getMessage()];
+            }
+        }
+        return ['success' => true];
     }
 }

@@ -20,6 +20,7 @@ use yii\helpers\Html;
         <?= $form->field($model, 'story_id')->widget(SelectStoryWidget::class, [
             'id' => 'select-story-slides',
             'onChange' => 'onStoryChange',
+            'loadUrl' => ['/story/autocomplete/select-published'],
         ]) ?>
     </div>
     <div class="modal-footer">

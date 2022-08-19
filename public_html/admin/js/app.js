@@ -1,4 +1,45 @@
 
+
+function pjaxGridDeleteInit() {
+  var handler = function() {
+    $('.pjax-delete-link').on('click', function(e) {
+      e.preventDefault();
+      var deleteUrl = $(this).attr('delete-url');
+      var pjaxContainer = $(this).attr('pjax-container');
+      var result = confirm('Подтверждаете удаление записи?');
+      if (result) {
+        $.ajax({
+          url: deleteUrl,
+          type: 'post',
+          error: function(xhr, status, error) {
+            alert(xhr.responseJSON.message)
+            //toastr.error(xhr.responseJSON.message);
+          }
+        }).done(function(data) {
+          if (data && data.success) {
+            //toastr.success('Успешно');
+            $.pjax.reload('#' + $.trim(pjaxContainer), {timeout: 3000});
+          }
+          else {
+            //toastr.error(data['message'] || 'Неизвестная ошибка');
+            alert(data['message'] || 'Неизвестная ошибка');
+          }
+        });
+      }
+    });
+  }
+  handler();
+  /*  $(document)
+      .off('ready pjax:success', handler)
+      .on('ready pjax:success', handler);*/
+}
+
+pjaxGridDeleteInit();
+
+$(document)
+  .off('pjax:success', pjaxGridDeleteInit)
+  .on('pjax:success', pjaxGridDeleteInit);
+
 (function() {
   $.ajaxSetup({
     cache: true

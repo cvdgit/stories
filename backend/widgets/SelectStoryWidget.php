@@ -95,6 +95,7 @@ class SelectStoryWidget extends Widget
 
     private function renderOptionExpression(): JsExpression
     {
+        /** @noinspection SyntaxError */
         return new JsExpression(<<<JS
             function(item, escape) {
                 return "<div class=\"media\" style=\"padding:10px\">" +

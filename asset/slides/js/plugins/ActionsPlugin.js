@@ -13,11 +13,11 @@ export default () => {
 
       const slidesPlayer = new SlidesPlayer(deck);
 
-      function executeAction() {
+      function executeAction(e) {
 
-        const storyId = $(this).attr("data-action-story");
-        const slideId = $(this).attr("data-action-slide");
-        const backToNextSlide = ($(this).attr("data-backtonextslide") === "1");
+        const storyId = $(e.target).attr("data-action-story");
+        const slideId = $(e.target).attr("data-action-slide");
+        const backToNextSlide = ($(e.target).attr("data-backtonextslide") === "1");
 
         slidesPlayer.goToSlide(storyId, slideId, backToNextSlide);
       }

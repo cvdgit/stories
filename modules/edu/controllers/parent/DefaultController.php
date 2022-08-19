@@ -8,6 +8,7 @@ use common\models\User;
 use common\models\UserStudent;
 use Exception;
 use modules\edu\forms\student\StudentForm;
+use modules\edu\models\EduClassProgram;
 use modules\edu\services\StudentService;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -25,33 +26,8 @@ class DefaultController extends Controller
         $this->studentService = $studentService;
     }
 
-    public function actionIndex()
+    public function actionIndex(): string
     {
-
-        $student = Yii::$app->studentContext->getStudent();
-
-        /*
-        $readCookies = $this->request->cookies;
-        $uidCookie = $readCookies->getValue('uid');
-
-        if ($uidCookie === null) {
-            return $this->redirect(['/edu/student/index']);
-        }
-
-        $sessionRow = (new Query())
-            ->select('*')
-            ->from('user_student_session')
-            ->where('uid = :uid', [':uid' => $uidCookie])
-            ->one();
-
-        if ($sessionRow === false) {
-            return $this->redirect(['/edu/student/index']);
-        }
-
-        $student = UserStudent::findOne($sessionRow['student_id']);
-        if (!$student->isMain()) {
-            return $this->redirect(['/edu/student/index']);
-        }*/
 
         /** @var User $currentUser */
         $currentUser = Yii::$app->user->identity;
@@ -81,6 +57,35 @@ class DefaultController extends Controller
 
         return $this->render('create-student', [
             'formModel' => $formModel,
+        ]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionStats(int $id, int $class_program_id = null): string
+    {
+
+        if (($student = UserStudent::findOne($id)) === null) {
+            throw new NotFoundHttpException('Ученик не найден');
+        }
+
+        $classProgram = null;
+        if (($class_program_id !== null) && ($classProgram = EduClassProgram::findOne($class_program_id)) === null) {
+            throw new NotFoundHttpException('Ученик не найден');
+        }
+
+        $class = $student->class;
+        $classPrograms = $class->eduClassPrograms;
+
+        if ($classProgram === null && count($classPrograms) > 0) {
+            $classProgram = $classPrograms[0];
+        }
+
+        return $this->render('stats', [
+            'classProgram' => $classProgram,
+            'classPrograms' => $classPrograms,
+            'student' => $student,
         ]);
     }
 }

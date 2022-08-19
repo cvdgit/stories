@@ -8,10 +8,12 @@ class Button
 {
 
     private $url;
+    private $options;
 
-    public function __construct($url)
+    public function __construct($url, array $options = [])
     {
         $this->url = $url;
+        $this->options = $options;
     }
 
     public $icons = [
@@ -22,11 +24,10 @@ class Button
 
     public function createButton($icon, $title, array $options = []): string
     {
-        $defaultOptions = [
+        $defaultOptions = array_merge([
             'title' => $title,
             'data-pjax' => '0',
-        ];
-        return Html::a($this->icons[$icon], $this->url, array_merge($defaultOptions, $options));
+        ], $options);
+        return Html::a($this->icons[$icon], $this->url, array_merge($defaultOptions, $this->options));
     }
-
 }

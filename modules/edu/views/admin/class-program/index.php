@@ -30,8 +30,18 @@ $this->title = 'Программы обучения';
         'options' => ['class' => 'table-responsive'],
         'summary' => false,
         'columns' => [
-            'class.name',
-            'program.name',
+            [
+                'attribute' => 'class.name',
+                'label' => 'Класс',
+            ],
+            [
+                'attribute' => 'program.name',
+                'label' => 'Программа',
+            ],
+            [
+                'attribute' => 'topicsCount',
+                'label' => 'Кол-во тем',
+            ],
             [
                 'class' => ActionColumn::class,
                 'template' => '{update} {delete}',

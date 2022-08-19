@@ -16,24 +16,23 @@ export default () => {
 
       stack = [];
       inTransitionStory = false;
-      currentStoryId = null;
 
       const slidesConfig = new SlidesConfig();
       this.config = slidesConfig.get(this.id);
 
-      const action = () => {
+      currentStoryId = this.config.story_id;
 
-        const story_id = $(this).data("storyId");
-        const slide_id = $(this).data("slides");
-        const backToNextSlide = ($(this).attr("data-backtonextslide") === "1");
+      const action = (e) => {
+
+        const story_id = $(e.target).data("storyId");
+        const slide_id = $(e.target).data("slides");
+        const backToNextSlide = ($(e.target).attr("data-backtonextslide") === "1");
         const slide_index = this.deck.getIndices().h;
-        
+
         this.goToSlide(story_id, slide_id, backToNextSlide);
       }
 
-      $(".reveal > .slides").on("click", "button[data-story-id]", function() {
-        action();
-      });
+      $(".reveal > .slides").on("click", "button[data-story-id]", action);
     },
 
     backToStory(callback) {
@@ -64,8 +63,9 @@ export default () => {
             .empty()
             .append(data);
 
-          if (window["StoryBackground"]) {
-            StoryBackground.init();
+          if (this.deck.hasPlugin('background')) {
+            const backgroundPlugin = this.deck.getPlugin('background');
+            backgroundPlugin.initBackground();
           }
 
           this.deck.sync();
@@ -132,7 +132,7 @@ export default () => {
           WikidsVideo.createPlayer();
         }
 
-        this.stack.unshift({
+        stack.unshift({
           "story_id": currentStoryId,
           "slide_index": backToNextSlide ? slide_index : slide_index + 1,
           "slide_id": slideID

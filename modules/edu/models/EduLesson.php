@@ -94,7 +94,10 @@ class EduLesson extends ActiveRecord
     public function getStories(): ActiveQuery
     {
         return $this->hasMany(Story::class, ['id' => 'story_id'])
-            ->viaTable('edu_lesson_story', ['lesson_id' => 'id']);
+            ->viaTable('edu_lesson_story', ['lesson_id' => 'id'])
+            ->innerJoin('edu_lesson_story', 'edu_lesson_story.story_id = story.id')
+            ->andWhere(['edu_lesson_story.lesson_id' => $this->id])
+            ->orderBy(['edu_lesson_story.order' => SORT_ASC]);
     }
 
     public function addStory(int $storyId): void
@@ -104,5 +107,10 @@ class EduLesson extends ActiveRecord
                 return $story->id;
             }, $this->stories),
             [$storyId]));
+    }
+
+    public function getStoriesCount(): int
+    {
+        return $this->getEduLessonStories()->count();
     }
 }

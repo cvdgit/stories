@@ -367,7 +367,7 @@ class Story extends ActiveRecord
         return $this->hasMany(StorySlide::class, ['story_id' => 'id'])->orderBy(['number' => SORT_ASC]);
     }
 
-    private static function modifySlideData(int $id, string $data): string
+    public static function modifySlideData(int $id, string $data): string
     {
         $search = [
             'data-id=""',
