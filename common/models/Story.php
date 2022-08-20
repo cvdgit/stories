@@ -715,13 +715,13 @@ class Story extends ActiveRecord
         return $this->access_by_link === 1;
     }
 
-    public function grantLinkAccess(): string
+    public function grantLinkAccess(): bool
     {
         $this->access_by_link = 1;
         return $this->save(false);
     }
 
-    public function revokeLinkAccess(): string
+    public function revokeLinkAccess(): bool
     {
         $this->access_by_link = 0;
         return $this->save(false);
