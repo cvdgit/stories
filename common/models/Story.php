@@ -746,7 +746,7 @@ class Story extends ActiveRecord
         if (!empty($this->story_file)) {
             $folder = $this->story_file;
         }
-        return $folder;
+        return (string)$folder;
     }
 
     public function getSlideImagesPath($abs = true): string
