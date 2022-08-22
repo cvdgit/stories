@@ -27,7 +27,7 @@ $model = new SlideSourceForm();
                 </div>
             </div>
             <div class="modal-body">
-                <?= $form->field($model, 'source')->widget(CodemirrorWidget::class, [
+                <?php /*$form->field($model, 'source', ['inputOptions' => ['id' => 'source']])->widget(CodemirrorWidget::class, [
                     'presetsDir' => Yii::getAlias('@backend/components/codemirror'),
                     'preset' => 'html',
                     'settings' => [
@@ -39,7 +39,8 @@ $model = new SlideSourceForm();
                         'foldGutter' => true,
                         'lint' => true,
                     ],
-                ])->label(false) ?>
+                ])->label(false)*/ ?>
+                <?= $form->field($model, 'source')->textarea() ?>
                 <?= $form->field($model, 'slide_id')->hiddenInput()->label(false) ?>
             </div>
             <?php ActiveForm::end() ?>
@@ -49,10 +50,10 @@ $model = new SlideSourceForm();
 <?php
 $js = <<< JS
 (function() {
-    
+
     var modal = $('#slide-source-modal');
     var form = $('#slide-source-form', modal);
-    
+
     modal
         .on('show.bs.modal', function() {
             $('#slidesourceform-slide_id', this).val(StoryEditor.getCurrentSlideID());
@@ -66,13 +67,13 @@ $js = <<< JS
             editor.setCursor(0, 0);
             editor.refresh();
         });
-    
+
     form.on('beforeSubmit', function(e) {
         e.preventDefault();
         $.ajax({
             url: $(this).attr('action'),
             type: $(this).attr('method'),
-            data: new FormData(this), 
+            data: new FormData(this),
             dataType: 'json',
             cache: false,
             contentType: false,
