@@ -108,7 +108,7 @@ class EduClassProgram extends ActiveRecord
         return $this->getEduTopics()->count();
     }
 
-    private function getStudentStories(int $studentId): Query
+    private function getClassProgramStories(): Query
     {
         return (new Query())
             ->from(['topic' => 'edu_topic'])
@@ -117,16 +117,16 @@ class EduClassProgram extends ActiveRecord
             ->where(['topic.class_program_id' => $this->id]);
     }
 
-    public function getStudentStoriesCount(int $studentId): int
+    public function getClassProgramStoriesCount(): int
     {
-        return $this->getStudentStories($studentId)
+        return $this->getClassProgramStories()
             ->count('lesson_story.story_id');
     }
 
     public function getStudentFinishedStoriesCount(int $studentId): int
     {
 
-        $rows = $this->getStudentStories($studentId)
+        $rows = $this->getClassProgramStories()
             ->select(['story_id' => 'lesson_story.story_id'])
             ->all();
 

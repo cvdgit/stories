@@ -16,7 +16,7 @@ use yii\helpers\Url;
         <div class="caption">
             <h3><?= $model->program->name ?></h3>
             <p>&nbsp;</p>
-            <p>Пройдено историй <?= $model->getStudentFinishedStoriesCount($studentId) ?> из <?= $model->getStudentStoriesCount($studentId) ?></p>
+            <p>Пройдено историй <?= $model->getStudentFinishedStoriesCount($studentId) ?> из <?= $model->getClassProgramStoriesCount() ?></p>
         </div>
     </a>
 </div>

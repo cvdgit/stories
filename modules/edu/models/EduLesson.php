@@ -7,6 +7,7 @@ use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Query;
 
 /**
  * This is the model class for table "edu_lesson".
@@ -112,5 +113,38 @@ class EduLesson extends ActiveRecord
     public function getStoriesCount(): int
     {
         return $this->getEduLessonStories()->count();
+    }
+
+    private function getLessonStories(): Query
+    {
+        return (new Query())
+            ->from(['lesson' => 'edu_lesson'])
+            ->innerJoin(['lesson_story' => 'edu_lesson_story'], 'lesson_story.lesson_id = lesson.id')
+            ->where(['lesson.id' => $this->id]);
+    }
+
+    public function getLessonStoriesCount(): int
+    {
+        return $this->getLessonStories()
+            ->count('lesson_story.story_id');
+    }
+
+    public function getStudentFinishedStoriesCount(int $studentId): int
+    {
+
+        $rows = $this->getLessonStories()
+            ->select(['story_id' => 'lesson_story.story_id'])
+            ->all();
+
+        $storyIds = array_map(static function($row) {
+            return $row['story_id'];
+        }, $rows);
+
+        return (new Query())
+            ->from('story_student_progress')
+            ->where(['student_id' => $studentId])
+            ->andWhere(['in', 'story_id', $storyIds])
+            ->andWhere('progress = 100')
+            ->count();
     }
 }
