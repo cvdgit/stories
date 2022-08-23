@@ -5,6 +5,7 @@ namespace modules\edu\models;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Query;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -105,5 +106,39 @@ class EduClassProgram extends ActiveRecord
     public function getTopicsCount(): int
     {
         return $this->getEduTopics()->count();
+    }
+
+    private function getStudentStories(int $studentId): Query
+    {
+        return (new Query())
+            ->from(['topic' => 'edu_topic'])
+            ->innerJoin(['lesson' => 'edu_lesson'], 'topic.id = lesson.topic_id')
+            ->innerJoin(['lesson_story' => 'edu_lesson_story'], 'lesson_story.lesson_id = lesson.id')
+            ->where(['topic.class_program_id' => $this->id]);
+    }
+
+    public function getStudentStoriesCount(int $studentId): int
+    {
+        return $this->getStudentStories($studentId)
+            ->count('lesson_story.story_id');
+    }
+
+    public function getStudentFinishedStoriesCount(int $studentId): int
+    {
+
+        $rows = $this->getStudentStories($studentId)
+            ->select(['story_id' => 'lesson_story.story_id'])
+            ->all();
+
+        $storyIds = array_map(static function($row) {
+            return $row['story_id'];
+        }, $rows);
+
+        return (new Query())
+            ->from('story_student_progress')
+            ->where(['student_id' => $studentId])
+            ->andWhere(['in', 'story_id', $storyIds])
+            ->andWhere('progress = 100')
+            ->count();
     }
 }
