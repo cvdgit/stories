@@ -23,6 +23,8 @@ $this->registerCss(<<<CSS
     cursor: pointer;
     display: flex;
     flex-direction: row;
+    margin-bottom: 10px;
+    padding: 10px 0;
 }
 .testing-item__name {
     margin-right: auto;
@@ -66,7 +68,7 @@ CSS
 
                             <h3 class="h4"><?= $topic->name . ' / ' . $lesson->name ?></h3>
 
-                            <table class="table table-hover table-sm table-bordered">
+                            <table class="table table-sm table-bordered">
                                 <thead>
                                     <tr>
                                         <th>История</th>
