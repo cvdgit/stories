@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use common\rbac\UserRoles;
 use yii\bootstrap\Nav;
 use yii\web\View;
 
@@ -40,15 +41,16 @@ CSS
                     || Yii::$app->controller->id === 'admin/topic'
                     || Yii::$app->controller->id === 'admin/lesson',
             ],
-/*            [
-                'label' => 'Темы',
-                'url' => ['/edu/admin/topic/index'],
-                'active' => Yii::$app->controller->id === 'admin/topic' || Yii::$app->controller->id === 'admin/lesson',
-            ],*/
             [
                 'label' => 'Доступ к модулю',
                 'url' => ['/edu/admin/user-access/index'],
                 'active' => Yii::$app->controller->id === 'admin/user-access',
+            ],
+            [
+                'label' => 'Управление классами',
+                'url' => ['/edu/admin/class-book/index'],
+                'active' => Yii::$app->controller->id === 'admin/class-book',
+                'visible' => Yii::$app->user->can(UserRoles::ROLE_ADMIN),
             ],
         ],
     ]) ?>

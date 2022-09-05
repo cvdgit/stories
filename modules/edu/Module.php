@@ -21,7 +21,7 @@ class Module extends \yii\base\Module
 
     private $accessChecker;
 
-    public function __construct($id, $parent = null,EduAccessChecker $accessChecker = null, $config = [])
+    public function __construct($id, $parent = null, EduAccessChecker $accessChecker = null, $config = [])
     {
         parent::__construct($id, $parent, $config);
         $this->accessChecker = $accessChecker;
