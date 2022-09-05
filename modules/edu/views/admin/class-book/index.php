@@ -26,7 +26,13 @@ $this->title = 'Классы';
         'options' => ['class' => 'table-responsive'],
         'summary' => false,
         'columns' => [
-            'name',
+            [
+                'attribute' => 'name',
+                'format' => 'raw',
+                'value' => static function($model) {
+                    return Html::a($model->name, ['/edu/admin/class-book/view', 'id' => $model->id]);
+                },
+            ],
             [
                 'attribute' => 'user.profileName',
                 'label' => 'Учитель',

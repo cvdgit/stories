@@ -6,9 +6,11 @@ namespace modules\edu\controllers\admin;
 
 use common\rbac\UserRoles;
 use modules\edu\models\EduClassBook;
+use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 
 class ClassBookController extends Controller
 {
@@ -39,6 +41,28 @@ class ClassBookController extends Controller
         ]);
 
         return $this->render('index', [
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionView(int $id)
+    {
+
+        if (($model = EduClassBook::findOne($id)) === null) {
+            throw new NotFoundHttpException('Класс не найден');
+        }
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $model->getStudents(),
+            'sort' => [
+                'defaultOrder' => ['name' => SORT_ASC],
+            ]
+        ]);
+
+        return $this->render('view', [
             'dataProvider' => $dataProvider,
         ]);
     }
