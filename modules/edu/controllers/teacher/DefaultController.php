@@ -5,12 +5,15 @@ declare(strict_types=1);
 
 namespace modules\edu\controllers\teacher;
 
+use common\models\Story;
+use common\models\UserStudent;
 use modules\edu\models\EduClassBook;
 use modules\edu\models\EduClassProgram;
-use modules\edu\models\EduProgram;
 use Yii;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 class DefaultController extends Controller
 {
@@ -45,5 +48,32 @@ class DefaultController extends Controller
             'classBook' => $classBook,
             'classProgram' => $classProgram,
         ]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionStoryTesting(int $story_id, int $student_id): array
+    {
+        $this->response->format = Response::FORMAT_JSON;
+
+        if (($story = Story::findOne($story_id)) === null) {
+            throw new NotFoundHttpException('История не найдена');
+        }
+
+        if (($student = UserStudent::findOne($student_id)) === null) {
+            throw new NotFoundHttpException('Ученик не найден');
+        }
+
+        $testings = array_map(static function($testing) use ($student) {
+            return [
+                'id' => $testing->id,
+                'name' => $testing->header,
+                'resource' => Url::to(['/test/detail', 'test_id' => $testing->id, 'student_id' => $student->id]),
+                'progress' => $student->getProgress($testing->id)
+            ];
+        }, $story->tests);
+
+        return ['success' => true, 'data' => $testings];
     }
 }
