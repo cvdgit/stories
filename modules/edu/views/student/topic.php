@@ -40,7 +40,7 @@ $this->title = $student->name;
                 'itemView' => '_lesson_item',
                 'itemOptions' => ['tag' => false],
                 'viewParams' => ['studentId' => $student->id],
-                'layout' => "{summary}\n<div class=\"row\">{items}</div>\n{pager}",
+                'layout' => "{summary}\n<div class=\"row display-flex\">{items}</div>\n{pager}",
             ]) ?>
 
         </div>
