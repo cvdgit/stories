@@ -112,4 +112,11 @@ class StudentService
             ->update('user_student', ['user_id' => $userId], ['id' => $studentId])
             ->execute();
     }
+
+    public function changeStatus(int $studentId, int $status): void
+    {
+        Yii::$app->db->createCommand()
+            ->update('user_student', ['status' => $status], ['id' => $studentId])
+            ->execute();
+    }
 }

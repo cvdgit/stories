@@ -56,6 +56,7 @@ class ClassBookService
             }
 
             $this->studentService->changeUser($student->id, $user->id);
+            $this->studentService->changeStatus($student->id, UserStudent::STATUS_MAIN);
 
             $this->userAccessService->createAccess($user->id);
         });
