@@ -10,7 +10,7 @@ use yii\helpers\Url;
  * @var int $studentId
  */
 ?>
-<div class="col-sm-6 col-md-4">
+<div class="col-sm-6 col-md-4" style="margin-bottom:1rem">
     <a href="<?= Url::to(['/edu/student/lesson', 'id' => $model->id]) ?>" class="thumbnail">
         <div class="caption">
             <h3><?= $model->name ?></h3>
