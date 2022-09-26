@@ -69,7 +69,8 @@ window.initSlides = function() {
     help: false,
     dependencies: [],
     touch: true,
-    maxScale: 1.0
+    maxScale: 1.0,
+    minScale: 0.8
   });
 
   deck.initialize({
