@@ -30,7 +30,7 @@ return [
         ],
         'authManager' => [
             'class' => DbManager::class,
-            'cache' => 'cache',
+            //'cache' => 'cache',
         ],
         'formatter' => [
             'dateFormat' => 'dd.MM.yyyy',
