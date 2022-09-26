@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace modules\edu\controllers\teacher;
 
+use common\models\User;
 use Exception;
 use modules\edu\forms\teacher\ClassBookForm;
 use modules\edu\forms\student\StudentForm;
@@ -119,10 +120,11 @@ class ClassBookController extends Controller
 
         $formModel = new StudentForm();
         $formModel->class_id = $model->class_id;
+
         if ($this->request->isPost && $formModel->load($this->request->post())) {
+
             try {
-                $studentId = $this->studentService->createStudent(Yii::$app->user->getId(), $formModel);
-                $this->teacherService->addStudentToClassBook($model->id, $studentId);
+                $this->studentService->createStudentWithUserAndAddToClassBook(User::createUsername(), $formModel, $model->id);
                 Yii::$app->session->addFlash('success', 'Ученик успешно создан и добавлен в класс');
                 return $this->redirect(['students', 'id' => $id]);
             }

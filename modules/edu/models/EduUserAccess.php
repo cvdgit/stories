@@ -78,4 +78,12 @@ class EduUserAccess extends ActiveRecord
             ->andWhere(['status' => 1])
             ->one();
     }
+
+    public static function create(int $userId): self
+    {
+        $model = new self();
+        $model->user_id = $userId;
+        $model->status = 1;
+        return $model;
+    }
 }

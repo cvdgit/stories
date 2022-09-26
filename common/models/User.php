@@ -103,7 +103,7 @@ class User extends ActiveRecord implements IdentityInterface
      * @param string $username
      * @return static|null
      */
-    public static function findByUsername($username)
+    public static function findByUsername(string $username): ?User
     {
         return static::findOne(['username' => $username]);
     }
@@ -410,7 +410,7 @@ class User extends ActiveRecord implements IdentityInterface
         $student->save();
     }
 
-    public function student()
+    public function student(): ?UserStudent
     {
         return $this
             ->getStudents()

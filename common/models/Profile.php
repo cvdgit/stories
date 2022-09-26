@@ -102,6 +102,15 @@ class Profile extends ActiveRecord
         return $this->first_name . ' ' . $this->last_name;
     }
 
+    public static function create(int $userId, string $firstName, string $lastName): self
+    {
+        $model = new static();
+        $model->user_id = $userId;
+        $model->first_name = $firstName;
+        $model->last_name = $lastName;
+        return $model;
+    }
+
     public static function createProfile($userID)
     {
         $profile = new static();

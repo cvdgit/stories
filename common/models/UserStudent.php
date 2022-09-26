@@ -140,7 +140,7 @@ class UserStudent extends ActiveRecord
 
     public static function createStudent(int $userId, string $name, int $classId, string $birth_date = null): UserStudent
     {
-        return self::create($userId, $name,self::STATUS_STUDENT, $classId, $birth_date);
+        return self::create($userId, $name,self::STATUS_MAIN, $classId, $birth_date);
     }
 
     public static function createMain(int $userId, string $name): UserStudent
