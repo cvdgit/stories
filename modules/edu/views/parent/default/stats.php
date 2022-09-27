@@ -23,6 +23,83 @@ $this->registerCss(<<<CSS
     text-decoration: none;
     color: #99cd50;
 }
+.student-progress-cell__header {
+    color: #aab8be;
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: left;
+    padding: 11px 8px 8px;
+}
+.student-progress-table__body {
+    display: flex;
+    position: relative;
+}
+.student-progress-table {
+    max-width: min-content;
+    width: 100%;
+}
+.student-progress-table-content {
+    max-width: 688px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+.topic-row {
+    position: relative;
+    width: 100%;
+    height: 40px;
+    padding-right: 30px;
+}
+.topic-row__cell {
+    padding: 12px 8px;
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.content-row {
+    position: relative;
+    width: 100%;
+    height: 40px;
+}
+.topic-row:nth-child(even), .content-row:nth-child(even) {
+    background-color: #f2f2f3;
+}
+.content-row__cell {
+    padding: 12px 8px;
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.content-lesson {
+    display: inline-block;
+    margin-right: 5px;
+    padding-top: 2px;
+    font-size: 13px;
+}
+.content-lesson span {
+    box-sizing: border-box;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    position: relative;
+    top: 2px;
+    margin: 0 0 0 0;
+}
+.content-lesson .not-started {
+    box-sizing: border-box;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #d3d3d3;
+    background: transparent;
+}
 CSS
 );
 ?>
@@ -44,39 +121,53 @@ CSS
     </div>
 
     <?php if ($classProgram): ?>
-    <div>
 
-        <h2 class="h3"><?= $classProgram->program->name ?></h2>
+    <div style="margin-bottom: 100px">
 
-        <?php foreach ($classProgram->eduTopics as $topic): ?>
+        <div style="display: flex; border-bottom: 2px solid #aaa">
+            <div style="max-width:min-content;width:100%">
+                <div class="student-progress-cell__header">Тема</div>
+            </div>
             <div>
-                <div>
-                    <?php foreach ($topic->eduLessons as $lesson): ?>
-                        <div>
+                <div class="student-progress-cell__header">Прогресс</div>
+            </div>
+        </div>
 
-                            <h3 class="h4"><?= $topic->name . ' / ' . $lesson->name ?></h3>
+        <div class="student-progress-table__body">
 
-                            <table class="table table-hover table-sm table-bordered">
-                                <thead>
-                                <tr>
-                                    <th>История</th>
-                                    <th>Прогресс</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <?php foreach($lesson->stories as $story): ?>
-                                    <tr>
-                                        <td><?= $story->title ?></td>
-                                        <td><?= ($progress = $story->findStudentStoryProgress($student->id)) !== null ? $progress->progress : 'Нет' ?></td>
-                                    </tr>
-                                <?php endforeach ?>
-                                </tbody>
-                            </table>
+            <div class="student-progress-table-topics">
+                <?php foreach ($classProgram->eduTopics as $topic): ?>
+                <div class="topic-row">
+                    <div class="topic-row__cell">
+                        <?= $topic->name ?>
+                    </div>
+                </div>
+                <?php endforeach ?>
+            </div>
+
+            <div class="student-progress-table-content">
+                <div style="width:100%">
+                    <?php foreach ($classProgram->eduTopics as $topic): ?>
+                    <div class="content-row">
+                        <div class="content-row__cell">
+                            <div style="white-space: nowrap">
+                                <?php foreach ($topic->eduLessons as $lesson): ?>
+                                <div style="display:inline-block;margin-right:15px">
+                                    <?php foreach ($lesson->stories as $story): ?>
+                                    <div class="content-lesson">
+                                        <span class="not-started"></span>
+                                    </div>
+                                    <?php endforeach; ?>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
                         </div>
+                    </div>
                     <?php endforeach ?>
                 </div>
             </div>
-        <?php endforeach ?>
+        </div>
     </div>
+
     <?php endif ?>
 </div>
