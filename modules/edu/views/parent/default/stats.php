@@ -94,11 +94,13 @@ $this->registerCss(<<<CSS
     margin: 0 0 0 0;
 }
 .content-lesson .not-started {
-    box-sizing: border-box;
-    width: 14px;
-    height: 14px;
-    border: 2px solid #d3d3d3;
-    background: transparent;
+    background-color: #d3d3d3;
+}
+.content-lesson .in-progress {
+    background-color: #6fc4e2;
+}
+.content-lesson .is-done {
+    background-color: #37ae68;
 }
 CSS
 );
@@ -154,9 +156,23 @@ CSS
                                 <?php foreach ($topic->eduLessons as $lesson): ?>
                                 <div style="display:inline-block;margin-right:15px">
                                     <?php foreach ($lesson->stories as $story): ?>
+                                    <?php $progress = $story->findStudentStoryProgress($student->id); ?>
+                                    <?php if ($progress === null): ?>
                                     <div class="content-lesson">
                                         <span class="not-started"></span>
                                     </div>
+                                    <?php else: ?>
+                                    <?php if ($progress->statusInProgress()): ?>
+                                    <div class="content-lesson">
+                                        <span class="in-progress"></span>
+                                    </div>
+                                    <?php endif ?>
+                                    <?php if ($progress->statusIsDone()): ?>
+                                    <div class="content-lesson">
+                                        <span class="is-done"></span>
+                                    </div>
+                                    <?php endif ?>
+                                    <?php endif ?>
                                     <?php endforeach; ?>
                                 </div>
                                 <?php endforeach; ?>

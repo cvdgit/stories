@@ -63,4 +63,14 @@ class StoryStudentProgress extends ActiveRecord
     {
         return $this->hasOne(UserStudent::class, ['id' => 'student_id']);
     }
+
+    public function statusIsDone(): bool
+    {
+        return $this->progress === 100;
+    }
+
+    public function statusInProgress(): bool
+    {
+        return $this->progress > 0 && !$this->statusIsDone();
+    }
 }
