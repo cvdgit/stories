@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 namespace modules\edu\forms\student;
 
+use common\models\UserStudent;
 use modules\edu\models\EduClass;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
@@ -14,6 +15,15 @@ class StudentForm extends Model
 
     public $name;
     public $class_id;
+
+    public function __construct(UserStudent $model = null, $config = [])
+    {
+        parent::__construct($config);
+        if ($model !== null) {
+            $this->name = $model->name;
+            $this->class_id = $model->class_id;
+        }
+    }
 
     public function rules(): array
     {

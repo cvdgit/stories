@@ -43,7 +43,14 @@ CSS
         'dataProvider' => $dataProvider,
         'summary' => false,
         'columns' => [
-            'name',
+            [
+                'attribute' => 'name',
+                'format' => 'raw',
+                'value' => static function($model) {
+                    return Html::a($model->name, ['/edu/parent/default/update-student', 'id' => $model->id]);
+                }
+            ],
+            'class.name:text:Класс',
             [
                 'attribute' => 'studentLogin.username',
                 'label' => 'Логин',

@@ -58,6 +58,21 @@ class StudentService
         return $studentModel->id;
     }
 
+    /**
+     * @throws Exception
+     */
+    public function updateStudent(UserStudent $student, StudentForm $form): void
+    {
+        if (!$form->validate()) {
+            throw ModelDomainException::create($form);
+        }
+
+        $student->updateStudent($form->name, (int)$form->class_id);
+        if (!$student->save()) {
+            throw ModelDomainException::create($student);
+        }
+    }
+
     public function createStudentLogin(int $studentId, string $username, string $password): void
     {
         $studentLogin = StudentLogin::create($studentId, $username, $password);

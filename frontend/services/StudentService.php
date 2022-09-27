@@ -31,7 +31,7 @@ class StudentService
             throw ModelDomainException::create($form);
         }
 
-        $studentModel->updateStudent($form);
+        $studentModel->updateStudent($form->name, $form->class_id, $form->birth_date);
         if (!$studentModel->save()) {
             throw ModelDomainException::create($studentModel);
         }

@@ -48,15 +48,43 @@ class DefaultController extends Controller
         if ($this->request->isPost && $formModel->load($this->request->post())) {
             try {
                 $this->studentService->createStudent(Yii::$app->user->getId(), $formModel);
+                Yii::$app->session->setFlash('success', 'Ученик успешно создан');
                 return $this->redirect(['index']);
             }
             catch (Exception $exception) {
                 Yii::$app->errorHandler->logException($exception);
+                Yii::$app->session->setFlash('error', $exception->getMessage());
+            }
+        }
+        return $this->render('create-student', [
+            'formModel' => $formModel,
+        ]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionUpdateStudent(int $id)
+    {
+        if (($student = UserStudent::findOne($id)) === null) {
+            throw new NotFoundHttpException('Ученик не найден');
+        }
+
+        $studentForm = new StudentForm($student);
+        if ($this->request->isPost && $studentForm->load($this->request->post())) {
+            try {
+                $this->studentService->updateStudent($student, $studentForm);
+                Yii::$app->session->setFlash('success', 'Ученик успешно изменен');
+                return $this->redirect(['index']);
+            }
+            catch (Exception $exception) {
+                Yii::$app->errorHandler->logException($exception);
+                Yii::$app->session->setFlash('error', $exception->getMessage());
             }
         }
 
-        return $this->render('create-student', [
-            'formModel' => $formModel,
+        return $this->render('update-student', [
+            'formModel' => $studentForm,
         ]);
     }
 

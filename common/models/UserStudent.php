@@ -174,11 +174,11 @@ class UserStudent extends ActiveRecord
         return $this->hasOne(StudentLogin::class, ['student_id' => 'id']);
     }
 
-    public function updateStudent(UserStudentForm $form): void
+    public function updateStudent(string $name, int $classId, string $birthDate = null): void
     {
-        $this->name = $form->name;
-        $this->birth_date = $form->birth_date;
-        $this->class_id = $form->class_id;
+        $this->name = $name;
+        $this->birth_date = $birthDate;
+        $this->class_id = $classId;
     }
 
     public function getClass(): ActiveQuery
