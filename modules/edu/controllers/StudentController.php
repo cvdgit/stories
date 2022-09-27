@@ -83,6 +83,7 @@ class StudentController extends Controller
             'student' => $student,
             'topics' => $classProgram->eduTopics,
             'dataProvider' => $dataProvider,
+            'topic' => $topic,
         ]);
     }
 
@@ -113,6 +114,7 @@ class StudentController extends Controller
             'topics' => $classProgram->eduTopics,
             'dataProvider' => $dataProvider,
             'lesson' => $lesson,
+            'currentTopicId' => $topic->id,
         ]);
     }
 }

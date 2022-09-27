@@ -15,6 +15,7 @@ use yii\widgets\ListView;
  * @var DataProviderInterface $dataProvider
  * @var EduTopic[] $topics
  * @var string $classProgramName
+ * @var EduTopic $topic
  */
 
 $this->title = $student->name;
@@ -30,9 +31,11 @@ $this->title = $student->name;
 
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-3 site-sidebar">
-            <?= $this->render('_all_topics', ['topics' => $topics]) ?>
+            <?= $this->render('_all_topics', ['topics' => $topics, 'currentTopicId' => $topic->id]) ?>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-9 site-main" style="margin-top:0">
+
+            <h2 class="h3" style="margin-top:0;margin-bottom:2rem"><?= Html::encode($topic->name) ?></h2>
 
             <?= ListView::widget([
                 'dataProvider' => $dataProvider,

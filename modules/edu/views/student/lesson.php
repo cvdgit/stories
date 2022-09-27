@@ -21,6 +21,7 @@ use yii\widgets\Pjax;
  * @var string $classProgramName
  * @var View $this
  * @var EduLesson $lesson
+ * @var int $currentTopicId
  */
 
 $this->title = $student->name;
@@ -52,11 +53,11 @@ CSS
 
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-3 site-sidebar">
-            <?= $this->render('_all_topics', ['topics' => $topics]) ?>
+            <?= $this->render('_all_topics', ['topics' => $topics, 'currentTopicId' => $currentTopicId]) ?>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-9 site-main" style="margin-top:0">
 
-            <h3 style="margin-top:0"><?= Html::encode($lesson->name) ?></h3>
+            <h2 class="h3" style="margin-top:0;margin-bottom:2rem"><?= Html::encode($lesson->name) ?></h2>
 
             <div class="story-list-wrap">
 

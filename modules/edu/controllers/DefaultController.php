@@ -18,6 +18,10 @@ class DefaultController extends Controller
 
     public function actionIndex(): Response
     {
+        if (Yii::$app->user->can(UserRoles::ROLE_ADMIN)) {
+            return $this->redirect(['/edu/parent/default/index']);
+        }
+
         $student = Yii::$app->studentContext->getStudent();
 
         if (Yii::$app->user->can(UserRoles::ROLE_TEACHER)) {

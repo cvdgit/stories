@@ -7,10 +7,15 @@ use yii\widgets\Menu;
 
 /**
  * @var EduTopic[] $topics
+ * @var int $currentTopicId
  */
 
-$items = array_map(static function(EduTopic $topic) {
-    return ['label' => $topic->name, 'url' => ['/edu/student/topic', 'id' => $topic->id]];
+$items = array_map(static function(EduTopic $topic) use ($currentTopicId) {
+    return [
+        'label' => $topic->name,
+        'url' => ['/edu/student/topic', 'id' => $topic->id],
+        'active' => $topic->id === $currentTopicId,
+    ];
 }, $topics);
 ?>
 <?= Menu::widget([

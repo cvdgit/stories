@@ -38,3 +38,7 @@
   justify-content: space-between;
   height: 100%;
 }
+
+.story-category-list li {
+  margin-bottom: 1rem;
+}

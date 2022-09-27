@@ -59,6 +59,7 @@ $this->params['breadcrumbs'] = [
                     <?= GridView::widget([
                         'dataProvider' => $lessonsDataProvider,
                         'summary' => false,
+                        'options' => ['class' => 'table-responsive'],
                         'columns' => [
                             [
                                 'attribute' => 'name',
