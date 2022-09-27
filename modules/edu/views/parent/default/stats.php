@@ -94,10 +94,12 @@ $this->registerCss(<<<CSS
     margin: 0 0 0 0;
 }
 .content-lesson .not-started {
-    background-color: #d3d3d3;
+    border: 2px #d3d3d3 solid;
+    background: transparent;
 }
 .content-lesson .in-progress {
-    background-color: #6fc4e2;
+    border: 2px #6fc4e2 solid;
+    background: transparent;
 }
 .content-lesson .is-done {
     background-color: #37ae68;
