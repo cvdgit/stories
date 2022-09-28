@@ -153,6 +153,11 @@ $this->registerJs(<<<JS
         const resource = $(this).data('resource');
         $('#test-detail-modal').modal({'remote': resource});
     });
+
+    $('#test-detail-modal').on('hide.bs.modal', function() {
+        $(this).removeData('bs.modal');
+        $(this).find('.modal-content').html('');
+    });
 })();
 JS
 );

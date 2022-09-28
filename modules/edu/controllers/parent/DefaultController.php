@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace modules\edu\controllers\parent;
 
+use common\models\Story;
 use common\models\User;
 use common\models\UserStudent;
 use Exception;
 use modules\edu\forms\student\StudentForm;
 use modules\edu\models\EduClassProgram;
+use modules\edu\query\EduProgramStoriesFetcher;
+use modules\edu\query\EduProgramStoryIdsFetcher;
+use modules\edu\query\StudentStoryStatByDateFetcher;
 use modules\edu\services\StudentService;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -110,10 +114,61 @@ class DefaultController extends Controller
             $classProgram = $classPrograms[0];
         }
 
+        $stat = [];
+
+        $programStoriesData = (new EduProgramStoriesFetcher())->fetch($class->id, $classProgram->id);
+        $storyIds = array_column($programStoriesData, 'storyId');
+
+        $storyModels = Story::find()
+            ->where(['in', 'id', $storyIds])
+            ->indexBy('id')
+            ->all();
+
+        $statData = (new StudentStoryStatByDateFetcher())->fetch($student->id, $storyIds);
+
+        foreach ($statData as $statItem) {
+
+            $item = [
+                'date' => $statItem['targetDate'],
+                'topics' => [],
+            ];
+
+            $topics = [];
+            foreach (explode(',', $statItem['storyIds']) as $storyId) {
+
+                $storyData = $programStoriesData[$storyId];
+
+                if (!isset($topics[$storyData['topicId']])) {
+                    $topics[$storyData['topicId']] = [
+                        'topicId' => $storyData['topicId'],
+                        'topicName' => $storyData['topicName'],
+                        'lessons' => [],
+                    ];
+                }
+
+                $topicLessonIds = array_column($topics[$storyData['topicId']]['lessons'],'lessonId');
+                if (!in_array($storyData['lessonId'], $topicLessonIds, true)) {
+                    $lessonItem = [
+                        'lessonId' => $storyData['lessonId'],
+                        'lessonName' => $storyData['lessonName'],
+                        'stories' => [],
+                    ];
+                    $topics[$storyData['topicId']]['lessons'][$storyData['lessonId']] = $lessonItem;
+                }
+
+                $topics[$storyData['topicId']]['lessons'][$storyData['lessonId']]['stories'][] = $storyModels[$storyId];
+            }
+
+            $item['topics'] = $topics;
+
+            $stat[] = $item;
+        }
+
         return $this->render('stats', [
             'classProgram' => $classProgram,
             'classPrograms' => $classPrograms,
             'student' => $student,
+            'stat' => $stat,
         ]);
     }
 }

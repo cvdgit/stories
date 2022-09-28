@@ -7,12 +7,14 @@ declare(strict_types=1);
  * @var UserStudent $student
  * @var EduClassProgram|null $classProgram
  * @var EduClassProgram[] $classPrograms
+ * @var array $stat
  */
 
 use common\models\UserStudent;
 use modules\edu\models\EduClassBook;
 use modules\edu\models\EduClassProgram;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\web\View;
 use yii\widgets\Menu;
 
@@ -104,6 +106,20 @@ $this->registerCss(<<<CSS
 .content-lesson .is-done {
     background-color: #37ae68;
 }
+.testing-item {
+    user-select: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 10px;
+    padding: 10px 0;
+}
+.testing-item__name {
+    margin-right: auto;
+}
+.testing-item__progress {
+
+}
 CSS
 );
 ?>
@@ -156,6 +172,7 @@ CSS
                         <div class="content-row__cell">
                             <div style="white-space: nowrap">
                                 <?php foreach ($topic->eduLessons as $lesson): ?>
+                                <?php if (count($lesson->stories) > 0): ?>
                                 <div style="display:inline-block;margin-right:15px">
                                     <?php foreach ($lesson->stories as $story): ?>
                                     <?php $progress = $story->findStudentStoryProgress($student->id); ?>
@@ -177,6 +194,7 @@ CSS
                                     <?php endif ?>
                                     <?php endforeach; ?>
                                 </div>
+                                <?php endif ?>
                                 <?php endforeach; ?>
                             </div>
                         </div>
@@ -187,5 +205,107 @@ CSS
         </div>
     </div>
 
+    <div id="edu-stats">
+        <?php foreach ($stat as $item): ?>
+        <div>
+            <h2 class="h3"><?= $item['date'] ?></h2>
+            <div>
+            <?php foreach ($item['topics'] as $topicItem): ?>
+                <h3 class="h4"><?= Html::encode($topicItem['topicName']) ?></h3>
+                <div>
+                    <?php foreach ($topicItem['lessons'] as $lessonItem): ?>
+                    <h4 class="h5"><?= Html::encode($lessonItem['lessonName']) ?></h4>
+                    <div class="row">
+                        <div class="col-md-8">
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                            <tr>
+                                <th class="col-md-8">История</th>
+                                <th class="col-md-2">Прогресс</th>
+                                <th class="col-md-2">Тесты</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                        <?php foreach ($lessonItem['stories'] as $story): ?>
+                            <tr>
+                                <td><?= $story->title ?></td>
+                                <td><?= ($progress = $story->findStudentStoryProgress($student->id)) !== null ? $progress->progress : 'Нет' ?></td>
+                                <td><a class="show-testing" href="<?= Url::to(['/edu/teacher/default/story-testing', 'story_id' => $story->id, 'student_id' => $student->id]) ?>">Результаты</a></td>
+                            </tr>
+                        <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                    <?php endforeach ?>
+                </div>
+            <?php endforeach ?>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+
     <?php endif ?>
 </div>
+
+<div class="modal remote fade" id="test-detail-modal">
+    <div class="modal-dialog">
+        <div class="modal-content"></div>
+    </div>
+</div>
+
+<?php
+$this->registerJs(<<<JS
+(function() {
+    $('#edu-stats').on('click', '.show-testing', function(e) {
+        e.preventDefault();
+
+        const thisRow = $(this).parents('tr:eq(0)');
+
+        let testingRow = thisRow.next();
+        if (!testingRow.hasClass('testing-row')) {
+            testingRow = $('<tr/>', {class: 'testing-row'}).append(
+                $('<td/>', {colspan: thisRow.find('td').length})
+            );
+            testingRow.insertAfter(thisRow);
+        }
+
+        const url = $(this).attr('href');
+
+        testingRow.find('td').empty();
+        $.getJSON(url)
+            .done(function(response) {
+                if (response && response.success) {
+                    const testings = response.data || [];
+                    if (testings.length === 0) {
+                        testingRow.find('td').text('Тестирование не найдено');
+                        return;
+                    }
+                    testings.forEach(testing => {
+                        const row = $('<div/>', {class: 'testing-item'})
+                            .data('resource', testing.resource)
+                            .append(
+                                $('<div/>', {class: 'testing-item__name'}).text(testing.name)
+                            )
+                            .append(
+                                $('<div/>', {class: 'testing-item__progress'}).text('Прогресс: ' + testing.progress)
+                            );
+                        testingRow.find('td').append(row);
+                    });
+                }
+            });
+    });
+
+    $('#edu-stats').on('click', '.testing-item', function(e) {
+        e.preventDefault();
+        const resource = $(this).data('resource');
+        $('#test-detail-modal').modal({'remote': resource});
+    });
+
+    $('#test-detail-modal').on('hide.bs.modal', function() {
+        $(this).removeData('bs.modal');
+        $(this).find('.modal-content').html('');
+    });
+})();
+JS
+);
