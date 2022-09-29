@@ -29,6 +29,7 @@ use yii\helpers\FileHelper;
  * @property string $hint
  * @property string $audio_file_id
  * @property int $sort_view
+ * @property string $incorrect_description
  *
  * @property StoryTestAnswer[] $storyTestAnswers
  * @property StoryTestAnswer[] $storyTestAnswersWithHidden

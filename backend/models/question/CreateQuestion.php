@@ -29,6 +29,7 @@ class CreateQuestion extends QuestionModel
         }
         $model = StoryTestQuestion::create($this->story_test_id, $this->name, $this->type, $this->order, $this->mix_answers);
         $model->hint = $this->hint;
+        $model->incorrect_description = $this->incorrect_description;
         $this->uploadImage($model);
         $model->save();
         return $model->id;

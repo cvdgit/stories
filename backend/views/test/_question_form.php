@@ -2,6 +2,7 @@
 use backend\widgets\QuestionErrorTextWidget;
 use backend\widgets\QuestionSlidesWidget;
 use common\helpers\Url;
+use vova07\imperavi\Widget;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\helpers\Html;
@@ -51,6 +52,18 @@ $isNewRecord = $model instanceof \backend\models\question\CreateQuestion;
                     ?>
                 </div>
             <?php endif ?>
+
+            <?= $form->field($model, 'incorrect_description')->widget(Widget::class, [
+                'settings' => [
+                    'lang' => 'ru',
+                    'minHeight' => 150,
+                    'buttons' => ['html', 'bold', 'italic', 'deleted', 'unorderedlist', 'orderedlist', 'alignment', 'horizontalrule'],
+                    'plugins' => [
+                        'fontcolor',
+                        'fontsize',
+                    ],
+                ],
+            ]); ?>
 
             <?= $form->field($model, 'story_test_id')->hiddenInput()->label(false) ?>
 

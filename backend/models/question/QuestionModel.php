@@ -21,6 +21,7 @@ abstract class QuestionModel extends Model
     public $imageFile;
     public $hint;
     public $audio_file_id;
+    public $incorrect_description;
 
     private $model;
 
@@ -33,6 +34,7 @@ abstract class QuestionModel extends Model
             [['hint'], 'string', 'max' => 255],
             [['imageFile'], 'image'],
             [['story_test_id'], 'exist', 'targetClass' => StoryTest::class, 'targetAttribute' => ['story_test_id' => 'id']],
+            ['incorrect_description', 'string'],
         ];
     }
 
@@ -46,6 +48,7 @@ abstract class QuestionModel extends Model
             'mix_answers' => 'Перемешивать ответы',
             'hint' => 'Подсказка',
             'audio_file_id' => 'Аудио файл',
+            'incorrect_description' => 'Текст при неправильном ответе',
         ];
     }
 

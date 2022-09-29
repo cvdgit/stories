@@ -28,14 +28,18 @@ class BaseQuestion
     private $hint;
     private $slides;
     private $audioFile;
+    private $incorrectDescription;
 
-    public function __construct(int $id,
-                                string $name,
-                                bool $lastAnswerIsCorrect,
-                                $image = null,
-                                $origImage = null,
-                                $hint = null,
-                                $audioFile = null)
+    public function __construct(
+        int $id,
+        string $name,
+        bool $lastAnswerIsCorrect,
+        $image = null,
+        $origImage = null,
+        $hint = null,
+        $audioFile = null,
+        string $incorrectDescription = null
+    )
     {
         $this->id = $id;
         $this->name = $name;
@@ -44,6 +48,7 @@ class BaseQuestion
         $this->lastAnswerIsCorrect = $lastAnswerIsCorrect;
         $this->hint = $hint;
         $this->audioFile = $audioFile;
+        $this->incorrectDescription = $incorrectDescription;
     }
 
     /**
@@ -178,5 +183,10 @@ class BaseQuestion
     public function getAudioFile()
     {
         return $this->audioFile;
+    }
+
+    public function getIncorrectDescription(): ?string
+    {
+        return $this->incorrectDescription;
     }
 }

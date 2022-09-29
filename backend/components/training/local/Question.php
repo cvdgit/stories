@@ -19,14 +19,26 @@ class Question extends BaseQuestion
      * @param bool $lastAnswerIsCorrect
      * @param int $mixAnswers
      * @param int $type
-     * @param $image
-     * @param $origImage
-     * @param $hint
-     * @param $audioFile
+     * @param null $image
+     * @param null $origImage
+     * @param null $hint
+     * @param null $audioFile
+     * @param string|null $incorrectDescription
      */
-    public function __construct(int $id, string $name, bool $lastAnswerIsCorrect, int $mixAnswers, int $type, $image = null, $origImage = null, $hint = null, $audioFile = null)
+    public function __construct(
+        int $id,
+        string $name,
+        bool $lastAnswerIsCorrect,
+        int $mixAnswers,
+        int $type,
+        $image = null,
+        $origImage = null,
+        $hint = null,
+        $audioFile = null,
+        string $incorrectDescription = null
+    )
     {
-        parent::__construct($id, $name, $lastAnswerIsCorrect, $image, $origImage, $hint, $audioFile);
+        parent::__construct($id, $name, $lastAnswerIsCorrect, $image, $origImage, $hint, $audioFile, $incorrectDescription);
         $this->mixAnswers = $mixAnswers;
         $this->type = $type;
     }

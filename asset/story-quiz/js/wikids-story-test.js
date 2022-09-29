@@ -2194,6 +2194,14 @@ function WikidsStoryTest(el, options) {
     text = text.replace('{1}', question.entity_name);
     $elements.append($('<h4/>').text(text + ':'));
 
+    if (question.incorrect_description) {
+      $elements.append(
+        $('<div/>', {class: 'question-description__wrap'}).append(
+          createDescription(question.incorrect_description)
+        )
+      );
+    }
+
     var questionNeoParams = question['params'] || [];
 
     if (questionViewRegion(question)) {
@@ -2336,7 +2344,8 @@ function WikidsStoryTest(el, options) {
       }
 
       $elementRow.appendTo($elements);
-    } else {
+    }
+    else {
       var $element;
       var answerText = '';
       var userAnswer = answer[0];

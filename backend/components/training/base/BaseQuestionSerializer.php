@@ -35,6 +35,7 @@ class BaseQuestionSerializer
             'hint' => $q->getHint(),
             'slides' => $q->getSlides(),
             'audio_file' => $q->getAudioFile(),
+            'incorrect_description' => $q->getIncorrectDescription(),
         ];
     }
 }

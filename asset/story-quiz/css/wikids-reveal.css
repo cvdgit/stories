@@ -859,7 +859,7 @@ p.wikids-test-description {
 }
 
 .seq-question__wrap--full {
-  height: 50vh;
+  height: 60vh;
 }
 
 .sequence-question-list {
@@ -1519,11 +1519,15 @@ p.wikids-test-description {
 }
 
 .question-description__text {
-  font-size: 17px;
-  font-weight: 400!important;
-  line-height: 1.8;
-  margin: 0;
+  font-size: 17px !important;
+  font-weight: 400 !important;
+  line-height: 1.8 !important;
+  margin: 0 !important;
   text-align: left;
+  color: black;
+}
+.question-description__text p {
+  margin: 0 !important;
 }
 
 .wikids-test-controls {
