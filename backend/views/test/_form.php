@@ -7,6 +7,7 @@ use common\models\test\AnswerType;
 use common\models\test\SourceType;
 use common\models\test\TestTemplateParts;
 use common\models\User;
+use vova07\imperavi\Widget;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use backend\components\TestTypeOptions;
@@ -24,7 +25,17 @@ $opt = new TestTypeOptions($model->answer_type);
         $headerField->hint('Подстановки: ' . TestTemplateParts::asText());
     }
     echo $headerField;
-    $descriptionField = $form->field($model, 'description_text')->textarea(['rows' => 6]);
+    $descriptionField = $form->field($model, 'description_text')->widget(Widget::class, [
+        'settings' => [
+            'lang' => 'ru',
+            'minHeight' => 200,
+            'buttons' => ['html', 'bold', 'italic', 'deleted', 'unorderedlist', 'orderedlist', 'alignment', 'horizontalrule'],
+            'plugins' => [
+                'fontcolor',
+                'fontsize',
+            ],
+        ],
+    ]);
     if ($model->isTemplate()) {
         $descriptionField->hint('Подстановки: ' . TestTemplateParts::asText());
     }
