@@ -171,31 +171,25 @@ CSS
                     <div class="content-row">
                         <div class="content-row__cell">
                             <div style="white-space: nowrap">
-                                <?php foreach ($topic->eduLessons as $lesson): ?>
-                                <?php if (count($lesson->stories) > 0): ?>
                                 <div style="display:inline-block;margin-right:15px">
-                                    <?php foreach ($lesson->stories as $story): ?>
-                                    <?php $progress = $story->findStudentStoryProgress($student->id); ?>
-                                    <?php if ($progress === null): ?>
+                                <?php foreach ($topic->eduLessons as $lesson): ?>
                                     <div class="content-lesson">
-                                        <span class="not-started"></span>
-                                    </div>
-                                    <?php else: ?>
-                                    <?php if ($progress->statusInProgress()): ?>
-                                    <div class="content-lesson">
-                                        <span class="in-progress"></span>
-                                    </div>
-                                    <?php endif ?>
-                                    <?php if ($progress->statusIsDone()): ?>
-                                    <div class="content-lesson">
+                                        <?php
+                                        $storiesCount = $lesson->getStoriesCount();
+                                        $finishedStoriesCount = $lesson->getStudentFinishedStoriesCount($student->id);
+                                        ?>
+                                        <?php if ($storiesCount === $finishedStoriesCount): ?>
                                         <span class="is-done"></span>
+                                        <?php endif ?>
+                                        <?php if ($storiesCount > 0 && $finishedStoriesCount === 0): ?>
+                                        <span class="not-started"></span>
+                                        <?php endif ?>
+                                        <?php if ($finishedStoriesCount > 0 && $finishedStoriesCount < $storiesCount): ?>
+                                            <span class="in-progress"></span>
+                                        <?php endif ?>
                                     </div>
-                                    <?php endif ?>
-                                    <?php endif ?>
-                                    <?php endforeach; ?>
-                                </div>
-                                <?php endif ?>
                                 <?php endforeach; ?>
+                                </div>
                             </div>
                         </div>
                     </div>

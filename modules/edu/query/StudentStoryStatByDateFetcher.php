@@ -11,7 +11,7 @@ class StudentStoryStatByDateFetcher
 {
     public function fetch(int $studentId, array $programStoryIds = null): array
     {
-        $subQuery = (new Query())
+/*        $subQuery = (new Query())
             ->select([
                 'storyId' => 'story_id',
                 'createdAt' => new Expression('MAX(created_at)'),
@@ -32,6 +32,22 @@ class StudentStoryStatByDateFetcher
 
         if ($programStoryIds !== null) {
             $query->andWhere(['in', 't.storyId', $programStoryIds]);
+        }
+
+        return $query->all();*/
+
+        $query = (new Query())
+            ->select([
+                'storyIds' => new Expression('GROUP_CONCAT(DISTINCT story_id)'),
+                'targetDate' => new Expression("DATE_FORMAT(FROM_UNIXTIME(created_at + (3 * 60 * 60)), '%Y-%m-%d')"),
+            ])
+            ->from('story_student_stat')
+            ->where(['student_id' => $studentId])
+            ->groupBy(['targetDate'])
+            ->orderBy(['targetDate' => SORT_DESC]);
+
+        if ($programStoryIds !== null) {
+            $query->andWhere(['in', 'story_id', $programStoryIds]);
         }
 
         return $query->all();
