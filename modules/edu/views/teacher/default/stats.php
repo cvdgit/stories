@@ -6,6 +6,7 @@ declare(strict_types=1);
  * @var View $this
  * @var EduClassBook $classBook
  * @var EduClassProgram $classProgram
+ * @var array $lastActivities
  */
 
 use modules\edu\models\EduClassBook;
@@ -32,71 +33,186 @@ $this->registerCss(<<<CSS
 .testing-item__progress {
 
 }
+.table-stat {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    width: 100%;
+}
+.left-col {
+    max-width: 384px;
+    width: 100%;
+    flex: 1 0 auto;
+}
+.right-col {
+    max-width: calc(100% - 384px);
+    width: 100%;
+    flex: 1 0 100%;
+    display: flex;
+    margin-bottom: -17px;
+    position: relative;
+    overflow-x: auto;
+}
+.table-head {
+    width: 100%;
+}
+.table-body {
+    width: 100%;
+}
+.table-cell {
+    height: 40px;
+    padding: 12px 8px;
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    position: relative;
+    z-index: 15;
+    background: white;
+    -webkit-transition: all 0.2s ease-in-out;
+    -moz-transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out;
+}
+.table-header-cell {
+    line-height: 14px;
+    word-wrap: normal;
+    white-space: normal;
+    padding: 11px 8px 8px;
+    font-weight: bold;
+    color: #000;
+    text-transform: none;
+    text-align: left;
+    font-size: 1.4rem;
+}
+.table-cell.size-1 {
+    width: 80px;
+}
+.table-cell.size-2 {
+    width: 160px;
+}
+.student-link {
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    transition: all ease .3s;
+    color: #99CD50;
+}
+.right-col-inner {
+    display: flex;
+    padding-bottom: 17px;
+    transition: transform .25s ease-in-out;
+}
+.topic-col {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: auto;
+    padding-right: 20px;
+    align-items: flex-start;
+}
+.topic-cell {
+    width: 100%;
+    max-width: 100%;
+    flex: 1 0 100%;
+    white-space: nowrap;
+}
+.content-lesson {
+    display: inline-block;
+    margin-right: 5px;
+    padding-top: 2px;
+    font-size: 13px;
+}
+.content-lesson span {
+    box-sizing: border-box;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    position: relative;
+    top: 2px;
+    margin: 0 0 0 0;
+}
+.content-lesson .not-started {
+    border: 2px #d3d3d3 solid;
+    background: transparent;
+}
+.content-lesson .in-progress {
+    border: 2px #6fc4e2 solid;
+    background: transparent;
+}
+.content-lesson .is-done {
+    background-color: #37ae68;
+}
 CSS
 );
 ?>
 <div class="container">
     <?= TeacherMenuWidget::widget() ?>
 
-    <h1 class="h2"><?= Html::a('<i class="glyphicon glyphicon-arrow-left back-arrow"></i>', ['/edu/teacher/default/index']) ?> <?= Html::encode($classProgram->program->name . ' / ' . $classBook->name) ?></h1>
+    <h1 class="h2" style="margin-bottom:40px">
+        <?= Html::a('<i class="glyphicon glyphicon-arrow-left back-arrow"></i>', ['/edu/teacher/default/index']) ?> <?= Html::encode($classBook->name . ' / ' . $classProgram->program->name) ?>
+    </h1>
 
-    <div id="edu-stats">
-
-        <?php if (count($classBook->students) === 0): ?>
-
-        <div>
-
-            <p class="lead">Нет данных.</p>
-
-        </div>
-
-        <?php else: ?>
-
-        <?php foreach ($classBook->students as $student): ?>
-
-        <div>
-
-            <h2 class="h3"><?= $student->name ?></h2>
-
-            <div>
-                <?php foreach ($classProgram->eduTopics as $topic): ?>
-                <div>
-
-                    <div>
-                        <?php foreach ($topic->eduLessons as $lesson): ?>
-                        <div>
-
-                            <h3 class="h4"><?= $topic->name . ' / ' . $lesson->name ?></h3>
-
-                            <table class="table table-sm table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>История</th>
-                                        <th>Прогресс</th>
-                                        <th>Тесты</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach($lesson->stories as $story): ?>
-                                    <tr>
-                                        <td><?= $story->title ?></td>
-                                        <td><?= ($progress = $story->findStudentStoryProgress($student->id)) !== null ? $progress->progress : 'Нет' ?></td>
-                                        <td><a class="show-testing" href="<?= Url::to(['/edu/teacher/default/story-testing', 'story_id' => $story->id, 'student_id' => $student->id]) ?>">Результаты</a></td>
-                                    </tr>
-                                    <?php endforeach ?>
-                                </tbody>
-                            </table>
-                        </div>
-                        <?php endforeach ?>
-                    </div>
+    <div style="margin-bottom: 100px">
+        <div class="table-stat">
+            <div class="left-col">
+                <div class="table-head">
+                    <div class="table-cell table-header-cell size-2">Ученик</div>
+                    <div class="table-cell table-header-cell size-1">Прогресс</div>
+                    <div class="table-cell table-header-cell size-1">Посл. активн.</div>
                 </div>
-                <?php endforeach ?>
+                <div class="table-body">
+                    <?php foreach ($classBook->students as $student): ?>
+                    <div class="table-cell size-2">
+                        <a href="#" class="student-link"><?= $student->name ?></a>
+                    </div>
+                    <div class="table-cell size-1"><?= $classProgram->getStudentProgress($student->id) ?>%</div>
+                    <div class="table-cell size-1"><?= $lastActivities[$student->id] ?? '-' ?></div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="right-col">
+                <div class="right-col-inner">
+                    <?php foreach ($classProgram->eduTopics as $topic): ?>
+                    <div class="topic-col">
+                        <div class="table-head">
+                            <div class="table-cell table-header-cell topic-cell"><?= $topic->name ?></div>
+                        </div>
+                        <div class="table-body">
+                        <?php foreach ($classBook->students as $student): ?>
+                            <div class="table-cell topic-cell">
+                                <div style="white-space: nowrap;">
+                                    <div style="display: inline-block; margin-right: 15px">
+                                    <?php foreach ($topic->eduLessons as $lesson): ?>
+                                        <div class="content-lesson">
+                                        <?php
+                                        $storiesCount = $lesson->getStoriesCount();
+                                        $finishedStoriesCount = $lesson->getStudentFinishedStoriesCount($student->id);
+                                        ?>
+                                        <?php if ($storiesCount === $finishedStoriesCount): ?>
+                                            <span class="is-done"></span>
+                                        <?php endif ?>
+                                        <?php if ($storiesCount > 0 && $finishedStoriesCount === 0): ?>
+                                            <span class="not-started"></span>
+                                        <?php endif ?>
+                                        <?php if ($finishedStoriesCount > 0 && $finishedStoriesCount < $storiesCount): ?>
+                                            <span class="in-progress"></span>
+                                        <?php endif ?>
+                                        </div>
+                                    <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
-
-        <?php endforeach ?>
-
-        <?php endif ?>
     </div>
 </div>
 

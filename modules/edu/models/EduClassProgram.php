@@ -141,4 +141,17 @@ class EduClassProgram extends ActiveRecord
             ->andWhere('progress = 100')
             ->count();
     }
+
+    public function getStudentProgress(int $studentId): int
+    {
+        $total = $this->getClassProgramStoriesCount();
+        if ($total === 0) {
+            return 0;
+        }
+        $finished = $this->getStudentFinishedStoriesCount($studentId);
+        if ($finished === 0) {
+            return 0;
+        }
+        return $finished * 100 / $total;
+    }
 }

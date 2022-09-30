@@ -9,6 +9,8 @@ use common\models\Story;
 use common\models\UserStudent;
 use modules\edu\models\EduClassBook;
 use modules\edu\models\EduClassProgram;
+use modules\edu\query\EduProgramStoriesFetcher;
+use modules\edu\query\StudentProgramLastActivityDateFetcher;
 use Yii;
 use yii\helpers\Url;
 use yii\web\Controller;
@@ -44,9 +46,14 @@ class DefaultController extends Controller
             throw new NotFoundHttpException('Программа не найдена');
         }
 
+        $studentIds = array_map(static function($student){ return $student->id; }, $classBook->students);
+        $storyIds = (new EduProgramStoriesFetcher())->fetch($classBook->class_id, $classProgram->id);
+        $lastActivities = (new StudentProgramLastActivityDateFetcher())->fetch($studentIds, array_keys($storyIds));
+
         return $this->render('stats', [
             'classBook' => $classBook,
             'classProgram' => $classProgram,
+            'lastActivities'  => $lastActivities,
         ]);
     }
 
