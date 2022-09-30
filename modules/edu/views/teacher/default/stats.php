@@ -167,7 +167,7 @@ CSS
                 <div class="table-body">
                     <?php foreach ($classBook->students as $student): ?>
                     <div class="table-cell size-2">
-                        <a href="#" class="student-link"><?= $student->name ?></a>
+                        <a href="<?= Url::to(['/edu/teacher/default/student-stats', 'id' => $student->id, 'class_program_id' => $classProgram->id]) ?>" class="student-link"><?= $student->name ?></a>
                     </div>
                     <div class="table-cell size-1"><?= $classProgram->getStudentProgress($student->id) ?>%</div>
                     <div class="table-cell size-1"><?= $lastActivities[$student->id] ?? '-' ?></div>

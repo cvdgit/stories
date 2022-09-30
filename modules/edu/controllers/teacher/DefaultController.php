@@ -11,6 +11,7 @@ use modules\edu\models\EduClassBook;
 use modules\edu\models\EduClassProgram;
 use modules\edu\query\EduProgramStoriesFetcher;
 use modules\edu\query\StudentProgramLastActivityDateFetcher;
+use modules\edu\query\StudentStoryStatByDateFetcher;
 use Yii;
 use yii\helpers\Url;
 use yii\web\Controller;
@@ -82,5 +83,85 @@ class DefaultController extends Controller
         }, $story->tests);
 
         return ['success' => true, 'data' => $testings];
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionStudentStats(int $id, int $class_program_id): string
+    {
+
+        if (($student = UserStudent::findOne($id)) === null) {
+            throw new NotFoundHttpException('Ученик не найден');
+        }
+
+        $classProgram = null;
+        if (($class_program_id !== null) && ($classProgram = EduClassProgram::findOne($class_program_id)) === null) {
+            throw new NotFoundHttpException('Ученик не найден');
+        }
+
+        $class = $student->class;
+        $classPrograms = $class->eduClassPrograms;
+
+        if ($classProgram === null && count($classPrograms) > 0) {
+            $classProgram = $classPrograms[0];
+        }
+
+        $stat = [];
+
+        $programStoriesData = (new EduProgramStoriesFetcher())->fetch($class->id, $classProgram->id);
+        $storyIds = array_column($programStoriesData, 'storyId');
+
+        $storyModels = Story::find()
+            ->where(['in', 'id', $storyIds])
+            ->indexBy('id')
+            ->all();
+
+        $statData = (new StudentStoryStatByDateFetcher())->fetch($student->id, $storyIds);
+
+        foreach ($statData as $statItem) {
+
+            $item = [
+                'date' => $statItem['targetDate'],
+                'topics' => [],
+            ];
+
+            $topics = [];
+            foreach (explode(',', $statItem['storyIds']) as $storyId) {
+
+                $storyData = $programStoriesData[$storyId];
+
+                if (!isset($topics[$storyData['topicId']])) {
+                    $topics[$storyData['topicId']] = [
+                        'topicId' => $storyData['topicId'],
+                        'topicName' => $storyData['topicName'],
+                        'lessons' => [],
+                    ];
+                }
+
+                $topicLessonIds = array_column($topics[$storyData['topicId']]['lessons'],'lessonId');
+                if (!in_array($storyData['lessonId'], $topicLessonIds, true)) {
+                    $lessonItem = [
+                        'lessonId' => $storyData['lessonId'],
+                        'lessonName' => $storyData['lessonName'],
+                        'stories' => [],
+                    ];
+                    $topics[$storyData['topicId']]['lessons'][$storyData['lessonId']] = $lessonItem;
+                }
+
+                $topics[$storyData['topicId']]['lessons'][$storyData['lessonId']]['stories'][] = $storyModels[$storyId];
+            }
+
+            $item['topics'] = $topics;
+
+            $stat[] = $item;
+        }
+
+        return $this->render('student_stats', [
+            'classProgram' => $classProgram,
+            'classPrograms' => $classPrograms,
+            'student' => $student,
+            'stat' => $stat,
+        ]);
     }
 }
