@@ -38,6 +38,60 @@ $this->registerCss(<<<CSS
         width: 1300px;
     }
 }
+.story-image {
+    width: 100%;
+    display: flex;
+    flex: 0 0 auto;
+    background-color: rgb(255, 255, 255);
+    height: 160px;
+    border-radius: 16px;
+    box-sizing: border-box;
+    background-size: 100% 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+    position: relative;
+    top: 0;
+    left: 0;
+}
+.edu-story-item.is-done .story-image {
+    border: 4px #99cd50 solid;
+}
+.edu-story-item.is-done .story-image .story-image__icon {
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-radius: 50%;
+    background-size: 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+    transform: translate(33%, -33%);
+    background-color: rgb(28, 198, 127);
+    z-index: 999;
+    background-image: url(/school/img/done_white.svg);
+}
+.edu-story-item.to-learn .story-image {
+    border: 4px #4574EE solid;
+}
+.edu-story-item.to-learn .story-image .story-image__icon {
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-radius: 50%;
+    background-size: 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+    transform: translate(33%, -33%);
+    background-color: rgb(128, 62, 241);
+    z-index: 999;
+    background-image: url(/school/img/play_white.svg);
+}
+.story-list .edu-story-item .story-item-image-overlay {
+    border-radius: 16px;
+}
 CSS
 );
 ?>

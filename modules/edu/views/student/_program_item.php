@@ -11,12 +11,21 @@ use yii\helpers\Url;
  * @var int $studentId
  */
 ?>
-<div class="col-sm-6 col-md-4">
-    <a href="<?= Url::to($model->createTopicRoute($classId)) ?>" class="thumbnail">
-        <div class="caption">
-            <h3><?= $model->program->name ?></h3>
-            <p>&nbsp;</p>
-            <p>Пройдено историй <?= $model->getStudentFinishedStoriesCount($studentId) ?> из <?= $model->getClassProgramStoriesCount() ?></p>
+<div class="col-sm-4 col-md-3">
+    <a href="<?= Url::to($model->createTopicRoute($classId)) ?>" class="thumbnail panel-wrap">
+        <div class="panel-img"></div>
+        <div class="panel-inner">
+            <div class="panel-header">
+                <span class="panel-header__text"><?= $model->program->name ?></span>
+            </div>
+        </div>
+        <div class="panel-progress">
+            <div class="progress-chart">
+                <?php if (($progress = $model->getStudentProgress($studentId)) > 0): ?>
+                <div><?= $progress ?> %</div>
+                <?php endif ?>
+            </div>
+            <div class="progress-text">Пройдено историй <?= $model->getStudentFinishedStoriesCount($studentId) ?> из <?= $model->getClassProgramStoriesCount() ?></div>
         </div>
     </a>
 </div>
