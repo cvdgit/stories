@@ -28,9 +28,17 @@ return [
         'cache' => [
             'class' => FileCache::class,
         ],
+        'cacheFrontend' => [
+            'class' => FileCache::class,
+            'cachePath' => Yii::getAlias('@frontend') . '/runtime/cache',
+        ],
+        'cacheBackend' => [
+            'class' => FileCache::class,
+            'cachePath' => Yii::getAlias('@backend') . '/runtime/cache',
+        ],
         'authManager' => [
             'class' => DbManager::class,
-            //'cache' => 'cache',
+            'cache' => 'cache',
         ],
         'formatter' => [
             'dateFormat' => 'dd.MM.yyyy',
