@@ -15,7 +15,6 @@ export default () => {
     config: {},
 
     init(deck) {
-
       this.deck = deck;
 
       const slidesConfig = new SlidesConfig();
@@ -54,6 +53,7 @@ export default () => {
           'dataUrl': '/question/get',
           'dataParams': {'testId': test_id},
           'forSlide': true,
+          'deck': deck,
           init: () => {
             return $.ajax({
               "url": this.config.initAction + '?testId=' + test_id + '&studentId=' + this.config.student_id,
@@ -64,7 +64,7 @@ export default () => {
           onInitialized: () => {
 
             test.addEventListener("finish", storyTestResults);
-            test.addEventListener("backToStory", this.backToStory);
+            test.addEventListener("backToStory", this.backToStory.bind(this));
 
             this.deck.sync();
             this.deck.slide(0);
@@ -76,11 +76,8 @@ export default () => {
       }
 
       $(".reveal > .slides").on("click", "button[data-test-id]", function() {
-
         action(this);
       });
-
-
 
       const initTesting = () => {
 

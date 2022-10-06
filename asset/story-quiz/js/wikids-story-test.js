@@ -408,8 +408,8 @@ function WikidsStoryTest(el, options) {
       .done(function (response) {
         load(response);
         if (that.options.forSlide) {
-          Reveal.sync();
-          Reveal.slide(0);
+          that.options.deck.sync();
+          that.options.deck.slide(0);
         }
       })
       .fail(function (response) {
