@@ -52,6 +52,8 @@ return [
         'story/<alias:[\w\-]+>/<list:\d+>' => 'story/view',
         'story/<alias:[\w\-]+>' => 'story/view',
 
+        '/edu/story/<id:\d+>' => 'edu/story/view',
+
         'success' => 'rate/success',
         'fail' => 'rate/fail',
         'file-avatar' => 'upload/file-avatar',

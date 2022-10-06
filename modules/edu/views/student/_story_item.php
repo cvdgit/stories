@@ -10,6 +10,7 @@ use yii\helpers\Url;
 /**
  * @var Story $model
  * @var int $studentId
+ * @var int $programId
  */
 
 $progress = $model->findStudentStoryProgress($studentId);
@@ -20,7 +21,7 @@ if ($progress && $progress->statusIsDone()) {
 ?>
 <div class="col-lg-3 col-md-4 col-sm-6">
     <div class="story-item edu-story-item <?= $status ?>">
-        <a class="run-story" href="<?= Url::toRoute(['/edu-story/view', 'id' => $model->id]) ?>" data-pjax="0">
+        <a class="run-story" href="<?= Url::toRoute(['/edu/story/view', 'id' => $model->id, 'program_id' => $programId]) ?>" data-pjax="0">
             <div class="story-item-image">
                 <?php $img = empty($model->cover) ? '/img/story-1.jpg' : StoryCover::getListThumbPath($model->cover); ?>
                 <div class="story-image" style="background-image: url(<?= $img ?>)">

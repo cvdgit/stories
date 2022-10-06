@@ -6,8 +6,11 @@ use common\models\User;
 use common\rbac\UserRoles;
 use Ramsey\Uuid\Uuid;
 use Yii;
+use yii\db\Query;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\Cookie;
+use yii\web\Request;
 use yii\web\Response;
 
 /**
@@ -110,5 +113,35 @@ class DefaultController extends Controller
             ->execute();
 
         return $this->redirect(['/edu/parent/index']);
+    }
+
+    public function actionGetNextStory(int $story_id, int $program_id, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+
+        $query = (new Query())
+            ->select([
+                'storyId' => 'els.story_id',
+            ])
+            ->from(['et' => 'edu_topic'])
+            ->innerJoin(['el' => 'edu_lesson'], 'et.id = el.topic_id')
+            ->innerJoin(['els' => 'edu_lesson_story'], 'el.id = els.lesson_id')
+            ->where(['et.class_program_id' => $program_id])
+            ->orderBy(['et.`order`' => SORT_ASC, 'el.`order`' => SORT_ASC, 'els.`order`' => SORT_ASC]);
+        $rows = $query->all();
+
+        $nextStoryId = null;
+        foreach ($rows as $i => $row) {
+
+            if ($story_id === (int) $row['storyId']) {
+                $nextIndex = $i + 1;
+                if (isset($rows[$nextIndex])) {
+                    $nextStoryId = $rows[$nextIndex]['storyId'];
+                    break;
+                }
+            }
+        }
+
+        return ['success' => true, 'url' => Url::to(['/edu/story/view', 'id' => $nextStoryId, 'program_id' => $program_id])];
     }
 }

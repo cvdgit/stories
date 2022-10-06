@@ -115,6 +115,7 @@ class StudentController extends Controller
             'dataProvider' => $dataProvider,
             'lesson' => $lesson,
             'currentTopicId' => $topic->id,
+            'programId' => $classProgram->program_id,
         ]);
     }
 }

@@ -22,6 +22,7 @@ use yii\widgets\Pjax;
  * @var View $this
  * @var EduLesson $lesson
  * @var int $currentTopicId
+ * @var int $programId
  */
 
 $this->title = $student->name;
@@ -120,7 +121,7 @@ CSS
                 'dataProvider' => $dataProvider,
                 'summary' => false,
                 'itemView' => '_story_item',
-                'viewParams' => ['studentId' => $student->id],
+                'viewParams' => ['studentId' => $student->id, 'programId' => $programId],
                 'itemOptions' => ['tag' => false],
                 'layout' => "{summary}\n<div class=\"story-list\"><div class=\"flex-row row\">{items}</div></div>\n{pager}",
             ]) ?>
@@ -140,7 +141,7 @@ CSS
 <?php
 $this->registerJs(<<<JS
 (function() {
-
+/*
 $('.story-list-wrap').on('click', '.run-story', function(e) {
     e.preventDefault();
     $('#run-story-modal')
@@ -163,7 +164,7 @@ $('#run-story-modal')
         $(this).find('.modal-content').html('');
 
         $.pjax.reload({container: '#pjax-stories', async: false});
-    });
+    });*/
 
 })();
 JS

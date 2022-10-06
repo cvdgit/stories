@@ -1,0 +1,14 @@
+.next-story {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.next-story__button {
+
+}
+.next-story__text {
+  margin: 50px 0;
+}

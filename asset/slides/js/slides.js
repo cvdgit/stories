@@ -12,6 +12,7 @@ import SlideLinksPlugin from "./plugins/slide_links/SlideLinksPlugin";
 import StatPlugin from "./plugins/stat/StatPlugin";
 import SlidesPlayer from "./SlidesPlayer";
 import Background from "./plugins/Background";
+import NextStory from "./plugins/NextStory";
 
 function onSlideMouseDown(e, player) {
 
@@ -84,7 +85,8 @@ window.initSlides = function() {
       ActionsPlugin,
       SlideLinksPlugin,
       StatPlugin,
-      Background
+      Background,
+      NextStory
     ]
   });
 
