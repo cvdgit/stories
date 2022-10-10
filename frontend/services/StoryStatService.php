@@ -59,8 +59,11 @@ class StoryStatService
         // все видимые слайды
         $numberOfSlides = (new Query())
             ->from('{{%story_slide}}')
-            ->where(['story_id' => $storyId])
-            ->andWhere(['status' => StorySlide::STATUS_VISIBLE])
+            ->where([
+                'story_id' => $storyId,
+                'status' => StorySlide::STATUS_VISIBLE,
+                'kind' => StorySlide::KIND_SLIDE,
+            ])
             ->count('id');
 
         $numberOfSlides--; // отнять последний слайд - Конец
