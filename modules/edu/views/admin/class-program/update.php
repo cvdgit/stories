@@ -39,6 +39,7 @@ $this->title = 'Программа обучения';
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <div class="btn-group">
                         <?= Html::a('Добавить тему', ['/edu/admin/topic/create', 'class_program_id' => $model->id], ['class' => 'btn btn-primary btn-sm']) ?>
+                        <button id="save-grid-order" type="button" class="btn btn-primary btn-sm">Сохранить порядок</button>
                     </div>
                 </div>
             </div>
@@ -50,8 +51,16 @@ $this->title = 'Программа обучения';
                         'summary' => false,
                         'columns' => [
                             [
+                                'attribute' => 'order',
+                                'label' => '',
+                            ],
+                            [
                                 'attribute' => 'name',
                                 'enableSorting' => false,
+                                'format' => 'raw',
+                                'value' => static function($model) {
+                                    return Html::a($model->name, ['/edu/admin/topic/update', 'id' => $model->id]);
+                                }
                             ],
                             [
                                 'attribute' => 'lessonsCount',

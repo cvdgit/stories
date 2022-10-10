@@ -59,32 +59,31 @@ class OrderColumn extends DataColumn
         $this->grid->getView()->registerJs(<<<JS
 window.gridOrderColumn = window['gridOrderColumn'] || (function() {
 
-    let moveTimeout;
+    if ($('#save-grid-order').length) {
+        $('#save-grid-order').on('click', (e) => {
+            e.preventDefault();
+            saveOrder(grid);
+        });
+    }
+
     function saveOrder(grid) {
 
-      if (moveTimeout) {
-        clearTimeout(moveTimeout);
-      }
+        const rows = grid.find('tbody tr:visible').map((index, elem) => {
+            return parseInt($(elem).attr('data-key'));
+        }).get();
 
-      moveTimeout = setTimeout(() => {
-
-          const rows = grid.find('tbody tr:visible').map((index, elem) => {
-              return parseInt($(elem).attr('data-key'));
-          }).get();
-
-         $.post({
+        $.post({
             'url': '$action',
             'dataType': 'json',
             'data': {'$attr': rows},
             'cache': 'no-cache'
-         })
-             .done((response) => {
+        })
+            .done((response) => {
                  if (response && response.success) {
                      toastr.success('Порядок успешно сохранен');
+                     location.reload();
                  }
-             });
-
-      }, 1500);
+            });
     }
 
     const grid = $('$container');
@@ -97,7 +96,6 @@ window.gridOrderColumn = window['gridOrderColumn'] || (function() {
             const sibling = elem.prev();
             if (sibling) {
                 elem.insertBefore(sibling);
-                saveOrder(grid);
             }
         })
         .on('click', '.move-down', function(e) {
@@ -107,7 +105,6 @@ window.gridOrderColumn = window['gridOrderColumn'] || (function() {
             const sibling = elem.next();
             if (sibling) {
                 elem.insertAfter(sibling);
-                saveOrder(grid);
             }
         });
 

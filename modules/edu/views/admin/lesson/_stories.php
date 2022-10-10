@@ -8,6 +8,7 @@ use modules\edu\models\EduLesson;
 use yii\data\DataProviderInterface;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
+use yii\grid\SerialColumn;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\web\View;
@@ -25,6 +26,7 @@ use yii\widgets\Pjax;
         <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group">
                 <?= Html::a('Добавить историю', ['select-story', 'lesson_id' => $lessonModel->id], ['data-toggle' => 'modal', 'data-target' => '#select-story-modal', 'class' => 'btn btn-primary btn-sm']) ?>
+                <button id="save-grid-order" type="button" class="btn btn-primary btn-sm">Сохранить порядок</button>
             </div>
         </div>
     </div>
@@ -34,7 +36,11 @@ use yii\widgets\Pjax;
         <?= GridView::widget([
             'dataProvider' => $storiesDataProvider,
             'summary' => false,
+            'options' => ['class' => 'table-responsive'],
             'columns' => [
+                [
+                    'class' => SerialColumn::class,
+                ],
                 'title',
                 [
                     'class' => OrderColumn::class,

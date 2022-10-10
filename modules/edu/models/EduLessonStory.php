@@ -3,6 +3,7 @@
 namespace modules\edu\models;
 
 use Yii;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "edu_lesson_story".
@@ -12,7 +13,7 @@ use Yii;
  * @property int $order
  *
  * @property EduLesson $lesson
- * @property Story $story
+ * @property EduStory $story
  */
 class EduLessonStory extends \yii\db\ActiveRecord
 {
@@ -33,8 +34,8 @@ class EduLessonStory extends \yii\db\ActiveRecord
             [['lesson_id', 'story_id'], 'required'],
             [['lesson_id', 'story_id', 'order'], 'integer'],
             [['lesson_id', 'story_id'], 'unique', 'targetAttribute' => ['lesson_id', 'story_id']],
-            [['lesson_id'], 'exist', 'skipOnError' => true, 'targetClass' => EduLesson::className(), 'targetAttribute' => ['lesson_id' => 'id']],
-            [['story_id'], 'exist', 'skipOnError' => true, 'targetClass' => Story::className(), 'targetAttribute' => ['story_id' => 'id']],
+            [['lesson_id'], 'exist', 'skipOnError' => true, 'targetClass' => EduLesson::class, 'targetAttribute' => ['lesson_id' => 'id']],
+            [['story_id'], 'exist', 'skipOnError' => true, 'targetClass' => EduStory::class, 'targetAttribute' => ['story_id' => 'id']],
         ];
     }
 
@@ -50,23 +51,13 @@ class EduLessonStory extends \yii\db\ActiveRecord
         ];
     }
 
-    /**
-     * Gets query for [[Lesson]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getLesson()
+    public function getLesson(): ActiveQuery
     {
-        return $this->hasOne(EduLesson::className(), ['id' => 'lesson_id']);
+        return $this->hasOne(EduLesson::class, ['id' => 'lesson_id']);
     }
 
-    /**
-     * Gets query for [[Story]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStory()
+    public function getStory(): ActiveQuery
     {
-        return $this->hasOne(Story::className(), ['id' => 'story_id']);
+        return $this->hasOne(EduStory::class, ['id' => 'story_id']);
     }
 }

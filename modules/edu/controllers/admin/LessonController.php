@@ -10,6 +10,7 @@ use modules\edu\models\EduTopic;
 use modules\edu\services\LessonService;
 use Yii;
 use yii\data\ActiveDataProvider;
+use yii\db\Query;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -60,8 +61,14 @@ class LessonController extends Controller
             'topic_id' => $topic_id,
         ]);
 
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
+        if ($this->request->isPost && $model->load($this->request->post())) {
+
+            $model->order = (new Query())
+                    ->from('edu_lesson')
+                    ->where(['topic_id' => $topic_id])
+                    ->max('`order`') + 1;
+
+            if ($model->save()) {
                 return $this->redirect(['update', 'id' => $model->id]);
             }
         } else {

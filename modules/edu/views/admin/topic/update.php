@@ -48,6 +48,7 @@ $this->params['breadcrumbs'] = [
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <div class="btn-group">
                         <?= Html::a('Создать урок', ['/edu/admin/lesson/create', 'topic_id' => $topicModel->id], ['class' => 'btn btn-sm btn-primary']) ?>
+                        <button id="save-grid-order" type="button" class="btn btn-primary btn-sm">Сохранить порядок</button>
                     </div>
                 </div>
             </div>
@@ -62,8 +63,16 @@ $this->params['breadcrumbs'] = [
                         'options' => ['class' => 'table-responsive'],
                         'columns' => [
                             [
+                                'attribute' => 'order',
+                                'label' => '',
+                            ],
+                            [
                                 'attribute' => 'name',
                                 'enableSorting' => false,
+                                'format' => 'raw',
+                                'value' => static function($model) {
+                                    return Html::a($model->name, ['/edu/admin/lesson/update', 'id' => $model->id]);
+                                }
                             ],
                             [
                                 'attribute' => 'storiesCount',

@@ -10,6 +10,7 @@ use modules\edu\models\EduTopicSearch;
 use modules\edu\services\TopicService;
 use Yii;
 use yii\data\ActiveDataProvider;
+use yii\db\Query;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -76,8 +77,14 @@ class TopicController extends Controller
             'class_program_id' => $class_program_id,
         ]);
 
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
+        if ($this->request->isPost && $model->load($this->request->post())) {
+
+            $model->order = (new Query())
+                    ->from('edu_topic')
+                    ->where(['class_program_id' => $class_program_id])
+                    ->max('`order`') + 1;
+
+            if ($model->save()) {
                 return $this->redirect(['update', 'id' => $model->id]);
             }
         } else {

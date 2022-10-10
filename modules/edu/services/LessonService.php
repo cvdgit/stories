@@ -8,7 +8,9 @@ use DomainException;
 use modules\edu\forms\admin\LessonStoryOrderForm;
 use modules\edu\forms\admin\SelectStoryForm;
 use modules\edu\models\EduLesson;
+use modules\edu\models\EduLessonStory;
 use Yii;
+use yii\db\Query;
 
 class LessonService
 {
@@ -26,10 +28,14 @@ class LessonService
             throw ModelDomainException::create($form);
         }
 
-        $lessonModel->addStory($form->story_id);
-        if (!$lessonModel->save()) {
-            throw ModelDomainException::create($lessonModel);
-        }
+        Yii::$app->db->createCommand()->insert('edu_lesson_story', [
+            'lesson_id' => $lessonModel->id,
+            'story_id' => $form->story_id,
+            'order' => (new Query())
+                ->from('edu_lesson_story')
+                ->where(['lesson_id' => $lessonModel->id])
+                ->max('`order`') + 1,
+        ])->execute();
     }
 
     public function saveOrder(int $lessonId, LessonStoryOrderForm $form): void

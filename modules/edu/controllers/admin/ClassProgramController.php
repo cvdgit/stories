@@ -100,6 +100,7 @@ class ClassProgramController extends Controller
 
         $topicsDataProvider = new ActiveDataProvider([
             'query' => $model->getEduTopics(),
+            'pagination' => false,
         ]);
 
         return $this->render('update', [

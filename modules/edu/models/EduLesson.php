@@ -101,13 +101,11 @@ class EduLesson extends ActiveRecord
             ->orderBy(['edu_lesson_story.order' => SORT_ASC]);
     }
 
-    public function addStory(int $storyId): void
+    public function addStory(EduLessonStory $lessonStory): void
     {
-        $this->stories = array_unique(array_merge(
-            array_map(static function($story) {
-                return $story->id;
-            }, $this->stories),
-            [$storyId]));
+        $stories = $this->stories;
+        $stories[] = $lessonStory;
+        $this->stories = $stories;
     }
 
     public function getStoriesCount(): int
