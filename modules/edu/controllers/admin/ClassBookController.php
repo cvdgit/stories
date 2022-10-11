@@ -4,14 +4,20 @@ declare(strict_types=1);
 
 namespace modules\edu\controllers\admin;
 
+use common\models\Story;
 use common\models\UserStudent;
 use common\rbac\UserRoles;
 use Exception;
 use modules\edu\models\EduClassBook;
+use modules\edu\models\EduClassProgram;
+use modules\edu\query\EduProgramStoriesFetcher;
+use modules\edu\query\StudentStatsFetcher;
+use modules\edu\query\StudentStoryStatByDateFetcher;
 use modules\edu\services\ClassBookService;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
+use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -101,5 +107,68 @@ class ClassBookController extends Controller
         }
 
         return $this->redirect(['view', 'id' => $classBook->id]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     * @throws BadRequestHttpException
+     */
+    public function actionStat(int $class_book_id, int $student_id, int $class_program_id = null)
+    {
+        if (($classBook = EduClassBook::findOne($class_book_id)) === null) {
+            throw new NotFoundHttpException('Класс не найден');
+        }
+
+        if (($student = UserStudent::findOne($student_id)) === null) {
+            throw new NotFoundHttpException('Ученик не найден');
+        }
+
+        $classPrograms = $classBook->classPrograms;
+        if (count($classPrograms) === 0) {
+            throw new BadRequestHttpException('Не удалось определить предметы для класса');
+        }
+
+        $currentClassProgram = null;
+        if ($class_program_id !== null && count($classPrograms) > 1) {
+            $currentClassProgram = $classBook->getClassPrograms()
+                ->andWhere(['class_program_id' => $class_program_id])
+                ->one();
+        }
+        else {
+            $currentClassProgram = $classPrograms[0];
+        }
+        if ($currentClassProgram === null) {
+            throw new NotFoundHttpException('Программа не найдена');
+        }
+
+        $classProgramItems = array_map(static function(EduClassProgram $program) use ($student, $classBook, $currentClassProgram) {
+            return [
+                'label' => $program->program->name,
+                'url' => [
+                    '/edu/admin/class-book/stat',
+                    'student_id' => $student->id,
+                    'class_book_id' => $classBook->id,
+                    'class_program_id' => $program->id,
+                ],
+                'active' => $currentClassProgram && $currentClassProgram->id === $program->id,
+            ];
+        }, $classPrograms);
+
+        $programStoriesData = (new EduProgramStoriesFetcher())->fetch($classBook->id, $currentClassProgram->id);
+        $storyIds = array_column($programStoriesData, 'storyId');
+        $storyModels = Story::find()
+            ->where(['in', 'id', $storyIds])
+            ->indexBy('id')
+            ->all();
+        $statData = (new StudentStoryStatByDateFetcher())->fetch($student->id, $storyIds);
+
+        $stat = (new StudentStatsFetcher())->fetch($statData, $programStoriesData, $storyModels);
+
+        return $this->render('stat', [
+            'student' => $student,
+            'classProgram' => $currentClassProgram,
+            'classProgramItems' => $classProgramItems,
+            'stat' => $stat,
+        ]);
     }
 }

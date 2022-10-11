@@ -29,7 +29,13 @@ $this->title = 'Класс';
         'dataProvider' => $dataProvider,
         'summary' => false,
         'columns' => [
-            'name',
+            [
+                'attribute' => 'name',
+                'format' => 'raw',
+                'value' => static function($model) use ($classBook) {
+                    return Html::a($model->name, ['/edu/admin/class-book/stat', 'student_id' => $model->id, 'class_book_id' => $classBook->id]);
+                },
+            ],
             [
                 'attribute' => 'studentLogin.username',
                 'label' => 'Логин',
@@ -44,7 +50,7 @@ $this->title = 'Класс';
                     return Html::a($model->user->profileName, '#');
                 }
             ],
-            [
+/*            [
                 'format' => 'raw',
                 'value' => static function($model) use ($classBook) {
                     return Html::a(
@@ -53,7 +59,7 @@ $this->title = 'Класс';
                         ['onclick' => "return confirm('Создать пользователя?')"]
                     );
                 }
-            ],
+            ],*/
         ],
     ]) ?>
 </div>
