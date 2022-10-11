@@ -154,7 +154,8 @@ class ClassBookController extends Controller
             ];
         }, $classPrograms);
 
-        $programStoriesData = (new EduProgramStoriesFetcher())->fetch($classBook->id, $currentClassProgram->id);
+        $programStoriesData = (new EduProgramStoriesFetcher())->fetch($classBook->class_id, $currentClassProgram->id);
+
         $storyIds = array_column($programStoriesData, 'storyId');
         $storyModels = Story::find()
             ->where(['in', 'id', $storyIds])
