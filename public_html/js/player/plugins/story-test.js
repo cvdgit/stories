@@ -39,6 +39,7 @@ var TestSlide = (function() {
             'dataUrl': '/question/get',
             'dataParams': {'testId': test_id},
             'forSlide': true,
+            'deck': Reveal,
             init: function() {
               return $.ajax({
                 "url": config.initAction + '?testId=' + test_id,
