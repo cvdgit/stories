@@ -5,7 +5,6 @@ namespace backend\controllers;
 use backend\models\ChangePasswordForm;
 use backend\models\user\SelectUserForm;
 use backend\models\UserCreateForm;
-use backend\models\UserQuestionHistorySearch;
 use backend\models\UserSearch;
 use backend\models\UserUpdateForm;
 use common\models\SubscriptionForm;
@@ -96,10 +95,7 @@ class UserController extends Controller
 
         $paymentSearch = new PaymentSearch();
         $dataProvider = $paymentSearch->search(Yii::$app->request->queryParams, $user->id);
-
         $searchModel = new UserStorySearch($user->id);
-        $questionHistorySearchModel = new UserQuestionHistorySearch($user->getStudentID());
-
         $userStudentsDataProvider = new ActiveDataProvider([
             'query' => $user->getStudents()->orderBy(['created_at' => SORT_ASC]),
         ]);
@@ -108,7 +104,6 @@ class UserController extends Controller
             'model' => $form,
             'dataProvider' => $dataProvider,
             'historyDataProvider' => $searchModel->search(Yii::$app->request->queryParams),
-            'questionHistoryDataProvider' => $questionHistorySearchModel->search(Yii::$app->request->queryParams),
             'userStudentsDataProvider' => $userStudentsDataProvider,
         ]);
     }

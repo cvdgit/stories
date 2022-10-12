@@ -1,8 +1,16 @@
 <?php
+
+declare(strict_types=1);
+
+use yii\data\DataProviderInterface;
 use yii\grid\GridView;
 use yii\helpers\Html;
-/** @var $this yii\web\View */
-/** @var $dataProvider yii\data\ActiveDataProvider  */
+use yii\web\View;
+
+/**
+ * @var View $this
+ * @var DataProviderInterface $dataProvider
+ */
 ?>
 <div class="row">
     <div class="col-lg-12">
@@ -13,7 +21,7 @@ use yii\helpers\Html;
                 [
                     'format' => 'raw',
                     'attribute' => 'name',
-                    'value' => function($model) {
+                    'value' => static function($model) {
                         return Html::a($model->name, ['history/view', 'id' => $model->id]);
                     }
                 ],

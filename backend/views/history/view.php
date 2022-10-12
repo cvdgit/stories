@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use common\models\UserStudent;
 use yii\helpers\Html;
 
@@ -26,22 +28,25 @@ CSS
 
         <table class="table table-bordered table-sm table-hover table-striped">
             <thead>
-                <th>Тест</th>
-                <th></th>
+                <tr>
+                    <th>Тест</th>
+                    <th>Дата последнего действия</th>
+                    <th></th>
+                </tr>
             </thead>
             <tbody>
 
             <?php if (!empty($rows)): ?>
                 <?php foreach ($rows as $row): ?>
-
                 <tr>
                     <td><?= Html::a($row['test_name'], ['detail', 'student_id' => $student->id, 'test_id' => $row['test_id']]) ?></td>
+                    <td><?= Yii::$app->formatter->asDatetime($row['max_date']) ?></td>
                     <td><?= Html::a('Очистить историю', ['history/clear', 'student_id' => $student->id, 'test_id' => $row['test_id']], ['class' => 'btn btn-danger']) ?></td>
                 </tr>
                 <?php endforeach ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="2">Нет данных</td>
+                    <td colspan="3">Нет данных</td>
                 </tr>
             <?php endif ?>
 

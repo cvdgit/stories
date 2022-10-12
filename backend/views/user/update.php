@@ -1,12 +1,22 @@
 <?php
+
+declare(strict_types=1);
+
+use backend\models\UserUpdateForm;
 use yii\bootstrap\Tabs;
+use yii\data\DataProviderInterface;
 use yii\helpers\Html;
-/** @var $this yii\web\View */
-/** @var $model common\models\User */
-/** @var $dataProvider yii\data\ActiveDataProvider */
-/** @var $historyDataProvider yii\data\ActiveDataProvider */
-/** @var $questionHistoryDataProvider yii\data\ActiveDataProvider */
-$this->title = 'Пользователь: ' . $model->username;
+use yii\web\View;
+
+/**
+ * @var View $this
+ * @var UserUpdateForm $model
+ * @var DataProviderInterface $dataProvider
+ * @var DataProviderInterface $historyDataProvider
+ * @var DataProviderInterface $userStudentsDataProvider
+ */
+
+$this->title = 'Пользователь: ' . $model->getFio();
 $this->params['sidebarMenuItems'] = [
 	['label' => $model->username, 'url' => ['/user/update', 'id' => $model->id]],
 ];

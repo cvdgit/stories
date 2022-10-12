@@ -32,12 +32,16 @@ class TestingHistory
                 'test_id' => 't.test_id',
                 'test_name' => 't2.title',
                 'items_count' => 'COUNT(t.id)',
+                'max_date' => 'MAX(t.created_at)',
             ])
             ->from(['t' => 'user_question_history'])
             ->innerJoin(['t2' => 'story_test'], 't.test_id = t2.id')
             ->where(['t.student_id' => $studentId])
             ->groupBy('t.test_id')
-            ->orderBy(['t2.title' => SORT_ASC]);
+            ->orderBy([
+                'max_date' => SORT_DESC,
+                't2.title' => SORT_ASC,
+            ]);
         return $query->all();
     }
 
@@ -49,6 +53,7 @@ class TestingHistory
                 'correct' => 'question_history.correct_answer',
                 'user_answers' => "GROUP_CONCAT(answers.answer_entity_name SEPARATOR ', ')",
                 'question_created' => 'question_history.created_at',
+                'question_date' => 'question_history.created_at',
             ])
             ->from(['t' => 'story_test'])
             ->innerJoin(['question_history' => 'user_question_history'], 'question_history.test_id = t.id')

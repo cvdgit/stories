@@ -31,6 +31,7 @@ CSS
             <thead>
                 <tr>
                     <th>ИД вопроса</th>
+                    <th>Дата</th>
                     <th>Вопрос</th>
                     <th>Ответ пользователя</th>
                     <th>Кол-во звезд</th>
@@ -40,6 +41,7 @@ CSS
             <?php foreach ($detail as $row): ?>
                 <tr>
                     <td><?= $row['question_id'] ?></td>
+                    <td><?= Yii::$app->formatter->asDatetime($row['question_date']) ?></td>
                     <td><?= $row['entity_name'] ?></td>
                     <td><?= $row['answer_entity_name'] ?></td>
                     <td><?= $row['stars'] ?></td>

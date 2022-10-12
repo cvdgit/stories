@@ -320,7 +320,8 @@ class UserQuestionHistoryModel extends Model
                 'tbl.questionID AS question_id',
                 'tbl2.entity_name AS entity_name',
                 '(SELECT t3.answer_entity_name FROM user_question_answer t3 WHERE t3.question_history_id = tbl.questionID AND t3.answer_entity_id = tbl.answerEntityID) AS answer_entity_name',
-                'tbl2.stars AS stars'
+                'tbl2.stars AS stars',
+                'tbl2.created_at AS question_date',
             ])
             ->from(['tbl' => $query])
             ->innerJoin(['tbl2' => UserQuestionHistory::tableName()], 'tbl2.id = tbl.questionID')

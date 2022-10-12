@@ -1,8 +1,8 @@
 <?php
 
+declare(strict_types=1);
 
 namespace backend\models;
-
 
 use common\models\User;
 use Yii;
@@ -11,7 +11,6 @@ use yii\helpers\ArrayHelper;
 
 class UserUpdateForm extends Model
 {
-
     public $id;
     public $username;
     public $email;
@@ -59,4 +58,8 @@ class UserUpdateForm extends Model
         return ArrayHelper::map(Yii::$app->authManager->getRoles(), 'name', 'description');
     }
 
+    public function getFio(): string
+    {
+        return $this->_user->getProfileName();
+    }
 }
