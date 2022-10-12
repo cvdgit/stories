@@ -1,6 +1,7 @@
 <?php
 
 use yii\grid\GridView;
+use yii\widgets\Pjax;
 
 /** @var $this yii\web\View */
 /** @var $model common\models\User */
@@ -9,6 +10,7 @@ use yii\grid\GridView;
 ?>
 <div class="row">
     <div class="col-lg-12">
+        <?php Pjax::begin(['id' => 'pjax-story-history']); ?>
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'columns' => [
@@ -27,5 +29,6 @@ use yii\grid\GridView;
                 ],
             ],
         ]) ?>
+        <?php Pjax::end() ?>
     </div>
 </div>
