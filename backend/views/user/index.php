@@ -19,7 +19,13 @@ $this->title = 'Пользователи';
     'options' => ['class' => 'table-responsive'],
     'columns' => [
         'id',
-        'fio',
+        [
+            'attribute' => 'fio',
+            'format' => 'raw',
+            'value' => static function($model) {
+                return Html::a($model->fio, ['/user/update', 'id' => $model->id]);
+            }
+        ],
         'email:email',
         'last_activity:datetime',
         'created_at:datetime',
