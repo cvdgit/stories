@@ -19,6 +19,7 @@ $this->title = 'Пользователи';
     'options' => ['class' => 'table-responsive'],
     'columns' => [
         'id',
+        'fio',
         'email:email',
         'last_activity:datetime',
         'created_at:datetime',
@@ -29,11 +30,7 @@ $this->title = 'Пользователи';
             },
             'filter' => UserHelper::getStatusArray(),
         ],
-        [
-            'attribute' => 'active_payment',
-            'value' => 'activePayment.rate.title',
-        ],
-        'auth.source',
+        'source',
         [
             'attribute' => 'role',
             'label' => 'Роль',

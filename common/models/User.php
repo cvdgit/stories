@@ -49,6 +49,12 @@ class User extends ActiveRecord implements IdentityInterface
 
     public $active_payment;
 
+    /** @var string */
+    public $fio;
+
+    /** @var string */
+    public $source;
+
     private $roleManager;
 
     public function __construct($config = [])
@@ -84,6 +90,8 @@ class User extends ActiveRecord implements IdentityInterface
             'status' => 'Статус',
             'active_payment' => 'Подписка',
             'last_activity' => 'Последняя активность',
+            'fio' => 'ФИО',
+            'source' => 'Источник',
         ];
     }
 
