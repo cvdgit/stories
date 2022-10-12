@@ -28,7 +28,7 @@ class UserSearch extends Model
         $query = User::find()
             ->select([
                 'user.*',
-                'fio' => "CONCAT(profile.last_name, ' ', profile.first_name)",
+                'fio' => "COALESCE(CONCAT(profile.last_name, ' ', profile.first_name), user.username)",
                 'source' => 'auth.source',
             ])
             ->leftJoin('auth', 'auth.user_id = user.id')
@@ -43,8 +43,8 @@ class UserSearch extends Model
                 'attributes' => [
                     'id',
                     'fio' => [
-                        'asc' => ["CONCAT(profile.last_name, ' ', profile.first_name)" => SORT_ASC],
-                        'desc' => ["CONCAT(profile.last_name, ' ', profile.first_name)" => SORT_DESC],
+                        'asc' => ["COALESCE(CONCAT(profile.last_name, ' ', profile.first_name), user.username)" => SORT_ASC],
+                        'desc' => ["COALESCE(CONCAT(profile.last_name, ' ', profile.first_name), user.username)" => SORT_DESC],
                     ],
                     'email',
                     'last_activity',
@@ -60,11 +60,7 @@ class UserSearch extends Model
             return $dataProvider;
         }
 
-        $query->andFilterWhere([
-            'or',
-            ['like', 'profile.first_name', $this->fio],
-            ['like', 'profile.last_name', $this->fio],
-        ]);
+        $query->andFilterWhere(['like', "COALESCE(CONCAT(profile.last_name, ' ', profile.first_name), user.username)", $this->fio]);
         $query->andFilterWhere(['like', 'email', $this->email]);
         $query->andFilterWhere([
             'status' => $this->status,
