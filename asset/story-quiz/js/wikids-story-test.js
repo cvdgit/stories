@@ -1874,7 +1874,7 @@ function WikidsStoryTest(el, options) {
   }
 
   function isShuffleAnswers(q) {
-    return testConfig.sourceIsNeo() && getQuestionView(currentQuestion) !== 'svg' || (
+    return testConfig.sourceIsNeo() && getQuestionView(currentQuestion) !== 'svg' && getQuestionView(currentQuestion) !== 'region' || (
       testConfig.sourceIsLocal()
       && parseInt(q.mix_answers) === 1
       && !testConfig.answerTypeIsNumPad(q)
