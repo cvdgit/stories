@@ -13,6 +13,7 @@ import StatPlugin from "./plugins/stat/StatPlugin";
 import SlidesPlayer from "./SlidesPlayer";
 import Background from "./plugins/Background";
 import NextStory from "./plugins/NextStory";
+import isMobile from "./is_mobile";
 
 function onSlideMouseDown(e, player) {
 
@@ -94,8 +95,10 @@ window.initSlides = function() {
 
   deck.on('ready', function() {
 
-    deck.on("mousedown", (e) => onSlideMouseDown(e, slidesPlayer));
-    deck.on("contextmenu", (e) => e.preventDefault());
+    if (!isMobile()) {
+      deck.on("mousedown", (e) => onSlideMouseDown(e, slidesPlayer));
+      deck.on("contextmenu", (e) => e.preventDefault());
+    }
   })
 
   return deck;

@@ -17,6 +17,7 @@ $this->registerCss(<<<CSS
     border-radius: 16px;
     box-shadow: rgb(57 78 127 / 20%) 0 4px 8px;
     transition: transform 125ms ease-in-out 0s, box-shadow 125ms ease-in-out 0s;
+    margin-bottom: 20px;
 }
 .topic-list-item {
     border: 0 none;
