@@ -1874,7 +1874,7 @@ function WikidsStoryTest(el, options) {
   }
 
   function isShuffleAnswers(q) {
-    return testConfig.sourceIsNeo() && getQuestionView(currentQuestion) !== 'svg' && getQuestionView(currentQuestion) !== 'region' || (
+    return testConfig.sourceIsNeo() && getQuestionView(currentQuestion) !== 'svg' || (
       testConfig.sourceIsLocal()
       && parseInt(q.mix_answers) === 1
       && !testConfig.answerTypeIsNumPad(q)
@@ -1929,7 +1929,7 @@ function WikidsStoryTest(el, options) {
 
     dom.questions.fadeIn();
 
-    if (isShuffleAnswers(currentQuestion) && !questionViewSequence(currentQuestion) && !questionViewPassTest(currentQuestion) && !questionViewDragWords(currentQuestion)) {
+    if (isShuffleAnswers(currentQuestion) && !questionViewRegion(currentQuestion) && !questionViewSequence(currentQuestion) && !questionViewPassTest(currentQuestion) && !questionViewDragWords(currentQuestion)) {
       $('.wikids-test-answers', currentQuestionElement)
         .empty()
         .append(createAnswers(getAnswersData(currentQuestion), currentQuestion)
