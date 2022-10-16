@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace modules\edu\controllers;
 
 use common\rbac\UserRoles;
-use modules\edu\models\EduProgram;
+use modules\edu\models\EduClassProgram;
 use modules\edu\models\EduStory;
 use yii\db\Query;
 use yii\filters\AccessControl;
@@ -41,7 +41,7 @@ class StoryController extends Controller
         if (($story = EduStory::findOne($id)) === null) {
             throw new NotFoundHttpException('История не найдена');
         }
-        if (($program = EduProgram::findOne($program_id)) === null) {
+        if (($program = EduClassProgram::findOne($program_id)) === null) {
             throw new NotFoundHttpException('Программа не найдена');
         }
 
