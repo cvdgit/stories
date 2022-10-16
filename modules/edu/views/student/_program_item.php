@@ -16,7 +16,7 @@ use yii\helpers\Url;
         <div class="panel-img"></div>
         <div class="panel-inner">
             <div class="panel-header">
-                <span class="panel-header__text"><?= $model->program->name . '('. $model->id . ')' ?></span>
+                <span class="panel-header__text"><?= $model->program->name ?></span>
             </div>
         </div>
         <div class="panel-progress">
