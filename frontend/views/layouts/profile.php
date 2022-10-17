@@ -1,3 +1,15 @@
+<?php
+
+declare(strict_types=1);
+
+use yii\web\View;
+use yii\widgets\Menu;
+
+/**
+ * @var View $this
+ * @var string $content
+ */
+?>
 <?php $this->beginContent('@frontend/views/layouts/main.php') ?>
 <div class="container">
     <div class="row">
@@ -8,18 +20,18 @@
                     <div class="cst-image-div" id="image-preview" style="background-image: url('/img/no_avatar.png')"></div>
                 </div>
             </div-->
-            <?= \yii\widgets\Menu::widget([
+            <?= Menu::widget([
                 'items' => [
                     [
                         'label' => '<i class="glyphicon glyphicon-cog"></i> Основная информация',
                         'url' => ['/profile'],
                         'active' => Yii::$app->controller->id === 'profile',
                     ],
-                    [
+/*                    [
                         'label' => '<i class="glyphicon glyphicon-user"></i> Ученики',
                         'url' => ['/student/index'],
                         'active' => Yii::$app->controller->id === 'student',
-                    ],
+                    ],*/
                     [
                         'label' => '<i class="glyphicon glyphicon-education"></i> История обучения',
                         'url' => ['/training'],
@@ -31,12 +43,12 @@
                             ],
                         ],
                     ],
-                    [
+/*                    [
                         'label' => '<i class="glyphicon glyphicon-education"></i> Задания',
                         'url' => ['/study/index'],
                         'active' => Yii::$app->controller->id === 'study',
                         'visible' => Yii::$app->user->can('student'),
-                    ],
+                    ],*/
                     /*[
                         'label' => '<i class="glyphicon glyphicon-ruble"></i> Подписки',
                         'url' => ['/payment/index'],

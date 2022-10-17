@@ -24,10 +24,8 @@ class StudentController extends UserController
         $this->studentService = $studentService;
     }
 
-    public function actionCreate()
+/*    public function actionCreate()
     {
-
-        /** @var User $currentUser */
         $currentUser = Yii::$app->user->identity;
 
         $studentForm = new UserStudentForm();
@@ -46,12 +44,11 @@ class StudentController extends UserController
         return $this->renderAjax('create', [
             'model' => $studentForm,
         ]);
-    }
+    }*/
 
-    public function actionDelete(int $id): array
+/*    public function actionDelete(int $id): array
     {
         $this->response->format = Response::FORMAT_JSON;
-        /** @var User $currentUser */
         $currentUser = Yii::$app->user->identity;
         try {
             $this->studentService->delete($id, $currentUser->id);
@@ -61,20 +58,18 @@ class StudentController extends UserController
             Yii::$app->errorHandler->logException($exception);
             return ['success' => false];
         }
-    }
+    }*/
 
     /**
      * @throws ForbiddenHttpException
      * @throws NotFoundHttpException
      */
-    public function actionUpdate(int $id)
+    /*public function actionUpdate(int $id)
     {
-
         if (($studentModel = UserStudent::findOne($id)) === null) {
             throw new NotFoundHttpException('Ученик не найден');
         }
 
-        /** @var User $currentUser */
         $currentUser = Yii::$app->user->identity;
 
         if (!$this->studentService->isOwnerThisUser($studentModel, $currentUser->id)) {
@@ -98,17 +93,14 @@ class StudentController extends UserController
             'updateRoute' => ['student/update', 'id' => $studentModel->id],
             'model' => $studentForm,
         ]);
-    }
+    }*/
 
-    public function actionIndex(): string
+/*    public function actionIndex(): string
     {
-
-        /** @var User $currentUser */
         $currentUser = Yii::$app->user->identity;
-
         return $this->render('index', [
             'students' => $currentUser->getStudentsAsArray(),
         ]);
-    }
+    }*/
 
 }
