@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace modules\edu\models;
 
+use common\helpers\EmailHelper;
 use DomainException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -49,11 +50,16 @@ class EduParentInvite extends ActiveRecord
         if ($this->status !== 0) {
             throw new DomainException('Некорректный статус для отправки приглашения');
         }
-        $mail = $mailer
+        /*$mail = $mailer
             ->compose(['html' => '@common/mail/parent-invite'], ['code' => $this->code])
             ->setSubject('Приглашение на wikids.ru')
             ->setTo($this->email);
         if (!$mail->send()) {
+            throw new DomainException('Unable to send email ' . $this->email);
+        }*/
+
+        $response = EmailHelper::sendEmail($this->email, 'Приглашение на wikids.ru', 'parent-invite', ['code' => $this->code]);
+        if (!$response->isSuccess()) {
             throw new DomainException('Unable to send email ' . $this->email);
         }
     }
