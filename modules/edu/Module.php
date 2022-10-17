@@ -36,6 +36,9 @@ class Module extends \yii\base\Module
                     [
                         'allow' => true,
                         'matchCallback' => function($rule, $action) {
+                            if ($action->id === 'invite') {
+                                return true;
+                            }
                             return $this->accessChecker->canUserAccess(Yii::$app->user->getId());
                         }
                     ]

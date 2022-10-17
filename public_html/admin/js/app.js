@@ -188,7 +188,6 @@ var Neo = (function(jQuery) {
     };
 })(jQuery);
 
-
 function yiiModalFormInit(formElement, doneCallback, failCallback, alwaysCallback) {
     formElement.on('beforeSubmit', function(e) {
         e.preventDefault();

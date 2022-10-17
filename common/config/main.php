@@ -1,8 +1,10 @@
 <?php
 
 use modules\edu\components\StudentContext;
+use yii\mail\MailerInterface;
 use yii\rbac\DbManager;
 use yii\caching\FileCache;
+use yii\swiftmailer\Mailer;
 
 return [
     'language' => 'ru',

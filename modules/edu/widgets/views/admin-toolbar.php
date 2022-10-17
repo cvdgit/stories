@@ -52,6 +52,12 @@ CSS
                 'active' => Yii::$app->controller->id === 'admin/class-book',
                 'visible' => Yii::$app->user->can(UserRoles::ROLE_ADMIN),
             ],
+            [
+                'label' => 'Ученики',
+                'url' => ['/edu/admin/student/index'],
+                'active' => Yii::$app->controller->id === 'admin/student',
+                'visible' => Yii::$app->user->can(UserRoles::ROLE_ADMIN),
+            ],
         ],
     ]) ?>
 

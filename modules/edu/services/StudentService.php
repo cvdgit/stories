@@ -13,6 +13,9 @@ use DomainException;
 use Exception;
 use modules\edu\components\StudentLoginGenerator;
 use modules\edu\forms\student\StudentForm;
+use modules\edu\models\EduParentInvite;
+use modules\edu\models\EduParentStudent;
+use modules\edu\models\EduStudent;
 use modules\edu\models\StudentLogin;
 use Yii;
 
@@ -38,24 +41,24 @@ class StudentService
     /**
      * @throws Exception
      */
-    public function createStudent(int $userId, StudentForm $form): int
+    public function createStudentByParent(int $parentId, string $username, StudentForm $form, string $studentLogin, string $studentPassword): void
     {
-        if (!$form->validate()) {
-            throw ModelDomainException::create($form);
-        }
 
-        $studentModel = UserStudent::createStudent($userId, $form->name, (int)$form->class_id);
+        $this->transactionManager->wrap(function() use ($parentId, $username, $form, $studentLogin, $studentPassword) {
 
-        $this->transactionManager->wrap(function() use ($studentModel) {
+            $this->userService->createUserForStudent($username, $form->name, $form->name);
+            if ((!$user = User::findByUsername($username)) === null) {
+                throw new DomainException('Пользователь не найден');
+            }
 
+            $studentModel = EduStudent::createByParent($user->id, $form->name, (int)$form->class_id);
             if (!$studentModel->save()) {
                 throw ModelDomainException::create($studentModel);
             }
 
-            $this->createStudentLogin($studentModel->id, StudentLoginGenerator::generateLogin(), StudentLoginGenerator::generatePassword());
+            $this->createStudentLogin($studentModel->id, $studentLogin, $studentPassword);
+            $this->createParentStudent($parentId, $studentModel->id);
         });
-
-        return $studentModel->id;
     }
 
     /**
@@ -133,5 +136,48 @@ class StudentService
         Yii::$app->db->createCommand()
             ->update('user_student', ['status' => $status], ['id' => $studentId])
             ->execute();
+    }
+
+    public function delete(int $studentId): void
+    {
+        $this->transactionManager->wrap(static function() use ($studentId) {
+            Yii::$app->db->createCommand()
+                ->delete('user_student', ['id' => $studentId])
+                ->execute();
+            Yii::$app->db->createCommand()
+                ->delete('user_student_session', ['student_id' => $studentId])
+                ->execute();
+        });
+    }
+
+    private function createParentStudent(int $parentId, int $studentId): void
+    {
+        $parentStudent = EduParentStudent::create($parentId, $studentId);
+        if (!$parentStudent->save()) {
+            throw new DomainException('Произошла ошибка');
+        }
+    }
+
+    public function setStudentParent(int $parentId, EduParentInvite $invite): void
+    {
+        if ($invite->isActive()) {
+            throw new DomainException('Приглашение уже использовано');
+        }
+
+        $invite->setInviteActive();
+
+        $this->transactionManager->wrap(function() use($parentId, $invite) {
+
+            $this->createParentStudent($parentId, $invite->student_id);
+
+            if (!$invite->save()) {
+                throw new DomainException('Произошла ошибка');
+            }
+
+            //$this->changeUser($invite->student_id, $parentId);
+            //$this->changeStatus($invite->student_id, UserStudent::STATUS_STUDENT);
+
+            $this->userAccessService->createAccess($parentId);
+        });
     }
 }

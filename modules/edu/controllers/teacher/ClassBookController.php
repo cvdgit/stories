@@ -8,28 +8,33 @@ use common\models\User;
 use Exception;
 use modules\edu\forms\teacher\ClassBookForm;
 use modules\edu\forms\student\StudentForm;
+use modules\edu\forms\teacher\ParentInviteForm;
 use modules\edu\models\EduClass;
 use modules\edu\models\EduClassBook;
 use modules\edu\models\EduClassProgram;
+use modules\edu\models\EduStudent;
+use modules\edu\services\ParentInviteService;
 use modules\edu\services\StudentService;
 use modules\edu\services\TeacherService;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Request;
 use yii\web\Response;
 
 class ClassBookController extends Controller
 {
-
     private $teacherService;
     private $studentService;
+    private $parentInviteService;
 
-    public function __construct($id, $module, TeacherService $teacherService, StudentService $studentService, $config = [])
+    public function __construct($id, $module, TeacherService $teacherService, StudentService $studentService, ParentInviteService $parentInviteService, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->teacherService = $teacherService;
         $this->studentService = $studentService;
+        $this->parentInviteService = $parentInviteService;
     }
 
     public function actionIndex()
@@ -157,5 +162,34 @@ class ClassBookController extends Controller
                 'name' => $item->program->name,
             ];
         }, $class->eduClassPrograms);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionParentInvite(int $student_id, Request $request, Response $response)
+    {
+        if (($student = EduStudent::findOne($student_id)) === null) {
+            throw new NotFoundHttpException('Ученик не найден');
+        }
+
+        $inviteForm = new ParentInviteForm();
+        if ($request->isPost && $inviteForm->load($request->post())) {
+            $response->format = Response::FORMAT_JSON;
+            if (!$inviteForm->validate()) {
+                return ['success' => false, 'message' => 'Not valid'];
+            }
+            try {
+                $this->parentInviteService->sendInvite($student->id, $inviteForm);
+                return ['success' => true];
+            }
+            catch (Exception $exception) {
+                Yii::$app->errorHandler->logException($exception);
+                return ['success' => false, 'message' => $exception->getMessage()];
+            }
+        }
+        return $this->renderAjax('parent_invite', [
+            'formModel' => $inviteForm,
+        ]);
     }
 }

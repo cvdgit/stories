@@ -23,7 +23,7 @@ use yii\db\ActiveRecord;
  * @property EduClassBookProgram[] $eduClassBookPrograms
  * @property EduClassBookStudent[] $eduClassBookStudents
  * @property EduClassProgram[] $classPrograms
- * @property UserStudent[] $students
+ * @property EduStudent[] $students
  * @property User $user
  */
 class EduClassBook extends ActiveRecord
@@ -107,7 +107,7 @@ class EduClassBook extends ActiveRecord
 
     public function getStudents(): ActiveQuery
     {
-        return $this->hasMany(UserStudent::class, ['id' => 'student_id'])
+        return $this->hasMany(EduStudent::class, ['id' => 'student_id'])
             ->viaTable('edu_class_book_student', ['class_book_id' => 'id']);
     }
 

@@ -130,3 +130,26 @@ $(document).ready(function() {
 });
 
 */
+
+function onBeforeSubmitForm(formElement, callback) {
+  formElement.on('beforeSubmit', function(e) {
+    e.preventDefault();
+    callback(formElement[0]);
+    return false;
+  })
+    .on('submit', function(e) {
+      e.preventDefault();
+    });
+}
+
+function sendForm(formData, url, type) {
+  return $.ajax({
+    url,
+    type,
+    data: formData,
+    dataType: 'json',
+    cache: false,
+    contentType: false,
+    processData: false
+  });
+}

@@ -8,16 +8,21 @@ use common\models\Story;
 use common\models\User;
 use common\models\UserStudent;
 use Exception;
+use modules\edu\components\StudentLoginGenerator;
 use modules\edu\forms\student\StudentForm;
 use modules\edu\models\EduClassProgram;
+use modules\edu\models\EduParentInvite;
+use modules\edu\models\EduUser;
 use modules\edu\query\EduProgramStoriesFetcher;
-use modules\edu\query\EduProgramStoryIdsFetcher;
 use modules\edu\query\StudentStoryStatByDateFetcher;
 use modules\edu\services\StudentService;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Request;
+use yii\web\Response;
 
 class DefaultController extends Controller
 {
@@ -33,12 +38,11 @@ class DefaultController extends Controller
     public function actionIndex(): string
     {
 
-        /** @var User $currentUser */
-        $currentUser = Yii::$app->user->identity;
+        /** @var EduUser $currentUser */
+        $currentUser = EduUser::findOne(Yii::$app->user->getId());
 
         $dataProvider = new ActiveDataProvider([
-            'query' => $currentUser->getStudents()
-                ->andWhere(['<>', 'status', UserStudent::STATUS_MAIN])
+            'query' => $currentUser->getStudents(),
         ]);
 
         return $this->render('index', [
@@ -46,18 +50,23 @@ class DefaultController extends Controller
         ]);
     }
 
-    public function actionCreateStudent()
+    public function actionCreateStudent(Request $request)
     {
         $formModel = new StudentForm();
-        if ($this->request->isPost && $formModel->load($this->request->post())) {
+        if ($formModel->load($request->post())) {
+
+            if (!$formModel->validate()) {
+                throw new \DomainException('Ошибка валидации');
+            }
+
             try {
-                $this->studentService->createStudent(Yii::$app->user->getId(), $formModel);
+                $this->studentService->createStudentByParent(Yii::$app->user->getId(), EduUser::createUsername(), $formModel, StudentLoginGenerator::generateLogin(), StudentLoginGenerator::generatePassword());
                 Yii::$app->session->setFlash('success', 'Ученик успешно создан');
                 return $this->redirect(['index']);
             }
             catch (Exception $exception) {
                 Yii::$app->errorHandler->logException($exception);
-                Yii::$app->session->setFlash('error', $exception->getMessage());
+                Yii::$app->session->setFlash('error', 'Ошибка при создании ученика');
             }
         }
         return $this->render('create-student', [
@@ -170,5 +179,36 @@ class DefaultController extends Controller
             'student' => $student,
             'stat' => $stat,
         ]);
+    }
+
+    public function actionInvite(string $code): Response
+    {
+        try {
+            if (Yii::$app->user->isGuest) {
+                throw new ForbiddenHttpException('Необходимо авторизоваться');
+            }
+
+            if (($invite = EduParentInvite::findOne(['code' => $code])) === null) {
+                throw new NotFoundHttpException('Приглашение не найдено');
+            }
+
+            if (($user = EduUser::findOne(['email' => $invite->email])) === null) {
+                throw new NotFoundHttpException('Пользователь не найден');
+            }
+
+            $currentUserEmail = Yii::$app->user->identity->email;
+            if (!$invite->isOwnerEmail($currentUserEmail)) {
+                throw new ForbiddenHttpException('Отказано в доступе');
+            }
+
+            $this->studentService->setStudentParent($user->id, $invite);
+
+            Yii::$app->session->setFlash('success', 'Операция выполнена успешно');
+            return $this->redirect(['/edu/parent/default/index']);
+        }
+        catch (Exception $exception) {
+            Yii::$app->session->setFlash('error', $exception->getMessage());
+            return $this->redirect(['/']);
+        }
     }
 }

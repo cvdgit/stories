@@ -60,6 +60,54 @@ CSS
                 'attribute' => 'studentLogin.password',
                 'label' => 'Пароль',
             ],
+            [
+                'label' => 'Родитель',
+                'format' => 'raw',
+                'value' => static function($model) {
+                    if ($model->haveInvitedParent()) {
+                        return 'На Wikids';
+                    }
+                    return Html::a('Пригласить', ['/edu/teacher/class-book/parent-invite', 'student_id' => $model->id], [
+                        'data-toggle' => 'modal',
+                        'data-target' => '#parent-invite-modal',
+                    ]);
+                }
+            ],
         ],
     ]) ?>
 </div>
+
+<div class="modal site-dialog remote fade" tabindex="-1" id="parent-invite-modal">
+    <div class="modal-dialog">
+        <div class="modal-content"></div>
+    </div>
+</div>
+
+<?php
+$this->registerJs(<<<JS
+(function() {
+    const modal = $('#parent-invite-modal');
+    modal
+        .on('hide.bs.modal', function() {
+            $(this).removeData('bs.modal');
+            $(this).find('.modal-content').html('');
+        })
+        .on('loaded.bs.modal', function() {
+            const formElement = $('#parent-invite-form', this);
+            onBeforeSubmitForm(formElement, (form) => {
+                const formData = new FormData(form);
+                sendForm(formData, $(form).attr('action'), $(form).attr('method'))
+                    .done(response => {
+                        if (response && response.success) {
+                            toastr.success('Приглашение успешно отправлено');
+                        }
+                        if (response && response.success === false) {
+                            toastr.error(response.message);
+                        }
+                    })
+                    .always(() => modal.modal('hide'));
+            });
+        });
+})();
+JS
+);
