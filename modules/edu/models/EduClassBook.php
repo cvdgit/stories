@@ -136,13 +136,15 @@ class EduClassBook extends ActiveRecord
         return $model;
     }
 
+    public function updateClassBook(string $name, int $classId): void
+    {
+        $this->name = $name;
+        $this->class_id = $classId;
+    }
+
     public function addClassPrograms(array $classProgramIds): void
     {
-        $this->classPrograms = array_unique(array_merge(
-            array_map(static function($classProgram) {
-                return $classProgram->id;
-            }, $this->classPrograms),
-            $classProgramIds));
+        $this->classPrograms = $classProgramIds;
     }
 
     public function addStudent(int $studentId): void

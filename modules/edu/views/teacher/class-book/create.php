@@ -52,7 +52,7 @@ $this->registerJs(<<<JS
                 .then(function(response) {
                     if (response && response.length > 0) {
                         response.forEach(function(item) {
-                            $('<label><input type="checkbox" name="ClassBookForm[class_programs][]" value="' + item.id + '"> ' + item.name + '</label>')
+                            $('<div class="checkbox"><label><input type="checkbox" name="ClassBookForm[class_programs][]" value="' + item.id + '"> ' + item.name + '</label></div>')
                                 .appendTo('#classbookform-class_programs')
                         });
                     }

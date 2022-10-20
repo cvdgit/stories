@@ -11,7 +11,6 @@ use modules\edu\models\EduClassBook;
 
 class TeacherService
 {
-
     public function createClassBook(int $userId, ClassBookForm $form): int
     {
         if (!$form->validate()) {
@@ -32,6 +31,15 @@ class TeacherService
             throw new DomainException('Класс не найден');
         }
         $classBook->addStudent($studentId);
+        if (!$classBook->save()) {
+            throw ModelDomainException::create($classBook);
+        }
+    }
+
+    public function updateClassBook(EduClassBook $classBook, ClassBookForm $form): void
+    {
+        $classBook->updateClassBook($form->name, (int)$form->class_id);
+        $classBook->addClassPrograms($form->class_programs);
         if (!$classBook->save()) {
             throw ModelDomainException::create($classBook);
         }

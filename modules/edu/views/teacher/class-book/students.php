@@ -7,6 +7,7 @@ use modules\edu\widgets\TeacherMenuWidget;
 use yii\data\DataProviderInterface;
 use yii\grid\GridView;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\web\View;
 
 /**
@@ -36,6 +37,9 @@ CSS
 
     <div class="header-block">
         <h1 style="font-size: 32px; margin: 0; font-weight: 500; line-height: 1.2" class="h2"><?= Html::a('<i class="glyphicon glyphicon-arrow-left back-arrow"></i>', ['/edu/teacher/class-book/index']) ?> <?= Html::encode($this->title) ?></h1>
+        <div style="margin-left: 1rem; margin-right: auto; height: 100%">
+            <a href="<?= Url::to(['/edu/teacher/class-book/update', 'id' => $formModel->getId()]) ?>">Изменить</a>
+        </div>
         <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group">
                 <?= Html::a('Добавить ученика', ['/edu/teacher/class-book/create-student', 'id' => $formModel->getId()], ['class' => 'btn btn-small']) ?>

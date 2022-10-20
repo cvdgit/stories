@@ -55,9 +55,8 @@ class ClassBookController extends Controller
         $formModel = new ClassBookForm();
         if ($this->request->isPost && $formModel->load($this->request->post())) {
             try {
-                $id = $this->teacherService->createClassBook(Yii::$app->user->getId(), $formModel);
+                $this->teacherService->createClassBook(Yii::$app->user->getId(), $formModel);
                 return $this->redirect(['index']);
-                //return $this->redirect(['update', 'id' => $id]);
             }
             catch (Exception $exception) {
                 Yii::$app->errorHandler->logException($exception);
@@ -83,14 +82,31 @@ class ClassBookController extends Controller
     /**
      * @throws NotFoundHttpException
      */
-    public function actionUpdate(int $id): string
+    public function actionUpdate(int $id, Request $request)
     {
         $model = $this->loadClassBook($id);
 
         $formModel = new ClassBookForm($model);
 
+        if ($formModel->load($request->post()) && $formModel->validate()) {
+            try {
+                $this->teacherService->updateClassBook($model, $formModel);
+                return $this->redirect(['index']);
+            }
+            catch (Exception $exception) {
+                Yii::$app->errorHandler->logException($exception);
+                Yii::$app->session->addFlash('error', 'При изменении класса произошла ошибка');
+            }
+        }
+
+        $checkBoxList = [];
+        foreach ($model->class->eduClassPrograms as $classProgram) {
+            $checkBoxList[$classProgram->id] = $classProgram->program->name;
+        }
+
         return $this->render('update', [
             'formModel' => $formModel,
+            'checkBoxList' => $checkBoxList,
         ]);
     }
 
