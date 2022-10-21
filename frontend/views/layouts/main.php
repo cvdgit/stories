@@ -1,21 +1,24 @@
 <?php
 
-/* @var $this yii\web\View */
-/* @var $content string */
+declare(strict_types=1);
 
 use common\rbac\UserRoles;
 use common\widgets\ToastrFlash;
 use frontend\assets\AppAsset;
 use frontend\widgets\ContactWidget;
-use frontend\widgets\LoginWidget;
 use frontend\widgets\MainMenuWidget;
-use frontend\widgets\SignupWidget;
 use frontend\widgets\StorySlider;
 use frontend\widgets\UserNotification;
 use yii\bootstrap\Dropdown;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use common\helpers\Url;
+use yii\web\View;
+
+/**
+ * @var View $this
+ * @var string $content
+ */
 
 AppAsset::register($this);
 ?>
@@ -82,9 +85,9 @@ AppAsset::register($this);
                         <div class="user-menu-wrapper">
                         <?php if (Yii::$app->user->isGuest): ?>
                             <div class="user-menu-inner">
-                                <?= Html::a('Регистрация', '#', ['data-toggle' => 'modal', 'data-target' => '#wikids-signup-modal', 'onclick' => "ym(53566996, 'reachGoal', 'show_registration_form'); return true;"]) ?>
+                                <?= Html::a('Регистрация', ['/signup/request'], ['onclick' => "ym(53566996, 'reachGoal', 'show_registration_form'); return true;"]) ?>
                                 <span class="delimiter"></span>
-                                <?= Html::a('Войти', '#', ['class' => 'login-item', 'data-toggle' => 'modal', 'data-target' => '#wikids-login-modal']) ?>
+                                <?= Html::a('Войти', ['/auth/login'], ['class' => 'login-item']) ?>
                             </div>
                         <?php else: ?>
                             <?= UserNotification::widget() ?>
@@ -181,12 +184,8 @@ AppAsset::register($this);
             </div>
         </div>
     </footer>
-  <?php if (Yii::$app->user->isGuest): ?>
-  <?= LoginWidget::widget() ?>
-  <?= SignupWidget::widget() ?>
-  <?php endif ?>
-  <?= ContactWidget::widget() ?>
-  <?= ToastrFlash::widget() ?>
+    <?= ContactWidget::widget() ?>
+    <?= ToastrFlash::widget() ?>
 <?php $this->endBody() ?>
 </body>
 </html>

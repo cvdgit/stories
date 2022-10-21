@@ -11,10 +11,14 @@ use frontend\widgets\SignupWidget;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use common\rbac\UserRoles;
+use yii\web\View;
 
 SchoolAsset::register($this);
 
-/** @var $content string */
+/**
+ * @var string $content
+ * @var View $this
+ */
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>

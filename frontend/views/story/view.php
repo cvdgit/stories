@@ -104,6 +104,9 @@ $(".more-facts").on("click", function() {
 
 $('.to-slides-tab').on('click', function() {
     $('#story-views-tab a:first').tab('show');
+    $('body,html').animate({
+        scrollTop: 0
+    }, 500);
 });
 JS;
 $this->registerJs($js);

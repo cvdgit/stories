@@ -42,7 +42,7 @@ return [
                 'httpOnly' => true,
                 'domain' => $params['cookieDomain'],
             ],
-            'loginUrl' => ['/'],
+            'loginUrl' => ['/auth/login'],
             'on beforeLogout' => static function() {
                 $readCookies = Yii::$app->response->cookies;
                 if ($readCookies->has('uid')) {

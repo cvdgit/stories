@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\models\Story;
 use common\models\StudyTask;
 use common\models\UserToken;
 use common\services\WelcomeUserService;
@@ -12,14 +13,13 @@ use frontend\components\UserAlreadyExistsException;
 use Yii;
 use yii\authclient\ClientInterface;
 use yii\filters\VerbFilter;
-use yii\helpers\Url;
 use yii\web\Controller;
 use common\models\LoginForm;
 use common\services\auth\AuthService;
 use frontend\components\auth\AuthHandler;
 use yii\web\NotFoundHttpException;
-use yii\web\Response;
 use yii\authclient\AuthAction;
+use yii\web\Response;
 
 class AuthController extends Controller
 {
@@ -34,7 +34,7 @@ class AuthController extends Controller
         $this->welcomeUserService = $welcomeUserService;
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'verbs' => [
@@ -46,7 +46,7 @@ class AuthController extends Controller
         ];
     }
 
-    public function actions()
+    public function actions(): array
     {
         return [
             'auth' => [
@@ -76,46 +76,48 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * Logs in a user.
-     *
-     * @return mixed
-     */
     public function actionLogin()
     {
-        $this->response->format = Response::FORMAT_JSON;
-
-        if (!Yii::$app->user->isGuest && !$this->request->isAjax) {
+        if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
 
+        $returnUrl = null;
+        $storyInfo = '';
+        if (($backRoute = $this->service->getBackRoute(Yii::$app->user->returnUrl, Yii::$app->request->referrer)) !== null) {
+            $returnUrl = $backRoute['url'];
+            if (($story = Story::findOne([$backRoute['match']['field'] => $backRoute['match']['value'], 'status' => 1])) !== null) {
+                $storyInfo = $story->title;
+            }
+        }
+
         $form = new LoginForm();
+        $form->returnUrl = $returnUrl;
+
         if ($this->request->isPost && $form->load($this->request->post())) {
             try {
                 $route = $this->service->auth($form);
-                return [
-                    'success' => true,
-                    'returnUrl' => count($route) > 0 ? Url::to($route) : null,
-                ];
+                if (!empty($form->returnUrl)) {
+                    $route = $returnUrl;
+                }
+                return $this->redirect($route);
             } catch (DomainException $e) {
-                return ['success' => false, 'message' => $e->getMessage()];
+                Yii::$app->session->setFlash('error', $e->getMessage());
             } catch (Exception $e) {
-                return ['success' => false, 'message' => 'Произошла ошибка'];
+                Yii::$app->session->setFlash('error', 'Произошла ошибка');
             } finally {
                 if (isset($e)) {
                     Yii::$app->errorHandler->logException($e);
                 }
             }
         }
-        //return ['success' => false];
+        return $this->render('login', [
+            'model' => $form,
+            'storyInfo' => $storyInfo,
+        ]);
     }
 
-    /**
-     * Logs out the current user.
-     *
-     * @return mixed
-     */
-    public function actionLogout()
+    public function actionLogout(): Response
     {
         if (Yii::$app->user->isGuest) {
             return $this->goHome();
@@ -124,7 +126,7 @@ class AuthController extends Controller
         return $this->goHome();
     }
 
-    private function goToTask($task)
+    private function goToTask($task): Response
     {
         if (($task !== null) && ($taskModel = StudyTask::findTask($task)) !== null) {
             return $this->redirect($taskModel->getStudyTaskUrl());
@@ -132,7 +134,7 @@ class AuthController extends Controller
         return $this->goHome();
     }
 
-    public function actionToken(string $token, $task = null)
+    public function actionToken(string $token, $task = null): Response
     {
         if (!Yii::$app->user->isGuest) {
             return $this->goToTask($task);

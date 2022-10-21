@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace frontend\controllers;
 
 use common\models\Auth;
@@ -9,59 +11,44 @@ use Exception;
 use frontend\models\EmailForm;
 use Yii;
 use yii\web\Controller;
+use yii\web\Request;
 use yii\web\Response;
 use frontend\models\SignupForm;
 use common\services\auth\SignupService;
 
-
 class SignupController extends Controller
 {
+    private $signupService;
+    private $welcomeService;
 
-    protected $service;
-    protected $welcomeService;
-
-    public function __construct($id, $module, SignupService $service, WelcomeUserService $welcomeService, $config = [])
+    public function __construct($id, $module, SignupService $signupService, WelcomeUserService $welcomeService, $config = [])
     {
         parent::__construct($id, $module, $config);
-        $this->service = $service;
+        $this->signupService = $signupService;
         $this->welcomeService = $welcomeService;
     }
 
-    /**
-     * Signs user up.
-     *
-     * @return mixed
-     */
-    public function actionRequest()
+    public function actionRequest(Request $request)
     {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        if (Yii::$app->request->isAjax) {
-            $model = new SignupForm();
-            if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-                try {
-                    $username = User::createUsername();
-                    $this->service->signup($username, $model->email, $model->password);
-                }
-                catch (Exception $ex) {
-                    Yii::$app->errorHandler->logException($ex);
-                    return ['success' => false, 'message' => [$ex->getMessage()]];
-                }
-                $user = User::findByEmail($model->email);
-                if ($user !== null) {
-                    try {
-                        $this->service->sentEmailConfirm($user);
-                        return ['success' => true, 'message' => ['Проверьте свой адрес электронной почты, чтобы подтвердить регистрацию']];
-                    } catch (Exception $ex) {
-                        Yii::$app->errorHandler->logException($ex);
-                        return ['success' => false, 'message' => ['Ошибка при отправке письма с подтверждением регистрации на сайте']];
-                    }
-                }
+        if (!Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
+
+        $signupForm = new SignupForm();
+        if ($signupForm->load($request->post()) && $signupForm->validate()) {
+            try {
+                $this->signupService->signupWithConfirmEmail(User::createUsername(), $signupForm->email, $signupForm->password);
+                Yii::$app->session->setFlash('success', 'Проверьте свой адрес электронной почты, чтобы подтвердить регистрацию');
             }
-            else {
-                return ['success' => false, 'message' => $model->errors];
+            catch (Exception $ex) {
+                Yii::$app->errorHandler->logException($ex);
+                Yii::$app->session->setFlash('error', $ex->getMessage());
             }
         }
-        return ['success' => false, 'message' => ['']];
+
+        return $this->render('request', [
+            'formModel' => $signupForm,
+        ]);
     }
 
     public function actionSignupConfirm($token)
@@ -102,7 +89,7 @@ class SignupController extends Controller
             $password = Yii::$app->security->generateRandomString(6);
 
             try {
-                $this->service->signup($username, $model->email, $password);
+                $this->signupService->signup($username, $model->email, $password);
             }
             catch (Exception $ex) {
                 Yii::$app->errorHandler->logException($ex);
@@ -116,7 +103,7 @@ class SignupController extends Controller
                 $auth->save();
 
                 try {
-                    $this->service->sentEmailConfirm($user);
+                    $this->signupService->sentEmailConfirm($user);
                     Yii::$app->session->setFlash('success', 'Проверьте свой адрес электронной почты, чтобы подтвердить регистрацию');
                 } catch (Exception $ex) {
                     Yii::$app->errorHandler->logException($ex);
@@ -132,5 +119,4 @@ class SignupController extends Controller
             'model' => $model,
         ]);
     }
-
 }

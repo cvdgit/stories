@@ -2702,3 +2702,41 @@ li.sub-dropdown>span {
   cursor: pointer;
   user-select: none;
 }
+
+
+
+
+.auth-wrap {
+  max-width: 38rem;
+  margin: auto;
+  width: 100%;
+}
+.auth-header {
+
+}
+.auth-header__text {
+  margin: 0 0 2.5rem;
+}
+.auth-form-wrap {
+
+}
+.auth-form-row {
+  margin-bottom: 2rem;
+}
+.auth-form-row .checkbox {
+  font-size: 1.4rem;
+}
+.auth-links {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 5rem;
+}
+.auth-links__divider {
+  margin: 0 1rem;
+}
+.auth-form-submit {
+  padding: 1.5rem 3rem;
+  margin-bottom: 3rem;
+}

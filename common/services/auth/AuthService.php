@@ -8,7 +8,10 @@ use common\models\Auth;
 use common\models\LoginForm;
 use common\models\User;
 use DomainException;
+use frontend\components\ChainUrlMatcher;
+use frontend\components\EduStoryUrlMatcher;
 use frontend\components\NoEmailException;
+use frontend\components\StoryUrlMatcher;
 use frontend\components\UserAlreadyExistsException;
 use frontend\models\auth\AuthUserForm;
 use frontend\models\auth\CreateUserForm;
@@ -36,9 +39,8 @@ class AuthService
 
         $login = $form->email;
 
+        $returnRoute = ['/site/index'];
         $user = User::findByEmail($login);
-
-        $returnRoute = [];
         if ($user === null) {
 
             $studentLogin = StudentLogin::findLogin($login, $form->password);
@@ -58,7 +60,32 @@ class AuthService
         }
 
         Yii::$app->user->login($user, $form->rememberMe ? Yii::$app->params['user.rememberMeDuration'] : 0);
+
         return $returnRoute;
+    }
+
+    public function getBackRoute(string $returnUrl = null, string $referrerUrl = null): ?array
+    {
+        $url = $referrerUrl ?? null;
+        if ($url === null && $returnUrl !== null) {
+            $url = $returnUrl;
+        }
+
+        if ($url !== null) {
+
+            $matcher = new ChainUrlMatcher(...[
+                new StoryUrlMatcher(),
+                new EduStoryUrlMatcher(),
+            ]);
+
+            if (($result = $matcher->match($url)) !== null) {
+                return [
+                    'url' => $url,
+                    'match' => $result,
+                ];
+            }
+        }
+        return null;
     }
 
     /**

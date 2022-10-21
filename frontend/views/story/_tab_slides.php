@@ -1,5 +1,7 @@
 <?php
 use yii\helpers\Html;
+use yii\helpers\Url;
+
 /** @var $model common\models\Story */
 /** @var $playlist common\models\Playlist */
 ?>
@@ -8,7 +10,7 @@ use yii\helpers\Html;
     <noindex>
         <div class="alert alert-info story-wrapper-guest">
             <h2>Режим обучения доступен только авторизованным пользователям</h2>
-            <p>Чтобы продолжить просмотр <a data-toggle="modal" data-target="#wikids-signup-modal" href="#">зарегистрируйтесь</a> или <a data-toggle="modal" data-target="#wikids-login-modal" href="#">войдите в аккаунт</a></p>
+            <p>Чтобы продолжить просмотр <a href="<?= Url::to(['/signup/request']) ?>">зарегистрируйтесь</a> или <a href="<?= Url::to(['/auth/login']) ?>">войдите в аккаунт</a></p>
         </div>
         <div class="jumbotron wikids-jumbotron">
             <p class="text-center">Возможности режима обучения:</p>

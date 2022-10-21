@@ -2,10 +2,8 @@ suite_namespace: frontend\tests\acceptance
 actor: AcceptanceTester
 modules:
     enabled:
-        - WebDriver:
+        - PhpBrowser:
               url: https://wikids.test/
-              browser: chrome
-              port: 8443
         - Yii2:
-            part: init
-            entryScript: index-test.php
+            part: [init, orm, fixtures]
+            cleanup: true

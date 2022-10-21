@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace common\services\auth;
 
 use common\components\ModelDomainException;
 use common\helpers\EmailHelper;
 use common\rbac\UserRoles;
 use common\services\RoleManager;
+use DomainException;
 use Exception;
 use frontend\components\queue\UnisenderAddJob;
 use frontend\models\auth\CreateUserForm;
@@ -16,37 +19,25 @@ use common\services\TransactionManager;
 
 class SignupService
 {
-
-    private $transaction;
+    private $transactionManager;
     private $roleManager;
 
-    public function __construct(TransactionManager $transaction, RoleManager $roleManager)
+    public function __construct(TransactionManager $transactionManager, RoleManager $roleManager)
     {
-        $this->transaction = $transaction;
+        $this->transactionManager = $transactionManager;
         $this->roleManager = $roleManager;
     }
 
-    /**
-     * @param $username
-     * @param $email
-     * @param $password
-     * @throws Exception
-     */
-    public function signup($username, $email, $password): void
+    public function signup(string $username, string $email, string $password): void
     {
-        $user = User::createSignup(
-            $username,
-            $email,
-            $password
-        );
-        $this->transaction->wrap(function() use ($user) {
+        $user = User::createSignup($username, $email, $password);
+        $this->transactionManager->wrap(function() use ($user) {
 
-            /* @var $user User */
-            $user->save();
+            if (!$user->save()) {
+                throw new DomainException('Ошибка при сохранении пользователя');
+            }
 
-            $auth = Yii::$app->authManager;
-            $authorRole = $auth->getRole('user');
-            $auth->assign($authorRole, $user->getId());
+            $this->roleManager->assign($user->id, UserRoles::ROLE_USER);
 
             $user->createMainStudent();
         });
@@ -65,7 +56,7 @@ class SignupService
         );
         $user->status = User::STATUS_ACTIVE;
 
-        $this->transaction->wrap(function() use ($user) {
+        $this->transactionManager->wrap(function() use ($user) {
 
             if (!$user->save()) {
                 throw ModelDomainException::create($user);
@@ -109,11 +100,21 @@ class SignupService
 
     public function afterUserSignup(User $user)
     {
-        $this->transaction->wrap(function() use ($user) {
+        $this->transactionManager->wrap(function() use ($user) {
             $this->sendWelcomeEmail($user);
             $this->activateFreeSubscription($user);
             $this->addJob($user->id);
         });
     }
 
+    public function signupWithConfirmEmail(string $username, string $email, string $password): void
+    {
+        $this->signup($username, $email, $password);
+
+        if (($user = User::findByEmail($email)) === null) {
+            throw new DomainException('Пользователь с указанным email не найден');
+        }
+
+        $this->sentEmailConfirm($user);
+    }
 }

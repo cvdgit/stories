@@ -22,7 +22,7 @@ class SchoolMainMenuWidget extends Widget
         $this->accessChecker = $accessChecker;
     }
 
-    public function run()
+    public function run(): string
     {
         $items = [
             [
@@ -53,13 +53,13 @@ class SchoolMainMenuWidget extends Widget
         if (Yii::$app->user->isGuest) {
             $items[] = [
                 'label' => 'Войти',
-                'url' => '#',
-                'template' => Html::a('{label}', '{url}', ['class' => 'menu-item__link', 'data-toggle' => 'modal', 'data-target' => '#wikids-login-modal']),
+                'url' => ['/auth/login'],
+                'linkOptions' => ['class' => 'menu-item__link'],
             ];
             $items[] = [
                 'label' => 'Регистрация',
-                'url' => '#',
-                'template' => Html::a('{label}', '{url}', ['class' => 'registration-link', 'data-toggle' => 'modal', 'data-target' => '#wikids-signup-modal']),
+                'url' => ['/signup/request'],
+                'template' => Html::a('{label}', '{url}', ['class' => 'registration-link', 'onclick' => "ym(53566996, 'reachGoal', 'show_registration_form'); return true;"]),
             ];
         }
         else {

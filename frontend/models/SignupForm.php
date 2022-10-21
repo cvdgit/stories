@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace frontend\models;
 
 use DomainException;
@@ -12,55 +15,41 @@ use common\models\User;
  */
 class SignupForm extends Model
 {
-    //public $username;
     public $email;
     public $password;
     public $agree;
 
-    public function rules()
+    public function rules(): array
     {
         return [
-/*            ['username', 'trim'],
-            ['username', 'required'],
-            ['username', 'match', 'pattern' => '/^[^А-Яа-я\s]+$/u', 'message' => 'Имя пользователя не может содержать кириллические символы'],
-            ['username', 'unique', 'targetClass' => User::class, 'message' => 'Пользователь с таким именем уже существует'],
-            ['username', 'string', 'min' => 2, 'max' => 255],*/
-
+            [['email', 'password', 'agree'], 'required'],
             ['email', 'trim'],
             ['email', 'required'],
             ['email', 'email'],
             ['email', 'string', 'max' => 255],
             ['email', 'unique', 'targetClass' => User::class, 'message' => 'Пользователь с таким email уже существует'],
-
             ['password', 'required'],
             ['password', 'string', 'min' => 6],
-
             ['agree', 'required', 'requiredValue' => 1],
             ['agree', 'boolean'],
         ];
     }
 
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
-            //'username' => 'Имя пользователя',
             'email' => 'Email',
             'password' => 'Пароль',
             'agree' => 'Я принимаю',
         ];
     }
 
-    /**
-     * Signs user up.
-     *
-     * @return User|null the saved model or null if saving fails
-     */
     public function signup()
     {
         if (!$this->validate()) {
             throw new DomainException('Signup model is not valid');
         }
-        
+
         $user = new User();
         $user->username = $this->username;
         $user->email = $this->email;

@@ -1,32 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace common\services;
 
 use DomainException;
+use Exception;
 use yii\rbac\ManagerInterface;
 
 class RoleManager
 {
-
-    protected $manager;
+    private $manager;
 
     public function __construct(ManagerInterface $manager)
     {
         $this->manager = $manager;
     }
 
-    public function assign($userId, $name): void
+    /**
+     * @throws Exception
+     */
+    public function assign(int $userId, string $roleName): void
     {
-        if (!$role = $this->manager->getRole($name)) {
-            throw new DomainException('Роль "' . $name . '" не существует.');
+        if (($role = $this->manager->getRole($roleName)) === null) {
+            throw new DomainException('Роль "' . $roleName . '" не существует.');
         }
         $this->manager->revokeAll($userId);
         $this->manager->assign($role, $userId);
     }
 
-    public function revoke(int $userID): bool
+    public function revoke(int $userId): bool
     {
-        return $this->manager->revokeAll($userID);
+        return $this->manager->revokeAll($userId);
     }
 
     public function canUser(int $userId, string $permissionName, $params = []): bool
