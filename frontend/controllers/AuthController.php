@@ -98,7 +98,7 @@ class AuthController extends Controller
             try {
                 $route = $this->service->auth($form);
                 if (!empty($form->returnUrl)) {
-                    $route = $returnUrl;
+                    $route = $form->returnUrl;
                 }
                 return $this->redirect($route);
             } catch (DomainException $e) {
