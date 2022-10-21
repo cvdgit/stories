@@ -102,13 +102,11 @@ class AuthController extends Controller
                 }
                 return $this->redirect($route);
             } catch (DomainException $e) {
+                Yii::$app->errorHandler->logException($e);
                 Yii::$app->session->setFlash('error', $e->getMessage());
             } catch (Exception $e) {
+                Yii::$app->errorHandler->logException($e);
                 Yii::$app->session->setFlash('error', 'Произошла ошибка');
-            } finally {
-                if (isset($e)) {
-                    Yii::$app->errorHandler->logException($e);
-                }
             }
         }
         return $this->render('login', [
