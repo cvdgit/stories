@@ -130,9 +130,7 @@ class ClassBookController extends Controller
 
         $currentClassProgram = null;
         if ($class_program_id !== null && count($classPrograms) > 1) {
-            $currentClassProgram = $classBook->getClassPrograms()
-                ->andWhere(['class_program_id' => $class_program_id])
-                ->one();
+            $currentClassProgram = EduClassProgram::findClassProgram($classBook->class_id, $class_program_id);
         }
         else {
             $currentClassProgram = $classPrograms[0];
