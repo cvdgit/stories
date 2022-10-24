@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace common\models;
 
 use Yii;
@@ -16,10 +18,10 @@ use yii\db\ActiveRecord;
  * @property string $text
  * @property int $created_at
  * @property int $updated_at
+ * @property string $comment
  */
 class ContactRequest extends ActiveRecord
 {
-
     public function behaviors(): array
     {
         return [
@@ -38,18 +40,6 @@ class ContactRequest extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules(): array
-    {
-        return [
-            [['name', 'phone', 'email', 'text'], 'required'],
-            [['text'], 'string'],
-            [['name', 'phone', 'email'], 'string', 'max' => 255],
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels(): array
     {
         return [
@@ -59,7 +49,7 @@ class ContactRequest extends ActiveRecord
             'text' => 'Текст',
             'email' => 'Email',
             'created_at' => 'Дата создания',
-            'updated_at' => 'Updated At',
+            'comment' => 'Комментарий',
         ];
     }
 
