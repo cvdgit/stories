@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use common\models\UserStudent;
 use modules\edu\models\EduClassProgram;
+use modules\edu\widgets\LessonStatusWidget;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
 use yii\web\View;
@@ -163,21 +164,11 @@ CSS
                                 <div style="white-space: nowrap">
                                     <div style="display:inline-block;margin-right:15px">
                                         <?php foreach ($topic->eduLessons as $lesson): ?>
-                                            <div class="content-lesson">
-                                                <?php
-                                                $storiesCount = $lesson->getStoriesCount();
-                                                $finishedStoriesCount = $lesson->getStudentFinishedStoriesCount($student->id);
-                                                ?>
-                                                <?php if ($storiesCount === $finishedStoriesCount): ?>
-                                                    <span class="is-done"></span>
-                                                <?php endif ?>
-                                                <?php if ($storiesCount > 0 && $finishedStoriesCount === 0): ?>
-                                                    <span class="not-started"></span>
-                                                <?php endif ?>
-                                                <?php if ($finishedStoriesCount > 0 && $finishedStoriesCount < $storiesCount): ?>
-                                                    <span class="in-progress"></span>
-                                                <?php endif ?>
-                                            </div>
+                                            <?= LessonStatusWidget::widget([
+                                                'total' => $lesson->getStoriesCount(),
+                                                'finished' => $lesson->getStudentFinishedStoriesCount($student->id),
+                                                'inProgress' => $lesson->fetchStudentInProgressStoriesCount($student->id),
+                                            ]) ?>
                                         <?php endforeach; ?>
                                     </div>
                                 </div>

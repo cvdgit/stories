@@ -18,6 +18,7 @@ use modules\edu\query\StudentStoryStatByDateFetcher;
 use modules\edu\services\StudentService;
 use Yii;
 use yii\data\ActiveDataProvider;
+use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -118,6 +119,9 @@ class DefaultController extends Controller
 
         $class = $student->class;
         $classPrograms = $class->eduClassPrograms;
+        if (count($classPrograms) === 0) {
+            throw new BadRequestHttpException('Программа обучения не найдена');
+        }
 
         if ($classProgram === null && count($classPrograms) > 0) {
             $classProgram = $classPrograms[0];

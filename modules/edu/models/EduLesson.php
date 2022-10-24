@@ -129,7 +129,6 @@ class EduLesson extends ActiveRecord
 
     public function getStudentFinishedStoriesCount(int $studentId): int
     {
-
         $rows = $this->getLessonStories()
             ->select(['story_id' => 'lesson_story.story_id'])
             ->all();
@@ -143,6 +142,24 @@ class EduLesson extends ActiveRecord
             ->where(['student_id' => $studentId])
             ->andWhere(['in', 'story_id', $storyIds])
             ->andWhere('progress = 100')
+            ->count();
+    }
+
+    public function fetchStudentInProgressStoriesCount(int $studentId): int
+    {
+        $rows = $this->getLessonStories()
+            ->select(['story_id' => 'lesson_story.story_id'])
+            ->all();
+
+        $storyIds = array_map(static function($row) {
+            return $row['story_id'];
+        }, $rows);
+
+        return (new Query())
+            ->from('story_student_progress')
+            ->where(['student_id' => $studentId])
+            ->andWhere(['in', 'story_id', $storyIds])
+            ->andWhere('progress > 0 AND progress < 100')
             ->count();
     }
 }
