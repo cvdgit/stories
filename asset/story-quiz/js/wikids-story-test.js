@@ -1820,13 +1820,25 @@ function WikidsStoryTest(el, options) {
         $.post('/question/answer', answerParams);
       }
       if (testConfig.sourceIsLocal() || testConfig.sourceIsTests()) {
-        answerList = answer.map(function (entity_id) {
-          var answer = answerByID(currentQuestion, entity_id);
-          return {
-            'answer_entity_id': entity_id,
-            'answer_entity_name': answer ? answer.name : 'no correct'
-          };
-        });
+
+        if (testConfig.answerTypeIsInput(currentQuestion)) {
+          answerList = answer.map(function (answerText) {
+            return {
+              'answer_entity_id': currentQuestion.id,
+              'answer_entity_name': answerText
+            };
+          });
+        }
+        else {
+          answerList = answer.map(function (entity_id) {
+            var answer = answerByID(currentQuestion, entity_id);
+            return {
+              'answer_entity_id': entity_id,
+              'answer_entity_name': answer ? answer.name : 'no correct'
+            };
+          });
+        }
+
         answerParams = {
           'source': testConfig.getSource(),
           'test_id': testConfig.getTestID(),
@@ -1857,7 +1869,7 @@ function WikidsStoryTest(el, options) {
         continueTestAction(answer);
       } else {
         dom.results
-          .html("<p>Ответ не верный.</p>")
+          .html("<p>Ответ неверный.</p>")
           .show()
           .delay(1000)
           .fadeOut('slow', function () {
