@@ -11,6 +11,7 @@ use Exception;
 use modules\edu\models\EduClassBook;
 use modules\edu\models\EduClassProgram;
 use modules\edu\query\EduProgramStoriesFetcher;
+use modules\edu\query\StudentQuestionFetcher;
 use modules\edu\query\StudentStatsFetcher;
 use modules\edu\query\StudentStoryStatByDateFetcher;
 use modules\edu\services\ClassBookService;
@@ -161,13 +162,15 @@ class ClassBookController extends Controller
             ->all();
         $statData = (new StudentStoryStatByDateFetcher())->fetch($student->id, $storyIds);
 
-        $stat = (new StudentStatsFetcher())->fetch($statData, $programStoriesData, $storyModels);
+        $stat = (new StudentStatsFetcher())->fetch($statData, $programStoriesData);
 
         return $this->render('stat', [
             'student' => $student,
             'classProgram' => $currentClassProgram,
             'classProgramItems' => $classProgramItems,
             'stat' => $stat,
+            'storyModels' => $storyModels,
+            'questionFetcher' => new StudentQuestionFetcher(),
         ]);
     }
 }

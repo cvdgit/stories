@@ -6,7 +6,7 @@ namespace modules\edu\query;
 
 class StudentStatsFetcher
 {
-    public function fetch(array $statData, array $programStoriesData, array $storyModels): array
+    public function fetch(array $statData, array $programStoriesData): array
     {
         $stat = [];
 
@@ -40,7 +40,7 @@ class StudentStatsFetcher
                     $topics[$storyData['topicId']]['lessons'][$storyData['lessonId']] = $lessonItem;
                 }
 
-                $topics[$storyData['topicId']]['lessons'][$storyData['lessonId']]['stories'][] = $storyModels[$storyId];
+                $topics[$storyData['topicId']]['lessons'][$storyData['lessonId']]['stories'][] = $storyId;
             }
 
             $item['topics'] = $topics;

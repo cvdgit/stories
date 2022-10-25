@@ -11,6 +11,8 @@ use modules\edu\models\EduClassBook;
 use modules\edu\models\EduClassProgram;
 use modules\edu\query\EduProgramStoriesFetcher;
 use modules\edu\query\StudentProgramLastActivityDateFetcher;
+use modules\edu\query\StudentQuestionFetcher;
+use modules\edu\query\StudentStatsFetcher;
 use modules\edu\query\StudentStoryStatByDateFetcher;
 use Yii;
 use yii\helpers\Url;
@@ -107,8 +109,6 @@ class DefaultController extends Controller
             $classProgram = $classPrograms[0];
         }
 
-        $stat = [];
-
         $programStoriesData = (new EduProgramStoriesFetcher())->fetch($class->id, $classProgram->id);
         $storyIds = array_column($programStoriesData, 'storyId');
 
@@ -119,49 +119,15 @@ class DefaultController extends Controller
 
         $statData = (new StudentStoryStatByDateFetcher())->fetch($student->id, $storyIds);
 
-        foreach ($statData as $statItem) {
-
-            $item = [
-                'date' => $statItem['targetDate'],
-                'topics' => [],
-            ];
-
-            $topics = [];
-            foreach (explode(',', $statItem['storyIds']) as $storyId) {
-
-                $storyData = $programStoriesData[$storyId];
-
-                if (!isset($topics[$storyData['topicId']])) {
-                    $topics[$storyData['topicId']] = [
-                        'topicId' => $storyData['topicId'],
-                        'topicName' => $storyData['topicName'],
-                        'lessons' => [],
-                    ];
-                }
-
-                $topicLessonIds = array_column($topics[$storyData['topicId']]['lessons'],'lessonId');
-                if (!in_array($storyData['lessonId'], $topicLessonIds, true)) {
-                    $lessonItem = [
-                        'lessonId' => $storyData['lessonId'],
-                        'lessonName' => $storyData['lessonName'],
-                        'stories' => [],
-                    ];
-                    $topics[$storyData['topicId']]['lessons'][$storyData['lessonId']] = $lessonItem;
-                }
-
-                $topics[$storyData['topicId']]['lessons'][$storyData['lessonId']]['stories'][] = $storyModels[$storyId];
-            }
-
-            $item['topics'] = $topics;
-
-            $stat[] = $item;
-        }
+        $stat = (new StudentStatsFetcher())->fetch($statData, $programStoriesData);
 
         return $this->render('student_stats', [
             'classProgram' => $classProgram,
             'classPrograms' => $classPrograms,
             'student' => $student,
             'stat' => $stat,
+            'storyModels' => $storyModels,
+            'questionFetcher' => new StudentQuestionFetcher(),
         ]);
     }
 }

@@ -8,11 +8,14 @@ declare(strict_types=1);
  * @var EduClassProgram|null $classProgram
  * @var EduClassProgram[] $classPrograms
  * @var array $stat
+ * @var Story[] $storyModels
+ * @var StudentQuestionFetcher $questionFetcher
  */
 
+use common\models\Story;
 use common\models\UserStudent;
-use modules\edu\models\EduClassBook;
 use modules\edu\models\EduClassProgram;
+use modules\edu\query\StudentQuestionFetcher;
 use modules\edu\widgets\LessonStatusWidget;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -205,16 +208,22 @@ CSS
                         <table class="table table-sm table-bordered">
                             <thead>
                             <tr>
-                                <th class="col-md-8">История</th>
+                                <th class="col-md-6">История</th>
                                 <th class="col-md-2">Прогресс</th>
+                                <th class="col-md-2">Ответов на вопросы / неправильных</th>
                                 <th class="col-md-2">Тесты</th>
                             </tr>
                             </thead>
                             <tbody>
-                        <?php foreach ($lessonItem['stories'] as $story): ?>
+                        <?php foreach ($lessonItem['stories'] as $storyId): ?>
+                            <?php $story = $storyModels[$storyId]; ?>
                             <tr>
                                 <td><?= $story->title ?></td>
                                 <td><?= ($progress = $story->findStudentStoryProgress($student->id)) !== null ? $progress->progress : 'Нет' ?></td>
+                                <td>
+                                    <?php $questionData = $questionFetcher->fetch($student->id, (int)$storyId, $item['date']); ?>
+                                    <?= $questionData['total'] . ($questionData['incorrect'] > 0 ? ' / ' . $questionData['incorrect'] : ''); ?>
+                                </td>
                                 <td><a class="show-testing" href="<?= Url::to(['/edu/teacher/default/story-testing', 'story_id' => $story->id, 'student_id' => $student->id]) ?>">Результаты</a></td>
                             </tr>
                         <?php endforeach; ?>

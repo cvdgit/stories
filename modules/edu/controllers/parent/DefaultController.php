@@ -14,6 +14,7 @@ use modules\edu\models\EduClassProgram;
 use modules\edu\models\EduParentInvite;
 use modules\edu\models\EduUser;
 use modules\edu\query\EduProgramStoriesFetcher;
+use modules\edu\query\StudentQuestionFetcher;
 use modules\edu\query\StudentStoryStatByDateFetcher;
 use modules\edu\services\StudentService;
 use Yii;
@@ -182,6 +183,7 @@ class DefaultController extends Controller
             'classPrograms' => $classPrograms,
             'student' => $student,
             'stat' => $stat,
+            'questionFetcher' => new StudentQuestionFetcher(),
         ]);
     }
 
