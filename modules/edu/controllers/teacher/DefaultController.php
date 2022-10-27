@@ -109,7 +109,7 @@ class DefaultController extends Controller
             $classProgram = $classPrograms[0];
         }
 
-        $programStoriesData = (new EduProgramStoriesFetcher())->fetch($class->id, $classProgram->id);
+        $programStoriesData = (new EduProgramStoriesFetcher())->fetch($class->id, $classProgram->program_id);
         $storyIds = array_column($programStoriesData, 'storyId');
 
         $storyModels = Story::find()
