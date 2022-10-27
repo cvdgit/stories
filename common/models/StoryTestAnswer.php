@@ -62,7 +62,7 @@ class StoryTestAnswer extends ActiveRecord
             'story_question_id' => 'Вопрос',
             'name' => 'Ответ',
             'order' => 'Order',
-            'is_correct' => 'Ответ правильный',
+            'is_correct' => 'Верный',
             'image' => 'Изображение',
         ];
     }
@@ -98,6 +98,17 @@ class StoryTestAnswer extends ActiveRecord
             $model->image = $image;
         }
         return $model;
+    }
+
+    public function updateAnswer(string $name, int $isCorrect): void
+    {
+        $this->name = $name;
+        $this->is_correct = $isCorrect;
+    }
+
+    public function updateAnswerImage(string $image = null): void
+    {
+        $this->image = $image;
     }
 
     public static function createFromRelation(string $name, int $isCorrect, string $description = null): self

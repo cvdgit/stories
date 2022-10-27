@@ -37,7 +37,7 @@ class AnswerManageWidget extends BaseQuizManageWidget
     }
 
     public function itemCallback($item): array {
-        return $this->createItem($item->name, ['test/update-answer', 'answer_id' => $item->id], $item->id === $this->currentModelId);
+        return $this->createItem($item->name, ['/answer/update', 'id' => $item->id], $item->id === $this->currentModelId);
     }
 
     private function createAnswerRoute(): array

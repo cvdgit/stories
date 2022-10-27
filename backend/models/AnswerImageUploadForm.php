@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\models;
 
 use Imagine\Image\ManipulatorInterface;
@@ -11,7 +13,6 @@ use yii\web\UploadedFile;
 
 class AnswerImageUploadForm extends Model
 {
-
     public $answer_id;
     /**
      * @var UploadedFile
