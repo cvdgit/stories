@@ -96,6 +96,7 @@ export default () => {
           'dataParams': params,
           'forSlide': false,
           'required': params.testRequired,
+          'deck': deck,
           init: function() {
             return $.getJSON('/question/init', params);
           },

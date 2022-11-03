@@ -83,14 +83,14 @@ const RegionQuestion = function(test) {
   }
 }
 
-RegionQuestion.prototype.create = function(question, questionAnswers) {
+RegionQuestion.prototype.create = function(question, questionAnswers, props = {}) {
   var params = question.params;
   var regionMapName = 'regions-' + question.id;
   var that = this;
   var $wrapper = this.createImageWrapper(params, regionMapName)
     .on('click', function(e) {
       function getScale() {
-        var scale = 1;
+        let scale = props.scale || 1;
         if (window['Reveal']) {
           scale = Reveal.getScale();
         }
@@ -98,6 +98,7 @@ RegionQuestion.prototype.create = function(question, questionAnswers) {
       }
       var elem = $(e.target).parent()[0];
       var zoom = getScale();
+      console.log(zoom);
       var clientRect = elem.getBoundingClientRect();
       var x, y;
       if (zoom > 1) {

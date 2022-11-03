@@ -850,7 +850,7 @@ function WikidsStoryTest(el, options) {
   }
 
   function createRegionAnswer(question, answers) {
-    return that.regionQuestion.create(question, answers);
+    return that.regionQuestion.create(question, answers, {scale: (that.options.deck && that.options.deck.getScale()) || null});
   }
 
   function createRecordingAnswers(question, answers) {
@@ -1984,6 +1984,7 @@ function WikidsStoryTest(el, options) {
         nextQuestion([result]);
       });
     }
+
     if (testConfig.answerTypeIsRecording(currentQuestion)) {
       dom.nextButton.off("click").on("click", function () {
         var result = that.recordingAnswer.getResult();
