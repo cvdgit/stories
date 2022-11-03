@@ -1,8 +1,24 @@
 <?php
+
+declare(strict_types=1);
+
+use common\models\Story;
 use yii\helpers\Html;
-/** @var $model common\models\Story */
+use yii\web\View;
+
+/**
+ * @var View $this
+ * @var $model Story
+ */
+
+$this->registerCss(<<<CSS
+.story-categories a {
+    text-decoration: underline;
+}
+CSS
+);
 ?>
-<div>
+<div style="margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px #ddd solid">
     <h1><?= Html::encode($model->title) ?></h1>
     <div class="story-description">
         <div class="story-categories">

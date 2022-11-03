@@ -118,8 +118,8 @@ $isBookView = $storyDefaultView === 'book';
 ?>
 <div class="container story-head-container">
 	<main class="site-story-main">
-        <?php if (Yii::$app->user->isGuest): ?>
         <?= $this->render('_story_main_block', ['model' => $model]) ?>
+        <?php if (Yii::$app->user->isGuest): ?>
         <div class="tabbable-panel">
             <div class="tabbable-line">
             <?= Tabs::widget([
@@ -162,9 +162,6 @@ $isBookView = $storyDefaultView === 'book';
 
 <div class="container">
     <main class="site-story-main-descr">
-        <?php if (!Yii::$app->user->isGuest): ?>
-        <?= $this->render('_story_main_block', ['model' => $model]) ?>
-        <?php endif ?>
         <div class="story-description" style="margin-top: 10px">
             <div class="row">
                 <div class="col-lg-7 col-md-7 col-sm-12">
