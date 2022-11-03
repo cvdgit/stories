@@ -1,17 +1,17 @@
 const TestSpeech = function(options) {
 
-  var defaultOptions = {
+  let defaultOptions = {
     pitch: 1,
     rate: 0.8
   };
   options = options || {};
   options = Object.assign(defaultOptions, options);
 
-  var synthesis = window.speechSynthesis;
+  const synthesis = window.speechSynthesis;
 
   function setSpeech() {
-    return new Promise(function(resolve, reject) {
-      var handle;
+    return new Promise(function(resolve) {
+      let handle;
       handle = setInterval(function() {
         if (synthesis.getVoices().length > 0) {
           resolve(synthesis.getVoices());
@@ -21,33 +21,42 @@ const TestSpeech = function(options) {
     });
   }
 
-  var voices = [];
-  setSpeech().then(function(speech) {
-    voices = speech;
-  });
+  let voices = [];
 
   return {
     'readText': function(text, voice, onEnd) {
 
-      var utterance = new SpeechSynthesisUtterance(text);
-
+      const utterance = new SpeechSynthesisUtterance(text);
       voice = voice || 'Google русский';
-      for (var i = 0; i < voices.length; i++) {
-        if (voices[i].name === voice) {
-          utterance.voice = voices[i];
-          break;
+
+      const read = (speechVoices) => {
+
+        voices = speechVoices;
+
+        for (let i = 0; i < voices.length; i++) {
+          if (voices[i].name === voice) {
+            utterance.voice = voices[i];
+            break;
+          }
         }
+
+        for (let [key, value] of Object.entries(options)) {
+          utterance[key] = value;
+        }
+
+        if (typeof onEnd === 'function') {
+          utterance.onend = onEnd;
+        }
+
+        synthesis.speak(utterance);
       }
 
-      for (var [key, value] of Object.entries(options)) {
-        utterance[key] = value;
+      if (!voices.length) {
+        setSpeech().then((speechVoices) => read(speechVoices));
       }
-
-      if (typeof onEnd === 'function') {
-        utterance.onend = onEnd;
+      else {
+        read(voices);
       }
-
-      synthesis.speak(utterance);
     },
     'cancel': function() {
       synthesis.cancel();

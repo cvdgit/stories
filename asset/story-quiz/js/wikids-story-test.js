@@ -26,6 +26,7 @@ import PassTest from "./questions/PassTest";
 import DragWords from "./questions/DragWords";
 import {createBeginPage} from "./components/BeginPage";
 import createHome from "./components/header/Home";
+import createPlayBackdrop from "./components/questionAudio";
 
 
 var plugins = [];
@@ -238,13 +239,13 @@ function WikidsStoryTest(el, options) {
     return parseInt(that.options.required) === 1;
   }
 
-  function createContainer() {
+  function createContainer(content) {
     if (that.options.forSlide) {
       setElementHtml($("<section/>")
         .attr("data-background-color", "#ffffff")
-        .append(dom.wrapper));
+        .append(content));
     } else {
-      setElementHtml(dom.wrapper);
+      setElementHtml(content);
     }
   }
 
@@ -288,7 +289,7 @@ function WikidsStoryTest(el, options) {
     }
 
     dom.wrapper.append(dom.beginPage);
-    createContainer();
+    createContainer(dom.wrapper);
   }
 
   function incorrectAnswerAction() {
@@ -382,7 +383,7 @@ function WikidsStoryTest(el, options) {
     addEventListeners();
 
     start();
-    createContainer();
+    createContainer(dom.wrapper);
   }
 
   function createLoader(text) {
@@ -826,7 +827,7 @@ function WikidsStoryTest(el, options) {
 
   function createInputAnswer(question, answer) {
     var $elem = $('<div/>');
-    if (testConfig.isSayCorrectAnswer()) {
+    if (testConfig.isSayCorrectAnswer() || testConfig.isAskQuestion()) {
       var $repeat = '<a href="" title="Повторить слово" class="glyphicon glyphicon-repeat synthesis-question" style="top: 5px; right: 10px"><i></i></a>';
       $elem.append($repeat);
     }
@@ -1044,11 +1045,12 @@ function WikidsStoryTest(el, options) {
         titleElement.append($('<div/>', {text: questionName}));
       }
 
+      const playContent = $(createPlayBackdrop());
       $('<span/>', {
         'css': {'line-height': '3.5rem', 'margin-left': '10px', 'color': '#000', 'cursor': 'pointer'},
         'title': 'Прослушать'
       })
-        .on('click', function () {
+        .on('click', function() {
           var $this = $(this);
           if ($this.data('process')) {
             return false;
@@ -1058,20 +1060,12 @@ function WikidsStoryTest(el, options) {
           var i = $(this).find('i');
           i.removeClass('glyphicon-volume-up').addClass('glyphicon-option-horizontal');
 
-          var onSpeechEnd = function () {
+          questionWrap.append(playContent);
+          sayQuestionName(question, () => {
             i.removeClass('glyphicon-option-horizontal').addClass('glyphicon-volume-up');
             $this.data('process', false);
-          }
-
-          if (haveAudioFile(question)) {
-            setTimeout(function () {
-              playAudio(getAudioFile(question), onSpeechEnd);
-            }, 500);
-          } else {
-            setTimeout(function () {
-              speech.readText(text, testConfig.getAskQuestionLang(), onSpeechEnd);
-            }, 500);
-          }
+            playContent.remove();
+          });
         })
         .append($('<i/>', {'class': 'glyphicon glyphicon-volume-up'}))
         .appendTo(titleElement);
@@ -1935,11 +1929,13 @@ function WikidsStoryTest(el, options) {
       .find('input[type=checkbox],input[type=radio]')
       .prop('checked', false);
 
+    dom.questions.show();
+
+    const playContent = $(createPlayBackdrop());
+
     currentQuestionElement
       .addClass('wikids-test-active-question')
-      .fadeIn();
-
-    dom.questions.fadeIn();
+      .show();
 
     if (isShuffleAnswers(currentQuestion) && !questionViewRegion(currentQuestion) && !questionViewSequence(currentQuestion) && !questionViewPassTest(currentQuestion) && !questionViewDragWords(currentQuestion)) {
       $('.wikids-test-answers', currentQuestionElement)
@@ -1975,7 +1971,7 @@ function WikidsStoryTest(el, options) {
       $('.drag-words-question', currentQuestionElement).html(that.dragWordsQuestion.create(currentQuestion));
       dom.nextButton.off("click").on("click", function () {
         const answer = that.dragWordsQuestion.getUserAnswers();
-        nextQuestion(answer, function(question, userAnswers) {
+        nextQuestion(answer, function (question, userAnswers) {
           return that.dragWordsQuestion.checkAnswers(question, userAnswers);
         });
       });
@@ -1998,25 +1994,54 @@ function WikidsStoryTest(el, options) {
 
     if (testConfig.answerTypeIsInput(currentQuestion)) {
 
+      const q = $('.wikids-test-active-question .answer-input', dom.questions);
+      q.val('');
+
       if (testConfig.isSayCorrectAnswer()) {
-        sayCorrectAnswerName(nextQuestionObj);
-        var text = getCorrectAnswers(nextQuestionObj)[0].name;
+
+        currentQuestionElement.append(playContent);
+
+        const correctText = getCorrectAnswers(nextQuestionObj)[0].name;
+        sayCorrectAnswerName(correctText, () => {
+          playContent.remove();
+          q.trigger('focus');
+        });
+
         $('.wikids-test-active-question .synthesis-question', dom.questions)
           .off('click')
-          .on('click', function (e) {
+          .on('click',(e) => {
             e.preventDefault();
-            speech.readText(text, testConfig.getInputVoice());
+
+            currentQuestionElement.append(playContent)
+            sayCorrectAnswerName(correctText, () => {
+              playContent.remove();
+              q.trigger('focus');
+            });
           });
       }
+      else if (testConfig.isAskQuestion()) {
 
-      if (testConfig.isAskQuestion()) {
-        sayQuestionName();
+        currentQuestionElement.append(playContent);
+        sayQuestionName(currentQuestion, () => {
+          playContent.remove();
+          q.trigger('focus');
+        });
+
+        $('.wikids-test-active-question .synthesis-question', dom.questions)
+          .off('click')
+          .on('click',(e) => {
+            e.preventDefault();
+
+            currentQuestionElement.append(playContent)
+            sayQuestionName(currentQuestion, () => {
+              playContent.remove();
+              q.trigger('focus');
+            });
+          });
       }
-
-      var q = $('.wikids-test-active-question .answer-input', dom.questions);
-      setTimeout(function () {
-        q.val('').focus();
-      }, 100);
+      else {
+        q.trigger('focus');
+      }
     }
 
     if (testConfig.answerTypeIsRecording(currentQuestion)) {
@@ -2038,16 +2063,10 @@ function WikidsStoryTest(el, options) {
 
     if (testConfig.answerTypeIsDefault()) {
       if (testConfig.isAskQuestion()) {
-        if (haveAudioFile(currentQuestion)) {
-          setTimeout(function () {
-            playAudio(getAudioFile(currentQuestion));
-          }, 500);
-        } else {
-          var readText = currentQuestion.name;
-          setTimeout(function () {
-            speech.readText(readText, testConfig.getAskQuestionLang());
-          }, 500);
-        }
+        currentQuestionElement.append(playContent);
+        sayQuestionName(currentQuestion, () => {
+          playContent.remove();
+        });
       }
 
       if (testConfig.isVoiceResponse()) {
@@ -2103,24 +2122,24 @@ function WikidsStoryTest(el, options) {
                       } else {
 
                         var $content = $(`<div class="voice-content">
-                                         <div>
-                                           <div class="voice-content-row">
-                                             <h4 class="voice-content-row__title">Input:</h4>
-                                             <p class="voice-input">${response.input}</p>
-                                           </div>
-                                           <div class="voice-content-row">
-                                             <h4 class="voice-content-row__title">Output:</h4>
-                                             <p class="voice-output">${response.output || 'Пусто'}</p>
-                                           </div>
-                                           <div class="voice-content-row">
-                                             <h4 class="voice-content-row__title">Расстояние:</h4>
-                                             <p class="voice-lev">${response.lev}</p>
-                                           </div>
-                                         </div>
-                                         <div class="voice-content-action">
-                                           <button class="voice-add" type="button">Добавить как верный ответ</button>
-                                         </div>
-                                       </div>`);
+                                     <div>
+                                       <div class="voice-content-row">
+                                         <h4 class="voice-content-row__title">Input:</h4>
+                                         <p class="voice-input">${response.input}</p>
+                                       </div>
+                                       <div class="voice-content-row">
+                                         <h4 class="voice-content-row__title">Output:</h4>
+                                         <p class="voice-output">${response.output || 'Пусто'}</p>
+                                       </div>
+                                       <div class="voice-content-row">
+                                         <h4 class="voice-content-row__title">Расстояние:</h4>
+                                         <p class="voice-lev">${response.lev}</p>
+                                       </div>
+                                     </div>
+                                     <div class="voice-content-action">
+                                       <button class="voice-add" type="button">Добавить как верный ответ</button>
+                                     </div>
+                                   </div>`);
 
                         $content.find('.voice-add').on('click', function () {
                           VoiceResponseInfo.setContent(dom.wrapper, '<div class="voice-result"><p>...</p></div>');
@@ -2151,26 +2170,16 @@ function WikidsStoryTest(el, options) {
     }
   }
 
-  function sayQuestionName() {
-    if (haveAudioFile(currentQuestion)) {
-      setTimeout(function () {
-        playAudio(getAudioFile(currentQuestion));
-      }, 500);
+  function sayQuestionName(question, onEndCallback) {
+    if (haveAudioFile(question)) {
+      playAudio(getAudioFile(question), onEndCallback);
     } else {
-      var readText = currentQuestion.name;
-      setTimeout(function () {
-        speech.readText(readText, testConfig.getAskQuestionLang());
-      }, 500);
+      speech.readText(question.name, testConfig.getAskQuestionLang(), onEndCallback);
     }
   }
 
-  function sayCorrectAnswerName(question) {
-    var text = getCorrectAnswers(question)[0].name;
-    var q = $('.wikids-test-active-question .answer-input', dom.questions);
-    setTimeout(function () {
-      speech.readText(text, testConfig.getInputVoice());
-      q.focus();
-    }, 500);
+  function sayCorrectAnswerName(text, onEndCallback) {
+    speech.readText(text, testConfig.getInputVoice(), onEndCallback);
   }
 
   function cancelSpeech() {
