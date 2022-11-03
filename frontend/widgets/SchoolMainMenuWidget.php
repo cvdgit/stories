@@ -25,7 +25,7 @@ class SchoolMainMenuWidget extends Widget
     public function run(): string
     {
         $items = [
-            [
+/*            [
                 'label' => '<span class="menu-item__link dropdown-toggle">Разделы</span>',
                 'items' => [
                     ['label' => 'Истории для детей', 'url' => ['/story/index', 'section' => 'stories']],
@@ -33,6 +33,11 @@ class SchoolMainMenuWidget extends Widget
                 ],
                 'options' => ['class' => 'menu-item dropdown'],
                 'submenuTemplate' => "\n<ul class='dropdown-menu'>\n{items}\n</ul>\n",
+            ],*/
+            [
+                'label' => 'Истории для детей',
+                'url' => ['/story/index', 'section' => 'stories'],
+                'active' => Yii::$app->controller->id === 'story',
             ],
             [
                 'label' => 'Блог',

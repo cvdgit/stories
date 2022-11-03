@@ -23,10 +23,15 @@ class MainMenuWidget extends Widget
     {
         $sectionMenuItems = SiteSection::allVisibleForMenu(Yii::$app->request->get('section'));
         $menuItems = [
-            [
+/*            [
                 'label' => '<span>Разделы <b class="caret"></b></span>',
                 'items' => $sectionMenuItems,
                 'options' => ['class' => 'sub-dropdown'],
+            ],*/
+            [
+                'label' => 'Истории для детей',
+                'url' => ['/story/index', 'section' => 'stories'],
+                'active' => Yii::$app->controller->id === 'story',
             ],
             [
                 'label' => 'Блог',
