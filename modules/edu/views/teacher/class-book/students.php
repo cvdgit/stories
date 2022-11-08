@@ -2,13 +2,16 @@
 
 declare(strict_types=1);
 
+use backend\widgets\grid\PjaxDeleteButton;
 use modules\edu\forms\teacher\ClassBookForm;
 use modules\edu\widgets\TeacherMenuWidget;
 use yii\data\DataProviderInterface;
+use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\web\View;
+use yii\widgets\Pjax;
 
 /**
  * @var View $this
@@ -36,9 +39,11 @@ CSS
     <?= TeacherMenuWidget::widget() ?>
 
     <div class="header-block">
-        <h1 style="font-size: 32px; margin: 0; font-weight: 500; line-height: 1.2" class="h2"><?= Html::a('<i class="glyphicon glyphicon-arrow-left back-arrow"></i>', ['/edu/teacher/class-book/index']) ?> <?= Html::encode($this->title) ?></h1>
-        <div style="margin-left: 1rem; margin-right: auto; height: 100%">
-            <a href="<?= Url::to(['/edu/teacher/class-book/update', 'id' => $formModel->getId()]) ?>">Изменить</a>
+        <div style="display: flex; flex-direction: row; align-items: center">
+            <h1 style="font-size: 32px; margin: 0; font-weight: 500; line-height: 1.2" class="h2"><?= Html::a('<i class="glyphicon glyphicon-arrow-left back-arrow"></i>', ['/edu/teacher/class-book/index']) ?> <?= Html::encode($this->title) ?></h1>
+            <div style="margin-left: 1rem; margin-right: auto; height: 100%">
+                <a href="<?= Url::to(['/edu/teacher/class-book/update', 'id' => $formModel->getId()]) ?>">Изменить</a>
+            </div>
         </div>
         <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group">
@@ -51,6 +56,7 @@ CSS
         <p class="lead">Класс: <?= Html::encode($formModel->name) ?></p>
     </div>
 
+    <?php Pjax::begin(['id' => 'pjax-students']); ?>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'summary' => false,
@@ -77,8 +83,22 @@ CSS
                     ]);
                 }
             ],
+            [
+                'class' => ActionColumn::class,
+                'template' => '{delete}',
+                'buttons' => [
+                    'delete' => static function($url, $model) {
+                        return new PjaxDeleteButton('#', [
+                            'class' => 'pjax-delete-link',
+                            'delete-url' => Url::to(['/edu/teacher/class-book/delete-student', 'id' => $model->id]),
+                            'pjax-container' => 'pjax-students',
+                        ]);
+                    }
+                ],
+            ],
         ],
-    ]) ?>
+    ]); ?>
+    <?php Pjax::end(); ?>
 </div>
 
 <div class="modal site-dialog remote fade" tabindex="-1" id="parent-invite-modal">

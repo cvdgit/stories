@@ -18,6 +18,8 @@ use modules\edu\services\StudentService;
 use modules\edu\services\TeacherService;
 use Yii;
 use yii\data\ActiveDataProvider;
+use yii\filters\AjaxFilter;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Request;
@@ -35,6 +37,22 @@ class ClassBookController extends Controller
         $this->teacherService = $teacherService;
         $this->studentService = $studentService;
         $this->parentInviteService = $parentInviteService;
+    }
+
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'delete-student' => ['POST'],
+                ],
+            ],
+            [
+                'class' => AjaxFilter::class,
+                'only' => ['delete-student'],
+            ],
+        ];
     }
 
     public function actionIndex()
@@ -207,5 +225,23 @@ class ClassBookController extends Controller
         return $this->renderAjax('parent_invite', [
             'formModel' => $inviteForm,
         ]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionDeleteStudent(int $id, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+        if (EduStudent::findOne($id) === null) {
+            throw new NotFoundHttpException('Ученик не найден');
+        }
+        try {
+            $this->studentService->delete($id);
+            return ['success' => true, 'message' => 'Успешно'];
+        }
+        catch (Exception $exception) {
+            return ['success' => false, 'message' => $exception->getMessage()];
+        }
     }
 }
