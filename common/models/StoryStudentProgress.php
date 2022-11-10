@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -19,39 +20,19 @@ use yii\db\ActiveRecord;
  */
 class StoryStudentProgress extends ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
+    public function behaviors(): array
+    {
+        return [
+            [
+                'class' => TimestampBehavior::class,
+                'createdAtAttribute' => false,
+            ],
+        ];
+    }
+
     public static function tableName(): string
     {
         return 'story_student_progress';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rules(): array
-    {
-        return [
-            [['story_id', 'student_id', 'updated_at'], 'required'],
-            [['story_id', 'student_id', 'progress', 'updated_at'], 'integer'],
-            [['story_id', 'student_id'], 'unique', 'targetAttribute' => ['story_id', 'student_id']],
-            [['story_id'], 'exist', 'skipOnError' => true, 'targetClass' => Story::class, 'targetAttribute' => ['story_id' => 'id']],
-            [['student_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserStudent::class, 'targetAttribute' => ['student_id' => 'id']],
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels(): array
-    {
-        return [
-            'story_id' => 'Story ID',
-            'student_id' => 'Student ID',
-            'progress' => 'Progress',
-            'updated_at' => 'Updated At',
-        ];
     }
 
     public function getStory(): ActiveQuery
@@ -72,5 +53,31 @@ class StoryStudentProgress extends ActiveRecord
     public function statusInProgress(): bool
     {
         return $this->progress > 0 && !$this->statusIsDone();
+    }
+
+    public static function create(int $storyId, int $studentId, int $progress = 0): self
+    {
+        $model = new self();
+        $model->story_id = $storyId;
+        $model->student_id = $studentId;
+        $model->progress = $progress;
+        return $model;
+    }
+
+    public function calcProgress(int $numberOfSlides, int $viewedSlidesNumber): int
+    {
+        $percent = round($viewedSlidesNumber * 100 / $numberOfSlides);
+        if ($percent > 100) {
+            $percent = 100;
+        }
+        if ($percent < 0) {
+            $percent = 0;
+        }
+        return $percent;
+    }
+
+    public function updateProgress(int $progress): void
+    {
+        $this->progress = $progress;
     }
 }

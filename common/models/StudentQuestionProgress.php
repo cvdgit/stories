@@ -55,7 +55,7 @@ class StudentQuestionProgress extends ActiveRecord
         return self::findAll(['test_id' => $testID]);
     }
 
-    public static function create(int $studentID, int $questionID, int $progress, int $testID)
+    public static function create(int $studentID, int $questionID, int $progress, int $testID): StudentQuestionProgress
     {
         $model = new self();
         $model->student_id = $studentID;
@@ -65,7 +65,7 @@ class StudentQuestionProgress extends ActiveRecord
         return $model;
     }
 
-    public function updateProgress(int $progress)
+    public function updateProgress(int $progress): void
     {
         $this->progress = $progress;
     }

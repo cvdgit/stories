@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use common\models\study_task\StudyTaskProgressStatus;
 use common\services\story\CountersService;
+use Exception;
 use frontend\models\SlideStatForm;
 use frontend\models\StoryStudentStatForm;
 use frontend\services\StoryStatService;
@@ -13,7 +14,6 @@ use yii\web\Response;
 
 class StatisticsController extends Controller
 {
-
     private $countersService;
     private $storyStatService;
 
@@ -58,8 +58,9 @@ class StatisticsController extends Controller
                 $this->storyStatService->saveStudentStat($form);
                 return ['success' => true];
             }
-            catch (\Exception $exception) {
+            catch (Exception $exception) {
                 Yii::$app->errorHandler->logException($exception);
+                return ['success' => false, 'message' => $exception->getMessage()];
             }
         }
 

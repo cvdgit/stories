@@ -14,6 +14,7 @@ use common\models\User;
 use common\models\UserQuestionHistoryModel;
 use common\models\UserStudent;
 use Exception;
+use frontend\services\QuestionProgressService;
 use linslin\yii2\curl\Curl;
 use Yii;
 use yii\db\Query;
@@ -26,13 +27,18 @@ use yii\web\NotFoundHttpException;
 
 class QuestionController extends Controller
 {
-
     private $quizHistoryService;
 
-    public function __construct($id, $module, QuizHistoryService $quizHistoryService, $config = [])
+    /**
+     * @var QuestionProgressService
+     */
+    private $questionProgressService;
+
+    public function __construct($id, $module, QuizHistoryService $quizHistoryService, QuestionProgressService $questionProgressService, $config = [])
     {
-        $this->quizHistoryService = $quizHistoryService;
         parent::__construct($id, $module, $config);
+        $this->quizHistoryService = $quizHistoryService;
+        $this->questionProgressService = $questionProgressService;
     }
 
     public function actionInit(int $testId, int $userId = null, int $studentId = null): array
@@ -321,28 +327,39 @@ class QuestionController extends Controller
             ->one();
     }
 
-    public function actionAnswer()
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionAnswer(): array
     {
         if (Yii::$app->user->isGuest) {
             return ['success' => false];
         }
+
         $model = new UserQuestionHistoryModel();
         if ($model->load(Yii::$app->request->post(), '') && $model->validate()) {
 
+            $userQuestionHistoryID = null;
             if ($model->isSourceNeo()) {
                 $userQuestionHistoryID = $model->createUserQuestionHistory();
             }
             if ($model->isSourceWordList() || $model->isSourceTest() || $model->isSourceTests()) {
                 $userQuestionHistoryID = $model->createWordListQuestionHistory();
             }
-            $createdModels = $model->createUserQuestionAnswers($userQuestionHistoryID);
 
-            if (count($createdModels) > 0) {
-                if ($model->isSourceWordList()) {
+            if ($userQuestionHistoryID !== null) {
+                $createdModels = $model->createUserQuestionAnswers($userQuestionHistoryID);
+                if ((count($createdModels) > 0) && $model->isSourceWordList()) {
                     $testModel = $this->findTestModel($model->test_id);
                     if ($testModel->isRememberAnswers()) {
                         TestRememberAnswer::updateTestRememberAnswer($testModel->id, $model->student_id, $model->entity_id, $createdModels[0]->answer_entity_name);
                     }
+                }
+
+                try {
+                    $this->questionProgressService->saveProgress($model->student_id, $model->test_id, $model->progress, $model->question_topic_id);
+                } catch (Exception $exception) {
+                    Yii::$app->errorHandler->logException($exception);
                 }
             }
         }
@@ -365,12 +382,15 @@ class QuestionController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
-    protected function findTestModel(int $id)
+    /**
+     * @throws NotFoundHttpException
+     */
+    protected function findTestModel(int $id): StoryTest
     {
         if (($model = StoryTest::findOne($id)) !== null) {
             return $model;
         }
-        throw new NotFoundHttpException('The requested page does not exist.');
+        throw new NotFoundHttpException('Тест не найден');
     }
 
     /**

@@ -17,11 +17,11 @@ export default (config) => {
   const session = makeSessionId();
 
   function send(data) {
-    $.ajax({
+    return $.ajax({
       url: config.action,
       type: 'POST',
       dataType: 'json',
-      data: data
+      data
     });
   }
 
@@ -40,21 +40,17 @@ export default (config) => {
   }
 
   function sendStatistics(ev) {
-
     const data = getStatistics(ev);
-
     if (data) {
-      send(data);
+      return send(data);
     }
   }
 
   return {
     slideChangeEvent(ev) {
-
       const ts = toUnixTS(ev.timeStamp);
-
       if (ts > 0 && ev.indexh > 0) {
-        sendStatistics(ev);
+        return sendStatistics(ev);
       }
     }
   };

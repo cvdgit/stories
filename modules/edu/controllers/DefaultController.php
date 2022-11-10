@@ -4,12 +4,17 @@ namespace modules\edu\controllers;
 
 use common\models\User;
 use common\rbac\UserRoles;
+use modules\edu\models\EduStory;
+use modules\edu\query\StoryStudentProgressFetcher;
 use Ramsey\Uuid\Uuid;
 use Yii;
+use yii\db\Expression;
 use yii\db\Query;
 use yii\helpers\Url;
+use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\Cookie;
+use yii\web\NotFoundHttpException;
 use yii\web\Request;
 use yii\web\Response;
 
@@ -143,5 +148,46 @@ class DefaultController extends Controller
         }
 
         return ['success' => true, 'url' => Url::to(['/edu/story/view', 'id' => $nextStoryId, 'program_id' => $program_id])];
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     * @throws BadRequestHttpException
+     */
+    public function actionStoryStat(int $story_id, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+
+        if (($story = EduStory::findOne($story_id)) === null) {
+            throw new NotFoundHttpException('История не найдена');
+        }
+
+        /** @var User $currentUser */
+        $currentUser = Yii::$app->user->identity;
+        if (($mainStudent = $currentUser->student()) === null) {
+            throw new BadRequestHttpException('Не удалось определить студента');
+        }
+
+        $progress = (new StoryStudentProgressFetcher())->fetch($story->id, $mainStudent->id);
+
+        $testingRows = (new Query())
+            ->select([
+                'test_id' => new Expression('DISTINCT story_story_test.test_id'),
+                'test_name' => 'story_test.title',
+                'progress' => new Expression('IFNULL(student_question_progress.progress, 0)'),
+            ])
+            ->from('story_story_test')
+            ->innerJoin('story_test', 'story_story_test.test_id = story_test.id')
+            ->leftJoin('student_question_progress', 'student_question_progress.test_id = story_test.id AND student_question_progress.student_id = :student', [':student' => $mainStudent->id])
+            ->where(['story_story_test.story_id' => $story->id])
+            ->all();
+
+        $data = [
+            'is_complete' => $story->isComplete($progress),
+            'progress' => $progress,
+            'tests' => $testingRows,
+        ];
+
+        return ['success' => true, 'data' => $data];
     }
 }

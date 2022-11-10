@@ -82,4 +82,9 @@ class EduStory extends ActiveRecord
             ->andWhere(['in', 't2.type', [1, 2]])
             ->all();
     }
+
+    public function isComplete(int $progress): bool
+    {
+        return $progress === 100;
+    }
 }

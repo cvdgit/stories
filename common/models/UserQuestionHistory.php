@@ -137,7 +137,7 @@ class UserQuestionHistory extends ActiveRecord
         return $model;
     }
 
-    public function afterSave($insert, $changedAttributes)
+    /*public function afterSave($insert, $changedAttributes)
     {
         $progressModel = new \frontend\models\StudentQuestionProgress();
         $progressModel->student_id = $this->student_id;
@@ -146,7 +146,7 @@ class UserQuestionHistory extends ActiveRecord
         $progressModel->progress = $this->progress;
         $progressModel->updateProgress();
         parent::afterSave($insert, $changedAttributes);
-    }
+    }*/
 
     public static function clearTestHistory(int $studentID, int $testID)
     {
