@@ -35,6 +35,7 @@ class PoetryWordProcessorTest extends Unit
             3 => new TestWord(['id' => 3, 'name' => '3', 'word_list_id' => 1, 'order' => 3]),
             4 => new TestWord(['id' => 4, 'name' => '4', 'word_list_id' => 1, 'order' => 4]),
             5 => new TestWord(['id' => 5, 'name' => '5', 'word_list_id' => 1, 'order' => 5]),
+            6 => new TestWord(['id' => 6, 'name' => '6', 'word_list_id' => 1, 'order' => 6]),
         ];
         $wordProcessor = new PoetryWordProcessor($words);
         $dto = $wordProcessor->process($word);
