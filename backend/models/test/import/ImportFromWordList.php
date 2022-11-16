@@ -23,7 +23,7 @@ class ImportFromWordList extends Model
                 'number_answers',
                 'required',
                 'when' => function(self $model) {
-                    return !$model->isTypeSequence();
+                    return (int)$model->question_type === QuestionType::SEQUENCE;
                 },
                 'whenClient' => "function (attribute, value) {
                     return $('#importfromwordlist-question_type').val() === '0';
@@ -47,11 +47,12 @@ class ImportFromWordList extends Model
         return [
             QuestionType::ONE => 'Один ответ',
             QuestionType::SEQUENCE => 'Восстановить последовательность',
+            QuestionType::POETRY => 'Запоминание стихов',
         ];
     }
 
     public function isTypeSequence(): bool
     {
-        return (int)$this->question_type === QuestionType::SEQUENCE;
+        return (int) $this->question_type === QuestionType::SEQUENCE;
     }
 }

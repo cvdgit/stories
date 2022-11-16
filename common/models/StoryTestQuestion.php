@@ -196,6 +196,11 @@ class StoryTestQuestion extends ActiveRecord
         return $model;
     }
 
+    public static function createPoetry(int $testId, string $name, int $order = null): self
+    {
+        return self::create($testId, $name, QuestionType::POETRY, $order, 1);
+    }
+
     public function getImagesPath(): string
     {
         return $this->getRegionImage()->getImagesPath();
@@ -239,6 +244,11 @@ class StoryTestQuestion extends ActiveRecord
     public function typeIsDragWords(): bool
     {
         return (new QuestionType($this->type))->isDragWords();
+    }
+
+    public function typeIsPoetry(): bool
+    {
+        return (new QuestionType($this->type))->isPoetry();
     }
 
     public function deleteRegionImages(): void

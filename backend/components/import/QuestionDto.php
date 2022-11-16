@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\components\import;
 
 class QuestionDto
 {
-
     private $name;
     private $answers = [];
 
@@ -58,5 +59,12 @@ class QuestionDto
     public function getAnswers(): array
     {
         return $this->answers;
+    }
+
+    public function getCorrectAnswers(): array
+    {
+        return array_values(array_filter($this->getAnswers(), static function (AnswerDto $answer) {
+            return $answer->isCorrect();
+        }));
     }
 }

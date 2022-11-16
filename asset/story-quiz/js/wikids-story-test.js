@@ -27,6 +27,7 @@ import DragWords from "./questions/DragWords";
 import {createBeginPage} from "./components/BeginPage";
 import createHome from "./components/header/Home";
 import createPlayBackdrop from "./components/questionAudio";
+import Poetry from "./questions/Poetry";
 
 
 var plugins = [];
@@ -91,6 +92,7 @@ function WikidsStoryTest(el, options) {
   this.voiceResponse = null;
   this.passTestQuestion = null;
   this.dragWordsQuestion = null;
+  this.poetryQuestion = null;
 
   setElementHtml(createLoader('Инициализация'));
 
@@ -107,6 +109,8 @@ function WikidsStoryTest(el, options) {
     testParams = {};
 
   var questionAnswers = {};
+
+  let questionList = [];
 
   function reset() {
     numQuestions = 0;
@@ -1092,7 +1096,10 @@ function WikidsStoryTest(el, options) {
       .data("question", question);
 
     questionWrap.append(stars);
-    questionWrap.append(titleElement);
+
+    if (!questionViewPoetry(question)) {
+      questionWrap.append(titleElement);
+    }
 
     if (testConfig.showDescriptionInQuestions() && testConfig.getDescription().length) {
       questionWrap.append(
@@ -1106,10 +1113,10 @@ function WikidsStoryTest(el, options) {
   }
 
   function createQuestions(questions) {
-    var $questions = $("<div/>").addClass("wikids-test-questions");
+    const $questions = $("<div/>").addClass("wikids-test-questions");
     questions.forEach(function (question) {
 
-      var $question = createQuestion(question);
+      const $question = createQuestion(question);
 
       var view = question['view'] ? question.view : '';
       if (testConfig.answerTypeIsNumPad(question)) {
@@ -1153,6 +1160,9 @@ function WikidsStoryTest(el, options) {
           break;
         case 'drag-words':
           $answers = that.dragWordsQuestion.createWrapper();
+          break;
+        case 'poetry':
+          $answers = that.poetryQuestion.createWrapper();
           break;
         default:
           $answers = createAnswers(getAnswersData(question), question);
@@ -1478,6 +1488,10 @@ function WikidsStoryTest(el, options) {
 
   function questionViewDragWords(question) {
     return getQuestionView(question) === 'drag-words';
+  }
+
+  function questionViewPoetry(question) {
+    return getQuestionView(question) === 'poetry';
   }
 
   function questionViewDefault(question) {
@@ -1921,6 +1935,11 @@ function WikidsStoryTest(el, options) {
 
     cancelSpeech();
 
+    const exists = questionList.find(q => parseInt(q.id) === parseInt(currentQuestion.id));
+    if (exists) {
+      questionList = questionList.filter(q => parseInt(q.id) !== parseInt(currentQuestion.id));
+    }
+
     dom.nextButton.off("click").on("click", nextQuestion);
 
     currentQuestionElement = $('.wikids-test-question[data-question-id=' + nextQuestionObj.id + ']', dom.questions);
@@ -1937,7 +1956,14 @@ function WikidsStoryTest(el, options) {
       .addClass('wikids-test-active-question')
       .show();
 
-    if (isShuffleAnswers(currentQuestion) && !questionViewRegion(currentQuestion) && !questionViewSequence(currentQuestion) && !questionViewPassTest(currentQuestion) && !questionViewDragWords(currentQuestion)) {
+    if (
+      isShuffleAnswers(currentQuestion)
+      && !questionViewRegion(currentQuestion)
+      && !questionViewSequence(currentQuestion)
+      && !questionViewPassTest(currentQuestion)
+      && !questionViewDragWords(currentQuestion)
+      && !questionViewPoetry(currentQuestion)
+    ) {
       $('.wikids-test-answers', currentQuestionElement)
         .empty()
         .append(createAnswers(getAnswersData(currentQuestion), currentQuestion)
@@ -1975,6 +2001,12 @@ function WikidsStoryTest(el, options) {
           return that.dragWordsQuestion.checkAnswers(question, userAnswers);
         });
       });
+    }
+
+    if (questionViewPoetry(currentQuestion)) {
+      $('.drag-words-question', currentQuestionElement)
+        .html(that.poetryQuestion.create(currentQuestion));
+      that.poetryQuestion.scroll();
     }
 
     if (testConfig.answerTypeIsMissingWords(currentQuestion)) {
@@ -2469,6 +2501,7 @@ function WikidsStoryTest(el, options) {
       && !questionViewDefault(currentQuestion)
       && !questionViewSvg(currentQuestion)
       && !questionViewRegion(currentQuestion)
+      && !questionViewPoetry(currentQuestion)
       && !testConfig.sourceIsNeo()) {
       dom.wrapper.removeClass('wikids-test--no-controls');
       dom.controls.show();
@@ -2520,12 +2553,17 @@ function WikidsStoryTest(el, options) {
           showCorrectAnswerPage(currentQuestion, answer);
         }
       } else {
+
+        questionList.push(currentQuestion);
+
         showNextQuestion();
         dom.results.hide();
         showNextButton();
       }
     }
   }
+
+  this.getQuestionList = () => questionList;
 
   function dispatchEvent(type, args) {
     var event = document.createEvent("HTMLEvents", 1, 2);
@@ -2686,6 +2724,7 @@ WikidsStoryTest.mount(RegionQuestion);
 WikidsStoryTest.mount(VoiceResponse);
 WikidsStoryTest.mount(PassTest);
 WikidsStoryTest.mount(DragWords);
+WikidsStoryTest.mount(Poetry);
 
 WikidsStoryTest.getTests = function () {
   return tests;

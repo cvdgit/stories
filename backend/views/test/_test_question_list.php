@@ -23,6 +23,7 @@ use yii\helpers\Url;
                         <li><?= Html::a('Последовательность', ['test/question-sequence/create', 'test_id' => $model->id]) ?></li>
                         <li><?= Html::a('Тест с пропусками', ['test/pass-test/create', 'test_id' => $model->id]) ?></li>
                         <li><?= Html::a('Перетаскивание слов', ['test/drag-words/create', 'test_id' => $model->id]) ?></li>
+                        <li><?= Html::a('Запоминание стихов', ['/testing/question/poetry/create', 'test_id' => $model->id]) ?></li>
                     </ul>
                 </div>
                 <?php endif ?>

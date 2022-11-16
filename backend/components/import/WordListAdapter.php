@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\components\import;
 
 use common\models\TestWord;
@@ -7,7 +9,6 @@ use DomainException;
 
 class WordListAdapter
 {
-
     private $words;
     private $processor;
 

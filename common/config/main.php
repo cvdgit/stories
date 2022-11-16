@@ -22,6 +22,7 @@ return [
     'modules' => [
         'files' => ['class' => \modules\files\Module::class],
         'edu' => ['class' => \modules\edu\Module::class],
+        'testing' => ['class' => \modules\testing\Module::class],
     ],
     'components' => [
         'studentContext' => [

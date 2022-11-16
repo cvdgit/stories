@@ -19,6 +19,7 @@ class QuestionType
 
     public const PASS_TEST = 8;
     public const DRAG_WORDS = 9;
+    public const POETRY = 10;
 
     private $type;
 
@@ -44,6 +45,7 @@ class QuestionType
             self::ANSWER_MISSING_WORDS => 'Пропущенные слова',
             self::PASS_TEST => 'Тест с пропусками',
             self::DRAG_WORDS => 'Перетаскивание слов',
+            self::POETRY => 'Запоминание стихов',
         ];
     }
 
@@ -80,5 +82,10 @@ class QuestionType
     public function isDragWords(): bool
     {
         return $this->type === self::DRAG_WORDS;
+    }
+
+    public function isPoetry(): bool
+    {
+        return $this->type === self::POETRY;
     }
 }

@@ -22,9 +22,9 @@ class QuestionManageWidget extends BaseQuizManageWidget
 
     public function run(): string
     {
-        if (!$this->quizModel instanceof StoryTest) {
-            throw new DomainException('Unknown quiz');
-        }
+        //if (!$this->quizModel instanceof StoryTest) {
+        //    throw new DomainException('Unknown quiz');
+        //}
 
         return $this->render('question-manage', [
             'items' => $this->makeNavItems(),

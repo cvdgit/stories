@@ -44,7 +44,7 @@ $('#import-from-word-list-form')
                 location.reload();
             }
             else {
-                toastr.error(response.errors);
+                toastr.error(response.message);
             }
         })
         .always(function() {
