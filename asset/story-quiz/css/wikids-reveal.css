@@ -1570,6 +1570,18 @@ p.wikids-test-description {
   user-select: none;
 }
 
+.pass-test-btn.success {
+  color: #fff;
+  background-color: #5cb85c;
+  border-color: #4cae4c;
+}
+
+.pass-test-btn.danger {
+  color: #fff;
+  background-color: #d9534f;
+  border-color: #d43f3a;
+}
+
 .pass-test-btn:hover {
   color: #333;
   background-color: #e6e6e6;

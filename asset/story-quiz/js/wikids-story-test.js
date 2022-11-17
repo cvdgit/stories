@@ -307,6 +307,7 @@ function WikidsStoryTest(el, options) {
   var testQuestions = [];
 
   function makeTestQuestions() {
+    console.log('makeTestQuestions');
     var end = false;
     var max = getQuestionRepeat();
     while (!end && testQuestions.length < max) {
@@ -1734,7 +1735,7 @@ function WikidsStoryTest(el, options) {
         skipQuestion.push(currentQuestion.id);
       }
     } else {
-      currentQuestion.lastAnswerIsCorrect = false;
+      currentQuestion.lastAnswerIsCorrect = questionViewPoetry(currentQuestion);
       if (currentQuestion['stars']) {
         var increased = questionsRepeat.inc(currentQuestion);
         if (increased) {
@@ -1750,7 +1751,26 @@ function WikidsStoryTest(el, options) {
 
     var done = false;
     if (!answerIsCorrect) {
+
       testQuestions.unshift(currentQuestion);
+
+      const max = 3;
+      let i = 0;
+      while (questionList.length && i < max) {
+
+        let backQuestion = questionList.pop();
+        if (questionsRepeat.inc(backQuestion)) {
+          testProgress.dec();
+        }
+        testQuestions.unshift(backQuestion);
+        updateStars(dom.questions.find(`[data-question-id=${backQuestion.id}]`), questionsRepeat.number(backQuestion));
+
+        i++;
+      }
+
+      if (i > 0) {
+        updateProgress();
+      }
     } else {
       done = questionsRepeat.done(currentQuestion);
       if (done) {
@@ -1862,29 +1882,53 @@ function WikidsStoryTest(el, options) {
       }
     }
 
-    $activeQuestion
-      .hide()
-      .removeClass('wikids-test-active-question');
-
     if (!answerIsCorrect) {
-      dom.questions.hide();
-      dom.controls.hide();
-      dom.wrapper.addClass('wikids-test--no-controls');
-      if (testConfig.sourceIsWord()
-        && !testConfig.answerTypeIsNumPad(currentQuestion)
-        && !testConfig.answerTypeIsInput(currentQuestion)
-        && !testConfig.answerTypeIsMissingWords(currentQuestion)) {
-        continueTestAction(answer);
+
+      if (questionViewPoetry(currentQuestion)) {
+        that.poetryQuestion.showCorrectOverlay(answer, getCorrectAnswers(currentQuestion));
+
+        $activeQuestion.append(that.poetryQuestion.createOverlay(() => {
+
+          $activeQuestion
+            .hide()
+            .removeClass('wikids-test-active-question');
+
+          that.poetryQuestion.removeOverlay();
+          showNextQuestion();
+          dom.results.hide();
+          showNextButton();
+        }));
+
       } else {
-        dom.results
-          .html("<p>Ответ неверный.</p>")
-          .show()
-          .delay(1000)
-          .fadeOut('slow', function () {
-            continueTestAction(answer);
-          });
+
+        $activeQuestion
+          .hide()
+          .removeClass('wikids-test-active-question');
+
+        dom.questions.hide();
+        dom.controls.hide();
+        dom.wrapper.addClass('wikids-test--no-controls');
+        if (testConfig.sourceIsWord()
+          && !testConfig.answerTypeIsNumPad(currentQuestion)
+          && !testConfig.answerTypeIsInput(currentQuestion)
+          && !testConfig.answerTypeIsMissingWords(currentQuestion)) {
+          continueTestAction(answer);
+        } else {
+          dom.results
+            .html("<p>Ответ неверный.</p>")
+            .show()
+            .delay(1000)
+            .fadeOut('slow', function () {
+              continueTestAction(answer);
+            });
+        }
       }
     } else {
+
+      $activeQuestion
+        .hide()
+        .removeClass('wikids-test-active-question');
+
       if (done && !that.options.fastMode && getQuestionRepeat() > 1) {
         showQuestionSuccessPage(answer);
       } else {

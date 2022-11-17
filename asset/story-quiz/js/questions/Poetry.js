@@ -30,6 +30,8 @@ const Poetry = function (test) {
       const btn = $('<button/>', {type: 'button', class: 'pass-test-btn', style: 'margin-bottom: 10px'})
         .text(answer.name);
 
+      btn.attr('data-answer-id', answer.id);
+
       btn.on('click', () => {
         test.nextQuestion([answer.id]);
       });
@@ -41,6 +43,8 @@ const Poetry = function (test) {
 
     return $wrap;
   };
+
+  this.overlay = null;
 
   const that = this;
 
@@ -71,6 +75,25 @@ const Poetry = function (test) {
     scroll() {
       const list = that.element.find('.poetry-list');
       list.prop('scrollTop', list.prop("scrollHeight"));
+    },
+
+    showCorrectOverlay(answer, correct) {
+      (answer || []).forEach(answerId => that.element.find(`button[data-answer-id=${answerId}]`).addClass('danger'));
+      correct.forEach(correctAnswer => that.element.find(`button[data-answer-id=${correctAnswer.id}]`).addClass('success'));
+    },
+
+    createOverlay(clickCallback) {
+      that.overlay = $(`
+    <div class="audio-backdrop" style="position: absolute; width: 100%; height: 100%; left: 0; top: 0; z-index: 10; display: flex; align-items: center; justify-content: center">
+      <div style="pointer-events: none; position: absolute; width: 100%; height: 100%; left: 0; top: 0; background: rgba(255,255,255,0.1)"></div>
+    </div>
+  `);
+      that.overlay.on('click', clickCallback);
+      return that.overlay;
+    },
+
+    removeOverlay() {
+      that.overlay && that.overlay.remove();
     }
   }
 };
