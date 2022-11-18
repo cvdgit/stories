@@ -102,7 +102,8 @@ class DefaultController extends Controller
             throw new NotFoundHttpException('Ученик не найден');
         }
 
-        $class = $student->class;
+        //$class = $student->class;
+        $class = $classBook->class;
         $classPrograms = $class->eduClassPrograms;
 
         if ($classProgram === null && count($classPrograms) > 0) {
