@@ -18,137 +18,6 @@ use yii\helpers\Url;
 use yii\web\View;
 
 $this->title = 'Статистика';
-
-$this->registerCss(<<<CSS
-.testing-item {
-    user-select: none;
-    cursor: pointer;
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 10px;
-    padding: 10px 0;
-}
-.testing-item__name {
-    margin-right: auto;
-}
-.testing-item__progress {
-
-}
-.table-stat {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    width: 100%;
-}
-.left-col {
-    max-width: 384px;
-    width: 100%;
-    flex: 1 0 auto;
-}
-.right-col {
-    max-width: calc(100% - 384px);
-    width: 100%;
-    flex: 1 0 100%;
-    display: flex;
-    margin-bottom: -17px;
-    position: relative;
-    overflow-x: auto;
-}
-.table-head {
-    width: 100%;
-}
-.table-body {
-    width: 100%;
-}
-.table-cell {
-    height: 40px;
-    padding: 12px 8px;
-    display: inline-block;
-    vertical-align: top;
-    box-sizing: border-box;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    position: relative;
-    z-index: 15;
-    background: white;
-    -webkit-transition: all 0.2s ease-in-out;
-    -moz-transition: all 0.2s ease-in-out;
-    transition: all 0.2s ease-in-out;
-}
-.table-header-cell {
-    line-height: 14px;
-    word-wrap: normal;
-    white-space: normal;
-    padding: 11px 8px 8px;
-    font-weight: bold;
-    color: #000;
-    text-transform: none;
-    text-align: left;
-    font-size: 1.4rem;
-}
-.table-cell.size-1 {
-    width: 80px;
-}
-.table-cell.size-2 {
-    width: 160px;
-}
-.student-link {
-    font-weight: bold;
-    text-decoration: none;
-    display: inline-block;
-    transition: all ease .3s;
-    color: #99CD50;
-}
-.right-col-inner {
-    display: flex;
-    padding-bottom: 17px;
-    transition: transform .25s ease-in-out;
-}
-.topic-col {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    width: auto;
-    padding-right: 20px;
-    align-items: flex-start;
-}
-.topic-cell {
-    width: 100%;
-    max-width: 100%;
-    flex: 1 0 100%;
-    white-space: nowrap;
-}
-.content-lesson {
-    display: inline-block;
-    margin-right: 5px;
-    padding-top: 2px;
-    font-size: 13px;
-}
-.content-lesson span {
-    box-sizing: border-box;
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    position: relative;
-    top: 2px;
-    margin: 0 0 0 0;
-}
-.content-lesson .not-started {
-    border: 2px #d3d3d3 solid;
-    background: transparent;
-}
-.content-lesson .in-progress {
-    border: 2px #6fc4e2 solid;
-    background: transparent;
-}
-.content-lesson .is-done {
-    background-color: #37ae68;
-}
-CSS
-);
 ?>
 <div class="container">
     <?= TeacherMenuWidget::widget() ?>
@@ -168,7 +37,7 @@ CSS
                 <div class="table-body">
                     <?php foreach ($classBook->students as $student): ?>
                     <div class="table-cell size-2">
-                        <a href="<?= Url::to(['/edu/teacher/default/student-stats', 'id' => $student->id, 'class_program_id' => $classProgram->id]) ?>" class="student-link"><?= $student->name ?></a>
+                        <a href="<?= Url::to(['/edu/teacher/default/student-stats', 'id' => $student->id, 'class_program_id' => $classProgram->id, 'class_book_id' => $classBook->id]) ?>" class="student-link"><?= $student->name ?></a>
                     </div>
                     <div class="table-cell size-1"><?= $classProgram->getStudentProgress($student->id) ?>%</div>
                     <div class="table-cell size-1"><?= $lastActivities[$student->id] ?? '-' ?></div>

@@ -22,14 +22,11 @@ use yii\web\Response;
 
 class DefaultController extends Controller
 {
-
     public function actionIndex()
     {
-
         $classBooks = EduClassBook::findTeacherClassBooks(Yii::$app->user->getId())
             ->orderBy(['name' => SORT_ASC])
             ->all();
-
         return $this->render('index', [
             'classBooks' => $classBooks,
         ]);
@@ -40,7 +37,6 @@ class DefaultController extends Controller
      */
     public function actionClassProgramStats(int $class_book_id, int $class_program_id)
     {
-
         if (($classBook = EduClassBook::findOne($class_book_id)) === null) {
             throw new NotFoundHttpException('Класс не найден');
         }
@@ -90,11 +86,15 @@ class DefaultController extends Controller
     /**
      * @throws NotFoundHttpException
      */
-    public function actionStudentStats(int $id, int $class_program_id): string
+    public function actionStudentStats(int $id, int $class_program_id, int $class_book_id): string
     {
-
         if (($student = UserStudent::findOne($id)) === null) {
             throw new NotFoundHttpException('Ученик не найден');
+        }
+
+        $classBook = EduClassBook::findOne($class_book_id);
+        if ($classBook === null) {
+            throw new NotFoundHttpException('Класс не найден');
         }
 
         $classProgram = null;
@@ -128,6 +128,7 @@ class DefaultController extends Controller
             'stat' => $stat,
             'storyModels' => $storyModels,
             'questionFetcher' => new StudentQuestionFetcher(),
+            'classBook' => $classBook,
         ]);
     }
 }

@@ -2,18 +2,9 @@
 
 declare(strict_types=1);
 
-/**
- * @var View $this
- * @var UserStudent $student
- * @var EduClassProgram|null $classProgram
- * @var EduClassProgram[] $classPrograms
- * @var array $stat
- * @var Story[] $storyModels
- * @var StudentQuestionFetcher $questionFetcher
- */
-
 use common\models\Story;
 use common\models\UserStudent;
+use modules\edu\models\EduClassBook;
 use modules\edu\models\EduClassProgram;
 use modules\edu\query\StudentQuestionFetcher;
 use modules\edu\widgets\LessonStatusWidget;
@@ -22,122 +13,30 @@ use yii\helpers\Url;
 use yii\web\View;
 use yii\widgets\Menu;
 
+/**
+ * @var View $this
+ * @var UserStudent $student
+ * @var EduClassProgram|null $classProgram
+ * @var EduClassProgram[] $classPrograms
+ * @var array $stat
+ * @var Story[] $storyModels
+ * @var StudentQuestionFetcher $questionFetcher
+ * @var EduClassBook $classBook
+ */
+
 $this->title = 'Статистика';
-
-$this->registerCss(<<<CSS
-.class-program-list li.active a {
-    text-decoration: none;
-    color: #99cd50;
-}
-.student-progress-cell__header {
-    color: #aab8be;
-    text-transform: uppercase;
-    font-size: 14px;
-    font-weight: bold;
-    text-align: left;
-    padding: 11px 8px 8px;
-}
-.student-progress-table__body {
-    display: flex;
-    position: relative;
-}
-.student-progress-table {
-    max-width: min-content;
-    width: 100%;
-}
-.student-progress-table-content {
-    max-width: 688px;
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-}
-.topic-row {
-    position: relative;
-    width: 100%;
-    height: 40px;
-    padding-right: 30px;
-}
-.topic-row__cell {
-    padding: 12px 8px;
-    display: inline-block;
-    vertical-align: top;
-    box-sizing: border-box;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-.content-row {
-    position: relative;
-    width: 100%;
-    height: 40px;
-}
-.topic-row:nth-child(even), .content-row:nth-child(even) {
-    background-color: #f2f2f3;
-}
-.content-row__cell {
-    padding: 12px 8px;
-    display: inline-block;
-    vertical-align: top;
-    box-sizing: border-box;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-.content-lesson {
-    display: inline-block;
-    margin-right: 5px;
-    padding-top: 2px;
-    font-size: 13px;
-}
-.content-lesson span {
-    box-sizing: border-box;
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    position: relative;
-    top: 2px;
-    margin: 0 0 0 0;
-}
-.content-lesson .not-started {
-    border: 2px #d3d3d3 solid;
-    background: transparent;
-}
-.content-lesson .in-progress {
-    border: 2px #6fc4e2 solid;
-    background: transparent;
-}
-.content-lesson .is-done {
-    background-color: #37ae68;
-}
-.testing-item {
-    user-select: none;
-    cursor: pointer;
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 10px;
-    padding: 10px 0;
-}
-.testing-item__name {
-    margin-right: auto;
-}
-.testing-item__progress {
-
-}
-CSS
-);
 ?>
 <div class="container">
 
-    <h1 class="h2"><?= Html::a('<i class="glyphicon glyphicon-arrow-left back-arrow"></i>', ['/edu/parent/default/index']) ?> <?= Html::encode($student->name) ?></h1>
+    <h1 class="h2"><?= Html::a('<i class="glyphicon glyphicon-arrow-left back-arrow"></i>', ['/edu/teacher/default/class-program-stats', 'class_book_id' => $classBook->id, 'class_program_id' => $classProgram->id]) ?> <?= Html::encode($student->name) ?></h1>
 
     <div style="margin: 30px 0;text-align: center">
         <?= Menu::widget([
             'options' => ['class' => 'class-program-list list-inline'],
-            'items' => array_map(static function(EduClassProgram $program) use ($student, $classProgram) {
+            'items' => array_map(static function(EduClassProgram $program) use ($student, $classProgram, $classBook) {
                 return [
                     'label' => $program->program->name,
-                    'url' => ['/edu/parent/default/stats', 'id' => $student->id, 'class_program_id' => $program->id],
+                    'url' => ['/edu/teacher/default/student-stats', 'class_book_id' => $classBook->id, 'id' => $student->id, 'class_program_id' => $program->id],
                     'active' => $classProgram && $classProgram->id === $program->id,
                 ];
             }, $classPrograms)
