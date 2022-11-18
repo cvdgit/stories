@@ -61,6 +61,7 @@ $this->title = 'Статистика';
                                             'total' => $lesson->getStoriesCount(),
                                             'finished' => $lesson->getStudentFinishedStoriesCount($student->id),
                                             'inProgress' => $lesson->fetchStudentInProgressStoriesCount($student->id),
+                                            'tooltip' => $lesson->name,
                                         ]) ?>
                                     <?php endforeach; ?>
                                     </div>

@@ -12,6 +12,7 @@ class LessonStatusWidget extends Widget
     public $total;
     public $inProgress;
     public $finished;
+    public $tooltip;
 
     public function run(): string
     {
@@ -29,6 +30,11 @@ class LessonStatusWidget extends Widget
             $content = '<span class="in-progress"></span>';
         }
 
-        return Html::tag('div', $content, ['class' => 'content-lesson']);
+        $options = ['class' => 'content-lesson'];
+        if ($this->tooltip !== null) {
+            $options['data-toggle'] = 'tooltip';
+            $options['title'] = $this->tooltip;
+        }
+        return Html::tag('div', $content, $options);
     }
 }
