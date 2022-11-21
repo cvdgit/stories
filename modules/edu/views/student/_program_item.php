@@ -21,7 +21,7 @@ use yii\helpers\Url;
         </div>
         <div class="panel-progress">
             <div class="progress-chart">
-                <?php if (($progress = $model->getStudentProgress($studentId)) > 0): ?>
+                <?php if (($progress = $model->getStudentProgress($model->getClassProgramStoriesCount(), $model->getStudentFinishedStoriesCount($studentId))) > 0): ?>
                 <div><?= $progress ?> %</div>
                 <?php endif ?>
             </div>
