@@ -18,7 +18,10 @@ use yii\web\View;
  */
 
 $storyId = $story->id;
-$studentId = Yii::$app->studentContext->getId() === null ? Yii::$app->user->identity->getStudentID() : null;
+$studentId = Yii::$app->studentContext->getId();
+if ($studentId === null) {
+    $studentId = Yii::$app->user->identity->getStudentID();
+}
 $config = [
     'feedback' => [
         'action' => Url::to(['/feedback/create', 'id' => $storyId])
