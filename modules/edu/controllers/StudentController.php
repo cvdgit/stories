@@ -25,9 +25,12 @@ class StudentController extends Controller
      */
     public function actionIndex(): string
     {
-
-        if (($student = Yii::$app->studentContext->getStudent()) === null) {
-            throw new ForbiddenHttpException('Доступ запрещен');
+        $student = Yii::$app->studentContext->getStudent();
+        if ($student === null) {
+            $student = Yii::$app->user->identity->student();
+            if ($student === null) {
+                throw new ForbiddenHttpException('Доступ запрещен');
+            }
         }
 
         $classBooks = $student->classBooks;
