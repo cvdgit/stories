@@ -71,7 +71,6 @@ export default () => {
 
       const transitionPlugin = deck.getPlugin('transition');
       const testingPlugin = deck.getPlugin('testing');
-
       const nextButtonHandler = () => {
         $.getJSON('/edu/default/get-next-story?story_id=' + config.story_id + '&program_id=' + config.program_id)
           .done(response => {
@@ -95,7 +94,7 @@ export default () => {
             const statPlugin = deck.getPlugin('stat');
             Promise.all(statPlugin.getStack()).then(values => {
 
-              $.getJSON('/edu/default/story-stat?story_id=' + config.story_id)
+              $.getJSON(`/edu/default/story-stat?story_id=${config.story_id}&student_id=${config.student_id}`)
                 .done(response => {
                   if (response && response.success) {
                     $slide.append(createNextStory({...response.data, onNextButtonClick: nextButtonHandler}));

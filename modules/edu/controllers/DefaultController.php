@@ -5,6 +5,7 @@ namespace modules\edu\controllers;
 use common\models\User;
 use common\rbac\UserRoles;
 use modules\edu\models\EduStory;
+use modules\edu\models\EduStudent;
 use modules\edu\query\StoryStudentProgressFetcher;
 use Ramsey\Uuid\Uuid;
 use Yii;
@@ -154,7 +155,7 @@ class DefaultController extends Controller
      * @throws NotFoundHttpException
      * @throws BadRequestHttpException
      */
-    public function actionStoryStat(int $story_id, Response $response): array
+    public function actionStoryStat(int $story_id, int $student_id, Response $response): array
     {
         $response->format = Response::FORMAT_JSON;
 
@@ -162,13 +163,12 @@ class DefaultController extends Controller
             throw new NotFoundHttpException('История не найдена');
         }
 
-        /** @var User $currentUser */
-        $currentUser = Yii::$app->user->identity;
-        if (($mainStudent = $currentUser->student()) === null) {
-            throw new BadRequestHttpException('Не удалось определить студента');
+        $student = EduStudent::findOne($student_id);
+        if ($student === null) {
+            throw new NotFoundHttpException('Ученик не найден');
         }
 
-        $progress = (new StoryStudentProgressFetcher())->fetch($story->id, $mainStudent->id);
+        $progress = (new StoryStudentProgressFetcher())->fetch($story->id, $student->id);
 
         $testingRows = (new Query())
             ->select([
@@ -178,7 +178,7 @@ class DefaultController extends Controller
             ])
             ->from('story_story_test')
             ->innerJoin('story_test', 'story_story_test.test_id = story_test.id')
-            ->leftJoin('student_question_progress', 'student_question_progress.test_id = story_test.id AND student_question_progress.student_id = :student', [':student' => $mainStudent->id])
+            ->leftJoin('student_question_progress', 'student_question_progress.test_id = story_test.id AND student_question_progress.student_id = :student', [':student' => $student->id])
             ->where(['story_story_test.story_id' => $story->id])
             ->all();
 

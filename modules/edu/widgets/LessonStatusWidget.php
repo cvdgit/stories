@@ -13,21 +13,22 @@ class LessonStatusWidget extends Widget
     public $inProgress;
     public $finished;
     public $tooltip;
+    public $lessonId;
 
     public function run(): string
     {
         $content = '';
 
         if ($this->total === $this->finished) {
-            $content = '<span class="is-done"></span>';
+            $content = '<span class="is-done" data-to-lesson="' . $this->lessonId . '"></span>';
         }
 
         if ($this->total > 0 && $this->finished === 0) {
-            $content = '<span class="not-started" ></span >';
+            $content = '<span class="not-started"></span >';
         }
 
         if ($this->inProgress > 0 || ($this->finished > 0 && $this->finished < $this->total)) {
-            $content = '<span class="in-progress"></span>';
+            $content = '<span class="in-progress" data-to-lesson="' . $this->lessonId . '"></span>';
         }
 
         $options = ['class' => 'content-lesson'];

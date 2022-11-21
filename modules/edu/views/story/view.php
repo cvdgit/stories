@@ -53,6 +53,7 @@ $config = [
     'next-story' => [
         'story_id' => $storyId,
         'program_id' => $programId,
+        'student_id' => Yii::$app->studentContext->getId(),
     ],
 ];
 

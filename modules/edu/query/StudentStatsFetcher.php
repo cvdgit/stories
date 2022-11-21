@@ -20,30 +20,29 @@ class StudentStatsFetcher
             $topics = [];
             foreach (explode(',', $statItem['storyIds']) as $storyId) {
 
-                $storyData = $programStoriesData[$storyId];
+                $row = array_filter($programStoriesData, static function($elem) use ($storyId) {
+                    return (int)$elem['storyId'] === (int)$storyId;
+                });
+                $storyRow = current($row);
 
-                if (!isset($topics[$storyData['topicId']])) {
-                    $topics[$storyData['topicId']] = [
-                        'topicId' => $storyData['topicId'],
-                        'topicName' => $storyData['topicName'],
-                        'lessons' => [],
-                    ];
-                }
+                $topicRows = array_filter($programStoriesData, static function($elem) use ($storyRow) {
+                    return (int)$elem['topicId'] === (int)$storyRow['topicId'] && (int)$elem['lessonId'] === (int)$storyRow['lessonId'];
+                });
 
-                $topicLessonIds = array_column($topics[$storyData['topicId']]['lessons'],'lessonId');
-                if (!in_array($storyData['lessonId'], $topicLessonIds, true)) {
-                    $lessonItem = [
-                        'lessonId' => $storyData['lessonId'],
-                        'lessonName' => $storyData['lessonName'],
-                        'stories' => [],
-                    ];
-                    $topics[$storyData['topicId']]['lessons'][$storyData['lessonId']] = $lessonItem;
-                }
+                $lesson = [
+                    'lessonName' => $storyRow['lessonName'],
+                    'lessonId' => $storyRow['lessonId'],
+                    'stories' => array_column($topicRows, 'storyId'),
+                ];
 
-                $topics[$storyData['topicId']]['lessons'][$storyData['lessonId']]['stories'][] = $storyId;
+                $topics[] = [
+                    'topicId' => $storyRow['topicId'],
+                    'topicName' => $storyRow['topicName'],
+                    'lessons' => [$lesson],
+                ];
+
+                $item['topics'] = $topics;
             }
-
-            $item['topics'] = $topics;
 
             $stat[] = $item;
         }

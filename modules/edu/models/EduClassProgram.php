@@ -120,12 +120,11 @@ class EduClassProgram extends ActiveRecord
     public function getClassProgramStoriesCount(): int
     {
         return $this->getClassProgramStories()
-            ->count('lesson_story.story_id');
+            ->count('DISTINCT lesson_story.story_id');
     }
 
     public function getStudentFinishedStoriesCount(int $studentId): int
     {
-
         $rows = $this->getClassProgramStories()
             ->select(['story_id' => 'lesson_story.story_id'])
             ->all();
@@ -142,13 +141,11 @@ class EduClassProgram extends ActiveRecord
             ->count();
     }
 
-    public function getStudentProgress(int $studentId): int
+    public function getStudentProgress(int $total, int $finished): int
     {
-        $total = $this->getClassProgramStoriesCount();
         if ($total === 0) {
             return 0;
         }
-        $finished = $this->getStudentFinishedStoriesCount($studentId);
         if ($finished === 0) {
             return 0;
         }

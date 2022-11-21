@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace modules\edu\models;
 
+use common\models\StoryStudentProgress;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 

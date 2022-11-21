@@ -39,7 +39,7 @@ $this->title = 'Статистика';
                     <div class="table-cell size-2">
                         <a href="<?= Url::to(['/edu/teacher/default/student-stats', 'id' => $student->id, 'class_program_id' => $classProgram->id, 'class_book_id' => $classBook->id]) ?>" class="student-link"><?= $student->name ?></a>
                     </div>
-                    <div class="table-cell size-1"><?= $classProgram->getStudentProgress($student->id) ?>%</div>
+                    <div class="table-cell size-1"><?= $classProgram->getStudentProgress($classProgram->getClassProgramStoriesCount(), $classProgram->getStudentFinishedStoriesCount($student->id)); ?>%</div>
                     <div class="table-cell size-1"><?= $lastActivities[$student->id] ?? '-' ?></div>
                     <?php endforeach; ?>
                 </div>

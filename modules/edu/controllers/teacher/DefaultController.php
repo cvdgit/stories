@@ -45,9 +45,13 @@ class DefaultController extends Controller
             throw new NotFoundHttpException('Программа не найдена');
         }
 
-        $studentIds = array_map(static function($student){ return $student->id; }, $classBook->students);
-        $storyIds = (new EduProgramStoriesFetcher())->fetch($classBook->class_id, $classProgram->id);
-        $lastActivities = (new StudentProgramLastActivityDateFetcher())->fetch($studentIds, array_keys($storyIds));
+        $studentIds = array_map(static function($student) {
+            return $student->id;
+        }, $classBook->students);
+
+        $storiesData = (new EduProgramStoriesFetcher())->fetch($classBook->class_id, $classProgram->program_id);
+        $storyIds = array_unique(array_column($storiesData, 'storyId'));
+        $lastActivities = (new StudentProgramLastActivityDateFetcher())->fetch($studentIds, $storyIds);
 
         return $this->render('stats', [
             'classBook' => $classBook,
@@ -102,7 +106,6 @@ class DefaultController extends Controller
             throw new NotFoundHttpException('Ученик не найден');
         }
 
-        //$class = $student->class;
         $class = $classBook->class;
         $classPrograms = $class->eduClassPrograms;
 
@@ -119,7 +122,6 @@ class DefaultController extends Controller
             ->all();
 
         $statData = (new StudentStoryStatByDateFetcher())->fetch($student->id, $storyIds);
-
         $stat = (new StudentStatsFetcher())->fetch($statData, $programStoriesData);
 
         return $this->render('student_stats', [

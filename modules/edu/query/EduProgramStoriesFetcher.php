@@ -27,7 +27,11 @@ class EduProgramStoriesFetcher
             ->innerJoin(['els' => 'edu_lesson_story'], 'el.id = els.lesson_id')
             ->innerJoin(['s' => 'story'], 'els.story_id = s.id')
             ->where(['ecp.class_id' => $classId, 'ecp.program_id' => $programId])
-            ->indexBy('storyId');
+            ->orderBy([
+                'et.order' => SORT_ASC,
+                'el.order' => SORT_ASC,
+                'els.order' => SORT_ASC,
+            ]);
         return $query->all();
     }
 }

@@ -32,7 +32,7 @@ class StudentProgramLastActivityDateFetcher
             ->from('story_student_progress')
             ->where(['in', 'student_id', $studentIds])
             ->andWhere(['in', 'story_id', $storyIds])
-            ->groupBy(['student_id', 'story_id'])
+            ->groupBy(['student_id'])
             ->indexBy('studentId');
         $rows = $query->all();
 
