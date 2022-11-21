@@ -18,6 +18,7 @@ use yii\web\View;
  */
 
 $storyId = $story->id;
+$studentId = Yii::$app->studentContext->getId() === null ? Yii::$app->user->identity->getStudentID() : null;
 $config = [
     'feedback' => [
         'action' => Url::to(['/feedback/create', 'id' => $storyId])
@@ -33,7 +34,7 @@ $config = [
         'storyBodyAction' => Url::to(['/story/get-story-body']),
         'story_id' => $storyId,
         'initAction' => Url::to(['/question/init']),
-        'student_id' => Yii::$app->studentContext->getId(),
+        'student_id' => $studentId,
     ],
     'links' => [
         'story_id' => $storyId,
@@ -48,12 +49,12 @@ $config = [
     'stat' => [
         'story_id' => $storyId,
         'action' => Url::to(['/statistics/write-edu']),
-        'student_id' => Yii::$app->studentContext->getId(),
+        'student_id' => $studentId,
     ],
     'next-story' => [
         'story_id' => $storyId,
         'program_id' => $programId,
-        'student_id' => Yii::$app->studentContext->getId(),
+        'student_id' => $studentId,
     ],
 ];
 
