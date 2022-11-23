@@ -4,17 +4,13 @@ declare(strict_types=1);
 
 namespace modules\edu\controllers\admin;
 
-use common\models\Story;
 use common\models\UserStudent;
 use common\rbac\UserRoles;
 use Exception;
 use modules\edu\models\EduClassBook;
 use modules\edu\models\EduClassProgram;
-use modules\edu\query\EduProgramStoriesFetcher;
-use modules\edu\query\StudentQuestionFetcher;
-use modules\edu\query\StudentStatsFetcher;
-use modules\edu\query\StudentStoryStatByDateFetcher;
 use modules\edu\services\ClassBookService;
+use modules\edu\widgets\StudentStatWidget;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -114,7 +110,7 @@ class ClassBookController extends Controller
      * @throws NotFoundHttpException
      * @throws BadRequestHttpException
      */
-    public function actionStat(int $class_book_id, int $student_id, int $class_program_id = null)
+    public function actionStat(int $class_book_id, int $student_id, int $class_program_id = null): string
     {
         if (($classBook = EduClassBook::findOne($class_book_id)) === null) {
             throw new NotFoundHttpException('Класс не найден');
@@ -129,7 +125,6 @@ class ClassBookController extends Controller
             throw new BadRequestHttpException('Не удалось определить предметы для класса');
         }
 
-        $currentClassProgram = null;
         if ($class_program_id !== null && count($classPrograms) > 1) {
             $currentClassProgram = EduClassProgram::findOne($class_program_id);
         }
@@ -153,24 +148,16 @@ class ClassBookController extends Controller
             ];
         }, $classPrograms);
 
-        $programStoriesData = (new EduProgramStoriesFetcher())->fetch($classBook->class_id, $currentClassProgram->program_id);
-
-        $storyIds = array_column($programStoriesData, 'storyId');
-        $storyModels = Story::find()
-            ->where(['in', 'id', $storyIds])
-            ->indexBy('id')
-            ->all();
-        $statData = (new StudentStoryStatByDateFetcher())->fetch($student->id, $storyIds);
-
-        $stat = (new StudentStatsFetcher())->fetch($statData, $programStoriesData);
-
         return $this->render('stat', [
             'student' => $student,
             'classProgram' => $currentClassProgram,
             'classProgramItems' => $classProgramItems,
-            'stat' => $stat,
-            'storyModels' => $storyModels,
-            'questionFetcher' => new StudentQuestionFetcher(),
+
+            'statWidget' => StudentStatWidget::widget([
+                'classProgram' => $currentClassProgram,
+                'classId' => $classBook->class->id,
+                'student' => $student,
+            ]),
         ]);
     }
 }

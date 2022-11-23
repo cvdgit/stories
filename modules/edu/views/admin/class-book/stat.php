@@ -2,10 +2,8 @@
 
 declare(strict_types=1);
 
-use common\models\Story;
 use common\models\UserStudent;
 use modules\edu\models\EduClassProgram;
-use modules\edu\query\StudentQuestionFetcher;
 use yii\web\View;
 use yii\widgets\Menu;
 
@@ -14,9 +12,7 @@ use yii\widgets\Menu;
  * @var array $classProgramItems
  * @var EduClassProgram $classProgram
  * @var UserStudent $student
- * @var array $stat
- * @var Story[] $storyModels
- * @var StudentQuestionFetcher $questionFetcher
+ * @var string $statWidget
  */
 
 $this->title = 'Статистика';
@@ -31,11 +27,5 @@ $this->title = 'Статистика';
         ]) ?>
     </div>
 
-    <?= $this->render('@modules/edu/views/common/_student_stat', [
-        'classProgram' => $classProgram,
-        'student' => $student,
-        'stat' => $stat,
-        'storyModels' => $storyModels,
-        'questionFetcher' => $questionFetcher,
-    ]); ?>
+    <?= $statWidget; ?>
 </div>

@@ -18,6 +18,8 @@ class StudentStatsFetcher
             ];
 
             $topics = [];
+            $lessons = [];
+            $topicLessons = [];
             foreach (explode(',', $statItem['storyIds']) as $storyId) {
 
                 $row = array_filter($programStoriesData, static function($elem) use ($storyId) {
@@ -35,10 +37,18 @@ class StudentStatsFetcher
                     'stories' => array_column($topicRows, 'storyId'),
                 ];
 
-                $topics[] = [
+                if (!isset($topicLessons[$storyRow['topicId']])) {
+                    $topicLessons[$storyRow['topicId']] = [];
+                }
+                if (!in_array($storyRow['lessonId'], $topicLessons[$storyRow['topicId']], true)) {
+                    $topicLessons[$storyRow['topicId']][] = $storyRow['lessonId'];
+                    $lessons[] = $lesson;
+                }
+
+                $topics[$storyRow['topicId']] = [
                     'topicId' => $storyRow['topicId'],
                     'topicName' => $storyRow['topicName'],
-                    'lessons' => [$lesson],
+                    'lessons' => $lessons,
                 ];
 
                 $item['topics'] = $topics;

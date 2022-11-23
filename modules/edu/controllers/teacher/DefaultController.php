@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace modules\edu\controllers\teacher;
 
 use common\models\Story;
@@ -11,9 +10,7 @@ use modules\edu\models\EduClassBook;
 use modules\edu\models\EduClassProgram;
 use modules\edu\query\EduProgramStoriesFetcher;
 use modules\edu\query\StudentProgramLastActivityDateFetcher;
-use modules\edu\query\StudentQuestionFetcher;
-use modules\edu\query\StudentStatsFetcher;
-use modules\edu\query\StudentStoryStatByDateFetcher;
+use modules\edu\widgets\StudentStatWidget;
 use Yii;
 use yii\helpers\Url;
 use yii\web\Controller;
@@ -113,25 +110,17 @@ class DefaultController extends Controller
             $classProgram = $classPrograms[0];
         }
 
-        $programStoriesData = (new EduProgramStoriesFetcher())->fetch($class->id, $classProgram->program_id);
-        $storyIds = array_column($programStoriesData, 'storyId');
-
-        $storyModels = Story::find()
-            ->where(['in', 'id', $storyIds])
-            ->indexBy('id')
-            ->all();
-
-        $statData = (new StudentStoryStatByDateFetcher())->fetch($student->id, $storyIds);
-        $stat = (new StudentStatsFetcher())->fetch($statData, $programStoriesData);
-
         return $this->render('student_stats', [
-            'classProgram' => $classProgram,
-            'classPrograms' => $classPrograms,
-            'student' => $student,
-            'stat' => $stat,
-            'storyModels' => $storyModels,
-            'questionFetcher' => new StudentQuestionFetcher(),
             'classBook' => $classBook,
+            'classProgram' => $classProgram,
+            'student' => $student,
+            'classPrograms' => $classPrograms,
+
+            'statWidget' => StudentStatWidget::widget([
+                'classProgram' => $classProgram,
+                'classId' => $class->id,
+                'student' => $student,
+            ]),
         ]);
     }
 }

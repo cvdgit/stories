@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace modules\edu\controllers\parent;
 
-use common\models\Story;
-use common\models\User;
 use common\models\UserStudent;
 use Exception;
 use modules\edu\components\StudentLoginGenerator;
@@ -13,11 +11,8 @@ use modules\edu\forms\student\StudentForm;
 use modules\edu\models\EduClassProgram;
 use modules\edu\models\EduParentInvite;
 use modules\edu\models\EduUser;
-use modules\edu\query\EduProgramStoriesFetcher;
-use modules\edu\query\StudentQuestionFetcher;
-use modules\edu\query\StudentStatsFetcher;
-use modules\edu\query\StudentStoryStatByDateFetcher;
 use modules\edu\services\StudentService;
+use modules\edu\widgets\StudentStatWidget;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\web\BadRequestHttpException;
@@ -29,7 +24,6 @@ use yii\web\Response;
 
 class DefaultController extends Controller
 {
-
     private $studentService;
 
     public function __construct($id, $module, StudentService $studentService, $config = [])
@@ -106,10 +100,10 @@ class DefaultController extends Controller
 
     /**
      * @throws NotFoundHttpException
+     * @throws BadRequestHttpException
      */
     public function actionStats(int $id, int $class_program_id = null): string
     {
-
         if (($student = UserStudent::findOne($id)) === null) {
             throw new NotFoundHttpException('Ученик не найден');
         }
@@ -129,24 +123,16 @@ class DefaultController extends Controller
             $classProgram = $classPrograms[0];
         }
 
-        $programStoriesData = (new EduProgramStoriesFetcher())->fetch($class->id, $classProgram->program_id);
-        $storyIds = array_column($programStoriesData, 'storyId');
-
-        $storyModels = Story::find()
-            ->where(['in', 'id', $storyIds])
-            ->indexBy('id')
-            ->all();
-
-        $statData = (new StudentStoryStatByDateFetcher())->fetch($student->id, $storyIds);
-        $stat = (new StudentStatsFetcher())->fetch($statData, $programStoriesData);
-
         return $this->render('stats', [
             'classProgram' => $classProgram,
             'classPrograms' => $classPrograms,
             'student' => $student,
-            'stat' => $stat,
-            'questionFetcher' => new StudentQuestionFetcher(),
-            'storyModels' => $storyModels,
+
+            'statWidget' => StudentStatWidget::widget([
+                'classProgram' => $classProgram,
+                'classId' => $class->id,
+                'student' => $student,
+            ]),
         ]);
     }
 
