@@ -11,14 +11,12 @@ use yii\db\Query;
 
 class StudentContext extends Component
 {
-
     private $cookieUid;
     private $student;
 
     public function init(): void
     {
         parent::init();
-
         $this->cookieUid = Yii::$app->request->cookies->getValue('uid');
     }
 

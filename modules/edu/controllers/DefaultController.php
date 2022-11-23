@@ -24,7 +24,6 @@ use yii\web\Response;
  */
 class DefaultController extends Controller
 {
-
     public function actionIndex(): Response
     {
         if (Yii::$app->user->can(UserRoles::ROLE_ADMIN)) {
@@ -148,6 +147,9 @@ class DefaultController extends Controller
             }
         }
 
+        if ($nextStoryId === null) {
+            return ['success' => true, 'url' => Url::to(['/edu/student/index'])];
+        }
         return ['success' => true, 'url' => Url::to(['/edu/story/view', 'id' => $nextStoryId, 'program_id' => $program_id])];
     }
 

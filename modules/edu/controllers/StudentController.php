@@ -2,23 +2,33 @@
 
 namespace modules\edu\controllers;
 
-use common\models\User;
-use common\models\UserStudent;
+use common\rbac\UserRoles;
 use modules\edu\models\EduClassProgram;
 use modules\edu\models\EduLesson;
-use modules\edu\models\EduProgram;
 use modules\edu\models\EduTopic;
-use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\data\ActiveDataProvider;
-use yii\db\Query;
+use yii\filters\AccessControl;
 use yii\web\Controller;
-use yii\web\Cookie;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
 class StudentController extends Controller
 {
+    public function behaviors(): array
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => [UserRoles::ROLE_STUDENT],
+                    ],
+                ],
+            ],
+        ];
+    }
 
     /**
      * @throws ForbiddenHttpException
@@ -34,17 +44,14 @@ class StudentController extends Controller
         }
 
         $classBooks = $student->classBooks;
-
         $classProgramIds = [];
         if (count($classBooks) === 0) {
-
             $class = $student->class;
             $classProgramIds = array_map(static function($classProgram) {
                 return $classProgram->id;
             }, $class->eduClassPrograms);
         }
         else {
-
             foreach ($classBooks as $classBook) {
                 $classProgramIds = array_merge($classProgramIds, $classBook->getClassProgramIds());
             }
@@ -66,7 +73,6 @@ class StudentController extends Controller
      */
     public function actionTopic(int $id): string
     {
-
         if (($topic = EduTopic::findOne($id)) === null) {
             throw new NotFoundHttpException('Тема не найдена');
         }

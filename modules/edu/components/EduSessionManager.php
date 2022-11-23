@@ -8,7 +8,6 @@ use yii\web\Cookie;
 
 class EduSessionManager
 {
-
     public function switch(int $userId, int $studentId, bool $parent = false): void
     {
         $readCookies = Yii::$app->response->cookies;
