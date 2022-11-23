@@ -13,13 +13,13 @@ class StudentStoryStatByDateFetcher
     {
         $query = (new Query())
             ->select([
-                'storyIds' => new Expression('GROUP_CONCAT(DISTINCT story_id)'),
+                'storyIds' => new Expression('GROUP_CONCAT(DISTINCT story_id ORDER BY created_at DESC)'),
                 'targetDate' => new Expression("DATE_FORMAT(FROM_UNIXTIME(created_at + (3 * 60 * 60)), '%Y-%m-%d')"),
             ])
             ->from('story_student_stat')
             ->where(['student_id' => $studentId])
             ->groupBy(['targetDate'])
-            ->orderBy(['targetDate' => SORT_DESC]);
+            ->orderBy(['MAX(created_at)' => SORT_DESC]);
 
         if ($programStoryIds !== null) {
             $query->andWhere(['in', 'story_id', $programStoryIds]);
