@@ -12,7 +12,6 @@ use frontend\models\EmailForm;
 use Yii;
 use yii\web\Controller;
 use yii\web\Request;
-use yii\web\Response;
 use frontend\models\SignupForm;
 use common\services\auth\SignupService;
 
@@ -99,7 +98,7 @@ class SignupController extends Controller
             $user = User::findByUsername($username);
             if ($user !== null) {
 
-                $auth = Auth::create($user->id, $authHandler['source'], $authHandler['source_id']);
+                $auth = Auth::create($user->id, $authHandler['source'], (string)$authHandler['source_id']);
                 $auth->save();
 
                 try {
