@@ -15,7 +15,7 @@ use yii\web\NotFoundHttpException;
 
 class StudentController extends Controller
 {
-    public function behaviors(): array
+/*    public function behaviors(): array
     {
         return [
             'access' => [
@@ -28,7 +28,7 @@ class StudentController extends Controller
                 ],
             ],
         ];
-    }
+    }*/
 
     /**
      * @throws ForbiddenHttpException

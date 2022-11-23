@@ -17,7 +17,7 @@ class StoryController extends Controller
 {
     public $layout = '@frontend/views/layouts/edu';
 
-    public function behaviors(): array
+/*    public function behaviors(): array
     {
         return [
             'access' => [
@@ -30,7 +30,7 @@ class StoryController extends Controller
                 ],
             ],
         ];
-    }
+    }*/
 
     /**
      * @throws NotFoundHttpException
