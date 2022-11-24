@@ -77,8 +77,12 @@ class StudentController extends Controller
             throw new NotFoundHttpException('Тема не найдена');
         }
 
-        if (($student = Yii::$app->studentContext->getStudent()) === null) {
-            throw new ForbiddenHttpException('Доступ запрещен');
+        $student = Yii::$app->studentContext->getStudent();
+        if ($student === null) {
+            $student = Yii::$app->user->identity->student();
+            if ($student === null) {
+                throw new ForbiddenHttpException('Доступ запрещен');
+            }
         }
 
         $classProgram = $topic->classProgram;
@@ -106,8 +110,12 @@ class StudentController extends Controller
             throw new NotFoundHttpException('Урок не найден');
         }
 
-        if (($student = Yii::$app->studentContext->getStudent()) === null) {
-            throw new ForbiddenHttpException('Доступ запрещен');
+        $student = Yii::$app->studentContext->getStudent();
+        if ($student === null) {
+            $student = Yii::$app->user->identity->student();
+            if ($student === null) {
+                throw new ForbiddenHttpException('Доступ запрещен');
+            }
         }
 
         $topic = $lesson->topic;
