@@ -1754,22 +1754,24 @@ function WikidsStoryTest(el, options) {
 
       testQuestions.unshift(currentQuestion);
 
-      const max = 3;
-      let i = 0;
-      while (questionList.length && i < max) {
+      if (questionViewPoetry(currentQuestion)) {
+        const max = 3;
+        let i = 0;
+        while (questionList.length && i < max) {
 
-        let backQuestion = questionList.pop();
-        if (questionsRepeat.inc(backQuestion)) {
-          testProgress.dec();
+          let backQuestion = questionList.pop();
+          if (questionsRepeat.inc(backQuestion)) {
+            testProgress.dec();
+          }
+          testQuestions.unshift(backQuestion);
+          updateStars(dom.questions.find(`[data-question-id=${backQuestion.id}]`), questionsRepeat.number(backQuestion));
+
+          i++;
         }
-        testQuestions.unshift(backQuestion);
-        updateStars(dom.questions.find(`[data-question-id=${backQuestion.id}]`), questionsRepeat.number(backQuestion));
 
-        i++;
-      }
-
-      if (i > 0) {
-        updateProgress();
+        if (i > 0) {
+          updateProgress();
+        }
       }
     } else {
       done = questionsRepeat.done(currentQuestion);
