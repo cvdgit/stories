@@ -1,9 +1,18 @@
 <?php
+
+declare(strict_types=1);
+
 use backend\widgets\QuestionManageWidget;
 use common\models\StoryTest;
-use backend\models\pass_test\CreatePassTestForm;
-/** @var StoryTest $quizModel */
-/** @var CreatePassTestForm $model */
+use backend\models\pass_test\PassTestForm;
+use common\models\StoryTestQuestion;
+
+/**
+ * @var StoryTest $quizModel
+ * @var PassTestForm $model
+ * @var StoryTestQuestion $questionModel
+ */
+
 $this->title = 'Изменить вопрос';
 $this->params['breadcrumbs'] = [
     ['label' => 'Все тесты', 'url' => ['test/index', 'source' => $quizModel->source]],
@@ -15,4 +24,4 @@ $this->params['breadcrumbs'] = [
     'quizModel' => $quizModel,
     'currentModelId' => $questionModel->id,
     'renderData' => $this->render('_question', ['model' => $model, 'isNewRecord' => false]),
-]) ?>
+]); ?>

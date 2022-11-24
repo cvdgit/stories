@@ -2,11 +2,12 @@
 
 namespace backend\controllers\test;
 
-use backend\models\pass_test\CreatePassTestForm;
+use backend\models\pass_test\PassTestForm;
 use backend\services\PassTestService;
 use common\models\StoryTest;
 use common\models\StoryTestQuestion;
 use common\rbac\UserRoles;
+use Exception;
 use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\Url;
@@ -16,7 +17,6 @@ use yii\web\Response;
 
 class PassTestController extends Controller
 {
-
     private $passTestService;
 
     public function __construct($id, $module, PassTestService $passTestService, $config = [])
@@ -49,7 +49,7 @@ class PassTestController extends Controller
             throw new NotFoundHttpException('Quiz not found');
         }
 
-        $createPassTestForm = new CreatePassTestForm();
+        $createPassTestForm = new PassTestForm();
         if ($this->request->isPost && $createPassTestForm->load($this->request->post())) {
             $this->response->format = Response::FORMAT_JSON;
             try {
@@ -57,7 +57,7 @@ class PassTestController extends Controller
                 Yii::$app->session->setFlash('success', 'Вопрос успешно создан');
                 return ['success' => true, 'url' => Url::to(['test/update', 'id' => $quizModel->id])];
             }
-            catch (\Exception $exception) {
+            catch (Exception $exception) {
                 return ['success' => false, 'message' => $exception->getMessage()];
             }
         }
@@ -77,9 +77,7 @@ class PassTestController extends Controller
             throw new NotFoundHttpException('Question not found');
         }
 
-        $createPassTestForm = new CreatePassTestForm();
-        $createPassTestForm->name = $questionModel->name;
-        $createPassTestForm->payload = $questionModel->regions;
+        $createPassTestForm = new PassTestForm($questionModel);
 
         if ($this->request->isPost && $createPassTestForm->load($this->request->post())) {
             $this->response->format = Response::FORMAT_JSON;
@@ -87,7 +85,7 @@ class PassTestController extends Controller
                 $this->passTestService->update($questionModel, $createPassTestForm);
                 return ['success' => true];
             }
-            catch (\Exception $exception) {
+            catch (Exception $exception) {
                 return ['success' => false, 'message' => $exception->getMessage()];
             }
         }

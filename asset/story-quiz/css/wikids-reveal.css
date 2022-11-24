@@ -1626,10 +1626,31 @@ p.wikids-test-description {
   text-transform: none;
 }
 
-.custom-select:focus {
+.custom-select:focus, .custom-input:focus {
   border-color: #80bdff;
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgb(0 123 255 / 25%);
+}
+
+.custom-input {
+  transition: background-color .15s ease-in-out,
+  border-color .15s ease-in-out,
+  box-shadow .15s ease-in-out;
+  display: inline-block;
+  height: calc(1.5em + 14px);
+  padding: 6px 12px;
+  font-weight: 400;
+  font-size: inherit;
+  line-height: 1.5;
+  color: #495057;
+  vertical-align: middle;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  word-wrap: normal;
+  text-transform: none;
 }
 
 .drag-words-question {

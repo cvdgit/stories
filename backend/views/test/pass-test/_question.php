@@ -1,5 +1,8 @@
 <?php
-use backend\models\pass_test\CreatePassTestForm;
+
+declare(strict_types=1);
+
+use backend\models\pass_test\PassTestForm;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
 $this->registerCss(<<<CSS
@@ -69,11 +72,12 @@ $this->registerCss(<<<CSS
 }
 CSS
 );
-/** @var CreatePassTestForm $model */
+/** @var PassTestForm $model */
 /** @var bool $isNewRecord */
 ?>
 <?php $form = ActiveForm::begin(['id' => 'pass-test-form']) ?>
-<?= $form->field($model, 'name') ?>
+<?= $form->field($model, 'name')->textInput(['maxlength' => true]); ?>
+<?= $form->field($model, 'view')->dropDownList($model->getViewItems(), ['prompt' => 'Выберите представление']); ?>
 <div>
     <div style="margin-bottom:10px;display:flex;flex-direction:row;align-items:center">
         <div class="content__title">
@@ -586,7 +590,7 @@ $this->registerJs(<<<JS
 
     form.on('beforeValidate', function() {
 
-        $('#createpasstestform-content').val($('#content').text());
+        $('#passtestform-content').val($('#content').text());
 
         const el = $('<div>' + $('#content').html() + '</div>');
         el.find('span[data-fragment-id]').replaceWith(function() {
@@ -613,7 +617,7 @@ $this->registerJs(<<<JS
         const payload = dataWrapper.getPayload();
         payload.content = content;
         payload.fragments = fragments;
-        $('#createpasstestform-payload').val(JSON.stringify(payload));
+        $('#passtestform-payload').val(JSON.stringify(payload));
     });
 
     function yiiFormSubmit(form, beforeCallback) {

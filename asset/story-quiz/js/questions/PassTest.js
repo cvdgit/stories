@@ -4,34 +4,30 @@ const PassTest = function (test) {
   this.element = null;
 };
 
-PassTest.prototype.createContent = function (payload) {
+function createSelectElement(fragmentId, items) {
 
-  let content = payload.content;
-  payload.fragments.forEach(function(fragment) {
+  const select = $('<select/>', {
+    'class': 'highlight custom-select',
+    'data-fragment-id': fragmentId
+  });
+  $('<option/>').val('').text('').appendTo(select);
 
-    const code = $('<span/>', {
-      'class': 'dropdown',
-      'data-fragment-id': fragment.id
-    });
-    code.append('<button class="pass-test-btn dropdown-toggle highlight" data-toggle="dropdown"></button><ul class="dropdown-menu"></ul>');
-
-    const select = $('<select/>', {
-      'class': 'highlight custom-select',
-      'data-fragment-id': fragment.id
-    });
-    $('<option/>').val('').text('').appendTo(select);
-
-    const items = shuffle(fragment.items);
-    items.forEach((item) => {
-      $('<option/>').text(item.title).appendTo(select);
-    });
-
-    const reg = new RegExp('{' + fragment.id + '}');
-    content = content.replace(reg, select[0].outerHTML);
+  items.forEach((item) => {
+    $('<option/>').text(item.title).appendTo(select);
   });
 
-  return content;
-};
+  return select;
+}
+
+function createTextElement(fragmentId, size) {
+  const input = $('<input/>', {
+    'type': 'text',
+    'class': 'highlight custom-input',
+    'data-fragment-id': fragmentId
+  });
+  input.prop('size', size);
+  return input;
+}
 
 PassTest.prototype.createWrapper = function (content) {
   const $wrapper = $('<div class="seq-question pass-test-question"><div class="seq-question__wrap seq-question__wrap--full pass-test-question__wrap"></div></div>');
@@ -50,7 +46,35 @@ PassTest.prototype.createWrapper = function (content) {
 
 PassTest.prototype.create = function (question, answers) {
 
-  const $content = $(this.createContent(question.payload));
+  const {fragments} = question.payload;
+  let {content} = question.payload;
+
+  //question.item_view
+
+  fragments.forEach(fragment => {
+
+    const code = $('<span/>', {
+      'class': 'dropdown',
+      'data-fragment-id': fragment.id
+    });
+    code.append('<button class="pass-test-btn dropdown-toggle highlight" data-toggle="dropdown"></button><ul class="dropdown-menu"></ul>');
+
+    let element;
+    if (question.item_view === 'text') {
+      const correctItem = fragment.items.filter(item => item.correct);
+      if (correctItem.length === 0) {
+        return;
+      }
+      element = createTextElement(fragment.id, correctItem[0].title.length);
+    } else {
+      element = createSelectElement(fragment.id, shuffle(fragment.items));
+    }
+
+    const reg = new RegExp('{' + fragment.id + '}');
+    content = content.replace(reg, element[0].outerHTML);
+  });
+
+  const $content = $(content);
   $content.on('click', '.dropdown-menu a', function(e) {
     e.preventDefault();
     const text = $(this).text();
@@ -85,7 +109,8 @@ PassTest.prototype.getContent = function(payload) {
 
 PassTest.prototype.getUserAnswers = function() {
   return this.element.find('.highlight').map(function(index, elem) {
-    return $(elem).find('option:selected').text().trim().toLowerCase();
+    const $el = $(elem);
+    return ($el.is('select') ? $el.find('option:selected').text() : $el.val()).trim().toLowerCase();
   }).get();
 }
 

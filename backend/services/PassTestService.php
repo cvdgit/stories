@@ -2,7 +2,7 @@
 
 namespace backend\services;
 
-use backend\models\pass_test\CreatePassTestForm;
+use backend\models\pass_test\PassTestForm;
 use backend\models\question\QuestionType;
 use common\components\ModelDomainException;
 use common\models\StoryTestAnswer;
@@ -53,7 +53,7 @@ class PassTestService
         }
     }
 
-    public function create(int $quizId, CreatePassTestForm $form): void
+    public function create(int $quizId, PassTestForm $form): void
     {
         if (!$form->validate()) {
             throw ModelDomainException::create($form);
@@ -66,7 +66,7 @@ class PassTestService
         });
     }
 
-    public function update(StoryTestQuestion $questionModel, CreatePassTestForm $form): void
+    public function update(StoryTestQuestion $questionModel, PassTestForm $form): void
     {
         if (!$form->validate()) {
             throw ModelDomainException::create($form);
@@ -74,6 +74,7 @@ class PassTestService
 
         $questionModel->name = $form->name;
         $questionModel->regions = $form->payload;
+        $questionModel->sort_view = $form->view;
 
         $this->transactionManager->wrap(function() use ($questionModel, $form) {
 
