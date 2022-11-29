@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use backend\components\question\base\Answer;
 use backend\models\test\TestRepeat;
 use common\helpers\Url;
 use common\models\test\AnswerType;
@@ -521,5 +522,17 @@ class StoryTest extends ActiveRecord
     public function calcRepeat(bool $fastMode): int
     {
         return $fastMode ? 1 : $this->repeat;
+    }
+
+    public static function createPoetry(string $title): StoryTest
+    {
+        $model = new self();
+        $model->title = $title;
+        $model->header = $title;
+        $model->remote = self::LOCAL;
+        $model->source = SourceType::TEST;
+        $model->repeat = 1;
+        $model->answer_type = AnswerType::DEFAULT;
+        return $model;
     }
 }

@@ -22,18 +22,14 @@ use yii\helpers\Url;
  */
 class TestWordList extends ActiveRecord
 {
-
     public $linked_story;
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'test_word_list';
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class,
@@ -46,17 +42,14 @@ class TestWordList extends ActiveRecord
         ];
     }
 
-    public function transactions()
+    public function transactions(): array
     {
         return [
             self::SCENARIO_DEFAULT => self::OP_ALL,
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['name'], 'required'],
@@ -64,10 +57,7 @@ class TestWordList extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -100,7 +90,7 @@ class TestWordList extends ActiveRecord
         return $query;
     }
 
-    public function getTestWordsAsArray($filter = null)
+    public function getTestWordsAsArray($filter = null): array
     {
         return $this->getWordsQuery($filter)->asArray()->all();
     }
@@ -127,18 +117,23 @@ class TestWordList extends ActiveRecord
         return ArrayHelper::map(self::find()->orderBy(['name' => SORT_ASC])->all(), 'id', 'name');
     }
 
-    public static function create(string $name)
+    public static function create(string $name, int $storyId = null): TestWordList
     {
         $model = new self();
         $model->name = $name;
+        if ($storyId !== null) {
+            $model->stories = [$storyId];
+        }
         return $model;
     }
 
-    /**
-     * @return ActiveQuery
-     * @throws \yii\base\InvalidConfigException
-     */
-    public function getStories()
+    public function updateWordList(string $name, int $storyId = null): void
+    {
+        $this->name = $name;
+        $this->stories = $storyId === null ? null : [$storyId];
+    }
+
+    public function getStories(): ActiveQuery
     {
         return $this->hasMany(Story::class, ['id' => 'story_id'])
             ->viaTable('test_word_list_story', ['test_word_list_id' => 'id']);

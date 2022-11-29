@@ -2,6 +2,8 @@
 
 namespace backend\components;
 
+use JetBrains\PhpStorm\ArrayShape;
+
 class WordListFormatter
 {
 
@@ -18,6 +20,9 @@ class WordListFormatter
         return implode(PHP_EOL, $texts);
     }
 
+    /**
+     * @return array{name: string, correct_answer: string}
+     */
     private function createWord(string $name, $correct = ''): array
     {
         $name = trim(preg_replace('/\s{2,}/', ' ', $name));
@@ -48,7 +53,10 @@ class WordListFormatter
         return preg_match_all('/(\\d+)#([\\w]+)/ui', $text, $matches);
     }
 
-    public function createOne(string $name, $correct = ''): array
+    /**
+     * @return array{name: string, correct_answer: string}
+     */
+    public function createOne(string $name, string $correct = ''): array
     {
         return $this->createWord($name, $correct);
     }

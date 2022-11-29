@@ -4,8 +4,8 @@ namespace backend\controllers;
 
 use backend\components\StoryTextFormatter;
 use backend\components\WordListFormatter;
-use backend\forms\CreateWordList;
-use backend\forms\UpdateWordList;
+use backend\forms\WordListForm;
+use backend\forms\WordListPoetryForm;
 use backend\models\test\CreateStoryForm;
 use backend\models\WordListAsTextForm;
 use backend\models\WordListFromStoryForm;
@@ -13,33 +13,36 @@ use backend\services\WordListService;
 use common\models\Story;
 use backend\services\StoryEditorService;
 use common\rbac\UserRoles;
+use Exception;
 use Yii;
 use common\models\TestWordList;
 use backend\models\TestWordListSearch;
+use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Request;
 use yii\web\Response;
+use yii\web\User as WebUser;
 
 /**
  * WordListController implements the CRUD actions for TestWordList model.
  */
 class WordListController extends Controller
 {
-
     private $storyService;
     private $wordListService;
 
     public function __construct($id, $module, StoryEditorService $storyService, WordListService $wordListService, $config = [])
     {
+        parent::__construct($id, $module, $config);
         $this->storyService = $storyService;
         $this->wordListService = $wordListService;
-        parent::__construct($id, $module, $config);
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
@@ -60,67 +63,60 @@ class WordListController extends Controller
         ];
     }
 
-    /**
-     * Lists all TestWordList models.
-     * @return mixed
-     */
-    public function actionIndex()
+    public function actionIndex(Request $request): string
     {
         $searchModel = new TestWordListSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
+        $dataProvider = $searchModel->search($request->queryParams);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
     }
 
-    /**
-     * Creates a new TestWordList model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
+    public function actionCreate(Request $request)
     {
-        $model = new CreateWordList();
-        if ($model->load(Yii::$app->request->post())) {
+        $wordListForm = new WordListForm();
+        if ($wordListForm->load($request->post()) && $wordListForm->validate()) {
             try {
-                $id = $model->createWordList();
+                $this->wordListService->createWordList($wordListForm);
                 Yii::$app->session->setFlash('success', 'Список успешно создан');
-                return $this->redirect(['update', 'id' => $id]);
+                return $this->redirect(['index']);
             }
-            catch (\Exception $ex) {
+            catch (Exception $ex) {
+                Yii::$app->errorHandler->logException($ex);
                 Yii::$app->session->setFlash('error', $ex->getMessage());
                 return $this->refresh();
             }
         }
         return $this->render('create', [
-            'model' => $model,
+            'model' => $wordListForm,
         ]);
     }
 
     /**
-     * Updates an existing TestWordList model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @throws NotFoundHttpException
      */
-    public function actionUpdate($id)
+    public function actionUpdate(int $id, Request $request)
     {
-        $model = new UpdateWordList($this->findModel($id));
-        if ($model->load(Yii::$app->request->post())) {
+        $wordList = $this->findModel($id);
+        $wordListForm = new WordListForm($wordList);
+        if ($wordListForm->load($request->post()) && $wordListForm->validate()) {
             try {
-                $model->updateWordList();
+                $this->wordListService->updateWordList($wordList, $wordListForm);
                 Yii::$app->session->setFlash('success', 'Список успешно обновлен');
-            }
-            catch (\Exception $ex) {
+            } catch (Exception $ex) {
+                Yii::$app->errorHandler->logException($ex);
                 Yii::$app->session->setFlash('error', $ex->getMessage());
             }
             return $this->refresh();
         }
+        $wordsDataProvider = new ActiveDataProvider([
+            'query' => $wordList->getTestWords(),
+            'pagination' => false,
+        ]);
         return $this->render('update', [
-            'model' => $model,
+            'model' => $wordListForm,
+            'wordsDataProvider' => $wordsDataProvider,
         ]);
     }
 
@@ -139,18 +135,14 @@ class WordListController extends Controller
     }
 
     /**
-     * Finds the TestWordList model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return TestWordList the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
+     * @throws NotFoundHttpException
      */
-    protected function findModel($id)
+    private function findModel(int $id): TestWordList
     {
         if (($model = TestWordList::findOne($id)) !== null) {
             return $model;
         }
-        throw new NotFoundHttpException('The requested page does not exist.');
+        throw new NotFoundHttpException('Список слов не найден');
     }
 
     protected function findStoryModel($id)
@@ -186,7 +178,7 @@ class WordListController extends Controller
                 $storyModel = $this->findStoryModel($model->story_id);
                 $wordListID = $model->createWordList($storyModel);
             }
-            catch (\Exception $ex) {
+            catch (Exception $ex) {
                 return ['message' => $ex->getMessage()];
             }
             return $this->redirect(['word-list/update', 'id' => $wordListID]);
@@ -203,7 +195,7 @@ class WordListController extends Controller
                 $wordList = $this->findModel($model->word_list_id);
                 $model->createWordList();
             }
-            catch (\Exception $ex) {
+            catch (Exception $ex) {
                 return ['message' => $ex->getMessage(), 'success' => false];
             }
             return ['message' => 'OK', 'success' => true, 'params' => $wordList->getTestWordsAsArray()];
@@ -228,7 +220,7 @@ class WordListController extends Controller
                 $this->wordListService->create($model, Yii::$app->user->id);
                 return Json::encode(['success' => true, 'message' => '']);
             }
-            catch (\Exception $ex) {
+            catch (Exception $ex) {
                 return Json::encode(['success' => false, 'message' => $ex->getMessage()]);
             }
         }
@@ -237,4 +229,28 @@ class WordListController extends Controller
         ]);
     }
 
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionCreatePoetry(int $word_list_id, Request $request, Response $response, WebUser $user)
+    {
+        $wordList = $this->findModel($word_list_id);
+        $form = new WordListPoetryForm();
+        $form->name = $wordList->name;
+        if ($form->load($request->post())) {
+            $response->format = Response::FORMAT_JSON;
+            if (!$form->validate()) {
+                return ['success' => false, 'message' => 'Validation error'];
+            }
+            try {
+                $this->wordListService->createPoetry($user->getId(), $form, $wordList->testWords);
+                return ['success' => true, 'message' => 'OK'];
+            } catch (Exception $exception) {
+                return ['success' => false, 'message' => $exception->getMessage()];
+            }
+        }
+        return $this->renderAjax('create-poetry-modal', [
+            'formModel' => $form,
+        ]);
+    }
 }

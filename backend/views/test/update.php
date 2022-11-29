@@ -1,5 +1,6 @@
 <?php
 use backend\assets\SortableJsAsset;
+use backend\forms\WordListForm;
 use yii\bootstrap\Dropdown;
 use yii\helpers\Html;
 /**
@@ -49,7 +50,10 @@ SortableJsAsset::register($this);
                     <?= $this->render('_test_question_list', ['model' => $model, 'dataProvider' => $dataProvider]) ?>
                 <?php endif ?>
                 <?php if ($model->isSourceWordList()): ?>
-                    <?= $this->renderFile('@backend/views/word-list/_list.php', ['model' => new \backend\forms\UpdateWordList($model->wordList)]) ?>
+                    <?= $this->renderFile('@backend/views/word-list/_list.php', [
+                        'model' => new WordListForm($model->wordList),
+                        'dataProvider' => new \yii\data\ActiveDataProvider(['query' => $model->wordList->getTestWords()]),
+                    ]) ?>
                 <?php endif ?>
                 <?php if ($model->isSourceTests()): ?>
                     <?= $this->render('_test_tests_list', ['testModel' => $model]) ?>

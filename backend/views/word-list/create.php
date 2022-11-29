@@ -1,9 +1,18 @@
 <?php
+
+declare(strict_types=1);
+
+use backend\forms\WordListForm;
 use yii\helpers\Html;
-/* @var $this yii\web\View */
-/* @var $model backend\forms\CreateWordList */
+use yii\web\View;
+
+/**
+ * @var View $this
+ * @var WordListForm $model
+ */
+
 $this->title = 'Создать список слов';
-$this->params['breadcrumbs'][] = ['label' => 'Test Word Lists', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Списки слов', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="test-word-list-create">
@@ -12,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-md-6">
             <?= $this->render('_form', [
                 'model' => $model,
-            ]) ?>
+            ]); ?>
         </div>
     </div>
 </div>

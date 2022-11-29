@@ -1,32 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\controllers;
 
-use backend\components\WordListFormatter;
-use backend\models\CreateWordForm;
-use backend\models\UpdateWordForm;
+use backend\forms\WordForm;
+use backend\services\WordService;
 use common\models\TestWord;
 use common\models\TestWordList;
 use common\rbac\UserRoles;
-use Yii;
+use Exception;
 use yii\filters\AccessControl;
-use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Request;
 use yii\web\Response;
 
 class WordController extends Controller
 {
+    /** @var WordService */
+    private $wordService;
 
-    private $wordFormatter;
-
-    public function __construct($id, $module, WordListFormatter $wordFormatter, $config = [])
+    public function __construct($id, $module, WordService $wordService, $config = [])
     {
         parent::__construct($id, $module, $config);
-        $this->wordFormatter = $wordFormatter;
+        $this->wordService = $wordService;
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
@@ -42,101 +43,108 @@ class WordController extends Controller
     }
 
     /**
-     * @param int $list_id
-     * @return string
      * @throws NotFoundHttpException
      */
-    public function actionCreate(int $list_id)
+    public function actionCreate(int $list_id, Request $request, Response $response)
     {
-        $listModel = $this->findListModel($list_id);
-        $model = new CreateWordForm($listModel);
-        if ($model->load(Yii::$app->request->post())) {
-            try {
-                $model->createWord($this->wordFormatter);
-                return Json::encode(['success' => true, 'params' => $model->getTestWordsAsArray()]);
+        $wordList = $this->findListModel($list_id);
+        $wordForm = new WordForm();
+        if ($wordForm->load($request->post())) {
+            $response->format = Response::FORMAT_JSON;
+            if (!$wordForm->validate()) {
+                return ['success' => false, 'message' => 'Word validation error'];
             }
-            catch (\Exception $ex) {
-                return Json::encode(['success' => false, 'errors' => [$ex->getMessage()]]);
+            try {
+                $this->wordService->create($wordList->id, $wordForm);
+                return ['success' => true, 'message' => 'Слово успешно добавлено'];
+            }
+            catch (Exception $ex) {
+                return ['success' => false, 'message' => $ex->getMessage()];
             }
         }
-        return $this->renderAjax('create', ['model' => $model]);
+        return $this->renderAjax('create', ['model' => $wordForm]);
     }
 
     /**
-     * @param $id
-     * @return TestWord|null
      * @throws NotFoundHttpException
      */
-    protected function findModel($id)
+    private function findModel(int $id): TestWord
     {
         if (($model = TestWord::findOne($id)) !== null) {
             return $model;
         }
-        throw new NotFoundHttpException('The requested page does not exist.');
+        throw new NotFoundHttpException('Слово не найдено');
     }
 
     /**
-     * @param $id
-     * @return TestWordList|null
      * @throws NotFoundHttpException
      */
-    protected function findListModel($id)
+    private function findListModel(int $id): TestWordList
     {
         if (($model = TestWordList::findOne($id)) !== null) {
             return $model;
         }
-        throw new NotFoundHttpException('The requested page does not exist.');
+        throw new NotFoundHttpException('Список слов не найден');
     }
 
     /**
-     * @param int $id
-     * @return string
      * @throws NotFoundHttpException
      */
-    public function actionUpdate(int $id)
+    public function actionUpdate(int $id, Request $request, Response $response)
     {
-        $model = $this->findModel($id);
-        $updateForm = new UpdateWordForm($model);
-        if ($updateForm->load(Yii::$app->request->post())) {
-            try {
-                $updateForm->updateWord($this->wordFormatter);
-                return Json::encode(['success' => true, 'params' => $model->wordList->getTestWordsAsArray()]);
+        $word = $this->findModel($id);
+        $wordForm = new WordForm($word);
+        if ($wordForm->load($request->post())) {
+            $response->format = Response::FORMAT_JSON;
+            if (!$wordForm->validate()) {
+                return ['success' => false, 'message' => 'Word validation error'];
             }
-            catch (\Exception $ex) {
-                return Json::encode(['success' => false, 'errors' => [$ex->getMessage()]]);
+            try {
+                $this->wordService->update($word->id, $wordForm);
+                return ['success' => true, 'message' => 'Слово успешно изменено'];
+            }
+            catch (Exception $ex) {
+                return ['success' => false, 'message' => $ex->getMessage()];
             }
         }
-        return $this->renderAjax('update', ['model' => $updateForm]);
+        return $this->renderAjax('update', ['model' => $wordForm]);
     }
 
     /**
-     * @param int $id
-     * @return bool[]
      * @throws NotFoundHttpException
-     * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
      */
-    public function actionDelete(int $id)
+    public function actionDelete(int $id, Response $response): array
     {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $this->findModel($id)->delete();
-        return ['success' => true];
+        $response->format = Response::FORMAT_JSON;
+        $this->findModel($id);
+        try {
+            $this->wordService->delete($id);
+            return ['success' => true];
+        } catch (Exception $exception) {
+            return ['success' => false, 'message' => $exception->getMessage()];
+        }
     }
 
-    public function actionCopy(int $id)
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionCopy(int $id, Request $request, Response $response)
     {
-        $model = $this->findModel($id);
-        $updateForm = new UpdateWordForm($model);
-        if ($updateForm->load(Yii::$app->request->post())) {
-            try {
-                $updateForm->copyWord($this->wordFormatter);
-                return Json::encode(['success' => true, 'params' => $model->wordList->getTestWordsAsArray()]);
+        $word = $this->findModel($id);
+        $copyForm = new WordForm($word);
+        if ($copyForm->load($request->post())) {
+            $response->format = Response::FORMAT_JSON;
+            if (!$copyForm->validate()) {
+                return ['success' => false, 'message' => 'Word validation error'];
             }
-            catch (\Exception $ex) {
-                return Json::encode(['success' => false, 'errors' => [$ex->getMessage()]]);
+            try {
+                $this->wordService->copy($word->word_list_id, $copyForm);
+                return ['success' => true, 'message' => 'Слово успешно скопировано'];
+            }
+            catch (Exception $ex) {
+                return ['success' => false, 'message' => $ex->getMessage()];
             }
         }
-        return $this->renderAjax('copy', ['model' => $updateForm]);
+        return $this->renderAjax('copy', ['model' => $copyForm]);
     }
-
 }

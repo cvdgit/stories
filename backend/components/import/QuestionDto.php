@@ -6,15 +6,16 @@ namespace backend\components\import;
 
 class QuestionDto
 {
+    /** @var string */
     private $name;
+    /** @var string */
+    private $payload;
     private $answers = [];
 
-    /**
-     * @param string $name
-     */
-    public function __construct(string $name)
+    public function __construct(string $name, string $payload = null)
     {
         $this->name = $name;
+        $this->payload = $payload;
     }
 
     /**
@@ -66,5 +67,13 @@ class QuestionDto
         return array_values(array_filter($this->getAnswers(), static function (AnswerDto $answer) {
             return $answer->isCorrect();
         }));
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPayload(): ?string
+    {
+        return $this->payload;
     }
 }

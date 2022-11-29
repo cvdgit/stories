@@ -1,37 +1,25 @@
 <?php
-use backend\forms\CreateWordList;
+
+declare(strict_types=1);
+
+use backend\forms\WordListForm;
 use backend\widgets\SelectStoryWidget;
 use yii\helpers\Html;
+use yii\web\View;
 use yii\widgets\ActiveForm;
-/* @var $this yii\web\View */
-/* @var $model */
-/* @var $form yii\widgets\ActiveForm */
-$isNewRecord = $model instanceof CreateWordList;
+
+/**
+ * @var View $this
+ * @var WordListForm $model
+ * @var ActiveForm $form
+ */
 ?>
 <div class="test-word-list-form">
     <?php $form = ActiveForm::begin(); ?>
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'story')->widget(SelectStoryWidget::class) ?>
+    <?= $form->field($model, 'story_id')->widget(SelectStoryWidget::class, ['storyModel' => $model->getStory()]) ?>
     <div class="form-group">
-        <?= Html::submitButton($isNewRecord ? 'Создать' : 'Сохранить', ['class' => 'btn btn-success']) ?>
-        <?php if (!$isNewRecord): ?>
-        <?= Html::a('Создать тест и историю', ['word-list/create-story-form', 'id' => $model->id], ['class' => 'btn', 'data-toggle' => 'modal', 'data-target' => '#create-test-and-story-modal']) ?>
-        <?php endif ?>
+        <?= Html::submitButton($model->isNewRecord() ? 'Создать' : 'Сохранить', ['class' => 'btn btn-success']) ?>
     </div>
     <?php ActiveForm::end(); ?>
-    <?php if (!$isNewRecord): ?>
-        <?= Html::a('Создать из шаблона', ['test-template/create-tests', 'word_list_id' => $model->id], ['class' => 'btn btn-default', 'data-toggle' => 'modal', 'data-target' => '#create-from-template-modal']) ?>
-    <?php endif ?>
-</div>
-
-<div class="modal remote fade" id="create-test-and-story-modal">
-    <div class="modal-dialog">
-        <div class="modal-content"></div>
-    </div>
-</div>
-
-<div class="modal remote fade" id="create-from-template-modal">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content"></div>
-    </div>
 </div>

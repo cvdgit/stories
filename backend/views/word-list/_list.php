@@ -1,109 +1,74 @@
 <?php
+
+declare(strict_types=1);
+
+use backend\forms\WordListForm;
+use backend\widgets\grid\PjaxDeleteButton;
+use backend\widgets\WordEditWidget;
+use common\models\TestWord;
+use yii\data\DataProviderInterface;
+use yii\grid\ActionColumn;
+use yii\grid\GridView;
 use yii\helpers\Html;
-use yii\helpers\Json;
 use yii\helpers\Url;
-/** @var $model common\models\TestWordList */
+use yii\web\View;
+use yii\widgets\Pjax;
+
+/**
+ * @var View $this
+ * @var WordListForm $model
+ * @var DataProviderInterface $dataProvider
+ */
+
+$this->registerJs($this->renderFile('@backend/views/word-list/_words.js'));
 ?>
 <p>
-    <?= Html::a('Добавить слово', ['word/create', 'list_id' => $model->id], ['class' => 'btn btn-primary', 'id' => 'create-test-word']) ?>
-    <?= Html::a('Редактировать как текст', ['word-list/text-edit', 'word_list_id' => $model->id], ['class' => 'btn btn-primary', 'id' => 'edit-as-text']) ?>
+    <?= Html::a('Добавить слово', ['/word/create', 'list_id' => $model->getId()], ['class' => 'btn btn-primary', 'id' => 'create-test-word']) ?>
+    <?= Html::a('Редактировать как текст', ['/word-list/text-edit', 'word_list_id' => $model->getId()], ['class' => 'btn btn-primary', 'id' => 'edit-as-text']) ?>
 </p>
 <h4>Слова</h4>
-<table class="table table-bordered" id="test-word-table">
-    <thead>
-    <tr>
-        <th>Слово</th>
-        <th>Правильный ответ</th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody></tbody>
-</table>
 
-<div class="modal remote fade" id="create-test-word-modal">
-    <div class="modal-dialog">
-        <div class="modal-content"></div>
-    </div>
+<div id="test-word-table">
+    <?php Pjax::begin(['id' => 'pjax-words']); ?>
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'summary' => false,
+        'columns' => [
+            [
+                'attribute' => 'name',
+                'format' => 'raw',
+                'value' => static function(TestWord $model) {
+                    return Html::a($model->name, ['/word/update', 'id' => $model->id], ['class' => 'update-test-word', 'data-pjax' => '0']);
+                },
+                'enableSorting' => false,
+            ],
+            [
+                'attribute' => 'correct_answer',
+                'enableSorting' => false,
+            ],
+            [
+                'class' => ActionColumn::class,
+                'template' => '{copy} {delete}',
+                'buttons' => [
+                    'delete' => static function ($url, $model) {
+                        return new PjaxDeleteButton('#', [
+                            'class' => 'pjax-delete-link',
+                            'delete-url' => Url::to(['/word/delete', 'id' => $model->id]),
+                            'pjax-container' => 'pjax-words',
+                        ]);
+                    },
+                    'copy' => static function ($url, $model) {
+                        return Html::a('<i class="glyphicon glyphicon-copy"></i>', ['/word/copy', 'id' => $model->id], ['class' => 'copy-test-word', 'data-pjax' => 0, 'style' => 'margin-right: 10px']);
+                    },
+                ],
+            ],
+        ],
+    ]); ?>
+    <?php Pjax::end(); ?>
 </div>
 
-<div class="modal remote fade" id="update-test-word-modal">
-    <div class="modal-dialog">
-        <div class="modal-content"></div>
-    </div>
-</div>
-
-<?= \backend\widgets\WordEditWidget::widget([
+<?= WordEditWidget::widget([
     'modelAttribute' => 'word-list-id',
-    'modelAttributeValue' => $model->id,
+    'modelAttributeValue' => $model->getId(),
     'target' => '#edit-as-text',
 ]) ?>
-
-<?php
-$words = Json::encode($model->getTestWordsAsArray());
-$deleteUrl = Url::to(['word/delete']);
-$updateUrl = Url::to(['word/update']);
-$copyUrl = Url::to(['word/copy']);
-$js = <<< JS
-
-$('#test-word-table').on('click', '.update-test-word,.copy-test-word', function(e) {
-    e.preventDefault();
-    $('#update-test-word-modal')
-        .modal({'remote': $(this).attr('href')})
-        .modal('show');
-});
-
-$('#update-test-word-modal').on('hide.bs.modal', function() {
-    $(this).removeData('bs.modal');
-    $(this).find('.modal-content').html('');
-});
-
-var words = $words;
-window.fillTestWordsTable = function(params) {
-    var table = $('#test-word-table tbody');
-    table.empty();
-    params.forEach(function(param) {
-        var updateLink = $('<a/>')
-            .addClass('update-test-word')
-            .attr({href: '$updateUrl' + '&id=' + param.id, title: 'Изменить запись'})
-            .html('<i class="glyphicon glyphicon-edit"></i>')
-            .css('marginRight', '10px');
-        var copyLink = $('<a/>')
-            .addClass('copy-test-word')
-            .attr({href: '$copyUrl' + '&id=' + param.id, title: 'Копировать запись'})
-            .html('<i class="glyphicon glyphicon-copy"></i>')
-            .css('marginRight', '10px');
-        var deleteLink = $('<a/>')
-            .attr({href: '#', title: 'Удалить запись'})
-            .html('<i class="glyphicon glyphicon-trash"></i>')
-            .on('click', function(e) {
-                e.preventDefault();
-                if (!confirm('Удалить запись?')) {
-                    return false;
-                }
-                var that = this;
-                $.getJSON('$deleteUrl', {id: param.id})
-                .done(function(response) {
-                    if (response && response.success) {
-                        $(that).parent().parent().remove();
-                    }
-                })
-            });
-        $('<tr/>')
-            .append($('<td/>').text(param.name))
-            .append($('<td/>').text(param.correct_answer))
-            .append($('<td/>')
-                .append(updateLink)
-                .append(copyLink)
-                .append(deleteLink))
-            .appendTo(table);
-    });
-}
-fillTestWordsTable(words);
-
-$('#create-test-word').on('click', function(e) {
-    e.preventDefault();
-    $('#create-test-word-modal').modal({'remote': $(this).attr('href')});
-});
-
-JS;
-$this->registerJs($js);

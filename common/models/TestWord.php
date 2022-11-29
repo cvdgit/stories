@@ -33,7 +33,7 @@ class TestWord extends ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Name',
+            'name' => 'Слово',
             'word_list_id' => 'Word List ID',
             'order' => 'Порядок',
             'correct_answer' => 'Правильный ответ',

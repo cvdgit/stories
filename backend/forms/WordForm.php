@@ -1,6 +1,6 @@
 <?php
 
-namespace backend\models;
+namespace backend\forms;
 
 use backend\components\WordListFormatter;
 use common\models\TestWord;
@@ -8,22 +8,21 @@ use common\models\TestWordList;
 use DomainException;
 use yii\base\Model;
 
-class CreateWordForm extends Model
+class WordForm extends Model
 {
-
     public $name;
     public $correct_answer;
 
-    /** @var TestWordList */
-    private $list;
-
-    public function __construct(TestWordList $list, $config = [])
+    public function __construct(TestWord $model = null, $config = [])
     {
-        $this->list = $list;
         parent::__construct($config);
+        if ($model !== null) {
+            $this->name = $model->name;
+            $this->correct_answer = $model->correct_answer;
+        }
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             [['name'], 'required'],
@@ -31,7 +30,7 @@ class CreateWordForm extends Model
         ];
     }
 
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'name' => 'Слово',

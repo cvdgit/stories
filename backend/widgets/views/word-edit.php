@@ -1,8 +1,17 @@
 <?php
+
+declare(strict_types=1);
+
+use backend\models\WordListAsTextForm;
 use yii\helpers\Html;
+use yii\web\View;
 use yii\widgets\ActiveForm;
-/** @var $model backend\models\WordListAsTextForm */
-/** @var $target string */
+
+/**
+ * @var View $this
+ * @var WordListAsTextForm $model
+ * @var string $target
+ */
 ?>
 <div class="modal fade" id="story-text-modal">
     <div class="modal-dialog modal-lg">
@@ -78,7 +87,7 @@ $('#word-list-as-text-form')
         $.ajax({
             url: $(this).attr('action'),
             type: $(this).attr('method'),
-            data: form_data, 
+            data: form_data,
             dataType: 'json',
             cache: false,
             contentType: false,
@@ -86,7 +95,7 @@ $('#word-list-as-text-form')
         })
         .done(function(response) {
                 if (response && response.success) {
-                    fillTestWordsTable(response.params);
+                    $.pjax.reload('#pjax-words', {timeout: 3000});
                 }
                 else {
                     toastr.error(response.errors);
