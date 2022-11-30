@@ -1,6 +1,6 @@
 import {_extends, shuffle} from "../common";
 
-const Poetry = function (test) {
+const Poetry = function (test, el, options) {
 
   this.element = null;
 
@@ -17,14 +17,19 @@ const Poetry = function (test) {
 
     $content.appendTo($wrap);
 
-    const list = test.getQuestionList() || [];
-    list.forEach((q) => {
-      $content.append($('<div/>', {style: 'margin: 0 0 10px; font-size: 24px'}).text(q.name));
+    options.historyValues.forEach(val => {
+      $content.append($('<div/>', {style: 'margin: 0 0 10px; font-size: 2rem'}).text(val));
     });
 
-    $content.append($('<p/>', {style: 'font-size:24px'}).text(question.name));
+    const list = test.getQuestionList() || [];
+    list.forEach((q) => {
+      $content.append($('<div/>', {style: 'margin: 0 0 10px; font-size: 2rem'}).text(q.name));
+    });
+
+    $content.append($('<p/>', {style: 'font-size:2rem'}).text(question.name));
 
     const answers = shuffle(question.storyTestAnswers);
+    const btnWrap = $('<div/>', {'class': 'drag-words-answers__words'});
     answers.forEach((answer) => {
 
       const btn = $('<button/>', {type: 'button', class: 'pass-test-btn', style: 'margin-bottom: 10px'})
@@ -36,10 +41,9 @@ const Poetry = function (test) {
         test.nextQuestion([answer.id]);
       });
 
-      $('<div/>')
-        .append(btn)
-        .appendTo($wrap);
+      btn.appendTo(btnWrap);
     });
+    $wrap.append(btnWrap);
 
     return $wrap;
   };
@@ -72,8 +76,8 @@ const Poetry = function (test) {
       return that.element;
     },
 
-    scroll() {
-      const list = that.element.find('.poetry-list');
+    scroll(el) {
+      const list = el.find('.poetry-list');
       list.prop('scrollTop', list.prop("scrollHeight"));
     },
 

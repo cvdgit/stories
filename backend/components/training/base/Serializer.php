@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\components\training\base;
 
 use common\models\StoryTest;
@@ -7,6 +9,12 @@ use yii\helpers\HtmlPurifier;
 
 class Serializer
 {
+    private $historyValues;
+
+    public function __construct(array $historyValues = [])
+    {
+        $this->historyValues = $historyValues;
+    }
 
     public function serialize(StoryTest $test,
                               QuestionCollection $collection,
@@ -20,7 +28,7 @@ class Serializer
                 'storyTestQuestions' => $collection->serialize($test->isShuffleQuestions()),
                 'test' => [
                     'id' => $test->id,
-                    'description' => HtmlPurifier::process(nl2br($test->description_text)),
+                    'description' => HtmlPurifier::process(nl2br($test->description_text ?? '')),
                     'progress' => [
                         'total' => $collection->getTotal() * ($fastMode ? 1 : $test->repeat),
                         'current' => $userStarsCount,
@@ -45,8 +53,8 @@ class Serializer
                 ],
                 'students' => $students,
                 'stories' => $stories,
+                'historyValues' => $this->historyValues,
             ],
         ];
     }
-
 }

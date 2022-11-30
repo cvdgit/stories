@@ -54,9 +54,9 @@ var PluginManager = {
       var pluginName = plugin.pluginName;
       //if (!test.options[pluginName] && !plugin.initializeByDefault) return;
       if (!plugin.initializeByDefault) return;
-      var initialized = new plugin(test, el, {});
+      var initialized = new plugin(test, el, defaults);
       initialized.test = test;
-      initialized.options = {};
+      //initialized.options = defaults;
       test[pluginName] = initialized; // Add default options from plugin
       _extends(defaults, initialized.defaults);
     });
@@ -389,6 +389,10 @@ function WikidsStoryTest(el, options) {
 
     start();
     createContainer(dom.wrapper);
+
+    if (questionViewPoetry(currentQuestion)) {
+      that.poetryQuestion.scroll($(currentQuestionElement).find('.drag-words-question'));
+    }
   }
 
   function createLoader(text) {
@@ -412,6 +416,11 @@ function WikidsStoryTest(el, options) {
     });
     $.getJSON(that.options.dataUrl, dataParams)
       .done(function (response) {
+
+        PluginManager.initializePlugins(that, el, {
+          'historyValues': response[0].historyValues
+        });
+
         load(response);
         if (that.options.forSlide) {
           that.options.deck.sync();
@@ -2052,7 +2061,6 @@ function WikidsStoryTest(el, options) {
     if (questionViewPoetry(currentQuestion)) {
       $('.drag-words-question', currentQuestionElement)
         .html(that.poetryQuestion.create(currentQuestion));
-      that.poetryQuestion.scroll();
     }
 
     if (testConfig.answerTypeIsMissingWords(currentQuestion)) {
@@ -2686,7 +2694,7 @@ function WikidsStoryTest(el, options) {
     $('.reveal .slides section.present').append($hintWrapper);
   }
 
-  PluginManager.initializePlugins(this, el, {});
+  //PluginManager.initializePlugins(this, el, {});
 
   this.getCurrentQuestionElement = function () {
     return currentQuestionElement;

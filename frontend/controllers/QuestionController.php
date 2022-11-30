@@ -146,10 +146,29 @@ class QuestionController extends Controller
         }
 
         if ($test->isSourceTest()) {
+
             $collection = (new TestBuilder($test, $test->getQuestionData($userHistory), $test->getQuestionDataCount(), $userStars, $fastMode))
                 ->build();
-            return (new Serializer())
-                ->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount, $fastMode);
+
+            $historyValues = [];
+            if (count($userHistory) > 0) {
+                $questionId = $collection->getQuestions()[0]->getId();
+                $lastQuestionOrder = (new Query())
+                    ->select('order')
+                    ->from('story_test_question')
+                    ->where(['id' => $questionId])
+                    ->scalar();
+                $prevQuery = (new Query())
+                    ->select('name')
+                    ->from('story_test_question')
+                    ->where(['story_test_id' => $test->id])
+                    ->andWhere(['<', 'order', $lastQuestionOrder])
+                    ->orderBy(['order' => SORT_ASC]);
+                $historyValues = array_column($prevQuery->all(), 'name');
+            }
+
+            $serializer = new Serializer($historyValues);
+            return $serializer->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount, $fastMode);
         }
 
         if ($test->isSourceTests()) {

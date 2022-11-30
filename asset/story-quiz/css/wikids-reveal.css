@@ -1561,7 +1561,7 @@ p.wikids-test-description {
   background-image: none;
   border: 1px solid #ccc;
   padding: 6px 12px;
-  font-size: 14px;
+  font-size: 2rem;
   line-height: 1.42857143;
   border-radius: 4px;
   -webkit-user-select: none;
@@ -1662,11 +1662,12 @@ p.wikids-test-description {
 
 .drag-words-question__wrap {
   height: 100%;
-  min-width: 500px;
-  max-width: 900px;
+  min-width: 900px;
+  max-width: 1200px;
 }
 
 .drag-words-answers {
+  font-size: 2rem;
 }
 
 .drag-words-answers__content {
