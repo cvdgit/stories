@@ -17,13 +17,17 @@ class PoetryWordProcessor implements WordProcessor
         $this->words = $words;
     }
 
-    private function createIncorrectAnswers(TestWord $current, TestWord $next, int $max): array
+    /**
+     * @param list<AnswerDto> $answers
+     * @param int $max
+     * @return list<AnswerDto>
+     */
+    private function createIncorrectAnswers(array $answers, int $max): array
     {
-        $incorrect = array_filter($this->words, static function(TestWord $item) use ($current, $next) {
-            return $item->id !== $current->id
-                && $item->name !== $current->name
-                && $item->id !== $next->id
-                && $item->name !== $next->name;
+        $incorrect = array_filter($this->words, static function(TestWord $item) use ($answers) {
+            return count(array_filter($answers, static function(AnswerDto $answerItem) use ($item) {
+                return $item->name === $answerItem->getName();
+            })) === 0;
         });
 
         if (count($incorrect) === 0) {
@@ -61,9 +65,13 @@ class PoetryWordProcessor implements WordProcessor
         }
 
         $answers = [new AnswerDto($nextWord->name, true)];
+        $nextIncorrect = next($values);
+        if ($nextIncorrect !== false) {
+            $answers[] = new AnswerDto($nextIncorrect->name, false);
+        }
 
         $max = 5 - count($answers);
-        $answers = array_merge($answers, $this->createIncorrectAnswers($word, $nextWord, $max));
+        $answers = array_merge($answers, $this->createIncorrectAnswers($answers, $max));
         shuffle($answers);
 
         $question->setAnswers($answers);
