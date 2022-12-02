@@ -2083,6 +2083,7 @@ function WikidsStoryTest(el, options) {
 
       const q = $('.wikids-test-active-question .answer-input', dom.questions);
       q.val('');
+      q.trigger('focus');
 
       if (testConfig.isSayCorrectAnswer()) {
 
@@ -2119,15 +2120,12 @@ function WikidsStoryTest(el, options) {
           .on('click',(e) => {
             e.preventDefault();
 
-            currentQuestionElement.append(playContent)
+            //currentQuestionElement.append(playContent)
             sayQuestionName(currentQuestion, () => {
-              playContent.remove();
+              //playContent.remove();
               q.trigger('focus');
             });
           });
-      }
-      else {
-        q.trigger('focus');
       }
     }
 
