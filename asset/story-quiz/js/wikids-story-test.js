@@ -2086,11 +2086,11 @@ function WikidsStoryTest(el, options) {
 
       if (testConfig.isSayCorrectAnswer()) {
 
-        currentQuestionElement.append(playContent);
+        //currentQuestionElement.append(playContent);
 
         const correctText = getCorrectAnswers(nextQuestionObj)[0].name;
         sayCorrectAnswerName(correctText, () => {
-          playContent.remove();
+          //playContent.remove();
           q.trigger('focus');
         });
 
@@ -2099,18 +2099,18 @@ function WikidsStoryTest(el, options) {
           .on('click',(e) => {
             e.preventDefault();
 
-            currentQuestionElement.append(playContent)
+            //currentQuestionElement.append(playContent)
             sayCorrectAnswerName(correctText, () => {
-              playContent.remove();
+              //playContent.remove();
               q.trigger('focus');
             });
           });
       }
       else if (testConfig.isAskQuestion()) {
 
-        currentQuestionElement.append(playContent);
+        //currentQuestionElement.append(playContent);
         sayQuestionName(currentQuestion, () => {
-          playContent.remove();
+          //playContent.remove();
           q.trigger('focus');
         });
 
