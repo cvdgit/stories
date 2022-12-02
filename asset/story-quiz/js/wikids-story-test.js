@@ -2256,6 +2256,7 @@ function WikidsStoryTest(el, options) {
   }
 
   function sayQuestionName(question, onEndCallback) {
+    cancelSpeech();
     if (haveAudioFile(question)) {
       playAudio(getAudioFile(question), onEndCallback);
     } else {
