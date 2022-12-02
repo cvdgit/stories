@@ -2264,6 +2264,7 @@ function WikidsStoryTest(el, options) {
   }
 
   function sayCorrectAnswerName(text, onEndCallback) {
+    cancelSpeech();
     speech.readText(text, testConfig.getInputVoice(), onEndCallback);
   }
 
