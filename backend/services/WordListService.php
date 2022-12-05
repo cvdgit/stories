@@ -104,7 +104,7 @@ class WordListService
     {
         foreach ($items as $item) {
 
-            $test = $this->storyTestService->createFromTemplate($item->template_id, $wordList->name);
+            $test = $this->storyTestService->createFromTemplate((int)$item->template_id, $wordList->name);
             if (!$test->save()) {
                 throw new Exception('Can\'t be saved StoryTest model. Errors: '. implode(', ', $test->getFirstErrors()));
             }
