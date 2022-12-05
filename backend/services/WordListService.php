@@ -110,7 +110,7 @@ class WordListService
             }
 
             $words = $wordList->testWords;
-            $modifier = WordListModifierBuilder::build($item->word_list_processing, $words);
+            $modifier = WordListModifierBuilder::build((int)$item->word_list_processing, $words);
             $questionsData = $modifier->modify();
 
             foreach ($questionsData as $question) {
