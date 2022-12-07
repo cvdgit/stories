@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace modules\edu\controllers\admin;
 
 use Exception;
@@ -11,6 +13,7 @@ use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Request;
 use yii\web\Response;
 
 /**
@@ -18,7 +21,6 @@ use yii\web\Response;
  */
 class ClassProgramController extends Controller
 {
-
     private $classProgramService;
 
     public function __construct($id, $module, ClassProgramService $classProgramService, $config = [])
@@ -30,7 +32,7 @@ class ClassProgramController extends Controller
     /**
      * @inheritDoc
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return array_merge(
             parent::behaviors(),
@@ -45,16 +47,10 @@ class ClassProgramController extends Controller
         );
     }
 
-    /**
-     * Lists all EduClassProgram models.
-     *
-     * @return string
-     */
-    public function actionIndex()
+    public function actionIndex(Request $request): string
     {
         $searchModel = new EduClassProgramSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
-
+        $dataProvider = $searchModel->search($request->queryParams);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -159,5 +155,20 @@ class ClassProgramController extends Controller
             }
         }
         return ['success' => true];
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionView(int $id): string
+    {
+        $classProgram = EduClassProgram::findOne($id);
+        if ($classProgram === null) {
+            throw new NotFoundHttpException('Программа обучения не найдена');
+        }
+
+        return $this->render('view', [
+            'classProgram' => $classProgram,
+        ]);
     }
 }

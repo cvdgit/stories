@@ -37,6 +37,7 @@ return [
             'preview/<alias:[\w\-]+>' => 'preview/view',
             'study/task/<id:\d+>' => 'study/task',
             '<section:\w+>' => 'story/index',
+            '/edu/story/<id:\d+>' => 'edu/story/view',
         ],
     ],
 
