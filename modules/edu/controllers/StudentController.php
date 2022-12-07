@@ -3,11 +3,13 @@
 namespace modules\edu\controllers;
 
 use common\rbac\UserRoles;
+use modules\edu\components\TopicAccessManager;
 use modules\edu\models\EduClassProgram;
 use modules\edu\models\EduLesson;
 use modules\edu\models\EduTopic;
 use Yii;
 use yii\data\ActiveDataProvider;
+use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
@@ -15,20 +17,29 @@ use yii\web\NotFoundHttpException;
 
 class StudentController extends Controller
 {
-/*    public function behaviors(): array
+    /** @var TopicAccessManager */
+    private $topicAccessManager;
+
+    public function __construct($id, $module, TopicAccessManager $topicAccessManager, $config = [])
     {
-        return [
-            'access' => [
-                'class' => AccessControl::class,
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'roles' => [UserRoles::ROLE_STUDENT],
+        parent::__construct($id, $module, $config);
+        $this->topicAccessManager = $topicAccessManager;
+    }
+
+    /*    public function behaviors(): array
+        {
+            return [
+                'access' => [
+                    'class' => AccessControl::class,
+                    'rules' => [
+                        [
+                            'allow' => true,
+                            'roles' => [UserRoles::ROLE_STUDENT],
+                        ],
                     ],
                 ],
-            ],
-        ];
-    }*/
+            ];
+        }*/
 
     /**
      * @throws ForbiddenHttpException
@@ -91,12 +102,15 @@ class StudentController extends Controller
             'query' => $topic->getEduLessons(),
         ]);
 
+        $lessonAccess = $this->topicAccessManager->getStudentLessonAccess($classProgram->id, $student->id);
+
         return $this->render('topic', [
             'classProgramName' => $classProgram->program->name,
             'student' => $student,
             'topics' => $classProgram->eduTopics,
             'dataProvider' => $dataProvider,
             'topic' => $topic,
+            'lessonAccess' => $lessonAccess,
         ]);
     }
 
@@ -118,12 +132,14 @@ class StudentController extends Controller
             }
         }
 
-        $topic = $lesson->topic;
-        $classProgram = $topic->classProgram;
+        $this->canAccessTopic($lesson->topic_id, $lesson->id, $student->id);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $lesson->getStories(),
         ]);
+
+        $topic = $lesson->topic;
+        $classProgram = $topic->classProgram;
 
         return $this->render('lesson', [
             'classProgramName' => $classProgram->program->name,
@@ -134,5 +150,28 @@ class StudentController extends Controller
             'currentTopicId' => $topic->id,
             'programId' => $classProgram->id,
         ]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     * @throws ForbiddenHttpException
+     */
+    private function canAccessTopic(int $topicId, int $lessonId, int $studentId): void
+    {
+        $classProgramId = (new Query())
+            ->select('class_program_id')
+            ->from('edu_topic')
+            ->where(['id' => $topicId])
+            ->scalar();
+        if (empty($classProgramId)) {
+            throw new NotFoundHttpException('Тема не найдена');
+        }
+        $lessonAccess = $this->topicAccessManager->getStudentLessonAccess($classProgramId, $studentId);
+        if (!isset($lessonAccess[$lessonId])) {
+            throw new NotFoundHttpException('Урок не найден');
+        }
+        if ($lessonAccess[$lessonId]['access'] === false) {
+            throw new ForbiddenHttpException('Что бы получить доступ к урок - необходимо пройти предыдущие');
+        }
     }
 }

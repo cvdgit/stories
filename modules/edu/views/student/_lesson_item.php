@@ -8,8 +8,11 @@ use yii\helpers\Url;
 /**
  * @var EduLesson $model
  * @var int $studentId
+ * @var array{"access":bool} $lessonAccess
  */
+$access = $lessonAccess[$model->id]['access'];
 ?>
+<?php if ($access): ?>
 <a href="<?= Url::to(['/edu/student/lesson', 'id' => $model->id]) ?>" class="col-sm-4 col-md-3 lesson-item__wrap">
     <div class="lesson-item">
         <div class="lesson-image">
@@ -19,11 +22,25 @@ use yii\helpers\Url;
             <div class="lesson-name__inner">
                 <span><?= $model->name ?></span>
                 <?php if (($finishedStories = $model->getStudentFinishedStoriesCount($studentId)) > 0): ?>
-                <span style="color:rgba(9, 21, 38, 0.6);">
-                    <?= $finishedStories ?>&nbsp;/&nbsp;<?= $model->getLessonStoriesCount() ?>
-                </span>
+                    <span style="color:rgba(9, 21, 38, 0.6);">
+                <?= $finishedStories ?>&nbsp;/&nbsp;<?= $model->getLessonStoriesCount() ?>
+            </span>
                 <?php endif; ?>
             </div>
         </div>
     </div>
 </a>
+<?php else: ?>
+<div class="col-sm-4 col-md-3 lesson-item__wrap">
+    <div class="lesson-item">
+        <div class="lesson-image">
+            <img class="lesson-image__img" src="/school/img/logo_blocked.svg" alt="">
+        </div>
+        <div class="lesson-name">
+            <div class="lesson-name__inner">
+                <span><?= $model->name; ?></span>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>

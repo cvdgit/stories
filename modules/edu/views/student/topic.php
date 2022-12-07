@@ -18,63 +18,10 @@ use yii\widgets\ListView;
  * @var EduTopic[] $topics
  * @var string $classProgramName
  * @var EduTopic $topic
+ * @var array $lessonAccess
  */
 
 $this->title = $student->name;
-
-$this->registerCss(<<<CSS
-.lesson-item {
-    position: relative;
-    width: 200px;
-    padding: 0;
-    box-sizing: border-box;
-    margin-bottom: 10px;
-    display: flex;
-    flex-direction: column;
-    -webkit-box-align: center;
-    align-items: center;
-    z-index: 1;
-}
-.lesson-item__wrap {
-    margin-bottom: 1rem;
-    text-decoration: none;
-}
-.lesson-item__wrap:hover .lesson-name span {
-    color: #99cd50 !important;
-}
-.lesson-image {
-    position: relative;
-    top: 0;
-    left: 0;
-    width: 100px;
-    height: 100px;
-}
-.lesson-image__img {
-    width: 100px;
-    height: 100px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-.lesson-name {
-    color: rgba(9, 21, 38, 0.85);
-    text-align: center;
-    width: 100%;
-    margin-top: 16px;
-}
-.lesson-name__inner {
-    max-width: 100%;
-    display: inline-block;
-    color: inherit;
-    font-weight: normal;
-    font-style: normal;
-    transform: rotate(0.03deg);
-    font-size: 16px;
-    line-height: 22px;
-}
-CSS
-);
 ?>
 <div class="container">
     <?= StudentToolbarWidget::widget(['student' => $student]) ?>
@@ -98,7 +45,7 @@ CSS
                 'summary' => false,
                 'itemView' => '_lesson_item',
                 'itemOptions' => ['tag' => false],
-                'viewParams' => ['studentId' => $student->id],
+                'viewParams' => ['studentId' => $student->id, 'lessonAccess' => $lessonAccess],
                 'layout' => "{summary}\n<div class=\"row display-flex\">{items}</div>\n{pager}",
             ]) ?>
 

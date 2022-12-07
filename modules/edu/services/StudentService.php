@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace modules\edu\services;
 
 use common\components\ModelDomainException;
@@ -21,17 +20,17 @@ use Yii;
 
 class StudentService
 {
-
     private $transactionManager;
     private $userService;
     private $teacherService;
     private $userAccessService;
 
-    public function __construct(TransactionManager $transactionManager,
-                                UserService $userService,
-                                TeacherService $teacherService,
-                                UserAccessService $userAccessService)
-    {
+    public function __construct(
+        TransactionManager $transactionManager,
+        UserService $userService,
+        TeacherService $teacherService,
+        UserAccessService $userAccessService
+    ) {
         $this->transactionManager = $transactionManager;
         $this->userService = $userService;
         $this->teacherService = $teacherService;

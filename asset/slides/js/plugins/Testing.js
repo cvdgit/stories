@@ -153,6 +153,8 @@ export default () => {
 
         this.deck.sync();
         this.deck.slide(slide_index);
+
+        //console.log('sync');
       }
 
       if (stack.length > 0) {
