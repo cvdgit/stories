@@ -44,7 +44,6 @@ $this->title = 'Программы обучения';
             ],
             [
                 'class' => ActionColumn::class,
-                'template' => '{update} {delete}',
             ],
         ],
     ]) ?>
