@@ -151,7 +151,7 @@ class QuestionController extends Controller
                 ->build();
 
             $historyValues = [];
-            if (count($userHistory) > 0) {
+            if (count($userHistory) > 0 && $collection->count() > 0) {
                 $questionId = $collection->getQuestions()[0]->getId();
                 $lastQuestionOrder = (new Query())
                     ->select('order')

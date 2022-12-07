@@ -390,7 +390,7 @@ function WikidsStoryTest(el, options) {
     start();
     createContainer(dom.wrapper);
 
-    if (questionViewPoetry(currentQuestion)) {
+    if (currentQuestion && questionViewPoetry(currentQuestion)) {
       that.poetryQuestion.scroll($(currentQuestionElement).find('.drag-words-question'));
     }
   }

@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\components\training\base;
 
 class QuestionCollection
 {
-
     /** @var int */
     private $total;
 
@@ -25,12 +26,12 @@ class QuestionCollection
         return $this->questions;
     }
 
-    public function addQuestion(BaseQuestion $question)
+    public function addQuestion(BaseQuestion $question): void
     {
         $this->questions[] = $question;
     }
 
-    public function getTotal()
+    public function getTotal(): int
     {
         return $this->total;
     }
@@ -47,4 +48,8 @@ class QuestionCollection
         }, $this->questions);
     }
 
+    public function count(): int
+    {
+        return count($this->questions);
+    }
 }
