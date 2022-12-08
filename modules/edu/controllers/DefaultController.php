@@ -175,7 +175,7 @@ class DefaultController extends Controller
         $testingRows = (new Query())
             ->select([
                 'test_id' => new Expression('DISTINCT story_story_test.test_id'),
-                'test_name' => 'story_test.title',
+                'test_name' => 'story_test.header',
                 'progress' => new Expression('IFNULL(student_question_progress.progress, 0)'),
             ])
             ->from('story_story_test')
