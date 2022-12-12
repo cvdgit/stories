@@ -2061,6 +2061,7 @@ function WikidsStoryTest(el, options) {
     if (questionViewPoetry(currentQuestion)) {
       $('.drag-words-question', currentQuestionElement)
         .html(that.poetryQuestion.create(currentQuestion));
+      that.poetryQuestion.scroll($(currentQuestionElement).find('.drag-words-question'));
     }
 
     if (testConfig.answerTypeIsMissingWords(currentQuestion)) {
