@@ -42,6 +42,9 @@ class BaseQuestion extends Question {
             //    tags.push('IMG');
             //}
             let input = e.target.querySelector('input');
+            if (!input) {
+              input = e.target;
+            }
             if (!tags.includes(tagName)) {
                 input.checked = !input.checked;
             }
