@@ -28,10 +28,11 @@ $js = <<< JS
 var isGuest = $isGuest;
 
 var lazy = $(".lazy").Lazy({
-    scrollDirection: "vertical",
     effect: "fadeIn",
     visibleOnly: true,
-    chainable: true
+    afterLoad: function(element) {
+        element.removeClass('lazy');
+    }
 });
 
 if ($("#story_wrapper").is(":visible")) {
