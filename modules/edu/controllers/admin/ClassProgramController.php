@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace modules\edu\controllers\admin;
 
+use modules\edu\forms\admin\LessonAccessForm;
 use Exception;
 use modules\edu\forms\admin\ClassProgramTopicOrderForm;
 use modules\edu\models\EduClassProgram;
 use modules\edu\models\EduClassProgramSearch;
 use modules\edu\services\ClassProgramService;
 use yii\data\ActiveDataProvider;
+use yii\db\Query;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -166,9 +168,16 @@ class ClassProgramController extends Controller
         if ($classProgram === null) {
             throw new NotFoundHttpException('Программа обучения не найдена');
         }
+        $lessonAccess = (new Query())
+            ->select('lesson_id')
+            ->from('edu_lesson_access')
+            ->where(['class_program_id' => $classProgram->id])
+            ->all();
+        $lessonAccess = array_column($lessonAccess, 'lesson_id');
 
         return $this->render('view', [
             'classProgram' => $classProgram,
+            'lessonAccess' => $lessonAccess,
         ]);
     }
 }

@@ -5,6 +5,7 @@ namespace modules\edu\services;
 use common\components\ModelDomainException;
 use common\services\TransactionManager;
 use DomainException;
+use modules\edu\forms\admin\LessonAccessForm;
 use modules\edu\forms\admin\LessonStoryOrderForm;
 use modules\edu\forms\admin\SelectStoryForm;
 use modules\edu\models\EduLesson;
@@ -80,5 +81,24 @@ class LessonService
             throw new DomainException('Урок не найден');
         }
         $lessonModel->delete();
+    }
+
+    public function lessonAccess(int $classProgramId, LessonAccessForm $form): void
+    {
+        Yii::$app->db->createCommand()
+            ->delete('edu_lesson_access', ['class_program_id' => $classProgramId])
+            ->execute();
+        $rows = [];
+        foreach ($form->lessonIds as $lessonId) {
+            $rows[] = [
+                'class_program_id' => $classProgramId,
+                'lesson_id' => $lessonId,
+            ];
+        }
+        if (count($rows) > 0) {
+            Yii::$app->db->createCommand()
+                ->batchInsert('edu_lesson_access', ['class_program_id', 'lesson_id'], $rows)
+                ->execute();
+        }
     }
 }

@@ -59,6 +59,18 @@ class TopicAccessManager
             $lessonAccess[$firstKey]['access'] = true;
         }
 
+        $accessRows = (new Query())
+            ->select('lesson_id')
+            ->from('edu_lesson_access')
+            ->where(['class_program_id' => $classProgramId])
+            ->all();
+        $lessonAccessSettings = array_column($accessRows, 'lesson_id');
+        foreach ($lessonRows as $lessonRow) {
+            if (in_array((int) $lessonRow['lessonId'], $lessonAccessSettings)) {
+                $lessonAccess[$lessonRow['lessonId']] = ['access' => true];
+            }
+        }
+
         return $lessonAccess;
     }
 }

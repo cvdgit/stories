@@ -3,8 +3,10 @@
 namespace modules\edu\controllers\admin;
 
 use Exception;
+use modules\edu\forms\admin\LessonAccessForm;
 use modules\edu\forms\admin\LessonStoryOrderForm;
 use modules\edu\forms\admin\SelectStoryForm;
+use modules\edu\models\EduClassProgram;
 use modules\edu\models\EduLesson;
 use modules\edu\models\EduTopic;
 use modules\edu\services\LessonService;
@@ -14,6 +16,7 @@ use yii\db\Query;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Request;
 use yii\web\Response;
 
 /**
@@ -21,7 +24,6 @@ use yii\web\Response;
  */
 class LessonController extends Controller
 {
-
     private $lessonService;
 
     public function __construct($id, $module, LessonService $lessonService, $config = [])
@@ -174,5 +176,31 @@ class LessonController extends Controller
         $this->response->format = Response::FORMAT_JSON;
         $this->lessonService->deleteStory($lesson_id, $story_id);
         return ['success' => true];
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionSaveAccess(int $id, Request $request, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+        $classProgram = EduClassProgram::findOne($id);
+        if ($classProgram === null) {
+            throw new NotFoundHttpException('Программа обучения не найдена');
+        }
+        $lessonAccessForm = new LessonAccessForm();
+        if ($lessonAccessForm->load($request->post())) {
+            if (!$lessonAccessForm->validate()) {
+                return ['success' => false, 'message' => 'Validation error'];
+            }
+            try {
+                $this->lessonService->lessonAccess($classProgram->id, $lessonAccessForm);
+                return ['success' => true];
+            } catch (Exception $exception) {
+                Yii::$app->errorHandler->logException($exception);
+                return ['success' => false, 'message' => $exception->getMessage()];
+            }
+        }
+        return ['success' => false];
     }
 }
