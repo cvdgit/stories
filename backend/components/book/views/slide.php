@@ -31,7 +31,7 @@ MobileTestAsset::register($this);
         <?php else: ?>
             <?php if ($manager->texts->isEmpty() && !$manager->images->isEmpty()): ?>
                 <div class="row">
-                    <div class="col-lg-6">
+                    <div class="col-lg-12">
                         <?= BlockRenderer::renderImages($manager->images) ?>
                     </div>
                 </div>
