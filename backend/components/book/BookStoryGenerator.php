@@ -147,7 +147,7 @@ class BookStoryGenerator
         }
 
         if (!$slideBlocks->getGuestBlocks(Test::class)->isEmpty()) {
-            $content = (new OneColumnRenderer())
+            $content .= "\n" . (new OneColumnRenderer())
                 ->render(
                     BlockRenderer::renderTests($slideBlocks->getGuestBlocks(Test::class))
                 );
