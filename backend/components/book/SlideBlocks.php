@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\components\book;
 
-use backend\components\book\blocks\HtmlTest;
+use backend\components\book\blocks\GuestBlockInterface;
 use backend\components\book\blocks\Image;
 use backend\components\book\blocks\Link;
 use backend\components\book\blocks\Test;
@@ -12,48 +14,37 @@ use backend\components\book\blocks\Video;
 
 class SlideBlocks
 {
-
-    protected $params = [
-        'texts' => Text::class,
-        'images' => Image::class,
-        'htmltests' => HtmlTest::class,
-        'tests' => Test::class,
-        'transitions' => Transition::class,
-        'links' => Link::class,
-        'videos' => Video::class,
+    private $params = [
+        Text::class,
+        Image::class,
+        Test::class,
+        Transition::class,
+        Link::class,
+        Video::class,
     ];
 
-    /** @var BlockCollection[] */
-    protected $blocks = [];
+    /** @var array<BlockCollection> */
+    private $blocks = [];
 
     public function __construct()
     {
-        foreach ($this->params as $blocksName => $className) {
-            $this->blocks[$blocksName] = new BlockCollection($className);
+        foreach ($this->params as $className) {
+            $this->blocks[$className] = new BlockCollection($className);
         }
     }
 
-    public function __get(string $name)
+    public function addGuestBlock(GuestBlockInterface $block): void
     {
-        if (isset($this->blocks[$name])) {
-            return $this->blocks[$name];
-        }
-        return null;
+        $className = get_class($block);
+        $this->blocks[$className]->append($block);
     }
 
-    public function __call($name, $arguments)
+    public function getGuestBlocks(string $className): BlockCollection
     {
-        $blockName = strtolower(str_replace('create', '', $name));
-        if (isset($this->blocks[$blockName])) {
-            $blockCollection = $this->blocks[$blockName];
-            $blockCollection->createBlock($arguments);
-        }
-        else {
-            $this->$name($arguments);
-        }
+        return $this->blocks[$className];
     }
 
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         $empty = true;
         foreach ($this->blocks as $block) {
@@ -61,10 +52,4 @@ class SlideBlocks
         }
         return $empty;
     }
-
-    public function getBlocks()
-    {
-        return $this->blocks;
-    }
-
 }

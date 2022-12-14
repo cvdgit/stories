@@ -6,26 +6,34 @@ namespace backend\components\book\blocks;
 
 use common\models\SlideVideo;
 
-class Video extends Block
+class Video implements GuestBlockInterface
 {
-
     /** @var string */
-    protected $videoID;
+    private $videoId;
+    /** @var string|null  */
+    private $name;
 
-    public $name;
-
-    public function __construct($videoID)
+    public function __construct(string $videoId)
     {
-        $this->videoID = $videoID;
+        $this->videoId = $videoId;
         $this->name = $this->getVideoName();
     }
 
-    protected function getVideoName()
+    private function getVideoName(): ?string
     {
-        $video = SlideVideo::findModelByVideoID($this->videoID);
+        $video = SlideVideo::findModelByVideoID($this->videoId);
         if ($video !== null) {
             return $video->title;
         }
     }
 
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function isEmpty(): bool
+    {
+        return empty($this->videoId);
+    }
 }

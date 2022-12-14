@@ -1,37 +1,51 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\components\book;
 
-use ReflectionClass;
+use backend\components\book\blocks\GuestBlockInterface;
+use Iterator;
 
-class BlockCollection implements \Iterator
+/**
+ * @template T
+ */
+class BlockCollection implements Iterator
 {
+    private $className;
+    /** @var array <int, T> */
+    private $blocks = [];
 
-    protected $className;
-    protected $blocks = [];
-
-    public function __construct($className)
+    public function __construct(string $className)
     {
         $this->className = $className;
     }
 
-    public function getBlocks()
+    /**
+     * @return T
+     */
+    public function getBlocks(): array
     {
         return $this->blocks;
     }
 
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return count($this->blocks) === 0;
     }
 
-    public function createBlock($arguments)
+    public function append(GuestBlockInterface $block): void
+    {
+        $this->blocks[] = $block;
+    }
+
+/*    public function createBlock($arguments)
     {
         $reflector = new ReflectionClass($this->className);
         $block = $reflector->newInstanceArgs($arguments);
         $this->blocks[] = $block;
         return $block;
-    }
+    }*/
 
     public function current()
     {
@@ -48,13 +62,13 @@ class BlockCollection implements \Iterator
         return key($this->blocks);
     }
 
-    public function valid()
+    public function valid(): bool
     {
         $key = key($this->blocks);
-        return ($key !== NULL && $key !== FALSE);
+        return $key !== null;
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         reset($this->blocks);
     }

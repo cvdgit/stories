@@ -30,6 +30,7 @@ var isGuest = $isGuest;
 var lazy = $(".lazy").Lazy({
     effect: "fadeIn",
     visibleOnly: true,
+    chainable: false,
     afterLoad: function(element) {
         element.removeClass('lazy');
     }
@@ -73,7 +74,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
         window['ym'] && ym(53566996, 'reachGoal', 'transition_to_training');
     }
     else if (view === "tab-book") {
-        lazy.update(false);
+        lazy.update(true);
     }
     else {
 

@@ -1,24 +1,45 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\components\book\blocks;
 
-class Test extends AbstractTest
+class Test implements GuestBlockInterface
 {
+    private $testId;
+    private $header;
+    private $description;
 
-    public $header;
-    public $description;
-
-    protected $testID;
-
-    public function __construct($testID)
+    public function __construct(int $testId, string $header = '', string $description = '')
     {
-        $this->testID = $testID;
-        parent::__construct();
+        $this->testId = $testId;
+        $this->header = $header;
+        $this->description = $description;
     }
 
-    public function getTestID()
+    public function getTestId(): int
     {
-        return $this->testID;
+        return $this->testId;
     }
 
+    public function isEmpty(): bool
+    {
+        return empty($this->testId);
+    }
+
+    /**
+     * @return string
+     */
+    public function getHeader(): string
+    {
+        return $this->header;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
 }
