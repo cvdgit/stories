@@ -72,7 +72,7 @@ class BookStoryGenerator
                         if ($testId !== null) {
                             $test = StoryTest::findOne($testId);
                             if ($test !== null) {
-                                $slideBlocks->addGuestBlock(new Test($testId, $test->header, $test->description_text));
+                                $slideBlocks->addGuestBlock(new Test($testId, $test->header, (string)$test->description_text));
                             }
                         }
                         break;
@@ -86,7 +86,7 @@ class BookStoryGenerator
                         if ($testId !== null) {
                             $test = StoryTest::findOne($testId);
                             if ($test !== null) {
-                                $slideBlocks->addGuestBlock(new Test($testId, $test->header, $test->description_text));
+                                $slideBlocks->addGuestBlock(new Test($testId, $test->header, (string)$test->description_text));
                             }
                         }
                         break;
