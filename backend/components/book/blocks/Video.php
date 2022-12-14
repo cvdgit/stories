@@ -25,6 +25,7 @@ class Video implements GuestBlockInterface
         if ($video !== null) {
             return $video->title;
         }
+        return '';
     }
 
     public function getName(): ?string
