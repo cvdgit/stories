@@ -75,7 +75,7 @@ class HistoryFilterForm extends Model
         ]);
         $historyQuery->from(['t' => 'user_question_history']);
         $historyQuery->innerJoin(['t2' => 'story_story_test'], 't.test_id = t2.test_id');
-        $historyQuery->where(['t.student_id' => $studentId]);
+        $historyQuery->where(['t.student_id' => $studentId, 't.correct_answer' => 1]);
 
         $targetDate = Yii::$app->formatter->asDate($this->date, 'php:Y-m-d');
         $betweenBegin = new Expression("UNIX_TIMESTAMP('$targetDate 00:00:00')");
