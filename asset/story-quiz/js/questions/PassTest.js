@@ -68,7 +68,7 @@ PassTest.prototype.createWrapper = function (content) {
   return $wrapper;
 };
 
-PassTest.prototype.create = function (question, answers) {
+PassTest.prototype.create = function (question, fragmentAnswerCallback) {
 
   const {fragments} = question.payload;
   let {content} = question.payload;
@@ -121,12 +121,6 @@ PassTest.prototype.create = function (question, answers) {
         .addClass('highlight-done disabled')
         .prop('disabled', true);
 
-      /*const next = $(e.target).next('.highlight');
-      if (next.length && next.hasClass('disabled') && (!next.hasClass('highlight-done'))) {
-        next.removeClass('disabled');
-        next.removeAttr('disabled');
-      }*/
-
       const next = $content.find('.highlight:not(.highlight-done,.highlight-fail):eq(0)');
       if (next.length && next.hasClass('disabled') && (!next.hasClass('highlight-done'))) {
         next.removeClass('disabled');
@@ -142,11 +136,10 @@ PassTest.prototype.create = function (question, answers) {
           resetFragmentElement($(elem));
         }
       });
+    }
 
-      /*$content
-        .find('.highlight:eq(0)')
-        .removeClass('disabled')
-        .removeAttr('disabled');*/
+    if (typeof fragmentAnswerCallback === 'function') {
+      fragmentAnswerCallback(check, $(e.target).val());
     }
   });
 

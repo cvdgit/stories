@@ -28,6 +28,7 @@ import {createBeginPage} from "./components/BeginPage";
 import createHome from "./components/header/Home";
 import createPlayBackdrop from "./components/questionAudio";
 import Poetry from "./questions/Poetry";
+import AnswerHistorySender from "./components/AnswerHistorySender";
 
 
 var plugins = [];
@@ -1948,6 +1949,41 @@ function WikidsStoryTest(el, options) {
     }
   }
 
+  function writeAnswerHistory(data) {
+    if (App.userIsGuest() && that.options.fastMode) {
+      return;
+    }
+    new AnswerHistorySender('/question/answer').send(data);
+  }
+
+  function createAnswerHistoryDataItems(items, callback) {
+    return items.map(item => {
+      const answer = callback(item);
+      return {
+        'answer_entity_id': answer[0],
+        'answer_entity_name': answer[1]
+      }
+    });
+  }
+
+  function createAnswerHistoryData(questionId, questionName, answerIsCorrect, answers) {
+    const changes = {
+      'entity_id': questionId,
+      'entity_name': questionName,
+      'correct_answer': answerIsCorrect ? 1 : 0
+    };
+    let data = {
+      'source': testConfig.getSource(),
+      'test_id': testConfig.getTestID(),
+      'student_id': currentStudent.id,
+      'answers': answers,
+      'progress': testProgress.calcPercent(),
+      'stars': questionsRepeat.number(currentQuestion)
+    };
+    data = {...data, ...changes};
+    return data;
+  }
+
   function isShuffleAnswers(q) {
     return testConfig.sourceIsNeo() && getQuestionView(currentQuestion) !== 'svg' || (
       testConfig.sourceIsLocal()
@@ -2039,8 +2075,20 @@ function WikidsStoryTest(el, options) {
 
     if (questionViewPassTest(currentQuestion)) {
 
+      const fragmentAnswerCallback = (check, fragment) => {
+        if (!check) {
+          const historyData = createAnswerHistoryData(
+            currentQuestion.id,
+            currentQuestion.name,
+            false,
+            createAnswerHistoryDataItems([fragment], fragmentText => [currentQuestion.id, fragmentText])
+          );
+          writeAnswerHistory(historyData);
+        }
+      };
+
       $('.seq-question', currentQuestionElement)
-        .html(that.passTestQuestion.create(currentQuestion, getAnswersData(currentQuestion)));
+        .html(that.passTestQuestion.create(currentQuestion, fragmentAnswerCallback));
 
       dom.nextButton.off("click").on("click", function () {
         var answer = that.passTestQuestion.getUserAnswers();
