@@ -1762,3 +1762,13 @@ p.wikids-test-description {
   margin-bottom: 10px;
   text-align: center;
 }
+
+.highlight-done {
+  border: 2px #d6e9c6 solid;
+  background-color: #dff0d8;
+}
+
+.highlight-fail {
+  border: 2px #ebccd1 solid;
+  background-color: #f2dede;
+}

@@ -4,12 +4,13 @@ const PassTest = function (test) {
   this.element = null;
 };
 
-function createSelectElement(fragmentId, items) {
-
-  const select = $('<select/>', {
-    'class': 'highlight custom-select',
-    'data-fragment-id': fragmentId
-  });
+function createSelectElement(fragmentId, attrs = {}, items) {
+  attrs = {
+    'data-fragment-id': fragmentId,
+    class: 'highlight custom-select',
+    ...attrs
+  };
+  const select = $('<select/>', attrs);
   $('<option/>').val('').text('').appendTo(select);
 
   items.forEach((item) => {
@@ -19,14 +20,37 @@ function createSelectElement(fragmentId, items) {
   return select;
 }
 
-function createTextElement(fragmentId, size) {
-  const input = $('<input/>', {
-    'type': 'text',
-    'class': 'highlight custom-input',
-    'data-fragment-id': fragmentId
-  });
-  input.prop('size', size);
+function createTextElement(fragmentId, attrs = {}) {
+  attrs = {
+    type: 'text',
+    'data-fragment-id': fragmentId,
+    class: 'highlight custom-input',
+    ...attrs
+  };
+  const input = $('<input/>', attrs);
+  input.prop('size', attrs.size);
   return input;
+}
+
+function checkFragmentValueIsCorrect(fragmentId, value, fragments) {
+  const fragment = fragments.find(elem => elem.id === fragmentId);
+  if (fragment) {
+    const fragmentItem = fragment.items.find(item => item.title === value);
+    return fragmentItem && fragmentItem.correct;
+  }
+  return false;
+}
+
+function resetFragmentElement(element) {
+  element
+    .removeClass('disabled')
+    .removeClass('highlight-done')
+    .removeClass('highlight-fail')
+    .removeAttr('disabled')
+    .val('');
+  element
+    .addClass('disabled')
+    .prop('disabled', true);
 }
 
 PassTest.prototype.createWrapper = function (content) {
@@ -49,25 +73,25 @@ PassTest.prototype.create = function (question, answers) {
   const {fragments} = question.payload;
   let {content} = question.payload;
 
-  //question.item_view
-
-  fragments.forEach(fragment => {
-
-    const code = $('<span/>', {
-      'class': 'dropdown',
-      'data-fragment-id': fragment.id
-    });
-    code.append('<button class="pass-test-btn dropdown-toggle highlight" data-toggle="dropdown"></button><ul class="dropdown-menu"></ul>');
-
+  fragments.forEach((fragment) => {
     let element;
+
+    const elemAttrs = {
+      class: 'highlight disabled',
+      disabled: 'disabled'
+    };
+
     if (question.item_view === 'text') {
       const correctItem = fragment.items.filter(item => item.correct);
       if (correctItem.length === 0) {
         return;
       }
-      element = createTextElement(fragment.id, correctItem[0].title.length);
+      elemAttrs.size = correctItem[0].title.length;
+      elemAttrs.class += ' custom-input';
+      element = createTextElement(fragment.id, elemAttrs);
     } else {
-      element = createSelectElement(fragment.id, shuffle(fragment.items));
+      elemAttrs.class += ' custom-select';
+      element = createSelectElement(fragment.id, elemAttrs, shuffle(fragment.items));
     }
 
     const reg = new RegExp('{' + fragment.id + '}');
@@ -75,10 +99,55 @@ PassTest.prototype.create = function (question, answers) {
   });
 
   const $content = $(content);
-  $content.on('click', '.dropdown-menu a', function(e) {
-    e.preventDefault();
-    const text = $(this).text();
-    $(this).parents('[data-fragment-id]:eq(0)').find('.highlight').text(text);
+
+  $content
+    .find('.highlight:eq(0)')
+    .removeClass('disabled')
+    .removeAttr('disabled');
+
+  $content.on('change', 'select,input[type=text]', (e) => {
+    const value = e.target.value;
+
+    const fragmentId = $(e.target).attr('data-fragment-id');
+    const check = checkFragmentValueIsCorrect(fragmentId, value, fragments);
+
+    $(e.target)
+      .removeClass('highlight-fail')
+      .removeClass('highlight-done');
+
+    if (check) {
+
+      $(e.target)
+        .addClass('highlight-done disabled')
+        .prop('disabled', true);
+
+      /*const next = $(e.target).next('.highlight');
+      if (next.length && next.hasClass('disabled') && (!next.hasClass('highlight-done'))) {
+        next.removeClass('disabled');
+        next.removeAttr('disabled');
+      }*/
+
+      const next = $content.find('.highlight:not(.highlight-done,.highlight-fail):eq(0)');
+      if (next.length && next.hasClass('disabled') && (!next.hasClass('highlight-done'))) {
+        next.removeClass('disabled');
+        next.removeAttr('disabled');
+      }
+
+    } else {
+
+      $(e.target).addClass('highlight-fail');
+
+      $content.find('.highlight.highlight-done,.highlight.highlight-fail').each((i, elem) => {
+        if ($(elem).attr('data-fragment-id') !== fragmentId) {
+          resetFragmentElement($(elem));
+        }
+      });
+
+      /*$content
+        .find('.highlight:eq(0)')
+        .removeClass('disabled')
+        .removeAttr('disabled');*/
+    }
   });
 
   this.element = this.createWrapper($content)
