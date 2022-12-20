@@ -19,6 +19,7 @@ export default () => {
 
         const createTitle = (props = {}) => {
           const title = document.createElement('h2');
+          title.classList.add('h1');
           title.classList.add('next-story__text');
           title.textContent = props.is_complete ? 'История пройдена!' : `История пройдена на ${props.progress}%`;
           return title;
@@ -53,12 +54,22 @@ export default () => {
 
         if (props.tests.length > 0) {
 
+          if (!props.is_complete) {
+            const info = document.createElement('div');
+            info.classList.add('alert');
+            info.classList.add('alert-info');
+            info.style.fontSize = '2rem';
+            info.textContent = 'Чтобы завершить прохождение истории, необходимо пройти все тесты';
+            element.querySelector('.next-story').appendChild(info);
+          }
+
           const testHeader = document.createElement('h2');
-          testHeader.classList.add('h1');
-          testHeader.textContent = `Тесты`;
+          testHeader.classList.add('h3');
+          testHeader.textContent = 'Прогресс прохождения тестов в истории:';
           element.querySelector('.next-story').appendChild(testHeader);
 
           const list = document.createElement('ul');
+          list.style.fontSize = '2rem';
           props.tests.forEach(item => {
             list.appendChild(createTestingRow(item));
           });
