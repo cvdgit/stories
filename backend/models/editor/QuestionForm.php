@@ -4,6 +4,7 @@ namespace backend\models\editor;
 
 use common\models\StorySlide;
 use common\models\StoryStoryTest;
+use common\models\StoryTest;
 use DomainException;
 
 class QuestionForm extends BaseForm
@@ -48,5 +49,22 @@ class QuestionForm extends BaseForm
         }
         $model->save(false);
         $slideModel->setQuestionSlide();
+    }
+
+    public function haveTest(): bool
+    {
+        return !empty($this->test_id);
+    }
+
+    public function getTestName(): string
+    {
+        if (!$this->haveTest()) {
+            return '';
+        }
+        $test = StoryTest::findOne($this->test_id);
+        if ($test === null) {
+            return '';
+        }
+        return $test->title;
     }
 }

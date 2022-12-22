@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\components\story\reader\blocks;
 
 use backend\components\story\AbstractBlock;
 
 class AbstractBlockReader
 {
-
     /** @var \phpQueryObject */
     protected $pqBlock;
 
@@ -15,7 +16,7 @@ class AbstractBlockReader
         $this->pqBlock = $bqBlock;
     }
 
-    protected function styleToArray($style): array
+    protected function styleToArray(string $style): array
     {
         $styleArray = [];
         foreach (explode(';', $style) as $part) {
@@ -27,7 +28,7 @@ class AbstractBlockReader
         return $styleArray;
     }
 
-    protected function getStyleValue($style, $param): string
+    protected function getStyleValue(string $style, string $param): string
     {
         $value = '';
         if (!empty($style)) {
@@ -37,12 +38,11 @@ class AbstractBlockReader
         return $value;
     }
 
-    protected function loadBlockProperties(AbstractBlock $block, $style)
+    protected function loadBlockProperties(AbstractBlock $block, string $style): void
     {
         $block->setWidth($this->getStyleValue($style, 'width'));
         $block->setHeight($this->getStyleValue($style, 'height'));
         $block->setTop($this->getStyleValue($style, 'top'));
         $block->setLeft($this->getStyleValue($style, 'left'));
     }
-
 }

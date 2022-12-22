@@ -2,6 +2,7 @@
 
 namespace backend\services;
 
+use backend\components\book\blocks\Test;
 use backend\components\image\EditorImage;
 use backend\components\image\SlideImage;
 use backend\components\story\AbstractBlock;
@@ -25,6 +26,7 @@ use common\models\StorySlide;
 use common\models\StorySlideImage;
 use DomainException;
 use common\models\Story;
+use yii\db\Query;
 
 class StoryEditorService
 {
@@ -243,6 +245,17 @@ class StoryEditorService
             $block->update($form);
         }
         if ($block->isTest()) {
+
+            /** @var Test $block */
+            $testId = $block->getTestId();
+            $questionCount = (int)(new Query())
+                ->from('story_test_question')
+                ->where(['story_test_id' => $testId])
+                ->count();
+            if ($questionCount === 0) {
+                throw new DomainException('Невозможно изменить т.к. в выбранном тесте нет вопросов');
+            }
+
             try {
                 $this->storyLinkService->createTestLink($model->story_id, $block->getTestID());
             }
@@ -329,6 +342,30 @@ class StoryEditorService
             }
             if ($videoModel !== null) {
                 $block->setContent($videoModel->title);
+            }
+        }
+
+        if ($block->isTest()) {
+            /** @var Test $block */
+            $testId = $block->getTestId();
+            $questionCount = (int)(new Query())
+                ->from('story_test_question')
+                ->where(['story_test_id' => $testId])
+                ->count();
+            if ($questionCount === 0) {
+                throw new DomainException('Невозможно добавить т.к. в выбранном тесте нет вопросов');
+            }
+        }
+
+        if ($block->isHtmlTest()) {
+            /** @var HTMLBLock $block */
+            $content = TestBlockContent::createFromHtml($block->getContent());
+            $questionCount = (int)(new Query())
+                ->from('story_test_question')
+                ->where(['story_test_id' => $content->getTestID()])
+                ->count();
+            if ($questionCount === 0) {
+                throw new DomainException('Невозможно добавить т.к. в выбранном тесте нет вопросов');
             }
         }
 

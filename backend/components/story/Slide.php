@@ -81,10 +81,9 @@ class Slide
         return array_shift($blocks);
     }
 
-    public function createBlock($type)
+    public function createBlock(string $type): AbstractBlock
     {
-        $block = Yii::createObject($type);
-        return $block->create();
+        return Yii::createObject($type)->create();
     }
 
     /**

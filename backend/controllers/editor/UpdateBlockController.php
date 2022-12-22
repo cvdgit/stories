@@ -14,6 +14,7 @@ use backend\models\editor\VideoForm;
 use backend\services\StoryEditorService;
 use common\models\StorySlide;
 use common\rbac\UserRoles;
+use Exception;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -93,14 +94,19 @@ class UpdateBlockController extends BaseController
         return $this->updateBlock(new QuestionForm(['scenario' => 'update']));
     }
 
-    private function updateBlock(BaseForm $form)
+    private function updateBlock(BaseForm $form): array
     {
         if ($form->load(Yii::$app->request->post()) && $form->validate()) {
             $slideModel = $this->findModel(StorySlide::class, $form->slide_id);
-            $html = $this->editorService->updateBlock($form);
-            $form->afterUpdate($slideModel);
-            return ['success' => true, 'block_id' => $form->block_id, 'html' => $html];
+            try {
+                $html = $this->editorService->updateBlock($form);
+                $form->afterUpdate($slideModel);
+                return ['success' => true, 'block_id' => $form->block_id, 'html' => $html];
+            }
+            catch(Exception $ex) {
+                return ['success' => false, 'errors' => $ex->getMessage()];
+            }
         }
-        return $form->getErrors();
+        return ['success' => false, 'errors' => implode('<br/>', $form->getErrorSummary(true))];
     }
 }

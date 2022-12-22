@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\components\story\reader;
 
 use backend\components\story\AbstractBlock;
 use backend\components\story\reader\blocks\ImageReader;
+use backend\components\story\reader\blocks\TestReader;
 use backend\components\story\reader\blocks\VideoReader;
 use backend\components\story\reader\blocks\HtmlReader;
 
 class HtmlBlockReader implements ReaderInterface
 {
-
     private $pqBlock;
 
     private $blockMap = [
@@ -17,6 +19,7 @@ class HtmlBlockReader implements ReaderInterface
         AbstractBlock::TYPE_VIDEO => VideoReader::class,
         AbstractBlock::TYPE_VIDEOFILE => VideoReader::class,
         AbstractBlock::TYPE_HTML => HtmlReader::class,
+        AbstractBlock::TYPE_TEST => TestReader::class,
     ];
 
     public function __construct(string $html)

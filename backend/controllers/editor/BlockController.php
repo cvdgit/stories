@@ -7,6 +7,7 @@ use backend\components\story\AbstractBlock;
 use backend\components\story\HTMLBLock;
 use backend\components\story\ImageBlock;
 use backend\components\story\reader\HtmlBlockReader;
+use backend\components\story\TestBlock;
 use backend\components\story\TestBlockContent;
 use backend\models\ImageSlideBlock;
 use backend\services\StoryEditorService;
@@ -66,6 +67,10 @@ class BlockController extends BaseController
             StoryStoryTest::deleteStoryTest($slideModel->story_id, $content->getTestID());
             // Установить для слайда тип по умолчанию вместо слайда с тестом
             $slideModel->setKindSlide();
+        }
+        if ($block->isTest()) {
+            /** @var TestBlock $block */
+            StoryStoryTest::deleteStoryTest($slideModel->story_id, $block->getTestID());
         }
         return ['success' => true, 'block' => $block->getId()];
     }

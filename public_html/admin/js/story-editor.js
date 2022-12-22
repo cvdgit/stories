@@ -1266,6 +1266,9 @@ var StoryEditor = (function() {
             'typeIsHtml': function() {
                 return this.getType() === 'html';
             },
+          'typeIsTest': function() {
+            return this.getType() === 'test';
+          },
             'typeIsText': function() {
                 return this.getType() === 'text';
             },
@@ -1467,7 +1470,7 @@ var StoryEditor = (function() {
 
     function deleteBlockAction(blockID) {
         var block = blockID ? blockManager.find(blockID) : blockManager.getActive();
-        if (block.typeIsImage() || block.typeIsVideo() || block.typeIsHtml()) {
+        if (block.typeIsImage() || block.typeIsVideo() || block.typeIsHtml() || block.typeIsTest()) {
             blockManager.deleteBlock(slidesManager.getCurrentSlideID(), contentCleaner.cleanSlideBlock(block.getElement()))
                 .done(function(response) {
                     deleteBlock(block);
