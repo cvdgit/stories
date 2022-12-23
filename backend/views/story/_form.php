@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use common\models\User;
 use dosamigos\selectize\SelectizeTextInput;
+use vova07\imperavi\Widget;
 /** @var $this yii\web\View */
 /** @var $model common\models\Story */
 /** @var $form yii\widgets\ActiveForm */
@@ -15,7 +16,17 @@ use dosamigos\selectize\SelectizeTextInput;
 <?php if (!$model->isNewRecord): ?>
 <?= $form->field($model, 'alias')->textInput(['maxlength' => true]) ?>
 <?php endif ?>
-<?= $form->field($model, 'description')->textarea(['rows' => 3]) ?>
+<?= $form->field($model, 'description')->widget(Widget::class, [
+    'settings' => [
+        'lang' => 'ru',
+        'minHeight' => 200,
+        'buttons' => ['html', 'bold', 'italic', 'deleted', 'unorderedlist', 'orderedlist', 'alignment', 'horizontalrule'],
+        'plugins' => [
+            'fontcolor',
+            'fontsize',
+        ],
+    ],
+]); ?>
 <?= $form->field($coverUploadForm, 'coverFile')->fileInput() ?>
 <?php if (!empty($model->cover)): ?>
 <div class="row">
