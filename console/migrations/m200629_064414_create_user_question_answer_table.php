@@ -17,7 +17,7 @@ class m200629_064414_create_user_question_answer_table extends Migration
             'id' => $this->primaryKey(),
             'question_history_id' => $this->integer()->notNull(),
             'answer_entity_id' => $this->integer()->notNull(),
-            'answer_entity_name' => $this->string()->notNull(),
+            'answer_entity_name' => $this->string(512)->notNull(),
         ]);
         $this->addForeignKey(
             'fk-user_question_answer-question_history_id',

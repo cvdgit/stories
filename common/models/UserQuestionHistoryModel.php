@@ -29,7 +29,8 @@ class UserQuestionHistoryModel extends Model
         return [
             [['source', 'student_id', 'test_id', 'entity_id', 'entity_name'], 'required'],
             [['source', 'student_id', 'test_id', 'question_topic_id', 'entity_id', 'relation_id', 'correct_answer'], 'integer'],
-            [['question_topic_name', 'entity_name', 'relation_name'], 'string', 'max' => 255],
+            [['question_topic_name', 'relation_name'], 'string', 'max' => 255],
+            [['entity_name'], 'string', 'max' => 512],
             [['test_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTest::class, 'targetAttribute' => ['test_id' => 'id']],
             [['student_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserStudent::class, 'targetAttribute' => ['student_id' => 'id']],
             ['answers', 'safe'],
