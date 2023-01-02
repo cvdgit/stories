@@ -6,6 +6,7 @@ namespace modules\edu\controllers\teacher;
 
 use common\models\Story;
 use common\models\UserStudent;
+use common\services\TestDetailService;
 use modules\edu\models\EduClassBook;
 use modules\edu\models\EduClassProgram;
 use modules\edu\query\EduProgramStoriesFetcher;
@@ -19,6 +20,15 @@ use yii\web\Response;
 
 class DefaultController extends Controller
 {
+    /** @var TestDetailService */
+    private $testDetailService;
+
+    public function __construct($id, $module, TestDetailService $testDetailService, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->testDetailService = $testDetailService;
+    }
+
     public function actionIndex()
     {
         $classBooks = EduClassBook::findTeacherClassBooks(Yii::$app->user->getId())
@@ -76,7 +86,7 @@ class DefaultController extends Controller
             return [
                 'id' => $testing->id,
                 'name' => $testing->header,
-                'resource' => Url::to(['/test/detail', 'test_id' => $testing->id, 'student_id' => $student->id]),
+                'resource' => Url::to(['/edu/teacher/default/detail', 'test_id' => $testing->id, 'student_id' => $student->id]),
                 'progress' => $student->getProgress($testing->id)
             ];
         }, $story->tests);
@@ -121,6 +131,14 @@ class DefaultController extends Controller
                 'classId' => $class->id,
                 'student' => $student,
             ]),
+        ]);
+    }
+
+    public function actionDetail(int $test_id, int $student_id)
+    {
+        $rows = $this->testDetailService->getDetail($test_id, $student_id);
+        return $this->renderAjax('_detail', [
+            'rows' => $rows,
         ]);
     }
 }
