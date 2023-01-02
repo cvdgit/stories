@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace common\services;
 
 use common\models\StoryTest;
@@ -10,7 +12,6 @@ use yii\db\Query;
 
 class TestDetailService
 {
-
     public function getDetail(int $testId, int $studentId): array
     {
         $query = (new Query())
@@ -27,5 +28,15 @@ class TestDetailService
             ->orderBy(['question_history.created_at' => SORT_ASC])
             ->groupBy('question_history.id');
         return $query->all();
+    }
+
+    public function getIncorrectCount(int $testId, int $studentId): int
+    {
+        $query = (new Query())
+            ->from(['t' => StoryTest::tableName()])
+            ->innerJoin(['question_history' => UserQuestionHistory::tableName()], 'question_history.test_id = t.id')
+            ->where(['t.id' => $testId, 'question_history.student_id' => $studentId])
+            ->andWhere('question_history.correct_answer = 0');
+        return (int)$query->count();
     }
 }

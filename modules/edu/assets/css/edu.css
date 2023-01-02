@@ -273,7 +273,11 @@
 .testing-item__progress {
 
 }
-
+.testing-item__incorrect {
+  color: red;
+  font-weight: bold;
+  margin-right: 20px;
+}
 
 
 .header-block {

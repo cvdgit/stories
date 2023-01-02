@@ -82,10 +82,11 @@ class DefaultController extends Controller
             throw new NotFoundHttpException('Ученик не найден');
         }
 
-        $testings = array_map(static function($testing) use ($student) {
+        $testings = array_map(function($testing) use ($student) {
             return [
                 'id' => $testing->id,
                 'name' => $testing->header,
+                'incorrect' => $this->testDetailService->getIncorrectCount($testing->id, $student->id),
                 'resource' => Url::to(['/edu/teacher/default/detail', 'test_id' => $testing->id, 'student_id' => $student->id]),
                 'progress' => $student->getProgress($testing->id)
             ];

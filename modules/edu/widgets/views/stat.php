@@ -160,6 +160,9 @@ $this->registerJs(<<<JS
                                 $('<div/>', {class: 'testing-item__name'}).text(testing.name)
                             )
                             .append(
+                                $('<div/>', {class: 'testing-item__incorrect'}).text(testing.incorrect)
+                            )
+                            .append(
                                 $('<div/>', {class: 'testing-item__progress'}).text('Прогресс: ' + testing.progress)
                             );
                         testingRow.find('td').append(row);
