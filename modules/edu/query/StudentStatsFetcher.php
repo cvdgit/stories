@@ -39,6 +39,7 @@ class StudentStatsFetcher
 
                 if (!isset($topicLessons[$storyRow['topicId']])) {
                     $topicLessons[$storyRow['topicId']] = [];
+                    $lessons = [];
                 }
                 if (!in_array($storyRow['lessonId'], $topicLessons[$storyRow['topicId']], true)) {
                     $topicLessons[$storyRow['topicId']][] = $storyRow['lessonId'];
