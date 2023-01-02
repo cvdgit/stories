@@ -22,12 +22,18 @@ class StudentQuestionFetcher
             ->andWhere(['user_question_history.student_id' => $studentId])
             ->andWhere(['between', 'user_question_history.created_at', $betweenBegin, $betweenEnd]);
 
-        $incorrectQuery = clone $query;
-        $incorrectQuery->andWhere('user_question_history.correct_answer = 0');
+        $incorrectQuery = (new Query())
+            ->from('story')
+            ->innerJoin('story_story_test', 'story_story_test.story_id = story.id')
+            ->innerJoin('user_question_history', 'story_story_test.test_id = user_question_history.test_id')
+            ->where(['story.id' => $storyId])
+            ->andWhere(['user_question_history.student_id' => $studentId])
+            ->andWhere('user_question_history.correct_answer = 0')
+            ->andWhere(['between', 'user_question_history.created_at', $betweenBegin, $betweenEnd]);
 
         return [
             'total' => $query->count('user_question_history.id'),
-            'incorrect' => $incorrectQuery->count(),
+            'incorrect' => $incorrectQuery->count('user_question_history.id'),
         ];
     }
 }
