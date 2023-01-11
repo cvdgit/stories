@@ -10,6 +10,7 @@ use common\rbac\UserRoles;
 use Exception;
 use Yii;
 use yii\filters\AccessControl;
+use yii\helpers\Json;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -96,5 +97,18 @@ class PassTestController extends Controller
             'model' => $createPassTestForm,
             'questionModel' => $questionModel,
         ]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionPayload(int $id, Response $response)
+    {
+        $response->format = Response::FORMAT_JSON;
+        $question = StoryTestQuestion::findOne($id);
+        if ($question === null) {
+            throw new NotFoundHttpException('Вопрос не найден');
+        }
+        return Json::decode($question->regions);
     }
 }

@@ -12,10 +12,14 @@ class PassTestForm extends Model
     public $payload;
     public $view;
 
+    /** @var int|null */
+    private $id;
+
     public function __construct(StoryTestQuestion $model = null, $config = [])
     {
         parent::__construct($config);
         if ($model !== null) {
+            $this->id = $model->id;
             $this->name = $model->name;
             $this->payload = $model->regions;
             $this->view = $model->sort_view;
@@ -54,5 +58,13 @@ class PassTestForm extends Model
             0 => 'Список',
             1 => 'Поле для ввода',
         ];
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
     }
 }

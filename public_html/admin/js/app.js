@@ -217,7 +217,7 @@ function yiiModalFormInit(formElement, doneCallback, failCallback, alwaysCallbac
         });
 }
 
-function RemoteModal({id, title}) {
+function RemoteModal({id, title, dialogClassName}) {
 
   const content = `
     <div class="modal fade" tabindex="-1" id="${id}">
@@ -240,6 +240,10 @@ function RemoteModal({id, title}) {
   $('body').append(content);
 
   const element = $('body').find(`div#${id}`);
+
+  if (dialogClassName) {
+    element.find('.modal-dialog').addClass(dialogClassName);
+  }
 
   element.on('hide.bs.modal', function() {
     $(this).removeData('bs.modal');
