@@ -2,11 +2,15 @@
 
 declare(strict_types=1);
 
+use backend\forms\FragmentListSearch;
+use yii\bootstrap\ActiveForm;
 use yii\web\View;
+use yii\widgets\Pjax;
 
 /**
  * @var View $this
  * @var array $items
+ * @var FragmentListSearch $searchFormModel
  */
 
 $this->registerCss(<<<CSS
@@ -33,6 +37,16 @@ $this->registerCss(<<<CSS
 CSS
 );
 ?>
+
+<div>
+    <?php $form = ActiveForm::begin(['id' => 'lists-filter-form', 'options' => ['class' => 'form-inline']]); ?>
+    <?= $form->field($searchFormModel, 'my_lists')->checkbox(); ?>
+    <?= $form->field($searchFormModel, 'for_current_test')->checkbox(); ?>
+    <?php ActiveForm::end(); ?>
+</div>
+
+<?php Pjax::begin(['id' => 'pjax-lists', 'enablePushState' => false]); ?>
+
 <div class="dual-list">
     <div class="row">
         <div class="col-md-6">
@@ -63,6 +77,9 @@ CSS
         </div>
     </div>
 </div>
+
+<?php Pjax::end(); ?>
+
 <div>
     <button id="create-fragment-list" type="button" class="btn btn-primary">Вставить список</button>
 </div>

@@ -84,6 +84,7 @@ CSS
  * @var View $this
  * @var PassTestForm $model
  * @var bool $isNewRecord
+ * @var int $testingId
  */
 ?>
 <?php $form = ActiveForm::begin(['id' => 'pass-test-form']) ?>
@@ -96,8 +97,8 @@ CSS
         </div>
         <div style="margin-left:auto">
             <button class="btn btn-primary btn-sm" id="search" type="button">Поиск</button>
-            <a href="<?= Url::to(['/fragment-list/create']); ?>" class="btn btn-primary btn-sm" id="create-fragment-list" type="button">Создать список</a>
-            <a href="<?= Url::to(['/fragment-list/select']); ?>" class="btn btn-primary btn-sm" id="select-fragment-list" type="button">Вставить из списка</a>
+            <a href="<?= Url::to(['/fragment-list/create', 'testing_id' => $testingId]); ?>" class="btn btn-primary btn-sm" id="create-fragment-list" type="button">Создать список</a>
+            <a href="<?= Url::to(['/fragment-list/select', 'testing_id' => $testingId]); ?>" class="btn btn-primary btn-sm" id="select-fragment-list" type="button">Вставить из списка</a>
             <button class="btn btn-primary btn-sm" id="add" type="button">Вставить пропуск</button>
         </div>
     </div>

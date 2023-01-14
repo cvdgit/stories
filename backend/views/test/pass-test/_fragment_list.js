@@ -5,9 +5,15 @@
     attachBeforeSubmit(formElement, (form) => {
       sendForm($(form).attr('action'), $(form).attr('method'), new FormData(form))
         .done((response) => {
-          if (response && response.success) {
-            createDialog.hide();
-            toastr.success(response.message);
+          if (response) {
+            if (response.success) {
+              toastr.success(response.message);
+              createDialog.hide();
+            } else {
+              toastr.error(response.message);
+            }
+          } else {
+            toastr.error('Неизвестная ошибка');
           }
         })
     });
@@ -47,6 +53,9 @@
       },
       isEmpty() {
         return selectedIds.length === 0;
+      },
+      reset() {
+        selectedIds = [];
       }
     }
   }
@@ -55,7 +64,7 @@
 
     const selectedItems = new SelectedItems();
 
-    $(this).find('#all-items-list').on('click', '.add-items', function(e) {
+    $(this).on('click', '#all-items-list .add-items', function(e) {
 
       $(this).parent().find('.items .list-item').each((i, item) => {
 
@@ -100,6 +109,21 @@
 
       selectDialog.hide();
     });
+
+    const $content = $(this);
+    $content.find('#lists-filter-form input[type=checkbox]').on('click', function() {
+      $.pjax.reload({
+        container: '#pjax-lists',
+        replace: false,
+        url: $content.find('#lists-filter-form').attr('action'),
+        method: 'post',
+        data: $content.find('#lists-filter-form').serialize()
+      });
+    });
+
+    $(window).on('pjax:success', (e) => {
+      selectedItems.reset();
+    })
   };
 
   $('#select-fragment-list').on('click', function(e) {

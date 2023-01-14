@@ -15,6 +15,9 @@ class PassTestForm extends Model
     /** @var int|null */
     private $id;
 
+    /** @var int|null */
+    private $testId;
+
     public function __construct(StoryTestQuestion $model = null, $config = [])
     {
         parent::__construct($config);
@@ -23,6 +26,7 @@ class PassTestForm extends Model
             $this->name = $model->name;
             $this->payload = $model->regions;
             $this->view = $model->sort_view;
+            $this->testId = $model->story_test_id;
         }
     }
 
@@ -66,5 +70,13 @@ class PassTestForm extends Model
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getTestId(): ?int
+    {
+        return $this->testId;
     }
 }

@@ -23,5 +23,5 @@ $this->params['breadcrumbs'] = [
 <?= QuestionManageWidget::widget([
     'quizModel' => $quizModel,
     'currentModelId' => $questionModel->id,
-    'renderData' => $this->render('_question', ['model' => $model, 'isNewRecord' => false]),
+    'renderData' => $this->render('_question', ['model' => $model, 'isNewRecord' => false, 'testingId' => $quizModel->id]),
 ]); ?>

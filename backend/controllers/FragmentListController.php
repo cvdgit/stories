@@ -7,13 +7,16 @@ namespace backend\controllers;
 use backend\components\MorphyWrapper;
 use backend\forms\FragmentListForm;
 use backend\forms\FragmentListItemForm;
+use backend\forms\FragmentListSearch;
 use backend\services\QuestionFragmentService;
+use common\models\StoryTest;
 use common\rbac\UserRoles;
 use yii\base\Model;
 use yii\db\Expression;
 use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Request;
 use yii\web\Response;
 use yii\web\User as WebUser;
@@ -43,8 +46,16 @@ class FragmentListController extends Controller
         ];
     }
 
-    public function actionCreate(Request $request, Response $response, WebUser $user)
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionCreate(int $testing_id, Request $request, Response $response, WebUser $user)
     {
+        $testing = StoryTest::findOne($testing_id);
+        if ($testing === null) {
+            throw new NotFoundHttpException('Тест не найден');
+        }
+
         $fragmentForm = new FragmentListForm();
         $fragmentItemForm = new FragmentListItemForm();
         if ($fragmentForm->load($request->post())) {
@@ -59,7 +70,7 @@ class FragmentListController extends Controller
             }
             if (Model::loadMultiple($items, $request->post()) && Model::validateMultiple($items)) {
                 try {
-                    $this->questionFragmentService->create($user->getId(), $fragmentForm, $items);
+                    $this->questionFragmentService->create($user->getId(), $fragmentForm, $items, $testing->id);
                     return ['success' => true, 'message' => 'Список успешно создан'];
                 }
                 catch (\Exception $ex) {
@@ -73,13 +84,42 @@ class FragmentListController extends Controller
         ]);
     }
 
-    public function actionSelect(): string
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionSelect(int $testing_id, Request $request, WebUser $user): string
     {
-        $lists = (new Query())
+        $testing = StoryTest::findOne($testing_id);
+        if ($testing === null) {
+            throw new NotFoundHttpException('Тест не найден');
+        }
+
+        $searchForm = new FragmentListSearch();
+
+        $listsQuery = (new Query())
             ->select('*')
             ->from('fragment_list')
-            ->orderBy(['name' => SORT_ASC])
-            ->all();
+            ->orderBy(['name' => SORT_ASC]);
+
+        $lists = [];
+        if ($request->isPost && $searchForm->load($request->post())) {
+            if (!$searchForm->validate()) {
+                return $this->renderAjax('select', [
+                    'items' => [],
+                    'searchFormModel' => $searchForm,
+                ]);
+            }
+        }
+
+        if ($searchForm->my_lists) {
+            $listsQuery->andWhere(['created_by' => $user->getId()]);
+        }
+
+        if ($searchForm->for_current_test) {
+            $listsQuery->innerJoin('fragment_list_testing', 'fragment_list.id = fragment_list_testing.fragment_list_id');
+        }
+
+        $lists = $listsQuery->all();
 
         $itemIds = array_map(static function($item) {
             return $item['id'];
@@ -103,6 +143,7 @@ class FragmentListController extends Controller
 
         return $this->renderAjax('select', [
             'items' => $lists,
+            'searchFormModel' => $searchForm,
         ]);
     }
 

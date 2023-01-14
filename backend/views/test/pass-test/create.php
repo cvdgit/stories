@@ -9,6 +9,7 @@ use backend\models\pass_test\PassTestForm;
 /**
  * @var StoryTest $quizModel
  * @var PassTestForm $model
+ * @var int $testingId
  */
 
 $this->title = 'Новый вопрос';
@@ -21,5 +22,5 @@ $this->params['breadcrumbs'] = [
 <?= QuestionManageWidget::widget([
     'isCreate' => true,
     'quizModel' => $quizModel,
-    'renderData' => $this->render('_question', ['model' => $model, 'isNewRecord' => true]),
+    'renderData' => $this->render('_question', ['model' => $model, 'isNewRecord' => true, 'testingId' => $testingId]),
 ]); ?>

@@ -66,6 +66,7 @@ class PassTestController extends Controller
         return $this->render('create', [
             'quizModel' => $quizModel,
             'model' => $createPassTestForm,
+            'testingId' => $quizModel->id,
         ]);
     }
 
