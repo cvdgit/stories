@@ -105,6 +105,8 @@ console.log(question);
     .removeClass('disabled')
     .removeAttr('disabled');
 
+  let currentIncorrectFragmentId;
+
   $content.on('change', 'select,input[type=text]', (e) => {
     const value = e.target.value;
 
@@ -116,6 +118,8 @@ console.log(question);
       .removeClass('highlight-done');
 
     if (check) {
+
+      currentIncorrectFragmentId = null;
 
       $(e.target)
         .addClass('highlight-done disabled')
@@ -131,25 +135,29 @@ console.log(question);
 
       $(e.target).addClass('highlight-fail');
 
-      const max = question['max_prev_items'] || 0;
+      if (currentIncorrectFragmentId !== fragmentId) {
 
-      if (max === 0) {
-        $content.find('.highlight.highlight-done,.highlight.highlight-fail').each((i, elem) => {
-          if ($(elem).attr('data-fragment-id') !== fragmentId) {
-            resetFragmentElement($(elem));
-          }
-        });
-      } else {
-        const prevAll = $(e.target).prevAll('.highlight.highlight-done,.highlight.highlight-fail');
-        if (prevAll.length) {
-          prevAll.each((i, elem) => {
-            if (i >= max) {
-              return;
+        const max = question['max_prev_items'] || 0;
+        if (max === 0) {
+          $content.find('.highlight.highlight-done,.highlight.highlight-fail').each((i, elem) => {
+            if ($(elem).attr('data-fragment-id') !== fragmentId) {
+              resetFragmentElement($(elem));
             }
-            resetFragmentElement($(elem));
           });
+        } else {
+          const prevAll = $(e.target).prevAll('.highlight.highlight-done,.highlight.highlight-fail');
+          if (prevAll.length) {
+            prevAll.each((i, elem) => {
+              if (i >= max) {
+                return;
+              }
+              resetFragmentElement($(elem));
+            });
+          }
         }
       }
+
+      currentIncorrectFragmentId = fragmentId;
     }
 
     if (typeof fragmentAnswerCallback === 'function') {
