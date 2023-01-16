@@ -27,7 +27,7 @@ CSS
             <?php endforeach ?>
         </div>
         <?php if (!empty($model->description)): ?>
-            <div class="story-text"><?= Html::encode($model->description) ?></div>
+            <div class="story-text"><?= Html::encode(strip_tags($model->description)); ?></div>
         <?php endif ?>
         <?php $facts = $model->storyFacts(); ?>
         <?php if (count($facts) > 0): ?>
