@@ -57,9 +57,9 @@ CSS
                     <li style="display: flex; justify-content: space-between; align-items: center" data-list-id="<?= $listItem['id'] ?>" class="list-group-item">
                         <div>
                             <h4><?= $listItem['name']; ?></h4>
-                            <div class="items hide">
+                            <div class="items">
                                 <?php foreach ($listItem['items'] as $item): ?>
-                                <div data-item-id="<?= $item['id']; ?>" class="list-item"><?= $item['name']; ?></div>
+                                <span data-item-id="<?= $item['id']; ?>" class="label label-success list-item"><?= $item['name']; ?></span>
                                 <?php endforeach; ?>
                             </div>
                         </div>
