@@ -29,6 +29,7 @@ class PassTestQuestion extends Question
             'view' => 'pass-test',
             'payload' => Json::decode($this->question->regions),
             'item_view' => $this->question->sort_view === 0 ? 'list' : 'text',
+            'max_prev_items' => $this->question->max_prev_items
         ], parent::serialize());
     }
 }

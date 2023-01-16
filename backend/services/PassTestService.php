@@ -20,10 +20,11 @@ class PassTestService
         $this->transactionManager = $transactionManager;
     }
 
-    public function createQuestion(int $quizId, string $name, string $payload): int
+    public function createQuestion(int $quizId, string $name, string $payload, int $maxPrevItems = 0): int
     {
         $questionModel = StoryTestQuestion::create($quizId, $name, QuestionType::PASS_TEST);
         $questionModel->regions = $payload;
+        $questionModel->max_prev_items = $maxPrevItems;
         if (!$questionModel->save()) {
             throw ModelDomainException::create($questionModel);
         }
@@ -75,6 +76,7 @@ class PassTestService
         $questionModel->name = $form->name;
         $questionModel->regions = $form->payload;
         $questionModel->sort_view = $form->view;
+        $questionModel->max_prev_items = $form->max_prev_items;
 
         $this->transactionManager->wrap(function() use ($questionModel, $form) {
 

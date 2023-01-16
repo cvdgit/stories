@@ -72,7 +72,7 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
 
   const {fragments} = question.payload;
   let {content} = question.payload;
-
+console.log(question);
   fragments.forEach((fragment) => {
     let element;
 
@@ -131,11 +131,24 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
 
       $(e.target).addClass('highlight-fail');
 
-      $content.find('.highlight.highlight-done,.highlight.highlight-fail').each((i, elem) => {
+      /*$content.find('.highlight.highlight-done,.highlight.highlight-fail').each((i, elem) => {
         if ($(elem).attr('data-fragment-id') !== fragmentId) {
           resetFragmentElement($(elem));
         }
-      });
+      });*/
+
+      const prevAll = $(e.target).prevAll('.highlight.highlight-done,.highlight.highlight-fail');
+      if (prevAll.length) {
+        const max = question['max_prev_items'] || 0;
+        prevAll.each((i, elem) => {
+
+          if (i >= max) {
+            return;
+          }
+
+          resetFragmentElement($(elem));
+        });
+      }
     }
 
     if (typeof fragmentAnswerCallback === 'function') {

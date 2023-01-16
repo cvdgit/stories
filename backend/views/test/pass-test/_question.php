@@ -90,6 +90,8 @@ CSS
 <?php $form = ActiveForm::begin(['id' => 'pass-test-form']) ?>
 <?= $form->field($model, 'name')->textInput(['maxlength' => true]); ?>
 <?= $form->field($model, 'view')->dropDownList($model->getViewItems(), ['prompt' => 'Выберите представление']); ?>
+<?= $form->field($model, 'max_prev_items')->dropDownList($model->getMaxPrevItems())
+    ->hint('При неправильном выборе возврат на указанное количество элементов'); ?>
 <div>
     <div style="margin-bottom:10px;display:flex;flex-direction:row;align-items:center">
         <div class="content__title">

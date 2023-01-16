@@ -11,6 +11,7 @@ class PassTestForm extends Model
     public $content;
     public $payload;
     public $view;
+    public $max_prev_items;
 
     /** @var int|null */
     private $id;
@@ -27,6 +28,7 @@ class PassTestForm extends Model
             $this->payload = $model->regions;
             $this->view = $model->sort_view;
             $this->testId = $model->story_test_id;
+            $this->max_prev_items = $model->max_prev_items;
         }
     }
 
@@ -43,7 +45,7 @@ class PassTestForm extends Model
             [['name', 'content'], 'required'],
             [['name'], 'string', 'max' => 255],
             [['content', 'payload'], 'safe'],
-            ['view', 'integer'],
+            [['view', 'max_prev_items'], 'integer'],
         ];
     }
 
@@ -53,6 +55,7 @@ class PassTestForm extends Model
             'name' => 'Вопрос',
             'content' => 'Текст с пропусками',
             'view' => 'Представление',
+            'max_prev_items' => 'Возврат на',
         ];
     }
 
@@ -78,5 +81,17 @@ class PassTestForm extends Model
     public function getTestId(): ?int
     {
         return $this->testId;
+    }
+
+    public function getMaxPrevItems(): array
+    {
+        return [
+            'Начало',
+            '1 элемент',
+            '2 элемента',
+            '3 элемента',
+            '4 элемента',
+            '5 элементов',
+        ];
     }
 }

@@ -30,6 +30,7 @@ use yii\helpers\FileHelper;
  * @property string $audio_file_id
  * @property int $sort_view
  * @property string $incorrect_description
+ * @property int $max_prev_items
  *
  * @property StoryTestAnswer[] $storyTestAnswers
  * @property StoryTestAnswer[] $storyTestAnswersWithHidden
