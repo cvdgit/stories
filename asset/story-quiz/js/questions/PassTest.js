@@ -131,23 +131,24 @@ console.log(question);
 
       $(e.target).addClass('highlight-fail');
 
-      /*$content.find('.highlight.highlight-done,.highlight.highlight-fail').each((i, elem) => {
-        if ($(elem).attr('data-fragment-id') !== fragmentId) {
-          resetFragmentElement($(elem));
-        }
-      });*/
+      const max = question['max_prev_items'] || 0;
 
-      const prevAll = $(e.target).prevAll('.highlight.highlight-done,.highlight.highlight-fail');
-      if (prevAll.length) {
-        const max = question['max_prev_items'] || 0;
-        prevAll.each((i, elem) => {
-
-          if (i >= max) {
-            return;
+      if (max === 0) {
+        $content.find('.highlight.highlight-done,.highlight.highlight-fail').each((i, elem) => {
+          if ($(elem).attr('data-fragment-id') !== fragmentId) {
+            resetFragmentElement($(elem));
           }
-
-          resetFragmentElement($(elem));
         });
+      } else {
+        const prevAll = $(e.target).prevAll('.highlight.highlight-done,.highlight.highlight-fail');
+        if (prevAll.length) {
+          prevAll.each((i, elem) => {
+            if (i >= max) {
+              return;
+            }
+            resetFragmentElement($(elem));
+          });
+        }
       }
     }
 
