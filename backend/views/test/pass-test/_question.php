@@ -98,6 +98,7 @@ CSS
             <?= Html::activeLabel($model, 'content') ?>
         </div>
         <div style="margin-left:auto">
+            <a href="<?= Url::to(['/fragment-list/manage']); ?>" class="btn btn-primary btn-sm" id="manage" type="button">Управление</a>
             <button class="btn btn-primary btn-sm" id="search" type="button">Поиск</button>
             <a href="<?= Url::to(['/fragment-list/create', 'testing_id' => $testingId]); ?>" class="btn btn-primary btn-sm" id="create-fragment-list" type="button">Создать список</a>
             <a href="<?= Url::to(['/fragment-list/select', 'testing_id' => $testingId]); ?>" class="btn btn-primary btn-sm" id="select-fragment-list" type="button">Вставить из списка</a>
@@ -121,3 +122,4 @@ $this->registerJs($this->renderFile('@backend/views/test/pass-test/_content.js')
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_question.js'));
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_fragment_list.js'));
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_search.js'));
+$this->registerJs($this->renderFile('@backend/views/test/pass-test/_manage.js'));

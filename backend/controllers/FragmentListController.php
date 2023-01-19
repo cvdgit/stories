@@ -147,7 +147,7 @@ class FragmentListController extends Controller
         ]);
     }
 
-    public function actionSearch(Response $response, Request $request)
+    public function actionSearch(Response $response, Request $request): array
     {
         $response->format = Response::FORMAT_JSON;
 
@@ -308,5 +308,15 @@ class FragmentListController extends Controller
         return $this->renderAjax('select_one', [
             'items' => $lists,
         ]);
+    }
+
+    public function actionManage(): string
+    {
+        $listsQuery = (new Query())
+            ->select('*')
+            ->from('fragment_list')
+            ->orderBy(['name' => SORT_ASC]);
+        $items = $listsQuery->all();
+        return $this->renderAjax('manage', ['items' => $items]);
     }
 }
