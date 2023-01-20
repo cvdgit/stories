@@ -123,6 +123,9 @@ export default () => {
           text
         };
 
+        const transitionPlugin = this.deck.getPlugin('transition');
+        console.log(transitionPlugin.getInTransition());
+
         payload.slide_id = $(currentSlide).attr("data-id");
 
         const quiz = findQuizObject();

@@ -247,6 +247,7 @@ function WikidsStoryTest(el, options) {
   function createContainer(content) {
     if (that.options.forSlide) {
       setElementHtml($("<section/>")
+        .attr('data-id', that.options['fromSlideId'])
         .attr("data-background-color", "#ffffff")
         .append(content));
     } else {

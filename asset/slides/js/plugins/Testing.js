@@ -53,6 +53,7 @@ export default () => {
           'dataUrl': '/question/get',
           'dataParams': {'testId': test_id},
           'forSlide': true,
+          'fromSlideId': $(deck.getCurrentSlide()).attr('data-id'),
           'deck': deck,
           init: () => {
             return $.ajax({
