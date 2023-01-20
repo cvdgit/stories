@@ -6,6 +6,7 @@ use frontend\models\SignupForm;
 use yii\authclient\widgets\AuthChoice;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
+use yii\captcha\Captcha;
 use yii\helpers\Url;
 use yii\web\View;
 
@@ -34,10 +35,16 @@ $this->setMetaTags($title, $title, 'wikids, сказки, истории', $titl
                 <?= $form->field($formModel, 'password', ['inputOptions' => ['placeholder' => 'Пароль']])->passwordInput() ?>
             </div>
             <div class="auth-form-row">
+                <?= $form->field($formModel, 'captcha')->widget(Captcha::class, [
+                    'captchaAction' => '/signup/captcha',
+                ]); ?>
+            </div>
+            <div class="auth-form-row">
                 <div class="checkbox">
-                    <?= Html::activeCheckbox($formModel, 'agree', ['style' => 'margin-top: 1px']); ?>
-                    <span class="auth-links__divider">|</span>
-                    <?= Html::a('Пользовательское соглашение', ['/policy'], ['target' => '_blank']); ?>
+                    <?= $form->field($formModel, 'agree')
+                        ->error(false)
+                        ->checkbox(['style' => 'margin-top: 1px'])
+                        ->hint(Html::a('Пользовательское соглашение', ['/policy'], ['target' => '_blank', 'style' => 'text-decoration: underline'])); ?>
                 </div>
             </div>
             <div class="auth-form-row">

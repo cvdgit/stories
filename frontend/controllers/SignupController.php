@@ -8,6 +8,7 @@ use common\models\Auth;
 use common\models\User;
 use common\services\WelcomeUserService;
 use Exception;
+use frontend\components\MathCaptchaAction;
 use frontend\models\EmailForm;
 use Yii;
 use yii\web\Controller;
@@ -27,6 +28,13 @@ class SignupController extends Controller
         $this->welcomeService = $welcomeService;
     }
 
+    public function actions()
+    {
+        return [
+            'captcha' => MathCaptchaAction::class,
+        ];
+    }
+
     public function actionRequest(Request $request)
     {
         if (!Yii::$app->user->isGuest) {
@@ -38,6 +46,7 @@ class SignupController extends Controller
             try {
                 $this->signupService->signupWithConfirmEmail(User::createUsername(), $signupForm->email, $signupForm->password);
                 Yii::$app->session->setFlash('success', 'Проверьте свой адрес электронной почты, чтобы подтвердить регистрацию');
+                return $this->refresh();
             }
             catch (Exception $ex) {
                 Yii::$app->errorHandler->logException($ex);

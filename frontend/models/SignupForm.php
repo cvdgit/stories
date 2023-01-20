@@ -18,11 +18,12 @@ class SignupForm extends Model
     public $email;
     public $password;
     public $agree;
+    public $captcha;
 
     public function rules(): array
     {
         return [
-            [['email', 'password', 'agree'], 'required'],
+            [['email', 'password', 'agree', 'captcha'], 'required'],
             ['email', 'trim'],
             ['email', 'required'],
             ['email', 'email'],
@@ -30,8 +31,9 @@ class SignupForm extends Model
             ['email', 'unique', 'targetClass' => User::class, 'message' => 'Пользователь с таким email уже существует'],
             ['password', 'required'],
             ['password', 'string', 'min' => 6],
-            ['agree', 'required', 'requiredValue' => 1],
+            ['agree', 'required', 'requiredValue' => 1, 'message' => 'Обязательно для заполнения'],
             ['agree', 'boolean'],
+            ['captcha', 'captcha', 'captchaAction' => '/signup/captcha'],
         ];
     }
 
@@ -40,7 +42,8 @@ class SignupForm extends Model
         return [
             'email' => 'Email',
             'password' => 'Пароль',
-            'agree' => 'Я принимаю',
+            'agree' => 'Я принимаю пользовательское соглашение',
+            'captcha' => 'Решите пример'
         ];
     }
 
