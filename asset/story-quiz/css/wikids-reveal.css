@@ -1764,11 +1764,11 @@ p.wikids-test-description {
 }
 
 .highlight-done {
-  border: 2px #d6e9c6 solid;
-  background-color: #dff0d8;
+  border: 2px #d6e9c6 solid !important;
+  background-color: #dff0d8 !important;
 }
 
 .highlight-fail {
-  border: 2px #ebccd1 solid;
-  background-color: #f2dede;
+  border: 2px #ebccd1 solid !important;
+  background-color: #f2dede !important;
 }
