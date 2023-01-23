@@ -174,7 +174,6 @@ class FragmentListController extends Controller
 
         //$content = preg_replace('/\s+/u',' ', $content);
         //$content = trim(preg_replace('/[^\w\s\-{}]/u', '', $content));
-
         //$words = array_unique(preg_split('/\s/u', $content,-1,PREG_SPLIT_NO_EMPTY));
 
         $morphy = new MorphyWrapper();
@@ -185,6 +184,7 @@ class FragmentListController extends Controller
             $itemWord = $listItem['tagName'];
 
             $listItemBase = $morphy->getBaseForm($itemWord);
+            $listPseudoRoot = $morphy->getPseudoRoot($itemWord);
             if (empty($listItemBase)) {
                 $listItemBase = $itemWord;
             }
@@ -195,6 +195,7 @@ class FragmentListController extends Controller
                     'word' => $itemWord,
                     'tag' => mb_strtolower($listItemBase),
                     'list_id' => $listItem['listId'],
+                    'match' => mb_strtolower($listPseudoRoot),
                 ];
             }
         }

@@ -35,9 +35,9 @@
           $('#content-cache').empty();
 
           words.forEach(word => {
-            const reg = new RegExp(`${word.word}`, 'igu');
-            contentHtml = contentHtml.replace(reg, () => {
-              return `<span class="btn btn-info search-fragment" data-list-id="${word.list_id}" contenteditable="false">${word.word}</span>`;
+            const reg = new RegExp(`[^\w\dа-я]+(${word.match}[a-zа-я0-9]*)[^\.,\s]?`, 'igu');
+            contentHtml = contentHtml.replace(reg, (match, p1, p2, offset, s) => {
+              return ` <span class="btn btn-info search-fragment" data-word="${word.word}" data-list-id="${word.list_id}" contenteditable="false">${p1.trim()}</span> `;
             });
           });
 
@@ -61,6 +61,7 @@
 
     const $item = $(this);
     const listId = $item.attr('data-list-id');
+    const itemWord = $item.attr('data-word');
 
     searchDialog.show({
       url: `/admin/index.php?r=fragment-list/select-one&list_id=${listId}`,
@@ -82,18 +83,22 @@
 
           $body.find('#selected-items-list li').each((i, elem) => {
 
-            const title = $(elem).text().trim();
+            let title = $(elem).text().trim();
+            const correct = title === $item.text() || title === itemWord;
+
+            if (correct) {
+              title = $item.text();
+            }
 
             dataWrapper.createFragmentItem(elementId, {
               id: generateUUID(),
               title,
-              correct: title === $item.text()
+              correct
             });
           });
 
           searchDialog.hide();
         });
-
       }
     });
   });
