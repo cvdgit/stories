@@ -189,6 +189,10 @@ class FragmentListController extends Controller
                 $listItemBase = $itemWord;
             }
 
+            if ($listPseudoRoot === null) {
+                $listPseudoRoot = $listItemBase;
+            }
+
             if (str_contains($content, mb_strtolower($listItemBase))) {
 
                 $result[] = [

@@ -35,10 +35,14 @@
           $('#content-cache').empty();
 
           words.forEach(word => {
-            const reg = new RegExp(`[^\w\dа-я]+(${word.match}[a-zа-я0-9]*)[^\.,\s]?`, 'igu');
-            contentHtml = contentHtml.replace(reg, (match, p1, p2, offset, s) => {
-              return ` <span class="btn btn-info search-fragment" data-word="${word.word}" data-list-id="${word.list_id}" contenteditable="false">${p1.trim()}</span> `;
-            });
+
+            const {match} = word;
+            if (match.search(/\s/) === -1) {
+              const reg = new RegExp(`[^\w\dа-я]+(${word.match}[a-zа-я0-9]*)[^\.,\s]?`, 'igu');
+              contentHtml = contentHtml.replace(reg, (match, p1, p2, offset, s) => {
+                return ` <span class="btn btn-info search-fragment" data-word="${word.word}" data-list-id="${word.list_id}" contenteditable="false">${p1.trim()}</span> `;
+              });
+            }
           });
 
           dataWrapper.setContent(contentHtml);
