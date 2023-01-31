@@ -76,13 +76,19 @@ $('#import-slides').on('click', function() {
     return;
   }
 
+  const deleteSlides = $('#import-slides-delete').is(':checked') ? '1' : '0';
+
+  if (!confirm(`Подтверждаете импорт${deleteSlides === '1' ? ' и удаление выбранных слайдов из выбранной истории ' : ''} слайдов?`)) {
+    return;
+  }
+
   const toStoryId = $('#import-slides-list')
     .attr('data-to-story-id');
 
   const formData = new FormData();
   formData.append('to_story_id', toStoryId);
   formData.append('from_story_id', fromStoryId);
-  formData.append('delete_slides', $('#import-slides-delete').is(':checked') ? 1 : 0);
+  formData.append('delete_slides', deleteSlides);
   ids.map(slideId => formData.append('slides[]', slideId));
 
   sendForm(`/admin/index.php?r=slide-import/import&story_id=${fromStoryId}`, 'post', formData)
