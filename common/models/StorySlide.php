@@ -334,4 +334,28 @@ class StorySlide extends ActiveRecord
         }
         return $this->data;
     }
+
+    public static function findStorySlide(int $storyId, int $slideId): ?StorySlide
+    {
+        return self::find()
+            ->where([
+                'id' => $slideId,
+                'story_id' => $storyId,
+            ])
+            ->one();
+    }
+
+    public function copySlide(StorySlide $sourceSlide, int $newSlideStoryId): StorySlide
+    {
+        $slide = new self();
+        $slide->story_id = $newSlideStoryId;
+        $slide->number = self::find()
+                ->where(['story_id' => $newSlideStoryId])
+                ->max('number') + 1;
+        $slide->data = $sourceSlide->getSlideOrLinkData();
+        $slide->status = $sourceSlide->status;
+        $slide->kind = $sourceSlide->kind;
+        $slide->link_slide_id = $sourceSlide->link_slide_id;
+        return $slide;
+    }
 }

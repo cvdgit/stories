@@ -3,15 +3,16 @@
 namespace frontend\controllers;
 
 use common\models\StorySlideImage;
-use DomainException;
 use Yii;
 use yii\web\Controller;
-use yii\web\HttpException;
+use yii\web\NotFoundHttpException;
 use Yii\web\Response;
 
 class ImageController extends Controller
 {
-
+    /**
+     * @throws NotFoundHttpException
+     */
     public function actionView(string $id)
     {
         $image = $this->findModelByHash($id);
@@ -23,7 +24,7 @@ class ImageController extends Controller
 
         if (!$image->isSuccess()) {
             if ($image->linkImages === null) {
-                throw new HttpException(404);
+                throw new NotFoundHttpException('Изображение не найдено');
             }
             $image = $image->linkImages[0];
         }
@@ -45,17 +46,20 @@ class ImageController extends Controller
             $img_data = file_get_contents($imagePath);
         }
         catch (\Exception $ex) {
-            throw new HttpException(404);
+            throw new NotFoundHttpException('Изображение не найдено');
         }
         $response->data = $img_data;
         return $response;
     }
 
-    public function findModelByHash(string $hash): ?StorySlideImage
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function findModelByHash(string $hash): StorySlideImage
     {
         if (($model = StorySlideImage::findOne(['hash' => $hash])) !== null) {
             return $model;
         }
-        throw new DomainException('Изображение не найдено');
+        throw new NotFoundHttpException('Изображение не найдено');
     }
 }

@@ -12,11 +12,13 @@ use backend\components\story\ImageBlock;
 use backend\components\story\reader\HTMLReader;
 use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\Slide;
+use backend\components\story\TestBlock;
 use backend\components\story\TestBlockContent;
 use backend\components\story\VideoBlock;
 use backend\components\story\writer\HTMLWriter;
 use backend\components\StudyTaskFinalSlide;
 use backend\models\editor\BaseForm;
+use backend\models\ImageSlideBlock;
 use backend\models\video\VideoSource;
 use common\models\LessonBlock;
 use common\models\slide\SlideKind;
@@ -24,6 +26,7 @@ use common\models\slide\SlideStatus;
 use common\models\SlideVideo;
 use common\models\StorySlide;
 use common\models\StorySlideImage;
+use common\models\StoryStoryTest;
 use DomainException;
 use common\models\Story;
 use yii\db\Query;
@@ -222,6 +225,19 @@ class StoryEditorService
         foreach ($slide->getBlocks() as $block) {
             if ($block->isVideo()) {
                 Story::updateVideo($slideModel->story_id, false);
+            }
+            if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
+                ImageSlideBlock::deleteImageBlock($slideModel->id, $block->getId());
+            }
+            if ($block->getType() === AbstractBlock::TYPE_HTML) {
+                /** @var HTMLBLock $block */
+                /** @var TestBlockContent $content */
+                $content = $block->getContentObject(TestBlockContent::class);
+                StoryStoryTest::deleteStoryTest($slideModel->story_id, $content->getTestID());
+            }
+            if ($block->isTest()) {
+                /** @var TestBlock $block */
+                StoryStoryTest::deleteStoryTest($slideModel->story_id, $block->getTestID());
             }
         }
         $slideModel->delete();

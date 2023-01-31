@@ -1,9 +1,21 @@
 <?php
+
+declare(strict_types=1);
+
+use backend\models\WordListFromStoryForm;
+use common\models\Story;
 use yii\bootstrap\Dropdown;
 use yii\helpers\Html;
+use yii\web\View;
 use yii\widgets\ActiveForm;
-/** @var $model common\models\Story */
-/** @var $wordListModel backend\models\WordListFromStoryForm */
+
+/**
+ * @var View $this
+ * @var Story $model
+ * @var WordListFromStoryForm $wordListModel
+ */
+
+$this->registerJs($this->renderFile('@backend/views/story/_slides_import.js'));
 ?>
 <div class="dropdown pull-right">
     <a href="#" data-toggle="dropdown" class="dropdown-toggle btn btn-default">
@@ -18,6 +30,7 @@ use yii\widgets\ActiveForm;
             ['label' => 'Создать список слов (по предложениям)', 'url' => ['/word-list/make-from-story-by-proposals', 'story_id' => $model->id], 'linkOptions' => ['class' => 'story-text']],
             ['label' => 'Создать список слов (по словам)', 'url' => ['/word-list/make-from-story-by-words', 'story_id' => $model->id], 'linkOptions' => ['class' => 'story-text']],
             ['label' => 'Доступ по ссылке', 'url' => '#access-by-link-modal', 'linkOptions' => ['data-toggle' => 'modal']],
+            ['label' => 'Импорт слайдов', 'url' => ['/slide-import/import', 'story_id' => $model->id], 'linkOptions' => ['id' => 'slide-import']],
         ],
     ]);
     ?>

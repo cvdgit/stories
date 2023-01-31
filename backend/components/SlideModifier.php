@@ -20,13 +20,11 @@ use common\models\StoryTest;
 
 class SlideModifier
 {
-
     /** @var Slide */
     private $slide;
 
     public function __construct(int $slideID, string $slideData)
     {
-
         $search = [
             'data-id=""',
             'data-background-color="#000000"',
