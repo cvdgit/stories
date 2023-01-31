@@ -267,7 +267,7 @@ class StoryTestQuestion extends ActiveRecord
         }
     }
 
-    public function afterDelete()
+/*    public function afterDelete()
     {
         parent::afterDelete();
         if ($this->typeIsRegion()) {
@@ -275,7 +275,7 @@ class StoryTestQuestion extends ActiveRecord
                 $this->deleteRegionImages();
             }
         }
-    }
+    }*/
 
     public function deleteImage(): void
     {

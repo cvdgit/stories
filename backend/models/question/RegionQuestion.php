@@ -47,7 +47,7 @@ class RegionQuestion extends Model
         $uploadedFile = UploadedFile::getInstance($this, 'imageFile');
         if ($uploadedFile !== null) {
 
-            $model->deleteRegionImages();
+            //$model->deleteRegionImages();
 
             $regionImageFile = new RegionImageFile($uploadedFile, $model->getRegionImage());
             $imagePath = $regionImageFile->saveOriginal();
