@@ -1,12 +1,10 @@
 <?php
 
-
 namespace backend\controllers;
 
-
+use backend\actions\ReplaceVideo\ReplaceVideoAction;
 use backend\components\story\AbstractBlock;
 use backend\components\story\reader\HtmlSlideReader;
-use backend\components\story\writer\HTMLWriter;
 use backend\models\SlideVideoSearch;
 use backend\models\video\CreateVideoForm;
 use backend\models\video\UpdateVideoForm;
@@ -15,25 +13,23 @@ use backend\services\VideoService;
 use common\models\SlideVideo;
 use common\models\Story;
 use common\rbac\UserRoles;
-use Exception;
-use Yii;
-use yii\data\ActiveDataProvider;
+use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class VideoController extends Controller
 {
-
-    protected $service;
+    private $service;
 
     public function __construct($id, $module, VideoService $service, $config = [])
     {
-        $this->service = $service;
         parent::__construct($id, $module, $config);
+        $this->service = $service;
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
@@ -48,10 +44,17 @@ class VideoController extends Controller
         ];
     }
 
-    public function actionIndex(int $source = VideoSource::YOUTUBE)
+    public function actions(): array
+    {
+        return [
+            'replace' => ReplaceVideoAction::class,
+        ];
+    }
+
+    public function actionIndex(int $source = VideoSource::YOUTUBE): string
     {
         $model = new SlideVideoSearch();
-        $params = array_merge([], Yii::$app->request->queryParams);
+        $params = array_merge([], \Yii::$app->request->queryParams);
         $params['SlideVideoSearch']['source'] = $source;
         $dataProvider = $model->search($params);
         return $this->render('index', [
@@ -64,7 +67,7 @@ class VideoController extends Controller
     public function actionCreate()
     {
         $model = new CreateVideoForm();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+        if ($model->load(\Yii::$app->request->post()) && $model->validate()) {
             $model->createVideo();
             return $this->redirect(['index']);
         }
@@ -77,14 +80,14 @@ class VideoController extends Controller
     {
         $model = new UpdateVideoForm($id);
         $model->loadModel();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+        if ($model->load(\Yii::$app->request->post()) && $model->validate()) {
             try {
                 $id = $model->saveVideo();
-                Yii::$app->session->addFlash('success', 'Видео успешно изменено');
+                \Yii::$app->session->addFlash('success', 'Видео успешно изменено');
                 return $this->redirect(['update', 'id' => $id]);
             }
-            catch (Exception $ex) {
-                Yii::$app->session->addFlash('error', $ex->getMessage());
+            catch (\Exception $ex) {
+                \Yii::$app->session->addFlash('error', $ex->getMessage());
             }
         }
         return $this->render('update', [
@@ -92,28 +95,42 @@ class VideoController extends Controller
         ]);
     }
 
-    public function actionDelete(int $id)
+    /**
+     * @throws StaleObjectException
+     * @throws NotFoundHttpException
+     */
+    public function actionDelete(int $id): Response
     {
-        $model = SlideVideo::findModel($id);
+        $model = SlideVideo::findOne($id);
+        if ($model === null) {
+            throw new NotFoundHttpException('Видео не найдено');
+        }
         $model->delete();
         return $this->redirect(['index']);
     }
 
-    public function actionCheck(int $id)
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionCheck(int $id): array
     {
-        Yii::$app->response->format = Response::FORMAT_JSON;
+        \Yii::$app->response->format = Response::FORMAT_JSON;
 
-        $model = SlideVideo::findModel($id);
+        $model = SlideVideo::findOne($id);
+        if ($model === null) {
+            throw new NotFoundHttpException('Видео не найдено');
+        }
+
         $isValid = $this->service->checkVideo($model->video_id);
         $model->status = $isValid ? SlideVideo::STATUS_SUCCESS : SlideVideo::STATUS_ERROR;
         $model->save(false, ['status']);
-        
+
         return ['success' => $isValid];
     }
 
-    public function actionGetStories(string $video_id)
+    public function actionGetStories(string $video_id): array
     {
-        Yii::$app->response->format = Response::FORMAT_JSON;
+        \Yii::$app->response->format = Response::FORMAT_JSON;
         $data = [];
         $models = Story::find()->with('storySlides')->andWhere(['video' => 1])->all();
         foreach ($models as $model) {
@@ -136,5 +153,4 @@ class VideoController extends Controller
         }
         return $data;
     }
-
 }

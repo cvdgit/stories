@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace backend\actions\slide_import;
+namespace backend\actions\SlideImport;
 
 use yii\base\Model;
 

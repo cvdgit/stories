@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace backend\controllers;
 
-use backend\actions\slide_import\ImportAction;
+use backend\actions\SlideImport\ImportAction;
 use common\rbac\UserRoles;
 use yii\filters\AccessControl;
 use yii\web\Controller;

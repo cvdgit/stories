@@ -136,4 +136,13 @@ class Slide
         $this->id = $id;
     }
 
+    /**
+     * @return list<VideoBlock>
+     */
+    public function getVideoBlocks(): array
+    {
+        return array_filter($this->blocks, static function(AbstractBlock $block) {
+            return $block->isVideo();
+        });
+    }
 }
