@@ -18,7 +18,7 @@ function WikidsVideoPlayer(elemID, options) {
     }
 
     player = new Plyr('#' + elemID, {
-        autoplay: true,
+        autoplay: options.duration > 0,
         controls: controls,
         clickToPlay: true,
         keyboard: false
@@ -28,7 +28,9 @@ function WikidsVideoPlayer(elemID, options) {
         sourceIsFile = options.source === 2;
 
     player.on("ready", function(event) {
+      if (options.duration > 0) {
         player.play();
+      }
         player.speed = options.speed;
         if (options.seekTo > 0) {
             player.currentTime = options.seekTo;
