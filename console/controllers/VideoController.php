@@ -20,9 +20,9 @@ class VideoController extends Controller
         parent::__construct($id, $module, $config);
     }
 
-    public function actionCheck()
+    public function actionCheck(): void
     {
-        $models = SlideVideo::find()->all();
+        $models = SlideVideo::find()->where(['source' => 1])->all();
         $invalidVideos = [];
         foreach ($models as $model) {
             $isValid = $this->service->checkVideo($model->video_id);
