@@ -1,8 +1,17 @@
 <?php
+
+declare(strict_types=1);
+
+use common\models\StoryTest;
 use yii\helpers\Html;
-/* @var $this yii\web\View */
-/* @var $model common\models\StoryTest */
-/** @var $dataProvider yii\data\ActiveDataProvider */
+use yii\web\View;
+
+/**
+ * @var View $this
+ * @var StoryTest $model
+ * @var array $scheduleItems
+ */
+
 $this->title = 'Создать тест';
 $this->params['breadcrumbs'] = [
     ['label' => 'Все тесты', 'url' => ['test/index', 'source' => $model->source]],
@@ -16,6 +25,7 @@ $this->params['breadcrumbs'] = [
             <?= $this->render('_form', [
                 'model' => $model,
                 'repeatChangeModel' => null,
+                'scheduleItems' => $scheduleItems
             ]) ?>
         </div>
     </div>

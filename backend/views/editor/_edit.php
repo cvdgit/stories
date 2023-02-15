@@ -112,7 +112,7 @@ echo $this->render('modal/image_from_file', ['storyModel' => $model]);
 echo $this->render('modal/image_from_url', ['storyModel' => $model]);
 echo $this->render('modal/slide_images', ['storyModel' => $model]);
 echo $this->render('modal/relations');
-echo $this->render('modal/slide_source');
+//echo $this->render('modal/slide_source');
 
 $storyID = $model->id;
 
@@ -266,6 +266,12 @@ $js = <<< JS
         }
     });
 
+    const slideSourceModal = new RemoteModal({
+        id: 'slide-source-modal',
+        title: 'Разметка слайда',
+        dialogClassName: 'modal-lg'
+    });
+
     $('.slide-menu').on('click', '[data-slide-action]', function(e) {
         var elem = $(this);
         if (elem.prop('data-process')) {
@@ -294,7 +300,18 @@ $js = <<< JS
                 $('#neo-relation-modal').modal('show');
                 break;
             case 'source':
-                $('#slide-source-modal').modal('show');
+                slideSourceModal.show({
+                    url: '/admin/index.php?r=slide/source&id=' + StoryEditor.getCurrentSlideID(),
+                    callback: function() {
+                        attachBeforeSubmit($(this).find('form')[0], function(form) {
+                            sendForm($(form).attr('action'), $(form).attr('method'), new FormData(form))
+                                .done(response => {
+                                    StoryEditor.loadSlide(StoryEditor.getCurrentSlideID());
+                                    slideSourceModal.hide();
+                                });
+                        });
+                    }
+                });
                 break;
         }
         if (callback) {

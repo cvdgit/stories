@@ -1,19 +1,30 @@
 <?php
+
+declare(strict_types=1);
+
+use backend\models\test\ChangeRepeatForm;
 use backend\models\test\InputVoice;
 use backend\models\test\RecorderLang;
 use backend\models\test\TestRepeat;
 use backend\widgets\CreateTestTemplateWidget;
+use common\models\StoryTest;
 use common\models\test\AnswerType;
 use common\models\test\SourceType;
 use common\models\test\TestTemplateParts;
 use common\models\User;
 use vova07\imperavi\Widget;
 use yii\helpers\Html;
+use yii\web\View;
 use yii\widgets\ActiveForm;
 use backend\components\TestTypeOptions;
-/** @var $this yii\web\View */
-/** @var $model common\models\StoryTest */
-/** @var backend\models\test\ChangeRepeatForm $repeatChangeModel */
+
+/**
+ * @var View $this
+ * @var StoryTest $model
+ * @var ChangeRepeatForm $repeatChangeModel
+ * @var array $scheduleItems
+ */
+
 $opt = new TestTypeOptions($model->answer_type);
 ?>
 <div class="story-test-form">
@@ -100,6 +111,8 @@ $opt = new TestTypeOptions($model->answer_type);
         </div>
     </div>
     <?php endif ?>
+
+    <?= $form->field($model, 'schedule_id')->dropDownList($scheduleItems, ['prompt' => 'Выберите расписание повторения']); ?>
 
     <?= $form->field($model, 'sortable')->hiddenInput()->label(false) ?>
 

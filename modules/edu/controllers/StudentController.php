@@ -2,15 +2,14 @@
 
 namespace modules\edu\controllers;
 
-use common\rbac\UserRoles;
 use modules\edu\components\TopicAccessManager;
 use modules\edu\models\EduClassProgram;
 use modules\edu\models\EduLesson;
 use modules\edu\models\EduTopic;
+use modules\edu\RepetitionApiInterface;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\Query;
-use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -19,11 +18,14 @@ class StudentController extends Controller
 {
     /** @var TopicAccessManager */
     private $topicAccessManager;
+    /** @var RepetitionApiInterface */
+    private $repetitionApi;
 
-    public function __construct($id, $module, TopicAccessManager $topicAccessManager, $config = [])
+    public function __construct($id, $module, TopicAccessManager $topicAccessManager, RepetitionApiInterface $repetitionApi, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->topicAccessManager = $topicAccessManager;
+        $this->repetitionApi = $repetitionApi;
     }
 
     /*    public function behaviors(): array
@@ -72,9 +74,12 @@ class StudentController extends Controller
             'query' => EduClassProgram::find()->where(['in', 'id', $classProgramIds]),
         ]);
 
+        $repetitionDataProvider = $this->repetitionApi->getRepetitionDataProvider($student->id);
+
         return $this->render('index', [
             'student' => $student,
             'dataProvider' => $dataProvider,
+            'repetitionDataProvider' => $repetitionDataProvider,
         ]);
     }
 

@@ -1,4 +1,8 @@
 <?php
+
+use backend\modules\repetition\query\ScheduleFetcher;
+use backend\modules\repetition\ScheduleFetcherInterface;
+
 $params = array_merge(
     require __DIR__ . '/../../common/config/params.php',
     require __DIR__ . '/../../common/config/params-local.php',
@@ -14,7 +18,14 @@ return [
         'log',
         'common\bootstrap\Bootstrap',
     ],
-    'modules' => [],
+    'modules' => [
+        'repetition' => \backend\modules\repetition\Module::class,
+    ],
+    'container' => [
+        'definitions' => [
+            ScheduleFetcherInterface::class => ScheduleFetcher::class
+        ],
+    ],
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-wikids',

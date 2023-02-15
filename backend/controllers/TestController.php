@@ -7,6 +7,7 @@ use backend\models\question\CreateQuestion;
 use backend\models\question\UpdateQuestion;
 use backend\models\search\TestSearch;
 use backend\models\test\ChangeRepeatForm;
+use backend\modules\repetition\ScheduleFetcherInterface;
 use common\models\StoryTest;
 use common\models\StoryTestAnswer;
 use common\models\StoryTestQuestion;
@@ -20,6 +21,7 @@ use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -27,16 +29,17 @@ use yii\web\UploadedFile;
 
 class TestController extends Controller
 {
-
     private $historyService;
+    private $scheduleFetcher;
 
-    public function __construct($id, $module, TestHistoryService $historyService, $config = [])
+    public function __construct($id, $module, TestHistoryService $historyService, ScheduleFetcherInterface $scheduleFetcher, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->historyService = $historyService;
+        $this->scheduleFetcher = $scheduleFetcher;
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
@@ -91,19 +94,21 @@ class TestController extends Controller
         $model->source = $source;
         $model->created_by = Yii::$app->user->id;
         $model->answer_type = AnswerType::DEFAULT;
-        $dataProvider = new ActiveDataProvider([
-            'query' => $model->getStoryTestQuestions(),
-        ]);
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['update', 'id' => $model->id]);
         }
+
         return $this->render('create', [
             'model' => $model,
-            'dataProvider' => $dataProvider,
+            'scheduleItems' => ArrayHelper::map($this->scheduleFetcher->getSchedules(), 'id', 'name'),
         ]);
     }
 
-    public function actionUpdate($id)
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionUpdate(int $id)
     {
         $model = $this->findModel($id);
         $dataProvider = new ActiveDataProvider([
@@ -118,6 +123,7 @@ class TestController extends Controller
             'model' => $model,
             'dataProvider' => $dataProvider,
             'repeatChangeModel' => new ChangeRepeatForm($model->id, $model->repeat),
+            'scheduleItems' => ArrayHelper::map($this->scheduleFetcher->getSchedules(), 'id', 'name'),
         ]);
     }
 

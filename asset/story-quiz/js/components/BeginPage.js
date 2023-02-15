@@ -10,6 +10,16 @@ export function createBeginPage(testResponse, options = {canModerate: false, onA
     activeStudent = testResponse.students[0];
   }
 
+  const $restartQuiz = $('<a/>', {
+    href: '',
+    text: 'Начать заново',
+    class: 'restart-quiz',
+    css: {
+      display: 'none',
+      padding: '10px'
+    }
+  });
+
   testResponse.students.forEach((student) => {
 
     const $item = $('<a/>')
@@ -22,7 +32,7 @@ export function createBeginPage(testResponse, options = {canModerate: false, onA
           .text(student.name)
       );
 
-    const progress = parseInt(student['progress'])
+    const progress = options.repetitionMode ? 0 : parseInt(student['progress']);
     if (progress > 0) {
       $item.append(
         $('<p/>').addClass('list-group-item-text').text(progress + '% завершено')
@@ -33,7 +43,7 @@ export function createBeginPage(testResponse, options = {canModerate: false, onA
       e.preventDefault();
 
       const stud = $(this).data('student');
-      const studProgress = parseInt(stud.progress);
+      const studProgress = options.repetitionMode ? 0 : parseInt(stud.progress);
 
       activeStudent = stud;
       $beginButton.text(studProgress === 0 ? 'Начать тест' : 'Продолжить тест');
@@ -80,46 +90,38 @@ export function createBeginPage(testResponse, options = {canModerate: false, onA
 
   $col.append($beginButton);
 
-  const $restartQuiz = $('<a/>', {
-    href: '',
-    text: 'Начать заново',
-    class: 'restart-quiz',
-    css: {
-      display: 'none',
-      padding: '10px'
-    }
-  });
-  $restartQuiz.on('click', function(e) {
-    e.preventDefault();
-    if (!confirm('Вы уверены, что хотите начать тестирование сначала?')) {
-      return;
-    }
+  if (!options.repetitionMode) {
+    $restartQuiz.on('click', function (e) {
+      e.preventDefault();
+      if (!confirm('Вы уверены, что хотите начать тестирование сначала?')) {
+        return;
+      }
 
-    const that = $(this);
+      const that = $(this);
 
-    if (typeof options.onRestart === 'function') {
-      options.onRestart(activeStudent.id)
-        .done((response) => {
-          if (response && response.success) {
-            toastr.success('Успешно');
+      if (typeof options.onRestart === 'function') {
+        options.onRestart(activeStudent.id)
+          .done((response) => {
+            if (response && response.success) {
+              toastr.success('Успешно');
 
-            const active = $listGroup.find('a.active')
+              const active = $listGroup.find('a.active')
 
-            active.find('.list-group-item-text').remove();
+              active.find('.list-group-item-text').remove();
 
-            const stud = active.data('student');
-            stud.progress = 0;
-            active.data('student', stud);
+              const stud = active.data('student');
+              stud.progress = 0;
+              active.data('student', stud);
 
-            active.click();
-          }
-          else {
-            toastr.error(response['message'] || 'Неизвестная ошибка');
-          }
-        })
-    }
-  });
-  $col.append($restartQuiz);
+              active.click();
+            } else {
+              toastr.error(response['message'] || 'Неизвестная ошибка');
+            }
+          })
+      }
+    });
+    $col.append($restartQuiz);
+  }
 
   $listGroup.find('a:eq(0)').click();
 

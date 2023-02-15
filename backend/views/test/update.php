@@ -1,13 +1,18 @@
 <?php
+
+declare(strict_types=1);
+
 use backend\assets\SortableJsAsset;
 use backend\forms\WordListForm;
 use yii\bootstrap\Dropdown;
 use yii\helpers\Html;
+
 /**
  * @var $this yii\web\View
  * @var $model common\models\StoryTest
  * @var $dataProvider yii\data\ActiveDataProvider
  * @var backend\models\test\ChangeRepeatForm $repeatChangeModel
+ * @var array $scheduleItems
  */
 $this->title = 'Изменить тест';
 $this->params['breadcrumbs'] = [
@@ -39,7 +44,11 @@ SortableJsAsset::register($this);
     <?php endif ?>
     <div class="row">
         <div class="col-md-6">
-            <?= $this->render('_form', ['model' => $model, 'repeatChangeModel' => $repeatChangeModel]) ?>
+            <?= $this->render('_form', [
+                'model' => $model,
+                'repeatChangeModel' => $repeatChangeModel,
+                'scheduleItems' => $scheduleItems,
+            ]); ?>
         </div>
         <div class="col-md-6 test-sidebar">
             <?php if (!$model->isNewRecord && !$model->isVariant() && !$model->isTemplate()): ?>

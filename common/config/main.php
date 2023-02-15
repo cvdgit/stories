@@ -1,10 +1,11 @@
 <?php
 
+use common\components\dispatchers\EventDispatcherInterface;
+use common\components\dispatchers\SimpleEventDispatcher;
 use modules\edu\components\StudentContext;
-use yii\mail\MailerInterface;
-use yii\rbac\DbManager;
 use yii\caching\FileCache;
-use yii\swiftmailer\Mailer;
+use yii\di\Container;
+use yii\rbac\DbManager;
 
 return [
     'language' => 'ru',
@@ -23,6 +24,16 @@ return [
         'files' => ['class' => \modules\files\Module::class],
         'edu' => ['class' => \modules\edu\Module::class],
         'testing' => ['class' => \modules\testing\Module::class],
+    ],
+    'container' => [
+        'singletons' => [
+            EventDispatcherInterface::class => SimpleEventDispatcher::class,
+            SimpleEventDispatcher::class => static function (Container $container) {
+                return new SimpleEventDispatcher($container, [
+                    \frontend\events\StudentTestingFinish::class => [\frontend\modules\repetition\listeners\StartRepetitionListener::class],
+                ]);
+            },
+        ],
     ],
     'components' => [
         'studentContext' => [

@@ -86,5 +86,7 @@ return [
         'stories/tag/<tag:[\w\s\-]+>' => 'story/tag',
         '<section:\w+>/category/<category:[\w\-]+>' => 'story/category',
         '<section:\w+>' => 'story/index',
+
+        '/video/<id:\d+>' => 'video/stream',
     ],
 ];

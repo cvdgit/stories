@@ -72,14 +72,16 @@ function WikidsStoryTest(el, options) {
     throw "Element must be an HTMLElement, not ".concat({}.toString.call(el));
   }
 
-  options = options || {};
-  this.options = Object.assign({}, options);
+  this.options = Object.assign({
+    repetitionMode: false,
+    fastMode: false
+  }, options || {});
 
-  if (!options['init'] || typeof options['init'] !== 'function') {
+  if (!this.options['init'] || typeof this.options['init'] !== 'function') {
     throw 'Необходимо определить свойство init';
   }
 
-  const testingId = options.dataParams.testId;
+  const testingId = this.options.dataParams.testId;
 
   var that = this;
 
@@ -256,11 +258,11 @@ function WikidsStoryTest(el, options) {
   }
 
   function run() {
-    options.init()
+    that.options.init()
       .done((response) => {
         init(response);
-        if (typeof options['onInitialized'] === 'function') {
-          options.onInitialized();
+        if (typeof that.options['onInitialized'] === 'function') {
+          that.options.onInitialized();
         }
       });
   }
@@ -277,13 +279,14 @@ function WikidsStoryTest(el, options) {
     } else {
       dom.beginPage = createBeginPage(testResponse, {
         canModerate: App.userIsModerator(),
+        repetitionMode: that.options.repetitionMode,
         onActive: (student) => {
           currentStudent = student;
           activeStudent.set(student);
           $('.wikids-test-student-info', dom.header).text(currentStudent.name);
         },
         onStart: (fastMode) => {
-          loadData({fastMode});
+          loadData(that.options.repetitionMode ? {fastMode: true} : {fastMode});
         },
         onRestart: (studentId) => {
           return $.getJSON('/question/quiz-restart', {quiz_id: testResponse.test.id, student_id: studentId})
@@ -405,16 +408,16 @@ function WikidsStoryTest(el, options) {
       .append($('<img/>').attr('src', '/img/loading.gif'));
   }
 
-  function loadData(options) {
+  function loadData(loadOptions) {
     console.debug('WikidsStoryTest.loadData');
 
     setElementHtml(createLoader());
 
-    that.options.fastMode = options.fastMode;
+    that.options.fastMode = loadOptions.fastMode;
 
     var dataParams = Object.assign(that.options.dataParams || {}, {
       studentId: activeStudent.getID(),
-      fastMode: options.fastMode
+      fastMode: loadOptions.fastMode
     });
     $.getJSON(that.options.dataUrl, dataParams)
       .done(function (response) {
@@ -1309,13 +1312,24 @@ function WikidsStoryTest(el, options) {
 
   function setTestResults(title) {
     title = title || 'Тест пройден';
+
     dom.results
       .empty()
       .append("<h2>" + title + "</h2>");
-    var linkedStories = linked.getHtml();
+
+    const linkedStories = linked.getHtml();
     if (linkedStories.length) {
       dom.results.append(linkedStories);
     }
+
+    if (that.options.repetitionMode) {
+      dom.results.append(`
+        <div>
+          <a class="btn" href="/edu/student/index">Назад</a>
+        </div>
+      `);
+    }
+
     return dom.results.show();
   }
 
@@ -1359,8 +1373,9 @@ function WikidsStoryTest(el, options) {
     }
     activeStudent.setFinish(true);
     dispatchEvent("finish", {
-      "testID": getTestData().id,
-      "correctAnswers": correctAnswersNumber
+      "testID": getTestData().test.id,
+      "correctAnswers": correctAnswersNumber,
+      studentId: currentStudent.id
     });
   }
 

@@ -27,6 +27,14 @@ return [
     'on beforeAction' => function($event) {
         \common\models\User::updateLastActivity();
     },
+    'modules' => [
+        'repetition' => ['class' => \frontend\modules\repetition\Module::class],
+    ],
+    'container' => [
+        'definitions' => [
+            \modules\edu\RepetitionApiInterface::class => \frontend\modules\repetition\RepetitionApiProvider::class,
+        ],
+    ],
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-wikids',

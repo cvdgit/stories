@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use frontend\events\StudentTestingFinish;
 use yii\db\ActiveRecord;
 
 /**
@@ -16,6 +17,8 @@ use yii\db\ActiveRecord;
  */
 class StudentQuestionProgress extends ActiveRecord
 {
+    private $events = [];
+
     /**
      * {@inheritdoc}
      */
@@ -68,6 +71,9 @@ class StudentQuestionProgress extends ActiveRecord
     public function updateProgress(int $progress): void
     {
         $this->progress = $progress;
+        if ($progress === 100) {
+            $this->recordEvent(new StudentTestingFinish($this->test_id, $this->student_id));
+        }
     }
 
     public static function resetProgress(int $studentID, int $testID)
@@ -86,4 +92,15 @@ class StudentQuestionProgress extends ActiveRecord
         }
     }
 
+    public function releaseEvents(): array
+    {
+        $events = $this->events;
+        $this->events = [];
+        return $events;
+    }
+
+    private function recordEvent($event): void
+    {
+        $this->events[] = $event;
+    }
 }

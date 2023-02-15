@@ -145,4 +145,9 @@ class SlideVideo extends ActiveRecord
         }
         parent::afterDelete();
     }
+
+    public function getFilePath(): string
+    {
+        return \Yii::getAlias('@public') . $this->getUploadedFileUrl('video_id');
+    }
 }
