@@ -16,7 +16,7 @@ class ScheduleForm extends Model
     /** @var list<ScheduleItemForm> */
     private $items = [];
 
-    public function __construct(?Schedule $schedule, $config = [])
+    public function __construct(?Schedule $schedule = null, $config = [])
     {
         parent::__construct($config);
         if ($schedule !== null) {
