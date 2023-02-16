@@ -83,7 +83,8 @@ function WikidsStoryTest(el, options) {
 
   const testingId = this.options.dataParams.testId;
 
-  var that = this;
+  const that = this;
+  this.container = $(el).parent();
 
   el['_wikids_test'] = this;
 
@@ -2719,7 +2720,7 @@ function WikidsStoryTest(el, options) {
   function createInnerDialog(title, content) {
 
     var defIndex = 400;
-    $(Reveal.getCurrentSlide()).find('.slide-hints-wrapper').each(function () {
+    that.container.find('.slide-hints-wrapper').each(function () {
       defIndex++;
     });
     var $hintWrapper = $('<div/>', {'class': 'slide-hints-wrapper', 'css': {'z-index': defIndex}});
@@ -2744,7 +2745,7 @@ function WikidsStoryTest(el, options) {
               .on('click', function () {
                 $hintWrapper.hide();
                 $(this).parents('.slide-hints-wrapper:eq(0)').remove();
-                if (!$(Reveal.getCurrentSlide()).find('.slide-hints-wrapper').length) {
+                if (!that.container.find('.slide-hints-wrapper').length) {
                   $('.reveal .story-controls').show();
                 }
               })
@@ -2756,7 +2757,7 @@ function WikidsStoryTest(el, options) {
     $hint.appendTo($hintInner);
 
     $('.reveal .story-controls').hide();
-    $('.reveal .slides section.present').append($hintWrapper);
+    that.container.append($hintWrapper);
   }
 
   //PluginManager.initializePlugins(this, el, {});

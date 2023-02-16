@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use common\models\StoryTest;
 use frontend\assets\TestAsset;
+use yii\helpers\Url;
 use yii\web\View;
 
 /**
@@ -60,6 +61,7 @@ $this->registerCss(<<<CSS
 .run-test {
     padding: 0;
     text-align: center;
+    height: 100%;
 }
 CSS
 );
@@ -69,7 +71,7 @@ CSS
         <div class="course-header">
             <div class="course-header-wrap">
                 <div class="course-header-inner">
-                    <a href="#" class="leave-course-button"><i style="font-size: 12px" class="glyphicon glyphicon-chevron-left"></i> Назад</a>
+                    <a href="<?= Url::to(['/edu/student/index']); ?>" class="leave-course-button"><i style="font-size: 12px" class="glyphicon glyphicon-chevron-left"></i> Назад</a>
                 </div>
                 <div></div>
             </div>
