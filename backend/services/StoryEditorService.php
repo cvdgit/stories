@@ -27,6 +27,7 @@ use common\models\SlideVideo;
 use common\models\StorySlide;
 use common\models\StorySlideImage;
 use common\models\StoryStoryTest;
+use common\models\test\SourceType;
 use DomainException;
 use common\models\Story;
 use yii\db\Query;
@@ -364,24 +365,38 @@ class StoryEditorService
         if ($block->isTest()) {
             /** @var Test $block */
             $testId = $block->getTestId();
-            $questionCount = (int)(new Query())
-                ->from('story_test_question')
-                ->where(['story_test_id' => $testId])
-                ->count();
-            if ($questionCount === 0) {
-                throw new DomainException('Невозможно добавить т.к. в выбранном тесте нет вопросов');
+            $source = (int)(new Query())
+                ->select('source')
+                ->from('story_test')
+                ->where(['id' => $testId])
+                ->scalar();
+            if ($source !== SourceType::TESTS) {
+                $questionCount = (int) (new Query())
+                    ->from('story_test_question')
+                    ->where(['story_test_id' => $testId])
+                    ->count();
+                if ($questionCount === 0) {
+                    throw new DomainException('Невозможно добавить т.к. в выбранном тесте нет вопросов');
+                }
             }
         }
 
         if ($block->isHtmlTest()) {
             /** @var HTMLBLock $block */
             $content = TestBlockContent::createFromHtml($block->getContent());
-            $questionCount = (int)(new Query())
-                ->from('story_test_question')
-                ->where(['story_test_id' => $content->getTestID()])
-                ->count();
-            if ($questionCount === 0) {
-                throw new DomainException('Невозможно добавить т.к. в выбранном тесте нет вопросов');
+            $source = (int)(new Query())
+                ->select('source')
+                ->from('story_test')
+                ->where(['id' => $content->getTestID()])
+                ->scalar();
+            if ($source !== SourceType::TESTS) {
+                $questionCount = (int) (new Query())
+                    ->from('story_test_question')
+                    ->where(['story_test_id' => $content->getTestID()])
+                    ->count();
+                if ($questionCount === 0) {
+                    throw new DomainException('Невозможно добавить т.к. в выбранном тесте нет вопросов');
+                }
             }
         }
 
