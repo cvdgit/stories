@@ -1,161 +1,80 @@
 <?php
-use common\helpers\Url;
-use common\helpers\UserHelper;
-use common\models\StoryTest;
-use common\models\test\AnswerType;
+
+declare(strict_types=1);
+
+use backend\Testing\TestSearch;
 use common\models\test\SourceType;
 use common\models\test\TestStatus;
-use dosamigos\datepicker\DatePicker;
+use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Nav;
+use yii\data\DataProviderInterface;
 use yii\helpers\Html;
 use yii\grid\GridView;
-/* @var $this yii\web\View */
-/* @var $searchModel backend\models\search\TestSearch */
-/* @var $dataProvider yii\data\ActiveDataProvider */
-/* @var $source int */
-/* @var $sourceRecordsTotal int */
+use yii\web\View;
+use yii\widgets\Pjax;
+
+/**
+ * @var View $this
+ * @var TestSearch $searchModel
+ * @var DataProviderInterface $dataProvider
+ * @var int $source
+ * @var int $sourceRecordsTotal
+ * @var array $columns
+ */
+
 $this->title = 'Тесты';
-?>
-<h1 class="page-header"><?= Html::encode($this->title) ?></h1>
-<p>
-    <?= Html::a('Создать тест', ['create', 'source' => $source], ['class' => 'btn btn-primary']) ?>
-</p>
-<?= Nav::widget([
-    'options' => ['class' => 'nav nav-tabs material-tabs'],
-    'items' => array_merge(SourceType::asNavItems($source), TestStatus::templatesNavItem()),
-]) ?>
-<?php
 
-if (Yii::$app->user->can('admin') && $searchModel->isNeoTest()) {
-    echo Html::tag(
-        'div',
-        Html::a('Очистить историю по всем тестам (' . ($sourceRecordsTotal === 0 ? 'нет записей' : $sourceRecordsTotal) . ')', ['history/clear-all-by-source', 'source' => $source], ['class' => 'btn btn-danger pull-right']),
-        ['class' => 'clearfix', 'style' => 'padding: 20px 0 0 0']);
-}
-
-$columns = [];
-$columns[] = [
-    'attribute' =>'title',
-    'format' => 'raw',
-    'value' => static function(StoryTest $model) {
-        return Html::a($model->title, ['test/update', 'id' => $model->id], ['title' => 'Перейти к редактированию']);
-    },
-];
-$columns[] = [
-    'attribute' => 'created_by',
-    'value' => 'createdBy.profileName',
-    'label' => 'Автор',
-    'filter' => UserHelper::getTestCreatorsUserArray(),
-];
-if ($searchModel->isWordList()) {
-    $columns[] = [
-        'attribute' => 'wordList.name',
-        'label' => 'Список слов',
-    ];
-}
-if ($searchModel->isNeoTest()) {
-    $columns[] = [
-        'attribute' => 'childrenTestsCount',
-        'label' => 'Количество вариантов',
-    ];
-}
-if (!$searchModel->isNeoTest() && !$searchModel->isWordList() && !$searchModel->isTests() && !$searchModel->isTemplate()) {
-    $columns[] = [
-        'attribute' => 'questionsNumber',
-        'label' => 'Вопросов',
-    ];
-}
-if ($searchModel->isTests()) {
-    $columns[] = [
-        'attribute' => 'relatedTestsNumber',
-        'label' => 'Количество тестов',
-    ];
-}
-if (!$searchModel->isNeoTest()) {
-    $columns[] = [
-        'attribute' => 'answer_type',
-        'value' => static function($model) {
-            return AnswerType::asText($model->answer_type);
-        },
-        'filter' => AnswerType::asArray(),
-    ];
-
-}
-$columns[] = [
-    'attribute' => 'created_at',
-    'value' => 'created_at',
-    'format' => 'datetime',
-    'filter' => DatePicker::widget([
-        'model' => $searchModel,
-        'attribute' => 'created_at',
-        'language' => 'ru',
-        'clientOptions' => [
-            'autoclose' => true,
-            'format' => 'dd.mm.yyyy'
-        ]
-    ]),
-];
-if (!$searchModel->isNeoTest() && !$searchModel->isTemplate()) {
-    $columns[] = [
-        'attribute' => 'transition',
-        'label' => 'Переход',
-        'format' => 'raw',
-        'value' => function ($model) {
-            $html = '';
-            $stories = $model->stories;
-            if (count($stories) > 0) {
-                $story = $stories[0];
-                $html = Html::a('к истории', Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $story->alias]), ['target' => '_blank']);
-            }
-            if ($model->haveWordList()) {
-                if (!empty($html)) {
-                    $html .= '<br/>';
-                }
-                $html .= Html::a('к списку слов', \common\models\TestWordList::getUpdateUrl($model->word_list_id), ['target' => '_blank']);
-            }
-            return $html;
-        }
-    ];
-}
-
-$columns[] = [
-    'class' => 'yii\grid\ActionColumn',
-    'template' => '{update} {delete}',
-    'urlCreator' => static function($action, $model, $key, $index) {
-        $url = '';
-        if ($action === 'update') {
-            $urlParam = ['test/update', 'id' => $model->id];
-            if ($model->isVariant()) {
-                $urlParam['id'] = $model->parent_id;
-                $urlParam['#'] = $model->id;
-            }
-            $url = Url::to($urlParam);
-        }
-        if ($action === 'delete') {
-            $id = $model->id;
-            if ($model->isVariant()) {
-                $id = $model->parent_id;
-            }
-            $url = Url::to(['test/delete', 'id' => $id]);
-        }
-        return $url;
-    },
-];
-
-echo GridView::widget([
-    'dataProvider' => $dataProvider,
-    'filterModel' => $searchModel,
-    'options' => ['class' => 'table-responsive test-grid'],
-    'columns' => $columns,
-]) ?>
-
-<?php
-$css = <<<CSS
+$this->registerCss(<<<CSS
 .test-grid {
     margin-top: 20px;
 }
 .test-grid .summary {
     text-align: right;
 }
-CSS;
-$this->registerCss($css);
+CSS
+);
+
+$this->registerJs($this->renderFile('@backend/views/test/_index.js'));
+?>
+<div class="header-block">
+    <h1 style="font-size: 32px; margin: 0 0 0.5rem 0; font-weight: 500; line-height: 1.2" class="h2"><?= Html::encode($this->title) ?></h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group">
+            <?= Html::a('Создать тест', ['create', 'source' => $source], ['class' => 'btn btn-primary']); ?>
+        </div>
+    </div>
+</div>
+
+<div>
+    <?php $form = ActiveForm::begin([
+        'id' => 'testing-filter-form',
+        'options' => ['class' => 'form-inline'],
+    ]); ?>
+    <?= $form->field($searchModel, 'my_tests')->checkbox(); ?>
+    <?= $form->field($searchModel, 'with_repetition')->checkbox(); ?>
+    <?php ActiveForm::end(); ?>
+</div>
+
+<?= Nav::widget([
+    'options' => ['class' => 'nav nav-tabs material-tabs'],
+    'items' => array_merge(SourceType::asNavItems($source), TestStatus::templatesNavItem()),
+]); ?>
+
+<?php if (Yii::$app->user->can('admin') && $searchModel->isNeoTest()): ?>
+    <?= Html::tag(
+        'div',
+        Html::a('Очистить историю по всем тестам (' . ($sourceRecordsTotal === 0 ? 'нет записей' : $sourceRecordsTotal) . ')', ['history/clear-all-by-source', 'source' => $source], ['class' => 'btn btn-danger pull-right']),
+        ['class' => 'clearfix', 'style' => 'padding: 20px 0 0 0']); ?>
+<?php endif; ?>
+
+<div class="tests-wrap">
+    <?php Pjax::begin(['id' => 'pjax-tests', 'enablePushState' => false]); ?>
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
+        'options' => ['class' => 'table-responsive test-grid'],
+        'layout' => "{items}\n{summary}\n{pager}",
+        'columns' => $columns,
+    ]); ?>
+    <?php Pjax::end(); ?>
+</div>

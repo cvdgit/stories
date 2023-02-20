@@ -5,15 +5,15 @@ namespace backend\controllers;
 use backend\models\AnswerImageUploadForm;
 use backend\models\question\CreateQuestion;
 use backend\models\question\UpdateQuestion;
-use backend\models\search\TestSearch;
 use backend\models\test\ChangeRepeatForm;
 use backend\modules\repetition\ScheduleFetcherInterface;
+use backend\Testing\IndexAction;
+use backend\Testing\TestSearch;
 use common\models\StoryTest;
 use common\models\StoryTestAnswer;
 use common\models\StoryTestQuestion;
 use common\models\StoryTestResult;
 use common\models\test\AnswerType;
-use common\models\test\SourceType;
 use common\models\test\TestStatus;
 use common\rbac\UserRoles;
 use common\services\TestHistoryService;
@@ -60,18 +60,11 @@ class TestController extends Controller
         ];
     }
 
-    public function actionIndex(int $source = SourceType::TEST)
+    public function actions(): array
     {
-        $searchModel = new TestSearch();
-        $params = array_merge([], Yii::$app->request->queryParams);
-        $params['TestSearch']['source'] = $source;
-        $dataProvider = $searchModel->search($params);
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'source' => $source,
-            'sourceRecordsTotal' => $this->historyService->getRecordsCountBySource($source),
-        ]);
+        return [
+            'index' => IndexAction::class,
+        ];
     }
 
     public function actionTemplates()

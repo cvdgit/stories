@@ -1,16 +1,18 @@
 <?php
 
-namespace backend\models\search;
+declare(strict_types=1);
+
+namespace backend\Testing;
 
 use common\models\StoryTest;
 use common\models\test\SourceType;
 use common\models\test\TestStatus;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\data\DataProviderInterface;
 
 class TestSearch extends Model
 {
-
     public $title;
     public $created_at;
     public $source;
@@ -18,7 +20,10 @@ class TestSearch extends Model
     public $status;
     public $created_by;
 
-    public function rules()
+    public $my_tests = true;
+    public $with_repetition;
+
+    public function rules(): array
     {
         return [
             [['title'], 'string', 'max' => 50],
@@ -26,6 +31,15 @@ class TestSearch extends Model
             ['status', 'default', 'value' => TestStatus::DEFAULT],
             [['source', 'answer_type', 'status', 'created_by'], 'integer'],
             ['status', 'in', 'range' => TestStatus::all()],
+            [['my_tests', 'with_repetition'], 'boolean'],
+        ];
+    }
+
+    public function attributeLabels(): array
+    {
+        return [
+            'my_tests' => 'Только мои тесты',
+            'with_repetition' => 'С расписанием повторений',
         ];
     }
 
@@ -49,7 +63,7 @@ class TestSearch extends Model
         return $this->status === TestStatus::TEMPLATE;
     }
 
-    public function search($params)
+    public function search(int $userId, array $params = []): DataProviderInterface
     {
         $query = StoryTest::find()->with(['storyTestQuestions', 'createdBy']);
         $dataProvider = new ActiveDataProvider([
@@ -63,8 +77,15 @@ class TestSearch extends Model
                 'pageSize' => 50,
             ],
         ]);
-        if (!($this->load($params) && $this->validate())) {
+
+        $this->load($params);
+        if (!$this->validate()) {
+            $query->andWhere('1 = 0');
             return $dataProvider;
+        }
+
+        if ($this->my_tests) {
+            $this->created_by = $userId;
         }
 
         $query->where('parent_id = 0');
@@ -77,7 +98,10 @@ class TestSearch extends Model
         $query->andFilterWhere(['answer_type' => $this->answer_type]);
         $query->andFilterWhere(['created_by' => $this->created_by]);
 
+        if ($this->with_repetition) {
+            $query->andWhere('schedule_id IS NOT NULL');
+        }
+
         return $dataProvider;
     }
-
 }
