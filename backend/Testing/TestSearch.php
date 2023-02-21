@@ -84,7 +84,7 @@ class TestSearch extends Model
             return $dataProvider;
         }
 
-        if ($this->my_tests) {
+        if ($this->my_tests && empty($this->created_by)) {
             $this->created_by = $userId;
         }
 
