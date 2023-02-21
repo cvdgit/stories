@@ -71,10 +71,10 @@ $this->registerJs($this->renderFile('@backend/views/test/_index.js'));
 <div class="tests-wrap">
     <?php Pjax::begin([
         'id' => 'pjax-tests',
-        'clientOptions' => [
+/*        'clientOptions' => [
             'method' => 'post',
             'url' => Url::to(['index', 'source' => $source]),
-        ],
+        ],*/
         'enablePushState' => false,
     ]); ?>
     <?= GridView::widget([
