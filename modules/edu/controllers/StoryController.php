@@ -50,13 +50,7 @@ class StoryController extends Controller
                 'lessonId' => 'els.lesson_id',
             ])
             ->from(['els' => 'edu_lesson_story'])
-            ->innerJoin(['l' => 'edu_lesson'], 'els.lesson_id = l.id')
-            ->innerJoin(['t' => 'edu_topic'], 'l.topic_id = t.id')
-            ->innerJoin(['cp' => 'edu_class_program'], 't.class_program_id = cp.id')
-            ->where([
-                'els.story_id' => $story->id,
-                'cp.program_id' => $program->id,
-            ]);
+            ->where(['els.story_id' => $story->id]);
         $rows = $query->all();
         if (count($rows) === 0) {
             throw new BadRequestHttpException('Не удалось определить урок');
