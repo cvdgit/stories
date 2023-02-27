@@ -20,6 +20,8 @@ $this->params['breadcrumbs'] = [
     $this->title,
 ];
 SortableJsAsset::register($this);
+
+$this->registerJs($this->renderFile('@backend/views/test/_repetition.js'));
 ?>
 <div class="story-test-update">
     <?php if ($model->isRemote() || $model->isTemplate()): ?>
@@ -37,6 +39,18 @@ SortableJsAsset::register($this);
                         ['label' => 'Запустить тест от пользователя', 'url' => ['user/user-list'], 'linkOptions' => ['data-toggle' => 'modal', 'data-target' => '#select-user-modal']],
                         ['label' => 'Печать', 'url' => ['question/print', 'test_id' => $model->id], 'linkOptions' => ['data-toggle' => 'modal', 'data-target' => '#print-questions-modal']],
                         ['label' => 'История прохождения', 'url' => ['/history/list', 'test_id' => $model->id], 'visible' => !$model->isTemplate()],
+                        [
+                            'label' => 'Создать повторение',
+                            'url' => ['/repetition/testing/create', 'test_id' => $model->id],
+                            'visible' => !$model->isTemplate(),
+                            'linkOptions' => ['id' => 'create-repetition'],
+                        ],
+                        [
+                            'label' => 'Список повторений',
+                            'url' => ['/repetition/testing/list', 'test_id' => $model->id],
+                            'visible' => !$model->isTemplate(),
+                            'linkOptions' => ['id' => 'list-repetition'],
+                        ],
                     ],
                 ]) ?>
             </div>

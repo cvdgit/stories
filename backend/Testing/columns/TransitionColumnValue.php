@@ -16,13 +16,13 @@ class TransitionColumnValue
             $stories = $model->stories;
             if (count($stories) > 0) {
                 $story = $stories[0];
-                $html = Html::a('к истории', \Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $story->alias]), ['target' => '_blank']);
+                $html = Html::a('к истории', \Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $story->alias]), ['data-pjax' => '0', 'target' => '_blank']);
             }
             if ($model->haveWordList()) {
                 if (!empty($html)) {
                     $html .= '<br/>';
                 }
-                $html .= Html::a('к списку слов', \common\models\TestWordList::getUpdateUrl($model->word_list_id), ['target' => '_blank']);
+                $html .= Html::a('к списку слов', \common\models\TestWordList::getUpdateUrl($model->word_list_id), ['data-pjax' => '0', 'target' => '_blank']);
             }
             return $html;
         };

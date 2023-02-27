@@ -20,7 +20,6 @@ class TestSearch extends Model
     public $status;
     public $created_by;
 
-    public $my_tests = true;
     public $with_repetition;
 
     public function rules(): array
@@ -31,14 +30,13 @@ class TestSearch extends Model
             ['status', 'default', 'value' => TestStatus::DEFAULT],
             [['source', 'answer_type', 'status', 'created_by'], 'integer'],
             ['status', 'in', 'range' => TestStatus::all()],
-            [['my_tests', 'with_repetition'], 'boolean'],
+            [['with_repetition'], 'boolean'],
         ];
     }
 
     public function attributeLabels(): array
     {
         return [
-            'my_tests' => 'Только мои тесты',
             'with_repetition' => 'С расписанием повторений',
         ];
     }
@@ -83,10 +81,6 @@ class TestSearch extends Model
             $query->andWhere('1 = 0');
             return $dataProvider;
         }
-
-/*        if ($this->my_tests && empty($this->created_by)) {
-            $this->created_by = $userId;
-        }*/
 
         $query->where('parent_id = 0');
         $query->andFilterWhere(['status' => $this->status]);

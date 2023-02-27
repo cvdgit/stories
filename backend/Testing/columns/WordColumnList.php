@@ -28,7 +28,7 @@ class WordColumnList implements ColumnListInterface
                 'attribute' =>'title',
                 'format' => 'raw',
                 'value' => static function(StoryTest $model) {
-                    return Html::a($model->title, ['test/update', 'id' => $model->id], ['title' => 'Перейти к редактированию']);
+                    return Html::a($model->title, ['test/update', 'id' => $model->id], ['data-pjax' => '0', 'title' => 'Перейти к редактированию']);
                 },
             ],
             [

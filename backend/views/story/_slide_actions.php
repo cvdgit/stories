@@ -17,6 +17,7 @@ use yii\widgets\ActiveForm;
 
 $this->registerJs($this->renderFile('@backend/views/story/_slides_import.js'));
 $this->registerJs($this->renderFile('@backend/views/story/_replace_video.js'));
+$this->registerJs($this->renderFile('@backend/views/story/_repetition.js'));
 ?>
 <div class="dropdown pull-right">
     <a href="#" data-toggle="dropdown" class="dropdown-toggle btn btn-default">
@@ -33,6 +34,7 @@ $this->registerJs($this->renderFile('@backend/views/story/_replace_video.js'));
             ['label' => 'Доступ по ссылке', 'url' => '#access-by-link-modal', 'linkOptions' => ['data-toggle' => 'modal']],
             ['label' => 'Импорт слайдов', 'url' => ['/slide-import/import', 'story_id' => $model->id], 'linkOptions' => ['id' => 'slide-import']],
             ['label' => 'Заменить видео', 'url' => ['/video/replace', 'story_id' => $model->id], 'linkOptions' => ['id' => 'video-replace']],
+            ['label' => 'Создать повторения', 'url' => ['/repetition/story/create', 'story_id' => $model->id], 'linkOptions' => ['id' => 'create-repetition']],
         ],
     ]);
     ?>

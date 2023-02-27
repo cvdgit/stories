@@ -50,7 +50,6 @@ $this->registerJs($this->renderFile('@backend/views/test/_index.js'));
         'id' => 'testing-filter-form',
         'options' => ['class' => 'form-inline'],
     ]); ?>
-    <?= $form->field($searchModel, 'my_tests')->checkbox(); ?>
     <?= $form->field($searchModel, 'with_repetition')->checkbox(); ?>
     <?php ActiveForm::end(); ?>
 </div>
@@ -68,7 +67,7 @@ $this->registerJs($this->renderFile('@backend/views/test/_index.js'));
 <?php endif; ?>
 
 <div class="tests-wrap">
-    <?php // Pjax::begin(['id' => 'pjax-tests', 'enablePushState' => false]); ?>
+    <?php Pjax::begin(['id' => 'pjax-tests']); ?>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
@@ -76,5 +75,5 @@ $this->registerJs($this->renderFile('@backend/views/test/_index.js'));
         'layout' => "{items}\n{summary}\n{pager}",
         'columns' => $columns,
     ]); ?>
-    <?php // Pjax::end(); ?>
+    <?php Pjax::end(); ?>
 </div>

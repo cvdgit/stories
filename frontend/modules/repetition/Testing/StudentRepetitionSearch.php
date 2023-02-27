@@ -52,7 +52,7 @@ class StudentRepetitionSearch extends Model
             ])
             ->from(['t' => 'story_test'])
             ->where('t.schedule_id IS NOT NULL')
-            ->andWhere(['exists', $testingCompletedQuery])
+            //->andWhere(['exists', $testingCompletedQuery])
             ->andWhere(['>', new Expression('UNIX_TIMESTAMP()'), $repetitionQuery]);
 
         return new SqlDataProvider([
