@@ -96,7 +96,10 @@ class TestSearch extends Model
         ]);
         $query->andFilterWhere(['source' => $this->source]);
         $query->andFilterWhere(['answer_type' => $this->answer_type]);
-        $query->andFilterWhere(['created_by' => $this->created_by]);
+
+        if (!empty($this->created_by)) {
+            $query->andFilterWhere(['created_by' => $this->created_by]);
+        }
 
         if ($this->with_repetition) {
             $query->andWhere('schedule_id IS NOT NULL');

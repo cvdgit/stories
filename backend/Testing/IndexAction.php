@@ -29,6 +29,7 @@ class IndexAction extends Action
     {
         $searchModel = new TestSearch([
             'source' => $source,
+            'created_by' => $user->getId(),
         ]);
 
         //$dataProvider = $searchModel->search($user->id, $request->isPjax ? $request->post() : $request->get());
