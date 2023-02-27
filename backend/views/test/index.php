@@ -10,7 +10,6 @@ use yii\bootstrap\Nav;
 use yii\data\DataProviderInterface;
 use yii\helpers\Html;
 use yii\grid\GridView;
-use yii\helpers\Url;
 use yii\web\View;
 use yii\widgets\Pjax;
 
@@ -69,14 +68,7 @@ $this->registerJs($this->renderFile('@backend/views/test/_index.js'));
 <?php endif; ?>
 
 <div class="tests-wrap">
-    <?php Pjax::begin([
-        'id' => 'pjax-tests',
-/*        'clientOptions' => [
-            'method' => 'post',
-            'url' => Url::to(['index', 'source' => $source]),
-        ],*/
-        'enablePushState' => false,
-    ]); ?>
+    <?php // Pjax::begin(['id' => 'pjax-tests', 'enablePushState' => false]); ?>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
@@ -84,5 +76,5 @@ $this->registerJs($this->renderFile('@backend/views/test/_index.js'));
         'layout' => "{items}\n{summary}\n{pager}",
         'columns' => $columns,
     ]); ?>
-    <?php Pjax::end(); ?>
+    <?php // Pjax::end(); ?>
 </div>
