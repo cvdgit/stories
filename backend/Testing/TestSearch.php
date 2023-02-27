@@ -84,9 +84,9 @@ class TestSearch extends Model
             return $dataProvider;
         }
 
-        if ($this->my_tests && empty($this->created_by)) {
+/*        if ($this->my_tests && empty($this->created_by)) {
             $this->created_by = $userId;
-        }
+        }*/
 
         $query->where('parent_id = 0');
         $query->andFilterWhere(['status' => $this->status]);
