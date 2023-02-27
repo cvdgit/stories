@@ -31,7 +31,8 @@ class IndexAction extends Action
             'source' => $source,
         ]);
 
-        $dataProvider = $searchModel->search($user->id, $request->isPjax ? $request->post() : $request->get());
+        //$dataProvider = $searchModel->search($user->id, $request->isPjax ? $request->post() : $request->get());
+        $dataProvider = $searchModel->search($user->id, $request->get());
 
         $list = (new ColumnsMapper([
             SourceType::TEST => new DefaultColumnsList($searchModel),
