@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace backend\modules\repetition\Repetition\StoryCreate;
 
 use backend\modules\repetition\Repetition\TestingCreate\CreateRepetitionForm;
+use backend\modules\repetition\Repetition\UserStudentItemsFetcher;
 use backend\modules\repetition\Schedule\Schedule;
 use common\models\Story;
 use common\models\UserStudent;
@@ -40,7 +41,7 @@ class CreateRepetitionAction extends Action
 
         return $this->controller->renderAjax('create', [
             'formModel' => $createForm,
-            'studentItems' => ArrayHelper::map(UserStudent::find()->orderBy(['name' => SORT_ASC])->all(), 'id', 'name'),
+            'studentItems' => ArrayHelper::map((new UserStudentItemsFetcher())->fetch(), 'studentId', 'studentName'),
             'scheduleItems' => ArrayHelper::map(Schedule::find()->orderBy(['name' => SORT_ASC])->all(), 'id', 'name'),
             'storyTests' => (new StoryTestsFetcher())->fetch($story->id),
         ]);

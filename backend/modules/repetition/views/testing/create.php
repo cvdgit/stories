@@ -15,8 +15,8 @@ use yii\web\View;
 ?>
 <?php $form = ActiveForm::begin(['id' => 'create-repetition-form']); ?>
 <?= $form->field($formModel, 'test_name')->textInput(['disabled' => true]); ?>
-<?= $form->field($formModel, 'student_id')->dropDownList($studentItems); ?>
-<?= $form->field($formModel, 'schedule_id')->dropDownList($scheduleItems); ?>
+<?= $form->field($formModel, 'student_id')->dropDownList($studentItems, ['prompt' => 'Выберите ученика']); ?>
+<?= $form->field($formModel, 'schedule_id')->dropDownList($scheduleItems, ['prompt' => 'Выберите расписание']); ?>
 <div class="form-group">
     <button type="submit" class="btn btn-success">Создать</button>
 </div>

@@ -16,8 +16,8 @@ use yii\web\View;
  */
 ?>
 <?php $form = ActiveForm::begin(['id' => 'create-repetition-form']); ?>
-<?= $form->field($formModel, 'student_id')->dropDownList($studentItems); ?>
-<?= $form->field($formModel, 'schedule_id')->dropDownList($scheduleItems); ?>
+<?= $form->field($formModel, 'student_id')->dropDownList($studentItems, ['prompt' => 'Выберите ученика']); ?>
+<?= $form->field($formModel, 'schedule_id')->dropDownList($scheduleItems, ['prompt' => 'Выберите расписание']); ?>
 <div id="test-items-list">
     <?php foreach ($storyTests as $testItem): ?>
     <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; height: 40px; cursor: pointer">
