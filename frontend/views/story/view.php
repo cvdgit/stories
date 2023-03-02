@@ -1,19 +1,32 @@
 <?php
+
+declare(strict_types=1);
+
+use common\models\Playlist;
+use common\models\Story;
+use frontend\assets\LazyAsset;
+use frontend\models\CommentForm;
 use frontend\widgets\StoryFavorites;
 use frontend\widgets\StoryLikeWidget;
 use yii\bootstrap\Tabs;
+use yii\data\DataProviderInterface;
 use yii\helpers\Html;
 use yii\helpers\Url;
-/* @var $this yii\web\View */
-/* @var $model common\models\Story */
-/* @var $userCanViewStory bool */
-/* @var $commentForm frontend\models\CommentForm */
-/* @var $dataProvider yii\data\ActiveDataProvider */
-/** @var $guestStoryBody string */
-\frontend\assets\LazyAsset::register($this);
+use yii\web\View;
+
+/**
+ * @var View $this
+ * @var Story $model
+ * @var bool $userCanViewStory
+ * @var CommentForm $commentForm
+ * @var DataProviderInterface $dataProvider
+ * @var string $guestStoryBody
+ */
+
+LazyAsset::register($this);
 $title = $model->title;
 $this->setMetaTags($title,
-                   $model->description,
+                   empty($model->description) ? $model->title : $model->description,
                    $model->title . ', ' . $model->title . ' сказка на ночь',
                    $title);
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
@@ -116,7 +129,7 @@ $this->registerJs($js);
 $isSlidesView = $storyDefaultView === 'slides';
 $isBookView = $storyDefaultView === 'book';
 
-/** @var $playlist common\models\Playlist */
+/** @var $playlist Playlist */
 ?>
 <div class="container story-head-container">
 	<main class="site-story-main">
