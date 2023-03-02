@@ -7,6 +7,8 @@ IndexIgnore */*
 
 RewriteEngine on
 
+RedirectMatch 403 /\..*$
+
 RewriteCond %{HTTPS} off
 RewriteCond %{HTTP:X-Forwarded-Proto} !https
 RewriteCond %{REQUEST_URI} !robots.txt
