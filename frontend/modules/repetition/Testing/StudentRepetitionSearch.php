@@ -60,16 +60,12 @@ class StudentRepetitionSearch extends Model
             ])
             ->from(['t' => 'story_test'])
             ->where(['in', 't.id', $studentTestIds])
-            //->where('t.schedule_id IS NOT NULL')
-            //->andWhere(['exists', $testingCompletedQuery])
             ->andWhere(['>', new Expression('UNIX_TIMESTAMP()'), $repetitionQuery]);
 
         return new SqlDataProvider([
             'sql' => $query->createCommand()->getRawSql(),
             'totalCount' => $query->count(),
-            'pagination' => [
-                'pageSize' => 4,
-            ],
+            'pagination' => false,
             'sort' => [
                 'defaultOrder' => [
                     'date' => SORT_ASC
