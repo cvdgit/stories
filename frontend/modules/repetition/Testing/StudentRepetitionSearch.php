@@ -42,6 +42,14 @@ class StudentRepetitionSearch extends Model
             ->andWhere('r.test_id = t.id')
             ->andWhere(['r.student_id' => $studentId]);
 
+        $studentTestIds = (new Query())
+            ->select(['testId' => new Expression('DISTINCT test_id')])
+            ->from('test_repetition')
+            ->where(['student_id' => $studentId])
+            ->andWhere('done = 0')
+            ->all();
+        $studentTestIds = array_column($studentTestIds, 'testId');
+
         $query = (new Query())
             ->select([
                 't.id',
@@ -51,7 +59,8 @@ class StudentRepetitionSearch extends Model
                 'doneItems' => $repetitionDoneQuery,
             ])
             ->from(['t' => 'story_test'])
-            ->where('t.schedule_id IS NOT NULL')
+            ->where(['in', 't.id', $studentTestIds])
+            //->where('t.schedule_id IS NOT NULL')
             //->andWhere(['exists', $testingCompletedQuery])
             ->andWhere(['>', new Expression('UNIX_TIMESTAMP()'), $repetitionQuery]);
 
