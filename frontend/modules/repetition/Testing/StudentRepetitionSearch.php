@@ -68,10 +68,12 @@ class StudentRepetitionSearch extends Model
             'pagination' => false,
             'sort' => [
                 'defaultOrder' => [
-                    'date' => SORT_ASC
+                    'date' => SORT_ASC,
+                    'header' => SORT_ASC,
                 ],
                 'attributes' => [
                     'date',
+                    'header',
                 ],
             ],
         ]);
