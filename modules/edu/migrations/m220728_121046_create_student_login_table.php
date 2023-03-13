@@ -1,5 +1,7 @@
 <?php
 
+namespace modules\edu\migrations;
+
 use yii\db\Migration;
 use yii\db\Query;
 use modules\edu\components\StudentLoginGenerator;

@@ -94,12 +94,21 @@ class EduClassProgram extends ActiveRecord
             ->one();
     }
 
-    public function createTopicRoute(int $classId): array
+    public function createTopicRoute(): ?array
     {
         $route = ['/edu/student/topic'];
-        if (($classProgram = self::findClassProgram($classId, $this->program_id)) !== null && count($classProgram->eduTopics) > 0){
-            $route['id'] = $classProgram->eduTopics[0]->id;
+        $topics = $this->eduTopics;
+
+        if ($topics === []) {
+            return null;
         }
+
+        $route['id'] = $topics[0]->id;
+
+        /*if (($classProgram = self::findClassProgram($classId, $this->program_id)) !== null && count($classProgram->eduTopics) > 0){
+            $route['id'] = $classProgram->eduTopics[0]->id;
+        }*/
+
         return $route;
     }
 

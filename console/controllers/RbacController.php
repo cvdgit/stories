@@ -21,10 +21,6 @@ class RbacController extends Controller
         $adminRole = $auth->createRole('admin');
         $adminRole->description = 'Администратор сайта';
 
-        // $createStory = $auth->createPermission('createStory');
-        // $updateStory = $auth->createPermission('updateStory');
-        // $deleteStory = $auth->createPermission('deleteStory');
-
         $adminPanelPermission = $auth->createPermission(UserRoles::PERMISSION_ADMIN_PANEL);
         $adminPanelPermission->description = 'Доступ к панели администрирования';
         $auth->add($adminPanelPermission);
@@ -53,10 +49,13 @@ class RbacController extends Controller
         $manageUsersPermission->description = 'Управление пользователями';
         $auth->add($manageUsersPermission);
 
-        //$userGroupRule = new \common\rbac\UserGroupRule;
-        //$auth->add($userGroupRule);
-        //$author->ruleName = $userGroupRule->name;
-        //$admin->ruleName  = $userGroupRule->name;
+        $manageNewsPermission = $auth->createPermission(UserRoles::PERMISSION_MANAGE_NEWS);
+        $manageNewsPermission->description = 'Управление новостями';
+        $auth->add($manageNewsPermission);
+
+        $manageTestsPermission = $auth->createPermission(UserRoles::PERMISSION_MANAGE_TEST);
+        $manageTestsPermission->description = 'Управление тестами';
+        $auth->add($manageTestsPermission);
 
         $auth->add($userRole);
         $auth->add($moderatorRole);
@@ -67,17 +66,16 @@ class RbacController extends Controller
         $auth->addChild($moderatorRole, $accessEditorPermission);
         $auth->addChild($moderatorRole, $accessFeedbackPermission);
         $auth->addChild($moderatorRole, $accessStatisticsPermission);
+        $auth->addChild($moderatorRole, $manageTestsPermission);
 
         $auth->addChild($adminRole, $manageCategoriesPermission);
         $auth->addChild($adminRole, $manageUsersPermission);
+        $auth->addChild($adminRole, $manageNewsPermission);
 
         $auth->addChild($moderatorRole, $userRole);
         $auth->addChild($adminRole, $moderatorRole);
 
-        $auth->assign($moderatorRole, 4);
-        $auth->assign($adminRole, 1);
-
-$moderatorRole = $auth->getRole('moderator');
+        //$moderatorRole = $auth->getRole('moderator');
 
         $manageTagsPermission = $auth->createPermission(UserRoles::PERMISSION_TAGS_ACCESS);
         $manageTagsPermission->description = 'Управление тэгами';
@@ -99,77 +97,15 @@ $moderatorRole = $auth->getRole('moderator');
 
         $auth->addChild($adminRole, $manageCommentsPermission);
 
+        //$auth->assign($moderatorRole, 4);
+        $auth->assign($adminRole, 1);
 
+        $this->actionInitSection();
+        $this->actionCreateStudentRole();
+        $this->actionInitStudy();
+        $this->actionInitContactRequest();
 
-/*
-        // добавляем разрешение "createStory"
-        $createStory = $auth->createPermission('createStory');
-        $createStory->description = 'Создать историю';
-        $auth->add($createStory);
-
-        // добавляем разрешение "updateStory"
-        $updateStory = $auth->createPermission('updateStory');
-        $updateStory->description = 'Изменить историю';
-        $auth->add($updateStory);
-
-        // добавляем разрешение "deleteStory"
-        $deleteStory = $auth->createPermission('deleteStory');
-        $deleteStory->description = 'Удалить историю';
-        $auth->add($deleteStory);
-
-        // добавляем роль "author" и даём роли разрешение "createStory"
-        $author = $auth->createRole('author');
-        $auth->add($author);
-        $auth->addChild($author, $createStory);
-
-        // добавляем роль "author" и даём роли разрешение "updateStory"
-        $author = $auth->createRole('author');
-        $auth->add($author);
-        $auth->addChild($author, $updateStory);
-
-        // добавляем роль "author" и даём роли разрешение "deleteStory"
-        $author = $auth->createRole('author');
-        $auth->add($author);
-        $auth->addChild($author, $deleteStory);
-
-        $userGroupRule = new \common\rbac\UserGroupRule;
-        $auth->add($userGroupRule);
-
-        $author = $auth->createRole('author');
-        $author->ruleName = $userGroupRule->name;
-        $auth->add($author);
-
-
-        // добавляем роль "admin" и даём роли разрешение "updatePost"
-        // а также все разрешения роли "author"
-        $admin = $auth->createRole('admin');
-        $admin->ruleName = $userGroupRule->name;
-        $auth->add($admin);
-        $auth->addChild($admin, $author);
-
-
-        // add the rule
-        $rule = new \common\rbac\AuthorRule;
-        $auth->add($rule);
-
-        // добавляем разрешение "updateOwnStory" и привязываем к нему правило.
-        $updateOwnStory = $auth->createPermission('updateOwnStory');
-        $updateOwnStory->description = 'Редактировать свою историю';
-        $updateOwnStory->ruleName = $rule->name;
-        $auth->add($updateOwnStory);
-
-        // "updateOwnStory" будет использоваться из "updateStory"
-        $auth->addChild($updateOwnStory, $updateStory);
-
-        // разрешаем "автору" обновлять его посты
-        $auth->addChild($author, $updateOwnStory);
-
-
-        // Назначение ролей пользователям. 1 и 2 это IDs возвращаемые IdentityInterface::getId()
-        // обычно реализуемый в модели User.
-        $auth->assign($author, 1);
-        $auth->assign($admin, 2);
-        */
+        $this->stdout('RBAC init done!' . PHP_EOL);
     }
 
     private function initSectionPermission(ManagerInterface $auth)
@@ -186,7 +122,7 @@ $moderatorRole = $auth->getRole('moderator');
     {
         $auth = Yii::$app->authManager;
         $this->initSectionPermission($auth);
-        $this->stdout('Done!' . PHP_EOL);
+        $this->stdout('RBAC init section done!' . PHP_EOL);
     }
 
     public function actionCreateStudentRole()
@@ -198,7 +134,7 @@ $moderatorRole = $auth->getRole('moderator');
 
         $userRole = $auth->getRole('user');
         $auth->addChild($studentRole, $userRole);
-        $this->stdout('Done!' . PHP_EOL);
+        $this->stdout('RBAC create student role done!' . PHP_EOL);
     }
 
     public function actionInitStudy()
@@ -221,7 +157,7 @@ $moderatorRole = $auth->getRole('moderator');
         $auth->removeChild($adminRole, $moderatorRole);
         $auth->addChild($adminRole, $teacherRole);
 
-        $this->stdout('Done!' . PHP_EOL);
+        $this->stdout('RBAC init study done!' . PHP_EOL);
     }
 
     public function actionInitContactRequest(): void
@@ -235,6 +171,6 @@ $moderatorRole = $auth->getRole('moderator');
         $adminRole = $auth->getRole(UserRoles::ROLE_ADMIN);
         $auth->addChild($adminRole, $permission);
 
-        $this->stdout('Done!' . PHP_EOL);
+        $this->stdout('RBAC init contact request done!' . PHP_EOL);
     }
 }

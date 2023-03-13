@@ -8,3 +8,4 @@ Yii::setAlias('@api', dirname(dirname(__DIR__)) . '/api');
 Yii::setAlias('@modules', dirname(dirname(__DIR__)) . '/modules');
 Yii::setAlias('@backendModules', dirname(dirname(__DIR__)) . '/backend/modules');
 Yii::setAlias('@frontedModules', dirname(dirname(__DIR__)) . '/frontend/modules');
+Yii::setAlias('@tests', dirname(dirname(__DIR__)) . '/tests');

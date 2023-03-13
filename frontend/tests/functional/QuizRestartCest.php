@@ -1,10 +1,13 @@
 <?php
+
 namespace frontend\tests\functional;
-use common\fixtures\StoryTestFixture;
-use common\fixtures\UserFixture;
-use common\fixtures\UserStudentFixture;
+
+use tests\fixtures\StoryTestFixture;
+use tests\fixtures\UserFixture;
+use tests\fixtures\UserStudentFixture;
 use common\models\User;
 use frontend\tests\FunctionalTester;
+
 class QuizRestartCest
 {
     public function _before(FunctionalTester $I)

@@ -45,16 +45,26 @@ class CategoryController extends BaseController
     /**
      * @throws NotFoundHttpException
      */
-    private function findRootCategoryByTree(int $tree): ?Category
+    private function findRootCategoryByTree(int $tree): Category
     {
         if (($model = Category::findRootByTree($tree)) !== null) {
             return $model;
         }
-        throw new NotFoundHttpException('The requested page does not exist.');
+        throw new NotFoundHttpException('Дерево категорий не найдено');
     }
 
-    public function actionIndex(int $tree = 0)
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionIndex(int $tree = 0): string
     {
+/*        $root = Category::findRootByTree($tree);
+        if ($root === null) {
+            $root = new Category([
+                'name' => 'new',
+                'tree' => 0,
+            ]);
+        }*/
         $rootCategory = $this->findRootCategoryByTree($tree);
         return $this->render('tree', [
             'rootCategory' => $rootCategory,

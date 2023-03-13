@@ -1,5 +1,7 @@
 <?php
 
+namespace console\migrations;
+
 use yii\db\Migration;
 
 /**
@@ -21,7 +23,7 @@ class m200908_114114_add_test_id_column_to_student_question_progress_table exten
         $this->dropForeignKey('fk-student_question_progress-student_id', $this->tableName);
         $this->dropPrimaryKey('pk-student_question_progress', $this->tableName);
 
-        $command = Yii::$app->db->createCommand('UPDATE student_question_progress t 
+        $command = \Yii::$app->db->createCommand('UPDATE student_question_progress t
                                                      SET t.test_id = (SELECT t2.id FROM story_test t2 WHERE t2.question_list_id = t.question_id)');
         $command->execute();
 

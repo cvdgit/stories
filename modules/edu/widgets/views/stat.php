@@ -21,6 +21,7 @@ use yii\web\View;
  * @var Story[] $storyModels
  * @var StudentQuestionFetcher $questionFetcher
  * @var StudentStoryDurationFetcher $timeFetcher
+ * @var bool $canClearHistory
  */
 ?>
     <div style="margin-bottom: 100px">
@@ -92,6 +93,7 @@ use yii\web\View;
                                                 <th class="col-md-2">Время</th>
                                                 <th class="col-md-2">Ответов на вопросы / неправильных</th>
                                                 <th class="col-md-2">Тесты</th>
+                                                <th></th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -106,6 +108,11 @@ use yii\web\View;
                                                         <?= $questionData['total'] . ($questionData['incorrect'] > 0 ? ' / ' . $questionData['incorrect'] : ''); ?>
                                                     </td>
                                                     <td><a class="show-testing" href="<?= Url::to(['/edu/teacher/default/story-testing', 'story_id' => $story->id, 'student_id' => $student->id]) ?>">Результаты</a></td>
+                                                    <td>
+                                                        <?php if ($canClearHistory): ?>
+                                                            <a onclick="return confirm('Подтверждаете?')" href="<?= Url::to(['/edu/default/clear-story-history', 'story_id' => $story->id, 'student_id' => $student->id]); ?>" title="Очистить прогресс по этой истории для ученика"><i class="glyphicon glyphicon-trash"></i></a>
+                                                        <?php endif; ?>
+                                                    </td>
                                                 </tr>
                                             <?php endforeach; ?>
                                             </tbody>

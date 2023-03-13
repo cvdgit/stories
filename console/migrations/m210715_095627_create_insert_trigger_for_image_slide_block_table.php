@@ -1,5 +1,7 @@
 <?php
 
+namespace console\migrations;
+
 use yii\db\Migration;
 
 /**
@@ -13,7 +15,7 @@ class m210715_095627_create_insert_trigger_for_image_slide_block_table extends M
     public function safeUp()
     {
         $trigger = <<<SQL
-CREATE TRIGGER `insert_in_story_story_slide_image` AFTER INSERT ON `image_slide_block` 
+CREATE TRIGGER `insert_in_story_story_slide_image` AFTER INSERT ON `image_slide_block`
 FOR EACH ROW
 BEGIN
     DECLARE storyID integer;
@@ -23,7 +25,7 @@ BEGIN
     END IF;
 END
 SQL;
-        $command = Yii::$app->db->createCommand($trigger);
+        $command = \Yii::$app->db->createCommand($trigger);
         $command->execute();
     }
 
@@ -32,7 +34,7 @@ SQL;
      */
     public function safeDown()
     {
-        $command = Yii::$app->db->createCommand('DROP TRIGGER IF EXISTS `insert_in_story_story_slide_image`');
+        $command = \Yii::$app->db->createCommand('DROP TRIGGER IF EXISTS `insert_in_story_story_slide_image`');
         $command->execute();
     }
 }

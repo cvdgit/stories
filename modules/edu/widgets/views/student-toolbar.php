@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use common\models\UserStudent;
 use yii\web\View;
 
 /**
- * @var UserStudent $student
+ * @var string $studentName
+ * @var string $studentClassName
  * @var View $this
  */
 
@@ -27,7 +27,7 @@ CSS
     <div class="student-toolbar">
         <div style="margin-right: auto"></div>
         <div>
-            <?= $student->name . ' (' . $student->class->name . ')' ?>
+            <?= $studentName . ' (' . $studentClassName . ')' ?>
         </div>
     </div>
 </div>

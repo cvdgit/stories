@@ -1,5 +1,7 @@
 <?php
 
+namespace console\migrations;
+
 use yii\db\Migration;
 
 /**
@@ -32,12 +34,6 @@ class m210819_134243_create_site_section_table extends Migration
             'CASCADE',
             'CASCADE'
         );
-
-        $this->batchInsert('{{%site_section}}', ['alias', 'category_id', 'title', 'description', 'keywords', 'h1', 'visible'], [
-            ['stories', 1, 'Истории для детей', 'Истории для детей', 'Истории для детей, wikids, сказки, истории', 'Истории для детей', 1],
-            ['education', 1, 'education', 'education', 'education', 'education', 0],
-            ['directum', 1, 'directum', 'directum', 'directum', 'directum', 0],
-        ]);
     }
 
     /**

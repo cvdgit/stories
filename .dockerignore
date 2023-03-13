@@ -1,0 +1,12 @@
+/.git
+/.idea
+/vendor
+/node_modules
+/.ready
+/frontend/runtime/*
+/backend/runtime/*
+/public_html/assets/*
+/public_html/admin/assets/*
+/public_html/build/*
+/public_html/upload/*
+/public_html/admin/upload/*

@@ -25,6 +25,9 @@ class StudentStatWidget extends Widget
     /** @var EduStudent */
     public $student;
 
+    /** @var bool */
+    public $canClearHistory = false;
+
     /** @var StudentStoryDurationFetcher */
     private $studentStoryDurationFetcher;
 
@@ -54,6 +57,7 @@ class StudentStatWidget extends Widget
             'storyModels' => $storyModels,
             'questionFetcher' => new StudentQuestionFetcher(),
             'timeFetcher' => $this->studentStoryDurationFetcher,
+            'canClearHistory' => $this->canClearHistory,
         ]);
     }
 }

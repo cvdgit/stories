@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\controllers;
 
 use Exception;
@@ -41,7 +42,6 @@ class SiteController extends Controller
     public function actionIndex()
     {
         return $this->redirect(['/school/index']);
-        return $this->render('index');
     }
 
     /**

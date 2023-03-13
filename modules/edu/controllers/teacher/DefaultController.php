@@ -6,6 +6,7 @@ namespace modules\edu\controllers\teacher;
 
 use common\models\Story;
 use common\models\UserStudent;
+use common\rbac\UserRoles;
 use common\services\TestDetailService;
 use modules\edu\models\EduClassBook;
 use modules\edu\models\EduClassProgram;
@@ -17,6 +18,7 @@ use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
+use yii\web\User as WebUser;
 
 class DefaultController extends Controller
 {
@@ -29,7 +31,7 @@ class DefaultController extends Controller
         $this->testDetailService = $testDetailService;
     }
 
-    public function actionIndex()
+    public function actionIndex(): string
     {
         $classBooks = EduClassBook::findTeacherClassBooks(Yii::$app->user->getId())
             ->orderBy(['name' => SORT_ASC])
@@ -97,8 +99,9 @@ class DefaultController extends Controller
 
     /**
      * @throws NotFoundHttpException
+     * @throws \Throwable
      */
-    public function actionStudentStats(int $id, int $class_program_id, int $class_book_id): string
+    public function actionStudentStats(int $id, int $class_program_id, int $class_book_id, WebUser $user): string
     {
         if (($student = UserStudent::findOne($id)) === null) {
             throw new NotFoundHttpException('Ученик не найден');
@@ -131,6 +134,7 @@ class DefaultController extends Controller
                 'classProgram' => $classProgram,
                 'classId' => $class->id,
                 'student' => $student,
+                'canClearHistory' => $user->can(UserRoles::ROLE_TEACHER),
             ]),
         ]);
     }

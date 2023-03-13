@@ -35,3 +35,6 @@ phpunit.phar
 
 # vagrant runtime
 /.vagrant
+
+/.ready
+/public_html/build/*

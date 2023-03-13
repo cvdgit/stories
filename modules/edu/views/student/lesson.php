@@ -7,7 +7,6 @@ use common\models\UserStudent;
 use frontend\assets\SlidesAsset;
 use modules\edu\models\EduLesson;
 use modules\edu\models\EduTopic;
-use modules\edu\widgets\StudentToolbarWidget;
 use yii\bootstrap\Html;
 use yii\data\DataProviderInterface;
 use yii\web\View;
@@ -23,6 +22,7 @@ use yii\widgets\Pjax;
  * @var EduLesson $lesson
  * @var int $currentTopicId
  * @var int $programId
+ * @var string $studentToolbarWidget
  */
 
 $this->title = $student->name;
@@ -97,8 +97,7 @@ CSS
 );
 ?>
 <div class="container">
-
-    <?= StudentToolbarWidget::widget(['student' => $student]) ?>
+    <?= $studentToolbarWidget; ?>
 
     <div class="row">
         <div class="col-lg-12">

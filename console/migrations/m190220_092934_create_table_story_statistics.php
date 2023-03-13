@@ -1,5 +1,7 @@
 <?php
 
+namespace console\migrations;
+
 use yii\db\Migration;
 
 /**
@@ -13,7 +15,7 @@ class m190220_092934_create_table_story_statistics extends Migration
     public function safeUp()
     {
         $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
-        
+
         $this->createTable('{{%story_statistics}}', [
             'id' => $this->primaryKey(),
             'story_id' => $this->integer()->notNull(),
@@ -24,7 +26,7 @@ class m190220_092934_create_table_story_statistics extends Migration
             'created_at' => $this->integer()->notNull(),
             'session' => $this->string(50)->notNull(),
         ], $tableOptions);
-        
+
         $this->addForeignKey(
             'fk_storystatistics_story_id',
             '{{%story_statistics}}',

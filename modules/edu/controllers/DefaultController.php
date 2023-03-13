@@ -4,9 +4,12 @@ namespace modules\edu\controllers;
 
 use common\models\User;
 use common\rbac\UserRoles;
+use Exception;
 use modules\edu\models\EduStory;
 use modules\edu\models\EduStudent;
 use modules\edu\query\StoryStudentProgressFetcher;
+use modules\edu\services\StudentService;
+use modules\edu\services\StudentStatService;
 use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\db\Expression;
@@ -15,15 +18,27 @@ use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\Cookie;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
-use yii\web\Request;
 use yii\web\Response;
+use yii\web\User as WebUser;
 
 /**
  * Default controller for the `edu` module
  */
 class DefaultController extends Controller
 {
+    /**
+     * @var StudentStatService
+     */
+    private $studentStatService;
+
+    public function __construct($id, $module, StudentStatService $studentStatService, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->studentStatService = $studentStatService;
+    }
+
     public function actionIndex(): Response
     {
         if (Yii::$app->user->can(UserRoles::ROLE_ADMIN)) {
@@ -191,5 +206,23 @@ class DefaultController extends Controller
         ];
 
         return ['success' => true, 'data' => $data];
+    }
+
+    /**
+     * @throws ForbiddenHttpException
+     */
+    public function actionClearStoryHistory(int $student_id, int $story_id, WebUser $user): Response
+    {
+        if (!$user->can(UserRoles::ROLE_TEACHER)) {
+            throw new ForbiddenHttpException('Доступ запрещен');
+        }
+        try {
+            $this->studentStatService->clearStoryHistory($student_id, $story_id);
+            Yii::$app->session->setFlash('success', 'Успешно');
+        } catch (Exception $exception) {
+            Yii::$app->errorHandler->logException($exception);
+            Yii::$app->session->setFlash('error', $exception->getMessage());
+        }
+        return $this->redirect($this->request->referrer);
     }
 }

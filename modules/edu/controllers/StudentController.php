@@ -2,14 +2,19 @@
 
 namespace modules\edu\controllers;
 
+use common\models\UserStudent;
 use modules\edu\components\TopicAccessManager;
+use modules\edu\models\EduClass;
 use modules\edu\models\EduClassProgram;
 use modules\edu\models\EduLesson;
 use modules\edu\models\EduTopic;
+use modules\edu\query\StudentClassFetcher;
 use modules\edu\RepetitionApiInterface;
+use modules\edu\widgets\StudentToolbarWidget;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\Query;
+use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -21,11 +26,20 @@ class StudentController extends Controller
     /** @var RepetitionApiInterface */
     private $repetitionApi;
 
-    public function __construct($id, $module, TopicAccessManager $topicAccessManager, RepetitionApiInterface $repetitionApi, $config = [])
-    {
+    private $studentClassFetcher;
+
+    public function __construct(
+        $id,
+        $module,
+        TopicAccessManager $topicAccessManager,
+        RepetitionApiInterface $repetitionApi,
+        StudentClassFetcher $studentClassFetcher,
+        $config = []
+    ) {
         parent::__construct($id, $module, $config);
         $this->topicAccessManager = $topicAccessManager;
         $this->repetitionApi = $repetitionApi;
+        $this->studentClassFetcher = $studentClassFetcher;
     }
 
     /*    public function behaviors(): array
@@ -44,7 +58,7 @@ class StudentController extends Controller
         }*/
 
     /**
-     * @throws ForbiddenHttpException
+     * @throws ForbiddenHttpException|BadRequestHttpException
      */
     public function actionIndex(): string
     {
@@ -56,13 +70,25 @@ class StudentController extends Controller
             }
         }
 
+        $studentClassId = $this->studentClassFetcher->fetch($student->id);
+        if ($studentClassId !== null) {
+            $studentClass = EduClass::findOne($studentClassId);
+        } else {
+            $studentClass = $student->class;
+            if ($studentClass === null) {
+                throw new BadRequestHttpException('Не удалось определить класс');
+            }
+        }
+
+        // Классы, в которых состоит ученик
         $classBooks = $student->classBooks;
         $classProgramIds = [];
+
         if (count($classBooks) === 0) {
-            $class = $student->class;
+            // Если ученик не состоит ни в одном классе
             $classProgramIds = array_map(static function($classProgram) {
                 return $classProgram->id;
-            }, $class->eduClassPrograms);
+            }, $studentClass->eduClassPrograms);
         }
         else {
             foreach ($classBooks as $classBook) {
@@ -78,14 +104,14 @@ class StudentController extends Controller
 
         return $this->render('index', [
             'student' => $student,
+            'studentToolbarWidget' => $this->renderStudentToolbarWidget($student, $studentClass),
             'dataProvider' => $dataProvider,
             'repetitionDataProvider' => $repetitionDataProvider,
         ]);
     }
 
     /**
-     * @throws NotFoundHttpException
-     * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException|ForbiddenHttpException|BadRequestHttpException
      */
     public function actionTopic(int $id): string
     {
@@ -101,6 +127,16 @@ class StudentController extends Controller
             }
         }
 
+        $studentClassId = $this->studentClassFetcher->fetch($student->id);
+        if ($studentClassId !== null) {
+            $studentClass = EduClass::findOne($studentClassId);
+        } else {
+            $studentClass = $student->class;
+            if ($studentClass === null) {
+                throw new BadRequestHttpException('Не удалось определить класс');
+            }
+        }
+
         $classProgram = $topic->classProgram;
 
         $dataProvider = new ActiveDataProvider([
@@ -112,6 +148,7 @@ class StudentController extends Controller
         return $this->render('topic', [
             'classProgramName' => $classProgram->program->name,
             'student' => $student,
+            'studentToolbarWidget' => $this->renderStudentToolbarWidget($student, $studentClass),
             'topics' => $classProgram->eduTopics,
             'dataProvider' => $dataProvider,
             'topic' => $topic,
@@ -122,6 +159,7 @@ class StudentController extends Controller
     /**
      * @throws NotFoundHttpException
      * @throws ForbiddenHttpException
+     * @throws BadRequestHttpException
      */
     public function actionLesson(int $id): string
     {
@@ -134,6 +172,16 @@ class StudentController extends Controller
             $student = Yii::$app->user->identity->student();
             if ($student === null) {
                 throw new ForbiddenHttpException('Доступ запрещен');
+            }
+        }
+
+        $studentClassId = $this->studentClassFetcher->fetch($student->id);
+        if ($studentClassId !== null) {
+            $studentClass = EduClass::findOne($studentClassId);
+        } else {
+            $studentClass = $student->class;
+            if ($studentClass === null) {
+                throw new BadRequestHttpException('Не удалось определить класс');
             }
         }
 
@@ -154,6 +202,7 @@ class StudentController extends Controller
             'lesson' => $lesson,
             'currentTopicId' => $topic->id,
             'programId' => $classProgram->id,
+            'studentToolbarWidget' => $this->renderStudentToolbarWidget($student, $studentClass),
         ]);
     }
 
@@ -178,5 +227,10 @@ class StudentController extends Controller
         if ($lessonAccess[$lessonId]['access'] === false) {
             throw new ForbiddenHttpException('Что бы получить доступ к урок - необходимо пройти предыдущие');
         }
+    }
+
+    private function renderStudentToolbarWidget(UserStudent $student, EduClass $class): string
+    {
+        return StudentToolbarWidget::widget(['studentName' => $student->name, 'studentClassName' => $class->name]);
     }
 }

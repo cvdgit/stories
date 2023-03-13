@@ -1,5 +1,7 @@
 <?php
 
+namespace console\migrations;
+
 use yii\db\Migration;
 use yii\db\Query;
 
@@ -68,7 +70,7 @@ class m210715_085924_create_junction_table_for_story_and_story_slide_image_table
                 ])
             ->from('{{%image_slide_block}}')
             ->innerJoin('{{%story_slide}}', '{{%story_slide}}.id = {{%image_slide_block}}.slide_id');
-        $command = Yii::$app->db->createCommand();
+        $command = \Yii::$app->db->createCommand();
         foreach ($query->batch(500) as $batch) {
             $rows = [];
             foreach ($batch as $row) {

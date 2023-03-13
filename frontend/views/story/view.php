@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
+use common\helpers\SmartDate;
 use common\models\Playlist;
 use common\models\Story;
+use common\rbac\UserRoles;
 use frontend\assets\LazyAsset;
 use frontend\models\CommentForm;
+use frontend\widgets\FollowingStories;
 use frontend\widgets\StoryFavorites;
 use frontend\widgets\StoryLikeWidget;
 use yii\bootstrap\Tabs;
@@ -161,7 +164,7 @@ $isBookView = $storyDefaultView === 'book';
         <?php else: ?>
         <?= $this->render('_tab_slides', ['model' => $model, 'playlist' => $playlist]) ?>
         <?php endif ?>
-        <?php if (Yii::$app->user->can(\common\rbac\UserRoles::ROLE_MODERATOR)): ?>
+        <?php if (Yii::$app->user->can(UserRoles::ROLE_MODERATOR)): ?>
             <div class="panel panel-info" style="margin-top:10px">
                 <div class="panel-body">
                     <?= $model->isPublished() ? '' : 'История не опубликована' ?>
@@ -187,7 +190,7 @@ $isBookView = $storyDefaultView === 'book';
                         <?php endforeach ?>
                         <!--/noindex-->
                     </div>
-                    <div class="story-date"><span>Опубликована:</span> <?= \common\helpers\SmartDate::dateSmart($model->published_at, true) ?></div>
+                    <div class="story-date"><span>Опубликована:</span> <?= SmartDate::dateSmart($model->published_at, true) ?></div>
                 </div>
                 <div class="col-lg-5 col-md-5 col-sm-12">
                     <div class="story-share-block">
@@ -210,7 +213,7 @@ $isBookView = $storyDefaultView === 'book';
                 <div class="col-md-3">
                     <div class="following-stories">
                         <h2>Смотрите также:</h2>
-                        <?= \frontend\widgets\FollowingStories::widget(['storyID' => $model->id]) ?>
+                        <?= FollowingStories::widget(['storyID' => $model->id]) ?>
                     </div>
                 </div>
             </div>

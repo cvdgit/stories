@@ -7,12 +7,27 @@ use yii\helpers\Url;
 
 /**
  * @var EduClassProgram $model
- * @var int $classId
  * @var int $studentId
  */
+
+$route = $model->createTopicRoute();
 ?>
 <div class="col-sm-4 col-md-3">
-    <a href="<?= Url::to($model->createTopicRoute($classId)) ?>" class="thumbnail panel-wrap">
+    <?php if ($route === null): ?>
+    <div class="thumbnail panel-wrap">
+        <div class="panel-img"></div>
+        <div class="panel-inner">
+            <div class="panel-header">
+                <span class="panel-header__text"><?= $model->program->name ?></span>
+            </div>
+        </div>
+        <div class="panel-progress">
+            <div class="progress-chart"></div>
+            <div class="progress-text">Нет тем</div>
+        </div>
+    </div>
+    <?php else: ?>
+    <a href="<?= Url::to($route); ?>" class="thumbnail panel-wrap">
         <div class="panel-img"></div>
         <div class="panel-inner">
             <div class="panel-header">
@@ -28,4 +43,5 @@ use yii\helpers\Url;
             <div class="progress-text">Пройдено историй <?= $model->getStudentFinishedStoriesCount($studentId) ?> из <?= $model->getClassProgramStoriesCount() ?></div>
         </div>
     </a>
+    <?php endif; ?>
 </div>

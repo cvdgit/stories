@@ -1,5 +1,6 @@
 <?php
 
+use common\bootstrap\Bootstrap;
 use yii\console\controllers\FixtureController;
 use yii\console\controllers\MigrateController;
 use yii\console\controllers\ServeController;
@@ -18,7 +19,7 @@ return [
     'basePath' => dirname(__DIR__),
     'bootstrap' => [
         'log',
-        'common\bootstrap\Bootstrap',
+        Bootstrap::class,
         'queue',
     ],
     'modules' => [
@@ -27,16 +28,20 @@ return [
     ],
     'controllerNamespace' => 'console\controllers',
     'controllerMap' => [
-        'fixture' => [
+        'fixture' => YII_ENV_DEV ? [
             'class' => FixtureController::class,
             'namespace' => 'common\fixtures',
-        ],
+        ] : false,
         'migrate' => [
             'class' => MigrateController::class,
+            'migrationPath' => [
+                '@vendor/yiisoft/yii2/rbac/migrations',
+            ],
             'migrationNamespaces' => [
                 'yii\queue\db\migrations',
-                //'modules\edu\migrations',
-                //'modules\files\migrations',
+                'console\migrations',
+                'modules\edu\migrations',
+                'modules\files\migrations',
             ],
         ],
         'serve' => [
