@@ -1958,11 +1958,11 @@ function WikidsStoryTest(el, options) {
         .hide()
         .removeClass('wikids-test-active-question');
 
-      if (done && !that.options.fastMode && getQuestionRepeat() > 1) {
+      /*if (done && !that.options.fastMode && getQuestionRepeat() > 1) {
         showQuestionSuccessPage(answer);
-      } else {
+      } else {*/
         continueTestAction(answer);
-      }
+      //}
     }
   }
 
