@@ -370,7 +370,7 @@ class StoryEditorService
                 ->from('story_test')
                 ->where(['id' => $testId])
                 ->scalar();
-            if ($source !== SourceType::TESTS) {
+            if ($source === SourceType::TEST) {
                 $questionCount = (int) (new Query())
                     ->from('story_test_question')
                     ->where(['story_test_id' => $testId])
@@ -389,7 +389,7 @@ class StoryEditorService
                 ->from('story_test')
                 ->where(['id' => $content->getTestID()])
                 ->scalar();
-            if ($source !== SourceType::TESTS) {
+            if ($source === SourceType::TEST) {
                 $questionCount = (int) (new Query())
                     ->from('story_test_question')
                     ->where(['story_test_id' => $content->getTestID()])
