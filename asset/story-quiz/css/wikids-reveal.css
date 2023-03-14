@@ -1601,7 +1601,6 @@ p.wikids-test-description {
 .pass-test-question__wrap .highlight {
   display: inline-block;
   width: auto;
-  max-width: 200px;
 }
 
 .custom-select {

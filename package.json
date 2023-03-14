@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "npx webpack --config webpack.dev.js",
-    "prod": "npx webpack --config webpack.prod.js"
+    "prod": "npx webpack --config webpack.prod.js",
+    "build": "webpack --config webpack.prod.js",
+    "watch": "webpack --watch --config webpack.prod.js"
   },
   "repository": {
     "type": "git",
