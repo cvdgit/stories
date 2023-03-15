@@ -16,7 +16,7 @@ use yii\helpers\Url;
         <div class="panel-img"></div>
         <div class="panel-inner">
             <div class="panel-header">
-                <span title="<?= $model['header']; ?>" class="panel-header__text" style="text-overflow: ellipsis; overflow: hidden; display: -webkit-box; -webkit-line-break: 2; -webkit-box-orient: vertical"><?= $model['header']; ?></span>
+                <span title="<?= $model['header']; ?>" class="panel-header__text" style="text-overflow: ellipsis; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical"><?= $model['header']; ?></span>
             </div>
         </div>
         <div class="panel-progress">
