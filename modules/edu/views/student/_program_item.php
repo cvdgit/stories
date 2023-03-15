@@ -40,7 +40,7 @@ $route = $model->createTopicRoute();
                 <div><?= $progress ?> %</div>
                 <?php endif ?>
             </div>
-            <div class="progress-text">Пройдено историй <?= $model->getStudentFinishedStoriesCount($studentId) ?> из <?= $model->getClassProgramStoriesCount() ?></div>
+            <div class="progress-text">Пройдено <?= $model->getStudentFinishedStoriesCount($studentId) ?> из <?= $model->getClassProgramStoriesCount() ?></div>
         </div>
     </a>
     <?php endif; ?>
