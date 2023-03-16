@@ -6,6 +6,14 @@
   justify-content: center;
   flex-direction: column;
 }
+.next-story ul {
+  overflow: auto;
+  max-width: 800px;
+  list-style: none;
+}
+.next-story ul li {
+  padding: 10px 0;
+}
 .next-story__button {
 
 }
