@@ -27,7 +27,7 @@ $isNewRecord = $model instanceof \backend\models\question\CreateQuestion;
     <div class="row">
         <div class="col-lg-6">
             <?php $form = ActiveForm::begin(); ?>
-            <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'name')->textarea(['rows' => 5]) ?>
             <?= $form->field($model, 'hint')->textInput(['maxlength' => true]) ?>
             <?= $form->field($model, 'type')->dropDownList(\backend\models\question\QuestionType::asArray()) ?>
             <?= $form->field($model, 'mix_answers')->checkbox() ?>
@@ -104,7 +104,7 @@ $isNewRecord = $model instanceof \backend\models\question\CreateQuestion;
                                     'attribute' =>'name',
                                     'format' => 'raw',
                                     'value' => static function($model) {
-                                        return Html::a($model->name, ['/answer/update', 'id' => $model->id], ['data-pjax' => 0, 'class' => 'answer-update']);
+                                        return Html::a(Html::encode($model->name), ['/answer/update', 'id' => $model->id], ['data-pjax' => 0, 'class' => 'answer-update']);
                                     },
                                     'enableSorting' => false,
                                 ],

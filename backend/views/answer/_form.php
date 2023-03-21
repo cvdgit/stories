@@ -10,7 +10,7 @@ use yii\widgets\ActiveForm;
     <div class="row">
         <div class="col-lg-8">
             <?php $form = ActiveForm::begin(['id' => 'create-answer-form']); ?>
-            <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'name')->textarea(['rows' => 5]) ?>
             <?= $form->field($answerImageModel, 'answerImage')->fileInput() ?>
             <?php if ($model->haveImage()): ?>
             <div style="padding: 20px 0; text-align: center">

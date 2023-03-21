@@ -16,7 +16,7 @@ use yii\web\View;
 
 ?>
 <?php $form = ActiveForm::begin(['id' => 'answer-form']); ?>
-<?= $form->field($formModel, 'name')->textInput(['maxlength' => true]) ?>
+<?= $form->field($formModel, 'name')->textarea(['rows' => 5]) ?>
 <?= $form->field($answerImageModel, 'answerImage')->fileInput() ?>
 <?php if ($formModel->haveImage()): ?>
     <div style="padding: 20px 0; text-align: center">

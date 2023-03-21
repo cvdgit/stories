@@ -2,6 +2,8 @@
 
 namespace backend\components\training\base;
 
+use yii\helpers\Html;
+
 class AnswerSerializer
 {
 
@@ -19,7 +21,7 @@ class AnswerSerializer
     {
         return [
             'id' => $this->answer->getId(),
-            'name' => trim($this->answer->getName()),
+            'name' => Html::encode(trim($this->answer->getName())),
             'is_correct' => (int) $this->answer->isCorrect(),
             'description' => $this->answer->getDescription(),
             'region_id' => $this->answer->getRegionID(),

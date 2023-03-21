@@ -2570,7 +2570,7 @@ function WikidsStoryTest(el, options) {
               if (testConfig.answerTypeIsInput(question) && testConfig.isStrictAnswer()) {
                 $answerElement = $('<p/>').html(textDiff(answerText, userAnswer));
               } else {
-                $answerElement = $('<p/>').text(answerText);
+                $answerElement = $('<p/>').html(answerText);
               }
             }
             $content.append($answerElement);
