@@ -1710,6 +1710,8 @@ function WikidsStoryTest(el, options) {
       return;
     }
 
+    const thisAnswer = Array.from(answer);
+
     if (typeof checkAnswersCallback === 'function') {
       answerIsCorrect = checkAnswersCallback(currentQuestion, answer);
     }
@@ -1878,15 +1880,14 @@ function WikidsStoryTest(el, options) {
       }
       if (testConfig.sourceIsLocal() || testConfig.sourceIsTests()) {
 
-        if (testConfig.answerTypeIsInput(currentQuestion)) {
-          answerList = answer.map(function (answerText) {
+        if (testConfig.answerTypeIsInput(currentQuestion) || testConfig.answerTypeIsPassTest(currentQuestion)) {
+          answerList = thisAnswer.map(function (answerText, index) {
             return {
-              'answer_entity_id': currentQuestion.id,
+              'answer_entity_id': index,
               'answer_entity_name': answerText
             };
           });
-        }
-        else {
+        } else {
           answerList = answer.map(function (entity_id) {
             var answer = answerByID(currentQuestion, entity_id);
             return {
@@ -2108,7 +2109,7 @@ function WikidsStoryTest(el, options) {
         .html(that.passTestQuestion.create(currentQuestion, fragmentAnswerCallback));
 
       dom.nextButton.off("click").on("click", function () {
-        var answer = that.passTestQuestion.getUserAnswers();
+        const answer = that.passTestQuestion.getUserAnswers();
         nextQuestion(answer);
       });
     }

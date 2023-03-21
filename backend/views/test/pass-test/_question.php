@@ -97,12 +97,21 @@ CSS
         <div class="content__title">
             <?= Html::activeLabel($model, 'content') ?>
         </div>
-        <div style="margin-left:auto">
-            <a href="<?= Url::to(['/fragment-list/manage']); ?>" class="btn btn-primary btn-sm" id="manage" type="button">Управление</a>
-            <button class="btn btn-primary btn-sm" id="search" type="button">Поиск</button>
-            <a href="<?= Url::to(['/fragment-list/create', 'testing_id' => $testingId]); ?>" class="btn btn-primary btn-sm" id="create-fragment-list" type="button">Создать список</a>
-            <a href="<?= Url::to(['/fragment-list/select', 'testing_id' => $testingId]); ?>" class="btn btn-primary btn-sm" id="select-fragment-list" type="button">Вставить из списка</a>
-            <button class="btn btn-primary btn-sm" id="add" type="button">Вставить пропуск</button>
+        <div style="margin-left:auto;display: flex">
+            <a style="margin-right: 6px" href="<?= Url::to(['/fragment-list/manage']); ?>" class="btn btn-primary btn-sm" id="manage" type="button">Управление</a>
+            <button style="margin-right: 6px" class="btn btn-primary btn-sm" id="search" type="button">Поиск</button>
+            <a style="margin-right: 6px" href="<?= Url::to(['/fragment-list/create', 'testing_id' => $testingId]); ?>" class="btn btn-primary btn-sm" id="create-fragment-list" type="button">Создать список</a>
+            <a style="margin-right: 6px" href="<?= Url::to(['/fragment-list/select', 'testing_id' => $testingId]); ?>" class="btn btn-primary btn-sm" id="select-fragment-list" type="button">Вставить из списка</a>
+            <div class="dropdown">
+                <button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                    Вставить пропуск
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li><a href="#" id="add">Один ответ</a></li>
+                    <li><a href="#" id="add-multi">Несколько ответов</a></li>
+                </ul>
+            </div>
         </div>
     </div>
     <div style="min-height:300px;max-height:300px;overflow-y:auto">

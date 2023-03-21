@@ -70,7 +70,8 @@ const TestConfig = function (data) {
       return data.voiceResponse;
     },
     getDescription: () => data.description,
-    showDescriptionInQuestions: () => data.showDescriptionInQuestions
+    showDescriptionInQuestions: () => data.showDescriptionInQuestions,
+    answerTypeIsPassTest: (q) => parseInt(q['type']) === 8
   }
 }
 

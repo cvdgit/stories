@@ -51,7 +51,7 @@ class TestingHistory
             ->select([
                 'question_name' => 'question_history.entity_name',
                 'correct' => 'question_history.correct_answer',
-                'user_answers' => "GROUP_CONCAT(answers.answer_entity_name SEPARATOR ', ')",
+                'user_answers' => "GROUP_CONCAT(answers.answer_entity_name ORDER BY answers.id SEPARATOR ', ')",
                 'question_created' => 'question_history.created_at',
                 'question_date' => 'question_history.created_at',
             ])

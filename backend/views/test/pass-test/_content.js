@@ -1,4 +1,3 @@
-
 (function() {
 
   function Fragments() {
@@ -14,8 +13,8 @@
       }
     };
 
-    this.createFragment = (id) => {
-      values.fragments.push({id, items: []});
+    this.createFragment = (id, multi = false) => {
+      values.fragments.push({id, items: [], multi});
       return id;
     }
 
@@ -33,7 +32,7 @@
       const fragment = this.findFragment(id);
       const item = {
         ...newItem,
-        order: values.fragments.length + 1
+        order: fragment.items.length + 1
       };
       fragment.items.push(item);
       return item;
@@ -52,6 +51,13 @@
       })[0];
     };
 
+    this.getFragmentCorrectItems = (id) => {
+      const fragment = this.findFragment(id);
+      return fragment.items.filter(item => {
+        return item.correct;
+      });
+    };
+
     this.setFragmentCorrectItem = (fragment_id, item_id) => {
       const fragment = this.findFragment(fragment_id);
       fragment.items.map((item) => {
@@ -61,6 +67,15 @@
         return item.id === item_id;
       })[0];
       item.correct = true;
+      return item;
+    };
+
+    this.setFragmentCorrectItemMulti = (fragment_id, item_id) => {
+      const fragment = this.findFragment(fragment_id);
+      const item = fragment.items.filter(item => {
+        return item.id === item_id;
+      })[0];
+      item.correct = !item.correct;
       return item;
     };
 
@@ -89,11 +104,11 @@
         'data-fragment-id': fragment.id
       });
 
-      const correctItem = this.getFragmentCorrectItem(fragment.id);
-
-      let title = 'ПУСТО';
-      if (correctItem) {
-        title = correctItem.title;
+      let title = this.getFragmentCorrectItems(fragment.id)
+        .map(item => item.title)
+        .join(', ');
+      if (!title) {
+        title = 'ПУСТО';
       }
       code.append('<button class="btn btn-default dropdown-toggle highlight" data-toggle="dropdown">' + title + '</button><ul class="dropdown-menu"></ul>');
 
@@ -108,11 +123,9 @@
     return content;
   }
 
-  window['dataWrapper'] = (function(dataWrapper) {
+  const dataWrapper = window['dataWrapper'] = (function(dataWrapper) {
     return dataWrapper;
   })(new Fragments());
-
-  const dataWrapper = window.dataWrapper;
 
   const questionId = parseInt($('#content').attr('data-question-id'));
   if (questionId) {
@@ -143,70 +156,58 @@
     characterData: true
   });
 
-  function fragmentItemTextChanged(fragment_id, item_id, text) {
-    const item = dataWrapper.findFragmentItem(fragment_id, item_id);
+  function fragmentItemTextChanged(fragment_id, item, text) {
     if (item.correct) {
       $('#content').find('span[data-fragment-id=' + fragment_id + '] > .highlight').text(text);
     }
     item.title = text;
   }
 
-  function fragmentItemSetCorrect(fragment_id, item_id) {
-    const item = dataWrapper.setFragmentCorrectItem(fragment_id, item_id);
-    $('#content').find('span[data-fragment-id=' + fragment_id + '] > .highlight').text(item.title);
+  function fragmentItemSetCorrect(fragment_id, text) {
+    $('#content')
+      .find('span[data-fragment-id=' + fragment_id + '] > .highlight')
+      .text(text || 'ПУСТО');
   }
 
-  function fragmentItemRemove(elem, fragment_id, item_id) {
-
-    const item = dataWrapper.findFragmentItem(fragment_id, item_id);
-    if (item.correct) {
-      $('#content').find('span[data-fragment-id=' + fragment_id + '] > .highlight').text('ПУСТО');
-    }
-
-    dataWrapper.removeFragmentItem(fragment_id, item_id);
+  function fragmentItemRemove(elem) {
     $(elem).parent().parent().hide().remove();
   }
 
-  function addFragmentItem(fragment_id) {
-
-    const item = dataWrapper.createFragmentItem(fragment_id, {
-      id: generateUUID(),
-      correct: false,
-      title: ''
-    });
-
-    const elem = createFragmentItemElement(fragment_id, item);
-
+  function addFragmentItem(fragmentId, elem) {
     const createElem = $('#content')
-      .find('span[data-fragment-id=' + fragment_id + '] > .dropdown-menu .divider');
-
+      .find('span[data-fragment-id=' + fragmentId + '] > .dropdown-menu .divider');
     elem.insertBefore(createElem)
       .find('.fragment-title__edit')
       .focus();
   }
 
-  function createFragmentItemElement(fragment_id, item) {
+  /**
+   * @param item
+   * @param setCorrectHandler
+   * @param textChangedHandler
+   * @param itemRemoveHandler
+   * @param multi
+   * @returns {*|jQuery}
+   */
+  function createFragmentItemElement(item, setCorrectHandler, textChangedHandler, itemRemoveHandler, multi = false) {
+
+    const input = $('<input/>', {
+      name: item.fragmentId,
+      type: multi ? 'checkbox' : 'radio',
+      checked: item.correct
+    })
+      .on('click', function() { setCorrectHandler(); });
+
     return $('<li/>', {class: 'fragment-item'})
       .append(
         $('<span/>', {class: 'fragment-input'})
-          .append(
-            $('<input/>', {
-              name: fragment_id,
-              type: 'radio',
-              checked: item.correct
-            })
-              .on('click', function() {
-                fragmentItemSetCorrect(fragment_id, item.id);
-              })
-          )
+          .append(input)
       )
       .append(
         $('<span/>', {'class': 'fragment-title'})
           .append(
             $('<a/>', {'href': '#', 'contenteditable': true, class: 'fragment-title__edit'})
-              .on('input', function() {
-                fragmentItemTextChanged(fragment_id, item.id, $(this).text());
-              })
+              .on('input', function() { textChangedHandler($(this).text()); })
               .on('keydown', function(event) {
                 if (event.key === 'Enter') {
                   event.preventDefault();
@@ -228,7 +229,7 @@
               .html('<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>')
               .on('click', function(e) {
                 e.preventDefault();
-                fragmentItemRemove(this, fragment_id, item.id);
+                itemRemoveHandler(this);
                 return false;
               })
           )
@@ -242,11 +243,44 @@
     .on('show.bs.dropdown', '.dropdown', function() {
 
       const fragment_id = $(this).attr('data-fragment-id');
+
       const menu = $(this).find('.dropdown-menu');
       menu.empty();
 
+      const fragment = dataWrapper.findFragment(fragment_id);
+      console.log(fragment);
+
+      const setCorrectHandler = (itemId) => {
+        if (fragment.multi) {
+          dataWrapper.setFragmentCorrectItemMulti(fragment_id, itemId);
+          const text = dataWrapper.getFragmentCorrectItems(fragment_id).map(item => item.title).join(', ');
+          fragmentItemSetCorrect(fragment_id, text);
+        } else {
+          const item = dataWrapper.setFragmentCorrectItem(fragment_id, itemId);
+          fragmentItemSetCorrect(fragment_id, item.title);
+        }
+      }
+
+      const textChangedHandler = (itemId, text) => {
+        const item = dataWrapper.findFragmentItem(fragment_id, itemId);
+        fragmentItemTextChanged(fragment_id, item, text);
+        fragmentItemSetCorrect(fragment_id, dataWrapper.getFragmentCorrectItems(fragment_id).map(item => item.title).join(', '));
+      };
+
+      const itemRemoveHandler = (itemId, elem) => {
+        dataWrapper.removeFragmentItem(fragment_id, itemId);
+        fragmentItemRemove(elem);
+        fragmentItemSetCorrect(fragment_id, dataWrapper.getFragmentCorrectItems(fragment_id).map(item => item.title).join(', '));
+      };
+
       dataWrapper.getFragmentItems(fragment_id).forEach(function(item) {
-        const elem = createFragmentItemElement(fragment_id, item);
+        const elem = createFragmentItemElement(
+          {fragmentId: fragment_id, ...item},
+          () => setCorrectHandler(item.id),
+          (text) => textChangedHandler(item.id, text),
+          (elem) => itemRemoveHandler(item.id, elem),
+          fragment.multi
+        );
         elem.appendTo(menu);
       });
 
@@ -258,7 +292,22 @@
           .text('Добавить слово')
           .on('click', function(e) {
             e.preventDefault();
-            addFragmentItem(fragment_id);
+
+            const item = dataWrapper.createFragmentItem(fragment_id, {
+              id: generateUUID(),
+              correct: false,
+              title: ''
+            });
+
+            const elem = createFragmentItemElement(
+              {fragmentId: fragment_id, ...item},
+              () => setCorrectHandler(item.id),
+              (text) => textChangedHandler(item.id, text),
+              (elem) => itemRemoveHandler(elem, fragment_id, item.id),
+              fragment.multi
+            );
+
+            addFragmentItem(fragment_id, elem);
           })
       ).appendTo(menu);
 

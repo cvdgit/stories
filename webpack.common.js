@@ -1,6 +1,5 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
 module.exports = {
     entry: {
@@ -19,9 +18,6 @@ module.exports = {
         jquery: 'jQuery',
     },
     plugins: [
-        //new CleanWebpackPlugin({
-        //    exclude: /\.gitignore/,
-        //}),
         new MiniCssExtractPlugin()
     ],
     module: {

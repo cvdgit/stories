@@ -1596,6 +1596,7 @@ p.wikids-test-description {
 .pass-test-question__wrap {
   line-height: 2.4;
   font-size: 24px;
+  max-width: none !important;
 }
 
 .pass-test-question__wrap .highlight {
@@ -1763,6 +1764,10 @@ p.wikids-test-description {
   text-align: center;
 }
 
+.highlight {
+  position: relative;
+}
+
 .highlight-done {
   border: 2px #d6e9c6 solid !important;
   background-color: #dff0d8 !important;
@@ -1771,4 +1776,72 @@ p.wikids-test-description {
 .highlight-fail {
   border: 2px #ebccd1 solid !important;
   background-color: #f2dede !important;
+}
+
+.highlight .dropdown-menu {
+  font-size: inherit;
+}
+
+.highlight .dropdown-toggle {
+  cursor: pointer;
+  min-width: 150px;
+}
+
+.dropdown-menu-item {
+  display: block;
+  padding: 3px 20px;
+  clear: both;
+  font-weight: 400;
+  line-height: 1.42857143;
+  color: #333333;
+  white-space: nowrap;
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.25rem 1.5rem;
+  clear: both;
+  font-weight: 400;
+  color: #212529;
+  text-align: inherit;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+  color: #16181b;
+  text-decoration: none;
+  background-color: #e9ecef;
+}
+
+.custom-control {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  min-height: 1.5rem;
+  padding-left: 1.5rem;
+  -webkit-print-color-adjust: exact;
+  color-adjust: exact;
+}
+
+.custom-control input[type=checkbox],
+.custom-control input[type=radio] {
+  width: 16px;
+  height: 20px;
+}
+
+.custom-control label {
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+  font-weight: normal;
+  display: block;
+  user-select: none;
+}
+
+.highlight.disabled {
+  opacity: .7;
 }

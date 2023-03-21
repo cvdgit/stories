@@ -4,20 +4,52 @@ const PassTest = function (test) {
   this.element = null;
 };
 
-function createSelectElement(fragmentId, attrs = {}, items) {
-  attrs = {
+function createSelectElement(fragmentId, attrs = {}, items, multi = false) {
+
+  const $wrapper = $('<div/>', {
     'data-fragment-id': fragmentId,
     class: 'highlight custom-select',
     ...attrs
-  };
-  const select = $('<select/>', attrs);
-  $('<option/>').val('').text('').appendTo(select);
-
-  items.forEach((item) => {
-    $('<option/>').text(item.title).appendTo(select);
   });
 
-  return select;
+  const $toggle = $('<div/>', {
+    class: 'dropdown-toggle disabled',
+    'data-toggle': 'dropdown'
+  });
+  $toggle.html('&nbsp;')
+  $toggle.appendTo($wrapper);
+
+  const $menu = $('<div/>', {class: 'dropdown-menu'});
+
+  const singleCallback = item => $('<div/>', {class: 'dropdown-item'})
+    .append(
+      $('<div/>', {class: 'custom-control'})
+        .append(
+          $('<input/>', {type: 'radio', name: fragmentId, id: 'item' + item.id})
+        )
+        .append(
+          $('<label/>', {for: 'item' + item.id}).text(item.title)
+        )
+    );
+
+  const multipleCallback = item => $('<div/>', {class: 'dropdown-item'})
+    .append(
+      $('<div/>', {class: 'custom-control'})
+        .append(
+          $('<input/>', {type: 'checkbox', id: 'item' + item.id, 'value': item.title})
+        )
+        .append(
+          $('<label/>', {for: 'item' + item.id}).text(item.title)
+        )
+    );
+
+  items.forEach(
+    item => $menu.append(multi ? multipleCallback(item) : singleCallback(item))
+  );
+
+  $menu.appendTo($wrapper);
+
+  return $wrapper;
 }
 
 function createTextElement(fragmentId, attrs = {}) {
@@ -32,11 +64,25 @@ function createTextElement(fragmentId, attrs = {}) {
   return input;
 }
 
-function checkFragmentValueIsCorrect(fragmentId, value, fragments) {
+/*function checkFragmentValueIsCorrect(fragmentId, value, fragments) {
   const fragment = fragments.find(elem => elem.id === fragmentId);
   if (fragment) {
     const fragmentItem = fragment.items.find(item => item.title === value);
     return fragmentItem && fragmentItem.correct;
+  }
+  return false;
+}*/
+
+function checkFragmentValueIsCorrect(fragmentId, value, fragments) {
+  const values = Array.isArray(value) ? value : [value];
+  const fragment = fragments.find(elem => elem.id === fragmentId);
+  if (fragment) {
+    const correctValues = fragment.items.filter(item => item.correct).map(item => item.title);
+    return correctValues.every(correctValue => {
+      return values.some(value => {
+        return correctValue === value;
+      });
+    });
   }
   return false;
 }
@@ -47,10 +93,17 @@ function resetFragmentElement(element) {
     .removeClass('highlight-done')
     .removeClass('highlight-fail')
     .removeAttr('disabled')
-    .val('');
+    .find('.dropdown-toggle')
+    .html('&nbsp;')
+    .addClass('disabled');
   element
     .addClass('disabled')
     .prop('disabled', true);
+
+  element.removeData('values');
+
+  element.find('.dropdown-menu input[type=radio]').prop('checked', false);
+  element.find('.dropdown-menu input[type=checkbox]').prop('checked', false);
 }
 
 PassTest.prototype.createWrapper = function (content) {
@@ -68,11 +121,66 @@ PassTest.prototype.createWrapper = function (content) {
   return $wrapper;
 };
 
+let currentIncorrectFragmentId;
+
+function checkHandler($target, check, fragmentId, $content, maxPrevItems) {
+
+  $target
+    .removeClass('highlight-fail')
+    .removeClass('highlight-done');
+
+  if (check) {
+
+    currentIncorrectFragmentId = null;
+
+    $target
+      .addClass('highlight-done disabled')
+      .prop('disabled', true)
+      .find('.dropdown-toggle')
+      .addClass('disabled');
+
+    const next = $content.find('.highlight:not(.highlight-done,.highlight-fail):eq(0)');
+    if (next.length && next.hasClass('disabled') && (!next.hasClass('highlight-done'))) {
+      next.removeClass('disabled');
+      next.removeAttr('disabled');
+      next.find('.dropdown-toggle').removeClass('disabled');
+    }
+
+  } else {
+
+    $target.addClass('highlight-fail');
+
+    if (currentIncorrectFragmentId !== fragmentId) {
+
+      const max = maxPrevItems || 0;
+      if (max === 0) {
+        $content.find('.highlight.highlight-done,.highlight.highlight-fail').each((i, elem) => {
+          if ($(elem).attr('data-fragment-id') !== fragmentId) {
+            resetFragmentElement($(elem));
+          }
+        });
+      } else {
+        const prevAll = $target.prevAll('.highlight.highlight-done,.highlight.highlight-fail');
+        if (prevAll.length) {
+          prevAll.each((i, elem) => {
+            if (i >= max) {
+              return;
+            }
+            resetFragmentElement($(elem));
+          });
+        }
+      }
+    }
+
+    currentIncorrectFragmentId = fragmentId;
+  }
+}
+
 PassTest.prototype.create = function (question, fragmentAnswerCallback) {
 
   const {fragments} = question.payload;
   let {content} = question.payload;
-console.log(question);
+
   fragments.forEach((fragment) => {
     let element;
 
@@ -91,7 +199,7 @@ console.log(question);
       element = createTextElement(fragment.id, elemAttrs);
     } else {
       elemAttrs.class += ' custom-select';
-      element = createSelectElement(fragment.id, elemAttrs, shuffle(fragment.items));
+      element = createSelectElement(fragment.id, elemAttrs, shuffle(fragment.items), fragment.multi);
     }
 
     const reg = new RegExp('{' + fragment.id + '}');
@@ -103,66 +211,80 @@ console.log(question);
   $content
     .find('.highlight:eq(0)')
     .removeClass('disabled')
-    .removeAttr('disabled');
+    .removeAttr('disabled')
+    .find('.dropdown-toggle')
+    .removeClass('disabled');
 
-  let currentIncorrectFragmentId;
+  $content.on('change', '.dropdown-item input[type=radio]', e => {
+    const $target = $(e.target);
+    const value = $target.siblings('label').text().trim();
 
-  $content.on('change', 'select,input[type=text]', (e) => {
+    $target.parents('.highlight:eq(0)').find('.dropdown-toggle').text(value);
+
+    const fragmentId = $target.parents('.highlight:eq(0)').attr('data-fragment-id');
+    const check = checkFragmentValueIsCorrect(fragmentId, value, fragments);
+
+    $target.parents('.highlight:eq(0)').find('.dropdown-toggle').dropdown('toggle');
+
+    checkHandler($target.parents('.highlight:eq(0)'), check, fragmentId, $content, question['max_prev_items']);
+
+    if (typeof fragmentAnswerCallback === 'function') {
+      fragmentAnswerCallback(check, value);
+    }
+  });
+
+  $content.on('change', '.dropdown-item input[type=checkbox]', e => {
+
+    const $target = $(e.target);
+    const $elem = $target.parents('.highlight:eq(0)');
+    const values = $elem.data('values') || [];
+
+    const value = $target.val();
+    if ($target.is(':checked') && !values.includes(value)) {
+      values.push(value);
+    }
+
+    if (!$target.is(':checked') && values.includes(value)) {
+      values.splice(values.indexOf(value), 1);
+    }
+
+    $elem.data('values', values);
+
+    $target
+      .parents('.highlight:eq(0)')
+      .find('.dropdown-toggle').html(values.length ? values.join(', ') : '&nbsp;');
+
+    const fragmentId = $target.parents('.highlight:eq(0)').attr('data-fragment-id');
+    const fragment = fragments.find(elem => elem.id === fragmentId);
+    if (values.length === fragment.items.filter(item => item.correct).length) {
+
+      const check = checkFragmentValueIsCorrect(fragmentId, values, fragments);
+
+      $elem.find('.dropdown-toggle').dropdown('toggle');
+
+      checkHandler($target.parents('.highlight:eq(0)'), check, fragmentId, $content, question['max_prev_items']);
+
+      if (typeof fragmentAnswerCallback === 'function') {
+        fragmentAnswerCallback(check, values.join(', '));
+      }
+    }
+  });
+
+  $content.on('change', 'input[type=text]', (e) => {
     const value = e.target.value;
 
     const fragmentId = $(e.target).attr('data-fragment-id');
     const check = checkFragmentValueIsCorrect(fragmentId, value, fragments);
 
-    $(e.target)
-      .removeClass('highlight-fail')
-      .removeClass('highlight-done');
-
-    if (check) {
-
-      currentIncorrectFragmentId = null;
-
-      $(e.target)
-        .addClass('highlight-done disabled')
-        .prop('disabled', true);
-
-      const next = $content.find('.highlight:not(.highlight-done,.highlight-fail):eq(0)');
-      if (next.length && next.hasClass('disabled') && (!next.hasClass('highlight-done'))) {
-        next.removeClass('disabled');
-        next.removeAttr('disabled');
-      }
-
-    } else {
-
-      $(e.target).addClass('highlight-fail');
-
-      if (currentIncorrectFragmentId !== fragmentId) {
-
-        const max = question['max_prev_items'] || 0;
-        if (max === 0) {
-          $content.find('.highlight.highlight-done,.highlight.highlight-fail').each((i, elem) => {
-            if ($(elem).attr('data-fragment-id') !== fragmentId) {
-              resetFragmentElement($(elem));
-            }
-          });
-        } else {
-          const prevAll = $(e.target).prevAll('.highlight.highlight-done,.highlight.highlight-fail');
-          if (prevAll.length) {
-            prevAll.each((i, elem) => {
-              if (i >= max) {
-                return;
-              }
-              resetFragmentElement($(elem));
-            });
-          }
-        }
-      }
-
-      currentIncorrectFragmentId = fragmentId;
-    }
+    checkHandler($(e.target), check, fragmentId, $content, question['max_prev_items']);
 
     if (typeof fragmentAnswerCallback === 'function') {
       fragmentAnswerCallback(check, $(e.target).val());
     }
+  });
+
+  $content.on('click', '.dropdown-menu', function(e) {
+    e.stopPropagation();
   });
 
   this.element = this.createWrapper($content)
@@ -176,13 +298,13 @@ PassTest.prototype.getContent = function(payload) {
 
   payload.fragments.forEach(function(fragment) {
 
-    const correctItem = fragment.items.filter((item) => {
-      return item.correct;
-    })[0];
+    const correctItems = fragment.items
+      .filter(item => item.correct)
+      .sort((a, b) => parseInt(a.order) - parseInt(b.order));
 
     let correctItemTitle = '';
-    if (correctItem) {
-      correctItemTitle = correctItem.title;
+    if (correctItems.length) {
+      correctItemTitle = correctItems.map(item => item.title).join(', ');
     }
 
     const reg = new RegExp('{' + fragment.id + '}');
@@ -193,8 +315,26 @@ PassTest.prototype.getContent = function(payload) {
 
 PassTest.prototype.getUserAnswers = function() {
   return this.element.find('.highlight').map(function(index, elem) {
+
     const $el = $(elem);
-    return ($el.is('select') ? $el.find('option:selected').text() : $el.val()).trim().toLowerCase();
+
+    if ($el.is('input[type=text]')) {
+      return [$el.val().trim().toLowerCase()];
+    }
+
+    const $radio = $el.find('.dropdown-menu input[type=radio]:checked');
+    if ($radio.length) {
+      return [$radio.siblings('label').text().trim().toLowerCase()];
+    }
+
+    const $boxes = $el.find('.dropdown-menu input[type=checkbox]:checked');
+    if ($boxes.length) {
+      const values = $el.data('values') || [];
+      if (values.length) {
+        return values;
+      }
+      return $boxes.map((i, box) => $(box).attr('value').trim().toLowerCase()).get();
+    }
   }).get();
 }
 
