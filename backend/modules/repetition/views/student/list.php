@@ -37,19 +37,7 @@ $this->title = 'Ученики с повторением';
                 }
             ],
             'scheduleName:text:Расписание',
-            [
-                'attribute' => 'lastItem',
-                'label' => 'Дата последнего повторения',
-                'value' => static function ($model) {
-                    return SmartDate::dateSmart($model['lastItem'], true);
-                },
-            ],
-            [
-                'label' => 'Пройдено',
-                'value' => static function ($model) {
-                    return $model['repetitionItemsCount'] . ' из ' . $model['scheduleItemsCount'];
-                },
-            ],
+            'testsCount:text:Тестов',
         ],
     ]); ?>
 </div>

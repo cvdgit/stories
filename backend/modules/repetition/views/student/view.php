@@ -28,6 +28,7 @@ $this->title = 'Повторения';
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'summary' => false,
+        'options' => ['class' => 'table-responsive'],
         'columns' => [
             'testName:text:Тест',
             'scheduleName:text:Расписание',

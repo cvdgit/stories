@@ -20,7 +20,7 @@ class StudentRepetitionSearch extends Model
                 'testId' => 'st.id',
                 'scheduleName' => 's.name',
                 'scheduleId' => 's.id',
-                'allDone' => 'GROUP_CONCAT(r.done ORDER BY r.created_at)',
+                'allDone' => 'GROUP_CONCAT(r.done ORDER BY r.created_at DESC)',
                 'lastItem' => new Expression('MAX(r.created_at)'),
                 'scheduleItemsCount' => (new Query())
                     ->select(new Expression('count(t.id)'))

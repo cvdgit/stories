@@ -22,12 +22,7 @@ class StudentListSearch extends Model
                 'studentId' => 'us.id',
                 'scheduleName' => 's.name',
                 'scheduleId' => 's.id',
-                'lastItem' => new Expression('MAX(r.created_at)'),
-                'scheduleItemsCount' => (new Query())
-                    ->select(new Expression('count(t.id)'))
-                    ->from(['t' => 'schedule_item'])
-                    ->where('s.id = t.schedule_id'),
-                'repetitionItemsCount' => new Expression('COUNT(IF(r.done = 1, r.id, null))'),
+                'testsCount' => new Expression('COUNT(DISTINCT r.test_id)'),
             ])
             ->from(['r' => 'test_repetition'])
             ->innerJoin(['us' => 'user_student'], 'r.student_id = us.id')
