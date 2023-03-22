@@ -25,6 +25,7 @@ class StudentViewAction extends Action
 
         return $this->controller->render('view', [
             'dataProvider' => $dataProvider,
+            'studentId' => $student->id,
         ]);
     }
 }

@@ -23,7 +23,8 @@ return [
     ],
     'container' => [
         'definitions' => [
-            ScheduleFetcherInterface::class => ScheduleFetcher::class
+            ScheduleFetcherInterface::class => ScheduleFetcher::class,
+            \backend\modules\repetition\RepetitionApiInterface::class => \frontend\modules\repetition\RepetitionApiProvider::class,
         ],
     ],
     'components' => [

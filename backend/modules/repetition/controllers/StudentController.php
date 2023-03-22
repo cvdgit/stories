@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace backend\modules\repetition\controllers;
 
+use backend\modules\repetition\Students\CreateRepetition\CreateRepetitionAction;
 use backend\modules\repetition\Students\ListAction;
+use backend\modules\repetition\Students\NextRepetition\NextRepetitionAction;
 use backend\modules\repetition\Students\View\StudentViewAction;
 use common\rbac\UserRoles;
 use yii\filters\AccessControl;
@@ -32,6 +34,8 @@ class StudentController extends Controller
         return [
             'list' => ListAction::class,
             'view' => StudentViewAction::class,
+            'create-repetition' => CreateRepetitionAction::class,
+            'next-repetition' => NextRepetitionAction::class,
         ];
     }
 }

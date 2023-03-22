@@ -34,22 +34,7 @@
                 }
               });
           });
-
-/*          sendForm($(form).attr('action'), $(form).attr('method'), new FormData(form))
-            .done((response) => {
-              if (response) {
-                if (response.success) {
-                  toastr.success(response.message);
-                  modal.hide();
-                } else {
-                  toastr.error(response.message);
-                }
-              } else {
-                toastr.error('Неизвестная ошибка');
-              }
-            })*/
         });
-
       }
     });
   });
