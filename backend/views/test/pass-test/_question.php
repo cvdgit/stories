@@ -114,7 +114,7 @@ CSS
             </div>
         </div>
     </div>
-    <div style="min-height:300px;max-height:300px;overflow-y:auto">
+    <div style="min-height:300px;overflow-y:auto">
         <div class="content" data-question-id="<?= $model->getId(); ?>" id="content" contenteditable="true"></div>
     </div>
     <?= $form->field($model, 'content')->hiddenInput()->label(false) ?>
