@@ -331,7 +331,7 @@ PassTest.prototype.getUserAnswers = function() {
     if ($boxes.length) {
       const values = $el.data('values') || [];
       if (values.length) {
-        return values;
+        return values.map(val => val.trim().toLowerCase());
       }
       return $boxes.map((i, box) => $(box).attr('value').trim().toLowerCase()).get();
     }
