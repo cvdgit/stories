@@ -32,18 +32,34 @@
               return '{' + $(this).attr('data-fragment-id') + '}';
             });
           let contentHtml = $('#content-cache #content').html();
+
           $('#content-cache').empty();
 
+          const matches = new Map();
           words.forEach(word => {
 
             const {match} = word;
             if (match.search(/\s/) === -1) {
-              const reg = new RegExp(`[^\w\dа-я]+(${word.match}[a-zа-я0-9]*)[^\.,\s]?`, 'igu');
-              contentHtml = contentHtml.replace(reg, (match, p1, p2, offset, s) => {
+
+              const reg = new RegExp(`[^0-9а-яА-Яa-zA-Z-{]+(${word.match}[a-zA-Zа-яА-Я0-9]*)[^\.,\s]?`, 'igu');
+
+              /*contentHtml = contentHtml.replace(reg, (match, p1, p2, offset, s) => {
                 return ` <span class="btn btn-info search-fragment" data-word="${word.word}" data-list-id="${word.list_id}" contenteditable="false">${p1.trim()}</span> `;
+              });*/
+
+              contentHtml = contentHtml.replace(reg, (match, p1, p2, offset, s) => {
+                const id = generateUUID();
+                matches.set(id, ` <span class="btn btn-info search-fragment" data-word="${word.word}" data-list-id="${word.list_id}" contenteditable="false">${p1.trim()}</span> `);
+                return ` {${id}} `;
               });
             }
           });
+
+          for (let entry of matches) {
+            const [entryId, entryValue] = entry;
+            const reg = new RegExp(`\\{${entryId.replace('-', '\-')}\\}`, 'igu');
+            contentHtml = contentHtml.replace(reg, entryValue);
+          }
 
           dataWrapper.setContent(contentHtml);
           let content = dataWrapper.initFragments();
