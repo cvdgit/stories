@@ -121,7 +121,7 @@
 	height: 100%;
   position: relative;
   display: grid;
-  grid-template-rows: 42px auto 100px;
+  grid-template-rows: 42px auto 80px;
 }
 
 .wikids-test--no-controls {
@@ -859,7 +859,7 @@ p.wikids-test-description {
 }
 
 .seq-question__wrap--full {
-  height: 450px;
+  height: 500px;
 }
 
 .sequence-question-list {
