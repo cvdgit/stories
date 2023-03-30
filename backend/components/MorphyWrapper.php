@@ -33,8 +33,12 @@ class MorphyWrapper
         return $result[0];
     }
 
-    public function getAllForms(string $word): ?string
+    public function getAllForms(string $word): array
     {
-        return $this->morphy->getAllForms(mb_strtoupper($word))[0];
+        $result = $this->morphy->getAllForms(mb_strtoupper($word));
+        if ($result === false) {
+            return [];
+        }
+        return $result;
     }
 }

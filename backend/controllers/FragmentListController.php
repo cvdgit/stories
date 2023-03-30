@@ -186,6 +186,9 @@ class FragmentListController extends Controller
 
             $listItemBase = $morphy->getBaseForm($itemWord);
             $listPseudoRoot = $morphy->getPseudoRoot($itemWord);
+
+            $allForms = $morphy->getAllForms($itemWord);
+
             if (empty($listItemBase)) {
                 $listItemBase = $itemWord;
             }
@@ -194,16 +197,23 @@ class FragmentListController extends Controller
                 $listPseudoRoot = $listItemBase;
             }
 
-            if (str_contains($content, mb_strtolower($listItemBase))) {
+            //if (str_contains($content, mb_strtolower($listItemBase))) {
 
-                $tag = mb_strtolower($listItemBase);
-                $result[$tag] = [
-                    'word' => $itemWord,
-                    'tag' => $tag,
-                    'list_id' => $listItem['listId'],
-                    'match' => mb_strtolower($listPseudoRoot),
-                ];
+            $tag = mb_strtolower($listItemBase);
+            $match = mb_strtolower($listPseudoRoot);
+
+            if (mb_strlen($match) < 4) {
+                $match = $tag;
             }
+
+            $result[] = [
+                'word' => $itemWord,
+                'tag' => $tag,
+                'list_id' => $listItem['listId'],
+                'match' => $match,
+                'all' => $allForms,
+            ];
+            //}
         }
 
 /*
