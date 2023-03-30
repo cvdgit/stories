@@ -869,6 +869,7 @@ p.wikids-test-description {
 .seq-answers {
   max-width: 600px;
   margin: 0 auto;
+  overflow: auto !important;
 }
 
 .seq-answers div {
