@@ -41,7 +41,7 @@
             const {match} = word;
             if (match.search(/\s/) === -1) {
 
-              const reg = new RegExp(`[^0-9а-яА-Яa-zA-Z-{]+(${word.match}[a-zA-Zа-яА-Я0-9]*)[^\.,\s]?`, 'igu');
+              const reg = new RegExp(`[^0-9а-яА-Яa-zA-Z-{}]+(${word.match}[a-zA-Zа-яА-Я0-9]*)[^\.,\s]?`, 'igu');
 
               /*contentHtml = contentHtml.replace(reg, (match, p1, p2, offset, s) => {
                 return ` <span class="btn btn-info search-fragment" data-word="${word.word}" data-list-id="${word.list_id}" contenteditable="false">${p1.trim()}</span> `;
