@@ -36,10 +36,12 @@
           $('#content-cache').empty();
 
           const matches = new Map();
-          words.forEach(word => {
+          words
+            .sort((a, b) => b.word.length - a.word.length)
+            .forEach(word => {
 
             const {match} = word;
-            if (match.search(/\s/) === -1) {
+            //if (match.search(/\s/) === -1) {
 
               const reg = new RegExp(`[^0-9а-яА-Яa-zA-Z-{}<>]+(${word.match}[a-zA-Zа-яА-Я0-9]*)[^\.,\s]?`, 'igu');
 
@@ -48,7 +50,9 @@
                 matches.set(id, ` <span class="btn btn-info search-fragment" data-word="${word.word}" data-list-id="${word.list_id}" contenteditable="false">${p1.trim()}</span> `);
                 return ` {${id}} `;
               });
-            }
+            //} else {
+
+            //}
           });
 
           for (let entry of matches) {
