@@ -179,6 +179,7 @@ class FragmentListController extends Controller
         $morphy = new MorphyWrapper();
 
         $result = [];
+        //$lists = [];
         foreach ($fragmentLists as $listItem) {
 
             $itemWord = $listItem['tagName'];
@@ -195,9 +196,10 @@ class FragmentListController extends Controller
 
             if (str_contains($content, mb_strtolower($listItemBase))) {
 
-                $result[] = [
+                $tag = mb_strtolower($listItemBase);
+                $result[$tag] = [
                     'word' => $itemWord,
-                    'tag' => mb_strtolower($listItemBase),
+                    'tag' => $tag,
                     'list_id' => $listItem['listId'],
                     'match' => mb_strtolower($listPseudoRoot),
                 ];
@@ -278,7 +280,7 @@ class FragmentListController extends Controller
             }
         }*/
 
-        return ['success' => true, 'words' => $result, 'debug' => []];
+        return ['success' => true, 'words' => array_values($result), 'debug' => []];
     }
 
     public function actionSelectOne(int $list_id): string
