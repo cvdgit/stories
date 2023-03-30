@@ -60,41 +60,13 @@
     }
   }
 
-  const addSelectEvents = function(container, selectedItems) {
-    $(container).find('#all-items-list')
-      .on('click', '.add-items', function(e) {
-        $(this).parent().find('.items .list-item').each((i, item) => {
-
-          const itemId = parseInt($(item).attr('data-item-id'));
-          if (selectedItems.exists(itemId)) {
-            return;
-          }
-
-          selectedItems.add({id: itemId, title: $(item).text()});
-
-          const elem = $('<li/>', {class: 'list-group-item selected-item', 'data-item-id': itemId})
-            .append('<p>' + $(item).text() + '</p>');
-
-          elem.append(
-            $('<i/>', {class: 'glyphicon glyphicon-trash selected-del'})
-              .on('click', function(e) {
-                $(this).parent().remove();
-                selectedItems.del(itemId);
-              })
-          );
-
-          $(container).find('#selected-items-list').append(elem);
-        });
-      });
-  }
+  const selectedItems = new SelectedItems();
 
   const selectCallback = function(fragmentId) {
 
-    const selectedItems = new SelectedItems();
+    const $content = $(this);
 
-    addSelectEvents($(this), selectedItems);
-
-    $(this).find('#create-fragment-list').on('click', function(e) {
+    $content.find('#create-fragment-list').on('click', function(e) {
 
       if (selectedItems.isEmpty()) {
         toastr.info('Итоговый список пуст');
@@ -109,11 +81,39 @@
         });
       });
 
+      selectedItems.reset();
+
       selectDialog.hide();
     });
 
-    const $content = $(this);
+    $content.on('click', ' #all-items-list .add-items', function(e) {
+
+      $(this).parent().find('.items .list-item').each((i, item) => {
+
+        const itemId = parseInt($(item).attr('data-item-id'));
+        if (selectedItems.exists(itemId)) {
+          return;
+        }
+
+        selectedItems.add({id: itemId, title: $(item).text()});
+
+        const elem = $('<li/>', {class: 'list-group-item selected-item', 'data-item-id': itemId})
+          .append('<p>' + $(item).text() + '</p>');
+
+        elem.append(
+          $('<i/>', {class: 'glyphicon glyphicon-trash selected-del'})
+            .on('click', function(e) {
+              $(this).parent().remove();
+              selectedItems.del(itemId);
+            })
+        );
+
+        $content.find('#selected-items-list').append(elem);
+      });
+    });
+
     $content.find('#lists-filter-form input[type=checkbox]').on('click', function() {
+      selectedItems.reset();
       $.pjax.reload({
         container: '#pjax-lists',
         replace: false,
@@ -123,11 +123,6 @@
       });
     });
   };
-
-  $(window).on('pjax:success', (e) => {
-    const selectedItems = new SelectedItems();
-    addSelectEvents($(e.target), selectedItems);
-  })
 
   $('#select-fragment-list').on('click', function(e) {
     e.preventDefault();
