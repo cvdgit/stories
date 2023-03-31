@@ -160,9 +160,18 @@ function checkHandler($target, check, fragmentId, $content, maxPrevItems) {
           }
         });
       } else {
-        const prevAll = $target.prevAll('.highlight.highlight-done,.highlight.highlight-fail');
-        if (prevAll.length) {
-          prevAll.each((i, elem) => {
+
+        const prevList = [];
+        $content.find('.highlight.highlight-done,.highlight.highlight-fail').each((i, elem) => {
+          if ($(elem).attr('data-fragment-id') === fragmentId) {
+            return;
+          }
+          prevList.push($(elem));
+        });
+
+        if (prevList.length) {
+          prevList.reverse();
+          prevList.forEach((elem, i) => {
             if (i >= max) {
               return;
             }
