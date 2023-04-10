@@ -52,7 +52,7 @@ class QuestionController extends Controller
             try {
                 $id = $model->create();
                 Yii::$app->session->setFlash('success', 'Вопрос успешно создан');
-                return $this->redirect(['update', 'id' => $id]);
+                return $this->redirect(['update', 'id' => $id, '#' => 'question' . $id]);
             }
             catch (\Exception $ex) {
                 Yii::$app->session->setFlash('error', $ex->getMessage());

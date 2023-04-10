@@ -53,7 +53,8 @@ $this->registerJs(<<<JS
 (function() {
     const hash = window.location.hash.substring(1);
     if (hash) {
-        $("a[data-anchor='" + hash + "']")[0].scrollIntoView({ behavior: "auto", block: "end", inline: "start" });
+        $("a[data-anchor='" + hash + "']")[0].scrollIntoView({ behavior: "auto", block: "center", inline: "nearest" });
+        window.scrollTo({ top: 0, behavior: 'auto' });
     }
 })();
 JS

@@ -62,7 +62,7 @@ class QuestionSequenceController extends BaseController
             try {
                 $id = $model->createQuestion();
                 Yii::$app->session->setFlash('success', 'Вопрос успешно создан');
-                return $this->redirect(['update', 'id' => $id]);
+                return $this->redirect(['update', 'id' => $id, '#' => 'question' . $id]);
             }
             catch (\Exception $ex) {
                 Yii::$app->session->setFlash('error', $ex->getMessage());
