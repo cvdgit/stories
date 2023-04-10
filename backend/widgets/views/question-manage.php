@@ -1,10 +1,18 @@
 <?php
+
+declare(strict_types=1);
+
 use yii\bootstrap\Nav;
 use yii\bootstrap\Html;
-/** @var array $items */
-/** @var string $renderData */
-/** @var array $createItems */
-/** @var bool $isCreate */
+use yii\web\View;
+
+/**
+ * @var View $this
+ * @var array $items
+ * @var string $renderData
+ * @var array $createItems
+ * @var bool $isCreate
+ */
 ?>
 <div class="question-manage" style="height: 100%">
     <div class="row">
@@ -28,7 +36,7 @@ use yii\bootstrap\Html;
                 <div style="display: flex; flex-direction: column; overflow: hidden">
                     <div style="display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; flex-grow: 1">
                         <?= Nav::widget([
-                            'options' => ['class' => 'nav-sidebar nav-sidebar--question', 'style' => 'display: flex; flex-direction: column; height: 100%; overflow-y: auto'],
+                            'options' => ['id' => 'nav-question-list', 'class' => 'nav-sidebar nav-sidebar--question', 'style' => 'display: flex; flex-direction: column; height: 100%; overflow-y: auto'],
                             'items' => $items,
                         ]) ?>
                     </div>
@@ -40,3 +48,13 @@ use yii\bootstrap\Html;
         </div>
     </div>
 </div>
+<?php
+$this->registerJs(<<<JS
+(function() {
+    const hash = window.location.hash.substring(1);
+    if (hash) {
+        $("a[data-anchor='" + hash + "']")[0].scrollIntoView({ behavior: "auto", block: "end", inline: "start" });
+    }
+})();
+JS
+);

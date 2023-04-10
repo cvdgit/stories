@@ -38,8 +38,9 @@ class QuestionManageWidget extends BaseQuizManageWidget
     {
         return [
             'label' => $item->name,
-            'url' => ['test/update-question', 'question_id' => $item->id],
+            'url' => ['test/update-question', 'question_id' => $item->id, '#' => 'question' . $item->id],
             'active' => $item->id === $this->currentModelId,
+            'linkOptions' => ['data-anchor' => 'question' . $item->id],
         ];
     }
 
