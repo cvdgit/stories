@@ -9,7 +9,7 @@ use yii\bootstrap\Html;
 <div class="question-manage" style="height: 100%">
     <div class="row">
         <div class="col-lg-3">
-            <div style="background-color: #f8f9fa; box-shadow: inset -1px 0 0 rgb(0 0 0 / 10%); padding: 10px; height: 100%">
+            <div style="background-color: #f8f9fa; box-shadow: inset -1px 0 0 rgb(0 0 0 / 10%); padding: 10px; height: calc(100vh - 150px); display: flex; flex-direction: column">
                 <?php if (!$isCreate): ?>
                 <div style="margin-bottom: 20px">
                     <div class="btn-group btn-block">
@@ -25,10 +25,14 @@ use yii\bootstrap\Html;
                 </div>
                 <?php endif ?>
                 <h4>Список вопросов</h4>
-                <?= Nav::widget([
-                    'options' => ['class' => 'nav-sidebar nav-sidebar--question'],
-                    'items' => $items,
-                ]) ?>
+                <div style="display: flex; flex-direction: column; overflow: hidden">
+                    <div style="display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; flex-grow: 1">
+                        <?= Nav::widget([
+                            'options' => ['class' => 'nav-sidebar nav-sidebar--question', 'style' => 'display: flex; flex-direction: column; height: 100%; overflow-y: auto'],
+                            'items' => $items,
+                        ]) ?>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-lg-9">
