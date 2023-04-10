@@ -126,7 +126,7 @@ function generateUUID() {
           textNode.textContent = '\u00A0';
         }
 
-        const words = textNode.textContent.split(' ');
+        const words = textNode.textContent.replace(/\s\s+/g, ' ').split(' ');
         words.forEach(word => {
 
           dataWrapper.createFragmentItem(elementId, {

@@ -104,6 +104,10 @@ function resetFragmentElement(element) {
 
   element.find('.dropdown-menu input[type=radio]').prop('checked', false);
   element.find('.dropdown-menu input[type=checkbox]').prop('checked', false);
+
+  if (element.hasClass('custom-input')) {
+    element.val('');
+  }
 }
 
 PassTest.prototype.createWrapper = function (content) {
@@ -198,7 +202,7 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
       disabled: 'disabled'
     };
 
-    if (question.item_view === 'text') {
+    if (question.item_view === 'text' || (fragment.items.length === 1 && 1 === fragment.items.filter(item => item.correct).length)) {
       const correctItem = fragment.items.filter(item => item.correct);
       if (correctItem.length === 0) {
         return;
