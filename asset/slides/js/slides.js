@@ -1,5 +1,5 @@
 import 'reveal.js/dist/reveal.css';
-import '../css/wikids-reveal.css';
+//import '../css/wikids-reveal.css';
 import Reveal from 'reveal.js';
 import CustomControls from "./plugins/controls/CustomControls";
 import Feedback from "./plugins/Feedback";
