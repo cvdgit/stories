@@ -89,15 +89,19 @@ class LessonService
             ->delete('edu_lesson_access', ['class_program_id' => $classProgramId])
             ->execute();
         $rows = [];
-        foreach ($form->lessonIds as $lessonId) {
-            $rows[] = [
-                'class_program_id' => $classProgramId,
-                'lesson_id' => $lessonId,
-            ];
+        foreach ($form->lessonIds as $i => $lessonId) {
+            $accessType = $form->accessTypes[$i];
+            if (!empty($accessType)) {
+                $rows[] = [
+                    'class_program_id' => $classProgramId,
+                    'lesson_id' => $lessonId,
+                    'access_type' => $accessType,
+                ];
+            }
         }
         if (count($rows) > 0) {
             Yii::$app->db->createCommand()
-                ->batchInsert('edu_lesson_access', ['class_program_id', 'lesson_id'], $rows)
+                ->batchInsert('edu_lesson_access', ['class_program_id', 'lesson_id', 'access_type'], $rows)
                 ->execute();
         }
     }

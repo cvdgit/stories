@@ -10,7 +10,7 @@ use yii\web\View;
 /**
  * @var View $this
  * @var EduClassProgram $classProgram
- * @var array<int> $lessonAccess
+ * @var array<int, array<array-key, string>> $lessonAccess
  */
 
 $this->title = 'Программа обучения';
@@ -51,11 +51,7 @@ $this->registerJs($this->renderFile('@modules/edu/views/admin/class-program/_vie
                     <div style="display: flex; flex-direction: row; align-items: center">
                         <h4 class="h5">Урок: <?= $lesson->name; ?></h4>
                         <div style="margin: 0 20px">|</div>
-                        <div class="checkbox">
-                            <label>
-                                <input data-lesson-id="<?= $lesson->id; ?>" type="checkbox" <?= in_array($lesson->id, $lessonAccess) ? 'checked' : '' ?>> Доступен
-                            </label>
-                        </div>
+                        <?= Html::dropDownList('lesson' . $lesson->id, $lessonAccess[$lesson->id] ?? null, ['access' => 'Доступен', 'deny' => 'Недоступен'], ['class' => 'form-control', 'data-lesson-id' => $lesson->id, 'style' => 'width: auto', 'prompt' => 'Автоматический доступ']); ?>
                     </div>
                     <div>
                         <div class="row" style="display: flex; flex-wrap: wrap">

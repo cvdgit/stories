@@ -2,23 +2,33 @@
 
   const $lessonList = $('#lesson-list');
   const $controls = $('#controls');
-  $lessonList.on('click', 'input[data-lesson-id]', function() {
-    const ids = getLessonIds($lessonList);
+  $lessonList.on('change', '[data-lesson-id]', function() {
     $controls.show();
   });
 
   function getLessonIds($container) {
     return $container
-      .find('input[type=checkbox]:checked')
+      .find('.edu-topic .edu-lesson [data-lesson-id]')
       .map((i, elem) => parseInt($(elem).attr('data-lesson-id')))
       .get();
   }
 
   $controls.find('button').on('click', function() {
-    const ids = getLessonIds($lessonList);
+
     const formData = new FormData();
     formData.append('LessonAccessForm[action]', 'access');
-    ids.map(lessonId => formData.append('LessonAccessForm[lessonIds][]', lessonId));
+
+    $lessonList
+      .find('.edu-topic .edu-lesson [data-lesson-id]')
+      .each((i, elem) => {
+
+        const lessonId = $(elem).attr('data-lesson-id');
+        const accessType = $(elem).find('option:selected').val();
+
+        formData.append(`LessonAccessForm[lessonIds][${i}]`, lessonId);
+        formData.append(`LessonAccessForm[accessTypes][${i}]`, accessType);
+      });
+
     sendForm($(this).attr('data-action'), 'post', formData)
       .then(response => {
         if (response && response.success) {

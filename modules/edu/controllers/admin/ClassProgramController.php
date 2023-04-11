@@ -168,12 +168,16 @@ class ClassProgramController extends Controller
         if ($classProgram === null) {
             throw new NotFoundHttpException('Программа обучения не найдена');
         }
+
         $lessonAccess = (new Query())
-            ->select('lesson_id')
+            ->select(['lesson_id', 'access_type'])
             ->from('edu_lesson_access')
             ->where(['class_program_id' => $classProgram->id])
             ->all();
-        $lessonAccess = array_column($lessonAccess, 'lesson_id');
+        $lessonAccess = array_combine(
+            array_column($lessonAccess, 'lesson_id'),
+            array_column($lessonAccess, 'access_type')
+        );
 
         return $this->render('view', [
             'classProgram' => $classProgram,

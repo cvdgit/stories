@@ -6,6 +6,8 @@ namespace modules\edu\components;
 
 use yii\db\Expression;
 use yii\db\Query;
+use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 
 class TopicAccessManager
 {
@@ -60,17 +62,38 @@ class TopicAccessManager
         }
 
         $accessRows = (new Query())
-            ->select('lesson_id')
+            ->select(['lesson_id', 'access_type'])
             ->from('edu_lesson_access')
             ->where(['class_program_id' => $classProgramId])
             ->all();
-        $lessonAccessSettings = array_column($accessRows, 'lesson_id');
+
+        $lessonAccessSettings = array_combine(
+            array_column($accessRows, 'lesson_id'),
+            array_column($accessRows, 'access_type')
+        );
+
         foreach ($lessonRows as $lessonRow) {
-            if (in_array((int) $lessonRow['lessonId'], $lessonAccessSettings)) {
-                $lessonAccess[$lessonRow['lessonId']] = ['access' => true];
+            $accessType = $lessonAccessSettings[$lessonRow['lessonId']] ?? null;
+            if ($accessType !== null) {
+                $lessonAccess[$lessonRow['lessonId']] = ['access' => ($accessType === 'access')];
             }
         }
 
         return $lessonAccess;
+    }
+
+    /**
+     * @throws BadRequestHttpException
+     * @throws ForbiddenHttpException
+     */
+    public function checkAccessLesson(int $classProgramId, int $lessonId, int $studentId): void
+    {
+        $lessonAccess = $this->getStudentLessonAccess($classProgramId, $studentId);
+        if (!isset($lessonAccess[$lessonId])) {
+            throw new BadRequestHttpException('Ошибка доступа к уроку');
+        }
+        if ($lessonAccess[$lessonId]['access'] === false) {
+            throw new ForbiddenHttpException('Доступ закрыт преподавателем');
+        }
     }
 }

@@ -10,12 +10,14 @@ class LessonAccessForm extends Model
 {
     public $action;
     public $lessonIds = [];
+    public $accessTypes = [];
 
     public function rules(): array
     {
         return [
             ['action', 'string'],
             ['lessonIds', 'each', 'rule' => ['integer']],
+            ['accessTypes', 'each', 'rule' => ['string']],
         ];
     }
 }

@@ -15,13 +15,11 @@ use yii\web\View;
  * @var EduStory $story
  * @var int $programId
  * @var array $backRoute
+ * @var int $studentId
  */
 
 $storyId = $story->id;
-$studentId = Yii::$app->studentContext->getId();
-if ($studentId === null) {
-    $studentId = Yii::$app->user->identity->getStudentID();
-}
+
 $config = [
     'feedback' => [
         'action' => Url::to(['/feedback/create', 'id' => $storyId])
