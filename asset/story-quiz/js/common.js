@@ -89,3 +89,21 @@ export function _extends() {
   };
   return _extends.apply(this, arguments);
 }
+
+/**
+ * @param element
+ */
+export function show (element) {
+  element
+    .removeClass('hide flex-show')
+    .addClass('flex-show');
+}
+
+/**
+ * @param element
+ */
+export function hide (element) {
+  element
+    .removeClass('hide flex-show')
+    .addClass('hide');
+}

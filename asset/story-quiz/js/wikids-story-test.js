@@ -4,7 +4,7 @@ import {
   shuffle,
   combineArraysRecursively,
   textDiff,
-  _extends
+  _extends, hide, show
 } from './common';
 import QuestionSuccess from './components/QuestionSuccess';
 import AnswerTypeNumPad from "./answers/AnswerTypeNumPad";
@@ -1107,9 +1107,10 @@ function WikidsStoryTest(el, options) {
 
     const questionWrap = $('<div/>')
       .addClass("wikids-test-question")
-      .hide()
       .attr("data-question-id", question.id)
       .data("question", question);
+
+    hide(questionWrap);
 
     questionWrap.append(stars);
 
@@ -1366,7 +1367,8 @@ function WikidsStoryTest(el, options) {
   }
 
   function finish() {
-    $('.wikids-test-active-question', el).hide().removeClass('wikids-test-active-question');
+    hide($('.wikids-test-active-question', el));
+    $('.wikids-test-active-question', el).removeClass('wikids-test-active-question');
     dom.finishButton.hide();
     setTestResults();
     if (currentStudent) {
@@ -1624,7 +1626,7 @@ function WikidsStoryTest(el, options) {
 
   function showQuestionSuccessPage(answer) {
 
-    dom.questions.hide();
+    hide(dom.questions);
     dom.controls.hide();
     if (!dom.wrapper.hasClass('wikids-test--no-controls')) {
       dom.wrapper.addClass('wikids-test--no-controls');
@@ -1919,9 +1921,8 @@ function WikidsStoryTest(el, options) {
 
         $activeQuestion.append(that.poetryQuestion.createOverlay(() => {
 
-          $activeQuestion
-            .hide()
-            .removeClass('wikids-test-active-question');
+          hide($activeQuestion);
+          $activeQuestion.removeClass('wikids-test-active-question');
 
           that.poetryQuestion.removeOverlay();
           showNextQuestion();
@@ -1931,33 +1932,33 @@ function WikidsStoryTest(el, options) {
 
       } else {
 
-        $activeQuestion
-          .hide()
-          .removeClass('wikids-test-active-question');
+        hide($activeQuestion);
+        $activeQuestion.removeClass('wikids-test-active-question');
 
-        dom.questions.hide();
+        hide(dom.questions);
         dom.controls.hide();
         dom.wrapper.addClass('wikids-test--no-controls');
+
         if (testConfig.sourceIsWord()
           && !testConfig.answerTypeIsNumPad(currentQuestion)
           && !testConfig.answerTypeIsInput(currentQuestion)
           && !testConfig.answerTypeIsMissingWords(currentQuestion)) {
           continueTestAction(answer);
         } else {
+          dom.results.html("<p>Ответ неверный</p>");
+          show(dom.results);
           dom.results
-            .html("<p>Ответ неверный.</p>")
-            .show()
             .delay(1000)
-            .fadeOut('slow', function () {
+            .fadeOut('slow', () => {
+              hide(dom.results);
               continueTestAction(answer);
             });
         }
       }
     } else {
 
-      $activeQuestion
-        .hide()
-        .removeClass('wikids-test-active-question');
+      hide($activeQuestion);
+      $activeQuestion.removeClass('wikids-test-active-question');
 
       /*if (done && !that.options.fastMode && getQuestionRepeat() > 1) {
         showQuestionSuccessPage(answer);
@@ -2057,13 +2058,12 @@ function WikidsStoryTest(el, options) {
       .find('input[type=checkbox],input[type=radio]')
       .prop('checked', false);
 
-    dom.questions.show();
+    show(dom.questions);
+    dom.questions.animate({scrollTop: 0});
 
     const playContent = $(createPlayBackdrop());
 
-    currentQuestionElement
-      .addClass('wikids-test-active-question')
-      .show();
+    show(currentQuestionElement.addClass('wikids-test-active-question'));
 
     if (
       isShuffleAnswers(currentQuestion)
@@ -2602,6 +2602,7 @@ function WikidsStoryTest(el, options) {
       .find('.wikids-test-correct-answer-answers')
       .empty()
       .html($elements[0].childNodes)
+      .animate({scrollTop: 0})
       .end()
       .show();
 

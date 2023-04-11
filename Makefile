@@ -33,7 +33,7 @@ site-clear:
 	docker run --rm -v ${PWD}:/app -w /app alpine sh -c 'rm -rf .ready public_html/assets/* public_html/admin/assets/* public_html/build/* api/runtime/* frontend/runtime/* console/runtime/* backend/runtime/* public_html/slides_file/* public_html/slides/*'
 
 site-permissions:
-	docker run --rm -v ${PWD}:/app -w /app alpine sh -c 'mkdir -p public_html/build && chmod 777 public_html/assets public_html/admin/assets public_html/build api/runtime frontend/runtime console/runtime backend/runtime public_html/slides_file public_html/slides'
+	docker run --rm -v ${PWD}:/app -w /app alpine sh -c 'mkdir -p public_html/build && chmod 777 public_html/assets public_html/admin/assets public_html/build api/runtime frontend/runtime console/runtime backend/runtime public_html/slides_file public_html/slides public_html/test_images'
 
 site-composer-install:
 	docker-compose run --rm site composer install

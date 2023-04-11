@@ -119,13 +119,19 @@
 
 .wikids-test {
 	height: 100%;
+  width: 100%;
   position: relative;
-  display: grid;
-  grid-template-rows: 42px auto 80px;
+  /*display: grid;
+  grid-template-rows: 42px auto 80px;*/
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  flex-grow: 1;
 }
 
 .wikids-test--no-controls {
-  grid-template-rows: 42px auto;
+  /*grid-template-rows: 42px auto;*/
 }
 
 .wikids-test-header {
@@ -147,6 +153,11 @@
 .wikids-test-questions {
 	margin-top: 10px;
 	text-align: left;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
 .wikids-test-questions .question-title {
@@ -219,6 +230,9 @@
 .wikids-test-question {
 	height: 100%;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
 .wikids-test-answer {
@@ -585,11 +599,13 @@ p.wikids-test-description {
 }
 
 .wikids-test-correct-answer-page {
-  display: grid;
-  grid-template-rows: auto 100px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 	width: 100%;
 	height: 100%;
 	background-color: inherit;
+  justify-content: space-between;
 }
 
 .wikids-test-correct-answer-page-action {
@@ -604,11 +620,9 @@ p.wikids-test-description {
 }
 
 .wikids-test-correct-answer-answers {
-	max-height: 586px;
-	overflow: hidden;
+  overflow: hidden;
 	overflow-y: auto;
 	text-align: left;
-	min-height: 500px;
 }
 
 .wikids-test-correct-answer-answers > .row {
@@ -844,22 +858,24 @@ p.wikids-test-description {
 .new-questions {
 	width: 100%;
 	height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .seq-question {
-  /*height: calc(100% - 183px);*/
   display: flex;
-  align-items: flex-start;
   justify-content: center;
+  flex-direction: column;
 }
 
 .seq-question__wrap {
   min-width: 500px;
-  max-width: 900px;
+  /*max-width: 900px;*/
 }
 
 .seq-question__wrap--full {
-  height: 375px;
+  /*height: 375px;*/
 }
 
 .sequence-question-list {
@@ -869,7 +885,7 @@ p.wikids-test-description {
 .seq-answers {
   max-width: 600px;
   margin: 0 auto;
-  overflow: auto !important;
+  /*overflow: auto !important;*/
 }
 
 .seq-answers div {
@@ -1542,6 +1558,7 @@ p.wikids-test-description {
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  height: 100%;
 }
 
 .pass-test-btn {
@@ -1845,4 +1862,12 @@ p.wikids-test-description {
 
 .highlight.disabled {
   opacity: .7;
+}
+
+.flex-show {
+  display: flex !important;
+}
+
+.hide {
+  display: none;
 }
