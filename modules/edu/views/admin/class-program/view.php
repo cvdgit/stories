@@ -48,7 +48,7 @@ $this->registerJs($this->renderFile('@modules/edu/views/admin/class-program/_vie
             <div>
                 <?php foreach ($topic->eduLessons as $lesson): ?>
                 <div class="edu-lesson">
-                    <div style="display: flex; flex-direction: row; align-items: center">
+                    <div style="display: flex; flex-direction: row; align-items: center; margin-bottom: 10px">
                         <h4 class="h5">Урок: <?= $lesson->name; ?></h4>
                         <div style="margin: 0 20px">|</div>
                         <?= Html::dropDownList('lesson' . $lesson->id, $lessonAccess[$lesson->id] ?? null, ['access' => 'Доступен', 'deny' => 'Недоступен'], ['class' => 'form-control', 'data-lesson-id' => $lesson->id, 'style' => 'width: auto', 'prompt' => 'Автоматический доступ']); ?>
