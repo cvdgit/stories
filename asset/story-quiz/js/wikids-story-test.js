@@ -252,7 +252,7 @@ function WikidsStoryTest(el, options) {
       setElementHtml($("<section/>")
         .attr('data-id', that.options['fromSlideId'])
         .attr("data-background-color", "#ffffff")
-        .append(content));
+        .append($('<div class="sl-block" data-block-id="" data-block-type="html" style="min-width: 4px;min-height: 4px;width: 1280px;height: 720px;left: 0px;top: 0px;"><div class="sl-block-content" style="z-index: 11;"><div class="new-questions"></div></div></div>').find('.new-questions').append(content).end()));
     } else {
       setElementHtml(content);
     }
@@ -299,6 +299,13 @@ function WikidsStoryTest(el, options) {
     }
 
     dom.wrapper.append(dom.beginPage);
+
+    if (that.options.forSlide) {
+      const $backContent = $('<div style="display: flex; flex-direction: row; justify-content: start"><button class="btn" type="button">Назад к истории</button></div>');
+      $backContent.find('button').on('click', () => backToStory())
+      dom.wrapper.append($backContent);
+    }
+
     createContainer(dom.wrapper);
   }
 

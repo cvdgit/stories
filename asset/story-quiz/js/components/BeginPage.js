@@ -80,7 +80,7 @@ export function createBeginPage(testResponse, options = {canModerate: false, onA
     .append($('<h3/>').text('Выберите ученика:'))
     .append($listGroup);
 
-  if (options.canModerate) {
+  if (options.canModerate && !options.repetitionMode) {
     const $options = $('<div/>', {
       class: 'wikids-test-begin-page-options'
     });
