@@ -158,7 +158,7 @@ var Education = (function() {
 
     function initEducation() {
         var currentSlideID = $(getCurrentSlide()).attr('data-id');
-        if (readySlides[currentSlideID]) {
+        if (readySlides[currentSlideID] && !$(getCurrentSlide()).find('.new-questions').is(':empty')) {
             return;
         }
         readySlides[currentSlideID] = true;

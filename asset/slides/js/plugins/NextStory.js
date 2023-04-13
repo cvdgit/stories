@@ -48,7 +48,7 @@ export default () => {
         const createTestingRow = (testingProps) => {
           const element = document.createElement('li');
           element.classList.add('text-left');
-          element.innerHTML = `${testingProps.test_name} - <strong>${testingProps.progress}%</strong>`;
+          element.innerHTML = `<a title="Перейти к слайду" class="story-test-row" href="#/${testingProps.slide_number}">${testingProps.test_name}</a> - <strong>${testingProps.progress}%</strong>`;
           return element;
         };
 

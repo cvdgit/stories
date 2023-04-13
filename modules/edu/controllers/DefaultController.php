@@ -7,15 +7,14 @@ use common\rbac\UserRoles;
 use Exception;
 use modules\edu\models\EduStory;
 use modules\edu\models\EduStudent;
+use modules\edu\query\GetStoryTests\StoryTestsFetcher;
 use modules\edu\query\StoryStudentProgressFetcher;
-use modules\edu\services\StudentService;
 use modules\edu\services\StudentStatService;
 use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\db\Expression;
 use yii\db\Query;
 use yii\helpers\Url;
-use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\Cookie;
 use yii\web\ForbiddenHttpException;
@@ -170,7 +169,6 @@ class DefaultController extends Controller
 
     /**
      * @throws NotFoundHttpException
-     * @throws BadRequestHttpException
      */
     public function actionStoryStat(int $story_id, int $student_id, Response $response): array
     {
@@ -185,19 +183,33 @@ class DefaultController extends Controller
             throw new NotFoundHttpException('Ученик не найден');
         }
 
+        $storyTests = (new StoryTestsFetcher())->fetch($story->id);
+        $storyTestIds = array_map(static function ($item) {
+            return $item->getTestId();
+        }, $storyTests);
+
         $progress = (new StoryStudentProgressFetcher())->fetch($story->id, $student->id);
 
         $testingRows = (new Query())
             ->select([
-                'test_id' => new Expression('DISTINCT story_story_test.test_id'),
+                'test_id' => new Expression('DISTINCT story_test.id'),
                 'test_name' => 'story_test.header',
                 'progress' => new Expression('IFNULL(student_question_progress.progress, 0)'),
             ])
-            ->from('story_story_test')
-            ->innerJoin('story_test', 'story_story_test.test_id = story_test.id')
+            ->from('story_test')
             ->leftJoin('student_question_progress', 'student_question_progress.test_id = story_test.id AND student_question_progress.student_id = :student', [':student' => $student->id])
-            ->where(['story_story_test.story_id' => $story->id])
+            ->where(['in', 'story_test.id', $storyTestIds])
             ->all();
+
+        $testSlides = array_combine(
+            array_map(static function ($item) { return $item->getTestId(); }, $storyTests),
+            array_map(static function ($item) { return $item->getSlideNumber(); }, $storyTests)
+        );
+
+        $testingRows = array_map(static function ($row) use ($testSlides) {
+            $row['slide_number'] = $testSlides[$row['test_id']];
+            return $row;
+        }, $testingRows);
 
         $data = [
             'is_complete' => $story->isComplete($progress),

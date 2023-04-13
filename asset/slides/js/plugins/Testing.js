@@ -116,15 +116,11 @@ export default () => {
       readySlides = [];
 
       const initEducation = () => {
-
         const currentSlideID = $(deck.getCurrentSlide()).attr('data-id');
-
-        if (readySlides[currentSlideID]) {
+        if (readySlides[currentSlideID] && !$(deck.getCurrentSlide()).find('.new-questions').is(':empty')) {
           return;
         }
-
         readySlides[currentSlideID] = true;
-
         initTesting();
       }
 
