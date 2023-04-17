@@ -87,6 +87,14 @@ function checkFragmentValueIsCorrect(fragmentId, value, fragments) {
   return false;
 }
 
+function getFragmentCorrectValues(fragments, fragmentId) {
+  const fragment = fragments.find(elem => elem.id === fragmentId);
+  if (fragment) {
+    return fragment.items.filter(item => item.correct).map(item => item.title);
+  }
+  return [];
+}
+
 function resetFragmentElement(element) {
   element
     .removeClass('disabled')
@@ -290,6 +298,24 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
     const check = checkFragmentValueIsCorrect(fragmentId, value, fragments);
 
     checkHandler($(e.target), check, fragmentId, $content, question['max_prev_items']);
+
+    const $target = $(e.target);
+    if (check) {
+      if ($target.parent().hasClass('highlight-wrap')) {
+        $target.parent().popover('destroy');
+        $target.unwrap();
+      }
+    } else {
+      if ($target.parent().hasClass('highlight-wrap')) {
+        $target.parent().popover('show');
+      } else {
+        const correctItems = getFragmentCorrectValues(fragments, fragmentId);
+        if (correctItems.length) {
+          $target.wrap(`<div class="highlight-wrap" data-trigger="manual" style="display: inline-block; position: relative" data-placement="auto" data-content="${correctItems.join(', ')}"></div>`);
+          $target.parent().popover('show');
+        }
+      }
+    }
 
     if (typeof fragmentAnswerCallback === 'function') {
       fragmentAnswerCallback(check, $(e.target).val());
