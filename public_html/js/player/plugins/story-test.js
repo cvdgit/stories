@@ -34,7 +34,7 @@ var TestSlide = (function() {
 
         var test_id = $(this).data("testId"),
             slide_index = Reveal.getIndices().h;
-
+console.log(test_id);
         var test = WikidsStoryTest.create(container[0], {
             'dataUrl': '/question/get',
             'dataParams': {'testId': test_id},
