@@ -1339,7 +1339,7 @@ function WikidsStoryTest(el, options) {
       `);
     }
 
-    return dom.results.show();
+    show(dom.results);
   }
 
   function nextSlideAction() {
@@ -1355,6 +1355,9 @@ function WikidsStoryTest(el, options) {
     currentQuestionIndex = 0;
 
     if (numQuestions === 0) {
+
+      hide(dom.questions);
+
       if (currentStudent.progress === 100) {
         setTestResults();
         if (that.options.forSlide) {
@@ -1362,6 +1365,7 @@ function WikidsStoryTest(el, options) {
         }
         dom.nextSlideButton.show();
       } else {
+        dom.controls.hide();
         setTestResults('В тесте нет вопросов');
       }
       return;
@@ -1374,8 +1378,13 @@ function WikidsStoryTest(el, options) {
   }
 
   function finish() {
+
     hide($('.wikids-test-active-question', el));
     $('.wikids-test-active-question', el).removeClass('wikids-test-active-question');
+
+    hide(dom.questions);
+    dom.controls.hide();
+
     dom.finishButton.hide();
     setTestResults();
     if (currentStudent) {
@@ -2639,7 +2648,7 @@ function WikidsStoryTest(el, options) {
   }
 
   function hideNextButton() {
-    dom.nextButton.hdie();
+    dom.nextButton.hide();
   }
 
   function continueTestAction(answer) {
