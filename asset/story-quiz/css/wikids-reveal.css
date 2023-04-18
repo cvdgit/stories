@@ -866,8 +866,9 @@ p.wikids-test-description {
 
 .seq-question {
   display: flex;
-  justify-content: center;
+  justify-content: start;
   flex-direction: column;
+  height: 100%;
 }
 
 .seq-question__wrap {
