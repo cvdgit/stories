@@ -1,14 +1,22 @@
 <?php
+
+declare(strict_types=1);
+
 use backend\helpers\SummaryHelper;
 use common\helpers\SmartDate;
-use common\models\Payment;
 use dosamigos\chartjs\ChartJs;
 use yii\helpers\Html;
-/** @var $this yii\web\View */
-/** @var array $labels */
-/** @var array $data */
-/** @var array $todayStories */
-/** @var array $users */
+use yii\web\View;
+
+/**
+ * @var View $this
+ * @var array $labels
+ * @var array $data
+ * @var array $todayStories
+ * @var array $users
+ * @var int $answersCount
+ */
+
 $this->title = 'Панель управления';
 ?>
 <div class="site-index">
@@ -17,14 +25,11 @@ $this->title = 'Панель управления';
             <div class="col-lg-3">
                 <h4>Сегодня</h4>
                 <ul class="list-group">
-                    <li class="list-group-item"><span class="badge"><?= SummaryHelper::activatedSubscriptions() ?></span> Активировано подписок</li>
                     <li class="list-group-item"><span class="badge"><?= SummaryHelper::publishedStories() ?></span> Опубликовано историй</li>
                     <li class="list-group-item"><span class="badge"><?= SummaryHelper::registeredUsers() ?></span> Зарегистрировано пользователей</li>
                     <li class="list-group-item"><span class="badge"><?= SummaryHelper::commentsWritten() ?></span> Написано комментариев</li>
                     <li class="list-group-item"><span class="badge"><?= SummaryHelper::viewedStories() ?></span> Просмотрено историй</li>
-                </ul>
-                <ul class="list-group">
-                    <?= Html::a('<span class="badge">' . SummaryHelper::activePayments() . '</span> Активных подписок', ['payment/index', 'status' => Payment::STATUS_VALID], ['class' => 'list-group-item list-group-item-info']) ?>
+                    <li class="list-group-item"><span class="badge"><?= $answersCount; ?></span> Ответов на вопросы</li>
                 </ul>
             </div>
             <div class="col-lg-9">
@@ -66,6 +71,9 @@ $this->title = 'Панель управления';
                     ]) ?>
                 </div>
             </div>
+        </div>
+        <div class="row">
+
         </div>
         <div class="row">
             <div class="col-lg-6">

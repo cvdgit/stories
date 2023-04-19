@@ -92,11 +92,23 @@ class SiteController extends Controller
 
         $todayStories = $this->getStories(date('Y-m-d'));
 
+        $currentDate = date('Y-m-d');
+        $answersCount = (new Query())
+            ->from('user_question_history')
+            ->where([
+                'between',
+                'created_at',
+                new Expression("UNIX_TIMESTAMP('$currentDate 00:00:00')"),
+                new Expression("UNIX_TIMESTAMP('$currentDate 23:59:59')")
+            ])
+            ->count();
+
         return $this->render('index', [
             'labels' => $labels,
             'data' => $data,
             'todayStories' => $todayStories,
             'users' => $this->getUsers(date('Y-m-d')),
+            'answersCount' => $answersCount,
         ]);
     }
 
