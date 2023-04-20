@@ -20,11 +20,13 @@ return [
     ],
     'modules' => [
         'repetition' => \backend\modules\repetition\Module::class,
+        'changelog' => \backend\modules\changelog\Module::class,
     ],
     'container' => [
         'definitions' => [
             ScheduleFetcherInterface::class => ScheduleFetcher::class,
             \backend\modules\repetition\RepetitionApiInterface::class => \frontend\modules\repetition\RepetitionApiProvider::class,
+            \backend\Changelog\ChangelogApiInterface::class => \backend\modules\changelog\ChangelogApi::class,
         ],
     ],
     'components' => [

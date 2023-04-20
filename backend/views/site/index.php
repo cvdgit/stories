@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
+use backend\Changelog\Changelog;
 use backend\helpers\SummaryHelper;
 use common\helpers\SmartDate;
 use dosamigos\chartjs\ChartJs;
 use yii\helpers\Html;
 use yii\web\View;
+use yii\helpers\HtmlPurifier;
 
 /**
  * @var View $this
@@ -15,6 +17,7 @@ use yii\web\View;
  * @var array $todayStories
  * @var array $users
  * @var int $answersCount
+ * @var Changelog[] $changelog
  */
 
 $this->title = 'Панель управления';
@@ -33,6 +36,26 @@ $this->title = 'Панель управления';
                 </ul>
             </div>
             <div class="col-lg-9">
+                <h4>Последние изменения</h4>
+                <div style="max-height: 600px; overflow: hidden; overflow-y: auto">
+                    <?php foreach ($changelog as $item): ?>
+                        <div class="row" style="margin-bottom: 20px">
+                            <div class="col-lg-12">
+                                <div style="display: flex; flex-direction: row; align-items: end">
+                                    <h3 style="margin: 0"><?= $item->getTitle(); ?></h3>
+                                    <p class="text-muted" style="margin: 0 0 0 10px" class="time"><?= Yii::$app->formatter->asDate($item->getCreated()) ?></p>
+                                </div>
+                                <div class="content" style="line-height: 1.4; margin: 10px 0">
+                                    <?= HtmlPurifier::process($item->getText()); ?>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8">
                 <div style="height: 400px">
                     <?= ChartJs::widget([
                         'type' => 'line',
@@ -71,9 +94,27 @@ $this->title = 'Панель управления';
                     ]) ?>
                 </div>
             </div>
-        </div>
-        <div class="row">
-
+            <div class="col-lg-4">
+                <div class="table-responsive" style="max-height: 40vh">
+                    <table class="table table-condensed table-striped">
+                        <caption>Активные сегодня пользователи</caption>
+                        <thead>
+                        <tr>
+                            <th>Пользователь</th>
+                            <th>Время</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($users as $user): ?>
+                            <tr>
+                                <td><?= Html::encode($user['user_name']) ?></td>
+                                <td><?= str_replace('сегодня в ', '', SmartDate::dateSmart($user['user_active_at'], true)) ?></td>
+                            </tr>
+                        <?php endforeach ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
         <div class="row">
             <div class="col-lg-6">
@@ -97,27 +138,7 @@ $this->title = 'Панель управления';
                     </table>
                 </div>
             </div>
-            <div class="col-lg-6">
-                <div class="table-responsive" style="max-height: 40vh">
-                    <table class="table table-condensed table-striped">
-                        <caption>Активные сегодня пользователи</caption>
-                        <thead>
-                        <tr>
-                            <th>Пользователь</th>
-                            <th>Время</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <?php foreach ($users as $user): ?>
-                            <tr>
-                                <td><?= Html::encode($user['user_name']) ?></td>
-                                <td><?= str_replace('сегодня в ', '', SmartDate::dateSmart($user['user_active_at'], true)) ?></td>
-                            </tr>
-                        <?php endforeach ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+
         </div>
     </div>
 </div>

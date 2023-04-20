@@ -42,6 +42,7 @@ return [
                 'console\migrations',
                 'modules\edu\migrations',
                 'modules\files\migrations',
+                'backend\modules\changelog\migrations',
             ],
         ],
         'serve' => [

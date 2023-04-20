@@ -88,6 +88,7 @@ AppAsset::register($this);
                         ['label' => 'Файлы', 'url' => ['/files/study-file/index']],
                         ['label' => 'Обучение', 'url' => ['/edu/admin/default/index']],
                         ['label' => 'Повторение', 'url' => ['/repetition/schedule/index']],
+                        ['label' => 'Changelog', 'url' => ['/changelog/default/index']],
                     ],
                 ]) ?>
                 <?php endif ?>

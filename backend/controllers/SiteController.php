@@ -1,6 +1,7 @@
 <?php
 namespace backend\controllers;
 
+use backend\Changelog\ChangelogApiProvider;
 use Yii;
 use yii\db\Expression;
 use yii\db\Query;
@@ -14,6 +15,13 @@ use yii\web\ErrorAction;
  */
 class SiteController extends Controller
 {
+    private $changelogApi;
+
+    public function __construct($id, $module, ChangelogApiProvider $changelogApi, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->changelogApi = $changelogApi;
+    }
 
     /**
      * @return array
@@ -51,7 +59,6 @@ class SiteController extends Controller
 
     public function actionIndex(): string
     {
-
         $date = new \DateTime('now');
         $endDate = clone $date;
         $startDate = clone $date->modify('-6 days');
@@ -109,6 +116,7 @@ class SiteController extends Controller
             'todayStories' => $todayStories,
             'users' => $this->getUsers(date('Y-m-d')),
             'answersCount' => $answersCount,
+            'changelog' => $this->changelogApi->getChangelogLastItems(),
         ]);
     }
 
