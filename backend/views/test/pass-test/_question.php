@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use backend\assets\SvgAsset;
+use backend\assets\TestQuestionAsset;
 use backend\models\pass_test\PassTestForm;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
@@ -86,6 +88,9 @@ CSS
  * @var bool $isNewRecord
  * @var int $testingId
  */
+
+SvgAsset::register($this);
+TestQuestionAsset::register($this);
 ?>
 <?php $form = ActiveForm::begin(['id' => 'pass-test-form']) ?>
 <?= $form->field($model, 'name')->textInput(['maxlength' => true]); ?>
@@ -98,6 +103,7 @@ CSS
             <?= Html::activeLabel($model, 'content') ?>
         </div>
         <div style="margin-left:auto;display: flex">
+            <button id="content-as-html" style="margin-right: 6px" type="button" class="btn btn-primary btn-sm">HTML</button>
             <a style="margin-right: 6px" href="<?= Url::to(['/fragment-list/manage']); ?>" class="btn btn-primary btn-sm" id="manage" type="button">Управление</a>
             <button style="margin-right: 6px" class="btn btn-primary btn-sm" id="search" type="button">Поиск</button>
             <a style="margin-right: 6px" href="<?= Url::to(['/fragment-list/create', 'testing_id' => $testingId]); ?>" class="btn btn-primary btn-sm" id="create-fragment-list" type="button">Создать список</a>
@@ -110,12 +116,14 @@ CSS
                 <ul class="dropdown-menu dropdown-menu-right">
                     <li><a href="#" id="add">Один ответ</a></li>
                     <li><a href="#" id="add-multi">Несколько ответов</a></li>
+                    <li><a href="#" id="add-region">Выбор области</a></li>
                 </ul>
             </div>
         </div>
     </div>
     <div style="min-height:300px;overflow-y:auto">
-        <div class="content" data-question-id="<?= $model->getId(); ?>" id="content" contenteditable="true"></div>
+        <div class="content" data-testing-id="<?= $testingId; ?>" data-question-id="<?= $model->getId(); ?>" id="content" contenteditable="true"></div>
+        <textarea id="content_html" rows="10" style="width: 100%; min-height: 300px; display: none"></textarea>
     </div>
     <?= $form->field($model, 'content')->hiddenInput()->label(false) ?>
 </div>
@@ -126,9 +134,12 @@ CSS
 <?php ActiveForm::end() ?>
 <div id="content-cache" class="hide"></div>
 <?php
+//$this->registerJs($this->renderFile('@backend/views/test/pass-test/_functions.js'));
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_selection.js'));
+//$this->registerJs($this->renderFile('@backend/views/test/pass-test/_regions.js'));
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_content.js'));
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_question.js'));
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_fragment_list.js'));
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_search.js'));
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_manage.js'));
+$this->registerJs($this->renderFile('@backend/views/test/pass-test/_html.js'));
