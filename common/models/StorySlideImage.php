@@ -136,6 +136,17 @@ class StorySlideImage extends ActiveRecord
         return $image;
     }
 
+    public static function create(string $imageId, string $fileName, string $folder, string $extension): self
+    {
+        $image = new self;
+        $image->root_folder_id = 3;
+        $image->hash = $imageId;
+        $image->folder = $folder;
+        $image->filename = $fileName;
+        $image->mime_type = $extension;
+        return $image;
+    }
+
     /*public static function usedCollections(int $storyID)
     {
         $storySlidesQuery = (new Query())

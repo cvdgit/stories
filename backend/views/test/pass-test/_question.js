@@ -45,29 +45,38 @@ function generateUUID() {
         var ranges = [];
         var range;
         for (var i = 0, len = sel.rangeCount; i < len; ++i) {
-          ranges.push( sel.getRangeAt(i) );
+          ranges.push(sel.getRangeAt(i));
         }
         sel.removeAllRanges();
 
         i = ranges.length;
         while (i--) {
           range = ranges[i];
-          surroundRangeContents(range, templateElement, function(element, textNode) {
+          surroundRangeContents(range, (textNodes) => {
+
+            const element = templateElement.cloneNode(true);
+            textNodes[0].parentNode.insertBefore(element, textNodes[0]);
+
+            let textContent = '';
+            for (let i = 0, node; node = textNodes[i++]; ) {
+              element.appendChild(node);
+              textContent += node.nodeType === 3 ? node.textContent : node.outerHTML;
+              element.querySelector('.dropdown-toggle').appendChild(node);
+            }
 
             const id = dataWrapper.createFragment(generateUUID());
             element.setAttribute('data-fragment-id', id);
 
-            if (textNode.textContent === ' ') {
-              textNode.textContent = '\u00A0';
+            if (textNodes[0].textContent === ' ') {
+              textNodes[0].textContent = '\u00A0';
             }
 
             dataWrapper.createFragmentItem(id, {
               id: generateUUID(),
-              title: textNode.textContent,
+              title: textContent,
               correct: true
             });
 
-            element.querySelector('.dropdown-toggle').appendChild(textNode);
           });
           sel.addRange(range);
         }
@@ -116,17 +125,104 @@ function generateUUID() {
     while (i--) {
 
       range = ranges[i];
+      surroundRangeContents(range, function(textNodes) {
 
-      surroundRangeContents(range, templateElement, function(element, textNode) {
+        const element = templateElement.cloneNode(true);
+        textNodes[0].parentNode.insertBefore(element, textNodes[0]);
+
+        let textContent = '';
+        for (let i = 0, node; node = textNodes[i++]; ) {
+          element.appendChild(node);
+          textContent += node.nodeType === 3 ? node.textContent : node.outerHTML;
+          element.querySelector('.dropdown-toggle').appendChild(node);
+        }
 
         dataWrapper.createFragment(elementId, true);
         element.setAttribute('data-fragment-id', elementId);
 
-        if (textNode.textContent === ' ') {
-          textNode.textContent = '\u00A0';
+        if (textNodes[0].textContent === ' ') {
+          textNodes[0].textContent = '\u00A0';
         }
 
-        const words = textNode.textContent.replace(/\s\s+/g, ' ').split(' ');
+        const words = textContent.replace(/\s\s+/g, ' ').split(' ');
+        words.forEach(word => {
+          dataWrapper.createFragmentItem(elementId, {
+            id: generateUUID(),
+            title: word.trim(),
+            correct: true
+          });
+        });
+
+        //textNode.textContent = words.join(', ');
+        //element.querySelector('.dropdown-toggle').appendChild(textNode);
+      });
+
+      selection.addRange(range);
+    }
+  });
+
+  const regionTemplateElement = document.createElement("span");
+  regionTemplateElement.className = "";
+  regionTemplateElement.setAttribute('contenteditable', false);
+  regionTemplateElement.innerHTML = '<button type="button" class="btn btn-default highlight select-region"></button>';
+
+  $('#add-region').on('click', function(e) {
+    e.preventDefault();
+
+    if (!window.getSelection) {
+      toastr.error('window.getSelection error');
+      return;
+    }
+
+    const selection = window.getSelection();
+    if (selection.toString().length === 0) {
+      toastr.info('Необходимо выделить фрагмент текста');
+      return;
+    }
+
+    if (selection.isCollapsed) {
+      return;
+    }
+
+    const selText = selection.toString();
+    const skipTrim = (selText.length === 1) && (selText === ' ');
+    if (!skipTrim) {
+      trimRanges(selection);
+    }
+
+    const ranges = [];
+    for (let i = 0, len = selection.rangeCount; i < len; ++i) {
+      ranges.push(selection.getRangeAt(i));
+    }
+    selection.removeAllRanges();
+
+    let range;
+    i = ranges.length;
+    const elementId = generateUUID();
+    while (i--) {
+
+      range = ranges[i];
+
+      surroundRangeContents(range, function(textNodes) {
+
+        const element = regionTemplateElement.cloneNode(true);
+        textNodes[0].parentNode.insertBefore(element, textNodes[0]);
+
+        let textContent = '';
+        for (let i = 0, node; node = textNodes[i++]; ) {
+          element.appendChild(node);
+          textContent += node.nodeType === 3 ? node.textContent : node.outerHTML;
+          element.querySelector('.highlight').appendChild(node);
+        }
+
+        dataWrapper.createRegionFragment(elementId);
+        element.setAttribute('data-fragment-id', elementId);
+
+        if (textNodes[0].textContent === ' ') {
+          textNodes[0].textContent = '\u00A0';
+        }
+
+        const words = textContent.replace(/\s\s+/g, ' ').split(' ');
         words.forEach(word => {
 
           dataWrapper.createFragmentItem(elementId, {
@@ -136,9 +232,8 @@ function generateUUID() {
           });
         });
 
-        textNode.textContent = words.join(', ');
-
-        element.querySelector('.dropdown-toggle').appendChild(textNode);
+        //textNode.textContent = words.join(', ');
+        //element.querySelector('.highlight').appendChild(textNode);
       });
 
       selection.addRange(range);

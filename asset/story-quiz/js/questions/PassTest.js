@@ -28,7 +28,7 @@ function createSelectElement(fragmentId, attrs = {}, items, multi = false) {
           $('<input/>', {type: 'radio', name: fragmentId, id: 'item' + item.id})
         )
         .append(
-          $('<label/>', {for: 'item' + item.id}).text(item.title)
+          $('<label/>', {for: 'item' + item.id}).html(item.title)
         )
     );
 
@@ -39,7 +39,7 @@ function createSelectElement(fragmentId, attrs = {}, items, multi = false) {
           $('<input/>', {type: 'checkbox', id: 'item' + item.id, 'value': item.title})
         )
         .append(
-          $('<label/>', {for: 'item' + item.id}).text(item.title)
+          $('<label/>', {for: 'item' + item.id}).html(item.title)
         )
     );
 
@@ -238,9 +238,9 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
 
   $content.on('change', '.dropdown-item input[type=radio]', e => {
     const $target = $(e.target);
-    const value = $target.siblings('label').text().trim();
+    const value = $target.siblings('label').html().trim();
 
-    $target.parents('.highlight:eq(0)').find('.dropdown-toggle').text(value);
+    $target.parents('.highlight:eq(0)').find('.dropdown-toggle').html(value);
 
     const fragmentId = $target.parents('.highlight:eq(0)').attr('data-fragment-id');
     const check = checkFragmentValueIsCorrect(fragmentId, value, fragments);
@@ -363,7 +363,7 @@ PassTest.prototype.getUserAnswers = function() {
 
     const $radio = $el.find('.dropdown-menu input[type=radio]:checked');
     if ($radio.length) {
-      return [$radio.siblings('label').text().trim().toLowerCase()];
+      return [$radio.siblings('label').html().trim().toLowerCase()];
     }
 
     const $boxes = $el.find('.dropdown-menu input[type=checkbox]:checked');

@@ -4,6 +4,7 @@ namespace backend\controllers\test;
 
 use backend\models\pass_test\PassTestForm;
 use backend\services\PassTestService;
+use backend\Testing\Questions\PassTest\RegionImageUploadAction;
 use common\models\StoryTest;
 use common\models\StoryTestQuestion;
 use common\rbac\UserRoles;
@@ -38,6 +39,13 @@ class PassTestController extends Controller
                     ],
                 ],
             ],
+        ];
+    }
+
+    public function actions(): array
+    {
+        return [
+            'region-image-upload' => RegionImageUploadAction::class,
         ];
     }
 

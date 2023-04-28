@@ -1745,11 +1745,18 @@ function WikidsStoryTest(el, options) {
         };
       }
       if (view === 'input' || view === 'recognition' || questionViewPassTest(currentQuestion) || testConfig.answerTypeIsMissingWords(currentQuestion)) {
+
+        const decodeHtml = (html) => {
+          const txt = document.createElement("textarea");
+          txt.innerHTML = html;
+          return txt.value;
+        }
+
         correctAnswersCallback = function (elem) {
           if (testConfig.isStrictAnswer()) {
             return elem.name;
           } else {
-            return elem.name.toLowerCase();
+            return decodeHtml(elem.name).toLowerCase();
           }
         };
         convertAnswerToInt = false;

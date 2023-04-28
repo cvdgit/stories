@@ -67,7 +67,10 @@ $this->registerCss(<<<CSS
     text-decoration: none;
 }
 .fragment-action {
-    display: block;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 10px;
     padding: 0 10px;
 }
 .fragment-action a {
@@ -134,9 +137,9 @@ TestQuestionAsset::register($this);
 <?php ActiveForm::end() ?>
 <div id="content-cache" class="hide"></div>
 <?php
-//$this->registerJs($this->renderFile('@backend/views/test/pass-test/_functions.js'));
+$this->registerJs($this->renderFile('@backend/views/test/pass-test/_functions.js'));
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_selection.js'));
-//$this->registerJs($this->renderFile('@backend/views/test/pass-test/_regions.js'));
+$this->registerJs($this->renderFile('@backend/views/test/pass-test/_regions.js'));
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_content.js'));
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_question.js'));
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_fragment_list.js'));

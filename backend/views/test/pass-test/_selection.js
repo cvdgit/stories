@@ -1,8 +1,8 @@
 function getNextNode(node) {
-  var next = node.firstChild;
-  if (next) {
-    return next;
-  }
+  //var next = node.firstChild;
+  //if (next) {
+  //  return next;
+  //}
   while (node) {
     if ( (next = node.nextSibling) ) {
       return next;
@@ -29,18 +29,18 @@ function getNodesInRange(range) {
   var node;
 
   // Walk parent nodes from start to common ancestor
-  for (node = start.parentNode; node; node = node.parentNode) {
+  /*for (node = start.parentNode; node; node = node.parentNode) {
     nodes.push(node);
     if (node === commonAncestor) {
       break;
     }
   }
-  nodes.reverse();
+  nodes.reverse();*/
 
   // Walk children and siblings from start until end is found
   for (node = start; node; node = getNextNode(node)) {
     nodes.push(node);
-    if (node === end) {
+    if (node.textContent === end.textContent) {
       break;
     }
   }
@@ -51,10 +51,11 @@ function getNodesInRange(range) {
 function getTextNodesInRange(range) {
   var textNodes = [];
   var nodes = getNodesInRange(range);
+  //console.log('nodes', nodes);
   for (var i = 0, node, el; node = nodes[i++]; ) {
-    if (node.nodeType === 3) {
+    //if (node.nodeType === 3) {
       textNodes.push(node);
-    }
+    //}
   }
   return textNodes;
 }
@@ -81,7 +82,10 @@ function getNodeIndex(node) {
 }
 
 function splitRangeBoundaries(range) {
-  var sc = range.startContainer, so = range.startOffset, ec = range.endContainer, eo = range.endOffset;
+  var sc = range.startContainer,
+      so = range.startOffset,
+      ec = range.endContainer,
+      eo = range.endOffset;
   var startEndSame = (sc === ec);
 
   // Split the end boundary if necessary
@@ -100,23 +104,20 @@ function splitRangeBoundaries(range) {
     }
     so = 0;
   }
+
   range.setStart(sc, so);
   range.setEnd(ec, eo);
 }
 
-function surroundRangeContents(range, templateElement, afterInsertCallback) {
+function surroundRangeContents(range, callback) {
   splitRangeBoundaries(range);
   var textNodes = getTextNodesInRange(range);
   if (textNodes.length === 0) {
     return;
   }
-  for (var i = 0, node, el; node = textNodes[i++]; ) {
-    if (node.nodeType === 3) {
-      el = templateElement.cloneNode(true);
-      node.parentNode.insertBefore(el, node);
-      afterInsertCallback(el, node);
-    }
-  }
+
+  callback(textNodes);
+
   range.setStart(textNodes[0], 0);
   var lastTextNode = textNodes[textNodes.length - 1];
   range.setEnd(lastTextNode, lastTextNode.length);

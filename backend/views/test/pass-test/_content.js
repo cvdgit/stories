@@ -18,9 +18,24 @@
       return id;
     }
 
+    this.createRegionFragment = (id) => {
+      values.fragments.push({
+        id,
+        items: [],
+        multi: false,
+        type: 'region',
+        region: {
+          image: null,
+          regions: []
+        }
+      });
+      return id;
+    }
+
     this.findFragment = (id) => {
       return values.fragments.filter((fragment) => fragment.id === id)[0];
     };
+
     this.findFragmentItem = (fragment_id, item_id) => {
       const fragment = this.findFragment(fragment_id);
       return fragment.items.filter(item => {
@@ -39,6 +54,7 @@
     }
 
     this.getFragments = () => values.fragments;
+
     this.getFragmentItems = (id) => {
       const fragment = this.findFragment(id);
       return fragment.items;
@@ -87,6 +103,7 @@
     }
 
     this.getContent = () => values.content;
+
     this.setContent = (content) => values.content = content;
 
     this.getPayload = () => values;
@@ -98,11 +115,9 @@
 
     this.getFragments().forEach(fragment => {
 
-      const code = $('<span/>', {
-        'class': 'dropdown',
-        'contenteditable': false,
-        'data-fragment-id': fragment.id
-      });
+      const $element = $(fragmentElementBuilder(fragment.type));
+
+      $element.attr('data-fragment-id', fragment.id)
 
       let title = this.getFragmentCorrectItems(fragment.id)
         .map(item => item.title)
@@ -110,10 +125,10 @@
       if (!title) {
         title = 'ПУСТО';
       }
-      code.append('<button class="btn btn-default dropdown-toggle highlight" data-toggle="dropdown">' + title + '</button><ul class="dropdown-menu"></ul>');
+      $element.find('.highlight').html(title);
 
       const reg = new RegExp('{' + fragment.id + '}');
-      content = content.replace(reg, code[0].outerHTML);
+      content = content.replace(reg, $element[0].outerHTML);
     });
 
     if (content.length === 0) {
@@ -158,7 +173,7 @@
 
   function fragmentItemTextChanged(fragment_id, item, text) {
     if (item.correct) {
-      $('#content').find('span[data-fragment-id=' + fragment_id + '] > .highlight').text(text);
+      $('#content').find('span[data-fragment-id=' + fragment_id + '] > .highlight').html(text);
     }
     item.title = text;
   }
@@ -166,7 +181,7 @@
   function fragmentItemSetCorrect(fragment_id, text) {
     $('#content')
       .find('span[data-fragment-id=' + fragment_id + '] > .highlight')
-      .text(text || 'ПУСТО');
+      .html(text || 'ПУСТО');
   }
 
   function fragmentItemRemove(elem) {
@@ -186,10 +201,11 @@
    * @param setCorrectHandler
    * @param textChangedHandler
    * @param itemRemoveHandler
+   * @param itemCopyHandler
    * @param multi
    * @returns {*|jQuery}
    */
-  function createFragmentItemElement(item, setCorrectHandler, textChangedHandler, itemRemoveHandler, multi = false) {
+  function createFragmentItemElement(item, setCorrectHandler, textChangedHandler, itemRemoveHandler, itemCopyHandler, multi = false) {
 
     const input = $('<input/>', {
       name: item.fragmentId,
@@ -207,7 +223,7 @@
         $('<span/>', {'class': 'fragment-title'})
           .append(
             $('<a/>', {'href': '#', 'contenteditable': true, class: 'fragment-title__edit'})
-              .on('input', function() { textChangedHandler($(this).text()); })
+              .on('input', function() { textChangedHandler($(this).html()); })
               .on('keydown', function(event) {
                 if (event.key === 'Enter') {
                   event.preventDefault();
@@ -219,11 +235,16 @@
                 event.preventDefault();
                 document.execCommand("insertText", false, ' ');
               })
-              .text(item.title)
+              .html(item.title)
           )
       )
       .append(
         $('<span/>', {class: 'fragment-action'})
+          .append(
+            $('<a/>', {href: '#', title: 'Копировать строку'})
+              .html('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" /></svg>')
+              .on('click', itemCopyHandler)
+          )
           .append(
             $('<a/>', {'href': '#'})
               .html('<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>')
@@ -248,7 +269,6 @@
       menu.empty();
 
       const fragment = dataWrapper.findFragment(fragment_id);
-      console.log(fragment);
 
       const setCorrectHandler = (itemId) => {
         if (fragment.multi) {
@@ -273,14 +293,32 @@
         fragmentItemSetCorrect(fragment_id, dataWrapper.getFragmentCorrectItems(fragment_id).map(item => item.title).join(', '));
       };
 
-      dataWrapper.getFragmentItems(fragment_id).forEach(function(item) {
-        const elem = createFragmentItemElement(
-          {fragmentId: fragment_id, ...item},
+      const itemCopyHandler = (title) => {
+
+        const item = dataWrapper.createFragmentItem(fragment_id, {
+          id: generateUUID(),
+          correct: false,
+          title
+        });
+
+        const elem = createElement(fragment_id, item, fragment.multi);
+
+        addFragmentItem(fragment_id, elem);
+      }
+
+      const createElement = (fragmentId, item, multi) => {
+        return createFragmentItemElement(
+          {fragmentId, ...item},
           () => setCorrectHandler(item.id),
           (text) => textChangedHandler(item.id, text),
           (elem) => itemRemoveHandler(item.id, elem),
-          fragment.multi
+          () => itemCopyHandler(item.title),
+          multi
         );
+      };
+
+      dataWrapper.getFragmentItems(fragment_id).forEach(function(item) {
+        const elem = createElement(fragment_id, item, fragment.multi);
         elem.appendTo(menu);
       });
 
@@ -299,13 +337,7 @@
               title: ''
             });
 
-            const elem = createFragmentItemElement(
-              {fragmentId: fragment_id, ...item},
-              () => setCorrectHandler(item.id),
-              (text) => textChangedHandler(item.id, text),
-              (elem) => itemRemoveHandler(elem, fragment_id, item.id),
-              fragment.multi
-            );
+            const elem = createElement(fragment_id, item, fragment.multi);
 
             addFragmentItem(fragment_id, elem);
           })
@@ -323,6 +355,13 @@
 
   $('#content').on('click', '.dropdown-menu', function(e) {
     e.stopPropagation();
+  });
+
+  $('#content').on('click', '.select-region', function(e) {
+    initRegionFragments({
+      testingId: $('#content').attr('data-testing-id'),
+      fragment: dataWrapper.findFragment($(this).parent().attr('data-fragment-id'))
+    });
   });
 
   const form = $('#pass-test-form');

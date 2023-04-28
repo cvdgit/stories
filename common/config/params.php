@@ -47,6 +47,7 @@ return [
     'images.root' => [
         1 => '/admin/upload/',
         2 => '/slides/',
+        3 => '/upload/testing/',
     ],
 
     'study.url' => 'https://study.wikids.ru',
