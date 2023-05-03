@@ -2827,6 +2827,10 @@ function WikidsStoryTest(el, options) {
     return currentQuestion && currentQuestion.id;
   };
 
+  this.getDeck = () => {
+    return that.options.deck || null;
+  };
+
   return {
     run,
     "load": load,

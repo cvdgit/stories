@@ -1,4 +1,3 @@
-
 function generateUUID() {
   var d = new Date().getTime();
   var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now() * 1000)) || 0;
@@ -20,92 +19,26 @@ function generateUUID() {
 
   const dataWrapper = window.dataWrapper;
 
-  $('#add').on('click', function(e) {
-    e.preventDefault();
-
-    if (window.getSelection) {
-      var sel = window.getSelection();
-      if (sel.rangeCount > 0) {
-
-        if (sel.isCollapsed) {
-          return;
-        }
-
-        const selText = sel.toString();
-        const skipTrim = (selText.length === 1) && (selText === ' ');
-        if (!skipTrim) {
-          trimRanges(sel);
-        }
-
-        var templateElement = document.createElement("span");
-        templateElement.className = "dropdown";
-        templateElement.setAttribute('contenteditable', false);
-        templateElement.innerHTML = '<button class="btn btn-default dropdown-toggle highlight" data-toggle="dropdown"></button><ul class="dropdown-menu"></ul>';
-
-        var ranges = [];
-        var range;
-        for (var i = 0, len = sel.rangeCount; i < len; ++i) {
-          ranges.push(sel.getRangeAt(i));
-        }
-        sel.removeAllRanges();
-
-        i = ranges.length;
-        while (i--) {
-          range = ranges[i];
-          surroundRangeContents(range, (textNodes) => {
-
-            const element = templateElement.cloneNode(true);
-            textNodes[0].parentNode.insertBefore(element, textNodes[0]);
-
-            let textContent = '';
-            for (let i = 0, node; node = textNodes[i++]; ) {
-              element.appendChild(node);
-              textContent += node.nodeType === 3 ? node.textContent : node.outerHTML;
-              element.querySelector('.dropdown-toggle').appendChild(node);
-            }
-
-            const id = dataWrapper.createFragment(generateUUID());
-            element.setAttribute('data-fragment-id', id);
-
-            if (textNodes[0].textContent === ' ') {
-              textNodes[0].textContent = '\u00A0';
-            }
-
-            dataWrapper.createFragmentItem(id, {
-              id: generateUUID(),
-              title: textContent,
-              correct: true
-            });
-
-          });
-          sel.addRange(range);
-        }
-      }
-    }
-  });
-
-  const templateElement = document.createElement("span");
-  templateElement.className = "dropdown";
-  templateElement.setAttribute('contenteditable', false);
-  templateElement.innerHTML = '<button class="btn btn-default dropdown-toggle highlight" data-toggle="dropdown"></button><ul class="dropdown-menu"></ul>';
-
-  $('#add-multi').on('click', function(e) {
-    e.preventDefault();
+  const initSelection = () => {
 
     if (!window.getSelection) {
-      toastr.error('window.getSelection error');
-      return;
+      throw new Error('window.getSelection error');
     }
 
     const selection = window.getSelection();
+
     if (selection.toString().length === 0) {
-      toastr.info('Необходимо выделить фрагмент текста');
-      return;
+      throw new Error('Необходимо выделить фрагмент текста');
     }
 
     if (selection.isCollapsed) {
-      return;
+      throw new Error('selection is collapsed');
     }
+
+    return selection;
+  }
+
+  const initRanges = (selection) => {
 
     const selText = selection.toString();
     const skipTrim = (selText.length === 1) && (selText === ' ');
@@ -119,19 +52,70 @@ function generateUUID() {
     }
     selection.removeAllRanges();
 
-    let range;
-    i = ranges.length;
-    const elementId = generateUUID();
+    return ranges;
+  }
+
+  $('#add').on('click', function (e) {
+    e.preventDefault();
+
+    const selection = initSelection();
+    const ranges = initRanges(selection);
+
+    let i = ranges.length;
     while (i--) {
+      const range = ranges[i];
 
-      range = ranges[i];
-      surroundRangeContents(range, function(textNodes) {
+      surroundRangeContents(range, (textNodes) => {
 
-        const element = templateElement.cloneNode(true);
+        const element = fragmentElementBuilder('single').cloneNode(true);
         textNodes[0].parentNode.insertBefore(element, textNodes[0]);
 
         let textContent = '';
-        for (let i = 0, node; node = textNodes[i++]; ) {
+        for (let i = 0, node; node = textNodes[i++];) {
+          element.appendChild(node);
+          textContent += node.nodeType === 3 ? node.textContent : node.outerHTML;
+          element.querySelector('.dropdown-toggle').appendChild(node);
+        }
+
+        const id = dataWrapper.createFragment(generateUUID());
+        element.setAttribute('data-fragment-id', id);
+
+        if (textNodes[0].textContent === ' ') {
+          textNodes[0].textContent = '\u00A0';
+        }
+
+        dataWrapper.createFragmentItem(id, {
+          id: generateUUID(),
+          title: textContent,
+          correct: true
+        });
+
+      });
+
+      selection.addRange(range);
+    }
+  });
+
+  $('#add-multi').on('click', function (e) {
+    e.preventDefault();
+
+    const selection = initSelection();
+    const ranges = initRanges(selection);
+
+    let i = ranges.length;
+    const elementId = generateUUID();
+
+    while (i--) {
+
+      const range = ranges[i];
+
+      surroundRangeContents(range, function (textNodes) {
+
+        const element = fragmentElementBuilder('multi').cloneNode(true);
+        textNodes[0].parentNode.insertBefore(element, textNodes[0]);
+
+        let textContent = '';
+        for (let i = 0, node; node = textNodes[i++];) {
           element.appendChild(node);
           textContent += node.nodeType === 3 ? node.textContent : node.outerHTML;
           element.querySelector('.dropdown-toggle').appendChild(node);
@@ -161,55 +145,26 @@ function generateUUID() {
     }
   });
 
-  const regionTemplateElement = document.createElement("span");
-  regionTemplateElement.className = "";
-  regionTemplateElement.setAttribute('contenteditable', false);
-  regionTemplateElement.innerHTML = '<button type="button" class="btn btn-default highlight select-region"></button>';
-
-  $('#add-region').on('click', function(e) {
+  $('#add-region').on('click', function (e) {
     e.preventDefault();
 
-    if (!window.getSelection) {
-      toastr.error('window.getSelection error');
-      return;
-    }
+    const selection = initSelection();
+    const ranges = initRanges(selection);
 
-    const selection = window.getSelection();
-    if (selection.toString().length === 0) {
-      toastr.info('Необходимо выделить фрагмент текста');
-      return;
-    }
-
-    if (selection.isCollapsed) {
-      return;
-    }
-
-    const selText = selection.toString();
-    const skipTrim = (selText.length === 1) && (selText === ' ');
-    if (!skipTrim) {
-      trimRanges(selection);
-    }
-
-    const ranges = [];
-    for (let i = 0, len = selection.rangeCount; i < len; ++i) {
-      ranges.push(selection.getRangeAt(i));
-    }
-    selection.removeAllRanges();
-
-    let range;
-    i = ranges.length;
+    let i = ranges.length;
     const elementId = generateUUID();
+
     while (i--) {
 
-      range = ranges[i];
+      const range = ranges[i];
 
-      surroundRangeContents(range, function(textNodes) {
+      surroundRangeContents(range, function (textNodes) {
 
-        const element = regionTemplateElement.cloneNode(true);
+        const element = fragmentElementBuilder('region').cloneNode(true);
         textNodes[0].parentNode.insertBefore(element, textNodes[0]);
 
         let textContent = '';
-        for (let i = 0, node; node = textNodes[i++]; ) {
+        for (let i = 0, node; node = textNodes[i++];) {
           element.appendChild(node);
           textContent += node.nodeType === 3 ? node.textContent : node.outerHTML;
           element.querySelector('.highlight').appendChild(node);
@@ -239,5 +194,4 @@ function generateUUID() {
       selection.addRange(range);
     }
   });
-
 })();

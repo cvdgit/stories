@@ -84,9 +84,9 @@ function createRegionImageSelect(testingId, fragment) {
     })
       .done(response => {
         fragment.region.image = response.data;
-        $body.empty().append(createRegionEditor(response.data));
+        $body.empty().append(createRegionEditor({region: {image: response.data}}));
       });
-  })
+  });
 
   $body.find('#region-image-file').on('change', e => {
     $form.submit();

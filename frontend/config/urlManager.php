@@ -69,6 +69,8 @@ return [
         'comment/reply/<id:\d+>' => 'comment/reply',
 
         'image/<id:[\w\d]+' => 'image/view',
+        'image/<id>' => 'image/view',
+
         'question/<param:[\w\s\d]+>/<value:[\w\d\s]+>' => 'question/get',
 
         'students' => 'student/index',

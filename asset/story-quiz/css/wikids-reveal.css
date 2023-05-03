@@ -1873,3 +1873,8 @@ p.wikids-test-description {
 .hide {
   display: none;
 }
+
+.region-fragment-btn {
+  cursor: pointer;
+  user-select: none;
+}

@@ -1,7 +1,11 @@
 import {_extends, shuffle} from "../common";
+import InnerDialog from "../components/Dialog";
+import passTestRegionContent from "./PassTestRegionContent";
 
 const PassTest = function (test) {
   this.element = null;
+  this.container = test.container;
+  this.deck = test.getDeck();
 };
 
 function createSelectElement(fragmentId, attrs = {}, items, multi = false) {
@@ -64,6 +68,18 @@ function createTextElement(fragmentId, attrs = {}) {
   return input;
 }
 
+function createRegionElement(fragment, attrs = {}) {
+  attrs = {
+    'data-fragment-id': fragment.id,
+    class: 'highlight custom-input',
+    ...attrs
+  };
+  const div = $('<div/>', attrs);
+
+  div.text('Выберите область');
+  return div;
+}
+
 /*function checkFragmentValueIsCorrect(fragmentId, value, fragments) {
   const fragment = fragments.find(elem => elem.id === fragmentId);
   if (fragment) {
@@ -115,6 +131,10 @@ function resetFragmentElement(element) {
 
   if (element.hasClass('custom-input')) {
     element.val('');
+  }
+
+  if (element.hasClass('region-fragment-btn')) {
+    element.text('Выберите область');
   }
 }
 
@@ -210,17 +230,22 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
       disabled: 'disabled'
     };
 
-    if (question.item_view === 'text' || (fragment.items.length === 1 && 1 === fragment.items.filter(item => item.correct).length)) {
-      const correctItem = fragment.items.filter(item => item.correct);
-      if (correctItem.length === 0) {
-        return;
-      }
-      elemAttrs.size = correctItem[0].title.length;
-      elemAttrs.class += ' custom-input';
-      element = createTextElement(fragment.id, elemAttrs);
+    if (fragment['type'] === 'region') {
+      elemAttrs.class += ' custom-input region-fragment-btn';
+      element = createRegionElement(fragment, elemAttrs);
     } else {
-      elemAttrs.class += ' custom-select';
-      element = createSelectElement(fragment.id, elemAttrs, shuffle(fragment.items), fragment.multi);
+      if (question.item_view === 'text' || (fragment.items.length === 1 && 1 === fragment.items.filter(item => item.correct).length)) {
+        const correctItem = fragment.items.filter(item => item.correct);
+        if (correctItem.length === 0) {
+          return;
+        }
+        elemAttrs.size = correctItem[0].title.length;
+        elemAttrs.class += ' custom-input';
+        element = createTextElement(fragment.id, elemAttrs);
+      } else {
+        elemAttrs.class += ' custom-select';
+        element = createSelectElement(fragment.id, elemAttrs, shuffle(fragment.items), fragment.multi);
+      }
     }
 
     const reg = new RegExp('{' + fragment.id + '}');
@@ -326,6 +351,32 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
     e.stopPropagation();
   });
 
+  $content.on('click', '.region-fragment-btn', (e) => {
+
+    const fragmentId = e.target.getAttribute('data-fragment-id');
+    const fragment = fragments.find(elem => elem.id === fragmentId);
+
+    const { region } = fragment;
+    const { image, regions } = region;
+
+    const props = {scale: (this.deck && this.deck.getScale()) || null};
+    const regionContent = passTestRegionContent('q' + fragmentId, image, regions, props, (check, answers) => {
+
+      checkHandler($(e.target), check, fragmentId, $content, question['max_prev_items']);
+
+      dialog.hide();
+
+      e.target.textContent = check ? fragment.items[0].title : 'Выберите область';
+
+      if (typeof fragmentAnswerCallback === 'function') {
+        fragmentAnswerCallback(check, answers.join(', '));
+      }
+    });
+
+    const dialog = new InnerDialog(this.container, {title: 'Отметьте правильную область', content: regionContent});
+    dialog.show();
+  });
+
   this.element = this.createWrapper($content)
     .find(".seq-question__wrap");
   return this.element;
@@ -353,7 +404,7 @@ PassTest.prototype.getContent = function(payload) {
 };
 
 PassTest.prototype.getUserAnswers = function() {
-  return this.element.find('.highlight').map(function(index, elem) {
+  const answers = this.element.find('.highlight').map(function(index, elem) {
 
     const $el = $(elem);
 
@@ -374,7 +425,13 @@ PassTest.prototype.getUserAnswers = function() {
       }
       return $boxes.map((i, box) => $(box).attr('value').trim().toLowerCase()).get();
     }
+
+    if ($el.hasClass('region-fragment-btn')) {
+      return [$el.html().toLowerCase()];
+    }
   }).get();
+  console.log(answers);
+  return answers;
 }
 
 _extends(PassTest, {
