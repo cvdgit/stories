@@ -44,7 +44,7 @@ const Modal = function({id, title}) {
 const modal = new Modal({id: 'region-fragment', title: 'Выбор области'});
 
 const initRegionFragments = ({testingId, fragment}) => {
-
+console.log(fragment);
   if (fragment.region.image !== null) {
     modal.show({
       body: createRegionEditor(fragment)
@@ -59,11 +59,14 @@ function createRegionImageSelect(testingId, fragment) {
 
   const body = `
     <div>
-      <form id="region-image-form" action="/admin/index.php?r=test/pass-test/region-image-upload" method="post" enctype="multipart/form-data">
-        <input type="file" id="region-image-file" name="image">
-        <input type="hidden" name="fragment_id" value="${fragment.id}">
-        <input type="hidden" name="testing_id" value="${testingId}">
-      </form>
+      <div style="padding-bottom: 20px">
+        <form id="region-image-form" action="/admin/index.php?r=test/pass-test/region-image-upload" method="post" enctype="multipart/form-data">
+          <input type="file" id="region-image-file" name="image">
+          <input type="hidden" name="fragment_id" value="${fragment.id}">
+          <input type="hidden" name="testing_id" value="${testingId}">
+        </form>
+      </div>
+      <div id="image-list" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px"></div>
     </div>
   `;
 
@@ -84,7 +87,7 @@ function createRegionImageSelect(testingId, fragment) {
     })
       .done(response => {
         fragment.region.image = response.data;
-        $body.empty().append(createRegionEditor({region: {image: response.data}}));
+        $body.empty().append(createRegionEditor(fragment));
       });
   });
 
@@ -92,11 +95,27 @@ function createRegionImageSelect(testingId, fragment) {
     $form.submit();
   });
 
+  $.getJSON('/admin/index.php?r=test/pass-test/images', {testing_id: testingId})
+    .done(response => {
+      $('#image-list').empty();
+      (response.images || []).forEach(image => {
+        $('<div/>', {css: {cursor: 'pointer'}})
+          .append(
+            $('<img/>', {src: image.url, css: {width: '100%'}})
+          )
+          .on('click', e => {
+            fragment.region.image = image;
+            $body.empty().append(createRegionEditor(fragment));
+          })
+          .appendTo('#image-list');
+      });
+    })
+
   return $body;
 }
 
 function createRegionEditor(fragment) {
-
+console.log(fragment);
   const {url, width, height} = fragment.region.image;
 
   const content = `
@@ -161,6 +180,7 @@ function createRegionEditor(fragment) {
 
   $content.find('#save-regions').on('click', () => {
     fragment.region.regions = regionSVG.getRegions();
+    console.log(fragment)
     modal.hide();
   });
 

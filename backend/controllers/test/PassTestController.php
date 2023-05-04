@@ -4,6 +4,7 @@ namespace backend\controllers\test;
 
 use backend\models\pass_test\PassTestForm;
 use backend\services\PassTestService;
+use backend\Testing\Questions\PassTest\ImagesAction;
 use backend\Testing\Questions\PassTest\RegionImageUploadAction;
 use common\models\StoryTest;
 use common\models\StoryTestQuestion;
@@ -46,6 +47,7 @@ class PassTestController extends Controller
     {
         return [
             'region-image-upload' => RegionImageUploadAction::class,
+            'images' => ImagesAction::class,
         ];
     }
 

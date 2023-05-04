@@ -8,8 +8,6 @@ use common\models\StorySlideImage;
 use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\base\Action;
-use yii\log\LogRuntimeException;
-use yii\web\NotFoundHttpException;
 use yii\web\Request;
 use yii\web\Response;
 use yii\web\UploadedFile;
@@ -48,7 +46,7 @@ class RegionImageUploadAction extends Action
 
                 $image = StorySlideImage::findByHash($imageId);
                 if ($image === null) {
-                    throw new LogRuntimeException('Ошибка при создании файла');
+                    throw new \RuntimeException('Ошибка при создании файла');
                 }
 
                 $data = [
