@@ -177,18 +177,11 @@ function generateUUID() {
           textNodes[0].textContent = '\u00A0';
         }
 
-        const words = textContent.replace(/\s\s+/g, ' ').split(' ');
-        words.forEach(word => {
-
-          dataWrapper.createFragmentItem(elementId, {
-            id: generateUUID(),
-            title: word.trim(),
-            correct: true
-          });
+        dataWrapper.createFragmentItem(elementId, {
+          id: generateUUID(),
+          title: textContent,
+          correct: true
         });
-
-        //textNode.textContent = words.join(', ');
-        //element.querySelector('.highlight').appendChild(textNode);
       });
 
       selection.addRange(range);
