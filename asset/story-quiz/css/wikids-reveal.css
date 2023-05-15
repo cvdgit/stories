@@ -1133,6 +1133,12 @@ p.wikids-test-description {
 	 */
 }
 
+.slide-hints-auto {
+  width: auto !important;
+  height: auto !important;
+  padding: 10px;
+}
+
 .slide-hints--feedback {
   width: 650px;
   height: 300px;

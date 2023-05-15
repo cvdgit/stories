@@ -1,6 +1,7 @@
 import {_extends, shuffle} from "../common";
 import InnerDialog from "../components/Dialog";
 import passTestRegionContent from "./PassTestRegionContent";
+import passTestRegionCorrect from "./PassTestRegionCorrect";
 
 const PassTest = function (test) {
   this.element = null;
@@ -371,6 +372,10 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
       if (typeof fragmentAnswerCallback === 'function') {
         fragmentAnswerCallback(check, answers.join(', '));
       }
+
+      if (!check) {
+        passTestRegionCorrect(this.container, 'q' + fragmentId, image, regions);
+      }
     });
 
     const dialog = new InnerDialog(this.container, {title: 'Отметьте правильную область', content: regionContent});
@@ -430,7 +435,6 @@ PassTest.prototype.getUserAnswers = function() {
       return [$el.html().toLowerCase()];
     }
   }).get();
-  console.log(answers);
   return answers;
 }
 

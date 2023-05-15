@@ -1,10 +1,10 @@
 
 const InnerDialog = function(container, {title, content}) {
 
-  const $wrapper = $('<div/>', {class: 'slide-hints-wrapper', 'css': {'z-index': 400}});
+  const $wrapper = $('<div/>', {class: 'slide-hints-wrapper', 'css': {'z-index': 400, display: 'none'}});
   const $background = $('<div/>', {class: 'slide-hints-background'});
   const $inner = $('<div/>', {class: 'slide-hints-inner'});
-  const $content = $('<div/>', {class: 'slide-hints'});
+  const $content = $('<div/>', {class: 'slide-hints slide-hints-auto'});
 
   $background.appendTo($wrapper);
   $inner.appendTo($wrapper);
@@ -36,12 +36,11 @@ const InnerDialog = function(container, {title, content}) {
   $content.appendTo($inner);
 
   const show = () => {
-    console.log('show');
     container.append($wrapper);
+    $wrapper.fadeIn();
   };
 
   const hide = () => {
-    console.log('hide');
     $wrapper.hide()
     $wrapper.remove();
   };
