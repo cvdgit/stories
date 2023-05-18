@@ -20,7 +20,7 @@ function sendQuestionsRequest(testId) {
 
 function drawQuestion(question) {
   return `
-    <div class="import-question-row" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center">
+    <div class="import-question-row" style="display: flex; flex-direction: row; justify-content: space-between; align-items: baseline; margin-bottom: 20px">
         <div><a href="${question.url}" target="_blank">${question.name}</a></div>
         <div class="slides-row-actions">
             <div class="checkbox">
