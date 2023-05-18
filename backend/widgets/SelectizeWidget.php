@@ -4,6 +4,7 @@ namespace backend\widgets;
 
 use dosamigos\selectize\SelectizeTextInput;
 use yii\base\Widget;
+use yii\web\JsExpression;
 
 class SelectizeWidget extends Widget
 {
@@ -12,6 +13,7 @@ class SelectizeWidget extends Widget
     public $attribute;
 
     public $options = [];
+    public $onChange = '{}';
 
     public function run()
     {
@@ -32,6 +34,7 @@ class SelectizeWidget extends Widget
                 'allowEmptyOption' => true,
                 'options' => $this->getOptions(),
                 'items' => [$this->model->{$this->attribute}],
+                'onChange' => new JsExpression($this->onChange),
                 //'render' => [
                 //    'option' => $this->renderOptionExpression(),
                 //],

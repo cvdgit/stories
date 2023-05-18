@@ -440,4 +440,13 @@ class StoryTestQuestion extends ActiveRecord
         ];
         return $updateQuestionMap[$this->type] ?? null;
     }
+
+    public static function createFromQuestion(StoryTestQuestion $question, int $testId, int $order): self
+    {
+        $newQuestion = new self();
+        $newQuestion->attributes = $question->attributes;
+        $newQuestion->story_test_id = $testId;
+        $newQuestion->order = $order;
+        return $newQuestion;
+    }
 }

@@ -22,6 +22,7 @@ $this->params['breadcrumbs'] = [
 SortableJsAsset::register($this);
 
 $this->registerJs($this->renderFile('@backend/views/test/_repetition.js'));
+$this->registerJs($this->renderFile('@backend/views/test/_questions-import.js'));
 ?>
 <div class="story-test-update">
     <?php if ($model->isRemote() || $model->isTemplate()): ?>
@@ -50,6 +51,12 @@ $this->registerJs($this->renderFile('@backend/views/test/_repetition.js'));
                             'url' => ['/repetition/testing/list', 'test_id' => $model->id],
                             'visible' => !$model->isTemplate(),
                             'linkOptions' => ['id' => 'list-repetition'],
+                        ],
+                        [
+                            'label' => 'Импортировать вопросы',
+                            'url' => ['/questions-import/form', 'test_id' => $model->id],
+                            'visible' => !$model->isTemplate(),
+                            'linkOptions' => ['id' => 'questions-import'],
                         ],
                     ],
                 ]) ?>

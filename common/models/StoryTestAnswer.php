@@ -227,4 +227,12 @@ class StoryTestAnswer extends ActiveRecord
     {
         return ['test/create-answer', 'question_id' => $questionId];
     }
+
+    public static function createFromAnswer(StoryTestAnswer $answer, int $questionId): self
+    {
+        $newAnswer = new self();
+        $newAnswer->attributes = $answer->attributes;
+        $newAnswer->story_question_id = $questionId;
+        return $newAnswer;
+    }
 }

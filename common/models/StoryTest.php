@@ -13,6 +13,7 @@ use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
 
@@ -535,5 +536,14 @@ class StoryTest extends ActiveRecord
         $model->repeat = 1;
         $model->answer_type = AnswerType::DEFAULT;
         return $model;
+    }
+
+    public function getMaxQuestionsOrder(): int
+    {
+        return (int) (new Query())
+            ->select(new Expression('MAX(`order`)'))
+            ->from('story_test_question')
+            ->where(['story_test_id' => $this->id])
+            ->scalar();
     }
 }
