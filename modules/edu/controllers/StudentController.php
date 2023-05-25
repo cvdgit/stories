@@ -104,11 +104,11 @@ class StudentController extends Controller
         $studentClassBookId = $this->studentClassFetcher->fetch($student->id);
         $studentClass = $this->getStudentClass($studentClassBookId, $student->class);
 
-        $classProgramIds = array_map(static function($classProgram) {
+        /*$classProgramIds = array_map(static function($classProgram) {
             return $classProgram->id;
-        }, $studentClass->eduClassPrograms);
+        }, $studentClass->eduClassPrograms);*/
 
-        /*// Классы, в которых состоит ученик
+        // Классы, в которых состоит ученик
         $classBooks = $student->classBooks;
         $classProgramIds = [];
 
@@ -122,7 +122,7 @@ class StudentController extends Controller
             foreach ($classBooks as $classBook) {
                 $classProgramIds = array_merge($classProgramIds, $classBook->getClassProgramIds());
             }
-        }*/
+        }
 
         $dataProvider = new ActiveDataProvider([
             'query' => EduClassProgram::find()->where(['in', 'id', $classProgramIds]),
