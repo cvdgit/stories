@@ -94,20 +94,37 @@ class EduClassProgram extends ActiveRecord
             ->one();
     }
 
-    public function createTopicRoute(): ?array
+    public function getEduTopicsWithAccess(int $classBookId): ActiveQuery
+    {
+        return $this->hasMany(EduTopic::class, ['class_program_id' => 'id'])
+            ->innerJoin(['acc' => 'edu_class_book_topic_access'], 'acc.topic_id = edu_topic.id')
+            ->andWhere([
+                'acc.class_book_id' => $classBookId,
+                'acc.class_program_id' => $this->id,
+            ]);
+    }
+
+    public function createTopicRoute(int $classBookId = null): ?array
     {
         $route = ['/edu/student/topic'];
-        $topics = $this->eduTopics;
 
-        if ($topics === []) {
+        if ($classBookId === null) {
+            $topics = $this->eduTopics;
+        } else {
+            $topics = $this->getEduTopics()
+                ->innerJoin(['acc' => 'edu_class_book_topic_access'], 'acc.topic_id = edu_topic.id')
+                ->andWhere([
+                    'acc.class_book_id' => $classBookId,
+                    'acc.class_program_id' => $this->id,
+                ])
+                ->all();
+        }
+
+        if (empty($topics)) {
             return null;
         }
 
         $route['id'] = $topics[0]->id;
-
-        /*if (($classProgram = self::findClassProgram($classId, $this->program_id)) !== null && count($classProgram->eduTopics) > 0){
-            $route['id'] = $classProgram->eduTopics[0]->id;
-        }*/
 
         return $route;
     }

@@ -15,6 +15,7 @@ use yii\widgets\ListView;
  * @var View $this
  * @var DataProviderInterface $repetitionDataProvider
  * @var string $studentToolbarWidget
+ * @var int|null $classBookId
  */
 
 $this->title = $student->name;
@@ -48,7 +49,7 @@ $this->title = $student->name;
             'summary' => false,
             'itemView' => '_program_item',
             'itemOptions' => ['tag' => false],
-            'viewParams' => ['studentId' => $student->id],
+            'viewParams' => ['studentId' => $student->id, 'classBookId' => $classBookId],
             'layout' => "{summary}\n<div class=\"row\">{items}</div>\n{pager}",
         ]) ?>
     </div>

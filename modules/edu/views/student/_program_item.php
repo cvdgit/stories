@@ -8,9 +8,10 @@ use yii\helpers\Url;
 /**
  * @var EduClassProgram $model
  * @var int $studentId
+ * @var int|null $classBookId
  */
 
-$route = $model->createTopicRoute();
+$route = $model->createTopicRoute($classBookId);
 ?>
 <div class="col-sm-4 col-md-3">
     <?php if ($route === null): ?>

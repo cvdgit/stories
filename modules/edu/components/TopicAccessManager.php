@@ -11,7 +11,13 @@ use yii\web\ForbiddenHttpException;
 
 class TopicAccessManager
 {
-    public function getStudentLessonAccess(int $classProgramId, int $studentId): array
+    /**
+     * @param int $classProgramId
+     * @param int $studentId
+     * @param array<array-key, int> $topicIds
+     * @return array
+     */
+    public function getStudentLessonAccess(int $classProgramId, int $studentId, array $topicIds): array
     {
         $query = (new Query())
             ->select([
@@ -26,7 +32,7 @@ class TopicAccessManager
                 'edu_lesson_story.story_id' => new Expression('story_student_progress.story_id'),
                 'story_student_progress.student_id' => $studentId,
             ])
-            ->where(['edu_topic.class_program_id' => $classProgramId])
+            ->where(['in', 'edu_topic.id', $topicIds])
             ->groupBy(['topicId', 'lessonId'])
             ->orderBy([
                 'edu_topic.order' => SORT_ASC,
@@ -86,9 +92,9 @@ class TopicAccessManager
      * @throws BadRequestHttpException
      * @throws ForbiddenHttpException
      */
-    public function checkAccessLesson(int $classProgramId, int $lessonId, int $studentId): void
+    public function checkAccessLesson(int $classProgramId, int $lessonId, int $studentId, int $topicId): void
     {
-        $lessonAccess = $this->getStudentLessonAccess($classProgramId, $studentId);
+        $lessonAccess = $this->getStudentLessonAccess($classProgramId, $studentId, [$topicId]);
         if (!isset($lessonAccess[$lessonId])) {
             throw new BadRequestHttpException('Ошибка доступа к уроку');
         }

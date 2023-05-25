@@ -176,4 +176,15 @@ class EduClassBook extends ActiveRecord
     {
         return $this->getStudents()->count();
     }
+
+    public function getTopicAccess(): ActiveQuery
+    {
+        return $this->hasMany(EduClassBookTopicAccess::class, ['class_book_id' => 'id']);
+    }
+
+    public function getTopics(): ActiveQuery
+    {
+        return $this->hasMany(EduTopic::class, ['id' => 'topic_id'])
+            ->viaTable('edu_class_book_topic_access', ['class_book_id' => 'id']);
+    }
 }

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use modules\edu\models\EduClassBook;
 use modules\edu\widgets\grid\ArrowColumn;
 use modules\edu\widgets\TeacherMenuWidget;
 use yii\data\DataProviderInterface;
@@ -15,20 +16,7 @@ use yii\web\View;
  */
 
 $this->title = 'Мои классы';
-
-$this->registerCss(<<<CSS
-.header-block {
-    display: flex;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    margin-top: 20px;
-}
-CSS
-);
+$this->registerJs($this->renderFile('@modules/edu/views/teacher/class-book/_program-list.js'));
 ?>
 <div class="container">
     <?= TeacherMenuWidget::widget() ?>
@@ -42,25 +30,34 @@ CSS
         </div>
     </div>
 
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'summary' => false,
-        'columns' => [
-            'name',
-            [
-                'attribute' => 'class.name',
-                'label' => 'Класс',
+    <div id="class-book-list">
+        <?= GridView::widget([
+            'dataProvider' => $dataProvider,
+            'summary' => false,
+            'columns' => [
+                'name',
+                [
+                    'attribute' => 'class.name',
+                    'label' => 'Класс',
+                ],
+                [
+                    'label' => 'Темы',
+                    'format' => 'raw',
+                    'value' => static function(EduClassBook $classBook): string {
+                        return Html::a('Настроить', ['/edu/teacher/class-book/manage-topics', 'class_book_id' => $classBook->id], ['class' => 'manage-topics']);
+                    }
+                ],
+                [
+                    'label' => 'Учеников',
+                    'attribute' => 'studentCount',
+                ],
+                [
+                    'class' => ArrowColumn::class,
+                    'url' => static function($model) {
+                        return ['/edu/teacher/class-book/students', 'id' => $model->id];
+                    },
+                ],
             ],
-            [
-                'label' => 'Учеников',
-                'attribute' => 'studentCount',
-            ],
-            [
-                'class' => ArrowColumn::class,
-                'url' => static function($model) {
-                    return ['/edu/teacher/class-book/students', 'id' => $model->id];
-                },
-            ],
-        ],
-    ]) ?>
+        ]); ?>
+    </div>
 </div>

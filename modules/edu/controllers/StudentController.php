@@ -5,6 +5,7 @@ namespace modules\edu\controllers;
 use common\models\UserStudent;
 use modules\edu\components\TopicAccessManager;
 use modules\edu\models\EduClass;
+use modules\edu\models\EduClassBook;
 use modules\edu\models\EduClassProgram;
 use modules\edu\models\EduLesson;
 use modules\edu\models\EduTopic;
@@ -58,9 +59,31 @@ class StudentController extends Controller
         }*/
 
     /**
-     * @throws ForbiddenHttpException|BadRequestHttpException
+     * @throws BadRequestHttpException
      */
-    public function actionIndex(): string
+    private function getStudentClass(int $classBookId = null, EduClass $class = null): EduClass
+    {
+        if ($classBookId !== null) {
+            $classBook = EduClassBook::findOne($classBookId);
+            if ($classBook === null) {
+                throw new BadRequestHttpException('Класс не найден');
+            }
+            $studentClass = $classBook->class;
+        } else {
+            $studentClass = $class;
+        }
+
+        if ($studentClass === null) {
+            throw new BadRequestHttpException('Не удалось определить класс');
+        }
+
+        return $studentClass;
+    }
+
+    /**
+     * @throws ForbiddenHttpException
+     */
+    private function getStudent(): UserStudent
     {
         $student = Yii::$app->studentContext->getStudent();
         if ($student === null) {
@@ -69,18 +92,23 @@ class StudentController extends Controller
                 throw new ForbiddenHttpException('Доступ запрещен');
             }
         }
+        return $student;
+    }
 
-        $studentClassId = $this->studentClassFetcher->fetch($student->id);
-        if ($studentClassId !== null) {
-            $studentClass = EduClass::findOne($studentClassId);
-        } else {
-            $studentClass = $student->class;
-            if ($studentClass === null) {
-                throw new BadRequestHttpException('Не удалось определить класс');
-            }
-        }
+    /**
+     * @throws ForbiddenHttpException|BadRequestHttpException
+     */
+    public function actionIndex(): string
+    {
+        $student = $this->getStudent();
+        $studentClassBookId = $this->studentClassFetcher->fetch($student->id);
+        $studentClass = $this->getStudentClass($studentClassBookId, $student->class);
 
-        // Классы, в которых состоит ученик
+        $classProgramIds = array_map(static function($classProgram) {
+            return $classProgram->id;
+        }, $studentClass->eduClassPrograms);
+
+        /*// Классы, в которых состоит ученик
         $classBooks = $student->classBooks;
         $classProgramIds = [];
 
@@ -94,7 +122,7 @@ class StudentController extends Controller
             foreach ($classBooks as $classBook) {
                 $classProgramIds = array_merge($classProgramIds, $classBook->getClassProgramIds());
             }
-        }
+        }*/
 
         $dataProvider = new ActiveDataProvider([
             'query' => EduClassProgram::find()->where(['in', 'id', $classProgramIds]),
@@ -107,6 +135,7 @@ class StudentController extends Controller
             'studentToolbarWidget' => $this->renderStudentToolbarWidget($student, $studentClass),
             'dataProvider' => $dataProvider,
             'repetitionDataProvider' => $repetitionDataProvider,
+            'classBookId' => $studentClassBookId,
         ]);
     }
 
@@ -119,15 +148,9 @@ class StudentController extends Controller
             throw new NotFoundHttpException('Тема не найдена');
         }
 
-        $student = Yii::$app->studentContext->getStudent();
-        if ($student === null) {
-            $student = Yii::$app->user->identity->student();
-            if ($student === null) {
-                throw new ForbiddenHttpException('Доступ запрещен');
-            }
-        }
+        $student = $this->getStudent();
 
-        $studentClassId = $this->studentClassFetcher->fetch($student->id);
+        /*$studentClassId = $this->studentClassFetcher->fetch($student->id);
         if ($studentClassId !== null) {
             $studentClass = EduClass::findOne($studentClassId);
         } else {
@@ -135,21 +158,43 @@ class StudentController extends Controller
             if ($studentClass === null) {
                 throw new BadRequestHttpException('Не удалось определить класс');
             }
-        }
+        }*/
+
+        $studentClassBookId = $this->studentClassFetcher->fetch($student->id);
+        $studentClass = $this->getStudentClass($studentClassBookId, $student->class);
 
         $classProgram = $topic->classProgram;
+
+        if ($studentClassBookId !== null) {
+            $haveTopicAccess = (new Query())
+                ->from('edu_class_book_topic_access')
+                ->where([
+                    'class_book_id' => $studentClassBookId,
+                    'class_program_id' => $topic->class_program_id,
+                    'topic_id' => $topic->id,
+                ])
+                ->exists();
+            if (!$haveTopicAccess) {
+                throw new ForbiddenHttpException('Доступ к теме запрещен');
+            }
+        }
 
         $dataProvider = new ActiveDataProvider([
             'query' => $topic->getEduLessons(),
         ]);
 
-        $lessonAccess = $this->topicAccessManager->getStudentLessonAccess($classProgram->id, $student->id);
+        $topics = $studentClassBookId === null ? $classProgram->eduTopics :  $classProgram->getEduTopicsWithAccess($studentClassBookId)->all();
+        $topicIds = array_map(static function($topic) {
+            return $topic->id;
+        }, $topics);
+
+        $lessonAccess = $this->topicAccessManager->getStudentLessonAccess($classProgram->id, $student->id, $topicIds);
 
         return $this->render('topic', [
             'classProgramName' => $classProgram->program->name,
             'student' => $student,
             'studentToolbarWidget' => $this->renderStudentToolbarWidget($student, $studentClass),
-            'topics' => $classProgram->eduTopics,
+            'topics' => $topics,
             'dataProvider' => $dataProvider,
             'topic' => $topic,
             'lessonAccess' => $lessonAccess,
@@ -167,66 +212,46 @@ class StudentController extends Controller
             throw new NotFoundHttpException('Урок не найден');
         }
 
-        $student = Yii::$app->studentContext->getStudent();
-        if ($student === null) {
-            $student = Yii::$app->user->identity->student();
-            if ($student === null) {
-                throw new ForbiddenHttpException('Доступ запрещен');
+        $student = $this->getStudent();
+        $studentClassBookId = $this->studentClassFetcher->fetch($student->id);
+        $studentClass = $this->getStudentClass($studentClassBookId, $student->class);
+
+        $topic = $lesson->topic;
+
+        if ($studentClassBookId !== null) {
+            $haveTopicAccess = (new Query())
+                ->from('edu_class_book_topic_access')
+                ->where([
+                    'class_book_id' => $studentClassBookId,
+                    'class_program_id' => $topic->class_program_id,
+                    'topic_id' => $topic->id,
+                ])
+                ->exists();
+            if (!$haveTopicAccess) {
+                throw new ForbiddenHttpException('Доступ к теме запрещен');
             }
         }
 
-        $studentClassId = $this->studentClassFetcher->fetch($student->id);
-        if ($studentClassId !== null) {
-            $studentClass = EduClass::findOne($studentClassId);
-        } else {
-            $studentClass = $student->class;
-            if ($studentClass === null) {
-                throw new BadRequestHttpException('Не удалось определить класс');
-            }
-        }
-
-        $this->canAccessTopic($lesson->topic_id, $lesson->id, $student->id);
+        $this->topicAccessManager->getStudentLessonAccess($topic->class_program_id, $student->id, [$topic->id]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $lesson->getStories(),
         ]);
 
-        $topic = $lesson->topic;
+
         $classProgram = $topic->classProgram;
+        $topics = $studentClassBookId === null ? $classProgram->eduTopics :  $classProgram->getEduTopicsWithAccess($studentClassBookId)->all();
 
         return $this->render('lesson', [
             'classProgramName' => $classProgram->program->name,
             'student' => $student,
-            'topics' => $classProgram->eduTopics,
+            'topics' => $topics,
             'dataProvider' => $dataProvider,
             'lesson' => $lesson,
             'currentTopicId' => $topic->id,
             'programId' => $classProgram->id,
             'studentToolbarWidget' => $this->renderStudentToolbarWidget($student, $studentClass),
         ]);
-    }
-
-    /**
-     * @throws NotFoundHttpException
-     * @throws ForbiddenHttpException
-     */
-    private function canAccessTopic(int $topicId, int $lessonId, int $studentId): void
-    {
-        $classProgramId = (new Query())
-            ->select('class_program_id')
-            ->from('edu_topic')
-            ->where(['id' => $topicId])
-            ->scalar();
-        if (empty($classProgramId)) {
-            throw new NotFoundHttpException('Тема не найдена');
-        }
-        $lessonAccess = $this->topicAccessManager->getStudentLessonAccess($classProgramId, $studentId);
-        if (!isset($lessonAccess[$lessonId])) {
-            throw new NotFoundHttpException('Урок не найден');
-        }
-        if ($lessonAccess[$lessonId]['access'] === false) {
-            throw new ForbiddenHttpException('Что бы получить доступ к урок - необходимо пройти предыдущие');
-        }
     }
 
     private function renderStudentToolbarWidget(UserStudent $student, EduClass $class): string

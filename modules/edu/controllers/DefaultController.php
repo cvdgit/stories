@@ -9,6 +9,7 @@ use modules\edu\models\EduStory;
 use modules\edu\models\EduStudent;
 use modules\edu\query\GetStoryTests\StoryTestsFetcher;
 use modules\edu\query\StoryStudentProgressFetcher;
+use modules\edu\query\StudentClassFetcher;
 use modules\edu\services\StudentStatService;
 use Ramsey\Uuid\Uuid;
 use Yii;
@@ -31,11 +32,13 @@ class DefaultController extends Controller
      * @var StudentStatService
      */
     private $studentStatService;
+    private $studentClassFetcher;
 
-    public function __construct($id, $module, StudentStatService $studentStatService, $config = [])
+    public function __construct($id, $module, StudentStatService $studentStatService, StudentClassFetcher $studentClassFetcher, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->studentStatService = $studentStatService;
+        $this->studentClassFetcher = $studentClassFetcher;
     }
 
     public function actionIndex(): Response
@@ -134,9 +137,33 @@ class DefaultController extends Controller
         return $this->redirect(['/edu/parent/index']);
     }
 
+    /**
+     * @throws ForbiddenHttpException
+     */
     public function actionGetNextStory(int $story_id, int $program_id, Response $response): array
     {
         $response->format = Response::FORMAT_JSON;
+
+        $student = Yii::$app->studentContext->getStudent();
+        if ($student === null) {
+            $student = Yii::$app->user->identity->student();
+            if ($student === null) {
+                throw new ForbiddenHttpException('Доступ запрещен');
+            }
+        }
+
+        $studentClassBookId = $this->studentClassFetcher->fetch($student->id);
+        $programTopics = (new Query())
+            ->select(['topicId' => 't.id'])
+            ->from(['t' => 'edu_topic'])
+            ->innerJoin(['acc' => 'edu_class_book_topic_access'], 'acc.topic_id = t.id')
+            ->where([
+                't.class_program_id' => $program_id,
+                'acc.class_book_id' => $studentClassBookId
+            ])
+            ->andWhere('acc.class_program_id = t.class_program_id')
+            ->all();
+        $programTopicIds = array_column($programTopics, 'topicId');
 
         $query = (new Query())
             ->select([
@@ -145,7 +172,7 @@ class DefaultController extends Controller
             ->from(['et' => 'edu_topic'])
             ->innerJoin(['el' => 'edu_lesson'], 'et.id = el.topic_id')
             ->innerJoin(['els' => 'edu_lesson_story'], 'el.id = els.lesson_id')
-            ->where(['et.class_program_id' => $program_id])
+            ->where(['in', 'et.id', $programTopicIds])
             ->orderBy(['et.`order`' => SORT_ASC, 'el.`order`' => SORT_ASC, 'els.`order`' => SORT_ASC]);
         $rows = $query->all();
 

@@ -16,6 +16,8 @@ use modules\edu\models\EduStudent;
 use modules\edu\services\ParentInviteService;
 use modules\edu\services\StudentService;
 use modules\edu\services\TeacherService;
+use modules\edu\Teacher\ClassBook\ManageTopics\ManageTopicsFormAction;
+use modules\edu\Teacher\ClassBook\ManageTopics\TopicAccessAction;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AjaxFilter;
@@ -39,7 +41,7 @@ class ClassBookController extends Controller
         $this->parentInviteService = $parentInviteService;
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'verbs' => [
@@ -55,7 +57,15 @@ class ClassBookController extends Controller
         ];
     }
 
-    public function actionIndex()
+    public function actions(): array
+    {
+        return [
+            'manage-topics' => ManageTopicsFormAction::class,
+            'save-topic-access' => TopicAccessAction::class,
+        ];
+    }
+
+    public function actionIndex(): string
     {
         $dataProvider = new ActiveDataProvider([
             'query' => EduClassBook::findTeacherClassBooks(Yii::$app->user->getId()),

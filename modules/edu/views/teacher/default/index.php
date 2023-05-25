@@ -40,7 +40,7 @@ $this->title = 'Учительская доска';
                             '/edu/teacher/default/class-program-stats',
                             'class_book_id' => $classBook->id,
                             'class_program_id' => $classProgram->classProgram->id
-                        ]) ?>
+                        ]); ?>
                     </td>
                 </tr>
                 <?php endforeach ?>
