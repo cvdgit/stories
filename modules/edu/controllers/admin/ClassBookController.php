@@ -10,6 +10,8 @@ use Exception;
 use modules\edu\models\EduClassBook;
 use modules\edu\models\EduClassProgram;
 use modules\edu\services\ClassBookService;
+use modules\edu\Teacher\ClassBook\ManageTopics\AdminManageTopicsFormAction;
+use modules\edu\Teacher\ClassBook\ManageTopics\TopicAccessAction;
 use modules\edu\widgets\StudentStatWidget;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -44,6 +46,14 @@ class ClassBookController extends Controller
         ];
     }
 
+    public function actions(): array
+    {
+        return [
+            'manage-topics' => AdminManageTopicsFormAction::class,
+            'save-topic-access' => TopicAccessAction::class,
+        ];
+    }
+
     public function actionIndex()
     {
 
@@ -62,9 +72,8 @@ class ClassBookController extends Controller
     /**
      * @throws NotFoundHttpException
      */
-    public function actionView(int $id)
+    public function actionView(int $id): string
     {
-
         if (($model = EduClassBook::findOne($id)) === null) {
             throw new NotFoundHttpException('Класс не найден');
         }
@@ -76,9 +85,14 @@ class ClassBookController extends Controller
             ]
         ]);
 
+        $programs = array_map(static function(EduClassProgram $classProgram): string {
+            return $classProgram->program->name;
+        }, $model->classPrograms);
+
         return $this->render('view', [
             'dataProvider' => $dataProvider,
             'classBook' => $model,
+            'programs' => $programs,
         ]);
     }
 

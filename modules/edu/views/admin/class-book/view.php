@@ -13,9 +13,12 @@ use yii\web\View;
  * @var View $this
  * @var DataProviderInterface $dataProvider
  * @var EduClassBook $classBook
+ * @var array<array-key, string> $programs
  */
 
 $this->title = 'Класс';
+
+$this->registerJs($this->renderFile('@modules/edu/views/admin/class-book/_manage_topics.js'));
 ?>
 <div>
     <?= AdminToolbarWidget::widget() ?>
@@ -24,6 +27,12 @@ $this->title = 'Класс';
         <?= Html::a('<i class="glyphicon glyphicon-arrow-left back-arrow"></i>', ['/edu/admin/class-book/index']) ?>
         <?= Html::encode($this->title) ?>
     </h1>
+
+    <div>
+        <p><strong>Класс:</strong> <?= $classBook->class->name; ?></p>
+        <p><strong>Программы:</strong> <?= implode(', ', $programs); ?></p>
+        <p><strong>Тема:</strong> <?= Html::a('Настроить', ['/edu/admin/class-book/manage-topics', 'class_book_id' => $classBook->id], ['id' => 'manage-topics']); ?></p>
+    </div>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
