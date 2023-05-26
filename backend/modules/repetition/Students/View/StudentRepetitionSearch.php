@@ -27,6 +27,7 @@ class StudentRepetitionSearch extends Model
                     ->from(['t' => 'schedule_item'])
                     ->where('s.id = t.schedule_id'),
                 'repetitionItemsCount' => new Expression('COUNT(IF(r.done = 1, r.id, null))'),
+                'targetTime' => new Expression('MAX(r.created_at) + (MAX(si.hours) * 60 * 60)'),
             ])
             ->from(['r' => 'test_repetition'])
             ->innerJoin(['st' => 'story_test'], 'r.test_id = st.id')

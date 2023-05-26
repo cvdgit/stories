@@ -46,6 +46,13 @@ $this->registerJs($this->renderFile('@backendModules/repetition/views/student/_v
                 },
             ],
             [
+                'attribute' => 'targetTime',
+                'label' => 'Дата следующего повторения',
+                'value' => static function ($model) {
+                    return SmartDate::dateSmart($model['targetTime'], true);
+                },
+            ],
+            [
                 'label' => 'Пройдено',
                 'value' => static function ($model) {
                     return $model['repetitionItemsCount'] . ' из ' . $model['scheduleItemsCount'];
