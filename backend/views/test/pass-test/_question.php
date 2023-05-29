@@ -124,7 +124,7 @@ TestQuestionAsset::register($this);
             </div>
         </div>
     </div>
-    <div style="min-height:300px;overflow-y:auto">
+    <div style="min-height:300px">
         <div class="content" data-testing-id="<?= $testingId; ?>" data-question-id="<?= $model->getId(); ?>" id="content" contenteditable="true"></div>
         <textarea id="content_html" rows="10" style="width: 100%; min-height: 300px; display: none"></textarea>
     </div>

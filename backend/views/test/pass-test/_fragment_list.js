@@ -161,7 +161,7 @@
 
       range = ranges[i];
 
-      surroundRangeContents(range, templateElement, function(element, textNode) {
+      /*surroundRangeContents(range, templateElement, function(element, textNode) {
 
         dataWrapper.createFragment(elementId);
         element.setAttribute('data-fragment-id', elementId);
@@ -177,6 +177,33 @@
         });
 
         element.querySelector('.dropdown-toggle').appendChild(textNode);
+      });*/
+
+      surroundRangeContents(range, (textNodes) => {
+
+        const element = fragmentElementBuilder('single').cloneNode(true);
+        textNodes[0].parentNode.insertBefore(element, textNodes[0]);
+
+        let textContent = '';
+        for (let i = 0, node; node = textNodes[i++];) {
+          element.appendChild(node);
+          textContent += node.nodeType === 3 ? node.textContent : node.outerHTML;
+          element.querySelector('.dropdown-toggle').appendChild(node);
+        }
+
+        dataWrapper.createFragment(elementId);
+        element.setAttribute('data-fragment-id', elementId);
+
+        if (textNodes[0].textContent === ' ') {
+          textNodes[0].textContent = '\u00A0';
+        }
+
+        dataWrapper.createFragmentItem(elementId, {
+          id: generateUUID(),
+          title: textContent,
+          correct: true
+        });
+
       });
 
       selection.addRange(range);

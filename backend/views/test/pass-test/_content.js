@@ -344,6 +344,16 @@
       ).appendTo(menu);
 
       $('<li/>').append(
+        $('<a/>', {'href': '#', 'class': 'save-word-list'})
+          .text('Сохранить список')
+          .on('click', function(e) {
+            e.preventDefault();
+
+            console.log(fragment);
+          })
+      ).appendTo(menu);
+
+      $('<li/>').append(
         $('<a/>', {'href': '#', 'class': 'add-word'})
           .text('Удалить пропуск')
           .on('click', function(e) {
