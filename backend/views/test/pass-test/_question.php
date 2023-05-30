@@ -100,7 +100,7 @@ TestQuestionAsset::register($this);
 <?= $form->field($model, 'view')->dropDownList($model->getViewItems(), ['prompt' => 'Выберите представление']); ?>
 <?= $form->field($model, 'max_prev_items')->dropDownList($model->getMaxPrevItems())
     ->hint('При неправильном выборе возврат на указанное количество элементов'); ?>
-<div>
+<div class="content-wrap">
     <div style="margin-bottom:10px;display:flex;flex-direction:row;align-items:center">
         <div class="content__title">
             <?= Html::activeLabel($model, 'content') ?>
@@ -117,9 +117,9 @@ TestQuestionAsset::register($this);
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right">
-                    <li><a href="#" id="add">Один ответ</a></li>
-                    <li><a href="#" id="add-multi">Несколько ответов</a></li>
-                    <li><a href="#" id="add-region">Выбор области</a></li>
+                    <li><a href="#" data-fragment-type="single" class="add-fragment">Один ответ</a></li>
+                    <li><a href="#" data-fragment-type="multi" class="add-fragment">Несколько ответов</a></li>
+                    <li><a href="#" data-fragment-type="region" class="add-fragment">Выбор области</a></li>
                 </ul>
             </div>
         </div>
@@ -127,6 +127,18 @@ TestQuestionAsset::register($this);
     <div style="min-height:300px">
         <div class="content" data-testing-id="<?= $testingId; ?>" data-question-id="<?= $model->getId(); ?>" id="content" contenteditable="true"></div>
         <textarea id="content_html" rows="10" style="width: 100%; min-height: 300px; display: none"></textarea>
+        <div id="add-fragment" style="position: fixed; display: none">
+            <div class="dropdown">
+                <button title="Вставить пропуск" class="btn btn-success btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                    <i class="glyphicon glyphicon-plus"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li><a href="#" data-fragment-type="single" class="add-fragment">Один ответ</a></li>
+                    <li><a href="#" data-fragment-type="multi" class="add-fragment">Несколько ответов</a></li>
+                    <li><a href="#" data-fragment-type="region" class="add-fragment">Выбор области</a></li>
+                </ul>
+            </div>
+        </div>
     </div>
     <?= $form->field($model, 'content')->hiddenInput()->label(false) ?>
 </div>
