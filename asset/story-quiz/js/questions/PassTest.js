@@ -77,12 +77,13 @@ function createRegionElement(fragment, attrs = {}) {
   };
   const div = $('<div/>', attrs);
 
-  /*const correctText = fragment.items
+  const correctText = fragment.items
     .filter(item => item.correct)
     .map(item => item.title)
-    .join(', ');*/
+    .join(', ');
 
-  div.text('Выберите область');
+  div.text(correctText);
+  div.attr('data-region-text', correctText);
   return div;
 }
 
@@ -140,7 +141,7 @@ function resetFragmentElement(element) {
   }
 
   if (element.hasClass('region-fragment-btn')) {
-    element.text('Выберите область');
+    element.text(element.attr('data-region-text'));
   }
 }
 
@@ -372,7 +373,8 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
 
       dialog.hide();
 
-      e.target.textContent = check ? fragment.items[0].title : 'Выберите область';
+      //e.target.textContent = check ? fragment.items[0].title : 'Выберите область';
+      e.target.textContent = fragment.items[0].title;
 
       if (typeof fragmentAnswerCallback === 'function') {
         fragmentAnswerCallback(check, answers.join(', '));
