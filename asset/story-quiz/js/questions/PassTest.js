@@ -77,6 +77,11 @@ function createRegionElement(fragment, attrs = {}) {
   };
   const div = $('<div/>', attrs);
 
+  /*const correctText = fragment.items
+    .filter(item => item.correct)
+    .map(item => item.title)
+    .join(', ');*/
+
   div.text('Выберите область');
   return div;
 }
@@ -352,7 +357,7 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
     e.stopPropagation();
   });
 
-  $content.on('click', '.region-fragment-btn', (e) => {
+  $content.on('click', '.region-fragment-btn:not(.disabled)', (e) => {
 
     const fragmentId = e.target.getAttribute('data-fragment-id');
     const fragment = fragments.find(elem => elem.id === fragmentId);
