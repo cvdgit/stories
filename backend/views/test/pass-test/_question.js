@@ -301,7 +301,7 @@ function generateUUID() {
                   if (fragment.type === 'region') {
                     dataWrapper.createRegionFragment(elementId);
                   } else {
-                    dataWrapper.createFragment(elementId);
+                    dataWrapper.createFragment(elementId, fragment.multi);
                   }
                   element.setAttribute('data-fragment-id', elementId);
 
