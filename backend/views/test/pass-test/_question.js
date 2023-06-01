@@ -103,8 +103,9 @@ function generateUUID() {
     }
     selectionStart = false;
     const offset = getRangeOffset(window.getSelection());
-    offset.left += 5;
-    offset.top -= 5;
+    const r = $('#content')[0].getBoundingClientRect();
+    offset.left -= r.x - 5;
+    offset.top -= r.y + 5;
     $('#add-fragment').css(offset).show();
   });
 

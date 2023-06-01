@@ -169,10 +169,10 @@ CSS
             </div>
         </div>
     </div>
-    <div style="min-height:300px">
+    <div style="min-height:300px;position:relative">
         <div class="content" data-testing-id="<?= $testingId; ?>" data-question-id="<?= $model->getId(); ?>" id="content" contenteditable="true"></div>
         <textarea id="content_html" rows="10" style="width: 100%; min-height: 300px; display: none"></textarea>
-        <div id="add-fragment" style="position: fixed; display: none">
+        <div id="add-fragment" style="position: absolute; display: none">
             <div class="dropdown">
                 <button title="Вставить пропуск" class="btn btn-success btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
                     <i class="glyphicon glyphicon-plus"></i>
