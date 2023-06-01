@@ -123,6 +123,22 @@ function surroundRangeContents(range, callback) {
   range.setEnd(lastTextNode, lastTextNode.length);
 }
 
+function surroundRangeContentsAsNodes(range) {
+
+  splitRangeBoundaries(range);
+
+  const textNodes = getTextNodesInRange(range);
+  if (textNodes.length === 0) {
+    return;
+  }
+
+  range.setStart(textNodes[0], 0);
+  const lastTextNode = textNodes[textNodes.length - 1];
+  range.setEnd(lastTextNode, lastTextNode.length);
+
+  return textNodes;
+}
+
 function trimRanges(selection) {
   for (let i = 0, range = selection.getRangeAt(0); i < selection.rangeCount; range = selection.getRangeAt(i++)) {
 

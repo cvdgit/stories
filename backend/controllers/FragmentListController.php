@@ -9,6 +9,7 @@ use backend\forms\FragmentListForm;
 use backend\forms\FragmentListItemForm;
 use backend\forms\FragmentListSearch;
 use backend\services\QuestionFragmentService;
+use backend\Testing\Questions\PassTest\Fragments\SaveFragmentAction;
 use common\models\StoryTest;
 use common\rbac\UserRoles;
 use yii\base\Model;
@@ -43,6 +44,13 @@ class FragmentListController extends Controller
                     ],
                 ],
             ],
+        ];
+    }
+
+    public function actions(): array
+    {
+        return [
+            'save' => SaveFragmentAction::class,
         ];
     }
 

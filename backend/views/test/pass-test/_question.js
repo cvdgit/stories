@@ -55,139 +55,6 @@ function generateUUID() {
     return ranges;
   }
 
-  $('#add').on('click', function (e) {
-    e.preventDefault();
-
-    const selection = initSelection();
-    const ranges = initRanges(selection);
-
-    let i = ranges.length;
-    while (i--) {
-      const range = ranges[i];
-
-      surroundRangeContents(range, (textNodes) => {
-
-        const element = fragmentElementBuilder('single').cloneNode(true);
-        textNodes[0].parentNode.insertBefore(element, textNodes[0]);
-
-        let textContent = '';
-        for (let i = 0, node; node = textNodes[i++];) {
-          element.appendChild(node);
-          textContent += node.nodeType === 3 ? node.textContent : node.outerHTML;
-          element.querySelector('.dropdown-toggle').appendChild(node);
-        }
-
-        const id = dataWrapper.createFragment(generateUUID());
-        element.setAttribute('data-fragment-id', id);
-
-        if (textNodes[0].textContent === ' ') {
-          textNodes[0].textContent = '\u00A0';
-        }
-
-        dataWrapper.createFragmentItem(id, {
-          id: generateUUID(),
-          title: textContent,
-          correct: true
-        });
-
-      });
-
-      selection.addRange(range);
-    }
-  });
-
-  $('#add-multi').on('click', function (e) {
-    e.preventDefault();
-
-    const selection = initSelection();
-    const ranges = initRanges(selection);
-
-    let i = ranges.length;
-    const elementId = generateUUID();
-
-    while (i--) {
-
-      const range = ranges[i];
-
-      surroundRangeContents(range, function (textNodes) {
-
-        const element = fragmentElementBuilder('multi').cloneNode(true);
-        textNodes[0].parentNode.insertBefore(element, textNodes[0]);
-
-        let textContent = '';
-        for (let i = 0, node; node = textNodes[i++];) {
-          element.appendChild(node);
-          textContent += node.nodeType === 3 ? node.textContent : node.outerHTML;
-          element.querySelector('.dropdown-toggle').appendChild(node);
-        }
-
-        dataWrapper.createFragment(elementId, true);
-        element.setAttribute('data-fragment-id', elementId);
-
-        if (textNodes[0].textContent === ' ') {
-          textNodes[0].textContent = '\u00A0';
-        }
-
-        const words = textContent.replace(/\s\s+/g, ' ').split(' ');
-        words.forEach(word => {
-          dataWrapper.createFragmentItem(elementId, {
-            id: generateUUID(),
-            title: word.trim(),
-            correct: true
-          });
-        });
-
-        //textNode.textContent = words.join(', ');
-        //element.querySelector('.dropdown-toggle').appendChild(textNode);
-      });
-
-      selection.addRange(range);
-    }
-  });
-
-  $('#add-region').on('click', function (e) {
-    e.preventDefault();
-
-    const selection = initSelection();
-    const ranges = initRanges(selection);
-
-    let i = ranges.length;
-    const elementId = generateUUID();
-
-    while (i--) {
-
-      const range = ranges[i];
-
-      surroundRangeContents(range, function (textNodes) {
-
-        const element = fragmentElementBuilder('region').cloneNode(true);
-        textNodes[0].parentNode.insertBefore(element, textNodes[0]);
-
-        let textContent = '';
-        for (let i = 0, node; node = textNodes[i++];) {
-          element.appendChild(node);
-          textContent += node.nodeType === 3 ? node.textContent : node.outerHTML;
-          element.querySelector('.highlight').appendChild(node);
-        }
-
-        dataWrapper.createRegionFragment(elementId);
-        element.setAttribute('data-fragment-id', elementId);
-
-        if (textNodes[0].textContent === ' ') {
-          textNodes[0].textContent = '\u00A0';
-        }
-
-        dataWrapper.createFragmentItem(elementId, {
-          id: generateUUID(),
-          title: textContent,
-          correct: true
-        });
-      });
-
-      selection.addRange(range);
-    }
-  });
-
   $('#add-fragment')
     .offset({left: 0, top: 0})
     .hide();
@@ -250,6 +117,8 @@ function generateUUID() {
     selectionStart = true;
   }
 
+
+
   $('.content-wrap').on('click', '.add-fragment', function(e) {
     e.preventDefault();
 
@@ -264,6 +133,16 @@ function generateUUID() {
 
       while (i--) {
         const range = ranges[i];
+
+        /*const nodes = surroundRangeContentsAsNodes(range);
+        const element = fragmentElementBuilder('single').cloneNode(true);
+        nodes[0].parentNode.insertBefore(element, nodes[0]);
+        let textContent = '';
+        for (let i = 0, node; node = nodes[i++];) {
+          element.appendChild(node);
+          textContent += node.nodeType === 3 ? node.textContent : node.outerHTML;
+          element.querySelector('.dropdown-toggle').appendChild(node);
+        }*/
 
         surroundRangeContents(range, (textNodes) => {
 
@@ -379,6 +258,77 @@ function generateUUID() {
         selection.addRange(range);
       }
     }
+  });
+
+  $('#add-fragment').on('show.bs.dropdown', '.dropdown', function() {
+
+    const $list = $(this).find('#last-fragments');
+    $list.empty();
+
+    dataWrapper.getFragments().forEach(fragment => {
+      const correct = dataWrapper.getFragmentCorrectItems(fragment.id);
+      const $li = $('<li/>')
+        .append(
+          $('<a/>', {
+            href: '#',
+            text: correct.map(item => item.title).join(', ')
+          })
+            .on('click', (e) => {
+              e.preventDefault();
+
+              const selection = initSelection();
+              const ranges = initRanges(selection);
+
+              let i = ranges.length;
+              const elementId = generateUUID();
+
+              while (i--) {
+                const range = ranges[i];
+
+                surroundRangeContents(range, (textNodes) => {
+
+                  const element = fragmentElementBuilder(fragment.type).cloneNode(true);
+                  textNodes[0].parentNode.insertBefore(element, textNodes[0]);
+
+                  let textContent = '';
+                  for (let i = 0, node; node = textNodes[i++];) {
+                    element.appendChild(node);
+                    textContent += node.nodeType === 3 ? node.textContent : node.outerHTML;
+                    element.querySelector(fragment.type === 'region' ? '.highlight' : '.dropdown-toggle').appendChild(node);
+                  }
+
+                  if (fragment.type === 'region') {
+                    dataWrapper.createRegionFragment(elementId);
+                  } else {
+                    dataWrapper.createFragment(elementId);
+                  }
+                  element.setAttribute('data-fragment-id', elementId);
+
+                  if (textNodes[0].textContent === ' ') {
+                    textNodes[0].textContent = '\u00A0';
+                  }
+
+                  dataWrapper.createFragmentItem(elementId, {
+                    id: generateUUID(),
+                    title: textContent,
+                    correct: true
+                  });
+
+                  if (fragment.type !== 'region') {
+                    fragment.items.forEach(item => dataWrapper.createFragmentItem(elementId, {
+                      id: generateUUID(),
+                      title: item.title,
+                      correct: false
+                    }));
+                  }
+                });
+
+                selection.addRange(range);
+              }
+            })
+        );
+      $li.appendTo($list);
+    });
   });
 
 })();
