@@ -869,7 +869,7 @@ var StoryEditor = (function() {
                     {name: 'insert', groups: ['insert']}
                 ],
                 // Font
-                removeButtons: 'About,Maximize,ShowBlocks,BGColor,Styles,Image,Flash,Table,Smiley,SpecialChar,PageBreak,Iframe,Anchor,BidiLtr,BidiRtl,Language,Source,Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Find,Replace,SelectAll,Scayt,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,Underline,Subscript,Superscript,CopyFormatting,CreateDiv,Indent,Outdent'
+                removeButtons: 'About,Maximize,ShowBlocks,BGColor,Styles,Image,Flash,Table,Smiley,SpecialChar,PageBreak,Iframe,Anchor,BidiLtr,BidiRtl,Language,Source,Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Find,Replace,SelectAll,Scayt,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,Underline,CopyFormatting,CreateDiv,Indent,Outdent'
             });
 
             elem.data('editorName', ed.name);
