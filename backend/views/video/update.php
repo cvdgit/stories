@@ -1,11 +1,17 @@
 <?php
+
+declare(strict_types=1);
+
 use common\helpers\Url;
 use frontend\assets\PlyrAsset;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+
 /** @var $this yii\web\View */
 /** @var $model backend\models\video\UpdateVideoForm */
+
 PlyrAsset::register($this);
+
 $this->title = 'Изменить видео';
 $this->params['breadcrumbs'] = [
     ['label' => 'Видео', 'url' => ['video/index']],
@@ -23,8 +29,15 @@ $this->params['breadcrumbs'] = [
     <?php ActiveForm::end(); ?>
     </div>
     <div class="col-md-6">
-        <div style="margin-top: 72px">
-            <div class="plyr__video-embed" id="video-container" data-plyr-provider="youtube" data-plyr-embed-id="<?= $model->video_id ?>"></div>
+        <div>
+            <div class="plyr__video-embed" id="video-container">
+                <iframe
+                    src="https://www.youtube.com/embed/<?= $model->video_id; ?>"
+                    allowfullscreen
+                    allowtransparency
+                    allow="autoplay"
+                ></iframe>
+            </div>
         </div>
     </div>
 </div>
@@ -33,7 +46,21 @@ $this->params['breadcrumbs'] = [
 $action = Url::to(['video/get-stories', 'video_id' => '_VIDEO_']);
 $js = <<< JS
 
-var player = new Plyr('#video-container', {});
+const player = Plyr.setup('#video-container', {
+    captions: { active: true },
+    youtube: {
+        noCookie: false,
+        rel: 0,
+        showinfo: 0,
+        iv_load_policy: 3,
+        modestbranding: 1,
+        cc_load_policy: 1,
+        cc_lang_pref: 'en',
+        enablejsapi: 1,
+        playsinline: 1,
+        fmt: 'vtt'
+    }
+});
 
 $("#check-video").on("click", function(e) {
     e.preventDefault();
