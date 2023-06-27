@@ -1,56 +1,49 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\components\story;
 
+use backend\models\editor\VideoForm;
 use backend\models\video\VideoSource;
 
 class VideoBlock extends AbstractBlock
 {
-
     protected $type = AbstractBlock::TYPE_VIDEO;
 
     public const DEFAULT_SPEED = 1;
     public const DEFAULT_VOLUME = 0.8;
 
-    /** @var string */
     private $video_id;
-
-    /** @var int */
     private $seek_to;
-
-    /** @var int */
     private $duration;
-
-    /** @var int */
-    private $mute;
-
-    /** @var int */
+    private $mute = false;
     private $speed;
-
-    /** @var int */
     private $volume;
-
-    /** @var int */
-    private $to_next_slide;
-
-    /** @var int */
+    private $to_next_slide = false;
     private $source;
-
-    /** @var string */
     private $content;
+    private $show_captions = false;
 
-    public function update($form)
+    /**
+     * @param VideoForm $form
+     * @return void
+     */
+    public function update($form): void
     {
-        $this->video_id = $form->video_id;
-        $this->seek_to = $form->seek_to;
-        $this->duration = $form->duration;
-        $this->mute = $form->mute;
-        $this->speed = $form->speed;
-        $this->volume = $form->volume;
-        $this->to_next_slide = $form->to_next_slide;
-        //$this->source = $form->source;
+        $this->setVideoId($form->video_id);
+        $this->setSeekTo((float) $form->seek_to);
+        $this->setDuration((float) $form->duration);
+        $this->setMute((int) $form->mute === 1);
+        $this->setSpeed((float) $form->speed);
+        $this->setVolume((float) $form->volume);
+        $this->setToNextSlide((int) $form->to_next_slide === 1);
+        $this->setShowCaptions((int) $form->show_captions === 1);
     }
 
+    /**
+     * @return self
+     */
     public function create()
     {
         $block = new self();
@@ -61,53 +54,37 @@ class VideoBlock extends AbstractBlock
         $block->setDuration(0);
         $block->setSource(VideoSource::YOUTUBE);
         $block->setType(AbstractBlock::TYPE_VIDEO);
+        $block->setShowCaptions(false);
+        $block->setMute(false);
         return $block;
     }
 
-    public function setSource($value): void
+    public function setSource(int $value): void
     {
         $this->source = $value;
-        if (empty($this->source)) {
-            $this->source = VideoSource::YOUTUBE;
-        }
     }
 
     public function getSource(): int
     {
-        if ($this->source === null) {
-            $this->source = VideoSource::YOUTUBE;
-        }
         return $this->source;
     }
 
-    /**
-     * @return string
-     */
-    public function getVideoId()
+    public function getVideoId(): ?string
     {
         return $this->video_id;
     }
 
-    /**
-     * @param string $video_id
-     */
-    public function setVideoId($video_id): void
+    public function setVideoId(string $video_id): void
     {
         $this->video_id = $video_id;
     }
 
-    /**
-     * @return int
-     */
-    public function getSeekTo()
+    public function getSeekTo(): ?float
     {
         return $this->seek_to;
     }
 
-    /**
-     * @param int $seek_to
-     */
-    public function setSeekTo($seek_to): void
+    public function setSeekTo(float $seek_to): void
     {
         $this->seek_to = $seek_to;
     }
@@ -115,103 +92,85 @@ class VideoBlock extends AbstractBlock
     public function getValues(): array
     {
         return array_merge([
-            'video_id' => $this->video_id,
-            'seek_to' => $this->seek_to,
-            'duration' => $this->duration,
-            'mute' => $this->mute,
-            'speed' => $this->speed,
-            'volume' => $this->volume,
-            'to_next_slide' => $this->to_next_slide,
+            'video_id' => $this->getVideoId(),
+            'seek_to' => $this->getSeekTo(),
+            'duration' => $this->getDuration(),
+            'mute' => $this->isMute(),
+            'speed' => $this->getSpeed(),
+            'volume' => $this->getVolume(),
+            'to_next_slide' => $this->isToNextSlide(),
             'source' => $this->getSource(),
+            'show_captions' => $this->isShowCaptions(),
         ], parent::getValues());
     }
 
-    /**
-     * @return int
-     */
-    public function getDuration()
+    public function getDuration(): ?float
     {
         return $this->duration;
     }
 
-    /**
-     * @param int $duration
-     */
-    public function setDuration($duration): void
+    public function setDuration(float $duration): void
     {
         $this->duration = $duration;
     }
 
-    /**
-     * @return bool
-     */
-    public function isMute()
+    public function isMute(): bool
     {
         return $this->mute;
     }
 
-    /**
-     * @param bool $mute
-     */
-    public function setMute($mute): void
+    public function setMute(bool $mute = true): void
     {
         $this->mute = $mute;
     }
 
-    public function getMute()
-    {
-        return $this->mute;
-    }
-
-    /**
-     * @return int
-     */
-    public function getSpeed()
+    public function getSpeed(): ?float
     {
         return $this->speed;
     }
 
-    /**
-     * @param int $speed
-     */
-    public function setSpeed($speed): void
+    public function setSpeed(float $speed): void
     {
         $this->speed = $speed;
     }
 
-    /**
-     * @return int
-     */
-    public function getVolume()
+    public function getVolume(): ?float
     {
         return $this->volume;
     }
 
-    /**
-     * @param int $volume
-     */
-    public function setVolume($volume): void
+    public function setVolume(float $volume): void
     {
         $this->volume = $volume;
     }
 
-    public function getToNextSlide()
+    public function isToNextSlide(): bool
     {
         return $this->to_next_slide;
     }
 
-    public function setToNextSlide($value)
+    public function setToNextSlide(bool $value): void
     {
         $this->to_next_slide = $value;
     }
 
-    public function getContent(): string
+    public function getContent(): ?string
     {
-        return (string) $this->content;
+        return $this->content;
     }
 
     public function setContent(string $content): void
     {
         $this->content = $content;
+    }
+
+    public function isShowCaptions(): bool
+    {
+        return $this->show_captions;
+    }
+
+    public function setShowCaptions(bool $showCaptions = true): void
+    {
+        $this->show_captions = $showCaptions;
     }
 }

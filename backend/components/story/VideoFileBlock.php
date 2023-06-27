@@ -6,7 +6,6 @@ use backend\models\video\VideoSource;
 
 class VideoFileBlock extends VideoBlock
 {
-
     protected $type = AbstractBlock::TYPE_VIDEOFILE;
 
     public function create()
@@ -19,6 +18,8 @@ class VideoFileBlock extends VideoBlock
         $block->setDuration(0);
         $block->setSource(VideoSource::FILE);
         $block->setType(AbstractBlock::TYPE_VIDEOFILE);
+        $block->setShowCaptions(false);
+        $block->setMute(false);
         return $block;
     }
 }

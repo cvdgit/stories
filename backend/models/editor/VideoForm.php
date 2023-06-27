@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\models\editor;
 
 use backend\models\video\VideoSource;
 
 class VideoForm extends BaseForm
 {
-
     public $video_id;
     public $seek_to;
     public $duration = 0;
@@ -14,20 +15,21 @@ class VideoForm extends BaseForm
     public $speed = 1;
     public $volume = 0.8;
     public $to_next_slide;
+    public $show_captions;
 
     public $source;
 
-    public function rules()
+    public function rules(): array
     {
         return array_merge(parent::rules(), [
             ['video_id', 'string'],
             ['video_id', 'string'],
             [['seek_to', 'duration', 'speed', 'volume'], 'double'],
-            [['mute', 'to_next_slide', 'source'], 'integer'],
+            [['mute', 'to_next_slide', 'source', 'show_captions'], 'integer'],
         ]);
     }
 
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return array_merge(parent::attributeLabels(), [
             'video_id' => 'Видео',
@@ -37,6 +39,7 @@ class VideoForm extends BaseForm
             'speed' => 'Скорость воспроизведения',
             'volume' => 'Громкость',
             'to_next_slide' => 'Автоматический переход на следующий слайд',
+            'show_captions' => 'Субтитры',
         ]);
     }
 

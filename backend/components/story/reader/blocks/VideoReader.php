@@ -16,11 +16,12 @@ class VideoReader extends AbstractBlockReader implements BlockReaderInterface
 
         $element = $this->pqBlock->find('div.wikids-video-player');
         $block->setVideoId($element->attr('data-video-id'));
-        $block->setSeekTo($element->attr('data-seek-to'));
-        $block->setDuration($element->attr('data-video-duration'));
-        $block->setMute($element->attr('data-mute') === 'true' ? 1 : 0);
-        $block->setToNextSlide($element->attr('data-to-next-slide') === 'true' ? 1 : 0);
-        $block->setSource($element->attr('data-source'));
+        $block->setSeekTo((float) $element->attr('data-seek-to'));
+        $block->setDuration((float) $element->attr('data-video-duration'));
+        $block->setMute($element->attr('data-mute') === 'true');
+        $block->setToNextSlide($element->attr('data-to-next-slide') === 'true');
+        $block->setShowCaptions($element->attr('data-show-captions') === 'true');
+        $block->setSource((int) $element->attr('data-source'));
         $volume = $element->attr('data-volume');
         if (empty($volume)) {
             $volume = VideoBlock::DEFAULT_VOLUME;

@@ -232,11 +232,12 @@ class HtmlSlideReader implements ReaderInterface
 
         $element = pq($htmlBlock)->find('div.wikids-video-player');
         $block->setVideoId(pq($element)->attr('data-video-id'));
-        $block->setSeekTo(pq($element)->attr('data-seek-to'));
-        $block->setDuration(pq($element)->attr('data-video-duration'));
-        $block->setMute(pq($element)->attr('data-mute') === 'true' ? 1 : 0);
-        $block->setToNextSlide(pq($element)->attr('data-to-next-slide') === 'true' ? 1 : 0);
-        $block->setSource(pq($element)->attr('data-source'));
+        $block->setSeekTo((float) pq($element)->attr('data-seek-to'));
+        $block->setDuration((float) pq($element)->attr('data-video-duration'));
+        $block->setMute(pq($element)->attr('data-mute') === 'true');
+        $block->setToNextSlide(pq($element)->attr('data-to-next-slide') === 'true');
+        $block->setShowCaptions(pq($element)->attr('data-show-captions') === 'true');
+        $block->setSource((int) pq($element)->attr('data-source'));
         $volume = pq($element)->attr('data-volume');
         if (empty($volume)) {
             $volume = VideoBlock::DEFAULT_VOLUME;
@@ -260,5 +261,4 @@ class HtmlSlideReader implements ReaderInterface
         $block->setTop($this->getStyleValue($style, 'top'));
         $block->setLeft($this->getStyleValue($style, 'left'));
     }
-
 }

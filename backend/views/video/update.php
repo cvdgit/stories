@@ -46,14 +46,13 @@ $this->params['breadcrumbs'] = [
 $action = Url::to(['video/get-stories', 'video_id' => '_VIDEO_']);
 $js = <<< JS
 
-const player = Plyr.setup('#video-container', {
-    captions: { active: true },
+const player = new Plyr('#video-container', {
     youtube: {
         noCookie: false,
         rel: 0,
         showinfo: 0,
         iv_load_policy: 3,
-        modestbranding: 1,
+        modestbranding: 0,
         cc_load_policy: 1,
         cc_lang_pref: 'en',
         enablejsapi: 1,

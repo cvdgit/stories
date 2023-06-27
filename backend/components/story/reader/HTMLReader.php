@@ -223,10 +223,10 @@ class HTMLReader extends AbstractReader implements ReaderInterface
 
         $element = pq($htmlBlock)->find('div.wikids-video-player');
         $block->setVideoId(pq($element)->attr('data-video-id'));
-        $block->setSeekTo(pq($element)->attr('data-seek-to'));
-        $block->setDuration(pq($element)->attr('data-video-duration'));
-        $block->setMute(pq($element)->attr('data-mute') === 'true' ? 1 : 0);
-        $block->setVolume(pq($element)->attr('data-volume'));
+        $block->setSeekTo((float) pq($element)->attr('data-seek-to'));
+        $block->setDuration((float) pq($element)->attr('data-video-duration'));
+        $block->setMute(pq($element)->attr('data-mute') === 'true');
+        $block->setVolume((float) pq($element)->attr('data-volume'));
 
         $style = pq($htmlBlock)->attr('style');
         $this->loadBlockProperties($block, $style);
