@@ -21,6 +21,7 @@ class VideoReader extends AbstractBlockReader implements BlockReaderInterface
         $block->setMute($element->attr('data-mute') === 'true');
         $block->setToNextSlide($element->attr('data-to-next-slide') === 'true');
         $block->setShowCaptions($element->attr('data-show-captions') === 'true');
+        $block->setCaptionsUrl($element->attr('data-captions-url'));
         $block->setSource((int) $element->attr('data-source'));
         $volume = $element->attr('data-volume');
         if (empty($volume)) {

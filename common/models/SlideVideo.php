@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace common\models;
 
-use backend\components\FileBehavior;
 use backend\components\queue\ChangeVideoJob;
-use backend\models\video\VideoFolder;
 use backend\models\video\VideoSource;
+use backend\models\VideoCaption;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
@@ -23,22 +25,27 @@ use yii\web\NotFoundHttpException;
  * @property int $updated_at
  * @property int $status
  * @property int $source;
+ * @property string $uuid [varchar(36)]
+ *
+ * @property VideoCaption[] $captions
  */
 class SlideVideo extends ActiveRecord
 {
-
-    const STATUS_SUCCESS = 0;
-    const STATUS_ERROR = 1;
+    public const STATUS_SUCCESS = 0;
+    public const STATUS_ERROR = 1;
 
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'slide_video';
     }
 
-    public function behaviors()
+    /**
+     * {@inheritdoc}
+     */
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class,
@@ -47,25 +54,24 @@ class SlideVideo extends ActiveRecord
                 'attribute' => 'video_id',
                 'filePath' => '@public'.Yii::$app->params['slides.videos'].'/[[pk]].[[extension]]',
                 'fileUrl' => Yii::$app->params['slides.videos'].'/[[pk]].[[extension]]',
-            ]
+            ],
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['status'], 'integer'],
-            //['video_id', 'file'],
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -93,12 +99,23 @@ class SlideVideo extends ActiveRecord
         return $array;
     }
 
-    public static function create(string $title, string $video_id, int $source): SlideVideo
+    public static function create(string $uuid, string $title, string $video_id, int $source): SlideVideo
     {
         $model = new self();
+        $model->uuid = $uuid;
         $model->title = $title;
         $model->video_id = $video_id;
         $model->source = $source;
+        return $model;
+    }
+
+    public static function createFromFile(string $uuid, string $title): SlideVideo
+    {
+        $model = new self();
+        $model->uuid = $uuid;
+        $model->video_id = $uuid;
+        $model->title = $title;
+        $model->source = VideoSource::FILE;
         return $model;
     }
 
@@ -120,20 +137,20 @@ class SlideVideo extends ActiveRecord
         return (int)$this->status === self::STATUS_SUCCESS;
     }
 
-    protected function addJob(string $oldVideoID, string $newVideoID) {
+    /*protected function addJob(string $oldVideoID, string $newVideoID) {
         Yii::$app->queue->push(new ChangeVideoJob([
             'oldVideoID' => $oldVideoID,
             'newVideoID' => $newVideoID,
         ]));
-    }
+    }*/
 
-    public function afterSave($insert, $changedAttributes)
+    /*public function afterSave($insert, $changedAttributes)
     {
         if (!$insert && isset($changedAttributes['video_id']) && $changedAttributes['video_id'] !== $this->video_id) {
             $this->addJob($changedAttributes['video_id'], $this->video_id);
         }
         parent::afterSave($insert, $changedAttributes);
-    }
+    }*/
 
     public function afterDelete()
     {
@@ -149,5 +166,10 @@ class SlideVideo extends ActiveRecord
     public function getFilePath(): string
     {
         return \Yii::getAlias('@public') . $this->getUploadedFileUrl('video_id');
+    }
+
+    public function getCaptions(): ActiveQuery
+    {
+        return $this->hasMany(VideoCaption::class, ['video_id' => 'id']);
     }
 }

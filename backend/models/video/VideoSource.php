@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\models\video;
 
 use common\models\SlideVideo;
 
 class VideoSource
 {
-
     public const YOUTUBE = 1;
     public const FILE = 2;
 
@@ -33,15 +34,18 @@ class VideoSource
         return (int) $model->source === self::YOUTUBE;
     }
 
-    public static function asNavItems(int $source)
+    public static function asNavItems(): array
     {
-        return array_map(static function(string $value, int $key) use ($source) {
-            return [
-                'label' => $value,
-                'url' => ['video/index', 'source' => $key],
-                'active' => ($source === $key),
-            ];
-        }, self::asArray(), array_keys(self::asArray()));
+        $items = self::asArray();
+        return [
+            [
+                'label' => $items[self::YOUTUBE],
+                'url' => ['video/index'],
+            ],
+            [
+                'label' => $items[self::FILE],
+                'url' => ['video/file/index'],
+            ],
+        ];
     }
-
 }

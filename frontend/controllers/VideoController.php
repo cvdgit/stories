@@ -27,4 +27,20 @@ class VideoController extends Controller
         $videoStream = new VideoStream($video->getFilePath());
         $videoStream->start();
     }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionCaptions(int $id, Response $response): string
+    {
+        $response->format = Response::FORMAT_RAW;
+        $video = SlideVideo::findOne($id);
+        if ($video === null) {
+            throw new NotFoundHttpException('Видео не найдено');
+        }
+        if (count($video->captions) > 0) {
+            return $video->captions[0]->content;
+        }
+        return '';
+    }
 }

@@ -24,6 +24,7 @@ class VideoBlock extends AbstractBlock
     private $source;
     private $content;
     private $show_captions = false;
+    private $captions_url;
 
     /**
      * @param VideoForm $form
@@ -172,5 +173,15 @@ class VideoBlock extends AbstractBlock
     public function setShowCaptions(bool $showCaptions = true): void
     {
         $this->show_captions = $showCaptions;
+    }
+
+    public function setCaptionsUrl(string $url = null): void
+    {
+        $this->captions_url = $url;
+    }
+
+    public function getCaptionsUrl(): ?string
+    {
+        return $this->captions_url;
     }
 }

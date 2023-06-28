@@ -291,6 +291,9 @@ class StoryEditorService
             }
             if ($videoModel !== null) {
                 $block->setContent($videoModel->title);
+                if ($block->getSource() === VideoSource::FILE && $block->isShowCaptions()) {
+                    $block->setCaptionsUrl('/video/captions?id=' . $videoModel->id);
+                }
             }
         }
 
@@ -359,6 +362,9 @@ class StoryEditorService
             }
             if ($videoModel !== null) {
                 $block->setContent($videoModel->title);
+                if ($block->getSource() === VideoSource::FILE && $block->isShowCaptions()) {
+                    $block->setCaptionsUrl('/video/captions?id=' . $videoModel->id);
+                }
             }
         }
 

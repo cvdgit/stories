@@ -237,6 +237,7 @@ class HtmlSlideReader implements ReaderInterface
         $block->setMute(pq($element)->attr('data-mute') === 'true');
         $block->setToNextSlide(pq($element)->attr('data-to-next-slide') === 'true');
         $block->setShowCaptions(pq($element)->attr('data-show-captions') === 'true');
+        $block->setCaptionsUrl(pq($element)->attr('data-captions-url'));
         $block->setSource((int) pq($element)->attr('data-source'));
         $volume = pq($element)->attr('data-volume');
         if (empty($volume)) {

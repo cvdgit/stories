@@ -449,13 +449,13 @@ p.wikids-test-description {
 	height: 100%;
 }
 
-/*.plyr__video-embed iframe {
+.plyr__video-embed iframe {
 	top: -50% !important;
 	height: 200% !important;
 	width: 100%;
-}*/
+}
 
-.plyr iframe {
+/*.plyr iframe {
   transition: 1s filter;
   filter: opacity(1);
 }
@@ -475,7 +475,7 @@ p.wikids-test-description {
   left: 0;
   bottom: 0;
   right: 0;
-}
+}*/
 
 .autoplay-overlay {
 	display: none;

@@ -1,22 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\models;
 
 use backend\models\video\VideoSource;
 use common\models\SlideVideo;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\data\DataProviderInterface;
 
 class SlideVideoSearch extends Model
 {
-
     public $title;
     public $video_id;
     public $created_at;
     public $status;
     public $source;
 
-    public function rules()
+    public function rules(): array
     {
         return [
             [['video_id', 'title'], 'string'],
@@ -26,9 +28,10 @@ class SlideVideoSearch extends Model
         ];
     }
 
-    public function search(array $params)
+    public function search(int $source, array $params):DataProviderInterface
     {
         $query = SlideVideo::find();
+        $query->andWhere(['source' => $source]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -54,15 +57,4 @@ class SlideVideoSearch extends Model
 
         return $dataProvider;
     }
-
-    public function sourceIsFile(): bool
-    {
-        return (int) $this->source === VideoSource::FILE;
-    }
-
-    public function sourceIsYouTube(): bool
-    {
-        return (int) $this->source === VideoSource::YOUTUBE;
-    }
-
 }

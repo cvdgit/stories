@@ -1,24 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\models\video;
 
 use common\models\SlideVideo;
+use Ramsey\Uuid\Uuid;
 use yii\base\Model;
 
 class CreateVideoForm extends Model
 {
-
     public $title;
     public $video_id;
     public $source;
 
-    public function init()
+    /**
+     * @inheritdoc
+     */
+    public function init(): void
     {
         parent::init();
         $this->source = VideoSource::YOUTUBE;
     }
 
-    public function rules()
+    /**
+     * @inheritdoc
+     */
+    public function rules(): array
     {
         return [
             [['video_id', 'title', 'source'], 'required'],
@@ -28,7 +36,10 @@ class CreateVideoForm extends Model
         ];
     }
 
-    public function attributeLabels()
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels(): array
     {
         return [
             'title' => 'Название',
@@ -36,13 +47,12 @@ class CreateVideoForm extends Model
         ];
     }
 
-    public function createVideo()
+    public function createVideo(): void
     {
         if (!$this->validate()) {
             throw new \DomainException('Model not valid');
         }
-        $model = SlideVideo::create($this->title, $this->video_id, $this->source);
+        $model = SlideVideo::create(Uuid::uuid4()->toString(), $this->title, $this->video_id, $this->source);
         $model->save();
     }
-
 }

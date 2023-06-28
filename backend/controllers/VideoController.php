@@ -17,6 +17,7 @@ use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Request;
 use yii\web\Response;
 
 class VideoController extends Controller
@@ -51,16 +52,13 @@ class VideoController extends Controller
         ];
     }
 
-    public function actionIndex(int $source = VideoSource::YOUTUBE): string
+    public function actionIndex(Request $request): string
     {
         $model = new SlideVideoSearch();
-        $params = array_merge([], \Yii::$app->request->queryParams);
-        $params['SlideVideoSearch']['source'] = $source;
-        $dataProvider = $model->search($params);
+        $dataProvider = $model->search(VideoSource::YOUTUBE, $request->get());
         return $this->render('index', [
             'searchModel' => $model,
             'dataProvider' => $dataProvider,
-            'source' => $source,
         ]);
     }
 

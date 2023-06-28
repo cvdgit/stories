@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\controllers\video;
 
-use backend\models\video\CreateFileVideoForm;
 use backend\models\video\UpdateFileVideoForm;
 use backend\models\video\VideoSource;
+use backend\VideoFromFile\Captions\VideoCaptionsAction;
+use backend\VideoFromFile\Create\CreateFileAction;
+use backend\VideoFromFile\Update\UpdateFileAction;
+use backend\VideoFromFile\VideoListAction;
 use common\models\SlideVideo;
 use common\rbac\UserRoles;
-use Exception;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -16,8 +20,7 @@ use yii\web\NotFoundHttpException;
 
 class FileController extends Controller
 {
-
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
@@ -38,41 +41,14 @@ class FileController extends Controller
         ];
     }
 
-    public function actionCreate()
+    public function actions(): array
     {
-        $model = new CreateFileVideoForm();
-        if ($model->load(Yii::$app->request->post())) {
-            try {
-                $id = $model->createVideo();
-                Yii::$app->session->addFlash('success', 'Видео успешно добавлено');
-                return $this->redirect(['update', 'id' => $id]);
-            }
-            catch (Exception $ex) {
-                Yii::$app->session->addFlash('error', $ex->getMessage());
-            }
-        }
-        return $this->render('create', [
-            'model' => $model,
-        ]);
-    }
-
-    public function actionUpdate(int $id)
-    {
-        $videoModel = $this->findModel($id);
-        $model = new UpdateFileVideoForm($videoModel);
-        if ($model->load(Yii::$app->request->post())) {
-            try {
-                $model->updateVideo();
-                Yii::$app->session->setFlash('success', 'Видео успешно изменен');
-            }
-            catch (\Exception $ex) {
-                Yii::$app->session->setFlash('error', $ex->getMessage());
-            }
-            return $this->refresh();
-        }
-        return $this->render('update', [
-            'model' => $model,
-        ]);
+        return [
+            'index' => VideoListAction::class,
+            'create' => CreateFileAction::class,
+            'update' => UpdateFileAction::class,
+            'captions' => VideoCaptionsAction::class,
+        ];
     }
 
     /**

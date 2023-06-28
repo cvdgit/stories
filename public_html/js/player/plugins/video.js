@@ -39,7 +39,7 @@ function WikidsVideoPlayer(elemID, options) {
     clickToPlay: true,
     keyboard: false,
     youtube,
-    captions: {active: true, language: 'auto'}
+    captions: {active: true, language: 'en', update: true}
   });
 
   var sourceIsYouTube = options.source === 1,
@@ -190,7 +190,8 @@ var WikidsVideo = (function () {
         volume: parseFloat(elem.attr("data-volume") || 0.8),
         showControls: config.showControls || false,
         source: parseInt(elem.attr('data-source')),
-        showCaptions: elem.attr("data-show-captions") === "true"
+        showCaptions: elem.attr("data-show-captions") === "true",
+        captionsUrl: elem.attr("data-captions-url")
       };
 
       var sourceIsYouTube = options.source === 1,
@@ -203,8 +204,19 @@ var WikidsVideo = (function () {
           id: elemID,
           controls: true,
           src: options.videoID,
-          type: 'video/mp4'
+          type: 'video/mp4',
+          height: '720px',
+          width: '1280px'
         });
+        if (options.showCaptions && options.captionsUrl) {
+          $('<track/>', {
+            kind: 'captions',
+            src: options.captionsUrl,
+            srclang: 'en',
+            label: 'English',
+            default: true
+          }).appendTo($video);
+        }
         elem.replaceWith($video);
       } else {
         elem.empty();

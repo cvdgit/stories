@@ -29,6 +29,7 @@ class VideoBlockMarkup extends AbstractMarkup
             'data-speed' => $block->getSpeed(),
             'data-volume' => $block->getVolume(),
             'data-source' => $block->getSource(),
+            'data-captions-url' => $block->getCaptionsUrl(),
         ]);
     }
 

@@ -1,10 +1,20 @@
 <?php
-/** @var $model backend\models\video\CreateFileVideoForm */
+
+declare(strict_types=1);
+
+use backend\VideoFromFile\Create\CreateFileForm;
 use yii\helpers\Html;
+use yii\web\View;
 use yii\widgets\ActiveForm;
+
+/**
+ * @var View $this
+ * @var CreateFileForm $model
+ */
+
 $this->title = 'Новое видео из файла';
 $this->params['breadcrumbs'] = [
-    ['label' => 'Видео', 'url' => ['video/index', 'source' => $model->source]],
+    ['label' => 'Видео', 'url' => ['/video/file/index']],
     $this->title,
 ];
 ?>
@@ -15,7 +25,8 @@ $this->params['breadcrumbs'] = [
             <?php $form = ActiveForm::begin(); ?>
             <?= $form->field($model, 'title')->textInput() ?>
             <?= $form->field($model, 'videoFile')->fileInput() ?>
-            <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']) ?>
+            <?= $form->field($model, 'captions')->textarea(['rows' => '20']) ?>
+            <?= Html::submitButton('Создать', ['class' => 'btn btn-primary']) ?>
             <?php ActiveForm::end(); ?>
         </div>
     </div>
