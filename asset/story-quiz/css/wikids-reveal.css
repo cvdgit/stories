@@ -455,6 +455,11 @@ p.wikids-test-description {
 	width: 100%;
 }
 
+.plyr__video-wrapper {
+  width: 100%;
+  height: 100%;
+}
+
 /*.plyr iframe {
   transition: 1s filter;
   filter: opacity(1);

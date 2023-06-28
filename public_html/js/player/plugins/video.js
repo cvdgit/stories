@@ -205,8 +205,8 @@ var WikidsVideo = (function () {
           controls: true,
           src: options.videoID,
           type: 'video/mp4',
-          height: '720px',
-          width: '1280px'
+          height: '100%',
+          width: 'auto'
         });
         if (options.showCaptions && options.captionsUrl) {
           $('<track/>', {
