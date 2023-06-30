@@ -26,7 +26,6 @@ function WikidsVideoPlayer(elemID, options) {
     playsinline: 1
   };
 
-  console.log(options);
   if (options.showCaptions) {
     youtube.cc_load_policy = 1;
     youtube.cc_lang_pref = 'ru';

@@ -455,10 +455,21 @@ p.wikids-test-description {
 	width: 100%;
 }
 
+.plyr--video {
+  background-color: #fff !important;
+}
+
 .plyr__video-wrapper {
   width: 100%;
   height: 100%;
+  background-color: #fff !important;
 }
+
+.plyr__poster {
+  background-color: #fff !important;
+}
+
+
 
 /*.plyr iframe {
   transition: 1s filter;
