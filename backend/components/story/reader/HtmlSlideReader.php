@@ -11,6 +11,7 @@ use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
 use backend\components\story\TransitionBlock;
 use backend\components\story\VideoBlock;
+use backend\models\video\VideoSource;
 
 class HtmlSlideReader implements ReaderInterface
 {
@@ -238,7 +239,13 @@ class HtmlSlideReader implements ReaderInterface
         $block->setToNextSlide(pq($element)->attr('data-to-next-slide') === 'true');
         $block->setShowCaptions(pq($element)->attr('data-show-captions') === 'true');
         $block->setCaptionsUrl(pq($element)->attr('data-captions-url'));
-        $block->setSource((int) pq($element)->attr('data-source'));
+
+        $videoSource = pq($element)->attr('data-source');
+        if (empty($videoSource)) {
+            $videoSource = VideoSource::YOUTUBE;
+        }
+        $block->setSource((int) $videoSource);
+
         $volume = pq($element)->attr('data-volume');
         if (empty($volume)) {
             $volume = VideoBlock::DEFAULT_VOLUME;

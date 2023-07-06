@@ -4,6 +4,7 @@ namespace backend\components\story\reader\blocks;
 
 use backend\components\story\AbstractBlock;
 use backend\components\story\VideoBlock;
+use backend\models\video\VideoSource;
 
 class VideoReader extends AbstractBlockReader implements BlockReaderInterface
 {
@@ -22,7 +23,13 @@ class VideoReader extends AbstractBlockReader implements BlockReaderInterface
         $block->setToNextSlide($element->attr('data-to-next-slide') === 'true');
         $block->setShowCaptions($element->attr('data-show-captions') === 'true');
         $block->setCaptionsUrl($element->attr('data-captions-url'));
-        $block->setSource((int) $element->attr('data-source'));
+
+        $videoSource = $element->attr('data-source');
+        if (empty($videoSource)) {
+            $videoSource = VideoSource::YOUTUBE;
+        }
+        $block->setSource((int) $videoSource);
+
         $volume = $element->attr('data-volume');
         if (empty($volume)) {
             $volume = VideoBlock::DEFAULT_VOLUME;
