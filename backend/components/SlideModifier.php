@@ -107,7 +107,9 @@ class SlideModifier
                     $videoModel = SlideVideo::findModelByVideoID($block->getVideoId());
                 }
                 else {
-                    $videoModel = SlideVideo::findModel(pathinfo($block->getVideoId(), PATHINFO_FILENAME));
+                    try {
+                        $videoModel = SlideVideo::findModel(pathinfo($block->getVideoId(), PATHINFO_FILENAME));
+                    } catch (\Exception $ex) {}
                 }
                 if ($videoModel !== null) {
                     $block->setContent($videoModel->title);
