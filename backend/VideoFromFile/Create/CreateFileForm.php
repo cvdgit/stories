@@ -17,7 +17,7 @@ class CreateFileForm extends Model
         return [
             [['title', 'videoFile'], 'required'],
             [['title'], 'string', 'max' => 255],
-            ['videoFile', 'file', 'extensions' => 'mp4', 'maxSize' => 1024 * 1024 * 120],
+            ['videoFile', 'file', 'extensions' => 'mp4', 'maxSize' => 1024 * 1024 * 500],
             ['captions', 'string'],
         ];
     }
