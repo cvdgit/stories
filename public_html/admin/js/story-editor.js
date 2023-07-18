@@ -1155,6 +1155,12 @@ var StoryEditor = (function() {
                 aspectRatio: false,
             };
         }
+      if (block.typeIsVideo()) {
+        config = {
+          handles: 'all',
+          aspectRatio: false,
+        };
+      }
         if (block.isPlaceholder()) {
             config = {
                 handles: 'all',
