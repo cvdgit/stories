@@ -204,16 +204,13 @@ CSS
             'settings' => [
                 'lang' => 'ru',
                 'minHeight' => 200,
-                'buttons' => ['html'],
+                'buttons' => ['html', 'bold', 'italic', 'deleted', 'alignment'],
                 'plugins' => [
                     'table',
                 ],
                 'replaceDivs' => false,
                 'paragraphize' => false,
             ],
-            /*'options' => [
-                'id' => 'content',
-            ],*/
         ]); ?>
 
         <div id="add-fragment" style="position: absolute; display: none">
