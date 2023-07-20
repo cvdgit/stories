@@ -20,7 +20,7 @@ class SelectTestAction extends Action
             ])
             ->from('story_test')
             ->where(['like', 'title', $query])
-            ->andWhere(['not in', 'id', [$to_test_id]])
+            //->andWhere(['not in', 'id', [$to_test_id]])
             ->orderBy(['title' => SORT_ASC])
             ->all();
     }
