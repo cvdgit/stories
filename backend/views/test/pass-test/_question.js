@@ -169,7 +169,6 @@ function generateUUID() {
             title: textContent,
             correct: true
           });
-
         });
 
         selection.addRange(range);

@@ -9,6 +9,7 @@ class PassTestForm extends Model
 {
     public $name;
     public $content;
+    public $content_html;
     public $payload;
     public $view;
     public $max_prev_items;

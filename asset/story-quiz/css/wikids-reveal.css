@@ -1657,6 +1657,28 @@ p.wikids-test-description {
   max-width: none !important;
 }
 
+.seq-answers table {
+  border: 0;
+  border-collapse: collapse;
+  empty-cells: show;
+  max-width: 100%;
+  width: 100%;
+  border-spacing: 0;
+  margin-bottom: 20px;
+}
+
+.seq-answers table td {
+  padding: 1.7rem 1.5rem;
+  min-width: 5px;
+}
+
+.seq-answers table td,
+.seq-answers table th {
+  font-size: 1.4rem;
+  vertical-align: middle;
+  border: 1px solid #ddd;
+}
+
 .pass-test-question__wrap {
   line-height: 2.4;
   font-size: 24px;

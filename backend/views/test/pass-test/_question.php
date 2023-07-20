@@ -83,6 +83,8 @@ $this->registerCss(<<<CSS
     cursor: pointer;
     user-select: none;
 }
+
+
 CSS
 );
 /**
@@ -137,6 +139,31 @@ $this->registerCss(<<<CSS
 	-moz-border-radius: 6px 0 6px 6px;
 	border-radius: 6px 0 6px 6px;
 }
+
+#content .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    display: none;
+    float: left;
+    min-width: 160px;
+    padding: 5px 0;
+    margin: 2px 0 0;
+    font-size: 14px;
+    text-align: left;
+    list-style: none;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ccc;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+}
+#content .open > .dropdown-menu {
+    display: block;
+}
 CSS
 );
 ?>
@@ -171,7 +198,24 @@ CSS
     </div>
     <div style="min-height:300px;position:relative">
         <div class="content" data-testing-id="<?= $testingId; ?>" data-question-id="<?= $model->getId(); ?>" id="content" contenteditable="true"></div>
-        <textarea id="content_html" rows="10" style="width: 100%; min-height: 300px; display: none"></textarea>
+
+        <?= \vova07\imperavi\Widget::widget([
+            'selector' => '#content',
+            'settings' => [
+                'lang' => 'ru',
+                'minHeight' => 200,
+                'buttons' => ['html'],
+                'plugins' => [
+                    'table',
+                ],
+                'replaceDivs' => false,
+                'paragraphize' => false,
+            ],
+            /*'options' => [
+                'id' => 'content',
+            ],*/
+        ]); ?>
+
         <div id="add-fragment" style="position: absolute; display: none">
             <div class="dropdown">
                 <button title="Вставить пропуск" class="btn btn-success btn-sm dropdown-toggle" type="button" data-toggle="dropdown">

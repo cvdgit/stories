@@ -148,7 +148,8 @@
       .done(response => {
         dataWrapper.loadData(response);
         let content = dataWrapper.initFragments();
-        $('#content').html(content);
+        //$('#content').html(content);
+        $('#content').redactor('code.set', content);
       });
   }
 
@@ -165,6 +166,8 @@
       return '{' + $(this).attr('data-fragment-id') + '}';
     });
     dataWrapper.setContent(el[0].innerHTML);
+
+    $('#content').redactor('code.sync');
   });
   observer.observe($('#content')[0], {
     subtree: true,
