@@ -150,6 +150,7 @@
         let content = dataWrapper.initFragments();
         //$('#content').html(content);
         $('#content').redactor('code.set', content);
+        $('#content').redactor('code.sync', content);
       });
   }
 

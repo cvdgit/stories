@@ -210,6 +210,7 @@ CSS
                 ],
                 'replaceDivs' => false,
                 'paragraphize' => false,
+                'linebreaks' => true,
             ],
         ]); ?>
 
