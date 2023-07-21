@@ -265,7 +265,7 @@
 
   $('#content')
     .on('hide.bs.dropdown', '.dropdown', function() {
-      $(this).find('.dropdown-menu').empty();
+      $(this).find('.dropdown-menu').empty().html('&nbsp;');
     })
     .on('show.bs.dropdown', '.dropdown', function() {
 
