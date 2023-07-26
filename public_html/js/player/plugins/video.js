@@ -185,7 +185,7 @@ var WikidsVideo = (function () {
         duration: parseInt(elem.attr("data-video-duration") || 0),
         mute: elem.attr("data-mute") === "true",
         toNextSlide: elem.attr("data-to-next-slide") === "true",
-        speed: parseInt(elem.attr("data-speed") || 1),
+        speed: parseFloat(elem.attr("data-speed") || 1),
         volume: parseFloat(elem.attr("data-volume") || 0.8),
         showControls: config.showControls || false,
         source: parseInt(elem.attr('data-source')),
