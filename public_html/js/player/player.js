@@ -32,10 +32,21 @@ var WikidsStoryFeedback = (function() {
     }
 
     const findQuizObject = function() {
-      if (window['WikidsStoryTest']) {
-        var elem = $(Reveal.getCurrentSlide()).find('div.new-questions');
-        if (elem.length) {
-          var test = elem[0]['_wikids_test'];
+      if (window['TestSlide'] && window.TestSlide.inTest()) {
+        // button click test
+        if (window['WikidsStoryTest']) {
+          const tests = window.WikidsStoryTest.getTests();
+          if (tests.length) {
+            return tests[0]['_wikids_test'];
+          }
+        }
+      } else {
+        if (window['WikidsStoryTest']) {
+          const elem = $(Reveal.getCurrentSlide()).find('div.new-questions');
+          if (!elem.length) {
+            return true;
+          }
+          const test = elem[0]['_wikids_test'];
           if (test !== undefined) {
             return test;
           }

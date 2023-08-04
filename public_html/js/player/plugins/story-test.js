@@ -34,12 +34,14 @@ var TestSlide = (function() {
 
         var test_id = $(this).data("testId"),
             slide_index = Reveal.getIndices().h;
+        const slideId = $(this).parents('section[data-id]:eq(0)').attr('data-id');
 
         var test = WikidsStoryTest.create(container[0], {
             'dataUrl': '/question/get',
             'dataParams': {'testId': test_id},
             'forSlide': true,
             'deck': Reveal,
+          fromSlideId: slideId,
             init: function() {
               return $.ajax({
                 "url": config.initAction + '?testId=' + test_id,

@@ -102,16 +102,27 @@ export default () => {
 
       const findQuizObject = () => {
 
-        if (window['WikidsStoryTest']) {
+        const testing = this.deck.getPlugin('testing');
+        if (testing && testing.inTest()) {
+          // button click test
+          if (window['WikidsStoryTest']) {
+            const tests = window.WikidsStoryTest.getTests();
+            if (tests.length) {
+              return tests[0]['_wikids_test'];
+            }
+          }
+        } else {
+          if (window['WikidsStoryTest']) {
 
-          const elem = $(currentSlide).find('div.new-questions');
+            const elem = $(currentSlide).find('div.new-questions');
 
-          if (elem.length) {
+            if (elem.length) {
 
-            const test = elem[0]['_wikids_test'];
+              const test = elem[0]['_wikids_test'];
 
-            if (test !== undefined) {
-              return test;
+              if (test !== undefined) {
+                return test;
+              }
             }
           }
         }
@@ -122,9 +133,6 @@ export default () => {
         var payload = {
           text
         };
-
-        const transitionPlugin = this.deck.getPlugin('transition');
-        console.log(transitionPlugin.getInTransition());
 
         payload.slide_id = $(currentSlide).attr("data-id");
 
