@@ -142,7 +142,7 @@ class SiteSection extends ActiveRecord
         return Url::to(['/story/index', 'section' => $this->alias]);
     }
 
-    public static function findByCategory(int $categoryID): self
+    public static function findByCategory(int $categoryID): ?self
     {
         return self::find()->where('category_id = :category', [':category' => $categoryID])->one();
     }

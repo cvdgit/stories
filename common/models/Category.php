@@ -195,7 +195,7 @@ class Category extends ActiveRecord
         if ($root === null) {
             return [];
         }
-        
+
         $rootItem = ['label' => 'Все категории', 'url' => ['/story/index', 'section' => 'stories']];
 
         $storyNumbers = (new Query())
@@ -288,10 +288,16 @@ class Category extends ActiveRecord
         }, $categories), [$this->id]);
     }
 
+    /**
+     * @throws NotFoundHttpException
+     */
     public function getCategoryUrl(): string
     {
         $root = self::findRootByTree($this->tree);
         $section = SiteSection::findByCategory($root->id);
+        if ($section === null) {
+            throw new NotFoundHttpException('Раздел не найден');
+        }
         return Url::to(['story/category', 'section' => $section->alias, 'category' => $this->alias]);
     }
 
