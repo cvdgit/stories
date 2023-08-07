@@ -59,7 +59,7 @@ $this->registerJs($this->renderFile('@modules/edu/views/admin/class-book/_manage
                     return Html::a($model->user->profileName, '#');
                 }
             ],
-/*            [
+            [
                 'format' => 'raw',
                 'value' => static function($model) use ($classBook) {
                     return Html::a(
@@ -68,7 +68,7 @@ $this->registerJs($this->renderFile('@modules/edu/views/admin/class-book/_manage
                         ['onclick' => "return confirm('Создать пользователя?')"]
                     );
                 }
-            ],*/
+            ],
         ],
     ]) ?>
 </div>

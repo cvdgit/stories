@@ -1,36 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace frontend\controllers;
 
 use common\helpers\SmartDate;
 use common\models\User;
+use common\models\UserStudent;
 use frontend\components\learning\form\HistoryFilterForm;
 use frontend\components\learning\form\WeekFilterForm;
 use frontend\components\UserController;
 use Yii;
-use yii\db\Expression;
-use yii\db\Query;
 use yii\web\NotFoundHttpException;
+use yii\web\Request;
+use yii\web\User as WebUser;
 
 class TrainingController extends UserController
 {
-
     /**
      * @throws NotFoundHttpException
      */
-    private function getStudent(int $studentId = null)
+    private function getStudent(User $user, int $studentId = null): UserStudent
     {
-        /** @var User $user */
-        $user = Yii::$app->user->identity;
-
         if ($studentId === null) {
             $targetStudent = $user->student();
+        } else {
+            $targetStudent = $user->findStudentById($studentId);
         }
-        else {
-            if (($targetStudent = $user->findStudentById($studentId)) === null) {
-                throw new NotFoundHttpException('Студент не найден');
-            }
+
+        if ($targetStudent === null) {
+            throw new NotFoundHttpException('Не удалось определить ученика');
         }
+
         return $targetStudent;
     }
 
@@ -50,14 +51,17 @@ class TrainingController extends UserController
     /**
      * @throws NotFoundHttpException
      */
-    public function actionIndex(int $student_id = null): string
+    public function actionIndex(WebUser $user, Request $request, int $student_id = null): string
     {
-
-        $targetStudent = $this->getStudent($student_id);
+        $currentUser = User::findOne($user->getId());
+        if ($currentUser === null) {
+            throw new NotFoundHttpException('Не удалось определить пользователя');
+        }
+        $targetStudent = $this->getStudent($currentUser, $student_id);
         $studentId = $targetStudent->id;
 
         $filterForm = new HistoryFilterForm();
-        if ($this->request->isPost && $filterForm->load($this->request->post()) && $filterForm->validate()) {
+        if ($request->isPost && $filterForm->load($request->post()) && $filterForm->validate()) {
             $filterForm->updateDate();
         }
 
@@ -108,7 +112,7 @@ class TrainingController extends UserController
             }
         }
 
-        $interval = $filterForm->hours;
+        $interval = (int) $filterForm->hours;
         $times = HistoryFilterForm::createTimes($interval);
 
         $columns = [
@@ -161,8 +165,10 @@ class TrainingController extends UserController
             $models[] = $model;
         }
 
+        $students = array_merge($currentUser->students, $currentUser->parentStudents);
+
         return $this->render('index_new', [
-            'items' => $this->getNavItems('training/index', Yii::$app->user->identity->students, $targetStudent->id),
+            'items' => $this->getNavItems('training/index', $students, $targetStudent->id),
             'view' => 'day',
             'viewParams' => [
                 'columns' => $columns,
@@ -175,14 +181,17 @@ class TrainingController extends UserController
     /**
      * @throws NotFoundHttpException
      */
-    public function actionWeek(int $student_id = null): string
+    public function actionWeek(Request $request, WebUser $user, int $student_id = null): string
     {
-
-        $targetStudent = $this->getStudent($student_id);
+        $currentUser = User::findOne($user->getId());
+        if ($currentUser === null) {
+            throw new NotFoundHttpException('Не удалось определить пользователя');
+        }
+        $targetStudent = $this->getStudent($currentUser, $student_id);
         $studentId = $targetStudent->id;
 
         $filterForm = new WeekFilterForm();
-        if ($filterForm->load($this->request->post())) {
+        if ($filterForm->load($request->post())) {
             $filterForm->updateWeekDates();
         }
 
@@ -243,8 +252,10 @@ class TrainingController extends UserController
             $models[] = $model;
         }
 
+        $students = array_merge($currentUser->students, $currentUser->parentStudents);
+
         return $this->render('index_new', [
-            'items' => $this->getNavItems('training/week', Yii::$app->user->identity->students, $targetStudent->id),
+            'items' => $this->getNavItems('training/week', $students, $targetStudent->id),
             'view' => 'week',
             'viewParams' => [
                 'filterModel' => $filterForm,

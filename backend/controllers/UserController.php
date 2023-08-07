@@ -97,7 +97,7 @@ class UserController extends Controller
         $dataProvider = $paymentSearch->search(Yii::$app->request->queryParams, $user->id);
         $searchModel = new UserStorySearch($user->id);
         $userStudentsDataProvider = new ActiveDataProvider([
-            'query' => $user->getStudents()->orderBy(['created_at' => SORT_ASC]),
+            'query' => $user->getAllStudents()->orderBy(['created_at' => SORT_ASC]),
         ]);
 
         return $this->render('update', [

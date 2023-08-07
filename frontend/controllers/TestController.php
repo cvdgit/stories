@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace frontend\controllers;
 
-use backend\services\StoryEditorService;
 use common\helpers\UserHelper;
 use common\models\Category;
 use common\models\Story;
 use common\models\StoryTest;
 use common\models\StudentQuestionProgress;
+use common\models\User;
 use common\models\UserQuestionHistory;
 use common\models\UserStudent;
 use common\services\TestDetailService;
@@ -16,21 +18,19 @@ use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\User as WebUser;
 
 class TestController extends Controller
 {
-
-    private $storyEditorService;
     private $testDetailService;
 
-    public function __construct($id, $module, StoryEditorService $storyEditorService, TestDetailService $testDetailService, $config = [])
+    public function __construct($id, $module, TestDetailService $testDetailService, $config = [])
     {
         parent::__construct($id, $module, $config);
-        $this->storyEditorService = $storyEditorService;
         $this->testDetailService = $testDetailService;
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
@@ -45,7 +45,10 @@ class TestController extends Controller
         ];
     }
 
-    public function actionIndex(int $category_id, $student_id = null)
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionIndex(WebUser $user, int $category_id, int $student_id = null): string
     {
         $model = $this->findCategoryModel($category_id);
         $query = Story::findPublishedStories()
@@ -62,10 +65,26 @@ class TestController extends Controller
             ],
         ]);
         $this->getView()->setMetaTags('Тесты', 'Тесты', 'Тесты', 'Тесты');
+
+        $students = [];
+        $currentUser = User::findOne($user->getId());
+        if ($currentUser !== null) {
+            $students = array_merge($currentUser->students, $currentUser->parentStudents);
+        }
+
+        if ($student_id !== null) {
+            $activeStudent = $currentUser->findStudentById($student_id);
+            if ($activeStudent === null) {
+                throw new NotFoundHttpException('Ученик не найден');
+            }
+        } else {
+            $activeStudent = $students[0];
+        }
+
         return $this->render('index', [
             'dataProvider' => $dataProvider,
-            'students' => UserHelper::getStudents(),
-            'activeStudent' => UserHelper::getStudent($student_id),
+            'students' => $students,
+            'activeStudent' => $activeStudent,
             'category' => $model,
         ]);
     }

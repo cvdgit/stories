@@ -8,9 +8,12 @@ use common\models\UserStudent;
 use Exception;
 use modules\edu\components\StudentLoginGenerator;
 use modules\edu\forms\student\StudentForm;
+use modules\edu\models\EduClass;
+use modules\edu\models\EduClassBook;
 use modules\edu\models\EduClassProgram;
 use modules\edu\models\EduParentInvite;
 use modules\edu\models\EduUser;
+use modules\edu\query\StudentClassFetcher;
 use modules\edu\services\StudentService;
 use modules\edu\widgets\StudentStatWidget;
 use Yii;
@@ -25,11 +28,13 @@ use yii\web\Response;
 class DefaultController extends Controller
 {
     private $studentService;
+    private $studentClassFetcher;
 
-    public function __construct($id, $module, StudentService $studentService, $config = [])
+    public function __construct($id, $module, StudentService $studentService, StudentClassFetcher $studentClassFetcher, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->studentService = $studentService;
+        $this->studentClassFetcher = $studentClassFetcher;
     }
 
     public function actionIndex(): string
@@ -99,6 +104,28 @@ class DefaultController extends Controller
     }
 
     /**
+     * @throws BadRequestHttpException
+     */
+    private function getStudentClass(int $classBookId = null, EduClass $class = null): EduClass
+    {
+        if ($classBookId !== null) {
+            $classBook = EduClassBook::findOne($classBookId);
+            if ($classBook === null) {
+                throw new BadRequestHttpException('Класс не найден');
+            }
+            $studentClass = $classBook->class;
+        } else {
+            $studentClass = $class;
+        }
+
+        if ($studentClass === null) {
+            throw new BadRequestHttpException('Не удалось определить класс');
+        }
+
+        return $studentClass;
+    }
+
+    /**
      * @throws NotFoundHttpException
      * @throws BadRequestHttpException
      */
@@ -113,7 +140,9 @@ class DefaultController extends Controller
             throw new NotFoundHttpException('Ученик не найден');
         }
 
-        $class = $student->class;
+        $studentClassBookId = $this->studentClassFetcher->fetch($student->id);
+        $class = $this->getStudentClass($studentClassBookId, $student->class);
+
         $classPrograms = $class->eduClassPrograms;
         if (count($classPrograms) === 0) {
             throw new BadRequestHttpException('Программа обучения не найдена');

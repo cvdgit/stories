@@ -36,6 +36,7 @@ use yii\web\IdentityInterface;
  * @property Story[] $stories
  * @property Notification[] $notifications
  * @property UserStudent[] $students
+ * @property UserStudent[] $parentStudents
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -392,12 +393,22 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->getNotifications()->last($this->id)->all();
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStudents()
+    public function getStudents(): ActiveQuery
     {
         return $this->hasMany(UserStudent::class, ['user_id' => 'id']);
+    }
+
+    public function getParentStudents(): ActiveQuery
+    {
+        return $this->hasMany(UserStudent::class, ['id' => 'student_id'])
+            ->viaTable('edu_parent_student', ['parent_id' => 'id']);
+    }
+
+    public function getAllStudents(): ActiveQuery
+    {
+        $query = $this->hasMany(UserStudent::class, ['id' => 'student_id'])
+            ->viaTable('edu_parent_student', ['parent_id' => 'id']);
+        return $this->hasMany(UserStudent::class, ['user_id' => 'id'])->union($query);
     }
 
     public function getStudentsAsArray(): array
@@ -433,7 +444,11 @@ class User extends ActiveRecord implements IdentityInterface
 
     public function findStudentById(int $id): ?UserStudent
     {
-        return $this
+        $student = $this
+            ->getParentStudents()
+            ->andWhere(['id' => $id])
+            ->one();
+        return $student ?? $this
             ->getStudents()
             ->andWhere(['id' => $id])
             ->one();

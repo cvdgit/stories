@@ -1,13 +1,21 @@
 <?php
+
+declare(strict_types=1);
+
+use common\models\Category;
+use common\models\UserStudent;
+use yii\data\DataProviderInterface;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\web\View;
 use yii\widgets\ListView;
+
 /**
- * @var $this yii\web\View
- * @var $dataProvider yii\data\ActiveDataProvider
- * @var $students array
- * @var $activeStudent common\models\UserStudent
- * @var $category common\models\Category
+ * @var View $this
+ * @var DataProviderInterface $dataProvider
+ * @var UserStudent[] $students
+ * @var UserStudent $activeStudent
+ * @var Category $category
  */
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 ?>
@@ -17,8 +25,8 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
             <h3>Ученики</h3>
             <div class="list-group">
                 <?php foreach ($students as $student): ?>
-                <?php $active = $student['id'] === $activeStudent->id ? ' active' : '' ?>
-                <?= Html::a($student['name'], ['test/index', 'category_id' => $category->id, 'student_id' => $student['id']], ['class' => 'list-group-item' . $active]) ?>
+                <?php $active = $student->id === $activeStudent->id ? ' active' : '' ?>
+                <?= Html::a($student->getStudentName(), ['test/index', 'category_id' => $category->id, 'student_id' => $student->id], ['class' => 'list-group-item' . $active]) ?>
                 <?php endforeach ?>
             </div>
         </nav>
