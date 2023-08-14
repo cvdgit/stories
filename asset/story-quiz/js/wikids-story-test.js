@@ -1049,7 +1049,7 @@ function WikidsStoryTest(el, options) {
       questionName = 'Заполните пропущенные части';
     }
 
-    if (questionViewSequence(question)) {
+    if (questionViewSequence(question) || questionViewPassTest(question) || questionViewDragWords(question)) {
       questionName = question.name;
     }
 
