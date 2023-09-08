@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace modules\edu\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use modules\edu\models\EduClass;
+use yii\data\DataProviderInterface;
 
 /**
  * EduClassSearch represents the model behind the search form of `modules\edu\models\EduClass`.
@@ -14,7 +16,7 @@ class EduClassSearch extends EduClass
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['id'], 'integer'],
@@ -25,7 +27,7 @@ class EduClassSearch extends EduClass
     /**
      * {@inheritdoc}
      */
-    public function scenarios()
+    public function scenarios(): array
     {
         // bypass scenarios() implementation in the parent class
         return Model::scenarios();
@@ -38,7 +40,7 @@ class EduClassSearch extends EduClass
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search(array $params): DataProviderInterface
     {
         $query = EduClass::find();
 
@@ -46,6 +48,9 @@ class EduClassSearch extends EduClass
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => [
+                'defaultOrder' => ['name' => SORT_ASC],
+            ]
         ]);
 
         $this->load($params);
