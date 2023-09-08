@@ -21,7 +21,7 @@ use yii\helpers\ArrayHelper;
  */
 class EduClassProgram extends ActiveRecord
 {
-
+    public $topicsTotal;
     /**
      * {@inheritdoc}
      */

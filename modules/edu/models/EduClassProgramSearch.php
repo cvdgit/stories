@@ -1,63 +1,71 @@
 <?php
 
+declare(strict_types=1);
+
 namespace modules\edu\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use modules\edu\models\EduClassProgram;
+use yii\data\DataProviderInterface;
+use yii\db\Query;
 
 /**
  * EduClassProgramSearch represents the model behind the search form of `modules\edu\models\EduClassProgram`.
  */
-class EduClassProgramSearch extends EduClassProgram
+class EduClassProgramSearch extends Model
 {
+    public $class_id;
+    public $program_id;
     /**
      * {@inheritdoc}
      */
     public function rules(): array
     {
         return [
-            [['id', 'class_id', 'program_id'], 'integer'],
+            [['class_id', 'program_id'], 'integer'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function scenarios()
+    public function search(array $params): DataProviderInterface
     {
-        // bypass scenarios() implementation in the parent class
-        return Model::scenarios();
-    }
+        $query = EduClassProgram::find()
+            ->innerJoinWith(['class', 'program']);
 
-    /**
-     * Creates data provider instance with search query applied
-     *
-     * @param array $params
-     *
-     * @return ActiveDataProvider
-     */
-    public function search($params)
-    {
-        $query = EduClassProgram::find();
-
-        // add conditions that should always apply here
+        $query->addSelect([
+            'edu_class_program.*',
+            'topicsTotal' => (new Query())->select('COUNT(edu_topic.id)')->from('edu_topic')->where('edu_topic.class_program_id = edu_class_program.id'),
+        ]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => false,
+            'sort' => [
+                'defaultOrder' => ['cpId' => SORT_DESC],
+                'attributes' => [
+                    'cpId' => [
+                        'asc' => ['edu_class_program.id' => SORT_ASC],
+                        'desc' => ['edu_class_program.id' => SORT_DESC],
+                    ],
+                    'class.name' => [
+                        'asc' => ['edu_class.name' => SORT_ASC],
+                        'desc' => ['edu_class.name' => SORT_DESC],
+                    ],
+                    'program.name' => [
+                        'asc' => ['edu_program.name' => SORT_ASC],
+                        'desc' => ['edu_program.name' => SORT_DESC],
+                    ],
+                    'topicsTotal',
+                ],
+            ],
         ]);
 
         $this->load($params);
 
         if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
             return $dataProvider;
         }
 
-        // grid filtering conditions
         $query->andFilterWhere([
-            'id' => $this->id,
             'class_id' => $this->class_id,
             'program_id' => $this->program_id,
         ]);
