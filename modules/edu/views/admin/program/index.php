@@ -1,15 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
+use modules\edu\models\EduProgramSearch;
 use modules\edu\widgets\AdminHeaderWidget;
 use modules\edu\widgets\AdminToolbarWidget;
+use yii\data\DataProviderInterface;
 use yii\helpers\Html;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
+use yii\web\View;
 
 /**
- * @var $this yii\web\View
- * @var $searchModel modules\edu\models\EduProgramSearch
- * @var $dataProvider yii\data\ActiveDataProvider
+ * @var View $this
+ * @var EduProgramSearch $searchModel
+ * @var DataProviderInterface $dataProvider
  */
 
 $this->title = 'Предметы';
@@ -24,6 +29,7 @@ $this->title = 'Предметы';
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
         'options' => ['class' => 'table-responsive'],
         'summary' => false,
         'columns' => [

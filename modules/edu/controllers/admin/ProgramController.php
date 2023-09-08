@@ -36,7 +36,7 @@ class ProgramController extends Controller
      *
      * @return string
      */
-    public function actionIndex()
+    public function actionIndex(): string
     {
         $searchModel = new EduProgramSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
