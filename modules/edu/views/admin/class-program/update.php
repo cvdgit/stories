@@ -1,12 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 use backend\widgets\grid\order\OrderColumn;
 use backend\widgets\grid\PjaxDeleteButton;
+use modules\edu\models\EduClass;
 use modules\edu\models\EduClassProgram;
+use modules\edu\models\EduProgram;
+use modules\edu\Teacher\ClassProgram\Update\UpdateClassProgramForm;
 use modules\edu\widgets\AdminToolbarWidget;
+use yii\bootstrap\ActiveForm;
 use yii\data\DataProviderInterface;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\web\View;
@@ -15,7 +22,8 @@ use yii\widgets\Pjax;
 /**
  * @var View $this
  * @var EduClassProgram $model
- * @var $topicsDataProvider DataProviderInterface
+ * @var DataProviderInterface $topicsDataProvider
+ * @var UpdateClassProgramForm $formModel
  */
 
 $this->title = 'Программа обучения';
@@ -28,9 +36,17 @@ $this->title = 'Программа обучения';
         <?= Html::encode($this->title) ?>
     </h1>
 
-    <p class="lead">
-        <?= $model->class->name . ' / ' . $model->program->name ?>
-    </p>
+    <div class="row">
+        <div class="col-lg-6">
+            <?php $form = ActiveForm::begin(); ?>
+            <?= $form->field($formModel, 'class_id')->dropDownList(ArrayHelper::map(EduClass::find()->orderBy(['name' => SORT_ASC])->all(), 'id', 'name'), ['prompt' => 'Выберите класс']) ?>
+            <?= $form->field($formModel, 'program_id')->dropDownList(ArrayHelper::map(EduProgram::find()->orderBy(['name' => SORT_ASC])->all(), 'id', 'name'), ['prompt' => 'Выберите предмет']) ?>
+            <div class="form-group">
+                <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
+            </div>
+            <?php ActiveForm::end(); ?>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-lg-12">

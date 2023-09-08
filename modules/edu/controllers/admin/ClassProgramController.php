@@ -10,6 +10,7 @@ use modules\edu\forms\admin\ClassProgramTopicOrderForm;
 use modules\edu\models\EduClassProgram;
 use modules\edu\models\EduClassProgramSearch;
 use modules\edu\services\ClassProgramService;
+use modules\edu\Teacher\ClassProgram\Update\UpdateClassProgramForm;
 use yii\data\ActiveDataProvider;
 use yii\db\Query;
 use yii\web\Controller;
@@ -82,17 +83,28 @@ class ClassProgramController extends Controller
     }
 
     /**
-     * Updates an existing EduClassProgram model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $id ID
+     * @throws NotFoundHttpException
      * @return string|Response
-     * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate(int $id)
+    public function actionUpdate(int $id, Request $request)
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+        $updateForm = new UpdateClassProgramForm($model);
+        if ($updateForm->load($request->post()) && $updateForm->validate()) {
+
+            try {
+                $model->class_id = $updateForm->class_id;
+                $model->program_id = $updateForm->program_id;
+                if (!$model->save()) {
+                    throw new \DomainException('Ошибка при сохранении');
+                }
+                \Yii::$app->session->setFlash('success', 'Успешно');
+            } catch (Exception $exception) {
+                \Yii::$app->errorHandler->logException($exception);
+                \Yii::$app->session->setFlash('error', 'Ошибка при сохранении');
+            }
+
             return $this->refresh();
         }
 
@@ -102,6 +114,7 @@ class ClassProgramController extends Controller
         ]);
 
         return $this->render('update', [
+            'formModel' => $updateForm,
             'model' => $model,
             'topicsDataProvider' => $topicsDataProvider,
         ]);
