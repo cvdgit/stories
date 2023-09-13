@@ -5,6 +5,7 @@ declare(strict_types=1);
 use backend\assets\SvgAsset;
 use backend\assets\TestQuestionAsset;
 use backend\models\pass_test\PassTestForm;
+use common\assets\panzoom\PanzoomAsset;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
@@ -83,8 +84,6 @@ $this->registerCss(<<<CSS
     cursor: pointer;
     user-select: none;
 }
-
-
 CSS
 );
 /**
@@ -96,6 +95,7 @@ CSS
 
 SvgAsset::register($this);
 TestQuestionAsset::register($this);
+PanzoomAsset::register($this);
 
 $this->registerCss(<<<CSS
 .dropdown-submenu {
@@ -163,6 +163,14 @@ $this->registerCss(<<<CSS
 }
 #content .open > .dropdown-menu {
     display: block;
+}
+.image-container-wrapper {
+    overflow: hidden;
+    margin-top: 10px;
+    border: 1px #d0d0d0 solid;
+}
+.image-container-wrapper svg {
+    outline: 0;
 }
 CSS
 );

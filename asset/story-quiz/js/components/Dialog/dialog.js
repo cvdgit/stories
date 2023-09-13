@@ -35,9 +35,12 @@ const InnerDialog = function(container, {title, content}) {
   $content.append(content);
   $content.appendTo($inner);
 
-  const show = () => {
+  const show = (afterShowCallback) => {
     container.append($wrapper);
     $wrapper.fadeIn();
+    if (typeof afterShowCallback === 'function') {
+      afterShowCallback($wrapper);
+    }
   };
 
   const hide = () => {

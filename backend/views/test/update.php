@@ -94,7 +94,7 @@ $this->registerJs($this->renderFile('@backend/views/test/_questions-import.js'))
 </div>
 
 <div class="modal remote fade modal-fullscreen" id="run-test-modal">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content"></div>
     </div>
 </div>
@@ -127,7 +127,15 @@ $css = <<< CSS
 .run-test .wikids-test-answer img {
     height: 90px;
 }
-.modal-fullscreen .modal-dialog {
+
+@media (min-width: 768px) {
+  .modal-xl {
+    width: 90%;
+    max-width: 1200px;
+  }
+}
+
+/*.modal-fullscreen .modal-dialog {
   width: 80%;
   height: 50%;
   margin-top: 10px;
@@ -136,7 +144,7 @@ $css = <<< CSS
 .modal-fullscreen .modal-content {
   height: auto;
   min-height: 100%;
-}
+}*/
 .modal-fullscreen .story-container {
     background-color: #fff;
     padding: 0;

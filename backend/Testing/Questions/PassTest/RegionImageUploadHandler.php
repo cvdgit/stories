@@ -29,8 +29,8 @@ class RegionImageUploadHandler
         try {
             $file = $this->fileUploadService->uploadFile($command->getFolderPart(), $command->getImage());
 
-            Image::resize($file->getFilePath(), 1000, 500)
-                ->save($file->getFilePath(), ['quality' => 100]);
+            /*Image::resize($file->getFilePath(), 1000, 500)
+                ->save($file->getFilePath(), ['quality' => 100]);*/
 
             $this->create(
                 $command->getImageId(),

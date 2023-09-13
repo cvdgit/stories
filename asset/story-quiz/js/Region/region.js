@@ -3,11 +3,29 @@ const createImageWrapper = (imageParams, mapName) => {
   const $img = $('<img/>')
     .attr('src', imageParams.url)
     .attr('usemap', '#' + mapName)
-    .css({'position': 'absolute', 'left': 0, 'top': 0, 'width': '100%', 'height': '100%'});
+    .css({
+      //'position': 'absolute',
+      //'left': 0,
+      //'top': 0,
+      'width': imageParams.width + 'px',
+      'height': imageParams.height + 'px',
+    });
   return $('<div/>')
     .addClass('question-region')
-    .css({'width': imageParams.width + 'px', 'height': imageParams.height + 'px', 'position': 'relative', 'margin': '0 auto'})
-    .append($img);
+    .css({
+      //'width': imageParams.width + 'px',
+      //'height': imageParams.height + 'px',
+      maxHeight: '500px',
+      overflow: 'hidden'
+      //'margin': '0 auto'
+    })
+    .append($('<div/>', {
+      css: {
+        //position: 'relative',
+        //width: imageParams.width + 'px',
+        //height: imageParams.height + 'px'
+      }
+    }).append($('<div/>', {class: 'question-region-inner'}).append($img)));
 };
 
 const createMap = (mapName) => {

@@ -2,6 +2,7 @@
 
 namespace backend\assets;
 
+use common\assets\panzoom\PanzoomAsset;
 use yii\web\AssetBundle;
 
 class TestAsset extends AssetBundle
@@ -16,6 +17,6 @@ class TestAsset extends AssetBundle
         '../build/story_quiz.js',
     ];
     public $depends = [
-        //AppAsset::class,
+        PanzoomAsset::class,
     ];
 }

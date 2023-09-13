@@ -44,7 +44,7 @@ const Modal = function({id, title}) {
 const modal = new Modal({id: 'region-fragment', title: 'Выбор области'});
 
 const initRegionFragments = ({testingId, fragment}) => {
-console.log(fragment);
+
   if (fragment.region.image !== null) {
     modal.show({
       body: createRegionEditor(fragment)
@@ -115,15 +115,19 @@ function createRegionImageSelect(testingId, fragment) {
 }
 
 function createRegionEditor(fragment) {
-console.log(fragment);
+
   const {url, width, height} = fragment.region.image;
 
   const content = `
   <div class="row">
       <div class="col-md-5">
-          <div class="btn-group" id="select-shapes" data-toggle="buttons" style="margin-bottom: 20px">
+          <div class="btn-group" id="select-shapes" data-toggle="buttons">
               <label class="btn btn-default active">
-                  <input type="radio" name="shape" value="rect" autocomplete="off" checked> Прямоугольник
+                  <input type="radio" name="shape" value="move" autocomplete="off" checked>
+                  <i class="glyphicon glyphicon-move"></i>
+              </label>
+              <label class="btn btn-default">
+                  <input type="radio" name="shape" value="rect" autocomplete="off"> Прямоугольник
               </label>
               <label class="btn btn-default">
                   <input type="radio" name="shape" value="circle" autocomplete="off"> Круг
@@ -133,12 +137,10 @@ console.log(fragment);
               </label>
           </div>
       </div>
-      <div class="col-md-7">
-          <div class="alert alert-info" role="alert" style="font-size:1.5rem;margin-bottom:2px">Для удаления области, выделите ее и нажмите DEL</div>
-      </div>
+      <div class="col-md-7"></div>
   </div>
   <div class="image-container-wrapper">
-      <div id="image-container"></div>
+      <div id="image-container" style="max-height: 500px"></div>
   </div>
   <div style="display: flex; flex-direction: row; justify-content: center; padding: 10px 0; gap: 10px">
     <button type="button" class="btn btn-primary" id="save-regions">Сохранить</button>
@@ -166,21 +168,56 @@ console.log(fragment);
     }
   }
 
-  const shapeType = new ShapeType('rect');
-  selectShapes.on('change', function() {
-    shapeType.setType($(this).find("input[name='shape']:checked").val());
-  });
+  const shapeType = new ShapeType();
 
-  const regionSVG = new RegionsSVG(
-    $content.find('#image-container')[0],
-    {path: url, width, height},
-    shapeType,
-    fragment.region.regions || []
-  );
+  const regionSVG = new RegionsSVG($content.find('#image-container')[0]);
+
+  regionSVG.loadImage(url, width, height, fragment.region.regions || [], (args) => {
+
+    let initialZoom = 0.5;
+    if (height > 500) {
+      initialZoom = 500 / height;
+    } else {
+      initialZoom = height / 500;
+    }
+
+    const zoom = panzoom($content.find('#image-container #regionImageWrap')[0], {
+      excludeClass: 'scheme-mark',
+      maxZoom: 3,
+      minZoom: 0.4,
+      bounds: true,
+      initialZoom,
+      initialX: 0,
+      initialY: 0
+    });
+
+    regionSVG.setDraggableMode();
+
+    selectShapes.on('change', function() {
+      const val = $(this).find("input[name='shape']:checked").val();
+      if (val === 'move') {
+        zoom.resume();
+        regionSVG.setDraggableMode();
+      } else {
+        zoom.pause();
+        regionSVG.setDraggableMode(false);
+        switch (val) {
+          case 'polyline':
+            regionSVG.drawPolyline();
+            break;
+          case 'circle':
+            regionSVG.drawCircle();
+            break;
+          case 'rect':
+            regionSVG.drawRect();
+            break;
+        }
+      }
+    });
+  });
 
   $content.find('#save-regions').on('click', () => {
     fragment.region.regions = regionSVG.getRegions();
-    console.log(fragment)
     modal.hide();
   });
 

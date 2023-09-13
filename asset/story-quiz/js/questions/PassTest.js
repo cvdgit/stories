@@ -386,7 +386,27 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
     });
 
     const dialog = new InnerDialog(this.container, {title: 'Отметьте правильную область', content: regionContent});
-    dialog.show();
+    dialog.show((wrap) => {
+
+      const imageElement = wrap.find('.question-region-inner img');
+      const height = parseInt(imageElement.css('height'));
+
+      let initialZoom = 0.5;
+      if (height > 500) {
+        initialZoom = 500 / height;
+      } else {
+        initialZoom = height / 500;
+      }
+
+      window.regionZoom = panzoom(wrap.find('.question-region-inner')[0], {
+        maxZoom: 3,
+        minZoom: 0.4,
+        bounds: true,
+        initialZoom,
+        initialX: 0,
+        initialY: 0
+      });
+    });
   });
 
   this.element = this.createWrapper($content)
@@ -416,7 +436,7 @@ PassTest.prototype.getContent = function(payload) {
 };
 
 PassTest.prototype.getUserAnswers = function() {
-  const answers = this.element.find('.highlight').map(function(index, elem) {
+  const answers = this.element.find('.highlight.highlight-done').map(function(index, elem) {
 
     const $el = $(elem);
 

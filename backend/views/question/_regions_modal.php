@@ -96,9 +96,9 @@ $js = <<< JS
     }
 
     var shapeType = new ShapeType('rect');
-    selectShapes.on('change', function() {
+    /*selectShapes.on('change', function() {
         shapeType.setType($(this).find("input[name='shape']:checked").val());
-    });
+    });*/
 
     var element = $('#updateregionquestion-regions');
     var regionSVG;
@@ -107,19 +107,34 @@ $js = <<< JS
 
         selectShapes.button('reset');
 
-        if (regionSVG === undefined) {
-
-            var data = element.val() || [];
-            if (typeof data === 'string') {
-                data = JSON.parse(data);
-            }
-
-            regionSVG = new RegionsSVG(
-                'image-container',
-                {'path': '$imagePath', 'width': $imageWidth, 'height': $imageHeight},
-                shapeType,
-                data);
+        let data = element.val() || [];
+        if (typeof data === 'string') {
+            data = JSON.parse(data);
         }
+
+        if (regionSVG === undefined) {
+            regionSVG = new RegionsSVG('image-container');
+        }
+
+        regionSVG.loadImage('$imagePath', $imageWidth, $imageHeight, data, (args) => {
+
+            regionSVG.drawRect();
+
+          selectShapes.on('change', function() {
+            const val = $(this).find("input[name='shape']:checked").val();
+            switch (val) {
+              case 'polyline':
+                regionSVG.drawPolyline();
+                break;
+              case 'circle':
+                regionSVG.drawCircle();
+                break;
+              case 'rect':
+                regionSVG.drawRect();
+                break;
+            }
+            });
+        });
     });
 
     $('#save-regions', modal).on('click', function() {
