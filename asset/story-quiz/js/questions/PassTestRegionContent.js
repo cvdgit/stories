@@ -12,9 +12,9 @@ const AnswerManager = function() {
   const answers = [];
   return {
     add(answer) {
-      if (answers.indexOf(answer) === -1) {
+      //if (answers.indexOf(answer) === -1) {
         answers.push(answer);
-      }
+      //}
     },
     getAnswers() {
       return answers;
@@ -51,6 +51,8 @@ const PassTestRegionContent = (regionMapName, imageParams, regions, props, callb
     y: 0
   };
 
+  let done = false;
+
   $map
     .on('mousedown', 'area', function(e) {
       point.x = e.clientX;
@@ -58,6 +60,10 @@ const PassTestRegionContent = (regionMapName, imageParams, regions, props, callb
     })
     .on('mouseup', 'area', function(e) {
       if (e.clientX !== point.x || e.clientY !== point.y) {
+        return;
+      }
+
+      if (done) {
         return;
       }
 
@@ -102,11 +108,12 @@ const PassTestRegionContent = (regionMapName, imageParams, regions, props, callb
       }
 
       if (answerManager.getAnswers().length === correctRegions.length) {
-        //setTimeout(function() {
+        done = true;
+        setTimeout(function() {
           $wrapper.find('span.answer-point').remove();
           callback(checkValueIsCorrect(correctRegions, answerManager.getAnswers()), answerManager.getAnswers());
           answerManager.resetAnswers();
-        //}, 500);
+        }, 500);
       }
     });
 
