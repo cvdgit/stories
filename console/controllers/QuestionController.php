@@ -22,7 +22,7 @@ class QuestionController extends Controller
         $i = 0;
         foreach ($models as $model) {
             $json = Json::decode($model->regions);
-            if (count($json['fragments']) > 1) {
+            if (isset($json['fragments']) && count($json['fragments']) > 1) {
                 $i++;
             }
         }
