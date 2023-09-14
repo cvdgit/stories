@@ -102,13 +102,14 @@ class SiteController extends Controller
         $currentDate = date('Y-m-d');
         $answersCount = (new Query())
             ->from('user_question_history')
+            ->innerJoin(['q' => 'story_test_question'], 'user_question_history.entity_id = q.id')
             ->where([
                 'between',
                 'created_at',
                 new Expression("UNIX_TIMESTAMP('$currentDate 00:00:00')"),
                 new Expression("UNIX_TIMESTAMP('$currentDate 23:59:59')")
             ])
-            ->count();
+            ->sum('q.weight');
 
         return $this->render('index', [
             'labels' => $labels,

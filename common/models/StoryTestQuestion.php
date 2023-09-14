@@ -31,6 +31,7 @@ use yii\helpers\FileHelper;
  * @property int $sort_view
  * @property string $incorrect_description
  * @property int $max_prev_items
+ * @property int $weight
  *
  * @property StoryTestAnswer[] $storyTestAnswers
  * @property StoryTestAnswer[] $storyTestAnswersWithHidden
@@ -39,7 +40,6 @@ use yii\helpers\FileHelper;
  */
 class StoryTestQuestion extends ActiveRecord
 {
-
     const QUESTION_TYPE_RADIO = 0;
     const QUESTION_TYPE_CHECKBOX = 1;
 

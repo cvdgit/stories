@@ -69,12 +69,13 @@ class HistoryFilterForm extends Model
         $minuteExpression = new Expression("minute(FROM_UNIXTIME(t.created_at + (3 * 60 * 60))) DIV $this->hours");
         $historyQuery->select([
             'story_id' => 't2.story_id',
-            'question_count' => new Expression('COUNT(t.id)'),
+            'question_count' => new Expression('SUM(q.weight)'),
             'hour' => $hourExpression,
             'minute_div' => $minuteExpression,
         ]);
         $historyQuery->from(['t' => 'user_question_history']);
         $historyQuery->innerJoin(['t2' => 'story_story_test'], 't.test_id = t2.test_id');
+        $historyQuery->innerJoin(['q' => 'story_test_question'], 't.entity_id = q.id');
         $historyQuery->where(['t.student_id' => $studentId, 't.correct_answer' => 1]);
 
         $targetDate = Yii::$app->formatter->asDate($this->date, 'php:Y-m-d');

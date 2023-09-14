@@ -20,23 +20,21 @@ class PassTestService
         $this->transactionManager = $transactionManager;
     }
 
-    public function createQuestion(int $quizId, string $name, string $payload, int $maxPrevItems = 0): int
+    public function createQuestion(int $quizId, string $name, string $payload, int $maxPrevItems = 0, int $weight = 1): int
     {
         $questionModel = StoryTestQuestion::create($quizId, $name, QuestionType::PASS_TEST);
         $questionModel->regions = $payload;
         $questionModel->max_prev_items = $maxPrevItems;
+        $questionModel->weight = $weight;
         if (!$questionModel->save()) {
             throw ModelDomainException::create($questionModel);
         }
         return $questionModel->id;
     }
 
-    public function createAnswers(int $questionId, string $json): void
+    public function createAnswers(int $questionId, array $payload): void
     {
-
-        $payload = Json::decode($json);
         $fragments = $payload['fragments'];
-
         foreach ($fragments as $fragment) {
 
             foreach ($fragment['items'] as $item) {
@@ -61,9 +59,9 @@ class PassTestService
         }
 
         $this->transactionManager->wrap(function() use ($quizId, $form) {
-
-            $questionId = $this->createQuestion($quizId, $form->name, $form->payload);
-            $this->createAnswers($questionId, $form->payload);
+            $json = Json::decode($form->payload);
+            $questionId = $this->createQuestion($quizId, $form->name, $form->payload, $form->max_prev_items, $this->calcWeight($json));
+            $this->createAnswers($questionId, $json);
         });
     }
 
@@ -78,14 +76,26 @@ class PassTestService
         $questionModel->sort_view = $form->view;
         $questionModel->max_prev_items = $form->max_prev_items;
 
-        $this->transactionManager->wrap(function() use ($questionModel, $form) {
+        $json = Json::decode($form->payload);
+        $questionModel->weight = $this->calcWeight($json);
+
+        $this->transactionManager->wrap(function() use ($questionModel, $json) {
 
             if (!$questionModel->save()) {
                 throw ModelDomainException::create($questionModel);
             }
 
             StoryTestAnswer::deleteAll(['story_question_id' => $questionModel->id]);
-            $this->createAnswers($questionModel->id, $form->payload);
+            $this->createAnswers($questionModel->id, $json);
         });
+    }
+
+    public function calcWeight(array $json): int
+    {
+        $weight = count($json['fragments']);
+        if ($weight === 0) {
+            $weight = 1;
+        }
+        return $weight;
     }
 }
