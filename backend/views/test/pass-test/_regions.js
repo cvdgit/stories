@@ -65,6 +65,11 @@ function createRegionImageSelect(testingId, fragment) {
           <input type="hidden" name="fragment_id" value="${fragment.id}">
           <input type="hidden" name="testing_id" value="${testingId}">
         </form>
+        <div id="loading" style="display: none">
+            <div style="width: 100%; height: 100%; min-height: 100px; display: flex; align-items: center; justify-content: center; flex-direction: column">
+                <img width="45px" src="/img/loading.gif" alt="Loading...">
+            </div>
+        </div>
       </div>
       <div id="image-list" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px"></div>
     </div>
@@ -76,6 +81,8 @@ function createRegionImageSelect(testingId, fragment) {
   $form.on('submit', e => {
     e.preventDefault();
 
+    $body.find('#loading').show();
+
     $.ajax({
       url: $(e.target).attr('action'),
       type: $(e.target).attr('method'),
@@ -86,8 +93,13 @@ function createRegionImageSelect(testingId, fragment) {
       processData: false
     })
       .done(response => {
-        fragment.region.image = response.data;
-        $body.empty().append(createRegionEditor(fragment));
+        $body.find('#loading').hide();
+        if (response.success) {
+          fragment.region.image = response.data;
+          $body.empty().append(createRegionEditor(fragment));
+        } else {
+          toastr.error(response.message);
+        }
       });
   });
 
@@ -183,8 +195,6 @@ function createRegionEditor(fragment) {
 
     const zoom = panzoom($content.find('#image-container #regionImageWrap')[0], {
       excludeClass: 'scheme-mark',
-      maxZoom: 3,
-      minZoom: 0.4,
       bounds: true,
       initialZoom,
       initialX: 0,

@@ -399,8 +399,6 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
       }
 
       window.regionZoom = panzoom(wrap.find('.question-region-inner')[0], {
-        maxZoom: 3,
-        minZoom: 0.4,
         bounds: true,
         initialZoom,
         initialX: 0,

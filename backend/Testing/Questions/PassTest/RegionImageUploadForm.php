@@ -19,7 +19,7 @@ class RegionImageUploadForm extends Model
     {
         return [
             [['image', 'fragment_id', 'testing_id'], 'required'],
-            ['image', 'file', 'maxSize' => 1024 * 1024 * 20, 'extensions' => ['jpeg', 'jpg', 'png']],
+            ['image', 'file', 'maxSize' => 1024 * 1024 * 2, 'extensions' => ['jpeg', 'jpg', 'png']],
             [['testing_id', 'fragment_id'], 'string'],
         ];
     }
