@@ -48,7 +48,8 @@ class StoryTestAnswer extends ActiveRecord
         return [
             //[['name'], 'required'],
             [['order', 'is_correct', 'hidden'], 'integer'],
-            [['name', 'image', 'description'], 'string', 'max' => 255],
+            [['name'], 'string', 'max' => 512],
+            [['image', 'description'], 'string', 'max' => 255],
         ];
     }
 
