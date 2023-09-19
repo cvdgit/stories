@@ -33,7 +33,7 @@ class TestingAnswerForm extends Model
         return [
             [['name'], 'required'],
             [['is_correct'], 'integer'],
-            [['name'], 'string', 'max' => 255],
+            [['name'], 'string', 'max' => 512],
         ];
     }
 
