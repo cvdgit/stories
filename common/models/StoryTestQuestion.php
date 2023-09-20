@@ -79,7 +79,7 @@ class StoryTestQuestion extends ActiveRecord
             [['story_test_id', 'name', 'type'], 'required'],
             [['story_test_id', 'order', 'type', 'mix_answers', 'audio_file_id'], 'integer'],
             [['image', 'hint'], 'string', 'max' => 255],
-            [['name'], 'string', 'max' => 512],
+            //[['name'], 'string', 'max' => 512],
             [['story_test_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTest::class, 'targetAttribute' => ['story_test_id' => 'id']],
             [['regions'], 'safe'],
             ['sort_view', 'in', 'range' => SortView::values()],
@@ -425,6 +425,11 @@ class StoryTestQuestion extends ActiveRecord
     public static function getCreateDragWordsQuestionRoute(int $quizId): array
     {
         return ['test/drag-words/create', 'test_id' => $quizId];
+    }
+
+    public static function getCreateImageGapsQuestionRoute(int $quizId): array
+    {
+        return ['test/image-gaps/create', 'test_id' => $quizId];
     }
 
     public function getQuestionUpdateRoute(): ?array
