@@ -21,7 +21,7 @@ class AnswerSerializer
     {
         return [
             'id' => $this->answer->getId(),
-            'name' => Html::encode(trim($this->answer->getName())),
+            'name' => trim($this->answer->getName()),
             'is_correct' => (int) $this->answer->isCorrect(),
             'description' => $this->answer->getDescription(),
             'region_id' => $this->answer->getRegionID(),
