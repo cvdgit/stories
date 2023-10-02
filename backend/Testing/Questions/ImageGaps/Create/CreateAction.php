@@ -57,7 +57,7 @@ class CreateAction extends Action
 
             try {
                 $this->uploadHandler->handle(new UploadImageGapsCommand($fileId, $rootFolder, $createForm->image));
-                $questionId = $this->createQuestionHandler->handle(new CreateQuestionCommand($quiz->id, $createForm->name, $image, $createForm->max_prev_items));
+                $questionId = $this->createQuestionHandler->handle(new CreateQuestionCommand($quiz->id, $createForm->name, $image, (int) $createForm->max_prev_items));
                 return $this->controller->redirect(['update', 'id' => $questionId]);
             } catch (Exception $exception) {
                 Yii::$app->errorHandler->logException($exception);
