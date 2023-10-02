@@ -666,6 +666,9 @@ p.wikids-test-description {
   overflow: hidden;
 	overflow-y: auto;
 	text-align: left;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .wikids-test-correct-answer-answers > .row {
@@ -1968,4 +1971,47 @@ p.wikids-test-description {
 
 .reveal .slides>section {
   height: 100%;
+}
+
+.image-gaps-question {
+  flex-direction: unset;
+}
+
+.image-gaps {
+  max-height: 500px;
+}
+
+.image-gaps svg {
+  width: 100% !important;
+  height: 100% !important;
+  outline: 0;
+}
+
+.image-gaps .scheme-mark {
+  fill-opacity: 1;
+  fill: #a94442;
+  stroke: #2a2a2a;
+  cursor: pointer;
+  transition: all .3s;
+}
+
+.image-gaps-answer-item {
+  padding: 10px;
+}
+
+.image-gaps-answer-item__check {
+  transform: scale(2);
+  margin-left: 10px !important;
+}
+
+.image-gaps-answer-item__title {
+  margin-left: 10px;
+}
+
+.image-gaps-fragment__done {
+  fill: #d1e7dd !important;
+  stroke: #a3cfbb !important;
+  fill-opacity: .3 !important;
+  cursor: default;
+  transition: all .3s;
 }

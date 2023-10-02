@@ -1,25 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\models\question;
 
 use DomainException;
 
 class QuestionType
 {
-
     public const ONE = 0;
     public const MANY = 1;
     public const REGION = 2;
     public const SEQUENCE = 3;
-
     public const ANSWER_NUMPAD = 4;
     public const ANSWER_INPUT = 5;
     public const ANSWER_RECORDING = 6;
     public const ANSWER_MISSING_WORDS = 7;
-
     public const PASS_TEST = 8;
     public const DRAG_WORDS = 9;
     public const POETRY = 10;
+    public const IMAGE_GAPS = 11;
 
     private $type;
 
@@ -46,6 +46,7 @@ class QuestionType
             self::PASS_TEST => 'Тест с пропусками',
             self::DRAG_WORDS => 'Перетаскивание слов',
             self::POETRY => 'Запоминание стихов',
+            self::IMAGE_GAPS => 'Изображение с пропусками',
         ];
     }
 
@@ -87,5 +88,10 @@ class QuestionType
     public function isPoetry(): bool
     {
         return $this->type === self::POETRY;
+    }
+
+    public function isImageGaps(): bool
+    {
+        return $this->type === self::IMAGE_GAPS;
     }
 }

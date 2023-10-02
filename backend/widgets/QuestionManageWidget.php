@@ -1,20 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\widgets;
 
+use backend\Testing\Questions\QuestionRoutes;
 use common\models\StoryTest;
-use common\models\StoryTestQuestion;
-use DomainException;
 
 class QuestionManageWidget extends BaseQuizManageWidget
 {
-
     /** @var StoryTest */
     public $quizModel;
 
     public $isCreate = false;
 
-    public function init()
+    public function init(): void
     {
         $this->createItemTitle = 'Новый вопрос';
         parent::init();
@@ -52,12 +52,8 @@ class QuestionManageWidget extends BaseQuizManageWidget
     private function getCreateQuestionItems(): array
     {
         $quizId = $this->quizModel->id;
-        return [
-            ['label' => 'По умолчанию', 'route' => StoryTestQuestion::getCreateQuestionRoute($quizId)],
-            ['label' => 'Выбор области', 'route' => StoryTestQuestion::getCreateRegionQuestionRoute($quizId)],
-            ['label' => 'Последовательность', 'route' => StoryTestQuestion::getCreateSequenceQuestionRoute($quizId)],
-            ['label' => 'Тест с пропусками', 'route' => StoryTestQuestion::getCreatePassTestQuestionRoute($quizId)],
-            ['label' => 'Перетаскивание слов', 'route' => StoryTestQuestion::getCreateDragWordsQuestionRoute($quizId)],
-        ];
+        return array_map(static function(string $label, array $route): array {
+            return ['label' => $label, 'route' => $route];
+        }, array_keys(QuestionRoutes::getRoutes($quizId)), array_values(QuestionRoutes::getRoutes($quizId)));
     }
 }

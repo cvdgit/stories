@@ -5,6 +5,7 @@ namespace backend\components\training\collection;
 use backend\components\training\base\BaseQuestion;
 use backend\components\training\collection\build\Base;
 use backend\components\training\collection\build\DragWords;
+use backend\components\training\collection\build\ImageGaps;
 use backend\components\training\collection\build\PassTest;
 use backend\components\training\collection\build\Poetry;
 use backend\components\training\collection\build\Region;
@@ -29,20 +30,17 @@ class TestCollection extends BaseCollection
         /** @var StoryTestQuestion $questionData */
         if ($questionData->typeIsRegion()) {
             $question = (new Region($questionData, $stars))->build();
-        }
-        else if ($questionData->typeIsSequence()) {
+        } else if ($questionData->typeIsSequence()) {
             $question = (new Sequence($questionData, $stars))->build();
-        }
-        else if ($questionData->typeIsPassTest()) {
+        } else if ($questionData->typeIsPassTest()) {
             $question = (new PassTest($questionData, $stars))->build();
-        }
-        else if ($questionData->typeIsDragWords()) {
+        } else if ($questionData->typeIsDragWords()) {
             $question = (new DragWords($questionData, $stars))->build();
-        }
-        else if ($questionData->typeIsPoetry()) {
+        } else if ($questionData->typeIsPoetry()) {
             $question = (new Poetry($questionData, $stars))->build();
-        }
-        else {
+        } else if ($questionData->typeIsImageGaps()) {
+            $question = (new ImageGaps($questionData, $stars))->build();
+        } else {
             $question = (new Base($questionData, $stars, $this->testModel))->build();
         }
 

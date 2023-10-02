@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 use backend\assets\SortableJsAsset;
 use backend\forms\WordListForm;
+use backend\models\test\ChangeRepeatForm;
+use common\models\StoryTest;
 use yii\bootstrap\Dropdown;
+use yii\data\DataProviderInterface;
 use yii\helpers\Html;
+use yii\web\View;
 
 /**
- * @var $this yii\web\View
- * @var $model common\models\StoryTest
- * @var $dataProvider yii\data\ActiveDataProvider
- * @var backend\models\test\ChangeRepeatForm $repeatChangeModel
+ * @var View $this
+ * @var StoryTest $model
+ * @var DataProviderInterface $dataProvider
+ * @var ChangeRepeatForm $repeatChangeModel
  * @var array $scheduleItems
+ * @var array $routes
  */
 $this->title = 'Изменить тест';
 $this->params['breadcrumbs'] = [
@@ -77,7 +82,7 @@ $this->registerJs($this->renderFile('@backend/views/test/_questions-import.js'))
                     <?= $this->render('_test_children_list', ['model' => $model]) ?>
                 <?php endif ?>
                 <?php if ($model->isSourceTest()): ?>
-                    <?= $this->render('_test_question_list', ['model' => $model, 'dataProvider' => $dataProvider]) ?>
+                    <?= $this->render('_test_question_list', ['routes' => $routes, 'model' => $model, 'dataProvider' => $dataProvider]) ?>
                 <?php endif ?>
                 <?php if ($model->isSourceWordList()): ?>
                     <?= $this->renderFile('@backend/views/word-list/_list.php', [

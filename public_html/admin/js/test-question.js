@@ -1,4 +1,21 @@
 
+function generateUUID() {
+  var d = new Date().getTime();
+  var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now() * 1000)) || 0;
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16;
+    if (d > 0) {
+      r = (d + r) % 16 | 0;
+      d = Math.floor(d / 16);
+    }
+    else {
+      r = (d2 + r) % 16 | 0;
+      d2 = Math.floor(d2 / 16);
+    }
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+}
+
 SVG.Element.prototype.draw.extend('line polyline polygon', {
     init:function(e){
         // When we draw a polygon, we immediately need 2 points.
@@ -178,8 +195,8 @@ function Shapes() {
   };
 }
 
-function RegionsSVG(id) {
-  'use strict';
+function RegionsSVG(id, {onDeleteHandler}) {
+  //'use strict';
 
   this.shapes = new Shapes();
 
@@ -205,7 +222,7 @@ function RegionsSVG(id) {
       .off('mouseup');
   };
 
-  this.addDragEventListeners = (type, drawShapeHandler) => {
+  this.addDragEventListeners = (type, drawShapeHandler, dragEndHandler) => {
 
     let currentShape = null;
 
@@ -263,6 +280,10 @@ function RegionsSVG(id) {
             .selectize({rotationPoint: false})
             .resize()
             .draggable();
+
+          if (typeof dragEndHandler === 'function') {
+            dragEndHandler(currentShape.attr());
+          }
         }
         currentShape = null;
       });
@@ -278,6 +299,9 @@ function RegionsSVG(id) {
           .draggable(false)
           .remove();
         this.shapes.setCurrentShape(null);
+        if (typeof onDeleteHandler === 'function') {
+          onDeleteHandler(shape.attr('data-answer-id'));
+        }
       }
     }
   });
@@ -355,9 +379,15 @@ RegionsSVG.prototype.deleteRegion = function(id) {
   this.shapes.getByID(id).remove();
 }
 
-RegionsSVG.prototype.drawRect = function() {
+RegionsSVG.prototype.drawRect = function({attrsHandler, drawEndHandler}) {
   this.removeDragEventListeners();
-  this.addDragEventListeners('rect',() => this.wrapper.rect().attr(this.markOptions));
+  this.addDragEventListeners('rect',() => {
+    let rectAttrs = {...this.markOptions};
+    if (typeof attrsHandler === 'function') {
+      rectAttrs = {...this.markOptions, ...attrsHandler()};
+    }
+    return this.wrapper.rect().attr(rectAttrs);
+  }, drawEndHandler);
 }
 
 RegionsSVG.prototype.drawCircle = function() {
@@ -397,4 +427,10 @@ RegionsSVG.prototype.setDraggableMode = function (mode = true) {
         }
       });
   }
+}
+
+RegionsSVG.prototype.resetSelectize = function() {
+  this.shapes.all().map(shape => {
+    shape.selectize(false);
+  });
 }

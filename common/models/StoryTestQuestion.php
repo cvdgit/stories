@@ -252,6 +252,11 @@ class StoryTestQuestion extends ActiveRecord
         return (new QuestionType($this->type))->isPoetry();
     }
 
+    public function typeIsImageGaps(): bool
+    {
+        return (new QuestionType($this->type))->isImageGaps();
+    }
+
     public function deleteRegionImages(): void
     {
         if (!empty($this->image)) {
@@ -442,6 +447,7 @@ class StoryTestQuestion extends ActiveRecord
             QuestionType::SEQUENCE => ['test/question-sequence/update', 'id' => $this->id],
             QuestionType::PASS_TEST => ['test/pass-test/update', 'id' => $this->id],
             QuestionType::DRAG_WORDS => ['test/drag-words/update', 'id' => $this->id],
+            QuestionType::IMAGE_GAPS => ['test/image-gaps/update', 'id' => $this->id],
         ];
         return $updateQuestionMap[$this->type] ?? null;
     }

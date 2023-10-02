@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\widgets;
 
 use yii\base\Widget;
 
 abstract class BaseQuizManageWidget extends Widget
 {
-
     /** @var int|null */
     public $currentModelId;
 

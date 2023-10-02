@@ -29,6 +29,7 @@ import createHome from "./components/header/Home";
 import createPlayBackdrop from "./components/questionAudio";
 import Poetry from "./questions/Poetry";
 import AnswerHistorySender from "./components/AnswerHistorySender";
+import ImageGaps from "./ImageGaps/ImageGaps";
 
 
 var plugins = [];
@@ -95,6 +96,7 @@ function WikidsStoryTest(el, options) {
   this.regionQuestion = null;
   this.voiceResponse = null;
   this.passTestQuestion = null;
+  this.imageGapsQuestion = null;
   this.dragWordsQuestion = null;
   this.poetryQuestion = null;
 
@@ -1049,7 +1051,7 @@ function WikidsStoryTest(el, options) {
       questionName = 'Заполните пропущенные части';
     }
 
-    if (questionViewSequence(question) || questionViewPassTest(question) || questionViewDragWords(question)) {
+    if (questionViewSequence(question) || questionViewPassTest(question) || questionViewDragWords(question) || questionViewImageGaps(question)) {
       questionName = question.name;
     }
 
@@ -1187,6 +1189,9 @@ function WikidsStoryTest(el, options) {
           break;
         case 'poetry':
           $answers = that.poetryQuestion.createWrapper();
+          break;
+        case 'image-gaps':
+          $answers = that.imageGapsQuestion.createWrapper();
           break;
         default:
           $answers = createAnswers(getAnswersData(question), question);
@@ -1532,6 +1537,10 @@ function WikidsStoryTest(el, options) {
     return getQuestionView(question) === 'pass-test';
   }
 
+  function questionViewImageGaps(question) {
+    return getQuestionView(question) === 'image-gaps';
+  }
+
   function questionViewDragWords(question) {
     return getQuestionView(question) === 'drag-words';
   }
@@ -1744,7 +1753,7 @@ function WikidsStoryTest(el, options) {
           return parseInt(elem.name);
         };
       }
-      if (view === 'input' || view === 'recognition' || questionViewPassTest(currentQuestion) || testConfig.answerTypeIsMissingWords(currentQuestion)) {
+      if (view === 'input' || view === 'recognition' || questionViewPassTest(currentQuestion) || questionViewImageGaps(currentQuestion) || testConfig.answerTypeIsMissingWords(currentQuestion)) {
 
         const decodeHtml = (html) => {
           const txt = document.createElement("textarea");
@@ -2093,6 +2102,7 @@ function WikidsStoryTest(el, options) {
       && !questionViewRegion(currentQuestion)
       && !questionViewSequence(currentQuestion)
       && !questionViewPassTest(currentQuestion)
+      && !questionViewImageGaps(currentQuestion)
       && !questionViewDragWords(currentQuestion)
       && !questionViewPoetry(currentQuestion)
     ) {
@@ -2134,6 +2144,33 @@ function WikidsStoryTest(el, options) {
       dom.nextButton.off("click").on("click", function () {
         const answer = that.passTestQuestion.getUserAnswers();
         nextQuestion(answer);
+      });
+    }
+
+    if (questionViewImageGaps(currentQuestion)) {
+
+      let imageGapsAnswers = [];
+      $('.seq-question', currentQuestionElement)
+        .html(that.imageGapsQuestion.create(
+            currentQuestion,
+            (check, allAnswers) => {
+              if (!check) {
+
+              }
+              imageGapsAnswers = allAnswers;
+            }
+          )
+        );
+
+      dom.nextButton.off("click").on("click", function () {
+        nextQuestion(imageGapsAnswers.map(f => f.answers).flat(), (currentQuestion, answer) => {
+          const correctValues = getCorrectAnswers(currentQuestion).map(a => a.region_id);
+          return correctValues.every(correctValue => {
+            return answer.some(value => {
+              return correctValue === value;
+            });
+          })
+        });
       });
     }
 
@@ -2404,14 +2441,13 @@ function WikidsStoryTest(el, options) {
 
     if (questionViewRegion(question)) {
       $elements.append(that.regionQuestion.createSuccess(question));
-    }
-    else if (questionViewPassTest(question)) {
+    } else if (questionViewPassTest(question)) {
       $elements.append(that.passTestQuestion.getContent(question.payload));
-    }
-    else if (questionViewDragWords(question)) {
+    } else if (questionViewImageGaps(question)) {
+      $elements.append(that.imageGapsQuestion.getContent(question));
+    } else if (questionViewDragWords(question)) {
       $elements.append(that.dragWordsQuestion.getContent(question.payload));
-    }
-    else if (testConfig.sourceIsNeo() && neoQuestionWithAnimalSigns()) {
+    } else if (testConfig.sourceIsNeo() && neoQuestionWithAnimalSigns()) {
 
       var $elementRow = $('<div/>', {'class': 'row row-no-gutters'});
       var $elementCol = $('<div/>', {'class': 'col-md-8 col-md-offset-2'});
@@ -2542,8 +2578,7 @@ function WikidsStoryTest(el, options) {
       }
 
       $elementRow.appendTo($elements);
-    }
-    else {
+    } else {
       var $element;
       var answerText = '';
       var userAnswer = answer[0];
@@ -2874,6 +2909,7 @@ WikidsStoryTest.mount(VoiceResponse);
 WikidsStoryTest.mount(PassTest);
 WikidsStoryTest.mount(DragWords);
 WikidsStoryTest.mount(Poetry);
+WikidsStoryTest.mount(ImageGaps);
 
 WikidsStoryTest.getTests = function () {
   return tests;

@@ -8,6 +8,7 @@ use backend\models\question\UpdateQuestion;
 use backend\models\test\ChangeRepeatForm;
 use backend\modules\repetition\ScheduleFetcherInterface;
 use backend\Testing\IndexAction;
+use backend\Testing\Questions\QuestionRoutes;
 use backend\Testing\TestSearch;
 use common\models\StoryTest;
 use common\models\StoryTestAnswer;
@@ -117,6 +118,7 @@ class TestController extends Controller
             'dataProvider' => $dataProvider,
             'repeatChangeModel' => new ChangeRepeatForm($model->id, $model->repeat),
             'scheduleItems' => ArrayHelper::map($this->scheduleFetcher->getSchedules(), 'id', 'name'),
+            'routes' => QuestionRoutes::getRoutes($model->id),
         ]);
     }
 
