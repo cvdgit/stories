@@ -52,23 +52,30 @@
       initialZoom = containerWidth / width;
     }
 
-    const zoom = panzoom($('#image-container #regionImageWrap')[0], {
+    const zoom = Panzoom($('#image-container #regionImageWrap')[0], {
       excludeClass: 'scheme-mark',
       bounds: true,
-      initialZoom,
+      startScale: initialZoom,
       initialX: 0,
       initialY: 0
     });
+    $('#image-container #regionImageWrap')[0].parentElement.addEventListener('wheel', zoom.zoomWithWheel);
 
     regionSVG.setDraggableMode();
 
     selectShapes.on('change', function() {
       const val = $(this).find("input[name='shape']:checked").val();
       if (val === 'move') {
-        zoom.resume();
+
+        zoom.bind();
+        $('#image-container #regionImageWrap').css('cursor', 'move');
+
         regionSVG.setDraggableMode();
       } else {
-        zoom.pause();
+
+        zoom.destroy();
+        $('#image-container #regionImageWrap').css('cursor', 'default');
+
         regionSVG.setDraggableMode(false);
         switch (val) {
           case 'rect':
@@ -102,6 +109,7 @@
   `);
 
   $('#image-container').on('dblclick', '.scheme-mark', function(e) {
+    //e.preventDefault();
 
     const fragmentId = $(this).data('answerId');
 

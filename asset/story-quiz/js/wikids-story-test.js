@@ -322,7 +322,6 @@ function WikidsStoryTest(el, options) {
   var testQuestions = [];
 
   function makeTestQuestions() {
-    console.log('makeTestQuestions');
     var end = false;
     var max = getQuestionRepeat();
     while (!end && testQuestions.length < max) {
@@ -354,7 +353,6 @@ function WikidsStoryTest(el, options) {
   }
 
   function load(data) {
-    console.debug('WikidsStoryTest.load');
 
     testData = data[0];
     questions = getQuestionsData();
@@ -408,6 +406,45 @@ function WikidsStoryTest(el, options) {
     if (currentQuestion && questionViewPoetry(currentQuestion)) {
       that.poetryQuestion.scroll($(currentQuestionElement).find('.drag-words-question'));
     }
+
+    if (currentQuestion && questionViewImageGaps(currentQuestion)) {
+      const containerRect = $('.image-gaps-question', currentQuestionElement)[0].getBoundingClientRect();
+      initPanzoom(
+        $('#regionImageWrap', currentQuestionElement)[0],
+        containerRect.width,
+        currentQuestion.params
+      );
+    }
+  }
+
+  function initPanzoom(element, containerWidth, params) {
+    const {imageWidth, imageHeight} = params;
+    let initialZoom = 0.5;
+    if (imageHeight > 500) {
+      initialZoom = 500 / imageHeight;
+    } else {
+      initialZoom = 1;
+    }
+
+    if (imageWidth > containerWidth) {
+      initialZoom = containerWidth / imageWidth;
+    }
+
+    //if (imageWidth < containerWidth) {
+      initialZoom = 1 + ((1280 - imageWidth) / imageWidth);
+    //}
+
+console.log(imageWidth, containerWidth, initialZoom);
+    const zoom = Panzoom(element, {
+      excludeClass: 'scheme-mark',
+      bounds: true,
+      startScale: initialZoom,
+      initialX: 0,
+      initialY: 0
+    });
+    element.parentElement.addEventListener('wheel', zoom.zoomWithWheel);
+
+    return zoom;
   }
 
   function createLoader(text) {
@@ -2161,6 +2198,14 @@ function WikidsStoryTest(el, options) {
             }
           )
         );
+
+      if (document.getElementById('regionImageWrap') !== null) {
+        initPanzoom(
+          $('#regionImageWrap', currentQuestionElement)[0],
+          $('.image-gaps-question', currentQuestionElement).width(),
+          currentQuestion.params
+        );
+      }
 
       dom.nextButton.off("click").on("click", function () {
         nextQuestion(imageGapsAnswers.map(f => f.answers).flat(), (currentQuestion, answer) => {

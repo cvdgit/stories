@@ -193,23 +193,31 @@ function createRegionEditor(fragment) {
       initialZoom = height / 500;
     }
 
-    const zoom = panzoom($content.find('#image-container #regionImageWrap')[0], {
-      excludeClass: 'scheme-mark',
+    const zoom = Panzoom($content.find('#image-container #regionImageWrap')[0], {
+      //excludeClass: 'scheme-mark',
       bounds: true,
-      initialZoom,
-      initialX: 0,
-      initialY: 0
+      startScale: initialZoom,
+      startX: 0,
+      startY: 0
     });
+
+    $content.find('#image-container #regionImageWrap')[0].parentElement.addEventListener('wheel', zoom.zoomWithWheel);
 
     regionSVG.setDraggableMode();
 
     selectShapes.on('change', function() {
       const val = $(this).find("input[name='shape']:checked").val();
       if (val === 'move') {
-        zoom.resume();
+
+        zoom.bind();
+        $content.find('#image-container #regionImageWrap').css('cursor', 'move');
+
         regionSVG.setDraggableMode();
       } else {
-        zoom.pause();
+
+        zoom.destroy();
+        $content.find('#image-container #regionImageWrap').css('cursor', 'default');
+
         regionSVG.setDraggableMode(false);
         switch (val) {
           case 'polyline':

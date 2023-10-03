@@ -73,6 +73,7 @@ echo FrontendRevealWidget::widget([
         PlyrAsset::class,
         RecorderAsset::class,
         \common\assets\panzoom\PanzoomAsset::class,
+        \common\assets\panzoom\PanzoomOldAsset::class,
     ],
     'plugins' => $plugins,
 ]);

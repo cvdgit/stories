@@ -21,7 +21,6 @@ ImageGaps.prototype.create = function (question, fragmentAnswerCallback) {
   const $content = $(content);
 
   let allAnswers = [];
-  let currentIncorrectFragmentId;
   const maxPrevItems = parseInt(question['max_prev_items']) || 0;
 
   const that = this;
@@ -100,22 +99,6 @@ ImageGaps.prototype.create = function (question, fragmentAnswerCallback) {
     });
   })
 
-  const {imageWidth, imageHeight} = question.params;
-  let initialZoom = 0.5;
-  if (imageHeight > 500) {
-    initialZoom = 500 / imageHeight;
-  } else {
-    initialZoom = 1;
-  }
-
-  window.regionZoom = panzoom($content.find('#regionImageWrap')[0], {
-    excludeClass: 'scheme-mark',
-    bounds: true,
-    initialZoom,
-    initialX: 0,
-    initialY: 0
-  });
-
   this.element = $('<div/>', {class: 'image-gaps'}).append($content);
 
   return this.element;
@@ -127,21 +110,6 @@ ImageGaps.prototype.getContent = function(question) {
   const $content = $(content);
   $content.find(".scheme-mark").remove();
 
-  const {imageWidth, imageHeight} = question.params;
-  let initialZoom = 0.5;
-  if (imageHeight > 500) {
-    initialZoom = 500 / imageHeight;
-  } else {
-    initialZoom = 1;
-  }
-
-  window.regionZoom = panzoom($content.find('#regionImageWrap')[0], {
-    excludeClass: 'scheme-mark',
-    bounds: true,
-    initialZoom,
-    initialX: 0,
-    initialY: 0
-  });
   return this.createWrapper($('<div/>', {class: 'image-gaps'}).append($content));
 };
 

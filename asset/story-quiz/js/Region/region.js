@@ -13,19 +13,18 @@ const createImageWrapper = (imageParams, mapName) => {
   return $('<div/>')
     .addClass('question-region')
     .css({
-      //'width': imageParams.width + 'px',
-      //'height': imageParams.height + 'px',
       maxHeight: '500px',
-      overflow: 'hidden'
+      overflow: 'hidden',
       //'margin': '0 auto'
+      position: 'relative'
     })
-    .append($('<div/>', {
-      css: {
-        //position: 'relative',
+    .append(
+      $('<div/>', {
+        class: 'question-region-inner',
         //width: imageParams.width + 'px',
-        //height: imageParams.height + 'px'
-      }
-    }).append($('<div/>', {class: 'question-region-inner'}).append($img)));
+        //height: imageParams.height + 'px',
+      }).append($img)
+    );
 };
 
 const createMap = (mapName) => {

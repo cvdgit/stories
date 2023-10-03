@@ -18,5 +18,6 @@ class TestAsset extends AssetBundle
     ];
     public $depends = [
         PanzoomAsset::class,
+        \common\assets\panzoom\PanzoomOldAsset::class,
     ];
 }

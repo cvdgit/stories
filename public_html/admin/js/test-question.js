@@ -195,7 +195,7 @@ function Shapes() {
   };
 }
 
-function RegionsSVG(id, {onDeleteHandler}) {
+function RegionsSVG(id, {onDeleteHandler} = {}) {
   //'use strict';
 
   this.shapes = new Shapes();
@@ -379,7 +379,7 @@ RegionsSVG.prototype.deleteRegion = function(id) {
   this.shapes.getByID(id).remove();
 }
 
-RegionsSVG.prototype.drawRect = function({attrsHandler, drawEndHandler}) {
+RegionsSVG.prototype.drawRect = function({attrsHandler, drawEndHandler} = {}) {
   this.removeDragEventListeners();
   this.addDragEventListeners('rect',() => {
     let rectAttrs = {...this.markOptions};
