@@ -212,9 +212,12 @@ CSS
             'settings' => [
                 'lang' => 'ru',
                 'minHeight' => 200,
-                'buttons' => ['html', 'bold', 'italic', 'deleted', 'alignment'],
+                'buttons' => ['html', 'bold', 'italic', 'deleted', 'alignment', 'image'],
+                'imageUpload' => Url::to(['/test/pass-test/image-upload']),
                 'plugins' => [
                     'table',
+                    'imagemanager',
+                    //'fullscreen',
                 ],
                 'replaceDivs' => false,
                 'paragraphize' => false,

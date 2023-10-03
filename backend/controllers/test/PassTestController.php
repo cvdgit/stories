@@ -10,6 +10,7 @@ use common\models\StoryTest;
 use common\models\StoryTestQuestion;
 use common\rbac\UserRoles;
 use Exception;
+use vova07\imperavi\actions\UploadFileAction;
 use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\Json;
@@ -48,6 +49,11 @@ class PassTestController extends Controller
         return [
             'region-image-upload' => RegionImageUploadAction::class,
             'images' => ImagesAction::class,
+            'image-upload' => [
+                'class' => UploadFileAction::class,
+                'url' => '/upload/pass-test/', // Directory URL address, where files are stored.
+                'path' => '@public/upload/pass-test',
+            ],
         ];
     }
 
