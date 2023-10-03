@@ -5,6 +5,7 @@ declare(strict_types=1);
 use backend\assets\SvgAsset;
 use backend\assets\TestQuestionAsset;
 use backend\models\pass_test\PassTestForm;
+use backend\widgets\QuestionSlidesWidget;
 use common\assets\panzoom\PanzoomAsset;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
@@ -246,6 +247,9 @@ CSS
         </div>
     </div>
     <?= $form->field($model, 'content')->hiddenInput()->label(false) ?>
+    <?php if (!$isNewRecord): ?>
+        <?= QuestionSlidesWidget::widget(['modelId' => $model->getId()]); ?>
+    <?php endif ?>
 </div>
 <div>
     <?= Html::activeHiddenInput($model, 'payload') ?>

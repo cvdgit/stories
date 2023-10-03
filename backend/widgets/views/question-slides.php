@@ -1,8 +1,15 @@
 <?php
+
+declare(strict_types=1);
+
 use backend\widgets\SelectStorySlidesWidget;
 use yii\helpers\Json;
-/** @var $slides array */
-/** @var $questionID int */
+
+/**
+ * @var $slides array
+ * @var $questionID int
+ */
+
 $css = <<<CSS
 .question-slides-block {
     margin: 20px 0;
@@ -86,17 +93,17 @@ function onSaveSlides(selected, modal, targetElement) {
         button.button('reset');
         modal.modal('hide');
     });
-    
-    
+
+
     /*var list = $('#story-slides').find('.selected-slides');
     list.empty();
-    
+
     selected = selected || [];
     if (selected.length > 0) {
         $('<p/>', {'text': 'Слайды выбраны. История будет создана после сохранения.'})
             .appendTo(list);
     }
-    
+
     var modelName = '';
     selected.forEach(function(slideID) {
         list.append($('<input/>', {
@@ -109,7 +116,7 @@ function onSaveSlides(selected, modal, targetElement) {
 }
 (function() {
     "use strict";
-    
+
     var questionSlides = $slidesJson;
     createQuestionSlideList(questionSlides);
 })();
