@@ -37,19 +37,23 @@ CSS
 <?= $form->field($formModel, 'max_prev_items')->dropDownList($formModel->getMaxPrevItems())
     ->hint('При неправильном выборе возврат на указанное количество элементов'); ?>
 <div style="margin-bottom: 20px">
-    <div class="row">
-        <div class="col-md-5">
-            <div class="btn-group" id="select-shapes" data-toggle="buttons">
-                <label class="btn btn-default active">
-                    <input type="radio" name="shape" value="move" autocomplete="off" checked>
-                    <i class="glyphicon glyphicon-move"></i>
-                </label>
-                <label class="btn btn-default">
-                    <input type="radio" name="shape" value="rect" autocomplete="off"> Выделить
-                </label>
-            </div>
+    <div style="margin-bottom: 10px">
+        <div style="display: flex" class="btn-group" id="select-shapes" data-toggle="buttons">
+            <label style="display: block" data-toggle="tooltip" title="В этом режиме можно перемещать, увеличивать и уменьшать изображение" class="btn btn-default active">
+                <input type="radio" name="shape" value="move" autocomplete="off" checked>
+                <i class="glyphicon glyphicon-move"></i>
+            </label>
+            <label style="display: block" data-toggle="tooltip" title="Режим&nbsp;добавления&nbsp;областей. В этом режиме нельзя перемещать изображение" class="btn btn-default">
+                <input type="radio" name="shape" value="rect" autocomplete="off"> Выделить
+            </label>
         </div>
-        <div class="col-md-7"></div>
+    </div>
+    <div>
+        <div class="alert alert-info">
+            <i class="glyphicon glyphicon-info-sign"></i>
+            Двойной клик по выделенному фрагменту открывает диалог добавления ответов.<br/>
+            Что бы удалить фрагмент необходимо выделить его и нажать клавишу Del
+        </div>
     </div>
     <div class="image-container-wrapper">
         <div id="image-container" style="max-height: 500px" class="image-gaps"></div>

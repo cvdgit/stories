@@ -1,5 +1,7 @@
 (function() {
 
+  $('[data-toggle="tooltip"]').tooltip();
+
   const modal = new RemoteModal({id: 'image-gaps-modal', title: 'Ответы'});
 
   const selectShapes = $('#select-shapes');
