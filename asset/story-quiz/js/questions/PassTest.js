@@ -77,12 +77,17 @@ function createRegionElement(fragment, attrs = {}) {
   };
   const div = $('<div/>', attrs);
 
-  const correctText = fragment.items
-    .filter(item => item.correct)
-    .map(item => item.title)
-    .join(', ');
+  let correctText = 'Выберите область';
+  const showCorrectText = fragment['show_correct_text'] && fragment['show_correct_text'] === true;
+  if (showCorrectText) {
+    correctText = fragment.items
+      .filter(item => item.correct)
+      .map(item => item.title)
+      .join(', ');
+  }
 
   div.text(correctText);
+
   div.attr('data-region-text', correctText);
   return div;
 }
@@ -373,8 +378,12 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
 
       dialog.hide();
 
-      //e.target.textContent = check ? fragment.items[0].title : 'Выберите область';
-      e.target.textContent = fragment.items[0].title;
+      const showCorrectText = fragment['show_correct_text'] && fragment['show_correct_text'] === true;
+      if (showCorrectText) {
+        e.target.textContent = fragment.items[0].title;
+      } else {
+        e.target.textContent = check ? fragment.items[0].title : 'Выберите область';
+      }
 
       if (typeof fragmentAnswerCallback === 'function') {
         fragmentAnswerCallback(check, answers.join(', '));

@@ -129,6 +129,7 @@ function createRegionImageSelect(testingId, fragment) {
 function createRegionEditor(fragment) {
 
   const {url, width, height} = fragment.region.image;
+  const showCorrectText = fragment['show_correct_text'] && fragment['show_correct_text'] === true;
 
   const content = `
   <div class="row">
@@ -149,7 +150,9 @@ function createRegionEditor(fragment) {
               </label>
           </div>
       </div>
-      <div class="col-md-7"></div>
+      <div class="col-md-7">
+        <label><input type="checkbox" id="show_correct_text" ${showCorrectText ? "checked" : ""}> Показывать правильный ответ для фрагмента</label>
+      </div>
   </div>
   <div class="image-container-wrapper">
       <div id="image-container" style="max-height: 500px"></div>
@@ -236,6 +239,7 @@ function createRegionEditor(fragment) {
 
   $content.find('#save-regions').on('click', () => {
     fragment.region.regions = regionSVG.getRegions();
+    fragment.show_correct_text = $content.find("#show_correct_text").is(":checked");
     modal.hide();
   });
 

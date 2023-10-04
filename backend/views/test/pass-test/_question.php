@@ -187,7 +187,6 @@ CSS
             <?= Html::activeLabel($model, 'content') ?>
         </div>
         <div style="margin-left:auto;display: flex">
-            <button id="content-as-html" style="margin-right: 6px" type="button" class="btn btn-primary btn-sm">HTML</button>
             <a style="margin-right: 6px" href="<?= Url::to(['/fragment-list/manage']); ?>" class="btn btn-primary btn-sm" id="manage" type="button">Управление</a>
             <button style="margin-right: 6px" class="btn btn-primary btn-sm" id="search" type="button">Поиск</button>
             <a style="margin-right: 6px" href="<?= Url::to(['/fragment-list/create', 'testing_id' => $testingId]); ?>" class="btn btn-primary btn-sm" id="create-fragment-list" type="button">Создать список</a>
@@ -226,7 +225,7 @@ CSS
             ],
         ]); ?>
 
-        <div id="add-fragment" style="position: absolute; display: none">
+        <div id="add-fragment" style="position: absolute; display: none; z-index: 999">
             <div class="dropdown">
                 <button title="Вставить пропуск" class="btn btn-success btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
                     <i class="glyphicon glyphicon-plus"></i>
@@ -266,4 +265,3 @@ $this->registerJs($this->renderFile('@backend/views/test/pass-test/_question.js'
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_fragment_list.js'));
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_search.js'));
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_manage.js'));
-$this->registerJs($this->renderFile('@backend/views/test/pass-test/_html.js'));
