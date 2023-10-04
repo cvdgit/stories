@@ -411,30 +411,33 @@ function WikidsStoryTest(el, options) {
       const containerRect = $('.image-gaps-question', currentQuestionElement)[0].getBoundingClientRect();
       initPanzoom(
         $('#regionImageWrap', currentQuestionElement)[0],
-        containerRect.width,
         currentQuestion.params
       );
     }
   }
 
-  function initPanzoom(element, containerWidth, params) {
+  function initPanzoom(element, params) {
+
     const {imageWidth, imageHeight} = params;
     let initialZoom = 0.5;
-    if (imageHeight > 500) {
-      initialZoom = 500 / imageHeight;
+
+    const containerWidth = 1280;
+    const containerHeight = 500;
+
+    if (imageHeight > containerHeight) {
+      initialZoom = containerHeight / imageHeight;
     } else {
       initialZoom = 1;
     }
 
     if (imageWidth > containerWidth) {
-      initialZoom = containerWidth / imageWidth;
+      //initialZoom = containerWidth / imageWidth;
     }
 
-    //if (imageWidth < containerWidth) {
-      initialZoom = 1 + ((1280 - imageWidth) / imageWidth);
-    //}
+    if (imageWidth < containerWidth) {
+      initialZoom = 1 + ((containerWidth - imageWidth) / imageWidth);
+    }
 
-console.log(imageWidth, containerWidth, initialZoom);
     const zoom = Panzoom(element, {
       excludeClass: 'scheme-mark',
       bounds: true,
@@ -2200,9 +2203,9 @@ console.log(imageWidth, containerWidth, initialZoom);
         );
 
       if (document.getElementById('regionImageWrap') !== null) {
+        //$('.image-gaps-question', currentQuestionElement).width(),
         initPanzoom(
           $('#regionImageWrap', currentQuestionElement)[0],
-          $('.image-gaps-question', currentQuestionElement).width(),
           currentQuestion.params
         );
       }
