@@ -27,7 +27,7 @@ class PassTestForm extends Model
             $this->id = $model->id;
             $this->name = $model->name;
             $this->payload = $model->regions;
-            $this->view = $model->sort_view;
+            $this->view = $model->sort_view === 0 || $model->sort_view === 1 ? 0 : $model->sort_view;
             $this->testId = $model->story_test_id;
             $this->max_prev_items = $model->max_prev_items;
         }
@@ -55,7 +55,7 @@ class PassTestForm extends Model
         return [
             'name' => 'Вопрос',
             'content' => 'Текст с пропусками',
-            'view' => 'Представление',
+            'view' => 'Показывать',
             'max_prev_items' => 'Возврат на',
         ];
     }
@@ -63,8 +63,8 @@ class PassTestForm extends Model
     public function getViewItems(): array
     {
         return [
-            0 => 'Список',
-            1 => 'Поле для ввода',
+            0 => 'Все фрагменты',
+            2 => 'Один за раз',
         ];
     }
 

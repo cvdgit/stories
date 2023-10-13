@@ -2015,3 +2015,41 @@ p.wikids-test-description {
   cursor: default;
   transition: all .3s;
 }
+
+.pass-test-progress__wrap {
+  position: fixed;
+  left: 0;
+  right: 16px;
+  bottom: 50px;
+  height: 2px;
+  z-index: 200;
+}
+
+.pass-test-progress {
+  position: absolute;
+  right: 0;
+  left: 0;
+  margin-left: 0;
+  transition-duration: .3s;
+  transition-property: padding,height;
+  background: rgba(0,0,0,0);
+}
+
+.pass-test-progress__container {
+  position: relative;
+  width: 100%;
+  min-height: 2px;
+  padding: 3px 0;
+  overflow: hidden;
+}
+
+.pass-test-progress__container-indicator {
+  position: absolute;
+  width: 100%;
+  left: -100%;
+  top: 0;
+  height: 4px;
+  background: #285f9f;
+  transition-duration: .3s;
+  transition-property: transform;
+}

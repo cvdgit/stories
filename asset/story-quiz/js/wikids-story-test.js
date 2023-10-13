@@ -2182,7 +2182,7 @@ function WikidsStoryTest(el, options) {
         .html(that.passTestQuestion.create(currentQuestion, fragmentAnswerCallback));
 
       dom.nextButton.off("click").on("click", function () {
-        const answer = that.passTestQuestion.getUserAnswers();
+        const answer = that.passTestQuestion.getUserAnswers(currentQuestion?.item_view, currentQuestion.payload);
         nextQuestion(answer);
       });
     }

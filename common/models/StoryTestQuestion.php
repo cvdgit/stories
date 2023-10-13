@@ -82,7 +82,7 @@ class StoryTestQuestion extends ActiveRecord
             //[['name'], 'string', 'max' => 512],
             [['story_test_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTest::class, 'targetAttribute' => ['story_test_id' => 'id']],
             [['regions'], 'safe'],
-            ['sort_view', 'in', 'range' => SortView::values()],
+            ['sort_view', 'in', 'range' => [0, 1, 2]],
         ];
     }
 

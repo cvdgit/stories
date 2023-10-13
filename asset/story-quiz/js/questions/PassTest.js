@@ -151,16 +151,30 @@ function resetFragmentElement(element) {
 }
 
 PassTest.prototype.createWrapper = function (content) {
-  const $wrapper = $('<div class="seq-question pass-test-question"><div class="seq-question__wrap seq-question__wrap--full pass-test-question__wrap"></div></div>');
+  const $wrapper = $(`
+    <div class="seq-question pass-test-question">
+      <div class="seq-question__wrap seq-question__wrap--full pass-test-question__wrap"></div>
+    </div>
+  `);
   const $answers = $('<div/>', {
     'class': 'wikids-test-answers seq-answers'
   });
   if (content) {
     $answers.append(content);
   }
+
   $wrapper
     .find(".seq-question__wrap")
-    .append($answers);
+    .append($answers)
+    .append(`
+      <div class="pass-test-progress__wrap">
+        <div class="pass-test-progress">
+          <div class="pass-test-progress__container">
+            <div class="pass-test-progress__container-indicator" style="transform: translate3d(0%, 0px, 0px)"></div>
+          </div>
+        </div>
+      </div>
+    `);
 
   return $wrapper;
 };
@@ -229,51 +243,222 @@ function checkHandler($target, check, fragmentId, $content, maxPrevItems) {
   }
 }
 
+function oneCheckHandler($target, check) {
+  $target
+    .removeClass('highlight-fail')
+    .removeClass('highlight-done');
+  if (check) {
+    $target
+      .addClass('highlight-done disabled')
+      .prop('disabled', true)
+      .find('.dropdown-toggle')
+      .addClass('disabled');
+  } else {
+    $target.addClass('highlight-fail');
+  }
+}
+
+function createFragmentElement(fragment) {
+
+  let element;
+
+  const elemAttrs = {
+    class: 'highlight disabled',
+    disabled: 'disabled'
+  };
+
+  if (fragment['type'] === 'region') {
+    elemAttrs.class += ' custom-input region-fragment-btn';
+    element = createRegionElement(fragment, elemAttrs);
+  } else {
+    if (fragment.items.length === 1 && 1 === fragment.items.filter(item => item.correct).length) {
+      const correctItem = fragment.items.filter(item => item.correct);
+      if (correctItem.length === 0) {
+        return;
+      }
+      elemAttrs.size = correctItem[0].title.length;
+      elemAttrs.class += ' custom-input';
+      element = createTextElement(fragment.id, elemAttrs);
+    } else {
+      elemAttrs.class += ' custom-select';
+      element = createSelectElement(fragment.id, elemAttrs, shuffle(fragment.items), fragment.multi);
+    }
+  }
+
+  return element;
+}
+
+function contentReplace(content, element, fragmentId) {
+  const reg = new RegExp(`{${fragmentId}}`);
+  return content.replace(reg, element[0].outerHTML);
+}
+
+function contentReplaceToCorrect(content, fragments) {
+  fragments.map(f => {
+    const correctItems = f.items
+      .filter(item => item.correct)
+      .sort((a, b) => parseInt(a.order) - parseInt(b.order));
+
+    let correctItemTitle = '';
+    if (correctItems.length) {
+      correctItemTitle = correctItems.map(item => item.title).join(', ');
+    }
+
+    const reg = new RegExp('{' + f.id + '}');
+    content = content.replace(reg, correctItemTitle);
+  });
+  return content;
+}
+
 PassTest.prototype.create = function (question, fragmentAnswerCallback) {
 
   const {fragments} = question.payload;
   let {content} = question.payload;
 
-  fragments.forEach((fragment) => {
-    let element;
+  let copyFragments = [...fragments];
 
-    const elemAttrs = {
-      class: 'highlight disabled',
-      disabled: 'disabled'
-    };
+  const getFragment = () => copyFragments.shift();
 
-    if (fragment['type'] === 'region') {
-      elemAttrs.class += ' custom-input region-fragment-btn';
-      element = createRegionElement(fragment, elemAttrs);
-    } else {
-      if (question.item_view === 'text' || (fragment.items.length === 1 && 1 === fragment.items.filter(item => item.correct).length)) {
-        const correctItem = fragment.items.filter(item => item.correct);
-        if (correctItem.length === 0) {
-          return;
-        }
-        elemAttrs.size = correctItem[0].title.length;
-        elemAttrs.class += ' custom-input';
-        element = createTextElement(fragment.id, elemAttrs);
-      } else {
-        elemAttrs.class += ' custom-select';
-        element = createSelectElement(fragment.id, elemAttrs, shuffle(fragment.items), fragment.multi);
+  let passedFragments = [];
+  const addPassedFragment = (id) => {
+    if (!passedFragments.find(f => f.id === id)) {
+      passedFragments = [...passedFragments, id];
+    }
+  }
+
+  const resetPassedFragments = (maxPrevItems) => {
+
+    if (parseInt(maxPrevItems) === 0) {
+      copyFragments = [...fragments];
+      passedFragments = [];
+    }
+
+    for (let i = 0; i < maxPrevItems; i++) {
+      const fragmentId = passedFragments.pop();
+      if (fragmentId) {
+        copyFragments = [fragments.find(f => f.id === fragmentId), ...copyFragments];
       }
     }
 
-    const reg = new RegExp('{' + fragment.id + '}');
-    content = content.replace(reg, element[0].outerHTML);
-  });
+    if (passedFragments.length === 0) {
+      copyFragments = [...fragments];
+    }
 
-  const $content = $(content);
+    console.log(copyFragments);
+  }
 
-  $content
-    .find('.highlight:eq(0)')
-    .removeClass('disabled')
-    .removeAttr('disabled')
-    .find('.dropdown-toggle')
-    .removeClass('disabled');
+  const createOtherFragments = id => [...fragments].filter(f => f.id !== id);
 
-  $content.on('change', '.dropdown-item input[type=radio]', e => {
+  const oneFragmentAction = ($element, check, fragmentId, maxPrevItems) => {
+
+    oneCheckHandler($element, check);
+
+    if (check) {
+      const fragment = getFragment();
+      if (fragment) {
+        const $content = createOneContent(fragment, content, [...fragments].filter(f => f.id !== fragment.id));
+        this.element.find(".seq-answers")
+          .hide()
+          .html($content)
+          .fadeIn();
+        this.element.find('.highlight')[0].scrollIntoView({block: "start", behavior: "smooth"});
+      } else {
+        const $content = contentReplaceToCorrect(content, [...fragments]);
+        this.element.find(".seq-answers")
+          .hide()
+          .html($content)
+          .fadeIn();
+      }
+    } else {
+      copyFragments = [fragments.find(f => f.id === fragmentId), ...copyFragments];
+    }
+
+    passedFragmentsHandler(check, fragmentId, maxPrevItems);
+  }
+
+  const passedFragmentsHandler = (check, fragmentId, maxPrevItems) => {
+    if (check) {
+      if (!lastAnswerIsIncorrect) {
+        addPassedFragment(fragmentId);
+      }
+      lastAnswerIsIncorrect = false;
+    } else {
+      resetPassedFragments(maxPrevItems);
+      lastAnswerIsIncorrect = true;
+    }
+    this.element.data("answers", passedFragments);
+    updateProgress(passedFragments.length / fragments.length * 100);
+  };
+
+  const fragmentAction = ($target, check, fragmentId, $content, maxPrevItems) => {
+
+    checkHandler($target, check, fragmentId, $content, maxPrevItems);
+
+    if (check) {
+      addPassedFragment(fragmentId);
+    } else {
+      resetPassedFragments(maxPrevItems);
+    }
+
+    updateProgress(passedFragments.length / fragments.length * 100);
+  }
+
+  const fragment = getFragment();
+
+  this.element = this.createWrapper()
+    .find(".seq-question__wrap");
+
+  const updateProgress = (value) => {
+    this.element
+      .find(".pass-test-progress__container-indicator")
+      .css("transform", `translate3d(${value}%, 0px, 0px)`);
+  }
+
+  const createOneContent = (fragment, content, otherFragments) => {
+
+    const fragmentElement = createFragmentElement(fragment);
+    let newContent = contentReplace(content, fragmentElement, fragment.id);
+    newContent = contentReplaceToCorrect(newContent, otherFragments);
+
+    const $content = $(newContent);
+    $content
+      .find('.highlight:eq(0)')
+      .removeClass('disabled')
+      .removeAttr('disabled')
+      .find('.dropdown-toggle')
+      .removeClass('disabled');
+
+    return $content;
+  }
+
+  const viewIsOne = question.item_view === 'one';
+
+  let $content;
+  if (viewIsOne) {
+    $content = createOneContent(fragment, content, createOtherFragments(fragment.id));
+  } else {
+
+    let newContent = content;
+
+    fragments.map(fragment => {
+      const fragmentElement = createFragmentElement(fragment);
+      newContent = contentReplace(newContent, fragmentElement, fragment.id);
+    });
+
+    $content = $(newContent);
+    $content
+      .find('.highlight:eq(0)')
+      .removeClass('disabled')
+      .removeAttr('disabled')
+      .find('.dropdown-toggle')
+      .removeClass('disabled');
+  }
+
+  this.element.find(".seq-answers").html($content);
+
+  let lastAnswerIsIncorrect = false;
+
+  this.element.on('change', '.dropdown-item input[type=radio]', e => {
     const $target = $(e.target);
     const value = $target.siblings('label').html().trim();
 
@@ -284,14 +469,18 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
 
     $target.parents('.highlight:eq(0)').find('.dropdown-toggle').dropdown('toggle');
 
-    checkHandler($target.parents('.highlight:eq(0)'), check, fragmentId, $content, question['max_prev_items']);
+    if (viewIsOne) {
+      oneFragmentAction($target.parents('.highlight:eq(0)'), check, fragmentId, question['max_prev_items']);
+    } else {
+      fragmentAction($target.parents('.highlight:eq(0)'), check, fragmentId, $content, question['max_prev_items']);
+    }
 
     if (typeof fragmentAnswerCallback === 'function') {
       fragmentAnswerCallback(check, value);
     }
   });
 
-  $content.on('change', '.dropdown-item input[type=checkbox]', e => {
+  this.element.on('change', '.dropdown-item input[type=checkbox]', e => {
 
     const $target = $(e.target);
     const $elem = $target.parents('.highlight:eq(0)');
@@ -320,7 +509,11 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
 
       $elem.find('.dropdown-toggle').dropdown('toggle');
 
-      checkHandler($target.parents('.highlight:eq(0)'), check, fragmentId, $content, question['max_prev_items']);
+      if (viewIsOne) {
+        oneFragmentAction($target.parents('.highlight:eq(0)'), check, fragmentId, question['max_prev_items'])
+      } else {
+        fragmentAction($target.parents('.highlight:eq(0)'), check, fragmentId, $content, question['max_prev_items']);
+      }
 
       if (typeof fragmentAnswerCallback === 'function') {
         fragmentAnswerCallback(check, values.join(', '));
@@ -328,13 +521,16 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
     }
   });
 
-  $content.on('change', 'input[type=text]', (e) => {
+  this.element.on('change', 'input[type=text]', (e) => {
     const value = e.target.value;
-
     const fragmentId = $(e.target).attr('data-fragment-id');
     const check = checkFragmentValueIsCorrect(fragmentId, value, fragments);
 
-    checkHandler($(e.target), check, fragmentId, $content, question['max_prev_items']);
+    if (viewIsOne) {
+      oneFragmentAction($(e.target), check, fragmentId, question['max_prev_items']);
+    } else {
+      fragmentAction($(e.target), check, fragmentId, $content, question['max_prev_items']);
+    }
 
     const $target = $(e.target);
     if (check) {
@@ -359,11 +555,11 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
     }
   });
 
-  $content.on('click', '.dropdown-menu', function(e) {
+  this.element.on('click', '.dropdown-menu', function(e) {
     e.stopPropagation();
   });
 
-  $content.on('click', '.region-fragment-btn:not(.disabled)', (e) => {
+  this.element.on('click', '.region-fragment-btn:not(.disabled)', (e) => {
 
     const fragmentId = e.target.getAttribute('data-fragment-id');
     const fragment = fragments.find(elem => elem.id === fragmentId);
@@ -374,7 +570,11 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
     const props = {scale: (this.deck && this.deck.getScale()) || null};
     const regionContent = passTestRegionContent('q' + fragmentId, image, regions, props, (check, answers) => {
 
-      checkHandler($(e.target), check, fragmentId, $content, question['max_prev_items']);
+      if (viewIsOne) {
+        oneFragmentAction($(e.target), check, fragmentId, question['max_prev_items']);
+      } else {
+        fragmentAction($(e.target), check, fragmentId, $content, question['max_prev_items']);
+      }
 
       dialog.hide();
 
@@ -416,8 +616,6 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
     });
   });
 
-  this.element = this.createWrapper($content)
-    .find(".seq-question__wrap");
   return this.element;
 };
 
@@ -442,34 +640,48 @@ PassTest.prototype.getContent = function(payload) {
   return '<div style="max-width:800px;margin:0 auto;font-size:24px;line-height:1.4;">' + content.replace(/\s\s+/g, ' ') + '</div>';
 };
 
-PassTest.prototype.getUserAnswers = function() {
-  const answers = this.element.find('.highlight.highlight-done').map(function(index, elem) {
+PassTest.prototype.getUserAnswers = function(itemView, payload) {
 
-    const $el = $(elem);
+  if (itemView === "one") {
 
-    if ($el.is('input[type=text]')) {
-      return [$el.val().trim().toLowerCase()];
-    }
+    const oneFragmentAnswers = this.element.data("answers") || [];
 
-    const $radio = $el.find('.dropdown-menu input[type=radio]:checked');
-    if ($radio.length) {
-      return [$radio.siblings('label').html().trim().toLowerCase()];
-    }
+    const {fragments} = payload;
+    let answers = [];
+    oneFragmentAnswers.map(fragmentId => {
+      const fragment = fragments.find(f => f.id === fragmentId);
+      answers = [...answers, ...fragment.items.filter(i => i.correct).map(i => i.title.toLowerCase())];
+    });
+    return answers;
 
-    const $boxes = $el.find('.dropdown-menu input[type=checkbox]:checked');
-    if ($boxes.length) {
-      const values = $el.data('values') || [];
-      if (values.length) {
-        return values.map(val => val.trim().toLowerCase());
+  } else {
+    return this.element.find('.highlight.highlight-done').map(function (index, elem) {
+
+      const $el = $(elem);
+
+      if ($el.is('input[type=text]')) {
+        return [$el.val().trim().toLowerCase()];
       }
-      return $boxes.map((i, box) => $(box).attr('value').trim().toLowerCase()).get();
-    }
 
-    if ($el.hasClass('region-fragment-btn')) {
-      return [$el.html().toLowerCase()];
-    }
-  }).get();
-  return answers;
+      const $radio = $el.find('.dropdown-menu input[type=radio]:checked');
+      if ($radio.length) {
+        return [$radio.siblings('label').html().trim().toLowerCase()];
+      }
+
+      const $boxes = $el.find('.dropdown-menu input[type=checkbox]:checked');
+      if ($boxes.length) {
+        const values = $el.data('values') || [];
+        if (values.length) {
+          return values.map(val => val.trim().toLowerCase());
+        }
+        return $boxes.map((i, box) => $(box).attr('value').trim().toLowerCase()).get();
+      }
+
+      if ($el.hasClass('region-fragment-btn')) {
+        return [$el.html().toLowerCase()];
+      }
+    }).get();
+  }
 }
 
 _extends(PassTest, {
