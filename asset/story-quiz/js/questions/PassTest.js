@@ -181,7 +181,7 @@ PassTest.prototype.createWrapper = function (content) {
 
 let currentIncorrectFragmentId;
 
-function checkHandler($target, check, fragmentId, $content, maxPrevItems) {
+function checkHandler($target, check, fragmentId, $content, maxPrevItems, fragmentsTotal) {
 
   $target
     .removeClass('highlight-fail')
@@ -199,10 +199,10 @@ function checkHandler($target, check, fragmentId, $content, maxPrevItems) {
 
     const next = $content.find('.highlight:not(.highlight-done,.highlight-fail):eq(0)');
     if (next.length && next.hasClass('disabled') && (!next.hasClass('highlight-done'))) {
+      next[0].scrollIntoView({block: "start", behavior: "smooth"});
       next.removeClass('disabled');
       next.removeAttr('disabled');
       next.find('.dropdown-toggle').removeClass('disabled');
-      next[0].scrollIntoView({block: "start", behavior: "smooth"});
     }
 
   } else {
@@ -242,6 +242,13 @@ function checkHandler($target, check, fragmentId, $content, maxPrevItems) {
 
     currentIncorrectFragmentId = fragmentId;
   }
+
+  const value = $content.find(".highlight.highlight-done").length / fragmentsTotal * 100;
+  $content
+    .parent()
+    .parent()
+    .find(".pass-test-progress__container-indicator")
+    .css("transform", `translate3d(${value}%, 0px, 0px)`);
 }
 
 function oneCheckHandler($target, check) {
@@ -391,15 +398,15 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
 
   const fragmentAction = ($target, check, fragmentId, $content, maxPrevItems) => {
 
-    checkHandler($target, check, fragmentId, $content, maxPrevItems);
+    checkHandler($target, check, fragmentId, $content, maxPrevItems, fragments.length);
 
-    if (check) {
+    /*if (check) {
       addPassedFragment(fragmentId);
     } else {
       resetPassedFragments(maxPrevItems);
     }
 
-    updateProgress(passedFragments.length / fragments.length * 100);
+    updateProgress(passedFragments.length / fragments.length * 100);*/
   }
 
   const fragment = getFragment();
