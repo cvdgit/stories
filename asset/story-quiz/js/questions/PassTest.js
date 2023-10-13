@@ -202,6 +202,7 @@ function checkHandler($target, check, fragmentId, $content, maxPrevItems) {
       next.removeClass('disabled');
       next.removeAttr('disabled');
       next.find('.dropdown-toggle').removeClass('disabled');
+      next[0].scrollIntoView({block: "start", behavior: "smooth"});
     }
 
   } else {
@@ -343,8 +344,6 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
     if (passedFragments.length === 0) {
       copyFragments = [...fragments];
     }
-
-    console.log(copyFragments);
   }
 
   const createOtherFragments = id => [...fragments].filter(f => f.id !== id);
