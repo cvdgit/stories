@@ -175,6 +175,12 @@ $this->registerCss(<<<CSS
 }
 CSS
 );
+$this->registerJs(<<<JS
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+JS
+);
 ?>
 <?php $form = ActiveForm::begin(['id' => 'pass-test-form']) ?>
 <?= $form->field($model, 'name')->textInput(['maxlength' => true]); ?>
@@ -189,6 +195,7 @@ CSS
         <div style="margin-left:auto;display: flex">
             <a style="margin-right: 6px" href="<?= Url::to(['/fragment-list/manage']); ?>" class="btn btn-primary btn-sm" id="manage" type="button">Управление</a>
             <button style="margin-right: 6px" class="btn btn-primary btn-sm" id="search" type="button">Поиск</button>
+            <button data-toggle="tooltip" title="Добавить фрагменты случайным образом" style="margin-right: 6px" class="btn btn-success btn-sm" id="random" type="button">Заполнить</button>
             <a style="margin-right: 6px" href="<?= Url::to(['/fragment-list/create', 'testing_id' => $testingId]); ?>" class="btn btn-primary btn-sm" id="create-fragment-list" type="button">Создать список</a>
             <a style="margin-right: 6px" href="<?= Url::to(['/fragment-list/select', 'testing_id' => $testingId]); ?>" class="btn btn-primary btn-sm" id="select-fragment-list" type="button">Вставить из списка</a>
             <div class="dropdown">
@@ -265,3 +272,4 @@ $this->registerJs($this->renderFile('@backend/views/test/pass-test/_question.js'
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_fragment_list.js'));
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_search.js'));
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_manage.js'));
+$this->registerJs($this->renderFile('@backend/views/test/pass-test/_random.js'));

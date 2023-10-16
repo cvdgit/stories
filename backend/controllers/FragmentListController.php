@@ -9,6 +9,7 @@ use backend\forms\FragmentListForm;
 use backend\forms\FragmentListItemForm;
 use backend\forms\FragmentListSearch;
 use backend\services\QuestionFragmentService;
+use backend\Testing\Fragments\Random\RandomFragmentsAction;
 use backend\Testing\Questions\PassTest\Fragments\SaveFragmentAction;
 use common\models\StoryTest;
 use common\rbac\UserRoles;
@@ -51,6 +52,7 @@ class FragmentListController extends Controller
     {
         return [
             'save' => SaveFragmentAction::class,
+            'random' => RandomFragmentsAction::class
         ];
     }
 
