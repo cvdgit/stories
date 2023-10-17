@@ -15,20 +15,32 @@ class RandomFragmentsAction extends Action
     {
         $response->format = Response::FORMAT_JSON;
 
-        $content = mb_convert_encoding($request->rawBody, "UTF-8");
-        $words = str_word_count($content, 2, "АаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯя0..9{}");
+        $pattern = "/(?<=>)([^>]+)(?=<\/?)/u";
+        $subject = mb_convert_encoding($request->rawBody, "UTF-8");
+        $matches = [];
+        preg_match_all($pattern, $subject, $matches, PREG_OFFSET_CAPTURE);
 
-        $words = array_filter($words, static function(string $word): bool {
+        $allWords = [];
+        foreach ($matches[0] as $match) {
+
+            [$text, $offset] = $match;
+
+            $words = str_word_count($text, 2, "<>АаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯя0..9{}");
+
+            foreach ($words as $wordOffset => $word) {
+                $allWords[$offset + $wordOffset] = $word;
+            }
+        }
+
+        $allWords = array_filter($allWords, static function(string $word): bool {
             return preg_match('/{[a-z0-9]+-[a-z0-9]+-4[a-z0-9]+-[a-z0-9]+-[a-z0-9]+}/i', $word) !== 1;
         });
 
-        //die(print_r($words));
-
-        $keys = array_rand($words, 5);
+        $keys = array_rand($allWords, 5);
         $keys = array_reverse($keys);
 
-        $values = array_map(static function(int $key) use ($words): string {
-            return mb_convert_encoding($words[$key] ?? "no-${key}", "UTF-8");
+        $values = array_map(static function(int $key) use ($allWords): string {
+            return mb_convert_encoding($allWords[$key] ?? "no-${key}", "UTF-8");
         }, array_values($keys));
 
         $fragments = [];
@@ -36,7 +48,7 @@ class RandomFragmentsAction extends Action
         foreach ($keys as $i => $start) {
 
             $id = Uuid::uuid4()->toString();
-            $content = substr_replace($content, "{" . $id . "}", $start, strlen($values[$i]));
+            $subject = substr_replace($subject, "{" . $id . "}", $start, strlen($values[$i]));
 
             $fragments[] = [
                 "start" => $start,
@@ -55,7 +67,7 @@ class RandomFragmentsAction extends Action
 
         return [
             "success" => true,
-            "content" => $content,
+            "content" => $subject,
             "fragments" => $fragments,
         ];
     }

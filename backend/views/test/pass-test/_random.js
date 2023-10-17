@@ -8,7 +8,7 @@
       return '{' + $(this).attr('data-fragment-id') + '}';
     });
 
-    const content = el[0].outerText;
+    const content = el[0].outerHTML;
 
     $.ajax({
       url: '/admin/index.php?r=fragment-list/random',
