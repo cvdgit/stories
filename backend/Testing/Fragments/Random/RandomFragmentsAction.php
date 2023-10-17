@@ -33,7 +33,7 @@ class RandomFragmentsAction extends Action
         }
 
         $allWords = array_filter($allWords, static function(string $word): bool {
-            return preg_match('/{[a-z0-9]+-[a-z0-9]+-4[a-z0-9]+-[a-z0-9]+-[a-z0-9]+}/i', $word) !== 1;
+            return $word !== "nbsp" && preg_match('/{[a-z0-9]+-[a-z0-9]+-4[a-z0-9]+-[a-z0-9]+-[a-z0-9]+}/i', $word) !== 1;
         });
 
         $keys = array_rand($allWords, 5);
