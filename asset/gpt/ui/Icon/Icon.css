@@ -1,0 +1,11 @@
+.icon {
+  font-size: 18px;
+  padding: var(--spacing);
+  cursor: pointer;
+}
+
+.icon {
+  font-size: 18px;
+  padding: var(--spacing-min);
+  display: inline-block;
+}

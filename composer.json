@@ -14,12 +14,12 @@
     },
     "minimum-stability": "stable",
     "require": {
-        "php": ">=7.2.0",
+        "php": "^7.3",
         "yiisoft/yii2": "~2.0.6",
         "yiisoft/yii2-bootstrap": "~2.0.0",
         "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
         "bower-asset/reveal.js": "4.0.2",
-        "electrolinux/phpquery": "^0.9.6",
+        "electrolinux/phpquery": "dev-master",
         "2amigos/yii2-taggable-behavior": "~1.0",
         "2amigos/yii2-selectize-widget": "~1.0",
         "creocoder/yii2-nested-sets": "^0.9.0",
@@ -54,7 +54,8 @@
         "bower-asset/dm-file-uploader": "^1.0",
         "bower-asset/ckeditor": "^4.16",
         "notamedia/yii2-sentry": "^1.7",
-        "ramsey/uuid": "^4.2"
+        "ramsey/uuid": "^4.2",
+        "justinrainbow/json-schema": "^5.2"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",
@@ -75,7 +76,10 @@
             "enabled": false
         },
         "preferred-install": "dist",
-        "github-protocols": ["https"]
+        "github-protocols": ["https"],
+        "platform": {
+            "php": "7.3.11"
+        }
     },
     "repositories": [
         {
@@ -83,5 +87,9 @@
             "url": "https://asset-packagist.org"
         },
         { "type": "vcs", "url": "https://github.com/monter08/PHPThumb" }
-    ]
+    ],
+    "scripts": {
+        "console": "php bin/console.php",
+        "test": "codecept"
+    }
 }

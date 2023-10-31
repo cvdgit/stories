@@ -43,6 +43,7 @@ return [
                 'modules\edu\migrations',
                 'modules\files\migrations',
                 'backend\modules\changelog\migrations',
+                'backend\modules\gpt\migrations',
             ],
         ],
         'serve' => [

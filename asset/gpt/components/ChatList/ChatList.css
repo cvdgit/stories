@@ -1,0 +1,106 @@
+.conversations {
+  width: 100%;
+}
+
+.conversation-new {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing) 0;
+  cursor: pointer;
+  color: var(--primary);
+}
+
+.conversation-item {
+  padding: var(--spacing);
+  color: var(--text-color);
+  cursor: pointer;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: var(--spacing-min);
+  border-radius: var(--border-radius);
+}
+
+.conversation-item:hover {
+  background-color: var(--border-color);
+}
+
+.conversation-item:hover .conversation-tool {
+  visibility: inherit;
+}
+
+.conversation-item.current {
+  background-color: var(--background-color-gray);
+}
+
+.title-container {
+  font-size: 12px;
+  position: relative;
+  flex: 1 1 auto;
+  margin-left: var(--spacing-min);
+}
+
+.conversation-title {
+  width: 100%;
+}
+
+.conversation-title__text {
+  flex: 1;
+  font-weight: 800;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.conversation-title__messages {
+  font-size: 12px;
+  color: var(--text-color-gray);
+}
+
+.conversation-tool {
+  visibility: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.conversation-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border-radius: var(--border-radius);
+  margin: var(--spacing-min);
+  cursor: pointer;
+  transition: 0.3s;
+  flex: 0 0 auto;
+}
+
+.conversation-edit {
+  width: 100%;
+}
+
+.conversation-edit__title {
+  margin-bottom: var(--spacing);
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+}
+
+.conversation-edit__text {
+  margin-left: var(--spacing-min);
+}
+
+.conversation-edit__wrap {
+  display: flex;
+  background-color: var(--background-color);
+  border-radius: var(--border-radius);
+  width: 100%;
+}
+
+.conversation-edit__bar {
+  margin-top: var(--spacing);
+}

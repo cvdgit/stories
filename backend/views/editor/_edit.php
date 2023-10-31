@@ -1,14 +1,24 @@
 <?php
+
+declare(strict_types=1);
+
 use backend\assets\StoryEditorAsset;
 use backend\widgets\BackendRevealWidget;
+use common\models\Story;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
-/** @var yii\web\View $this */
-/** @var common\models\Story $model */
-/** @var string $configJSON */
-/** @var bool $inLesson */
+use yii\web\View;
+
+/**
+ * @var View $this
+ * @var Story $model
+ * @var string $configJSON
+ * @var bool $inLesson
+ */
+
 StoryEditorAsset::register($this);
+$this->registerJs($this->renderFile("@backend/views/editor/_gpt_slide_text.js"));
 ?>
 <div class="wrap-editor">
     <div class="slides-sidebar">
@@ -91,6 +101,10 @@ StoryEditorAsset::register($this);
                 <span class="glyphicon glyphicon-play icon"></span>
                 <span class="text">Кнопка</span>
             </li>
+            <li class="blocks-sidebar-item" id="gpt-text">
+                <img src="/img/chatgpt-icon.png" width="28" alt="">
+                <span class="text">Тест</span>
+            </li>
         </ul>
     </div>
 </div>
@@ -171,6 +185,7 @@ $js = <<< JS
     }
 
     var editorPopover = new EditorPopover();
+    const gpt = new GptSlideText();
     editorPopover.attach('#create-video-block', {'placement': 'left'}, [
         {'name': 'youtube', 'title': 'YouTube', 'click': function() {
             showCreateBlockModal('video');
@@ -185,6 +200,36 @@ $js = <<< JS
         }},
         {'name': 'transition', 'title': 'Переход', 'click': function() {
             showCreateBlockModal('transition');
+        }}
+    ]);
+    editorPopover.attach('#gpt-text', {'placement': 'left'}, [
+        {'name': 'gpt-slide-text', 'title': 'Создать тест', 'click': function() {
+            const currentSlide = StoryEditor.getCurrentSlide();
+            if (!currentSlide) {
+                toastr.error("Нет слайда");
+                return;
+            }
+            const texts = [];
+            currentSlide.getElement().find(`div[data-block-type="text"]`).map((i, el) => {
+                const text = $(el).text();
+                if (text.length) {
+                    texts.push(text);
+                }
+            })
+
+            if (!texts.length) {
+                toastr.warning("Текст на слайде не найден");
+                return;
+            }
+
+            gpt.showModal({
+                content: texts.join(`\\n`),
+                slideId: currentSlide.getID(),
+                storyId: StoryEditor.getConfigValue("storyID"),
+                processCallback: () => {
+                    StoryEditor.loadSlides();
+                }
+            });
         }}
     ]);
     editorPopover.attach('#create-slide-action', {'placement': 'right'}, [

@@ -288,3 +288,50 @@ function sendForm(url, type, formData) {
     processData: false
   });
 }
+
+const SimpleModal = function({id, title}) {
+
+  const content = `
+    <div class="modal rounded-0 fade" tabindex="-1" id="${id}" data-backdrop="static">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header" style="display: flex; justify-content: space-between">
+            <h5 class="modal-title" style="margin-right: auto">${title}</h5>
+            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+          </div>
+          <div class="modal-body d-flex">...</div>
+        </div>
+      </div>
+    </div>
+    `;
+
+  if ($('body').find(`div#${id}`).length) {
+    $('body').find(`div#${id}`).remove();
+  }
+
+  $('body').append(content);
+
+  const element = $('body').find(`div#${id}`);
+
+  element
+    .off('show.bs.modal')
+    .on('show.bs.modal', () => {});
+  //.off('hide.bs.modal');
+  //.on('hide.bs.modal', hideCallback);
+
+  this.show = ({body}) => {
+    element.find('.modal-body')
+      .empty()
+      .append(body);
+    element.modal();
+  };
+
+  this.hide = () => {
+    element.modal('hide');
+  }
+
+  /**
+   * @returns {*|jQuery}
+   */
+  this.getElement = () => element;
+}

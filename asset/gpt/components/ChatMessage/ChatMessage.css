@@ -1,0 +1,137 @@
+.message {
+  background-color: var(--background-color-gray);
+  border-radius: 0 var(--border-radius) var(--border-radius) 0;
+  flex: 1 1 auto;
+  font-size: var(--font-size-base);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.message > div {
+  width: 100%;
+}
+
+.message-header {
+  padding: 0 var(--spacing);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--background-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.header-title {
+  font-size: 14px;
+  padding: var(--spacing);
+  color: var(--text-color);
+  font-size: var(--font-size-title);
+  flex: 1;
+}
+
+.messages-number {
+  font-size: 12px;
+  color: var(--text-color-gray);
+}
+
+.message-bar {
+  padding: var(--spacing);
+  border-top: 1px solid var(--border-color);
+  background-color: var(--background-color);
+}
+
+.message-bar__inner {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.message-bar__type {
+  flex: 1;
+}
+
+.message-bar__icon {
+  display: flex;
+  align-items: center;
+}
+
+.message-bar__icon .icon {
+  padding: 8px;
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--text-color);
+}
+
+.messages-container {
+  flex: 1;
+  padding: 10px;
+  color: var(--text-color);
+}
+
+.message-item {
+  margin: var(--spacing) 0;
+  display: flex;
+}
+
+.role-user {
+  flex-direction: row-reverse;
+}
+
+.message-item__content {
+  margin-left: 10px;
+  margin-right: 38px;
+  display: flex;
+  justify-content: flex-start;
+  flex: 1;
+}
+
+.message-item__content--user {
+  margin-left: 38px;
+  justify-content: flex-end;
+  margin-right: var(--spacing);
+}
+
+.message-item__inner {
+  background-color: var(--background-color);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-base);
+  padding: var(--spacing);
+  min-width: 300px;
+}
+
+.message-item__tool {
+  margin-bottom: var(--spacing);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.message-item__date {
+  color: var(--text-color-gray);
+  font-size: 12px;
+}
+
+.message-item__bar {
+  display: flex;
+  align-items: center;
+}
+
+.message-bar__tool {
+  padding: var(--spacing) 0;
+}
+
+.message-bar__loading {
+  display: flex;
+  align-items: center;
+}
+
+.no-messages {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--spacing) * 10) 0;
+  flex-direction: column;
+}

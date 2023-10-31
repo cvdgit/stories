@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\controllers\test;
 
 use backend\models\question\QuestionType;
 use backend\models\test\import\ImportFromWordList;
 use backend\services\ImportQuestionService;
+use backend\Testing\ImportQuestionsFromJson\ImportFromJsonAction;
 use common\models\StoryTest;
 use Exception;
 use Yii;
@@ -18,10 +21,19 @@ class ImportController extends Controller
     /** @var ImportQuestionService */
     private $importService;
 
+    public $enableCsrfValidation = false;
+
     public function __construct($id, $module, ImportQuestionService $importService, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->importService = $importService;
+    }
+
+    public function actions(): array
+    {
+        return [
+            "json" => ImportFromJsonAction::class,
+        ];
     }
 
     /**

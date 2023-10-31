@@ -89,6 +89,7 @@ AppAsset::register($this);
                         ['label' => 'Обучение', 'url' => ['/edu/admin/default/index']],
                         ['label' => 'Повторение', 'url' => ['/repetition/schedule/index']],
                         ['label' => 'Changelog', 'url' => ['/changelog/default/index']],
+                        ['label' => 'ChatGPT', 'url' => ['/gpt/default/index']],
                     ],
                 ]) ?>
                 <?php endif ?>

@@ -1,0 +1,24 @@
+.textarea-box {
+  display: flex;
+}
+
+.textarea-box__inner {
+  flex: 1;
+}
+
+.textarea {
+  width: 100%;
+  border: var(--border-color);
+  padding: var(--spacing);
+  outline: none;
+  resize: none;
+  font-size: var(--font-size-base);
+  font-family: sans-serif;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  border-radius: var(--border-radius);
+}
+
+.textarea__transparent {
+  background-color: transparent;
+}

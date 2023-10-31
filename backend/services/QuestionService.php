@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\services;
 
 use backend\models\question\CreateQuestion;
@@ -19,7 +21,8 @@ class QuestionService
             $form->story_test_id,
             $form->name,
             $form->type,
-            $form->order
+            $form->order,
+            $form->mix_answers
         );
     }
 

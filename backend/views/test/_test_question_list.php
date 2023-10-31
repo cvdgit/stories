@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use backend\models\question\QuestionType;
 use common\models\StoryTest;
 use common\models\StoryTestQuestion;
 use yii\data\DataProviderInterface;
@@ -10,12 +9,16 @@ use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\web\View;
 
 /**
+ * @var View $this
  * @var StoryTest $model
  * @var DataProviderInterface $dataProvider
  * @var array $routes
  */
+
+$this->registerJs($this->renderFile("@backend/views/test/_gpt_import.js"));
 ?>
 <div>
     <div class="clearfix">
@@ -35,6 +38,9 @@ use yii\helpers\Url;
                 <?php endif ?>
             </div>
             <div>
+                <a data-quiz-id="<?= $model->id; ?>" id="gpt-import" class="btn" href="" style="padding: 0">
+                    <img style="width:30px" src="/img/chatgpt-icon.png" alt="">
+                </a>
                 <?= Html::a('Импортировать вопросы из списка слов', ['test/import/from-word-list', 'test_id' => $model->id], ['class' => 'btn btn-default', 'style' => 'margin-left: 20px', 'id' => 'import-from-word-list']) ?>
             </div>
         </div>

@@ -3,7 +3,7 @@ const common = require('./webpack.common.js');
 
 module.exports = merge(common, {
     mode: 'development',
-    watch: true,
+    //watch: true,
     watchOptions: {
         ignored: ['vendor/**', 'public_html/**', 'node_modules/**']
     },

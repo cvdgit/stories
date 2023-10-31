@@ -1884,6 +1884,9 @@ var StoryEditor = (function() {
         'getCurrentSlideID': function() {
             return slidesManager.getCurrentSlideID();
         },
+      'getCurrentSlide': function() {
+        return slidesManager.getActiveSlide();
+      },
 
         loadSlides,
         loadSlide,

@@ -21,6 +21,7 @@ return [
     'modules' => [
         'repetition' => \backend\modules\repetition\Module::class,
         'changelog' => \backend\modules\changelog\Module::class,
+        'gpt' => \backend\modules\gpt\Module::class,
     ],
     'container' => [
         'definitions' => [

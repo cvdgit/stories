@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\services;
 
-use ArrayObject;
 use backend\components\import\AnswerDto;
 use backend\components\import\DefaultWordProcessor;
 use backend\components\import\PoetryWordProcessor;
@@ -16,6 +17,7 @@ use backend\models\question\CreateQuestion;
 use backend\models\question\sequence\CreateSequenceQuestion;
 use backend\models\question\sequence\SortView;
 use backend\models\test\import\ImportFromWordList;
+use common\models\StoryTest;
 use common\models\StoryTestAnswer;
 use common\models\StoryTestQuestion;
 use common\models\TestWord;
@@ -175,5 +177,35 @@ class ImportQuestionService
                 }
             }
         });
+    }
+
+    public function createFromJson(int $testId, array $questions): void
+    {
+        $testModel = StoryTest::findOne($testId);
+        if ($testModel === null) {
+            throw new DomainException("Тест не найден");
+        }
+        if (count($questions) === 0) {
+            throw new DomainException('Список вопросов пуст');
+        }
+        foreach ($questions as $question) {
+
+            $questionForm = new CreateQuestion($testId);
+            $questionForm->name = $question->question;
+            $questionModel = $this->questionService->createQuestion($questionForm);
+
+            $questionAnswers = [];
+            foreach ($question->answers as $answer) {
+                $answerModel = new DefaultAnswerModel();
+                $answerModel->name = $answer->answer;
+                $answerModel->correct = $answer->correct ? 1 : 0;
+                $questionAnswers[] = $this->answerService->createAnswer($answerModel);
+            }
+            $questionModel->storyTestAnswers = $questionAnswers;
+
+            if (!$questionModel->save()) {
+                throw new DomainException('Question save exception');
+            }
+        }
     }
 }

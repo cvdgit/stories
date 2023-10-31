@@ -19,6 +19,7 @@ use backend\models\editor\TransitionForm;
 use backend\models\editor\VideoForm;
 use backend\models\video\VideoSource;
 use backend\services\StoryLinksService;
+use backend\SlideEditor\CreateQuizBySlideText\CreateQuizAction;
 use common\models\Lesson;
 use common\models\StorySlide;
 use DomainException;
@@ -62,6 +63,13 @@ class EditorController extends BaseController
                     ],
                 ],
             ],
+        ];
+    }
+
+    public function actions(): array
+    {
+        return [
+            "gpt-quiz" => CreateQuizAction::class,
         ];
     }
 
