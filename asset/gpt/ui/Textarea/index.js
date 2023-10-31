@@ -30,8 +30,10 @@ export const Textarea = forwardRef((props, ref) => {
   }
 
   function handleClear() {
+    console.log("handleClear")
     onChange && onChange("");
     onClear && onClear();
+    setContent("");
   }
 
   const handleKeyPress = (event) => {

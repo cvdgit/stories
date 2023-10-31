@@ -10,5 +10,6 @@ use yii\web\View;
  */
 
 GptAsset::register($this);
+$this->title = "ChatGPT";
 ?>
 <div id="app"></div>

@@ -63,6 +63,7 @@ export function MessageItem(props) {
 export function MessageBar() {
   const {sendMessage, setMessage, is, options, setIs, typingMessage, clearTyping, stopResponse} = useGlobal()
   useSendKey(sendMessage, options.general.command)
+  console.log(typingMessage);
   return (
     <div className="message-bar">
       {is.thinking && (
@@ -75,16 +76,11 @@ export function MessageBar() {
       )}
       <div className="message-bar__inner">
         <div className="message-bar__type">
-          <Textarea transparent={true} rows="3" value={typingMessage?.content || ''}
-                    onFocus={() => setIs({inputting: true})} onBlur={() => setIs({inputting: false})}
+          <Textarea transparent={true} rows="3" value={typingMessage.content || ''}
+                    onFocus={() => setIs({inputting: true})} showClear={!!(typingMessage.content || '').length} onBlur={() => setIs({inputting: false})}
                     placeholder="Введите что-нибудь...." onChange={setMessage}/>
         </div>
         <div className="message-bar__icon">
-          {typingMessage.content && (
-            <Tooltip text="clear">
-              <Icon className="icon" type="cancel" onClick={clearTyping}/>
-            </Tooltip>
-          )}
           <Icon className="icon" type="send" onClick={sendMessage}/>
         </div>
       </div>
