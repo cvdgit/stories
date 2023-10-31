@@ -1,5 +1,5 @@
 import React from 'react';
-import imageUrl from '../../images/avatar.png'
+import imageUrl from '../../images/wikids.png'
 import "./Avatar.css";
 
 export const Avatar = (props) => {

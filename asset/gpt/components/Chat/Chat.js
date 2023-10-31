@@ -11,7 +11,9 @@ function Chat() {
     <div className="chat chat-full">
       <div className="chat_inner">
         <div className="panel flex-c-sb flex-column">
-          <Avatar />
+          <a href="https://wikids.ru/admin">
+            <Avatar />
+          </a>
         </div>
         <div className="sider">
           <div className="search">

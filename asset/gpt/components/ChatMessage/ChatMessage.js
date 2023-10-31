@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import {Avatar, Icon, Textarea, Loading, Tooltip, Button} from '../../ui'
 import {useGlobal} from "../../context";
 import {useMessage} from "../../hooks/useMessage";
@@ -119,15 +119,23 @@ export function MessageContainer() {
 }
 
 export function ChatMessage() {
-  const {is} = useGlobal()
+  const {is, chat} = useGlobal();
   return (
     <div className="message">
-      <MessageHeader/>
-      <ScrollView>
-        <MessageContainer/>
-        {is?.thinking && <Loading/>}
-      </ScrollView>
-      <MessageBar/>
+      {chat.length ? (
+        <>
+          <MessageHeader/>
+          <ScrollView>
+            <MessageContainer/>
+            {is?.thinking && <Loading/>}
+          </ScrollView>
+          <MessageBar/>
+        </>
+      ) : (
+        <div className="no-conversions">
+          <div>Создайте новый разговор</div>
+        </div>
+      )}
     </div>
   )
 }

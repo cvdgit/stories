@@ -70,10 +70,10 @@ class ChatController extends Controller
                 "openai" => [
                     "baseUrl" => "",
                     "organizationId" => "",
-                    "temperature" => 1,
+                    "temperature" => 0.7,
                     "model" => "gpt-3.5-turbo",
                     "apiKey" => \Yii::$app->params["gpt.api.key"],
-                    "max_tokens" => 2048,
+                    //"max_tokens" => 4096,
                     "n" => 1,
                     "stream" => true,
                 ],

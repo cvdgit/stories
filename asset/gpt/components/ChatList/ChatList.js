@@ -5,7 +5,7 @@ import "./ChatList.css";
 
 export function ListEmpty() {
   return (
-    <div className="flex-column">
+    <div className="flex-column conversation-item">
       <Icon type="message"/>
       <Title type="h3">Разговоры не найдены<br/>Начните новый разговор</Title>
     </div>

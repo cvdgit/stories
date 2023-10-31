@@ -135,3 +135,12 @@
   padding: calc(var(--spacing) * 10) 0;
   flex-direction: column;
 }
+
+.no-conversions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--spacing) * 10) 0;
+  flex-direction: column;
+  height: 100%;
+}
