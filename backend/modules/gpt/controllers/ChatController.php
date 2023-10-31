@@ -72,7 +72,7 @@ class ChatController extends Controller
                     "organizationId" => "",
                     "temperature" => 1,
                     "model" => "gpt-3.5-turbo",
-                    "apiKey" => \Yii::$app->params["gpt.key"],
+                    "apiKey" => "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",
                     "max_tokens" => 2048,
                     "n" => 1,
                     "stream" => true,
