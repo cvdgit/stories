@@ -11,9 +11,9 @@ class QuizService
 
     public function getQuizData(StoryTest $test): array
     {
-        $collection = (new QuizBuilder($test, $test->getQuestionData(), $test->getQuestionDataCount(), [], true))
+        $collection = (new QuizBuilder($test, $test->getQuestionData(), $test->getQuestionDataCount(), [], false))
             ->build();
         return (new Serializer())
-            ->serialize($test, $collection, [], 0, true);
+            ->serialize($test, $collection, [], 0, false);
     }
 }
