@@ -24,7 +24,8 @@ class StreamController extends Controller
         \Yii::$app->session->close();
 
         header("Content-Type: text/event-stream");
-        header("Cache-Control: no-cache");
+        header("Cache-Control: no-cache, must-revalidate");
+        header("X-Accel-Buffering: no");
         header("Connection: keep-alive");
 
         $fields = [
@@ -42,6 +43,7 @@ class StreamController extends Controller
             ],
             CURLOPT_WRITEFUNCTION => function($ch, $chunk) {
                 echo $chunk;
+                sleep(1);
                 //flush();
                 return strlen($chunk);
             },
@@ -54,6 +56,6 @@ class StreamController extends Controller
         curl_close($ch);
 
         $response->statusCode = 404;
-        $response->data = null;
+        $response->data = 'no';
     }
 }
