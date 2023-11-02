@@ -14,14 +14,15 @@ class StreamController extends Controller
     public $enableCsrfValidation = false;
     public function actionChat(Request $request, Response $response)
     {
-        //@ob_end_clean();
-        //ini_set('output_buffering', '0');
-        //set_time_limit(0);
 
         $response->format = Response::FORMAT_RAW;
         $response->stream = true;
         $response->isSent = true;
         \Yii::$app->session->close();
+
+        @ob_end_clean();
+        ini_set('output_buffering', '0');
+        //set_time_limit(0);
 
         header("Content-Type: text/event-stream");
         header("Cache-Control: no-cache, must-revalidate");
@@ -43,8 +44,8 @@ class StreamController extends Controller
             ],
             CURLOPT_WRITEFUNCTION => function($ch, $chunk) {
                 echo $chunk;
-                sleep(1);
-                //flush();
+                //sleep(1);
+                flush();
                 return strlen($chunk);
             },
         ];
@@ -55,7 +56,7 @@ class StreamController extends Controller
         curl_exec($ch);
         curl_close($ch);
 
-        $response->statusCode = 404;
-        $response->data = 'no';
+        //$response->statusCode = 404;
+        //$response->data = 'no';
     }
 }
