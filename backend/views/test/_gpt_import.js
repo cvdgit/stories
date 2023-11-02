@@ -4,7 +4,7 @@
 
   async function sendMessage(message, questions, answers) {
 
-    var response = await fetch('http://172.27.10.79:8123/stream_chat/', {
+    var response = await fetch('/admin/index.php?r=gpt/stream/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
