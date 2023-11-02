@@ -4,7 +4,7 @@ function GptSlideText() {
 
   async function sendMessage(content, questions, answers) {
 
-    var response = await fetch('http://localhost:8123/stream_chat/', {
+    var response = await fetch('/admin/index.php?r=gpt/stream/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
