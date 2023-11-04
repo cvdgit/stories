@@ -127,7 +127,7 @@
 
     const questions = Number($body.find("#gpt-questions").val()) || 5;
     const answers = Number($body.find("#gpt-answers").val()) || 4;
-    const role = $body.find("#gpt-role");
+    const role = $body.find("#gpt-role").val();
 
     const response = sendMessage(message, questions, answers, role);
     response.then(data => {
