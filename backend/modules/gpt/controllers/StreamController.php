@@ -14,7 +14,6 @@ class StreamController extends Controller
     public $enableCsrfValidation = false;
     public function actionChat(Request $request, Response $response)
     {
-
         $response->format = Response::FORMAT_RAW;
         $response->stream = true;
         $response->isSent = true;
@@ -33,6 +32,7 @@ class StreamController extends Controller
             "content" => $request->post("content"),
             "questions" => $request->post("questions"),
             "answers" => $request->post("answers"),
+            "role" => $request->post("role"),
         ];
 
         $options = [
