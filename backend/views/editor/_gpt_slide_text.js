@@ -2,7 +2,7 @@ function GptSlideText() {
 
   const modal = new SimpleModal({id: "gpt-slide-text", title: "Создание теста на основе текста слайда"});
 
-  async function sendMessage(content, questions, answers) {
+  async function sendMessage(content, questions, answers, role) {
 
     var response = await fetch('/admin/index.php?r=gpt/stream/chat', {
       method: 'POST',
@@ -12,7 +12,8 @@ function GptSlideText() {
       body: JSON.stringify({
         content,
         questions,
-        answers
+        answers,
+        role
       })
     });
 
@@ -60,6 +61,13 @@ function GptSlideText() {
   const $body = $(`
     <div class="row">
       <div class="col-md-12">
+        <label for="gpt-questions">Роль:</label>
+        <select name="" id="gpt-role">
+          <option value="business_rx">Бизнес аналитик RX</option>
+          <option value="systems_rx">Системный аналитик RX</option>
+          <option value="history_teacher">Школьный учитель истории</option>
+          <option value="english_teacher">Школьный учитель английского</option>
+        </select>
         <label for="gpt-questions">Количество вопросов:</label>
         <select name="" id="gpt-questions">
           <option value="3">3</option>
@@ -123,8 +131,9 @@ function GptSlideText() {
 
         const questions = Number($body.find("#gpt-questions").val()) || 5;
         const answers = Number($body.find("#gpt-answers").val()) || 4;
+        const role = $body.find("#gpt-role").val();
 
-        const response = sendMessage(message, questions, answers);
+        const response = sendMessage(message, questions, answers, role);
         response.then(data => {
           if (data.ok) {
             $body.find("#gpt-loader").hide();
