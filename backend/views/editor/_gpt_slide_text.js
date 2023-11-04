@@ -65,8 +65,10 @@ function GptSlideText() {
         <select name="" id="gpt-role">
           <option value="business_rx">Бизнес аналитик RX</option>
           <option value="systems_rx">Системный аналитик RX</option>
+          <option value="marketer">Маркетолог</option>
           <option value="history_teacher">Школьный учитель истории</option>
           <option value="english_teacher">Школьный учитель английского</option>
+          <option value="biology_teacher">Школьный учитель биологии</option>
         </select>
         <label for="gpt-questions">Количество вопросов:</label>
         <select name="" id="gpt-questions">
