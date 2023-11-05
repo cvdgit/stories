@@ -4,7 +4,7 @@ let stack = [];
 let inTransitionStory = false;
 let currentStoryId = null;
 
-export default () => {
+export default function Transition() {
   return {
 
     deck: null,

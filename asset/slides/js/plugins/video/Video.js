@@ -135,7 +135,7 @@ let loaded = [];
 let players = [];
 let player = null;
 
-export default (slidesPlayer, config) => {
+export default function Video(slidesPlayer, config) {
 
   loaded = [];
 

@@ -1,5 +1,5 @@
 
-export default () => {
+function SlidesFullscreen() {
 
   const $playerContainer = $(".story-container");
   let fullScreenMode = false;
@@ -51,3 +51,5 @@ export default () => {
 
   }
 }
+
+export default SlidesFullscreen;

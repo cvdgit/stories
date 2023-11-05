@@ -1,5 +1,5 @@
 
-export default (config) => {
+export default function SlideLinks(config) {
 
   return {
 

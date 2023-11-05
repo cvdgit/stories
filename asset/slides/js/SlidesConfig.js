@@ -4,11 +4,12 @@ function getConfigValue(name) {
   return config[name];
 }
 
-export default () => {
-
+function SlidesConfig() {
   return {
     get: (name) => {
       return getConfigValue(name);
     }
   }
-};
+}
+
+export default SlidesConfig;

@@ -2,7 +2,7 @@ import "./customcontrols.css";
 import SlidesPlayer from "../../SlidesPlayer";
 import SlidesFullscreen from "../../SlidesFullscreen";
 
-export default () => {
+export default function CustomControls() {
 
   return {
     id: 'customcontrols',

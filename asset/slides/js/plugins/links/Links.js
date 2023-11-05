@@ -1,7 +1,7 @@
 
 let loaded = false;
 
-export default (config) => {
+export default function Links(config) {
 
   loaded = false;
 

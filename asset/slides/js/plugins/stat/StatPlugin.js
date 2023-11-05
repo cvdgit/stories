@@ -1,7 +1,7 @@
 import SlidesConfig from "../../SlidesConfig";
 import Stat from "./Stat";
 
-export default () => {
+export default function StatPlugin() {
 
   const stack = [];
 

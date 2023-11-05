@@ -2,7 +2,7 @@ import SlidesConfig from "../../SlidesConfig";
 import Video from "./Video";
 import SlidesPlayer from "../../SlidesPlayer";
 
-export default () => {
+export default function VideoPlugin() {
   return {
 
     id: 'video',

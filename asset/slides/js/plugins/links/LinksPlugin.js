@@ -2,7 +2,7 @@ import SlidesConfig from "../../SlidesConfig";
 import SlidesPlayer from "../../SlidesPlayer";
 import Links from "./Links";
 
-export default () => {
+export default function LinksPlugin() {
   return {
 
     id: 'links',

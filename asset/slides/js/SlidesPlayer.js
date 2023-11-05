@@ -1,5 +1,5 @@
 
-export default (deck) => {
+function SlidesPlayer(deck) {
 
   return {
 
@@ -82,3 +82,5 @@ export default (deck) => {
     }
   }
 }
+
+export default SlidesPlayer;

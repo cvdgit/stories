@@ -1,6 +1,6 @@
 import SlidesConfig from "../SlidesConfig";
 
-export default () => {
+export default function Feedback() {
   return {
     deck: null,
     options: {},

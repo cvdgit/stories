@@ -12,7 +12,7 @@ function makeSessionId() {
   return text;
 }
 
-export default (config) => {
+export default function Stat(config) {
 
   const session = makeSessionId();
 

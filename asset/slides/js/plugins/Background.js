@@ -1,6 +1,6 @@
 import SlidesPlayer from "../SlidesPlayer";
 
-export default () => {
+export default function Background() {
   return {
 
     deck: null,

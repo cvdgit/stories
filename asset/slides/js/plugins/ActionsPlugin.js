@@ -1,7 +1,7 @@
 import SlidesConfig from "../SlidesConfig";
 import SlidesPlayer from "../SlidesPlayer";
 
-export default () => {
+export default function ActionsPlugin() {
   return {
 
     id: 'actions',

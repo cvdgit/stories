@@ -3,7 +3,7 @@ import SlidesPlayer from "../SlidesPlayer";
 import "./next_story.css";
 import config from "reveal.js/js/config";
 
-export default () => {
+export default function NextStory() {
   return {
 
     id: 'next-story',

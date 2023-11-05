@@ -7,7 +7,7 @@ let currentStoryId = null;
 
 let readySlides = [];
 
-export default () => {
+export default function Testing() {
   return {
 
     id: 'testing',
