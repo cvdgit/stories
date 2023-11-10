@@ -195,7 +195,23 @@ JS
         <div style="margin-left:auto;display: flex">
             <a style="margin-right: 6px" href="<?= Url::to(['/fragment-list/manage']); ?>" class="btn btn-primary btn-sm" id="manage" type="button">Управление</a>
             <button style="margin-right: 6px" class="btn btn-primary btn-sm" id="search" type="button">Поиск</button>
-            <button data-toggle="tooltip" title="Добавить фрагменты случайным образом" style="margin-right: 6px" class="btn btn-success btn-sm" id="random" type="button">Заполнить</button>
+
+            <div class="dropdown" data-toggle="tooltip" title="Добавить фрагменты случайным образом">
+                <button data-toggle="dropdown" style="margin-right: 6px" class="btn btn-success btn-sm dropdown-toggle" type="button">
+                    Заполнить
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li style="height: 36px"><a href="#" id="random">Случайным образом</a></li>
+                    <li style="height: 36px">
+                        <a href="#" id="fill-with-gpt">
+                            <img style="width:30px" src="/img/chatgpt-icon.png" alt="">
+                            ChatGPT
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
             <a style="margin-right: 6px" href="<?= Url::to(['/fragment-list/create', 'testing_id' => $testingId]); ?>" class="btn btn-primary btn-sm" id="create-fragment-list" type="button">Создать список</a>
             <a style="margin-right: 6px" href="<?= Url::to(['/fragment-list/select', 'testing_id' => $testingId]); ?>" class="btn btn-primary btn-sm" id="select-fragment-list" type="button">Вставить из списка</a>
             <div class="dropdown">
@@ -273,3 +289,4 @@ $this->registerJs($this->renderFile('@backend/views/test/pass-test/_fragment_lis
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_search.js'));
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_manage.js'));
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_random.js'));
+$this->registerJs($this->renderFile('@backend/views/test/pass-test/_gpt_random.js'));

@@ -70,7 +70,7 @@
   const $body = $(`
 <div class="row">
       <div class="col-md-12">
-        <label for="gpt-questions">Роль:</label>
+        <label for="gpt-role">Роль:</label>
         <select name="" id="gpt-role">
           <option value="business_rx">Бизнес аналитик RX</option>
           <option value="systems_rx">Системный аналитик RX</option>
