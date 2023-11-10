@@ -196,7 +196,7 @@ JS
             <a style="margin-right: 6px" href="<?= Url::to(['/fragment-list/manage']); ?>" class="btn btn-primary btn-sm" id="manage" type="button">Управление</a>
             <button style="margin-right: 6px" class="btn btn-primary btn-sm" id="search" type="button">Поиск</button>
 
-            <div class="dropdown" data-toggle="tooltip" title="Добавить фрагменты случайным образом">
+            <div class="dropdown" data-toggle="tooltip" title="Добавить фрагменты">
                 <button data-toggle="dropdown" style="margin-right: 6px" class="btn btn-success btn-sm dropdown-toggle" type="button">
                     Заполнить
                     <span class="caret"></span>

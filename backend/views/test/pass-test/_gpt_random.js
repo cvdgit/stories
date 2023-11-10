@@ -110,8 +110,8 @@
           <option value="english_teacher">Школьный учитель английского</option>
           <option value="biology_teacher">Школьный учитель биологии</option>
         </select>
-        <label for="gpt-questions">Количество пропусков:</label>
-        <select name="" id="gpt-questions">
+        <label style="display: none" for="gpt-questions">Количество пропусков:</label>
+        <select style="display: none" name="" id="gpt-questions">
           <option value="5">5</option>
           <option value="6">6</option>
           <option value="7">7</option>
@@ -124,8 +124,8 @@
           <option value="14">14</option>
           <option value="15">15</option>
         </select>
-        <label for="gpt-answers">Количество ответов:</label>
-        <select name="" id="gpt-answers">
+        <label style="display: none" for="gpt-answers">Количество ответов:</label>
+        <select style="display: none" name="" id="gpt-answers">
           <option value="2">2</option>
           <option value="3" selected>3</option>
           <option value="4">4</option>
