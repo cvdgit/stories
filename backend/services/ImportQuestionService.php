@@ -14,6 +14,7 @@ use backend\components\import\WordProcessor;
 use backend\models\answer\DefaultAnswerModel;
 use backend\models\answer\SequenceAnswerModel;
 use backend\models\question\CreateQuestion;
+use backend\models\question\QuestionType;
 use backend\models\question\sequence\CreateSequenceQuestion;
 use backend\models\question\sequence\SortView;
 use backend\models\test\import\ImportFromWordList;
@@ -192,6 +193,14 @@ class ImportQuestionService
 
             $questionForm = new CreateQuestion($testId);
             $questionForm->name = $question->question;
+
+            $questionForm->type = QuestionType::ONE;
+            if (count(array_filter($question->answers, static function($answer) {
+                return $answer->correct;
+                })) > 1) {
+                $questionForm->type = QuestionType::MANY;
+            }
+
             $questionModel = $this->questionService->createQuestion($questionForm);
 
             $questionAnswers = [];
