@@ -181,6 +181,8 @@ $this->registerCss(<<<CSS
 }
 #to-gpt-fragments .label {
     font-size: 90%;
+    display: inline-block;
+    margin-right: 10px;
 }
 CSS
 );
