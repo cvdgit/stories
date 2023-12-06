@@ -1,5 +1,5 @@
 
-const AnswerHistorySender = url => {
+function AnswerHistorySender(url) {
   return {
     send(data) {
       return $.post(url, data);
