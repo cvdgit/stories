@@ -36,6 +36,18 @@
       return values.fragments.filter((fragment) => fragment.id === id)[0];
     };
 
+    this.findFragmentByCorrectItemTitle = (title) => {
+      let found;
+      values.fragments.map(f => {
+        const result = f.items.filter(i => i.correct && i.title === title);
+        if (result && result.length) {
+          found = f;
+          return;
+        }
+      });
+      return found;
+    };
+
     this.findFragmentItem = (fragment_id, item_id) => {
       const fragment = this.findFragment(fragment_id);
       return fragment.items.filter(item => {
@@ -100,6 +112,10 @@
       fragment.items = fragment.items.filter(item => {
         return item.id !== item_id;
       });
+    }
+
+    this.removeFragment = (fragment_id) => {
+      values.fragments = values.fragments.filter(f => f.id !== fragment_id);
     }
 
     this.getContent = () => values.content;
@@ -270,10 +286,16 @@
     })
     .on('show.bs.dropdown', '.dropdown', function() {
 
+      const $el = $(this);
       const fragment_id = $(this).attr('data-fragment-id');
 
       const menu = $(this).find('.dropdown-menu');
       menu.empty();
+
+      const rect = $el[0].getBoundingClientRect();
+      const dropDownTop = rect.top + $el.height() + 10;
+      menu.css('top', dropDownTop + "px");
+      menu.css('left', $el.offset().left + "px");
 
       const fragment = dataWrapper.findFragment(fragment_id);
 
@@ -378,7 +400,9 @@
           .text('Удалить пропуск')
           .on('click', function(e) {
             e.preventDefault();
-
+            const correctText = dataWrapper.getFragmentCorrectItems(fragment_id).map(item => item.title).join(', ');
+            $el.replaceWith(correctText);
+            dataWrapper.removeFragment(fragment_id);
           })
       ).appendTo(menu);
     });
@@ -393,6 +417,16 @@
       fragment: dataWrapper.findFragment($(this).parent().attr('data-fragment-id'))
     });
   });
+
+  $(document).on("scroll", function() {
+    $("#content .open > .dropdown-menu").each(function() {
+      const $el = $(this).parent();
+      const rect = $el[0].getBoundingClientRect();
+      const dropDownTop = rect.top + $el.height() + 10;
+      $(this).css('top', dropDownTop + "px");
+      $(this).css('left', $el.offset().left + "px");
+    })
+  })
 
   const form = $('#pass-test-form');
 

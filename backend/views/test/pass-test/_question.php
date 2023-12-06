@@ -24,7 +24,7 @@ $this->registerCss(<<<CSS
 .content {
     border: 1px #d0d0d0 solid;
     padding: 10px;
-    min-height: 300px;
+    min-height: auto;
 }
 .content__title label {
     margin-bottom: 0;
@@ -165,6 +165,9 @@ $this->registerCss(<<<CSS
 #content .open > .dropdown-menu {
     display: block;
 }
+#content .dropdown-menu {
+  position: fixed !important;
+}
 .image-container-wrapper {
     overflow: hidden;
     margin-top: 10px;
@@ -172,6 +175,12 @@ $this->registerCss(<<<CSS
 }
 .image-container-wrapper svg {
     outline: 0;
+}
+.redactor-editor {
+    overflow: hidden !important;
+}
+#to-gpt-fragments .label {
+    font-size: 90%;
 }
 CSS
 );
@@ -204,9 +213,15 @@ JS
                 <ul class="dropdown-menu dropdown-menu-right">
                     <li style="height: 36px"><a href="#" id="random">Случайным образом</a></li>
                     <li style="height: 36px">
-                        <a href="#" id="fill-with-gpt">
+                        <a href="#" id="gpt-generate-gaps">
                             <img style="width:30px" src="/img/chatgpt-icon.png" alt="">
-                            ChatGPT
+                            Добавить пропуски
+                        </a>
+                    </li>
+                    <li style="height: 36px">
+                        <a href="#" id="gpt-add-incorrect">
+                            <img style="width:30px" src="/img/chatgpt-icon.png" alt="">
+                            Добавить неправильные ответы к пропускам
                         </a>
                     </li>
                 </ul>
@@ -290,3 +305,4 @@ $this->registerJs($this->renderFile('@backend/views/test/pass-test/_search.js'))
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_manage.js'));
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_random.js'));
 $this->registerJs($this->renderFile('@backend/views/test/pass-test/_gpt_random.js'));
+$this->registerJs($this->renderFile('@backend/views/test/pass-test/_gpt_gaps.js'));

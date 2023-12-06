@@ -1,5 +1,4 @@
 import {setAbortController} from "./abortController";
-import {createParser} from "eventsource-parser";
 
 export async function* streamAsyncIterable(stream) {
   const reader = stream.getReader();
@@ -84,13 +83,12 @@ export const fetchStream = async ({
   let answer = "";
   const { controller, signal } = setAbortController();
 
-  console.log(messages);
-
   const result = await fetchAction({ options, messages, signal }).catch(
     (error) => {
       onError && onError(error, controller);
     }
   );
+
   if (!result) return;
   if (!result.ok) {
     const error = await result.json();
@@ -98,33 +96,20 @@ export const fetchStream = async ({
     return;
   }
 
-  const parser = createParser((event) => {
-    console.log(event.data);
-    if (event.type === "event") {
-      if (event.data === "[DONE]") {
-        return;
-      }
-      let data;
-      try {
-        data = JSON.parse(event.data);
-      } catch (error) {
-        return;
-      }
-      if ("content" in data.choices[0].delta) {
-        answer += data.choices[0].delta.content;
-        console.log(data);
-        onMessage && onMessage(answer, controller);
-      }
-    }
-  });
+  const decoder = new TextDecoder();
+
   let hasStarted = false;
   for await (const chunk of streamAsyncIterable(result.body)) {
-    const str = new TextDecoder().decode(chunk);
-    parser.feed(str);
+    const str = decoder.decode(chunk);
+
+    answer += str;
+    onMessage && onMessage(answer, controller);
+
     if (!hasStarted) {
       hasStarted = true;
       onStar && onStar(str, controller);
     }
   }
+
   await onEnd(answer);
 };

@@ -11,6 +11,8 @@ services:
     ports:
         - "80:80"
         - "443:443"
+    networks:
+        - gpt-network
 
   site-node-watch:
     image: node:19-alpine
@@ -19,6 +21,8 @@ services:
         - ./:/var/www/html
     working_dir: /var/www/html
     command: sh -c 'until [ -f .ready ] ; do sleep 1 ; done && npm run watch'
+    networks:
+        - gpt-network
 
   site-node-cli:
     image: node:19-alpine
@@ -26,6 +30,8 @@ services:
     volumes:
         - ./:/var/www/html
     working_dir: /var/www/html
+    networks:
+        - gpt-network
 
   site-mysql:
     image: mysql:5.7
@@ -40,6 +46,12 @@ services:
     ports:
         - "3306:3306"
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+        - gpt-network
 
 volumes:
     site-mysql-volume:
+
+networks:
+    gpt-network:
+        external: true
