@@ -1890,6 +1890,11 @@ p.wikids-test-description {
 
 .highlight .dropdown-menu {
   font-size: inherit;
+  max-width: 800px !important;
+}
+
+.highlight .dropdown-menu .dropdown-item {
+  white-space: break-spaces !important;
 }
 
 .highlight .dropdown-toggle {
