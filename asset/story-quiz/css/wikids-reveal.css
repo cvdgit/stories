@@ -1895,6 +1895,8 @@ p.wikids-test-description {
 
 .highlight .dropdown-menu .dropdown-item {
   white-space: break-spaces !important;
+  overflow: hidden;
+  vertical-align: middle;
 }
 
 .highlight .dropdown-toggle {

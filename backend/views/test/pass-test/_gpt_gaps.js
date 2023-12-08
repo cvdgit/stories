@@ -112,7 +112,7 @@
 
     e.preventDefault();
 
-    const content = $('#content').text();
+    const content = $('#content').text().replace(/\s+/g, " ");
 
     //$body.find("#gpt-message").text(content.toString().trim());
     $body.find("#gpt-result").text("");
@@ -271,7 +271,7 @@
         $body.find("#to-gpt-fragments").append(elem);
       })
 
-      const content = $('#content').text();
+      const content = $('#content').text().replace(/\s+/g, " ");
 
       modal.getElement()
         .off("click", "#gpt-send-incorrect")
