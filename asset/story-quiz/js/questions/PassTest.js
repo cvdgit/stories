@@ -622,6 +622,18 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
     });
   });
 
+  this.element
+    .on('show.bs.dropdown', '.highlight', function() {
+      const $el = $(this);
+      const menu = $(this).find('.dropdown-menu');
+      const rect = $el[0].getBoundingClientRect();
+      const $container = $el.parents(".seq-answers:eq(0)");
+      menu.removeClass("dropdown-menu-right");
+      if (rect.left + menu.width() + 100 > $container.width()) {
+        menu.addClass("dropdown-menu-right");
+      }
+    });
+
   return this.element;
 };
 
