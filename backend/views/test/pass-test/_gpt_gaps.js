@@ -301,14 +301,14 @@
               try {
                 const json = JSON.parse($body.find("#gpt-incorrect-result").text());
                 json.map(q => {
-                  const fragment = dataWrapper.findFragmentByCorrectItemTitle(q.question);
-                  if (fragment) {
-                    q.answers.map(answerName => dataWrapper.createFragmentItem(fragment.id, {
+                  const foundFragments = dataWrapper.findFragmentByCorrectItemTitle(q.question);
+                  foundFragments.map(f => {
+                    q.answers.map(answerName => dataWrapper.createFragmentItem(f.id, {
                       id: generateUUID(),
                       title: answerName,
                       correct: false
                     }))
-                  }
+                  });
                 });
               } catch (ex) {
 

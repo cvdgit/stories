@@ -37,12 +37,11 @@
     };
 
     this.findFragmentByCorrectItemTitle = (title) => {
-      let found;
+      const found = [];
       values.fragments.map(f => {
         const result = f.items.filter(i => i.correct && i.title === title);
         if (result && result.length) {
-          found = f;
-          return;
+          found.push(f);
         }
       });
       return found;
