@@ -141,7 +141,7 @@
 
         const fragments = window.dataWrapper.getFragments().map(f => f.items
           .filter(i => i.correct)
-          .map(i => i.title)
+          .map(i => i.title.replace(/\s+/g, " "))
           .join(" ")
         );
 
@@ -265,7 +265,7 @@
         const elem = $("<span/>", {class: "label label-primary"}).text(
           f.items
             .filter(i => i.correct)
-            .map(i => i.title)
+            .map(i => i.title.replace(/\s+/g, " "))
             .join(" ")
         )
         $body.find("#to-gpt-fragments").append(elem);
