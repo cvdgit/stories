@@ -139,11 +139,13 @@
 
         const role = $body.find("#gpt-role").val();
 
-        const fragments = window.dataWrapper.getFragments().map(f => f.items
+        let fragments = window.dataWrapper.getFragments().map(f => f.items
           .filter(i => i.correct)
           .map(i => i.title.replace(/\s+/g, " "))
           .join(" ")
         );
+
+        fragments = [...new Set(fragments)];
 
         const response = sendMessage(message, role, fragments);
         response.then(data => {
@@ -287,11 +289,13 @@
 
           const role = $body.find("#gpt-role").val();
 
-          const fragmentList = fragments.map(f => f.items
+          let fragmentList = fragments.map(f => f.items
             .filter(i => i.correct)
             .map(i => i.title)
             .join(" ")
           );
+
+          fragmentList = [...new Set(fragmentList)];
 
           const response = sendMessage(message, role, fragmentList);
           response.then(data => {
