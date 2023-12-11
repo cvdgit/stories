@@ -1889,7 +1889,7 @@ p.wikids-test-description {
 }
 
 .highlight .dropdown-menu {
-  font-size: inherit;
+  font-size: 20px;
   max-width: 800px !important;
 }
 
@@ -1897,6 +1897,11 @@ p.wikids-test-description {
   white-space: break-spaces !important;
   overflow: hidden;
   vertical-align: middle;
+  border-bottom: 1px #ccc solid;
+}
+
+.highlight .dropdown-menu .dropdown-item:last-child {
+  border-bottom: 0;
 }
 
 .highlight .dropdown-toggle {
