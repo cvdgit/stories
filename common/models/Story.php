@@ -653,7 +653,7 @@ class Story extends ActiveRecord
         return $model;
     }
 
-    public function getStoryUrl()
+    public function getStoryUrl(): string
     {
         return Url::toRoute(['/story/view', 'alias' => $this->alias]);
     }

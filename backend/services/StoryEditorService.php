@@ -20,6 +20,7 @@ use backend\components\StudyTaskFinalSlide;
 use backend\models\editor\BaseForm;
 use backend\models\ImageSlideBlock;
 use backend\models\video\VideoSource;
+use common\helpers\Url;
 use common\models\LessonBlock;
 use common\models\slide\SlideKind;
 use common\models\slide\SlideStatus;
@@ -31,6 +32,7 @@ use common\models\test\SourceType;
 use DomainException;
 use common\models\Story;
 use yii\db\Query;
+use yii\web\NotFoundHttpException;
 
 class StoryEditorService
 {
@@ -469,5 +471,40 @@ class StoryEditorService
     public function deleteFinalSlide(int $storyId): void
     {
         StorySlide::deleteAll('story_id = :story AND kind = :kind', [':story' => $storyId, ':kind' => SlideKind::FINAL_SLIDE]);
+    }
+
+    public function jsonFromStory(string $slideData, string $storyUrl): string
+    {
+        $reader = new HTMLReader($slideData);
+        $story = $reader->load();
+        $slides = [];
+        foreach ($story->getSlides() as $slide) {
+            $text = [];
+            $images = [];
+            foreach ($slide->getBlocks() as $block) {
+                if ($block->getType() === AbstractBlock::TYPE_TEXT || $block->getType() === AbstractBlock::TYPE_HEADER) {
+                    $text[] = $block->getText();
+                }
+                if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
+                    $path = $block->getFilePath();
+                    if (strpos($path, 'http') === false) {
+                        $path = Url::homeUrl() . $path;
+                    }
+                    $images[] = $path;
+                }
+            }
+            if (count($text) > 0) {
+                $slideModel = StorySlide::findOne($slide->getId());
+                if ($slideModel === null) {
+                    throw new NotFoundHttpException("Слайд не найден");
+                }
+                $slides[] = [
+                    "content" => implode(PHP_EOL, $text),
+                    "slide_url" => $storyUrl . ($slideModel->number === 1 ? "" : "#/" . $slideModel->number),
+                    "images" => $images,
+                ];
+            }
+        }
+        return json_encode($slides, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
     }
 }

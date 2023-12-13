@@ -29,6 +29,7 @@ $this->registerJs($this->renderFile('@backend/views/story/_repetition.js'));
             ['label' => 'Выгрузить файл', 'url' => ['/story/download', 'id' => $model->id]],
             //['label' => 'Read only история', 'url' => ['/story/readonly', 'id' => $model->id], 'linkOptions' => ['id' => 'readonly-story']],
             ['label' => 'Текст истории', 'url' => ['/story/text', 'id' => $model->id]],
+            ['label' => 'Экспорт в JSON', 'url' => ['/story/json', 'id' => $model->id]],
             ['label' => 'Создать список слов (по предложениям)', 'url' => ['/word-list/make-from-story-by-proposals', 'story_id' => $model->id], 'linkOptions' => ['class' => 'story-text']],
             ['label' => 'Создать список слов (по словам)', 'url' => ['/word-list/make-from-story-by-words', 'story_id' => $model->id], 'linkOptions' => ['class' => 'story-text']],
             ['label' => 'Доступ по ссылке', 'url' => '#access-by-link-modal', 'linkOptions' => ['data-toggle' => 'modal']],

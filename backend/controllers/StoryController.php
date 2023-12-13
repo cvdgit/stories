@@ -26,7 +26,7 @@ use backend\models\SourcePowerPointForm;
 
 class StoryController extends BaseController
 {
-    
+
     public $service;
     protected $editorService;
 
@@ -68,12 +68,12 @@ class StoryController extends BaseController
         $model->loadDefaultValues();
         $model->source_id = Story::SOURCE_POWERPOINT;
         $model->category_id = 1;
-        
+
         $coverUploadForm = new StoryCoverUploadForm();
         $fileUploadForm = new StoryFileUploadForm();
-        
+
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            
+
             $coverUploadForm->coverFile = UploadedFile::getInstance($coverUploadForm, 'coverFile');
             if ($coverUploadForm->coverFile !== null) {
                 $model->cover = $coverUploadForm->upload($model->cover);
@@ -335,5 +335,19 @@ class StoryController extends BaseController
             $form->saveEpisodeOrder();
         }
         return ['success' => true];
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionJson(int $id, Response $response): void
+    {
+        $response->format = Response::FORMAT_JSON;
+        $storyModel = Story::findOne($id);
+        if ($storyModel === null) {
+            throw new NotFoundHttpException("История не найдена");
+        }
+        $json = $this->editorService->jsonFromStory($storyModel->slidesData(true), Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $storyModel->alias]));
+        $response->sendContentAsFile($json, $storyModel->alias. '.json');
     }
 }
