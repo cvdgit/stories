@@ -505,6 +505,6 @@ class StoryEditorService
                 ];
             }
         }
-        return json_encode($slides, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
+        return json_encode($slides, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 }
