@@ -347,7 +347,7 @@ class StoryController extends BaseController
         if ($storyModel === null) {
             throw new NotFoundHttpException("История не найдена");
         }
-        $json = $this->editorService->jsonFromStory($storyModel->slidesData(true), Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $storyModel->alias]));
+        $json = $this->editorService->jsonFromStory($storyModel->slidesData(true), Yii::$app->urlManagerFrontend->createAbsoluteUrl(['preview/view', 'alias' => $storyModel->alias]));
         $response->sendContentAsFile($json, $storyModel->alias. '.json');
     }
 }
