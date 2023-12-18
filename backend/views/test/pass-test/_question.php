@@ -262,6 +262,7 @@ JS
                 'replaceDivs' => false,
                 'paragraphize' => false,
                 'linebreaks' => true,
+                'pastePlainText' => true,
             ],
         ]); ?>
 
