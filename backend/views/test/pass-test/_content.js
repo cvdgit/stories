@@ -169,12 +169,11 @@
       });
   }
 
-  /*document.getElementById('content').addEventListener('paste', function(e) {
+  document.getElementById('content').addEventListener('paste', function(e) {
     e.preventDefault();
-    var text = (e.originalEvent || e).clipboardData.getData('text/plain');
-    console.log(text);
+    const text = (e.originalEvent || e).clipboardData.getData('text/plain');
     document.execCommand("insertHTML", false, text);
-  });*/
+  });
 
   const observer = new MutationObserver((mutationRecords) => {
     const content = $('#content').html();
