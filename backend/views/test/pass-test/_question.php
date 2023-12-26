@@ -263,6 +263,7 @@ JS
                 'paragraphize' => false,
                 'linebreaks' => true,
                 'pastePlainText' => true,
+                'shortcuts' => false,
             ],
         ]); ?>
 

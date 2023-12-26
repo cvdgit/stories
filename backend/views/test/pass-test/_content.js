@@ -242,7 +242,9 @@
         $('<span/>', {'class': 'fragment-title'})
           .append(
             $('<a/>', {'href': '#', 'contenteditable': true, class: 'fragment-title__edit'})
-              .on('input', function() { textChangedHandler($(this).html()); })
+              .on('input', function() {
+                textChangedHandler($(this).html());
+              })
               .on('keydown', function(event) {
                 if (event.key === 'Enter') {
                   event.preventDefault();
@@ -404,6 +406,10 @@
             dataWrapper.removeFragment(fragment_id);
           })
       ).appendTo(menu);
+
+      setTimeout(function() {
+        $el.find(".fragment-title__edit:eq(0)").focus();
+      }, 0);
     });
 
   $('#content').on('click', '.dropdown-menu', function(e) {
