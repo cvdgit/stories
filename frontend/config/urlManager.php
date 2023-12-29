@@ -40,6 +40,7 @@ return [
         'favorites/add/<story_id:\d+>' => 'story/add-favorites',
         'stories/skazki-na-noch' => 'story/bedtime-stories',
         'stories/audio' => 'story/audio-stories',
+        'stories/chat' => 'story/chat',
 
         'story/random' => 'story/random',
         'story/like' => 'story/like',

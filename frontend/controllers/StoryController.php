@@ -479,4 +479,10 @@ class StoryController extends Controller
             ->asArray()
         );
     }
+
+    public function actionChat(): string
+    {
+        $this->layout = "chat";
+        return $this->render("chat");
+    }
 }

@@ -112,7 +112,6 @@ TXT;
             Выбери из текста слова, которые, на твой взгляд, определяют его суть.
             Эти слова не должны идти друг за другом в тексте если это не словосочетание.
             Не меняй формы слов. Слова оставляй также, как они написаны в тексте.
-            Слова должны быть написаны также, как они встречаются в тексте.
             $fragmentsPrompt
             Ответь в формате json: ["слово"]
 TEXT
@@ -221,6 +220,59 @@ TEXT
 
         $options = [
             CURLOPT_URL => \Yii::$app->params["gpt.api.completions.host"],
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POSTFIELDS => Json::encode($fields),
+            CURLOPT_HTTPHEADER => [
+                "Content-Type: application/json",
+            ],
+            CURLOPT_WRITEFUNCTION => function($ch, $chunk) {
+                echo $chunk;
+                //sleep(1);
+                flush();
+                return strlen($chunk);
+            },
+        ];
+
+        $ch = curl_init();
+        curl_setopt_array($ch, $options);
+
+        curl_exec($ch);
+
+        $error = curl_error($ch);
+        if ($error !== "") {
+            echo $error;
+        }
+
+        curl_close($ch);
+
+        //$response->statusCode = 404;
+        //$response->data = 'no';
+    }
+
+    public function actionWikids(Request $request, Response $response)
+    {
+        $response->format = Response::FORMAT_RAW;
+        $response->stream = true;
+        $response->isSent = true;
+        \Yii::$app->session->close();
+
+        @ob_end_clean();
+        ini_set('output_buffering', '0');
+        set_time_limit(0);
+
+        header("Content-Type: text/event-stream");
+        header("Cache-Control: no-cache, must-revalidate");
+        header("X-Accel-Buffering: no");
+        header("Connection: keep-alive");
+
+        $question = $request->post("question");
+
+        $fields = [
+            "question" => $question,
+        ];
+
+        $options = [
+            CURLOPT_URL => \Yii::$app->params["gpt.api.wikids.host"],
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POSTFIELDS => Json::encode($fields),
             CURLOPT_HTTPHEADER => [
