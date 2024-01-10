@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use backend\assets\json\JsonPatchAsset;
 use backend\assets\SvgAsset;
 use backend\assets\TestQuestionAsset;
 use backend\models\pass_test\PassTestForm;
@@ -97,6 +98,7 @@ CSS
 SvgAsset::register($this);
 TestQuestionAsset::register($this);
 PanzoomAsset::register($this);
+JsonPatchAsset::register($this);
 
 $this->registerCss(<<<CSS
 .dropdown-submenu {

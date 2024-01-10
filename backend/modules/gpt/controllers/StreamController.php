@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace backend\modules\gpt\controllers;
 
+use Ramsey\Uuid\Uuid;
 use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\Request;
@@ -12,6 +13,7 @@ use yii\web\Response;
 class StreamController extends Controller
 {
     public $enableCsrfValidation = false;
+
     public function actionChat(Request $request, Response $response)
     {
         $response->format = Response::FORMAT_RAW;
@@ -28,21 +30,67 @@ class StreamController extends Controller
         header("X-Accel-Buffering: no");
         header("Connection: keep-alive");
 
+        $text = $request->post("content");
+        $role = $request->post("role");
+        $questions = $request->post("questions");
+        $answers = $request->post("answers");
+
+        $rolesMap = [
+            "business_rx" => "Ты бизнес аналитик с большим опытом работы с системой электронного документооборота Directum RX, которой занимается созданием электронных тестов.",
+            "systems_rx" => "Ты системный аналитик, спроектировавший множество решений для системы электронного документооборота Directum RX, которой занимается созданием электронных тестов.",
+            "history_teacher" => "Ты учитель истории, которой занимается созданием электронных тестов для обучения.",
+            "english_teacher" => "Ты школьный учитель английского языка, которой занимается созданием электронных тестов для обучения.",
+            "biology_teacher" => "Ты школьный учитель биологии, которой занимается созданием электронных тестов для обучения.",
+            "marketer" => "Ты маркетолог с большим опытом, которой занимается созданием электронных тестов для обучения.",
+        ];
+
+        $roleText = $rolesMap[$role] ?? "";
+
+        $content = <<<TEXT
+$roleText
+Проанализируй следующий текст:
+```
+$text
+```
+Сформируй $questions вопросов по получившемуся тексту.
+Вопросы должны быть просто и понятно сформулированы, иметь один или несколько правильных ответов.
+Вопросы должны включать ключевые понятия, основные события, даты, факты и словарные термины.
+Придумай подходящие по смыслу неправильные ответы к вопросам, что бы итоговое количество вариантов ответов было не больше, чем $answers
+Ответь в формате json.
+[{{"question": "текст вопроса",
+"answers": [
+{{"answer": "текст ответа", "correct": "type boolean, правильный или нет"}}
+]
+}}]
+TEXT;
+
+        $message = [
+            "role" => "user",
+            "content" => trim($content),
+        ];
+
         $fields = [
-            "content" => $request->post("content"),
-            "questions" => $request->post("questions"),
-            "answers" => $request->post("answers"),
-            "role" => $request->post("role"),
+            "input" => [
+                "messages" => [
+                    $message,
+                ],
+            ],
+            "config" => [
+                "metadata" => [
+                    "conversation_id" => Uuid::uuid4()->toString(),
+                ],
+            ],
+            "include_names" => [],
         ];
 
         $options = [
-            CURLOPT_URL => \Yii::$app->params["gpt.api.host"],
+            CURLOPT_URL => \Yii::$app->params["gpt.api.completions.host"],
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POSTFIELDS => Json::encode($fields),
             CURLOPT_HTTPHEADER => [
                 "Content-Type: application/json",
             ],
-            CURLOPT_WRITEFUNCTION => function($ch, $chunk) {
+            CURLOPT_WRITEFUNCTION => function ($ch, $chunk) {
                 echo $chunk;
                 //sleep(1);
                 flush();
@@ -98,7 +146,7 @@ class StreamController extends Controller
         $roleText = $rolesMap[$role] ?? "";
         $fragmentsPrompt = "";
         if (!empty($fragments)) {
-            $fragmentsText = implode(", ", array_map(static function(string $f) {
+            $fragmentsText = implode(", ", array_map(static function (string $f) {
                 return '"' . $f . '"';
             }, $fragments));
             $fragmentsPrompt = <<<TXT
@@ -114,8 +162,7 @@ TXT;
             Не меняй формы слов. Слова оставляй также, как они написаны в тексте.
             $fragmentsPrompt
             Ответь в формате json: ["слово"]
-TEXT
-;
+TEXT;
 
         $message = [
             "role" => "user",
@@ -123,9 +170,17 @@ TEXT
         ];
 
         $fields = [
-            "messages" => [
-                $message,
+            "input" => [
+                "messages" => [
+                    $message,
+                ],
             ],
+            "config" => [
+                "metadata" => [
+                    "conversation_id" => Uuid::uuid4()->toString(),
+                ],
+            ],
+            "include_names" => [],
         ];
 
         $options = [
@@ -135,7 +190,7 @@ TEXT
             CURLOPT_HTTPHEADER => [
                 "Content-Type: application/json",
             ],
-            CURLOPT_WRITEFUNCTION => function($ch, $chunk) {
+            CURLOPT_WRITEFUNCTION => function ($ch, $chunk) {
                 echo $chunk;
                 //sleep(1);
                 flush();
@@ -204,8 +259,7 @@ TEXT
             Проанализируй эти слова (словосочетания) и для каждого придумай по 3 неправильных, подходящих по смыслу ответа.
             Если у тебя нет информации о каких-нибудь словах, то исключи их из списка.
             Ответь в формате json: [{{"question": "слово из списка", "answers": ["неправильный ответ 1", "неправильный ответ 2"]}}]
-TEXT
-        ;
+TEXT;
 
         $message = [
             "role" => "user",
@@ -213,9 +267,17 @@ TEXT
         ];
 
         $fields = [
-            "messages" => [
-                $message,
+            "input" => [
+                "messages" => [
+                    $message,
+                ],
             ],
+            "config" => [
+                "metadata" => [
+                    "conversation_id" => Uuid::uuid4()->toString(),
+                ],
+            ],
+            "include_names" => [],
         ];
 
         $options = [
@@ -225,7 +287,7 @@ TEXT
             CURLOPT_HTTPHEADER => [
                 "Content-Type: application/json",
             ],
-            CURLOPT_WRITEFUNCTION => function($ch, $chunk) {
+            CURLOPT_WRITEFUNCTION => function ($ch, $chunk) {
                 echo $chunk;
                 //sleep(1);
                 flush();
@@ -265,11 +327,7 @@ TEXT
         header("X-Accel-Buffering: no");
         header("Connection: keep-alive");
 
-        $question = $request->post("question");
-
-        $fields = [
-            "question" => $question,
-        ];
+        $fields = $request->post();
 
         $options = [
             CURLOPT_URL => \Yii::$app->params["gpt.api.wikids.host"],
@@ -278,7 +336,7 @@ TEXT
             CURLOPT_HTTPHEADER => [
                 "Content-Type: application/json",
             ],
-            CURLOPT_WRITEFUNCTION => function($ch, $chunk) {
+            CURLOPT_WRITEFUNCTION => function ($ch, $chunk) {
                 echo $chunk;
                 //sleep(1);
                 flush();

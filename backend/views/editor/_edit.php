@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use backend\assets\json\JsonPatchAsset;
 use backend\assets\StoryEditorAsset;
 use backend\widgets\BackendRevealWidget;
 use common\models\Story;
@@ -18,6 +19,7 @@ use yii\web\View;
  */
 
 StoryEditorAsset::register($this);
+JsonPatchAsset::register($this);
 $this->registerJs($this->renderFile("@backend/views/editor/_gpt_slide_text.js"));
 ?>
 <div class="wrap-editor">

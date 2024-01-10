@@ -183,7 +183,7 @@ class ChatController extends Controller
         return ["success" => true];
     }
 
-    public function actionSend(Request $request, Response $response)
+    public function actionSend(Request $request, Response $response): void
     {
         $response->format = Response::FORMAT_RAW;
         $response->stream = true;
@@ -207,6 +207,7 @@ class ChatController extends Controller
             CURLOPT_POSTFIELDS => Json::encode($fields),
             CURLOPT_HTTPHEADER => [
                 "Content-Type: application/json",
+                "Accept: text/event-stream",
             ],
             CURLOPT_WRITEFUNCTION => function($ch, $chunk) {
                 echo $chunk;

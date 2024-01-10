@@ -26,14 +26,39 @@ function GptSlideText() {
     var reader = response.body.getReader();
     var decoder = new TextDecoder('utf-8');
 
+    let streamedResponse = {}
     while (true) {
       const { done, value } = await reader.read();
       if (done) {
         break;
       }
       const decoded = decoder.decode(value, {stream: true});
-      document.getElementById("gpt-result").innerText += decoded;
-      document.getElementById("gpt-result").scrollTop = document.getElementById("gpt-result").scrollHeight;
+
+      decoded.split("\r\n\r\n").map(row => {
+        if (!row.length) {
+          return;
+        }
+
+        const [firstRow, secondRow] = row.split("\n");
+        const [, event] = firstRow.split(" ")
+
+        if (event && event.trim() === "data") {
+          const data = secondRow.toString().replace(/^data: /, "")
+          if (data) {
+            const chunk = JSON.parse(data);
+
+            streamedResponse = jsonpatch.applyPatch(
+              streamedResponse,
+              chunk.ops,
+            ).newDocument;
+
+            if (Array.isArray(streamedResponse?.streamed_output)) {
+              document.getElementById("gpt-result").innerText = streamedResponse.streamed_output.join("");
+              document.getElementById("gpt-result").scrollTop = document.getElementById("gpt-result").scrollHeight;
+            }
+          }
+        }
+      })
     }
 
     return response;

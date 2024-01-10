@@ -1,5 +1,22 @@
 (function() {
 
+  function generateUUID() {
+    var d = new Date().getTime();
+    var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now() * 1000)) || 0;
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16;
+      if (d > 0) {
+        r = (d + r) % 16 | 0;
+        d = Math.floor(d / 16);
+      }
+      else {
+        r = (d2 + r) % 16 | 0;
+        d2 = Math.floor(d2 / 16);
+      }
+      return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+  }
+
   async function sendMessage(element, question) {
 
     var response = await fetch('/admin/index.php?r=gpt/stream/wikids', {
@@ -8,7 +25,16 @@
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        question
+        input: {
+          question,
+          chat_history: [],
+        },
+        config: {
+          metadata: {
+            conversation_id: generateUUID(),
+          },
+        },
+        include_names: ["FindDocs"],
       })
     });
 
@@ -21,37 +47,64 @@
     var reader = response.body.getReader();
     var decoder = new TextDecoder('utf-8');
 
+    let streamedResponse = {}
+    let foundSources = false;
     while (true) {
-      const { done, value } = await reader.read();
+
+      const {done, value} = await reader.read();
       if (done) {
         break;
       }
 
-      let decoded = decoder.decode(value, {stream: true});
+      let decoded = decoder.decode(value);
 
-      try {
-        const meta = JSON.parse(decoded)
+      decoded.split("\r\n\r\n").map(row => {
+        if (!row.length) {
+          return;
+        }
 
-        const exists = [];
-        meta.map(item => {
-          if (!exists.includes(item.source)) {
-            exists.push(item.source)
-            if (item.images) {
-              const div = document.createElement("div")
-              div.innerHTML = `
-                <a target="_blank" href="${item.source}"><img width="300" src="${item.images}" /></a>
-              `
-              element.querySelector(".message-images").appendChild(div)
+        const [firstRow, secondRow] = row.split("\n");
+        const [, event] = firstRow.split(" ")
+
+        if (event && event.trim() === "data") {
+          const data = secondRow.toString().replace(/^data: /, "")
+          if (data) {
+            const chunk = JSON.parse(data);
+
+            streamedResponse = jsonpatch.applyPatch(
+              streamedResponse,
+              chunk.ops,
+            ).newDocument;
+
+            if (Array.isArray(streamedResponse?.logs?.["FindDocs"]?.final_output?.output) && !foundSources) {
+              foundSources = true
+              if (element.querySelector(".message-images").innerHTML === "") {
+                const exists = [];
+                streamedResponse.logs["FindDocs"].final_output.output.map((doc) => {
+                  if (!exists.includes(doc.metadata.source)) {
+                    exists.push(doc.metadata.source)
+                    const div = document.createElement("div")
+                    div.innerHTML = `
+                    <a target="_blank" href="${doc.metadata.source}"><img width="300" src="${doc.metadata.images}" /></a>
+                  `
+                    element.querySelector(".message-images").appendChild(div)
+                    container.scrollTop = container.scrollHeight
+                  }
+                });
+              }
+            }
+
+            if (streamedResponse.id !== undefined) {
+              //runId = streamedResponse.id;
+            }
+
+            if (Array.isArray(streamedResponse?.streamed_output)) {
+              element.querySelector(".message-content").innerHTML = streamedResponse.streamed_output.join("");
               container.scrollTop = container.scrollHeight
             }
           }
-        })
-        decoded = ""
-      } catch (e) {
-      }
-
-      element.querySelector(".message-content").innerHTML += decoded
-      container.scrollTop = container.scrollHeight
+        }
+      })
     }
 
     return response;

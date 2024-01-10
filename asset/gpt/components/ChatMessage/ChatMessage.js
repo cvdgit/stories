@@ -63,7 +63,6 @@ export function MessageItem(props) {
 export function MessageBar() {
   const {sendMessage, setMessage, is, options, setIs, typingMessage, clearTyping, stopResponse} = useGlobal()
   useSendKey(sendMessage, options.general.command)
-  console.log(typingMessage);
   return (
     <div className="message-bar">
       {is.thinking && (

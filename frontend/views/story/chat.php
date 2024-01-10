@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use backend\assets\json\JsonPatchAsset;
 use yii\web\View;
 
 /**
@@ -248,6 +249,7 @@ button,input,optgroup,select,textarea {
 CSS
 );
 
+JsonPatchAsset::register($this);
 $this->registerJs($this->renderFile("@frontend/views/story/_chat.js"));
 ?>
 <div style="display: flex; padding: 32px; flex-direction: column; height: 100%">

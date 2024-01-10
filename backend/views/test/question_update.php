@@ -1,7 +1,9 @@
 <?php
+
+declare(strict_types=1);
+
 use backend\widgets\QuestionManageWidget;
-use yii\bootstrap\Nav;
-use yii\helpers\Html;
+
 /* @var $this yii\web\View */
 /* @var $model backend\models\question\UpdateQuestion */
 /* @var $dataProvider yii\data\ActiveDataProvider */
