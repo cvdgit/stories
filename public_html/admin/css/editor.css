@@ -498,6 +498,8 @@ body {
     justify-content: flex-end;
     padding-bottom: 20px;
     font-weight: 500;
+  position: absolute;
+  z-index: 99999;
 }
 
 .wrap-editor-main .sl-block .wikids-video-player,
@@ -897,4 +899,8 @@ body {
   padding: 0;
   margin-bottom: 3px;
   border: 0;
+}
+
+.goto-test {
+  text-decoration: underline;
 }

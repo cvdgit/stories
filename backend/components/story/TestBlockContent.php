@@ -37,7 +37,9 @@ class TestBlockContent
         foreach ($params as $paramName => $paramValue) {
             $options['data-' . $paramName] = $paramValue;
         }
-        return Html::tag('div', $content, $options);
+
+        $link = Html::a($content, ["/test/update", "id" => $this->testID], ["data-toggle" => "tooltip", "title" => "Редактировать тест", "target" => "_blank", "class" => "goto-test"]);
+        return Html::tag('div', $link, $options);
     }
 
     /**

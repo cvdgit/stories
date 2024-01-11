@@ -371,7 +371,7 @@ $js = <<< JS
         }
     });
 
-    $('[data-editor-show=slide').on('click', function() {
+    $('[data-editor-show=slide]').on('click', function() {
         window.open(StoryEditor.getSlidePreviewUrl(), 'target=_blank');
     });
 })();

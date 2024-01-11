@@ -38,6 +38,7 @@ class PassTestForm extends Model
         parent::init();
         $this->name = 'Выберите правильный ответ из вариантов, предложенных в списке';
         $this->view = 0;
+        $this->max_prev_items = 5;
     }
 
     public function rules(): array

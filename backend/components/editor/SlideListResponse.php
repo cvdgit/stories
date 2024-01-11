@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\components\editor;
 
 use backend\components\SlideModifier;
 use common\models\StorySlide;
+use Exception;
 
 class SlideListResponse
 {
-
     private $slide;
     private $slideModifier;
 
@@ -18,9 +20,7 @@ class SlideListResponse
         $slideData = '';
         try {
             $slideData = $slide->getSlideOrLinkData();
-        }
-        catch (\Exception $ex) {
-
+        } catch (Exception $ex) {
         }
 
         $this->slideModifier = new SlideModifier($slide->id, $slideData);

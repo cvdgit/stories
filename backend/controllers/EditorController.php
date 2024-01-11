@@ -25,6 +25,7 @@ use common\models\StorySlide;
 use DomainException;
 use Exception;
 use Yii;
+use Yii\base\InvalidConfigException;
 use yii\filters\AccessControl;
 use common\models\Story;
 use common\services\StoryService;
@@ -273,10 +274,17 @@ class EditorController extends BaseController
         return $response;
     }
 
-    public function actionSlides(int $story_id)
+    /**
+     * @throws NotFoundHttpException
+     * @throws InvalidConfigException
+     */
+    public function actionSlides(int $story_id, Response $response): array
     {
-        Yii::$app->response->format = Response::FORMAT_JSON;
+        $response->format = Response::FORMAT_JSON;
         $model = $this->findModel(Story::class, $story_id);
+        if ($model === null) {
+            return [];
+        }
         return array_map(static function(StorySlide $slide) {
             return (new SlideListResponse($slide))->asArray();
         }, $model->storySlides);
