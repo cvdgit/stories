@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace backend\Story\Tests\StoryTests;
 
+use backend\components\StoryBreadcrumbsBuilder;
 use backend\components\StorySideBarMenuItemsBuilder;
 use backend\Story\Tests\StorySourceTestsFetcher;
 use common\models\Story;
@@ -38,7 +39,9 @@ class StoryTestsAction extends Action
         return $this->controller->render('index', [
             "dataProvider" => $dataProvider,
             "sidebarMenuItems" => (new StorySideBarMenuItemsBuilder($storyModel))->build(),
+            "breadcrumbs" => (new StoryBreadcrumbsBuilder($storyModel, "Тесты из истории"))->build(),
             "storyId" => $storyModel->id,
+            "title" => "Тесты из истории",
         ]);
     }
 }

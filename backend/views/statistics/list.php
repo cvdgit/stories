@@ -1,24 +1,28 @@
 <?php
+
+declare(strict_types=1);
+
+use common\models\Story;
 use yii\helpers\Html;
 use yii\web\JsExpression;
 use yii\helpers\Url;
 use dosamigos\chartjs\ChartJs;
-/* @var $this yii\web\View */
-/* @var $searchModel common\models\CategorySearch */
-/* @var $dataProvider yii\data\ActiveDataProvider */
-/** @var $model common\models\Story */
-$this->title = 'Статистика: ' . $model->title;
-$this->params['breadcrumbs'] = [
-    ['label' => 'Список историй', 'url' => ['index']],
-    ['label' => $model->title, 'url' => Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $model->alias]), 'target' => '_blank'],
-    $this->title,
-];
-$this->params['sidebarMenuItems'] = [
-    ['label' => $model->title, 'url' => ['story/update', 'id' => $model->id]],
-    ['label' => 'Редактор', 'url' => ['editor/edit', 'id' => $model->id]],
-    ['label' => 'Статистика', 'url' => ['statistics/list', 'id' => $model->id]],
-    ['label' => 'Озвучка', 'url' => ['audio/index', 'story_id' => $model->id]],
-];
+use yii\web\View;
+
+/**
+ * @var View $this
+ * @var Story $model
+ * @var array $chartData
+ * @var array $chartData2
+ * @var array $chartData3
+ * @var array $sidebarMenuItems
+ * @var array $breadcrumbs
+ * @var string $title
+ */
+
+$this->params = array_merge($this->params, $sidebarMenuItems);
+$this->params = array_merge($this->params, $breadcrumbs);
+$this->title = $title;
 
 $url = Url::to(['/editor/edit', 'id' => $model->id]);
 $js = <<< JS

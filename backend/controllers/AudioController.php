@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\controllers;
 
+use backend\components\StoryBreadcrumbsBuilder;
+use backend\components\StorySideBarMenuItemsBuilder;
 use backend\models\audio\AudioUploadForm;
 use backend\models\audio\CreateAudioForm;
 use backend\models\audio\UpdateAudioForm;
@@ -21,16 +25,15 @@ use yii\web\UploadedFile;
 
 class AudioController extends Controller
 {
-
-    protected $audioService;
+    private $audioService;
 
     public function __construct($id, $module, StoryAudioService $audioService, $config = [])
     {
-        $this->audioService = $audioService;
         parent::__construct($id, $module, $config);
+        $this->audioService = $audioService;
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
@@ -45,13 +48,17 @@ class AudioController extends Controller
         ];
     }
 
-    public function actionIndex(int $story_id)
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionIndex(int $story_id): string
     {
-        $model = Story::findModel($story_id);
-        $query = StoryAudioTrack::find();
-        $query->andFilterWhere(['story_id' => $story_id]);
+        $model = Story::findOne($story_id);
+        if ($model === null) {
+            throw new NotFoundHttpException("История не найдена");
+        }
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,
+            'query' => StoryAudioTrack::find()->andWhere(['story_id' => $story_id]),
             'pagination' => [
                 'pageSize' => 50,
             ],
@@ -62,6 +69,9 @@ class AudioController extends Controller
         return $this->render('index', [
             'model' => $model,
             'dataProvider' => $dataProvider,
+            "sidebarMenuItems" => (new StorySideBarMenuItemsBuilder($model))->build(),
+            "breadcrumbs" => (new StoryBreadcrumbsBuilder($model, 'Озвучка: ' . $model->title))->build(),
+            "title" => 'Озвучка: ' . $model->title,
         ]);
     }
 

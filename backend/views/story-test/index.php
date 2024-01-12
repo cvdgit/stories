@@ -12,11 +12,14 @@ use yii\web\View;
  * @var View $this
  * @var DataProviderInterface $dataProvider
  * @var array $sidebarMenuItems
+ * @var array $breadcrumbs
  * @var int $storyId
+ * @var string $title
  */
 
 $this->params = array_merge($this->params, $sidebarMenuItems);
-$this->title = "Тесты из истории";
+$this->params = array_merge($this->params, $breadcrumbs);
+$this->title = $title;
 $this->registerJs($this->renderFile('@backend/views/story-test/index.js'));
 ?>
 <div>
