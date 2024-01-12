@@ -11,7 +11,6 @@ use yii\web\NotFoundHttpException;
 
 class BaseController extends Controller
 {
-
     /**
      * @template T
      * @param class-string<T> $modelClassName
@@ -19,7 +18,7 @@ class BaseController extends Controller
      * @throws InvalidConfigException
      * @return T
      */
-    public function findModel(string $modelClassName, int $id): ?object
+    public function findModel(string $modelClassName, int $id): object
     {
         $modelObject = Yii::createObject($modelClassName);
         if (($model = $modelObject::findOne($id)) !== null) {
@@ -27,5 +26,4 @@ class BaseController extends Controller
         }
         throw new NotFoundHttpException('The requested page does not exist.');
     }
-
 }

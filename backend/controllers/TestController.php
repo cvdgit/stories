@@ -88,6 +88,7 @@ class TestController extends Controller
         $model->source = $source;
         $model->created_by = Yii::$app->user->id;
         $model->answer_type = AnswerType::DEFAULT;
+        $model->repeat = 1;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['update', 'id' => $model->id]);

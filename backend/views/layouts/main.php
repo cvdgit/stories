@@ -58,8 +58,9 @@ AppAsset::register($this);
                 <?php if (isset($this->params['sidebarMenuItems']) && count($this->params['sidebarMenuItems']) > 0): ?>
                 <?= Nav::widget([
                     'options' => ['class' => 'nav-sidebar'],
-                    'items' => $this->params['sidebarMenuItems'],
+                    'items' => array_merge(["<li style='padding: 10px 20px'>Меню истории:</li>"], $this->params['sidebarMenuItems']),
                 ]) ?>
+                <div style="border-bottom: 2px #808080 solid; margin-bottom: 20px"></div>
                 <?php endif ?>
                 <?php if (Yii::$app->user->can(UserRoles::PERMISSION_ADMIN_PANEL)): ?>
                 <?= Nav::widget([
