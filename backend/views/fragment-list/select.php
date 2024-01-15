@@ -74,12 +74,11 @@ CSS
             <div>
                 <ul id="selected-items-list" class="list-group list-group-flush"></ul>
             </div>
+            <div>
+                <button id="create-fragment-list" type="button" class="btn btn-primary">Вставить список</button>
+            </div>
         </div>
     </div>
 </div>
 
 <?php Pjax::end(); ?>
-
-<div>
-    <button id="create-fragment-list" type="button" class="btn btn-primary">Вставить список</button>
-</div>

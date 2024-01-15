@@ -66,7 +66,7 @@
 
     const $content = $(this);
 
-    $content.find('#create-fragment-list').on('click', function(e) {
+    $content.on('click', '#create-fragment-list', function(e) {
 
       if (selectedItems.isEmpty()) {
         toastr.info('Итоговый список пуст');
