@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace backend\modules\gpt\controllers;
 
+use backend\modules\gpt\EventStream;
 use Ramsey\Uuid\Uuid;
+use Yii;
 use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\Request;
@@ -12,6 +14,17 @@ use yii\web\Response;
 
 class StreamController extends Controller
 {
+    /**
+     * @var EventStream
+     */
+    private $eventStream;
+
+    public function __construct($id, $module, EventStream $eventStream, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->eventStream = $eventStream;
+    }
+
     public $enableCsrfValidation = false;
 
     public function actionChat(Request $request, Response $response)
@@ -19,7 +32,7 @@ class StreamController extends Controller
         $response->format = Response::FORMAT_RAW;
         $response->stream = true;
         $response->isSent = true;
-        \Yii::$app->session->close();
+        Yii::$app->session->close();
 
         @ob_end_clean();
         ini_set('output_buffering', '0');
@@ -84,7 +97,7 @@ TEXT;
         ];
 
         $options = [
-            CURLOPT_URL => \Yii::$app->params["gpt.api.completions.host"],
+            CURLOPT_URL => Yii::$app->params["gpt.api.completions.host"],
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POSTFIELDS => Json::encode($fields),
             CURLOPT_HTTPHEADER => [
@@ -119,50 +132,50 @@ TEXT;
         $response->format = Response::FORMAT_RAW;
         $response->stream = true;
         $response->isSent = true;
-        \Yii::$app->session->close();
+        Yii::$app->session->close();
 
-        @ob_end_clean();
-        ini_set('output_buffering', '0');
-        set_time_limit(0);
+        $prompt = $request->post("prompt");
 
-        header("Content-Type: text/event-stream");
-        header("Cache-Control: no-cache, must-revalidate");
-        header("X-Accel-Buffering: no");
-        header("Connection: keep-alive");
+        if ($prompt) {
+            $content = $prompt;
+        } else {
+            $text = $request->post("content");
+            $role = $request->post("role");
+            $fragments = $request->post("fragments");
 
-        $text = $request->post("content");
-        $role = $request->post("role");
-        $fragments = $request->post("fragments");
+            $rolesMap = [
+                "business_rx" => "Ты бизнес аналитик с большим опытом работы с системой электронного документооборота Directum RX, которой занимается созданием электронных тестов.",
+                "systems_rx" => "Ты системный аналитик, спроектировавший множество решений для системы электронного документооборота Directum RX, которой занимается созданием электронных тестов.",
+                "history_teacher" => "Ты учитель истории, которой занимается созданием электронных тестов для обучения.",
+                "english_teacher" => "Ты школьный учитель английского языка, которой занимается созданием электронных тестов для обучения.",
+                "biology_teacher" => "Ты школьный учитель биологии, которой занимается созданием электронных тестов для обучения.",
+                "marketer" => "Ты маркетолог с большим опытом, которой занимается созданием электронных тестов для обучения.",
+            ];
 
-        $rolesMap = [
-            "business_rx" => "Ты бизнес аналитик с большим опытом работы с системой электронного документооборота Directum RX, которой занимается созданием электронных тестов.",
-            "systems_rx" => "Ты системный аналитик, спроектировавший множество решений для системы электронного документооборота Directum RX, которой занимается созданием электронных тестов.",
-            "history_teacher" => "Ты учитель истории, которой занимается созданием электронных тестов для обучения.",
-            "english_teacher" => "Ты школьный учитель английского языка, которой занимается созданием электронных тестов для обучения.",
-            "biology_teacher" => "Ты школьный учитель биологии, которой занимается созданием электронных тестов для обучения.",
-            "marketer" => "Ты маркетолог с большим опытом, которой занимается созданием электронных тестов для обучения.",
-        ];
-
-        $roleText = $rolesMap[$role] ?? "";
-        $fragmentsPrompt = "";
-        if (!empty($fragments)) {
-            $fragmentsText = implode(", ", array_map(static function (string $f) {
-                return '"' . $f . '"';
-            }, $fragments));
-            $fragmentsPrompt = <<<TXT
-            Исключи слова: $fragmentsText
+            $roleText = $rolesMap[$role] ?? "";
+            $fragmentsPrompt = "";
+            if (!empty($fragments)) {
+                $fragmentsText = implode(", ", array_map(static function (string $f) {
+                    return '"' . $f . '"';
+                }, $fragments));
+                $fragmentsPrompt = <<<TXT
+Исключи слова: $fragmentsText
 TXT;
-        }
+            }
 
-        $content = <<<TEXT
-            $roleText
-            Проанализируй текст: $text.
-            Выбери из текста слова, которые, на твой взгляд, определяют его суть.
-            Эти слова не должны идти друг за другом в тексте если это не словосочетание.
-            Не меняй формы слов. Слова оставляй также, как они написаны в тексте.
-            $fragmentsPrompt
-            Ответь в формате json: ["слово"]
+            $content = <<<TEXT
+$roleText
+Проанализируй следующий текст:
+```
+$text
+```
+Выбери из текста слова, которые, на твой взгляд, определяют его суть.
+Эти слова не должны идти друг за другом в тексте если это не словосочетание.
+Не меняй формы слов. Слова оставляй также, как они написаны в тексте.
+$fragmentsPrompt
+Ответь в формате json: ["слово"]
 TEXT;
+        }
 
         $message = [
             "role" => "user",
@@ -183,35 +196,32 @@ TEXT;
             "include_names" => [],
         ];
 
-        $options = [
-            CURLOPT_URL => \Yii::$app->params["gpt.api.completions.host"],
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POSTFIELDS => Json::encode($fields),
-            CURLOPT_HTTPHEADER => [
-                "Content-Type: application/json",
+        @ob_end_clean();
+        ini_set('output_buffering', '0');
+        //set_time_limit(0);
+
+        header("Content-Type: text/event-stream");
+        header("Cache-Control: no-cache, must-revalidate");
+        header("X-Accel-Buffering: no");
+        header("Connection: keep-alive");
+
+        echo "event: data\r\n";
+
+        $ops = [
+            "ops" => [
+                [
+                    "op" => "replace",
+                    "path" => "",
+                    "value" => [
+                        "prompt_text" => $content,
+                    ],
+                ],
             ],
-            CURLOPT_WRITEFUNCTION => function ($ch, $chunk) {
-                echo $chunk;
-                //sleep(1);
-                flush();
-                return strlen($chunk);
-            },
         ];
+        echo 'data: ' . Json::encode($ops) . "\r\n";
+        flush();
 
-        $ch = curl_init();
-        curl_setopt_array($ch, $options);
-
-        curl_exec($ch);
-
-        $error = curl_error($ch);
-        if ($error !== "") {
-            echo $error;
-        }
-
-        curl_close($ch);
-
-        //$response->statusCode = 404;
-        //$response->data = 'no';
+        $this->eventStream->send(Yii::$app->params["gpt.api.completions.host"], Json::encode($fields));
     }
 
     public function actionPassTestIncorrectChat(Request $request, Response $response)
@@ -219,7 +229,7 @@ TEXT;
         $response->format = Response::FORMAT_RAW;
         $response->stream = true;
         $response->isSent = true;
-        \Yii::$app->session->close();
+        Yii::$app->session->close();
 
         @ob_end_clean();
         ini_set('output_buffering', '0');
@@ -281,7 +291,7 @@ TEXT;
         ];
 
         $options = [
-            CURLOPT_URL => \Yii::$app->params["gpt.api.completions.host"],
+            CURLOPT_URL => Yii::$app->params["gpt.api.completions.host"],
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POSTFIELDS => Json::encode($fields),
             CURLOPT_HTTPHEADER => [
@@ -316,7 +326,7 @@ TEXT;
         $response->format = Response::FORMAT_RAW;
         $response->stream = true;
         $response->isSent = true;
-        \Yii::$app->session->close();
+        Yii::$app->session->close();
 
         @ob_end_clean();
         ini_set('output_buffering', '0');
@@ -330,7 +340,7 @@ TEXT;
         $fields = $request->post();
 
         $options = [
-            CURLOPT_URL => \Yii::$app->params["gpt.api.wikids.host"],
+            CURLOPT_URL => Yii::$app->params["gpt.api.wikids.host"],
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POSTFIELDS => Json::encode($fields),
             CURLOPT_HTTPHEADER => [

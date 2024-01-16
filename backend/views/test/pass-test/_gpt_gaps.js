@@ -2,7 +2,7 @@
 
   const modal = new SimpleModal({id: "gpt-gaps-modal", title: "Генерация пропусков"});
 
-  async function sendMessage(content, role, fragments) {
+  async function sendMessage(content, role, fragments, prompt) {
 
     const response = await fetch('/admin/index.php?r=gpt/stream/pass-test-chat', {
       method: 'POST',
@@ -12,7 +12,8 @@
       body: JSON.stringify({
         content,
         role,
-        fragments
+        fragments,
+        prompt
       })
     });
 
@@ -42,6 +43,7 @@
         const [, event] = firstRow.split(" ")
 
         if (event && event.trim() === "data") {
+
           const data = secondRow.toString().replace(/^data: /, "")
           if (data) {
             const chunk = JSON.parse(data);
@@ -50,6 +52,12 @@
               streamedResponse,
               chunk.ops,
             ).newDocument;
+
+            if (streamedResponse?.prompt_text) {
+              document.getElementById("gpt-prompt-wrap").style.display = "block";
+              document.getElementById("gpt-prompt").innerText = streamedResponse.prompt_text;
+              document.getElementById("gpt-send-with-prompt").style.display = "inline-block"
+            }
 
             if (Array.isArray(streamedResponse?.streamed_output)) {
               document.getElementById("gpt-result").innerText = streamedResponse.streamed_output.join("");
@@ -108,27 +116,40 @@
 
   const $body = $(`
 <div class="row">
-      <div class="col-md-12">
-        <label for="gpt-role">Роль:</label>
-        <select name="" id="gpt-role">
-          <option value="">Без роли</option>
-          <option value="business_rx">Бизнес аналитик RX</option>
-          <option value="systems_rx">Системный аналитик RX</option>
-          <option value="marketer">Маркетолог</option>
-          <option value="history_teacher">Школьный учитель истории</option>
-          <option value="english_teacher">Школьный учитель английского</option>
-          <option value="biology_teacher">Школьный учитель биологии</option>
-        </select>
+  <div class="col-md-12">
+    <label for="gpt-role">Роль:</label>
+    <select name="" id="gpt-role">
+      <option value="">Без роли</option>
+      <option value="business_rx">Бизнес аналитик RX</option>
+      <option value="systems_rx">Системный аналитик RX</option>
+      <option value="marketer">Маркетолог</option>
+      <option value="history_teacher">Школьный учитель истории</option>
+      <option value="english_teacher">Школьный учитель английского</option>
+      <option value="biology_teacher">Школьный учитель биологии</option>
+    </select>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <div id="gpt-prompt-wrap" style="display: none">
+      <div style="padding: 10px 0"><a id="gpt-prompt-show" href="#">Show prompt</a></div>
+      <div>
+        <div contenteditable="plaintext-only" style="display: none; margin-bottom: 20px" id="gpt-prompt"></div>
       </div>
     </div>
+  </div>
+</div>
       <div class="row">
         <div class="col-md-12">
           <div id="gpt-result" style="height: 500px; overflow-y: auto; border: 1px solid #ccc; padding: 10px"></div>
          </div>
       </div>
       <div style="padding: 10px; display: flex; align-items: center; justify-content: space-between; flex-direction: row">
-        <button id="gpt-send" type="button" class="btn btn-primary">Отправить запрос</button>
-        <button id="gpt-create-questions" style="display: none" type="button" class="btn btn-success">Добавить пропуски</button>
+        <div>
+          <button id="gpt-send" type="button" class="btn btn-primary">Отправить запрос</button>
+          <button id="gpt-send-with-prompt" type="button" class="btn btn-primary">Отправить запрос с промтом</button>
+        </div>
+        <button id="gpt-insert-gaps" style="display: none" type="button" class="btn btn-success">Добавить пропуски</button>
         <img id="gpt-loader" style="display: none" src="/img/loading.gif" width="30" alt="">
       </div>
     `);
@@ -139,10 +160,20 @@
 
     const content = $('#content').text().replace(/\s+/g, " ");
 
-    //$body.find("#gpt-message").text(content.toString().trim());
     $body.find("#gpt-result").text("");
-    $body.find("#gpt-create-questions").css("display", "none");
-    $body.find("#gpt-loader").css("display", "none");
+    [
+      $body.find("#gpt-insert-gaps"),
+      $body.find("#gpt-loader"),
+      $body.find("#gpt-prompt-wrap"),
+      $body.find("#gpt-send-with-prompt")
+    ].map(el => el.hide())
+
+    modal.getElement()
+      .off("click", "#gpt-prompt-show")
+      .on("click", "#gpt-prompt-show", function(e) {
+        e.preventDefault()
+        modal.getElement().find("#gpt-prompt").show()
+      })
 
     modal.getElement()
       .off("click", "#gpt-send")
@@ -155,10 +186,10 @@
         }
 
         const $btn = $(this);
-        $btn.prop("disabled", true);
-        //$body.find("#gpt-message").prop("disabled", true);
 
-        $body.find("#gpt-create-questions").hide();
+        $btn.prop("disabled", true);
+        $body.find("#gpt-send-with-prompt").prop("disabled", true);
+        $body.find("#gpt-insert-gaps").hide();
         $body.find("#gpt-result").empty();
         $body.find("#gpt-loader").show();
 
@@ -173,23 +204,78 @@
         fragments = [...new Set(fragments)];
 
         const response = sendMessage(message, role, fragments);
+
         response.then(data => {
           if (data.ok) {
-            $body.find("#gpt-loader").hide();
-            //$body.find("#gpt-create-questions").show();
-            //$body.find("#gpt-message").prop("disabled", false);
+            $body.find("#gpt-loader").hide()
+            $body.find("#gpt-insert-gaps").show()
+          }
 
-            try {
-              const json = JSON.parse($body.find("#gpt-result").text());
-              replaceFragments(json);
-              modal.hide();
-            } catch (ex) {
-
-            }
+          if ($body.find("#gpt-send-with-prompt").is(":visible")) {
+            $body.find("#gpt-send-with-prompt").removeAttr("disabled")
           }
           $btn.prop("disabled", false);
         });
       });
+
+    modal.getElement()
+      .off("click", "#gpt-send-with-prompt")
+      .on("click", "#gpt-send-with-prompt", function() {
+
+        const message = content.toString().trim();
+        if (message.length < 50) {
+          toastr.warning("Слишком короткий текст");
+          return;
+        }
+
+        const $btn = $(this);
+
+        $btn.prop("disabled", true);
+        $body.find("#gpt-send").prop("disabled", true);
+        $body.find("#gpt-insert-gaps").hide();
+        $body.find("#gpt-result").empty();
+        $body.find("#gpt-loader").show();
+
+        const role = $body.find("#gpt-role").val();
+
+        let fragments = window.dataWrapper.getFragments().map(f => f.items
+          .filter(i => i.correct)
+          .map(i => i.title.replace(/\s+/g, " "))
+          .join(" ")
+        );
+
+        fragments = [...new Set(fragments)];
+
+        const prompt = $body.find("#gpt-prompt")
+          .html()
+          .replace(/<br>/g, "\n")
+
+        const response = sendMessage(message, role, fragments, prompt);
+
+        response.then(data => {
+          if (data.ok) {
+            $body.find("#gpt-loader").hide()
+            $body.find("#gpt-insert-gaps").show()
+          }
+
+          if ($body.find("#gpt-send").is(":visible")) {
+            $body.find("#gpt-send").removeAttr("disabled")
+          }
+          $btn.prop("disabled", false);
+        });
+      })
+
+    modal.getElement()
+      .off("click", "#gpt-insert-gaps")
+      .on("click", "#gpt-insert-gaps", function() {
+        try {
+          const json = JSON.parse($body.find("#gpt-result").text());
+          replaceFragments(json);
+          modal.hide();
+        } catch (ex) {
+          alert(ex.message)
+        }
+      })
 
     modal.show({
       body: $body
