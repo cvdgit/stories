@@ -11,7 +11,6 @@ use common\models\SiteSection;
 use common\models\StorySlide;
 use common\models\StoryTest;
 use common\models\UserQuestionHistoryModel;
-use common\rbac\UserPermissions;
 use common\services\story\CountersService;
 use common\services\StoryAudioService;
 use common\services\StoryFavoritesService;
@@ -38,6 +37,8 @@ use frontend\models\CommentForm;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
+use yii\debug\Module;
+use yii\web\View;
 
 class StoryController extends Controller
 {
@@ -483,6 +484,11 @@ class StoryController extends Controller
     public function actionChat(): string
     {
         $this->layout = "chat";
+
+        if (class_exists(Module::class)) {
+            $this->view->off(View::EVENT_END_BODY, [Module::getInstance(), 'renderToolbar']);
+        }
+
         return $this->render("chat");
     }
 }

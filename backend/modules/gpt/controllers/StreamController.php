@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace backend\modules\gpt\controllers;
 
 use backend\modules\gpt\EventStream;
+use Exception;
 use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\helpers\Json;
@@ -328,10 +329,6 @@ TEXT;
         $response->isSent = true;
         Yii::$app->session->close();
 
-        @ob_end_clean();
-        ini_set('output_buffering', '0');
-        set_time_limit(0);
-
         header("Content-Type: text/event-stream");
         header("Cache-Control: no-cache, must-revalidate");
         header("X-Accel-Buffering: no");
@@ -339,34 +336,25 @@ TEXT;
 
         $fields = $request->post();
 
-        $options = [
-            CURLOPT_URL => Yii::$app->params["gpt.api.wikids.host"],
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POSTFIELDS => Json::encode($fields),
-            CURLOPT_HTTPHEADER => [
-                "Content-Type: application/json",
-            ],
-            CURLOPT_WRITEFUNCTION => function ($ch, $chunk) {
-                echo $chunk;
-                //sleep(1);
-                flush();
-                return strlen($chunk);
-            },
-        ];
+        try {
+            $this->eventStream->send(Yii::$app->params["gpt.api.wikids.host"], Json::encode($fields));
+        } catch (Exception $ex) {
 
-        $ch = curl_init();
-        curl_setopt_array($ch, $options);
+            echo "event: error\r\n";
 
-        curl_exec($ch);
-
-        $error = curl_error($ch);
-        if ($error !== "") {
-            echo $error;
+            $ops = [
+                "ops" => [
+                    [
+                        "op" => "replace",
+                        "path" => "",
+                        "value" => [
+                            "error_text" => $ex->getMessage(),
+                        ],
+                    ],
+                ],
+            ];
+            echo 'data: ' . Json::encode($ops) . "\r\n";
+            flush();
         }
-
-        curl_close($ch);
-
-        //$response->statusCode = 404;
-        //$response->data = 'no';
     }
 }

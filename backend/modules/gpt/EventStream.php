@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace backend\modules\gpt;
 
+use yii\web\HttpException;
+
 class EventStream
 {
+    /**
+     * @throws HttpException
+     */
     public function send(string $url, string $fieldsJson): void
     {
         $options = [
@@ -18,7 +23,6 @@ class EventStream
             ],
             CURLOPT_WRITEFUNCTION => function ($ch, $chunk) {
                 echo $chunk;
-                //sleep(1);
                 flush();
                 return strlen($chunk);
             },
@@ -30,13 +34,10 @@ class EventStream
         curl_exec($ch);
 
         $error = curl_error($ch);
-        if ($error !== "") {
-            echo $error;
-        }
-
         curl_close($ch);
 
-        //$response->statusCode = 404;
-        //$response->data = 'no';
+        if ($error !== "") {
+            throw new HttpException(500, $error);
+        }
     }
 }

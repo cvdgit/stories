@@ -48,6 +48,7 @@
     var decoder = new TextDecoder('utf-8');
 
     let streamedResponse = {}
+    let errorResponse = {}
     let foundSources = false;
     while (true) {
 
@@ -102,6 +103,22 @@
               element.querySelector(".message-content").innerHTML = streamedResponse.streamed_output.join("");
               container.scrollTop = container.scrollHeight
             }
+          }
+        }
+
+        if (event && event.trim() === "error") {
+          const data = secondRow.toString().replace(/^data: /, "")
+          const chunk = JSON.parse(data);
+          if (data) {
+            if (chunk?.ops) {
+              errorResponse = jsonpatch.applyPatch(
+                errorResponse,
+                chunk.ops,
+              ).newDocument;
+            } else {
+              errorResponse.error_text = chunk.message
+            }
+            element.querySelector(".message-content").innerHTML = errorResponse.error_text
           }
         }
       })
@@ -210,7 +227,9 @@
   function createAnswerMessage() {
     const item = createMessageItem()
     item.innerHTML = `
+        <h3 style="margin-bottom: 0">Слайды:</h3>
         <div class="message-images"></div>
+        <h3 style="margin-bottom: 0">Ответ:</h3>
         <div class="message-content"></div>
         <div class="loading">
           <div class="loading-inner circle">

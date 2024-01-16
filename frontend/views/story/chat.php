@@ -12,6 +12,11 @@ use yii\web\View;
 $this->registerCss(
     <<<CSS
 
+*,:after,:before {
+    box-sizing: border-box;
+    border: 0 solid #e5e7eb
+}
+
 html {
     height: 100%;
 }
@@ -251,6 +256,8 @@ CSS
 
 JsonPatchAsset::register($this);
 $this->registerJs($this->renderFile("@frontend/views/story/_chat.js"));
+
+$this->title = "Задай вопрос по истории Руси";
 ?>
 <div style="display: flex; padding: 32px; flex-direction: column; height: 100%">
     <div
