@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace backend\modules\gpt\controllers;
 
-use backend\modules\gpt\EventStream;
+use backend\modules\gpt\ChatEventStream;
 use Exception;
 use Ramsey\Uuid\Uuid;
 use Yii;
@@ -16,34 +16,42 @@ use yii\web\Response;
 class StreamController extends Controller
 {
     /**
-     * @var EventStream
+     * @var ChatEventStream
      */
-    private $eventStream;
+    private $chatEventStream;
 
-    public function __construct($id, $module, EventStream $eventStream, $config = [])
+    public function __construct($id, $module, ChatEventStream $chatEventStream, $config = [])
     {
         parent::__construct($id, $module, $config);
-        $this->eventStream = $eventStream;
+        $this->chatEventStream = $chatEventStream;
     }
 
-    public $enableCsrfValidation = false;
-
-    public function actionChat(Request $request, Response $response)
+    public function beforeAction($action): bool
     {
-        $response->format = Response::FORMAT_RAW;
-        $response->stream = true;
-        $response->isSent = true;
-        Yii::$app->session->close();
+        if ($action->id === "stream") {
+            $this->enableCsrfValidation = false;
+        }
 
         @ob_end_clean();
         ini_set('output_buffering', '0');
-        //set_time_limit(0);
+        set_time_limit(0);
 
         header("Content-Type: text/event-stream");
         header("Cache-Control: no-cache, must-revalidate");
         header("X-Accel-Buffering: no");
         header("Connection: keep-alive");
 
+        $response = Yii::$app->response;
+        $response->format = Response::FORMAT_RAW;
+        $response->stream = true;
+        $response->isSent = true;
+        Yii::$app->session->close();
+
+        return parent::beforeAction($action);
+    }
+
+    public function actionChat(Request $request): void
+    {
         $text = $request->post("content");
         $role = $request->post("role");
         $questions = $request->post("questions");
@@ -97,44 +105,15 @@ TEXT;
             "include_names" => [],
         ];
 
-        $options = [
-            CURLOPT_URL => Yii::$app->params["gpt.api.completions.host"],
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POSTFIELDS => Json::encode($fields),
-            CURLOPT_HTTPHEADER => [
-                "Content-Type: application/json",
-            ],
-            CURLOPT_WRITEFUNCTION => function ($ch, $chunk) {
-                echo $chunk;
-                //sleep(1);
-                flush();
-                return strlen($chunk);
-            },
-        ];
-
-        $ch = curl_init();
-        curl_setopt_array($ch, $options);
-
-        curl_exec($ch);
-
-        $error = curl_error($ch);
-        if ($error !== "") {
-            echo $error;
+        try {
+            $this->chatEventStream->send("chat", Yii::$app->params["gpt.api.completions.host"], Json::encode($fields));
+        } catch (Exception $ex) {
+            Yii::$app->errorHandler->logException($ex);
         }
-
-        curl_close($ch);
-
-        //$response->statusCode = 404;
-        //$response->data = 'no';
     }
 
-    public function actionPassTestChat(Request $request, Response $response)
+    public function actionPassTestChat(Request $request): void
     {
-        $response->format = Response::FORMAT_RAW;
-        $response->stream = true;
-        $response->isSent = true;
-        Yii::$app->session->close();
-
         $prompt = $request->post("prompt");
 
         if ($prompt) {
@@ -197,15 +176,6 @@ TEXT;
             "include_names" => [],
         ];
 
-        @ob_end_clean();
-        ini_set('output_buffering', '0');
-        //set_time_limit(0);
-
-        header("Content-Type: text/event-stream");
-        header("Cache-Control: no-cache, must-revalidate");
-        header("X-Accel-Buffering: no");
-        header("Connection: keep-alive");
-
         echo "event: data\r\n";
 
         $ops = [
@@ -222,25 +192,15 @@ TEXT;
         echo 'data: ' . Json::encode($ops) . "\r\n";
         flush();
 
-        $this->eventStream->send(Yii::$app->params["gpt.api.completions.host"], Json::encode($fields));
+        try {
+            $this->chatEventStream->send("pass_test", Yii::$app->params["gpt.api.completions.host"], Json::encode($fields));
+        } catch (Exception $ex) {
+            Yii::$app->errorHandler->logException($ex);
+        }
     }
 
-    public function actionPassTestIncorrectChat(Request $request, Response $response)
+    public function actionPassTestIncorrectChat(Request $request): void
     {
-        $response->format = Response::FORMAT_RAW;
-        $response->stream = true;
-        $response->isSent = true;
-        Yii::$app->session->close();
-
-        @ob_end_clean();
-        ini_set('output_buffering', '0');
-        set_time_limit(0);
-
-        header("Content-Type: text/event-stream");
-        header("Cache-Control: no-cache, must-revalidate");
-        header("X-Accel-Buffering: no");
-        header("Connection: keep-alive");
-
         $text = $request->post("content");
         $role = $request->post("role");
         $fragments = $request->post("fragments");
@@ -261,15 +221,15 @@ TEXT;
         }
 
         $content = <<<TEXT
-            $roleText
-            Проанализируй текст: $text.
-            Вот список слов (словосочетаний) из этого текст:
-            ===
-            $fragmentsPrompt
-            ===
-            Проанализируй эти слова (словосочетания) и для каждого придумай по 3 неправильных, подходящих по смыслу ответа.
-            Если у тебя нет информации о каких-нибудь словах, то исключи их из списка.
-            Ответь в формате json: [{{"question": "слово из списка", "answers": ["неправильный ответ 1", "неправильный ответ 2"]}}]
+$roleText
+Проанализируй текст: $text.
+Вот список слов (словосочетаний) из этого текст:
+```
+$fragmentsPrompt
+```
+Проанализируй эти слова (словосочетания) и для каждого придумай по 3 неправильных, подходящих по смыслу ответа.
+Если у тебя нет информации о каких-нибудь словах, то исключи их из списка.
+Ответь в формате json: [{{"question": "слово из списка", "answers": ["неправильный ответ 1", "неправильный ответ 2"]}}]
 TEXT;
 
         $message = [
@@ -291,70 +251,32 @@ TEXT;
             "include_names" => [],
         ];
 
-        $options = [
-            CURLOPT_URL => Yii::$app->params["gpt.api.completions.host"],
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POSTFIELDS => Json::encode($fields),
-            CURLOPT_HTTPHEADER => [
-                "Content-Type: application/json",
-            ],
-            CURLOPT_WRITEFUNCTION => function ($ch, $chunk) {
-                echo $chunk;
-                //sleep(1);
-                flush();
-                return strlen($chunk);
-            },
-        ];
-
-        $ch = curl_init();
-        curl_setopt_array($ch, $options);
-
-        curl_exec($ch);
-
-        $error = curl_error($ch);
-        if ($error !== "") {
-            echo $error;
+        try {
+            $this->chatEventStream->send("pass_test_incorrect", Yii::$app->params["gpt.api.completions.host"], Json::encode($fields));
+        } catch (Exception $ex) {
+            Yii::$app->errorHandler->logException($ex);
         }
-
-        curl_close($ch);
-
-        //$response->statusCode = 404;
-        //$response->data = 'no';
     }
 
-    public function actionWikids(Request $request, Response $response)
+    public function actionWikids(Request $request): void
     {
-        $response->format = Response::FORMAT_RAW;
-        $response->stream = true;
-        $response->isSent = true;
-        Yii::$app->session->close();
-
-        header("Content-Type: text/event-stream");
-        header("Cache-Control: no-cache, must-revalidate");
-        header("X-Accel-Buffering: no");
-        header("Connection: keep-alive");
-
         $fields = $request->post();
 
         try {
-            $this->eventStream->send(Yii::$app->params["gpt.api.wikids.host"], Json::encode($fields));
+            $this->chatEventStream->send("wikids_chat", Yii::$app->params["gpt.api.wikids.host"], Json::encode($fields));
         } catch (Exception $ex) {
+            Yii::$app->errorHandler->logException($ex);
+        }
+    }
 
-            echo "event: error\r\n";
+    public function actionStream(Request $request): void
+    {
+        $fields = $request->post();
 
-            $ops = [
-                "ops" => [
-                    [
-                        "op" => "replace",
-                        "path" => "",
-                        "value" => [
-                            "error_text" => $ex->getMessage(),
-                        ],
-                    ],
-                ],
-            ];
-            echo 'data: ' . Json::encode($ops) . "\r\n";
-            flush();
+        try {
+            $this->chatEventStream->send("conversations", Yii::$app->params["gpt.api.completions.host"], Json::encode($fields));
+        } catch (Exception $ex) {
+            Yii::$app->errorHandler->logException($ex);
         }
     }
 }

@@ -19,10 +19,11 @@
 
   async function sendMessage(element, question) {
 
-    var response = await fetch('/admin/index.php?r=gpt/stream/wikids', {
+    const response = await fetch('/admin/index.php?r=gpt/stream/wikids', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        "X-CSRF-Token": $("meta[name=csrf-token]").attr("content")
       },
       body: JSON.stringify({
         input: {
@@ -44,8 +45,8 @@
       throw new Error(message);
     }
 
-    var reader = response.body.getReader();
-    var decoder = new TextDecoder('utf-8');
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder('utf-8');
 
     let streamedResponse = {}
     let errorResponse = {}
@@ -96,7 +97,7 @@
             }
 
             if (streamedResponse.id !== undefined) {
-              //runId = streamedResponse.id;
+              element.setAttribute("data-run-id", streamedResponse.id)
             }
 
             if (Array.isArray(streamedResponse?.streamed_output)) {
@@ -127,9 +128,38 @@
     return response;
   }
 
+  async function sendFeedback({score, key, runId, value, comment, feedbackId, isExplicit = true,}) {
+    const feedback_id = feedbackId ?? generateUUID();
+    const response = await fetch("/admin/index.php?r=gpt/feedback", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": $("meta[name=csrf-token]").attr("content")
+      },
+      body: JSON.stringify({
+        score,
+        run_id: runId,
+        key,
+        value,
+        feedback_id,
+        comment,
+        source_info: {
+          is_explicit: isExplicit,
+        },
+      }),
+    });
+    const data = await response.json();
+    return {
+      ...data,
+      feedbackId: feedback_id,
+    }
+  }
+
   const textarea = document.getElementById("send-message")
   const sendBtn = document.getElementById("send-message-btn")
   const container = document.getElementById("message-container")
+
+  const feedbacks = []
 
   textarea.addEventListener("keydown", e => {
     if (e.code === "Enter" && !e.shiftKey) {
@@ -156,13 +186,15 @@
 
       response.then(data => {
         answerItem.querySelector(".loading").style.display = "none"
+        answerItem.querySelector(".message-feedback").style.display = "block"
         textarea.removeAttribute("disabled")
         sendBtn.removeAttribute("disabled")
       })
     }
   })
 
-  $("#message-container").on("click", ".offer-line-item", function(e) {
+  $("#message-container")
+    .on("click", ".offer-line-item", function(e) {
 
     const message = $(this).text()
 
@@ -178,9 +210,35 @@
 
     response.then(data => {
       answerItem.querySelector(".loading").style.display = "none"
+      answerItem.querySelector(".message-feedback").style.display = "block"
       textarea.removeAttribute("disabled")
     })
-  });
+  })
+    .on("click", "[data-run-id] .feedback-button", async function() {
+
+      const runId = $(this).parents("[data-run-id]:eq(0)").attr("data-run-id")
+      if (!runId) {
+        return
+      }
+
+      if (feedbacks.includes(runId)) {
+        toastr.info("Вы уже отправили свой отзыв.")
+        return
+      }
+
+      const score = $(this).hasClass("feedback-like") ? 1 : 0
+      const data = await sendFeedback({
+        score,
+        runId,
+        key: "user_score",
+        isExplicit: true,
+      })
+
+      if (data.success) {
+        feedbacks.push(runId)
+        toastr.success("Успешно")
+      }
+    })
 
   sendBtn.addEventListener("click", function() {
 
@@ -205,6 +263,7 @@
 
     response.then(data => {
       answerItem.querySelector(".loading").style.display = "none"
+      answerItem.querySelector(".message-feedback").style.display = "block"
       textarea.removeAttribute("disabled")
       sendBtn.removeAttribute("disabled")
     })
@@ -219,8 +278,8 @@
   function createQuestionMessage(message) {
     const item = createMessageItem()
     item.innerHTML = `
-        <h2>${message}</h2>
-      `
+      <h2>${message}</h2>
+    `
     return item;
   }
 
@@ -231,6 +290,10 @@
         <div class="message-images"></div>
         <h3 style="margin-bottom: 0">Ответ:</h3>
         <div class="message-content"></div>
+        <div class="message-feedback" style="display: none">
+            <button type="button" class="feedback-button feedback-like">👍</button>
+            <button type="button" class="feedback-button feedback-dislike">👎</button>
+        </div>
         <div class="loading">
           <div class="loading-inner circle">
             <div class="loading-line">
@@ -244,5 +307,4 @@
       `
     return item;
   }
-
 })();

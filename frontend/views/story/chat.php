@@ -251,6 +251,49 @@ button,input,optgroup,select,textarea {
     color: currentColor;
     vertical-align: middle;
 }
+.message-feedback {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 8px;
+}
+
+.feedback-button {
+    display: inline-flex;
+    appearance: none;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    position: relative;
+    white-space: nowrap;
+    vertical-align: middle;
+    outline: transparent solid 2px;
+    outline-offset: 2px;
+    line-height: 1.2;
+    border-radius: 6px;
+    font-weight: 600;
+    transition-property: background-color,border-color,color,fill,stroke,opacity,box-shadow,transform;
+    transition-duration: 200ms;
+    height: 32px;
+    min-width: 32px;
+    font-size: 14px;
+    padding-inline-start: 12px;
+    padding-inline-end: 12px;
+    border-width: 1px;
+    border-style: solid;
+    border-image: initial;
+    border-color: #E2E8F0;
+    color: #1A202C;
+    cursor: pointer;
+}
+
+.feedback-button:hover {
+    background: #EDF2F7;
+}
+
+.feedback-like, .feedback-dislike {
+    background: none;
+}
 CSS
 );
 

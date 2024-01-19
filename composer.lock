@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b933952a1622f8f5893d3275376958fa",
+    "content-hash": "fcaec62483fbe18b136bd5258691a95e",
     "packages": [
         {
             "name": "2amigos/yii2-chartjs-widget",
@@ -368,12 +368,12 @@
             "version": "v1.7.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/uxsolutions/bootstrap-datepicker.git",
+                "url": "git@github.com:eternicode/bootstrap-datepicker.git",
                 "reference": "d364be5b066b38f3675a5a1dc174ce1ab1f3360e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/uxsolutions/bootstrap-datepicker/zipball/d364be5b066b38f3675a5a1dc174ce1ab1f3360e",
+                "url": "https://api.github.com/repos/eternicode/bootstrap-datepicker/zipball/d364be5b066b38f3675a5a1dc174ce1ab1f3360e",
                 "reference": "d364be5b066b38f3675a5a1dc174ce1ab1f3360e"
             },
             "require": {
@@ -498,7 +498,7 @@
             "version": "3.3.11",
             "source": {
                 "type": "git",
-                "url": "https://github.com/RobinHerbots/Inputmask.git",
+                "url": "git@github.com:RobinHerbots/Inputmask.git",
                 "reference": "5e670ad62f50c738388d4dcec78d2888505ad77b"
             },
             "dist": {
@@ -598,7 +598,7 @@
             "version": "v0.0.3",
             "source": {
                 "type": "git",
-                "url": "git@github.com:brianreavis/microplugin.js.git",
+                "url": "https://github.com/brianreavis/microplugin.js.git",
                 "reference": "d8671e6cc769938648f8735610534427cdeeaf67"
             },
             "dist": {
@@ -616,12 +616,12 @@
             "version": "v3.5.6",
             "source": {
                 "type": "git",
-                "url": "https://github.com/sampotts/plyr.git",
+                "url": "git@github.com:selz/plyr.git",
                 "reference": "7c442c93571fb5d75f96bff710e310d00e1289e9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sampotts/plyr/zipball/7c442c93571fb5d75f96bff710e310d00e1289e9",
+                "url": "https://api.github.com/repos/selz/plyr/zipball/7c442c93571fb5d75f96bff710e310d00e1289e9",
                 "reference": "7c442c93571fb5d75f96bff710e310d00e1289e9"
             },
             "type": "bower-asset"
@@ -661,7 +661,7 @@
             "version": "0.12.6-patch1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/selectize/selectize.js.git",
+                "url": "git@github.com:selectize/selectize.js.git",
                 "reference": "b8df29c9d4733857a4df4ddbf40d72abfd7c3ae9"
             },
             "dist": {
@@ -1512,6 +1512,107 @@
                 "html"
             ],
             "time": "2022-09-18T07:06:19+00:00"
+        },
+        {
+            "name": "gamringer/php-json-patch",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/gamringer/JSONPatch.git",
+                "reference": "b83ded1d6c4495dc41305df85fda2be1748ec34c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/gamringer/JSONPatch/zipball/b83ded1d6c4495dc41305df85fda2be1748ec34c",
+                "reference": "b83ded1d6c4495dc41305df85fda2be1748ec34c",
+                "shasum": ""
+            },
+            "require": {
+                "gamringer/php-json-pointer": "~3.1",
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "pdepend/pdepend": "@stable",
+                "phpmd/phpmd": "@stable",
+                "phpunit/phpunit": "@stable",
+                "sebastian/phpcpd": "@stable",
+                "squizlabs/php_codesniffer": "@stable"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "gamringer\\JSONPatch\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Guillaume Amringer",
+                    "email": "g.amringer@gmail.com"
+                }
+            ],
+            "description": "PHP JSON Patch (RFC6902) implementation",
+            "homepage": "https://github.com/gamringer/JSONPatch",
+            "keywords": [
+                "6902",
+                "RFC6902",
+                "json",
+                "json patch"
+            ],
+            "time": "2015-09-19T02:00:23+00:00"
+        },
+        {
+            "name": "gamringer/php-json-pointer",
+            "version": "3.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/gamringer/JSONPointer.git",
+                "reference": "4c7d6b9188fd0730769086fa2fb366835acb3968"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/gamringer/JSONPointer/zipball/4c7d6b9188fd0730769086fa2fb366835acb3968",
+                "reference": "4c7d6b9188fd0730769086fa2fb366835acb3968",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "pdepend/pdepend": "@stable",
+                "phpmd/phpmd": "@stable",
+                "phpunit/phpunit": "@stable",
+                "sebastian/phpcpd": "@stable",
+                "squizlabs/php_codesniffer": "@stable"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "gamringer\\JSONPointer\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Guillaume Amringer",
+                    "email": "g.amringer@gmail.com"
+                }
+            ],
+            "description": "PHP JSON Pointer (RFC6901) implementation",
+            "homepage": "https://github.com/gamringer/JSONPointer",
+            "keywords": [
+                "6901",
+                "RFC6901",
+                "json",
+                "json pointer"
+            ],
+            "time": "2017-02-06T14:42:22+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -4701,16 +4802,16 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.27.0",
+            "version": "v1.28.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "8ad114f6b39e2c98a8b0e3bd907732c207c2b534"
+                "reference": "42292d99c55abe617799667f454222c54c60e229"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/8ad114f6b39e2c98a8b0e3bd907732c207c2b534",
-                "reference": "8ad114f6b39e2c98a8b0e3bd907732c207c2b534",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/42292d99c55abe617799667f454222c54c60e229",
+                "reference": "42292d99c55abe617799667f454222c54c60e229",
                 "shasum": ""
             },
             "require": {
@@ -4725,7 +4826,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.27-dev"
+                    "dev-main": "1.28-dev"
                 },
                 "thanks": {
                     "name": "symfony/polyfill",
@@ -4777,7 +4878,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-11-03T14:55:06+00:00"
+            "time": "2023-07-28T09:04:16+00:00"
         },
         {
             "name": "symfony/polyfill-php72",

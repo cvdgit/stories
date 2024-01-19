@@ -7,7 +7,8 @@ function GptSlideText() {
     var response = await fetch('/admin/index.php?r=gpt/stream/chat', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        "X-CSRF-Token": $("meta[name=csrf-token]").attr("content")
       },
       body: JSON.stringify({
         content,

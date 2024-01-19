@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use common\widgets\ToastrFlash;
 use yii\helpers\Html;
 use yii\web\View;
 
@@ -25,6 +26,7 @@ use yii\web\View;
 <body>
 <?php $this->beginBody() ?>
 <?= $content ?>
+<?= ToastrFlash::widget(); ?>
 <?php $this->endBody() ?>
 </body>
 </html>

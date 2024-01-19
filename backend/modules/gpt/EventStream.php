@@ -11,7 +11,7 @@ class EventStream
     /**
      * @throws HttpException
      */
-    public function send(string $url, string $fieldsJson): void
+    public function send(string $url, string $fieldsJson, callable $callback = null): void
     {
         $options = [
             CURLOPT_URL => $url,
@@ -21,9 +21,12 @@ class EventStream
                 "Content-Type: application/json",
                 "Accept: text/event-stream"
             ],
-            CURLOPT_WRITEFUNCTION => function ($ch, $chunk) {
-                echo $chunk;
+            CURLOPT_WRITEFUNCTION => function ($ch, $chunk) use ($callback) {
+                if ($callback !== null && is_callable($callback)) {
+                    $callback($chunk);
+                }
                 flush();
+                echo $chunk;
                 return strlen($chunk);
             },
         ];

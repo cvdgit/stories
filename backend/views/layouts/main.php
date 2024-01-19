@@ -91,6 +91,7 @@ AppAsset::register($this);
                         ['label' => 'Повторение', 'url' => ['/repetition/schedule/index']],
                         ['label' => 'Changelog', 'url' => ['/changelog/default/index']],
                         ['label' => 'ChatGPT', 'url' => ['/gpt/default/index']],
+                        ['label' => 'GPT feedback', 'url' => ['/gpt/feedback/list']],
                     ],
                 ]) ?>
                 <?php endif ?>

@@ -15,7 +15,7 @@ class ChatController extends Controller
 {
     public $enableCsrfValidation = false;
 
-    public function actionGetData(Request $request, Response $response, WebUser $user): array
+    public function actionGetData(Response $response, WebUser $user): array
     {
         $response->format = Response::FORMAT_JSON;
 
@@ -25,8 +25,6 @@ class ChatController extends Controller
                 "user_id" => $user->getId()
             ])
             ->orderBy(["created_at" => SORT_ASC]);
-
-
 
         $conversations = [];
         foreach ($query->all() as $conversationPayload) {
@@ -68,7 +66,7 @@ class ChatController extends Controller
                     "size" => "normal",
                 ],
                 "openai" => [
-                    "baseUrl" => "/admin/index.php?r=gpt/chat/send",
+                    "baseUrl" => "/admin/index.php?r=gpt/stream/stream",
                     "organizationId" => "",
                     "temperature" => 0.7,
                     "model" => "gpt-3.5-turbo",
@@ -181,55 +179,5 @@ class ChatController extends Controller
         }
 
         return ["success" => true];
-    }
-
-    public function actionSend(Request $request, Response $response): void
-    {
-        $response->format = Response::FORMAT_RAW;
-        $response->stream = true;
-        $response->isSent = true;
-        \Yii::$app->session->close();
-
-        @ob_end_clean();
-        ini_set('output_buffering', '0');
-        //set_time_limit(0);
-
-        header("Content-Type: text/event-stream");
-        header("Cache-Control: no-cache, must-revalidate");
-        header("X-Accel-Buffering: no");
-        header("Connection: keep-alive");
-
-        $fields = $request->post();
-
-        $options = [
-            CURLOPT_URL => \Yii::$app->params["gpt.api.completions.host"],
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POSTFIELDS => Json::encode($fields),
-            CURLOPT_HTTPHEADER => [
-                "Content-Type: application/json",
-                "Accept: text/event-stream",
-            ],
-            CURLOPT_WRITEFUNCTION => function($ch, $chunk) {
-                echo $chunk;
-                //sleep(1);
-                flush();
-                return strlen($chunk);
-            },
-        ];
-
-        $ch = curl_init();
-        curl_setopt_array($ch, $options);
-
-        curl_exec($ch);
-
-        $error = curl_error($ch);
-        if ($error !== "") {
-            echo $error;
-        }
-
-        curl_close($ch);
-
-        //$response->statusCode = 404;
-        //$response->data = 'no';
     }
 }
