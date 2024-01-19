@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace backend\modules\gpt\controllers;
 
 use backend\JsonSchema\JsonSchemaValidator;
+use common\rbac\UserRoles;
 use Yii;
 use yii\data\SqlDataProvider;
 use yii\db\Query;
+use yii\filters\AccessControl;
 use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\Request;
@@ -15,6 +17,21 @@ use yii\web\Response;
 
 class FeedbackController extends Controller
 {
+    public function behaviors(): array
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => [UserRoles::ROLE_ADMIN],
+                    ],
+                ],
+            ],
+        ];
+    }
+
     public function actionIndex(Request $request, Response $response): array
     {
         $response->format = Response::FORMAT_JSON;
@@ -93,8 +110,15 @@ JSON;
             "sql" => '
                 SELECT
                     target,
-                    JSON_UNQUOTE(input->"$.input.question") AS `input`,
-                    CASE WHEN output->"$.final_output" IS NULL THEN JSON_UNQUOTE(output->"$.message") ELSE JSON_UNQUOTE(output->"$.final_output") END AS `output`,
+                    IF(input -> "$.input.question" IS NULL,
+                      JSON_UNQUOTE(JSON_EXTRACT(input, CONCAT("$.input.messages[", JSON_LENGTH(input ->> "$.input.messages") -1 ,"].content"))),
+                      JSON_UNQUOTE(input -> "$.input.question")
+                    ) AS `input`,
+                    CASE
+                        WHEN output->"$.final_output" IS NULL
+                        THEN JSON_UNQUOTE(output->"$.message")
+                        ELSE JSON_UNQUOTE(output->"$.final_output")
+                    END AS `output`,
                     created_at
                 FROM llm_feedback
                 ORDER BY created_at DESC',
