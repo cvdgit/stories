@@ -342,8 +342,8 @@
             ).newDocument;
 
             if (streamedResponse?.prompt_text) {
-              document.getElementById("gpt-prompt-wrap").style.display = "block";
-              document.getElementById("gpt-prompt").innerText = streamedResponse.prompt_text;
+              document.getElementById("gpt-prompt-wrap-incorrect").style.display = "block";
+              document.getElementById("gpt-prompt-incorrect").innerText = streamedResponse.prompt_text;
               document.getElementById("gpt-send-with-prompt-incorrect").style.display = "inline-block"
             }
 
@@ -383,10 +383,10 @@
     </div>
 <div class="row">
   <div class="col-md-12">
-    <div id="gpt-prompt-wrap" style="display: none">
-      <div style="padding: 10px 0"><a id="gpt-prompt-show" href="#">Show prompt</a></div>
+    <div id="gpt-prompt-wrap-incorrect" style="display: none">
+      <div style="padding: 10px 0"><a id="gpt-prompt-show-incorrect" href="#">Show prompt</a></div>
       <div>
-        <div contenteditable="plaintext-only" style="display: none; margin-bottom: 20px" id="gpt-prompt"></div>
+        <div contenteditable="plaintext-only" style="display: none; margin-bottom: 20px" id="gpt-prompt-incorrect"></div>
       </div>
     </div>
   </div>
@@ -413,7 +413,9 @@
     $body.find("#gpt-incorrect-result").text("");
     $body.find("#to-gpt-fragments").empty();
     $body.find("#gpt-loader").css("display", "none");
-    $body.find("#gpt-send-incorrect-with-prompt").css("display", "none");
+    $body.find("#gpt-prompt-wrap-incorrect").css("display", "none");
+    $body.find("#gpt-send-with-prompt-incorrect").css("display", "none");
+    $body.find("#gpt-insert-incorrect").css("display", "none");
 
     const fragments = window.dataWrapper.getFragments().filter(f => f.items.length === 1);
     if (fragments.length === 0) {
@@ -434,10 +436,10 @@
       const content = $('#content').text().replace(/\s+/g, " ");
 
       modal.getElement()
-        .off("click", "#gpt-prompt-show")
-        .on("click", "#gpt-prompt-show", function (e) {
+        .off("click", "#gpt-prompt-show-incorrect")
+        .on("click", "#gpt-prompt-show-incorrect", function (e) {
           e.preventDefault()
-          modal.getElement().find("#gpt-prompt").show()
+          modal.getElement().find("#gpt-prompt-incorrect").show()
         })
 
       modal.getElement()
@@ -482,7 +484,6 @@
         .on("click", "#gpt-send-with-prompt-incorrect", function () {
 
           const message = content.toString().trim();
-          console.log(message)
           if (message.length < 50) {
             toastr.warning("Слишком короткий текст");
             return;
@@ -506,7 +507,7 @@
 
           fragments = [...new Set(fragments)];
 
-          const prompt = $body.find("#gpt-prompt")
+          const prompt = $body.find("#gpt-prompt-incorrect")
             .html()
             .replace(/<br>/g, "\n")
 
