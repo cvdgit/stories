@@ -1,4 +1,4 @@
-(function() {
+(function () {
 
   const modal = new SimpleModal({id: "gpt-gaps-modal", title: "Генерация пропусков"});
 
@@ -29,7 +29,7 @@
 
     let streamedResponse = {}
     while (true) {
-      const { done, value } = await reader.read();
+      const {done, value} = await reader.read();
       if (done) {
         break;
       }
@@ -75,7 +75,7 @@
   function replaceFragments(json) {
 
     const el = $('<div>' + $('#content').html() + '</div>');
-    el.find('span[data-fragment-id]').replaceWith(function() {
+    el.find('span[data-fragment-id]').replaceWith(function () {
       return '{' + $(this).attr('data-fragment-id') + '}';
     });
 
@@ -148,14 +148,14 @@
       <div style="padding: 10px; display: flex; align-items: center; justify-content: space-between; flex-direction: row">
         <div>
           <button id="gpt-send" type="button" class="btn btn-primary">Отправить запрос</button>
-          <button id="gpt-send-with-prompt" type="button" class="btn btn-primary">Отправить запрос с промтом</button>
+          <button id="gpt-send-with-prompt" style="display: none" type="button" class="btn btn-primary">Отправить запрос с промтом</button>
         </div>
         <button id="gpt-insert-gaps" style="display: none" type="button" class="btn btn-success">Добавить пропуски</button>
         <img id="gpt-loader" style="display: none" src="/img/loading.gif" width="30" alt="">
       </div>
     `);
 
-  $('#gpt-generate-gaps').on('click', function(e) {
+  $('#gpt-generate-gaps').on('click', function (e) {
 
     e.preventDefault();
 
@@ -171,7 +171,7 @@
 
     modal.getElement()
       .off("click", "#gpt-prompt-show")
-      .on("click", "#gpt-prompt-show", function(e) {
+      .on("click", "#gpt-prompt-show", function (e) {
         e.preventDefault()
         modal.getElement().find("#gpt-prompt").show()
       })
@@ -221,7 +221,7 @@
 
     modal.getElement()
       .off("click", "#gpt-send-with-prompt")
-      .on("click", "#gpt-send-with-prompt", function() {
+      .on("click", "#gpt-send-with-prompt", function () {
 
         const message = content.toString().trim();
         if (message.length < 50) {
@@ -268,7 +268,7 @@
 
     modal.getElement()
       .off("click", "#gpt-insert-gaps")
-      .on("click", "#gpt-insert-gaps", function() {
+      .on("click", "#gpt-insert-gaps", function () {
         try {
           const json = JSON.parse($body.find("#gpt-result").text());
           replaceFragments(json);
@@ -284,13 +284,13 @@
   });
 })();
 
-(function() {
+(function () {
   const modal = new SimpleModal({
     id: "gpt-gaps-incorrect-modal",
     title: "Генерация неправильных ответов для пропусков"
   });
 
-  async function sendMessage(content, role, fragments) {
+  async function sendMessage(content, role, fragments, prompt) {
 
     const response = await fetch('/admin/index.php?r=gpt/stream/pass-test-incorrect-chat', {
       method: 'POST',
@@ -301,7 +301,8 @@
       body: JSON.stringify({
         content,
         role,
-        fragments
+        fragments,
+        prompt
       })
     });
 
@@ -316,7 +317,7 @@
 
     let streamedResponse = {}
     while (true) {
-      const { done, value } = await reader.read();
+      const {done, value} = await reader.read();
       if (done) {
         break;
       }
@@ -340,6 +341,12 @@
               chunk.ops,
             ).newDocument;
 
+            if (streamedResponse?.prompt_text) {
+              document.getElementById("gpt-prompt-wrap").style.display = "block";
+              document.getElementById("gpt-prompt").innerText = streamedResponse.prompt_text;
+              document.getElementById("gpt-send-with-prompt-incorrect").style.display = "inline-block"
+            }
+
             if (Array.isArray(streamedResponse?.streamed_output)) {
               document.getElementById("gpt-incorrect-result").innerText = streamedResponse.streamed_output.join("");
               document.getElementById("gpt-incorrect-result").scrollTop = document.getElementById("gpt-incorrect-result").scrollHeight;
@@ -357,7 +364,7 @@
       <div class="col-md-12">
       <div>Пропуски:</div>
       <div id="to-gpt-fragments" style="margin-top: 10px"></div>
-      <p style="margin-top: 10px; font-size: 12px;"><i>Учитываются пропуски у которых только один правильные ответ и нет неправильных</i></p>
+      <p style="margin-top: 10px; font-size: 12px;"><i>Учитываются пропуски у которых только один правильный ответ и нет неправильных</i></p>
 </div>
 </div>
 <div class="row">
@@ -374,6 +381,16 @@
         </select>
       </div>
     </div>
+<div class="row">
+  <div class="col-md-12">
+    <div id="gpt-prompt-wrap" style="display: none">
+      <div style="padding: 10px 0"><a id="gpt-prompt-show" href="#">Show prompt</a></div>
+      <div>
+        <div contenteditable="plaintext-only" style="display: none; margin-bottom: 20px" id="gpt-prompt"></div>
+      </div>
+    </div>
+  </div>
+</div>
       <div class="row">
         <div class="col-md-12">
             <div>Ответ нейросети:</div>
@@ -381,26 +398,29 @@
          </div>
       </div>
       <div style="padding: 10px; display: flex; align-items: center; justify-content: space-between; flex-direction: row">
-        <button id="gpt-send-incorrect" type="button" class="btn btn-primary">Отправить запрос</button>
+        <div>
+          <button id="gpt-send-incorrect" type="button" class="btn btn-primary">Отправить запрос</button>
+          <button id="gpt-send-with-prompt-incorrect" style="display: none" type="button" class="btn btn-primary">Отправить запрос с промтом</button>
+        </div>
+        <button id="gpt-insert-incorrect" style="display: none" type="button" class="btn btn-success">Добавить неправильные ответы</button>
         <img id="gpt-loader" style="display: none" src="/img/loading.gif" width="30" alt="">
       </div>
     `);
 
-  $("#gpt-add-incorrect").on("click", function(e) {
+  $("#gpt-add-incorrect").on("click", function (e) {
     e.preventDefault();
 
     $body.find("#gpt-incorrect-result").text("");
+    $body.find("#to-gpt-fragments").empty();
     $body.find("#gpt-loader").css("display", "none");
+    $body.find("#gpt-send-incorrect-with-prompt").css("display", "none");
 
     const fragments = window.dataWrapper.getFragments().filter(f => f.items.length === 1);
-
-    $body.find("#to-gpt-fragments").empty();
-
     if (fragments.length === 0) {
       $body.find("#gpt-send-incorrect").prop("disabled", true);
+      $body.find("#gpt-send-incorrect-with-prompt").prop("disabled", true);
       $body.find("#to-gpt-fragments").text("Нет подходящих пропусков");
     } else {
-
       fragments.map(f => {
         const elem = $("<span/>", {class: "label label-primary"}).text(
           f.items
@@ -414,14 +434,23 @@
       const content = $('#content').text().replace(/\s+/g, " ");
 
       modal.getElement()
+        .off("click", "#gpt-prompt-show")
+        .on("click", "#gpt-prompt-show", function (e) {
+          e.preventDefault()
+          modal.getElement().find("#gpt-prompt").show()
+        })
+
+      modal.getElement()
         .off("click", "#gpt-send-incorrect")
         .on("click", "#gpt-send-incorrect", function () {
 
           const message = content.toString().trim();
 
           const $btn = $(this);
-          $btn.prop("disabled", true);
 
+          $btn.prop("disabled", true);
+          $body.find("#gpt-send-with-prompt-incorrect").prop("disabled", true);
+          $body.find("#gpt-insert-incorrect").hide();
           $body.find("#gpt-incorrect-result").empty();
           $body.find("#gpt-loader").show();
 
@@ -439,29 +468,83 @@
           response.then(data => {
             if (data.ok) {
               $body.find("#gpt-loader").hide();
-
-              try {
-                const json = JSON.parse($body.find("#gpt-incorrect-result").text());
-                json.map(q => {
-                  const foundFragments = dataWrapper.findFragmentByCorrectItemTitle(q.question);
-                  foundFragments.map(f => {
-                    q.answers.map(answerName => dataWrapper.createFragmentItem(f.id, {
-                      id: generateUUID(),
-                      title: answerName,
-                      correct: false
-                    }))
-                  });
-                });
-              } catch (ex) {
-
-              }
-
-              modal.hide();
+              $body.find("#gpt-insert-incorrect").show();
+            }
+            if ($body.find("#gpt-send-with-prompt-incorrect").is(":visible")) {
+              $body.find("#gpt-send-with-prompt-incorrect").removeAttr("disabled")
             }
             $btn.prop("disabled", false);
           });
-
         });
+
+      modal.getElement()
+        .off("click", "#gpt-send-with-prompt-incorrect")
+        .on("click", "#gpt-send-with-prompt-incorrect", function () {
+
+          const message = content.toString().trim();
+          console.log(message)
+          if (message.length < 50) {
+            toastr.warning("Слишком короткий текст");
+            return;
+          }
+
+          const $btn = $(this);
+
+          $btn.prop("disabled", true);
+          $body.find("#gpt-send-incorrect").prop("disabled", true);
+          $body.find("#gpt-insert-incorrect").hide();
+          $body.find("#gpt-incorrect-result").empty();
+          $body.find("#gpt-loader").show();
+
+          const role = $body.find("#gpt-role").val();
+
+          let fragments = window.dataWrapper.getFragments().map(f => f.items
+            .filter(i => i.correct)
+            .map(i => i.title.replace(/\s+/g, " "))
+            .join(" ")
+          );
+
+          fragments = [...new Set(fragments)];
+
+          const prompt = $body.find("#gpt-prompt")
+            .html()
+            .replace(/<br>/g, "\n")
+
+          const response = sendMessage(message, role, fragments, prompt);
+
+          response.then(data => {
+            if (data.ok) {
+              $body.find("#gpt-loader").hide()
+              $body.find("#gpt-insert-incorrect").show()
+            }
+
+            if ($body.find("#gpt-send-incorrect").is(":visible")) {
+              $body.find("#gpt-send-incorrect").removeAttr("disabled")
+            }
+            $btn.prop("disabled", false);
+          });
+        })
+
+      modal.getElement()
+        .off("click", "#gpt-insert-incorrect")
+        .on("click", "#gpt-insert-incorrect", function () {
+          try {
+            const json = JSON.parse($body.find("#gpt-incorrect-result").text());
+            json.map(q => {
+              const foundFragments = dataWrapper.findFragmentByCorrectItemTitle(q.question);
+              foundFragments.map(f => {
+                q.answers.map(answerName => dataWrapper.createFragmentItem(f.id, {
+                  id: generateUUID(),
+                  title: answerName,
+                  correct: false
+                }))
+              });
+            });
+            modal.hide()
+          } catch (ex) {
+            alert(ex.message)
+          }
+        })
     }
 
     modal.show({
