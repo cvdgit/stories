@@ -6,6 +6,7 @@ namespace backend\modules\gpt\controllers;
 
 use backend\modules\gpt\ChatEventStream;
 use Exception;
+use frontend\GptChat\GptChatForm;
 use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\helpers\Json;
@@ -285,12 +286,60 @@ TEXT;
 
     public function actionWikids(Request $request): void
     {
-        $fields = $request->post();
+        $chatForm = new GptChatForm();
+        if ($chatForm->load($request->post())) {
 
-        try {
-            $this->chatEventStream->send("wikids_chat", Yii::$app->params["gpt.api.wikids.host"], Json::encode($fields));
-        } catch (Exception $ex) {
-            Yii::$app->errorHandler->logException($ex);
+            if (!$chatForm->validate()) {
+                echo "event: error\r\n";
+                $ops = [
+                    "ops" => [
+                        [
+                            "op" => "replace",
+                            "path" => "",
+                            "value" => [
+                                "error_text" => "Not valid.",
+                            ],
+                        ],
+                    ],
+                ];
+                echo 'data: ' . Json::encode($ops) . "\r\n";
+                flush();
+                return;
+            }
+
+            $fields = [
+                "input" => [
+                    "question" => $chatForm->text,
+                    "chat_history" => [],
+                ],
+                "config" => [
+                    "metadata" => [
+                        "conversation_id" => Uuid::uuid4()->toString(),
+                    ],
+                ],
+                "include_names" => ["FindDocs"],
+            ];
+
+            try {
+                $this->chatEventStream->send("wikids_chat", Yii::$app->params["gpt.api.wikids.host"], Json::encode($fields));
+            } catch (Exception $ex) {
+                Yii::$app->errorHandler->logException($ex);
+            }
+        } else {
+            echo "event: error\r\n";
+            $ops = [
+                "ops" => [
+                    [
+                        "op" => "replace",
+                        "path" => "",
+                        "value" => [
+                            "error_text" => "No data.",
+                        ],
+                    ],
+                ],
+            ];
+            echo 'data: ' . Json::encode($ops) . "\r\n";
+            flush();
         }
     }
 

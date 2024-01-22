@@ -473,7 +473,10 @@ class StoryEditorService
         StorySlide::deleteAll('story_id = :story AND kind = :kind', [':story' => $storyId, ':kind' => SlideKind::FINAL_SLIDE]);
     }
 
-    public function jsonFromStory(string $slideData, string $storyUrl): string
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function jsonFromStory(string $slideData, string $storyUrl, string $storyTitle): array
     {
         $reader = new HTMLReader($slideData);
         $story = $reader->load();
@@ -499,12 +502,13 @@ class StoryEditorService
                     throw new NotFoundHttpException("Слайд не найден");
                 }
                 $slides[] = [
+                    "story_title" => $storyTitle,
                     "content" => implode(PHP_EOL, $text),
                     "slide_url" => $storyUrl . ($slideModel->number === 1 ? "" : "#/" . $slideModel->number),
                     "images" => $images,
                 ];
             }
         }
-        return json_encode($slides, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        return $slides;
     }
 }

@@ -3,10 +3,13 @@
 declare(strict_types=1);
 
 use backend\assets\json\JsonPatchAsset;
+use frontend\GptChat\GptChatForm;
+use yii\widgets\ActiveForm;
 use yii\web\View;
 
 /**
  * @var View $this
+ * @var GptChatForm $formModel
  */
 
 $this->registerCss(
@@ -321,16 +324,22 @@ $this->title = "Задай вопрос по истории Руси";
                 </div>
             </div>
         </div>
-        <div class="textarea-wrap">
-            <textarea rows="1" id="send-message" class="textarea-input" placeholder="Какой город построили ильменские словене?"></textarea>
+            <?php $form = ActiveForm::begin(["id" => "send-message-form", "options" => ["class" => "textarea-wrap"]]); ?>
+            <?= $form
+                ->field($formModel, "text", ["options" => ["tag" => false]])
+                ->textarea(["id" => "send-message", "class" => "textarea-input", "rows" => 1, "placeholder" => "Какой город построили ильменские словене?"])
+                ->hint(false)
+                ->label(false)
+                ->error(false);
+            ?>
             <div class="send-btn">
                 <button type="submit" id="send-message-btn">
-                    <svg viewBox="0 0 24 24" focusable="false" class="chakra-icon css-onkibi" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
                         <path fill="currentColor"
                               d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"></path>
                     </svg>
                 </button>
             </div>
-        </div>
+            <?php ActiveForm::end(); ?>
     </div>
 </div>

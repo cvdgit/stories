@@ -17,6 +17,7 @@ use common\services\StoryFavoritesService;
 use common\services\StoryLikeService;
 use common\services\QuestionsService;
 use frontend\components\StoryRenderParams;
+use frontend\GptChat\GptChatForm;
 use frontend\models\CreateStoryTestRun;
 use frontend\models\MyAudioStoriesSearch;
 use frontend\models\StoryFavoritesSearch;
@@ -489,6 +490,10 @@ class StoryController extends Controller
             $this->view->off(View::EVENT_END_BODY, [Module::getInstance(), 'renderToolbar']);
         }
 
-        return $this->render("chat");
+        $chatForm = new GptChatForm();
+
+        return $this->render("chat", [
+            "formModel" => $chatForm,
+        ]);
     }
 }

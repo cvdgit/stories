@@ -1,15 +1,14 @@
-(function() {
+(function () {
 
   function generateUUID() {
     var d = new Date().getTime();
     var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now() * 1000)) || 0;
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
       var r = Math.random() * 16;
       if (d > 0) {
         r = (d + r) % 16 | 0;
         d = Math.floor(d / 16);
-      }
-      else {
+      } else {
         r = (d2 + r) % 16 | 0;
         d2 = Math.floor(d2 / 16);
       }
@@ -22,21 +21,9 @@
     const response = await fetch('/admin/index.php?r=gpt/stream/wikids', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         "X-CSRF-Token": $("meta[name=csrf-token]").attr("content")
       },
-      body: JSON.stringify({
-        input: {
-          question,
-          chat_history: [],
-        },
-        config: {
-          metadata: {
-            conversation_id: generateUUID(),
-          },
-        },
-        include_names: ["FindDocs"],
-      })
+      body: new FormData(form)
     });
 
     if (!response.ok) {
@@ -155,17 +142,18 @@
     }
   }
 
+  const form = document.getElementById("send-message-form")
   const textarea = document.getElementById("send-message")
   const sendBtn = document.getElementById("send-message-btn")
   const container = document.getElementById("message-container")
 
   const feedbacks = []
 
-  textarea.addEventListener("keydown", e => {
-    if (e.code === "Enter" && !e.shiftKey) {
-      e.preventDefault()
+  $(form)
+    .on('beforeSubmit', function(e) {
+      e.preventDefault();
 
-      const message = e.target.value;
+      const message = textarea.value
       if (!message) {
         return;
       }
@@ -174,7 +162,7 @@
         container.innerHTML = "";
       }
 
-      textarea.setAttribute("disabled", "true")
+      textarea.setAttribute("readonly", "true")
       sendBtn.setAttribute("disabled", "true")
 
       container.prepend(createQuestionMessage(message))
@@ -182,39 +170,33 @@
       const answerItem = createAnswerMessage()
       container.prepend(answerItem)
 
-      const response = sendMessage(answerItem, message)
+        const response = sendMessage(answerItem, message)
 
-      response.then(data => {
-        answerItem.querySelector(".loading").style.display = "none"
-        answerItem.querySelector(".message-feedback").style.display = "block"
-        textarea.removeAttribute("disabled")
-        sendBtn.removeAttribute("disabled")
-      })
+        response.then(data => {
+          answerItem.querySelector(".loading").style.display = "none"
+          answerItem.querySelector(".message-feedback").style.display = "block"
+          textarea.removeAttribute("readonly")
+          sendBtn.removeAttribute("disabled")
+        })
+
+      return false
+    })
+    .on('submit', e => e.preventDefault());
+
+  textarea.addEventListener("keydown", e => {
+    if (e.code === "Enter" && !e.shiftKey) {
+      e.preventDefault()
+      $(form).submit()
     }
   })
 
   $("#message-container")
-    .on("click", ".offer-line-item", function(e) {
-
-    const message = $(this).text()
-
-    container.innerHTML = ""
-    textarea.setAttribute("disabled", "true")
-
-    container.prepend(createQuestionMessage(message))
-
-    const answerItem = createAnswerMessage()
-    container.prepend(answerItem)
-
-    const response = sendMessage(answerItem, message)
-
-    response.then(data => {
-      answerItem.querySelector(".loading").style.display = "none"
-      answerItem.querySelector(".message-feedback").style.display = "block"
-      textarea.removeAttribute("disabled")
+    .on("click", ".offer-line-item", function (e) {
+      const message = $(this).text()
+      document.getElementById("send-message").innerText = message
+      $(form).submit()
     })
-  })
-    .on("click", "[data-run-id] .feedback-button", async function() {
+    .on("click", "[data-run-id] .feedback-button", async function () {
 
       const runId = $(this).parents("[data-run-id]:eq(0)").attr("data-run-id")
       if (!runId) {
@@ -239,35 +221,6 @@
         toastr.success("Успешно")
       }
     })
-
-  sendBtn.addEventListener("click", function() {
-
-    const message = textarea.value
-    if (!message) {
-      return;
-    }
-
-    if ($(container).find("#message-offers").length) {
-      container.innerHTML = "";
-    }
-
-    textarea.setAttribute("disabled", "true")
-    sendBtn.setAttribute("disabled", "true")
-
-    container.prepend(createQuestionMessage(message))
-
-    const answerItem = createAnswerMessage()
-    container.prepend(answerItem)
-
-    const response = sendMessage(answerItem, message)
-
-    response.then(data => {
-      answerItem.querySelector(".loading").style.display = "none"
-      answerItem.querySelector(".message-feedback").style.display = "block"
-      textarea.removeAttribute("disabled")
-      sendBtn.removeAttribute("disabled")
-    })
-  })
 
   function createMessageItem() {
     const item = document.createElement("div")
