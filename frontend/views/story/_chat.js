@@ -69,13 +69,17 @@
               foundSources = true
               if (element.querySelector(".message-images").innerHTML === "") {
                 const exists = [];
+                console.log(streamedResponse.logs["FindDocs"].final_output)
                 streamedResponse.logs["FindDocs"].final_output.output.map((doc) => {
                   if (!exists.includes(doc.metadata.source)) {
                     exists.push(doc.metadata.source)
                     const div = document.createElement("div")
                     div.innerHTML = `
-                    <a target="_blank" href="${doc.metadata.source}"><img width="300" src="${doc.metadata.images}" /></a>
-                  `
+                      <a target="_blank" href="${doc.metadata.source}">
+                        <img width="300" src="${doc.metadata.images}" />
+                        <div>${doc.metadata.story_title}</div>
+                      </a>
+                    `
                     element.querySelector(".message-images").appendChild(div)
                     container.scrollTop = container.scrollHeight
                   }
