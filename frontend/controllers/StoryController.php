@@ -496,4 +496,9 @@ class StoryController extends Controller
             "formModel" => $chatForm,
         ]);
     }
+
+    public function actionTest()
+    {
+        echo phpinfo();
+    }
 }
