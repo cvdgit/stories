@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace backend\modules\gpt;
 
+use Exception;
 use yii\web\HttpException;
 
 class EventStream
@@ -23,7 +24,9 @@ class EventStream
             ],
             CURLOPT_WRITEFUNCTION => function ($ch, $chunk) use ($callback) {
                 if ($callback !== null && is_callable($callback)) {
-                    $callback($chunk);
+                    try {
+                        $callback($chunk);
+                    } catch (Exception $ex) {}
                 }
                 flush();
                 echo $chunk;
