@@ -34,7 +34,7 @@ class ChatEventStream
                 $url,
                 $fieldsJson,
                 static function (string $chunk) use (&$streamedResponse, &$errorResponse): void {
-                    foreach (explode("\r\n\r\n", $chunk) as $row) {
+                    /*foreach (explode("\r\n\r\n", $chunk) as $row) {
                         if (!$row) {
                             continue;
                         }
@@ -55,7 +55,7 @@ class ChatEventStream
                             $data = str_replace("data: ", "", $rows[1]);
                             $errorResponse = Json::decode($data);
                         }
-                    }
+                    }*/
                 }
             );
         } catch (\Exception $ex) {
@@ -77,7 +77,7 @@ class ChatEventStream
             flush();
         }
 
-        $command = Yii::$app->db->createCommand();
+        /*$command = Yii::$app->db->createCommand();
         $command->insert("llm_feedback", [
             "run_id" => $streamedResponse->id,
             "target" => $target,
@@ -86,6 +86,6 @@ class ChatEventStream
             "output" => isset($errorResponse["message"]) ? $errorResponse : $streamedResponse,
             "created_at" => time(),
         ]);
-        $command->execute();
+        $command->execute();*/
     }
 }
