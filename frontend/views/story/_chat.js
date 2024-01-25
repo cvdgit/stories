@@ -58,42 +58,51 @@
         if (event && event.trim() === "data") {
           const data = secondRow.toString().replace(/^data: /, "")
           if (data) {
-            const chunk = JSON.parse(data);
 
-            streamedResponse = jsonpatch.applyPatch(
-              streamedResponse,
-              chunk.ops,
-            ).newDocument;
+            let chunk;
+            try {
+              chunk = JSON.parse(data);
+            } catch (ex) {
+              console.log("ex", data);
+            }
 
-            if (Array.isArray(streamedResponse?.logs?.["FindDocs"]?.final_output?.output) && !foundSources) {
-              foundSources = true
-              if (element.querySelector(".message-images").innerHTML === "") {
-                const exists = [];
-                console.log(streamedResponse.logs["FindDocs"].final_output)
-                streamedResponse.logs["FindDocs"].final_output.output.map((doc) => {
-                  if (!exists.includes(doc.metadata.source)) {
-                    exists.push(doc.metadata.source)
-                    const div = document.createElement("div")
-                    div.innerHTML = `
+            if (chunk) {
+
+              streamedResponse = jsonpatch.applyPatch(
+                streamedResponse,
+                chunk.ops,
+              ).newDocument;
+
+              if (Array.isArray(streamedResponse?.logs?.["FindDocs"]?.final_output?.output) && !foundSources) {
+                foundSources = true
+                if (element.querySelector(".message-images").innerHTML === "") {
+                  const exists = [];
+                  console.log(streamedResponse.logs["FindDocs"].final_output)
+                  streamedResponse.logs["FindDocs"].final_output.output.map((doc) => {
+                    if (!exists.includes(doc.metadata.source)) {
+                      exists.push(doc.metadata.source)
+                      const div = document.createElement("div")
+                      div.innerHTML = `
                       <a target="_blank" href="${doc.metadata.source}">
                         <img width="300" src="${doc.metadata.images}" />
                         <div>${doc.metadata.story_title}</div>
                       </a>
                     `
-                    element.querySelector(".message-images").appendChild(div)
-                    container.scrollTop = container.scrollHeight
-                  }
-                });
+                      element.querySelector(".message-images").appendChild(div)
+                      container.scrollTop = container.scrollHeight
+                    }
+                  });
+                }
               }
-            }
 
-            if (streamedResponse.id !== undefined) {
-              element.setAttribute("data-run-id", streamedResponse.id)
-            }
+              if (streamedResponse.id !== undefined) {
+                element.setAttribute("data-run-id", streamedResponse.id)
+              }
 
-            if (Array.isArray(streamedResponse?.streamed_output)) {
-              element.querySelector(".message-content").innerHTML = streamedResponse.streamed_output.join("");
-              container.scrollTop = container.scrollHeight
+              if (Array.isArray(streamedResponse?.streamed_output)) {
+                element.querySelector(".message-content").innerHTML = streamedResponse.streamed_output.join("");
+                container.scrollTop = container.scrollHeight
+              }
             }
           }
         }
