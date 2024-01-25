@@ -23,11 +23,11 @@ class EventStream
                 "Accept: text/event-stream"
             ],
             CURLOPT_WRITEFUNCTION => function ($ch, $chunk) use ($callback) {
-                /*if ($callback !== null && is_callable($callback)) {
+                if ($callback !== null && is_callable($callback)) {
                     try {
                         $callback($chunk);
                     } catch (Exception $ex) {}
-                }*/
+                }
                 echo $chunk;
                 flush();
                 return strlen($chunk);
