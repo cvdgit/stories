@@ -42,12 +42,12 @@ class ChatEventStream
                         $event = explode(" ", $rows[0])[1];
                         if (trim($event) === "data") {
                             $data = str_replace("data: ", "", $rows[1]);
-                            try {
+                            //try {
                                 $dataJson = Json::decode($data);
-                            } catch (\Exception $ex) {
+                            /*} catch (\Exception $ex) {
                                 $data = preg_replace('/[[:cntrl:]]/', '', $data);
                                 $dataJson = Json::decode($data);
-                            }
+                            }*/
                             $op = Patch::fromJSON(Json::encode($dataJson["ops"]));
                             $op->apply($streamedResponse);
                         }

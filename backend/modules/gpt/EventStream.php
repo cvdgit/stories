@@ -24,9 +24,9 @@ class EventStream
             ],
             CURLOPT_WRITEFUNCTION => function ($ch, $chunk) use ($callback) {
                 if ($callback !== null && is_callable($callback)) {
-                    try {
+                    //try {
                         $callback($chunk);
-                    } catch (Exception $ex) {}
+                    //} catch (Exception $ex) {}
                 }
                 flush();
                 echo $chunk;
