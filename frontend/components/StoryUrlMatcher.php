@@ -9,6 +9,10 @@ class StoryUrlMatcher implements UrlMatcherInterface
     public function match(string $url): ?array
     {
         $urlParams = parse_url($url);
+        if (!isset($urlParams["path"])) {
+            return null;
+        }
+
         $matches = [];
         if (preg_match('/^\/story\/([\w\-]+)/', $urlParams['path'], $matches)) {
             return [
