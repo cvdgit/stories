@@ -45,8 +45,8 @@
         break;
       }
 
-      let decoded = decoder.decode(value);
-      console.log(decoded)
+      let decoded = decoder.decode(value, {stream: true});
+      console.log(value)
 
       decoded.split("\r\n\r\n").map(row => {
         if (!row.length) {
