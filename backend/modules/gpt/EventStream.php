@@ -28,8 +28,8 @@ class EventStream
                         $callback($chunk);
                     } catch (Exception $ex) {}
                 }
-                echo $chunk;
                 flush();
+                echo $chunk;
                 return strlen($chunk);
             },
         ];
