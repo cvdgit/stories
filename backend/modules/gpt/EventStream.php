@@ -29,7 +29,6 @@ class EventStream
                     } catch (Exception $ex) {}
                 }
                 echo $chunk;
-                ob_end_flush();
                 flush();
                 return strlen($chunk);
             },
