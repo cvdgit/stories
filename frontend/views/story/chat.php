@@ -297,6 +297,24 @@ button,input,optgroup,select,textarea {
 .feedback-like, .feedback-dislike {
     background: none;
 }
+
+.citation {
+    position: relative;
+    bottom: 6px;
+    font-size: 12px;
+    line-height: 16px;
+    border-width: 1px;
+    border-radius: 4px;
+    padding-left: 4px;
+    padding-right: 4px;
+    background-color: rgba(78, 78, 81, 1);
+    color: #fff;
+    text-decoration: none;
+}
+.message-content {
+    white-space: pre-wrap;
+    line-height: 24px;
+}
 CSS
 );
 

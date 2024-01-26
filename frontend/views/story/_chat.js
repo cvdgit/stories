@@ -16,6 +16,22 @@
     });
   }
 
+  function parseOutput(output, sources) {
+    if (!sources.length) {
+      return output
+    }
+    const matches = Array.from(output.matchAll(/\[\^?(\d+)\^?\]/g))
+    if (!matches.length) {
+      return output
+    }
+    matches.map(match => {
+      if (match.index !== null) {
+        output = output.replace(match[0], `<a class="citation" target="_blank" href="${sources[match[1]].metadata.source}">${match[1]}</a>`)
+      }
+    })
+    return output
+  }
+
   async function sendMessage(element, question) {
 
     const response = await fetch('/admin/index.php?r=gpt/stream/wikids', {
@@ -38,6 +54,7 @@
     let streamedResponse = {}
     let errorResponse = {}
     let foundSources = false;
+    let sources = [];
     while (true) {
 
       const {done, value} = await reader.read();
@@ -67,10 +84,10 @@
             ).newDocument;
 
             if (Array.isArray(streamedResponse?.logs?.["FindDocs"]?.final_output?.output) && !foundSources) {
+              sources = streamedResponse.logs["FindDocs"].final_output.output
               foundSources = true
               if (element.querySelector(".message-images").innerHTML === "") {
                 const exists = [];
-                console.log(streamedResponse.logs["FindDocs"].final_output)
                 streamedResponse.logs["FindDocs"].final_output.output.map((doc) => {
                   if (!exists.includes(doc.metadata.source)) {
                     exists.push(doc.metadata.source)
@@ -93,7 +110,7 @@
             }
 
             if (Array.isArray(streamedResponse?.streamed_output)) {
-              element.querySelector(".message-content").innerHTML = streamedResponse.streamed_output.join("");
+              element.querySelector(".message-content").innerHTML = parseOutput(streamedResponse.streamed_output.join(""), sources)
               container.scrollTop = container.scrollHeight
             }
           }
