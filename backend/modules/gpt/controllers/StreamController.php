@@ -33,7 +33,7 @@ class StreamController extends Controller
             $this->enableCsrfValidation = false;
         }
 
-        @ob_end_clean();
+        //@ob_end_clean();
         ini_set('output_buffering', '0');
         set_time_limit(0);
 
