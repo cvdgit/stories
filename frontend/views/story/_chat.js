@@ -76,42 +76,50 @@
           const data = secondRow.toString().replace(/^data: /, "")
           if (data) {
 
-            const chunk = JSON.parse(data);
+            let chunk;
+            try {
+              chunk = JSON.parse(data);
+            } catch (ex) {
 
-            streamedResponse = jsonpatch.applyPatch(
-              streamedResponse,
-              chunk.ops,
-            ).newDocument;
+            }
 
-            if (Array.isArray(streamedResponse?.logs?.["FindDocs"]?.final_output?.output) && !foundSources) {
-              sources = streamedResponse.logs["FindDocs"].final_output.output
-              foundSources = true
-              if (element.querySelector(".message-images").innerHTML === "") {
-                const exists = [];
-                streamedResponse.logs["FindDocs"].final_output.output.map((doc) => {
-                  if (!exists.includes(doc.metadata.source)) {
-                    exists.push(doc.metadata.source)
-                    const div = document.createElement("div")
-                    div.innerHTML = `
+            if (chunk) {
+
+              streamedResponse = jsonpatch.applyPatch(
+                streamedResponse,
+                chunk.ops,
+              ).newDocument;
+
+              if (Array.isArray(streamedResponse?.logs?.["FindDocs"]?.final_output?.output) && !foundSources) {
+                sources = streamedResponse.logs["FindDocs"].final_output.output
+                foundSources = true
+                if (element.querySelector(".message-images").innerHTML === "") {
+                  const exists = [];
+                  sources.map((doc) => {
+                    if (!exists.includes(doc.metadata.source)) {
+                      exists.push(doc.metadata.source)
+                      const div = document.createElement("div")
+                      div.innerHTML = `
                       <a target="_blank" href="${doc.metadata.source}">
                         <img width="300" src="${doc.metadata.images}" />
                         <div>${doc.metadata.story_title}</div>
                       </a>
                     `
-                    element.querySelector(".message-images").appendChild(div)
-                    container.scrollTop = container.scrollHeight
-                  }
-                });
+                      element.querySelector(".message-images").appendChild(div)
+                      container.scrollTop = container.scrollHeight
+                    }
+                  });
+                }
               }
-            }
 
-            if (streamedResponse.id !== undefined) {
-              element.setAttribute("data-run-id", streamedResponse.id)
-            }
+              if (streamedResponse.id !== undefined) {
+                element.setAttribute("data-run-id", streamedResponse.id)
+              }
 
-            if (Array.isArray(streamedResponse?.streamed_output)) {
-              element.querySelector(".message-content").innerHTML = parseOutput(streamedResponse.streamed_output.join(""), sources)
-              container.scrollTop = container.scrollHeight
+              if (Array.isArray(streamedResponse?.streamed_output)) {
+                element.querySelector(".message-content").innerHTML = parseOutput(streamedResponse.streamed_output.join(""), sources)
+                container.scrollTop = container.scrollHeight
+              }
             }
           }
         }

@@ -335,10 +335,10 @@ $this->title = "Задай вопрос по истории Руси";
             <div id="message-offers"
                  style="display: flex; flex-direction: column; max-width: 100%; align-items: center; padding: 32px">
                 <div class="offer-line">
-                    <div class="offer-line-item">Где жили словене?</div>
+                    <div class="offer-line-item">Крещение Руси</div>
                     <div class="offer-line-item">Расскажи про ладожское озеро</div>
                     <div class="offer-line-item">Где жили словене?</div>
-                    <div class="offer-line-item">Где жили словене?</div>
+                    <div class="offer-line-item">Княгиня Ольга</div>
                 </div>
             </div>
         </div>
