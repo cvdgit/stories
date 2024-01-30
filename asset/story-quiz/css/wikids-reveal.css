@@ -1683,6 +1683,10 @@ p.wikids-test-description {
   max-width: none !important;
 }
 
+.seq-answers p {
+  font-weight: normal !important;
+}
+
 .seq-answers table {
   border: 0;
   border-collapse: collapse;

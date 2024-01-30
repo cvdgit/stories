@@ -21,6 +21,7 @@ use yii\web\View;
 StoryEditorAsset::register($this);
 JsonPatchAsset::register($this);
 $this->registerJs($this->renderFile("@backend/views/editor/_gpt_slide_text.js"));
+$this->registerJs($this->renderFile("@backend/views/editor/_pass_test.js"));
 ?>
 <div class="wrap-editor">
     <div class="slides-sidebar">
@@ -186,8 +187,20 @@ $js = <<< JS
         }
     }
 
+    function getSlideContent(slide) {
+        const texts = [];
+        slide.getElement().find(`div[data-block-type="text"]`).map((i, el) => {
+            const text = $(el).find(".slide-paragraph").html();
+            if (text.length) {
+                texts.push(text);
+            }
+        })
+        return "<div>" + texts.join(`\\n`) + "</div>"
+    }
+
     var editorPopover = new EditorPopover();
     const gpt = new GptSlideText();
+    const passTest = new CreatePassTest();
     editorPopover.attach('#create-video-block', {'placement': 'left'}, [
         {'name': 'youtube', 'title': 'YouTube', 'click': function() {
             showCreateBlockModal('video');
@@ -232,6 +245,27 @@ $js = <<< JS
                     StoryEditor.loadSlides();
                 }
             });
+        }},
+        {name: "pass-question-test", title: "Создать тест с пропусками", click: function() {
+            const currentSlide = StoryEditor.getCurrentSlide();
+            if (!currentSlide) {
+                toastr.error("Нет слайда");
+                return;
+            }
+            const texts = getSlideContent(currentSlide)
+            if (!texts.length) {
+                toastr.warning("Текст на слайде не найден");
+                return;
+            }
+
+            passTest.create({
+                content: texts,
+                slideId: currentSlide.getID(),
+                storyId: StoryEditor.getConfigValue("storyID"),
+                processCallback: () => {
+                    StoryEditor.loadSlides();
+                }
+            })
         }}
     ]);
     editorPopover.attach('#create-slide-action', {'placement': 'right'}, [

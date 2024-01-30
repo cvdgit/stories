@@ -19,6 +19,7 @@ use backend\models\editor\TransitionForm;
 use backend\models\editor\VideoForm;
 use backend\models\video\VideoSource;
 use backend\services\StoryLinksService;
+use backend\SlideEditor\CreatePassTest\CreatePassTestAction;
 use backend\SlideEditor\CreateQuizBySlideText\CreateQuizAction;
 use common\models\Lesson;
 use common\models\StorySlide;
@@ -36,7 +37,6 @@ use yii\web\Response;
 
 class EditorController extends BaseController
 {
-
     protected $storyService;
     protected $editorService;
     private $storyLinksService;
@@ -71,6 +71,7 @@ class EditorController extends BaseController
     {
         return [
             "gpt-quiz" => CreateQuizAction::class,
+            "create-pass-test" => CreatePassTestAction::class,
         ];
     }
 
