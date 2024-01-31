@@ -142,7 +142,7 @@
 </div>
       <div class="row">
         <div class="col-md-12">
-          <div id="gpt-result" style="height: 500px; overflow-y: auto; border: 1px solid #ccc; padding: 10px"></div>
+          <div contenteditable="plaintext-only" id="gpt-result" style="height: 500px; overflow-y: auto; border: 1px solid #ccc; padding: 10px"></div>
          </div>
       </div>
       <div style="padding: 10px; display: flex; align-items: center; justify-content: space-between; flex-direction: row">
@@ -394,7 +394,7 @@
       <div class="row">
         <div class="col-md-12">
             <div>Ответ нейросети:</div>
-          <div id="gpt-incorrect-result" style="height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px"></div>
+          <div contenteditable="plaintext-only" id="gpt-incorrect-result" style="height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px"></div>
          </div>
       </div>
       <div style="padding: 10px; display: flex; align-items: center; justify-content: space-between; flex-direction: row">
