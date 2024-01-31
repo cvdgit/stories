@@ -130,7 +130,7 @@
           <textarea id="gpt-message" style="width:100%; height: 500px; overflow-y: auto"></textarea>
         </div>
         <div class="col-md-6">
-          <div id="gpt-result" style="height: 500px; overflow-y: auto; border: 1px solid #ccc; padding: 10px"></div>
+          <div id="gpt-result" contenteditable="plaintext-only" style="height: 500px; overflow-y: auto; border: 1px solid #ccc; padding: 10px"></div>
          </div>
       </div>
       <div style="padding: 10px; display: flex; align-items: center; justify-content: space-between; flex-direction: row">

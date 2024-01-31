@@ -122,7 +122,7 @@ function GptSlideText() {
         </div>
         <div class="col-md-6">
             <label for="">Результат</label>
-          <div id="gpt-result" style="height: 500px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; font-size: 14px"></div>
+          <div contenteditable="plaintext-only" id="gpt-result" style="height: 500px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; font-size: 14px"></div>
          </div>
       </div>
       <div style="padding: 10px; display: flex; align-items: center; justify-content: space-between; flex-direction: row">
