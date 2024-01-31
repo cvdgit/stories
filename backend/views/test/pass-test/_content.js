@@ -163,7 +163,6 @@
       .done(response => {
         dataWrapper.loadData(response);
         let content = dataWrapper.initFragments();
-        //$('#content').html(content);
         $('#content').redactor('code.set', content);
         $('#content').redactor('code.sync', content);
       });
@@ -208,8 +207,7 @@
   }
 
   function addFragmentItem(fragmentId, elem) {
-    const createElem = $('#content')
-      .find('span[data-fragment-id=' + fragmentId + '] > .dropdown-menu .divider');
+    const createElem = $(".external-dropdown-menu.open .dropdown-menu .divider")
     elem.insertBefore(createElem)
       .find('.fragment-title__edit')
       .focus();
@@ -281,23 +279,25 @@
       );
   }
 
-  $('#content')
+  $("#content")
     .on('hide.bs.dropdown', '.dropdown', function() {
-      $(this).find('.dropdown-menu').empty().html('&nbsp;');
+      $(".external-dropdown-menu")
+        .removeClass("open")
+        .hide()
+        .find('.dropdown-menu').empty().html('&nbsp;');
     })
     .on('show.bs.dropdown', '.dropdown', function() {
 
-      const $el = $(this);
-      const fragment_id = $(this).attr('data-fragment-id');
+      const $menu = $(".external-dropdown-menu").find(".dropdown-menu")
+      $menu.empty()
 
-      const menu = $(this).find('.dropdown-menu');
-      menu.empty();
-
+      const $el = $(this)
       const rect = $el[0].getBoundingClientRect();
       const dropDownTop = rect.top + $el.height() + 10;
-      menu.css('top', dropDownTop + "px");
-      menu.css('left', $el.offset().left + "px");
+      $menu.css('top', dropDownTop + "px");
+      $menu.css('left', $el.offset().left + "px");
 
+      const fragment_id = $(this).attr('data-fragment-id');
       const fragment = dataWrapper.findFragment(fragment_id);
 
       const setCorrectHandler = (itemId) => {
@@ -324,15 +324,12 @@
       };
 
       const itemCopyHandler = (title) => {
-
         const item = dataWrapper.createFragmentItem(fragment_id, {
           id: generateUUID(),
           correct: false,
           title
         });
-
         const elem = createElement(fragment_id, item, fragment.multi);
-
         addFragmentItem(fragment_id, elem);
       }
 
@@ -349,29 +346,26 @@
 
       dataWrapper.getFragmentItems(fragment_id).forEach(function(item) {
         const elem = createElement(fragment_id, item, fragment.multi);
-        elem.appendTo(menu);
+        elem.appendTo($menu);
       });
 
-      $('<li/>', {class: 'divider', role: 'separator'})
-        .appendTo(menu);
+      $('<li/>', {class: 'divider'})
+        .appendTo($menu);
 
       $('<li/>').append(
         $('<a/>', {'href': '#', 'class': 'add-word'})
           .text('Добавить слово')
           .on('click', function(e) {
             e.preventDefault();
-
             const item = dataWrapper.createFragmentItem(fragment_id, {
               id: generateUUID(),
               correct: false,
               title: ''
             });
-
             const elem = createElement(fragment_id, item, fragment.multi);
-
             addFragmentItem(fragment_id, elem);
           })
-      ).appendTo(menu);
+      ).appendTo($menu);
 
       $('<li/>').append(
         $('<a/>', {'href': '#', 'class': 'save-word-list'})
@@ -394,7 +388,7 @@
                 }
               });
           })
-      ).appendTo(menu);
+      ).appendTo($menu);
 
       $('<li/>').append(
         $('<a/>', {'href': '#', 'class': 'add-word'})
@@ -405,14 +399,19 @@
             $el.replaceWith(correctText);
             dataWrapper.removeFragment(fragment_id);
           })
-      ).appendTo(menu);
+      ).appendTo($menu);
+
+      $menu
+        .parent()
+        .show()
+        .addClass("open")
 
       setTimeout(function() {
-        $el.find(".fragment-title__edit:eq(0)").focus();
-      }, 0);
-    });
+        $el.find(".fragment-title input:eq(0)").focus();
+      }, 50);
+    })
 
-  $('#content').on('click', '.dropdown-menu', function(e) {
+  $(".external-dropdown-menu").on('click', '.dropdown-menu', function(e) {
     e.stopPropagation();
   });
 
@@ -424,12 +423,13 @@
   });
 
   $(document).on("scroll", function() {
-    $("#content .open > .dropdown-menu").each(function() {
-      const $el = $(this).parent();
-      const rect = $el[0].getBoundingClientRect();
-      const dropDownTop = rect.top + $el.height() + 10;
-      $(this).css('top', dropDownTop + "px");
-      $(this).css('left', $el.offset().left + "px");
+    $("#content .open").each(function() {
+      const $el = $(this)
+      const rect = $el[0].getBoundingClientRect()
+      const dropDownTop = rect.top + $el.height() + 10
+      $(".external-dropdown-menu .dropdown-menu")
+        .css('top', dropDownTop + "px")
+        .css('left', $el.offset().left + "px")
     })
   })
 

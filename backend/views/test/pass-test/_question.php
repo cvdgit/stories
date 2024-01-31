@@ -167,7 +167,7 @@ $this->registerCss(<<<CSS
 #content .open > .dropdown-menu {
     display: block;
 }
-#content .dropdown-menu {
+.external-dropdown-menu .dropdown-menu {
   position: fixed !important;
 }
 .image-container-wrapper {
@@ -266,6 +266,13 @@ JS
                 'linebreaks' => true,
                 'pastePlainText' => true,
                 'shortcuts' => false,
+                /*'removeWithoutAttr' => [],
+                'removeEmpty' => [],
+                'removeAttr' => false,
+                'cleanStyleOnEnter' => false,
+                'allowedAttr' => [
+                    ['ul' => 'style'],
+                ],*/
             ],
         ]); ?>
 
@@ -287,6 +294,10 @@ JS
                     </li>
                 </ul>
             </div>
+        </div>
+
+        <div class="external-dropdown-menu" style="display: none">
+            <ul class="dropdown-menu"></ul>
         </div>
     </div>
     <?= $form->field($model, 'content')->hiddenInput()->label(false) ?>

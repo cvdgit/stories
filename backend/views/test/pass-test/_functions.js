@@ -5,7 +5,7 @@ function fragmentElementBuilder(type) {
     const element = document.createElement("span");
     element.className = "dropdown";
     element.setAttribute('contenteditable', false);
-    element.innerHTML = '<button class="btn btn-default dropdown-toggle highlight" data-toggle="dropdown"></button><ul class="dropdown-menu">&nbsp;</ul>';
+    element.innerHTML = '<button class="btn btn-default dropdown-toggle highlight" data-toggle="dropdown"></button>';
     return element;
   };
 
