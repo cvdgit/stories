@@ -20,7 +20,7 @@
     if (!sources.length) {
       return output
     }
-    const matches = Array.from(output.matchAll(/\[\^?(\d+)\^?\]/g))
+    const matches = Array.from(output.matchAll(/\[\{?(\d+)\}?\]/g))
     if (!matches.length) {
       return output
     }
