@@ -29,10 +29,10 @@
     matches.map(match => {
       if (match.index !== null) {
         let replaceValue
-        if (match[0].indexOf(",") >= 0) {
-          console.log("parts", match[0])
+        if (match[1].indexOf(",") >= 0) {
+          console.log("parts", match[1])
           const parts = []
-          match[0].split(",").map(part => {
+          match[1].split(",").map(part => {
             console.log("part", part)
             const index = parseInt(part.trim())
             parts.push(`<a class="citation" target="_blank" href="${sources[index]?.metadata?.source}">${index}</a>`)
