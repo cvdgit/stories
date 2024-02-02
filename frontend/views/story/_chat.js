@@ -142,7 +142,7 @@
       })
     }
 
-    return {response, sources};
+    return {response: await response, sources};
   }
 
   async function sendFeedback({score, key, runId, value, comment, feedbackId, isExplicit = true,}) {
