@@ -16,6 +16,8 @@
     });
   }
 
+  let sources = []
+
   function parseOutput(output, sources) {
     if (!sources.length) {
       return output
@@ -54,7 +56,6 @@
     let streamedResponse = {}
     let errorResponse = {}
     let foundSources = false;
-    let sources = [];
     while (true) {
 
       const {done, value} = await reader.read();
@@ -142,7 +143,7 @@
       })
     }
 
-    return {response: await response, sources};
+    return response;
   }
 
   async function sendFeedback({score, key, runId, value, comment, feedbackId, isExplicit = true,}) {
@@ -200,7 +201,7 @@
       const answerItem = createAnswerMessage()
       container.prepend(answerItem)
 
-      const {response, sources} = sendMessage(answerItem, message)
+      const response = sendMessage(answerItem, message)
 
       response.then(data => {
 
