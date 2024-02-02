@@ -32,6 +32,7 @@ use common\models\test\SourceType;
 use DomainException;
 use common\models\Story;
 use yii\db\Query;
+use yii\helpers\Json;
 use yii\web\NotFoundHttpException;
 
 class StoryEditorService
@@ -513,7 +514,7 @@ class StoryEditorService
                 }
                 $slides[] = [
                     "story_title" => $storyTitle,
-                    "content" => $content,
+                    "content" => Json::htmlEncode($content),
                     "slide_url" => $storyUrl . ($slideNumber === 1 ? "" : "#/" . $slideNumber),
                     "images" => $images,
                 ];
