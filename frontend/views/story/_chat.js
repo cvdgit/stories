@@ -22,13 +22,22 @@
     if (!sources.length) {
       return output
     }
-    const matches = Array.from(output.matchAll(/\[\{?(\d+)\}?\]/g))
+    const matches = Array.from(output.matchAll(/\[\{?([\d,\s]+)\}?\]/g))
     if (!matches.length) {
       return output
     }
     matches.map(match => {
       if (match.index !== null) {
-        output = output.replace(match[0], `<a class="citation" target="_blank" href="${sources[match[1]].metadata.source}">${match[1]}</a>`)
+        let replaceValue = `<a class="citation" target="_blank" href="${sources[match[1]].metadata.source}">${match[1]}</a>`
+        if (match[0].indexOf(",") >= 0) {
+          const parts = []
+          match[0].split(",").map(part => {
+            const index = parseInt(part.trim())
+            parts.push(`<a class="citation" target="_blank" href="${sources[index].metadata.source}">${index}</a>`)
+          })
+          replaceValue = parts.join(" ")
+        }
+        output = output.replace(match[0], replaceValue)
       }
     })
     return output
