@@ -33,11 +33,11 @@
           const parts = []
           match[0].split(",").map(part => {
             const index = parseInt(part.trim())
-            parts.push(`<a class="citation" target="_blank" href="${sources[index].metadata.source}">${index}</a>`)
+            parts.push(`<a class="citation" target="_blank" href="${sources[index]?.metadata?.source}">${index}</a>`)
           })
           replaceValue = parts.join(" ")
         } else {
-          replaceValue = `<a class="citation" target="_blank" href="${sources[match[1]].metadata.source}">${match[1]}</a>`
+          replaceValue = `<a class="citation" target="_blank" href="${sources[match[1]]?.metadata?.source}">${match[1]}</a>`
         }
         output = output.replace(match[0], replaceValue)
       }
