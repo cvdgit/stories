@@ -142,7 +142,7 @@
       })
     }
 
-    return response;
+    return {response, sources};
   }
 
   async function sendFeedback({score, key, runId, value, comment, feedbackId, isExplicit = true,}) {
@@ -200,9 +200,12 @@
       const answerItem = createAnswerMessage()
       container.prepend(answerItem)
 
-      const response = sendMessage(answerItem, message)
+      const {response, sources} = sendMessage(answerItem, message)
 
       response.then(data => {
+
+        answerItem.querySelector(".message-content").innerHTML = parseOutput(answerItem.querySelector(".message-content").innerHTML, sources)
+
         answerItem.querySelector(".loading").style.display = "none"
         answerItem.querySelector(".message-feedback").style.display = "block"
         textarea.removeAttribute("readonly")
