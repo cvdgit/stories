@@ -369,7 +369,7 @@ class StoryController extends BaseController
             if ($storyModel === null) {
                 throw new NotFoundHttpException("История не найдена");
             }
-            $slides = $this->editorService->jsonFromStory($storyModel->slidesData(true), Yii::$app->urlManagerFrontend->createAbsoluteUrl(['preview/view', 'alias' => $storyModel->alias]), $storyModel->title);
+            $slides = $this->editorService->jsonFromStory($storyModel->slidesData(), Yii::$app->urlManagerFrontend->createAbsoluteUrl(['preview/view', 'alias' => $storyModel->alias]), $storyModel->title);
             $allSlides = array_merge($allSlides, $slides);
         }
         $response->sendContentAsFile(json_encode($allSlides, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 'slides.json');

@@ -481,7 +481,14 @@ class StoryEditorService
         $reader = new HTMLReader($slideData);
         $story = $reader->load();
         $slides = [];
-        foreach ($story->getSlides() as $slide) {
+        foreach ($story->getSlides() as $i => $slide) {
+
+            $slideNumber = $i + 1;
+
+            if ($slide->getView() === "new-question") {
+                continue;
+            }
+
             $text = [];
             $images = [];
             foreach ($slide->getBlocks() as $block) {
@@ -496,15 +503,18 @@ class StoryEditorService
                     $images[] = $path;
                 }
             }
-            if (count($text) > 0) {
+
+            $content = implode(PHP_EOL, $text);
+
+            if (strlen($content) > 10) {
                 $slideModel = StorySlide::findOne($slide->getId());
                 if ($slideModel === null) {
                     throw new NotFoundHttpException("Слайд не найден");
                 }
                 $slides[] = [
                     "story_title" => $storyTitle,
-                    "content" => implode(PHP_EOL, $text),
-                    "slide_url" => $storyUrl . ($slideModel->number === 1 ? "" : "#/" . $slideModel->number),
+                    "content" => $content,
+                    "slide_url" => $storyUrl . ($slideNumber === 1 ? "" : "#/" . $slideNumber),
                     "images" => $images,
                 ];
             }
