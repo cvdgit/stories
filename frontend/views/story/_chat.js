@@ -28,7 +28,7 @@
     }
     matches.map(match => {
       if (match.index !== null) {
-        let replaceValue = `<a class="citation" target="_blank" href="${sources[match[1]].metadata.source}">${match[1]}</a>`
+        let replaceValue
         if (match[0].indexOf(",") >= 0) {
           const parts = []
           match[0].split(",").map(part => {
@@ -36,6 +36,8 @@
             parts.push(`<a class="citation" target="_blank" href="${sources[index].metadata.source}">${index}</a>`)
           })
           replaceValue = parts.join(" ")
+        } else {
+          replaceValue = `<a class="citation" target="_blank" href="${sources[match[1]].metadata.source}">${match[1]}</a>`
         }
         output = output.replace(match[0], replaceValue)
       }
