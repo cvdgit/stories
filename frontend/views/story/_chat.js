@@ -30,8 +30,10 @@
       if (match.index !== null) {
         let replaceValue
         if (match[0].indexOf(",") >= 0) {
+          console.log("parts", match[0])
           const parts = []
           match[0].split(",").map(part => {
+            console.log("part", part)
             const index = parseInt(part.trim())
             parts.push(`<a class="citation" target="_blank" href="${sources[index]?.metadata?.source}">${index}</a>`)
           })
