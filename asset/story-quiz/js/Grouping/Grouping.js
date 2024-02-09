@@ -15,20 +15,20 @@ Grouping.prototype.createWrapper = function (content) {
   return $wrapper;
 };
 
+function getGroupsClassName(groupsLen) {
+  switch (groupsLen) {
+    case 2: return "two-groups"
+    case 3: return "three-groups"
+    case 4: return "four-groups"
+    case 5: return "five-groups"
+    default: return "two-groups"
+  }
+}
+
 Grouping.prototype.create = function (question) {
 
   const {payload} = question
   const {groups} = payload
-
-  function getGroupsClassName(groupsLen) {
-    switch (groupsLen) {
-      case 2: return "two-groups"
-      case 3: return "three-groups"
-      case 4: return "four-groups"
-      case 5: return "five-groups"
-      default: return "two-groups"
-    }
-  }
 
   const $groups = $('<div/>', {class: "grouping-groups"})
   $groups.addClass(getGroupsClassName(groups.length))
@@ -98,6 +98,40 @@ Grouping.prototype.getUserAnswers = function() {
       }).get()
     }
   }).get()
+}
+
+Grouping.prototype.getContent = function(question) {
+  const {payload} = question
+  const {groups} = payload
+
+  const $groups = $("<div/>", {class: "grouping-groups"})
+  $groups.addClass(getGroupsClassName(groups.length))
+
+  groups.map(group => {
+
+    const $group = $("<div/>", {class: "grouping-group"})
+      .append(
+        $("<p/>").text(group.title)
+      )
+      .append(
+        $("<div/>", {class: "group-items-spot"})
+      )
+
+    group.items.map(item => {
+      const $item = $('<button/>', {
+        type: 'button',
+        class: 'pass-test-btn highlight',
+        text: item.title
+      })
+      $group.find(".group-items-spot").append($item)
+    })
+
+    $group.appendTo($groups)
+  })
+
+  const $wrap = $('<div/>', {class: "grouping-wrap"})
+
+  return $wrap.append($groups)
 }
 
 _extends(Grouping, {

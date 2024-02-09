@@ -2535,6 +2535,8 @@ function WikidsStoryTest(el, options) {
       $elements.append(that.regionQuestion.createSuccess(question));
     } else if (questionViewPassTest(question)) {
       $elements.append(that.passTestQuestion.getContent(question.payload));
+    } else if (questionViewGrouping(question)) {
+      $elements.append(that.groupingQuestion.getContent(question))
     } else if (questionViewImageGaps(question)) {
       $elements.append(that.imageGapsQuestion.getContent(question));
     } else if (questionViewDragWords(question)) {
