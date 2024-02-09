@@ -1,4 +1,4 @@
-import {_extends} from "../common";
+import {_extends, shuffle} from "../common";
 import Sortable from "sortablejs";
 
 function Grouping(test) {
@@ -61,6 +61,7 @@ Grouping.prototype.create = function (question) {
 
   const $groupItems = $('<div/>', {class: "grouping-items"})
 
+  items = shuffle(items)
   items.map(item => {
     const $item = $('<button/>', {
       type: 'button',
