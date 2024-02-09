@@ -31,16 +31,7 @@ class Answer
     /** @var int|null */
     private $hidden;
 
-    /**
-     * @param int $id
-     * @param string $name
-     * @param bool $correct
-     * @param $regionID
-     * @param $image
-     * @param $order
-     * @param $origImage
-     */
-    public function __construct(int $id, string $name, bool $correct, $regionID = '', $image = null, $order = null, $origImage = null)
+    public function __construct(int $id, string $name, bool $correct, string $regionID = '', $image = null, $order = null, $origImage = null)
     {
         $this->id = $id;
         $this->name = $name;

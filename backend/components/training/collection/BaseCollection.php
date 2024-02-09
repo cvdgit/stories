@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\components\training\collection;
 
+use backend\components\training\base\BaseQuestion;
 use backend\components\training\base\QuestionCollection;
+use common\models\StoryTestQuestion;
 
 abstract class BaseCollection
 {
-
     private $data;
     private $stars;
 
@@ -16,7 +19,7 @@ abstract class BaseCollection
         $this->stars = $stars;
     }
 
-    public function build(QuestionCollection $collection)
+    public function build(QuestionCollection $collection): void
     {
         foreach ($this->data as $questionData) {
             $question = $this->createQuestion($questionData, $this->stars);
@@ -24,5 +27,5 @@ abstract class BaseCollection
         }
     }
 
-    abstract public function createQuestion($questionData, $stars);
+    abstract public function createQuestion(StoryTestQuestion $questionData, array $stars): BaseQuestion;
 }

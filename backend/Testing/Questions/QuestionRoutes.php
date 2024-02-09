@@ -17,6 +17,7 @@ class QuestionRoutes
             'Тест с пропусками' => self::getCreatePassTestQuestionRoute($quizId),
             'Перетаскивание слов' => self::getCreateDragWordsQuestionRoute($quizId),
             'Изображение с пропусками' => self::getCreateImageGapsQuestionRoute($quizId),
+            'Группировка элементов' => ['test/grouping/create', 'test_id' => $quizId],
         ];
     }
 

@@ -30,6 +30,7 @@ import createPlayBackdrop from "./components/questionAudio";
 import Poetry from "./questions/Poetry";
 import AnswerHistorySender from "./components/AnswerHistorySender";
 import ImageGaps from "./ImageGaps/ImageGaps";
+import Grouping from "./Grouping";
 
 
 var plugins = [];
@@ -99,6 +100,10 @@ function WikidsStoryTest(el, options) {
   this.imageGapsQuestion = null;
   this.dragWordsQuestion = null;
   this.poetryQuestion = null;
+  /**
+   * @type Grouping
+   */
+  this.groupingQuestion = null;
 
   setElementHtml(createLoader('Инициализация'));
 
@@ -1091,7 +1096,12 @@ function WikidsStoryTest(el, options) {
       questionName = 'Заполните пропущенные части';
     }
 
-    if (questionViewSequence(question) || questionViewPassTest(question) || questionViewDragWords(question) || questionViewImageGaps(question)) {
+    if (questionViewSequence(question)
+      || questionViewPassTest(question)
+      || questionViewDragWords(question)
+      || questionViewImageGaps(question)
+      || questionViewGrouping(question)
+    ) {
       questionName = question.name;
     }
 
@@ -1232,6 +1242,9 @@ function WikidsStoryTest(el, options) {
           break;
         case 'image-gaps':
           $answers = that.imageGapsQuestion.createWrapper();
+          break;
+        case "grouping":
+          $answers = that.groupingQuestion.createWrapper();
           break;
         default:
           $answers = createAnswers(getAnswersData(question), question);
@@ -1581,6 +1594,10 @@ function WikidsStoryTest(el, options) {
     return getQuestionView(question) === 'image-gaps';
   }
 
+  function questionViewGrouping(question) {
+    return getQuestionView(question) === 'grouping';
+  }
+
   function questionViewDragWords(question) {
     return getQuestionView(question) === 'drag-words';
   }
@@ -1793,7 +1810,13 @@ function WikidsStoryTest(el, options) {
           return parseInt(elem.name);
         };
       }
-      if (view === 'input' || view === 'recognition' || questionViewPassTest(currentQuestion) || questionViewImageGaps(currentQuestion) || testConfig.answerTypeIsMissingWords(currentQuestion)) {
+      if (view === 'input'
+         || view === 'recognition'
+         || questionViewPassTest(currentQuestion)
+         || questionViewImageGaps(currentQuestion)
+         || testConfig.answerTypeIsMissingWords(currentQuestion)
+         || questionViewGrouping(currentQuestion)
+      ) {
 
         const decodeHtml = (html) => {
           const txt = document.createElement("textarea");
@@ -2145,6 +2168,7 @@ function WikidsStoryTest(el, options) {
       && !questionViewImageGaps(currentQuestion)
       && !questionViewDragWords(currentQuestion)
       && !questionViewPoetry(currentQuestion)
+      && !questionViewGrouping(currentQuestion)
     ) {
       $('.wikids-test-answers', currentQuestionElement)
         .empty()
@@ -2184,6 +2208,26 @@ function WikidsStoryTest(el, options) {
       dom.nextButton.off("click").on("click", function () {
         const answer = that.passTestQuestion.getUserAnswers(currentQuestion?.item_view, currentQuestion.payload);
         nextQuestion(answer);
+      });
+    }
+
+    if (questionViewGrouping(currentQuestion)) {
+      $('.seq-question', currentQuestionElement)
+        .html(that.groupingQuestion.create(currentQuestion));
+
+      const checker = (values) => (value, index) => {
+        return value === values.map(v => v.id).sort()[index];
+      }
+
+      dom.nextButton.off("click").on("click", function () {
+        const userAnswers = that.groupingQuestion.getUserAnswers()
+        nextQuestion(userAnswers.map(g => g.items).flat(), (q) => {
+          const correctAnswers = getCorrectAnswers(q).map(i => JSON.parse(i.description))
+          return correctAnswers.every(correctGroup => {
+            const userGroup = userAnswers.find(userGroup => userGroup.groupId === correctGroup.id)
+            return !!(userGroup.items.length === correctGroup.items.length && userGroup.items.sort().every(checker(correctGroup.items)));
+          })
+        })
       });
     }
 
@@ -2958,6 +3002,7 @@ WikidsStoryTest.mount(PassTest);
 WikidsStoryTest.mount(DragWords);
 WikidsStoryTest.mount(Poetry);
 WikidsStoryTest.mount(ImageGaps);
+WikidsStoryTest.mount(Grouping)
 
 WikidsStoryTest.getTests = function () {
   return tests;

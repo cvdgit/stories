@@ -1,0 +1,35 @@
+.grouping-wrap {
+  padding: 20px 0;
+}
+.grouping-actions {
+  padding: 0 0 20px 0;
+  text-align: center;
+}
+.grouping-item {
+  margin-bottom: 30px;
+  padding: 10px;
+}
+
+.grouping-item:last-child {
+  margin-bottom: 0;
+}
+
+.grouping-item .handle {
+  cursor: pointer;
+  user-select: none;
+}
+
+.grouping-item:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.grouping-item-inner {
+  display: flex;
+  flex-direction: row;
+}
+.grouping-item-item {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}

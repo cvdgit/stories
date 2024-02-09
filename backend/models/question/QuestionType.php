@@ -20,6 +20,7 @@ class QuestionType
     public const DRAG_WORDS = 9;
     public const POETRY = 10;
     public const IMAGE_GAPS = 11;
+    public const GROUPING = 12;
 
     private $type;
 
@@ -47,6 +48,7 @@ class QuestionType
             self::DRAG_WORDS => 'Перетаскивание слов',
             self::POETRY => 'Запоминание стихов',
             self::IMAGE_GAPS => 'Изображение с пропусками',
+            self::GROUPING => 'Группировка элементов',
         ];
     }
 
@@ -93,5 +95,10 @@ class QuestionType
     public function isImageGaps(): bool
     {
         return $this->type === self::IMAGE_GAPS;
+    }
+
+    public function isGrouping(): bool
+    {
+        return $this->type === self::GROUPING;
     }
 }
