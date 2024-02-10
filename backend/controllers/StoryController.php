@@ -363,15 +363,15 @@ class StoryController extends BaseController
     {
         $response->format = Response::FORMAT_JSON;
         $storyIds = [297, 298, 308, 335, 596, 685, 813, 1226, 1336, 1450, 1527, 1827, 1956, 2036, 2068, 2163];
-        $allSlides = [];
+        $allStories = [];
         foreach ($storyIds as $storyId) {
             $storyModel = Story::findOne($storyId);
             if ($storyModel === null) {
                 throw new NotFoundHttpException("История не найдена");
             }
-            $slides = $this->editorService->jsonFromStory($storyModel->slidesData(), Yii::$app->urlManagerFrontend->createAbsoluteUrl(['preview/view', 'alias' => $storyModel->alias]), $storyModel->title);
-            $allSlides = array_merge($allSlides, $slides);
+            $storyData = $this->editorService->jsonFromStory($storyModel->slidesData(), Yii::$app->urlManagerFrontend->createAbsoluteUrl(['preview/view', 'alias' => $storyModel->alias]), $storyModel->title);
+            $allStories[] = $storyData;
         }
-        $response->sendContentAsFile(json_encode($allSlides, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 'slides.json');
+        $response->sendContentAsFile(json_encode($allStories, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 'slides.json');
     }
 }
