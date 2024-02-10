@@ -424,17 +424,17 @@ class StoryEditorService
         return $model->save(false);
     }*/
 
-    public function textFromStory(Story $model)
+    public function textFromStory(Story $model): string
     {
         $reader = new HTMLReader($model->slidesData());
         $story = $reader->load();
         $text = [];
         foreach ($story->getSlides() as $slide) {
             foreach ($slide->getBlocks() as $block) {
-                if ($block->getType() === AbstractBlock::TYPE_TEXT) {
+                if ($block->getType() === AbstractBlock::TYPE_HEADER) {
                     $text[] = $block->getText();
                 }
-                if ($block->getType() === AbstractBlock::TYPE_HEADER) {
+                if ($block->getType() === AbstractBlock::TYPE_TEXT) {
                     $text[] = $block->getText();
                 }
             }
@@ -480,7 +480,7 @@ class StoryEditorService
     {
         $reader = new HTMLReader($slideData);
         $story = $reader->load();
-        $slides = [];
+        $texts = [];
         foreach ($story->getSlides() as $i => $slide) {
 
             $slideNumber = $i + 1;
@@ -489,22 +489,22 @@ class StoryEditorService
                 continue;
             }
 
-            $text = [];
-            $images = [];
+            //$text = [];
+            //$images = [];
             foreach ($slide->getBlocks() as $block) {
                 if ($block->getType() === AbstractBlock::TYPE_TEXT || $block->getType() === AbstractBlock::TYPE_HEADER) {
-                    $text[] = $block->getText();
+                    $texts[] = $block->getText();
                 }
-                if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
+                /*if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
                     $path = $block->getFilePath();
                     if (strpos($path, 'http') === false) {
                         $path = Url::homeUrl() . $path;
                     }
                     $images[] = $path;
-                }
+                }*/
             }
 
-            $content = implode(PHP_EOL, $text);
+            /*$content = implode(PHP_EOL, $text);
 
             if (strlen($content) > 10) {
                 $slideModel = StorySlide::findOne($slide->getId());
@@ -517,8 +517,12 @@ class StoryEditorService
                     "slide_url" => $storyUrl . ($slideNumber === 1 ? "" : "#/" . $slideNumber),
                     "images" => $images,
                 ];
-            }
+            }*/
         }
-        return $slides;
+        return [
+            "title" => $storyTitle,
+            "content" => implode(PHP_EOL, $texts),
+            "url" => $storyUrl,
+        ];
     }
 }
