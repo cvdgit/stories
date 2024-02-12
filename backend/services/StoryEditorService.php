@@ -521,8 +521,8 @@ class StoryEditorService
         }
 
         $content = implode(PHP_EOL, $texts);
-        $content = nl2br($content);
         $content = strip_tags($content);
+        $content = preg_replace('/[\r\n]+/', ' ', $content);
 
         return [
             "title" => $storyTitle,
