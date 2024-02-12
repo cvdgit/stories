@@ -519,9 +519,14 @@ class StoryEditorService
                 ];
             }*/
         }
+
+        $content = implode(PHP_EOL, $texts);
+        $content = strip_tags($content);
+        $content = preg_replace('/[\n]+/', "\r\n", $content);
+
         return [
             "title" => $storyTitle,
-            "content" => implode(PHP_EOL, $texts),
+            "content" => $content,
             "url" => $storyUrl,
         ];
     }
