@@ -521,6 +521,8 @@ class StoryEditorService
         }
 
         $content = implode(PHP_EOL, $texts);
+        $content = htmlentities($content, null, "utf-8");
+        $content = str_replace("&nbsp;", " ", $content);
         $content = html_entity_decode($content);
 
         //$content = str_replace("&nbsp;", " ", $content);
