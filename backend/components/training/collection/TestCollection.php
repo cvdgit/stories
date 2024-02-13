@@ -27,7 +27,7 @@ class TestCollection extends BaseCollection
         parent::__construct($data, $stars);
     }
 
-    public function createQuestion(StoryTestQuestion $questionData, array $stars): BaseQuestion
+    public function createQuestion($questionData, $stars): BaseQuestion
     {
         $type = $questionData->getQuestionType();
         if ($questionData->typeIsRegion()) {
