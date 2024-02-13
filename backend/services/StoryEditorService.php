@@ -523,8 +523,10 @@ class StoryEditorService
         $content = implode(PHP_EOL, $texts);
 
         $content = utf8_decode($content);
-        $content = str_replace("&nbsp;", " ", $content);
-        $content = strip_tags($content);
+        $content = html_entity_decode($content);
+
+        //$content = str_replace("&nbsp;", " ", $content);
+        //$content = strip_tags($content);
         //$content = preg_replace('/[\r\n]+/', ' ', $content);
 
         return [
