@@ -373,6 +373,6 @@ class StoryController extends BaseController
             $allStories[] = $storyData["content"];
         }
         //$response->sendContentAsFile(json_encode($allStories, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 'slides.json');
-        $response->sendContentAsFile(implode("\r\n", $allStories), 'slides.json');
+        $response->sendContentAsFile(implode("\n\n", $allStories), 'slides.txt');
     }
 }
