@@ -525,7 +525,6 @@ class StoryEditorService
         $content = str_replace("&nbsp;", " ", $content);
         $content = html_entity_decode($content);
         $content = strip_tags($content);
-        $content = preg_replace('/\s+/mu', ' ', $content);
 
         return [
             "title" => $storyTitle,
