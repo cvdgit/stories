@@ -27,9 +27,9 @@ class QuizCollection extends BaseCollection
         /** @var StoryTestQuestion $questionData */
         if ($questionData->typeIsRegion()) {
             $question = (new Region($questionData, $stars))->build();
-        } else if ($questionData->typeIsSequence()) {
+        } elseif ($questionData->typeIsSequence()) {
             $question = (new Sequence($questionData, $stars))->build();
-        } else if ($questionData->typeIsPassTest()) {
+        } elseif ($questionData->typeIsPassTest()) {
             $question = (new PassTest($questionData, $stars))->build();
         } else {
             $question = (new Base($questionData, $stars, $this->testModel))->build();

@@ -27,5 +27,5 @@ abstract class BaseCollection
         }
     }
 
-    abstract public function createQuestion(StoryTestQuestion $questionData, array $stars): BaseQuestion;
+    abstract public function createQuestion($questionData, $stars);
 }
