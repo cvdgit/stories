@@ -521,7 +521,9 @@ class StoryEditorService
         }
 
         $content = implode(PHP_EOL, $texts);
-        $content = str_replace("\xA0", ' ', html_entity_decode($content, ENT_QUOTES|ENT_SUBSTITUTE, "UTF-8"));
+
+        $content = utf8_decode($content);
+        $content = str_replace("&nbsp;", " ", $content);
         $content = strip_tags($content);
         //$content = preg_replace('/[\r\n]+/', ' ', $content);
 
