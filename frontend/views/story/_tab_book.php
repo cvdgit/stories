@@ -1,6 +1,15 @@
 <?php
-/** @var $model common\models\Story */
-/** @var $guestStoryBody string */
+
+declare(strict_types=1);
+
+use yii\web\View;
+use common\models\Story;
+
+/**
+ * @var View $this
+ * @var Story $model
+ * @var string $guestStoryBody
+ */
 ?>
 <div class="slides-readonly">
     <?php if ($model->isAudioStory()): ?>

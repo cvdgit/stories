@@ -20,6 +20,7 @@ elements.forEach((element) => {
             }
             if (isGuestMode) {
                 url = url + '&fast_mode=true';
+                window["ym"] && ym(53566996,'reachGoal','guest-run-test')
             }
             fetch(url)
                 .then(response => response.json())
