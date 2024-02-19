@@ -293,7 +293,6 @@
   async function sendMessage(content, role, fragments, prompt, lang) {
 
     const response = await fetch('/admin/index.php?r=gpt/stream/pass-test-incorrect-chat', {
-      timeout: 30000,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -336,8 +335,13 @@
         if (event && event.trim() === "data") {
           const data = secondRow.toString().replace(/^data: /, "")
           if (data) {
-            console.log(data)
-            const chunk = JSON.parse(data);
+            let chunk
+            try {
+              chunk = JSON.parse(data);
+            } catch (ex) {
+              console.log(ex)
+              return
+            }
 
             streamedResponse = jsonpatch.applyPatch(
               streamedResponse,
