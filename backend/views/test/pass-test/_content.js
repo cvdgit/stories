@@ -113,6 +113,11 @@
       });
     }
 
+    this.clearItems = (fragment_id) => {
+      const fragment = this.findFragment(fragment_id);
+      fragment.items = [];
+    }
+
     this.removeFragment = (fragment_id) => {
       values.fragments = values.fragments.filter(f => f.id !== fragment_id);
     }
@@ -151,6 +156,17 @@
     }
 
     return content;
+  }
+
+  Fragments.prototype.getRawContent = function() {
+    const el = $('<div>' + $('#content').html() + '</div>');
+    el.find('span[data-fragment-id]').replaceWith(function() {
+      return '{' + $(this).attr('data-fragment-id') + '}';
+    });
+    el.find('span.search-fragment').replaceWith(function() {
+      return $(this).text();
+    });
+    return el[0].innerHTML;
   }
 
   const dataWrapper = window['dataWrapper'] = (function(dataWrapper) {

@@ -290,7 +290,7 @@
     title: "Генерация неправильных ответов для пропусков"
   });
 
-  async function sendMessage(content, role, fragments, prompt) {
+  async function sendMessage(content, role, fragments, prompt, lang) {
 
     const response = await fetch('/admin/index.php?r=gpt/stream/pass-test-incorrect-chat', {
       method: 'POST',
@@ -302,7 +302,8 @@
         content,
         role,
         fragments,
-        prompt
+        prompt,
+        lang
       })
     });
 
@@ -359,52 +360,65 @@
     return response;
   }
 
-  const $body = $(`
-      <div class="row">
-      <div class="col-md-12">
-      <div>Пропуски:</div>
-      <div id="to-gpt-fragments" style="margin-top: 10px"></div>
-      <p style="margin-top: 10px; font-size: 12px;"><i>Учитываются пропуски у которых только один правильный ответ и нет неправильных</i></p>
-</div>
+  const $body = $(`<div class="row">
+    <div class="col-md-12">
+        <div>Пропуски:</div>
+        <div id="to-gpt-fragments" style="margin-top: 10px"></div>
+        <p style="margin-top: 10px; font-size: 12px;"><i>Учитываются пропуски у которых только один правильный ответ и
+            нет неправильных</i></p>
+    </div>
 </div>
 <div class="row">
-      <div class="col-md-12">
-        <label for="gpt-role">Роль:</label>
-        <select name="" id="gpt-role">
-          <option value="">Без роли</option>
-          <option value="business_rx">Бизнес аналитик RX</option>
-          <option value="systems_rx">Системный аналитик RX</option>
-          <option value="marketer">Маркетолог</option>
-          <option value="history_teacher">Школьный учитель истории</option>
-          <option value="english_teacher">Школьный учитель английского</option>
-          <option value="biology_teacher">Школьный учитель биологии</option>
-        </select>
-      </div>
-    </div>
-<div class="row">
-  <div class="col-md-12">
-    <div id="gpt-prompt-wrap-incorrect" style="display: none">
-      <div style="padding: 10px 0"><a id="gpt-prompt-show-incorrect" href="#">Show prompt</a></div>
-      <div>
-        <div contenteditable="plaintext-only" style="display: none; margin-bottom: 20px" id="gpt-prompt-incorrect"></div>
-      </div>
-    </div>
-  </div>
-</div>
-      <div class="row">
-        <div class="col-md-12">
-            <div>Ответ нейросети:</div>
-          <div contenteditable="plaintext-only" id="gpt-incorrect-result" style="height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px"></div>
-         </div>
-      </div>
-      <div style="padding: 10px; display: flex; align-items: center; justify-content: space-between; flex-direction: row">
-        <div>
-          <button id="gpt-send-incorrect" type="button" class="btn btn-primary">Отправить запрос</button>
-          <button id="gpt-send-with-prompt-incorrect" style="display: none" type="button" class="btn btn-primary">Отправить запрос с промтом</button>
+    <div class="col-md-12">
+        <div style="display: flex; flex-direction: row">
+            <div style="margin-right: 20px">
+                <label for="gpt-role">Роль:</label>
+                <select name="" id="gpt-role">
+                    <option value="">Без роли</option>
+                    <option value="business_rx">Бизнес аналитик RX</option>
+                    <option value="systems_rx">Системный аналитик RX</option>
+                    <option value="marketer">Маркетолог</option>
+                    <option value="history_teacher">Школьный учитель истории</option>
+                    <option value="english_teacher">Школьный учитель английского</option>
+                    <option value="biology_teacher">Школьный учитель биологии</option>
+                </select>
+            </div>
+            <div>
+                <label>На английском <input id="gpt-lang" type="checkbox"/></label>
+            </div>
         </div>
-        <button id="gpt-insert-incorrect" style="display: none" type="button" class="btn btn-success">Добавить неправильные ответы</button>
-        <img id="gpt-loader" style="display: none" src="/img/loading.gif" width="30" alt="">
-      </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div id="gpt-prompt-wrap-incorrect" style="display: none">
+            <div style="padding: 10px 0"><a id="gpt-prompt-show-incorrect" href="#">Show prompt</a></div>
+            <div>
+                <div contenteditable="plaintext-only" style="display: none; margin-bottom: 20px"
+                     id="gpt-prompt-incorrect"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div>Ответ нейросети:</div>
+        <div contenteditable="plaintext-only" id="gpt-incorrect-result"
+             style="height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px"></div>
+    </div>
+</div>
+<div style="padding: 10px; display: flex; align-items: center; justify-content: space-between; flex-direction: row">
+    <div>
+        <button id="gpt-send-incorrect" type="button" class="btn btn-primary">Отправить запрос</button>
+        <button id="gpt-send-with-prompt-incorrect" style="display: none" type="button" class="btn btn-primary">
+            Отправить запрос с промтом
+        </button>
+    </div>
+    <button id="gpt-insert-incorrect" style="display: none" type="button" class="btn btn-success">Добавить неправильные
+        ответы
+    </button>
+    <img id="gpt-loader" style="display: none" src="/img/loading.gif" width="30" alt="">
+</div>
     `);
 
   $("#gpt-add-incorrect").on("click", function (e) {
@@ -457,6 +471,7 @@
           $body.find("#gpt-loader").show();
 
           const role = $body.find("#gpt-role").val();
+          const lang = $body.find("#gpt-lang").is(":checked")
 
           let fragmentList = fragments.map(f => f.items
             .filter(i => i.correct)
@@ -466,7 +481,7 @@
 
           fragmentList = [...new Set(fragmentList)];
 
-          const response = sendMessage(message, role, fragmentList);
+          const response = sendMessage(message, role, fragmentList, null, lang);
           response.then(data => {
             if (data.ok) {
               $body.find("#gpt-loader").hide();
@@ -529,18 +544,38 @@
       modal.getElement()
         .off("click", "#gpt-insert-incorrect")
         .on("click", "#gpt-insert-incorrect", function () {
+          const lang = $body.find("#gpt-lang").is(":checked")
           try {
             const json = JSON.parse($body.find("#gpt-incorrect-result").text());
             json.map(q => {
               const foundFragments = dataWrapper.findFragmentByCorrectItemTitle(q.question);
               foundFragments.map(f => {
-                q.answers.map(answerName => dataWrapper.createFragmentItem(f.id, {
-                  id: generateUUID(),
-                  title: answerName,
-                  correct: false
-                }))
+                if (lang) {
+                  dataWrapper.clearItems(f.id)
+                  dataWrapper.createFragmentItem(f.id, {
+                    id: generateUUID(),
+                    title: q.translate,
+                    correct: true
+                  })
+                }
+                q.answers.map(answerName => {
+                  if (answerName === q.translate) {
+                    return
+                  }
+                  dataWrapper.createFragmentItem(f.id, {
+                    id: generateUUID(),
+                    title: answerName,
+                    correct: false
+                  })
+                })
               });
             });
+
+            dataWrapper.setContent(dataWrapper.getRawContent())
+            const content = dataWrapper.initFragments()
+            $('#content').redactor('code.set', content)
+            $('#content').redactor('code.sync', content)
+
             modal.hide()
           } catch (ex) {
             alert(ex.message)
