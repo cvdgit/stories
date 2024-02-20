@@ -190,7 +190,7 @@ TEXT;
                 ],
             ],
         ];
-        echo 'data: ' . Json::encode($ops) . "\r\n";
+        echo 'data: ' . Json::encode($ops) . "\r\n\r\n";
         flush();
 
         try {
@@ -280,7 +280,7 @@ TEXT;
                 ],
             ],
         ];
-        echo 'data: ' . Json::encode($ops) . "\r\n";
+        echo 'data: ' . Json::encode($ops) . "\r\n\r\n";
         flush();
 
         try {
@@ -308,7 +308,7 @@ TEXT;
                         ],
                     ],
                 ];
-                echo 'data: ' . Json::encode($ops) . "\r\n";
+                echo 'data: ' . Json::encode($ops) . "\r\n\r\n";
                 flush();
                 return;
             }
@@ -344,7 +344,7 @@ TEXT;
                     ],
                 ],
             ];
-            echo 'data: ' . Json::encode($ops) . "\r\n";
+            echo 'data: ' . Json::encode($ops) . "\r\n\r\n";
             flush();
         }
     }

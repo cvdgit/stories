@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use backend\assets\json\JsonPatchAsset;
 use backend\assets\SortableJsAsset;
 use backend\forms\WordListForm;
 use backend\models\test\ChangeRepeatForm;
@@ -27,7 +26,6 @@ $this->params['breadcrumbs'] = [
 ];
 
 SortableJsAsset::register($this);
-JsonPatchAsset::register($this);
 
 $this->registerJs($this->renderFile('@backend/views/test/_repetition.js'));
 $this->registerJs($this->renderFile('@backend/views/test/_questions-import.js'));

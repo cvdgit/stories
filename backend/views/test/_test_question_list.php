@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use backend\assets\MainAsset;
 use common\models\StoryTest;
 use common\models\StoryTestQuestion;
 use yii\data\DataProviderInterface;
@@ -18,6 +19,7 @@ use yii\web\View;
  * @var array $routes
  */
 
+MainAsset::register($this);
 $this->registerJs($this->renderFile("@backend/views/test/_gpt_import.js"));
 ?>
 <div>

@@ -4,10 +4,12 @@ function GptSlideText() {
 
   async function sendMessage(content, questions, answers, role) {
 
-    var response = await fetch('/admin/index.php?r=gpt/stream/chat', {
-      method: 'POST',
+    let accumulatedMessage = ""
+    return sendEventSourceMessage({
+      url: "/admin/index.php?r=gpt/stream/chat",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
+        Accept: "text/event-stream",
         "X-CSRF-Token": $("meta[name=csrf-token]").attr("content")
       },
       body: JSON.stringify({
@@ -15,54 +17,17 @@ function GptSlideText() {
         questions,
         answers,
         role
-      })
-    });
+      }),
+      onMessage: (streamedResponse) => {
 
-    if (!response.ok) {
-      const message = `Error: ${response.status}`;
-      toastr.error(message);
-      throw new Error(message);
-    }
+        if (Array.isArray(streamedResponse?.streamed_output)) {
+          accumulatedMessage = streamedResponse.streamed_output.join("");
+        }
 
-    var reader = response.body.getReader();
-    var decoder = new TextDecoder('utf-8');
-
-    let streamedResponse = {}
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) {
-        break;
+        document.getElementById("gpt-result").innerText = accumulatedMessage;
+        document.getElementById("gpt-result").scrollTop = document.getElementById("gpt-result").scrollHeight;
       }
-      const decoded = decoder.decode(value, {stream: true});
-
-      decoded.split("\r\n\r\n").map(row => {
-        if (!row.length) {
-          return;
-        }
-
-        const [firstRow, secondRow] = row.split("\n");
-        const [, event] = firstRow.split(" ")
-
-        if (event && event.trim() === "data") {
-          const data = secondRow.toString().replace(/^data: /, "")
-          if (data) {
-            const chunk = JSON.parse(data);
-
-            streamedResponse = jsonpatch.applyPatch(
-              streamedResponse,
-              chunk.ops,
-            ).newDocument;
-
-            if (Array.isArray(streamedResponse?.streamed_output)) {
-              document.getElementById("gpt-result").innerText = streamedResponse.streamed_output.join("");
-              document.getElementById("gpt-result").scrollTop = document.getElementById("gpt-result").scrollHeight;
-            }
-          }
-        }
-      })
-    }
-
-    return response;
+    })
   }
 
   async function createQuestions(storyId, slideId, jsonString) {
@@ -163,11 +128,9 @@ function GptSlideText() {
 
         const response = sendMessage(message, questions, answers, role);
         response.then(data => {
-          if (data.ok) {
-            $body.find("#gpt-loader").hide();
-            $body.find("#gpt-create-questions").show();
-            $body.find("#gpt-message").prop("disabled", false);
-          }
+          $body.find("#gpt-loader").hide();
+          $body.find("#gpt-create-questions").show();
+          $body.find("#gpt-message").prop("disabled", false);
           $btn.prop("disabled", false);
         });
       });

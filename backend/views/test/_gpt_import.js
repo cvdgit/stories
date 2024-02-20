@@ -4,10 +4,12 @@
 
   async function sendMessage(message, questions, answers, role) {
 
-    var response = await fetch('/admin/index.php?r=gpt/stream/chat', {
-      method: 'POST',
+    let accumulatedMessage = ""
+    return sendEventSourceMessage({
+      url: "/admin/index.php?r=gpt/stream/chat",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
+        Accept: "text/event-stream",
         "X-CSRF-Token": $("meta[name=csrf-token]").attr("content")
       },
       body: JSON.stringify({
@@ -15,65 +17,17 @@
         questions,
         answers,
         role
-      })
-    });
+      }),
+      onMessage: (streamedResponse) => {
 
-    if (!response.ok) {
-      const message = `Error: ${response.status}`;
-      toastr.error(message);
-      throw new Error(message);
-    }
-
-    var reader = response.body.getReader();
-    var decoder = new TextDecoder('utf-8');
-
-    let streamedResponse = {}
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) {
-        break;
-      }
-      const decoded = decoder.decode(value, {stream: true});
-
-      decoded.split("\r\n\r\n").map(row => {
-        if (!row.length) {
-          return;
+        if (Array.isArray(streamedResponse?.streamed_output)) {
+          accumulatedMessage = streamedResponse.streamed_output.join("");
         }
 
-        const [firstRow, secondRow] = row.split("\n");
-        const [, event] = firstRow.split(" ")
-
-        if (event && event.trim() === "data") {
-          const data = secondRow.toString().replace(/^data: /, "")
-          if (data) {
-            const chunk = JSON.parse(data);
-
-            streamedResponse = jsonpatch.applyPatch(
-              streamedResponse,
-              chunk.ops,
-            ).newDocument;
-
-            if (Array.isArray(streamedResponse?.streamed_output)) {
-              document.getElementById("gpt-result").innerText = streamedResponse.streamed_output.join("");
-              document.getElementById("gpt-result").scrollTop = document.getElementById("gpt-result").scrollHeight;
-            }
-          }
-        }
-      })
-    }
-
-    /*reader.read().then(function processResult(result) {
-      if (result.done) return;
-      let token = decoder.decode(result.value, {stream: true});
-      console.log(token);
-      if (token.endsWith('.') || token.endsWith('!') || token.endsWith('?')) {
-        document.getElementById("gpt-result").innerHTML += token + "<br>";
-      } else {
-        document.getElementById("gpt-result").innerHTML += token + ' ';
+        document.getElementById("gpt-result").innerText = accumulatedMessage;
+        document.getElementById("gpt-result").scrollTop = document.getElementById("gpt-result").scrollHeight;
       }
-      return reader.read().then(processResult);
-    });*/
-    return response;
+    })
   }
 
   async function createQuestions(quizId, jsonString) {
@@ -159,12 +113,10 @@
     const role = $body.find("#gpt-role").val();
 
     const response = sendMessage(message, questions, answers, role);
-    response.then(data => {
-      if (data.ok) {
-        $body.find("#gpt-loader").hide();
-        $body.find("#gpt-create-questions").show();
-        $body.find("#gpt-message").prop("disabled", false);
-      }
+    response.then(() => {
+      $body.find("#gpt-loader").hide();
+      $body.find("#gpt-create-questions").show();
+      $body.find("#gpt-message").prop("disabled", false);
       $btn.button("reset");
     });
   });

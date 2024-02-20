@@ -9,7 +9,8 @@ module.exports = {
     course: path.resolve(__dirname, 'asset/course/app.js'),
     story_quiz: path.resolve(__dirname, 'asset/story-quiz/js/wikids-story-test.js'),
     slides: path.resolve(__dirname, 'asset/slides/js/slides.js'),
-    wikids_gpt: path.resolve(__dirname, 'asset/gpt/index.js')
+    wikids_gpt: path.resolve(__dirname, 'asset/gpt/index.js'),
+    main: path.resolve(__dirname, 'asset/app/app.js'),
   },
   output: {
     filename: '[name].js',

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use backend\assets\json\JsonPatchAsset;
+use backend\assets\MainAsset;
 use frontend\GptChat\GptChatForm;
 use yii\widgets\ActiveForm;
 use yii\web\View;
@@ -318,7 +318,7 @@ button,input,optgroup,select,textarea {
 CSS
 );
 
-JsonPatchAsset::register($this);
+MainAsset::register($this);
 $this->registerJs($this->renderFile("@frontend/views/story/_chat.js"));
 
 $this->title = "Задай вопрос по истории Руси";

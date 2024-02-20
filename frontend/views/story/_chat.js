@@ -47,6 +47,56 @@
 
   async function sendMessage(element, question) {
 
+    let accumulatedMessage = ""
+    let errorResponse = {}
+    let foundSources = false
+
+    return sendEventSourceMessage({
+      url: "/admin/index.php?r=gpt/stream/wikids",
+      headers: {
+        Accept: "text/event-stream",
+        "X-CSRF-Token": $("meta[name=csrf-token]").attr("content")
+      },
+      body: new FormData(form),
+      onMessage: (streamedResponse) => {
+
+        if (Array.isArray(streamedResponse?.streamed_output)) {
+          accumulatedMessage = streamedResponse.streamed_output.join("");
+        }
+
+        sources = []
+        /*if (Array.isArray(streamedResponse?.logs?.["FindDocs"]?.final_output?.output) && !foundSources) {
+          sources = streamedResponse.logs["FindDocs"].final_output.output
+          foundSources = true
+          if (element.querySelector(".message-images").innerHTML === "") {
+            const exists = [];
+            sources.map((doc) => {
+              if (!exists.includes(doc.metadata.source)) {
+                exists.push(doc.metadata.source)
+                const div = document.createElement("div")
+                div.innerHTML = `
+                      <a target="_blank" href="${doc.metadata.source}">
+                        <img width="300" src="${doc.metadata.images}" />
+                        <div>${doc.metadata.story_title}</div>
+                      </a>
+                    `
+                element.querySelector(".message-images").appendChild(div)
+                container.scrollTop = container.scrollHeight
+              }
+            });
+          }
+        }*/
+
+        if (streamedResponse.id !== undefined) {
+          element.setAttribute("data-run-id", streamedResponse.id)
+        }
+
+        element.querySelector(".message-content").innerHTML = parseOutput(accumulatedMessage, sources)
+        container.scrollTop = container.scrollHeight
+      }
+    })
+
+    /*
     const response = await fetch('/admin/index.php?r=gpt/stream/wikids', {
       method: 'POST',
       headers: {
@@ -155,6 +205,7 @@
     }
 
     return response;
+    */
   }
 
   async function sendFeedback({score, key, runId, value, comment, feedbackId, isExplicit = true,}) {
@@ -214,7 +265,7 @@
 
       const response = sendMessage(answerItem, message)
 
-      response.then(data => {
+      response.then(() => {
 
         answerItem.querySelector(".message-content").innerHTML = parseOutput(answerItem.querySelector(".message-content").innerHTML, sources)
 

@@ -3,11 +3,12 @@
   const modal = new SimpleModal({id: "gpt-gaps-modal", title: "Генерация пропусков"});
 
   async function sendMessage(content, role, fragments, prompt) {
-
-    const response = await fetch('/admin/index.php?r=gpt/stream/pass-test-chat', {
-      method: 'POST',
+    let accumulatedMessage = ""
+    return sendEventSourceMessage({
+      url: "/admin/index.php?r=gpt/stream/pass-test-chat",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
+        Accept: "text/event-stream",
         "X-CSRF-Token": $("meta[name=csrf-token]").attr("content")
       },
       body: JSON.stringify({
@@ -15,61 +16,23 @@
         role,
         fragments,
         prompt
-      })
-    });
+      }),
+      onMessage: (streamedResponse) => {
 
-    if (!response.ok) {
-      const message = `Error: ${response.status}`;
-      toastr.error(message);
-      throw new Error(message);
-    }
+        if (Array.isArray(streamedResponse?.streamed_output)) {
+          accumulatedMessage = streamedResponse.streamed_output.join("");
+        }
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder('utf-8');
+        if (streamedResponse?.prompt_text) {
+          document.getElementById("gpt-prompt-wrap").style.display = "block";
+          document.getElementById("gpt-prompt").innerText = streamedResponse.prompt_text;
+          document.getElementById("gpt-send-with-prompt").style.display = "inline-block"
+        }
 
-    let streamedResponse = {}
-    while (true) {
-      const {done, value} = await reader.read();
-      if (done) {
-        break;
+        document.getElementById("gpt-result").innerText = accumulatedMessage;
+        document.getElementById("gpt-result").scrollTop = document.getElementById("gpt-result").scrollHeight;
       }
-      const decoded = decoder.decode(value, {stream: true});
-
-      decoded.split("\r\n\r\n").map(row => {
-        if (!row.length) {
-          return;
-        }
-
-        const [firstRow, secondRow] = row.split("\n");
-        const [, event] = firstRow.split(" ")
-
-        if (event && event.trim() === "data") {
-
-          const data = secondRow.toString().replace(/^data: /, "")
-          if (data) {
-            const chunk = JSON.parse(data);
-
-            streamedResponse = jsonpatch.applyPatch(
-              streamedResponse,
-              chunk.ops,
-            ).newDocument;
-
-            if (streamedResponse?.prompt_text) {
-              document.getElementById("gpt-prompt-wrap").style.display = "block";
-              document.getElementById("gpt-prompt").innerText = streamedResponse.prompt_text;
-              document.getElementById("gpt-send-with-prompt").style.display = "inline-block"
-            }
-
-            if (Array.isArray(streamedResponse?.streamed_output)) {
-              document.getElementById("gpt-result").innerText = streamedResponse.streamed_output.join("");
-              document.getElementById("gpt-result").scrollTop = document.getElementById("gpt-result").scrollHeight;
-            }
-          }
-        }
-      })
-    }
-
-    return response;
+    })
   }
 
   function replaceFragments(json) {
@@ -206,12 +169,9 @@
 
         const response = sendMessage(message, role, fragments);
 
-        response.then(data => {
-          if (data.ok) {
-            $body.find("#gpt-loader").hide()
-            $body.find("#gpt-insert-gaps").show()
-          }
-
+        response.then(() => {
+          $body.find("#gpt-loader").hide()
+          $body.find("#gpt-insert-gaps").show()
           if ($body.find("#gpt-send-with-prompt").is(":visible")) {
             $body.find("#gpt-send-with-prompt").removeAttr("disabled")
           }
@@ -253,12 +213,9 @@
 
         const response = sendMessage(message, role, fragments, prompt);
 
-        response.then(data => {
-          if (data.ok) {
-            $body.find("#gpt-loader").hide()
-            $body.find("#gpt-insert-gaps").show()
-          }
-
+        response.then(() => {
+          $body.find("#gpt-loader").hide()
+          $body.find("#gpt-insert-gaps").show()
           if ($body.find("#gpt-send").is(":visible")) {
             $body.find("#gpt-send").removeAttr("disabled")
           }
@@ -291,11 +248,12 @@
   });
 
   async function sendMessage(content, role, fragments, prompt, lang) {
-
-    const response = await fetch('/admin/index.php?r=gpt/stream/pass-test-incorrect-chat', {
-      method: 'POST',
+    let accumulatedMessage = ""
+    return sendEventSourceMessage({
+      url: "/admin/index.php?r=gpt/stream/pass-test-incorrect-chat",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
+        Accept: "text/event-stream",
         "X-CSRF-Token": $("meta[name=csrf-token]").attr("content")
       },
       body: JSON.stringify({
@@ -304,66 +262,23 @@
         fragments,
         prompt,
         lang
-      })
-    });
+      }),
+      onMessage: (streamedResponse) => {
 
-    if (!response.ok) {
-      const message = `Error: ${response.status}`;
-      toastr.error(message);
-      throw new Error(message);
-    }
+        if (Array.isArray(streamedResponse?.streamed_output)) {
+          accumulatedMessage = streamedResponse.streamed_output.join("");
+        }
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder('utf-8');
+        if (streamedResponse?.prompt_text) {
+          document.getElementById("gpt-prompt-wrap-incorrect").style.display = "block";
+          document.getElementById("gpt-prompt-incorrect").innerText = streamedResponse.prompt_text;
+          document.getElementById("gpt-send-with-prompt-incorrect").style.display = "inline-block"
+        }
 
-    let streamedResponse = {}
-    while (true) {
-      const {done, value} = await reader.read();
-      if (done) {
-        break;
+        document.getElementById("gpt-incorrect-result").innerText = accumulatedMessage;
+        document.getElementById("gpt-incorrect-result").scrollTop = document.getElementById("gpt-incorrect-result").scrollHeight;
       }
-      const decoded = decoder.decode(value, {stream: true});
-
-      decoded.split("\r\n\r\n").map(row => {
-        if (!row.length) {
-          return;
-        }
-
-        const [firstRow, secondRow] = row.split("\n");
-        const [, event] = firstRow.split(" ")
-
-        if (event && event.trim() === "data") {
-          const data = secondRow.toString().replace(/^data: /, "")
-          if (data) {
-            let chunk
-            try {
-              chunk = JSON.parse(data);
-            } catch (ex) {
-              console.log(ex)
-              return
-            }
-
-            streamedResponse = jsonpatch.applyPatch(
-              streamedResponse,
-              chunk.ops,
-            ).newDocument;
-
-            if (streamedResponse?.prompt_text) {
-              document.getElementById("gpt-prompt-wrap-incorrect").style.display = "block";
-              document.getElementById("gpt-prompt-incorrect").innerText = streamedResponse.prompt_text;
-              document.getElementById("gpt-send-with-prompt-incorrect").style.display = "inline-block"
-            }
-
-            if (Array.isArray(streamedResponse?.streamed_output)) {
-              document.getElementById("gpt-incorrect-result").innerText = streamedResponse.streamed_output.join("");
-              document.getElementById("gpt-incorrect-result").scrollTop = document.getElementById("gpt-incorrect-result").scrollHeight;
-            }
-          }
-        }
-      })
-    }
-
-    return response;
+    })
   }
 
   const $body = $(`<div class="row">
@@ -488,11 +403,9 @@
           fragmentList = [...new Set(fragmentList)];
 
           const response = sendMessage(message, role, fragmentList, null, lang);
-          response.then(data => {
-            if (data.ok) {
-              $body.find("#gpt-loader").hide();
-              $body.find("#gpt-insert-incorrect").show();
-            }
+          response.then(() => {
+            $body.find("#gpt-loader").hide();
+            $body.find("#gpt-insert-incorrect").show();
             if ($body.find("#gpt-send-with-prompt-incorrect").is(":visible")) {
               $body.find("#gpt-send-with-prompt-incorrect").removeAttr("disabled")
             }
@@ -534,12 +447,9 @@
 
           const response = sendMessage(message, role, fragments, prompt);
 
-          response.then(data => {
-            if (data.ok) {
-              $body.find("#gpt-loader").hide()
-              $body.find("#gpt-insert-incorrect").show()
-            }
-
+          response.then(() => {
+            $body.find("#gpt-loader").hide()
+            $body.find("#gpt-insert-incorrect").show()
             if ($body.find("#gpt-send-incorrect").is(":visible")) {
               $body.find("#gpt-send-incorrect").removeAttr("disabled")
             }
