@@ -9,7 +9,7 @@ const PassTest = function (test) {
   this.deck = test.getDeck();
 };
 
-function createSelectElement(fragmentId, attrs = {}, items, multi = false) {
+function createSelectElement(fragmentId, attrs = {}, items, multi = false, placeholder = null) {
 
   const $wrapper = $('<div/>', {
     'data-fragment-id': fragmentId,
@@ -21,7 +21,8 @@ function createSelectElement(fragmentId, attrs = {}, items, multi = false) {
     class: 'dropdown-toggle disabled',
     'data-toggle': 'dropdown'
   });
-  $toggle.html('&nbsp;')
+  $toggle.html(placeholder || '&nbsp;')
+  $toggle.attr("data-placeholder", placeholder || '&nbsp;')
   $toggle.appendTo($wrapper);
 
   const $menu = $('<div/>', {class: 'dropdown-menu'});
@@ -130,7 +131,7 @@ function resetFragmentElement(element) {
     .removeClass('highlight-fail')
     .removeAttr('disabled')
     .find('.dropdown-toggle')
-    .html('&nbsp;')
+    .html(element.find(".dropdown-toggle").attr("data-placeholder"))
     .addClass('disabled');
   element
     .addClass('disabled')
@@ -289,7 +290,7 @@ function createFragmentElement(fragment) {
       element = createTextElement(fragment.id, elemAttrs);
     } else {
       elemAttrs.class += ' custom-select';
-      element = createSelectElement(fragment.id, elemAttrs, shuffle(fragment.items), fragment.multi);
+      element = createSelectElement(fragment.id, elemAttrs, shuffle(fragment.items), fragment.multi, fragment.placeholder);
     }
   }
 

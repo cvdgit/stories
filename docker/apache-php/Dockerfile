@@ -21,8 +21,8 @@ COPY ./apache-php/default.conf /etc/apache2/sites-available/000-default.conf
 RUN cp /etc/apache2/mods-available/rewrite.load /etc/apache2/mods-enabled/ && \
     cp /etc/apache2/mods-available/headers.load /etc/apache2/mods-enabled/
 
-COPY ./apache-php/cert/cert.key /etc/ssl/private/
-COPY ./apache-php/cert/cert.crt /etc/ssl/certs/
+COPY ./apache-php/cert/frontend.key /etc/ssl/private/
+COPY ./apache-php/cert/frontend.crt /etc/ssl/certs/
 
 RUN a2enmod ssl && a2enmod socache_shmcb
 

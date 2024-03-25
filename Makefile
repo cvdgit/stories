@@ -70,3 +70,6 @@ site-test-generate:
 
 site-test:
 	docker compose run --rm site composer test run
+
+site-cert:
+	mkcert -cert-file=./docker/apache-php/cert/frontend.crt -key-file=./docker/apache-php/cert/frontend.key local.wikids

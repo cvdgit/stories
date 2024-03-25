@@ -467,6 +467,7 @@
               const foundFragments = dataWrapper.findFragmentByCorrectItemTitle(q.question);
               foundFragments.map(f => {
                 if (lang) {
+                  f.placeholder = q.question
                   dataWrapper.clearItems(f.id)
                   dataWrapper.createFragmentItem(f.id, {
                     id: generateUUID(),
