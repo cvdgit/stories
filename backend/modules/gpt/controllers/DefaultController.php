@@ -13,4 +13,9 @@ class DefaultController extends Controller
     {
         return $this->render("index");
     }
+
+    public function actionPdf(): string
+    {
+        return $this->render("pdf");
+    }
 }

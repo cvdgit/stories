@@ -92,6 +92,7 @@ AppAsset::register($this);
                         ['label' => 'Changelog', 'url' => ['/changelog/default/index']],
                         ['label' => 'ChatGPT', 'url' => ['/gpt/default/index']],
                         ['label' => 'GPT feedback', 'url' => ['/gpt/feedback/list']],
+                        ['label' => 'Pdf Chat', 'url' => ['/gpt/default/pdf']],
                     ],
                 ]) ?>
                 <?php endif ?>

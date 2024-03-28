@@ -11,6 +11,7 @@ module.exports = {
     slides: path.resolve(__dirname, 'asset/slides/js/slides.js'),
     wikids_gpt: path.resolve(__dirname, 'asset/gpt/index.js'),
     main: path.resolve(__dirname, 'asset/app/app.js'),
+    pdf_chat: path.resolve(__dirname, 'asset/pdf_chat/index.js'),
   },
   output: {
     filename: '[name].js',

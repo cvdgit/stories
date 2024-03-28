@@ -29,7 +29,7 @@ class StreamController extends Controller
 
     public function beforeAction($action): bool
     {
-        if ($action->id === "stream") {
+        if ($action->id === "stream" || $action->id === "pdf") {
             $this->enableCsrfValidation = false;
         }
 
@@ -355,6 +355,17 @@ TEXT;
 
         try {
             $this->chatEventStream->send("conversations", Yii::$app->params["gpt.api.completions.host"], Json::encode($fields));
+        } catch (Exception $ex) {
+            Yii::$app->errorHandler->logException($ex);
+        }
+    }
+
+    public function actionPdf(Request $request): void
+    {
+        $fields = $request->post();
+
+        try {
+            $this->chatEventStream->send("pdf", Yii::$app->params["gpt.api.pdf.host"], Json::encode($fields));
         } catch (Exception $ex) {
             Yii::$app->errorHandler->logException($ex);
         }
