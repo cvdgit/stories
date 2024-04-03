@@ -36,6 +36,9 @@ return [
                 ],
             ],
         ],
+        'errorHandler' => [
+            'errorAction' => 'v1/error/error',
+        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => true,
@@ -72,6 +75,15 @@ return [
                         '{id}' => '<id:\w+>'
                     ],
                     'only' => ['index'],
+                ],
+                [
+                    'class' => UrlRule::class,
+                    'controller' => 'v1/game',
+                    'pluralize' => false,
+                    /*'tokens' => [
+                        '{id}' => '<id:\w+>'
+                    ],*/
+                    'only' => ['view', 'create'],
                 ],
             ]
         ]
