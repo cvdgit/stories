@@ -2,18 +2,25 @@
 
   const container = document.querySelector("#unity-container");
   const canvas = document.querySelector("#unity-canvas");
+  const loadingBar = document.querySelector("#unity-loading-bar");
+  const progressBarFull = document.querySelector("#unity-progress-bar-full");
+  const fullscreenButton = document.querySelector("#unity-fullscreen-button");
+  const warningBanner = document.querySelector("#unity-warning");
 
   function unityShowBanner(msg, type) {
     function updateBannerVisibility() {
       warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
     }
 
-    var div = document.createElement('div');
+    const div = document.createElement('div');
     div.innerHTML = msg;
     warningBanner.appendChild(div);
-    if (type == 'error') div.style = 'background: red; padding: 10px;';
-    else {
-      if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+    if (type === 'error') {
+      div.style = 'background: red; padding: 10px;';
+    } else {
+      if (type === 'warning') {
+        div.style = 'background: yellow; padding: 10px;';
+      }
       setTimeout(function () {
         warningBanner.removeChild(div);
         updateBannerVisibility();
@@ -23,17 +30,23 @@
   }
 
   const buildUrl = "/game/Build";
-  // var loaderUrl = buildUrl + "/TestServerColor.loader.js";
+  const loaderUrl = buildUrl + "/BildForDemo9.loader.js";
+  const configJson = {
+    id: 100,
+    health: 300,
+    isAlive: true,
+    sceneToLoad: 3,
+    testSuccess: true,
+  };
   const config = {
-    dataUrl: buildUrl + "/TestServerColor.data.unityweb",
-    frameworkUrl: buildUrl + "/TestServerColor.framework.js.unityweb",
-    codeUrl: buildUrl + "/TestServerColor.wasm.unityweb",
+    dataUrl: buildUrl + "/BildForDemo9.data.unityweb",
+    frameworkUrl: buildUrl + "/BildForDemo9.framework.js.unityweb",
+    codeUrl: buildUrl + "/BildForDemo9.wasm.unityweb",
     streamingAssetsUrl: "StreamingAssets",
     companyName: "DefaultCompany",
-    productName: "TestAuthorization",
+    productName: "WikidsGame",
     productVersion: "0.1",
-    showBanner: () => console.log("Show Banner"),
-    color: "#0000FF",
+    showBanner: unityShowBanner,
   };
 
   if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
@@ -48,14 +61,21 @@
     canvas.style.height = "720px";
   }
 
+  loadingBar.style.display = "block";
+
   function progressCallback(progress) {
-    //progressBarFull.style.width = 100 * progress + "%";
+    progressBarFull.style.width = 100 * progress + "%";
   }
 
   createUnityInstance(canvas, config, progressCallback)
     .then((unityInstance) => {
 
-      unityInstance.SendMessage('JavaScriptHook', 'HexToColor', config.color);
+      loadingBar.style.display = "none";
+      fullscreenButton.onclick = () => {
+        unityInstance.SetFullscreen(1);
+      };
+
+      unityInstance.SendMessage('JavaScriptHook', 'HexToColor', JSON.stringify(configJson));
 
     }).catch((message) => {
     alert(message);
