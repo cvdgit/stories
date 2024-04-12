@@ -30,7 +30,7 @@
   }
 
   const buildUrl = "/game/Build";
-  const loaderUrl = buildUrl + "/BildForDemo9.loader.js";
+  const loaderUrl = buildUrl + "/BildForDemo11.loader.js";
   const configJson = {
     id: 100,
     health: 300,
@@ -39,9 +39,9 @@
     testSuccess: true,
   };
   const config = {
-    dataUrl: buildUrl + "/BildForDemo9.data.unityweb",
-    frameworkUrl: buildUrl + "/BildForDemo9.framework.js.unityweb",
-    codeUrl: buildUrl + "/BildForDemo9.wasm.unityweb",
+    dataUrl: buildUrl + "/BildForDemo11.data.unityweb",
+    frameworkUrl: buildUrl + "/BildForDemo11.framework.js.unityweb",
+    codeUrl: buildUrl + "/BildForDemo11.wasm.unityweb",
     streamingAssetsUrl: "StreamingAssets",
     companyName: "DefaultCompany",
     productName: "WikidsGame",
