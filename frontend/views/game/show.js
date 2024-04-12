@@ -31,13 +31,19 @@
 
   const buildUrl = "/game/Build";
   const loaderUrl = buildUrl + "/BildForDemo11.loader.js";
-  const configJson = {
+  /*const configJson = {
     id: 100,
     health: 300,
     isAlive: true,
     sceneToLoad: 3,
     testSuccess: true,
-  };
+  };*/
+
+  const configJson = window?.gameConfig
+  if (!configJson) {
+    throw new Error("Game config not found")
+  }
+
   const config = {
     dataUrl: buildUrl + "/BildForDemo11.data.unityweb",
     frameworkUrl: buildUrl + "/BildForDemo11.framework.js.unityweb",

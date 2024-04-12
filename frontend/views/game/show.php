@@ -8,13 +8,17 @@ use yii\web\View;
 
 /**
  * @var View $this
+ * @var string $config
  */
 
 GameAsset::register($this);
 
-/*$data = Json::encode([
-    "id":
-]);*/
+$this->registerJs(<<<JS
+(function(){
+    window.gameConfig = $config
+})();
+JS
+);
 
 $this->title = "Wikids Game";
 
