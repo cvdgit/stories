@@ -4,14 +4,22 @@ declare(strict_types=1);
 
 namespace frontend\controllers;
 
-use yii\web\Controller;
+use frontend\components\UserController;
 
-class GameController extends Controller
+class GameController extends UserController
 {
     public $layout = "game";
 
     public function actionShow(): string
     {
+        $defaultConfig = [
+            "id" => 100,
+            "health" => 300,
+            "isAlive" => true,
+            "sceneToLoad" => 3,
+            "testSuccess" => true,
+        ];
+
         return $this->render("show");
     }
 }

@@ -16,6 +16,8 @@ GameAsset::register($this);
     "id":
 ]);*/
 
+$this->title = "Wikids Game";
+
 $this->registerJs($this->renderFile("@frontend/views/game/show.js"));
 ?>
 <div id="unity-container" class="unity-desktop">
