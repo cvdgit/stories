@@ -75,7 +75,7 @@
         unityInstance.SetFullscreen(1);
       };
 
-      unityInstance.SendMessage('JavaScriptHook', 'HexToColor', JSON.stringify(configJson));
+      unityInstance.SendMessage('JavaScriptHook', 'UpdateConfigJson', JSON.stringify(configJson));
 
     }).catch((message) => {
     alert(message);
