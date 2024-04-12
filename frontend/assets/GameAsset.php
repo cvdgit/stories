@@ -12,6 +12,6 @@ class GameAsset extends AssetBundle
     public $baseUrl = '@web';
     public $css = [];
     public $js = [
-        'game/Build/TestServerColor.loader.js',
+        'game/Build/BildForDemo11.loader.js',
     ];
 }
