@@ -16,11 +16,6 @@ GameAsset::register($this);
     "id":
 ]);*/
 
-$this->registerJs(<<<JS
-window.gameData = {
-}
-JS
-);
 $this->registerJs($this->renderFile("@frontend/views/game/show.js"));
 ?>
 <div id="unity-container" class="unity-desktop">
