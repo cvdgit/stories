@@ -66,7 +66,7 @@
 
     const $content = $(this);
 
-    $content.on('click', '#create-fragment-list', function(e) {
+    $content.off('click').on('click', '#create-fragment-list', function(e) {
 
       if (selectedItems.isEmpty()) {
         toastr.info('Итоговый список пуст');
@@ -208,6 +208,8 @@
 
       selection.addRange(range);
     }
+
+    console.log(elementId)
 
     selectDialog.show({
       url: $(this).attr('href'),
