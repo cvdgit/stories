@@ -13,6 +13,7 @@ use common\models\UserStoryHistory;
 use PDO;
 use Yii;
 use yii\db\Exception;
+use yii\db\Expression;
 use yii\db\Query;
 use yii\helpers\Json;
 use yii\rest\Controller;
@@ -90,17 +91,16 @@ class GameController extends Controller
 
             $studentTests = (new Query())
                 ->select([
-                    "testId" => "student_progress.test_id",
+                    "testId" => "story_test.test_id",
                     "testTitle" => "t.title",
-                    "testProgress" => "student_progress.progress",
+                    "testProgress" => new Expression("CASE WHEN student_progress.progress IS NULL THEN 0 ELSE student_progress.progress END"),
                 ])
                 ->from(["story_test" => StoryStoryTest::tableName()])
-                ->innerJoin(["student_progress" => StudentQuestionProgress::tableName()],
-                    "story_test.test_id = student_progress.test_id")
-                ->innerJoin(["t" => StoryTest::tableName()], "student_progress.test_id = t.id")
+                ->leftJoin(["t" => StoryTest::tableName()], "story_test.test_id = t.id")
+                ->leftJoin(["student_progress" => StudentQuestionProgress::tableName()],
+                    "story_test.test_id = student_progress.test_id AND student_progress.student_id = :id", [":id" => $student->id])
                 ->where([
                     "story_test.story_id" => (int) $story["storyId"],
-                    "student_progress.student_id" => $student->id,
                 ])
                 ->all();
 
