@@ -21,6 +21,7 @@ class GameController extends UserController
             "isAlive" => true,
             "sceneToLoad" => 3,
             "testSuccess" => false,
+            "stories" => [],
         ];
 
         $data = (new Query())
