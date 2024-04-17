@@ -6,6 +6,7 @@ namespace api\modules\v1\controllers;
 
 use api\modules\v1\models\Story;
 use api\modules\v1\models\StoryTest;
+use common\models\StoryStoryTest;
 use common\models\StudentQuestionProgress;
 use common\models\User;
 use common\models\UserStoryHistory;
@@ -68,7 +69,7 @@ class GameController extends Controller
             ->where([
                 "story_history.user_id" => $userModel->id,
             ])
-            ->andWhere("s.id = 1980")
+            //->andWhere("s.id = 1980")
             ->all();
 
         $progress = [];
@@ -81,7 +82,7 @@ class GameController extends Controller
 
         foreach ($stories as $story) {
 
-            $story = [
+            $storyProgress = [
                 "id" => (int) $story["storyId"],
                 "title" => $story["storyTitle"],
                 "completed" => (int) $story["storyProgress"] === 100,
@@ -93,14 +94,17 @@ class GameController extends Controller
                     "testTitle" => "t.title",
                     "testProgress" => "student_progress.progress",
                 ])
-                ->from(["student_progress" => StudentQuestionProgress::tableName()])
+                ->from(["story_test" => StoryStoryTest::tableName()])
+                ->innerJoin(["student_progress" => StudentQuestionProgress::tableName()],
+                    "story_test.test_id = student_progress.test_id")
                 ->innerJoin(["t" => StoryTest::tableName()], "student_progress.test_id = t.id")
                 ->where([
+                    "story_test.story_id" => (int) $story["storyId"],
                     "student_progress.student_id" => $student->id,
                 ])
                 ->all();
 
-            $story["tests"] = array_map(static function (array $test): array {
+            $storyProgress["tests"] = array_map(static function (array $test): array {
                 return [
                     "id" => (int) $test["testId"],
                     "title" => $test["testTitle"],
@@ -108,7 +112,7 @@ class GameController extends Controller
                 ];
             }, $studentTests);
 
-            $progress[] = $story;
+            $progress[] = $storyProgress;
         }
 
         $data["progress"] = $progress;
