@@ -68,6 +68,7 @@ class GameController extends Controller
             ->where([
                 "story_history.user_id" => $userModel->id,
             ])
+            ->andWhere("s.id = 1980")
             ->all();
 
         $progress = [];
