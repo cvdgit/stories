@@ -2,7 +2,7 @@ const TestSpeech = function(options) {
 
   let defaultOptions = {
     pitch: 1,
-    rate: 0.8
+    rate: 1
   };
   options = options || {};
   options = Object.assign(defaultOptions, options);
