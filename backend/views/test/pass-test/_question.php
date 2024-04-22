@@ -200,6 +200,16 @@ JS
 <?= $form->field($model, 'view')->dropDownList($model->getViewItems(), ['prompt' => 'Выберите вид']); ?>
 <?= $form->field($model, 'max_prev_items')->dropDownList($model->getMaxPrevItems())
     ->hint('При неправильном выборе возврат на указанное количество элементов'); ?>
+<?= $form->field($model, 'imageFile')->fileInput() ?>
+<?php
+if (!$isNewRecord && $model->haveImage()): ?>
+    <div style="padding: 20px 0; text-align: center">
+        <?= Html::img($model->getImageUrl(), ['style' => 'max-width: 330px']) ?>
+        <div>
+            <?= Html::a('Удалить изображение', ['question/delete-image', 'id' => $model->getModelId()]) ?>
+        </div>
+    </div>
+<?php endif ?>
 <div class="content-wrap">
     <div style="margin-bottom:10px;display:flex;flex-direction:row;align-items:center">
         <div class="content__title">

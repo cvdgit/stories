@@ -4,20 +4,29 @@ namespace backend\services;
 
 use backend\models\pass_test\PassTestForm;
 use backend\models\question\QuestionType;
+use backend\Testing\Questions\ImageUpload\ImageUploadCommand;
+use backend\Testing\Questions\ImageUpload\ImageUploadHandler;
 use common\components\ModelDomainException;
 use common\models\StoryTestAnswer;
 use common\models\StoryTestQuestion;
 use common\services\TransactionManager;
+use DomainException;
+use Exception;
+use Yii;
 use yii\helpers\Json;
 
 class PassTestService
 {
-
     private $transactionManager;
+    /**
+     * @var ImageUploadHandler
+     */
+    private $imageUploadHandler;
 
-    public function __construct(TransactionManager $transactionManager)
+    public function __construct(TransactionManager $transactionManager, ImageUploadHandler $imageUploadHandler)
     {
         $this->transactionManager = $transactionManager;
+        $this->imageUploadHandler = $imageUploadHandler;
     }
 
     public function createQuestion(int $quizId, string $name, string $payload, int $maxPrevItems = 0, int $weight = 1): int
@@ -52,23 +61,52 @@ class PassTestService
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function create(int $quizId, PassTestForm $form): void
     {
         if (!$form->validate()) {
             throw ModelDomainException::create($form);
         }
 
-        $this->transactionManager->wrap(function() use ($quizId, $form) {
-            $json = Json::decode($form->payload);
-            $questionId = $this->createQuestion($quizId, $form->name, $form->payload, $form->max_prev_items, $this->calcWeight($json));
-            $this->createAnswers($questionId, $json);
+        $questionModel = StoryTestQuestion::create($quizId, $form->name, QuestionType::PASS_TEST);
+        $questionModel->regions = $form->payload;
+        $questionModel->max_prev_items = $form->max_prev_items;
+
+        $json = Json::decode($form->payload);
+        $questionModel->weight = $this->calcWeight($json);
+
+        $this->transactionManager->wrap(function() use ($questionModel, $json, $form) {
+
+            if ($form->imageFile !== null) {
+                $fileName = Yii::$app->security->generateRandomString() . '.' . $form->imageFile->extension;
+                $this->imageUploadHandler->handle(new ImageUploadCommand(
+                    $questionModel->getImagesPath(),
+                    $fileName,
+                    $form->imageFile,
+                    $questionModel->image
+                ));
+                $questionModel->image = "thumb_" . $fileName;
+            }
+
+            if (!$questionModel->save()) {
+                throw ModelDomainException::create($questionModel);
+            }
+
+            $this->createAnswers($questionModel->id, $json);
         });
     }
 
-    public function update(StoryTestQuestion $questionModel, PassTestForm $form): void
+    public function update(int $questionId, PassTestForm $form): void
     {
         if (!$form->validate()) {
             throw ModelDomainException::create($form);
+        }
+
+        $questionModel = StoryTestQuestion::findOne($questionId);
+        if ($questionModel === null) {
+            throw new DomainException("Question with id $questionId not found");
         }
 
         $questionModel->name = $form->name;
@@ -79,7 +117,18 @@ class PassTestService
         $json = Json::decode($form->payload);
         $questionModel->weight = $this->calcWeight($json);
 
-        $this->transactionManager->wrap(function() use ($questionModel, $json) {
+        $this->transactionManager->wrap(function() use ($questionModel, $json, $form) {
+
+            if ($form->imageFile !== null) {
+                $fileName = Yii::$app->security->generateRandomString() . '.' . $form->imageFile->extension;
+                $this->imageUploadHandler->handle(new ImageUploadCommand(
+                    $questionModel->getImagesPath(),
+                    $fileName,
+                    $form->imageFile,
+                    $questionModel->image
+                ));
+                $questionModel->image = "thumb_" . $fileName;
+            }
 
             if (!$questionModel->save()) {
                 throw ModelDomainException::create($questionModel);

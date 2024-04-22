@@ -17,7 +17,9 @@ use yii\helpers\Json;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Request;
 use yii\web\Response;
+use yii\web\UploadedFile;
 
 class PassTestController extends Controller
 {
@@ -60,21 +62,26 @@ class PassTestController extends Controller
     /**
      * @throws NotFoundHttpException
      */
-    public function actionCreate(int $test_id)
+    public function actionCreate(int $test_id, Request $request, Response $response)
     {
         if (($quizModel = StoryTest::findOne($test_id)) === null) {
             throw new NotFoundHttpException('Quiz not found');
         }
 
         $createPassTestForm = new PassTestForm();
-        if ($this->request->isPost && $createPassTestForm->load($this->request->post())) {
-            $this->response->format = Response::FORMAT_JSON;
+        if ($createPassTestForm->load($request->post())) {
+            $response->format = Response::FORMAT_JSON;
+            $createPassTestForm->imageFile = UploadedFile::getInstance($createPassTestForm, "imageFile");
+            if (!$createPassTestForm->validate()) {
+                return ["success" => false, "message" => $createPassTestForm->getErrorSummary(true)];
+            }
             try {
                 $this->passTestService->create($quizModel->id, $createPassTestForm);
                 Yii::$app->session->setFlash('success', 'Вопрос успешно создан');
                 return ['success' => true, 'url' => Url::to(['test/update', 'id' => $quizModel->id])];
             }
             catch (Exception $exception) {
+                Yii::$app->errorHandler->logException($exception);
                 return ['success' => false, 'message' => $exception->getMessage()];
             }
         }
@@ -89,21 +96,26 @@ class PassTestController extends Controller
     /**
      * @throws NotFoundHttpException
      */
-    public function actionUpdate(int $id)
+    public function actionUpdate(int $id, Request $request, Response $response)
     {
         if (($questionModel = StoryTestQuestion::findOne($id)) === null) {
             throw new NotFoundHttpException('Question not found');
         }
 
-        $createPassTestForm = new PassTestForm($questionModel);
+        $updatePassTestForm = new PassTestForm($questionModel);
 
-        if ($this->request->isPost && $createPassTestForm->load($this->request->post())) {
-            $this->response->format = Response::FORMAT_JSON;
+        if ($updatePassTestForm->load($request->post())) {
+            $response->format = Response::FORMAT_JSON;
+            $updatePassTestForm->imageFile = UploadedFile::getInstance($updatePassTestForm, "imageFile");
+            if (!$updatePassTestForm->validate()) {
+                return ["success" => false, "message" => $updatePassTestForm->getErrorSummary(true)];
+            }
             try {
-                $this->passTestService->update($questionModel, $createPassTestForm);
+                $this->passTestService->update($questionModel->id, $updatePassTestForm);
                 return ['success' => true];
             }
             catch (Exception $exception) {
+                Yii::$app->errorHandler->logException($exception);
                 return ['success' => false, 'message' => $exception->getMessage()];
             }
         }
@@ -111,7 +123,7 @@ class PassTestController extends Controller
         $quizModel = $questionModel->storyTest;
         return $this->render('update', [
             'quizModel' => $quizModel,
-            'model' => $createPassTestForm,
+            'model' => $updatePassTestForm,
             'questionModel' => $questionModel,
         ]);
     }

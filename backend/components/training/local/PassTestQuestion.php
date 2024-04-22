@@ -14,7 +14,7 @@ class PassTestQuestion extends Question
 
     public function __construct(StoryTestQuestion $question, array $stars)
     {
-        parent::__construct($question->id, $question->name,true, $question->mix_answers, $question->type);
+        parent::__construct($question->id, $question->name,true, $question->mix_answers, $question->type, $question->getImageUrl(), $question->getOrigImageUrl());
         $this->stars = $stars;
         $this->question = $question;
     }

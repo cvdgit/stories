@@ -1,9 +1,18 @@
 <?php
+
+declare(strict_types=1);
+
+use backend\models\drag_words\UpdateDragWordsForm;
 use backend\widgets\QuestionManageWidget;
 use common\models\StoryTest;
-use backend\models\pass_test\PassTestForm;
-/** @var StoryTest $quizModel */
-/** @var PassTestForm $model */
+use common\models\StoryTestQuestion;
+
+/**
+ * @var StoryTest $quizModel
+ * @var UpdateDragWordsForm $model
+ * @var StoryTestQuestion $questionModel
+ */
+
 $this->title = 'Изменить вопрос';
 $this->params['breadcrumbs'] = [
     ['label' => 'Все тесты', 'url' => ['test/index', 'source' => $quizModel->source]],

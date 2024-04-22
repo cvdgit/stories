@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\models\pass_test;
 
 use common\models\StoryTestQuestion;
@@ -13,16 +15,22 @@ class PassTestForm extends Model
     public $payload;
     public $view;
     public $max_prev_items;
+    public $imageFile;
 
     /** @var int|null */
     private $id;
 
     /** @var int|null */
     private $testId;
+    /**
+     * @var StoryTestQuestion|null
+     */
+    private $model;
 
     public function __construct(StoryTestQuestion $model = null, $config = [])
     {
         parent::__construct($config);
+        $this->model = $model;
         if ($model !== null) {
             $this->id = $model->id;
             $this->name = $model->name;
@@ -48,6 +56,7 @@ class PassTestForm extends Model
             [['name'], 'string', 'max' => 255],
             [['content', 'payload'], 'safe'],
             [['view', 'max_prev_items'], 'integer'],
+            [['imageFile'], 'image'],
         ];
     }
 
@@ -58,6 +67,7 @@ class PassTestForm extends Model
             'content' => 'Текст с пропусками',
             'view' => 'Показывать',
             'max_prev_items' => 'Возврат на',
+            'imageFile' => 'Изображение',
         ];
     }
 
@@ -95,5 +105,29 @@ class PassTestForm extends Model
             '4 элемента',
             '5 элементов',
         ];
+    }
+
+    public function getImageUrl(): ?string
+    {
+        if ($this->model === null) {
+            throw new \DomainException("Model is null");
+        }
+        return $this->model->getImageUrl();
+    }
+
+    public function haveImage(): bool
+    {
+        if ($this->model === null) {
+            throw new \DomainException("Model is null");
+        }
+        return !empty($this->model->image);
+    }
+
+    public function getModelId(): int
+    {
+        if ($this->model === null) {
+            throw new \DomainException("Model is null");
+        }
+        return $this->model->id;
     }
 }

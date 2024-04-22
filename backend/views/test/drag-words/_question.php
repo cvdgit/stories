@@ -1,10 +1,19 @@
 <?php
+
+declare(strict_types=1);
+
+use backend\models\drag_words\UpdateDragWordsForm;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
 use backend\models\drag_words\CreateDragWordsForm;
-/** @var CreateDragWordsForm $model */
-/** @var bool $isNewRecord */
-$this->registerCss(<<<CSS
+
+/**
+ * @var CreateDragWordsForm|UpdateDragWordsForm $model
+ * @var bool $isNewRecord
+ */
+
+$this->registerCss(
+    <<<CSS
 .highlight {
     user-select: none;
 }
@@ -96,42 +105,58 @@ $this->registerCss(<<<CSS
 CSS
 );
 ?>
-<?php $form = ActiveForm::begin(['id' => 'drag-words-form']) ?>
+<?php
+$form = ActiveForm::begin(['id' => 'drag-words-form']) ?>
 <?= $form->field($model, 'name') ?>
-<div>
-    <div style="margin-bottom:10px;display:flex;flex-direction:row;align-items:center">
-        <div class="content__title">
-            <?= Html::activeLabel($model, 'content') ?>
-        </div>
-        <div style="margin-left:auto">
-            <button class="btn btn-primary btn-sm" id="add" type="button">Вставить пропуск</button>
-        </div>
-    </div>
-    <div style="min-height:250px;max-height:250px;overflow-y:auto;margin-bottom:20px">
-        <div class="content" id="content" contenteditable="true"></div>
-    </div>
-    <div style="margin-bottom:10px;display:flex;flex-direction:row;align-items:center">
-        <div class="content__title">
-            <label for="">Дополнительные слова</label>
+<?= $form->field($model, 'imageFile')->fileInput() ?>
+<?php
+if (!$isNewRecord && $model->haveImage()): ?>
+    <div style="padding: 20px 0; text-align: center">
+        <?= Html::img($model->getImageUrl(), ['style' => 'max-width: 330px']) ?>
+        <div>
+            <?= Html::a('Удалить изображение', ['question/delete-image', 'id' => $model->getModelId()]) ?>
         </div>
     </div>
-    <div style="margin-bottom:10px;display:flex;flex-direction:row;align-items:center">
-        <div style="width: 100%; margin-right: 10px">
-            <input id="additional-word-input" type="text" autocomplete="off" class="form-control">
+<?php endif ?>
+    <div>
+        <div style="margin-bottom:10px;display:flex;flex-direction:row;align-items:center">
+            <div class="content__title">
+                <?= Html::activeLabel($model, 'content') ?>
+            </div>
+            <div style="margin-left:auto">
+                <button class="btn btn-primary btn-sm" id="add" type="button">Вставить пропуск</button>
+            </div>
         </div>
-        <div><button type="button" id="add-word" class="btn btn-secondary">Добавить</button></div>
+        <div style="min-height:250px;max-height:250px;overflow-y:auto;margin-bottom:20px">
+            <div class="content" id="content" contenteditable="true"></div>
+        </div>
+        <div style="margin-bottom:10px;display:flex;flex-direction:row;align-items:center">
+            <div class="content__title">
+                <label for="">Дополнительные слова</label>
+            </div>
+        </div>
+        <div style="margin-bottom:10px;display:flex;flex-direction:row;align-items:center">
+            <div style="width: 100%; margin-right: 10px">
+                <input id="additional-word-input" type="text" autocomplete="off" class="form-control">
+            </div>
+            <div>
+                <button type="button" id="add-word" class="btn btn-secondary">Добавить</button>
+            </div>
+        </div>
+        <div id="additional-words" class="add-words-list"></div>
+        <?= $form->field($model, 'content')->hiddenInput(["id" => "content-field"])->label(false) ?>
     </div>
-    <div id="additional-words" class="add-words-list"></div>
-    <?= $form->field($model, 'content')->hiddenInput()->label(false) ?>
-</div>
-<div>
-    <?= Html::activeHiddenInput($model, 'payload') ?>
-    <?= Html::submitButton($isNewRecord ? 'Создать вопрос' : 'Сохранить изменения', ['class' => 'btn btn-primary']) ?>
-</div>
-<?php ActiveForm::end() ?>
+    <div>
+        <?= Html::activeHiddenInput($model, 'payload', ["id" => "payload-field"]) ?>
+        <?= Html::submitButton($isNewRecord ? 'Создать вопрос' : 'Сохранить изменения', ['class' => 'btn btn-primary']
+        ) ?>
+    </div>
+<?php
+ActiveForm::end() ?>
 <?php
 $data = $model->payload ?? 'null';
-$this->registerJs(<<<JS
+$this->registerJs(
+    <<<JS
 (function() {
 
     function getNextNode(node) {
@@ -279,7 +304,7 @@ $this->registerJs(<<<JS
 
     document.getElementById('content').addEventListener('paste', function(e) {
         e.preventDefault();
-        var text = (e.originalEvent || e).clipboardData.getData('text/plain');
+        const text = (e.originalEvent || e).clipboardData.getData('text/plain');
         document.execCommand("insertHTML", false, text);
     });
 
@@ -481,7 +506,7 @@ $this->registerJs(<<<JS
 
     form.on('beforeValidate', function() {
 
-        $('#createdragwordsform-content').val($('#content').text());
+        $('#content-field').val($('#content').text());
 
         const el = $('<div>' + $('#content').html() + '</div>');
         el.find('span[data-fragment-id]').replaceWith(function() {
@@ -510,7 +535,7 @@ $this->registerJs(<<<JS
         const payload = dataWrapper.getPayload();
         payload.content = content;
         payload.fragments = fragments;
-        $('#createdragwordsform-payload').val(JSON.stringify(payload));
+        $('#payload-field').val(JSON.stringify(payload));
     });
 
     function yiiFormSubmit(form, beforeCallback) {
@@ -565,7 +590,8 @@ $this->registerJs(<<<JS
                 location.replace(response.url);
             }
             else {
-                toastr.success('Успешно');
+                //toastr.success('Успешно');
+                location.reload()
             }
         }
         else {

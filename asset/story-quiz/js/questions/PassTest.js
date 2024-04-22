@@ -151,7 +151,7 @@ function resetFragmentElement(element) {
   }
 }
 
-PassTest.prototype.createWrapper = function (content) {
+PassTest.prototype.createWrapper = function (content, question) {
   const $wrapper = $(`
     <div class="seq-question pass-test-question">
       <div class="seq-question__wrap seq-question__wrap--full pass-test-question__wrap"></div>
@@ -164,10 +164,36 @@ PassTest.prototype.createWrapper = function (content) {
     $answers.append(content);
   }
 
+  if (question) {
+    if (question.image) {
+
+      const $image = $('<img/>')
+        .attr("src", question.image)
+        .css('max-width', '300px');
+
+      const originalImageExists = question['original_image'] === undefined ? true : question['original_image'];
+      const that = this
+      if (originalImageExists || question['orig_image']) {
+        $image
+          .css('cursor', 'zoom-in')
+          .on('click', function () {
+            that.test.showOrigImage(question['orig_image'] || $(this).attr('src'));
+          });
+      }
+
+      const imageWrapper = $(`<div class="drag-words-question__image"></div>`)
+      imageWrapper.append($image)
+
+      $wrapper
+        .find(".seq-question__wrap")
+        .append(imageWrapper)
+    }
+  }
+
   $wrapper
     .find(".seq-question__wrap")
     .append($answers)
-    .append(`
+    /*.append(`
       <div class="pass-test-progress__wrap">
         <div class="pass-test-progress">
           <div class="pass-test-progress__container">
@@ -175,7 +201,7 @@ PassTest.prototype.createWrapper = function (content) {
           </div>
         </div>
       </div>
-    `);
+    `);*/
 
   return $wrapper;
 };
@@ -244,12 +270,12 @@ function checkHandler($target, check, fragmentId, $content, maxPrevItems, fragme
     currentIncorrectFragmentId = fragmentId;
   }
 
-  const value = $content.find(".highlight.highlight-done").length / fragmentsTotal * 100;
+  /*const value = $content.find(".highlight.highlight-done").length / fragmentsTotal * 100;
   $content
     .parent()
     .parent()
     .find(".pass-test-progress__container-indicator")
-    .css("transform", `translate3d(${value}%, 0px, 0px)`);
+    .css("transform", `translate3d(${value}%, 0px, 0px)`);*/
 }
 
 function oneCheckHandler($target, check) {
@@ -394,7 +420,7 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
       lastAnswerIsIncorrect = true;
     }
     this.element.data("answers", passedFragments);
-    updateProgress(passedFragments.length / fragments.length * 100);
+    //updateProgress(passedFragments.length / fragments.length * 100);
   };
 
   const fragmentAction = ($target, check, fragmentId, $content, maxPrevItems) => {
@@ -412,14 +438,14 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
 
   const fragment = getFragment();
 
-  this.element = this.createWrapper()
+  this.element = this.createWrapper(null, question)
     .find(".seq-question__wrap");
 
-  const updateProgress = (value) => {
+  /*const updateProgress = (value) => {
     this.element
       .find(".pass-test-progress__container-indicator")
       .css("transform", `translate3d(${value}%, 0px, 0px)`);
-  }
+  }*/
 
   const createOneContent = (fragment, content, otherFragments) => {
 
