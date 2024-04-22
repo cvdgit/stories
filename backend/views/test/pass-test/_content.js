@@ -536,7 +536,8 @@
         location.replace(response.url);
       }
       else {
-        toastr.success('Успешно');
+        //toastr.success('Успешно');
+        location.reload()
       }
     }
     else {
