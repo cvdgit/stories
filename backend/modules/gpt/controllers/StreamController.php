@@ -370,4 +370,49 @@ TEXT;
             Yii::$app->errorHandler->logException($ex);
         }
     }
+
+    public function actionRetelling(Request $request): void
+    {
+        $payload = Json::decode($request->rawBody);
+        $userResponse = $payload["userResponse"];
+        $slideTexts = $payload["slideTexts"];
+
+        $content = <<<TEXT
+Исходный текст:
+```
+$slideTexts
+```
+Пересказ:
+```
+$userResponse
+```
+Сравни Исходный текст и пересказ. \
+Сделай вывод о сходстве по смыслу в %.
+TEXT;
+
+        $message = [
+            "role" => "user",
+            "content" => trim($content),
+        ];
+
+        $fields = [
+            "input" => [
+                "messages" => [
+                    $message,
+                ],
+            ],
+            "config" => [
+                "metadata" => [
+                    "conversation_id" => Uuid::uuid4()->toString(),
+                ],
+            ],
+            "include_names" => [],
+        ];
+
+        try {
+            $this->chatEventStream->send("chat", Yii::$app->params["gpt.api.completions.host"], Json::encode($fields));
+        } catch (Exception $ex) {
+            Yii::$app->errorHandler->logException($ex);
+        }
+    }
 }

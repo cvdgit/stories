@@ -7,7 +7,8 @@ window.sendEventSourceMessage = async function ({
                                                   headers = {},
                                                   body,
                                                   onEnd,
-                                                  onMessage
+                                                  onMessage,
+                                                  onError
                                                 }) {
   let streamedResponse = {}
   return await fetchEventSource(url, {
@@ -34,6 +35,13 @@ window.sendEventSourceMessage = async function ({
           chunk.ops,
         ).newDocument;
         onMessage(streamedResponse)
+      }
+
+      if (msg.event === "error" && msg.data) {
+        const chunk = JSON.parse(msg.data);
+        if (chunk?.status_code) {
+          onError(chunk)
+        }
       }
     },
   });
