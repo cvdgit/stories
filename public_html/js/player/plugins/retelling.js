@@ -8,7 +8,7 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
 
     recorder.continuous = true;
     recorder.interimResults = true;
-    recorder.lang = config.getRecordingLang?.() || 'ru-RU';
+    recorder.lang = config.getRecordingLang?.() || 'ru-RU'; // en-US
 
     var recognizing = false;
     var startTimestamp = null;
@@ -105,12 +105,13 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
       });
     };
 
-    function start(event, text) {
+    function start(event, lang) {
       if (recognizing) {
         recorder.stop();
         return;
       }
       finalTranscript = '';
+      recorder.lang = lang
       recorder.start();
       startTimestamp = event.timeStamp;
       targetElement = event.target;
@@ -181,11 +182,11 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
     setRecognition: (recognition) => {
       this.recognition = recognition;
     },
-    start: (event, startCallback) => {
+    start: (event, lang, startCallback) => {
       if (typeof startCallback === 'function') {
         this.recognition.setCallback('onStart', startCallback);
       }
-      this.recognition.start(event);
+      this.recognition.start(event, lang);
     },
     stop: (endCallback) => {
       if (typeof endCallback === 'function') {
@@ -284,15 +285,21 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
         </div>
     </div>
     <div id="voice-area" style="position: relative; padding: 20px; height: 150px">
-        <div id="voice-control" class="question-voice" data-trigger="hover"
+    <div style="display: flex; gap: 20px; flex-direction: row; justify-content: center; align-items: center">
+        <select id="voice-lang">
+    <option value="ru-RU" selected>rus</option>
+    <option value="en-US">eng</option>
+</select>
+    <div id="voice-control" class="question-voice" data-trigger="hover"
              title="Нажмите что бы начать запись с микрофона"
-             style="display: block; position:relative; bottom: 0">
+             style="display: block; position:relative; bottom: 0; margin: 0">
             <div class="question-voice__inner">
                 <div id="start-recording" class="gn">
                     <div class="mc"></div>
                 </div>
             </div>
-        </div>
+        </div></div>
+
         <div id="voice-loader" style="display: none">
             <div style="display: flex; flex-direction: row; align-items: center; justify-content: center">
                 <img src="/img/loading.gif" alt="">
@@ -306,13 +313,13 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
 
   const feedbackDialog = new InnerDialog('Пересказ', content)
 
-  function startRecording(element) {
+  function startRecording(element, lang) {
     const state = $(element).data('state')
     const $that = $(element)
     if (!state) {
       $(document.getElementById("start-retelling")).hide()
       setTimeout(function () {
-        voiceResponse.start(new Event('voiceResponseStart'), function () {
+        voiceResponse.start(new Event('voiceResponseStart'), lang, function () {
           $that.data('state', 'recording');
           $that.addClass('recording');
           $that.before('<div class="pulse-ring"></div>');
@@ -393,7 +400,8 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
   feedbackDialog.onShow($element => {
     $element
       .on("click", "#start-recording", function() {
-        startRecording(this)
+        const voiceLang = $element.find("#voice-lang option:selected").val()
+        startRecording(this, voiceLang)
       })
       .on("click", "#start-retelling", () => {
         startRetelling($element).then(() => {
