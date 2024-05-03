@@ -15,36 +15,51 @@ use Yii;
 use yii\db\Exception;
 use yii\db\Expression;
 use yii\db\Query;
+use yii\filters\Cors;
 use yii\helpers\Json;
 use yii\rest\Controller;
 use yii\web\BadRequestHttpException;
-use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Request;
 use yii\web\Response;
-use yii\web\User as WebUser;
+use yii\filters\ContentNegotiator;
 
 class GameController extends Controller
 {
-    public function behaviors()
+    public function behaviors(): array
     {
-        return [
-            [
-                'class' => 'yii\filters\ContentNegotiator',
-                'formats' => [
-                    'application/json' => Response::FORMAT_JSON,
-                ],
-            ]
+        $behaviors = parent::behaviors();
+
+        // remove authentication filter
+        $auth = $behaviors['authenticator'];
+        unset($behaviors['authenticator']);
+
+        // add CORS filter
+        $behaviors['corsFilter'] = [
+            'class' => Cors::class,
         ];
+
+        // re-add authentication filter
+        $behaviors['authenticator'] = $auth;
+        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
+        $behaviors['authenticator']['except'] = ['options'];
+
+        $behaviors["contentNegotiator"] = [
+            "class" => ContentNegotiator::class,
+            "formats" => [
+                "application/json" => Response::FORMAT_JSON,
+            ],
+        ];
+
+        return $behaviors;
     }
 
     /**
      * @throws Exception
      * @throws NotFoundHttpException
-     * @throws ForbiddenHttpException
      * @throws BadRequestHttpException
      */
-    public function actionView(int $id, Response $response): array
+    public function actionView(int $id): array
     {
         $userModel = User::findOne($id);
         if ($userModel === null) {
