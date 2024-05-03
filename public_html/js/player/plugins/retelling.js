@@ -168,7 +168,8 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
       },
       setCallback: function (type, callback) {
         callbacks[type] = callback;
-      }
+      },
+      getStatus: () => recognizing
     }
   }
 
@@ -177,43 +178,26 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
   };
 
   VoiceResponse.prototype = {
-    setRecognition: function (recognition) {
+    setRecognition: (recognition) => {
       this.recognition = recognition;
     },
-    start: function (event, startCallback) {
+    start: (event, startCallback) => {
       if (typeof startCallback === 'function') {
         this.recognition.setCallback('onStart', startCallback);
       }
       this.recognition.start(event);
     },
-    stop: function (endCallback) {
+    stop: (endCallback) => {
       if (typeof endCallback === 'function') {
         this.recognition.setCallback('onEnd', endCallback);
       }
       this.recognition.stop();
     },
-    onResult: function (callback) {
+    onResult: (callback) => {
       this.recognition.addEventListener('onResult', callback);
-    }
+    },
+    getStatus: () => this.recognition.getStatus()
   };
-
-  VoiceResponse.remove = function (container) {
-    var elem = container.find('.question-voice');
-    if (elem.length) {
-      elem.fadeOut().remove();
-    }
-  };
-
-  VoiceResponse.create = function (action) {
-
-    var $button = $('<div class="gn"><div class="mc"></div></div>');
-    $button.on('click', action);
-
-    var $voiceWrap = $('<div class="question-voice"><div class="question-voice__inner"></div></div>');
-    $voiceWrap.find('.question-voice__inner')
-      .append($button);
-    return $voiceWrap;
-  }
 
   const voiceResponse = new VoiceResponse()
   voiceResponse.setRecognition(new MissingWordsRecognition({}))
@@ -232,174 +216,204 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
                 <button type="button" class="hints-close">&times;</button>
             </div>
         </div>
-        <div style="height: 100%; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; flex: 1 1 auto">
-            <div style="max-height: 100%">
-                <h3>Пересказ пользователя:</h3>
-                <div style="padding: 20px 40px; margin-bottom: 20px; background-color: #eee">
-                    <span contenteditable="plaintext-only" id="final_span"
-                          style="background-color: #eee; line-height: 50px; color: black; margin-right: 3px; padding: 10px"></span>
-                    <span id="interim_span" style="color: gray"></span>
-                </div>
-                <div style="display: flex; flex-direction: row; align-items: center; justify-content: center">
-                    <button style="display: none" id="start-retelling" class="btn" type="button">Проверить</button>
-                </div>
-            </div>
-            <div id="voice-area" style="position: relative; padding: 20px; height: 150px">
-                <div id="voice-control" class="question-voice" data-trigger="hover" title="Нажмите что бы начать запись с микрофона"
-                     style="display: block; position:relative; bottom: 0">
-                    <div class="question-voice__inner">
-                        <div id="start-recording" class="gn">
-                            <div class="mc"></div>
-                        </div>
-                    </div>
-                </div>
-                <div id="voice-loader" style="display: none">
-                    <div style="display: flex; flex-direction: row; align-items: center; justify-content: center">
-                        <img src="/img/loading.gif" alt="">
-                    </div>
-                </div>
-                <div id="retelling-response" style="display: none; font-size: 2.4rem; line-height: 3rem; overflow: auto; max-height: 100%;"></div>
-            </div>
-        </div>
+        <div id="dialog-body" style="display: flex; flex-direction: column; flex: 1 1 auto; max-height: 100%; overflow-y: auto;"></div>
     </div>
 </div>
 `
+    this.showHandler = null
+    this.hideHandler = null
 
-    function hideDialog() {
+    const hideDialog = () => {
+
+      Reveal.configure({ keyboard: true })
+
       if ($(Reveal.getCurrentSlide()).find('.slide-hints-wrapper').length) {
         $(Reveal.getCurrentSlide())
           .find('.slide-hints-wrapper')
           .hide()
-          .empty()
+          .remove()
       }
       $('.reveal .story-controls').show()
-    }
 
-    function startRecording(element) {
-      const state = $(element).data('state')
-      const $that = $(element)
-      if (!state) {
-        setTimeout(function () {
-          voiceResponse.start(new Event('voiceResponseStart'), function () {
-            $that.data('state', 'recording');
-            $that.addClass('recording');
-            $that.before('<div class="pulse-ring"></div>');
-          });
-        }, 500);
-      } else {
-        voiceResponse.stop(function (args) {
-          $that.siblings('.pulse-ring').remove();
-          $that.removeClass('recording');
-          $that.removeData('state');
-
-          if ($(document.getElementById("final_span")).text().trim().length) {
-            $(document.getElementById("start-retelling")).show()
-          }
-
-        })
+      if (typeof this.hideHandler === "function") {
+        this.hideHandler()
       }
     }
 
-    async function sendMessage(payload, $elem) {
-      let accumulatedMessage = ""
+    this.show = () => {
 
-      return sendEventSourceMessage({
-        url: "/admin/index.php?r=gpt/stream/retelling",
-        headers: {
-          Accept: "text/event-stream",
-          "X-CSRF-Token": $("meta[name=csrf-token]").attr("content")
-        },
-        body: JSON.stringify(payload),
-        onMessage: (streamedResponse) => {
-          $elem.find("#voice-loader").hide()
-          $elem.find("#retelling-response").show()
-          if (Array.isArray(streamedResponse?.streamed_output)) {
-            accumulatedMessage = streamedResponse.streamed_output.join("");
-          }
-          $elem.find("#retelling-response").text(accumulatedMessage)
-        },
-        onError: (streamedResponse) => {
-          $elem.find("#voice-loader").hide()
-          $elem.find("#retelling-response").show()
-          accumulatedMessage = streamedResponse?.message
-          $elem.find("#retelling-response").text(accumulatedMessage)
-        }
-      })
-    }
+      Reveal.configure({ keyboard: false })
 
-    async function startRetelling($elem) {
-
-      $elem.find(".question-voice").tooltip("hide")
-      const userResponse = $elem.find("#final_span").text().trim()
-
-      if (!userResponse) {
-        alert("Ответ пользователя пуст")
-        return
-      }
-
-      const slideTexts = $(Reveal.getCurrentSlide())
-        .find("[data-block-type=text]")
-        .map((i, el) => $(el).text())
-        .get()
-        .join("\n")
-
-      if (!slideTexts) {
-        alert("На слайде нет текста")
-        return
-      }
-
-      ["voice-control", "voice-loader", "retelling-response"]
-        .map(id => $elem.find(`#${id}`).hide())
-      $elem.find("#voice-loader").show()
-      $elem.find("#retelling-response").empty()
-
-      const response = await sendMessage({
-        userResponse,
-        slideTexts
-      }, $elem)
-    }
-
-    function addEventListeners($elem) {
-      $elem
-        .on("click", ".hints-close", hideDialog)
-        .on("click", "#start-recording", function() {
-          startRecording(this)
-        })
-        .on("click", "#start-retelling", () => {
-          startRetelling($elem).then(() => {
-            console.log("success")
-          })
-        })
-        .on("input", "#final_span", function() {
-          const display = $(this).text().length > 0 ? "block" : "none"
-          if (display !== $elem.find("#start-retelling").css("display")) {
-            $elem.find("#start-retelling").css("display", display)
-          }
-        })
-    }
-
-    this.show = function () {
       const $element = $(html)
-      addEventListeners($element)
+
+      $element.find("#dialog-body").append(content)
+      $element.on("click", ".hints-close", hideDialog)
+
       $('.reveal .story-controls').hide()
       $('.reveal .slides section.present')
         .append($element)
         .find(".slide-hints-wrapper")
         .show()
-      $element.find(".question-voice").tooltip("show")
+
+      if (typeof this.showHandler === "function") {
+        this.showHandler($element)
+      }
     }
 
-    /*function hideDialog() {
-      $hintWrapper.hide().remove()
-      if (!$(Reveal.getCurrentSlide()).find('.slide-hints-wrapper').length) {
-        $('.reveal .story-controls').show();
-      }
-    }*/
-
     this.hide = hideDialog;
+
+    this.onShow = callback => {
+      this.showHandler = callback
+    }
+
+    this.onHide = callback => {
+      this.hideHandler = callback
+    }
   }
 
-  const feedbackDialog = new InnerDialog('Пересказ');
+  const content = `<div style="height: 100%; position: relative; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; flex: 1 1 auto">
+    <div style="max-height: 100%; overflow-y: auto; display: flex; flex-direction: column; flex: 1 1 auto;">
+        <h3>Пересказ пользователя:</h3>
+        <div style="padding: 20px 40px; margin-bottom: 20px; background-color: #eee; font-size: 2.5rem; border-radius: 2rem">
+                    <span contenteditable="plaintext-only" id="final_span"
+                          style="outline: 0; background-color: #eee; line-height: 50px; color: black; margin-right: 3px; padding: 10px"></span>
+            <span id="interim_span" style="color: gray"></span>
+        </div>
+        <div style="display: flex; flex-direction: row; align-items: center; justify-content: center">
+            <button style="display: none" id="start-retelling" class="btn" type="button">Проверить</button>
+        </div>
+    </div>
+    <div id="voice-area" style="position: relative; padding: 20px; height: 150px">
+        <div id="voice-control" class="question-voice" data-trigger="hover"
+             title="Нажмите что бы начать запись с микрофона"
+             style="display: block; position:relative; bottom: 0">
+            <div class="question-voice__inner">
+                <div id="start-recording" class="gn">
+                    <div class="mc"></div>
+                </div>
+            </div>
+        </div>
+        <div id="voice-loader" style="display: none">
+            <div style="display: flex; flex-direction: row; align-items: center; justify-content: center">
+                <img src="/img/loading.gif" alt="">
+            </div>
+        </div>
+        <div id="retelling-response"
+             style="display: none; font-size: 2.4rem; line-height: 3rem; overflow: auto; max-height: 100%;"></div>
+    </div>
+</div>
+`
+
+  const feedbackDialog = new InnerDialog('Пересказ', content)
+
+  function startRecording(element) {
+    const state = $(element).data('state')
+    const $that = $(element)
+    if (!state) {
+      $(document.getElementById("start-retelling")).hide()
+      setTimeout(function () {
+        voiceResponse.start(new Event('voiceResponseStart'), function () {
+          $that.data('state', 'recording');
+          $that.addClass('recording');
+          $that.before('<div class="pulse-ring"></div>');
+        });
+      }, 500);
+    } else {
+      voiceResponse.stop(function (args) {
+        $that.siblings('.pulse-ring').remove();
+        $that.removeClass('recording');
+        $that.removeData('state');
+
+        if ($(document.getElementById("final_span")).text().trim().length) {
+          $(document.getElementById("start-retelling")).show()
+        }
+      })
+    }
+  }
+
+  async function sendMessage(payload, $elem) {
+    let accumulatedMessage = ""
+
+    return sendEventSourceMessage({
+      url: "/admin/index.php?r=gpt/stream/retelling",
+      headers: {
+        Accept: "text/event-stream",
+        "X-CSRF-Token": $("meta[name=csrf-token]").attr("content")
+      },
+      body: JSON.stringify(payload),
+      onMessage: (streamedResponse) => {
+        $elem.find("#voice-loader").hide()
+        $elem.find("#retelling-response").show()
+        if (Array.isArray(streamedResponse?.streamed_output)) {
+          accumulatedMessage = streamedResponse.streamed_output.join("");
+        }
+        $elem.find("#retelling-response").text(accumulatedMessage)
+      },
+      onError: (streamedResponse) => {
+        $elem.find("#voice-loader").hide()
+        $elem.find("#retelling-response").show()
+        accumulatedMessage = streamedResponse?.error_text
+        $elem.find("#retelling-response").text(accumulatedMessage)
+      }
+    })
+  }
+
+  async function startRetelling($elem) {
+
+    $elem.find(".question-voice").tooltip("hide")
+    const userResponse = $elem.find("#final_span").text().trim()
+
+    if (!userResponse) {
+      alert("Ответ пользователя пуст")
+      return
+    }
+
+    const slideTexts = $(Reveal.getCurrentSlide())
+      .find("[data-block-type=text]")
+      .map((i, el) => $(el).text())
+      .get()
+      .join("\n")
+
+    if (!slideTexts) {
+      alert("На слайде нет текста")
+      return
+    }
+
+    ["voice-control", "voice-loader", "retelling-response"]
+      .map(id => $elem.find(`#${id}`).hide())
+    $elem.find("#voice-loader").show()
+    $elem.find("#retelling-response").empty()
+
+    const response = await sendMessage({
+      userResponse,
+      slideTexts
+    }, $elem)
+  }
+
+  feedbackDialog.onShow($element => {
+    $element
+      .on("click", "#start-recording", function() {
+        startRecording(this)
+      })
+      .on("click", "#start-retelling", () => {
+        startRetelling($element).then(() => {
+          console.log("success")
+        })
+      })
+      .on("input", "#final_span", function() {
+        const display = $(this).text().length > 0 ? "block" : "none"
+        if (display !== $element.find("#start-retelling").css("display")) {
+          $element.find("#start-retelling").css("display", display)
+        }
+      })
+    $element.find(".question-voice").tooltip("show")
+  })
+
+  feedbackDialog.onHide(() => {
+    if (voiceResponse.getStatus()) {
+      voiceResponse.stop()
+    }
+  })
 
   return {
     begin: () => {

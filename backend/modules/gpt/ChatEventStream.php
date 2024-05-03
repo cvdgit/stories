@@ -61,7 +61,7 @@ class ChatEventStream
         } catch (\Exception $ex) {
             Yii::$app->errorHandler->logException($ex);
 
-            echo "event: error\r\n";
+            echo "event: error\n";
             $ops = [
                 "ops" => [
                     [
@@ -73,7 +73,7 @@ class ChatEventStream
                     ],
                 ],
             ];
-            echo 'data: ' . Json::encode($ops) . "\r\n";
+            echo 'data: ' . Json::encode($ops) . "\n\n";
             flush();
         }
 

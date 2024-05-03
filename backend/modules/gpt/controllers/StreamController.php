@@ -386,8 +386,9 @@ $slideTexts
 ```
 $userResponse
 ```
-Сравни Исходный текст и пересказ. \
-Сделай вывод о сходстве по смыслу в %.
+Изложи исходный текст полностью  по предложениям.
+Укажи степень сходства каждого сведения исходного текста с пересказом в процентах.
+Укажи общую степень сходства сведений исходного текста и пересказа в процентах.
 TEXT;
 
         $message = [
@@ -410,7 +411,7 @@ TEXT;
         ];
 
         try {
-            $this->chatEventStream->send("chat", Yii::$app->params["gpt.api.completions.host"], Json::encode($fields));
+            $this->chatEventStream->send("retelling", Yii::$app->params["gpt.api.completions.host"], Json::encode($fields));
         } catch (Exception $ex) {
             Yii::$app->errorHandler->logException($ex);
         }

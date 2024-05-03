@@ -40,7 +40,15 @@ window.sendEventSourceMessage = async function ({
       if (msg.event === "error" && msg.data) {
         const chunk = JSON.parse(msg.data);
         if (chunk?.status_code) {
-          onError(chunk)
+          onError({error_text: chunk.message})
+        } else if (chunk?.ops) {
+          streamedResponse = applyPatch(
+            streamedResponse,
+            chunk.ops,
+          ).newDocument;
+          onError(streamedResponse)
+        } else {
+          onError({error_text: "Unknown error"})
         }
       }
     },
