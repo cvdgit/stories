@@ -306,15 +306,8 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
                     <div class="mc"></div>
                 </div>
             </div>
-        </div></div>
-
-        <div id="voice-loader" style="display: none">
-            <div style="display: flex; flex-direction: row; align-items: center; justify-content: center">
-                <img src="/img/loading.gif" alt="">
-            </div>
         </div>
-        <div id="retelling-response"
-             style="display: none; font-size: 2.4rem; line-height: 3rem; overflow: auto; max-height: 100%;"></div>
+        </div>
     </div>
 </div>
 `
@@ -358,7 +351,7 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
     }
   }
 
-  async function sendMessage(payload, $elem) {
+  async function sendMessage(payload, $elem, onEndCallback) {
     let accumulatedMessage = ""
 
     return sendEventSourceMessage({
@@ -369,27 +362,48 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
       },
       body: JSON.stringify(payload),
       onMessage: (streamedResponse) => {
-        $elem.find("#voice-loader").hide()
+        //$elem.find("#voice-loader").hide()
         $elem.find("#retelling-response").show()
         if (Array.isArray(streamedResponse?.streamed_output)) {
           accumulatedMessage = streamedResponse.streamed_output.join("");
         }
-        $elem.find("#retelling-response").text(accumulatedMessage)
+        $elem.find("#retelling-response")[0].innerText = accumulatedMessage
+        $elem.find("#retelling-response")[0].scrollTop = $elem.find("#retelling-response")[0].scrollHeight;
       },
       onError: (streamedResponse) => {
-        $elem.find("#voice-loader").hide()
+        //$elem.find("#voice-loader").hide()
         $elem.find("#retelling-response").show()
         accumulatedMessage = streamedResponse?.error_text
-        $elem.find("#retelling-response").text(accumulatedMessage)
-      }
+        $elem.find("#retelling-response")[0].innerText = accumulatedMessage
+      },
+      onEnd: onEndCallback
     })
   }
 
   async function startRetelling($elem) {
 
-    $elem.find(".question-voice").tooltip("hide")
-    const userResponse = $elem.find("#final_span").text().trim()
+    if (voiceResponse.getStatus()) {
+      voiceResponse.stop()
+    }
 
+    const $wrap = $(`<div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, .5)">
+    <div style="background-color: #fff; padding: 20px; max-width: 800px; height: 500px; display: flex; justify-content: space-between; flex-direction: column; flex: 1 1 auto">
+        <div contenteditable="plaintext-only" id="retelling-response"
+             style="font-size: 2.2rem; text-align: left; line-height: 3.5rem; overflow-y: scroll; height: 100%; max-height: 100%;"></div>
+        <div style="display: flex; margin-top: 10px; flex-direction: row; align-items: center; justify-content: center">
+            <img id="voice-loader" height="50px" src="/img/loading.gif" alt="">
+            <button style="display: none" id="voice-finish" type="button" class="btn">OK</button>
+        </div>
+    </div>
+</div>`)
+
+    $wrap.find("#voice-finish").on("click", feedbackDialog.hide)
+
+    $elem.append($wrap)
+
+    $elem.find(".question-voice").tooltip("hide")
+
+    const userResponse = $elem.find("#result_span").text().trim()
     if (!userResponse) {
       alert("Ответ пользователя пуст")
       return
@@ -400,21 +414,24 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
       .map((i, el) => $(el).text())
       .get()
       .join("\n")
-
     if (!slideTexts) {
       alert("На слайде нет текста")
       return
     }
 
-    ["voice-control", "voice-loader", "retelling-response"]
+    ["voice-control"]
       .map(id => $elem.find(`#${id}`).hide())
-    $elem.find("#voice-loader").show()
-    $elem.find("#retelling-response").empty()
+
+    //$elem.find("#voice-loader").show()
+    $wrap.find("#retelling-response").empty()
 
     const response = await sendMessage({
       userResponse,
       slideTexts
-    }, $elem)
+    }, $wrap, () => {
+      $wrap.find("#voice-loader").hide()
+      $wrap.find("#voice-finish").show()
+    })
   }
 
   feedbackDialog.onShow($element => {
@@ -428,8 +445,14 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
           console.log("success")
         })
       })
-      .on("input", "#final_span", function () {
+      .on("input", "#result_span", function () {
         const display = $(this).text().length > 0 ? "block" : "none"
+        if (display !== $element.find("#start-retelling").css("display")) {
+          $element.find("#start-retelling").css("display", display)
+        }
+      })
+      .on("input", "#final_span", function () {
+        const display = $element.find("#result_span").text().length > 0 ? "block" : "none"
         if (display !== $element.find("#start-retelling").css("display")) {
           $element.find("#start-retelling").css("display", display)
         }
