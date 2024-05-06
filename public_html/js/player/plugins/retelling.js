@@ -50,15 +50,15 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
       }
 
       //if (finalTranscript.length) {
-        finalTranscript = capitalize(finalTranscript);
-        dispatchEvent({
-          type: 'onResult',
-          args: {
-            target: targetElement,
-            result: linebreak(finalTranscript),
-            interim: linebreak(interimTranscript)
-          }
-        });
+      finalTranscript = capitalize(finalTranscript);
+      dispatchEvent({
+        type: 'onResult',
+        args: {
+          target: targetElement,
+          result: linebreak(finalTranscript),
+          interim: linebreak(interimTranscript)
+        }
+      });
       //}
     };
 
@@ -203,8 +203,14 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
   const voiceResponse = new VoiceResponse()
   voiceResponse.setRecognition(new MissingWordsRecognition({}))
   voiceResponse.onResult((args) => {
-    document.getElementById("final_span").innerText = args.args?.result
-    document.getElementById("interim_span").innerText = args.args?.interim
+    const finalSpan = document.getElementById("final_span")
+    if (finalSpan) {
+      finalSpan.innerHTML = args.args?.result
+    }
+    const interimSpan = document.getElementById("interim_span")
+    if (interimSpan) {
+      interimSpan.innerHTML = args.args?.interim
+    }
   })
 
   function InnerDialog(title, content) {
@@ -226,7 +232,7 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
 
     const hideDialog = () => {
 
-      Reveal.configure({ keyboard: true })
+      Reveal.configure({keyboard: true})
 
       if ($(Reveal.getCurrentSlide()).find('.slide-hints-wrapper').length) {
         $(Reveal.getCurrentSlide())
@@ -243,7 +249,7 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
 
     this.show = () => {
 
-      Reveal.configure({ keyboard: false })
+      Reveal.configure({keyboard: false})
 
       const $element = $(html)
 
@@ -276,8 +282,10 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
     <div style="max-height: 100%; overflow-y: auto; display: flex; flex-direction: column; flex: 1 1 auto;">
         <h3>Пересказ пользователя:</h3>
         <div style="padding: 20px 40px; margin-bottom: 20px; background-color: #eee; font-size: 2.5rem; border-radius: 2rem">
-                    <span contenteditable="plaintext-only" id="final_span"
-                          style="outline: 0; background-color: #eee; line-height: 50px; color: black; margin-right: 3px; padding: 10px"></span>
+            <span contenteditable="plaintext-only" id="result_span"
+                  style="outline: 0; background-color: #eee; line-height: 50px; color: black; margin-right: 3px; padding: 10px"></span>
+            <span contenteditable="plaintext-only" id="final_span"
+                  style="outline: 0; background-color: #eee; line-height: 50px; color: black; margin-right: 3px; padding: 10px"></span>
             <span id="interim_span" style="color: gray"></span>
         </div>
         <div style="display: flex; flex-direction: row; align-items: center; justify-content: center">
@@ -331,7 +339,19 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
         $that.removeClass('recording');
         $that.removeData('state');
 
-        if ($(document.getElementById("final_span")).text().trim().length) {
+        const $resultSpan = $(document.getElementById("result_span"))
+        const $finalSpan = $(document.getElementById("final_span"))
+
+        if ($finalSpan.text().trim().length) {
+          $resultSpan.text(
+            $resultSpan.text().trim().length
+              ? $resultSpan.text().trim() + "\n" + $finalSpan.text().trim()
+              : $finalSpan.text().trim()
+          )
+          $finalSpan.empty()
+        }
+
+        if ($resultSpan.text().trim().length) {
           $(document.getElementById("start-retelling")).show()
         }
       })
@@ -399,7 +419,7 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
 
   feedbackDialog.onShow($element => {
     $element
-      .on("click", "#start-recording", function() {
+      .on("click", "#start-recording", function () {
         const voiceLang = $element.find("#voice-lang option:selected").val()
         startRecording(this, voiceLang)
       })
@@ -408,7 +428,7 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
           console.log("success")
         })
       })
-      .on("input", "#final_span", function() {
+      .on("input", "#final_span", function () {
         const display = $(this).text().length > 0 ? "block" : "none"
         if (display !== $element.find("#start-retelling").css("display")) {
           $element.find("#start-retelling").css("display", display)
