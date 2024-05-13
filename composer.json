@@ -57,7 +57,8 @@
         "ramsey/uuid": "^4.2",
         "justinrainbow/json-schema": "^5.2",
         "gamringer/php-json-patch": "^1.0",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "ext-zip": "*"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",

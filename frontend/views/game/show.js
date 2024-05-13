@@ -29,26 +29,25 @@
     updateBannerVisibility();
   }
 
-  const buildUrl = "/game/Build";
-  const loaderUrl = buildUrl + "/BildForDemo11.loader.js";
-  /*const configJson = {
-    id: 100,
-    health: 300,
-    isAlive: true,
-    sceneToLoad: 3,
-    testSuccess: true,
-  };*/
+  const gameLoaderConfig = window?.gameLoaderConfig
+  if (!gameLoaderConfig) {
+    throw new Error("Game Loader config not found")
+  }
 
+  const {folder} = gameLoaderConfig
+
+  const buildUrl = `${folder}/Build`;
+  const loaderUrl = buildUrl + "/BildForDemo11.loader.js";
   const configJson = window?.gameConfig
   if (!configJson) {
     throw new Error("Game config not found")
   }
 
   const config = {
-    dataUrl: buildUrl + "/BildForDemo11.data.unityweb",
-    frameworkUrl: buildUrl + "/BildForDemo11.framework.js.unityweb",
-    codeUrl: buildUrl + "/BildForDemo11.wasm.unityweb",
-    streamingAssetsUrl: "StreamingAssets",
+    dataUrl: `${buildUrl}/BildForDemo11.data.unityweb`,
+    frameworkUrl: `${buildUrl}/BildForDemo11.framework.js.unityweb`,
+    codeUrl: `${buildUrl}/BildForDemo11.wasm.unityweb`,
+    streamingAssetsUrl: `${folder}/StreamingAssets`,
     companyName: "DefaultCompany",
     productName: "WikidsGame",
     productVersion: "0.1",
@@ -73,17 +72,24 @@
     progressBarFull.style.width = 100 * progress + "%";
   }
 
-  createUnityInstance(canvas, config, progressCallback)
-    .then((unityInstance) => {
+  const script = document.createElement("script");
+  script.src = loaderUrl;
+  script.onload = () => {
+    createUnityInstance(canvas, config, progressCallback)
+      .then((unityInstance) => {
 
-      loadingBar.style.display = "none";
-      fullscreenButton.onclick = () => {
-        unityInstance.SetFullscreen(1);
-      };
+        loadingBar.style.display = "none";
+        fullscreenButton.onclick = () => {
+          unityInstance.SetFullscreen(1);
+        };
 
-      unityInstance.SendMessage('JavaScriptHook', 'UpdateConfigJson', JSON.stringify(configJson));
+        unityInstance.SendMessage('JavaScriptHook', 'UpdateConfigJson', JSON.stringify(configJson));
 
-    }).catch((message) => {
-    alert(message);
-  });
+      })
+      .catch((message) => {
+        alert(message);
+      })
+  };
+
+  document.body.appendChild(script);
 })()
