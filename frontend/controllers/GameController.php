@@ -104,7 +104,7 @@ class GameController extends UserController
             throw new ForbiddenHttpException('Access denied');
         }
 
-        $deployEmail = Yii::$app->params['game.deploy.email'];
+        $deployEmail = Yii::$app->params['game.deploy.email'] ?? '';
 
         if (!Yii::$app->user->can(UserRoles::ROLE_ADMIN) && !($deployEmail && $deployEmail === $userModel->email)) {
             throw new ForbiddenHttpException('Access denied');
