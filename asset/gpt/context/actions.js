@@ -99,10 +99,6 @@ export default function action(state, dispatch) {
                 is: {...is, thinking: content.length},
                 chat: newChat,
               });
-
-
-            },
-            onStar() {
             },
             onEnd(content) {
               setState({

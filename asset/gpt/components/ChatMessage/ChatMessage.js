@@ -65,7 +65,7 @@ export function MessageBar() {
   useSendKey(sendMessage, options.general.command)
   return (
     <div className="message-bar">
-      {is.thinking && (
+      {!!is.thinking && (
         <div className="message-bar__tool">
           <div className="message-bar__loading">
             <div className="flex-c"><span>Thinking</span> <Loading/></div>
@@ -122,7 +122,7 @@ export function ChatMessage() {
           <MessageHeader/>
           <ScrollView>
             <MessageContainer/>
-            {is?.thinking && <Loading/>}
+            {!!is?.thinking && <Loading/>}
           </ScrollView>
           <MessageBar/>
         </>
