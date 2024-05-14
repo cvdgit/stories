@@ -20,7 +20,7 @@ export const ScrollView = (props) => {
   };
   useEffect(() => {
     scrollToBottom()
-  }, [!!is?.thinking]);
+  }, [is?.thinking]);
 
   useEffect(() => {
     window.requestAnimationFrame(handleScroll);
