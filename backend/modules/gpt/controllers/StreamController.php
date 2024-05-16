@@ -416,4 +416,43 @@ TEXT;
             Yii::$app->errorHandler->logException($ex);
         }
     }
+
+    public function actionRetellingAnswers(Request $request): void
+    {
+        $payload = Json::decode($request->rawBody);
+        $slideTexts = $payload["slideTexts"];
+
+        $content = <<<TEXT
+Текст:
+```
+$slideTexts
+```
+Расположи каждое предложение с новой строки и задай вопрос к каждому предложению.
+TEXT;
+
+        $message = [
+            "role" => "user",
+            "content" => trim($content),
+        ];
+
+        $fields = [
+            "input" => [
+                "messages" => [
+                    $message,
+                ],
+            ],
+            "config" => [
+                "metadata" => [
+                    "conversation_id" => Uuid::uuid4()->toString(),
+                ],
+            ],
+            "include_names" => [],
+        ];
+
+        try {
+            $this->chatEventStream->send("retelling-answers", Yii::$app->params["gpt.api.completions.host"], Json::encode($fields));
+        } catch (Exception $ex) {
+            Yii::$app->errorHandler->logException($ex);
+        }
+    }
 }

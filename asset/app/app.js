@@ -8,13 +8,15 @@ window.sendEventSourceMessage = async function ({
                                                   body,
                                                   onEnd,
                                                   onMessage,
-                                                  onError
+                                                  onError,
+                                                  signal
                                                 }) {
   let streamedResponse = {}
   return await fetchEventSource(url, {
     method,
     headers,
     body,
+    signal,
     openWhenHidden: true,
     onerror(err) {
       throw err;

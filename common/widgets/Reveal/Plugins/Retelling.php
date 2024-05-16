@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace common\widgets\Reveal\Plugins;
 
 use common\models\Story;
-use common\services\StoryAudioService;
 use common\widgets\Reveal\Dependency;
-use Yii;
-use yii\helpers\Url;
 
 class Retelling extends AbstractPlugin implements PluginInterface
 {
@@ -26,7 +23,10 @@ class Retelling extends AbstractPlugin implements PluginInterface
 
     public function pluginCssFiles(): array
     {
-        return [];
+        $dep = new Dependency('/js/player/plugins/retelling.css');
+        return [
+            $dep->src,
+        ];
     }
 
     public function dependencies(): array

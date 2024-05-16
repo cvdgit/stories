@@ -214,16 +214,15 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
   })
 
   function InnerDialog(title, content) {
-
     const html = `<div class="slide-hints-wrapper" style="background-color: white">
-    <div style="display: flex; flex-direction: column; height: 100%; width: 100%; flex: 1 1 auto; justify-content: space-between">
-        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center">
+    <div class="retelling-dialog-inner">
+        <div class="retelling-dialog-header">
             <h2>${title}</h2>
             <div class="header-actions">
                 <button type="button" class="hints-close">&times;</button>
             </div>
         </div>
-        <div id="dialog-body" style="display: flex; flex-direction: column; flex: 1 1 auto; max-height: 100%; overflow-y: auto;"></div>
+        <div id="dialog-body" class="retelling-dialog-body"></div>
     </div>
 </div>
 `
@@ -278,36 +277,44 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
     }
   }
 
-  const content = `<div style="height: 100%; position: relative; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; flex: 1 1 auto">
-    <div style="max-height: 100%; overflow-y: auto; display: flex; flex-direction: column; flex: 1 1 auto;">
-        <h3>Пересказ пользователя:</h3>
-        <div style="padding: 20px 40px; margin-bottom: 20px; background-color: #eee; font-size: 2.5rem; border-radius: 2rem">
+  const content = `<div class="retelling-two-cols">
+    <div class="retelling-answers-col">
+    <h2 class="h3">Генерация вопросов <button id="answers-abort" style="display: none" class="btn">Остановить</button></h2>
+        <div class="retelling-answers" id="retelling-answers"></div>
+        <div id="retelling-error" style="display: none" class="alert alert-danger retelling-error"></div>
+    </div>
+    <div class="retelling-content">
+        <div style="max-height: 100%; overflow-y: auto; display: flex; flex-direction: column; flex: 1 1 auto;">
+            <h3>Пересказ пользователя:</h3>
+            <div style="padding: 20px 40px; margin-bottom: 20px; background-color: #eee; font-size: 2.5rem; border-radius: 2rem">
             <span contenteditable="plaintext-only" id="result_span"
                   style="outline: 0; background-color: #eee; line-height: 50px; color: black; margin-right: 3px; padding: 10px"></span>
-            <span contenteditable="plaintext-only" id="final_span"
-                  style="outline: 0; background-color: #eee; line-height: 50px; color: black; margin-right: 3px; padding: 10px"></span>
-            <span id="interim_span" style="color: gray"></span>
+                <span contenteditable="plaintext-only" id="final_span"
+                      style="outline: 0; background-color: #eee; line-height: 50px; color: black; margin-right: 3px; padding: 10px"></span>
+                <span id="interim_span" style="color: gray"></span>
+            </div>
+            <div style="display: flex; flex-direction: row; align-items: center; justify-content: center">
+                <button style="display: none" id="start-retelling" class="btn" type="button">Проверить</button>
+            </div>
         </div>
-        <div style="display: flex; flex-direction: row; align-items: center; justify-content: center">
-            <button style="display: none" id="start-retelling" class="btn" type="button">Проверить</button>
-        </div>
-    </div>
-    <div id="voice-area" style="position: relative; padding: 20px; height: 150px">
-    <div style="display: flex; gap: 20px; flex-direction: row; justify-content: center; align-items: center">
-        <select id="voice-lang">
-    <option value="ru-RU" selected>rus</option>
-    <option value="en-US">eng</option>
-</select>
-    <div id="voice-control" class="question-voice" data-trigger="hover"
-             title="Нажмите что бы начать запись с микрофона"
-             style="display: block; position:relative; bottom: 0; margin: 0">
-            <div class="question-voice__inner">
-                <div id="start-recording" class="gn">
-                    <div class="mc"></div>
+        <div id="voice-area" style="position: relative; padding: 20px; height: 150px">
+            <div style="display: flex; gap: 20px; flex-direction: row; justify-content: center; align-items: center">
+                <select id="voice-lang">
+                    <option value="ru-RU" selected>rus</option>
+                    <option value="en-US">eng</option>
+                </select>
+                <div id="voice-control" class="question-voice" data-trigger="hover"
+                     title="Нажмите что бы начать запись с микрофона"
+                     style="display: block; position:relative; bottom: 0; margin: 0">
+                    <div class="question-voice__inner">
+                        <div id="start-recording" class="gn">
+                            <div class="mc"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        </div>
+        <div id="retelling-content-overlay" class="retelling-content-overlay" title="Пока недоступно"></div>
     </div>
 </div>
 `
@@ -380,6 +387,66 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
     })
   }
 
+  async function getCache(slideTexts) {
+    const json = await fetchCache(`/admin/index.php?r=gpt/cache/get`, {slideTexts})
+    if (json?.success && json?.content) {
+      return json.content
+    }
+    return ''
+  }
+
+  async function setCache(slideTexts, content) {
+    return await fetchCache(`/admin/index.php?r=gpt/cache/set`, {slideTexts, content})
+  }
+
+  async function fetchCache(url, payload) {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-CSRF-Token': $('meta[name=csrf-token]').attr('content')
+      },
+      body: JSON.stringify(payload),
+    })
+    if (!response.ok) {
+      throw new Error(response.statusText)
+    }
+    return await response.json()
+  }
+
+  async function answersSendMessage({payload, onMessage, onError, onEndCallback, signal}) {
+    let accumulatedMessage = ""
+    return sendEventSourceMessage({
+      url: "/admin/index.php?r=gpt/stream/retelling-answers",
+      headers: {
+        Accept: "text/event-stream",
+        "X-CSRF-Token": $("meta[name=csrf-token]").attr("content")
+      },
+      body: JSON.stringify(payload),
+      signal,
+      onMessage: (streamedResponse) => {
+        if (Array.isArray(streamedResponse?.streamed_output)) {
+          accumulatedMessage = streamedResponse.streamed_output.join("");
+        }
+        onMessage(accumulatedMessage)
+      },
+      onError: (streamedResponse) => {
+        accumulatedMessage = streamedResponse?.error_text
+        onError(accumulatedMessage)
+      },
+      onEnd: onEndCallback
+    })
+  }
+
+  function getSlideText() {
+    return $(Reveal.getCurrentSlide())
+      .find("[data-block-type=text]")
+      .map((i, el) => $(el).text())
+      .get()
+      .join("\n")
+  }
+
   async function startRetelling($elem) {
 
     if (voiceResponse.getStatus()) {
@@ -409,11 +476,7 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
       return
     }
 
-    const slideTexts = $(Reveal.getCurrentSlide())
-      .find("[data-block-type=text]")
-      .map((i, el) => $(el).text())
-      .get()
-      .join("\n")
+    const slideTexts = getSlideText()
     if (!slideTexts) {
       alert("На слайде нет текста")
       return
@@ -431,6 +494,49 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
     }, $wrap, () => {
       $wrap.find("#voice-loader").hide()
       $wrap.find("#voice-finish").show()
+    })
+  }
+
+  async function generateAnswers($elem, signal) {
+    const slideTexts = getSlideText()
+    if (!slideTexts) {
+      alert("На слайде нет текста")
+      return
+    }
+
+    const $overlay = $elem.find('#retelling-content-overlay')
+    $overlay.show()
+
+    const content = await getCache(slideTexts)
+    if (content) {
+      $elem.find("#retelling-answers")[0].innerHTML = content
+      $overlay.hide()
+      return
+    }
+
+    const $abortButton = $elem.find('#answers-abort')
+    $abortButton.show()
+
+    const response = await answersSendMessage({
+      payload: {
+        slideTexts
+      },
+      signal,
+      onMessage: (message) => {
+        $elem.find("#retelling-answers")[0].innerText = message
+        $elem.find("#retelling-answers")[0].scrollTop = $elem.find("#retelling-answers")[0].scrollHeight;
+      },
+      onError: (error) => {
+        $overlay.hide()
+        $abortButton.hide()
+        $elem.find('#retelling-error').text(error).slideDown()
+      },
+      onEndCallback: () => {
+        $overlay.hide()
+        $abortButton.hide()
+
+        setCache(slideTexts, $elem.find("#retelling-answers").html())
+      }
     })
   }
 
@@ -457,7 +563,18 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
           $element.find("#start-retelling").css("display", display)
         }
       })
-    $element.find(".question-voice").tooltip("show")
+
+    // $element.find(".question-voice").tooltip("show")
+
+    const controller = new AbortController()
+
+    setTimeout(() => generateAnswers($element, controller.signal), 500)
+    $element.find('#retelling-answers').text('...')
+
+    $element.find('#answers-abort').on('click', function() {
+      controller.abort()
+      $(this).hide()
+    });
   })
 
   feedbackDialog.onHide(() => {
