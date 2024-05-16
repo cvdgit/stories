@@ -574,6 +574,7 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
     $element.find('#answers-abort').on('click', function() {
       controller.abort()
       $(this).hide()
+      $element.find('#retelling-content-overlay').hide()
     });
   })
 
