@@ -5,6 +5,7 @@ use common\rbac\UserRoles;
 use common\widgets\Reveal\Plugins\Retelling;
 use common\widgets\Reveal\Plugins\SlideLinks;
 use common\widgets\Reveal\Plugins\Video;
+use common\widgets\RevealButtons\RetellingAnswersButton;
 use common\widgets\RevealButtons\RetellingButton;
 use frontend\assets\PlyrAsset;
 use frontend\assets\RecorderAsset;
@@ -47,6 +48,7 @@ $canRetellingAccess = Yii::$app->user->can(UserRoles::ROLE_MODERATOR);
 
 if ($canRetellingAccess) {
     $buttons[] = new RetellingButton();
+    $buttons[] = new RetellingAnswersButton();
 }
 
 $plugins = [

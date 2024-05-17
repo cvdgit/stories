@@ -277,50 +277,6 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
     }
   }
 
-  const content = `<div class="retelling-two-cols">
-    <div class="retelling-answers-col">
-    <h2 class="h3">Генерация вопросов <button id="answers-abort" style="display: none" class="btn">Остановить</button></h2>
-        <div class="retelling-answers" id="retelling-answers"></div>
-        <div id="retelling-error" style="display: none" class="alert alert-danger retelling-error"></div>
-    </div>
-    <div class="retelling-content">
-        <div style="max-height: 100%; overflow-y: auto; display: flex; flex-direction: column; flex: 1 1 auto;">
-            <h3>Пересказ пользователя:</h3>
-            <div style="padding: 20px 40px; margin-bottom: 20px; background-color: #eee; font-size: 2.5rem; border-radius: 2rem">
-            <span contenteditable="plaintext-only" id="result_span"
-                  style="outline: 0; background-color: #eee; line-height: 50px; color: black; margin-right: 3px; padding: 10px"></span>
-                <span contenteditable="plaintext-only" id="final_span"
-                      style="outline: 0; background-color: #eee; line-height: 50px; color: black; margin-right: 3px; padding: 10px"></span>
-                <span id="interim_span" style="color: gray"></span>
-            </div>
-            <div style="display: flex; flex-direction: row; align-items: center; justify-content: center">
-                <button style="display: none" id="start-retelling" class="btn" type="button">Проверить</button>
-            </div>
-        </div>
-        <div id="voice-area" style="position: relative; padding: 20px; height: 150px">
-            <div style="display: flex; gap: 20px; flex-direction: row; justify-content: center; align-items: center">
-                <select id="voice-lang">
-                    <option value="ru-RU" selected>rus</option>
-                    <option value="en-US">eng</option>
-                </select>
-                <div id="voice-control" class="question-voice" data-trigger="hover"
-                     title="Нажмите что бы начать запись с микрофона"
-                     style="display: block; position:relative; bottom: 0; margin: 0">
-                    <div class="question-voice__inner">
-                        <div id="start-recording" class="gn">
-                            <div class="mc"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="retelling-content-overlay" class="retelling-content-overlay" title="Пока недоступно"></div>
-    </div>
-</div>
-`
-
-  const feedbackDialog = new InnerDialog('Пересказ', content)
-
   function startRecording(element, lang) {
     const state = $(element).data('state')
     const $that = $(element)
@@ -447,7 +403,7 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
       .join("\n")
   }
 
-  async function startRetelling($elem) {
+  async function startRetelling($elem, hideCallback) {
 
     if (voiceResponse.getStatus()) {
       voiceResponse.stop()
@@ -464,7 +420,7 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
     </div>
 </div>`)
 
-    $wrap.find("#voice-finish").on("click", feedbackDialog.hide)
+    $wrap.find("#voice-finish").on("click", hideCallback)
 
     $elem.append($wrap)
 
@@ -540,53 +496,174 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
     })
   }
 
-  feedbackDialog.onShow($element => {
-    $element
-      .on("click", "#start-recording", function () {
-        const voiceLang = $element.find("#voice-lang option:selected").val()
-        startRecording(this, voiceLang)
-      })
-      .on("click", "#start-retelling", () => {
-        startRetelling($element).then(() => {
-          console.log("success")
+  function showRetellingDialog() {
+    const content = `<div class="retelling-content">
+    <div style="max-height: 100%; overflow-y: auto; display: flex; flex-direction: column; flex: 1 1 auto;">
+        <h3>Пересказ пользователя:</h3>
+        <div style="padding: 20px 40px; margin-bottom: 20px; background-color: #eee; font-size: 2.5rem; border-radius: 2rem">
+            <span contenteditable="plaintext-only" id="result_span"
+                  style="outline: 0; background-color: #eee; line-height: 50px; color: black; margin-right: 3px; padding: 10px"></span>
+            <span contenteditable="plaintext-only" id="final_span"
+                  style="outline: 0; background-color: #eee; line-height: 50px; color: black; margin-right: 3px; padding: 10px"></span>
+            <span id="interim_span" style="color: gray"></span>
+        </div>
+        <div style="display: flex; flex-direction: row; align-items: center; justify-content: center">
+            <button style="display: none" id="start-retelling" class="btn" type="button">Проверить</button>
+        </div>
+    </div>
+    <div id="voice-area" style="position: relative; padding: 20px; height: 150px">
+        <div style="display: flex; gap: 20px; flex-direction: row; justify-content: center; align-items: center">
+            <select id="voice-lang">
+                <option value="ru-RU" selected>rus</option>
+                <option value="en-US">eng</option>
+            </select>
+            <div id="voice-control" class="question-voice" data-trigger="hover"
+                 title="Нажмите что бы начать запись с микрофона"
+                 style="display: block; position:relative; bottom: 0; margin: 0">
+                <div class="question-voice__inner">
+                    <div id="start-recording" class="gn">
+                        <div class="mc"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+`
+
+    const feedbackDialog = new InnerDialog('Пересказ', content)
+
+    feedbackDialog.onShow($element => {
+      $element
+        .on("click", "#start-recording", function () {
+          const voiceLang = $element.find("#voice-lang option:selected").val()
+          startRecording(this, voiceLang)
         })
-      })
-      .on("input", "#result_span", function () {
-        const display = $(this).text().length > 0 ? "block" : "none"
-        if (display !== $element.find("#start-retelling").css("display")) {
-          $element.find("#start-retelling").css("display", display)
-        }
-      })
-      .on("input", "#final_span", function () {
-        const display = $element.find("#result_span").text().length > 0 ? "block" : "none"
-        if (display !== $element.find("#start-retelling").css("display")) {
-          $element.find("#start-retelling").css("display", display)
-        }
-      })
+        .on("click", "#start-retelling", () => {
+          startRetelling($element, () => feedbackDialog.hide()).then(() => {
+            console.log("success")
+          })
+        })
+        .on("input", "#result_span", function () {
+          const display = $(this).text().length > 0 ? "block" : "none"
+          if (display !== $element.find("#start-retelling").css("display")) {
+            $element.find("#start-retelling").css("display", display)
+          }
+        })
+        .on("input", "#final_span", function () {
+          const display = $element.find("#result_span").text().length > 0 ? "block" : "none"
+          if (display !== $element.find("#start-retelling").css("display")) {
+            $element.find("#start-retelling").css("display", display)
+          }
+        })
+    })
 
-    // $element.find(".question-voice").tooltip("show")
+    feedbackDialog.onHide(() => {
+      if (voiceResponse.getStatus()) {
+        voiceResponse.stop()
+      }
+    })
 
-    const controller = new AbortController()
+    feedbackDialog.show()
+  }
 
-    setTimeout(() => generateAnswers($element, controller.signal), 500)
-    $element.find('#retelling-answers').text('...')
+  function showRetellingAnswersDialog() {
+    const content = `<div class="retelling-two-cols">
+    <div class="retelling-answers-col">
+    <h2 class="h3">Генерация вопросов <button id="answers-abort" style="display: none" class="btn">Остановить</button></h2>
+        <div class="retelling-answers" id="retelling-answers"></div>
+        <div id="retelling-error" style="display: none" class="alert alert-danger retelling-error"></div>
+    </div>
+    <div class="retelling-content">
+        <div style="max-height: 100%; overflow-y: auto; display: flex; flex-direction: column; flex: 1 1 auto;">
+            <h3>Пересказ пользователя:</h3>
+            <div style="padding: 20px 40px; margin-bottom: 20px; background-color: #eee; font-size: 2.5rem; border-radius: 2rem">
+            <span contenteditable="plaintext-only" id="result_span"
+                  style="outline: 0; background-color: #eee; line-height: 50px; color: black; margin-right: 3px; padding: 10px"></span>
+                <span contenteditable="plaintext-only" id="final_span"
+                      style="outline: 0; background-color: #eee; line-height: 50px; color: black; margin-right: 3px; padding: 10px"></span>
+                <span id="interim_span" style="color: gray"></span>
+            </div>
+            <div style="display: flex; flex-direction: row; align-items: center; justify-content: center">
+                <button style="display: none" id="start-retelling" class="btn" type="button">Проверить</button>
+            </div>
+        </div>
+        <div id="voice-area" style="position: relative; padding: 20px; height: 150px">
+            <div style="display: flex; gap: 20px; flex-direction: row; justify-content: center; align-items: center">
+                <select id="voice-lang">
+                    <option value="ru-RU" selected>rus</option>
+                    <option value="en-US">eng</option>
+                </select>
+                <div id="voice-control" class="question-voice" data-trigger="hover"
+                     title="Нажмите что бы начать запись с микрофона"
+                     style="display: block; position:relative; bottom: 0; margin: 0">
+                    <div class="question-voice__inner">
+                        <div id="start-recording" class="gn">
+                            <div class="mc"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="retelling-content-overlay" class="retelling-content-overlay" title="Пока недоступно"></div>
+    </div>
+</div>
+`
+    const feedbackDialog = new InnerDialog('Пересказ с вопросами', content)
 
-    $element.find('#answers-abort').on('click', function() {
-      controller.abort()
-      $(this).hide()
-      $element.find('#retelling-content-overlay').hide()
-    });
-  })
+    feedbackDialog.onShow($element => {
+      $element
+        .on("click", "#start-recording", function () {
+          const voiceLang = $element.find("#voice-lang option:selected").val()
+          startRecording(this, voiceLang)
+        })
+        .on("click", "#start-retelling", () => {
+          startRetelling($element, () => feedbackDialog.hide()).then(() => {
+            console.log("success")
+          })
+        })
+        .on("input", "#result_span", function () {
+          const display = $(this).text().length > 0 ? "block" : "none"
+          if (display !== $element.find("#start-retelling").css("display")) {
+            $element.find("#start-retelling").css("display", display)
+          }
+        })
+        .on("input", "#final_span", function () {
+          const display = $element.find("#result_span").text().length > 0 ? "block" : "none"
+          if (display !== $element.find("#start-retelling").css("display")) {
+            $element.find("#start-retelling").css("display", display)
+          }
+        })
 
-  feedbackDialog.onHide(() => {
-    if (voiceResponse.getStatus()) {
-      voiceResponse.stop()
-    }
-  })
+      // $element.find(".question-voice").tooltip("show")
+
+      const controller = new AbortController()
+
+      setTimeout(() => generateAnswers($element, controller.signal), 500)
+      $element.find('#retelling-answers').text('...')
+
+      $element.find('#answers-abort').on('click', function() {
+        controller.abort()
+        $(this).hide()
+        $element.find('#retelling-content-overlay').hide()
+      });
+    })
+
+    feedbackDialog.onHide(() => {
+      if (voiceResponse.getStatus()) {
+        voiceResponse.stop()
+      }
+    })
+
+    feedbackDialog.show()
+  }
 
   return {
-    begin: () => {
-      feedbackDialog.show()
+    begin() {
+      showRetellingDialog()
+    },
+    beginAnswers() {
+      showRetellingAnswersDialog()
     }
   };
 })()
