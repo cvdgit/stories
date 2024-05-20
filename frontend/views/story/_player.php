@@ -50,7 +50,8 @@ $buttons = [
 
 ];
 
-$canRetellingAccess = Yii::$app->user->can(UserRoles::ROLE_MODERATOR);
+$retellingUsers = Yii::$app->params['retelling.access.users'] ?? [];
+$canRetellingAccess = Yii::$app->user->can(UserRoles::ROLE_MODERATOR) || in_array(Yii::$app->user->getId(), $retellingUsers, true);
 
 if ($canRetellingAccess) {
     $buttons[] = new RetellingButton();

@@ -21,7 +21,7 @@ class Module extends \yii\base\Module
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => [UserRoles::ROLE_MODERATOR],
+                        'roles' => [UserRoles::ROLE_USER],
                     ],
                 ],
             ]

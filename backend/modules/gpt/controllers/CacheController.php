@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace backend\modules\gpt\controllers;
 
-use common\rbac\UserRoles;
 use Yii;
 use yii\db\Query;
-use yii\filters\AccessControl;
 use yii\helpers\Json;
 use yii\rest\Controller;
 use yii\web\Request;
@@ -15,21 +13,6 @@ use yii\web\Response;
 
 class CacheController extends Controller
 {
-    public function behaviors(): array
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::class,
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'roles' => [UserRoles::ROLE_MODERATOR],
-                    ],
-                ],
-            ],
-        ];
-    }
-
     public function actionGet(Request $request, Response $response): array
     {
         $response->format = Response::FORMAT_JSON;
