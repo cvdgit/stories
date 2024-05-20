@@ -26,6 +26,8 @@ use frontend\models\StoryLikeSearch;
 use frontend\models\StoryTrackModel;
 use frontend\models\UserStorySearch;
 use Yii;
+use yii\db\Expression;
+use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use common\models\Story;
@@ -72,17 +74,18 @@ class StoryController extends Controller
     protected $audioService;
     private $bookStoryGenerator;
 
-    public function __construct($id,
-                                $module,
-                                StoryService $storyService,
-                                CountersService $countersService,
-                                StoryLikeService $likeService,
-                                StoryFavoritesService $favoritesService,
-                                QuestionsService $questionsService,
-                                StoryAudioService $audioService,
-                                BookStoryGenerator $bookStoryGenerator,
-                                $config = [])
-    {
+    public function __construct(
+        $id,
+        $module,
+        StoryService $storyService,
+        CountersService $countersService,
+        StoryLikeService $likeService,
+        StoryFavoritesService $favoritesService,
+        QuestionsService $questionsService,
+        StoryAudioService $audioService,
+        BookStoryGenerator $bookStoryGenerator,
+        $config = []
+    ) {
         $this->storyService = $storyService;
         $this->countersService = $countersService;
         $this->likeService = $likeService;
@@ -112,14 +115,21 @@ class StoryController extends Controller
     public function actionIndex(string $section)
     {
         $sectionModel = $this->findSectionModel($section);
-        $this->getView()->setMetaTags($sectionModel->title, $sectionModel->description, $sectionModel->keywords, $sectionModel->h1);
+        $this->getView()->setMetaTags(
+            $sectionModel->title,
+            $sectionModel->description,
+            $sectionModel->keywords,
+            $sectionModel->h1
+        );
 
         $searchModel = new StorySearch();
         $searchModel->category_id = $sectionModel->getSectionCategories();
-        return $this->render('index', (new StoryRenderParams())
-            ->setSectionModel($sectionModel)
-            ->setSearchModel($searchModel, Yii::$app->request->queryParams)
-            ->asArray()
+        return $this->render(
+            'index',
+            (new StoryRenderParams())
+                ->setSectionModel($sectionModel)
+                ->setSearchModel($searchModel, Yii::$app->request->queryParams)
+                ->asArray()
         );
     }
 
@@ -145,11 +155,13 @@ class StoryController extends Controller
             $searchModel->defaultSortOrder = !empty($model->sort_order) ? $model->sort_order : SORT_ASC;
         }
         $searchModel->category_id = $model->subCategories();
-        return $this->render('index', (new StoryRenderParams())
-            ->setSectionModel($sectionModel)
-            ->setCategoryModel($model)
-            ->setSearchModel($searchModel, Yii::$app->request->queryParams)
-            ->asArray()
+        return $this->render(
+            'index',
+            (new StoryRenderParams())
+                ->setSectionModel($sectionModel)
+                ->setCategoryModel($model)
+                ->setSearchModel($searchModel, Yii::$app->request->queryParams)
+                ->asArray()
         );
     }
 
@@ -166,10 +178,12 @@ class StoryController extends Controller
 
         $searchModel = new StorySearch();
         $searchModel->tag_id = $model->id;
-        return $this->render('index', (new StoryRenderParams())
-            ->setSearchModel($searchModel, Yii::$app->request->queryParams)
-            ->setSearchAction(['/story/tag', 'tag' => $model->name])
-            ->asArray()
+        return $this->render(
+            'index',
+            (new StoryRenderParams())
+                ->setSearchModel($searchModel, Yii::$app->request->queryParams)
+                ->setSearchAction(['/story/tag', 'tag' => $model->name])
+                ->asArray()
         );
     }
 
@@ -190,7 +204,7 @@ class StoryController extends Controller
         $playlistID = Yii::$app->request->get('list');
         $playlist = null;
         if ($playlistID !== null) {
-            $playlist = Playlist::findModel((int)$playlistID);
+            $playlist = Playlist::findModel((int) $playlistID);
         }
 
         $dataProvider = Comment::getCommentDataProvider($model->id);
@@ -228,8 +242,7 @@ class StoryController extends Controller
                 $commentForm->body = '';
             }
             return $this->renderAjax('_comment_form', ['commentForm' => $commentForm]);
-        }
-        else {
+        } else {
             return $this->goHome();
         }
     }
@@ -243,8 +256,7 @@ class StoryController extends Controller
                 for ($i = $a; $i <= $b; $i++) {
                     $slides[] = $i;
                 }
-            }
-            else {
+            } else {
                 $slides[] = $value;
             }
         }
@@ -302,7 +314,13 @@ class StoryController extends Controller
             $userStars = $userQuestionHistoryModel->getUserQuestionHistoryStarsLocal($test->id);
             $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCountLocal($test->id);
         }
-        $collection = (new TestBuilder($test, $test->getQuestionData($userHistory), $test->getQuestionDataCount(), $userStars, $fastMode))
+        $collection = (new TestBuilder(
+            $test,
+            $test->getQuestionData($userHistory),
+            $test->getQuestionDataCount(),
+            $userStars,
+            $fastMode
+        ))
             ->build();
         return (new Serializer())
             ->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount, $fastMode);
@@ -317,7 +335,7 @@ class StoryController extends Controller
                 $students[] = [
                     'id' => $student->id,
                     'name' => $student->isMain() ? $student->user->getProfileName() : $student->name,
-                    'progress' => (int)$student->getProgress($testID),
+                    'progress' => (int) $student->getProgress($testID),
                 ];
             }
         }
@@ -338,8 +356,7 @@ class StoryController extends Controller
     {
         if (Yii::$app->user->isGuest) {
             $model = Story::findModel(Yii::$app->params['story.needSignup.id']);
-        }
-        else {
+        } else {
             $model = Story::findModel($id);
             /*$userCanViewStory = UserPermissions::canViewStory($model);
             if (!$userCanViewStory) {
@@ -356,34 +373,70 @@ class StoryController extends Controller
             }
         }
 
+        $completedRetelling = [];
+        if (!Yii::$app->user->isGuest) {
+            $ids = (new Query())
+                ->select([
+                    'slideId' => 'rh.slide_id',
+                    'overallSimilarity' => new Expression('MAX(rh.overall_similarity)'),
+                ])
+                ->from(['rh' => 'retelling_history'])
+                ->where([
+                    'story_id' => $id,
+                    'user_id' => Yii::$app->user->getId(),
+                ])
+                ->andWhere('rh.overall_similarity > 70')
+                ->groupBy(['rh.slide_id'])
+
+                ->all();
+            $completedRetelling = array_map(static function (array $item): int {
+                return (int) $item['slideId'];
+            }, $ids);
+        }
+
         return $this->renderAjax('_player', [
             'model' => $model,
             'userCanViewStory' => true,
             'audioTrackPath' => $audioTrackPath,
             'playlistID' => Yii::$app->request->get('list'),
             'saveStat' => $this->countersService->needUpdateCounters(),
+            'completedRetelling' => $completedRetelling,
         ]);
     }
 
     public function actionHistory()
     {
-        $this->getView()->setMetaTags('История просмотра', 'История просмотра', 'История просмотра', 'История просмотра');
-        return $this->render('index', (new StoryRenderParams())
-            ->setSearchModel(new UserStorySearch(Yii::$app->user->id), Yii::$app->request->queryParams)
-            ->setEmptyText('В этом разделе будут отображаться истории, которые были просмотрены вами')
-            ->setSearchAction(['/story/history'])
-            ->asArray()
+        $this->getView()->setMetaTags(
+            'История просмотра',
+            'История просмотра',
+            'История просмотра',
+            'История просмотра'
+        );
+        return $this->render(
+            'index',
+            (new StoryRenderParams())
+                ->setSearchModel(new UserStorySearch(Yii::$app->user->id), Yii::$app->request->queryParams)
+                ->setEmptyText('В этом разделе будут отображаться истории, которые были просмотрены вами')
+                ->setSearchAction(['/story/history'])
+                ->asArray()
         );
     }
 
     public function actionLiked()
     {
-        $this->getView()->setMetaTags('Понравившиеся истории', 'Понравившиеся истории', 'Понравившиеся истории', 'Понравившиеся истории');
-        return $this->render('index', (new StoryRenderParams())
-            ->setSearchModel(new StoryLikeSearch(Yii::$app->user->id), Yii::$app->request->queryParams)
-            ->setEmptyText('В этом разделе будут отображаться понравившиеся вам истории')
-            ->setSearchAction(['/story/liked'])
-            ->asArray()
+        $this->getView()->setMetaTags(
+            'Понравившиеся истории',
+            'Понравившиеся истории',
+            'Понравившиеся истории',
+            'Понравившиеся истории'
+        );
+        return $this->render(
+            'index',
+            (new StoryRenderParams())
+                ->setSearchModel(new StoryLikeSearch(Yii::$app->user->id), Yii::$app->request->queryParams)
+                ->setEmptyText('В этом разделе будут отображаться понравившиеся вам истории')
+                ->setSearchAction(['/story/liked'])
+                ->asArray()
         );
     }
 
@@ -417,12 +470,19 @@ class StoryController extends Controller
 
     public function actionFavorites()
     {
-        $this->getView()->setMetaTags('Избранные истории', 'Избранные истории', 'Избранные истории', 'Избранные истории');
-        return $this->render('index', (new StoryRenderParams())
-            ->setSearchModel(new StoryFavoritesSearch(Yii::$app->user->id), Yii::$app->request->queryParams)
-            ->setEmptyText('В этом разделе будут отображаться истории, добавленные вами в избранное')
-            ->setSearchAction(['/story/favorites'])
-            ->asArray()
+        $this->getView()->setMetaTags(
+            'Избранные истории',
+            'Избранные истории',
+            'Избранные истории',
+            'Избранные истории'
+        );
+        return $this->render(
+            'index',
+            (new StoryRenderParams())
+                ->setSearchModel(new StoryFavoritesSearch(Yii::$app->user->id), Yii::$app->request->queryParams)
+                ->setEmptyText('В этом разделе будут отображаться истории, добавленные вами в избранное')
+                ->setSearchAction(['/story/favorites'])
+                ->asArray()
         );
     }
 
@@ -443,11 +503,13 @@ class StoryController extends Controller
         );
         $searchModel = new StorySearch();
         $searchModel->category_id = $sectionModel->getSectionCategories();
-        return $this->render('index', (new StoryRenderParams())
-            ->setSectionModel($sectionModel)
-            ->setSearchModel($searchModel, Yii::$app->request->queryParams)
-            ->setSearchAction(['/story/index'])
-            ->asArray()
+        return $this->render(
+            'index',
+            (new StoryRenderParams())
+                ->setSectionModel($sectionModel)
+                ->setSearchModel($searchModel, Yii::$app->request->queryParams)
+                ->setSearchAction(['/story/index'])
+                ->asArray()
         );
     }
 
@@ -463,22 +525,26 @@ class StoryController extends Controller
         $searchModel = new StorySearch();
         $searchModel->category_id = $sectionModel->getSectionCategories();
         $searchModel->audio = 1;
-        return $this->render('index', (new StoryRenderParams())
-            ->setSectionModel($sectionModel)
-            ->setSearchModel($searchModel, Yii::$app->request->queryParams)
-            ->setSearchAction(['/story/index'])
-            ->asArray()
+        return $this->render(
+            'index',
+            (new StoryRenderParams())
+                ->setSectionModel($sectionModel)
+                ->setSearchModel($searchModel, Yii::$app->request->queryParams)
+                ->setSearchAction(['/story/index'])
+                ->asArray()
         );
     }
 
     public function actionMyaudio()
     {
         $this->getView()->setMetaTags('Моя озвучка', 'Моя озвучка', 'Моя озвучка', 'Моя озвучка');
-        return $this->render('index', (new StoryRenderParams())
-            ->setSearchModel(new MyAudioStoriesSearch(Yii::$app->user->id), Yii::$app->request->queryParams)
-            ->setEmptyText('В этом разделе будут отображаться истории, озвученные вами')
-            ->setSearchAction(['/story/myaudio'])
-            ->asArray()
+        return $this->render(
+            'index',
+            (new StoryRenderParams())
+                ->setSearchModel(new MyAudioStoriesSearch(Yii::$app->user->id), Yii::$app->request->queryParams)
+                ->setEmptyText('В этом разделе будут отображаться истории, озвученные вами')
+                ->setSearchAction(['/story/myaudio'])
+                ->asArray()
         );
     }
 

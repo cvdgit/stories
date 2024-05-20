@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace common\widgets\Reveal\Plugins;
 
-use common\models\Story;
 use common\widgets\Reveal\Dependency;
 
 class Retelling extends AbstractPlugin implements PluginInterface
 {
     public $configName = 'retelling';
-
-    /** @var Story */
-    public $story;
+    public $storyId;
+    public $completed = [];
 
     public function pluginConfig(): array
     {
         return [
-            $this->configName => [],
+            $this->configName => [
+                'story_id' => $this->storyId,
+                'completed' => $this->completed,
+            ],
         ];
     }
 

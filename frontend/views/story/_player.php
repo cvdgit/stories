@@ -1,6 +1,7 @@
 <?php
 
 use backend\assets\MainAsset;
+use common\models\Story;
 use common\rbac\UserRoles;
 use common\widgets\Reveal\Plugins\Retelling;
 use common\widgets\Reveal\Plugins\SlideLinks;
@@ -12,10 +13,15 @@ use frontend\assets\RecorderAsset;
 use frontend\widgets\FrontendRevealWidget;
 use yii\helpers\Json;
 use yii\helpers\Url;
-/* @var $this yii\web\View */
-/* @var $model common\models\Story */
-/* @var $userCanViewStory bool */
-/* @var $saveStat bool */
+use yii\web\View;
+
+/**
+ * @var View $this
+ * @var Story $model
+ * @var bool $userCanViewStory
+ * @var bool $saveStat
+ * @var array $completedRetelling
+ */
 
 MainAsset::register($this);
 
@@ -71,7 +77,7 @@ $plugins = [
 ];
 
 if ($canRetellingAccess) {
-    $plugins[] = ["class" => Retelling::class];
+    $plugins[] = ["class" => Retelling::class, 'storyId' => $model->id, 'completed' => $completedRetelling];
 }
 
 if ($saveStat) {

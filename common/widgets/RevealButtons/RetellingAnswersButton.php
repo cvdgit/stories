@@ -11,7 +11,7 @@ class RetellingAnswersButton extends Button
 	public function __construct()
 	{
 		$this->icon = 'glyphicon glyphicon-tasks';
-		$this->className = 'custom-feedback';
+		$this->className = 'control-retelling-answers';
 		$this->title = 'Пересказ с вопросами';
 		$this->action = new JsExpression('function() { RetellingPlugin.beginAnswers(); }');
 	}

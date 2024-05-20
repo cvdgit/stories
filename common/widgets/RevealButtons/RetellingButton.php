@@ -11,7 +11,7 @@ class RetellingButton extends Button
 	public function __construct()
 	{
 		$this->icon = 'glyphicon glyphicon-book';
-		$this->className = 'custom-feedback';
+		$this->className = 'control-retelling';
 		$this->title = 'Пересказ';
 		$this->action = new JsExpression('function() { RetellingPlugin.begin(); }');
 	}

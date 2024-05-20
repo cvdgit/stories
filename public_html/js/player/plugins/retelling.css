@@ -68,3 +68,7 @@
 .retelling-error {
   font-size: 2rem;
 }
+
+.retelling-success {
+  color: #3c763d !important;
+}

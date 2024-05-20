@@ -371,6 +371,22 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
     return await response.json()
   }
 
+  async function saveUserResult(payload) {
+    const response = await fetch(`/retelling/save`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-CSRF-Token': $('meta[name=csrf-token]').attr('content')
+      },
+      body: JSON.stringify(payload),
+    })
+    if (!response.ok) {
+      throw new Error(response.statusText)
+    }
+    return await response.json()
+  }
+
   async function answersSendMessage({payload, onMessage, onError, onEndCallback, signal}) {
     let accumulatedMessage = ""
     return sendEventSourceMessage({
@@ -401,6 +417,10 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
       .map((i, el) => $(el).text())
       .get()
       .join("\n")
+  }
+
+  function getSlideId() {
+    return Number($(Reveal.getCurrentSlide()).attr('data-id'))
   }
 
   async function startRetelling($elem, hideCallback) {
@@ -451,6 +471,8 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
       $wrap.find("#voice-loader").hide()
       $wrap.find("#voice-finish").show()
     })
+
+    return response
   }
 
   async function generateAnswers($elem, signal) {
@@ -540,8 +562,21 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
           startRecording(this, voiceLang)
         })
         .on("click", "#start-retelling", () => {
-          startRetelling($element, () => feedbackDialog.hide()).then(() => {
-            console.log("success")
+          startRetelling($element, () => feedbackDialog.hide()).then((response) => {
+            const json = processOutputAsJson($element.find('#retelling-response').text())
+            if (json) {
+              saveUserResult({
+                overall_similarity: Number(json?.overall_similarity),
+                content: getSlideText(),
+                story_id: retelling.story_id,
+                slide_id: getSlideId()
+              }).then(response => {
+                checkSlideRetellingIsCompleted(Reveal.getRevealElement(), response?.completed)
+                if (response?.completed) {
+                  retelling.completed = [...retelling.completed, getSlideId()]
+                }
+              })
+            }
           })
         })
         .on("input", "#result_span", function () {
@@ -565,6 +600,16 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
     })
 
     feedbackDialog.show()
+  }
+
+  function processOutputAsJson(output) {
+    let json = null
+    try {
+      json = JSON.parse(output.replace(/```json\n?|```/g, ''))
+    } catch (ex) {
+
+    }
+    return json
   }
 
   function showRetellingAnswersDialog() {
@@ -618,8 +663,21 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
           startRecording(this, voiceLang)
         })
         .on("click", "#start-retelling", () => {
-          startRetelling($element, () => feedbackDialog.hide()).then(() => {
-            console.log("success")
+          startRetelling($element, () => feedbackDialog.hide()).then((response) => {
+            const json = processOutputAsJson($element.find('#retelling-response').text())
+            if (json) {
+              saveUserResult({
+                overall_similarity: Number(json?.overall_similarity),
+                content: getSlideText(),
+                story_id: retelling.story_id,
+                slide_id: getSlideId()
+              }).then(response => {
+                checkSlideRetellingIsCompleted(Reveal.getRevealElement(), response?.completed)
+                if (response?.completed) {
+                  retelling.completed = [...retelling.completed, getSlideId()]
+                }
+              })
+            }
           })
         })
         .on("input", "#result_span", function () {
@@ -642,7 +700,7 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
       setTimeout(() => generateAnswers($element, controller.signal), 500)
       $element.find('#retelling-answers').text('...')
 
-      $element.find('#answers-abort').on('click', function() {
+      $element.find('#answers-abort').on('click', function () {
         controller.abort()
         $(this).hide()
         $element.find('#retelling-content-overlay').hide()
@@ -657,6 +715,27 @@ const RetellingPlugin = window.RetellingPlugin || (function () {
 
     feedbackDialog.show()
   }
+
+  function checkSlideRetellingIsCompleted(container, completed = false) {
+    const successClassName = 'retelling-success';
+    ['.control-retelling', '.control-retelling-answers'].map(
+      className => {
+        const $el = $('.story-controls', container).find(className)
+        $el.removeClass(successClassName)
+        if (completed) {
+          $el.addClass(successClassName)
+        }
+      }
+    )
+  }
+
+  Reveal.addEventListener('ready', (event) => {
+    checkSlideRetellingIsCompleted(Reveal.getRevealElement(), retelling?.completed.includes(getSlideId()))
+  });
+
+  Reveal.addEventListener('slidechanged', (event) => {
+    checkSlideRetellingIsCompleted(Reveal.getRevealElement(), retelling?.completed.includes(getSlideId()))
+  });
 
   return {
     begin() {
