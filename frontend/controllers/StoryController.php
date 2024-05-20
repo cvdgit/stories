@@ -385,7 +385,7 @@ class StoryController extends Controller
                     'story_id' => $id,
                     'user_id' => Yii::$app->user->getId(),
                 ])
-                ->andWhere('rh.overall_similarity > 70')
+                ->andWhere('rh.overall_similarity > 90')
                 ->groupBy(['rh.slide_id'])
 
                 ->all();

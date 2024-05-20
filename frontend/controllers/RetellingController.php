@@ -39,7 +39,7 @@ class RetellingController extends Controller
                     'created_at' => time(),
                 ]);
                 $command->execute();
-                return ['success' => true, 'completed' => (int) $form->overall_similarity > 70];
+                return ['success' => true, 'completed' => (int) $form->overall_similarity > 90];
             } catch (Exception $ex) {
                 Yii::$app->errorHandler->logException($ex);
                 return ['success' => false, 'message' => 'При сохранении истории повторения произошла ошибка'];
