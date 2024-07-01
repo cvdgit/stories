@@ -41,11 +41,12 @@
   }
 
   function initMentalMap() {
-    const currentSlideID = $(getCurrentSlide()).attr('data-id');
-    if (readySlides[currentSlideID] && !$(getCurrentSlide()).find('.mental-map').is(':empty')) {
+    const currentSlideID = $(getCurrentSlide()).attr('data-id')
+    if (readySlides[currentSlideID]) {
       return;
     }
     readySlides[currentSlideID] = true;
+    console.log('mental map init')
     init();
   }
 
