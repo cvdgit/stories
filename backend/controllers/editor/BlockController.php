@@ -14,13 +14,14 @@ use backend\services\StoryEditorService;
 use common\models\StorySlide;
 use common\models\StoryStoryTest;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\filters\VerbFilter;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class BlockController extends BaseController
 {
-
-    protected $editorService;
+    private $editorService;
 
     public function __construct($id, $module, StoryEditorService $editorService, $config = [])
     {
@@ -28,7 +29,7 @@ class BlockController extends BaseController
         $this->editorService = $editorService;
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'verbs' => [
@@ -40,12 +41,16 @@ class BlockController extends BaseController
         ];
     }
 
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return parent::beforeAction($action);
     }
 
+    /**
+     * @throws InvalidConfigException
+     * @throws NotFoundHttpException
+     */
     public function actionDelete(int $slide_id)
     {
         /** @var StorySlide $slideModel */

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\controllers\editor;
 
 use backend\components\BaseController;
@@ -26,13 +28,14 @@ use common\models\StorySlide;
 use common\rbac\UserRoles;
 use Exception;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class CreateBlockController extends BaseController
 {
-
     private $editorService;
 
     public function __construct($id, $module, StoryEditorService $editorService, $config = [])
@@ -41,13 +44,13 @@ class CreateBlockController extends BaseController
         $this->editorService = $editorService;
     }
 
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return parent::beforeAction($action);
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
@@ -118,10 +121,14 @@ class CreateBlockController extends BaseController
         return $this->createBlock(new QuestionForm(), HTMLBLock::class);
     }
 
+    /**
+     * @throws InvalidConfigException
+     * @throws NotFoundHttpException
+     */
     private function createBlock(BaseForm $form, string $blockClassName): array
     {
         if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-            $slideModel = $this->findModel(StorySlide::class, $form->slide_id);
+            $slideModel = $this->findModel(StorySlide::class, (int) $form->slide_id);
             try {
                 $html = $this->editorService->createBlock($slideModel, $form, $blockClassName);
                 $form->afterCreate($slideModel);

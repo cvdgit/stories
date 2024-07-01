@@ -19,8 +19,13 @@ class ImageReader extends AbstractBlockReader implements BlockReaderInterface
         $element = $this->pqBlock->find('img');
         if ($element->length > 0) {
 
+            $filePath = $element->attr('data-src');
+            if ($filePath === null) {
+                $filePath = $element->attr('src');
+            }
+
             $block->setElementAttributes($element->attr('*'));
-            $block->setFilePath($element->attr('data-src'));
+            $block->setFilePath($filePath);
             $block->setAction($element->attr('data-action'));
             $block->setActionStoryID($element->attr('data-action-story'));
             $block->setActionSlideID($element->attr('data-action-slide'));
@@ -28,7 +33,7 @@ class ImageReader extends AbstractBlockReader implements BlockReaderInterface
 
             $width = str_replace('px', '', $this->getStyleValue($style, 'width'));
             $height = str_replace('px', '', $this->getStyleValue($style, 'height'));
-            $block->setImageSize($element->attr('data-src'), $width, $height);
+            $block->setImageSize($filePath, $width, $height);
             $block->setNaturalImageSize($element->attr('data-natural-width'), $element->attr('data-natural-height'));
 
             $imageSourceElement = $this->pqBlock->find('span');

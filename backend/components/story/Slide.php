@@ -3,6 +3,7 @@
 namespace backend\components\story;
 
 use Yii;
+use yii\base\InvalidConfigException;
 
 class Slide
 {
@@ -54,7 +55,7 @@ class Slide
     /**
      * @param mixed $slideNumber
      */
-    public function setSlideNumber($slideNumber): void
+    public function setSlideNumber(int $slideNumber): void
     {
         $this->slideNumber = $slideNumber;
     }
@@ -75,12 +76,15 @@ class Slide
      */
     public function findBlockByID(string $blockID): AbstractBlock
     {
-        $blocks = array_filter($this->blocks, function(AbstractBlock $block) use ($blockID) {
+        $blocks = array_filter($this->blocks, static function(AbstractBlock $block) use ($blockID) {
             return ($block->getId() === $blockID);
         });
         return array_shift($blocks);
     }
 
+    /**
+     * @throws InvalidConfigException
+     */
     public function createBlock(string $type): AbstractBlock
     {
         return Yii::createObject($type)->create();
@@ -126,12 +130,12 @@ class Slide
         $this->audioFile = $audioFile;
     }
 
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function setId($id): void
+    public function setId(int $id): void
     {
         $this->id = $id;
     }

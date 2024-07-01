@@ -12,6 +12,8 @@ module.exports = {
     wikids_gpt: path.resolve(__dirname, 'asset/gpt/index.js'),
     main: path.resolve(__dirname, 'asset/app/app.js'),
     pdf_chat: path.resolve(__dirname, 'asset/pdf_chat/index.js'),
+    mental_map: path.resolve(__dirname, 'asset/mental_map/index.js'),
+    mental_map_quiz: path.resolve(__dirname, 'asset/mental_map_quiz/index.js'),
   },
   output: {
     filename: '[name].js',

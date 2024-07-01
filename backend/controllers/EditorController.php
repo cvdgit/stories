@@ -202,6 +202,10 @@ class EditorController extends BaseController
         ],
     ];
 
+    /**
+     * @throws InvalidConfigException
+     * @throws NotFoundHttpException
+     */
     public function actionFormCreate(int $slide_id, string $block_type)
     {
         /** @var StorySlide $model */
@@ -283,10 +287,7 @@ class EditorController extends BaseController
     {
         $response->format = Response::FORMAT_JSON;
         $model = $this->findModel(Story::class, $story_id);
-        if ($model === null) {
-            return [];
-        }
-        return array_map(static function(StorySlide $slide) {
+        return array_map(static function(StorySlide $slide): array {
             return (new SlideListResponse($slide))->asArray();
         }, $model->storySlides);
     }

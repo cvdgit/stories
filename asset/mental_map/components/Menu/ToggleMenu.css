@@ -1,0 +1,256 @@
+.menu {
+  display: inline-block;
+  position: relative;
+  vertical-align: middle
+}
+
+.menu--active {
+  z-index: 4
+}
+
+.menu--full {
+  display: block
+}
+
+.menu__trigger {
+  cursor: pointer;
+  display: inline-block;
+  font-family: inherit;
+  position: relative
+}
+
+.menu--active .menu__trigger,.menu__trigger:hover {
+  opacity: 1
+}
+
+.menu--active .menu__trigger {
+  z-index: 4
+}
+
+.menu__trigger--dots {
+  background: none;
+  border: none;
+  line-height: 0;
+  opacity: .2;
+  padding: 1rem
+}
+
+.menu__trigger--button {
+  border: .1rem solid rgba(49,53,55,.4)
+}
+
+.menu__trigger--simple {
+  background: none;
+  border: none;
+  font-size: inherit;
+  padding-left: 0;
+  padding-right: 0
+}
+
+.menu__trigger--simple>span,.menu__trigger--simple>svg {
+  display: inline-block;
+  vertical-align: middle
+}
+
+.menu__trigger--simple>span+svg {
+  margin-left: .5em
+}
+
+.menu__trigger--full-dropdown {
+  border: none;
+  border-bottom: 1px solid #f3f3f3;
+  color: #4a4a4a;
+  font-size: 1.4rem;
+  letter-spacing: .3px;
+  line-height: 1.5;
+  padding: 0 0 .6rem;
+  text-align: left;
+  width: 100%
+}
+
+.menu__trigger--full-dropdown:before {
+  border: .4rem solid transparent;
+  border-top: .5rem solid #4a4a4a;
+  content: "";
+  display: block;
+  height: 0;
+  position: absolute;
+  right: .8rem;
+  top: 1rem;
+  width: 0
+}
+
+.menu__trigger__chevron {
+  height: .9rem;
+  width: .9rem
+}
+
+.menu__content {
+  background-color: #fff;
+  box-shadow: 0 .2rem .7rem 0 rgba(0,0,0,.1);
+  cursor: auto;
+  opacity: 0;
+  padding: 1.5rem 0;
+  position: absolute;
+  text-align: left;
+  transition: opacity .3s;
+  visibility: hidden;
+  white-space: nowrap
+}
+
+.menu--active .menu__content {
+  opacity: 1;
+  visibility: visible
+}
+
+.menu__content--right {
+  right: -1rem
+}
+
+.menu__content--right--flush {
+  right: 0
+}
+
+.menu__content--left {
+  left: -1rem
+}
+
+.menu__content--bottom {
+  margin-top: .5rem;
+  top: 100%
+}
+
+.menu__content--top {
+  bottom: 100%;
+  margin-bottom: .5rem
+}
+
+.menu__content--above {
+  left: -3.5rem;
+  top: -14rem
+}
+
+.menu__content--centerX {
+  left: 50%;
+  transform: translateX(-50%)
+}
+
+.menu__content--dots {
+  bottom: auto;
+  padding: 3rem 0 1.5rem;
+  top: -.2rem
+}
+
+.menu__content--theme {
+  border-radius: 6px;
+  margin-top: .5rem;
+  min-width: 16rem;
+  right: 0
+}
+
+.menu__gridList {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  padding: 0 1.5rem;
+  text-align: center
+}
+
+.menu__gridItem,.menu__item {
+  color: #000;
+  cursor: pointer;
+  font-size: 1.4rem;
+  line-height: 1.5rem;
+  opacity: .4;
+  transition: opacity .3s;
+  white-space: nowrap
+}
+
+.menu__gridItem:hover:not([class*=disabled]),.menu__item:hover:not([class*=disabled]) {
+  background: #fafafa;
+  opacity: 1
+}
+
+.menu__gridItem--disabled,.menu__item--disabled {
+  cursor: not-allowed
+}
+
+.menu__item {
+  align-items: center;
+  display: flex;
+  font-weight: 400;
+  padding: 1.5rem 2.7rem 1.5rem 2.2rem
+}
+
+.menu__gridItem {
+  padding: 1rem;
+  width: 50%
+}
+
+.menu__icon {
+  line-height: 0;
+  margin-right: 1rem;
+  text-align: right;
+  width: 1.5rem
+}
+
+.menu__icon .i {
+  height: 1.5rem;
+  width: 1.5rem
+}
+
+.menu__icon .i-alt,.menu__icon .i-captions {
+  width: 2rem
+}
+
+.menu__heading {
+  border-bottom: 1px solid #e0e1e1;
+  color: #c2c3c3;
+  font-size: 1.2rem;
+  letter-spacing: .11rem;
+  margin: 1.5rem;
+  padding-bottom: 1.5rem
+}
+
+.menu__actions {
+  margin-left: 3rem;
+  text-align: right
+}
+
+.menu__name {
+  color: #4a4a4a;
+  margin-left: 1rem
+}
+
+.menu__soon {
+  cursor: default
+}
+
+.menu__info {
+  color: #7a8084;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: .7px;
+  text-transform: uppercase
+}
+
+.menu__group {
+  display: flex
+}
+
+.menu__action {
+  cursor: pointer;
+  display: inline-block;
+  line-height: 0;
+  margin-right: 1.5rem
+}
+
+.menu__action:last-child {
+  margin-right: 0
+}
+
+.menu__divider {
+  border-top: .1rem solid #f2f2f2;
+  margin: 1.5rem 0
+}

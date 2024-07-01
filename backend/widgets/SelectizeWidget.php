@@ -13,7 +13,7 @@ class SelectizeWidget extends Widget
     public $attribute;
 
     public $options = [];
-    public $onChange = '{}';
+    public $onChange = '() => {}';
 
     public function run()
     {

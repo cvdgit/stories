@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\controllers\editor;
 
 use backend\components\BaseController;
@@ -9,14 +11,16 @@ use backend\services\StoryEditorService;
 use common\models\StorySlide;
 use common\rbac\UserRoles;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Request;
 use yii\web\Response;
 
 class SlideController extends BaseController
 {
-
     private $editorService;
 
     public function __construct($id, $module, StoryEditorService $editorService, $config = [])
@@ -25,13 +29,16 @@ class SlideController extends BaseController
         $this->editorService = $editorService;
     }
 
-    public function beforeAction($action)
+    /**
+     * @throws BadRequestHttpException
+     */
+    public function beforeAction($action): bool
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return parent::beforeAction($action);
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
@@ -52,16 +59,20 @@ class SlideController extends BaseController
         ];
     }
 
-    public function actionSave()
+    /**
+     * @throws InvalidConfigException
+     * @throws NotFoundHttpException
+     */
+    public function actionSave(Request $request): array
     {
-        $data = Yii::$app->request->rawBody;
+        $data = $request->rawBody;
         $slide = $this->editorService->processData($data);
         foreach ($slide->getBlocks() as $block) {
             if ($block->getType() === AbstractBlock::TYPE_HTML) {
                 $data = str_replace('data-slide-view=""', 'data-slide-view="new-question"', $data);
             }
         }
-        /** @var StorySlide $model */
+
         $model = $this->findModel(StorySlide::class, $slide->getId());
         $model->updateData($data);
         return ['success' => true];

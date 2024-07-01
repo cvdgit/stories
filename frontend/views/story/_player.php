@@ -75,6 +75,7 @@ $plugins = [
     //['class' => \common\widgets\Reveal\Plugins\Recorder::class, 'story' => $model],
     ['class' => \common\widgets\Reveal\Plugins\SlideState::class, 'storyID' => $model->id],
     ['class' => \common\widgets\Reveal\Plugins\SlideLinksView::class],
+    ['class' => \common\widgets\Reveal\Plugins\MentalMap::class, 'storyId' => $model->id],
 ];
 
 if ($canRetellingAccess) {

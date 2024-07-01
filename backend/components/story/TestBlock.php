@@ -6,7 +6,6 @@ use backend\models\editor\TestForm;
 
 class TestBlock extends ButtonBlock
 {
-
     /** @var int */
     protected $testID;
 
@@ -36,9 +35,10 @@ class TestBlock extends ButtonBlock
         ], parent::getValues());
     }
 
-    public function create()
+    public function create(): TestBlock
     {
         $block = new self();
+        $block->setType(AbstractBlock::TYPE_TEST);
         $block->setWidth('auto');
         $block->setHeight('auto');
         $block->setTop('600px');

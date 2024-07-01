@@ -1,27 +1,28 @@
 <?php
 
+declare(strict_types=1);
 
 namespace backend\components\story\reader;
-
 
 use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
 use backend\components\story\HTMLBLock;
 use backend\components\story\ImageBlock;
+use backend\components\story\MentalMapBlock;
 use backend\components\story\Slide;
 use backend\components\story\Story;
 use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
 use backend\components\story\TransitionBlock;
 use backend\components\story\VideoBlock;
+use phpQuery;
 
 class HTMLReader extends AbstractReader implements ReaderInterface
 {
+    private $html;
+    /*private $rootPath;*/
 
-    protected $html;
-    protected $rootPath;
-
-    public function __construct($html)
+    public function __construct(string $html)
     {
         $this->story = new Story();
         $this->html = $html;
@@ -29,36 +30,36 @@ class HTMLReader extends AbstractReader implements ReaderInterface
 
     public function load(): Story
     {
-        $document = \phpQuery::newDocumentHTML($this->html);
+        $document = phpQuery::newDocumentHTML($this->html);
         $this->loadSlides($document);
         return $this->story;
     }
 
-    protected function loadSlides($document): void
+    private function loadSlides(\phpQueryObject $document): void
     {
         $sections = $document->find('section');
         $slideNumber = 1;
-        foreach ($sections as $i => $section) {
+        foreach ($sections as $section) {
             $htmlSlide = pq($section)->htmlOuter();
             $this->loadSlide($htmlSlide, $slideNumber);
             $slideNumber++;
         }
     }
 
-    protected function loadSlide($htmlSlide, int $slideIndex): void
+    private function loadSlide(string $htmlSlide, int $slideIndex): void
     {
         $slide = $this->story->createSlide();
         $slide->setSlideNumber($slideIndex);
         $slide->setView(pq($htmlSlide)->attr('data-slide-view') ?? '');
-        $slide->id = pq($htmlSlide)->attr('data-id');
+        $slide->id = (int) pq($htmlSlide)->attr('data-id');
         $blocks = pq($htmlSlide)->find('div.sl-block');
         $this->loadSlideBlocks($blocks, $slide);
     }
 
-    protected function loadSlideBlocks($htmlBlocks, $slide)
+    private function loadSlideBlocks(\phpQueryObject $htmlBlocks, Slide $slide): void
     {
         foreach ($htmlBlocks as $htmlBlock) {
-            $blockType = pq($htmlBlock)->attr('data-block-type');
+            $blockType = (string) pq($htmlBlock)->attr('data-block-type');
             switch ($blockType) {
                 case AbstractBlock::TYPE_TEXT:
                     $this->loadBlockText($htmlBlock, $slide);
@@ -81,12 +82,15 @@ class HTMLReader extends AbstractReader implements ReaderInterface
                 case AbstractBlock::TYPE_VIDEO:
                     $this->loadBlockVideo($htmlBlock, $slide);
                     break;
+                case AbstractBlock::TYPE_MENTAL_MAP:
+                    $this->loadBlockMentalMap($htmlBlock, $slide);
+                    break;
                 default:
             }
         }
     }
 
-    private function styleToArray($style): array
+    private function styleToArray(string $style): array
     {
         $styleArray = [];
         foreach (explode(';', $style) as $part) {
@@ -98,7 +102,7 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         return $styleArray;
     }
 
-    private function getStyleValue($style, $param): string
+    private function getStyleValue(string $style, string $param): string
     {
         $value = '';
         if (!empty($style)) {
@@ -108,7 +112,7 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         return $value;
     }
 
-    protected function loadBlockImage($htmlBlock, Slide $slide): void
+    private function loadBlockImage(\phpQueryObject $htmlBlock, Slide $slide): void
     {
         $block = new ImageBlock();
         $block->setType(AbstractBlock::TYPE_IMAGE);
@@ -128,7 +132,7 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         $slide->addBlock($block);
     }
 
-    protected function loadBlockText($htmlBlock, Slide $slide): void
+    protected function loadBlockText(\phpQueryObject $htmlBlock, Slide $slide): void
     {
         $block = new TextBlock();
         $block->setId(pq($htmlBlock)->attr('data-block-id'));
@@ -201,10 +205,24 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         $slide->addBlock($block);
     }
 
-    protected function loadBlockHtml($htmlBlock, Slide $slide): void
+    private function loadBlockHtml(\phpQueryObject $htmlBlock, Slide $slide): void
     {
         $block = new HtmlBlock();
         $block->setType(AbstractBlock::TYPE_HTML);
+
+        $element = pq($htmlBlock);
+
+        $this->loadBlockProperties($block, $element->attr('style'));
+        $block->setId(pq($htmlBlock)->attr('data-block-id'));
+        $block->setContent(pq($htmlBlock)->html());
+
+        $slide->addBlock($block);
+    }
+
+    private function loadBlockMentalMap(\phpQueryObject $htmlBlock, Slide $slide): void
+    {
+        $block = new MentalMapBlock();
+        $block->setType(AbstractBlock::TYPE_MENTAL_MAP);
 
         $element = pq($htmlBlock);
 
@@ -233,12 +251,11 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         $slide->addBlock($block);
     }
 
-    protected function loadBlockProperties(AbstractBlock $block, $style)
+    protected function loadBlockProperties(AbstractBlock $block, string $style): void
     {
         $block->setWidth($this->getStyleValue($style, 'width'));
         $block->setHeight($this->getStyleValue($style, 'height'));
         $block->setTop($this->getStyleValue($style, 'top'));
         $block->setLeft($this->getStyleValue($style, 'left'));
     }
-
 }

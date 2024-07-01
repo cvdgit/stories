@@ -3,9 +3,9 @@
 namespace backend\components;
 
 use backend\components\story\AbstractBlock;
-use backend\components\story\BlockType;
 use backend\components\story\HTMLBLock;
 use backend\components\story\ImageBlock;
+use backend\components\story\MentalMapBlockContent;
 use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\Slide;
 use backend\components\story\TestBlockContent;
@@ -17,6 +17,7 @@ use common\helpers\Url;
 use common\models\SlideVideo;
 use common\models\StorySlideImage;
 use common\models\StoryTest;
+use yii\helpers\Html;
 
 class SlideModifier
 {
@@ -89,27 +90,30 @@ class SlideModifier
     public function addDescription(): self
     {
         foreach ($this->slide->getBlocks() as $block) {
-            if (BlockType::isHtml($block)) {
+            if ($block->typeIs(AbstractBlock::TYPE_HTML)) {
                 /** @var HTMLBLock $block */
                 $content = TestBlockContent::createFromHtml($block->getContent());
                 try {
                     $testModel = StoryTest::findModel($content->getTestID());
                     $block->setContent($content->render([], $testModel->title));
-                }
-                catch (\Exception $ex) {
+                } catch (\Exception $ex) {
                     $block->setContent($content->render([], $ex->getMessage()));
                 }
             }
-            if (BlockType::isVideo($block) || BlockType::isVideoFile($block)) {
+            if ($block->typeIs(AbstractBlock::TYPE_MENTAL_MAP)) {
+                $content = MentalMapBlockContent::createFromHtml($block->getContent());
+                $block->setContent($content->renderWithDescription());
+            }
+            if ($block->typeIs(AbstractBlock::TYPE_VIDEO) || $block->typeIs(AbstractBlock::TYPE_VIDEOFILE)) {
                 /** @var VideoBlock $block */
                 $videoModel = null;
                 if ($block->getSource() === VideoSource::YOUTUBE) {
                     $videoModel = SlideVideo::findModelByVideoID($block->getVideoId());
-                }
-                else {
+                } else {
                     try {
                         $videoModel = SlideVideo::findModel(pathinfo($block->getVideoId(), PATHINFO_FILENAME));
-                    } catch (\Exception $ex) {}
+                    } catch (\Exception $ex) {
+                    }
                 }
                 if ($videoModel !== null) {
                     $block->setContent($videoModel->title);
@@ -127,7 +131,8 @@ class SlideModifier
     public function addVideoUrl(): self
     {
         foreach ($this->slide->getBlocks() as $block) {
-            if (($block->getType() === AbstractBlock::TYPE_VIDEO || $block->getType() === AbstractBlock::TYPE_VIDEOFILE)) {
+            if (($block->getType() === AbstractBlock::TYPE_VIDEO || $block->getType(
+                ) === AbstractBlock::TYPE_VIDEOFILE)) {
                 /** @var $block VideoBlock */
                 if ($block->getSource() === VideoSource::FILE) {
                     $path = $block->getVideoId();
@@ -145,7 +150,12 @@ class SlideModifier
     {
         $links = [];
         $matches = [];
-        $result = preg_match_all('~<a [^<>]*href=[\'"]([^\'"]+)[\'"][^<>]*>([^</a>]*)~i', $content, $matches, PREG_SET_ORDER);
+        $result = preg_match_all(
+            '~<a [^<>]*href=[\'"]([^\'"]+)[\'"][^<>]*>([^</a>]*)~i',
+            $content,
+            $matches,
+            PREG_SET_ORDER,
+        );
         if ($result !== false && $result > 0) {
             $site = Url::homeUrl();
             $site = preg_replace('/https?:\/\//', '', $site);
@@ -175,19 +185,19 @@ class SlideModifier
         $quizBlocks = [];
         $videoBlocks = [];
         foreach ($this->slide->getBlocks() as $slideBlock) {
-            if (BlockType::isText($slideBlock)) {
+            if ($slideBlock->typeIs(AbstractBlock::TYPE_TEXT)) {
                 /** @var $slideBlock TextBlock */
                 $textBlocks[] = $slideBlock;
             }
-            if (BlockType::isImage($slideBlock)) {
+            if ($slideBlock->typeIs(AbstractBlock::TYPE_IMAGE)) {
                 /** @var $slideBlock ImageBlock */
                 $imageBlocks[] = $slideBlock;
             }
-            if (BlockType::isHtml($slideBlock)) {
+            if ($slideBlock->typeIs(AbstractBlock::TYPE_HTML)) {
                 /** @var $slideBlock HTMLBLock */
                 $quizBlocks[] = $slideBlock;
             }
-            if (BlockType::isVideo($slideBlock) || BlockType::isVideoFile($slideBlock)) {
+            if ($slideBlock->typeIs(AbstractBlock::TYPE_VIDEO) || $slideBlock->typeIs(AbstractBlock::TYPE_VIDEOFILE)) {
                 /** @var $slideBlock VideoBlock */
                 $videoBlocks[] = $slideBlock;
             }
@@ -220,9 +230,7 @@ class SlideModifier
                 ],
             ];
             $blocks[] = $block;
-        }
-        else {
-
+        } else {
             if (count($quizBlocks) > 0) {
                 $content = TestBlockContent::createFromHtml($quizBlocks[0]->getContent());
                 $testModel = StoryTest::findModel($content->getTestID());
@@ -232,71 +240,70 @@ class SlideModifier
                     'description' => $testModel->description_text,
                 ];
                 $blocks[] = $block;
-            }
-            else if (count($videoBlocks) > 0) {
-                $videoBlock = $videoBlocks[0];
-                $block = [
-                    'id' => $videoBlock->getId(),
-                    'type' => 'multimedia',
-                    'items' => [
-                        [
-                            'video' => [
-                                'url' => $videoBlock->getVideoId(),
-                                'video_id' => $videoBlock->getVideoId(),
-                                'seek_to' => $videoBlock->getSeekTo(),
-                                'duration' => $videoBlock->getDuration(),
-                                'mute' => $videoBlock->isMute(),
-                                'speed' => $videoBlock->getSpeed(),
-                                'volume' => $videoBlock->getVolume(),
-                                'source' => $videoBlock->getSource(),
+            } else {
+                if (count($videoBlocks) > 0) {
+                    $videoBlock = $videoBlocks[0];
+                    $block = [
+                        'id' => $videoBlock->getId(),
+                        'type' => 'multimedia',
+                        'items' => [
+                            [
+                                'video' => [
+                                    'url' => $videoBlock->getVideoId(),
+                                    'video_id' => $videoBlock->getVideoId(),
+                                    'seek_to' => $videoBlock->getSeekTo(),
+                                    'duration' => $videoBlock->getDuration(),
+                                    'mute' => $videoBlock->isMute(),
+                                    'speed' => $videoBlock->getSpeed(),
+                                    'volume' => $videoBlock->getVolume(),
+                                    'source' => $videoBlock->getSource(),
+                                ],
                             ],
                         ],
-                    ],
-                    'layout' => 'video',
-                ];
-                $blocks[] = $block;
-            }
-            else {
-
-                foreach ($this->slide->getBlocks() as $slideBlock) {
-                    $block = null;
-                    if (BlockType::isText($slideBlock)) {
-                        /** @var $slideBlock TextBlock */
-                        $textContent = $this->processTextContent(trim($slideBlock->getText()));
-                        $links = array_merge($links, $textContent['links']);
-                        $items = [
-                            [
-                                'id' => $slideBlock->getId(),
-                                'paragraph' => $textContent['paragraph'],
-                            ],
-                        ];
-                        $block = [
-                            'id' => $slideBlock->getId(),
-                            'type' => 'text',
-                            'items' => $items,
-                        ];
-                    }
-                    if (BlockType::isImage($slideBlock)) {
-                        /** @var $slideBlock ImageBlock */
-                        $items = [
-                            [
-                                'id' => $slideBlock->getId(),
-                                'image' => [
-                                    'url' => $slideBlock->getFilePath(),
+                        'layout' => 'video',
+                    ];
+                    $blocks[] = $block;
+                } else {
+                    foreach ($this->slide->getBlocks() as $slideBlock) {
+                        $block = null;
+                        if ($slideBlock->typeIs(AbstractBlock::TYPE_TEXT)) {
+                            /** @var $slideBlock TextBlock */
+                            $textContent = $this->processTextContent(trim($slideBlock->getText()));
+                            $links = array_merge($links, $textContent['links']);
+                            $items = [
+                                [
+                                    'id' => $slideBlock->getId(),
+                                    'paragraph' => $textContent['paragraph'],
                                 ],
-                                'layout' => 'image',
-                                'caption' => '',
-                                'paragraph' => '',
-                            ],
-                        ];
-                        $block = [
-                            'id' => $slideBlock->getId(),
-                            'type' => 'image',
-                            'items' => $items,
-                        ];
-                    }
-                    if ($block !== null) {
-                        $blocks[] = $block;
+                            ];
+                            $block = [
+                                'id' => $slideBlock->getId(),
+                                'type' => 'text',
+                                'items' => $items,
+                            ];
+                        }
+                        if ($slideBlock->typeIs(AbstractBlock::TYPE_IMAGE)) {
+                            /** @var $slideBlock ImageBlock */
+                            $items = [
+                                [
+                                    'id' => $slideBlock->getId(),
+                                    'image' => [
+                                        'url' => $slideBlock->getFilePath(),
+                                    ],
+                                    'layout' => 'image',
+                                    'caption' => '',
+                                    'paragraph' => '',
+                                ],
+                            ];
+                            $block = [
+                                'id' => $slideBlock->getId(),
+                                'type' => 'image',
+                                'items' => $items,
+                            ];
+                        }
+                        if ($block !== null) {
+                            $blocks[] = $block;
+                        }
                     }
                 }
             }

@@ -1,0 +1,205 @@
+.wikids-longread-loader {
+  width: 100%;
+  height: 100%;
+}
+
+.wikids-longread-loader__container {
+  align-items: center;
+  background: #fff;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 9000;
+}
+
+.longread-loader {
+  margin: 2.9rem 0;
+  max-width: 50%;
+  text-align: center;
+}
+
+.longread-loader__spinner {
+  width: 3.2rem;
+  height: 3.2rem;
+  border: .2rem solid rgba(49, 53, 55, .5);
+  border-left-color: rgba(49, 53, 55, .15);
+  animation: spin 1.5s linear infinite;
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+.longread-loader__text {
+  margin-top: 3rem;
+  font-size: 2.4rem;
+  font-weight: 300;
+}
+
+.error-page {
+  margin: 2.9rem 0;
+  max-width: 50%;
+  text-align: center;
+}
+
+.error-page__wrapper {
+  width: 100%;
+  height: 100%;
+}
+
+.error-page__container {
+  align-items: center;
+  background: #fff;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 9000;
+}
+
+.error-page__text {
+  font-size: 2.4rem;
+  font-weight: 300;
+}
+
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg)
+  }
+  to {
+    transform: rotate(1turn)
+  }
+}
+
+.app-header {
+  background: #fff;
+  border-bottom: 0.1rem solid #eaeaeb;
+  color: #000;
+  height: 5rem;
+  left: 0;
+  padding: 1.4rem 3rem 1.4rem 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 1000;
+}
+
+.app-header__menu-btn {
+  border-right: 0.1rem solid #eaeaeb;
+  bottom: 0;
+  position: absolute;
+  text-align: center;
+  top: 0;
+  width: 5rem;
+}
+.app-header__btn-group {
+  align-items: center;
+  bottom: 0;
+  display: flex;
+  height: 5rem;
+  position: absolute;
+  right: 3rem;
+  top: 0;
+}
+
+.app-header__title {
+  color: rgba(0,0,0,.3);
+  font-size: 1.4rem;
+  font-weight: 900;
+  left: 3rem;
+  letter-spacing: .02rem;
+  max-width: 33rem;
+  overflow: hidden;
+  position: absolute;
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+
+.app-header__menu-btn+.app-header__title {
+  left: 7rem
+}
+
+.app-header__menu-btn .button {
+  align-items: center;
+  display: inline-flex;
+  height: 5rem;
+  justify-content: center;
+  transition: background .3s;
+  width: 100%;
+}
+
+.app-header__menu-close {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  transition: background .3s linear;
+  width: 100%;
+}
+
+.app-header__btn-group button {
+  font-family: inherit;
+}
+
+.button--done, .button--header {
+  background: #fff;
+  color: #000;
+  font-size: 1.2rem;
+  font-weight: 900;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.button--header {
+  border-radius: 2.5rem;
+  height: 2.5rem;
+  letter-spacing: .12rem;
+  line-height: 2.5rem;
+  padding: 0 1.5rem;
+}
+
+.button--header-done,.button--inverted {
+  background: #000;
+  border: 1px solid rgba(0,0,0,.4);
+  color: #fff
+}
+
+.button--header-done.button--disabled {
+  margin-left: 1.5rem;
+  opacity: .2
+}
+
+.button--header-done,.button--inverted,.button--outline {
+  border-radius: 2.5rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: .12rem;
+  padding: .25rem 2rem;
+  text-align: center;
+  text-transform: uppercase
+}
+
+.button--header-done,.button--inverted,button.button--outline {
+  padding: .4rem 2rem
+}
+
+.button--header-done, .button--inverted {
+  background: #000;
+  border: 1px solid rgba(0, 0, 0, .4);
+  color: #fff;
+}
+
+.button+.button--header-done,.button+.button--inverted,.button+.button--outline {
+  margin-left: 1.5rem
+}
+
+.button+.button--header-done-right-course-themes,.button+.button--inverted-right-course-themes,.button+.button--outline-right-course-themes {
+  margin-left: .6rem
+}

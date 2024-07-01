@@ -112,7 +112,7 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
     {
         $block = new ImageBlock();
         $block->setType(AbstractBlock::TYPE_IMAGE);
-        $block->setWidth($powerPointShape->isResizeProportional() . 'px');
+        $block->setWidth($powerPointShape->getWidth() . 'px');
         $block->setHeight($powerPointShape->getHeight() . 'px');
         $block->setLeft($powerPointShape->getOffsetX() . 'px');
         $block->setTop($powerPointShape->getOffsetY() . 'px');

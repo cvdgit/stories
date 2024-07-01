@@ -9,7 +9,6 @@ use backend\components\story\writer\HTML\elements\AbstractElement;
 
 class AbstractMarkup
 {
-
     protected $block;
     protected $element;
 
@@ -64,5 +63,4 @@ class AbstractMarkup
         $styleArray[$param] = $value;
         return $this->arrayToStyle($styleArray);
     }
-
 }

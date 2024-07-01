@@ -36,12 +36,12 @@ class ImageBlock extends AbstractBlock
     private $description = '';
     private $descriptionInside;
 
-    public function setFilePath($filePath): void
+    public function setFilePath(string $filePath): void
     {
         $this->filePath = $filePath;
     }
 
-    public function getFilePath()
+    public function getFilePath(): string
     {
         return $this->filePath;
     }
@@ -142,9 +142,10 @@ class ImageBlock extends AbstractBlock
         $this->setDescriptionInside($form->description_inside);
     }
 
-    public function create()
+    public function create(): ImageBlock
     {
         $block = new self();
+        $block->setType(AbstractBlock::TYPE_IMAGE);
         $block->setWidth('150px');
         $block->setHeight('150px');
         $block->setLeft('50px');

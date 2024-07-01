@@ -4,27 +4,27 @@ namespace backend\components\story;
 
 abstract class AbstractBlock
 {
+    public const TYPE_TEXT = 'text';
+    public const TYPE_HEADER = 'header';
+    public const TYPE_IMAGE = 'image';
+    public const TYPE_BUTTON = 'button';
+    public const TYPE_TRANSITION = 'transition';
+    public const TYPE_TEST = 'test';
+    public const TYPE_HTML = 'html';
+    public const TYPE_VIDEO = 'video';
+    public const TYPE_VIDEOFILE = 'videofile';
+    public const TYPE_MENTAL_MAP = 'mental_map';
 
-    const TYPE_TEXT = 'text';
-    const TYPE_HEADER = 'header';
-    const TYPE_IMAGE = 'image';
-    const TYPE_BUTTON = 'button';
-    const TYPE_TRANSITION = 'transition';
-    const TYPE_TEST = 'test';
-    const TYPE_HTML = 'html';
-    const TYPE_VIDEO = 'video';
-    const TYPE_VIDEOFILE = 'videofile';
-
-    protected $width;
-    protected $height;
-    protected $left;
-    protected $top;
-
-    /** @var string */
-    protected $type;
+    private $width;
+    private $height;
+    private $left;
+    private $top;
 
     /** @var string */
-    protected $id;
+    private $type;
+
+    /** @var string */
+    private $id;
 
     private $blockAttributes = [];
 
@@ -35,7 +35,7 @@ abstract class AbstractBlock
         $this->id = $this->generateID();
     }
 
-    public function generateID()
+    public function generateID(): string
     {
         return bin2hex(random_bytes(10));
     }
@@ -104,34 +104,22 @@ abstract class AbstractBlock
         $this->top = $top;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * @param mixed $type
-     */
-    public function setType($type): void
+    public function setType(string $type): void
     {
         $this->type = $type;
     }
 
-    /**
-     * @return string
-     */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
 
-    /**
-     * @param string $id
-     */
-    public function setId($id): void
+    public function setId(string $id): void
     {
         $this->id = $id;
     }
@@ -221,5 +209,10 @@ abstract class AbstractBlock
     public function getElementAttributes(): array
     {
         return $this->elementAttributes;
+    }
+
+    public function typeIs(string $type): bool
+    {
+        return $this->type === $type;
     }
 }

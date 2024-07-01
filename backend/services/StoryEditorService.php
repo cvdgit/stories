@@ -6,7 +6,6 @@ use backend\components\book\blocks\Test;
 use backend\components\image\EditorImage;
 use backend\components\image\SlideImage;
 use backend\components\story\AbstractBlock;
-use backend\components\story\BlockType;
 use backend\components\story\HTMLBLock;
 use backend\components\story\ImageBlock;
 use backend\components\story\reader\HTMLReader;
@@ -20,7 +19,6 @@ use backend\components\StudyTaskFinalSlide;
 use backend\models\editor\BaseForm;
 use backend\models\ImageSlideBlock;
 use backend\models\video\VideoSource;
-use common\helpers\Url;
 use common\models\LessonBlock;
 use common\models\slide\SlideKind;
 use common\models\slide\SlideStatus;
@@ -31,6 +29,7 @@ use common\models\StoryStoryTest;
 use common\models\test\SourceType;
 use DomainException;
 use common\models\Story;
+use yii\base\InvalidConfigException;
 use yii\db\Query;
 use yii\web\NotFoundHttpException;
 
@@ -283,7 +282,7 @@ class StoryEditorService
             }
         }
 
-        if (BlockType::isVideo($block) || BlockType::isVideoFile($block)) {
+        if ($block->typeIs(AbstractBlock::TYPE_VIDEO) || $block->typeIs(AbstractBlock::TYPE_VIDEOFILE)) {
             /** @var VideoBlock $block */
             if ($block->getSource() === VideoSource::YOUTUBE) {
                 $videoModel = SlideVideo::findModelByVideoID($block->getVideoId());
@@ -310,6 +309,10 @@ class StoryEditorService
         return $this->createBlock($slideModel, $form, HTMLBLock::class);
     }
 
+    /**
+     * @throws NotFoundHttpException
+     * @throws InvalidConfigException
+     */
     public function createBlock(StorySlide $slideModel, BaseForm $form, string $blockClassName): string
     {
         $slide = (new HtmlSlideReader($slideModel->data))->load();
@@ -336,7 +339,7 @@ class StoryEditorService
                 $form->imagePath = $form->imageModel->imageUrl();
                 $form->fullImagePath = $imagePath;
             }
-            else if (!empty($form->image_id)) {
+            elseif (!empty($form->image_id)) {
                 $form->imageModel = StorySlideImage::findModel($form->image_id);
                 $form->imagePath = $form->imageModel->imageUrl();
                 $form->fullImagePath = $form->imageModel->getImagePath();
@@ -354,7 +357,7 @@ class StoryEditorService
         else {
             $block->update($form);
         }
-        if (BlockType::isVideo($block) || BlockType::isVideoFile($block)) {
+        if ($block->typeIs(AbstractBlock::TYPE_VIDEO) || $block->typeIs(AbstractBlock::TYPE_VIDEOFILE)) {
             /** @var VideoBlock $block */
             if ($block->getSource() === VideoSource::YOUTUBE) {
                 $videoModel = SlideVideo::findModelByVideoID($block->getVideoId());

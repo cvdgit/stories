@@ -30,10 +30,10 @@ site-init: site-permissions \
 		   site-assets-build
 
 site-clear:
-	docker run --rm -v ${PWD}:/app -w /app alpine sh -c 'rm -rf .ready public_html/assets/* public_html/admin/assets/* public_html/build/* api/runtime/* frontend/runtime/* console/runtime/* backend/runtime/* public_html/slides_file/* public_html/slides/*'
+	docker run --rm -v ${PWD}:/app -w /app alpine sh -c 'rm -rf .ready public_html/assets/* public_html/admin/assets/* public_html/build/* api/runtime/* frontend/runtime/* console/runtime/* backend/runtime/* public_html/slides_file/* public_html/slides/* public_html/upload/mental-map/*'
 
 site-permissions:
-	docker run --rm -v ${PWD}:/app -w /app alpine sh -c 'mkdir -p public_html/build && chmod 777 public_html/assets public_html/admin/assets public_html/build api/runtime frontend/runtime console/runtime backend/runtime public_html/slides_file public_html/slides public_html/test_images public_html/upload public_html/slides_video public_html/upload/testing public_html/game public_html/game/arch'
+	docker run --rm -v ${PWD}:/app -w /app alpine sh -c 'mkdir -p public_html/build && chmod 777 public_html/assets public_html/admin/assets public_html/build api/runtime frontend/runtime console/runtime backend/runtime public_html/slides_file public_html/slides public_html/test_images public_html/upload public_html/slides_video public_html/upload/testing public_html/upload/mental-map public_html/game public_html/game/arch'
 
 site-composer-install:
 	docker compose run --rm site composer install

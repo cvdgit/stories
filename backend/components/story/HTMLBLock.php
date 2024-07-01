@@ -4,7 +4,6 @@ namespace backend\components\story;
 
 class HTMLBLock extends AbstractBlock
 {
-
     protected $type = AbstractBlock::TYPE_HTML;
 
     /** @var string */
@@ -33,9 +32,10 @@ class HTMLBLock extends AbstractBlock
         $this->content = $content;
     }
 
-    public function create()
+    public function create(): HTMLBLock
     {
         $block = new self();
+        $block->setType(AbstractBlock::TYPE_HTML);
         $block->setWidth('1280px');
         $block->setHeight('720px');
         $block->setLeft('0px');

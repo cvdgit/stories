@@ -101,6 +101,10 @@ $this->registerJs($this->renderFile("@backend/views/editor/_pass_test.js"));
                 <span class="glyphicon glyphicon-education icon"></span>
                 <span class="text">Тест</span>
             </li>
+            <li class="blocks-sidebar-item" data-block-type="mental_map">
+                <span class="glyphicon glyphicon-education icon"></span>
+                <span class="text">Ментальная карта</span>
+            </li>
             <li class="blocks-sidebar-item" id="create-button-block">
                 <span class="glyphicon glyphicon-play icon"></span>
                 <span class="text">Кнопка</span>
@@ -340,10 +344,12 @@ $js = <<< JS
     $('.blocks-sidebar').on('click', '[data-block-type]', function() {
         var type = $(this).attr('data-block-type');
         if (type === 'text') {
-            var html = StoryEditor.createEmptyBlock(type);
+            const html = StoryEditor.createEmptyBlock(type);
             StoryEditor.createSlideBlock(html);
-        }
-        else {
+        } else if (type === 'mental_map') {
+            const html = StoryEditor.createMentalMapBlock();
+            StoryEditor.createSlideBlock(html);
+        } else {
             showCreateBlockModal(type);
         }
     });

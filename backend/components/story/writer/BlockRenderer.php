@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\components\story\writer;
 
 use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
 use backend\components\story\HTMLBLock;
 use backend\components\story\ImageBlock;
+use backend\components\story\MentalMapBlock;
 use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
 use backend\components\story\TransitionBlock;
@@ -15,6 +18,7 @@ use backend\components\story\writer\HTML\ButtonBlockMarkup;
 use backend\components\story\writer\HTML\HeaderBlockMarkup;
 use backend\components\story\writer\HTML\HTMLBlockMarkup;
 use backend\components\story\writer\HTML\ImageBlockMarkup;
+use backend\components\story\writer\HTML\MentalMapBlockMarkup;
 use backend\components\story\writer\HTML\ParagraphBlockMarkup;
 use backend\components\story\writer\HTML\TestBlockMarkup;
 use backend\components\story\writer\HTML\TransitionBlockMarkup;
@@ -22,7 +26,6 @@ use backend\components\story\writer\HTML\VideoBlockMarkup;
 
 class BlockRenderer
 {
-
     public function render(AbstractBlock $block): string
     {
         $markupClassName = '';
@@ -50,6 +53,9 @@ class BlockRenderer
             case HTMLBLock::class:
                 $markupClassName = HTMLBlockMarkup::class;
                 break;
+            case MentalMapBlock::class:
+                $markupClassName = MentalMapBlockMarkup::class;
+                break;
             case VideoBlock::class:
             case VideoFileBlock::class:
             $markupClassName = VideoBlockMarkup::class;
@@ -57,5 +63,4 @@ class BlockRenderer
         }
         return (new $markupClassName($block))->markup();
     }
-
 }

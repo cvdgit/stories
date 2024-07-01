@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\components\story\reader;
 
 use backend\components\story\AbstractBlock;
 use backend\components\story\ButtonBlock;
 use backend\components\story\HTMLBLock;
 use backend\components\story\ImageBlock;
+use backend\components\story\MentalMapBlock;
 use backend\components\story\Slide;
 use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
@@ -15,11 +18,10 @@ use backend\models\video\VideoSource;
 
 class HtmlSlideReader implements ReaderInterface
 {
-
     private $slide;
     private $html;
 
-    public function __construct($html)
+    public function __construct(string $html)
     {
         $this->slide = new Slide();
         $this->html = $html;
@@ -32,18 +34,18 @@ class HtmlSlideReader implements ReaderInterface
         return $this->slide;
     }
 
-    private function loadSlide($htmlSlide): void
+    private function loadSlide(\phpQueryObject $htmlSlide): void
     {
         $this->slide->setView(pq($htmlSlide)->find('section')->attr('data-slide-view') ?? '');
-        $this->slide->setId(pq($htmlSlide)->find('section')->attr('data-id') ?? '');
+        $this->slide->setId((int) pq($htmlSlide)->find('section')->attr('data-id'));
         $blocks = pq($htmlSlide)->find('div.sl-block');
         $this->loadSlideBlocks($blocks);
     }
 
-    protected function loadSlideBlocks($htmlBlocks)
+    private function loadSlideBlocks(\phpQueryObject $htmlBlocks): void
     {
         foreach ($htmlBlocks as $htmlBlock) {
-            $blockType = pq($htmlBlock)->attr('data-block-type');
+            $blockType = (string) pq($htmlBlock)->attr('data-block-type');
             switch ($blockType) {
                 case AbstractBlock::TYPE_TEXT:
                     $this->loadBlockText($htmlBlock);
@@ -63,6 +65,9 @@ class HtmlSlideReader implements ReaderInterface
                 case AbstractBlock::TYPE_HTML:
                     $this->loadBlockHtml($htmlBlock);
                     break;
+                case AbstractBlock::TYPE_MENTAL_MAP:
+                    $this->loadBlockMentalMap($htmlBlock);
+                    break;
                 case AbstractBlock::TYPE_VIDEO:
                 case AbstractBlock::TYPE_VIDEOFILE:
                     $this->loadBlockVideo($htmlBlock);
@@ -72,7 +77,7 @@ class HtmlSlideReader implements ReaderInterface
         }
     }
 
-    private function styleToArray($style): array
+    private function styleToArray(string $style): array
     {
         $styleArray = [];
         foreach (explode(';', $style) as $part) {
@@ -84,7 +89,7 @@ class HtmlSlideReader implements ReaderInterface
         return $styleArray;
     }
 
-    private function getStyleValue($style, $param): string
+    private function getStyleValue(string $style, string $param): string
     {
         $value = '';
         if (!empty($style)) {
@@ -214,7 +219,7 @@ class HtmlSlideReader implements ReaderInterface
         $this->slide->addBlock($block);
     }
 
-    protected function loadBlockHtml($htmlBlock): void
+    private function loadBlockHtml(\DOMElement $htmlBlock): void
     {
         $block = new HtmlBlock();
         $block->setType(AbstractBlock::TYPE_HTML);
@@ -222,6 +227,17 @@ class HtmlSlideReader implements ReaderInterface
         $this->loadBlockProperties($block, $element->attr('style'));
         $block->setId(pq($htmlBlock)->attr('data-block-id'));
         $block->setContent(pq($htmlBlock)->find('.sl-block-content:eq(0)')->html());
+        $this->slide->addBlock($block);
+    }
+
+    private function loadBlockMentalMap(\DOMElement $htmlBlock): void
+    {
+        $block = new MentalMapBlock();
+        $block->setType(AbstractBlock::TYPE_MENTAL_MAP);
+        $element = pq($htmlBlock);
+        $this->loadBlockProperties($block, (string) $element->attr('style'));
+        $block->setId((string) pq($htmlBlock)->attr('data-block-id'));
+        $block->setContent((string) pq($htmlBlock)->find('.sl-block-content:eq(0)')->html());
         $this->slide->addBlock($block);
     }
 
