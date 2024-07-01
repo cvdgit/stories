@@ -112,7 +112,7 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         return $value;
     }
 
-    private function loadBlockImage(\phpQueryObject $htmlBlock, Slide $slide): void
+    private function loadBlockImage(\DOMElement $htmlBlock, Slide $slide): void
     {
         $block = new ImageBlock();
         $block->setType(AbstractBlock::TYPE_IMAGE);
@@ -132,7 +132,7 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         $slide->addBlock($block);
     }
 
-    protected function loadBlockText(\phpQueryObject $htmlBlock, Slide $slide): void
+    protected function loadBlockText(\DOMElement $htmlBlock, Slide $slide): void
     {
         $block = new TextBlock();
         $block->setId(pq($htmlBlock)->attr('data-block-id'));
@@ -205,7 +205,7 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         $slide->addBlock($block);
     }
 
-    private function loadBlockHtml(\phpQueryObject $htmlBlock, Slide $slide): void
+    private function loadBlockHtml(\DOMElement $htmlBlock, Slide $slide): void
     {
         $block = new HtmlBlock();
         $block->setType(AbstractBlock::TYPE_HTML);
@@ -219,7 +219,7 @@ class HTMLReader extends AbstractReader implements ReaderInterface
         $slide->addBlock($block);
     }
 
-    private function loadBlockMentalMap(\phpQueryObject $htmlBlock, Slide $slide): void
+    private function loadBlockMentalMap(\DOMElement $htmlBlock, Slide $slide): void
     {
         $block = new MentalMapBlock();
         $block->setType(AbstractBlock::TYPE_MENTAL_MAP);
