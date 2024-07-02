@@ -58,15 +58,17 @@ export default function App({mentalMapId}) {
     return () => clearTimeout(timeoutId);
   }, [mapText]);
 
+  const returnUrl = window?.mentalMapReturnUrl || '/'
+
   return (
     <div>
       <div>
         <div>
           <div className="app-header">
             <div className="app-header__menu-btn">
-              <a className="app-header__menu-close" href="/">icon</a>
+              <a className="app-header__menu-close" href={returnUrl}>Назад</a>
             </div>
-            <div className="app-header__title">title</div>
+            <div className="app-header__title">{state.name}</div>
             <div className="app-header__btn-group">
               <button onClick={() => {
                 setOpen(true)

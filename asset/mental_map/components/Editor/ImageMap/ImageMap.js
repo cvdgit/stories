@@ -111,15 +111,20 @@ export default function ImageMap({mapImage}) {
                         })
                       }}
                       onBeforeResize={e => {
-                        console.log(e)
+                        const val = window.getComputedStyle(e.target, null)
+                        let values = val.getPropertyValue('transform').split('(')[1]
+                        values = values.split(')')[0]
+                        values = values.split(',')
+                          .map(s => s.trim())
+                          .map(s => parseInt(s))
                         dispatch({
                           type: 'update_mental_map_images',
                           imageId: image.id,
                           payload: {
                             width: parseInt(e.target.style.width),
                             height: parseInt(e.target.style.height),
-                            //left: parseInt(e.translate[0]),
-                            //top: parseInt(e.translate[1])
+                            left: values[4],
+                            top: values[5]
                           }
                         })
                       }}
@@ -160,11 +165,12 @@ export default function ImageMap({mapImage}) {
                         }
                       })
                       setCurrentText(e.target.value)
-                    }} value={currentText} />
+                    }} value={currentText}/>
                   </div>
                 </div>
                 <div style={{marginTop: '2rem'}}>
-                  <textarea className="textarea" onChange={() => {}} value={state.text} style={{minHeight: '300px'}} />
+                  <textarea className="textarea" onChange={() => {
+                  }} value={state.text} style={{minHeight: '300px'}}/>
                 </div>
               </div>
             )}

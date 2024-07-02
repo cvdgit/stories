@@ -142,9 +142,9 @@ class HtmlSlideReader implements ReaderInterface
     protected function loadBlockText(\DOMElement $htmlBlock): void
     {
         $block = new TextBlock();
+        $block->setType(AbstractBlock::TYPE_TEXT);
         $block->setId(pq($htmlBlock)->attr('data-block-id'));
         if (pq($htmlBlock)->find('h1')->length > 0) {
-            $block->setType(AbstractBlock::TYPE_TEXT);
             $style = pq($htmlBlock)->find('h1')->attr('style');
             $text = pq($htmlBlock)->find('h1')->html();
             if (empty($text)) {
@@ -152,7 +152,6 @@ class HtmlSlideReader implements ReaderInterface
             }
             $text = '<p>' . $text . '</p>';
         } else {
-            $block->setType(AbstractBlock::TYPE_TEXT);
             $selector = 'p';
             if (pq($htmlBlock)->find('div.slide-paragraph')->length > 0) {
                 $selector = 'div.slide-paragraph';
