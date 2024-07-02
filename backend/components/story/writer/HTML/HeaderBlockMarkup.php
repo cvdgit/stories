@@ -26,7 +26,7 @@ class HeaderBlockMarkup extends TextBlockMarkup
 
         $contentBlockAttributes = array_merge($this->getContentBlockAttributes(), [
             'style' => $this->arrayToStyle([
-                'color' => 'rgb(255, 255, 255)',
+                'color' => 'rgb(0, 0, 0)',
                 'z-index' => 10,
                 'text-align' => 'center',
             ]),

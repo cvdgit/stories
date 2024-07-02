@@ -29,7 +29,7 @@ class HtmlSlideReader implements ReaderInterface
 
     public function load(): Slide
     {
-        $htmlSlide = \phpQuery::newDocumentHTML($this->html);
+        $htmlSlide = \phpQuery::newDocument($this->html, 'text/html');
         $this->loadSlide($htmlSlide);
         return $this->slide;
     }
@@ -139,27 +139,30 @@ class HtmlSlideReader implements ReaderInterface
         $this->slide->addBlock($block);
     }
 
-    protected function loadBlockText($htmlBlock): void
+    protected function loadBlockText(\DOMElement $htmlBlock): void
     {
         $block = new TextBlock();
         $block->setId(pq($htmlBlock)->attr('data-block-id'));
         if (pq($htmlBlock)->find('h1')->length > 0) {
-            $block->setType(AbstractBlock::TYPE_HEADER);
+            $block->setType(AbstractBlock::TYPE_TEXT);
             $style = pq($htmlBlock)->find('h1')->attr('style');
             $text = pq($htmlBlock)->find('h1')->html();
-        }
-        else {
+            if (empty($text)) {
+                $text = pq($htmlBlock)->find('p')->text();
+            }
+            $text = '<p>' . $text . '</p>';
+        } else {
             $block->setType(AbstractBlock::TYPE_TEXT);
             $selector = 'p';
             if (pq($htmlBlock)->find('div.slide-paragraph')->length > 0) {
                 $selector = 'div.slide-paragraph';
                 $text = pq($htmlBlock)->find($selector)->html();
-            }
-            else {
+            } else {
                 $text = '<p>' . pq($htmlBlock)->find($selector)->html() . '</p>';
             }
             $style = pq($htmlBlock)->find($selector)->attr('style');
         }
+
         $block->setText($text);
 
         $this->loadBlockProperties($block, pq($htmlBlock)->attr('style'));
