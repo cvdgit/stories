@@ -6,6 +6,7 @@ namespace api\modules\v1\controllers;
 
 use api\modules\v1\models\Story;
 use api\modules\v1\models\StoryTest;
+use api\modules\v1\RepetitionApiInterface;
 use common\models\StoryStoryTest;
 use common\models\StudentQuestionProgress;
 use common\models\User;
@@ -26,6 +27,17 @@ use yii\filters\ContentNegotiator;
 
 class GameController extends Controller
 {
+    /**
+     * @var RepetitionApiInterface
+     */
+    private $repetitionApi;
+
+    public function __construct($id, $module, RepetitionApiInterface $repetitionApi, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->repetitionApi = $repetitionApi;
+    }
+
     public function behaviors(): array
     {
         $behaviors = parent::behaviors();
@@ -132,11 +144,13 @@ class GameController extends Controller
 
         $data["progress"] = $progress;
 
+        $dataProvider = $this->repetitionApi->getRepetitionDataProvider($student->id);
+        $data['repetition'] = $dataProvider->getModels();
+
         return $data;
     }
 
     /**
-     * @throws Exception
      * @throws BadRequestHttpException
      */
     public function actionCreate(Request $request): array
@@ -155,7 +169,13 @@ class GameController extends Controller
         $sql = $command->getRawSql();
         $sql .= " ON DUPLICATE KEY UPDATE `data`=VALUES(`data`)";
         $command->setSql($sql);
-        $command->execute();
+
+        try {
+            $command->execute();
+        } catch (\Exception $exception) {
+            Yii::$app->errorHandler->logException($exception);
+            return ['error' => true];
+        }
 
         return [];
     }

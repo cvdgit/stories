@@ -22,6 +22,11 @@ return [
             'class' => 'api\modules\v1\Module'
         ]
     ],
+    'container' => [
+        'definitions' => [
+            \api\modules\v1\RepetitionApiInterface::class => \frontend\modules\repetition\ApiModuleProvider::class,
+        ],
+    ],
     'components' => [
         'user' => [
             'identityClass' => 'common\models\User',

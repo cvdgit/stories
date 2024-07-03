@@ -56,6 +56,10 @@ class DefaultController extends Controller
             return $this->redirect(['/edu/student/index']);
         }
 
+        if (Yii::$app->user->can(UserRoles::ROLE_STUDENT)) {
+            return $this->redirect(['/edu/student/index']);
+        }
+
         if ($student === null) {
             return $this->redirect(['/edu/parent/default/index']);
         }
