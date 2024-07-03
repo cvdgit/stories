@@ -83,7 +83,7 @@ export default function App({mentalMapId}) {
         ? <AppLoader/>
         : (
           <MentalMapContext.Provider value={mentalMapContext}>
-          <ImagesContext.Provider value={imagesContext}>
+            <ImagesContext.Provider value={imagesContext}>
               <Editor/>
             </ImagesContext.Provider>
           </MentalMapContext.Provider>
@@ -106,7 +106,7 @@ export default function App({mentalMapId}) {
                 text: e.target.value
               })
               setMapText(e.target.value)
-            }} value={state.text} />
+            }} value={state.text}/>
           </div>
         </Dialog>
       </CSSTransition>

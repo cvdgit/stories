@@ -9,6 +9,12 @@ export default function MentalMapReducer(state, action) {
         map: {...state.map, images: [...state.map.images, action.payload]}
       }
     }
+    case 'remove_image_from_mental_map': {
+      return {
+        ...state,
+        map: {...state.map, images: state.map.images.filter(i => i.id !== action.imageId)}
+      }
+    }
     case 'upload_mental_map_image': {
       return {
         ...state,

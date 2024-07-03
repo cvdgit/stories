@@ -107,7 +107,7 @@ export default function MentalMap(element, params) {
           return
         }
 
-        const content = createRetellingContent()
+        const content = createRetellingContent(() => dialog.hide())
         wrapper.querySelector('.mental-map-detail-container').innerHTML = ''
         wrapper.querySelector('.mental-map-detail-container').appendChild(content)
 
@@ -248,55 +248,9 @@ export default function MentalMap(element, params) {
         }
       })
     }
-
-    /*
-    const targetElement = event.target
-
-    if (targetElement.classList.contains('recording-start')) {
-      return
-    }
-
-    targetElement.classList.add('recording-start')
-
-    const finalSpan = document.createElement('span')
-    finalSpan.classList.add('recording-final')
-    finalSpan.setAttribute('contenteditable', 'plaintext-only')
-    targetElement.appendChild(finalSpan)
-    const resultSpan = document.createElement('span')
-    resultSpan.classList.add('recording-result')
-    resultSpan.setAttribute('contenteditable', 'plaintext-only')
-    targetElement.appendChild(resultSpan)
-    const interimSpan = document.createElement('span')
-    interimSpan.classList.add('recording-interim')
-    targetElement.appendChild(interimSpan)
-
-    setTimeout(function () {
-      voiceResponse.start(event, 'ru-RU', function () {
-        statusWrap.querySelector('.recording-status').innerHTML = `
-        <div><button type="button" class="recording-stop">Остановить запись</button></div>
-        `
-        statusWrap.querySelector('.recording-stop').addEventListener('click', e => {
-          voiceResponse.stop(() => {
-            statusWrap.querySelector('.recording-status').innerHTML = `
-        <div>Нажмите на фрагмент для начала записи</div>
-        <div><button class="start-retelling" type="button">Проверить</button></div>
-        `
-            statusWrap.querySelector('.start-retelling').addEventListener('click', e => {
-              if (voiceResponse.getStatus()) {
-                voiceResponse.stop()
-              }
-              const wrap = startRetelling()
-              detailContainer.innerHTML = ''
-              detailContainer.appendChild(wrap)
-            })
-          })
-        })
-      });
-    }, 500);
-     */
   }
 
-  function createRetellingContent() {
+  function createRetellingContent(hideCallback) {
     const wrap = document.createElement('div')
     wrap.classList.add('retelling-wrap')
     wrap.innerHTML = `
@@ -307,17 +261,11 @@ export default function MentalMap(element, params) {
             <button style="display: none" id="voice-finish" type="button" class="btn">OK</button>
         </div>
     `
-
-    //$wrap.find("#voice-finish").on("click", hideCallback)
-
+    wrap.querySelector('#voice-finish').addEventListener('click', hideCallback)
     return wrap
   }
 
   async function startRetelling(userResponse, targetText) {
-
-    /*
-    ["voice-control"].map(id => $elem.find(`#${id}`).hide())
-    */
     const onMessage = message => {
       const el = document.getElementById("retelling-response")
       $(el).show()
@@ -330,7 +278,6 @@ export default function MentalMap(element, params) {
       el.innerText = message
     }
     const onEnd = () => {
-      console.log('end')
       $(document.getElementById('voice-loader')).hide()
       $(document.getElementById('voice-finish')).show()
     }

@@ -27,7 +27,7 @@ export default function Editor() {
   }, [])
 
   const dragEndHandler = (item) => {
-console.log(item)
+
     if (!item.destination) return;
 
     if (item.destination.droppableId !== 'image') {
@@ -79,7 +79,7 @@ console.log(item)
 
   useEffect(() => {
     if (JSON.stringify(state.map) === JSON.stringify(imageMap)) {
-      return
+      //return
     }
     const timeoutId = setTimeout(() => api
       .post('/admin/index.php?r=mental-map/update-map', {

@@ -1,16 +1,61 @@
 import React, {useEffect, useRef, useState} from "react";
 import {Droppable} from "react-beautiful-dnd";
 import Moveable from "react-moveable";
-import {useMentalMap} from "../../App/App";
+import {useImages, useMentalMap} from "../../App/App";
 import Dialog from "../../Dialog";
 import {CSSTransition} from 'react-transition-group';
 
 let scale = 1
 
+const Editable = {
+  name: "editable",
+  props: [
+    'removeHandler'
+  ],
+  events: [],
+  render(moveable, React) {
+    const rect = moveable.getRect();
+    const {pos2} = moveable.state;
+
+    // Add key (required)
+    // Add class prefix moveable-(required)
+    const EditableViewer = moveable.useCSS("div", `
+        {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            will-change: transform;
+            transform-origin: 0px 0px;
+        }
+        .custom-button {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            background: #dc3545;
+            border-radius: 4px;
+            appearance: none;
+            border: 0;
+            color: white;
+            font-weight: bold;
+        }
+            `);
+    return <EditableViewer key={"editable-viewer"} className={"moveable-editable"} style={{
+      transform: `translate(${pos2[0]}px, ${pos2[1]}px) rotate(${rect.rotation}deg) translate(10px)`,
+    }}>
+      <button className="custom-button" onClick={() => {
+        moveable.props.removeHandler()
+        //moveable.state.target.parentElement.remove()
+      }}> -
+      </button>
+    </EditableViewer>;
+  },
+};
+
 export default function ImageMap({mapImage}) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
   const {state, dispatch} = useMentalMap()
+  const {dispatch: imagesDispatch} = useImages()
   const [currentImageItem, setCurrentImageItem] = useState(null)
   const [currentText, setCurrentText] = useState(null)
 
@@ -60,14 +105,14 @@ export default function ImageMap({mapImage}) {
                className="mental-map-container">
             <div id="container" className="container" style={{position: 'absolute', width: '100%', height: '100%'}}>
               <div style={{position: 'relative', width: '100%', height: '100%'}}>
-                <img src={mapImage.url} style={{height: '100%'}} alt=""/>
+                <img draggable={false} src={mapImage.url} style={{height: '100%'}} alt=""/>
                 {mapImage.images.map((image, i) => (
                   <div key={`im-${i}`}>
                     <img
                       style={{
                         left: '0',
                         top: '0',
-                        transform: `translate(${image.left}px, ${image.top}px)`,
+                        transform: `translate(${Math.abs(image.left)}px, ${Math.abs(image.top)}px)`,
                         width: `${image.width}px`,
                         height: `${image.height}px`
                       }}
@@ -84,10 +129,25 @@ export default function ImageMap({mapImage}) {
                       draggable={true}
                       resizable={true}
                       keepRatio={true}
-                      throttleResize={0}
-                      throttleDrag={0}
-                      scalable={true}
-                      origin={true}
+                      ables={[Editable]}
+                      props={{
+                        editable: true,
+                        removeHandler: () => {
+                          dispatch({
+                            type: 'remove_image_from_mental_map',
+                            imageId: image.id,
+                          })
+                          imagesDispatch({
+                            type: 'add_image',
+                            payload: {...image}
+                          })
+                        }
+                      }}
+                      //throttleResize={0}
+                      //throttleDrag={1}
+                      //scalable={true}
+                      snappable={true}
+                      //origin={true}
                       bounds={{
                         top: 0,
                         left: 0,
@@ -99,8 +159,7 @@ export default function ImageMap({mapImage}) {
                         e.setFixedDirection([0, 0]);
                       }}
                       onDrag={e => {
-                        e.target.style.transform = e.transform;
-
+                        e.target.style.transform = e.transform
                         dispatch({
                           type: 'update_mental_map_images',
                           imageId: image.id,
