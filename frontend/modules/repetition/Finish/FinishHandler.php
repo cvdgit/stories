@@ -71,12 +71,20 @@ class FinishHandler
                     ->execute();
 
                 \Yii::$app->db->createCommand()
-                    ->update('test_repetition', ['done' => 1], ['schedule_item_id' => $lastScheduleItem])
+                    ->update('test_repetition', ['done' => 1], [
+                        'schedule_item_id' => $lastScheduleItem,
+                        'test_id' => $command->test_id,
+                        'student_id' => $command->student_id,
+                    ])
                     ->execute();
             });
         } else {
             \Yii::$app->db->createCommand()
-                ->update('test_repetition', ['done' => 1], ['schedule_item_id' => $lastScheduleItem])
+                ->update('test_repetition', ['done' => 1], [
+                    'schedule_item_id' => $lastScheduleItem,
+                    'test_id' => $command->test_id,
+                    'student_id' => $command->student_id,
+                ])
                 ->execute();
         }
     }
