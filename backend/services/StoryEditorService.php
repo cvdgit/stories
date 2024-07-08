@@ -17,6 +17,7 @@ use backend\components\story\VideoBlock;
 use backend\components\story\writer\HTMLWriter;
 use backend\components\StudyTaskFinalSlide;
 use backend\models\editor\BaseForm;
+use backend\models\editor\ImageForm;
 use backend\models\ImageSlideBlock;
 use backend\models\video\VideoSource;
 use common\models\LessonBlock;
@@ -323,6 +324,7 @@ class StoryEditorService
         }
 
         if ($block->getType() === AbstractBlock::TYPE_IMAGE) {
+            /** @var ImageForm $form */
             $storyModel = Story::findModel($slideModel->story_id);
             if (!empty($form->url)) {
 
@@ -351,12 +353,13 @@ class StoryEditorService
                 $block->setBlockAttribute('data-image-id', $form->imageModel->id);
             }
         }
+
         if ($block->isHtmlTest()) {
             $block->setContent((new TestBlockContent($form->test_id, $form->required))->render());
-        }
-        else {
+        } else {
             $block->update($form);
         }
+
         if ($block->typeIs(AbstractBlock::TYPE_VIDEO) || $block->typeIs(AbstractBlock::TYPE_VIDEOFILE)) {
             /** @var VideoBlock $block */
             if ($block->getSource() === VideoSource::YOUTUBE) {

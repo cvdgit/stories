@@ -15,10 +15,10 @@ abstract class AbstractBlock
     public const TYPE_VIDEOFILE = 'videofile';
     public const TYPE_MENTAL_MAP = 'mental_map';
 
-    private $width;
-    private $height;
-    private $left;
-    private $top;
+    protected $width;
+    protected $height;
+    protected $left;
+    protected $top;
 
     /** @var string */
     private $type;

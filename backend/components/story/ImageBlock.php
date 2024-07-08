@@ -122,7 +122,7 @@ class ImageBlock extends AbstractBlock
     /**
      * @param ImageForm $form
      */
-    public function update($form)
+    public function update($form): void
     {
         if (!empty($form->fullImagePath)) {
             $this->setImageSize($form->fullImagePath);
