@@ -6,6 +6,7 @@ module.exports = {
     quiz: path.resolve(__dirname, 'asset/quiz/quiz.js'),
     audio: path.resolve(__dirname, 'asset/question/audio.js'),
     app: path.resolve(__dirname, 'asset/school/app.js'),
+    new_school: path.resolve(__dirname, 'asset/new-school/index.js'),
     course: path.resolve(__dirname, 'asset/course/app.js'),
     story_quiz: path.resolve(__dirname, 'asset/story-quiz/js/wikids-story-test.js'),
     slides: path.resolve(__dirname, 'asset/slides/js/slides.js'),
@@ -61,15 +62,8 @@ module.exports = {
         use: [MiniCssExtractPlugin.loader, 'css-loader'],
       },
       {
-        test: /\.png$/,
-        use: [
-          {
-            loader: "url-loader",
-            options: {
-              mimetype: "image/png",
-            },
-          },
-        ],
+        test: /\.(png|jpg|gif)$/i,
+        type: "asset",
       },
     ],
   }
