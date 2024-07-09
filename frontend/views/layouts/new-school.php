@@ -56,9 +56,9 @@ $this->beginBody() ?>
                 </div>
                 <div id="main-menu" class="nav__wrap navbar-collapse collapse justify-content-center">
                     <ul class="navbar-nav align-items-center bg-light p-3 rounded-pill">
-                        <li class="menu-item"><a class="text-dark mx-5 menu-item__link" href="#">Для кого</a></li>
-                        <li class="menu-item"><a class="text-dark mx-5 menu-item__link" href="#">Преимущества</a></li>
-                        <li class="menu-item"><a class="text-dark mx-5 menu-item__link" href="#">Сертификаты</a></li>
+                        <li class="menu-item"><a class="text-dark mx-5 menu-item__link" href="#for">Для кого</a></li>
+                        <li class="menu-item"><a class="text-dark mx-5 menu-item__link" href="#benefits">Преимущества</a></li>
+                        <li class="menu-item"><a class="text-dark mx-5 menu-item__link" href="#certificates">Сертификаты</a></li>
                     </ul>
                 </div>
                 <div>

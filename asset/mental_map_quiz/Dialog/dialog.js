@@ -4,7 +4,7 @@ const InnerDialog = function(container, {title, content}) {
   const $wrapper = $('<div/>', {class: 'slide-hints-wrapper', 'css': {'z-index': 400, display: 'none'}});
   const $background = $('<div/>', {class: 'slide-hints-background'});
   const $inner = $('<div/>', {class: 'slide-hints-inner'});
-  const $content = $('<div/>', {class: 'slide-hints slide-hints-auto'});
+  const $content = $('<div/>', {class: 'slide-hints', css: {height: '640px'}});
 
   $background.appendTo($wrapper);
   $inner.appendTo($wrapper);
@@ -21,11 +21,6 @@ const InnerDialog = function(container, {title, content}) {
             html: '&times;'
           })
             .on('click', function () {
-              /*$hintWrapper.hide();
-              $(this).parents('.slide-hints-wrapper:eq(0)').remove();
-              if (!that.container.find('.slide-hints-wrapper').length) {
-                $('.reveal .story-controls').show();
-              }*/
               hideHandler()
             })
         )

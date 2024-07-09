@@ -19,7 +19,7 @@
 }
 
 .mental-map-detail-container {
-  max-width: 800px;
+  /*max-width: 800px;*/
   min-width: 600px;
   min-height: 500px;
   padding: 10px;
@@ -32,6 +32,7 @@
   display: flex;
   flex-direction: row;
   flex: 1 0 50%;
+  overflow-y: auto;
 }
 
 .mental-map-detail-container-inner {
@@ -63,7 +64,7 @@
 .mental-map-all-text-container {
   display: flex;
   flex-direction: column;
-  max-width: 800px;
+  /*max-width: 800px;*/
   max-height: 600px;
   min-width: 600px;
   min-height: 500px;

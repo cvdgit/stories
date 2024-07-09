@@ -23,6 +23,24 @@ export default function MentalMap(element, params) {
   const container = document.createElement('div')
   container.classList.add('mental-map-container')
 
+  const blockTypes = ['text', 'image']
+
+  function showDialogHandler() {
+    Reveal.configure({keyboard: false});
+    $('.reveal .story-controls').hide();
+    blockTypes.map(blockType => {
+      $(Reveal.getCurrentSlide()).find(`div.sl-block[data-block-type=${blockType}]`).css('zIndex', '-1')
+    })
+  }
+
+  function hideDialogHandler() {
+    Reveal.configure({keyboard: true})
+    $('.reveal .story-controls').show();
+    blockTypes.map(blockType => {
+      $(Reveal.getCurrentSlide()).find(`div.sl-block[data-block-type=${blockType}]`).css('zIndex', 'auto')
+    })
+  }
+
   function mapImageClickHandler(image, texts) {
 
     const detailImgWrap = document.createElement('div')
@@ -36,13 +54,20 @@ export default function MentalMap(element, params) {
     const text = texts.find(t => t.id === image.id)
 
     text.words.map(word => {
-      const currentSpan = document.createElement('span')
-      currentSpan.classList.add('text-item-word')
-      currentSpan.textContent = word.word
-      if (word.hidden) {
-        currentSpan.classList.add('selected')
+      const {type} = word
+      if (type === 'break') {
+        const breakElem = document.createElement('div')
+        breakElem.innerHTML = '&nbsp;'
+        detailText.appendChild(breakElem)
+      } else {
+        const currentSpan = document.createElement('span')
+        currentSpan.classList.add('text-item-word')
+        currentSpan.innerHTML = word.word
+        if (word.hidden) {
+          currentSpan.classList.add('selected')
+        }
+        detailText.appendChild(currentSpan)
       }
-      detailText.appendChild(currentSpan)
     })
 
     const detailTextWrap = document.createElement('div')
@@ -92,6 +117,9 @@ export default function MentalMap(element, params) {
 
     const dialog = new InnerDialog($(container), {title: 'Изображение', content: detailContainer});
     dialog.show(wrapper => {
+
+      showDialogHandler()
+
       wrapper.querySelector('#start-recording').addEventListener('click', e => {
         startRecording(e.target)
       })
@@ -118,6 +146,7 @@ export default function MentalMap(element, params) {
     })
 
     dialog.onHide(() => {
+      hideDialogHandler()
       if (voiceResponse.getStatus()) {
         voiceResponse.stop()
       }
@@ -128,16 +157,24 @@ export default function MentalMap(element, params) {
     const json = await params.init()
 
     texts = json.map.images.map(image => {
+
+      const paragraphs = image.text.split(/(?:\r?\n)+/)
+      const words = paragraphs.map(p => {
+        const words = p.split(' ').map(word => ({word, type: word, hidden: false}))
+        return [...words, {type: 'break'}]
+      }).flat()
+
       return {
         id: image.id,
         text: image.text,
-        words: image.text.split(' ').map(word => ({word, hidden: false}))
+        words
       }
     })
 
     const img = document.createElement('img')
     img.src = json.map.url
     img.style.height = '100%'
+    img.style.margin = '0 auto'
     container.appendChild(img)
 
     json.map.images.map(image => {
@@ -181,18 +218,24 @@ export default function MentalMap(element, params) {
         textItem.classList.add('text-item')
 
         textState.words.map(word => {
-          const span = document.createElement('span')
-          span.classList.add('text-item-word')
-          if (word.hidden) {
-            span.classList.add('selected')
+          const {type} = word
+          if (type === 'break') {
+            const breakElem = document.createElement('div')
+            breakElem.innerHTML = '&nbsp;'
+            textItem.appendChild(breakElem)
+          } else {
+            const span = document.createElement('span')
+            span.classList.add('text-item-word')
+            if (word.hidden) {
+              span.classList.add('selected')
+            }
+            span.textContent = word.word
+            span.addEventListener('click', () => {
+              word.hidden = !word.hidden
+              span.classList.toggle('selected')
+            })
+            textItem.appendChild(span)
           }
-          span.textContent = word.word
-          span.addEventListener('click', () => {
-            word.hidden = !word.hidden
-            span.classList.toggle('selected')
-            console.log(texts)
-          })
-          textItem.appendChild(span)
         })
 
         item.appendChild(textItem)
@@ -201,7 +244,13 @@ export default function MentalMap(element, params) {
 
       const dialog = new InnerDialog($(container), {title: 'Весь текст', content: list});
 
-      dialog.show()
+      dialog.show(() => {
+        showDialogHandler()
+      })
+
+      dialog.onHide(() => {
+        hideDialogHandler()
+      })
     })
 
     this.element.appendChild(btn)

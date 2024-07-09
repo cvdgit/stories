@@ -71,7 +71,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 
 <section class="mb-4">
     <div class="container-lg p-0">
-        <div class="bg-light rounded-pill text-center" style="padding: .7rem; margin-bottom: 6rem">
+        <div id="for" class="bg-light rounded-pill text-center" style="padding: .7rem; margin-bottom: 6rem">
             <h2 class="section-header m-0">Кому подходит обучение в Wikids</h2>
         </div>
         <div>
@@ -152,7 +152,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 
 <section class="mb-5">
     <div class="container-lg p-0">
-        <div class="bg-light rounded-pill text-center" style="padding: .7rem; margin-bottom: 6rem">
+        <div id="benefits" class="bg-light rounded-pill text-center" style="padding: .7rem; margin-bottom: 6rem">
             <h2 class="section-header m-0">Преимущества нашей школы</h2>
         </div>
         <div>
@@ -305,7 +305,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 
 <section style="margin-bottom: 7rem">
     <div class="container-lg p-0">
-        <div class="bg-light rounded-pill text-center" style="padding: .7rem; margin-bottom: 6rem">
+        <div id="certificates" class="bg-light rounded-pill text-center" style="padding: .7rem; margin-bottom: 6rem">
             <h2 class="section-header m-0">Сертификаты</h2>
         </div>
         <div class="row no-gutters">
