@@ -125,10 +125,8 @@ if (Yii::$app->user->isGuest): ?>
     <?= SignupWidget::widget() ?>
 <?php
 endif ?>
-<?php
-// echo ContactWidget::widget() ?>
-<?php
-// echo ToastrFlash::widget() ?>
+<?= ContactWidget::widget() ?>
+<?= ToastrFlash::widget() ?>
 <?php
 $this->endBody() ?>
 </body>

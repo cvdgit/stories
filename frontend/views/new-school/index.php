@@ -21,7 +21,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 ?>
 <section style="margin-bottom: 10rem">
     <div class="container-lg p-0">
-        <div class="d-flex flex-row">
+        <div class="d-flex flex-lg-row flex-column">
             <div style="flex: 1 0 50%; margin-top: 10rem">
                 <div class="mb-3">
                     <h1 class="m-0 main-header">Удивительные возможности мозга ребенка</h1>
@@ -31,12 +31,12 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                     создателя школы домашнего обучения Wikids
                 </div>
                 <div>
-                    <button class="btn custom-btn position-relative" type="button">
+                    <a class="btn custom-btn position-relative contact-request" href="/contact/create">
                         Получить чек-лист
                         <span class="image-check-wrap">
                             <img class="image-check" src="/school/new/check-circle.gif" alt="check">
                         </span>
-                    </button>
+                    </a>
                 </div>
             </div>
             <div style="flex: 1 0 50%">
@@ -74,7 +74,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
         <div id="for" class="bg-light rounded-pill text-center" style="padding: .7rem; margin-bottom: 6rem">
             <h2 class="section-header m-0">Кому подходит обучение в Wikids</h2>
         </div>
-        <div>
+        <div class="container-lg">
             <div class="row">
                 <div class="col-md-6">
                     <div class="training-for-box bg-light">
@@ -155,7 +155,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
         <div id="benefits" class="bg-light rounded-pill text-center" style="padding: .7rem; margin-bottom: 6rem">
             <h2 class="section-header m-0">Преимущества нашей школы</h2>
         </div>
-        <div>
+        <div class="container-lg">
             <div class="row">
                 <div class="col-md-4">
                     <div class="training-for-box bg-light">
@@ -309,14 +309,14 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
             <h2 class="section-header m-0">Сертификаты</h2>
         </div>
         <div class="row no-gutters">
-            <div class="col-md-6">
+            <div class="col-lg-6">
                 <div class="bg-light mr-5 text-center" style="border-radius: 20px; padding: 3rem; font-size: 2rem; line-height: 3.1rem; font-weight: 400;">
                     <p><strong>Мы работаем ради результатов детей, школа домашнего обучения Wikids</strong> – это образовательный проект, призванный организовать процесс домашнего обучения вашего ребёнка.</p>
                     <p>Мы оказываем методическую и консультативную помощь родителям.</p>
                     <p><strong>Школа домашнего обучения Wikids</strong> обладает всеми необходимыми образовательными лицензиями.</p>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-lg-6">
                 <div class="d-flex flex-row">
                     <div style="flex: 1 0 50%; height: 40rem" class="text-center">
                         <img style="height: 100%; border-radius: 20px" src="/school/new/license-1-small.jpg" alt="">
@@ -362,3 +362,5 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
         </div>
     </div>
 </section>
+
+<?= $this->render('@frontend/views/school/_request') ?>
