@@ -7,6 +7,7 @@ namespace api\modules\v1\controllers;
 use api\modules\v1\models\Story;
 use api\modules\v1\models\StoryTest;
 use api\modules\v1\RepetitionApiInterface;
+use common\helpers\Url;
 use common\models\StoryStoryTest;
 use common\models\StudentQuestionProgress;
 use common\models\User;
@@ -146,7 +147,7 @@ class GameController extends Controller
 
         $dataProvider = $this->repetitionApi->getRepetitionDataProvider($student->id);
         $data['repetition'] = array_map(static function(array $item): array {
-            $item['url'] = '/my-repetition/' . $item['id'];
+            $item['url'] = Url::homeUrl() . '/my-repetition/' . $item['id'];
             return $item;
         }, $dataProvider->getModels());
 
