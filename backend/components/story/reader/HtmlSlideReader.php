@@ -268,12 +268,12 @@ class HtmlSlideReader implements ReaderInterface
         if (empty($volume)) {
             $volume = VideoBlock::DEFAULT_VOLUME;
         }
-        $block->setVolume($volume);
+        $block->setVolume((float) $volume);
         $speed = pq($element)->attr('data-speed');
         if (empty($speed)) {
             $speed = VideoBlock::DEFAULT_SPEED;
         }
-        $block->setSpeed($speed);
+        $block->setSpeed((float) $speed);
 
         $style = pq($htmlBlock)->attr('style');
         $this->loadBlockProperties($block, $style);
