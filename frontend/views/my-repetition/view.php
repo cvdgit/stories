@@ -66,25 +66,27 @@ $this->registerCss(<<<CSS
 CSS
 );
 ?>
-<div class="container-fluid">
-    <div class="course-header-wrapper">
-        <div class="course-header">
-            <div class="course-header-wrap">
-                <div class="course-header-inner">
-                    <a href="<?= Url::to(['/edu/student/index']); ?>" class="leave-course-button"><i style="font-size: 12px" class="glyphicon glyphicon-chevron-left"></i> Назад</a>
+
+<div class="container">
+    <div class="container-fluid">
+        <div class="course-header-wrapper">
+            <div class="course-header">
+                <div class="course-header-wrap">
+                    <div class="course-header-inner">
+                        <a href="<?= Url::to(['/my-repetition/index']); ?>" class="leave-course-button"><i style="font-size: 12px" class="glyphicon glyphicon-chevron-left"></i> Назад</a>
+                    </div>
+                    <div></div>
                 </div>
-                <div></div>
             </div>
         </div>
     </div>
-</div>
-
-<div class="story-box">
-    <div class="story-container">
-        <div class="story-container-inner" id="story-container">
-            <section class="run-test">
-                <div class="new-questions" data-test-id="<?= $testing->id; ?>" data-student-id="<?= $studentId; ?>"></div>
-            </section>
+    <div class="story-box" style="aspect-ratio: 16/9 auto">
+        <div class="story-container">
+            <div class="story-container-inner" id="story-container">
+                <section class="run-test">
+                    <div class="new-questions" data-test-id="<?= $testing->id; ?>" data-student-id="<?= $studentId; ?>"></div>
+                </section>
+            </div>
         </div>
     </div>
 </div>
@@ -99,7 +101,7 @@ $this->registerJs(<<<JS
         dataParams: params,
         forSlide: false,
         repetitionMode: true,
-        repetitionBackUrl: '/edu/student/index',
+        repetitionBackUrl: '/my-repetition',
         init: () => $.getJSON('/question/init', params),
         onInitialized: () => test.addEventListener('finish', event => {
             console.log(event);

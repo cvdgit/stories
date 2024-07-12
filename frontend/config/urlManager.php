@@ -41,6 +41,8 @@ return [
         'stories/skazki-na-noch' => 'story/bedtime-stories',
         'stories/audio' => 'story/audio-stories',
         'stories/chat' => 'story/chat',
+        '/my-repetition' => 'my-repetition/index',
+        '/my-repetition/<id:\d+>' => 'my-repetition/view',
 
         'story/random' => 'story/random',
         'story/like' => 'story/like',

@@ -145,7 +145,10 @@ class GameController extends Controller
         $data["progress"] = $progress;
 
         $dataProvider = $this->repetitionApi->getRepetitionDataProvider($student->id);
-        $data['repetition'] = $dataProvider->getModels();
+        $data['repetition'] = array_map(static function(array $item): array {
+            $item['url'] = Yii::$app->urlManager->createAbsoluteUrl(['/my-repetition/index', 'id' => $item['id']]);
+            return $item;
+        }, $dataProvider->getModels());
 
         return $data;
     }

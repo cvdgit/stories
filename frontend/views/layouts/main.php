@@ -100,6 +100,7 @@ AppAsset::register($this);
                                         ['label' => 'История просмотра', 'url' => ['/story/history']],
                                         ['label' => 'Любимые истории', 'url' => ['/story/liked']],
                                         ['label' => 'Избранные истории', 'url' => ['/story/favorites']],
+                                        ['label' => 'Повторения', 'url' => ['/my-repetition/index']],
                                         ['label' => 'Панель управления', 'url' => '/admin', 'visible' => Yii::$app->user->can(UserRoles::PERMISSION_ADMIN_PANEL)],
                                         ['label' => Html::beginForm(['/auth/logout']) .
                                  Html::submitButton('Выход', ['class' => 'login-item logout-btn-a']) .

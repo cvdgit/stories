@@ -119,7 +119,7 @@ class StoryController extends Controller
             $sectionModel->title,
             $sectionModel->description,
             $sectionModel->keywords,
-            $sectionModel->h1
+            $sectionModel->h1,
         );
 
         $searchModel = new StorySearch();
@@ -129,7 +129,7 @@ class StoryController extends Controller
             (new StoryRenderParams())
                 ->setSectionModel($sectionModel)
                 ->setSearchModel($searchModel, Yii::$app->request->queryParams)
-                ->asArray()
+                ->asArray(),
         );
     }
 
@@ -146,7 +146,7 @@ class StoryController extends Controller
             $model->name . ' - каталог историй',
             $model->name,
             'wikids, сказки, истории, каталог историй',
-            $model->name
+            $model->name,
         );
 
         $searchModel = new StorySearch();
@@ -161,7 +161,7 @@ class StoryController extends Controller
                 ->setSectionModel($sectionModel)
                 ->setCategoryModel($model)
                 ->setSearchModel($searchModel, Yii::$app->request->queryParams)
-                ->asArray()
+                ->asArray(),
         );
     }
 
@@ -173,7 +173,7 @@ class StoryController extends Controller
             $model->name . ' - каталог историй',
             $model->name,
             'wikids, сказки, истории, каталог историй',
-            $model->name
+            $model->name,
         );
 
         $searchModel = new StorySearch();
@@ -183,7 +183,7 @@ class StoryController extends Controller
             (new StoryRenderParams())
                 ->setSearchModel($searchModel, Yii::$app->request->queryParams)
                 ->setSearchAction(['/story/tag', 'tag' => $model->name])
-                ->asArray()
+                ->asArray(),
         );
     }
 
@@ -319,7 +319,7 @@ class StoryController extends Controller
             $test->getQuestionData($userHistory),
             $test->getQuestionDataCount(),
             $userStars,
-            $fastMode
+            $fastMode,
         ))
             ->build();
         return (new Serializer())
@@ -387,7 +387,6 @@ class StoryController extends Controller
                 ])
                 ->andWhere('rh.overall_similarity > 90')
                 ->groupBy(['rh.slide_id'])
-
                 ->all();
             $completedRetelling = array_map(static function (array $item): int {
                 return (int) $item['slideId'];
@@ -410,7 +409,7 @@ class StoryController extends Controller
             'История просмотра',
             'История просмотра',
             'История просмотра',
-            'История просмотра'
+            'История просмотра',
         );
         return $this->render(
             'index',
@@ -418,7 +417,7 @@ class StoryController extends Controller
                 ->setSearchModel(new UserStorySearch(Yii::$app->user->id), Yii::$app->request->queryParams)
                 ->setEmptyText('В этом разделе будут отображаться истории, которые были просмотрены вами')
                 ->setSearchAction(['/story/history'])
-                ->asArray()
+                ->asArray(),
         );
     }
 
@@ -428,7 +427,7 @@ class StoryController extends Controller
             'Понравившиеся истории',
             'Понравившиеся истории',
             'Понравившиеся истории',
-            'Понравившиеся истории'
+            'Понравившиеся истории',
         );
         return $this->render(
             'index',
@@ -436,7 +435,7 @@ class StoryController extends Controller
                 ->setSearchModel(new StoryLikeSearch(Yii::$app->user->id), Yii::$app->request->queryParams)
                 ->setEmptyText('В этом разделе будут отображаться понравившиеся вам истории')
                 ->setSearchAction(['/story/liked'])
-                ->asArray()
+                ->asArray(),
         );
     }
 
@@ -474,7 +473,7 @@ class StoryController extends Controller
             'Избранные истории',
             'Избранные истории',
             'Избранные истории',
-            'Избранные истории'
+            'Избранные истории',
         );
         return $this->render(
             'index',
@@ -482,7 +481,7 @@ class StoryController extends Controller
                 ->setSearchModel(new StoryFavoritesSearch(Yii::$app->user->id), Yii::$app->request->queryParams)
                 ->setEmptyText('В этом разделе будут отображаться истории, добавленные вами в избранное')
                 ->setSearchAction(['/story/favorites'])
-                ->asArray()
+                ->asArray(),
         );
     }
 
@@ -499,7 +498,7 @@ class StoryController extends Controller
             'Сказки на ночь для детей',
             'Сказки на ночь для детей',
             'wikids, сказки, сказки на ночь, истории, каталог историй, сказки на ночь для детей',
-            'Сказки на ночь для детей'
+            'Сказки на ночь для детей',
         );
         $searchModel = new StorySearch();
         $searchModel->category_id = $sectionModel->getSectionCategories();
@@ -509,7 +508,7 @@ class StoryController extends Controller
                 ->setSectionModel($sectionModel)
                 ->setSearchModel($searchModel, Yii::$app->request->queryParams)
                 ->setSearchAction(['/story/index'])
-                ->asArray()
+                ->asArray(),
         );
     }
 
@@ -520,7 +519,7 @@ class StoryController extends Controller
             'Аудио сказки для детей',
             'Аудио сказки для детей',
             'Аудио сказки для детей, сказки, истории, wikids',
-            'Аудио сказки для детей'
+            'Аудио сказки для детей',
         );
         $searchModel = new StorySearch();
         $searchModel->category_id = $sectionModel->getSectionCategories();
@@ -531,7 +530,7 @@ class StoryController extends Controller
                 ->setSectionModel($sectionModel)
                 ->setSearchModel($searchModel, Yii::$app->request->queryParams)
                 ->setSearchAction(['/story/index'])
-                ->asArray()
+                ->asArray(),
         );
     }
 
@@ -544,7 +543,7 @@ class StoryController extends Controller
                 ->setSearchModel(new MyAudioStoriesSearch(Yii::$app->user->id), Yii::$app->request->queryParams)
                 ->setEmptyText('В этом разделе будут отображаться истории, озвученные вами')
                 ->setSearchAction(['/story/myaudio'])
-                ->asArray()
+                ->asArray(),
         );
     }
 

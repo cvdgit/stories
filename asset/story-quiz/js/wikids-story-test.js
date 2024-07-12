@@ -1392,7 +1392,7 @@ function WikidsStoryTest(el, options) {
     if (that.options.repetitionMode) {
       dom.results.append(`
         <div>
-          <a class="btn" href="/edu/student/index">Назад</a>
+          <a class="btn" href="${that.options.repetitionBackUrl}">Назад</a>
         </div>
       `);
     }
