@@ -18,6 +18,14 @@
   cursor: pointer;
 }
 
+.mental-map-img img {
+  transition: transform .25s, visibility .25s ease-in;
+}
+
+.mental-map-img img:hover {
+  transform: scale(1.1);
+}
+
 .mental-map-detail-container {
   /*max-width: 800px;*/
   min-width: 600px;
@@ -51,8 +59,8 @@
 }
 
 .detail-text {
-  font-size: 2.5rem;
-  line-height: 3.5rem;
+  font-size: 2.2rem;
+  line-height: 3rem;
 }
 
 .mental-map-all-text-btn {
@@ -83,8 +91,8 @@
 }
 
 .text-item {
-  font-size: 2.5rem;
-  line-height: 3.5rem;
+  font-size: 2.2rem;
+  line-height: 3rem;
 }
 
 .text-item-word {

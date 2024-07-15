@@ -202,19 +202,23 @@ export default function MentalMap(element, params) {
     container.appendChild(img)
 
     json.map.images.map(image => {
-      const mapImg = document.createElement('img')
-      mapImg.classList.add('mental-map-img')
-      mapImg.src = image.url
-      mapImg.style.position = 'absolute'
-      mapImg.style.width = image.width + 'px'
-      mapImg.style.height = image.height + 'px'
-      mapImg.style.left = '0px'
-      mapImg.style.top = '0px'
-      mapImg.style.transform = `translate(${image.left}px, ${image.top}px)`
-      mapImg.addEventListener('click', () => {
+      const mapImgWrap = document.createElement('div')
+      mapImgWrap.classList.add('mental-map-img')
+      mapImgWrap.style.position = 'absolute'
+      mapImgWrap.style.width = image.width + 'px'
+      mapImgWrap.style.height = image.height + 'px'
+      mapImgWrap.style.left = '0px'
+      mapImgWrap.style.top = '0px'
+      mapImgWrap.style.transform = `translate(${image.left}px, ${image.top}px)`
+      mapImgWrap.addEventListener('click', () => {
         mapImageClickHandler(image, texts)
       })
-      container.appendChild(mapImg)
+
+      const mapImg = document.createElement('img')
+      mapImg.src = image.url
+      mapImgWrap.appendChild(mapImg)
+
+      container.appendChild(mapImgWrap)
     })
 
     this.element.appendChild(container)
