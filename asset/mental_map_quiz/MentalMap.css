@@ -50,6 +50,7 @@
   height: 100%;
   justify-content: space-between;
   flex: 1;
+  position: relative;
 }
 
 .detail-text-wrap {
@@ -137,10 +138,14 @@
 }
 
 .retelling-wrap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
   background-color: #fff;
-  max-width: 800px;
+  /*max-width: 800px;*/
   padding: 20px;
-  height: 500px;
+  height: 100%;
   display: flex;
   justify-content: space-between;
   flex-direction: column;

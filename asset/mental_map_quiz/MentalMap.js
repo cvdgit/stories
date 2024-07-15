@@ -157,7 +157,6 @@ export default function MentalMap(element, params) {
         }
 
         const content = createRetellingContent(() => dialog.hide())
-        wrapper.querySelector('.mental-map-detail-container').innerHTML = ''
         wrapper.querySelector('.mental-map-detail-container').appendChild(content)
 
         startRetelling(userResponse, text.text).then(response => {
@@ -166,6 +165,14 @@ export default function MentalMap(element, params) {
       })
 
       recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text)
+
+      wrapper.querySelector('#result_span').addEventListener('input', e => {
+        const text = e.target.innerText
+        const display = text.length > 0 ? 'block' : 'none'
+        if (display !== wrapper.querySelector('#start-retelling').style.display) {
+          wrapper.querySelector('#start-retelling').style.display = display
+        }
+      })
     })
 
     dialog.onHide(() => {
@@ -213,11 +220,9 @@ export default function MentalMap(element, params) {
       mapImgWrap.addEventListener('click', () => {
         mapImageClickHandler(image, texts)
       })
-
       const mapImg = document.createElement('img')
       mapImg.src = image.url
       mapImgWrap.appendChild(mapImg)
-
       container.appendChild(mapImgWrap)
     })
 
@@ -338,7 +343,9 @@ export default function MentalMap(element, params) {
             <button style="display: none" id="voice-finish" type="button" class="btn">OK</button>
         </div>
     `
-    wrap.querySelector('#voice-finish').addEventListener('click', hideCallback)
+    wrap.querySelector('#voice-finish').addEventListener('click', () => {
+      wrap.remove()
+    })
     return wrap
   }
 
@@ -353,6 +360,8 @@ export default function MentalMap(element, params) {
       const el = document.getElementById("retelling-response")
       $(el).show()
       el.innerText = message
+      $(document.getElementById('voice-loader')).hide()
+      $(document.getElementById('voice-finish')).show()
     }
     const onEnd = () => {
       $(document.getElementById('voice-loader')).hide()
