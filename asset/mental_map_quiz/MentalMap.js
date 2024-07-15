@@ -41,6 +41,20 @@ export default function MentalMap(element, params) {
     })
   }
 
+  function calcHiddenTextPercent(detailTexts) {
+    let totalCounter = 0;
+    let hiddenCounter = 0;
+    detailTexts.words.map(w => {
+      if (w.type === 'word') {
+        totalCounter++
+        if (w.hidden) {
+          hiddenCounter++
+        }
+      }
+    })
+    return `${totalCounter === 0 || hiddenCounter === 0 ? 0 : Math.round(hiddenCounter * 100 / totalCounter)}%`
+  }
+
   function mapImageClickHandler(image, texts) {
 
     const detailImgWrap = document.createElement('div')
@@ -66,6 +80,11 @@ export default function MentalMap(element, params) {
         if (word.hidden) {
           currentSpan.classList.add('selected')
         }
+        currentSpan.addEventListener('click', () => {
+          word.hidden = !word.hidden
+          currentSpan.classList.toggle('selected')
+          recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text)
+        })
         detailText.appendChild(currentSpan)
       }
     })
@@ -99,7 +118,9 @@ export default function MentalMap(element, params) {
 
     const recordingWrap = document.createElement('div')
     recordingWrap.classList.add('recording-status')
-    recordingWrap.innerHTML = `<div class="question-voice" style="bottom: 0">
+    recordingWrap.innerHTML = `
+<div class="mental-map-text-status"><div>Текст скрыт на: <strong id="hidden-text-percent"></strong></div></div>
+<div class="question-voice" style="bottom: 0">
     <div class="question-voice__inner">
         <div id="start-recording" class="gn">
             <div class="mc" style="pointer-events: none"></div>
@@ -143,6 +164,8 @@ export default function MentalMap(element, params) {
           console.log(response)
         })
       })
+
+      recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text)
     })
 
     dialog.onHide(() => {
@@ -160,7 +183,7 @@ export default function MentalMap(element, params) {
 
       const paragraphs = image.text.split(/(?:\r?\n)+/)
       const words = paragraphs.map(p => {
-        const words = p.split(' ').map(word => ({word, type: word, hidden: false}))
+        const words = p.split(' ').map(word => ({word, type: 'word', hidden: false}))
         return [...words, {type: 'break'}]
       }).flat()
 

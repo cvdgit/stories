@@ -141,7 +141,7 @@
 .recording-container {
   display: flex;
   flex-direction: column;
-  flex: 1 0 50%;
+  flex: 1 0 auto;
 }
 
 .retelling-container {
@@ -151,4 +151,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.mental-map-text-status {
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  font-size: 2.5rem;
 }
