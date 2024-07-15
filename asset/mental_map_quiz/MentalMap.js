@@ -71,7 +71,7 @@ export default function MentalMap(element, params) {
       const {type} = word
       if (type === 'break') {
         const breakElem = document.createElement('div')
-        breakElem.innerHTML = '&nbsp;'
+        breakElem.classList.add('line-sep')
         detailText.appendChild(breakElem)
       } else {
         const currentSpan = document.createElement('span')
@@ -180,13 +180,14 @@ export default function MentalMap(element, params) {
     const json = await params.init()
 
     texts = json.map.images.map(image => {
-
-      const paragraphs = image.text.split(/(?:\r?\n)+/)
+      const paragraphs = image.text.split('\n')
       const words = paragraphs.map(p => {
+        if (p === '') {
+          return [{type: 'break'}]
+        }
         const words = p.split(' ').map(word => ({word, type: 'word', hidden: false}))
         return [...words, {type: 'break'}]
       }).flat()
-
       return {
         id: image.id,
         text: image.text,
@@ -244,7 +245,7 @@ export default function MentalMap(element, params) {
           const {type} = word
           if (type === 'break') {
             const breakElem = document.createElement('div')
-            breakElem.innerHTML = '&nbsp;'
+            breakElem.classList.add('line-sep')
             textItem.appendChild(breakElem)
           } else {
             const span = document.createElement('span')
