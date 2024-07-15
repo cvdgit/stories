@@ -55,6 +55,16 @@ export default function MentalMap(element, params) {
     return `${totalCounter === 0 || hiddenCounter === 0 ? 0 : Math.round(hiddenCounter * 100 / totalCounter)}%`
   }
 
+  function processOutputAsJson(output) {
+    let json = null
+    try {
+      json = JSON.parse(output.replace(/```json\n?|```/g, ''))
+    } catch (ex) {
+
+    }
+    return json
+  }
+
   function mapImageClickHandler(image, texts) {
 
     const detailImgWrap = document.createElement('div')
@@ -119,7 +129,10 @@ export default function MentalMap(element, params) {
     const recordingWrap = document.createElement('div')
     recordingWrap.classList.add('recording-status')
     recordingWrap.innerHTML = `
-<div class="mental-map-text-status"><div>Текст скрыт на: <strong id="hidden-text-percent"></strong></div></div>
+<div class="mental-map-text-status">
+<div style="margin-bottom: 10px">Текст скрыт на: <strong id="hidden-text-percent"></strong></div>
+<div>Сходство: <strong id="similarity-percent"></strong></div>
+</div>
 <div class="question-voice" style="bottom: 0">
     <div class="question-voice__inner">
         <div id="start-recording" class="gn">
@@ -160,7 +173,11 @@ export default function MentalMap(element, params) {
         wrapper.querySelector('.mental-map-detail-container').appendChild(content)
 
         startRetelling(userResponse, text.text).then(response => {
-          console.log(response)
+          const json = processOutputAsJson(wrapper.querySelector('#retelling-response').innerText)
+          if (json) {
+            const val = Number(json?.overall_similarity)
+            recordingWrap.querySelector('#similarity-percent').innerText = `${val}%`
+          }
         })
       })
 
