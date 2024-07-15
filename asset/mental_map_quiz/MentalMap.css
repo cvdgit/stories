@@ -19,6 +19,7 @@
 }
 
 .mental-map-img img {
+  max-width: 100%;
   transition: transform .25s, visibility .25s ease-in;
 }
 
