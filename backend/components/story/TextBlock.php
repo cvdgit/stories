@@ -44,6 +44,7 @@ class TextBlock extends AbstractBlock
     public function create()
     {
         $block = new self();
+        $block->setType(AbstractBlock::TYPE_TEXT);
         $block->setWidth('290px');
         $block->setHeight('auto');
         $block->setLeft('983px');
