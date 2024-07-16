@@ -317,7 +317,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 </div>
             </div>
             <div class="col-lg-6">
-                <div class="d-flex flex-row">
+                <div class="d-flex flex-md-row flex-column">
                     <div style="flex: 1 0 50%; height: 40rem" class="text-center">
                         <img style="height: 100%; border-radius: 20px" src="/school/new/license-1-small.jpg" alt="">
                     </div>
