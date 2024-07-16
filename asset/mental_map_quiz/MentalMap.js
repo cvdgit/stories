@@ -133,15 +133,16 @@ export default function MentalMap(element, params) {
 <div style="margin-bottom: 10px">Текст скрыт на: <strong id="hidden-text-percent"></strong></div>
 <div>Сходство: <strong id="similarity-percent"></strong></div>
 </div>
-<div class="question-voice" style="bottom: 0">
+<div class="question-voice" style="bottom: 0; display: flex; position: relative; left: auto; top: auto">
     <div class="question-voice__inner">
         <div id="start-recording" class="gn">
             <div class="mc" style="pointer-events: none"></div>
         </div>
     </div>
 </div>
-<div class="retelling-container">
-    <button class="btn" style="display: none" type="button" id="start-retelling">Проверить</button>
+<div class="retelling-container" id="start-retelling-wrap" style="display: none; text-align: center">
+    <button class="btn" type="button" id="start-retelling">Проверить</button>
+    <label style="display: block; font-weight: normal; font-size: 2.2rem; margin-top: 10px" for="clear-text"><input style="transform: scale(1.5); margin-right: 10px" type="checkbox" id="clear-text" checked> без знаков</label>
 </div>`
     detailContainerInner.appendChild(recordingWrap)
 
@@ -172,7 +173,11 @@ export default function MentalMap(element, params) {
         const content = createRetellingContent(() => dialog.hide())
         wrapper.querySelector('.mental-map-detail-container').appendChild(content)
 
-        startRetelling(userResponse, text.text).then(response => {
+        const clearText = $(wrapper).find('#clear-text').is(':checked')
+
+        const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
+
+        startRetelling(clearText ? removePunctuation(userResponse) : userResponse, clearText ? removePunctuation(text.text) : text.text).then(response => {
           const json = processOutputAsJson(wrapper.querySelector('#retelling-response').innerText)
           if (json) {
             const val = Number(json?.overall_similarity)
@@ -186,8 +191,8 @@ export default function MentalMap(element, params) {
       wrapper.querySelector('#result_span').addEventListener('input', e => {
         const text = e.target.innerText
         const display = text.length > 0 ? 'block' : 'none'
-        if (display !== wrapper.querySelector('#start-retelling').style.display) {
-          wrapper.querySelector('#start-retelling').style.display = display
+        if (display !== wrapper.querySelector('#start-retelling-wrap').style.display) {
+          wrapper.querySelector('#start-retelling-wrap').style.display = display
         }
       })
     })
@@ -312,7 +317,7 @@ export default function MentalMap(element, params) {
   function startRecording(element) {
     const state = element.dataset.state
     if (!state) {
-      $(document.getElementById("start-retelling")).hide()
+      $(document.getElementById("start-retelling-wrap")).hide()
       setTimeout(function () {
         voiceResponse.start(new Event('voiceResponseStart'), 'ru-RU', function () {
           element.dataset.state = 'recording'
@@ -343,7 +348,7 @@ export default function MentalMap(element, params) {
         }
 
         if ($resultSpan.text().trim().length) {
-          $(document.getElementById("start-retelling")).show()
+          $(document.getElementById("start-retelling-wrap")).show()
         }
       })
     }

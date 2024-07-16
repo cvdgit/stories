@@ -135,6 +135,9 @@
   display: flex;
   flex: 0 0 100px;
   position: relative;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0 20px;
 }
 
 .retelling-wrap {
@@ -159,12 +162,11 @@
 }
 
 .retelling-container {
-  position: absolute;
-  right: 0;
   height: 10rem;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 
 .mental-map-text-status {
