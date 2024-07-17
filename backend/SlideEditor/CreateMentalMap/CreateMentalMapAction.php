@@ -140,9 +140,4 @@ class CreateMentalMapAction extends Action
             return ["success" => false, "message" => $exception->getMessage()];
         }
     }
-
-    private function setMentalMapImage(string $mentalMapId, string $targetUrl, string $mentalMapImagePath): void
-    {
-
-    }
 }

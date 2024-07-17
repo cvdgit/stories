@@ -444,9 +444,11 @@ class Story extends ActiveRecord
             $data .= $slideData;
             $search = [
                 'data-id=""',
+                'data-id="0"',
                 'data-background-color="#000000"',
             ];
             $replace = [
+                'data-id="' . $slide['id'] . '"',
                 'data-id="' . $slide['id'] . '"',
                 'data-background-color="#fff"',
             ];
