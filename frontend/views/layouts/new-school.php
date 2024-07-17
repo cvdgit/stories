@@ -45,14 +45,19 @@ $this->beginPage() ?>
 <body>
 <?php
 $this->beginBody() ?>
-<header class="header header--background">
+<header class="header header--background px-5 p-lg-0">
     <div class="header__inner">
         <div class="container-lg p-0">
-            <nav class="navbar navbar-dark navbar-expand-lg p-0">
-                <div class="logo">
-                    <a class="logo__link font-weight-bold" href="/"><img class="logo__image" src="/school/img/logo.svg"
-                                                                         alt="logo">
-                        Wikids</a>
+            <nav class="navbar navbar-dark navbar-expand-lg p-0 flex-column flex-lg-row">
+                <div class="d-flex flex-row justify-content-between logo-group mb-4 mb-lg-0">
+                    <div class="logo">
+                        <a class="logo__link font-weight-bold" href="/"><img class="logo__image" src="/school/img/logo.svg"
+                                                                             alt="logo">
+                            Wikids</a>
+                    </div>
+                    <button class="navbar-toggler collapsed" data-toggle="collapse" data-target="#main-menu">
+                        <span class="menu-icon"></span>
+                    </button>
                 </div>
                 <div id="main-menu" class="nav__wrap navbar-collapse collapse justify-content-center">
                     <ul class="navbar-nav align-items-center bg-light p-3 rounded-pill">
@@ -61,12 +66,9 @@ $this->beginBody() ?>
                         <li class="menu-item"><a class="text-dark mx-5 menu-item__link" href="#certificates">Сертификаты</a></li>
                     </ul>
                 </div>
-                <div>
+                <div class="text-center text-lg-left">
                     <a class="contact-phone font-weight-bold" href="tel:+79262074146">+7 (926) 207−41−46</a>
                 </div>
-                <button class="navbar-toggler collapsed" data-toggle="collapse" data-target="#main-menu">
-                    <span class="menu-icon"></span>
-                </button>
             </nav>
         </div>
     </div>

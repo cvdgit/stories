@@ -19,30 +19,22 @@ $this->setMetaTags(
 );
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 ?>
-<section style="margin-bottom: 10rem">
-    <div class="container-lg p-0">
-        <div class="d-flex flex-lg-row flex-column">
-            <div style="flex: 1 0 50%; margin-top: 10rem">
+<section class="hero-section">
+    <div class="container-lg px-5 p-lg-0">
+        <div class="d-flex flex-lg-row flex-column position-relative">
+            <div style="flex: 1 0 50%" class="text-lg-left text-center hero-text-wrap">
                 <div class="mb-3">
                     <h1 class="m-0 main-header">Удивительные возможности мозга ребенка</h1>
                 </div>
-                <div class="main-sub-header mb-3">Как использовать их для обучения?</div>
+                <div class="main-sub-header mb-lg-3 mb-5">Как использовать их для обучения?</div>
                 <div class="main-text" style="margin-bottom: 10rem">Получите полезный чек-лист от Артура Муталова,
                     создателя школы домашнего обучения Wikids
                 </div>
-                <div>
-                    <a class="btn custom-btn position-relative contact-request" href="/contact/create">
-                        Получить чек-лист
-                        <span class="image-check-wrap">
-                            <img class="image-check" src="/school/new/check-circle.gif" alt="check">
-                        </span>
-                    </a>
-                </div>
             </div>
             <div style="flex: 1 0 50%">
-                <div class="position-relative"
+                <div class="position-relative mb-5 mb-lg-0"
                      style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                    <div style="position: absolute; left: 25%; top: 7%; width: 10rem">
+                    <div class="hero-image-arrow" style="left: 25%; top: 7%">
                         <div style="animation: sbs-723432649-1688644807140 4s infinite linear; backface-visibility: hidden;">
                             <div style="transform: rotate(185deg);">
                                 <img style="max-width: 100%" src="/school/new/Shape.png" alt="">
@@ -56,7 +48,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                         </div>
                     </div>
                     <img style="max-width: 100%; z-index: 2" src="/school/new/1.png" alt="">
-                    <div style="position: absolute; right: 0; bottom: 3%; width: 10rem">
+                    <div class="hero-image-arrow" style="right: 0; bottom: 3%">
                         <div style="animation: sbs-723432649-1688644807140 4s infinite linear; backface-visibility: hidden;">
                             <div>
                                 <img style="max-width: 100%" src="/school/new/Shape.png" alt="">
@@ -65,12 +57,20 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                     </div>
                 </div>
             </div>
+            <div class="check-button-wrap" style="left: 0; bottom: 0">
+                <a class="btn custom-btn position-relative contact-request" href="https://t.me/wikids_bot">
+                    Получить чек-лист
+                    <span class="image-check-wrap">
+                            <img class="image-check" src="/school/new/check-circle.gif" alt="check">
+                        </span>
+                </a>
+            </div>
         </div>
     </div>
 </section>
 
 <section class="mb-4">
-    <div class="container-lg p-0">
+    <div class="container-lg px-5 p-lg-0">
         <div id="for" class="bg-light rounded-pill text-center" style="padding: .7rem; margin-bottom: 6rem">
             <h2 class="section-header m-0">Кому подходит обучение в Wikids</h2>
         </div>
@@ -138,20 +138,20 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 </section>
 
 <section style="margin-bottom: 7rem;">
-    <div class="container-lg p-0">
+    <div class="container-lg px-5 p-lg-0">
         <div class="section-info">
             <span style="color: var(--green)">Wikids</span> — это персонализированное обучение для каждого ребёнка
         </div>
         <div class="text-center">
-            <button class="btn custom-btn position-relative" type="button">
+            <a class="btn custom-btn position-relative" href="https://t.me/wikids_bot">
                 Получить чек-лист
-            </button>
+            </a>
         </div>
     </div>
 </section>
 
 <section class="mb-5">
-    <div class="container-lg p-0">
+    <div class="container-lg px-5 p-lg-0">
         <div id="benefits" class="bg-light rounded-pill text-center" style="padding: .7rem; margin-bottom: 6rem">
             <h2 class="section-header m-0">Преимущества нашей школы</h2>
         </div>
@@ -243,7 +243,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 </section>
 
 <section class="section">
-    <div class="container-lg p-0">
+    <div class="container-lg px-5 p-lg-0">
         <div class="section-header-new">
             <div class="row no-gutters">
                 <div class="col-12 col-lg-8 col-xl-8 col-xxl-6">
@@ -279,7 +279,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 </section>
 
 <section style="margin-bottom: 10rem;">
-    <div class="container-lg p-0">
+    <div class="container-lg px-5 p-lg-0">
         <div class="d-flex flex-row justify-content-center position-relative" style="margin-bottom: 4rem">
             <div style="position: absolute; left: 10%; width: 8.7rem; top: 50%; transform: translateY(-50%);">
                 <div style="transform: rotate(91deg);">
@@ -304,13 +304,13 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 </section>
 
 <section style="margin-bottom: 7rem">
-    <div class="container-lg p-0">
+    <div class="container-lg px-5 p-lg-0">
         <div id="certificates" class="bg-light rounded-pill text-center" style="padding: .7rem; margin-bottom: 6rem">
             <h2 class="section-header m-0">Сертификаты</h2>
         </div>
         <div class="row no-gutters">
             <div class="col-lg-6">
-                <div class="bg-light mr-5 text-center" style="border-radius: 20px; padding: 3rem; font-size: 2rem; line-height: 3.1rem; font-weight: 400;">
+                <div class="bg-light mr-0 mr-lg-5 text-center" style="border-radius: 20px; padding: 3rem; font-size: 2rem; line-height: 3.1rem; font-weight: 400;">
                     <p><strong>Мы работаем ради результатов детей, школа домашнего обучения Wikids</strong> – это образовательный проект, призванный организовать процесс домашнего обучения вашего ребёнка.</p>
                     <p>Мы оказываем методическую и консультативную помощь родителям.</p>
                     <p><strong>Школа домашнего обучения Wikids</strong> обладает всеми необходимыми образовательными лицензиями.</p>
@@ -331,7 +331,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
 </section>
 
 <section class="section section-contact">
-    <div class="container-lg p-0">
+    <div class="container-lg px-5 p-lg-0">
         <div class="contact-main">
             <div class="row no-gutters">
                 <div class="col-12 col-lg-6">

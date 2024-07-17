@@ -32,6 +32,10 @@ body {
   font-size: 3rem;
   line-height: 3rem;
   text-decoration: none;
+  @include media-breakpoint-down(md) {
+    font-size: 2.2rem;
+    line-height: 2.2rem;
+  }
 }
 
 .logo__link {
@@ -40,6 +44,10 @@ body {
   align-items: center;
   font-size: 3rem;
   line-height: 4.7rem;
+  @include media-breakpoint-down(md) {
+    font-size: 2.2rem;
+    line-height: 3.4rem;
+  }
 }
 
 .logo__link, .logo__link:hover {
@@ -54,7 +62,7 @@ body {
 }
 
 .header__inner {
-  margin: 2rem 0;
+  margin: 1rem 0;
 }
 
 .menu-icon {
@@ -85,6 +93,11 @@ body {
   color: var(--green);
   text-transform: uppercase;
   font-weight: 900;
+  @include media-breakpoint-down(md) {
+    font-size: 2.8rem;
+    line-height: 3.9rem;
+    padding: 0 2rem;
+  }
 }
 
 .section-header {
@@ -93,18 +106,31 @@ body {
   color: var(--green);
   text-transform: uppercase;
   font-weight: 700;
+  @include media-breakpoint-down(md) {
+    font-size: 2.6rem;
+    line-height: 3.6rem;
+  }
 }
 
 .main-sub-header {
   font-size: 3rem;
   line-height: 3rem;
   font-weight: 700;
+  @include media-breakpoint-down(md) {
+    font-size: 2rem;
+    line-height: 2.4rem;
+    padding: 0 2rem;
+  }
 }
 
 .main-text {
   font-size: 2rem;
   line-height: 3.1rem;
   font-weight: 400;
+  @include media-breakpoint-down(md) {
+    font-size: 1.8rem;
+    line-height: 2.8rem;
+  }
 }
 
 .custom-btn {
@@ -1280,4 +1306,43 @@ body {
   margin-top: 5px;
   margin-bottom: 10px;
   color: #737373;
+}
+
+.check-button-wrap {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  @include media-breakpoint-down(md) {
+    position: relative;
+    text-align: center;
+  }
+}
+
+.logo-group {
+  width: auto;
+  @include media-breakpoint-down(md) {
+    width: 100%;
+  }
+}
+
+.hero-text-wrap {
+  margin-top: 10rem;
+  @include media-breakpoint-down(md) {
+    margin-top: 2rem;
+  }
+}
+
+.hero-image-arrow {
+  width: 10rem;
+  position: absolute;
+  @include media-breakpoint-down(md) {
+    width: 4.7rem;
+  }
+}
+
+.hero-section {
+  margin-bottom: 10rem;
+  @include media-breakpoint-down(md) {
+    margin-bottom: 6rem;
+  }
 }
