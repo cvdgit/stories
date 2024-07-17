@@ -27,6 +27,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\UploadedFile;
+use yii\web\User as WebUser;
 
 class TestController extends Controller
 {
@@ -68,17 +69,18 @@ class TestController extends Controller
         ];
     }
 
-    public function actionTemplates()
+    public function actionTemplates(WebUser $user)
     {
         $searchModel = new TestSearch();
         $params = array_merge([], Yii::$app->request->queryParams);
         $params['TestSearch']['status'] = TestStatus::TEMPLATE;
-        $dataProvider = $searchModel->search($params);
+        $dataProvider = $searchModel->search($user->getId(), $params);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'source' => 123,
             'sourceRecordsTotal' => 0,
+            'columns' => [],
         ]);
     }
 
