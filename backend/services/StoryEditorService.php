@@ -8,9 +8,12 @@ use backend\components\image\SlideImage;
 use backend\components\story\AbstractBlock;
 use backend\components\story\HTMLBLock;
 use backend\components\story\ImageBlock;
+use backend\components\story\MentalMapBlock;
+use backend\components\story\MentalMapBlockContent;
 use backend\components\story\reader\HTMLReader;
 use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\Slide;
+use backend\components\story\SlideContent;
 use backend\components\story\TestBlock;
 use backend\components\story\TestBlockContent;
 use backend\components\story\VideoBlock;
@@ -175,17 +178,30 @@ class StoryEditorService
         return $model->id;
     }*/
 
-    public function createQuestionBlock(array $params)
+    /**
+     * @throws InvalidConfigException
+     */
+    public function createQuestionBlock(array $params): string
     {
         $reader = new HtmlSlideReader('');
         $slide = $reader->load();
         $slide->setView('new-question');
-        /** @var HTMLBLock $block */
         $block = $slide->createBlock(HTMLBLock::class);
         $block->setContent((new TestBlockContent($params['test-id']))->render());
         $slide->addBlock($block);
-        $writer = new HTMLWriter();
-        return $writer->renderSlide($slide);
+        return (new HTMLWriter())->renderSlide($slide);
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function getSlideWithMentalMapBlockContent(int $slideId, string $mentalMapId): string
+    {
+        $slide = (new HtmlSlideReader(new SlideContent($slideId, 'mental-map')))->load();
+        $block = $slide->createBlock(MentalMapBlock::class);
+        $block->setContent((new MentalMapBlockContent($mentalMapId))->render());
+        $slide->addBlock($block);
+        return (new HTMLWriter())->renderSlide($slide);
     }
 
     /*public function newCreateSlideQuestion(int $storyID, array $params)

@@ -83,9 +83,12 @@ class Slide
     }
 
     /**
+     * @template T
+     * @param class-string<T> $type
      * @throws InvalidConfigException
+     * @return T
      */
-    public function createBlock(string $type): AbstractBlock
+    public function createBlock(string $type): object
     {
         return Yii::createObject($type)->create();
     }

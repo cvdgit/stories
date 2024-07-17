@@ -44,4 +44,12 @@ class MentalMapBlockContent
             'data-mental-map-id' => $this->id,
         ]);
     }
+
+    public function render(): string
+    {
+        return Html::tag('div', '', [
+            'class' => 'mental-map',
+            'data-mental-map-id' => $this->id,
+        ]);
+    }
 }

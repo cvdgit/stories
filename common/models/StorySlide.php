@@ -44,6 +44,7 @@ class StorySlide extends ActiveRecord
     const KIND_SLIDE = 0;
     const KIND_LINK = 1;
     const KIND_QUESTION = 2;
+    public const KIND_MENTAL_MAP = 3;
 
     public static function tableName()
     {

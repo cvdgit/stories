@@ -19,6 +19,7 @@ use backend\models\editor\TransitionForm;
 use backend\models\editor\VideoForm;
 use backend\models\video\VideoSource;
 use backend\services\StoryLinksService;
+use backend\SlideEditor\CreateMentalMap\CreateMentalMapAction;
 use backend\SlideEditor\CreatePassTest\CreatePassTestAction;
 use backend\SlideEditor\CreateQuizBySlideText\CreateQuizAction;
 use common\models\Lesson;
@@ -72,6 +73,7 @@ class EditorController extends BaseController
         return [
             "gpt-quiz" => CreateQuizAction::class,
             "create-pass-test" => CreatePassTestAction::class,
+            'mental-map' => CreateMentalMapAction::class,
         ];
     }
 

@@ -23,6 +23,7 @@ MainAsset::register($this);
 
 $this->registerJs($this->renderFile("@backend/views/editor/_gpt_slide_text.js"));
 $this->registerJs($this->renderFile("@backend/views/editor/_pass_test.js"));
+$this->registerJs($this->renderFile("@backend/views/editor/_mental_map.js"));
 ?>
 <div class="wrap-editor">
     <div class="slides-sidebar">
@@ -203,6 +204,28 @@ $js = <<< JS
         return "<div>" + texts.join(`\\n`) + "</div>"
     }
 
+    function getSlideTextContent(slide) {
+        const texts = [];
+        slide.getElement().find(`div[data-block-type="text"]`).map((i, el) => {
+            const text = $(el).find(".slide-paragraph").text();
+            if (text.length) {
+                texts.push(text);
+            }
+        })
+        return texts.join(`\\n`)
+    }
+
+    function getSlideImages(slide) {
+        const urls = [];
+        slide.getElement().find(`div[data-block-type="image"]`).map((i, el) => {
+            const src = $(el).find('img').attr('src');
+            if (src.length) {
+                urls.push(src);
+            }
+        })
+        return urls
+    }
+
     var editorPopover = new EditorPopover();
     const gpt = new GptSlideText();
     const passTest = new CreatePassTest();
@@ -347,8 +370,33 @@ $js = <<< JS
             const html = StoryEditor.createEmptyBlock(type);
             StoryEditor.createSlideBlock(html);
         } else if (type === 'mental_map') {
-            const html = StoryEditor.createMentalMapBlock();
-            StoryEditor.createSlideBlock(html);
+
+            const currentSlide = StoryEditor.getCurrentSlide();
+            if (!currentSlide) {
+                toastr.error("Нет слайда");
+                return;
+            }
+            const texts = getSlideTextContent(currentSlide)
+            if (!texts.length) {
+                toastr.warning("Текст на слайде не найден");
+                return;
+            }
+
+            const images = getSlideImages(currentSlide)
+            let image = null
+            if (images.length > 0) {
+                image = images[0]
+            }
+
+            const mentalMapSlide = new MentalMapSlide()
+            mentalMapSlide
+                .createSlide(StoryEditor.getConfigValue('storyID'), currentSlide.getID(), texts, image)
+                .then(response => {
+                    StoryEditor.loadSlides()
+                })
+
+            //const html = StoryEditor.createMentalMapBlock();
+            //StoryEditor.createSlideBlock(html);
         } else {
             showCreateBlockModal(type);
         }
