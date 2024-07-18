@@ -243,12 +243,22 @@ export default function MentalMap(element, params) {
         mapImageClickHandler(image, texts)
       })
       const mapImg = document.createElement('img')
+      mapImg.setAttribute('title', image.text)
+      mapImg.dataset.trigger = 'hover'
+      mapImg.dataset.placement = 'auto'
+      mapImg.dataset.container = 'body'
       mapImg.src = image.url
       mapImgWrap.appendChild(mapImg)
       container.appendChild(mapImgWrap)
     })
 
     this.element.appendChild(container)
+
+    $('.mental-map-img img')
+      .on('shown.bs.tooltip', (...args) => {
+        console.log(args)
+      })
+      .tooltip()
 
     const btn = document.createElement('button')
     btn.classList.add('mental-map-all-text-btn')

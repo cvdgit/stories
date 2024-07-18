@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fcaec62483fbe18b136bd5258691a95e",
+    "content-hash": "0677f7d731fe9bc8a1dbcca8f0737a94",
     "packages": [
         {
             "name": "2amigos/yii2-chartjs-widget",
@@ -347,7 +347,7 @@
             "version": "v3.4.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/twbs/bootstrap.git",
+                "url": "git@github.com:twbs/bootstrap.git",
                 "reference": "68b0d231a13201eb14acd3dc84e51543d16e5f7e"
             },
             "dist": {
@@ -368,12 +368,12 @@
             "version": "v1.7.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/uxsolutions/bootstrap-datepicker.git",
+                "url": "git@github.com:eternicode/bootstrap-datepicker.git",
                 "reference": "d364be5b066b38f3675a5a1dc174ce1ab1f3360e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/uxsolutions/bootstrap-datepicker/zipball/d364be5b066b38f3675a5a1dc174ce1ab1f3360e",
+                "url": "https://api.github.com/repos/eternicode/bootstrap-datepicker/zipball/d364be5b066b38f3675a5a1dc174ce1ab1f3360e",
                 "reference": "d364be5b066b38f3675a5a1dc174ce1ab1f3360e"
             },
             "require": {
@@ -498,7 +498,7 @@
             "version": "3.3.11",
             "source": {
                 "type": "git",
-                "url": "https://github.com/RobinHerbots/Inputmask.git",
+                "url": "git@github.com:RobinHerbots/Inputmask.git",
                 "reference": "5e670ad62f50c738388d4dcec78d2888505ad77b"
             },
             "dist": {
@@ -519,7 +519,7 @@
             "version": "2.2.4",
             "source": {
                 "type": "git",
-                "url": "https://github.com/jquery/jquery-dist.git",
+                "url": "git@github.com:jquery/jquery-dist.git",
                 "reference": "c0185ab7c75aab88762c5aae780b9d83b80eda72"
             },
             "dist": {
@@ -643,16 +643,16 @@
         },
         {
             "name": "bower-asset/reveal.js",
-            "version": "4.0.2",
+            "version": "4.4.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:hakimel/reveal.js.git",
-                "reference": "bd19860b4d6e85ff98067546faa4ffd87527a0ba"
+                "reference": "f6f657b627f9703e32414d8d3f16fb49d41031cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hakimel/reveal.js/zipball/bd19860b4d6e85ff98067546faa4ffd87527a0ba",
-                "reference": "bd19860b4d6e85ff98067546faa4ffd87527a0ba"
+                "url": "https://api.github.com/repos/hakimel/reveal.js/zipball/f6f657b627f9703e32414d8d3f16fb49d41031cb",
+                "reference": "f6f657b627f9703e32414d8d3f16fb49d41031cb"
             },
             "type": "bower-asset"
         },
@@ -2117,12 +2117,12 @@
             "version": "v5.2.13",
             "source": {
                 "type": "git",
-                "url": "https://github.com/justinrainbow/json-schema.git",
+                "url": "https://github.com/jsonrainbow/json-schema.git",
                 "reference": "fbbe7e5d79f618997bc3332a6f49246036c45793"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/justinrainbow/json-schema/zipball/fbbe7e5d79f618997bc3332a6f49246036c45793",
+                "url": "https://api.github.com/repos/jsonrainbow/json-schema/zipball/fbbe7e5d79f618997bc3332a6f49246036c45793",
                 "reference": "fbbe7e5d79f618997bc3332a6f49246036c45793",
                 "shasum": ""
             },
@@ -10300,7 +10300,10 @@
     "platform": {
         "php": "^7.3",
         "ext-json": "*",
-        "ext-curl": "*"
+        "ext-curl": "*",
+        "ext-pdo": "*",
+        "ext-zip": "*",
+        "ext-dom": "*"
     },
     "platform-dev": [],
     "platform-overrides": {
