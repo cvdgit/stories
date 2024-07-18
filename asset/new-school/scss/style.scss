@@ -546,8 +546,9 @@ body {
       box-shadow: none;
       border: 0 none;
       padding: 1.5rem 10.9rem 1.6rem 10.9rem;
-      @include media-breakpoint-down(md) {
-        padding: 1.5rem 8.6rem 1.6rem 8.7rem;
+      @include media-breakpoint-down(sm) {
+        padding: 1.5rem 0 1.6rem 0;
+        width: 100%;
       }
     }
   }
@@ -871,68 +872,6 @@ body {
   }
   100% {
     transform: translateX(0px) translateY(0px);
-  }
-}
-
-.contact-form {
-  margin: 0;
-  &__wrap {
-    margin-right: 8rem;
-    margin-left: 14rem;
-    height: 100%;
-    @include media-breakpoint-down(xl) {
-      margin-left: 0;
-    }
-    @include media-breakpoint-down(md) {
-      margin-left: 0;
-      margin-right: 0;
-    }
-  }
-
-  &__controls {
-    margin-bottom: 6rem;
-  }
-
-  .form-control {
-    font-size: 1.8rem;
-    line-height: 2.16rem;
-    border-radius: 20px;
-    padding: 2rem 3rem;
-    height: auto;
-  }
-
-  .form-group {
-    margin-bottom: 2.1rem;
-    &.has-error {
-      .help-block {
-        text-align: center;
-      }
-    }
-  }
-
-  &--inline {
-    .form-group {
-      &.has-error {
-        .help-block {
-          color: #ffc107;
-        }
-      }
-    }
-  }
-}
-
-.contact-form-submit {
-  &__wrap {
-    text-align: center;
-    margin-bottom: 2.7rem;
-    .button {
-      box-shadow: none;
-      border: 0 none;
-      padding: 1.5rem 10.9rem 1.6rem 10.9rem;
-      @include media-breakpoint-down(md) {
-        padding: 1.5rem 8.6rem 1.6rem 8.7rem;
-      }
-    }
   }
 }
 

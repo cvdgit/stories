@@ -58,7 +58,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                 </div>
             </div>
             <div class="check-button-wrap" style="left: 0; bottom: 0">
-                <a class="btn custom-btn position-relative contact-request" href="https://t.me/wikids_bot">
+                <a target="_blank" class="btn custom-btn position-relative" href="https://t.me/wikids_bot">
                     Получить чек-лист
                     <span class="image-check-wrap">
                             <img class="image-check" src="/school/new/check-circle.gif" alt="check">
@@ -143,7 +143,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
             <span style="color: var(--green)">Wikids</span> — это персонализированное обучение для каждого ребёнка
         </div>
         <div class="text-center">
-            <a class="btn custom-btn position-relative" href="https://t.me/wikids_bot">
+            <a target="_blank" class="btn custom-btn position-relative" href="https://t.me/wikids_bot">
                 Получить чек-лист
             </a>
         </div>
