@@ -254,14 +254,10 @@ export default function MentalMap(element, params) {
 
     this.element.appendChild(container)
 
-    $('.mental-map-img img')
-      .on('shown.bs.tooltip', (...args) => {
-        console.log(args)
-      })
-      .tooltip()
+    $('.mental-map-img img').tooltip()
 
     const btn = document.createElement('button')
-    btn.classList.add('mental-map-all-text-btn')
+    btn.classList.add('btn', 'btn-small', 'mental-map-all-text-btn')
     btn.textContent = 'Весь текст'
     btn.addEventListener('click', () => {
 
@@ -319,6 +315,27 @@ export default function MentalMap(element, params) {
     })
 
     this.element.appendChild(btn)
+
+    const hideBtn = document.createElement('button')
+    hideBtn.classList.add('btn', 'btn-small', 'mental-map-hide-btn')
+    hideBtn.textContent = 'Скрыть'
+    hideBtn.addEventListener('click', e => {
+      $(e.target).toggleClass('img-hide')
+      if ($(e.target).hasClass('img-hide')) {
+        $(this.element).find('.mental-map-img img')
+          .each((i, el) => $(el).css({opacity: '0'}))
+        $(this.element).find('.mental-map-img').each((i, el) => {
+          $(el).append(`<span class="mental-map-point"></span>`)
+        })
+        $(e.target).text('Показать')
+      } else {
+        $(this.element).find('.mental-map-img span').remove()
+        $(this.element).find('.mental-map-img img')
+          .each((i, el) => $(el).css({opacity: '1'}))
+        $(e.target).text('Скрыть')
+      }
+    })
+    this.element.appendChild(hideBtn)
   }
 
   /**
