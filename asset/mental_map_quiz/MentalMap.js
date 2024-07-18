@@ -34,6 +34,9 @@ export default function MentalMap(element, params) {
   }
 
   function hideDialogHandler() {
+    if ($(Reveal.getCurrentSlide()).find('.slide-hints-wrapper').length) {
+      return
+    }
     Reveal.configure({keyboard: true})
     $('.reveal .story-controls').show();
     blockTypes.map(blockType => {
@@ -268,12 +271,16 @@ export default function MentalMap(element, params) {
         item.classList.add('text-container-row')
         const imageItem = document.createElement('div')
         imageItem.classList.add('image-item')
+
         const img = document.createElement('img')
-
         const image = json.map.images.find(i => i.id === textState.id)
-
         img.src = image.url
+        img.style.cursor = 'pointer'
+        img.addEventListener('click', e => {
+          mapImageClickHandler(image, texts)
+        })
         imageItem.appendChild(img)
+
         item.appendChild(imageItem)
         const textItem = document.createElement('div')
         textItem.classList.add('text-item')
