@@ -138,8 +138,7 @@ class Profile extends ActiveRecord
     {
         if ($this->profilePhoto === null) {
             $model = ProfileImage::create($photo);
-        }
-        else {
+        } else {
             $model = $this->profilePhoto;
             $model->file = $photo;
         }

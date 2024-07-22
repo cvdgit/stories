@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace frontend\controllers;
 
 use common\services\ProfileService;
@@ -11,8 +13,7 @@ use common\models\User;
 
 class ProfileController extends UserController
 {
-
-    protected $profileService;
+    private $profileService;
 
     public function __construct($id, $module, ProfileService $profileService, $config = [])
     {
@@ -20,7 +21,7 @@ class ProfileController extends UserController
         parent::__construct($id, $module, $config);
     }
 
-    public function actionIndex()
+    public function actionIndex(): string
     {
         $user = User::findModel(Yii::$app->user->id);
         return $this->render('index', [
