@@ -274,7 +274,7 @@ export default function MentalMap(element, params) {
         mapImageClickHandler(image, texts)
       })
       const mapImg = document.createElement('img')
-      mapImg.setAttribute('title', image.text)
+      mapImg.setAttribute('title', image.text.replace(/<[^>]*>?/gm, ''))
       mapImg.dataset.trigger = 'hover'
       mapImg.dataset.placement = 'auto'
       mapImg.dataset.container = 'body'
