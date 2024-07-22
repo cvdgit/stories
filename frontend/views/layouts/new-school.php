@@ -67,7 +67,7 @@ $this->beginBody() ?>
                         <span class="menu-icon"></span>
                     </button>
                 </div>
-                <div id="main-menu" class="nav__wrap navbar-collapse collapse justify-content-center">
+                <div id="main-menu" class="nav__wrap navbar-collapse collapse justify-content-center mb-4 mb-lg-0">
                     <?= NewSchoolMainMenuWidget::widget(); ?>
                 </div>
                 <div class="text-center text-lg-left d-flex flex-row align-items-center">

@@ -884,6 +884,7 @@ body {
     font-weight: 900;
     flex: 1;
     text-align: center;
+
     span {
       color: var(--green);
     }
@@ -908,6 +909,7 @@ body {
     position: relative;
     padding-top: 3.7rem;
     margin-bottom: 2.1rem;
+
     .close {
       position: absolute;
       right: 1rem;
@@ -921,6 +923,7 @@ body {
       @include media-breakpoint-down(md) {
         right: 0;
       }
+
       span {
         font-size: 3rem;
         line-height: 3rem;
@@ -937,17 +940,21 @@ body {
   input, textarea {
     background-color: var(--grey);
     border: 0 none;
-    &:active,&:focus {
+
+    &:active, &:focus {
       background-color: var(--grey);
       border: 0 none;
     }
   }
+
   .contact-form__controls {
     margin-bottom: 2rem;
   }
+
   .discount-agree, .discount-agree__link {
     color: var(--black1);
   }
+
   .contact-form-submit__wrap {
     margin-bottom: .7rem;
   }
@@ -991,6 +998,7 @@ body {
   border: 0;
   margin: 0;
   padding: 0;
+
   span {
     font-size: 3rem;
     line-height: 3rem;
@@ -1186,6 +1194,7 @@ body {
   border-width: 2px;
   padding-right: 36px;
 }
+
 .story-form .story-search-control:focus {
   border-color: rgba(136, 140, 158, 0.6);
 }
@@ -1293,14 +1302,17 @@ body {
     .menu-item {
       margin-right: 0;
       display: block;
+
       &:last-child {
         margin-right: 0;
       }
+
       &__link {
         display: block;
         padding: 1rem 2rem;
       }
     }
+
     .dropdown-item:hover,
     .dropdown-item:focus {
       color: var(--black1);
@@ -1314,6 +1326,7 @@ body {
   display: flex;
   align-items: center;
   cursor: pointer;
+
   &__name {
     margin-right: 2.1rem;
     font-size: 1.8rem;
@@ -1322,6 +1335,7 @@ body {
     max-width: 23rem;
     overflow: hidden;
   }
+
   &__image {
     width: 40px;
     height: 40px;
@@ -1332,9 +1346,11 @@ body {
 .menu-item {
   display: inline-block;
   margin-right: 3.6rem;
+
   &:last-child {
     margin-right: 0;
   }
+
   &__link {
     color: var(--black1);
     font-size: 1.8rem;
@@ -1344,6 +1360,7 @@ body {
       display: block;
     }
   }
+
   @include media-breakpoint-down(lg) {
     margin-right: 0;
     display: block;
@@ -1363,6 +1380,7 @@ body {
     @include media-breakpoint-down(md) {
       margin-right: 0;
     }
+
     &:hover {
       .dropdown-menu {
         display: block;
@@ -1372,22 +1390,27 @@ body {
         transition: opacity 300ms ease-in-out, display 300ms ease;
       }
     }
+
     span {
       &.dropdown-toggle {
         padding-right: 0 !important;
       }
     }
+
     .menu-item {
       margin-right: 0;
       display: block;
+
       &:last-child {
         margin-right: 0;
       }
+
       &__link {
         display: block;
         padding: 1rem 2rem;
       }
     }
+
     .dropdown-menu {
       min-width: auto;
       box-shadow: 0px 8px 16px 0px rgb(0 0 0 / 20%);
@@ -1435,11 +1458,24 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+
   &--no-image {
     color: var(--white);
     background-color: var(--green);
     font-size: 1.8rem;
     line-height: 2.109rem;
     font-weight: 500;
+  }
+}
+
+#main-menu {
+  @include media-breakpoint-down(md) {
+    width: 100%;
+  }
+
+  ul {
+    @include media-breakpoint-down(md) {
+      border-radius: 10px!important;
+    }
   }
 }
