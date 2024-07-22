@@ -5,9 +5,11 @@ declare(strict_types=1);
 use common\widgets\ToastrFlash;
 use frontend\assets\NewSchoolAsset;
 use frontend\widgets\ContactWidget;
+use frontend\widgets\GuestMenuWidget;
 use frontend\widgets\LoginWidget;
-use frontend\widgets\SchoolMainMenuWidget;
+use frontend\widgets\NewSchoolMainMenuWidget;
 use frontend\widgets\SignupWidget;
+use frontend\widgets\UserMenuWidget;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use common\rbac\UserRoles;
@@ -29,6 +31,13 @@ $this->beginPage() ?>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?= Html::csrfMetaTags() ?>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
     <title><?= Html::encode($this->title) ?></title>
     <?php
     $this->head() ?>
@@ -51,7 +60,8 @@ $this->beginBody() ?>
             <nav class="navbar navbar-dark navbar-expand-lg p-0 flex-column flex-lg-row">
                 <div class="d-flex flex-row justify-content-between logo-group mb-4 mb-lg-0">
                     <div class="logo">
-                        <a class="logo__link font-weight-bold" href="/"><img class="logo__image" src="/school/img/logo.svg"
+                        <a class="logo__link font-weight-bold" href="/"><img class="logo__image"
+                                                                             src="/school/img/logo.svg"
                                                                              alt="logo">
                             Wikids</a>
                     </div>
@@ -60,14 +70,22 @@ $this->beginBody() ?>
                     </button>
                 </div>
                 <div id="main-menu" class="nav__wrap navbar-collapse collapse justify-content-center">
-                    <ul class="navbar-nav align-items-center bg-light p-3 rounded-pill">
-                        <li class="menu-item"><a class="text-dark mx-5 menu-item__link" href="#for">Для кого</a></li>
-                        <li class="menu-item"><a class="text-dark mx-5 menu-item__link" href="#benefits">Преимущества</a></li>
-                        <li class="menu-item"><a class="text-dark mx-5 menu-item__link" href="#certificates">Сертификаты</a></li>
-                    </ul>
+                    <?= NewSchoolMainMenuWidget::widget(); ?>
                 </div>
-                <div class="text-center text-lg-left">
-                    <a class="contact-phone font-weight-bold" href="tel:+79262074146">+7 (926) 207−41−46</a>
+                <div class="text-center text-lg-left d-flex flex-row align-items-center menu-phone-wrap">
+                    <a class="contact-phone font-weight-bold mr-3" style="text-wrap: nowrap" href="tel:+79262074146">+7 (926) 207−41−46</a>
+                    <div>
+                        <?php if (Yii::$app->user->isGuest): ?>
+                        <?= GuestMenuWidget::widget(); ?>
+                        <?php else: ?>
+                        <div class="profile-row dropdown-toggle" data-toggle="dropdown">
+                            <img class="profile-image" src="<?= Yii::$app->user->identity->getProfilePhoto(); ?>" alt="pic" />
+                        </div>
+                        <div class="user-profile dropdown">
+                            <?= UserMenuWidget::widget(); ?>
+                        </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </nav>
         </div>

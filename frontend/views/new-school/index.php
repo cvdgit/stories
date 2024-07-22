@@ -27,7 +27,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
                     <h1 class="m-0 main-header">Удивительные возможности мозга ребенка</h1>
                 </div>
                 <div class="main-sub-header mb-lg-3 mb-5">Как использовать их для обучения?</div>
-                <div class="main-text" style="margin-bottom: 10rem">Получите полезный чек-лист от Артура Муталова,
+                <div class="main-text">Получите полезный чек-лист от Артура Муталова,
                     создателя школы домашнего обучения Wikids
                 </div>
             </div>
@@ -330,7 +330,7 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
     </div>
 </section>
 
-<section class="section section-contact">
+<section class="section section-contact" id="contact">
     <div class="container-lg px-5 p-lg-0">
         <div class="contact-main">
             <div class="row no-gutters">
