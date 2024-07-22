@@ -4,6 +4,7 @@ import Moveable from "react-moveable";
 import {useImages, useMentalMap} from "../../App/App";
 import Dialog from "../../Dialog";
 import {CSSTransition} from 'react-transition-group';
+import {trimRanges, surroundRangeContents} from '../../../Lib/selection'
 
 let scale = 1
 
@@ -58,6 +59,7 @@ export default function ImageMap({mapImage}) {
   const {dispatch: imagesDispatch} = useImages()
   const [currentImageItem, setCurrentImageItem] = useState(null)
   const [currentText, setCurrentText] = useState(null)
+  const textRef = useRef()
 
   useEffect(() => {
 
@@ -96,6 +98,76 @@ export default function ImageMap({mapImage}) {
 
     return () => window.removeEventListener('resize', resizeHandler)
   }, []);
+
+  const insertFragmentHandler = () => {
+    if (!window.getSelection) {
+      throw new Error('window.getSelection error');
+    }
+    const selection = window.getSelection();
+    if (selection.toString().length === 0) {
+      throw new Error('Необходимо выделить фрагмент текста');
+    }
+    if (selection.isCollapsed) {
+      throw new Error('selection is collapsed');
+    }
+    const selText = selection.toString();
+    const skipTrim = (selText.length === 1) && (selText === ' ');
+    if (!skipTrim) {
+      trimRanges(selection);
+    }
+
+    const ranges = [];
+    for (let i = 0, len = selection.rangeCount; i < len; ++i) {
+      ranges.push(selection.getRangeAt(i));
+    }
+    selection.removeAllRanges();
+
+    let i = ranges.length;
+
+    while (i--) {
+      const range = ranges[i];
+
+      surroundRangeContents(range, (textNodes) => {
+
+        const element = document.createElement('span')
+        element.classList.add('target-text')
+        textNodes[0].parentNode.insertBefore(element, textNodes[0]);
+
+        let textContent = '';
+        for (let i = 0, node; node = textNodes[i++];) {
+          element.appendChild(node);
+          textContent += node.nodeType === 3 ? node.textContent : node.outerHTML;
+          element.appendChild(node);
+        }
+
+        //const id = dataWrapper.createFragment(generateUUID());
+        //element.setAttribute('data-fragment-id', id);
+
+        if (textNodes[0].textContent === ' ') {
+          textNodes[0].textContent = '\u00A0';
+        }
+
+        /*dataWrapper.createFragmentItem(id, {
+          id: generateUUID(),
+          title: textContent,
+          correct: true
+        });*/
+      });
+
+      selection.addRange(range);
+    }
+  }
+
+  const emitChange = (e) => {
+    dispatch({
+      type: 'update_mental_map_images',
+      imageId: currentImageItem.id,
+      payload: {
+        text: e.target.innerHTML
+      }
+    })
+    //setCurrentText(e.target.innerHTML)
+  }
 
   return (
     <>
@@ -147,7 +219,7 @@ export default function ImageMap({mapImage}) {
                       //throttleDrag={1}
                       //scalable={true}
                       snappable={true}
-                      //origin={true}
+                      origin={false}
                       bounds={{
                         top: 0,
                         left: 0,
@@ -155,8 +227,12 @@ export default function ImageMap({mapImage}) {
                         bottom: 0,
                         position: 'css'
                       }}
+                      edge={true}
                       onResizeStart={e => {
                         e.setFixedDirection([0, 0]);
+                      }}
+                      onRender={e => {
+                        e.target.style.cssText += e.cssText;
                       }}
                       onDrag={e => {
                         e.target.style.transform = e.transform
@@ -214,17 +290,39 @@ export default function ImageMap({mapImage}) {
                   <div style={{marginRight: '20px'}}>
                     <img src={currentImageItem.url} alt=""/>
                   </div>
-                  <div style={{flex: '1'}}>
-                    <textarea placeholder="Текст" className="textarea" onChange={(e) => {
-                      dispatch({
-                        type: 'update_mental_map_images',
-                        imageId: currentImageItem.id,
-                        payload: {
-                          text: e.target.value
-                        }
-                      })
-                      setCurrentText(e.target.value)
-                    }} value={currentText}/>
+                  <div style={{flex: '1', display: 'flex', flexDirection: 'column'}}>
+                    <div style={{marginBottom: '10px'}}>
+                      <button onClick={insertFragmentHandler} className="button button--default button--outline"
+                              type="button">Выделить
+                      </button>
+                      <button onClick={() => {
+                        textRef.current.textContent = textRef.current.innerText
+                        dispatch({
+                          type: 'update_mental_map_images',
+                          imageId: currentImageItem.id,
+                          payload: {
+                            text: textRef.current.innerHTML
+                          }
+                        })
+                      }} className="button button--default button--outline"
+                              type="button">Очистить
+                      </button>
+                    </div>
+                    <div
+                      ref={textRef}
+                      contentEditable="plaintext-only"
+                      className="textarea"
+                      dangerouslySetInnerHTML={{__html: currentText}}
+                      onInput={emitChange}
+                      onBlur={emitChange}
+                      onKeyUp={emitChange}
+                      onKeyDown={emitChange}
+                      style={{
+                        borderStyle: 'solid',
+                        maxHeight: '20rem',
+                        overflowY: 'auto'
+                    }}
+                    />
                   </div>
                 </div>
                 <div style={{marginTop: '2rem'}}>

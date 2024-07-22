@@ -198,3 +198,7 @@
 .line-sep {
   height: 8px;
 }
+
+.word-target {
+  font-weight: 600;
+}

@@ -793,3 +793,7 @@
   perspective: 600px;
   perspective-origin: 50% 40%;
 }
+
+.target-text {
+  font-weight: 600;
+}

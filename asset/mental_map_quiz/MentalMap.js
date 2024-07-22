@@ -2,6 +2,7 @@ import './MentalMap.css'
 import InnerDialog from "./Dialog";
 import VoiceResponse from "./lib/VoiceResponse"
 import MissingWordsRecognition from "./lib/MissingWordsRecognition"
+import {v4 as uuidv4} from "uuid"
 
 export default function MentalMap(element, params) {
 
@@ -92,6 +93,9 @@ export default function MentalMap(element, params) {
         currentSpan.innerHTML = word.word
         if (word.hidden) {
           currentSpan.classList.add('selected')
+        }
+        if (word?.target) {
+          currentSpan.classList.add('word-target')
         }
         currentSpan.addEventListener('click', () => {
           word.hidden = !word.hidden
@@ -208,17 +212,41 @@ export default function MentalMap(element, params) {
     })
   }
 
+  function processImageText(text) {
+    const textFragments = new Map();
+    const reg = new RegExp(`<span[^>]*>(.*?)<\\/span>`, 'gm');
+    const imageText = text.replace(reg, (match, p1) => {
+      const id = uuidv4()
+      textFragments.set(`${id}`, `${p1.trim()}`);
+      return `{${id}}`;
+    })
+    return {
+      imageText,
+      textFragments
+    }
+  }
+
   const run = async () => {
     const json = await params.init()
-
     texts = json.map.images.map(image => {
-      const paragraphs = image.text.split('\n')
+      const {imageText, textFragments} = processImageText(image.text)
+      const paragraphs = imageText.split('\n')
       const words = paragraphs.map(p => {
         if (p === '') {
           return [{type: 'break'}]
         }
-        const words = p.split(' ').map(word => ({word, type: 'word', hidden: false}))
-        return [...words, {type: 'break'}]
+        const words = p.split(' ').map(word => {
+          if (word[0] === '{') {
+            const id = word.toString().replace(/[^\w\-]+/gmui, '')
+            if (textFragments.has(id)) {
+              const reg = new RegExp(`{${id}}`)
+              word = word.replace(reg, textFragments.get(id))
+              return word.split(' ').map(w => ({word: w, type: 'word', hidden: false, target: true}))
+            }
+          }
+          return [{word, type: 'word', hidden: false}]
+        })
+        return [...(words.flat()), {type: 'break'}]
       }).flat()
       return {
         id: image.id,
