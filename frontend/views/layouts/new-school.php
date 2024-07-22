@@ -5,11 +5,9 @@ declare(strict_types=1);
 use common\widgets\ToastrFlash;
 use frontend\assets\NewSchoolAsset;
 use frontend\widgets\ContactWidget;
-use frontend\widgets\GuestMenuWidget;
 use frontend\widgets\LoginWidget;
 use frontend\widgets\NewSchoolMainMenuWidget;
 use frontend\widgets\SignupWidget;
-use frontend\widgets\UserMenuWidget;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use common\rbac\UserRoles;
@@ -72,20 +70,8 @@ $this->beginBody() ?>
                 <div id="main-menu" class="nav__wrap navbar-collapse collapse justify-content-center">
                     <?= NewSchoolMainMenuWidget::widget(); ?>
                 </div>
-                <div class="text-center text-lg-left d-flex flex-row align-items-center menu-phone-wrap">
+                <div class="text-center text-lg-left d-flex flex-row align-items-center">
                     <a class="contact-phone font-weight-bold mr-3" style="text-wrap: nowrap" href="tel:+79262074146">+7 (926) 207−41−46</a>
-                    <div>
-                        <?php if (Yii::$app->user->isGuest): ?>
-                        <?= GuestMenuWidget::widget(); ?>
-                        <?php else: ?>
-                        <div class="profile-row dropdown-toggle" data-toggle="dropdown">
-                            <img class="profile-image" src="<?= Yii::$app->user->identity->getProfilePhoto(); ?>" alt="pic" />
-                        </div>
-                        <div class="user-profile dropdown">
-                            <?= UserMenuWidget::widget(); ?>
-                        </div>
-                        <?php endif; ?>
-                    </div>
                 </div>
             </nav>
         </div>

@@ -70,7 +70,6 @@ export default function MentalMap(element, params) {
   }
 
   function mapImageClickHandler(image, texts) {
-
     const detailImgWrap = document.createElement('div')
     const detailImg = document.createElement('img')
     detailImg.src = image.url
@@ -98,6 +97,15 @@ export default function MentalMap(element, params) {
           currentSpan.classList.add('word-target')
         }
         currentSpan.addEventListener('click', () => {
+
+          if (voiceResponse.getStatus()) {
+            voiceResponse.stop()
+          }
+          ['#result_span', '#final_span', '#interim_span'].map(q => {
+            detailTextWrap.querySelector(q).innerHTML = ''
+            recordingWrap.querySelector('#start-retelling-wrap').style.display = 'none'
+          })
+
           word.hidden = !word.hidden
           currentSpan.classList.toggle('selected')
           recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text)
