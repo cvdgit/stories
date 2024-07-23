@@ -185,7 +185,12 @@ export default function MentalMap(element, params) {
           return
         }
 
-        const content = createRetellingContent(() => dialog.hide())
+        const content = createRetellingContent(() => {
+          ['#result_span', '#final_span', '#interim_span'].map(q => {
+            wrapper.querySelector(q).innerHTML = ''
+            wrapper.querySelector('#start-retelling-wrap').style.display = 'none'
+          })
+        })
         wrapper.querySelector('.mental-map-detail-container').appendChild(content)
 
         const clearText = $(wrapper).find('#clear-text').is(':checked')
@@ -437,6 +442,9 @@ export default function MentalMap(element, params) {
     `
     wrap.querySelector('#voice-finish').addEventListener('click', () => {
       wrap.remove()
+      if (typeof hideCallback === 'function') {
+        hideCallback()
+      }
     })
     return wrap
   }
