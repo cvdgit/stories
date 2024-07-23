@@ -7,6 +7,7 @@ namespace frontend\controllers;
 use frontend\models\ContactRequestForm;
 use Yii;
 use yii\captcha\CaptchaAction;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\ErrorAction;
 
@@ -30,8 +31,11 @@ class NewSchoolController extends Controller
         ];
     }
 
-    public function actionIndex(): string
+    public function actionIndex()
     {
+        if (Yii::$app->request->pathInfo !== '') {
+            return $this->redirect(['/']);
+        }
         return $this->render('index', [
             'contactRequestModel' => new ContactRequestForm(),
         ]);

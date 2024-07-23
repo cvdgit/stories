@@ -41,7 +41,7 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->redirect(['/school/index']);
+        return $this->redirect(['/new-school/index']);
     }
 
     /**

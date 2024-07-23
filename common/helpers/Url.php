@@ -38,6 +38,6 @@ class Url extends \yii\helpers\Url
 
     public static function homeRoute(): array
     {
-        return ['/school/index'];
+        return ['/new-school/index'];
     }
 }

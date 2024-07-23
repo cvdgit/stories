@@ -31,8 +31,9 @@ class SchoolController extends Controller
 
     public function actionIndex()
     {
-        return $this->render('index', [
+        return $this->redirect(['new-school/index']);
+        /*return $this->render('index', [
             'contactRequestModel' => new ContactRequestForm(),
-        ]);
+        ]);*/
     }
 }

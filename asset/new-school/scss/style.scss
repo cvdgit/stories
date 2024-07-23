@@ -1319,6 +1319,16 @@ body {
       text-decoration: none;
       background-color: inherit;
     }
+
+    .dropdown-menu {
+      @include media-breakpoint-down(md) {
+        position: relative;
+        display: block;
+        border: 0 none;
+        background-color: transparent;
+        text-align: center;
+      }
+    }
   }
 }
 
@@ -1340,6 +1350,10 @@ body {
     width: 40px;
     height: 40px;
     margin-right: 0.9rem;
+  }
+
+  @include media-breakpoint-down(md) {
+    display: none;
   }
 }
 
@@ -1469,6 +1483,8 @@ body {
 }
 
 #main-menu {
+  position: relative;
+
   @include media-breakpoint-down(md) {
     width: 100%;
   }
