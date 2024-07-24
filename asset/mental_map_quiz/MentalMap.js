@@ -100,6 +100,7 @@ export default function MentalMap(element, params) {
 
           if (voiceResponse.getStatus()) {
             voiceResponse.stop()
+            startRecording(recordingWrap.querySelector('#start-recording'))
           }
           ['#result_span', '#final_span', '#interim_span'].map(q => {
             detailTextWrap.querySelector(q).innerHTML = ''
