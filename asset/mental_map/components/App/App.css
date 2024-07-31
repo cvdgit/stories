@@ -203,3 +203,29 @@
 .button+.button--header-done-right-course-themes,.button+.button--inverted-right-course-themes,.button+.button--outline-right-course-themes {
   margin-left: .6rem
 }
+
+.all-images-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  max-height: 500px;
+}
+
+.all-images-list-item {
+  display: flex;
+  flex-direction: row;
+}
+
+.text-line {
+  position: relative;
+  margin-left: 20px;
+  margin-bottom: 10px;
+}
+
+.text-line span {
+  font-weight: 500;
+  position: absolute;
+  left: -20px;
+  top: 0;
+}

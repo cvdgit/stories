@@ -6,8 +6,8 @@ function Dialog({children, nodeRef, hideHandler}) {
     <div ref={nodeRef} className="dialog export-dialog-modal">
       <div onClick={hideHandler} className="dialog__overlay"></div>
       <div className="dialog__content">
-        <div className="dialog__close">
-          <i className="icon icon-remove"></i>
+        <div className="dialog__close" onClick={hideHandler}>
+          <i className="icon icon-remove">&times;</i>
         </div>
         <div className="export-dialog__content">
           {children}

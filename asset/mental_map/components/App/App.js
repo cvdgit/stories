@@ -21,6 +21,10 @@ export default function App({mentalMapId}) {
   const [open, setOpen] = useState(false)
   const [mapText, setMapText] = useState(state.text)
   const firstUpdate = useRef(true)
+  const imagesRef = useRef()
+  const [imagesOpen, setImagesOpen] = useState(false)
+  const [textFragmentCount, setTextFragmentCount] = useState(0)
+  const [formattedMapText, setFormattedMapText] = useState()
 
   useEffect(() => {
     api
@@ -58,7 +62,15 @@ export default function App({mentalMapId}) {
     return () => clearTimeout(timeoutId);
   }, [mapText]);
 
+  useEffect(() => {
+    setFormattedMapText(formatTextWithLineNumbers(state.text))
+  }, [state.text]);
+
   const returnUrl = window?.mentalMapReturnUrl || '/'
+
+  function formatTextWithLineNumbers(text) {
+    return (text || '').split("\n").filter(p => p !== '')
+  }
 
   return (
     <div>
@@ -73,7 +85,12 @@ export default function App({mentalMapId}) {
               <button onClick={() => {
                 setOpen(true)
               }} className="button button--default button--header-done"
-                      type="button">Текст
+                      type="button">Текст {textFragmentCount > 0 && (<span> ({textFragmentCount})</span>)}
+              </button>
+              <button onClick={() => {
+                setImagesOpen(true)
+              }} className="button button--default button--header-done"
+                      type="button">Изображения
               </button>
             </div>
           </div>
@@ -97,16 +114,59 @@ export default function App({mentalMapId}) {
         classNames="dialog"
         unmountOnExit
       >
-        <Dialog nodeRef={ref} hideHandler={() => setOpen(false)}>
+        <Dialog nodeRef={ref} hideHandler={() => {
+          setTextFragmentCount((formattedMapText || []).length)
+          setOpen(false)
+        }}>
           <h2 className="dialog-heading">Текст</h2>
-          <div>
-            <textarea className="textarea" style={{minHeight: '400px'}} placeholder="Текст" onChange={(e) => {
-              dispatch({
-                type: 'update_mental_map_text',
-                text: e.target.value
-              })
-              setMapText(e.target.value)
-            }} value={state.text}/>
+          <div style={{display: 'flex', flexDirection: 'row', gap: '20px', maxHeight: '500px'}}>
+            <div style={{flex: '1'}}>
+              <textarea className="textarea" style={{minHeight: '400px'}} placeholder="Текст" onChange={(e) => {
+                dispatch({
+                  type: 'update_mental_map_text',
+                  text: e.target.value
+                })
+                setMapText(e.target.value)
+              }} value={state.text}/>
+            </div>
+            <div style={{flex: '1'}}>
+              <div className="textarea" style={{overflowY: 'auto', borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgb(176 190 197 / 1)'}}>
+                {(formattedMapText || []).map((p, i) => (<div className="text-line" key={i}><span>{i + 1}</span>{p}</div>))}
+              </div>
+            </div>
+          </div>
+        </Dialog>
+      </CSSTransition>
+
+      <CSSTransition
+        in={imagesOpen}
+        nodeRef={imagesRef}
+        timeout={200}
+        classNames="dialog"
+        unmountOnExit
+      >
+        <Dialog nodeRef={imagesRef} hideHandler={() => setImagesOpen(false)}>
+          <h2 className="dialog-heading">Изображения</h2>
+          <div className="all-images-list">
+            {state.map?.images.map((image, i) => (
+              <div className="all-images-list-item" key={i}>
+                <div style={{marginRight: '10px'}}>
+                  <img style={{maxWidth: '100px'}} src={image.url} alt="img"/>
+                </div>
+                <div style={{width: '100%'}}>
+                  <div
+                    className="textarea"
+                    style={{
+                      border: '1px #808080 solid',
+                      maxHeight: '100px',
+                      overflowY: 'auto'
+                    }}
+                    contentEditable="plaintext-only"
+                    dangerouslySetInnerHTML={{__html: image.text}}
+                  ></div>
+                </div>
+              </div>
+            ))}
           </div>
         </Dialog>
       </CSSTransition>

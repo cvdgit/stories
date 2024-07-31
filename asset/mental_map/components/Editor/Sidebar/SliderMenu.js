@@ -44,7 +44,7 @@ function SliderMenu({lessonId, createQuestionHandler, setActiveQuestion}) {
   return (
     <ToggleMenu toggle={toggle} classNames="menu--full">
       <MenuToggleButton classNames="button button--sidebar-basic"
-                        toggleHandler={toggleHandler}>Добавить изображения</MenuToggleButton>
+                        toggleHandler={toggleHandler}>Загрузить изображения</MenuToggleButton>
       <div>
         <ToggleMenuContent classNames="menu__content--top menu__content--centerX sidebar-list__menu">
           <ToggleMenuItem

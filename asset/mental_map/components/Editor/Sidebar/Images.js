@@ -1,15 +1,16 @@
-import React, {useRef, useState} from 'react'
+import React, {useCallback, useRef, useState} from 'react'
 import './Image.css'
 import {Draggable, Droppable} from "react-beautiful-dnd";
 import Image from "./Image";
-import SliderMenu from "./SliderMenu";
-import {useImages} from "../../App/App";
-import { v4 as uuidv4 } from 'uuid'
+import {useImages, useMentalMap} from "../../App/App";
+import {v4 as uuidv4} from 'uuid'
 
-export default function Images({addImageHandler}) {
+export default function Images() {
+  const {state, dispatch} = useMentalMap()
   const {state: images, dispatch: imagesDispatch} = useImages()
   const ref = useRef()
   const [files, setFiles] = useState(new Map())
+  const [selectedImages, setSelectedImages] = useState([])
 
   const fileChangeHandler = (e) => {
     if (!e.target.files) {
@@ -58,24 +59,92 @@ export default function Images({addImageHandler}) {
     })
   }
 
+  const moveSelectedImageHandler = () => {
+    if (selectedImages.length === 0) {
+      return
+    }
+    const updatedList = [...images].filter(i => {
+      return !(selectedImages.find(si => si.id === i.id) !== undefined)
+    })
+
+    imagesDispatch({
+      type: 'update_images',
+      payload: updatedList
+    })
+
+    const texts = (state.text || '').split("\n").filter(p => p !== '')
+
+    let left = 10
+    let top = 10
+    let w = left
+    let imgNum = state.map.images.length
+    selectedImages.map((si, index) => {
+
+      w = w + si.width + 50
+      if (index > 0) {
+        left = left + si.width + 50
+        if (w >= state.map.width) {
+          left = 10
+          top = top + si.height + 70
+          w = 10
+        }
+      }
+
+      dispatch({
+        type: 'add_image_to_mental_map',
+        payload: {
+          ...si,
+          left,
+          top,
+          text: texts[imgNum] ?? ''
+        }
+      })
+
+      imgNum++
+    })
+
+    setSelectedImages([])
+  }
+
+  /*const imageCheckBoxHandler = useCallback(() => {
+
+  })*/
+
   return (
 
     <div className="sidebar-list">
       <div className="sidebar-list__title">
         <span>Изображения</span>
+        <button onClick={moveSelectedImageHandler} type="button"
+                className="button button--default button--header-done">+ выбранные
+        </button>
       </div>
       {images.length
         ? (
           <div className="block-edit-gallery">
             <Droppable ignoreContainerClipping={false} isDropDisabled={true} droppableId="image-list">
               {(droppableProvided, droppableSnapshot) => (
-                <div ref={droppableProvided.innerRef} style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem'}}>
+                <div ref={droppableProvided.innerRef}
+                     style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem'}}>
                   {images.map((imageItem, index) => (
                     <Draggable key={index} draggableId={`image-${index}`} index={index}>
                       {(provided, snapshot) => {
                         return (
                           <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                            <Image imageItem={imageItem} file={getFile(imageItem.id)} uploadCompleteHandler={(response) => uploadCompleteHandler(imageItem, response)} />
+                            <Image
+                              checked={selectedImages.find(i => i.id === imageItem.id)}
+                              imageItem={imageItem}
+                              file={getFile(imageItem.id)}
+                              uploadCompleteHandler={(response) => uploadCompleteHandler(imageItem, response)}
+                              checkBoxHandler={(e) => {
+                                setSelectedImages((prevItems) => {
+                                  if (e.target.checked) {
+                                    return [...prevItems, imageItem]
+                                  }
+                                  return prevItems.filter(i => i.id !== imageItem.id)
+                                })
+                              }}
+                            />
                           </div>
                         )
                       }}

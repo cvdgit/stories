@@ -76,7 +76,8 @@
 }
 
 .export-dialog-modal .dialog__content {
-  padding: 5rem 4rem;
+  padding: 3rem 4rem;
+  width: 90rem;
 }
 
 .dialog__close {

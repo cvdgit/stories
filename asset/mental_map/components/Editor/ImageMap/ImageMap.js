@@ -52,6 +52,34 @@ const Editable = {
   },
 };
 
+const ImageIndexViewable = {
+  name: 'imageIndexViewable',
+  props: ['index'],
+  events: [],
+  render(moveable, React) {
+    const rect = moveable.getRect();
+
+    // Add key (required)
+    // Add class prefix moveable-(required)
+    return <div key={"dimension-viewer"} className={"moveable-dimension"} style={{
+      position: "absolute",
+      left: `${rect.width / 2}px`,
+      top: `${rect.height + 20}px`,
+      background: "#4af",
+      borderRadius: "2px",
+      padding: "2px 4px",
+      color: "white",
+      fontSize: "13px",
+      whiteSpace: "nowrap",
+      fontWeight: "bold",
+      willChange: "transform",
+      transform: `translate(-50%, 0px)`,
+    }}>
+      {moveable.props.index}
+    </div>;
+  },
+}
+
 export default function ImageMap({mapImage}) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
@@ -171,6 +199,24 @@ export default function ImageMap({mapImage}) {
 
   return (
     <>
+      <div>
+        <button onClick={() => {
+          state.map.images.map(i => {
+            dispatch({
+              type: 'remove_image_from_mental_map',
+              imageId: i.id,
+            })
+            const im = {...i}
+            im.text = ''
+            delete im.left
+            delete im.top
+            imagesDispatch({
+              type: 'add_image',
+              payload: im
+            })
+          })
+        }} type="button" style={{position: 'absolute', zIndex: '999'}}>Очистить</button>
+      </div>
       <Droppable droppableId="image">
         {(droppableProvided, droppableSnapshot) => (
           <div id="mentalMapContainer" ref={droppableProvided.innerRef}
@@ -201,9 +247,11 @@ export default function ImageMap({mapImage}) {
                       draggable={true}
                       resizable={true}
                       keepRatio={true}
-                      ables={[Editable]}
+                      ables={[Editable, ImageIndexViewable]}
                       props={{
                         editable: true,
+                        imageIndexViewable: true,
+                        index: i + 1,
                         removeHandler: () => {
                           dispatch({
                             type: 'remove_image_from_mental_map',
@@ -230,6 +278,7 @@ export default function ImageMap({mapImage}) {
                       edge={true}
                       onResizeStart={e => {
                         e.setFixedDirection([0, 0]);
+                        e.setMin([50, 50]);
                       }}
                       onRender={e => {
                         e.target.style.cssText += e.cssText;
