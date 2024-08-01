@@ -84,11 +84,17 @@ class SlideController extends BaseController
         return ['success' => true, 'id' => $slideID];
     }
 
-    public function actionDelete(int $slide_id)
+    /**
+     * @throws NotFoundHttpException
+     * @throws InvalidConfigException
+     */
+    public function actionDelete(int $slide_id): array
     {
         $slideModel = $this->findModel(StorySlide::class, $slide_id);
+        $prevSlide = $slideModel->findPrevSlide();
+        $prevSlideId = $prevSlide === null ? null : $prevSlide->id;
         $this->editorService->deleteSlide($slideModel);
-        return ['success' => true];
+        return ['success' => true, 'slide_id' => $prevSlideId];
     }
 
     public function actionCopy(int $slide_id, int $lesson_id = null): array

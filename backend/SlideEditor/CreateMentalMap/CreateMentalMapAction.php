@@ -80,8 +80,9 @@ class CreateMentalMapAction extends Action
         $content = $jsonBody->content;
         $mapImageUrl = $jsonBody->image;
 
+        $newSlideId = null;
         try {
-            $this->transactionManager->wrap(function () use ($content, $storyModel, $currentSlideModel, $user, $mapImageUrl) {
+            $this->transactionManager->wrap(function () use ($content, &$newSlideId, $storyModel, $currentSlideModel, $user, $mapImageUrl) {
 
                 $slideModel = $this->storySlideService->create($storyModel->id, 'empty', StorySlide::KIND_MENTAL_MAP);
                 $slideModel->number = $currentSlideModel->number + 1;
@@ -132,9 +133,10 @@ class CreateMentalMapAction extends Action
                         'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
                     );
                 }
+                $newSlideId = $slideModel->id;
             });
 
-            return ["success" => true];
+            return ["success" => true, 'slide_id' => $newSlideId];
         } catch (Exception $exception) {
             Yii::$app->errorHandler->logException($exception);
             return ["success" => false, "message" => $exception->getMessage()];

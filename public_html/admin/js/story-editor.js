@@ -405,32 +405,34 @@ SlideManager.prototype = {
         }
       }).disableSelection();
 
+      const $firstSlide = that.$slidesList.find('div.thumb-reveal-wrapper:eq(0)')
       if (toSetActiveSlideID) {
-        that.$slidesList
+        const $toActiveSlide = that.$slidesList
           .find('div[data-slide-id=' + toSetActiveSlideID + '].thumb-reveal-wrapper')
-          .click();
+        if ($toActiveSlide.length) {
+          $toActiveSlide.click();
+        } else {
+          $firstSlide.click();
+        }
       } else {
-        that.$slidesList
-          .find('div.thumb-reveal-wrapper:eq(0)')
-          .click();
+        $firstSlide.click();
       }
 
       if (that.decks.length > 0) {
         $.whenAll(that.decks).done(function () {
-
           if (toSetActiveSlideID) {
-
-            var el = that.$slidesList
+            const el = that.$slidesList
               .find('div[data-slide-id=' + toSetActiveSlideID + '].thumb-reveal-wrapper');
-
-            var rect = $('.slides-actions')[0].getBoundingClientRect();
-            var top = el.offset().top - (rect.height + rect.top);
-            if (top < 0) {
-              top = 0;
+            if (el.length) {
+              const rect = $('.slides-actions')[0].getBoundingClientRect();
+              let top = el.offset().top - (rect.height + rect.top);
+              if (top < 0) {
+                top = 0;
+              }
+              that.$slidesList.animate({
+                scrollTop: top
+              }, 'fast');
             }
-            that.$slidesList.animate({
-              scrollTop: top
-            }, 'fast');
           }
         });
       }
@@ -1635,7 +1637,7 @@ var StoryEditor = (function () {
     return slidesManager.deleteSlide().done(function (data) {
       if (data && data.success) {
         deleteSlide();
-        loadSlides();
+        loadSlides(data?.slide_id);
       }
     });
   }

@@ -200,6 +200,19 @@ class StorySlide extends ActiveRecord
             ->one();
     }
 
+    /**
+     * @return array|ActiveRecord|null
+     */
+    public function findPrevSlide(): ?StorySlide
+    {
+        return self::find()
+            ->where(['story_id' => $this->story_id])
+            ->andWhere(['<', 'number', $this->number])
+            ->orderBy(['number' => SORT_DESC])
+            ->limit(1)
+            ->one();
+    }
+
     public function afterSave($insert, $changedAttributes)
     {
         if ($insert) {

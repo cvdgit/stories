@@ -392,7 +392,11 @@ $js = <<< JS
             mentalMapSlide
                 .createSlide(StoryEditor.getConfigValue('storyID'), currentSlide.getID(), texts, image)
                 .then(response => {
-                    StoryEditor.loadSlides()
+                    if (response && response?.success) {
+                        StoryEditor.loadSlides(response?.slide_id)
+                    } else {
+                        alert('error')
+                    }
                 })
 
             //const html = StoryEditor.createMentalMapBlock();
