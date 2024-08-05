@@ -10,7 +10,7 @@
   position: relative;
   width: 100%;
   height: 100%;
-  display: flex;
+  /*display: flex;*/
   /*justify-content: center;*/
 }
 
@@ -19,7 +19,7 @@
 }
 
 .mental-map-img img {
-  max-width: 100%;
+  width: 100%;
   transition: transform .25s ease-in, opacity .25s linear;
 }
 

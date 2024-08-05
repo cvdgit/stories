@@ -5,6 +5,7 @@ import {useImages, useMentalMap} from "../../App/App";
 import Dialog from "../../Dialog";
 import {CSSTransition} from 'react-transition-group';
 import {trimRanges, surroundRangeContents} from '../../../Lib/selection'
+import PanZoom, {Element, PanZoomWithCover} from "@sasza/react-panzoom";
 
 let scale = 1
 
@@ -88,6 +89,7 @@ export default function ImageMap({mapImage}) {
   const [currentImageItem, setCurrentImageItem] = useState(null)
   const [currentText, setCurrentText] = useState(null)
   const textRef = useRef()
+  const zoomRef = useRef()
 
   useEffect(() => {
 
@@ -120,11 +122,15 @@ export default function ImageMap({mapImage}) {
       }
     }
 
-    resizeHandler()
+    //resizeHandler()
 
-    window.addEventListener('resize', resizeHandler)
+    //window.addEventListener('resize', resizeHandler)
 
-    return () => window.removeEventListener('resize', resizeHandler)
+    //return () => window.removeEventListener('resize', resizeHandler)
+  }, []);
+
+  useEffect(() => {
+    //zoomRef.current.reset()
   }, []);
 
   const insertFragmentHandler = () => {
@@ -215,115 +221,125 @@ export default function ImageMap({mapImage}) {
               payload: im
             })
           })
-        }} type="button" style={{position: 'absolute', zIndex: '999'}}>Очистить</button>
+        }} type="button" style={{position: 'absolute', zIndex: '999'}}>Очистить
+        </button>
       </div>
-      <Droppable droppableId="image">
-        {(droppableProvided, droppableSnapshot) => (
-          <div id="mentalMapContainer" ref={droppableProvided.innerRef}
-               className="mental-map-container">
-            <div id="container" className="container" style={{position: 'absolute', width: '100%', height: '100%'}}>
-              <div style={{position: 'relative', width: '100%', height: '100%'}}>
-                <img draggable={false} src={mapImage.url} style={{height: '100%'}} alt=""/>
-                {mapImage.images.map((image, i) => (
-                  <div key={`im-${i}`}>
-                    <img
-                      style={{
-                        left: '0',
-                        top: '0',
-                        transform: `translate(${Math.abs(image.left)}px, ${Math.abs(image.top)}px)`,
-                        width: `${image.width}px`,
-                        height: `${image.height}px`
-                      }}
-                      className={`mental-pic mental-pic-${i}`}
-                      src={image.url}
-                      onClick={() => {
-                        setCurrentImageItem(image)
-                        setCurrentText(image.text)
-                        setOpen(true)
-                      }}
-                      alt=""/>
-                    <Moveable
-                      target={`.mental-pic-${i}`}
-                      draggable={true}
-                      resizable={true}
-                      keepRatio={true}
-                      ables={[Editable, ImageIndexViewable]}
-                      props={{
-                        editable: true,
-                        imageIndexViewable: true,
-                        index: i + 1,
-                        removeHandler: () => {
-                          dispatch({
-                            type: 'remove_image_from_mental_map',
-                            imageId: image.id,
-                          })
-                          imagesDispatch({
-                            type: 'add_image',
-                            payload: {...image}
-                          })
-                        }
-                      }}
-                      //throttleResize={0}
-                      //throttleDrag={1}
-                      //scalable={true}
-                      snappable={true}
-                      origin={false}
-                      bounds={{
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        position: 'css'
-                      }}
-                      edge={true}
-                      onResizeStart={e => {
-                        e.setFixedDirection([0, 0]);
-                        e.setMin([50, 50]);
-                      }}
-                      onRender={e => {
-                        e.target.style.cssText += e.cssText;
-                      }}
-                      onDrag={e => {
-                        e.target.style.transform = e.transform
-                        dispatch({
-                          type: 'update_mental_map_images',
-                          imageId: image.id,
-                          payload: {
-                            left: parseInt(e.translate[0]),
-                            top: parseInt(e.translate[1])
-                          }
-                        })
-                      }}
-                      onBeforeResize={e => {
-                        const val = window.getComputedStyle(e.target, null)
-                        let values = val.getPropertyValue('transform').split('(')[1]
-                        values = values.split(')')[0]
-                        values = values.split(',')
-                          .map(s => s.trim())
-                          .map(s => parseInt(s))
-                        dispatch({
-                          type: 'update_mental_map_images',
-                          imageId: image.id,
-                          payload: {
-                            width: parseInt(e.target.style.width),
-                            height: parseInt(e.target.style.height),
-                            left: values[4],
-                            top: values[5]
-                          }
-                        })
-                      }}
-                      onResize={e => {
-                        e.target.style.cssText += `width: ${e.width}px; height: ${e.height}px`;
-                        e.target.style.transform = e.drag.transform;
-                      }}
-                    />
+
+      <div id="mentalMapContainer" className="mental-map-container">
+        <div style={{width: '100%', height: '100%', position: 'relative'}}>
+          <div id="container" className="container" style={{
+            aspectRatio: '16/9 auto',
+            position: 'absolute',
+            width: '100%',
+            inset: '50% auto auto 50%',
+            transform: 'translate(-50%, -50%)'
+          }}>
+            <PanZoom
+              boundary={{left: 0, top: 0}}
+              zoomInitial={0.5}
+              ref={zoomRef}
+              height={`${mapImage.height}px`}
+              width={`${mapImage.width}px`}
+              zoomMin={0.5}
+              zoomMax={1.8}
+              //onContainerChange={e => console.log('onContainerChange', e)}
+              //onContainerClick={e => console.log('onContainerClick', e)}
+              //onContainerPositionChange={e => console.log('onContainerPositionChange', e)}
+              //onContainerZoomChange={e => console.log('onContainerZoomChange', e)}
+              //onElementsChange={e => console.log('onElementsChange', e)}
+            >
+              <img draggable={false} src={mapImage.url} style={{height: '100%'}} alt=""/>
+              {mapImage.images.map((image, i) => (
+                <Element
+                  resizedMinWidth={100}
+                  resizedMaxWidth={300}
+                  resizable={true}
+                  key={`im-${i}`}
+                  id={`image${i}`}
+                  x={image.left}
+                  y={image.top}
+                  width={image.width}
+                  onAfterResize={(e) => {
+                    const elem = zoomRef.current.getElements()[e.id]
+                    dispatch({
+                      type: 'update_mental_map_images',
+                      imageId: image.id,
+                      payload: {
+                        width: elem.node.current.offsetWidth,
+                        height: elem.node.current.offsetHeight,
+                        left: elem.position.x,
+                        top: elem.position.y
+                      }
+                    })
+                  }}
+                  onMouseUp={e => {
+                    const target = e.e.target
+                    if (target.tagName === 'BUTTON') {
+                      dispatch({
+                        type: 'remove_image_from_mental_map',
+                        imageId: image.id,
+                      })
+                      imagesDispatch({
+                        type: 'add_image',
+                        payload: {...image}
+                      })
+                      return
+                    }
+                    if (target.tagName !== 'IMG') {
+                      return
+                    }
+                    const left = Math.floor(e.x)
+                    const top = Math.floor(e.y)
+                    if (image.left !== left || image.top !== top) {
+                      dispatch({
+                        type: 'update_mental_map_images',
+                        imageId: image.id,
+                        payload: {left, top}
+                      })
+                    } else {
+                      setCurrentImageItem(image)
+                      setCurrentText(image.text)
+                      setOpen(true)
+                    }
+                  }}
+                >
+                  <img
+                    style={{width: '100%', height: '100%', cursor: 'pointer'}}
+                    className={`1mental-pic mental-pic-${i}`}
+                    src={image.url}
+                    alt=""
+                  />
+                  <div style={{marginTop: '4px', display: 'flex', flexDirection: 'row', justifyContent: 'space-around', position: 'absolute', width: '100%'}}>
+                    <span style={{
+                      fontWeight: '500',
+                      width: '36px',
+                      height: '36px',
+                      fontSize: '26px',
+                      lineHeight: '26px',
+                      borderRadius: '6px',
+                      background: 'rgb(68, 170, 255)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'white'
+                    }}>{i + 1}</span>
+                    <button title="Удалить" type="button" style={{
+                      background: '#dc3545',
+                      width: '36px',
+                      height: '36px',
+                      fontSize: '30px',
+                      lineHeight: '30px',
+                      borderRadius: '6px',
+                      color: 'white'
+                    }}>&times;</button>
                   </div>
-                ))}
-              </div>
-              {droppableProvided.placeholder}
-            </div>
-          </div>)}
-      </Droppable>
+                </Element>
+              ))}
+            </PanZoom>
+          </div>
+        </div>
+      </div>
+
       <div>
         <CSSTransition
           in={open}
@@ -370,7 +386,7 @@ export default function ImageMap({mapImage}) {
                         borderStyle: 'solid',
                         maxHeight: '20rem',
                         overflowY: 'auto'
-                    }}
+                      }}
                     />
                   </div>
                 </div>

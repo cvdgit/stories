@@ -93,7 +93,7 @@ export default function Editor() {
 
   return (
     <div>
-      <DragDropContext onDragEnd={dragEndHandler}>
+
         <div className="author-layout author-layout--quiz">
           <div className="author-layout__sidebar author-layout__sidebar--scroll">
             <Images/>
@@ -115,7 +115,7 @@ export default function Editor() {
             </div>
           </div>
         </div>
-      </DragDropContext>
+
     </div>
   )
 }

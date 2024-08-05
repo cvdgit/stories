@@ -2,6 +2,7 @@ import React from 'react'
 import ImageUploader from "./ImageUploader";
 
 export default function Image({imageItem, file, uploadCompleteHandler, checkBoxHandler, checked}) {
+  console.log('ch', checked)
   return (
     <div className="block-edit-field-drag-item block-edit-field-drag-item--large">
       <div className="block-edit-field-drag-item__container">

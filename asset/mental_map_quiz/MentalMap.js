@@ -269,11 +269,15 @@ export default function MentalMap(element, params) {
       }
     })
 
+    const zoomWrap = document.createElement('div')
+    zoomWrap.classList.add('zoom-wrap')
+
     const img = document.createElement('img')
     img.src = json.map.url
     img.style.height = '100%'
-    img.style.margin = '0 auto'
-    container.appendChild(img)
+    //img.style.width = '100%'
+    //img.style.margin = '0 auto'
+    zoomWrap.appendChild(img)
 
     json.map.images.map(image => {
       const mapImgWrap = document.createElement('div')
@@ -294,9 +298,10 @@ export default function MentalMap(element, params) {
       mapImg.dataset.container = 'body'
       mapImg.src = image.url
       mapImgWrap.appendChild(mapImg)
-      container.appendChild(mapImgWrap)
+      zoomWrap.appendChild(mapImgWrap)
     })
 
+    container.appendChild(zoomWrap)
     this.element.appendChild(container)
 
     $('.mental-map-img img').tooltip()
@@ -385,6 +390,36 @@ export default function MentalMap(element, params) {
       }
     })
     this.element.appendChild(hideBtn)
+
+    let initialZoom = 0.8
+    const containerWidth = container.innerWidth
+    const containerHeight = container.innerHeight
+
+    if (json.map.height > containerHeight) {
+      initialZoom = containerHeight / json.map.height;
+    } else {
+      initialZoom = 1;
+    }
+
+    if (json.map.width > containerWidth) {
+      //initialZoom = containerWidth / imageWidth;
+    }
+
+    if (json.map.width < containerWidth) {
+      initialZoom = 1 + ((containerWidth - json.map.width) / json.map.width);
+    }
+
+    const zoom = Panzoom(zoomWrap, {
+      excludeClass: 'mental-map-img',
+      bounds: true,
+      startScale: initialZoom,
+      //initialX: 0,
+      //initialY: 0,
+      //startX: 0,
+      //startY: 0,
+      //origin: '0px 0px'
+    });
+    element.parentElement.addEventListener('wheel', zoom.zoomWithWheel);
   }
 
   /**

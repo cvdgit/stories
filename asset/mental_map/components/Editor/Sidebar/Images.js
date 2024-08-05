@@ -111,7 +111,6 @@ export default function Images() {
   })*/
 
   return (
-
     <div className="sidebar-list">
       <div className="sidebar-list__title">
         <span>Изображения</span>
@@ -122,38 +121,26 @@ export default function Images() {
       {images.length
         ? (
           <div className="block-edit-gallery">
-            <Droppable ignoreContainerClipping={false} isDropDisabled={true} droppableId="image-list">
-              {(droppableProvided, droppableSnapshot) => (
-                <div ref={droppableProvided.innerRef}
-                     style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem'}}>
-                  {images.map((imageItem, index) => (
-                    <Draggable key={index} draggableId={`image-${index}`} index={index}>
-                      {(provided, snapshot) => {
-                        return (
-                          <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                            <Image
-                              checked={selectedImages.find(i => i.id === imageItem.id)}
-                              imageItem={imageItem}
-                              file={getFile(imageItem.id)}
-                              uploadCompleteHandler={(response) => uploadCompleteHandler(imageItem, response)}
-                              checkBoxHandler={(e) => {
-                                setSelectedImages((prevItems) => {
-                                  if (e.target.checked) {
-                                    return [...prevItems, imageItem]
-                                  }
-                                  return prevItems.filter(i => i.id !== imageItem.id)
-                                })
-                              }}
-                            />
-                          </div>
-                        )
-                      }}
-                    </Draggable>
-                  ))}
-                  {droppableProvided.placeholder}
-                </div>
-              )}
-            </Droppable>
+            <div
+              style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem'}}>
+              {images.map((imageItem, index) => (
+                <Image
+                  key={index}
+                  checked={!!selectedImages.find(i => i.id === imageItem.id)}
+                  imageItem={imageItem}
+                  file={getFile(imageItem.id)}
+                  uploadCompleteHandler={(response) => uploadCompleteHandler(imageItem, response)}
+                  checkBoxHandler={(e) => {
+                    setSelectedImages((prevItems) => {
+                      if (e.target.checked) {
+                        return [...prevItems, imageItem]
+                      }
+                      return prevItems.filter(i => i.id !== imageItem.id)
+                    })
+                  }}
+                />
+              ))}
+            </div>
           </div>
         )
         : (<div className="sidebar-list__empty-message">
