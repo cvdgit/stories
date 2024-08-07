@@ -69,7 +69,7 @@ class ImageService
             }
         }
         else {
-            $ext = $ext[1];
+            $ext = $ext[0];
         }
 
         $imageFileName = md5(random_int(0, 9999) . time() . random_int(0, 9999)) . '.' . $ext;
