@@ -9,7 +9,6 @@ use backend\MentalMap\MentalMapImage;
 use backend\MentalMap\MentalMapImageForm;
 use common\rbac\UserRoles;
 use DomainException;
-use Imagine\Image\ManipulatorInterface;
 use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\base\Exception;

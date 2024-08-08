@@ -1,85 +1,11 @@
 import React, {useEffect, useRef, useState} from "react";
-import {Droppable} from "react-beautiful-dnd";
-import Moveable from "react-moveable";
 import {useImages, useMentalMap} from "../../App/App";
 import Dialog from "../../Dialog";
 import {CSSTransition} from 'react-transition-group';
 import {trimRanges, surroundRangeContents} from '../../../Lib/selection'
-import PanZoom, {Element, PanZoomWithCover} from "@sasza/react-panzoom";
+import PanZoom, {Element} from "@sasza/react-panzoom";
 
 let scale = 1
-
-const Editable = {
-  name: "editable",
-  props: [
-    'removeHandler'
-  ],
-  events: [],
-  render(moveable, React) {
-    const rect = moveable.getRect();
-    const {pos2} = moveable.state;
-
-    // Add key (required)
-    // Add class prefix moveable-(required)
-    const EditableViewer = moveable.useCSS("div", `
-        {
-            position: absolute;
-            left: 0px;
-            top: 0px;
-            will-change: transform;
-            transform-origin: 0px 0px;
-        }
-        .custom-button {
-            width: 24px;
-            height: 24px;
-            margin-bottom: 4px;
-            background: #dc3545;
-            border-radius: 4px;
-            appearance: none;
-            border: 0;
-            color: white;
-            font-weight: bold;
-        }
-            `);
-    return <EditableViewer key={"editable-viewer"} className={"moveable-editable"} style={{
-      transform: `translate(${pos2[0]}px, ${pos2[1]}px) rotate(${rect.rotation}deg) translate(10px)`,
-    }}>
-      <button className="custom-button" onClick={() => {
-        moveable.props.removeHandler()
-        //moveable.state.target.parentElement.remove()
-      }}> -
-      </button>
-    </EditableViewer>;
-  },
-};
-
-const ImageIndexViewable = {
-  name: 'imageIndexViewable',
-  props: ['index'],
-  events: [],
-  render(moveable, React) {
-    const rect = moveable.getRect();
-
-    // Add key (required)
-    // Add class prefix moveable-(required)
-    return <div key={"dimension-viewer"} className={"moveable-dimension"} style={{
-      position: "absolute",
-      left: `${rect.width / 2}px`,
-      top: `${rect.height + 20}px`,
-      background: "#4af",
-      borderRadius: "2px",
-      padding: "2px 4px",
-      color: "white",
-      fontSize: "13px",
-      whiteSpace: "nowrap",
-      fontWeight: "bold",
-      willChange: "transform",
-      transform: `translate(-50%, 0px)`,
-    }}>
-      {moveable.props.index}
-    </div>;
-  },
-}
 
 export default function ImageMap({mapImage}) {
   const [open, setOpen] = useState(false)

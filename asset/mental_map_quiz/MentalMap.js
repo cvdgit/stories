@@ -271,6 +271,8 @@ export default function MentalMap(element, params) {
 
     const zoomWrap = document.createElement('div')
     zoomWrap.classList.add('zoom-wrap')
+    zoomWrap.style.width = `${json.map.width}px`
+    zoomWrap.style.height = `${json.map.height}px`
 
     const img = document.createElement('img')
     img.src = json.map.url
@@ -411,8 +413,10 @@ export default function MentalMap(element, params) {
 
     const zoom = Panzoom(zoomWrap, {
       excludeClass: 'mental-map-img',
-      bounds: true,
+      contain: 'inside',
       startScale: initialZoom,
+      minScale: 0.4,
+      maxScale: 2,
       //initialX: 0,
       //initialY: 0,
       //startX: 0,
