@@ -154,11 +154,12 @@ export default function ImageMap({mapImage}) {
       <div id="mentalMapContainer" className="mental-map-container">
         <div style={{width: '100%', height: '100%', position: 'relative'}}>
           <div id="container" className="container" style={{
-            aspectRatio: '16/9 auto',
-            position: 'absolute',
+            //aspectRatio: '16/9 auto',
+            //position: 'absolute',
             width: '100%',
-            inset: '50% auto auto 50%',
-            transform: 'translate(-50%, -50%)'
+            height: '100%',
+            //inset: '50% auto auto 50%',
+            //transform: 'translate(-50%, -50%)'
           }}>
             <PanZoom
               boundary={{left: 0, top: 0}}
@@ -166,6 +167,8 @@ export default function ImageMap({mapImage}) {
               ref={zoomRef}
               height={`${mapImage.height}px`}
               width={`${mapImage.width}px`}
+              //style={{transformOrigin: '50% 50%'}}
+              transformOrigin='50% 50%'
               zoomMin={0.5}
               zoomMax={1.8}
               //onContainerChange={e => console.log('onContainerChange', e)}

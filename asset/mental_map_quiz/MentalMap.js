@@ -79,7 +79,6 @@ export default function MentalMap(element, params) {
     detailText.classList.add('detail-text')
 
     const text = texts.find(t => t.id === image.id)
-    console.log(text)
 
     text.words.map(word => {
       const {type} = word
@@ -219,12 +218,7 @@ export default function MentalMap(element, params) {
       })
     })
 
-    dialog.onHide(() => {
-      hideDialogHandler()
-      if (voiceResponse.getStatus()) {
-        voiceResponse.stop()
-      }
-    })
+    return dialog
   }
 
   function decodeHtml(html) {
@@ -257,7 +251,6 @@ export default function MentalMap(element, params) {
           return [{type: 'break'}]
         }
         const words = p.split(' ').map(word => {
-          console.log('word', word)
           if (word.indexOf('{') > -1) {
             const id = word.toString().replace(/[^\w\-]+/gmui, '')
             if (textFragments.has(id)) {
@@ -299,7 +292,15 @@ export default function MentalMap(element, params) {
       mapImgWrap.style.top = '0px'
       mapImgWrap.style.transform = `translate(${image.left}px, ${image.top}px)`
       mapImgWrap.addEventListener('click', () => {
-        mapImageClickHandler(image, texts)
+        element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
+        const dialog = mapImageClickHandler(image, texts)
+        dialog.onHide(() => {
+          element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
+          hideDialogHandler()
+          if (voiceResponse.getStatus()) {
+            voiceResponse.stop()
+          }
+        })
       })
       const mapImg = document.createElement('img')
       mapImg.setAttribute('title', image.text.replace(/<[^>]*>?/gm, ''))
@@ -312,6 +313,11 @@ export default function MentalMap(element, params) {
     })
 
     container.appendChild(zoomWrap)
+
+    const toolbar = document.createElement('div')
+    toolbar.classList.add('mental-map-toolbar')
+
+    this.element.appendChild(toolbar)
     this.element.appendChild(container)
 
     $('.mental-map-img img').tooltip()
@@ -334,7 +340,13 @@ export default function MentalMap(element, params) {
         img.src = image.url
         img.style.cursor = 'pointer'
         img.addEventListener('click', e => {
-          mapImageClickHandler(image, texts)
+          const dialog = mapImageClickHandler(image, texts)
+          dialog.onHide(() => {
+            hideDialogHandler()
+            if (voiceResponse.getStatus()) {
+              voiceResponse.stop()
+            }
+          })
         })
         imageItem.appendChild(img)
 
@@ -370,15 +382,17 @@ export default function MentalMap(element, params) {
       const dialog = new InnerDialog($(container), {title: 'Весь текст', content: list});
 
       dialog.show(() => {
+        element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
         showDialogHandler()
       })
 
       dialog.onHide(() => {
+        element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
         hideDialogHandler()
       })
     })
 
-    this.element.appendChild(btn)
+    toolbar.appendChild(btn)
 
     const hideBtn = document.createElement('button')
     hideBtn.classList.add('btn', 'btn-small', 'mental-map-hide-btn')
@@ -399,11 +413,11 @@ export default function MentalMap(element, params) {
         $(e.target).text('Скрыть')
       }
     })
-    this.element.appendChild(hideBtn)
+    toolbar.appendChild(hideBtn)
 
     let initialZoom = 0.8
-    const containerWidth = container.innerWidth
-    const containerHeight = container.innerHeight
+    const containerWidth = container.offsetWidth
+    const containerHeight = container.offsetHeight
 
     if (json.map.height > containerHeight) {
       initialZoom = containerHeight / json.map.height;
@@ -412,12 +426,14 @@ export default function MentalMap(element, params) {
     }
 
     if (json.map.width > containerWidth) {
-      //initialZoom = containerWidth / imageWidth;
+      initialZoom = containerWidth / json.map.width;
     }
-
+/*
     if (json.map.width < containerWidth) {
       initialZoom = 1 + ((containerWidth - json.map.width) / json.map.width);
-    }
+    }*/
+
+    console.log(initialZoom)
 
     const zoom = Panzoom(zoomWrap, {
       excludeClass: 'mental-map-img',
@@ -429,7 +445,7 @@ export default function MentalMap(element, params) {
       //initialY: 0,
       //startX: 0,
       //startY: 0,
-      //origin: '0px 0px'
+      //origin: '50% 50%'
     });
     element.parentElement.addEventListener('wheel', zoom.zoomWithWheel);
   }
