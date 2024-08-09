@@ -79,6 +79,7 @@ export default function MentalMap(element, params) {
     detailText.classList.add('detail-text')
 
     const text = texts.find(t => t.id === image.id)
+    console.log(text)
 
     text.words.map(word => {
       const {type} = word
@@ -226,13 +227,19 @@ export default function MentalMap(element, params) {
     })
   }
 
+  function decodeHtml(html) {
+    const txt = document.createElement("textarea");
+    txt.innerHTML = html;
+    return txt.value;
+  }
+
   function processImageText(text) {
     const textFragments = new Map();
     const reg = new RegExp(`<span[^>]*>(.*?)<\\/span>`, 'gm');
-    const imageText = text.replace(reg, (match, p1) => {
+    const imageText = decodeHtml(text.replace(/&nbsp;/g,' ')).replace(reg, (match, p1) => {
       const id = uuidv4()
-      textFragments.set(`${id}`, `${p1.trim()}`);
-      return `{${id}}`;
+      textFragments.set(`${id}`, `${p1.trim()}`)
+      return `{${id}}`
     })
     return {
       imageText,
@@ -250,7 +257,8 @@ export default function MentalMap(element, params) {
           return [{type: 'break'}]
         }
         const words = p.split(' ').map(word => {
-          if (word[0] === '{') {
+          console.log('word', word)
+          if (word.indexOf('{') > -1) {
             const id = word.toString().replace(/[^\w\-]+/gmui, '')
             if (textFragments.has(id)) {
               const reg = new RegExp(`{${id}}`)
@@ -413,7 +421,7 @@ export default function MentalMap(element, params) {
 
     const zoom = Panzoom(zoomWrap, {
       excludeClass: 'mental-map-img',
-      contain: 'inside',
+      //contain: 'inside',
       startScale: initialZoom,
       minScale: 0.4,
       maxScale: 2,
