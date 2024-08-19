@@ -72,7 +72,7 @@ export default function Images() {
       payload: updatedList
     })
 
-    const texts = (state.text || '').split("\n").filter(p => p !== '')
+    const texts = (state.text || '').split("\n\n").filter(p => p !== '')
 
     let left = 10
     let top = 10
