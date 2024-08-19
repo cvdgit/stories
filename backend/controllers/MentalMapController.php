@@ -239,4 +239,32 @@ class MentalMapController extends Controller
             return ['success' => false, 'message' => $exception->getMessage()];
         }
     }
+
+    /**
+     * @throws NotFoundHttpException|\yii\db\Exception
+     */
+    public function actionDeleteImage(Request $request, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+        $payload = $request->post('payload');
+        $mentalMapModel = MentalMap::findOne($payload['id']);
+        if ($mentalMapModel === null) {
+            throw new NotFoundHttpException('Mental Map not found');
+        }
+        $imageId = $payload['imageId'];
+        $imageExists = (new Query())
+            ->from(['t' => 'mental_map_image'])
+            ->where([
+                't.uuid' => $imageId,
+            ])
+            ->exists();
+        if ($imageExists) {
+            $command = Yii::$app->db->createCommand();
+            $command->delete('mental_map_image', [
+                'uuid' => $imageId,
+            ]);
+            $command->execute();
+        }
+        return ['success' => true];
+    }
 }

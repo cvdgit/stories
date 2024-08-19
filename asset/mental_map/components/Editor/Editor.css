@@ -810,6 +810,11 @@
   white-space: nowrap;
 }
 
+.text-item-word.selected {
+  border: 1px solid grey;
+  color: #fff;
+}
+
 .line-sep {
   height: 8px;
 }

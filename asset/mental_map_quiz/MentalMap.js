@@ -94,6 +94,8 @@ export default function MentalMap(element, params) {
           currentSpan.classList.add('selected')
         }
         if (word?.target) {
+          word.hidden = true
+          currentSpan.classList.add('selected')
           currentSpan.classList.add('word-target')
         }
         currentSpan.addEventListener('click', () => {
@@ -365,6 +367,11 @@ export default function MentalMap(element, params) {
             span.classList.add('text-item-word')
             if (word.hidden) {
               span.classList.add('selected')
+            }
+            if (word?.target) {
+              //word.hidden = true
+              span.classList.add('selected')
+              span.classList.add('word-target')
             }
             span.textContent = word.word
             span.addEventListener('click', () => {

@@ -17,7 +17,7 @@ function decodeHtml(html) {
 function processImageText(text) {
   const textFragments = new Map();
   const reg = new RegExp(`<span[^>]*>(.*?)<\\/span>`, 'gm');
-  const imageText = decodeHtml((text || '').replace(/&nbsp;/g,' ')).replace(reg, (match, p1) => {
+  const imageText = decodeHtml((text || '').replace(/&nbsp;/g, ' ')).replace(reg, (match, p1) => {
     const id = uuidv4()
     textFragments.set(`${id}`, `${p1.trim()}`)
     return `{${id}}`
@@ -26,6 +26,30 @@ function processImageText(text) {
     imageText,
     textFragments
   }
+}
+
+function createWordsFormText(text) {
+  const {imageText, textFragments} = processImageText(text)
+  console.log(imageText)
+  const paragraphs = imageText.split('\n')
+  const words = paragraphs.map(p => {
+    if (p === '') {
+      return [{type: 'break'}]
+    }
+    const words = p.split(' ').map(word => {
+      if (word.indexOf('{') > -1) {
+        const id = word.toString().replace(/[^\w\-]+/gmui, '')
+        if (textFragments.has(id)) {
+          const reg = new RegExp(`{${id}}`)
+          word = word.replace(reg, textFragments.get(id))
+          return word.split(' ').map(w => ({id: uuidv4(), word: w, type: 'word', hidden: true, target: true}))
+        }
+      }
+      return [{id: uuidv4(), word, type: 'word', hidden: false}]
+    })
+    return [...(words.flat()), {type: 'break'}]
+  }).flat()
+  return words
 }
 
 export default function ImageMap({mapImage}) {
@@ -39,6 +63,7 @@ export default function ImageMap({mapImage}) {
   const zoomRef = useRef()
   const [selectionMode, setSelectionMode] = useState(false)
   const [currentWords, setCurrentWords] = useState([])
+  const selectionRef = useRef()
 
   useEffect(() => {
 
@@ -77,6 +102,33 @@ export default function ImageMap({mapImage}) {
 
     //return () => window.removeEventListener('resize', resizeHandler)
   }, []);
+
+  useEffect(() => {
+    if (!currentWords.length) {
+      return
+    }
+
+    dispatch({
+      type: 'update_mental_map_images',
+      imageId: currentImageItem.id,
+      payload: {
+        text: getTextBySelections()
+      }
+    })
+
+  }, [JSON.stringify(currentWords)]);
+
+  function getTextBySelections() {
+    let text = ''
+    currentWords.map(word => {
+      if (word.type === 'break') {
+        text += "\n"
+      } else {
+        text += (word.hidden ? `<span class="target-text">${word.word}</span>` : word.word) + ' '
+      }
+    })
+    return text.trim()
+  }
 
   const insertFragmentHandler = () => {
     if (!window.getSelection) {
@@ -147,29 +199,9 @@ export default function ImageMap({mapImage}) {
     })
   }
 
-  function enterSelectionMode() {
-    const {imageText, textFragments} = processImageText(currentText)
-    const paragraphs = imageText.split('\n')
-    const words = paragraphs.map(p => {
-      if (p === '') {
-        return [{type: 'break'}]
-      }
-      const words = p.split(' ').map(word => {
-        if (word.indexOf('{') > -1) {
-          const id = word.toString().replace(/[^\w\-]+/gmui, '')
-          if (textFragments.has(id)) {
-            const reg = new RegExp(`{${id}}`)
-            word = word.replace(reg, textFragments.get(id))
-            return word.split(' ').map(w => ({word: w, type: 'word', hidden: false, target: true}))
-          }
-        }
-        return [{word, type: 'word', hidden: false}]
-      })
-      return [...(words.flat()), {type: 'break'}]
-    }).flat()
-    setCurrentWords(words)
-    setSelectionMode(true)
-  }
+  /*function enterSelectionMode(text) {
+    setCurrentWords(createWordsFormText(text))
+  }*/
 
   return (
     <>
@@ -335,32 +367,25 @@ export default function ImageMap({mapImage}) {
                   </div>
                   <div style={{flex: '1', display: 'flex', flexDirection: 'column'}}>
                     <div style={{marginBottom: '10px'}}>
-                      <button onClick={insertFragmentHandler} className="button button--default button--outline"
-                              type="button">Выделить
-                      </button>
                       <button onClick={() => {
-                        textRef.current.textContent = textRef.current.innerText
-                        dispatch({
-                          type: 'update_mental_map_images',
-                          imageId: currentImageItem.id,
-                          payload: {
-                            text: textRef.current.innerHTML
-                          }
-                        })
-                      }} className="button button--default button--outline"
-                              type="button">Очистить
-                      </button>
-                    </div>
-                    <div style={{marginBottom: '10px'}}>
-                      <button onClick={() => setSelectionMode(false)} className="button button--default button--outline"
+                        setCurrentText(getTextBySelections())
+                        setSelectionMode(false)
+                      }}
+                              className={`button button--default ${selectionMode ? 'button--outline' : 'button--header-done'} `}
                               type="button">Редактировать
                       </button>
-                      <button onClick={enterSelectionMode} className="button button--default button--outline"
+                      <button onClick={() => {
+                        setCurrentText(textRef.current.innerHTML)
+                        setCurrentWords(createWordsFormText(textRef.current.innerHTML))
+                        setSelectionMode(true)
+                      }}
+                              className={`button button--default ${selectionMode ? 'button--header-done' : 'button--outline'} `}
                               type="button">Выделить
                       </button>
                     </div>
                     {selectionMode ? (
                       <div
+                        ref={selectionRef}
                         className="textarea"
                         style={{
                           borderStyle: 'solid',
@@ -371,10 +396,24 @@ export default function ImageMap({mapImage}) {
                         {currentWords.map(word => {
                           const {type} = word
                           if (type === 'break') {
-                            return (<div className="line-sep"></div>)
+                            return (<div key={word.id} className="line-sep"></div>)
                           }
                           return (
-                            <span className="text-item-word">{word.word}</span>
+                            <span
+                              key={word.id}
+                              onClick={() => {
+                                setCurrentWords(prevState => [...prevState].map(w => {
+                                    if (w.id === word.id) {
+                                      w.hidden = !w.hidden
+                                    }
+                                    return w
+                                  })
+                                )
+
+                                //console.log(selectionRef.current.innerHTML)
+                              }}
+                              className={`text-item-word ${word.hidden ? 'selected' : ''}`}
+                            >{word.word}</span>
                           )
                         })}
                       </div>
