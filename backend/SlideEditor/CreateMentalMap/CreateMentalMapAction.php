@@ -108,6 +108,10 @@ class CreateMentalMapAction extends Action
 
                     $imageUrl = '/upload/mental-map/' . $mentalMapId . '/' . pathinfo($path, PATHINFO_BASENAME);
                     [$imageWidth, $imageHeight] = getimagesize($path);
+                } else {
+                    $imageUrl = '/img/mental_map_blank.jpg';
+                    $imageWidth = 1280;
+                    $imageHeight = 720;
                 }
 
                 $payload = [
