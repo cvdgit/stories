@@ -69,7 +69,7 @@ export default function App({mentalMapId}) {
   const returnUrl = window?.mentalMapReturnUrl || '/'
 
   function formatTextWithLineNumbers(text) {
-    return (text || '').split("\n").filter(p => p !== '')
+    return (text || '').split("\n\n").filter(p => p !== '')
   }
 
   return (

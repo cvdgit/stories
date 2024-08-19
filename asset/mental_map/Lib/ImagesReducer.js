@@ -20,6 +20,9 @@ export default function ImagesReducer(state, action) {
     case 'update_images': {
       return Array.from(action.payload)
     }
+    case 'delete_image': {
+      return [...state].filter(i => i.id !== action.imageId)
+    }
     default: {
       throw Error('Unknown action: ' + action.type);
     }

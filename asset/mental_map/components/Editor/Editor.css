@@ -800,3 +800,16 @@
 .target-text {
   font-weight: 600;
 }
+
+.text-item-word {
+  cursor: pointer;
+  display: inline-block;
+  margin-bottom: 6px;
+  margin-right: 8px;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.line-sep {
+  height: 8px;
+}

@@ -4,8 +4,29 @@ import Dialog from "../../Dialog";
 import {CSSTransition} from 'react-transition-group';
 import {trimRanges, surroundRangeContents} from '../../../Lib/selection'
 import PanZoom, {Element} from "@sasza/react-panzoom";
+import {v4 as uuidv4} from "uuid";
 
 let scale = 1
+
+function decodeHtml(html) {
+  const txt = document.createElement("textarea");
+  txt.innerHTML = html;
+  return txt.value;
+}
+
+function processImageText(text) {
+  const textFragments = new Map();
+  const reg = new RegExp(`<span[^>]*>(.*?)<\\/span>`, 'gm');
+  const imageText = decodeHtml((text || '').replace(/&nbsp;/g,' ')).replace(reg, (match, p1) => {
+    const id = uuidv4()
+    textFragments.set(`${id}`, `${p1.trim()}`)
+    return `{${id}}`
+  })
+  return {
+    imageText,
+    textFragments
+  }
+}
 
 export default function ImageMap({mapImage}) {
   const [open, setOpen] = useState(false)
@@ -16,6 +37,8 @@ export default function ImageMap({mapImage}) {
   const [currentText, setCurrentText] = useState(null)
   const textRef = useRef()
   const zoomRef = useRef()
+  const [selectionMode, setSelectionMode] = useState(false)
+  const [currentWords, setCurrentWords] = useState([])
 
   useEffect(() => {
 
@@ -53,10 +76,6 @@ export default function ImageMap({mapImage}) {
     //window.addEventListener('resize', resizeHandler)
 
     //return () => window.removeEventListener('resize', resizeHandler)
-  }, []);
-
-  useEffect(() => {
-    //zoomRef.current.reset()
   }, []);
 
   const insertFragmentHandler = () => {
@@ -126,7 +145,30 @@ export default function ImageMap({mapImage}) {
         text: e.target.innerHTML
       }
     })
-    //setCurrentText(e.target.innerHTML)
+  }
+
+  function enterSelectionMode() {
+    const {imageText, textFragments} = processImageText(currentText)
+    const paragraphs = imageText.split('\n')
+    const words = paragraphs.map(p => {
+      if (p === '') {
+        return [{type: 'break'}]
+      }
+      const words = p.split(' ').map(word => {
+        if (word.indexOf('{') > -1) {
+          const id = word.toString().replace(/[^\w\-]+/gmui, '')
+          if (textFragments.has(id)) {
+            const reg = new RegExp(`{${id}}`)
+            word = word.replace(reg, textFragments.get(id))
+            return word.split(' ').map(w => ({word: w, type: 'word', hidden: false, target: true}))
+          }
+        }
+        return [{word, type: 'word', hidden: false}]
+      })
+      return [...(words.flat()), {type: 'break'}]
+    }).flat()
+    setCurrentWords(words)
+    setSelectionMode(true)
   }
 
   return (
@@ -147,7 +189,7 @@ export default function ImageMap({mapImage}) {
               payload: im
             })
           })
-        }} type="button" style={{position: 'absolute', zIndex: '999'}}>Очистить
+        }} type="button" style={{position: 'absolute', zIndex: '999', right: '0'}}>Очистить
         </button>
       </div>
 
@@ -238,7 +280,14 @@ export default function ImageMap({mapImage}) {
                     src={image.url}
                     alt=""
                   />
-                  <div style={{marginTop: '4px', display: 'flex', flexDirection: 'row', justifyContent: 'space-around', position: 'absolute', width: '100%'}}>
+                  <div style={{
+                    marginTop: '4px',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-around',
+                    position: 'absolute',
+                    width: '100%'
+                  }}>
                     <span style={{
                       fontWeight: '500',
                       width: '36px',
@@ -302,26 +351,55 @@ export default function ImageMap({mapImage}) {
                               type="button">Очистить
                       </button>
                     </div>
-                    <div
-                      ref={textRef}
-                      contentEditable="plaintext-only"
-                      className="textarea"
-                      dangerouslySetInnerHTML={{__html: currentText}}
-                      onInput={emitChange}
-                      onBlur={emitChange}
-                      onKeyUp={emitChange}
-                      onKeyDown={emitChange}
-                      style={{
-                        borderStyle: 'solid',
-                        maxHeight: '20rem',
-                        overflowY: 'auto'
-                      }}
-                    />
+                    <div style={{marginBottom: '10px'}}>
+                      <button onClick={() => setSelectionMode(false)} className="button button--default button--outline"
+                              type="button">Редактировать
+                      </button>
+                      <button onClick={enterSelectionMode} className="button button--default button--outline"
+                              type="button">Выделить
+                      </button>
+                    </div>
+                    {selectionMode ? (
+                      <div
+                        className="textarea"
+                        style={{
+                          borderStyle: 'solid',
+                          maxHeight: '20rem',
+                          overflowY: 'auto'
+                        }}
+                      >
+                        {currentWords.map(word => {
+                          const {type} = word
+                          if (type === 'break') {
+                            return (<div className="line-sep"></div>)
+                          }
+                          return (
+                            <span className="text-item-word">{word.word}</span>
+                          )
+                        })}
+                      </div>
+                    ) : (
+                      <div
+                        ref={textRef}
+                        contentEditable="plaintext-only"
+                        className="textarea"
+                        dangerouslySetInnerHTML={{__html: currentText}}
+                        onInput={emitChange}
+                        onBlur={emitChange}
+                        onKeyUp={emitChange}
+                        onKeyDown={emitChange}
+                        style={{
+                          borderStyle: 'solid',
+                          maxHeight: '20rem',
+                          overflowY: 'auto'
+                        }}
+                      ></div>
+                    )}
+                    <div style={{marginTop: '2rem'}}>
+                    <textarea className="textarea" onChange={() => {
+                    }} value={state.text} style={{minHeight: '300px'}}/>
+                    </div>
                   </div>
-                </div>
-                <div style={{marginTop: '2rem'}}>
-                  <textarea className="textarea" onChange={() => {
-                  }} value={state.text} style={{minHeight: '300px'}}/>
                 </div>
               </div>
             )}

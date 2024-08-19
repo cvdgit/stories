@@ -11,7 +11,7 @@
 }
 
 .block-edit-field-image__image-container {
-  align-items: center;
+  /*align-items: center;*/
   display: flex;
   position: relative;
   justify-content: center;
@@ -52,7 +52,8 @@
 
 .block-edit-field-image__image {
   max-height: 10rem;
-  max-width: 10rem
+  max-width: 10rem;
+  user-select: none;
 }
 
 .block-edit-field-image__image--icon {
@@ -188,7 +189,7 @@
 }
 
 .block-edit-field-drag-item--large .block-edit-field-drag-item__container {
-  padding: 2rem 1rem;
+  /*padding: 2rem 1rem;*/
 }
 
 .block-edit-field-drag-item--large .block-edit-field-drag-item__container--top-border {
@@ -466,4 +467,14 @@
 
 .block-edit-gallery {
   margin-bottom: 18rem;
+}
+
+.delete-btn {
+  background: rgb(220, 53, 69);
+  width: 20px;
+  height: 20px;
+  font-size: 23px;
+  line-height: 20px;
+  border-radius: 6px;
+  color: white;
 }

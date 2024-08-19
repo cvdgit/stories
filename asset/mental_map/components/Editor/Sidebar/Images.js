@@ -1,9 +1,9 @@
-import React, {useCallback, useRef, useState} from 'react'
+import React, {useRef, useState} from 'react'
 import './Image.css'
-import {Draggable, Droppable} from "react-beautiful-dnd";
 import Image from "./Image";
 import {useImages, useMentalMap} from "../../App/App";
 import {v4 as uuidv4} from 'uuid'
+import api from "../../../Api";
 
 export default function Images() {
   const {state, dispatch} = useMentalMap()
@@ -106,9 +106,27 @@ export default function Images() {
     setSelectedImages([])
   }
 
-  /*const imageCheckBoxHandler = useCallback(() => {
+  const checkBoxHandler = (imageItem, value) => {
+    setSelectedImages((prevItems) => {
+      if (value) {
+        return [...prevItems, imageItem]
+      }
+      return prevItems.filter(i => i.id !== imageItem.id)
+    })
+  }
 
-  })*/
+  const deleteImageHandler = (imageId) => {
+    imagesDispatch({
+      type: 'delete_image',
+      imageId
+    })
+    api.post('/admin/index.php?r=mental-map/delete-image', {
+      payload: {
+        id: state.id,
+        imageId,
+      }
+    })
+  }
 
   return (
     <div className="sidebar-list">
@@ -122,7 +140,7 @@ export default function Images() {
         ? (
           <div className="block-edit-gallery">
             <div
-              style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem'}}>
+              style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem'}}>
               {images.map((imageItem, index) => (
                 <Image
                   key={index}
@@ -130,14 +148,8 @@ export default function Images() {
                   imageItem={imageItem}
                   file={getFile(imageItem.id)}
                   uploadCompleteHandler={(response) => uploadCompleteHandler(imageItem, response)}
-                  checkBoxHandler={(e) => {
-                    setSelectedImages((prevItems) => {
-                      if (e.target.checked) {
-                        return [...prevItems, imageItem]
-                      }
-                      return prevItems.filter(i => i.id !== imageItem.id)
-                    })
-                  }}
+                  checkBoxHandler={checkBoxHandler}
+                  deleteImageHandler={deleteImageHandler}
                 />
               ))}
             </div>
