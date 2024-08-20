@@ -3,6 +3,7 @@ import InnerDialog from "./Dialog";
 import VoiceResponse from "./lib/VoiceResponse"
 import MissingWordsRecognition from "./lib/MissingWordsRecognition"
 import {v4 as uuidv4} from "uuid"
+import DetailText from "./components/DetailText";
 
 export default function MentalMap(element, params) {
 
@@ -75,51 +76,22 @@ export default function MentalMap(element, params) {
     detailImg.src = image.url
     detailImgWrap.appendChild(detailImg)
 
-    const detailText = document.createElement('div')
-    detailText.classList.add('detail-text')
-
     const text = texts.find(t => t.id === image.id)
-
-    text.words.map(word => {
-      const {type} = word
-      if (type === 'break') {
-        const breakElem = document.createElement('div')
-        breakElem.classList.add('line-sep')
-        detailText.appendChild(breakElem)
-      } else {
-        const currentSpan = document.createElement('span')
-        currentSpan.classList.add('text-item-word')
-        currentSpan.innerHTML = word.word
-        if (word.hidden) {
-          currentSpan.classList.add('selected')
-        }
-        if (word?.target) {
-          word.hidden = true
-          currentSpan.classList.add('selected')
-          currentSpan.classList.add('word-target')
-        }
-        currentSpan.addEventListener('click', () => {
-
-          if (voiceResponse.getStatus()) {
-            voiceResponse.stop()
-            startRecording(recordingWrap.querySelector('#start-recording'))
-          }
-          ['#result_span', '#final_span', '#interim_span'].map(q => {
-            detailTextWrap.querySelector(q).innerHTML = ''
-            recordingWrap.querySelector('#start-retelling-wrap').style.display = 'none'
-          })
-
-          word.hidden = !word.hidden
-          currentSpan.classList.toggle('selected')
-          recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text)
-        })
-        detailText.appendChild(currentSpan)
-      }
-    })
 
     const detailTextWrap = document.createElement('div')
     detailTextWrap.classList.add('detail-text-wrap')
-    detailTextWrap.appendChild(detailText)
+
+    detailTextWrap.appendChild(DetailText(text, () => {
+      if (voiceResponse.getStatus()) {
+        voiceResponse.stop()
+        startRecording(recordingWrap.querySelector('#start-recording'))
+      }
+      ['#result_span', '#final_span', '#interim_span'].map(q => {
+        detailTextWrap.querySelector(q).innerHTML = ''
+        recordingWrap.querySelector('#start-retelling-wrap').style.display = 'none'
+      })
+      recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text)
+    }, () => recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text)))
 
     const recordingContainer = document.createElement('div')
     recordingContainer.classList.add('recording-container')
@@ -252,16 +224,16 @@ export default function MentalMap(element, params) {
         if (p === '') {
           return [{type: 'break'}]
         }
-        const words = p.split(' ').map(word => {
+        const words = p.split(' ').filter(w => w).map(word => {
           if (word.indexOf('{') > -1) {
             const id = word.toString().replace(/[^\w\-]+/gmui, '')
             if (textFragments.has(id)) {
               const reg = new RegExp(`{${id}}`)
               word = word.replace(reg, textFragments.get(id))
-              return word.split(' ').map(w => ({word: w, type: 'word', hidden: false, target: true}))
+              return word.split(' ').map(w => ({id: uuidv4(), word: w, type: 'word', hidden: false, target: true}))
             }
           }
-          return [{word, type: 'word', hidden: false}]
+          return [{id: uuidv4(), word, type: 'word', hidden: false}]
         })
         return [...(words.flat()), {type: 'break'}]
       }).flat()
@@ -272,6 +244,8 @@ export default function MentalMap(element, params) {
       }
     })
 
+    //console.log(texts)
+
     const zoomWrap = document.createElement('div')
     zoomWrap.classList.add('zoom-wrap')
     zoomWrap.style.width = `${json.map.width}px`
@@ -280,8 +254,6 @@ export default function MentalMap(element, params) {
     const img = document.createElement('img')
     img.src = json.map.url
     img.style.height = '100%'
-    //img.style.width = '100%'
-    //img.style.margin = '0 auto'
     zoomWrap.appendChild(img)
 
     json.map.images.map(image => {
@@ -435,24 +407,12 @@ export default function MentalMap(element, params) {
     if (json.map.width > containerWidth) {
       initialZoom = containerWidth / json.map.width;
     }
-/*
-    if (json.map.width < containerWidth) {
-      initialZoom = 1 + ((containerWidth - json.map.width) / json.map.width);
-    }*/
-
-    console.log(initialZoom)
 
     const zoom = Panzoom(zoomWrap, {
       excludeClass: 'mental-map-img',
-      //contain: 'inside',
       startScale: initialZoom,
       minScale: 0.4,
       maxScale: 2,
-      //initialX: 0,
-      //initialY: 0,
-      //startX: 0,
-      //startY: 0,
-      //origin: '50% 50%'
     });
     element.parentElement.addEventListener('wheel', zoom.zoomWithWheel);
   }

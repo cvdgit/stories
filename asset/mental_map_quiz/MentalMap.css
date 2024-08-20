@@ -207,3 +207,8 @@
 .mental-map-toolbar {
   text-align: left;
 }
+
+.detail-text-actions {
+  text-align: right;
+  margin-bottom: 10px;
+}
