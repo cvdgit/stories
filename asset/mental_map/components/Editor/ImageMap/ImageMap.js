@@ -409,8 +409,6 @@ export default function ImageMap({mapImage}) {
                                     return w
                                   })
                                 )
-
-                                //console.log(selectionRef.current.innerHTML)
                               }}
                               className={`text-item-word ${word.hidden ? 'selected' : ''}`}
                             >{word.word}</span>

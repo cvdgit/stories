@@ -40,13 +40,14 @@
   font-size: 1.2rem;
   font-weight: 900;
   letter-spacing: .08rem;
-  line-height: 4.2rem;
+  /*line-height: 4.2rem;*/
   margin-right: -3rem;
   position: relative;
   text-transform: uppercase;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  margin-bottom: 10px;
 }
 
 .sidebar-list__title span {

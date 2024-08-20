@@ -5,6 +5,22 @@ import {useImages, useMentalMap} from "../../App/App";
 import {v4 as uuidv4} from 'uuid'
 import api from "../../../Api";
 
+function shuffle(array) {
+  let counter = array.length;
+  // While there are elements in the array
+  while (counter > 0) {
+    // Pick a random index
+    const index = Math.floor(Math.random() * counter);
+    // Decrease counter by 1
+    counter--;
+    // And swap the last element with it
+    const temp = array[counter];
+    array[counter] = array[index];
+    array[index] = temp;
+  }
+  return array;
+}
+
 export default function Images() {
   const {state, dispatch} = useMentalMap()
   const {state: images, dispatch: imagesDispatch} = useImages()
@@ -60,11 +76,26 @@ export default function Images() {
   }
 
   const moveSelectedImageHandler = () => {
-    if (selectedImages.length === 0) {
-      return
+
+    const texts = (state.text || '')
+      .split("\n\n")
+      .filter(p => p !== '')
+
+    const imagesToAdd = [...selectedImages]
+
+    if (imagesToAdd.length === 0) {
+      let imgNum = state.map.images.length
+      if (imgNum < texts.length) {
+        const shuffleImages = shuffle([...images])
+        while (imgNum < texts.length) {
+          imagesToAdd.push(shuffleImages.pop())
+          imgNum++
+        }
+      }
     }
+
     const updatedList = [...images].filter(i => {
-      return !(selectedImages.find(si => si.id === i.id) !== undefined)
+      return !(imagesToAdd.find(si => si.id === i.id) !== undefined)
     })
 
     imagesDispatch({
@@ -72,13 +103,11 @@ export default function Images() {
       payload: updatedList
     })
 
-    const texts = (state.text || '').split("\n\n").filter(p => p !== '')
-
     let left = 10
     let top = 10
     let w = left
     let imgNum = state.map.images.length
-    selectedImages.map((si, index) => {
+    imagesToAdd.map((si, index) => {
 
       w = w + si.width + 50
       if (index > 0) {
