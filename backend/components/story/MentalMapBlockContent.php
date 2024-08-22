@@ -10,25 +10,30 @@ use yii\helpers\Html;
 
 class MentalMapBlockContent
 {
-
     /**
      * @var string
      */
     private $id;
 
-    public function __construct(string $id)
+    /**
+     * @var int
+     */
+    private $slideId;
+
+    public function __construct(string $id, int $slideId)
     {
         $this->id = $id;
+        $this->slideId = $slideId;
     }
 
-    public static function createFromHtml(string $html): MentalMapBlockContent
+    public static function createFromHtml(string $html, int $slideId): MentalMapBlockContent
     {
         $content = phpQuery::newDocumentHTML($html);
         $id = $content->find('.mental-map')->attr('data-mental-map-id');
         if (empty($id)) {
             throw new DomainException('Mental Map id undefined');
         }
-        return new self((string) $id);
+        return new self((string) $id, $slideId);
     }
 
     public function getId(): string
@@ -38,7 +43,7 @@ class MentalMapBlockContent
 
     public function renderWithDescription(): string
     {
-        $link = Html::a('Ментальная карта', ['mental-map/editor', 'id' => $this->id]);
+        $link = Html::a('Ментальная карта', ['mental-map/editor', 'id' => $this->id, 'from_slide' => $this->slideId]);
         return Html::tag('div', $link, [
             'class' => 'mental-map',
             'data-mental-map-id' => $this->id,

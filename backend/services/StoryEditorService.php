@@ -199,7 +199,7 @@ class StoryEditorService
     {
         $slide = (new HtmlSlideReader(new SlideContent($slideId, 'mental-map')))->load();
         $block = $slide->createBlock(MentalMapBlock::class);
-        $block->setContent((new MentalMapBlockContent($mentalMapId))->render());
+        $block->setContent((new MentalMapBlockContent($mentalMapId, $slideId))->render());
         $slide->addBlock($block);
         return (new HTMLWriter())->renderSlide($slide);
     }

@@ -49,7 +49,7 @@ class MentalMapController extends Controller
     /**
      * @throws BadRequestHttpException
      */
-    public function actionEditor(string $id, WebUser $user, Request $request): string
+    public function actionEditor(string $id, int $from_slide, WebUser $user, Request $request): string
     {
         $mentalMap = MentalMap::findOne($id);
         if ($mentalMap === null) {
@@ -83,7 +83,7 @@ class MentalMapController extends Controller
         return $this->render('editor', [
             'name' => $mentalMap->name,
             'id' => $mentalMap->uuid,
-            'returnUrl' => $request->referrer,
+            'returnUrl' => $request->referrer . '#' . $from_slide,
         ]);
     }
 
