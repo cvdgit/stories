@@ -294,6 +294,7 @@ export default function MentalMap(element, params) {
       closeBtn.addEventListener('click', () => {
         zoom.destroy()
         zoomContainer.remove()
+        element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
       })
       zoomContainer.appendChild(closeBtn)
 
