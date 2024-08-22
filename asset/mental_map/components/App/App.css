@@ -164,7 +164,17 @@
 .text-line {
   position: relative;
   margin-left: 20px;
+  margin-bottom: 20px;
+}
+
+.text-line:hover {
+  background-color: #eee;
+}
+
+.text-line p:not(:last-child) {
   margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px #ddd solid;
 }
 
 .text-line span {

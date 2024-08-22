@@ -118,7 +118,30 @@ export default function App({mentalMapId}) {
           setTextFragmentCount((formattedMapText || []).length)
           setOpen(false)
         }}>
-          <h2 className="dialog-heading">Текст</h2>
+          <h2
+            className="dialog-heading"
+            style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}
+          >
+            Текст
+            <button
+              type="button"
+              onClick={() => {
+                //setFormattedMapText(prevState => [...prevState].map(p => p.replace(/\n/g, ' ').trim().replace(/\s+/g, ' ')))
+                const paragraphs = (formattedMapText || [])
+                  .map(
+                    p => p.replace(/\n/g, ' ')
+                      .trim()
+                      .replace(/\s+/g, ' ')
+                  )
+                const text = paragraphs.join("\n\n")
+                dispatch({
+                  type: 'update_mental_map_text',
+                  text,
+                })
+                setMapText(text)
+              }}
+              className="button button--default button--outline"
+            >Форматировать</button></h2>
           <div style={{display: 'flex', flexDirection: 'row', gap: '20px', maxHeight: '500px'}}>
             <div style={{flex: '1'}}>
               <textarea className="textarea" style={{minHeight: '400px'}} placeholder="Текст" onChange={(e) => {
@@ -130,8 +153,17 @@ export default function App({mentalMapId}) {
               }} value={state.text}/>
             </div>
             <div style={{flex: '1'}}>
-              <div className="textarea" style={{overflowY: 'auto', borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgb(176 190 197 / 1)'}}>
-                {(formattedMapText || []).map((p, i) => (<div className="text-line" key={i}><span>{i + 1}</span>{p}</div>))}
+              <div className="textarea" style={{
+                overflowY: 'auto',
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                borderColor: 'rgb(176 190 197 / 1)'
+              }}>
+                {(formattedMapText || []).map((p, i) => (
+                  <div className="text-line" key={i}>
+                    <span>{i + 1}</span>
+                    {p.split("\n").map((t, j) => (<p key={j}>{t}</p>))}
+                  </div>))}
               </div>
             </div>
           </div>

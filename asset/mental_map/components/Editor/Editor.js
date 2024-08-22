@@ -1,8 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import {useImages, useMentalMap} from "../App/App";
-import {DragDropContext} from "react-beautiful-dnd";
 import Images from "./Sidebar/Images";
-import SliderMenu from "./Sidebar/SliderMenu";
 import './Editor.css'
 import ImageMap from "./ImageMap";
 import UploadImageMap from "./ImageMap/UploadImageMap";
