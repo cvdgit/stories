@@ -4,6 +4,8 @@ import VoiceResponse from "./lib/VoiceResponse"
 import MissingWordsRecognition from "./lib/MissingWordsRecognition"
 import {v4 as uuidv4} from "uuid"
 import DetailText from "./components/DetailText";
+import AllTexts from "./components/AllTexts";
+import MentalMapImage from "./components/MentalMapImage";
 
 export default function MentalMap(element, params) {
 
@@ -204,7 +206,7 @@ export default function MentalMap(element, params) {
   function processImageText(text) {
     const textFragments = new Map();
     const reg = new RegExp(`<span[^>]*>(.*?)<\\/span>`, 'gm');
-    const imageText = decodeHtml(text.replace(/&nbsp;/g,' ')).replace(reg, (match, p1) => {
+    const imageText = decodeHtml(text.replace(/&nbsp;/g, ' ')).replace(reg, (match, p1) => {
       const id = uuidv4()
       textFragments.set(`${id}`, `${p1.trim()}`)
       return `{${id}}`
@@ -244,177 +246,109 @@ export default function MentalMap(element, params) {
       }
     })
 
-    //console.log(texts)
-
-    const zoomWrap = document.createElement('div')
-    zoomWrap.classList.add('zoom-wrap')
-    zoomWrap.style.width = `${json.map.width}px`
-    zoomWrap.style.height = `${json.map.height}px`
-
-    const img = document.createElement('img')
-    img.src = json.map.url
-    img.style.height = '100%'
-    zoomWrap.appendChild(img)
-
-    json.map.images.map(image => {
-      const mapImgWrap = document.createElement('div')
-      mapImgWrap.classList.add('mental-map-img')
-      mapImgWrap.style.position = 'absolute'
-      mapImgWrap.style.width = image.width + 'px'
-      mapImgWrap.style.height = image.height + 'px'
-      mapImgWrap.style.left = '0px'
-      mapImgWrap.style.top = '0px'
-      mapImgWrap.style.transform = `translate(${image.left}px, ${image.top}px)`
-      mapImgWrap.addEventListener('click', () => {
-        element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
-        const dialog = mapImageClickHandler(image, texts)
-        dialog.onHide(() => {
-          element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
-          hideDialogHandler()
-          if (voiceResponse.getStatus()) {
-            voiceResponse.stop()
-          }
-        })
+    container.appendChild(AllTexts(texts, json.map.images, (image) => {
+      const dialog = mapImageClickHandler(image, texts)
+      dialog.onHide(() => {
+        hideDialogHandler()
+        if (voiceResponse.getStatus()) {
+          voiceResponse.stop()
+        }
       })
-      const mapImg = document.createElement('img')
-      mapImg.setAttribute('title', image.text.replace(/<[^>]*>?/gm, ''))
-      mapImg.dataset.trigger = 'hover'
-      mapImg.dataset.placement = 'auto'
-      mapImg.dataset.container = 'body'
-      mapImg.src = image.url
-      mapImgWrap.appendChild(mapImg)
-      zoomWrap.appendChild(mapImgWrap)
-    })
-
-    container.appendChild(zoomWrap)
+    }))
 
     const toolbar = document.createElement('div')
     toolbar.classList.add('mental-map-toolbar')
 
-    this.element.appendChild(toolbar)
-    this.element.appendChild(container)
+    const mentalMapBtn = document.createElement('button')
+    mentalMapBtn.classList.add('btn', 'btn-small', 'mental-map-btn')
+    mentalMapBtn.textContent = 'Ментальная карта'
+    let zoom
+    mentalMapBtn.addEventListener('click', (e) => {
 
-    $('.mental-map-img img').tooltip()
+      const zoomContainer = document.createElement('div')
+      zoomContainer.classList.add('zoom-container')
 
-    const btn = document.createElement('button')
-    btn.classList.add('btn', 'btn-small', 'mental-map-all-text-btn')
-    btn.textContent = 'Весь текст'
-    btn.addEventListener('click', () => {
-
-      const list = document.createElement('div')
-      list.classList.add('mental-map-all-text-container')
-      texts.map(textState => {
-        const item = document.createElement('div')
-        item.classList.add('text-container-row')
-        const imageItem = document.createElement('div')
-        imageItem.classList.add('image-item')
-
-        const img = document.createElement('img')
-        const image = json.map.images.find(i => i.id === textState.id)
-        img.src = image.url
-        img.style.cursor = 'pointer'
-        img.addEventListener('click', e => {
-          const dialog = mapImageClickHandler(image, texts)
+      const zoomWrap = MentalMapImage(
+        json.map.url,
+        `${json.map.width}px`,
+        `${json.map.height}px`,
+        json.map.images,
+        texts,
+        mapImageClickHandler,
+        (dialog) => {
+          element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
           dialog.onHide(() => {
+            element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
             hideDialogHandler()
             if (voiceResponse.getStatus()) {
               voiceResponse.stop()
             }
           })
-        })
-        imageItem.appendChild(img)
+        }
+      )
+      zoomContainer.appendChild(zoomWrap)
 
-        item.appendChild(imageItem)
-        const textItem = document.createElement('div')
-        textItem.classList.add('text-item')
-
-        textState.words.map(word => {
-          const {type} = word
-          if (type === 'break') {
-            const breakElem = document.createElement('div')
-            breakElem.classList.add('line-sep')
-            textItem.appendChild(breakElem)
-          } else {
-            const span = document.createElement('span')
-            span.classList.add('text-item-word')
-            if (word.hidden) {
-              span.classList.add('selected')
-            }
-            if (word?.target) {
-              //word.hidden = true
-              span.classList.add('selected')
-              span.classList.add('word-target')
-            }
-            span.textContent = word.word
-            span.addEventListener('click', () => {
-              word.hidden = !word.hidden
-              span.classList.toggle('selected')
-            })
-            textItem.appendChild(span)
-          }
-        })
-
-        item.appendChild(textItem)
-        list.appendChild(item)
+      const closeBtn = document.createElement('button')
+      closeBtn.classList.add('btn', 'btn-small', 'mental-map-close')
+      closeBtn.textContent = 'Закрыть'
+      closeBtn.addEventListener('click', () => {
+        zoom.destroy()
+        zoomContainer.remove()
       })
+      zoomContainer.appendChild(closeBtn)
 
-      const dialog = new InnerDialog($(container), {title: 'Весь текст', content: list});
-
-      dialog.show(() => {
-        element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
-        showDialogHandler()
+      const hideBtn = document.createElement('button')
+      hideBtn.classList.add('btn', 'btn-small', 'mental-map-hide-btn')
+      hideBtn.textContent = 'Скрыть'
+      hideBtn.addEventListener('click', e => {
+        $(e.target).toggleClass('img-hide')
+        if ($(e.target).hasClass('img-hide')) {
+          $(this.element).find('.mental-map-img img')
+            .each((i, el) => $(el).css({opacity: '0'}))
+          $(this.element).find('.mental-map-img').each((i, el) => {
+            $(el).append(`<span class="mental-map-point"></span>`)
+          })
+          $(e.target).text('Показать')
+        } else {
+          $(this.element).find('.mental-map-img span').remove()
+          $(this.element).find('.mental-map-img img')
+            .each((i, el) => $(el).css({opacity: '1'}))
+          $(e.target).text('Скрыть')
+        }
       })
+      zoomContainer.appendChild(hideBtn)
 
-      dialog.onHide(() => {
-        element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
-        hideDialogHandler()
-      })
-    })
+      this.element.appendChild(zoomContainer)
 
-    toolbar.appendChild(btn)
+      $('.mental-map-img img').tooltip()
 
-    const hideBtn = document.createElement('button')
-    hideBtn.classList.add('btn', 'btn-small', 'mental-map-hide-btn')
-    hideBtn.textContent = 'Скрыть'
-    hideBtn.addEventListener('click', e => {
-      $(e.target).toggleClass('img-hide')
-      if ($(e.target).hasClass('img-hide')) {
-        $(this.element).find('.mental-map-img img')
-          .each((i, el) => $(el).css({opacity: '0'}))
-        $(this.element).find('.mental-map-img').each((i, el) => {
-          $(el).append(`<span class="mental-map-point"></span>`)
-        })
-        $(e.target).text('Показать')
+      let initialZoom = 0.8
+      const containerWidth = container.offsetWidth
+      const containerHeight = container.offsetHeight
+
+      if (json.map.height > containerHeight) {
+        initialZoom = containerHeight / json.map.height;
       } else {
-        $(this.element).find('.mental-map-img span').remove()
-        $(this.element).find('.mental-map-img img')
-          .each((i, el) => $(el).css({opacity: '1'}))
-        $(e.target).text('Скрыть')
+        initialZoom = 1;
       }
+
+      if (json.map.width > containerWidth) {
+        initialZoom = containerWidth / json.map.width;
+      }
+
+      zoom = Panzoom(zoomWrap, {
+        excludeClass: 'mental-map-img',
+        startScale: initialZoom,
+        minScale: 0.4,
+        maxScale: 2,
+      });
+      element.parentElement.addEventListener('wheel', zoom.zoomWithWheel);
     })
-    toolbar.appendChild(hideBtn)
 
-    let initialZoom = 0.8
-    const containerWidth = container.offsetWidth
-    const containerHeight = container.offsetHeight
+    toolbar.appendChild(mentalMapBtn)
 
-    if (json.map.height > containerHeight) {
-      initialZoom = containerHeight / json.map.height;
-    } else {
-      initialZoom = 1;
-    }
-
-    if (json.map.width > containerWidth) {
-      initialZoom = containerWidth / json.map.width;
-    }
-
-    const zoom = Panzoom(zoomWrap, {
-      excludeClass: 'mental-map-img',
-      startScale: initialZoom,
-      minScale: 0.4,
-      maxScale: 2,
-    });
-    element.parentElement.addEventListener('wheel', zoom.zoomWithWheel);
+    this.element.appendChild(toolbar)
+    this.element.appendChild(container)
   }
 
   /**

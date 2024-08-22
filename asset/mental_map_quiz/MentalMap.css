@@ -10,7 +10,9 @@
   position: relative;
   width: 100%;
   height: 100%;
-  border: 1px #808080 solid;
+  /*border: 1px #808080 solid;*/
+  flex: 1;
+  overflow: hidden;
   /*display: flex;
   justify-content: center;*/
 }
@@ -86,20 +88,22 @@
 }
 
 .mental-map-hide-btn {
-  /*position: absolute;
-  left: 10px;
-  top: 70px;*/
+  position: absolute;
+  right: 0;
+  top: 70px;
 }
 
 .mental-map-all-text-container {
   display: flex;
   flex-direction: column;
-  /*max-width: 800px;*/
-  max-height: 600px;
-  min-width: 600px;
-  min-height: 500px;
+  max-height: 100%;
   padding: 10px;
   overflow-y: auto;
+  text-align: left;
+}
+
+.mental-map-all-text-container .selected {
+  color: #fff !important;
 }
 
 .text-container-row {
@@ -206,9 +210,29 @@
 
 .mental-map-toolbar {
   text-align: left;
+  background-color: #eee;
+  padding: 10px;
+  border-radius: 20px 20px 0 0;
+  border-bottom: 1px #808080 solid;
 }
 
 .detail-text-actions {
   text-align: right;
   margin-bottom: 10px;
+}
+
+.zoom-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  border: 1px #808080 solid;
+}
+
+.mental-map-close {
+  position: absolute;
+  right: 0;
+  top: 0;
 }
