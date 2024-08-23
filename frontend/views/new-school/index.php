@@ -70,7 +70,7 @@ $this->registerJs($this->renderFile('@frontend/views/new-school/index.js'));
             </div>
         </div>
         <div class="text-lg-left text-center">
-            <button data-toggle="modal" data-target="#consult-request-modal" type="button" class="btn white-btn">Бесплатная консультация</button>
+            <button data-toggle="modal" data-target="#consult-request-modal" style="width: 291px" type="button" class="btn white-btn">Оставить заявку</button>
         </div>
     </div>
 </section>
