@@ -1579,3 +1579,22 @@ body {
     margin: 0;
   }
 }
+
+.white-btn {
+  color: var(--black1);
+  background-color: var(--white);
+  border-radius: 500px;
+  font-size: 2rem;
+  line-height: 1.55;
+  text-transform: uppercase;
+  border-color: var(--black1);
+  border-style: solid;
+  font-weight: 700;
+  padding: 2rem 4rem;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+.white-btn:hover {
+  background-color: #f8f9fa;
+  color: black;
+}

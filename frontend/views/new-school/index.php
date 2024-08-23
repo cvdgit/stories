@@ -24,7 +24,7 @@ $this->registerJs($this->renderFile('@frontend/views/new-school/index.js'));
 ?>
 <section class="hero-section">
     <div class="container-lg px-5 p-lg-0">
-        <div class="d-flex flex-lg-row flex-column position-relative">
+        <div class="d-flex flex-lg-row flex-column position-relative mb-5">
             <div style="flex: 1 0 50%" class="text-lg-left text-center hero-text-wrap">
                 <div class="mb-3">
                     <h1 class="m-0 main-header">Удивительные возможности мозга ребенка</h1>
@@ -68,6 +68,9 @@ $this->registerJs($this->renderFile('@frontend/views/new-school/index.js'));
                         </span>
                 </a>
             </div>
+        </div>
+        <div>
+            <button data-toggle="modal" data-target="#consult-request-modal" type="button" class="btn white-btn">Бесплатная консультация</button>
         </div>
     </div>
 </section>
