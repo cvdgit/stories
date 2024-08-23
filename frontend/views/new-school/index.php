@@ -2,14 +2,16 @@
 
 declare(strict_types=1);
 
+use frontend\ConsultRequest\ConsultRequestForm;
+use frontend\models\ContactRequestForm;
 use frontend\widgets\StoriesTabWidget;
-use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\web\View;
 
 /**
  * @var View $this
- * @var $contactRequestModel
+ * @var ContactRequestForm $contactRequestModel
+ * @var ConsultRequestForm $consultRequestModel
  */
 
 $this->setMetaTags(
@@ -18,6 +20,7 @@ $this->setMetaTags(
     'домашнее обучение, онлайн школа, обучение детей, wikids, сказки, истории',
 );
 $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
+$this->registerJs($this->renderFile('@frontend/views/new-school/index.js'));
 ?>
 <section class="hero-section">
     <div class="container-lg px-5 p-lg-0">
@@ -363,4 +366,4 @@ $this->registerLinkTag(['rel' => 'canonical', 'href' => Url::canonical()]);
     </div>
 </section>
 
-<?= $this->render('@frontend/views/school/_request') ?>
+<?= $this->render('_consult_request_form', ['formModel' => $consultRequestModel]); ?>

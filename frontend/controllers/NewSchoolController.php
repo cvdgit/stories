@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace frontend\controllers;
 
+use frontend\ConsultRequest\ConsultRequestForm;
 use frontend\models\ContactRequestForm;
 use Yii;
 use yii\captcha\CaptchaAction;
-use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\ErrorAction;
 
@@ -38,6 +38,7 @@ class NewSchoolController extends Controller
         }
         return $this->render('index', [
             'contactRequestModel' => new ContactRequestForm(),
+            'consultRequestModel' => new ConsultRequestForm(),
         ]);
     }
 }

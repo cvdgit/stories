@@ -23,3 +23,10 @@ $(".categories li").click(function(e) {
     $(this).tab('show');
   }
 });
+
+(function() {
+  if (/^#request$/.test(location.hash)) {
+    $('#consult-request-modal').modal('show');
+  }
+})()
+
