@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use frontend\ConsultRequest\ConsultRequestForm;
 use yii\bootstrap\ActiveForm;
+use yii\helpers\Url;
 use yii\web\View;
 
 /**
@@ -47,7 +48,7 @@ use yii\web\View;
                     <p class="discount-agree__text">
                         Нажимая на кнопку вы принимаете
                         <br>
-                        <a href="#" class="discount-agree__link">пользовательское соглашение</a>
+                        <a href="<?= Url::to(['/site/policy']); ?>" target="_blank" class="discount-agree__link">пользовательское соглашение</a>
                     </p>
                 </div>
             </div>
