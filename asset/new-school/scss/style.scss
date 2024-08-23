@@ -549,7 +549,7 @@ body {
       border: 0 none;
       padding: 1.5rem 10.9rem 1.6rem 10.9rem;
       @include media-breakpoint-down(sm) {
-        padding: 1.5rem 0 1.6rem 0;
+        padding: 1.5rem 2rem 1.6rem 2rem;
         width: 100%;
       }
     }
@@ -1592,6 +1592,10 @@ body {
   font-weight: 700;
   padding: 2rem 4rem;
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+
+  @include media-breakpoint-down(md) {
+    padding: 2rem 3rem;
+  }
 }
 
 .white-btn:hover {
