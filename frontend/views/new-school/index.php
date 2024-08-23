@@ -146,8 +146,8 @@ $this->registerJs($this->renderFile('@frontend/views/new-school/index.js'));
             <span style="color: var(--green)">Wikids</span> — это персонализированное обучение для каждого ребёнка
         </div>
         <div class="text-center">
-            <a target="_blank" class="btn custom-btn position-relative" href="https://t.me/wikids_bot">
-                Получить чек-лист
+            <a class="btn custom-btn position-relative" data-toggle="modal" data-target="#consult-request-modal" href="#">
+                Записаться в школу
             </a>
         </div>
     </div>
