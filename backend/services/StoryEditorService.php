@@ -554,4 +554,11 @@ class StoryEditorService
             "url" => $storyUrl,
         ];
     }
+
+    public function renderBlock(string $slideContent, $block): string
+    {
+        $slide = (new HtmlSlideReader($slideContent))->load();
+        $slide->addBlock($block);
+        return (new HTMLWriter())->renderSlide($slide);
+    }
 }

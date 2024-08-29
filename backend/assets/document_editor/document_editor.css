@@ -1,0 +1,67 @@
+
+.editor {
+  display: block;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  cursor: default
+}
+
+.editor .hide_children > * {
+  display: none
+}
+
+.editor > .content {
+  position: relative;
+  outline: none;
+  margin: 0;
+  padding: 0;
+  min-width: 100%;
+  pointer-events: none
+}
+
+.editor > .content > .page {
+  position: absolute;
+  box-sizing: border-box;
+  left: 50%;
+  transform-origin: center top;
+  background: var(--page-background, #fff);
+  box-shadow: var(--page-box-shadow, 0 1px 3px 1px rgba(60, 64, 67, .15));
+  border: var(--page-border);
+  border-radius: var(--page-border-radius);
+  transition: left .3s, top .3s;
+  overflow: hidden;
+  pointer-events: all
+}
+
+.editor > .content[contenteditable], .editor > .content [contenteditable] {
+  cursor: text
+}
+
+.editor > .content [contenteditable=false] {
+  cursor: default
+}
+
+.editor > .overlays {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  min-width: 100%;
+  pointer-events: none
+}
+
+.editor > .overlays > .overlay {
+  position: absolute;
+  box-sizing: border-box;
+  left: 50%;
+  transform-origin: center top;
+  transition: left .3s, top .3s;
+  overflow: hidden;
+  z-index: 1
+}
+
+.main {
+  width: -moz-fit-content;
+  width: fit-content;
+  min-width: 100%;
+  padding: 0;
+}

@@ -8,6 +8,7 @@ use backend\components\editor\SlideListResponse;
 use backend\components\SlideModifier;
 use backend\components\story\AbstractBlock;
 use backend\components\story\reader\HtmlSlideReader;
+use backend\components\story\TextBlock;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
 use backend\models\editor\QuestionForm;
@@ -19,11 +20,13 @@ use backend\models\editor\TransitionForm;
 use backend\models\editor\VideoForm;
 use backend\models\video\VideoSource;
 use backend\services\StoryLinksService;
+use backend\services\StorySlideService;
 use backend\SlideEditor\CreateMentalMap\CreateMentalMapAction;
 use backend\SlideEditor\CreatePassTest\CreatePassTestAction;
 use backend\SlideEditor\CreateQuizBySlideText\CreateQuizAction;
 use common\models\Lesson;
 use common\models\StorySlide;
+use common\services\TransactionManager;
 use DomainException;
 use Exception;
 use Yii;
@@ -33,7 +36,9 @@ use common\models\Story;
 use common\services\StoryService;
 use common\rbac\UserRoles;
 use backend\services\StoryEditorService;
+use yii\helpers\Json;
 use yii\web\NotFoundHttpException;
+use yii\web\Request;
 use yii\web\Response;
 
 class EditorController extends BaseController
@@ -41,13 +46,37 @@ class EditorController extends BaseController
     protected $storyService;
     protected $editorService;
     private $storyLinksService;
+    /**
+     * @var TransactionManager
+     */
+    private $transactionManager;
+    /**
+     * @var StoryEditorService
+     */
+    private $storyEditorService;
+    /**
+     * @var StorySlideService
+     */
+    private $storySlideService;
 
-    public function __construct($id, $module, StoryService $storyService, StoryEditorService $editorService, StoryLinksService $storyLinksService, $config = [])
-    {
+    public function __construct(
+        $id,
+        $module,
+        StoryService $storyService,
+        StoryEditorService $editorService,
+        StoryLinksService $storyLinksService,
+        TransactionManager $transactionManager,
+        StorySlideService $storySlideService,
+        StoryEditorService $storyEditorService,
+        $config = []
+    ) {
         parent::__construct($id, $module, $config);
         $this->storyService = $storyService;
         $this->editorService = $editorService;
         $this->storyLinksService = $storyLinksService;
+        $this->transactionManager = $transactionManager;
+        $this->storySlideService = $storySlideService;
+        $this->storyEditorService = $storyEditorService;
     }
 
     /**
@@ -102,18 +131,21 @@ class EditorController extends BaseController
                 'copySlideAction' => ['editor/copy-slide'],
                 'storyImagesAction' => ['editor/image/list'],
             ])
-            ->setValue('storyUrl', Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $story->alias]));
+            ->setValue(
+                'storyUrl',
+                Yii::$app->urlManagerFrontend->createAbsoluteUrl(['story/view', 'alias' => $story->alias]),
+            );
     }
 
-	public function actionEdit($id)
-	{
+    public function actionEdit($id)
+    {
         $model = $this->findModel(Story::class, $id);
-	    $this->layout = 'editor';
+        $this->layout = 'editor';
         return $this->render('edit', [
             'model' => $model,
             'configJSON' => $this->getEditorConfig($model)->asJson(),
-		]);
-	}
+        ]);
+    }
 
     public function actionLesson(string $uuid): string
     {
@@ -140,8 +172,7 @@ class EditorController extends BaseController
         Yii::$app->response->format = Response::FORMAT_JSON;
         if ($slide_id === -1) {
             $model = StorySlide::findFirstSlide($story_id);
-        }
-        else {
+        } else {
             $model = StorySlide::findSlide($slide_id);
         }
         if ($model->isLink()) {
@@ -256,7 +287,8 @@ class EditorController extends BaseController
             $widgetStoryModel = $this->findModel(Story::class, $form->actionStoryID);
         }
 
-        $view = ($block->getType() === AbstractBlock::TYPE_VIDEO || $block->getType() === AbstractBlock::TYPE_VIDEOFILE) ? 'update_video' : 'update';
+        $view = ($block->getType() === AbstractBlock::TYPE_VIDEO || $block->getType(
+            ) === AbstractBlock::TYPE_VIDEOFILE) ? 'update_video' : 'update';
         return $this->renderAjax($view, [
             'model' => $form,
             'action' => ['editor/update-block/' . $block_type],
@@ -271,10 +303,13 @@ class EditorController extends BaseController
         $response = ['success' => false];
         if ($form->load(Yii::$app->request->post()) && $form->validate()) {
             try {
-                $response['id'] = $this->editorService->createSlideLink($form->story_id, $form->link_slide_id, $form->slide_id);
+                $response['id'] = $this->editorService->createSlideLink(
+                    $form->story_id,
+                    $form->link_slide_id,
+                    $form->slide_id,
+                );
                 $response['success'] = true;
-            }
-            catch (Exception $ex) {
+            } catch (Exception $ex) {
                 $response['error'] = $ex->getMessage();
             }
         }
@@ -289,7 +324,7 @@ class EditorController extends BaseController
     {
         $response->format = Response::FORMAT_JSON;
         $model = $this->findModel(Story::class, $story_id);
-        return array_map(static function(StorySlide $slide): array {
+        return array_map(static function (StorySlide $slide): array {
             return (new SlideListResponse($slide))->asArray();
         }, $model->storySlides);
     }
@@ -304,5 +339,70 @@ class EditorController extends BaseController
             return ['success' => true, 'id' => $slideModel->id];
         }
         return ['success' => false];
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionImportFromText(int $story_id, int $current_slide_id, Request $request, Response $response)
+    {
+        $response->format = Response::FORMAT_JSON;
+
+        $storyModel = Story::findOne($story_id);
+        if ($storyModel === null) {
+            return ['success' => false, 'message' => 'История не найдена'];
+        }
+
+        $currentSlideModel = StorySlide::findOne($current_slide_id);
+        if ($currentSlideModel === null) {
+            return ['success' => false, 'message' => 'Слайд не найден'];
+        }
+
+        $jsonBody = Json::decode($request->rawBody, false);
+        $texts = $jsonBody->texts;
+
+        $newSlideId = null;
+        try {
+            $this->transactionManager->wrap(
+                function () use ($texts, &$newSlideId, $storyModel, $currentSlideModel) {
+
+                    foreach ($texts as $text) {
+                        $slideModel = $this->storySlideService->create(
+                            $storyModel->id,
+                            'empty',
+                            StorySlide::KIND_SLIDE,
+                        );
+                        $slideModel->number = $currentSlideModel->number + 1;
+                        Story::insertSlideNumber($storyModel->id, $currentSlideModel->number);
+                        if (!$slideModel->save()) {
+                            throw new DomainException(
+                                'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
+                            );
+                        }
+
+                        $textBlock = new TextBlock();
+                        $textBlock->setType(AbstractBlock::TYPE_TEXT);
+                        $textBlock->setText(nl2br($text));
+                        $textBlock->setLeft('20px');
+                        $textBlock->setTop('20px');
+                        $textBlock->setWidth('1200px');
+                        $textBlock->setHeight('auto');
+
+                        $slideModel->updateData($this->storyEditorService->renderBlock($slideModel->data, $textBlock));
+                        if (!$slideModel->save()) {
+                            throw new DomainException(
+                                'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
+                            );
+                        }
+                        $newSlideId = $slideModel->id;
+                    }
+                },
+            );
+
+            return ["success" => true, 'slide_id' => $newSlideId];
+        } catch (Exception $exception) {
+            Yii::$app->errorHandler->logException($exception);
+            return ["success" => false, "message" => $exception->getMessage()];
+        }
     }
 }

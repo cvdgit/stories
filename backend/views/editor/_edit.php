@@ -135,7 +135,7 @@ echo $this->render('modal/image_from_file', ['storyModel' => $model]);
 echo $this->render('modal/image_from_url', ['storyModel' => $model]);
 echo $this->render('modal/slide_images', ['storyModel' => $model]);
 echo $this->render('modal/relations');
-//echo $this->render('modal/slide_source');
+echo $this->render('modal/import_from_text');
 
 $storyID = $model->id;
 
@@ -301,6 +301,9 @@ $js = <<< JS
         {'name': 'copy', 'title': 'Копия текущего слайда', 'click': StoryEditor.copySlide},
         {'name': 'link', 'title': 'Ссылка на слайд', 'click': function() {
             $('#slide-link-modal').modal('show');
+        }},
+        {name: 'importFromText', title: 'Импортировать из текста', click: () => {
+            $('#import-from-text-modal').modal('show')
         }}
     ]);
     editorPopover.attach('#create-image-block', {'placement': 'left'}, [
