@@ -44,6 +44,7 @@ return [
                 'modules\files\migrations',
                 'backend\modules\changelog\migrations',
                 'backend\modules\gpt\migrations',
+                'backend\modules\LearningPath\migrations',
             ],
         ],
         'serve' => [

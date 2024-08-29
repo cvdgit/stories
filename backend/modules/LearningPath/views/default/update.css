@@ -1,0 +1,37 @@
+.tree {
+
+}
+
+.tree-wrap {
+  width: 30rem;
+}
+
+.tree-container {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  gap: 20px;
+}
+
+.tree-name {
+  text-align: center;
+  font-weight: 600;
+  margin: 10px 10px 10px 0;
+  font-size: 20px;
+  flex: 1;
+}
+
+.tree-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+span.fancytree-title {
+  white-space: normal;
+}
+
+ul.fancytree-container {
+  border: 0 none;
+}
