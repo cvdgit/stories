@@ -126,6 +126,17 @@ $('.to-slides-tab').on('click', function() {
         scrollTop: 0
     }, 500);
 });
+
+$('.goto-slide-editor').on('click', (e) => {
+    e.preventDefault()
+    let href = e.target.getAttribute('href')
+    const id = $('.reveal').find('section.present').attr('data-id')
+    if (id) {
+        href += '#' + id
+    }
+    location.href = href
+})
+
 JS;
 $this->registerJs($js);
 
@@ -170,7 +181,7 @@ $isBookView = $storyDefaultView === 'book';
                     <?= $model->isPublished() ? '' : 'История не опубликована' ?>
                     <div class="pull-right">
                         <?= Html::a('Изменить', Yii::$app->urlManagerBackend->createAbsoluteUrl(['story/update', 'id' => $model->id]), ['class' => 'btn-link']) ?>
-                        | <?= Html::a('Редактор', Yii::$app->urlManagerBackend->createAbsoluteUrl(['editor/edit', 'id' => $model->id]), ['class' => 'btn-link']) ?>
+                        | <?= Html::a('Редактор', Yii::$app->urlManagerBackend->createAbsoluteUrl(['editor/edit', 'id' => $model->id]), ['class' => 'btn-link goto-slide-editor']) ?>
                     </div>
                 </div>
             </div>
