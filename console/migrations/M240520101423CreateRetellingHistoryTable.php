@@ -21,7 +21,7 @@ class M240520101423CreateRetellingHistoryTable extends Migration
             'slide_id' => $this->integer()->notNull(),
             'overall_similarity' => $this->tinyInteger()->notNull(),
             'created_at' => $this->integer()->notNull(),
-            'PRIMARY KEY (`story_id`, `user_id`, `key`)',
+            //'PRIMARY KEY (`story_id`, `user_id`, `key`)',
         ]);
     }
 

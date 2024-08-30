@@ -11,6 +11,7 @@ export default function MentalMap(element, params) {
 
   this.element = element
   let texts = []
+  let mentalMapId
 
   const voiceResponse = new VoiceResponse(new MissingWordsRecognition({}))
   voiceResponse.onResult(args => {
@@ -59,7 +60,7 @@ export default function MentalMap(element, params) {
         }
       }
     })
-    return `${totalCounter === 0 || hiddenCounter === 0 ? 0 : Math.round(hiddenCounter * 100 / totalCounter)}%`
+    return totalCounter === 0 || hiddenCounter === 0 ? 0 : Math.round(hiddenCounter * 100 / totalCounter)
   }
 
   function processOutputAsJson(output) {
@@ -72,18 +73,26 @@ export default function MentalMap(element, params) {
     return json
   }
 
-  function mapImageClickHandler(image, texts) {
+  function mapImageClickHandler(image, texts, historyItem) {
     const detailImgWrap = document.createElement('div')
     const detailImg = document.createElement('img')
     detailImg.src = image.url
+    detailImg.style.marginBottom = '10px'
     detailImgWrap.appendChild(detailImg)
+
+    const resultElement = document.createElement('div')
+    resultElement.classList.add('result-item')
+    resultElement.innerHTML = `
+      <div class="result-item-value">${historyItem ? `${historyItem.all}% (${historyItem.hiding}%)` : 'Нет результата'}</div>
+    `
+    detailImgWrap.appendChild(resultElement)
 
     const text = texts.find(t => t.id === image.id)
 
     const detailTextWrap = document.createElement('div')
     detailTextWrap.classList.add('detail-text-wrap')
 
-    detailTextWrap.appendChild(DetailText(text, () => {
+    const detailText = DetailText(text, () => {
       if (voiceResponse.getStatus()) {
         voiceResponse.stop()
         startRecording(recordingWrap.querySelector('#start-recording'))
@@ -92,8 +101,9 @@ export default function MentalMap(element, params) {
         detailTextWrap.querySelector(q).innerHTML = ''
         recordingWrap.querySelector('#start-retelling-wrap').style.display = 'none'
       })
-      recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text)
-    }, () => recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text)))
+      recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
+    }, () => recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%')
+    detailTextWrap.appendChild(detailText)
 
     const recordingContainer = document.createElement('div')
     recordingContainer.classList.add('recording-container')
@@ -179,11 +189,32 @@ export default function MentalMap(element, params) {
           if (json) {
             const val = Number(json?.overall_similarity)
             recordingWrap.querySelector('#similarity-percent').innerText = `${val}%`
+
+            const textHidingPercentage = calcHiddenTextPercent(text)
+            resultElement.querySelector('.result-item-value').innerHTML = `${val}% (${textHidingPercentage}%)`
+
+            const detailTextContent = detailText.cloneNode(true)
+            detailTextContent.querySelector('.detail-text-actions').remove()
+
+            saveUserResult({
+              story_id: params.story_id,
+              slide_id: Number($(Reveal.getCurrentSlide()).attr('data-id')),
+              mental_map_id: mentalMapId,
+              image_fragment_id: image.id,
+              overall_similarity: Number(json?.overall_similarity),
+              text_hiding_percentage: textHidingPercentage,
+              content: detailTextContent.innerHTML
+            }).then(response => {
+              if (response && response?.success) {
+                historyItem.all = response.history.all
+                historyItem.hiding = response.history.hiding
+              }
+            })
           }
         })
       })
 
-      recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text)
+      recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
 
       wrapper.querySelector('#result_span').addEventListener('input', e => {
         const text = e.target.innerText
@@ -195,6 +226,22 @@ export default function MentalMap(element, params) {
     })
 
     return dialog
+  }
+
+  async function saveUserResult(payload) {
+    const response = await fetch(`/mental-map/save`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-CSRF-Token': $('meta[name=csrf-token]').attr('content')
+      },
+      body: JSON.stringify(payload),
+    })
+    if (!response.ok) {
+      throw new Error(response.statusText)
+    }
+    return await response.json()
   }
 
   function decodeHtml(html) {
@@ -218,7 +265,8 @@ export default function MentalMap(element, params) {
   }
 
   const run = async () => {
-    const json = await params.init()
+    const {mentalMap: json, history} = await params.init()
+
     texts = json.map.images.map(image => {
       const {imageText, textFragments} = processImageText(image.text)
       const paragraphs = imageText.split('\n')
@@ -245,14 +293,18 @@ export default function MentalMap(element, params) {
         words
       }
     })
+    mentalMapId = json.id
 
-    container.appendChild(AllTexts(texts, json.map.images, (image) => {
-      const dialog = mapImageClickHandler(image, texts)
+    container.appendChild(AllTexts(texts, json.map.images, history, (image) => {
+      const historyItem = history.find(h => h.id === image.id)
+      const dialog = mapImageClickHandler(image, texts, historyItem)
       dialog.onHide(() => {
         hideDialogHandler()
         if (voiceResponse.getStatus()) {
           voiceResponse.stop()
         }
+        const el = container.querySelector(`[data-image-fragment-id='${image.id}']`)
+        el.querySelector('.result-item').innerHTML = `${historyItem.all}% (${historyItem.hiding}%)`
       })
     }))
 

@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace common\widgets\Reveal\Plugins;
 
 use common\widgets\Reveal\Dependency;
-use yii\helpers\Url;
 
 class MentalMap extends AbstractPlugin implements PluginInterface
 {
@@ -14,11 +15,7 @@ class MentalMap extends AbstractPlugin implements PluginInterface
     {
         return [
             $this->configName => [
-                /*'action' => Url::to(['story/get-story-test']),
-                'storeAction' => Url::to(['story/store-test-result', 'story_id' => $this->storyID]),
-                'storyBodyAction' => Url::to(['story/get-story-body']),
-                'story_id' => $this->storyID,
-                'initAction' => Url::to(['question/init']),*/
+                'story_id' => $this->storyId,
             ],
         ];
     }

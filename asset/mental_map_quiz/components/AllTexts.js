@@ -1,4 +1,4 @@
-export default function AllTexts(texts, images, imageClickHandler) {
+export default function AllTexts(texts, images, history, imageClickHandler) {
   const list = document.createElement('div')
   list.classList.add('mental-map-all-text-container')
   texts.map(textState => {
@@ -10,7 +10,11 @@ export default function AllTexts(texts, images, imageClickHandler) {
     imageItem.classList.add('image-item')
 
     const img = document.createElement('img')
+    img.style.marginBottom = '10px'
+
     const image = images.find(i => i.id === textState.id)
+    item.dataset.imageFragmentId = image.id
+
     img.src = image.url
     img.style.cursor = 'pointer'
     img.addEventListener('click', e => {
@@ -18,6 +22,15 @@ export default function AllTexts(texts, images, imageClickHandler) {
     })
 
     imageItem.appendChild(img)
+
+    const resultElement = document.createElement('div')
+    resultElement.classList.add('result-item')
+    const historyItem = history.find(h => h.id === image.id)
+    resultElement.innerHTML = `
+      <div class="result-item-value">${historyItem ? `${historyItem.all}% (${historyItem.hiding}%)` : 'Нет результата'}</div>
+    `
+    imageItem.appendChild(resultElement)
+
     item.appendChild(imageItem)
 
     const textItem = document.createElement('div')
@@ -50,6 +63,7 @@ export default function AllTexts(texts, images, imageClickHandler) {
     })
 
     item.appendChild(textItem)
+
     list.appendChild(item)
   })
 

@@ -236,3 +236,9 @@
   right: 0;
   top: 0;
 }
+
+.result-item {
+  font-size: 22px;
+  line-height: 28px;
+  margin-bottom: 20px;
+}

@@ -8,6 +8,8 @@
     return Reveal.getCurrentSlide();
   }
 
+  const {mentalMapConfig} = Reveal.getConfig()
+
   function init() {
     const elem = $('div.mental-map', getCurrentSlide());
     if (!elem.length) {
@@ -29,13 +31,15 @@
             'X-CSRF-Token': $('meta[name=csrf-token]').attr('content')
           },
           body: JSON.stringify({
+            story_id: mentalMapConfig.story_id,
             id: mentalMapId
           })
         })
 
         const json = await response.json()
-        return json.mentalMap
-      }
+        return {mentalMap: json.mentalMap, history: json.history}
+      },
+      ...mentalMapConfig
     })
     mentalMap.run()
   }
