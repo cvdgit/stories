@@ -76,7 +76,7 @@ class NewSchoolMainMenuWidget extends Widget
         }
         return Menu::widget([
             'items' => $items,
-            'options' => ['class' => 'navbar-nav align-items-center bg-light p-3 rounded-pill flex-wrap'],
+            'options' => ['class' => 'navbar-nav align-items-center bg-light p-3 rounded-pill flex-nowrap'],
             'linkTemplate' => Html::a('{label}', '{url}', ['class' => 'text-dark mx-5 menu-item__link']),
             'encodeLabels' => false,
         ]);

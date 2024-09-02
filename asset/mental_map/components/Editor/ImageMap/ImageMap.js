@@ -199,10 +199,6 @@ export default function ImageMap({mapImage}) {
     })
   }
 
-  /*function enterSelectionMode(text) {
-    setCurrentWords(createWordsFormText(text))
-  }*/
-
   return (
     <>
       <div>
@@ -303,6 +299,7 @@ export default function ImageMap({mapImage}) {
                       setCurrentImageItem(image)
                       setCurrentText(image.text)
                       setOpen(true)
+                      setSelectionMode(false)
                     }
                   }}
                 >
