@@ -184,7 +184,7 @@ export default function MentalMap(element, params) {
 
         const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
 
-        startRetelling(clearText ? removePunctuation(userResponse) : userResponse, clearText ? removePunctuation(text.text) : text.text).then(response => {
+        startRetelling(clearText ? removePunctuation(userResponse) : userResponse, clearText ? removePunctuation(stripTags(text.text)) : stripTags(text.text)).then(response => {
           const json = processOutputAsJson(wrapper.querySelector('#retelling-response').innerText)
           if (json) {
             const val = Number(json?.overall_similarity)
@@ -248,6 +248,12 @@ export default function MentalMap(element, params) {
     const txt = document.createElement("textarea");
     txt.innerHTML = html;
     return txt.value;
+  }
+
+  function stripTags(html) {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.textContent || div.innerText || '';
   }
 
   function processImageText(text) {
