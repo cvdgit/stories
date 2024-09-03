@@ -16,7 +16,8 @@ use yii\web\View;
 
 $this->title = 'История прохождения ментальных карт';
 
-$this->registerCss(<<<CSS
+$this->registerCss(
+    <<<CSS
 .detail-text {
 
 }
@@ -35,7 +36,7 @@ $this->registerCss(<<<CSS
     color: #fff;
     border: 1px #808080 solid;
 }
-CSS
+CSS,
 );
 ?>
 <div>
@@ -61,63 +62,35 @@ CSS
                  style="padding: 20px 0">
                 <?php
                 foreach ($mentalMaps as $mentalMap): ?>
+                    <h3 class="h4"><?= $mentalMap->name; ?></h3>
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
                             <tr>
-                                <th>Ментальная карта</th>
-                                <th>Фрагмент</th>
-                                <th>% сходства</th>
-                                <th>% закрытия текста</th>
-                                <th>Текст при ответе</th>
-                                <th>Дата</th>
+                                <th style="width: 35%">Фрагмент</th>
+                                <th style="width: 35%">Текст при ответе</th>
+                                <th style="width: 10%">% сходства</th>
+                                <th style="width: 10%">% закрытия текста</th>
+                                <th style="width: 10%">Дата</th>
                             </tr>
                             </thead>
-                            <?php
-                            $data = array_filter(
-                                $historyByUser[$user['id']],
-                                static function (array $row) use ($mentalMap): bool {
-                                    return $row['mental_map_id'] === $mentalMap->uuid;
-                                },
-                            );
-                            ?>
                             <tbody>
                             <?php
-                            if (count($data) === 0): ?>
+                            foreach ($mentalMap->getImages() as $image): ?>
+                                <?php
+                                $imageData = array_values(array_filter($historyByUser[$user['id']], static function (array $row) use ($mentalMap, $image): bool {
+                                    return $row['mentalMapId'] === $mentalMap->uuid && $row['imageFragmentId'] === $image['id'];
+                                }))[0] ?? [];
+                                ?>
                                 <tr>
-                                    <td colspan="6">Нет данных</td>
+                                    <td><?= $image['text']; ?></td>
+                                    <td><?= $imageData['content'] ?? '-'; ?></td>
+                                    <td><?= $imageData['all'] ?? '-'; ?></td>
+                                    <td><?= $imageData['hiding'] ?? '-'; ?></td>
+                                    <td><?= isset($imageData['createdAt']) ? SmartDate::dateSmart($imageData['createdAt'], true): '-'; ?></td>
                                 </tr>
                             <?php
-                            else: ?>
-                                <?php
-                                foreach ($data as $history): ?>
-                                    <tr>
-                                        <td><?= $mentalMap->name . ' (Слайд ' . $history['slideNumber'] . ')'; ?></td>
-                                        <td>
-                                            <?php
-                                            $imageFragment = $mentalMap->findImageFromPayload(
-                                                $history['image_fragment_id'],
-                                            );
-                                            echo $imageFragment['text']; ?>
-                                        </td>
-                                        <td><?= $history['overall_similarity']; ?></td>
-                                        <td><?= $history['text_hiding_percentage']; ?></td>
-                                        <td>
-                                            <div class="detail-text">
-                                                <?= $history['content']; ?>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <?= SmartDate::dateSmart(
-                                                $history['created_at'],
-                                                true,
-                                            ); ?>
-                                        </td>
-                                    </tr>
-                                <?php
-                                endforeach; ?>
-                            <?php
-                            endif; ?>
+                            endforeach; ?>
                             </tbody>
                         </table>
                     </div>
