@@ -166,6 +166,11 @@ abstract class AbstractBlock
         return $this->type === self::TYPE_HTML;
     }
 
+    public function isMentalMap(): bool
+    {
+        return $this->type === self::TYPE_MENTAL_MAP;
+    }
+
     public function isImage(): bool
     {
         return $this->type === self::TYPE_IMAGE;

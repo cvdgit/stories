@@ -19,6 +19,7 @@ $this->params['sidebarMenuItems'] = [
     ['label' => 'Разделы', 'url' => ['course/update', 'id' => $model->id]],
     ['label' => 'Статистика', 'url' => ['statistics/list', 'id' => $model->id]],
     ['label' => 'Озвучка', 'url' => ['audio/index', 'story_id' => $model->id]],
+    ['label' => 'Ментальные карты', 'url' => ['/mental-map-history/index', 'story_id' => $model->id]],
 ];
 ?>
 <div class="row">

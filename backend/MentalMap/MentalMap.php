@@ -6,6 +6,7 @@ namespace backend\MentalMap;
 
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
 /**
@@ -16,7 +17,8 @@ use yii\helpers\Json;
  * @property int $created_at [int(11)]
  * @property int $updated_at [int(11)]
  */
-class MentalMap extends ActiveRecord {
+class MentalMap extends ActiveRecord
+{
 
     public function behaviors(): array
     {
@@ -58,5 +60,12 @@ class MentalMap extends ActiveRecord {
         $payload = $this->payload;
         $payload['text'] = $text;
         $this->payload = $payload;
+    }
+
+    public function findImageFromPayload(string $imageId): ?array
+    {
+        return array_values(array_filter($this->getImages(), static function (array $item) use ($imageId): bool {
+            return $item['id'] === $imageId;
+        }))[0];
     }
 }
