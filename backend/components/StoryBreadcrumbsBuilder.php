@@ -31,8 +31,10 @@ class StoryBreadcrumbsBuilder
                 ['label' => 'Список историй', 'url' => ['/story/index']],
                 [
                     'label' => $this->story->title,
-                    'url' => Yii::$app->urlManagerFrontend->createAbsoluteUrl(['/story/view', 'alias' => $this->story->alias]),
-                    'target' => '_blank'
+                    'url' => Yii::$app->urlManagerFrontend->createAbsoluteUrl(
+                        ['/story/view', 'alias' => $this->story->alias],
+                    ),
+                    'target' => '_blank',
                 ],
                 $this->title,
             ],

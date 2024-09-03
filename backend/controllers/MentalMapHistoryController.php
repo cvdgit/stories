@@ -6,6 +6,8 @@ namespace backend\controllers;
 
 use backend\components\story\HTMLBLock;
 use backend\components\story\reader\HTMLReader;
+use backend\components\StoryBreadcrumbsBuilder;
+use backend\components\StorySideBarMenuItemsBuilder;
 use backend\MentalMap\MentalMap;
 use common\models\Story;
 use common\rbac\UserRoles;
@@ -120,6 +122,8 @@ class MentalMapHistoryController extends Controller
             'mentalMaps' => $mentalMaps,
             'historyByUser' => $historyByUser,
             'users' => array_values($users),
+            "sidebarMenuItems" => (new StorySideBarMenuItemsBuilder($storyModel))->build(),
+            "breadcrumbs" => (new StoryBreadcrumbsBuilder($storyModel, "Ментальные карты из истории"))->build(),
         ]);
     }
 }

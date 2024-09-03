@@ -29,7 +29,8 @@ class StorySideBarMenuItemsBuilder
                 ['label' => 'Разделы', 'url' => ['/course/update', 'id' => $id]],
                 ['label' => 'Статистика', 'url' => ['/statistics/list', 'id' => $id]],
                 ['label' => 'Озвучка', 'url' => ['/audio/index', 'story_id' => $id]],
-            ]
+                ['label' => 'Ментальные карты', 'url' => ['/mental-map-history/index', 'story_id' => $id]],
+            ],
         ];
     }
 }

@@ -12,9 +12,13 @@ use yii\web\View;
  * @var MentalMap[] $mentalMaps
  * @var array $historyByUser
  * @var array $users
+ * @var array $sidebarMenuItems
+ * @var array $breadcrumbs
  */
 
 $this->title = 'История прохождения ментальных карт';
+$this->params = array_merge($this->params, $sidebarMenuItems);
+$this->params = array_merge($this->params, $breadcrumbs);
 
 $this->registerCss(
     <<<CSS
@@ -78,16 +82,24 @@ CSS,
                             <?php
                             foreach ($mentalMap->getImages() as $image): ?>
                                 <?php
-                                $imageData = array_values(array_filter($historyByUser[$user['id']], static function (array $row) use ($mentalMap, $image): bool {
-                                    return $row['mentalMapId'] === $mentalMap->uuid && $row['imageFragmentId'] === $image['id'];
-                                }))[0] ?? [];
+                                $imageData = array_values(
+                                    array_filter(
+                                        $historyByUser[$user['id']],
+                                        static function (array $row) use ($mentalMap, $image): bool {
+                                            return $row['mentalMapId'] === $mentalMap->uuid && $row['imageFragmentId'] === $image['id'];
+                                        },
+                                    ),
+                                )[0] ?? [];
                                 ?>
                                 <tr>
                                     <td><?= $image['text']; ?></td>
                                     <td><?= $imageData['content'] ?? '-'; ?></td>
                                     <td><?= $imageData['all'] ?? '-'; ?></td>
                                     <td><?= $imageData['hiding'] ?? '-'; ?></td>
-                                    <td><?= isset($imageData['createdAt']) ? SmartDate::dateSmart($imageData['createdAt'], true): '-'; ?></td>
+                                    <td><?= isset($imageData['createdAt']) ? SmartDate::dateSmart(
+                                            $imageData['createdAt'],
+                                            true,
+                                        ) : '-'; ?></td>
                                 </tr>
                             <?php
                             endforeach; ?>
