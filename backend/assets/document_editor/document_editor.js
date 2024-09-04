@@ -12,7 +12,7 @@ window.DocumentEditor = (function () {
     ''
   ]
   const configDefault = {
-    page_format_mm: [338, 190],
+    page_format_mm: [384, 216],
     zoom: 1.0,
     display: 'vertical',
     page_margins: '10mm 15mm',
@@ -504,6 +504,32 @@ window.DocumentEditor = (function () {
     fit_in_progress = false;
   }
 
+  function inputEventHandler(e) {
+    if (!e) {
+      return;
+    }
+    fit_content_over_pages(); // fit content according to modifications
+    emit_new_content(); // emit content modification
+    if (e.inputType !== 'insertText') {
+      // update current style if it has changed
+      process_current_text_style();
+    }
+  }
+
+  function pasteEventHandler(e) {
+
+    const clipboardData = e.clipboardData || window.clipboardData
+
+    let pastedData = clipboardData.getData('Text')
+    e.preventDefault()
+
+    pastedData = pastedData.replace(/\n/g, ' ')
+      .trim()
+      .replace(/\s+/g, ' ')
+
+    document.execCommand('insertHTML', false, pastedData)
+  }
+
   return {
     init(documentEditorElement, documentContentElement, documentContent, documentConfig) {
 
@@ -513,16 +539,11 @@ window.DocumentEditor = (function () {
       content = documentContent || ['']
       Object.keys(documentConfig).forEach(item => config[item] = documentConfig[item])
 
-      contentElement.addEventListener('input', (e) => {
-        if (!e) {
-          return;
-        } // check that event is set
-        fit_content_over_pages(); // fit content according to modifications
-        emit_new_content(); // emit content modification
-        if (e.inputType !== "insertText") {
-          process_current_text_style();
-        } // update current style if it has changed
-      })
+      contentElement.removeEventListener('input', inputEventHandler)
+      contentElement.addEventListener('input', inputEventHandler)
+
+      contentElement.removeEventListener('paste', pasteEventHandler)
+      contentElement.addEventListener('paste', pasteEventHandler)
 
       update_editor_width()
       reset_content()

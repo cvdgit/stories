@@ -403,7 +403,11 @@ class EditorController extends BaseController
                                 'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
                             );
                         }
-                        $newSlideId = $slideModel->id;
+
+                        if ($newSlideId === null) {
+                            $newSlideId = $slideModel->id;
+                        }
+
                         $index++;
                     }
 

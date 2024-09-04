@@ -30,7 +30,8 @@
   border-radius: var(--page-border-radius);
   transition: left .3s, top .3s;
   overflow: hidden;
-  pointer-events: all
+  pointer-events: all;
+  font-size: 24px;
 }
 
 .editor > .content[contenteditable], .editor > .content [contenteditable] {
