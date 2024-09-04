@@ -31,6 +31,7 @@ use DomainException;
 use Exception;
 use Yii;
 use Yii\base\InvalidConfigException;
+use yii\db\Query;
 use yii\filters\AccessControl;
 use common\models\Story;
 use common\services\StoryService;
@@ -366,14 +367,22 @@ class EditorController extends BaseController
             $this->transactionManager->wrap(
                 function () use ($texts, &$newSlideId, $storyModel, $currentSlideModel) {
 
+                    $slides = (new Query())
+                        ->from('{{%story_slide}}')
+                        ->select(['id', 'number'])
+                        ->where('story_id = :story', [':story' => $storyModel->id])
+                        ->orderBy(['number' => SORT_ASC])
+                        ->all();
+
+                    $index = 1;
                     foreach ($texts as $text) {
                         $slideModel = $this->storySlideService->create(
                             $storyModel->id,
                             'empty',
                             StorySlide::KIND_SLIDE,
                         );
-                        $slideModel->number = $currentSlideModel->number + 1;
-                        Story::insertSlideNumber($storyModel->id, $currentSlideModel->number);
+                        $slideModel->number = $currentSlideModel->number + $index;
+                        //Story::insertSlideNumber($storyModel->id, $currentSlideModel->number);
                         if (!$slideModel->save()) {
                             throw new DomainException(
                                 'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
@@ -395,6 +404,17 @@ class EditorController extends BaseController
                             );
                         }
                         $newSlideId = $slideModel->id;
+                        $index++;
+                    }
+
+                    $command = Yii::$app->db->createCommand();
+                    $next = $currentSlideModel->number + count($texts) + 1;
+                    foreach ($slides as $slide) {
+                        if ($slide['number'] > $currentSlideModel->number) {
+                            $command->update('{{%story_slide}}', ['number' => $next], ['id' => $slide['id']]);
+                            $command->execute();
+                            $next++;
+                        }
                     }
                 },
             );
