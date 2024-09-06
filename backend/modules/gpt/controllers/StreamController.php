@@ -194,7 +194,11 @@ TEXT;
         flush();
 
         try {
-            $this->chatEventStream->send("pass_test", Yii::$app->params["gpt.api.completions.host"], Json::encode($fields));
+            $this->chatEventStream->send(
+                "pass_test",
+                Yii::$app->params["gpt.api.completions.host"],
+                Json::encode($fields),
+            );
         } catch (Exception $ex) {
             Yii::$app->errorHandler->logException($ex);
         }
@@ -284,7 +288,11 @@ TEXT;
         flush();
 
         try {
-            $this->chatEventStream->send("pass_test_incorrect", Yii::$app->params["gpt.api.completions.host"], Json::encode($fields));
+            $this->chatEventStream->send(
+                "pass_test_incorrect",
+                Yii::$app->params["gpt.api.completions.host"],
+                Json::encode($fields),
+            );
         } catch (Exception $ex) {
             Yii::$app->errorHandler->logException($ex);
         }
@@ -294,7 +302,6 @@ TEXT;
     {
         $chatForm = new GptChatForm();
         if ($chatForm->load($request->post())) {
-
             if (!$chatForm->validate()) {
                 echo "event: error\r\n";
                 $ops = [
@@ -327,7 +334,11 @@ TEXT;
             ];
 
             try {
-                $this->chatEventStream->send("wikids_chat", Yii::$app->params["gpt.api.wikids.host"], Json::encode($fields));
+                $this->chatEventStream->send(
+                    "wikids_chat",
+                    Yii::$app->params["gpt.api.wikids.host"],
+                    Json::encode($fields),
+                );
             } catch (Exception $ex) {
                 Yii::$app->errorHandler->logException($ex);
             }
@@ -354,7 +365,11 @@ TEXT;
         $fields = $request->post();
 
         try {
-            $this->chatEventStream->send("conversations", Yii::$app->params["gpt.api.completions.host"], Json::encode($fields));
+            $this->chatEventStream->send(
+                "conversations",
+                Yii::$app->params["gpt.api.completions.host"],
+                Json::encode($fields),
+            );
         } catch (Exception $ex) {
             Yii::$app->errorHandler->logException($ex);
         }
@@ -414,7 +429,11 @@ TEXT;
         ];
 
         try {
-            $this->chatEventStream->send("retelling", Yii::$app->params["gpt.api.completions.host"], Json::encode($fields));
+            $this->chatEventStream->send(
+                "retelling",
+                Yii::$app->params["gpt.api.completions.host"],
+                Json::encode($fields),
+            );
         } catch (Exception $ex) {
             Yii::$app->errorHandler->logException($ex);
         }
@@ -453,7 +472,71 @@ TEXT;
         ];
 
         try {
-            $this->chatEventStream->send("retelling-answers", Yii::$app->params["gpt.api.completions.host"], Json::encode($fields));
+            $this->chatEventStream->send(
+                "retelling-answers",
+                Yii::$app->params["gpt.api.completions.host"],
+                Json::encode($fields),
+            );
+        } catch (Exception $ex) {
+            Yii::$app->errorHandler->logException($ex);
+        }
+    }
+
+    public function actionRewriteText(Request $request): void
+    {
+        $payload = Json::decode($request->rawBody);
+        $slideTexts = $payload['content'];
+        $prompt = $payload['prompt'] ?? null;
+
+        $content = $prompt ?? <<<TEXT
+Текст:
+```
+{TEXT}
+```
+Перепиши текст сохраняя его суть.
+TEXT;
+
+        $message = [
+            "role" => "user",
+            "content" => trim(str_replace('{TEXT}', $slideTexts, $content)),
+        ];
+
+        $fields = [
+            "input" => [
+                "messages" => [
+                    $message,
+                ],
+            ],
+            "config" => [
+                "metadata" => [
+                    "conversation_id" => Uuid::uuid4()->toString(),
+                ],
+            ],
+            "include_names" => [],
+        ];
+
+        echo "event: data\r\n";
+
+        $ops = [
+            "ops" => [
+                [
+                    "op" => "replace",
+                    "path" => "",
+                    "value" => [
+                        "prompt_text" => $content,
+                    ],
+                ],
+            ],
+        ];
+        echo 'data: ' . Json::encode($ops) . "\r\n\r\n";
+        flush();
+
+        try {
+            $this->chatEventStream->send(
+                "rewrite",
+                Yii::$app->params["gpt.api.completions.host"],
+                Json::encode($fields),
+            );
         } catch (Exception $ex) {
             Yii::$app->errorHandler->logException($ex);
         }

@@ -711,7 +711,7 @@ UrlManager.prototype.setSlideId = function (id) {
   this.location.hash = '#' + id;
 }
 
-var StoryEditor = (function () {
+const StoryEditor = (function () {
   "use strict";
 
   var $editor = $('#story-editor');
@@ -968,6 +968,12 @@ var StoryEditor = (function () {
           .append($('<span/>', {'class': 'text', 'text': title}));
       }
 
+      function createToolbarItemWithImage(title, imageSrc, action) {
+        return $('<li/>', {'class': 'blocks-sidebar-item', 'data-toolbar-action': action})
+          .append($('<img/>', {'src': imageSrc, css: {width: '28px'}}))
+          .append($('<span/>', {'class': 'text', 'text': title}));
+      }
+
       function createToolbarItemGroup(actions) {
         var $group = $('<li/>', {'class': 'blocks-sidebar-item group'});
         actions.forEach(function (action) {
@@ -1007,6 +1013,10 @@ var StoryEditor = (function () {
       //if (!activeBlock.isPlaceholder()) {
       $list.append(createToolbarItem('Копировать', 'duplicate', 'duplicate'));
       //}
+
+      if (activeBlock.typeIsText()) {
+        $list.append(createToolbarItemWithImage('Переписать', '/img/chatgpt-icon.png', 'gpt-rewrite'));
+      }
 
       return $('<div/>', {'class': 'blocks-sidebar'}).append($list);
     }
@@ -1080,6 +1090,11 @@ var StoryEditor = (function () {
         },
         'select-image': function () {
           config.onImageReplace(blockManager.getActive().getID());
+        },
+        'gpt-rewrite': () => {
+          if (typeof params.gptRewriteHandler === 'function') {
+            params.gptRewriteHandler(blockManager.getActive(), blockModifier)
+          }
         }
       }
     });
