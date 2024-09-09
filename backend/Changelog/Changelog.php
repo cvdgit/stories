@@ -6,12 +6,14 @@ namespace backend\Changelog;
 
 class Changelog
 {
+    private $id;
     private $title;
     private $text;
     private $created;
 
-    public function __construct(string $title, string $text, \DateTimeImmutable $created)
+    public function __construct(int $id, string $title, string $text, \DateTimeImmutable $created)
     {
+        $this->id = $id;
         $this->title = $title;
         $this->text = $text;
         $this->created = $created;
@@ -30,5 +32,10 @@ class Changelog
     public function getCreated(): \DateTimeImmutable
     {
         return $this->created;
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
     }
 }

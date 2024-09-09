@@ -11,7 +11,7 @@ class LastChangelogListFetcher
     public function fetch(): array
     {
         return (new Query())
-            ->select(['title', 'text', 'created_at'])
+            ->select(['id', 'title', 'text', 'created_at'])
             ->from('changelog')
             ->where('status = 1')
             ->orderBy(['created_at' => SORT_DESC])

@@ -7,6 +7,7 @@ use backend\helpers\SummaryHelper;
 use common\helpers\SmartDate;
 use dosamigos\chartjs\ChartJs;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\web\View;
 use yii\helpers\HtmlPurifier;
 
@@ -21,6 +22,7 @@ use yii\helpers\HtmlPurifier;
  */
 
 $this->title = 'Панель управления';
+$this->registerJs($this->renderFile('@backend/views/site/index.js'));
 ?>
 <div class="site-index">
     <div class="body-content">
@@ -37,19 +39,12 @@ $this->title = 'Панель управления';
             </div>
             <div class="col-lg-9">
                 <h4>Последние изменения</h4>
-                <div style="max-height: 600px; overflow: hidden; overflow-y: auto">
+                <div id="changelogs" style="min-height: 250px; max-height: 600px; overflow-y: auto">
                     <?php foreach ($changelog as $item): ?>
-                        <div class="row" style="margin-bottom: 20px">
-                            <div class="col-lg-12">
-                                <div style="display: flex; flex-direction: row; align-items: end">
-                                    <h3 style="margin: 0"><?= $item->getTitle(); ?></h3>
-                                    <p class="text-muted" style="margin: 0 0 0 10px" class="time"><?= Yii::$app->formatter->asDate($item->getCreated()) ?></p>
-                                </div>
-                                <div class="content" style="line-height: 1.4; margin: 10px 0">
-                                    <?= HtmlPurifier::process($item->getText()); ?>
-                                </div>
-                            </div>
-                        </div>
+                        <a class="changelog-item" href="<?= Url::to(['/changelog/default/view', 'id' => $item->getId()]) ?>" style="display: flex; flex-direction: row; justify-content: space-between">
+                            <h4 style="margin: 0"><?= Html::encode($item->getTitle()) ?></h4>
+                            <p class="text-muted" class="time" style="margin: 0"><?= SmartDate::dateSmart($item->getCreated()->getTimestamp()) ?></p>
+                        </a>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -140,5 +135,11 @@ $this->title = 'Панель управления';
             </div>
 
         </div>
+    </div>
+</div>
+
+<div class="modal modal-fullscreen remote" id="changelog-modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content"></div>
     </div>
 </div>

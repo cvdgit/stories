@@ -34,7 +34,8 @@ class DefaultController extends Controller
 
     /**
      * @throws StaleObjectException
-     * @throws NotFoundHttpException|\Throwable
+     * @throws NotFoundHttpException
+     * @throws \Throwable
      */
     public function actionDelete(int $id): Response
     {
@@ -44,5 +45,17 @@ class DefaultController extends Controller
         }
         $changelog->delete();
         return $this->redirect(['index']);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionView(int $id): string
+    {
+        $changelog = Changelog::findOne($id);
+        if ($changelog === null) {
+            throw new NotFoundHttpException('Запись не найдена');
+        }
+        return $this->renderPartial('view', ['changelog' => $changelog]);
     }
 }
