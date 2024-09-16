@@ -73,6 +73,23 @@ export default function MentalMap(element, params) {
     return json
   }
 
+  function RecordingLangStore(defaultLang) {
+    let lang = defaultLang
+    return {
+      fromStore(langValue) {
+        if (langValue !== lang) {
+          lang = langValue
+        }
+        return lang
+      },
+      get() {
+        return lang
+      }
+    }
+  }
+
+  const langStore = new RecordingLangStore('ru-RU')
+
   function mapImageClickHandler(image, texts, historyItem) {
     const detailImgWrap = document.createElement('div')
     const detailImg = document.createElement('img')
@@ -95,7 +112,8 @@ export default function MentalMap(element, params) {
     const detailText = DetailText(text, () => {
       if (voiceResponse.getStatus()) {
         voiceResponse.stop()
-        startRecording(recordingWrap.querySelector('#start-recording'))
+        const voiceLang = langStore.fromStore($(recordingWrap).find("#voice-lang option:selected").val())
+        startRecording(recordingWrap.querySelector('#start-recording'), voiceLang)
       }
       ['#result_span', '#final_span', '#interim_span'].map(q => {
         detailTextWrap.querySelector(q).innerHTML = ''
@@ -130,21 +148,28 @@ export default function MentalMap(element, params) {
 
     const recordingWrap = document.createElement('div')
     recordingWrap.classList.add('recording-status')
-    recordingWrap.innerHTML = `
-<div class="mental-map-text-status">
-<div style="margin-bottom: 10px">Текст скрыт на: <strong id="hidden-text-percent"></strong></div>
-<div>Сходство: <strong id="similarity-percent"></strong></div>
+    recordingWrap.innerHTML = `<div class="mental-map-text-status">
+    <div style="margin-bottom: 10px">Текст скрыт на: <strong id="hidden-text-percent"></strong></div>
+    <div>Сходство: <strong id="similarity-percent"></strong></div>
 </div>
-<div class="question-voice" style="bottom: 0; display: flex; position: relative; left: auto; top: auto">
-    <div class="question-voice__inner">
-        <div id="start-recording" class="gn">
-            <div class="mc" style="pointer-events: none"></div>
+<div style="display: flex; align-items: center;">
+    <select class="form-control" id="voice-lang" style="margin-right: 20px; font-size: 24px; height: auto">
+        <option value="ru-RU" selected>rus</option>
+        <option value="en-US">eng</option>
+    </select>
+    <div class="question-voice" style="bottom: 0; display: flex; position: relative;">
+        <div class="question-voice__inner">
+            <div id="start-recording" class="gn">
+                <div class="mc" style="pointer-events: none"></div>
+            </div>
         </div>
     </div>
 </div>
 <div class="retelling-container" id="start-retelling-wrap" style="display: none; text-align: center">
     <button class="btn" type="button" id="start-retelling">Проверить</button>
-    <label style="display: block; font-weight: normal; font-size: 2.2rem; margin-top: 10px" for="clear-text"><input style="transform: scale(1.5); margin-right: 10px" type="checkbox" id="clear-text" checked> без знаков</label>
+    <label style="display: block; font-weight: normal; font-size: 2.2rem; margin-top: 10px" for="clear-text"><input
+            style="transform: scale(1.5); margin-right: 10px" type="checkbox" id="clear-text" checked> без
+        знаков</label>
 </div>`
     detailContainerInner.appendChild(recordingWrap)
 
@@ -154,11 +179,13 @@ export default function MentalMap(element, params) {
 
     const dialog = new InnerDialog($(container), {title: 'Изображение', content: detailContainer});
     dialog.show(wrapper => {
-
       showDialogHandler()
 
+      $(wrapper).find(`#voice-lang`).val(langStore.get())
+
       wrapper.querySelector('#start-recording').addEventListener('click', e => {
-        startRecording(e.target)
+        const voiceLang = langStore.fromStore($(wrapper).find("#voice-lang option:selected").val())
+        startRecording(e.target, voiceLang)
       })
       wrapper.querySelector('#start-retelling').addEventListener('click', e => {
 
@@ -412,13 +439,14 @@ export default function MentalMap(element, params) {
 
   /**
    * @param {HTMLElement} element
+   * @param {string} lang
    */
-  function startRecording(element) {
+  function startRecording(element, lang) {
     const state = element.dataset.state
     if (!state) {
       $(document.getElementById("start-retelling-wrap")).hide()
       setTimeout(function () {
-        voiceResponse.start(new Event('voiceResponseStart'), 'ru-RU', function () {
+        voiceResponse.start(new Event('voiceResponseStart'), lang, function () {
           element.dataset.state = 'recording'
           element.classList.add('recording')
 
