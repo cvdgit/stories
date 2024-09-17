@@ -7,6 +7,7 @@ use backend\models\question\CreateQuestion;
 use backend\models\question\UpdateQuestion;
 use backend\models\test\ChangeRepeatForm;
 use backend\modules\repetition\ScheduleFetcherInterface;
+use backend\Testing\columns\TemplateColumnsList;
 use backend\Testing\IndexAction;
 use backend\Testing\Questions\QuestionRoutes;
 use backend\Testing\TestSearch;
@@ -80,7 +81,7 @@ class TestController extends Controller
             'dataProvider' => $dataProvider,
             'source' => 123,
             'sourceRecordsTotal' => 0,
-            'columns' => [],
+            'columns' => (new TemplateColumnsList($searchModel))->getList(),
         ]);
     }
 
