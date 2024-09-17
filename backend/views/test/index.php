@@ -20,6 +20,7 @@ use yii\widgets\Pjax;
  * @var int $source
  * @var int $sourceRecordsTotal
  * @var array $columns
+ * @var int $status
  */
 
 $this->title = 'Тесты';
@@ -38,11 +39,13 @@ $this->registerJs($this->renderFile('@backend/views/test/_index.js'));
 ?>
 <div class="header-block">
     <h1 style="font-size: 32px; margin: 0 0 0.5rem 0; font-weight: 500; line-height: 1.2" class="h2"><?= Html::encode($this->title) ?></h1>
+    <?php if ($status === TestStatus::DEFAULT): ?>
     <div class="btn-toolbar mb-2 mb-md-0">
         <div class="btn-group">
             <?= Html::a('Создать тест', ['create', 'source' => $source], ['class' => 'btn btn-primary']); ?>
         </div>
     </div>
+    <?php endif ?>
 </div>
 
 <div>

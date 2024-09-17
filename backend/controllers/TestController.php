@@ -82,6 +82,7 @@ class TestController extends Controller
             'source' => 123,
             'sourceRecordsTotal' => 0,
             'columns' => (new TemplateColumnsList($searchModel))->getList(),
+            'status' => TestStatus::TEMPLATE,
         ]);
     }
 

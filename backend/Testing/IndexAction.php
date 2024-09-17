@@ -10,6 +10,7 @@ use backend\Testing\columns\NeoColumnsList;
 use backend\Testing\columns\TestsColumnsList;
 use backend\Testing\columns\WordColumnList;
 use common\models\test\SourceType;
+use common\models\test\TestStatus;
 use common\services\TestHistoryService;
 use yii\base\Action;
 use yii\web\Request;
@@ -48,6 +49,7 @@ class IndexAction extends Action
             'source' => $source,
             'sourceRecordsTotal' => $this->historyService->getRecordsCountBySource($source),
             'columns' => $list->getList(),
+            'status' => TestStatus::DEFAULT,
         ]);
     }
 }
