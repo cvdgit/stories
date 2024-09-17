@@ -1,3 +1,5 @@
+import FragmentResultElement from "./FragmentResultElement";
+
 export function appendWordElements(words, container, init, clickHandler) {
   words.map(word => {
     const {type} = word
@@ -54,13 +56,7 @@ export default function AllTexts(texts, images, history, imageClickHandler) {
 
     imageItem.appendChild(img)
 
-    const resultElement = document.createElement('div')
-    resultElement.classList.add('result-item')
-    const historyItem = history.find(h => h.id === image.id)
-    resultElement.innerHTML = `
-      <div class="result-item-value">${historyItem ? `${historyItem.all}% (${historyItem.hiding}% / ${historyItem?.target}%)` : 'Нет результата'}</div>
-    `
-    imageItem.appendChild(resultElement)
+    imageItem.appendChild(FragmentResultElement(history.find(h => h.id === image.id)))
 
     item.appendChild(imageItem)
 

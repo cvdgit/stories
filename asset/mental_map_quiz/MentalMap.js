@@ -6,6 +6,7 @@ import {v4 as uuidv4} from "uuid"
 import DetailText from "./components/DetailText";
 import AllTexts, {appendWordElements} from "./components/AllTexts";
 import MentalMapImage from "./components/MentalMapImage";
+import FragmentResultElement from "./components/FragmentResultElement";
 
 export default function MentalMap(element, params) {
 
@@ -111,12 +112,7 @@ export default function MentalMap(element, params) {
     detailImg.style.marginBottom = '10px'
     detailImgWrap.appendChild(detailImg)
 
-    const resultElement = document.createElement('div')
-    resultElement.classList.add('result-item')
-    resultElement.innerHTML = `
-      <div class="result-item-value">${historyItem ? `${historyItem.all}% (${historyItem.hiding}% / ${historyItem?.target}%)` : 'Нет результата'}</div>
-    `
-    detailImgWrap.appendChild(resultElement)
+    detailImgWrap.appendChild(FragmentResultElement(historyItem))
 
     const text = texts.find(t => t.id === image.id)
 
@@ -144,6 +140,7 @@ export default function MentalMap(element, params) {
     const recordingContainer = document.createElement('div')
     recordingContainer.classList.add('recording-container')
     recordingContainer.innerHTML = `
+      <div style="font-size: 2.2rem; line-height: 2.6rem; margin-bottom: 10px; color: #808080">Ответ ученика:</div>
       <div style="background-color: #eee; font-size: 2.2rem; line-height: 3rem">
             <span contenteditable="plaintext-only" id="result_span"
                   class="recording-final" style="line-height: 3rem"></span>
@@ -199,6 +196,8 @@ export default function MentalMap(element, params) {
     const dialog = new InnerDialog($(container), {title: 'Изображение', content: detailContainer});
     dialog.show(wrapper => {
       showDialogHandler()
+
+      $(wrapper).find('.result-item-value').tooltip()
 
       $(wrapper).find(`#voice-lang`).val(langStore.get())
 
@@ -359,7 +358,7 @@ export default function MentalMap(element, params) {
           voiceResponse.stop()
         }
         const el = container.querySelector(`[data-image-fragment-id='${image.id}']`)
-        el.querySelector('.result-item').innerHTML = `${historyItem.all}% (${historyItem.hiding}%)`
+        el.querySelector('.result-item-value').innerHTML = `${historyItem.all}% (${historyItem.hiding}% / ${historyItem.target}%)`
         el.querySelector('.text-item').innerHTML = ''
 
         appendWordElements(texts.find(t => t.id === image.id).words, el.querySelector('.text-item'))
@@ -460,6 +459,8 @@ export default function MentalMap(element, params) {
 
     this.element.appendChild(toolbar)
     this.element.appendChild(container)
+
+    $('.result-item-value').tooltip()
   }
 
   /**
