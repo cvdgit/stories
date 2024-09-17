@@ -66,6 +66,7 @@ class MentalMapController extends Controller
                 'id' => $image['id'],
                 'all' => 0,
                 'hiding' => 0,
+                'target' => 0,
             ];
         }, $images);
 
@@ -74,6 +75,7 @@ class MentalMapController extends Controller
                 'id' => 'h.image_fragment_id',
                 'all' => 'MAX(h.overall_similarity)',
                 'hiding' => 'MAX(h.text_hiding_percentage)',
+                'target' => 'MAX(h.text_target_percentage)',
             ])
             ->from(['h' => 'mental_map_history'])
             ->where([
@@ -89,6 +91,7 @@ class MentalMapController extends Controller
             if (isset($rows[$item['id']])) {
                 $item['all'] = (int) $rows[$item['id']]['all'];
                 $item['hiding'] = (int) $rows[$item['id']]['hiding'];
+                $item['target'] = (int) $rows[$item['id']]['target'];
             }
             return $item;
         }, $history);
@@ -124,6 +127,7 @@ class MentalMapController extends Controller
                     'content' => $form->content,
                     'overall_similarity' => $form->overall_similarity,
                     'text_hiding_percentage' => $form->text_hiding_percentage,
+                    'text_target_percentage' => $form->text_target_percentage,
                     'created_at' => time(),
                 ]);
                 $command->execute();
@@ -133,6 +137,7 @@ class MentalMapController extends Controller
                         'id' => 'h.image_fragment_id',
                         'all' => 'MAX(h.overall_similarity)',
                         'hiding' => 'MAX(h.text_hiding_percentage)',
+                        'target' => 'MAX(h.text_target_percentage)',
                     ])
                     ->from(['h' => 'mental_map_history'])
                     ->where([

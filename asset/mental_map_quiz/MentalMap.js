@@ -4,7 +4,7 @@ import VoiceResponse from "./lib/VoiceResponse"
 import MissingWordsRecognition from "./lib/MissingWordsRecognition"
 import {v4 as uuidv4} from "uuid"
 import DetailText from "./components/DetailText";
-import AllTexts from "./components/AllTexts";
+import AllTexts, {appendWordElements} from "./components/AllTexts";
 import MentalMapImage from "./components/MentalMapImage";
 
 export default function MentalMap(element, params) {
@@ -63,6 +63,20 @@ export default function MentalMap(element, params) {
     return totalCounter === 0 || hiddenCounter === 0 ? 0 : Math.round(hiddenCounter * 100 / totalCounter)
   }
 
+  function calcTargetTextPercent(detailTexts) {
+    let targetCounter = 0;
+    let targetHiddenCounter = 0;
+    detailTexts.words.map(w => {
+      if (w.type === 'word' && w?.target) {
+        targetCounter++
+        if (w.hidden) {
+          targetHiddenCounter++
+        }
+      }
+    })
+    return targetCounter === 0 || targetHiddenCounter === 0 ? 0 : Math.round(targetHiddenCounter * 100 / targetCounter)
+  }
+
   function processOutputAsJson(output) {
     let json = null
     try {
@@ -100,7 +114,7 @@ export default function MentalMap(element, params) {
     const resultElement = document.createElement('div')
     resultElement.classList.add('result-item')
     resultElement.innerHTML = `
-      <div class="result-item-value">${historyItem ? `${historyItem.all}% (${historyItem.hiding}%)` : 'Нет результата'}</div>
+      <div class="result-item-value">${historyItem ? `${historyItem.all}% (${historyItem.hiding}% / ${historyItem?.target}%)` : 'Нет результата'}</div>
     `
     detailImgWrap.appendChild(resultElement)
 
@@ -120,7 +134,11 @@ export default function MentalMap(element, params) {
         recordingWrap.querySelector('#start-retelling-wrap').style.display = 'none'
       })
       recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
-    }, () => recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%')
+      recordingWrap.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%'
+    }, () => {
+      recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
+      recordingWrap.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%'
+    })
     detailTextWrap.appendChild(detailText)
 
     const recordingContainer = document.createElement('div')
@@ -150,6 +168,7 @@ export default function MentalMap(element, params) {
     recordingWrap.classList.add('recording-status')
     recordingWrap.innerHTML = `<div class="mental-map-text-status">
     <div style="margin-bottom: 10px">Текст скрыт на: <strong id="hidden-text-percent"></strong></div>
+    <div style="margin-bottom: 10px">Важный текст: <strong id="target-text-percent"></strong></div>
     <div>Сходство: <strong id="similarity-percent"></strong></div>
 </div>
 <div style="display: flex; align-items: center;">
@@ -218,7 +237,8 @@ export default function MentalMap(element, params) {
             recordingWrap.querySelector('#similarity-percent').innerText = `${val}%`
 
             const textHidingPercentage = calcHiddenTextPercent(text)
-            resultElement.querySelector('.result-item-value').innerHTML = `${val}% (${textHidingPercentage}%)`
+            const textTargetPercentage = calcTargetTextPercent(text)
+            resultElement.querySelector('.result-item-value').innerHTML = `${val}% (${textHidingPercentage}% / ${textTargetPercentage}%)`
 
             const detailTextContent = detailText.cloneNode(true)
             detailTextContent.querySelector('.detail-text-actions').remove()
@@ -230,6 +250,7 @@ export default function MentalMap(element, params) {
               image_fragment_id: image.id,
               overall_similarity: Number(json?.overall_similarity),
               text_hiding_percentage: textHidingPercentage,
+              text_target_percentage: textTargetPercentage,
               content: detailTextContent.innerHTML
             }).then(response => {
               if (response && response?.success) {
@@ -242,6 +263,7 @@ export default function MentalMap(element, params) {
       })
 
       recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
+      recordingWrap.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%'
 
       wrapper.querySelector('#result_span').addEventListener('input', e => {
         const text = e.target.innerText
@@ -338,6 +360,9 @@ export default function MentalMap(element, params) {
         }
         const el = container.querySelector(`[data-image-fragment-id='${image.id}']`)
         el.querySelector('.result-item').innerHTML = `${historyItem.all}% (${historyItem.hiding}%)`
+        el.querySelector('.text-item').innerHTML = ''
+
+        appendWordElements(texts.find(t => t.id === image.id).words, el.querySelector('.text-item'))
       })
     }))
 

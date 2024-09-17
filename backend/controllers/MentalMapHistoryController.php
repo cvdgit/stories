@@ -87,6 +87,7 @@ class MentalMapHistoryController extends Controller
                 'imageFragmentId' => 'h.image_fragment_id',
                 'all' => 'h2.overall_similarity',
                 'hiding' => 'h2.text_hiding_percentage',
+                'target' => 'h2.text_target_percentage',
                 'content' => 'h2.content',
                 'createdAt' => 'h2.created_at',
             ])

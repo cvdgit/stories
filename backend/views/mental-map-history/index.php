@@ -71,10 +71,11 @@ CSS,
                         <table class="table table-bordered">
                             <thead>
                             <tr>
-                                <th style="width: 35%">Фрагмент</th>
-                                <th style="width: 35%">Текст при ответе</th>
+                                <th style="width: 30%">Фрагмент</th>
+                                <th style="width: 30%">Текст при ответе</th>
                                 <th style="width: 10%">% сходства</th>
                                 <th style="width: 10%">% закрытия текста</th>
+                                <th style="width: 10%">% закрытия важного текста</th>
                                 <th style="width: 10%">Дата</th>
                             </tr>
                             </thead>
@@ -96,6 +97,7 @@ CSS,
                                     <td><?= $imageData['content'] ?? '-'; ?></td>
                                     <td><?= $imageData['all'] ?? '-'; ?></td>
                                     <td><?= $imageData['hiding'] ?? '-'; ?></td>
+                                    <td><?= $imageData['target'] ?? '-' ?></td>
                                     <td><?= isset($imageData['createdAt']) ? SmartDate::dateSmart(
                                             $imageData['createdAt'],
                                             true,

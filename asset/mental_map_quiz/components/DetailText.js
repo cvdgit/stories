@@ -50,9 +50,11 @@ export default function DetailText(text, itemClickHandler, afterRandCallback) {
         currentSpan.classList.add('selected')
       }
       if (word?.target) {
-        word.hidden = true
-        currentSpan.classList.add('selected')
         currentSpan.classList.add('word-target')
+        //word.hidden = true
+        if (word.hidden) {
+          currentSpan.classList.add('selected')
+        }
       }
       currentSpan.addEventListener('click', () => {
 

@@ -15,13 +15,14 @@ class MentalMapHistoryForm extends Model
     public $content;
     public $overall_similarity;
     public $text_hiding_percentage;
+    public $text_target_percentage;
 
     public function rules(): array
     {
         return [
             [['story_id', 'mental_map_id', 'image_fragment_id', 'content', 'overall_similarity', 'slide_id'], 'required'],
             [['mental_map_id', 'image_fragment_id'], 'string', 'max' => 36],
-            [['story_id', 'overall_similarity', 'text_hiding_percentage', 'slide_id'], 'integer'],
+            [['story_id', 'overall_similarity', 'text_hiding_percentage', 'text_target_percentage', 'slide_id'], 'integer'],
             ['content', 'safe'],
         ];
     }
