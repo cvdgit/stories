@@ -8,6 +8,7 @@ use backend\MentalMap\MentalMap;
 use backend\services\ImageService;
 use backend\services\StoryEditorService;
 use backend\services\StorySlideService;
+use common\helpers\Url;
 use common\models\Story;
 use common\models\StorySlide;
 use common\services\TransactionManager;
@@ -103,6 +104,10 @@ class CreateMentalMapAction extends Action
                     $uploadsDir = Yii::getAlias('@public/upload');
                     $mentalMapDir = $uploadsDir . '/mental-map/' . $mentalMapId;
                     FileHelper::createDirectory($mentalMapDir);
+
+                    if (filter_var($mapImageUrl, FILTER_VALIDATE_URL) === false) {
+                        $mapImageUrl = Url::homeUrl() . $mapImageUrl;
+                    }
 
                     $path = $this->imageService->downloadImage($mapImageUrl, $mentalMapDir);
 
