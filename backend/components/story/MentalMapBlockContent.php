@@ -15,25 +15,19 @@ class MentalMapBlockContent
      */
     private $id;
 
-    /**
-     * @var int
-     */
-    private $slideId;
-
-    public function __construct(string $id, int $slideId)
+    public function __construct(string $id)
     {
         $this->id = $id;
-        $this->slideId = $slideId;
     }
 
-    public static function createFromHtml(string $html, int $slideId): MentalMapBlockContent
+    public static function createFromHtml(string $html): MentalMapBlockContent
     {
         $content = phpQuery::newDocumentHTML($html);
         $id = $content->find('.mental-map')->attr('data-mental-map-id');
         if (empty($id)) {
             throw new DomainException('Mental Map id undefined');
         }
-        return new self((string) $id, $slideId);
+        return new self((string) $id);
     }
 
     public function getId(): string
@@ -41,9 +35,9 @@ class MentalMapBlockContent
         return $this->id;
     }
 
-    public function renderWithDescription(): string
+    public function renderWithDescription(int $slideId): string
     {
-        $link = Html::a('Ментальная карта', ['mental-map/editor', 'id' => $this->id, 'from_slide' => $this->slideId]);
+        $link = Html::a('Ментальная карта', ['mental-map/editor', 'id' => $this->id, 'from_slide' => $slideId]);
         return Html::tag('div', $link, [
             'class' => 'mental-map',
             'data-mental-map-id' => $this->id,

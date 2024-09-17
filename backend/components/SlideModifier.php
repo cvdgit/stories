@@ -101,8 +101,8 @@ class SlideModifier
                 }
             }
             if ($block->typeIs(AbstractBlock::TYPE_MENTAL_MAP)) {
-                $content = MentalMapBlockContent::createFromHtml($block->getContent(), $this->slide->getId());
-                $block->setContent($content->renderWithDescription());
+                $content = MentalMapBlockContent::createFromHtml($block->getContent());
+                $block->setContent($content->renderWithDescription($this->slide->getId()));
             }
             if ($block->typeIs(AbstractBlock::TYPE_VIDEO) || $block->typeIs(AbstractBlock::TYPE_VIDEOFILE)) {
                 /** @var VideoBlock $block */

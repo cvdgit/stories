@@ -11,6 +11,7 @@ use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\TextBlock;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
+use backend\models\editor\MentalMapForm;
 use backend\models\editor\QuestionForm;
 use backend\models\editor\SlideLinkForm;
 use backend\models\editor\SlideSourceForm;
@@ -233,6 +234,10 @@ class EditorController extends BaseController
             'class' => VideoForm::class,
             'view' => '_video_form',
             'source' => VideoSource::FILE,
+        ],
+        AbstractBlock::TYPE_MENTAL_MAP => [
+            'class' => MentalMapForm::class,
+            'view' => '_mental_map_form',
         ],
     ];
 
