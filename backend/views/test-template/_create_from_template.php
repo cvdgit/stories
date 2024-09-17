@@ -15,7 +15,7 @@ use yii\helpers\Html;
     <div>
         <div class="row">
             <div class="col-md-7">
-                <?= $form->field($model, 'story_id')->widget(SelectStoryWidget::class) ?>
+                <?= $form->field($model, 'story_id')->widget(SelectStoryWidget::class, ['loadUrl' => ['/story/autocomplete/select-all']]) ?>
                 <?= $form->field($model, 'story_name', ['options' => ['style' => 'display:none']])->textInput(['maxlength' => true]) ?>
             </div>
             <div class="col-md-5" style="padding-top:34px">
@@ -52,7 +52,7 @@ use yii\helpers\Html;
 $js = <<<JS
 (function() {
     var form = $('#create-tests-form');
-    yiiModalFormInit(form, 
+    yiiModalFormInit(form,
         function(response) {
             if (response && response.success) {
                 $('#create-from-template-modal').modal('hide');
@@ -66,7 +66,7 @@ $js = <<<JS
             toastr.error(response.responseJSON.message);
         }
     );
-    
+
     function newFieldName(name, index) {
         var regexName = /(^.+?)([\[\d{1,}\]]{1,})(\[.+\]$)/i;
         var matches = name.match(regexName);
@@ -88,53 +88,53 @@ $js = <<<JS
             return matches[1] + '-' + identifiers.join('-') + '-' + matches[3];
         }
     }
-    
+
     $('#add-fields-row').on('click', function() {
-        
+
         var cloneRow = $('#field-item-list').find('.fields-row:eq(0)').clone();
         cloneRow.find('select').val('');
         cloneRow.find('.has-success').removeClass('has-success');
         cloneRow.find('.has-error').removeClass('has-error');
-        
+
         var index = $('#field-item-list').find('.fields-row').length;
-        
+
         cloneRow.find('select').each(function() {
-            
+
             var name = $(this).attr('name');
             var newName = newFieldName(name, index);
             if (newName) {
                 $(this).attr('name', newName);
             }
-            
+
             var id = $(this).attr('id');
             var newId = newFieldId(id, index);
             if (newId) {
                 $(this).attr('id', newId);
             }
         });
-        
+
         $('#field-item-list').append(cloneRow);
     });
-    
+
     $('#field-item-list').on('click', '.delete-fields-row', function(e) {
         e.preventDefault();
-        
+
         if ($('#field-item-list').find('.fields-row').length === 1) {
             return;
         }
-        
+
         $(this).parent().parent().remove();
-        
+
         $('#field-item-list').find('.fields-row').each(function(index) {
 
             $(this).find('select').each(function() {
-                
+
                 var name = $(this).attr('name');
                 var newName = newFieldName(name, index);
                 if (newName) {
                     $(this).attr('name', newName);
                 }
-                
+
                 var id = $(this).attr('id');
                 var newId = newFieldId(id, index);
                 if (newId) {
@@ -143,7 +143,7 @@ $js = <<<JS
             });
         });
     });
-    
+
     var storyIdControl = form.find('.field-createtestsform-story_id'),
         storyNameControl = form.find('.field-createtestsform-story_name');
     $('#createtestsform-new_story').on('click', function() {
