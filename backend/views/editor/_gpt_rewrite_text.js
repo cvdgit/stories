@@ -65,6 +65,10 @@ function GptRewriteText() {
         )
         response.then(data => {
           $modal.find('#gpt-rewrite-text-loader').hide()
+          $modal.find('#gpt-rewrite-text-actions').show()
+          $modal.find('#gpt-rewrite-text-with-prompt')
+            .removeAttr('disabled')
+            .removeClass('disabled')
         });
       })
     })
@@ -192,9 +196,7 @@ function GptRewriteText() {
       }
 
       const prompt = this.prompts.find(p => p.id === promptId)
-      console.log(promptId, this.prompts, prompt)
 
-      $modal.find('#gpt-rewrite-text-actions').show()
       $modal.find('#gpt-rewrite-text-with-prompt')
         .removeAttr('disabled')
         .removeClass('disabled')
