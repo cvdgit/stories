@@ -138,18 +138,33 @@ $this->registerJs($this->renderFile("@backend/views/editor/_gpt_rewrite_text.js"
                 <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
             </div>
             <div class="modal-body d-flex">
-                <div style="min-height: 400px">
-                    <div class="textarea" id="to-rewrite-text" style="max-height: 500px; overflow-y: auto" contenteditable="plaintext-only"></div>
-                    <div id="gpt-rewrite-text-wrap" style="display: none; max-height: 500px; overflow-y: auto">
-
-                        <div style="cursor: pointer; user-select: none; font-weight: 500; margin-bottom: 20px" id="gpt-rewrite-text-prompt-toggle">Prompt</div>
-                        <div id="gpt-rewrite-text-prompt-wrap" style="display: none;">
-                            <div contenteditable="plaintext-only" style="margin-bottom: 20px; border: 1px #eee solid" class="textarea" id="gpt-rewrite-text-prompt"></div>
-                            <div style="margin-bottom: 20px">
-                                <button id="gpt-rewrite-text-with-prompt" type="button" class="btn btn-secondary disabled" disabled>Отправить запрос с измененным промтом</button>
+                <div class="row">
+                    <div class="col-md-6">
+                        <select class="form-control" style="max-width: 400px" id="select-prompts"></select>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input id="gpt-prompt-name" autocomplete="off" type="text" class="form-control" placeholder="Название">
+                            <div class="input-group-btn">
+                                <button id="gpt-prompt-create" type="button" class="btn btn-primary">Создать</button>
                             </div>
                         </div>
-
+                    </div>
+                </div>
+                <div style="min-height: 400px">
+                    <div>
+                        <div style="cursor: pointer; user-select: none; font-weight: 500; margin: 10px 0" id="gpt-rewrite-text-prompt-toggle">Prompt</div>
+                        <div id="gpt-rewrite-text-prompt-wrap" style="display: none;">
+                            <div contenteditable="plaintext-only" style="margin-bottom: 20px; border: 1px #eee solid" class="textarea" id="gpt-rewrite-text-prompt"></div>
+                            <div style="margin-bottom: 20px; display: flex; align-items: center">
+                                <button style="margin-right: 20px" id="gpt-rewrite-text-with-prompt" type="button" class="btn btn-default disabled" disabled>Отправить запрос с измененным промтом</button>
+                                <button style="margin-right: 10px;" id="gpt-rewrite-text-save-prompt" class="btn btn-success" type="button">Сохранить</button>
+                                <div id="prompt-save-status" style="display: none">Успешно</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="textarea" id="to-rewrite-text" style="max-height: 500px; overflow-y: auto" contenteditable="plaintext-only"></div>
+                    <div id="gpt-rewrite-text-wrap" style="display: none; max-height: 500px; overflow-y: auto">
                         <div class="textarea" contenteditable="plaintext-only" id="gpt-rewrite-text-result">...</div>
                     </div>
                 </div>
@@ -157,7 +172,7 @@ $this->registerJs($this->renderFile("@backend/views/editor/_gpt_rewrite_text.js"
             <div class="modal-footer">
                 <div id="gpt-rewrite-text-actions">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-                    <button type="button" class="btn btn-primary" id="gpt-rewrite-text">Переписать текст</button>
+                    <button type="button" class="btn btn-primary" id="gpt-rewrite-text">Отправить запрос</button>
                     <button style="display: none" type="button" class="btn btn-success" id="gpt-rewrite-text-save">Сохранить текст</button>
                 </div>
                 <div id="gpt-rewrite-text-loader" style="display: none; text-align: center">
@@ -223,9 +238,10 @@ $js = <<< JS
     editorConfig.onReady = function() {
         $('.page-loader').addClass('loaded');
     }
+
+    const gptRewriteText = new GptRewriteText()
     editorConfig.gptRewriteHandler = (block, blockModifier) => {
         const content = getSlideTextContent(StoryEditor.getCurrentSlide())
-        const gptRewriteText = new GptRewriteText()
         gptRewriteText.showModal({content, rewriteTextSaveHandler: (text) => {
             block.getElement().find('.slide-paragraph').html(text)
             blockModifier.change()
