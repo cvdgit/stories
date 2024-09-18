@@ -255,6 +255,7 @@ export default function MentalMap(element, params) {
               if (response && response?.success) {
                 historyItem.all = response.history.all
                 historyItem.hiding = response.history.hiding
+                historyItem.target = response.history.target
               }
             })
           }
