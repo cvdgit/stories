@@ -237,7 +237,7 @@ export default function MentalMap(element, params) {
 
             const textHidingPercentage = calcHiddenTextPercent(text)
             const textTargetPercentage = calcTargetTextPercent(text)
-            resultElement.querySelector('.result-item-value').innerHTML = `${val}% (${textHidingPercentage}% / ${textTargetPercentage}%)`
+            wrapper.querySelector('.result-item-value').innerHTML = `${val}% (${textHidingPercentage}% / ${textTargetPercentage}%)`
 
             const detailTextContent = detailText.cloneNode(true)
             detailTextContent.querySelector('.detail-text-actions').remove()
