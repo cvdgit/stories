@@ -139,7 +139,7 @@
 
   $('#import-from-text').on('click', () => {
     const texts = $('.content', '#import-from-text-modal')
-      .find('.page').map((i, el) => el.innerText)
+      .find('.page').map((i, el) => el.innerText.trim().replace(/^\s+|\s+$/g, ''))
       .get()
       .filter(s => s.trim())
     if (texts.length === 0) {

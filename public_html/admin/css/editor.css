@@ -944,4 +944,5 @@ body {
   transition-duration: .15s;
   border-width: 1px;
   border-color: rgb(176 190 197 / 1);
+  border-style: solid;
 }

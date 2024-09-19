@@ -143,7 +143,7 @@ function GptRewriteText() {
         $select.trigger('change')
       }
     })
-    $modal.find('#to-rewrite-text').text(this.content)
+    $modal.find('#to-rewrite-text').text(this.content.trim().replace(/^\s+|\s+$/g, ''))
   });
 
   $modal.find('#gpt-rewrite-text')
@@ -179,7 +179,7 @@ function GptRewriteText() {
 
   $modal.find('#gpt-rewrite-text-save').on('click', () => {
     const text = $modal.find('#gpt-rewrite-text-result').html()
-    this.rewriteTextSaveHandler(text)
+    this.rewriteTextSaveHandler(text.trim().replace(/^\s+|\s+$/g, ''))
     $modal.modal('hide')
   })
 
