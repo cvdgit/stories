@@ -3,8 +3,6 @@ export default function MentalMapImage(
   mapImageWidth,
   mapImageHeight,
   images,
-  texts,
-  mapImageClickHandler,
   imageClickHandler
 ) {
 
@@ -28,8 +26,7 @@ export default function MentalMapImage(
     mapImgWrap.style.top = '0px'
     mapImgWrap.style.transform = `translate(${image.left}px, ${image.top}px)`
     mapImgWrap.addEventListener('click', () => {
-      const dialog = mapImageClickHandler(image, texts)
-      imageClickHandler(dialog)
+      imageClickHandler(image)
     })
     const mapImg = document.createElement('img')
     mapImg.setAttribute('title', image.text.replace(/<[^>]*>?/gm, ''))

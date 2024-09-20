@@ -319,6 +319,65 @@ export default function MentalMap(element, params) {
     }
   }
 
+  function showMentalMapHandler(zoomWrap, closeMentalMapHandler) {
+    const zoomContainer = document.createElement('div')
+    zoomContainer.classList.add('zoom-container')
+
+    zoomContainer.appendChild(zoomWrap)
+
+    const closeBtn = document.createElement('button')
+    closeBtn.classList.add('btn', 'btn-small', 'mental-map-close')
+    closeBtn.textContent = 'Закрыть'
+    closeBtn.addEventListener('click', closeMentalMapHandler)
+    zoomContainer.appendChild(closeBtn)
+
+    const hideBtn = document.createElement('button')
+    hideBtn.classList.add('btn', 'btn-small', 'mental-map-hide-btn')
+    hideBtn.textContent = 'Скрыть'
+    hideBtn.addEventListener('click', e => {
+      $(e.target).toggleClass('img-hide')
+      if ($(e.target).hasClass('img-hide')) {
+        $(zoomWrap).find('.mental-map-img img')
+          .each((i, el) => $(el).css({opacity: '0'}))
+        $(zoomWrap).find('.mental-map-img').each((i, el) => {
+          $(el).append(`<span class="mental-map-point"></span>`)
+        })
+        $(e.target).text('Показать')
+      } else {
+        $(zoomWrap).find('.mental-map-img span').remove()
+        $(zoomWrap).find('.mental-map-img img')
+          .each((i, el) => $(el).css({opacity: '1'}))
+        $(e.target).text('Скрыть')
+      }
+    })
+    zoomContainer.appendChild(hideBtn)
+
+    return zoomContainer
+  }
+
+  function initPanZoom(element, mapWidth, mapHeight) {
+    let initialZoom = 0.8
+    const containerWidth = container.offsetWidth
+    const containerHeight = container.offsetHeight
+
+    if (mapHeight > containerHeight) {
+      initialZoom = containerHeight / mapHeight
+    } else {
+      initialZoom = 1;
+    }
+
+    if (mapWidth > containerWidth) {
+      initialZoom = containerWidth / mapWidth
+    }
+
+    return Panzoom(element, {
+      excludeClass: 'mental-map-img',
+      startScale: initialZoom,
+      minScale: 0.4,
+      maxScale: 2,
+    })
+  }
+
   const run = async () => {
     const {mentalMap: json, history} = await params.init()
 
@@ -349,6 +408,8 @@ export default function MentalMap(element, params) {
       }
     })
     mentalMapId = json.id
+
+    const imageFirst = Boolean(json?.settings?.imageFirst)
 
     container.appendChild(AllTexts(texts, json.map.images, history, (image) => {
       const historyItem = history.find(h => h.id === image.id)
@@ -383,16 +444,25 @@ export default function MentalMap(element, params) {
         `${json.map.width}px`,
         `${json.map.height}px`,
         json.map.images,
-        texts,
-        mapImageClickHandler,
-        (dialog) => {
+        (image) => {
+
           element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
+
+          const historyItem = history.find(h => h.id === image.id)
+          const dialog = mapImageClickHandler(image, texts, historyItem)
+
           dialog.onHide(() => {
             element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
             hideDialogHandler()
             if (voiceResponse.getStatus()) {
               voiceResponse.stop()
             }
+
+            const el = container.querySelector(`[data-image-fragment-id='${image.id}']`)
+            el.querySelector('.result-item-value').innerHTML = `${historyItem.all}% (${historyItem.hiding}% / ${historyItem.target}%)`
+            el.querySelector('.text-item').innerHTML = ''
+
+            appendWordElements(texts.find(t => t.id === image.id).words, el.querySelector('.text-item'))
           })
         }
       )
@@ -462,6 +532,47 @@ export default function MentalMap(element, params) {
     this.element.appendChild(container)
 
     $('.result-item-value').tooltip()
+
+    if (imageFirst) {
+
+      const zoomWrap = MentalMapImage(
+        json.map.url,
+        `${json.map.width}px`,
+        `${json.map.height}px`,
+        json.map.images,
+        (image) => {
+
+          element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
+
+          const historyItem = history.find(h => h.id === image.id)
+          const dialog = mapImageClickHandler(image, texts, historyItem)
+
+          dialog.onHide(() => {
+            element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
+            hideDialogHandler()
+            if (voiceResponse.getStatus()) {
+              voiceResponse.stop()
+            }
+
+            const el = container.querySelector(`[data-image-fragment-id='${image.id}']`)
+            el.querySelector('.result-item-value').innerHTML = `${historyItem.all}% (${historyItem.hiding}% / ${historyItem.target}%)`
+            el.querySelector('.text-item').innerHTML = ''
+
+            appendWordElements(texts.find(t => t.id === image.id).words, el.querySelector('.text-item'))
+          })
+        }
+      )
+      const zoomContainer = showMentalMapHandler(zoomWrap, () => {
+        zoom.destroy()
+        zoomContainer.remove()
+        element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
+      })
+      this.element.appendChild(zoomContainer)
+      $('.mental-map-img img').tooltip()
+
+      zoom = initPanZoom(zoomWrap, json.map.width, json.map.height)
+      element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
+    }
   }
 
   /**

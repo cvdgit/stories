@@ -1,11 +1,11 @@
 import React from "react";
 import './Dialog.css'
 
-function Dialog({children, nodeRef, hideHandler}) {
+function Dialog({children, nodeRef, hideHandler, ...props}) {
   return (
     <div ref={nodeRef} className="dialog export-dialog-modal">
       <div onClick={hideHandler} className="dialog__overlay"></div>
-      <div className="dialog__content">
+      <div className="dialog__content" {...props}>
         <div className="dialog__close" onClick={hideHandler}>
           <i className="icon icon-remove">&times;</i>
         </div>

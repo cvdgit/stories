@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useEffect, useReducer, useRef, useState} from 'react';
+import React, {createContext, useContext, useEffect, useId, useReducer, useRef, useState} from 'react';
 import './App.css'
 import AppLoader from "./AppLoader";
 import Editor from "../Editor";
@@ -21,10 +21,12 @@ export default function App({mentalMapId}) {
   const [open, setOpen] = useState(false)
   const [mapText, setMapText] = useState(state.text)
   const firstUpdate = useRef(true)
-  const imagesRef = useRef()
-  const [imagesOpen, setImagesOpen] = useState(false)
+  const settingsRef = useRef()
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const [textFragmentCount, setTextFragmentCount] = useState(0)
   const [formattedMapText, setFormattedMapText] = useState()
+  const [settings, setSettings] = useState(state?.settings || {})
+  const checkId = useId()
 
   useEffect(() => {
     api
@@ -66,6 +68,21 @@ export default function App({mentalMapId}) {
     setFormattedMapText(formatTextWithLineNumbers(state.text))
   }, [state.text]);
 
+  useEffect(() => {
+    const timeoutId = setTimeout(() => api
+      .post('/admin/index.php?r=mental-map/update-settings', {
+        payload: {
+          id: state.id,
+          settings: state?.settings || {}
+        }
+      }), 500);
+    return () => clearTimeout(timeoutId);
+  }, [JSON.stringify(state?.settings)]);
+
+  useEffect(() => {
+    setFormattedMapText(formatTextWithLineNumbers(state.text))
+  }, [state.text]);
+
   const returnUrl = window?.mentalMapReturnUrl || '/'
 
   function formatTextWithLineNumbers(text) {
@@ -88,9 +105,9 @@ export default function App({mentalMapId}) {
                       type="button">Текст {textFragmentCount > 0 && (<span> ({textFragmentCount})</span>)}
               </button>
               <button onClick={() => {
-                setImagesOpen(true)
+                setSettingsOpen(true)
               }} className="button button--default button--header-done"
-                      type="button">Изображения
+                      type="button">Настройки
               </button>
             </div>
           </div>
@@ -171,34 +188,23 @@ export default function App({mentalMapId}) {
       </CSSTransition>
 
       <CSSTransition
-        in={imagesOpen}
-        nodeRef={imagesRef}
+        in={settingsOpen}
+        nodeRef={settingsRef}
         timeout={200}
         classNames="dialog"
         unmountOnExit
       >
-        <Dialog nodeRef={imagesRef} hideHandler={() => setImagesOpen(false)}>
-          <h2 className="dialog-heading">Изображения</h2>
-          <div className="all-images-list">
-            {state.map?.images.map((image, i) => (
-              <div className="all-images-list-item" key={i}>
-                <div style={{marginRight: '10px'}}>
-                  <img style={{maxWidth: '100px'}} src={image.url} alt="img"/>
-                </div>
-                <div style={{width: '100%'}}>
-                  <div
-                    className="textarea"
-                    style={{
-                      border: '1px #808080 solid',
-                      maxHeight: '100px',
-                      overflowY: 'auto'
-                    }}
-                    contentEditable="plaintext-only"
-                    dangerouslySetInnerHTML={{__html: image.text}}
-                  ></div>
-                </div>
-              </div>
-            ))}
+        <Dialog nodeRef={settingsRef} hideHandler={() => setSettingsOpen(false)} style={{width: '60rem'}}>
+          <h2 className="dialog-heading">Настройки</h2>
+          <div style={{padding: '20px 0'}}>
+            <div><label htmlFor={checkId}><input id={checkId} onChange={(e) => {
+              settings.imageFirst = !Boolean(state?.settings?.imageFirst)
+              setSettings(settings)
+              dispatch({
+                type: 'update_settings',
+                payload: settings
+              })
+            }} checked={Boolean(state?.settings?.imageFirst)} type="checkbox"/> При прохождении показывать изображение ментальной карты</label></div>
           </div>
         </Dialog>
       </CSSTransition>

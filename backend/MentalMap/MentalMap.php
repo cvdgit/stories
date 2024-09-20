@@ -62,6 +62,13 @@ class MentalMap extends ActiveRecord
         $this->payload = $payload;
     }
 
+    public function updateSettings(array $settings): void
+    {
+        $payload = $this->payload;
+        $payload['settings'] = $settings;
+        $this->payload = $payload;
+    }
+
     public function findImageFromPayload(string $imageId): ?array
     {
         return array_values(array_filter($this->getImages(), static function (array $item) use ($imageId): bool {

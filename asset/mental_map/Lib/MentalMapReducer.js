@@ -40,6 +40,12 @@ export default function MentalMapReducer(state, action) {
         text: action.text
       }
     }
+    case 'update_settings': {
+      return {
+        ...state,
+        settings: action.payload
+      }
+    }
     default: {
       throw Error('Unknown action: ' + action.type);
     }

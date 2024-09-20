@@ -267,4 +267,27 @@ class MentalMapController extends Controller
         }
         return ['success' => true];
     }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionUpdateSettings(Request $request, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+        $payload = $request->post('payload');
+        $mentalMapModel = MentalMap::findOne($payload['id']);
+        if ($mentalMapModel === null) {
+            throw new NotFoundHttpException('Mental Map not found');
+        }
+        try {
+            $mentalMapModel->updateSettings($payload['settings']);
+            if (!$mentalMapModel->save()) {
+                throw new DomainException('Mental Map settings update error');
+            }
+            return ['success' => true];
+        } catch (\Exception $exception) {
+            Yii::$app->errorHandler->logException($exception);
+            return ['success' => false, 'message' => $exception->getMessage()];
+        }
+    }
 }
