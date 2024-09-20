@@ -19,7 +19,7 @@ class Module extends \yii\base\Module
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => [UserRoles::ROLE_ADMIN],
+                        'roles' => [UserRoles::ROLE_TEACHER],
                     ],
                 ],
             ]
