@@ -5,8 +5,8 @@ export default function MentalMapManager() {
   const instances = {}
 
   return {
-    create(element, params) {
-      const instance = new MentalMap(element, params)
+    create(element, deck, params) {
+      const instance = new MentalMap(element, deck, params)
 
       return instance
     }

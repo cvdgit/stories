@@ -14,6 +14,7 @@ import SlidesPlayer from "./SlidesPlayer";
 import Background from "./plugins/Background";
 import NextStory from "./plugins/NextStory";
 import isMobile from "./is_mobile";
+import MentalMap from "./plugins/MentalMap";
 
 function onSlideMouseDown(e, player) {
 
@@ -24,6 +25,7 @@ function onSlideMouseDown(e, player) {
   if ($target.parents("section[data-slide-view=question]").length ||
     $target.parents("section[data-slide-view=new-question]").length ||
     $target.parents('.new-questions').length ||
+    $target.parents('.mental-map').length ||
     ($target[0].tagName === "IMG" && $target.attr("data-action") === "1") ||
     $target.hasClass("btn")||
     $target.parents(".wikids-slide-links").length ||
@@ -81,6 +83,7 @@ window.initSlides = function() {
       Feedback,
       Transition,
       Testing,
+      MentalMap,
       LinksPlugin,
       VideoPlugin,
       ActionsPlugin,

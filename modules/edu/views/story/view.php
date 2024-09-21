@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use common\helpers\Url;
 use common\rbac\UserRoles;
+use frontend\assets\MentalMapAsset;
 use frontend\assets\SlidesAsset;
 use frontend\assets\TestAsset;
 use modules\edu\models\EduStory;
@@ -37,6 +38,10 @@ $config = [
         'initAction' => Url::to(['/question/init']),
         'student_id' => $studentId,
     ],
+    'mental_map' => [
+        'story_id' => $storyId,
+        'student_id' => $studentId,
+    ],
     'links' => [
         'story_id' => $storyId,
         'links' => $story->slideBlocksData(),
@@ -67,6 +72,7 @@ JS
 );
 
 TestAsset::register($this);
+MentalMapAsset::register($this);
 SlidesAsset::register($this);
 
 $this->registerCss(<<<CSS

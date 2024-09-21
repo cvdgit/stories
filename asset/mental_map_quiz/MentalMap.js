@@ -7,8 +7,17 @@ import DetailText from "./components/DetailText";
 import AllTexts, {appendWordElements} from "./components/AllTexts";
 import MentalMapImage from "./components/MentalMapImage";
 import FragmentResultElement from "./components/FragmentResultElement";
+import sendEventSourceMessage from "../app/sendEventSourceMessage";
+import Panzoom from "../app/panzoom.min"
 
-export default function MentalMap(element, params) {
+/**
+ * @param element
+ * @param {Reveal} deck
+ * @param params
+ * @returns {{run: ((function(): Promise<void>)|*)}}
+ * @constructor
+ */
+export default function MentalMap(element, deck, params) {
 
   this.element = element
   let texts = []
@@ -32,21 +41,21 @@ export default function MentalMap(element, params) {
   const blockTypes = ['text', 'image']
 
   function showDialogHandler() {
-    Reveal.configure({keyboard: false});
+    deck.configure({keyboard: false});
     $('.reveal .story-controls').hide();
     blockTypes.map(blockType => {
-      $(Reveal.getCurrentSlide()).find(`div.sl-block[data-block-type=${blockType}]`).css('zIndex', '-1')
+      $(deck.getCurrentSlide()).find(`div.sl-block[data-block-type=${blockType}]`).css('zIndex', '-1')
     })
   }
 
   function hideDialogHandler() {
-    if ($(Reveal.getCurrentSlide()).find('.slide-hints-wrapper').length) {
+    if ($(deck.getCurrentSlide()).find('.slide-hints-wrapper').length) {
       return
     }
-    Reveal.configure({keyboard: true})
+    deck.configure({keyboard: true})
     $('.reveal .story-controls').show();
     blockTypes.map(blockType => {
-      $(Reveal.getCurrentSlide()).find(`div.sl-block[data-block-type=${blockType}]`).css('zIndex', 'auto')
+      $(deck.getCurrentSlide()).find(`div.sl-block[data-block-type=${blockType}]`).css('zIndex', 'auto')
     })
   }
 
@@ -244,7 +253,7 @@ export default function MentalMap(element, params) {
 
             saveUserResult({
               story_id: params.story_id,
-              slide_id: Number($(Reveal.getCurrentSlide()).attr('data-id')),
+              slide_id: Number($(deck.getCurrentSlide()).attr('data-id')),
               mental_map_id: mentalMapId,
               image_fragment_id: image.id,
               overall_similarity: Number(json?.overall_similarity),

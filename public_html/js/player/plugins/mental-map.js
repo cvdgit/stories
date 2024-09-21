@@ -21,7 +21,7 @@
       throw new Error('Mental map id not found')
     }
 
-    const mentalMap = mentalMapBuilder.create(elem[0], {
+    const mentalMap = mentalMapBuilder.create(elem[0], Reveal, {
       init: async () => {
         const response = await fetch(`/mental-map/init`, {
           method: 'POST',
