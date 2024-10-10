@@ -1,8 +1,10 @@
+
+const mentalMapBuilder = window.mentalMapBuilder = new MentalMapManagerQuiz();
+
+
 (function() {
 
   const readySlides = [];
-
-  const mentalMapBuilder = new MentalMapManagerQuiz()
 
   function getCurrentSlide() {
     return Reveal.getCurrentSlide();
@@ -39,8 +41,9 @@
         const json = await response.json()
         return {mentalMap: json.mentalMap, history: json.history}
       },
-      ...mentalMapConfig
-    })
+      ...mentalMapConfig,
+      ...elem.data()
+    }, $(getCurrentSlide()).attr('data-id'))
     mentalMap.run()
   }
 
@@ -50,7 +53,6 @@
       return;
     }
     readySlides[currentSlideID] = true;
-    console.log('mental map init')
     init();
   }
 

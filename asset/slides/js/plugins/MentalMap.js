@@ -27,41 +27,6 @@ export default function MentalMap() {
       stack = [];
       const container = $('.reveal > .slides')
 
-/*
-      const initTesting = () => {
-
-        const elem = $("div.new-questions", deck.getCurrentSlide());
-        if (!elem.length) {
-          return;
-        }
-
-        const params = elem.data();
-        params.studentId = this.config.student_id;
-
-        const slidesPLayer = new SlidesPlayer(deck);
-
-        const test = WikidsStoryTest.create(elem[0], {
-          'dataUrl': '/question/get',
-          'dataParams': params,
-          'forSlide': false,
-          'required': params.testRequired,
-          'deck': deck,
-          init: function() {
-            return $.getJSON('/question/init', params);
-          },
-          onInitialized: function() {
-            test.addEventListener("finish", function () {
-              slidesPLayer.right();
-            });
-            test.addEventListener("nextSlide", function () {
-              slidesPLayer.right();
-            });
-          }
-        });
-        test.run();
-      }
-      */
-
       const init = () => {
 
         const elem = $('div.mental-map', deck.getCurrentSlide())
@@ -99,7 +64,7 @@ export default function MentalMap() {
             return {mentalMap: json.mentalMap, history: json.history}
           },
           ...params
-        })
+        }, $(deck.getCurrentSlide()).attr('data-id'))
         mentalMap.run()
       }
 

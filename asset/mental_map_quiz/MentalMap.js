@@ -21,6 +21,7 @@ export default function MentalMap(element, deck, params) {
 
   this.element = element
   let texts = []
+  let mentalMapHistory = []
   let mentalMapId
 
   const voiceResponse = new VoiceResponse(new MissingWordsRecognition({}))
@@ -417,6 +418,7 @@ export default function MentalMap(element, deck, params) {
       }
     })
     mentalMapId = json.id
+    mentalMapHistory = history
 
     const imageFirst = Boolean(json?.settings?.imageFirst)
 
@@ -697,6 +699,12 @@ export default function MentalMap(element, deck, params) {
   }
 
   return {
-    run
+    run,
+    canNext() {
+      if (params?.mentalMapRequired) {
+        return mentalMapHistory.reduce((all, val) => all && val.all > 0, true)
+      }
+      return true
+    }
   }
 }

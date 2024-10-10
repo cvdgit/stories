@@ -6,6 +6,7 @@ use backend\components\BaseController;
 use backend\models\editor\BaseForm;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
+use backend\models\editor\MentalMapForm;
 use backend\models\editor\QuestionForm;
 use backend\models\editor\TestForm;
 use backend\models\editor\TextForm;
@@ -19,6 +20,7 @@ use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\NotFoundHttpException;
+use yii\web\Request;
 use yii\web\Response;
 
 class UpdateBlockController extends BaseController
@@ -92,6 +94,24 @@ class UpdateBlockController extends BaseController
     public function actionHtml()
     {
         return $this->updateBlock(new QuestionForm(['scenario' => 'update']));
+    }
+
+    public function actionMentalMap(Request $request): array
+    {
+        $form = new MentalMapForm();
+        if ($form->load($request->post()) && $form->validate()) {
+            try {
+                /*$model = StorySlide::findSlide($form->slide_id);
+                if ($model === null) {
+                    throw new NotFoundHttpException('Slide not found');
+                }*/
+                $html = $this->editorService->updateMentalMapBlock($form);
+                return ['success' => true, 'block_id' => $form->block_id, 'html' => $html];
+            } catch(Exception $ex) {
+                return ['success' => false, 'errors' => $ex->getMessage()];
+            }
+        }
+        return ['success' => false, 'errors' => implode('<br/>', $form->getErrorSummary(true))];
     }
 
     private function updateBlock(BaseForm $form): array

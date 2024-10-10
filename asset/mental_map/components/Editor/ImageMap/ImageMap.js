@@ -250,7 +250,7 @@ export default function ImageMap({mapImage}) {
               <img draggable={false} src={mapImage.url} style={{height: '100%'}} alt=""/>
               {mapImage.images.map((image, i) => (
                 <Element
-                  resizedMinWidth={50}
+                  resizedMinWidth={25}
                   resizedMaxWidth={500}
                   resizable={true}
                   key={`im-${i}`}

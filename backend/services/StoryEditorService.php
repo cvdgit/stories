@@ -21,6 +21,7 @@ use backend\components\story\writer\HTMLWriter;
 use backend\components\StudyTaskFinalSlide;
 use backend\models\editor\BaseForm;
 use backend\models\editor\ImageForm;
+use backend\models\editor\MentalMapForm;
 use backend\models\ImageSlideBlock;
 use backend\models\video\VideoSource;
 use common\models\LessonBlock;
@@ -260,6 +261,25 @@ class StoryEditorService
             }
         }
         $slideModel->delete();
+    }
+
+    public function updateMentalMapBlock(MentalMapForm $form): string
+    {
+        $model = StorySlide::findSlide($form->slide_id);
+        if ($model === null) {
+            throw new DomainException('Slide not found');
+        }
+        $reader = new HtmlSlideReader($model->data);
+        $slide = $reader->load();
+
+        /** @var MentalMapBlock $block */
+        $block = $slide->findBlockByID($form->block_id);
+        $block->setContent((new MentalMapBlockContent($form->mental_map_id, $form->required === '1'))->render());
+
+        $writer = new HTMLWriter();
+        $model->updateData($writer->renderSlide($slide));
+
+        return str_replace('data-src=', 'src=', $writer->renderBlock($block));
     }
 
     public function updateBlock($form): string

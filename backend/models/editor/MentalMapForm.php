@@ -12,6 +12,7 @@ use DomainException;
 class MentalMapForm extends BaseForm
 {
     public $mental_map_id;
+    public $required;
 
     /*public function scenarios()
     {
@@ -24,7 +25,7 @@ class MentalMapForm extends BaseForm
     {
         return array_merge(parent::rules(), [
             [['story_id', 'mental_map_id'], 'required'],
-            //[['story_id', 'test_id', 'required', 'lesson_id'], 'integer'],
+            [['story_id', 'required'], 'integer'],
             //[['story_id', 'test_id'], 'unique', 'targetAttribute' => ['story_id', 'test_id'], 'targetClass' => StoryStoryTest::class, 'message' => 'Невозможно добавить т.к. этот тест в эту историю уже добавлен', 'on' => 'default'],
         ]);
     }
@@ -33,7 +34,7 @@ class MentalMapForm extends BaseForm
     {
         return array_merge(parent::attributeLabels(), [
             'mental_map_id' => 'Ментальная карта',
-            //'required' => 'Тест обязателен для прохождения',
+            'required' => 'Тест обязателен для прохождения',
         ]);
     }
 

@@ -297,7 +297,7 @@ class EditorController extends BaseController
             ) === AbstractBlock::TYPE_VIDEOFILE) ? 'update_video' : 'update';
         return $this->renderAjax($view, [
             'model' => $form,
-            'action' => ['editor/update-block/' . $block_type],
+            'action' => ['editor/update-block/' . str_replace('_', '-', $block_type)],
             'widgetStoryModel' => $widgetStoryModel,
         ]);
     }

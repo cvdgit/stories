@@ -341,7 +341,15 @@ var WikidsPlayer = (function(document, $) {
                         }
                     }
                 }
-                Reveal.next();
+
+                if (window['mentalMapBuilder']) {
+                  const instance = mentalMapBuilder.getInstance($(Reveal.getCurrentSlide()).attr('data-id'))
+                  if (instance && !instance.canNext()) {
+                    return
+                  }
+                }
+
+              Reveal.next();
             }
         },
         "setSlideAudio": setSlideAudio,

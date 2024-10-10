@@ -17,3 +17,4 @@ use yii\widgets\ActiveForm;
     <p class="form-control input-sm"><?= $model->mental_map_id ?></p>
 </div>
 <?= $form->field($model, 'mental_map_id')->hiddenInput()->label(false) ?>
+<?= $form->field($model, 'required', ['inputOptions' => ['class' => 'form-control input-sm']])->checkbox() ?>

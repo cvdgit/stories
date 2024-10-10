@@ -46,11 +46,17 @@ class MentalMapBlock extends AbstractBlock
         $content = MentalMapBlockContent::createFromHtml($this->content);
         return array_merge([
             'mental_map_id' => $content->getId(),
+            'required' => $content->isRequired() ? '1' : '0',
         ], parent::getValues());
     }
 
     public function getContentObject(string $className): string
     {
         return '';
+    }
+
+    public static function fromBlock(): self
+    {
+        return new self();
     }
 }

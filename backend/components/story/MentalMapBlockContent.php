@@ -15,19 +15,26 @@ class MentalMapBlockContent
      */
     private $id;
 
-    public function __construct(string $id)
+    /**
+     * @var bool
+     */
+    private $required;
+
+    public function __construct(string $id, bool $required = false)
     {
         $this->id = $id;
+        $this->required = $required;
     }
 
     public static function createFromHtml(string $html): MentalMapBlockContent
     {
         $content = phpQuery::newDocumentHTML($html);
         $id = $content->find('.mental-map')->attr('data-mental-map-id');
+        $required = $content->find('.mental-map')->attr('data-mental-map-required') === 'true';
         if (empty($id)) {
             throw new DomainException('Mental Map id undefined');
         }
-        return new self((string) $id);
+        return new self((string) $id, $required);
     }
 
     public function getId(): string
@@ -41,6 +48,7 @@ class MentalMapBlockContent
         return Html::tag('div', $link, [
             'class' => 'mental-map',
             'data-mental-map-id' => $this->id,
+            'data-mental-map-required' => var_export($this->required, true),
         ]);
     }
 
@@ -49,6 +57,12 @@ class MentalMapBlockContent
         return Html::tag('div', '', [
             'class' => 'mental-map',
             'data-mental-map-id' => $this->id,
+            'data-mental-map-required' => var_export($this->required, true),
         ]);
+    }
+
+    public function isRequired(): bool
+    {
+        return $this->required;
     }
 }
