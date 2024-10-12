@@ -1,6 +1,6 @@
 import FragmentResultElement from "./FragmentResultElement";
 
-export function appendWordElements(words, container, init, clickHandler) {
+export function appendAllTextWordElements(words, container) {
   words.map(word => {
     const {type} = word
     if (type === 'break') {
@@ -10,22 +10,11 @@ export function appendWordElements(words, container, init, clickHandler) {
     } else {
       const span = document.createElement('span')
       span.classList.add('text-item-word')
-      if (word.hidden) {
-        word.hidden = true
-        span.classList.add('selected')
-      }
       if (word?.target) {
         span.classList.add('word-target')
-        if (init === true) {
-          word.hidden = true
-          span.classList.add('selected')
-        }
+
       }
       span.textContent = word.word
-      span.addEventListener('click', () => {
-        word.hidden = !word.hidden
-        span.classList.toggle('selected')
-      })
       container.appendChild(span)
     }
   })
@@ -63,7 +52,7 @@ export default function AllTexts(texts, images, history, imageClickHandler) {
     const textItem = document.createElement('div')
     textItem.classList.add('text-item')
 
-    appendWordElements(textState.words, textItem, true)
+    appendAllTextWordElements(textState.words, textItem)
 
     item.appendChild(textItem)
 

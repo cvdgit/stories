@@ -4,7 +4,7 @@ import VoiceResponse from "./lib/VoiceResponse"
 import MissingWordsRecognition from "./lib/MissingWordsRecognition"
 import {v4 as uuidv4} from "uuid"
 import DetailText from "./components/DetailText";
-import AllTexts, {appendWordElements} from "./components/AllTexts";
+import AllTexts, {appendAllTextWordElements} from "./components/AllTexts";
 import MentalMapImage from "./components/MentalMapImage";
 import FragmentResultElement from "./components/FragmentResultElement";
 import sendEventSourceMessage from "../app/sendEventSourceMessage";
@@ -434,7 +434,7 @@ export default function MentalMap(element, deck, params) {
         el.querySelector('.result-item-value').innerHTML = `${historyItem.all}% (${historyItem.hiding}% / ${historyItem.target}%)`
         el.querySelector('.text-item').innerHTML = ''
 
-        appendWordElements(texts.find(t => t.id === image.id).words, el.querySelector('.text-item'))
+        appendAllTextWordElements(texts.find(t => t.id === image.id).words, el.querySelector('.text-item'))
       })
     }))
 
@@ -473,7 +473,7 @@ export default function MentalMap(element, deck, params) {
             el.querySelector('.result-item-value').innerHTML = `${historyItem.all}% (${historyItem.hiding}% / ${historyItem.target}%)`
             el.querySelector('.text-item').innerHTML = ''
 
-            appendWordElements(texts.find(t => t.id === image.id).words, el.querySelector('.text-item'))
+            appendAllTextWordElements(texts.find(t => t.id === image.id).words, el.querySelector('.text-item'))
           })
         }
       )
@@ -569,7 +569,7 @@ export default function MentalMap(element, deck, params) {
             el.querySelector('.result-item-value').innerHTML = `${historyItem.all}% (${historyItem.hiding}% / ${historyItem.target}%)`
             el.querySelector('.text-item').innerHTML = ''
 
-            appendWordElements(texts.find(t => t.id === image.id).words, el.querySelector('.text-item'))
+            appendAllTextWordElements(texts.find(t => t.id === image.id).words, el.querySelector('.text-item'))
           })
         }
       )
