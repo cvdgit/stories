@@ -391,7 +391,7 @@ class StoryEditorService
         }
 
         if ($block->isHtmlTest()) {
-            $block->setContent((new TestBlockContent($form->test_id, $form->required))->render());
+            $block->setContent((new TestBlockContent($form->test_id, $form->required))->renderWithDescription([], 'Редактировать тест'));
         } else {
             $block->update($form);
         }

@@ -95,9 +95,9 @@ class SlideModifier
                 $content = TestBlockContent::createFromHtml($block->getContent());
                 try {
                     $testModel = StoryTest::findModel($content->getTestID());
-                    $block->setContent($content->render([], $testModel->title));
+                    $block->setContent($content->renderWithDescription([], $testModel->title));
                 } catch (\Exception $ex) {
-                    $block->setContent($content->render([], $ex->getMessage()));
+                    $block->setContent($content->renderWithDescription([], $ex->getMessage()));
                 }
             }
             if ($block->typeIs(AbstractBlock::TYPE_MENTAL_MAP)) {

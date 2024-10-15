@@ -27,7 +27,16 @@ class TestBlockContent
         return new self($content->attr('data-test-id'), $content->attr('data-test-required') ?? false);
     }
 
-    public function render(array $params = [], string $content = ''): string
+    public function render(): string
+    {
+        return Html::tag('div', '', [
+            'class' => 'new-questions',
+            'data-test-id' => $this->testID,
+            'data-test-required' => $this->required,
+        ]);
+    }
+
+    public function renderWithDescription(array $params = [], string $content = ''): string
     {
         $options = [
             'class' => 'new-questions',
