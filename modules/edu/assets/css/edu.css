@@ -408,3 +408,22 @@ a.lesson-item__wrap:hover .lesson-name span {
   padding: 0;
   height: 100%;
 }
+
+ .detail-text {
+
+ }
+.text-item-word {
+  display: inline-block;
+  white-space: nowrap;
+  margin-right: 8px;
+  user-select: none;
+  cursor: pointer;
+  margin-bottom: 6px;
+}
+.word-target {
+  font-weight: 600;
+}
+.text-item-word.selected {
+  color: #fff;
+  border: 1px #808080 solid;
+}

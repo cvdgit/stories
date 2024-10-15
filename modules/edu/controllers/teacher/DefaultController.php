@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace modules\edu\controllers\teacher;
 
+use backend\components\story\StoryMentalMapFetcher;
+use backend\MentalMap\FetchMentalMapUserHistory\MentalMapUserHistoryFetcher;
+use backend\MentalMap\MentalMap;
 use common\models\Story;
 use common\models\UserStudent;
 use common\rbac\UserRoles;
@@ -144,6 +147,42 @@ class DefaultController extends Controller
         $rows = $this->testDetailService->getDetail($test_id, $student_id);
         return $this->renderAjax('_detail', [
             'rows' => $rows,
+        ]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionStoryMentalMaps(int $story_id, int $student_id): string
+    {
+        if (($story = Story::findOne($story_id)) === null) {
+            throw new NotFoundHttpException('История не найдена');
+        }
+
+        if (($student = UserStudent::findOne($student_id)) === null) {
+            throw new NotFoundHttpException('Ученик не найден');
+        }
+
+        $mentalMapIds = (new StoryMentalMapFetcher())->fetch($story->slidesData());
+
+        if (count($mentalMapIds) === 0) {
+            return 'В истории нет ментальных карт';
+        }
+
+        $data = [];
+        $mentalMaps = [];
+        foreach ($mentalMapIds as $mentalMapId) {
+            $mentalMap = MentalMap::findOne($mentalMapId);
+            if ($mentalMap !== null) {
+                $mentalMaps[] = $mentalMap;
+            }
+        }
+
+        $historyData = (new MentalMapUserHistoryFetcher())->fetch($story->id, $student->user_id);
+
+        return $this->renderAjax('_mental_maps', [
+            'mentalMaps' => $mentalMaps,
+            'historyData' => $historyData,
         ]);
     }
 }
