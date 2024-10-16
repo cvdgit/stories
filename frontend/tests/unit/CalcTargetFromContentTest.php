@@ -1,0 +1,18 @@
+<?php
+
+declare(strict_types=1);
+
+namespace frontend\tests\unit;
+
+use phpQuery;
+
+class CalcTargetFromContentTest extends \Codeception\Test\Unit
+{
+    public function testMatchSuccess(): void
+    {
+        $content = '<span class="text-item-word" data-word-id="13586eeb-f490-44f0-9e73-42fcb85b83cf">Родовые</span><span class="text-item-word selected word-target" data-word-id="30917c76-98fb-4df6-80b1-984c402397af">общиqwны.</span><span class="text-item-word selected word-target" data-word-id="41f25d03-2b72-4f8d-9cc1-f02cb9e4cdbe">Приблизительно</span><span class="text-item-word selected word-target" data-word-id="4d03f24f-9f06-40e9-baed-3261efca1170">40</span><span class="text-item-word selected word-target" data-word-id="1c7d0e28-e530-46de-a529-3ed5597b4048">тысяч</span><span class="text-item-word" data-word-id="06bf7476-5517-4539-ae3a-ad6d1027ddc7">лет</span><span class="text-item-word" data-word-id="78ef11c4-e8e1-4b95-a066-4e71d41428b8">назад</span><span class="text-item-word" data-word-id="fb9e9fdb-fcd4-41dc-95f2-792c46a49fd1">человек</span><span class="text-item-word" data-word-id="31b3b7a1-2e2d-4420-a948-235f5960b9f3">стал</span><span class="text-item-word" data-word-id="0d0c0c18-54bb-4b74-abb2-8fa5b188dfa9">таким</span><span class="text-item-word" data-word-id="1491c79b-d0e0-439f-be15-8b1b467df24a">же,</span><span class="text-item-word" data-word-id="88c86ee9-5679-4ee4-8b42-298bbd89d734">как</span><span class="text-item-word" data-word-id="47f8ed57-dcb8-4e33-ab5d-558587f06ca4">люди</span><span class="text-item-word selected word-target" data-word-id="50c6f980-8859-4842-8a0a-fd5e9f852b8e">нашего</span><span class="text-item-word" data-word-id="88ff0f58-c9dd-4554-9436-463a1cc3fae3">времени.</span><span class="text-item-word" data-word-id="995ea013-9fd8-4dda-bacb-25fd818c4a4a">Учёные</span><span class="text-item-word" data-word-id="22603146-bfcd-40e6-aa0d-b71ecbbb0e39">называют</span><span class="text-item-word" data-word-id="e123df7c-d80a-443a-8648-67d15e40e320">его</span><span class="text-item-word" data-word-id="21284d84-cbba-4906-87e0-20cde22cda66">человеком</span><span class="text-item-word" data-word-id="1c8b9261-f75e-4324-ae99-d75c5277aaa4">разумным.</span><div class="line-sep"></div><span class="text-item-word" data-word-id="118b345f-2807-4231-9112-bed2f3268dda">В</span><span class="text-item-word" data-word-id="dd1f6ef2-7cc0-40c6-96b5-0bcb42d20539">это</span><span class="text-item-word" data-word-id="199c3336-4ffc-4b26-b87e-23e881937c8c">время</span><span class="text-item-word" data-word-id="90025bac-746a-46d1-8f23-8f59bf31f402">человеческие</span><span class="text-item-word" data-word-id="39ace80d-ed02-43fa-9f67-552b97061206">коллективы</span><span class="text-item-word" data-word-id="36c9029c-20b2-4366-95a7-c0f1e9f4bb9d">стали</span><span class="text-item-word" data-word-id="546386a5-c328-40fb-8fe6-2baa250dfaf3">более</span><span class="text-item-word" data-word-id="c03fe849-9e3e-485b-ae46-2dcee825e33c">сплочёнными.</span><span class="text-item-word" data-word-id="9eb85b38-a55a-4905-8f03-f0b7223a5dc0">«Люди</span><span class="text-item-word" data-word-id="1a462eee-e3f4-487d-8205-3e3a9280aa1d">разумные»</span><span class="text-item-word" data-word-id="0a2924a4-6f01-441a-99e0-368e90f112de">жили</span><span class="text-item-word" data-word-id="b0e4f9d8-d84c-404d-ad05-edf39240ee23">родовыми</span><span class="text-item-word" data-word-id="d4af3794-4e2e-4d4d-a690-df5029a74fb2">общинами.</span><div class="line-sep"></div>';
+        $document = phpQuery::newDocumentHTML($content);
+        $elements = $document->find('.selected');
+        $this->assertTrue($elements->length > 0);
+    }
+}

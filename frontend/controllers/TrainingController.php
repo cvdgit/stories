@@ -10,6 +10,7 @@ use common\models\UserStudent;
 use frontend\components\learning\form\HistoryFilterForm;
 use frontend\components\learning\form\WeekFilterForm;
 use frontend\components\UserController;
+use frontend\Training\FetchMentalMapHistoryTargetWords\MentalMapHistoryTargetWordsFetcher;
 use Yii;
 use yii\web\NotFoundHttpException;
 use yii\web\Request;
@@ -179,7 +180,7 @@ class TrainingController extends UserController
     }
 
     /**
-     * @throws NotFoundHttpException
+     * @throws NotFoundHttpException|\DateMalformedStringException
      */
     public function actionWeek(Request $request, WebUser $user, int $student_id = null): string
     {
@@ -196,9 +197,24 @@ class TrainingController extends UserController
         }
 
         $rows = $filterForm->search($studentId);
+        $mentalMapHistoryRows = (new MentalMapHistoryTargetWordsFetcher())->fetch($currentUser->id, $filterForm->getWeekStartDate(), $filterForm->getWeekEndDate());
 
         $stories = [];
         foreach ($rows as $row) {
+            $storyId = $row['story_id'];
+            if (!isset($stories[$storyId])) {
+                $stories[$storyId] = [
+                    'story_title' => $row['story_title'],
+                    'dates' => [],
+                ];
+            }
+            $stories[$storyId]['dates'][] = [
+                'question_count' => $row['question_count'],
+                'target_date' => $row['target_date'],
+            ];
+        }
+
+        foreach ($mentalMapHistoryRows as $row) {
             $storyId = $row['story_id'];
             if (!isset($stories[$storyId])) {
                 $stories[$storyId] = [
