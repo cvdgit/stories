@@ -27,8 +27,8 @@ use yii\widgets\Pjax;
 
 $this->title = $student->name;
 
-TestAsset::register($this);
-SlidesAsset::register($this);
+//TestAsset::register($this);
+//SlidesAsset::register($this);
 
 $this->registerCss(<<<CSS
 #run-story-modal .modal-body {

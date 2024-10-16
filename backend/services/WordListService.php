@@ -32,6 +32,7 @@ use common\services\TransactionManager;
 use DomainException;
 use Exception;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\di\Instance;
 
 class WordListService
@@ -92,21 +93,26 @@ class WordListService
                 throw new Exception('Can\'t be saved Story model. Errors: '. implode(', ', $story->getFirstErrors()));
             }
 
-            $data = $this->storyEditorService->createQuestionBlock(['test-id' => $test->id]);
-            $slide = $this->storySlideService->create($story->id, $data, StorySlide::KIND_QUESTION);
-            $slide->save();
+            $slide = $this->storySlideService->create($story->id, 'New questions', StorySlide::KIND_QUESTION);
+            if (!$slide->save()) {
+                throw new DomainException('Can\'t be saved Story model. Errors: '. implode(', ', $slide->getFirstErrors()));
+            }
+            $slide->updateData($this->storyEditorService->createQuestionBlock($slide->id, $test->id));
 
             $this->storyLinksService->createTestLink($story->id, $test->id);
         });
     }
 
+    /**
+     * @throws InvalidConfigException
+     */
     private function processItems(int $storyId, array $items, TestWordList $wordList): void
     {
         foreach ($items as $item) {
 
             $test = $this->storyTestService->createFromTemplate((int)$item->template_id, $wordList->name);
             if (!$test->save()) {
-                throw new Exception('Can\'t be saved StoryTest model. Errors: '. implode(', ', $test->getFirstErrors()));
+                throw new DomainException('Can\'t be saved StoryTest model. Errors: '. implode(', ', $test->getFirstErrors()));
             }
 
             $words = $wordList->testWords;
@@ -121,15 +127,16 @@ class WordListService
                 }
                 $questionModel->storyTestAnswers = $questionAnswers;
                 if (!$questionModel->save()) {
-                    throw new Exception('Can\'t be saved StoryTestQuestion model. Errors: '. implode(', ', $questionModel->getFirstErrors()));
+                    throw new DomainException('Can\'t be saved StoryTestQuestion model. Errors: '. implode(', ', $questionModel->getFirstErrors()));
                 }
             }
 
-            $data = $this->storyEditorService->createQuestionBlock(['test-id' => $test->id]);
-            $slide = $this->storySlideService->create($storyId, $data, StorySlide::KIND_QUESTION);
+            $slide = $this->storySlideService->create($storyId, 'New questions', StorySlide::KIND_QUESTION);
             if (!$slide->save()) {
-                throw new Exception('Can\'t be saved StorySlide model. Errors: '. implode(', ', $slide->getFirstErrors()));
+                throw new DomainException('Can\'t be saved StorySlide model. Errors: '. implode(', ', $slide->getFirstErrors()));
             }
+            $slide->updateData($this->storyEditorService->createQuestionBlock($slide->id, $test->id));
+
             $this->storyLinksService->createTestLink($storyId, $test->id);
         }
     }
@@ -146,27 +153,17 @@ class WordListService
 
             $this->processItems($story->id, $items, $wordList);
 
-            $finalSlide = $this->storyEditorService->createFinalSlide($story->id);
-            if (!$finalSlide->save()) {
-                throw new Exception('Can\'t be saved StorySlide model. Errors: '. implode(', ', $finalSlide->getFirstErrors()));
-            }
+            $this->storyEditorService->createFinalSlide($story->id);
         });
     }
 
     public function createFromTemplateExistsStory(int $storyId, array $items, TestWordList $wordList): void
     {
-
         $this->transactionManager->wrap(function() use ($storyId, $items, $wordList) {
-
             $story = Story::findModel($storyId);
             $this->storyEditorService->deleteFinalSlide($story->id);
-
             $this->processItems($story->id, $items, $wordList);
-
-            $finalSlide = $this->storyEditorService->createFinalSlide($story->id);
-            if (!$finalSlide->save()) {
-                throw new Exception('Can\'t be saved StorySlide model. Errors: '. implode(', ', $finalSlide->getFirstErrors()));
-            }
+            $this->storyEditorService->createFinalSlide($story->id);
         });
     }
 
@@ -221,11 +218,11 @@ class WordListService
                     $this->dragWordsService->createAnswers($question->id, $questionDto->getPayload());
                 }
 
-                $data = $this->storyEditorService->createQuestionBlock(['test-id' => $testing->id]);
-                $slide = $this->storySlideService->create($story->id, $data, StorySlide::KIND_QUESTION);
+                $slide = $this->storySlideService->create($story->id, 'New questions', StorySlide::KIND_QUESTION);
                 if (!$slide->save()) {
                     throw ModelDomainException::create($slide);
                 }
+                $slide->updateData($this->storyEditorService->createQuestionBlock($slide->id, $testing->id));
 
                 $this->storyLinksService->createTestLink($story->id, $testing->id);
             }
@@ -239,18 +236,15 @@ class WordListService
             $questions = $this->processWordList($words, $wordProcessor);
             $this->createPoetryQuestions($testing->id, $questions);
 
-            $data = $this->storyEditorService->createQuestionBlock(['test-id' => $testing->id]);
-            $slide = $this->storySlideService->create($story->id, $data, StorySlide::KIND_QUESTION);
+            $slide = $this->storySlideService->create($story->id, 'New questions', StorySlide::KIND_QUESTION);
             if (!$slide->save()) {
                 throw ModelDomainException::create($slide);
             }
+            $slide->updateData($this->storyEditorService->createQuestionBlock($slide->id, $testing->id));
 
             $this->storyLinksService->createTestLink($story->id, $testing->id);
 
-            $finalSlide = $this->storyEditorService->createFinalSlide($story->id);
-            if (!$finalSlide->save()) {
-                throw ModelDomainException::create($finalSlide);
-            }
+            $this->storyEditorService->createFinalSlide($story->id);
         });
     }
 

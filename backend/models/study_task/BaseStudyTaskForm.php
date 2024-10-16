@@ -16,6 +16,7 @@ use common\models\study_task\StudyTaskStatus;
 use common\services\TransactionManager;
 use DomainException;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\base\Model;
 
 class BaseStudyTaskForm extends Model
@@ -115,11 +116,17 @@ class BaseStudyTaskForm extends Model
         }
     }
 
+    /**
+     * @throws InvalidConfigException
+     */
     public function createFinalSlide(int $storyID): void
     {
-        $html = StudyTaskFinalSlide::create();
-        $finalSlide = StorySlide::createSlideFull($storyID, $html, null, SlideStatus::VISIBLE, SlideKind::FINAL_SLIDE);
-        $finalSlide->save();
+        $finalSlide = StorySlide::createSlideFull($storyID, 'Final slide', null, SlideStatus::VISIBLE, SlideKind::FINAL_SLIDE);
+        if (!$finalSlide->save()) {
+            throw new DomainException('Final slide save error');
+        }
+        $html = StudyTaskFinalSlide::create($finalSlide->id);
+        $finalSlide->updateData($html);
     }
 
     public function getStory(): ?Story

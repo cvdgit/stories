@@ -295,7 +295,9 @@ class StorySlide extends ActiveRecord
     public function updateData(string $data): void
     {
         $this->data = $data;
-        $this->save(false);
+        if (!$this->save(false)) {
+            throw new DomainException('Story slide update data exception');
+        }
     }
 
     public function toggleVisible(): int

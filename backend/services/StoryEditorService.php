@@ -182,13 +182,14 @@ class StoryEditorService
     /**
      * @throws InvalidConfigException
      */
-    public function createQuestionBlock(array $params): string
+    public function createQuestionBlock(int $slideId, int $testId): string
     {
         $reader = new HtmlSlideReader('');
         $slide = $reader->load();
         $slide->setView('new-question');
+        $slide->setId($slideId);
         $block = $slide->createBlock(HTMLBLock::class);
-        $block->setContent((new TestBlockContent($params['test-id']))->render());
+        $block->setContent((new TestBlockContent($testId))->render());
         $slide->addBlock($block);
         return (new HTMLWriter())->renderSlide($slide);
     }
@@ -504,10 +505,17 @@ class StoryEditorService
         return (new HtmlSlideReader($data))->load();
     }
 
-    public function createFinalSlide(int $storyId): StorySlide
+    /**
+     * @throws InvalidConfigException
+     */
+    public function createFinalSlide(int $storyId): void
     {
-        $html = StudyTaskFinalSlide::create();
-        return StorySlide::createSlideFull($storyId, $html, null, SlideStatus::VISIBLE, SlideKind::FINAL_SLIDE);
+        $finalSlide = StorySlide::createSlideFull($storyId, 'Final slide', null, SlideStatus::VISIBLE, SlideKind::FINAL_SLIDE);
+        if (!$finalSlide->save()) {
+            throw new DomainException('Can\'t be saved StorySlide model. Errors: '. implode(', ', $finalSlide->getFirstErrors()));
+        }
+        $html = StudyTaskFinalSlide::create($finalSlide->id);
+        $finalSlide->updateData($html);
     }
 
     public function deleteFinalSlide(int $storyId): void

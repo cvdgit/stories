@@ -96,14 +96,14 @@ class CreateQuizAction extends Action
                     }
                     $this->importQuestionService->createFromJson($testModel->id, $content);
 
-                    $data = $this->storyEditorService->createQuestionBlock(['test-id' => $testModel->id]);
-
-                    $slideModel = $this->storySlideService->create($storyModel->id, $data, StorySlide::KIND_QUESTION);
+                    $slideModel = $this->storySlideService->create($storyModel->id, 'New questions', StorySlide::KIND_QUESTION);
                     $slideModel->number = $currentSlideModel->number + 1;
                     Story::insertSlideNumber($storyModel->id, $currentSlideModel->number);
                     if (!$slideModel->save()) {
                         throw new \DomainException('Can\'t be saved StorySlide model. Errors: '. implode(', ', $slideModel->getFirstErrors()));
                     }
+                    $slideModel->updateData($this->storyEditorService->createQuestionBlock($slideModel->id, $testModel->id));
+
                     $this->storyLinksService->createTestLink($storyModel->id, $testModel->id);
                 });
 

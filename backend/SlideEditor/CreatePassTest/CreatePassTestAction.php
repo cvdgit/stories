@@ -124,14 +124,14 @@ class CreatePassTestAction extends Action
                     ]),
                 ]));
 
-                $data = $this->storyEditorService->createQuestionBlock(['test-id' => $testModel->id]);
-                $slideModel = $this->storySlideService->create($storyModel->id, $data, StorySlide::KIND_QUESTION);
+                $slideModel = $this->storySlideService->create($storyModel->id, 'New questions', StorySlide::KIND_QUESTION);
                 $slideModel->number = $nextSlideNumber;
                 Story::insertSlideNumber($storyModel->id, $currentSlideModel->number);
-
                 if (!$slideModel->save()) {
                     throw new \DomainException('Can\'t be saved StorySlide model. Errors: '. implode(', ', $slideModel->getFirstErrors()));
                 }
+                $slideModel->updateData($this->storyEditorService->createQuestionBlock($slideModel->id, $testModel->id));
+
                 $this->storyLinksService->createTestLink($storyModel->id, $testModel->id);
             });
             return ["success" => true];
