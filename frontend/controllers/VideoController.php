@@ -43,4 +43,19 @@ class VideoController extends Controller
         }
         return '';
     }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionView(string $id): string
+    {
+        $this->layout = 'video';
+        $video = SlideVideo::findOne(['uuid' => $id]);
+        if ($video === null) {
+            throw new NotFoundHttpException('Видео не найдено');
+        }
+        return $this->render('view', [
+            'video' => $video,
+        ]);
+    }
 }

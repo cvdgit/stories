@@ -93,5 +93,9 @@ return [
         '<section:\w+>' => 'story/index',
 
         '/video/<id:\d+>' => 'video/stream',
+        '/video/player/<id>' => 'video/view',
+
+        '/learning-path/<id:[A-Za-z0-9_-]+>' => 'learning-path/default/index',
+        '/learning-path/init/<id:[A-Za-z0-9_-]+>' => 'learning-path/default/init',
     ],
 ];

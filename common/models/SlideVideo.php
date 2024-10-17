@@ -172,4 +172,9 @@ class SlideVideo extends ActiveRecord
     {
         return $this->hasMany(VideoCaption::class, ['video_id' => 'id']);
     }
+
+    public function haveCaptions(): bool
+    {
+        return count($this->captions) > 0;
+    }
 }
