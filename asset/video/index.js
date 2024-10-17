@@ -1,4 +1,5 @@
 import Plyr from 'plyr'
+import 'plyr/src/sass/plyr.scss'
 
 const urlParams = new URLSearchParams(location.search)
 
