@@ -38,6 +38,8 @@ return [
             'study/task/<id:\d+>' => 'study/task',
             '<section:\w+>' => 'story/index',
             '/edu/story/<id:\d+>' => 'edu/story/view',
+            '/learning-path/<id:[A-Za-z0-9_-]+>' => 'learning-path/default/index',
+            '/video/player/<id>' => 'video/view',
         ],
     ],
 

@@ -6,7 +6,9 @@ use backend\models\SlideVideoSearch;
 use backend\models\video\VideoSource;
 use backend\widgets\grid\DeleteButton;
 use backend\widgets\grid\UpdateButton;
+use backend\widgets\grid\ViewButton;
 use backend\widgets\WikidsDatePicker;
+use common\models\SlideVideo;
 use yii\bootstrap\Dropdown;
 use yii\bootstrap\Nav;
 use yii\data\DataProviderInterface;
@@ -54,8 +56,11 @@ $this->title = 'Видео';
             ],
             [
                 'class' => ActionColumn::class,
-                'template' => '{update} {delete}',
+                'template' => '{view} {update} {delete}',
                 'buttons' => [
+                    'view' => static function($url, SlideVideo $model): string {
+                        return (new ViewButton(Yii::$app->urlManagerFrontend->createAbsoluteUrl(['/video/view', 'id' => $model->uuid])))();
+                    },
                     'update' => static function($url, $model) {
                         return (new UpdateButton(['video/file/update', 'id' => $model->id]))();
                     },
