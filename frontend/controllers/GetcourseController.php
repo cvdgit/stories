@@ -14,7 +14,7 @@ class GetcourseController extends Controller
 
     public function actionWebhook(Request $request): void
     {
-        $rawBody = $request->rawBody;
-        file_put_contents(Yii::getAlias('@public/upload/' . time()), $rawBody);
+        $rawBody = $request->get();
+        file_put_contents(Yii::getAlias('@public/upload/' . time()), var_export($rawBody, true));
     }
 }
