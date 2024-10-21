@@ -29,6 +29,20 @@ export default function MissingWordsRecognition(config) {
     }
   }
 
+  const DICTIONARY = {
+    'директом': 'Directum'
+  }
+
+  function editInterim(s) {
+    return s
+      .split(' ')
+      .map((word) => {
+        word = word.trim()
+        return DICTIONARY[word.toLowerCase()] ? DICTIONARY[word.toLowerCase()] : word
+      })
+      .join(' ')
+  }
+
   recorder.onresult = function (event) {
 
     let interimTranscript = '';
@@ -40,7 +54,8 @@ export default function MissingWordsRecognition(config) {
 
     for (let i = event.resultIndex; i < event.results.length; ++i) {
       if (event.results[i].isFinal) {
-        finalTranscript += event.results[i][0].transcript;
+        const result = editInterim(event.results[i][0].transcript)
+        finalTranscript += result;
       } else {
         interimTranscript += event.results[i][0].transcript;
       }
