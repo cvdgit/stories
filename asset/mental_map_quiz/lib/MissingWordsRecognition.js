@@ -30,7 +30,8 @@ export default function MissingWordsRecognition(config) {
   }
 
   const DICTIONARY = {
-    'директом': 'Directum'
+    'директом': 'Directum',
+    'директум': 'Directum'
   }
 
   function editInterim(s) {
