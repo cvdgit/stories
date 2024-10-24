@@ -570,4 +570,47 @@ class StreamController extends Controller
             Yii::$app->errorHandler->logException($ex);
         }
     }
+
+    public function actionRetellingRewrite(Request $request): void
+    {
+        $payload = Json::decode($request->rawBody);
+        $userResponse = $payload["userResponse"];
+        $slideTexts = $payload["slideTexts"];
+
+        $content = <<<TEXT
+            Найди отличия двух предложениях:
+            $slideTexts
+            $userResponse
+            Если различающиеся слова одинаковы по значению, то замени одно на другое в предложении и больше ничего не пиши.
+            TEXT;
+
+        $message = [
+            "role" => "user",
+            "content" => trim($content),
+        ];
+
+        $fields = [
+            "input" => [
+                "messages" => [
+                    $message,
+                ],
+            ],
+            "config" => [
+                "metadata" => [
+                    "conversation_id" => Uuid::uuid4()->toString(),
+                ],
+            ],
+            "include_names" => [],
+        ];
+
+        try {
+            $this->chatEventStream->send(
+                "retelling",
+                Yii::$app->params["gpt.api.completions.host"],
+                Json::encode($fields),
+            );
+        } catch (Exception $ex) {
+            Yii::$app->errorHandler->logException($ex);
+        }
+    }
 }

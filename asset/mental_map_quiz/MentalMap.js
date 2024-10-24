@@ -213,7 +213,7 @@ export default function MentalMap(element, deck, params) {
 
       wrapper.querySelector('#start-recording').addEventListener('click', e => {
         const voiceLang = langStore.fromStore($(wrapper).find("#voice-lang option:selected").val())
-        startRecording(e.target, voiceLang)
+        startRecording(e.target, voiceLang, text.text)
       })
       wrapper.querySelector('#start-retelling').addEventListener('click', e => {
 
@@ -590,7 +590,7 @@ export default function MentalMap(element, deck, params) {
    * @param {HTMLElement} element
    * @param {string} lang
    */
-  function startRecording(element, lang) {
+  function startRecording(element, lang, text) {
     const state = element.dataset.state
     if (!state) {
       $(document.getElementById("start-retelling-wrap")).hide()
@@ -626,8 +626,43 @@ export default function MentalMap(element, deck, params) {
         if ($resultSpan.text().trim().length) {
           $(document.getElementById("start-retelling-wrap")).show()
         }
+
+        const userResponse = $resultSpan.text().trim()
+        if (userResponse.length) {
+          const content = createRewriteContent(() => {})
+          $(element).parents('.mental-map-detail-container').append(content)
+          sendMessage(
+            `/admin/index.php?r=gpt/stream/retelling-rewrite`,
+            {
+              userResponse,
+              slideTexts: text
+            },
+            (message) => {
+              $resultSpan.text(message)
+            },
+            () => {
+              content.remove()
+            },
+            () => {
+              content.remove()
+            }
+          )
+        }
       })
     }
+  }
+
+  function createRewriteContent(hideCallback) {
+    const wrap = document.createElement('div')
+    wrap.classList.add('retelling-wrap')
+    wrap.style.backgroundColor = 'transparent'
+    wrap.style.padding = '0'
+    wrap.innerHTML = `
+      <div style="display: flex; align-items: center; justify-content: center; height: 100%; background-color: rgba(255, 255, 255, 0.4); backdrop-filter: blur(4px);">
+        <img src="/img/loading.gif" style="width: 100px" />
+      </div>
+    `
+    return wrap
   }
 
   function createRetellingContent(hideCallback) {
@@ -668,17 +703,17 @@ export default function MentalMap(element, deck, params) {
       $(document.getElementById('voice-loader')).hide()
       $(document.getElementById('voice-finish')).show()
     }
-    return await sendMessage({
+    return await sendMessage(`/admin/index.php?r=gpt/stream/retelling`, {
       userResponse,
       slideTexts: targetText
     }, onMessage, onError, onEnd)
   }
 
-  async function sendMessage(payload, onMessage, onError, onEnd) {
+  async function sendMessage(url, payload, onMessage, onError, onEnd) {
     let accumulatedMessage = ""
 
     return sendEventSourceMessage({
-      url: `/admin/index.php?r=gpt/stream/retelling`,
+      url,
       headers: {
         Accept: "text/event-stream",
         "X-CSRF-Token": $("meta[name=csrf-token]").attr("content")
