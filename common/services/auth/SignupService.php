@@ -52,7 +52,7 @@ class SignupService
         $user = User::createSignup(
             $form->username,
             $form->email,
-            $form->password
+            $form->password,
         );
         $user->status = User::STATUS_ACTIVE;
 

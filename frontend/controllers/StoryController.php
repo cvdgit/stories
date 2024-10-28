@@ -10,6 +10,7 @@ use common\models\Playlist;
 use common\models\SiteSection;
 use common\models\StorySlide;
 use common\models\StoryTest;
+use common\models\User;
 use common\models\UserQuestionHistoryModel;
 use common\services\story\CountersService;
 use common\services\StoryAudioService;
@@ -39,6 +40,7 @@ use common\services\StoryService;
 use frontend\models\CommentForm;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Request;
 use yii\web\Response;
 use yii\debug\Module;
 use yii\web\View;
@@ -188,27 +190,37 @@ class StoryController extends Controller
     }
 
     /**
-     * Displays a single Story model.
-     * @param string $alias
-     * @param null $track_id
-     * @return mixed
-     * @throws \yii\web\NotFoundHttpException
+     * @throws NotFoundHttpException
+     * @return Response|string
      */
-    public function actionView(string $alias, $track_id = null)
+    public function actionView(string $alias, Request $request, $track_id = null)
     {
-        $model = Story::findModelByAlias($alias);
+        $model = Story::findOne(['alias' => $alias]);
+        if ($model === null) {
+            throw new NotFoundHttpException('История не найдена');
+        }
+
         if (Yii::$app->user->isGuest && !$model->isPublished()) {
             throw new NotFoundHttpException('История не найдена');
         }
 
-        $playlistID = Yii::$app->request->get('list');
+        $getCourseUserId = $request->get('get_course_id');
+        if ($getCourseUserId !== null && Yii::$app->user->isGuest) {
+            $user = User::findOne(['get_course_id' => (int)$getCourseUserId]);
+            if ($user !== null) {
+                Yii::$app->user->login($user, Yii::$app->params['user.rememberMeDuration']);
+                return $this->refresh();
+            }
+        }
+
+        $playlistID = $request->get('list');
         $playlist = null;
         if ($playlistID !== null) {
             $playlist = Playlist::findModel((int) $playlistID);
         }
 
         $dataProvider = Comment::getCommentDataProvider($model->id);
-        if (Yii::$app->request->isPjax) {
+        if ($request->isPjax) {
             return $this->renderAjax('_comment_list', ['dataProvider' => $dataProvider]);
         }
 

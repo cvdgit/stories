@@ -15,20 +15,21 @@ use yii\web\IdentityInterface;
 /**
  * User model
  *
- * @property integer $id
+ * @property int $id
  * @property string $username
  * @property string $password_hash
  * @property string $password_reset_token
  * @property string $email
  * @property string $email_confirm_token
  * @property string $auth_key
- * @property integer $status
- * @property integer $group
- * @property integer $created_at
- * @property integer $updated_at
+ * @property int $status
+ * @property int $group
+ * @property int $created_at
+ * @property int $updated_at
  * @property string $password write-only password
  * @property string $image
- * @property integer last_activity
+ * @property int last_activity
+ * @property int|null $get_course_id
  *
  * @property Comment[] $comments
  * @property Payment[] $payments
@@ -40,7 +41,6 @@ use yii\web\IdentityInterface;
  */
 class User extends ActiveRecord implements IdentityInterface
 {
-
     const STATUS_DELETED = 0;
     const STATUS_WAIT = 5;
     const STATUS_ACTIVE = 10;
@@ -297,6 +297,7 @@ class User extends ActiveRecord implements IdentityInterface
         $user->setPassword(!empty($password) ? $password : Yii::$app->security->generateRandomString());
         $user->generateAuthKey();
         $user->status = self::STATUS_ACTIVE;
+        $user->group = self::GROUP_AUTHOR;
         return $user;
     }
 
@@ -495,5 +496,10 @@ class User extends ActiveRecord implements IdentityInterface
             ->getStudents()
             ->andWhere(['id' => $studentId])
             ->exists();
+    }
+
+    public function updateGetCourseId(int $getCourseId): void
+    {
+        $this->get_course_id = $getCourseId;
     }
 }
