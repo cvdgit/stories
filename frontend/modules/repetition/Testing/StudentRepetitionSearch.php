@@ -47,7 +47,7 @@ class StudentRepetitionSearch extends Model
         return (new Query())
             ->select([
                 'id' => 't.uuid',
-                'header' => 't.name',
+                new Expression('t.name COLLATE utf8_general_ci AS header'),
                 'date' => $repetitionQuery,
                 'totalItems' => $scheduleTotalQuery,
                 'doneItems' => $repetitionDoneQuery,
@@ -93,7 +93,7 @@ class StudentRepetitionSearch extends Model
         return (new Query())
             ->select([
                 'id' => 't.id',
-                'header' => 't.header',
+                new Expression('t.header COLLATE utf8_general_ci AS header'),
                 'date' => $repetitionQuery,
                 'totalItems' => $scheduleTotalQuery,
                 'doneItems' => $repetitionDoneQuery,
@@ -109,14 +109,14 @@ class StudentRepetitionSearch extends Model
         $testingQuery = $this->createTestingQuery($studentId);
         $mentalMapQuery = $this->createMentalMapQuery($studentId);
 
-        /*$query = (new Query())
+        $query = (new Query())
             ->select('t.*')
             ->from(['t' => $testingQuery->union($mentalMapQuery)])
-            ->orderBy(['t.header' => SORT_ASC]);*/
+            ->orderBy(['t.header' => SORT_ASC]);
 
         return new SqlDataProvider([
-            'sql' => $testingQuery->createCommand()->getRawSql(),
-            'totalCount' => $testingQuery->count(),
+            'sql' => $query->createCommand()->getRawSql(),
+            'totalCount' => $query->count(),
             'pagination' => false,
             'sort' => [
                 'defaultOrder' => [
