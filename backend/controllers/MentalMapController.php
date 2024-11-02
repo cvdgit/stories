@@ -7,6 +7,7 @@ namespace backend\controllers;
 use backend\MentalMap\MentalMap;
 use backend\MentalMap\MentalMapImage;
 use backend\MentalMap\MentalMapImageForm;
+use backend\modules\repetition\ScheduleFetcherInterface;
 use common\rbac\UserRoles;
 use DomainException;
 use Ramsey\Uuid\Uuid;
@@ -30,6 +31,16 @@ class MentalMapController extends Controller
 {
     public $layout = 'mental-map';
     public $enableCsrfValidation = false;
+    /**
+     * @var ScheduleFetcherInterface
+     */
+    private $scheduleFetcher;
+
+    public function __construct($id, $module, ScheduleFetcherInterface $scheduleFetcher, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->scheduleFetcher = $scheduleFetcher;
+    }
 
     public function behaviors(): array
     {
@@ -125,6 +136,7 @@ class MentalMapController extends Controller
                     'height' => $imageHeight,
                 ];
             }, $images),
+            'schedules' => $this->scheduleFetcher->getSchedules(),
         ];
     }
 

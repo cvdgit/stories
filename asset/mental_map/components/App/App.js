@@ -7,9 +7,11 @@ import MentalMapReducer from "../../Lib/MentalMapReducer";
 import ImagesReducer from "../../Lib/ImagesReducer";
 import Dialog from "../Dialog";
 import {CSSTransition} from "react-transition-group";
+import ScheduleReducer from "../../Lib/ScheduleReducer";
 
 export const MentalMapContext = createContext({});
 export const ImagesContext = createContext({});
+export const SchedulesContext = createContext({});
 
 export default function App({mentalMapId}) {
   const [loading, setLoading] = useState(true)
@@ -17,6 +19,7 @@ export default function App({mentalMapId}) {
   const [error, setError] = useState(null)
   const [state, dispatch] = useReducer(MentalMapReducer, {})
   const [imagesState, imagesDispatch] = useReducer(ImagesReducer, {})
+  const [schedules, setSchedules] = useState([])
   const ref = useRef()
   const [open, setOpen] = useState(false)
   const [mapText, setMapText] = useState(state.text)
@@ -42,6 +45,7 @@ export default function App({mentalMapId}) {
           type: 'images_loaded',
           images: response.images
         })
+        setSchedules(response.schedules)
       })
       .catch(async (error) => setError(await parseError(error)))
   }, [])
@@ -197,14 +201,37 @@ export default function App({mentalMapId}) {
         <Dialog nodeRef={settingsRef} hideHandler={() => setSettingsOpen(false)} style={{width: '60rem'}}>
           <h2 className="dialog-heading">Настройки</h2>
           <div style={{padding: '20px 0'}}>
-            <div><label htmlFor={checkId}><input id={checkId} onChange={(e) => {
-              settings.imageFirst = !Boolean(state?.settings?.imageFirst)
-              setSettings(settings)
-              dispatch({
-                type: 'update_settings',
-                payload: settings
-              })
-            }} checked={Boolean(state?.settings?.imageFirst)} type="checkbox"/> При прохождении показывать изображение ментальной карты</label></div>
+            <div style={{marginBlock: '20px'}}>
+              <label htmlFor={checkId}>
+                <input
+                  id={checkId}
+                  onChange={(e) => {
+                    settings.imageFirst = !Boolean(state?.settings?.imageFirst)
+                    setSettings(settings)
+                    dispatch({
+                      type: 'update_settings',
+                      payload: settings
+                    })
+                  }}
+                  checked={Boolean(state?.settings?.imageFirst)}
+                  type="checkbox"
+                /> При прохождении показывать изображение ментальной карты</label>
+            </div>
+            <div>
+              <select value={String(state?.settings?.scheduleId)} onChange={(e) => {
+                settings.scheduleId = e.target.value === '' ? null : Number(e.target.value)
+                setSettings(settings)
+                dispatch({
+                  type: 'update_settings',
+                  payload: settings
+                })
+              }} style={{width: '100%', padding: '10px'}}>
+                <option value="">Расписание повторений</option>
+                {schedules.map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </Dialog>
       </CSSTransition>

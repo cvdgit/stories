@@ -81,12 +81,12 @@
 
     var QuestionSuccess = function(stars) {
 
-        var textMap = new Array();
-        textMap[1] = 'одну зведу';
-        textMap[2] = 'две зведы';
-        textMap[3] = 'три зведы';
-        textMap[4] = 'четыре зведы';
-        textMap[5] = 'пять звед';
+        var textMap = [];
+        textMap[1] = 'одну звезду';
+        textMap[2] = 'две звезды';
+        textMap[3] = 'три звезды';
+        textMap[4] = 'четыре звезды';
+        textMap[5] = 'пять звезд';
 
         function create(title, image) {
 

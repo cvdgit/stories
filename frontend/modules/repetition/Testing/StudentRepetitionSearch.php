@@ -12,14 +12,54 @@ use yii\db\Query;
 
 class StudentRepetitionSearch extends Model
 {
-    public function search(int $studentId): DataProviderInterface
+    private function createMentalMapQuery(int $studentId): Query
     {
-        $testingCompletedQuery = (new Query())
-            ->from(['p' => 'student_question_progress'])
-            ->where('p.test_id = t.id')
-            ->andWhere(['p.student_id' => $studentId])
-            ->andWhere('p.progress = 100');
+        $repetitionQuery = (new Query())
+            ->select(new Expression('r.created_at + (i.hours * 60 * 60)'))
+            ->from(['i' => 'schedule_item'])
+            ->leftJoin(['r' => 'mental_map_repetition'], 'i.id = r.schedule_item_id')
+            ->where('t.schedule_id = i.schedule_id')
+            ->andWhere('r.mental_map_id = t.uuid')
+            ->andWhere(['r.student_id' => $studentId])
+            ->andWhere('r.done = 0');
 
+        $scheduleTotalQuery = (new Query())
+            ->select('count(i.id)')
+            ->from(['i' => 'schedule_item'])
+            ->where('t.schedule_id = i.schedule_id');
+
+        $repetitionDoneQuery = (new Query())
+            ->select('count(r.id)')
+            ->from(['i' => 'schedule_item'])
+            ->leftJoin(['r' => 'mental_map_repetition'], 'i.id = r.schedule_item_id')
+            ->where('t.schedule_id = i.schedule_id')
+            ->andWhere('r.mental_map_id = t.uuid')
+            ->andWhere(['r.student_id' => $studentId]);
+
+        $studentMentalMapIds = (new Query())
+            ->select(['mentalMapId' => new Expression('DISTINCT mental_map_id')])
+            ->from('mental_map_repetition')
+            ->where(['student_id' => $studentId])
+            ->andWhere('done = 0')
+            ->all();
+        $studentMentalMapIds = array_column($studentMentalMapIds, 'mentalMapId');
+
+        return (new Query())
+            ->select([
+                'id' => 't.uuid',
+                'header' => 't.name',
+                'date' => $repetitionQuery,
+                'totalItems' => $scheduleTotalQuery,
+                'doneItems' => $repetitionDoneQuery,
+                "'mental_map' AS `obj`",
+            ])
+            ->from(['t' => 'mental_map'])
+            ->where(['in', 't.uuid', $studentMentalMapIds])
+            ->andWhere(['>', new Expression('UNIX_TIMESTAMP()'), $repetitionQuery]);
+    }
+
+    private function createTestingQuery(int $studentId): Query
+    {
         $repetitionQuery = (new Query())
             ->select(new Expression('r.created_at + (i.hours * 60 * 60)'))
             ->from(['i' => 'schedule_item'])
@@ -50,17 +90,29 @@ class StudentRepetitionSearch extends Model
             ->all();
         $studentTestIds = array_column($studentTestIds, 'testId');
 
-        $query = (new Query())
+        return (new Query())
             ->select([
-                't.id',
-                't.header',
+                'id' => 't.id',
+                'header' => 't.header',
                 'date' => $repetitionQuery,
                 'totalItems' => $scheduleTotalQuery,
                 'doneItems' => $repetitionDoneQuery,
+                "'test' AS `obj`",
             ])
             ->from(['t' => 'story_test'])
             ->where(['in', 't.id', $studentTestIds])
             ->andWhere(['>', new Expression('UNIX_TIMESTAMP()'), $repetitionQuery]);
+    }
+
+    public function search(int $studentId): DataProviderInterface
+    {
+        $testingQuery = $this->createTestingQuery($studentId);
+        $mentalMapQuery = $this->createMentalMapQuery($studentId);
+
+        $query = (new Query())
+            ->select('t.*')
+            ->from(['t' => $testingQuery->union($mentalMapQuery)])
+            ->orderBy(['t.header' => SORT_ASC]);
 
         return new SqlDataProvider([
             'sql' => $query->createCommand()->getRawSql(),

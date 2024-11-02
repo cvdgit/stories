@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace frontend\MentalMap;
 
-use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 
 /**
@@ -23,5 +22,15 @@ class MentalMap extends ActiveRecord
             return [];
         }
         return $this->payload['map']['images'] ?? [];
+    }
+
+    public static function isDone(array $history): bool
+    {
+        if (count($history) === 0) {
+            return false;
+        }
+        return array_reduce($history, static function(bool $carry, array $item): bool {
+            return $carry && (int) $item['all'] > 0;
+        }, true);
     }
 }

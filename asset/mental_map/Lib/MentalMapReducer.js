@@ -43,7 +43,7 @@ export default function MentalMapReducer(state, action) {
     case 'update_settings': {
       return {
         ...state,
-        settings: action.payload
+        settings: {...state.settings, ...action.payload}
       }
     }
     default: {

@@ -12,7 +12,7 @@ import Panzoom from "../app/panzoom.min"
 
 /**
  * @param element
- * @param {Reveal} deck
+ * @param {Reveal|undefined} deck
  * @param params
  * @returns {{run: ((function(): Promise<void>)|*)}}
  * @constructor
@@ -23,6 +23,11 @@ export default function MentalMap(element, deck, params) {
   let texts = []
   let mentalMapHistory = []
   let mentalMapId
+
+  params = params || {}
+  params.slide_id = deck ? Number($(deck.getCurrentSlide()).attr('data-id')) : null
+
+  const repetitionMode = Boolean(params?.repetitionMode)
 
   const voiceResponse = new VoiceResponse(new MissingWordsRecognition({}))
   voiceResponse.onResult(args => {
@@ -42,6 +47,9 @@ export default function MentalMap(element, deck, params) {
   const blockTypes = ['text', 'image']
 
   function showDialogHandler() {
+    if (!deck) {
+      return
+    }
     deck.configure({keyboard: false});
     $('.reveal .story-controls').hide();
     blockTypes.map(blockType => {
@@ -50,6 +58,9 @@ export default function MentalMap(element, deck, params) {
   }
 
   function hideDialogHandler() {
+    if (!deck) {
+      return
+    }
     if ($(deck.getCurrentSlide()).find('.slide-hints-wrapper').length) {
       return
     }
@@ -253,14 +264,15 @@ export default function MentalMap(element, deck, params) {
             detailTextContent.querySelector('.detail-text-actions').remove()
 
             saveUserResult({
-              story_id: params.story_id,
-              slide_id: Number($(deck.getCurrentSlide()).attr('data-id')),
+              story_id: params?.story_id,
+              slide_id: params?.slide_id,
               mental_map_id: mentalMapId,
               image_fragment_id: image.id,
               overall_similarity: Number(json?.overall_similarity),
               text_hiding_percentage: textHidingPercentage,
               text_target_percentage: textTargetPercentage,
-              content: detailTextContent.innerHTML
+              content: detailTextContent.innerHTML,
+              repetition_mode: repetitionMode
             }).then(response => {
               if (response && response?.success) {
                 historyItem.all = response.history.all
@@ -296,6 +308,24 @@ export default function MentalMap(element, deck, params) {
         'X-CSRF-Token': $('meta[name=csrf-token]').attr('content')
       },
       body: JSON.stringify(payload),
+    })
+    if (!response.ok) {
+      throw new Error(response.statusText)
+    }
+    return await response.json()
+  }
+
+  async function finishRepetition(mentalMapId) {
+    const response = await fetch(`/mental-map/finish`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-CSRF-Token': $('meta[name=csrf-token]').attr('content')
+      },
+      body: JSON.stringify({
+        mental_map_id: mentalMapId
+      }),
     })
     if (!response.ok) {
       throw new Error(response.statusText)
@@ -389,7 +419,17 @@ export default function MentalMap(element, deck, params) {
   }
 
   const run = async () => {
-    const {mentalMap: json, history} = await params.init()
+
+    let responseJson
+    try {
+      responseJson = await params.init()
+    } catch (ex) {
+      container.innerText = ex.message
+      this.element.appendChild(container)
+      return
+    }
+
+    const {mentalMap: json, history} = responseJson
 
     texts = json.map.images.map(image => {
       const {imageText, textFragments} = processImageText(image.text)
@@ -435,6 +475,16 @@ export default function MentalMap(element, deck, params) {
         el.querySelector('.text-item').innerHTML = ''
 
         appendAllTextWordElements(texts.find(t => t.id === image.id).words, el.querySelector('.text-item'))
+
+        if (repetitionMode) {
+          const done = mentalMapHistory.reduce((all, val) => all && val.all > 0, true)
+          if (done) {
+            const content = createFinishRepetitionContent()
+            $(container).parents('.mental-map').append(content)
+
+            finishRepetition(params.mentalMapId)
+          }
+        }
       })
     }))
 
@@ -663,6 +713,20 @@ export default function MentalMap(element, deck, params) {
       </div>
     `
     return wrap
+  }
+
+  function createFinishRepetitionContent() {
+    const elem = document.createElement('div')
+    elem.classList.add('retelling-wrap')
+    elem.style.backgroundColor = 'transparent'
+    elem.style.padding = '0'
+    elem.innerHTML = `
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background-color: rgba(255, 255, 255, 0.4); backdrop-filter: blur(4px);">
+        <h2 style="margin-bottom: 20px">Ментальная карта пройдена</h2>
+        <a class="btn" href="${params.repetitionBackUrl}">Назад к обучению</a>
+      </div>
+    `
+    return elem
   }
 
   function createRetellingContent(hideCallback) {

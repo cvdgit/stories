@@ -6,8 +6,6 @@ namespace backend\MentalMap;
 
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Json;
 
 /**
  * @property string $uuid [varchar(36)]
@@ -16,10 +14,10 @@ use yii\helpers\Json;
  * @property int $user_id [int(11)]
  * @property int $created_at [int(11)]
  * @property int $updated_at [int(11)]
+ * @property int|null $schedule_id
  */
 class MentalMap extends ActiveRecord
 {
-
     public function behaviors(): array
     {
         return [
@@ -67,6 +65,7 @@ class MentalMap extends ActiveRecord
         $payload = $this->payload;
         $payload['settings'] = $settings;
         $this->payload = $payload;
+        $this->schedule_id = $settings['scheduleId'] ?? null;
     }
 
     public function findImageFromPayload(string $imageId): ?array
