@@ -24,11 +24,12 @@ return [
         RoutesLoader::class,
     ],
     'controllerNamespace' => 'frontend\controllers',
-    'on beforeAction' => function($event) {
+    'on beforeAction' => static function($event) {
         \common\models\User::updateLastActivity();
     },
     'modules' => [
         'repetition' => ['class' => \frontend\modules\repetition\Module::class],
+        'learning-path' => ['class' => \frontend\modules\LearningPath\Module::class],
     ],
     'container' => [
         'definitions' => [

@@ -31,7 +31,7 @@ $this->registerCss($this->renderFile('@backend/modules/LearningPath/views/defaul
     </div>
 </div>
 <div style="display: flex; flex-direction: column; height: 100%">
-    <div class="tree-container">
+    <div class="tree-container" data-learning-path-id="<?= $learningPath->uuid ?>">
         <?php
         foreach ($trees as $treeKey): ?>
             <div class="tree-wrap">

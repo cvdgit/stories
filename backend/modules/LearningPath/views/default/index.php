@@ -36,7 +36,12 @@ $this->registerJs($this->renderFile('@backend/modules/LearningPath/views/default
         'updated_at:datetime',
         [
             'class' => ActionColumn::class,
-            'template' => '{update} {delete}',
+            //'template' => '{update} {delete}',
+            'buttons' => [
+                'view' => static function($url, $model) {
+                    return (new \backend\widgets\grid\ViewButton(Yii::$app->urlManagerFrontend->createAbsoluteUrl(['/learning-path/default/index', 'id' => $model->uuid])))(['target' => '_blank']);
+                }
+            ],
         ],
     ],
 ]); ?>

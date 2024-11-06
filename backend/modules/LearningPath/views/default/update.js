@@ -1,12 +1,13 @@
 (function () {
 
   const learningPath = {}
+  const learningPathId = $('.tree-container').attr('data-learning-path-id')
 
   async function initTree($el) {
     let CLIPBOARD = null;
     const treeKey = $el.find('.tree').attr('data-tree')
 
-    const response = await fetch(`/admin/index.php?r=learning-path/default/data&id=c1fab246-7bc4-4e8b-b8a7-9abd8d7ba35f&key=${treeKey}`, {
+    const response = await fetch(`/admin/index.php?r=learning-path/default/data&id=${learningPathId}&key=${treeKey}`, {
       method: 'get',
       cache: 'no-cache',
       headers: {
@@ -39,7 +40,7 @@
           data.tree.info(event.type, data)
           learningPath[treeKey].items = data.tree.toDict(false)
 
-          fetch(`/admin/index.php?r=learning-path/default/save&id=c1fab246-7bc4-4e8b-b8a7-9abd8d7ba35f`, {
+          fetch(`/admin/index.php?r=learning-path/default/save&id=${learningPathId}`, {
             method: 'post',
             body: JSON.stringify({payload: learningPath}),
             cache: 'no-cache',
@@ -200,7 +201,7 @@
   })
 
   async function createTree(treeId, name) {
-    await fetch(`/admin/index.php?r=learning-path/default/create-tree&id=c1fab246-7bc4-4e8b-b8a7-9abd8d7ba35f`, {
+    await fetch(`/admin/index.php?r=learning-path/default/create-tree&id=${learningPathId}`, {
       method: 'post',
       body: JSON.stringify({
         tree: treeId,
@@ -239,7 +240,7 @@
   })
 
   async function saveTreeName(treeId, name) {
-    await fetch(`/admin/index.php?r=learning-path/default/save-tree-name&id=c1fab246-7bc4-4e8b-b8a7-9abd8d7ba35f`, {
+    await fetch(`/admin/index.php?r=learning-path/default/save-tree-name&id=${learningPathId}`, {
       method: 'post',
       body: JSON.stringify({
         tree: treeId,
@@ -268,7 +269,7 @@
   })
     .on('click', '.tree-delete', async (e) => {
       const treeId = $(e.target).parent().parent().find('.tree').attr('data-tree')
-      const response = await fetch(`/admin/index.php?r=learning-path/default/delete-tree&id=c1fab246-7bc4-4e8b-b8a7-9abd8d7ba35f`, {
+      const response = await fetch(`/admin/index.php?r=learning-path/default/delete-tree&id=${learningPathId}`, {
         method: 'post',
         body: JSON.stringify({
           tree: treeId,
