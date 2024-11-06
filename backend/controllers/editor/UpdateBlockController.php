@@ -19,7 +19,6 @@ use Exception;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
-use yii\web\NotFoundHttpException;
 use yii\web\Request;
 use yii\web\Response;
 

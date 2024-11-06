@@ -12,6 +12,7 @@ use backend\components\story\TestBlockContent;
 use backend\components\story\TextBlock;
 use backend\components\story\VideoBlock;
 use backend\components\story\writer\HTMLWriter;
+use backend\MentalMap\MentalMap;
 use backend\models\video\VideoSource;
 use common\helpers\Url;
 use common\models\SlideVideo;
@@ -102,7 +103,14 @@ class SlideModifier
             }
             if ($block->typeIs(AbstractBlock::TYPE_MENTAL_MAP)) {
                 $content = MentalMapBlockContent::createFromHtml($block->getContent());
-                $block->setContent($content->renderWithDescription($this->slide->getId()));
+                $title = null;
+                try {
+                    $mentalMap = MentalMap::findOne($content->getId());
+                    if ($mentalMap !== null) {
+                        $title = $mentalMap->name;
+                    }
+                } catch (\Exception $ex) {}
+                $block->setContent($content->renderWithDescription($this->slide->getId(), $title));
             }
             if ($block->typeIs(AbstractBlock::TYPE_VIDEO) || $block->typeIs(AbstractBlock::TYPE_VIDEOFILE)) {
                 /** @var VideoBlock $block */

@@ -449,12 +449,45 @@ $js = <<< JS
             }
 
             const images = getSlideImages(currentSlide)
-            let image = null
+            let image = ''
             if (images.length > 0) {
                 image = images[0]
             }
 
-            const mentalMapSlide = new MentalMapSlide()
+            $('#create-block-modal')
+                .off('loaded.bs.modal')
+                .on('loaded.bs.modal', function() {
+                    const storyId = StoryEditor.getConfigValue('storyID')
+                    const slideId = currentSlide.getID()
+                    attachBeforeSubmit($(this).find('form')[0], function(form) {
+                        const formData = new FormData(form)
+                        formData.append('MentalMapForm[texts]', texts)
+                        formData.append('MentalMapForm[image]', image)
+                            sendForm('/admin/index.php?r=editor/mental-map&current_slide_id=' + slideId + '&story_id=' + storyId, $(form).attr('method'), formData)
+                                .done(response => {
+                                    if (response && response?.success) {
+                                        $('#create-block-modal').modal('hide')
+                                      StoryEditor.loadSlides(response?.slide_id)
+                                    } else {
+                                      alert('error')
+                                    }
+                                });
+                        });
+
+                    /*const storyId = StoryEditor.getConfigValue('storyID')
+                    const slideId = currentSlide.getID()
+                    $(this).find('form')
+                      .append(
+                          $('<input/>', {type: 'hidden', name: 'MentalMapForm[texts]'}).val(texts)
+                      )
+                      .append(
+                          $('<input/>', {type: 'hidden', name: 'MentalMapForm[image]'}).val(image)
+                      )
+                      .attr('action', '/admin/index.php?r=editor/mental-map&current_slide_id=' + slideId + '&story_id=' + storyId)*/
+                })
+                .modal({'remote': StoryEditor.getCreateBlockUrl(type)});
+
+            /*const mentalMapSlide = new MentalMapSlide()
             mentalMapSlide
                 .createSlide(StoryEditor.getConfigValue('storyID'), currentSlide.getID(), texts, image)
                 .then(response => {
@@ -463,10 +496,7 @@ $js = <<< JS
                     } else {
                         alert('error')
                     }
-                })
-
-            //const html = StoryEditor.createMentalMapBlock();
-            //StoryEditor.createSlideBlock(html);
+                })*/
         } else {
             showCreateBlockModal(type);
         }

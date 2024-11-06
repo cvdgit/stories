@@ -10,11 +10,12 @@ use yii\widgets\ActiveForm;
  * @var View $this
  * @var ActiveForm $form
  * @var MentalMapForm $model
+ * @var Bool $new
  */
 ?>
-<div class="form-group">
-    <label class="control-label">Ментальная карта</label>
-    <p class="form-control input-sm"><?= $model->mental_map_id ?></p>
-</div>
+<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 <?= $form->field($model, 'mental_map_id')->hiddenInput()->label(false) ?>
+<?php if ($new): ?>
+<?= $form->field($model, 'use_slide_image', ['inputOptions' => ['class' => 'form-control input-sm']])->checkbox() ?>
+<?php endif ?>
 <?= $form->field($model, 'required', ['inputOptions' => ['class' => 'form-control input-sm']])->checkbox() ?>

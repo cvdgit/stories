@@ -11,7 +11,7 @@ use yii\helpers\Html;
 </div>
 <?php $form = ActiveForm::begin(['id' => 'block-form', 'action' => $action]); ?>
 <div class="modal-body">
-    <?= $this->render($model->view, ['form' => $form, 'model' => $model, 'widgetStoryModel' => $widgetStoryModel]) ?>
+    <?= $this->render($model->view, ['form' => $form, 'new' => true, 'model' => $model, 'widgetStoryModel' => $widgetStoryModel]) ?>
 </div>
 <div class="modal-footer">
     <?= $form->field($model, 'story_id')->hiddenInput()->label(false) ?>
@@ -28,7 +28,7 @@ $('#block-form')
         $.ajax({
             url: $(this).attr('action'),
             type: $(this).attr('method'),
-            data: new FormData(this), 
+            data: new FormData(this),
             dataType: 'json',
             cache: false,
             contentType: false,
@@ -52,4 +52,6 @@ $('#block-form')
         e.preventDefault();
     });
 JS;
-$this->registerJs($js);
+if (get_class($model) !== \backend\models\editor\MentalMapForm::class) {
+    $this->registerJs($js);
+}

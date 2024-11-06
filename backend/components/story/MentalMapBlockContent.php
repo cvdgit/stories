@@ -42,9 +42,9 @@ class MentalMapBlockContent
         return $this->id;
     }
 
-    public function renderWithDescription(int $slideId): string
+    public function renderWithDescription(int $slideId, string $title = 'Ментальная карта'): string
     {
-        $link = Html::a('Ментальная карта', ['mental-map/editor', 'id' => $this->id, 'from_slide' => $slideId]);
+        $link = Html::a($title, ['mental-map/editor', 'id' => $this->id, 'from_slide' => $slideId]);
         return Html::tag('div', $link, [
             'class' => 'mental-map',
             'data-mental-map-id' => $this->id,

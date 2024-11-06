@@ -245,7 +245,7 @@ class EditorController extends BaseController
      * @throws InvalidConfigException
      * @throws NotFoundHttpException
      */
-    public function actionFormCreate(int $slide_id, string $block_type)
+    public function actionFormCreate(int $slide_id, string $block_type): string
     {
         /** @var StorySlide $model */
         $model = $this->findModel(StorySlide::class, $slide_id);
@@ -281,7 +281,6 @@ class EditorController extends BaseController
 
         $values = $block->getValues();
         $form->load($values, '');
-
         $widgetStoryModel = $slideModel->story;
 
         if ($block->getType() === AbstractBlock::TYPE_TRANSITION && $form->transition_story_id === null) {

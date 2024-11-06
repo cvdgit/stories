@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace backend\SlideEditor\CreateMentalMap;
 
 use backend\MentalMap\MentalMap;
+use backend\models\editor\MentalMapForm;
 use backend\services\ImageService;
 use backend\services\StoryEditorService;
 use backend\services\StorySlideService;
@@ -18,7 +19,6 @@ use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\base\Action;
 use yii\helpers\FileHelper;
-use yii\helpers\Json;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Request;
@@ -77,78 +77,83 @@ class CreateMentalMapAction extends Action
             throw new NotFoundHttpException('Слайд не найден');
         }
 
-        $jsonBody = Json::decode($request->rawBody, false);
-        $content = $jsonBody->content;
-        $mapImageUrl = $jsonBody->image;
+        $mentalMapForm = new MentalMapForm();
+        if ($mentalMapForm->load($request->post())) {
+            if (!$mentalMapForm->validate()) {
+                return ['success' => false, 'message' => 'Not valid'];
+            }
 
-        $newSlideId = null;
-        try {
-            $this->transactionManager->wrap(function () use ($content, &$newSlideId, $storyModel, $currentSlideModel, $user, $mapImageUrl) {
+            $newSlideId = null;
+            try {
+                $this->transactionManager->wrap(function () use ($mentalMapForm, &$newSlideId, $storyModel, $currentSlideModel, $user) {
 
-                $slideModel = $this->storySlideService->create($storyModel->id, 'empty', StorySlide::KIND_MENTAL_MAP);
-                $slideModel->number = $currentSlideModel->number + 1;
-                Story::insertSlideNumber($storyModel->id, $currentSlideModel->number);
-                if (!$slideModel->save()) {
-                    throw new DomainException(
-                        'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
-                    );
-                }
-
-                $mentalMapId = Uuid::uuid4()->toString();
-                $name = 'Ментальная карта';
-
-                $imageUrl = null;
-                $imageWidth = null;
-                $imageHeight = null;
-                if ($mapImageUrl) {
-                    $uploadsDir = Yii::getAlias('@public/upload');
-                    $mentalMapDir = $uploadsDir . '/mental-map/' . $mentalMapId;
-                    FileHelper::createDirectory($mentalMapDir);
-
-                    if (filter_var($mapImageUrl, FILTER_VALIDATE_URL) === false) {
-                        $mapImageUrl = Url::homeUrl() . $mapImageUrl;
+                    $slideModel = $this->storySlideService->create($storyModel->id, 'empty', StorySlide::KIND_MENTAL_MAP);
+                    $slideModel->number = $currentSlideModel->number + 1;
+                    Story::insertSlideNumber($storyModel->id, $currentSlideModel->number);
+                    if (!$slideModel->save()) {
+                        throw new DomainException(
+                            'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
+                        );
                     }
 
-                    $path = $this->imageService->downloadImage($mapImageUrl, $mentalMapDir);
+                    $mentalMapId = Uuid::uuid4()->toString();
 
-                    $imageUrl = '/upload/mental-map/' . $mentalMapId . '/' . pathinfo($path, PATHINFO_BASENAME);
-                    [$imageWidth, $imageHeight] = getimagesize($path);
-                } else {
-                    $imageUrl = '/img/mental_map_blank.jpg';
-                    $imageWidth = 1280;
-                    $imageHeight = 720;
-                }
+                    $imageUrl = null;
+                    $imageWidth = null;
+                    $imageHeight = null;
 
-                $payload = [
-                    'id' => $mentalMapId,
-                    'name' => $name,
-                    'text' => $content,
-                    'map' => [
-                        'url' => $imageUrl,
-                        'width' => $imageWidth,
-                        'height' => $imageHeight,
-                        'images' => [],
-                    ],
-                ];
-                $mentalMap = MentalMap::create($mentalMapId, $name, $payload, $user->getId());
-                if (!$mentalMap->save()) {
-                    throw new BadRequestHttpException('Mental Map save exception');
-                }
+                    $mapImageUrl = $mentalMapForm->image;
+                    if ($mentalMapForm->use_slide_image === '1' && $mapImageUrl) {
+                        $uploadsDir = Yii::getAlias('@public/upload');
+                        $mentalMapDir = $uploadsDir . '/mental-map/' . $mentalMapId;
+                        FileHelper::createDirectory($mentalMapDir);
 
-                $data = $this->storyEditorService->getSlideWithMentalMapBlockContent($slideModel->id, $mentalMapId);
-                $slideModel->updateData($data);
-                if (!$slideModel->save()) {
-                    throw new DomainException(
-                        'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
-                    );
-                }
-                $newSlideId = $slideModel->id;
-            });
+                        if (filter_var($mapImageUrl, FILTER_VALIDATE_URL) === false) {
+                            $mapImageUrl = Url::homeUrl() . $mapImageUrl;
+                        }
 
-            return ["success" => true, 'slide_id' => $newSlideId];
-        } catch (Exception $exception) {
-            Yii::$app->errorHandler->logException($exception);
-            return ["success" => false, "message" => $exception->getMessage()];
+                        $path = $this->imageService->downloadImage($mapImageUrl, $mentalMapDir);
+
+                        $imageUrl = '/upload/mental-map/' . $mentalMapId . '/' . pathinfo($path, PATHINFO_BASENAME);
+                        [$imageWidth, $imageHeight] = getimagesize($path);
+                    } else {
+                        $imageUrl = '/img/mental_map_blank.jpg';
+                        $imageWidth = 1280;
+                        $imageHeight = 720;
+                    }
+
+                    $payload = [
+                        'id' => $mentalMapId,
+                        'name' => $mentalMapForm->name,
+                        'text' => $mentalMapForm->texts,
+                        'map' => [
+                            'url' => $imageUrl,
+                            'width' => $imageWidth,
+                            'height' => $imageHeight,
+                            'images' => [],
+                        ],
+                    ];
+                    $mentalMap = MentalMap::create($mentalMapId, $mentalMapForm->name, $payload, $user->getId());
+                    if (!$mentalMap->save()) {
+                        throw new BadRequestHttpException('Mental Map save exception');
+                    }
+
+                    $data = $this->storyEditorService->getSlideWithMentalMapBlockContent($slideModel->id, $mentalMapId, $mentalMapForm->required === '1');
+                    $slideModel->updateData($data);
+                    if (!$slideModel->save()) {
+                        throw new DomainException(
+                            'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
+                        );
+                    }
+                    $newSlideId = $slideModel->id;
+                });
+
+                return ["success" => true, 'slide_id' => $newSlideId];
+            } catch (Exception $exception) {
+                Yii::$app->errorHandler->logException($exception);
+                return ["success" => false, "message" => $exception->getMessage()];
+            }
         }
+        return ['success' => false, 'message' => 'No data'];
     }
 }

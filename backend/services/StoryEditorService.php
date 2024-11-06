@@ -197,11 +197,11 @@ class StoryEditorService
     /**
      * @throws InvalidConfigException
      */
-    public function getSlideWithMentalMapBlockContent(int $slideId, string $mentalMapId): string
+    public function getSlideWithMentalMapBlockContent(int $slideId, string $mentalMapId, bool $required = false): string
     {
         $slide = (new HtmlSlideReader(new SlideContent($slideId, 'mental-map')))->load();
         $block = $slide->createBlock(MentalMapBlock::class);
-        $block->setContent((new MentalMapBlockContent($mentalMapId, $slideId))->render());
+        $block->setContent((new MentalMapBlockContent($mentalMapId, $required))->render());
         $slide->addBlock($block);
         return (new HTMLWriter())->renderSlide($slide);
     }

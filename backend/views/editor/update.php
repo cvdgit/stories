@@ -11,7 +11,7 @@ use yii\helpers\Html;
 </div>
 <?php $form = ActiveForm::begin(['id' => 'block-form', 'action' => $action]); ?>
 <div class="modal-body">
-    <?= $this->render($model->view, ['form' => $form, 'model' => $model, 'widgetStoryModel' => $widgetStoryModel]) ?>
+    <?= $this->render($model->view, ['form' => $form, 'new' => false, 'model' => $model, 'widgetStoryModel' => $widgetStoryModel]) ?>
 </div>
 <div class="modal-footer">
     <?= $form->field($model, 'slide_id')->hiddenInput()->label(false) ?>
@@ -29,7 +29,7 @@ form
         $.ajax({
             url: $(this).attr('action'),
             type: $(this).attr('method'),
-            data: new FormData(this), 
+            data: new FormData(this),
             dataType: 'json',
             cache: false,
             contentType: false,

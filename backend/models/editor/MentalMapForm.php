@@ -4,15 +4,21 @@ declare(strict_types=1);
 
 namespace backend\models\editor;
 
-use common\models\StorySlide;
-use common\models\StoryStoryTest;
-use common\models\StoryTest;
-use DomainException;
-
 class MentalMapForm extends BaseForm
 {
     public $mental_map_id;
     public $required;
+    public $use_slide_image;
+    public $name;
+    public $texts;
+    public $image;
+
+    public function init(): void
+    {
+        parent::init();
+        $this->name = 'Ментальная карта';
+        $this->use_slide_image = true;
+    }
 
     /*public function scenarios()
     {
@@ -24,8 +30,12 @@ class MentalMapForm extends BaseForm
     public function rules(): array
     {
         return array_merge(parent::rules(), [
-            [['story_id', 'mental_map_id'], 'required'],
+            [['story_id', 'name'], 'required'],
             [['story_id', 'required'], 'integer'],
+            ['use_slide_image', 'boolean'],
+            ['texts', 'safe'],
+            [['image', 'name'], 'string'],
+            ['mental_map_id', 'string', 'max' => 36],
             //[['story_id', 'test_id'], 'unique', 'targetAttribute' => ['story_id', 'test_id'], 'targetClass' => StoryStoryTest::class, 'message' => 'Невозможно добавить т.к. этот тест в эту историю уже добавлен', 'on' => 'default'],
         ]);
     }
@@ -35,6 +45,8 @@ class MentalMapForm extends BaseForm
         return array_merge(parent::attributeLabels(), [
             'mental_map_id' => 'Ментальная карта',
             'required' => 'Тест обязателен для прохождения',
+            'use_slide_image' => 'Использовать изображение со слайда в качестве фона для ментальной карты',
+            'name' => 'Название',
         ]);
     }
 
