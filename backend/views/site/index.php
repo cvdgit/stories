@@ -43,7 +43,12 @@ $this->registerJs($this->renderFile('@backend/views/site/index.js'));
                     <?php foreach ($changelog as $item): ?>
                         <a class="changelog-item" href="<?= Url::to(['/changelog/default/view', 'id' => $item->getId()]) ?>" style="display: flex; flex-direction: row; justify-content: space-between">
                             <h4 style="margin: 0"><?= Html::encode($item->getTitle()) ?></h4>
-                            <p class="text-muted" class="time" style="margin: 0"><?= SmartDate::dateSmart($item->getCreated()->getTimestamp()) ?></p>
+                            <div style="display: flex; flex-direction: row; align-items: center">
+                                <?php if ($item->isNew()): ?>
+                                <span class="label label-info" style="margin-right: 10px">Новое</span>
+                                <?php endif ?>
+                                <p class="text-muted" class="time" style="margin: 0"><?= SmartDate::dateSmart($item->getCreated()->getTimestamp()) ?></p>
+                            </div>
                         </a>
                     <?php endforeach; ?>
                 </div>
