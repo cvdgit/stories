@@ -14,9 +14,6 @@ class StoryController extends Controller
     public function actionIndex(): string
     {
         $pathQuery = (new Query())
-            ->select(
-                new Expression("GROUP_CONCAT(CONCAT(c.name, ' / ', p.name, ' / ', t.name, ' / ', l.name) SEPARATOR ', ')"),
-            )
             ->from(['sl' => 'edu_lesson_story'])
             ->innerJoin(['l' => 'edu_lesson'], 'sl.lesson_id = l.id')
             ->innerJoin(['t' => 'edu_topic'], 'l.topic_id = t.id')
@@ -25,7 +22,7 @@ class StoryController extends Controller
             ->innerJoin(['c' => 'edu_class'], 'cp.class_id = c.id')
             ->where('s.id = sl.story_id');
 
-        $fromDate = (new \DateTime())->modify('-1year')->format('Y-m-d');
+        $fromDate = (new \DateTime())->modify('-2year')->format('Y-m-d');
         $betweenBegin = new Expression("UNIX_TIMESTAMP('$fromDate 00:00:00')");
 
         $toDate = (new \DateTime())->format('Y-m-d');
@@ -35,9 +32,22 @@ class StoryController extends Controller
             ->select([
                 'id' => 's.id',
                 'title' => 's.title',
+                'alias' => 's.alias',
                 'publishedAt' => 's.published_at',
-                'path' => $pathQuery,
-                'author' => new Expression("COALESCE(CONCAT(p.last_name, ' ', p.first_name), u.username)")
+                'path' => $pathQuery->select(
+                    new Expression(
+                        "GROUP_CONCAT(CONCAT(
+                        CONCAT('<a target=\"_blank\" href=\"/admin/index.php?r=edu/admin/class/update&id=', c.id, '\">', c.name, '</a>'),
+                        ' / ',
+                        CONCAT('<a target=\"_blank\" href=\"/admin/index.php?r=edu/admin/program/update&id=', p.id, '\">', p.name, '</a>'),
+                        ' / ',
+                        CONCAT('<a target=\"_blank\" href=\"/admin/index.php?r=edu/admin/topic/update&id=', t.id, '\">', t.name, '</a>'),
+                        ' / ',
+                        CONCAT('<a target=\"_blank\" href=\"/admin/index.php?r=edu/admin/lesson/update&id=', l.id, '\">', l.name, '</a>')
+                        ) SEPARATOR ', ')",
+                    ),
+                ),
+                'author' => new Expression("COALESCE(CONCAT(p.last_name, ' ', p.first_name), u.username)"),
             ])
             ->from(['s' => 'story'])
             ->innerJoin(['u' => 'user'], 's.user_id = u.id')
@@ -50,7 +60,10 @@ class StoryController extends Controller
             'totalCount' => $query->count(),
             'sort' => [
                 'attributes' => [
-                    'id', 'title', 'publishedAt', 'author',
+                    'id',
+                    'title',
+                    'publishedAt',
+                    'author',
                 ],
                 'defaultOrder' => ['publishedAt' => SORT_DESC],
             ],

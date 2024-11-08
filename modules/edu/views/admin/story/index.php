@@ -6,6 +6,7 @@ use modules\edu\widgets\AdminHeaderWidget;
 use modules\edu\widgets\AdminToolbarWidget;
 use yii\data\DataProviderInterface;
 use yii\grid\GridView;
+use yii\helpers\Html;
 use yii\web\View;
 
 /**
@@ -33,7 +34,12 @@ $this->title = 'Истории';
         ],
         [
             'attribute' => 'title',
+            'format' => 'raw',
             'label' => 'Название истории',
+            'value' => static function(array $model): string
+            {
+                return Html::a($model['title'], Yii::$app->urlManagerFrontend->createAbsoluteUrl(['/story/view', 'alias' => $model['alias']]), ['target' => '_blank']);
+            },
         ],
         [
             'attribute' => 'author',
@@ -46,6 +52,7 @@ $this->title = 'Истории';
         ],
         [
             'attribute' => 'path',
+            'format' => 'raw',
             'label' => 'Обучение'
         ],
     ],
