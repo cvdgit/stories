@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace modules\edu\controllers\admin;
 
-use modules\edu\models\EduStory;
-use Yii;
 use yii\data\SqlDataProvider;
 use yii\db\Expression;
 use yii\db\Query;
@@ -17,7 +15,7 @@ class StoryController extends Controller
     {
         $pathQuery = (new Query())
             ->select(
-                new Expression("GROUP_CONCAT(CONCAT(c.name, ' / ', p.name, ' / ', t.name, ' / ', l.name), ',')"),
+                new Expression("GROUP_CONCAT(CONCAT(c.name, ' / ', p.name, ' / ', t.name, ' / ', l.name) SEPARATOR ', ')"),
             )
             ->from(['sl' => 'edu_lesson_story'])
             ->innerJoin(['l' => 'edu_lesson'], 'sl.lesson_id = l.id')
