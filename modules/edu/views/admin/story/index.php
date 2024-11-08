@@ -27,10 +27,25 @@ $this->title = 'Истории';
     'options' => ['class' => 'table-responsive'],
     'summary' => false,
     'columns' => [
-        'id',
-        'title',
-        'author',
-        'publishedAt:datetime',
-        'path',
+        [
+            'attribute' => 'id',
+            'label' => 'ИД',
+        ],
+        [
+            'attribute' => 'title',
+            'label' => 'Название истории',
+        ],
+        [
+            'attribute' => 'author',
+            'label' => 'Автор',
+        ],
+        [
+            'attribute' => 'publishedAt:datetime',
+            'label' => 'Опубликована',
+        ],
+        [
+            'attribute' => 'path',
+            'label' => 'Обучение',
+        ],
     ],
 ]) ?>
