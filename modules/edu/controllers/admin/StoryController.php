@@ -37,8 +37,11 @@ class StoryController extends Controller
                 'title' => 's.title',
                 'publishedAt' => 's.published_at',
                 'path' => $pathQuery,
+                'author' => new Expression("COALESCE(CONCAT(p.last_name, ' ', p.first_name), u.username)")
             ])
             ->from(['s' => 'story'])
+            ->innerJoin(['u' => 'user'], 's.user_id = u.id')
+            ->leftJoin(['p' => 'profile'], 'u.id = p.user_id')
             ->where('s.published_at IS NOT NULL')
             ->andWhere(['between', 's.published_at', $betweenBegin, $betweenEnd]);
 

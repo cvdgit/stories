@@ -29,6 +29,7 @@ $this->title = 'Истории';
     'columns' => [
         'id',
         'title',
+        'author',
         'publishedAt:datetime',
         'path',
     ],
