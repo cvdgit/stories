@@ -18,12 +18,15 @@ $this->registerCss(<<<CSS
 CSS
 );
 ?>
-
 <div class="admin-toolbar clearfix" style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px #eee solid">
-
     <?= Nav::widget([
         'options' => ['class' => 'navbar-nav'],
         'items' => [
+            [
+                'label' => 'Истории',
+                'url' => ['/edu/admin/story/index'],
+                'active' => Yii::$app->controller->id === 'admin/story',
+            ],
             [
                 'label' => 'Классы',
                 'url' => ['/edu/admin/class/index'],
@@ -60,5 +63,4 @@ CSS
             ],
         ],
     ]) ?>
-
 </div>
