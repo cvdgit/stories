@@ -40,12 +40,13 @@ $this->title = 'Истории';
             'label' => 'Автор',
         ],
         [
-            'attribute' => 'publishedAt:datetime',
+            'attribute' => 'publishedAt',
+            'format' => 'datetime',
             'label' => 'Опубликована',
         ],
         [
             'attribute' => 'path',
-            'label' => 'Обучение',
+            'label' => 'Обучение'
         ],
     ],
 ]) ?>

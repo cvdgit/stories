@@ -50,7 +50,7 @@ class StoryController extends Controller
             'totalCount' => $query->count(),
             'sort' => [
                 'attributes' => [
-                    'id', 'title', 'publishedAt',
+                    'id', 'title', 'publishedAt', 'author',
                 ],
                 'defaultOrder' => ['publishedAt' => SORT_DESC],
             ],
