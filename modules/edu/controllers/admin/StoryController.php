@@ -22,7 +22,7 @@ class StoryController extends Controller
             ->innerJoin(['c' => 'edu_class'], 'cp.class_id = c.id')
             ->where('s.id = sl.story_id');
 
-        $fromDate = (new \DateTime())->modify('-2year')->format('Y-m-d');
+        $fromDate = (new \DateTime())->modify('-1year')->format('Y-m-d');
         $betweenBegin = new Expression("UNIX_TIMESTAMP('$fromDate 00:00:00')");
 
         $toDate = (new \DateTime())->format('Y-m-d');
