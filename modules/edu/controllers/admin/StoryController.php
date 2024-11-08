@@ -40,12 +40,20 @@ class StoryController extends Controller
             ])
             ->from(['s' => 'story'])
             ->where('s.published_at IS NOT NULL')
-            ->andWhere(['between', 's.published_at', $betweenBegin, $betweenEnd])
-            ->orderBy(['s.published_at' => SORT_DESC]);
+            ->andWhere(['between', 's.published_at', $betweenBegin, $betweenEnd]);
 
         $dataProvider = new SqlDataProvider([
             'sql' => $query->createCommand()->getRawSql(),
             'totalCount' => $query->count(),
+            'sort' => [
+                'attributes' => [
+                    'id', 'title', 'publishedAt',
+                ],
+                'defaultOrder' => ['publishedAt' => SORT_DESC],
+            ],
+            'pagination' => [
+                'pageSize' => 100,
+            ],
         ]);
         return $this->render('index', [
             'dataProvider' => $dataProvider,
