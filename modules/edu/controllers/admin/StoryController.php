@@ -17,7 +17,7 @@ class StoryController extends Controller
     {
         $pathQuery = (new Query())
             ->select(
-                new Expression("CONCAT(c.name, ' / ', p.name, ' / ', t.name, ' / ', l.name)"),
+                new Expression("GROUP_CONCAT(CONCAT(c.name, ' / ', p.name, ' / ', t.name, ' / ', l.name), ',')"),
             )
             ->from(['sl' => 'edu_lesson_story'])
             ->innerJoin(['l' => 'edu_lesson'], 'sl.lesson_id = l.id')
