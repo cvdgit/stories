@@ -224,7 +224,7 @@ export default function MentalMap(element, deck, params) {
 
       wrapper.querySelector('#start-recording').addEventListener('click', e => {
         const voiceLang = langStore.fromStore($(wrapper).find("#voice-lang option:selected").val())
-        startRecording(e.target, voiceLang, text.text)
+        startRecording(e.target, voiceLang, stripTags(text.text))
       })
       wrapper.querySelector('#start-retelling').addEventListener('click', e => {
 
