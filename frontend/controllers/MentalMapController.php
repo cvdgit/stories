@@ -6,6 +6,7 @@ namespace frontend\controllers;
 
 use common\models\Story;
 use common\models\User;
+use common\rbac\UserRoles;
 use Exception;
 use frontend\MentalMap\MentalMap;
 use frontend\MentalMap\MentalMapHistoryForm;
@@ -76,22 +77,6 @@ class MentalMapController extends Controller
             return ['success' => false, 'message' => 'Mental Map not found'];
         }
 
-        /*if (!isset($rawBody['story_id'])) {
-            return ['success' => false, 'message' => 'story_id must be set'];
-        }
-        $storyId = (int) $rawBody['story_id'];
-        if (Story::findOne($storyId) === null) {
-            return ['success' => false, 'message' => 'Story not found'];
-        }*/
-
-        /*$images = [];
-        if (isset($mentalMap->payload['map'])) {
-            $map = $mentalMap->payload['map'];
-            if (isset($map['images']) && is_array($map['images'])) {
-                $images = $map['images'];
-            }
-        }*/
-
         $repetitionMode = $rawBody['repetition_mode'] ?? false;
 
         if ($repetitionMode) {
@@ -107,7 +92,21 @@ class MentalMapController extends Controller
             $history = $this->createMentalMapHistory($mentalMap->getImages(), $mentalMap->uuid, $user->getId());
         }
 
-        return ['success' => true, 'mentalMap' => $mentalMap->payload, 'history' => $history];
+        $prompt = null;
+        if ($user->can(UserRoles::ROLE_ADMIN)) {
+            $prompt = (new Query())
+                ->select('t.prompt')
+                ->from(['t' => 'llm_prompt'])
+                ->where(['t.key' => 'text-rewrite'])
+                ->scalar();
+        }
+
+        return [
+            'success' => true,
+            'mentalMap' => $mentalMap->payload,
+            'history' => $history,
+            'rewritePrompt' => $prompt,
+        ];
     }
 
     public function actionSave(WebUser $user, Request $request, Response $response): array
@@ -250,5 +249,18 @@ class MentalMapController extends Controller
             }
         }
         return ['success' => false];
+    }
+
+    public function actionUpdateRewritePrompt(Request $request, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+        $payload = Json::decode($request->rawBody);
+        $prompt = $payload['prompt'];
+
+        $command = Yii::$app->db->createCommand();
+        $command->update('llm_prompt', ['prompt' => $prompt], ['key' => 'text-rewrite']);
+        $command->execute();
+
+        return ['success' => true];
     }
 }

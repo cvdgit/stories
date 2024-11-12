@@ -577,29 +577,20 @@ class StreamController extends Controller
         $userResponse = $payload["userResponse"];
         $slideTexts = $payload["slideTexts"];
 
-        $content = <<<TEXT
-Ты занимаешься анализом и сравнением двух текстов: исходного текста и ответа пользователя.
-Исходный текст:
-```
-$slideTexts
-```
-Ответ пользователя:
-```
-$userResponse
-```
-Наложи ответ пользователя на исходный текст и найди различия.
-В ответе пользователя исправь:
-название имен собственных;
-смену регистра;
-ошибочное изменение окончания слова;
-пропущенные пробелы перед словами.
+        $content = (new Query())
+            ->select('t.prompt')
+            ->from(['t' => 'llm_prompt'])
+            ->where(['t.key' => 'text-rewrite'])
+            ->scalar();
 
-Верни исправленный ответ пользователя.
-TEXT;
+        if (!$content) {
+            $this->flushError('Промт не найден');
+            Yii::$app->end();
+        }
 
         $message = [
             "role" => "user",
-            "content" => trim($content),
+            "content" => trim(str_replace(['{TEXT}', '{USER_RESPONSE}'], [$slideTexts, $userResponse], $content)),
         ];
 
         $fields = [

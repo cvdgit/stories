@@ -39,7 +39,7 @@ const mentalMapBuilder = window.mentalMapBuilder = new MentalMapManagerQuiz();
         })
 
         const json = await response.json()
-        return {mentalMap: json.mentalMap, history: json.history}
+        return {...json}
       },
       ...mentalMapConfig,
       ...elem.data()

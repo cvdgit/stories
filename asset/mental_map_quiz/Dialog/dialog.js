@@ -59,6 +59,8 @@ const InnerDialog = function(container, {title, content}) {
   this.onHide = callback => {
     this.hideCallback = callback
   }
+
+  this.getWrapper = () => $wrapper.find('.slide-hints-inner')[0]
 };
 
 export default InnerDialog;

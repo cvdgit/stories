@@ -9,6 +9,7 @@ import MentalMapImage from "./components/MentalMapImage";
 import FragmentResultElement from "./components/FragmentResultElement";
 import sendEventSourceMessage from "../app/sendEventSourceMessage";
 import Panzoom from "../app/panzoom.min"
+import RewritePromptBtn from "./components/RewritePromptBtn";
 
 /**
  * @param element
@@ -126,7 +127,7 @@ export default function MentalMap(element, deck, params) {
 
   const langStore = new RecordingLangStore('ru-RU')
 
-  function mapImageClickHandler(image, texts, historyItem) {
+  function mapImageClickHandler(image, texts, historyItem, rewritePrompt) {
     const detailImgWrap = document.createElement('div')
     const detailImg = document.createElement('img')
     detailImg.src = image.url
@@ -139,6 +140,17 @@ export default function MentalMap(element, deck, params) {
 
     const detailTextWrap = document.createElement('div')
     detailTextWrap.classList.add('detail-text-wrap')
+
+    let promptBtn;
+    if (rewritePrompt) {
+      promptBtn = RewritePromptBtn(() => {
+        const content = createUpdatePromptContent(rewritePrompt, (currentPrompt, close) => {
+          rewritePrompt = currentPrompt
+          saveRewritePrompt(currentPrompt).then(r => close())
+        })
+        dialog.getWrapper().append(content)
+      })
+    }
 
     const detailText = DetailText(text, () => {
       if (voiceResponse.getStatus()) {
@@ -155,7 +167,7 @@ export default function MentalMap(element, deck, params) {
     }, () => {
       recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
       recordingWrap.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%'
-    })
+    }, promptBtn)
     detailTextWrap.appendChild(detailText)
 
     const recordingContainer = document.createElement('div')
@@ -315,6 +327,24 @@ export default function MentalMap(element, deck, params) {
     return await response.json()
   }
 
+  async function saveRewritePrompt(newPrompt) {
+    const response = await fetch(`/mental-map/update-rewrite-prompt`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-CSRF-Token': $('meta[name=csrf-token]').attr('content')
+      },
+      body: JSON.stringify({
+        prompt: newPrompt,
+      }),
+    })
+    if (!response.ok) {
+      throw new Error(response.statusText)
+    }
+    return await response.json()
+  }
+
   async function finishRepetition(mentalMapId) {
     const response = await fetch(`/mental-map/finish`, {
       method: 'POST',
@@ -429,7 +459,7 @@ export default function MentalMap(element, deck, params) {
       return
     }
 
-    const {mentalMap: json, history} = responseJson
+    const {mentalMap: json, history, rewritePrompt} = responseJson
 
     texts = json.map.images.map(image => {
       const {imageText, textFragments} = processImageText(image.text)
@@ -464,7 +494,7 @@ export default function MentalMap(element, deck, params) {
 
     container.appendChild(AllTexts(texts, json.map.images, history, (image) => {
       const historyItem = history.find(h => h.id === image.id)
-      const dialog = mapImageClickHandler(image, texts, historyItem)
+      const dialog = mapImageClickHandler(image, texts, historyItem, rewritePrompt)
       dialog.onHide(() => {
         hideDialogHandler()
         if (voiceResponse.getStatus()) {
@@ -726,6 +756,32 @@ export default function MentalMap(element, deck, params) {
         <a class="btn" href="${params.repetitionBackUrl}">Назад к обучению</a>
       </div>
     `
+    return elem
+  }
+
+  function createUpdatePromptContent(prompt, saveHandler, closeHandler) {
+    const elem = document.createElement('div')
+    elem.classList.add('retelling-wrap')
+    elem.innerHTML = `
+<div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%">
+    <div class="textarea prompt-text" style="flex: 1" contenteditable="plaintext-only">${prompt}</div>
+    <div style="display: flex; flex-direction: row; justify-content: center; padding-top: 20px; align-items: center">
+        <button type="button" style="margin-right: 10px;" class="button prompt-save">Сохранить</button>
+        <button type="button" class="button prompt-close">Закрыть</button>
+    </div>
+</div>
+    `
+    elem.querySelector('.prompt-save').addEventListener('click', () => saveHandler(elem.querySelector('.prompt-text').textContent, close))
+
+    const close = () => {
+      elem.remove()
+      if (typeof closeHandler === 'function') {
+        closeHandler()
+      }
+    }
+
+    elem.querySelector('.prompt-close').addEventListener('click', close)
+
     return elem
   }
 

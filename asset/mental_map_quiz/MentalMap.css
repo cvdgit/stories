@@ -242,3 +242,27 @@
   line-height: 28px;
   margin-bottom: 20px;
 }
+
+.textarea {
+  background-color: transparent;
+  border-color: #b0bec5;
+  border-radius: 7px;
+  border-width: 1px;
+  border-style: solid;
+  color: #455a64;
+  font-family: Roboto, sans-serif;
+  font-size: 3rem;
+  font-weight: 400;
+  height: 100%;
+  line-height: 4rem;
+  min-height: 100px;
+  overflow-y: auto;
+  outline-style: solid;
+  outline-width: 0;
+  padding: 1rem 1.2rem;
+  resize: none;
+  transition-duration: .15s;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(.4,0,.2,1);
+  width: 100%;
+}

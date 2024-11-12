@@ -1,6 +1,6 @@
 import DetailTextActions from "./DetailTextActions";
 
-export default function DetailText(text, itemClickHandler, afterRandCallback) {
+export default function DetailText(text, itemClickHandler, afterRandCallback, promptBtn) {
   const detailText = document.createElement('div')
   detailText.classList.add('detail-text')
 
@@ -33,7 +33,7 @@ export default function DetailText(text, itemClickHandler, afterRandCallback) {
       }
     }
     afterRandCallback()
-  }))
+  }, promptBtn))
 
   text.words.map(word => {
     const {type} = word
