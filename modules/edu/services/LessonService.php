@@ -39,6 +39,18 @@ class LessonService
         ])->execute();
     }
 
+    public function addStoryRaw(int $lessonId, int $storyId): void
+    {
+        Yii::$app->db->createCommand()->insert('edu_lesson_story', [
+            'lesson_id' => $lessonId,
+            'story_id' => $storyId,
+            'order' => (new Query())
+                    ->from('edu_lesson_story')
+                    ->where(['lesson_id' => $lessonId])
+                    ->max('`order`') + 1,
+        ])->execute();
+    }
+
     public function saveOrder(int $lessonId, LessonStoryOrderForm $form): void
     {
         if (!$form->validate()) {
