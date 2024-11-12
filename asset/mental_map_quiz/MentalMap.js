@@ -677,7 +677,7 @@ export default function MentalMap(element, deck, params) {
           $(document.getElementById("start-retelling-wrap")).show()
         }
 
-        /*const userResponse = $resultSpan.text().trim()
+        const userResponse = $resultSpan.text().trim()
         if (userResponse.length) {
           const content = createRewriteContent(() => {})
           $(element).parents('.mental-map-detail-container').append(content)
@@ -697,7 +697,7 @@ export default function MentalMap(element, deck, params) {
               content.remove()
             }
           )
-        }*/
+        }
       })
     }
   }
