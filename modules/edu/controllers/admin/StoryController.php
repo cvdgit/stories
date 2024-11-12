@@ -104,10 +104,10 @@ class StoryController extends Controller
             }, EduClassProgram::find()->all()),
             'topicItems' => array_map(static function(EduTopic $item): array {
                 return ['id' => $item->id, 'class_program_id' => $item->class_program_id, 'name' => $item->name];
-            }, EduTopic::find()->orderBy(['name' => SORT_ASC])->all()),
+            }, EduTopic::find()->orderBy(['order' => SORT_ASC])->all()),
             'lessonItems' => array_map(static function(EduLesson $item): array {
                 return ['id' => $item->id, 'topic_id' => $item->topic_id, 'name' => $item->name];
-            }, EduLesson::find()->orderBy(['name' => SORT_ASC])->all()),
+            }, EduLesson::find()->orderBy(['order' => SORT_ASC])->all()),
         ]);
 
         return $this->render('index', [
