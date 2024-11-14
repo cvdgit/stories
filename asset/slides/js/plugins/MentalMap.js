@@ -7,8 +7,6 @@ let currentStoryId = null;
 
 let readySlides = [];
 
-const mentalMapBuilder = new MentalMapManagerQuiz()
-
 export default function MentalMap() {
   return {
 

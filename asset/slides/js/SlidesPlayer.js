@@ -1,4 +1,3 @@
-
 function SlidesPlayer(deck) {
 
   return {
@@ -31,19 +30,22 @@ function SlidesPlayer(deck) {
       else {
 
         if (deck.hasPlugin('testing')) {
-
           const elem = $(deck.getCurrentSlide()).find('div.new-questions');
-
           if (elem.length) {
-
             const test = elem[0]['_wikids_test'];
-
             if (test !== undefined) {
               const canNext = test.canNext();
               if (!canNext) {
                 return;
               }
             }
+          }
+        }
+
+        if (deck.hasPlugin('mental_map')) {
+          const instance = mentalMapBuilder.getInstance($(deck.getCurrentSlide()).attr('data-id'))
+          if (instance && !instance.canNext()) {
+            return
           }
         }
 

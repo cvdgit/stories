@@ -16,6 +16,8 @@ import NextStory from "./plugins/NextStory";
 import isMobile from "./is_mobile";
 import MentalMap from "./plugins/MentalMap";
 
+window.mentalMapBuilder = new MentalMapManagerQuiz()
+
 function onSlideMouseDown(e, player) {
 
   e = e || window.event;
@@ -60,7 +62,8 @@ window.initSlides = function() {
     controlsLayout: 'bottom-right',
     controlsBackArrows: 'faded',
     controlsTutorial: false,
-    progress: true,
+    progress: false,
+    keyboard: false,
     history: false,
     mouseWheel: false,
     showNotes: false,
@@ -97,7 +100,6 @@ window.initSlides = function() {
   const slidesPlayer = new SlidesPlayer(deck);
 
   deck.on('ready', function() {
-
     if (!isMobile()) {
       deck.on("mousedown", (e) => onSlideMouseDown(e, slidesPlayer));
       deck.on("contextmenu", (e) => e.preventDefault());
