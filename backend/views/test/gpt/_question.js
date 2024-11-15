@@ -68,13 +68,14 @@
     createPrompt(newPromptId, name, prompt, 'question').then(r => {
 
       if (r.success) {
-        const select = $('#gptquestionupdateform-promptid')
+        const select = $('.gptPromptId')
         select.find('option').map((i, el) => {
           if (el.value !== '') {
             el.remove()
           }
         })
         r.prompts.map(p => $('<option/>', {value: p.id, text: p.name, selected: p.id === newPromptId}).appendTo(select))
+        select.blur()
       }
 
       $('#prompt-create-modal').modal('hide')
@@ -82,7 +83,7 @@
   })
 
   $('#prompt-update-modal').find('#gpt-prompt-save').on('click', e => {
-    const id = $('#gptquestionupdateform-promptid').val()
+    const id = $('.gptPromptId').val()
 
     const name = $('#prompt-update-modal').find('#gpt-prompt-name').val()
     if (!name) {
@@ -94,13 +95,13 @@
       return
     }
     savePrompt(id, name, prompt).then(r => {
-      $('#gptquestionupdateform-promptid').find('option:selected').text(name)
+      $('.gptPromptId').find('option:selected').text(name)
       $('#prompt-update-modal').modal('hide')
     })
   })
 
   $('#prompt-update').on('click', e => {
-    const id = $('#gptquestionupdateform-promptid').val()
+    const id = $('.gptPromptId').val()
     fetchPrompt(id).then(r => {
       const modal = $('#prompt-update-modal')
       modal.find('#gpt-prompt').html(r.prompt)
@@ -146,9 +147,13 @@
   }
 
   $('#run-job-modal').find('#job-send').on('click', e => {
-    const promptId = $('#gptquestionupdateform-promptid').val()
-    const job = $('#gptquestionupdateform-job').html()
+    const promptId = $('.gptPromptId').val()
+    const job = $('.gptJob').html()
     const userResponse = $('#run-job-modal').find('#gpt-user-response').val()
+
+    if (!job || !userResponse) {
+      return
+    }
 
     const elem = document.createElement('div')
     elem.classList.add('run-job-message-item')
@@ -164,11 +169,20 @@
   })
 
   $('#run-job').on('click', e => {
-    const job = $('#gptquestionupdateform-job').html()
+    const job = $('.gptJob').html()
     $('#run-job-modal')
       .find('#run-job-text')
       .html(job)
       .end()
       .modal('show')
+  })
+
+  $('.gptPromptId').on('change', e => {
+    const value = e.target.value
+    const ids = ['#prompt-update', '#run-job']
+    ids.map(id => $(id).hide())
+    if (value) {
+      ids.map(id => $(id).show())
+    }
   })
 })();

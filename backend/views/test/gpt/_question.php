@@ -23,9 +23,9 @@ $this->registerCss($this->renderFile("@backend/views/test/gpt/_question.css"));
 <?php
 $form = ActiveForm::begin(['id' => 'gpt-question-form']) ?>
 <?= $form->field($formModel, 'name')->textInput(['maxlength' => true]) ?>
-<?= $form->field($formModel, 'job')->textarea(['rows' => 10]) ?>
+<?= $form->field($formModel, 'job')->textarea(['rows' => 10, 'class' => 'form-control gptJob']) ?>
 <div>
-    <?= $form->field($formModel, 'promptId')->dropDownList($prompts, ['prompt' => 'Выберите промт']) ?>
+    <?= $form->field($formModel, 'promptId')->dropDownList($prompts, ['prompt' => 'Выберите промт', 'class' => 'form-control gptPromptId']) ?>
     <div style="margin-bottom: 30px">
         <button id="prompt-update" style="display: <?= empty($formModel->promptId) ? 'none' : 'inline-block' ?>"
                 type="button" class="btn btn-success btn-sm">Изменить
