@@ -6,11 +6,13 @@ namespace backend\controllers;
 
 use common\rbac\UserRoles;
 use Yii;
+use yii\db\Exception;
 use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\helpers\Json;
 use yii\rest\Controller;
 use yii\web\Request;
+use yii\web\Response;
 
 class PromptController extends Controller
 {
@@ -40,14 +42,22 @@ class PromptController extends Controller
         return ['success' => true, 'prompts' => $prompts];
     }
 
+    /**
+     * @throws Exception
+     */
     public function actionSave(Request $request): array
     {
         $payload = Json::decode($request->rawBody);
         $prompt = $payload['prompt'];
         $promptId = $payload['id'];
+        $promptName = $payload['name'] ?? '';
 
         $command = Yii::$app->db->createCommand();
-        $command->update('llm_prompt', ['prompt' => $prompt], ['id' => $promptId]);
+        $columns = ['prompt' => $prompt];
+        if ($promptName !== '') {
+            $columns['name'] = $promptName;
+        }
+        $command->update('llm_prompt', $columns, ['id' => $promptId]);
         $command->execute();
         return ['success' => true];
     }
@@ -57,7 +67,8 @@ class PromptController extends Controller
         $payload = Json::decode($request->rawBody);
         $promptId = $payload['id'];
         $promptName = $payload['name'];
-        $prompt = <<<TEXT
+        $key = $payload['key'] ?? 'slide_text';
+        $prompt = $payload['prompt'] ?? <<<TEXT
             Текст:
             ```
             {TEXT}
@@ -71,16 +82,26 @@ class PromptController extends Controller
             'name' => $promptName,
             'prompt' => $prompt,
             'created_at' => time(),
-            'key' => 'slide_text',
+            'key' => $key,
         ]);
         $command->execute();
 
         $prompts = (new Query())
             ->select(['id', 'name', 'prompt'])
             ->from(['t' => 'llm_prompt'])
-            ->where("t.key = 'slide_text'")
+            ->where(['t.key' => $key])
             ->orderBy(['t.name' => SORT_ASC])
             ->all();
         return ['success' => true, 'prompts' => $prompts];
+    }
+
+    public function actionGet(string $id, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+        return (new Query())
+            ->select(['prompt', 'name'])
+            ->from(['t' => 'llm_prompt'])
+            ->where(['id' => $id])
+            ->one();
     }
 }

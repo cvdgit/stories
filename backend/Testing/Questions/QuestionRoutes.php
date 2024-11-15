@@ -18,6 +18,7 @@ class QuestionRoutes
             'Перетаскивание слов' => self::getCreateDragWordsQuestionRoute($quizId),
             'Изображение с пропусками' => self::getCreateImageGapsQuestionRoute($quizId),
             'Группировка элементов' => ['test/grouping/create', 'test_id' => $quizId],
+            'ChatGPT вопрос' => ['test/gpt/create', 'test_id' => $quizId],
         ];
     }
 

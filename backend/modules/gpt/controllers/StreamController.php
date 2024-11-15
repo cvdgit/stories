@@ -617,4 +617,51 @@ class StreamController extends Controller
             Yii::$app->errorHandler->logException($ex);
         }
     }
+
+    public function actionQuestion(Request $request): void
+    {
+        $payload = Json::decode($request->rawBody);
+        $promptId = $payload['promptId'];
+        $userResponse = $payload['userResponse'];
+        $job = $payload['job'];
+
+        $content = (new Query())
+            ->select('t.prompt')
+            ->from(['t' => 'llm_prompt'])
+            ->where(['t.id' => $promptId])
+            ->scalar();
+        if (!$content) {
+            $this->flushError('Промт не найден');
+            Yii::$app->end();
+        }
+
+        $message = [
+            "role" => "user",
+            "content" => trim(str_replace(['{JOB}', '{USER_RESPONSE}'], [$job, $userResponse], $content)),
+        ];
+
+        $fields = [
+            "input" => [
+                "messages" => [
+                    $message,
+                ],
+            ],
+            "config" => [
+                "metadata" => [
+                    "conversation_id" => Uuid::uuid4()->toString(),
+                ],
+            ],
+            "include_names" => [],
+        ];
+
+        try {
+            $this->chatEventStream->send(
+                "retelling",
+                Yii::$app->params["gpt.api.completions.host"],
+                Json::encode($fields),
+            );
+        } catch (Exception $ex) {
+            Yii::$app->errorHandler->logException($ex);
+        }
+    }
 }

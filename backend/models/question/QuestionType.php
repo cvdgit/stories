@@ -21,6 +21,7 @@ class QuestionType
     public const POETRY = 10;
     public const IMAGE_GAPS = 11;
     public const GROUPING = 12;
+    public const GPT_QUESTION = 13;
 
     private $type;
 
@@ -49,6 +50,7 @@ class QuestionType
             self::POETRY => 'Запоминание стихов',
             self::IMAGE_GAPS => 'Изображение с пропусками',
             self::GROUPING => 'Группировка элементов',
+            self::GPT_QUESTION => 'ChatGPT вопрос',
         ];
     }
 
@@ -100,5 +102,10 @@ class QuestionType
     public function isGrouping(): bool
     {
         return $this->type === self::GROUPING;
+    }
+
+    public function isGptQuestion(): bool
+    {
+        return $this->type === self::GPT_QUESTION;
     }
 }
