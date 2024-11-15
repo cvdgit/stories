@@ -656,7 +656,7 @@ class StreamController extends Controller
 
         try {
             $this->chatEventStream->send(
-                "retelling",
+                "question",
                 Yii::$app->params["gpt.api.completions.host"],
                 Json::encode($fields),
             );
