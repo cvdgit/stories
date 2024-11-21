@@ -18,6 +18,6 @@ class GptQuestionUpdateForm extends GptQuestionForm
         $payload = Json::decode($question->regions);
         $this->job = $payload['job'];
         $this->promptId = $payload['promptId'];
-        $this->solution = $payload['solution'];
+        $this->solution = $payload['solution'] ?? null;
     }
 }
