@@ -2141,3 +2141,70 @@ p.wikids-test-description {
   margin-right: 6px;
   margin-bottom: 6px;
 }
+
+.textarea {
+  height: 100%;
+  min-height: 100px;
+  width: 100%;
+  resize: none;
+  border-radius: 7px;
+  background-color: transparent;
+  padding: 1rem 1.2rem;
+  font-family: Roboto, sans-serif;
+  font-size: 1.4rem;
+  line-height: 2rem;
+  font-weight: 400;
+  color: rgb(69 90 100 / 1);
+  outline-style: solid;
+  outline-width: 0;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(.4,0,.2,1);
+  transition-duration: .15s;
+  border-width: 1px;
+  border-color: rgb(176 190 197 / 1);
+  border-style: solid;
+}
+
+.gpt-message-list {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 20px
+}
+
+.gpt-answer-wrap {
+  display: flex;
+  position: relative;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: start;
+  flex: 1
+}
+
+.gpt-user-response {
+  flex: 1;
+  min-height: 50px;
+  height: 50px
+}
+
+.job-send-loader {
+  display: none;
+  cursor: wait;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  align-items: center;
+  justify-content: center;
+  background-color: #eee;
+  border-radius: 8px
+}
+
+.run-job-message-item {
+  margin-bottom: 50px;
+  padding-bottom: 10px;
+  font-size: 14px;
+  border-bottom: 1px #808080 solid;
+}

@@ -373,6 +373,9 @@ class StoryTest extends ActiveRecord
         return (int) $this->answer_type === AnswerType::MISSING_WORDS;
     }
 
+    /**
+     * @return list<StoryTestQuestion>
+     */
     public function getQuestionData($filter = null): array
     {
         $query = StoryTestQuestion::find()
@@ -404,11 +407,15 @@ class StoryTest extends ActiveRecord
         return $query->all();
     }
 
-    public function getQuestionDataCount()
+    public function getQuestionDataCount(): int
     {
-        return StoryTestQuestion::find()
+        $count = StoryTestQuestion::find()
             ->where('story_test_id = :id', [':id' => $this->id])
             ->count();
+        if ($count === null) {
+            return 0;
+        }
+        return (int) $count;
     }
 
     public function getQuestionDataCountMobile()

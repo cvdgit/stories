@@ -31,6 +31,7 @@ import Poetry from "./questions/Poetry";
 import AnswerHistorySender from "./components/AnswerHistorySender";
 import ImageGaps from "./ImageGaps/ImageGaps";
 import Grouping from "./Grouping";
+import GptQuestion from "./GptQuestion";
 
 
 var plugins = [];
@@ -104,6 +105,10 @@ function WikidsStoryTest(el, options) {
    * @type Grouping
    */
   this.groupingQuestion = null;
+  /**
+   * @type GptQuestion
+   */
+  this.gptQuestion = null;
 
   setElementHtml(createLoader('Инициализация'));
 
@@ -1101,6 +1106,7 @@ function WikidsStoryTest(el, options) {
       || questionViewDragWords(question)
       || questionViewImageGaps(question)
       || questionViewGrouping(question)
+      || questionViewGpt(question)
     ) {
       questionName = question.name;
     }
@@ -1245,6 +1251,9 @@ function WikidsStoryTest(el, options) {
           break;
         case "grouping":
           $answers = that.groupingQuestion.createWrapper();
+          break;
+        case "gpt_question":
+          $answers = that.gptQuestion.createWrapper();
           break;
         default:
           $answers = createAnswers(getAnswersData(question), question);
@@ -1598,6 +1607,10 @@ function WikidsStoryTest(el, options) {
     return getQuestionView(question) === 'grouping';
   }
 
+  function questionViewGpt(question) {
+    return getQuestionView(question) === 'gpt_question';
+  }
+
   function questionViewDragWords(question) {
     return getQuestionView(question) === 'drag-words';
   }
@@ -1816,6 +1829,7 @@ function WikidsStoryTest(el, options) {
          || questionViewImageGaps(currentQuestion)
          || testConfig.answerTypeIsMissingWords(currentQuestion)
          || questionViewGrouping(currentQuestion)
+        || questionViewGpt(currentQuestion)
       ) {
 
         const decodeHtml = (html) => {
@@ -2169,6 +2183,7 @@ function WikidsStoryTest(el, options) {
       && !questionViewDragWords(currentQuestion)
       && !questionViewPoetry(currentQuestion)
       && !questionViewGrouping(currentQuestion)
+      && !questionViewGpt(currentQuestion)
     ) {
       $('.wikids-test-answers', currentQuestionElement)
         .empty()
@@ -2229,6 +2244,23 @@ function WikidsStoryTest(el, options) {
           })
         })
       });
+    }
+
+    if (questionViewGpt(currentQuestion)) {
+      const correctAnswerHandler = (userResponse) => {
+        nextQuestion([userResponse], () => true)
+      }
+      const incorrectAnswerHandler = (userResponse) => {
+        const historyData = createAnswerHistoryData(
+          currentQuestion.id,
+          currentQuestion.name,
+          false,
+          createAnswerHistoryDataItems([userResponse], r => [currentQuestion.id, r])
+        )
+        writeAnswerHistory(historyData)
+      }
+      $('.seq-question', currentQuestionElement)
+        .html(that.gptQuestion.create(currentQuestion, correctAnswerHandler, incorrectAnswerHandler));
     }
 
     if (questionViewImageGaps(currentQuestion)) {
@@ -2537,6 +2569,8 @@ function WikidsStoryTest(el, options) {
       $elements.append(that.passTestQuestion.getContent(question.payload));
     } else if (questionViewGrouping(question)) {
       $elements.append(that.groupingQuestion.getContent(question))
+    } else if (questionViewGpt(question)) {
+      $elements.append(that.gptQuestion.getContent(question))
     } else if (questionViewImageGaps(question)) {
       $elements.append(that.imageGapsQuestion.getContent(question));
     } else if (questionViewDragWords(question)) {
@@ -2776,6 +2810,7 @@ function WikidsStoryTest(el, options) {
       && !questionViewSvg(currentQuestion)
       && !questionViewRegion(currentQuestion)
       && !questionViewPoetry(currentQuestion)
+      && !questionViewGpt(currentQuestion)
       && !testConfig.sourceIsNeo()) {
       dom.wrapper.removeClass('wikids-test--no-controls');
       dom.controls.show();
@@ -3005,6 +3040,7 @@ WikidsStoryTest.mount(DragWords);
 WikidsStoryTest.mount(Poetry);
 WikidsStoryTest.mount(ImageGaps);
 WikidsStoryTest.mount(Grouping)
+WikidsStoryTest.mount(GptQuestion)
 
 WikidsStoryTest.getTests = function () {
   return tests;

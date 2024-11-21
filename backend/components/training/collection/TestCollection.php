@@ -7,21 +7,20 @@ namespace backend\components\training\collection;
 use backend\components\training\base\BaseQuestion;
 use backend\components\training\collection\build\Base;
 use backend\components\training\collection\build\DragWords;
+use backend\components\training\collection\build\GptQuestionBuilder;
 use backend\components\training\collection\build\Grouping;
 use backend\components\training\collection\build\ImageGaps;
 use backend\components\training\collection\build\PassTest;
 use backend\components\training\collection\build\Poetry;
 use backend\components\training\collection\build\Region;
 use backend\components\training\collection\build\Sequence;
-
 use common\models\StoryTest;
-use common\models\StoryTestQuestion;
 
 class TestCollection extends BaseCollection
 {
     private $testModel;
 
-    public function __construct($data, $stars, StoryTest $testModel)
+    public function __construct(array $data, array $stars, StoryTest $testModel)
     {
         $this->testModel = $testModel;
         parent::__construct($data, $stars);
@@ -44,6 +43,8 @@ class TestCollection extends BaseCollection
             $builder = new ImageGaps($questionData, $stars);
         } elseif ($type->isGrouping()) {
             $builder = new Grouping($questionData, $stars);
+        } elseif ($type->isGptQuestion()) {
+            $builder = new GptQuestionBuilder($questionData, $stars);
         } else {
             $builder = new Base($questionData, $stars, $this->testModel);
         }

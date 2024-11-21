@@ -10,10 +10,13 @@ use common\models\StoryTestQuestion;
 
 abstract class BaseCollection
 {
+    /**
+     * @var list<StoryTestQuestion>
+     */
     private $data;
     private $stars;
 
-    public function __construct($data, $stars)
+    public function __construct(array $data, $stars)
     {
         $this->data = $data;
         $this->stars = $stars;
@@ -27,5 +30,5 @@ abstract class BaseCollection
         }
     }
 
-    abstract public function createQuestion($questionData, $stars);
+    abstract public function createQuestion(StoryTestQuestion $questionData, $stars);
 }

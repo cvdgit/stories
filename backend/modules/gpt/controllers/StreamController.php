@@ -621,17 +621,54 @@ class StreamController extends Controller
     public function actionQuestion(Request $request): void
     {
         $payload = Json::decode($request->rawBody);
-        $promptId = $payload['promptId'];
         $userResponse = $payload['userResponse'];
-        $job = $payload['job'];
+        $promptId = $payload['promptId'] ?? null;
+        $job = $payload['job'] ?? null;
+        $questionId = $payload['questionId'] ?? null;
+
+        if ($questionId !== null) {
+            $questionPayload = (new Query())
+                ->select('regions')
+                ->from('story_test_question')
+                ->where(['id' => $questionId])
+                ->scalar();
+            if (!$questionPayload) {
+                $this->flushError('Вопрос не найден');
+                Yii::$app->end();
+            }
+            $questionPayload = Json::decode($questionPayload);
+            $job = $questionPayload['job'];
+            $promptId = $questionPayload['promptId'];
+        }
+
+        if (!$promptId) {
+            $this->flushError('Промт не определен');
+            Yii::$app->end();
+        }
 
         $content = (new Query())
             ->select('t.prompt')
             ->from(['t' => 'llm_prompt'])
             ->where(['t.id' => $promptId])
             ->scalar();
+
         if (!$content) {
             $this->flushError('Промт не найден');
+            Yii::$app->end();
+        }
+
+        if (!$content && !$userResponse) {
+            $this->flushError('Нет обязательных параметров');
+            Yii::$app->end();
+        }
+
+        if (strpos($content, '{JOB}') === false) {
+            $this->flushError('В промте нет шаблона {JOB}');
+            Yii::$app->end();
+        }
+
+        if (strpos($content, '{USER_RESPONSE}') === false) {
+            $this->flushError('В промте нет шаблона {USER_RESPONSE}');
             Yii::$app->end();
         }
 
