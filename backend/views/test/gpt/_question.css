@@ -27,3 +27,7 @@
   font-size: 14px;
   border-bottom: 1px #808080 solid;
 }
+
+.gptJobSolution {
+  flex: 1
+}

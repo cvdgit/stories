@@ -626,6 +626,7 @@ class StreamController extends Controller
         $job = $payload['job'] ?? null;
         $questionId = $payload['questionId'] ?? null;
 
+        $solution = null;
         if ($questionId !== null) {
             $questionPayload = (new Query())
                 ->select('regions')
@@ -639,6 +640,7 @@ class StreamController extends Controller
             $questionPayload = Json::decode($questionPayload);
             $job = $questionPayload['job'];
             $promptId = $questionPayload['promptId'];
+            $solution = $questionPayload['solution'] ?? null;
         }
 
         if (!$promptId) {
@@ -672,9 +674,67 @@ class StreamController extends Controller
             Yii::$app->end();
         }
 
+        if ($solution !== null && strpos($content, '{SOLUTION}') === false) {
+            $this->flushError('В промте нет шаблона {SOLUTION}');
+            Yii::$app->end();
+        }
+
+        if ($solution === null) {
+            $message = [
+                "role" => "user",
+                "content" => trim(str_replace(['{JOB}', '{USER_RESPONSE}'], [$job, $userResponse], $content)),
+            ];
+        } else {
+            $message = [
+                "role" => "user",
+                "content" => trim(str_replace(['{JOB}', '{SOLUTION}', '{USER_RESPONSE}'], [$job, $solution, $userResponse], $content)),
+            ];
+        }
+
+        $fields = [
+            "input" => [
+                "messages" => [
+                    $message,
+                ],
+            ],
+            "config" => [
+                "metadata" => [
+                    "conversation_id" => Uuid::uuid4()->toString(),
+                ],
+            ],
+            "include_names" => [],
+        ];
+
+        try {
+            $this->chatEventStream->send(
+                "question",
+                Yii::$app->params["gpt.api.completions.host"],
+                Json::encode($fields),
+            );
+        } catch (Exception $ex) {
+            Yii::$app->errorHandler->logException($ex);
+        }
+    }
+
+    public function actionSolution(Request $request): void
+    {
+        $payload = Json::decode($request->rawBody);
+        $job = $payload['job'];
+
+        $content = (new Query())
+            ->select('t.prompt')
+            ->from(['t' => 'llm_prompt'])
+            ->where(['t.key' => 'job_solution'])
+            ->scalar();
+
+        if (!$content) {
+            $this->flushError('Промт не найден');
+            Yii::$app->end();
+        }
+
         $message = [
             "role" => "user",
-            "content" => trim(str_replace(['{JOB}', '{USER_RESPONSE}'], [$job, $userResponse], $content)),
+            "content" => trim(str_replace(['{JOB}'], [$job], $content)),
         ];
 
         $fields = [

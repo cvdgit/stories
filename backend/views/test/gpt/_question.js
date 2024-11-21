@@ -146,6 +146,36 @@
     })
   }
 
+  async function sendMessageSolution(job, elem, onEndCallback) {
+    let accumulatedMessage = ''
+    return sendEventSourceMessage({
+      url: '/admin/index.php?r=gpt/stream/solution',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'text/event-stream',
+        'X-CSRF-Token': $("meta[name=csrf-token]").attr('content')
+      },
+      body: JSON.stringify({
+        job,
+      }),
+      onMessage: (streamedResponse) => {
+        /*if (streamedResponse?.prompt_text) {
+          $promptElem[0].textContent = streamedResponse.prompt_text;
+        }*/
+        if (Array.isArray(streamedResponse?.streamed_output)) {
+          accumulatedMessage = streamedResponse.streamed_output.join("");
+        }
+        elem.innerText = accumulatedMessage
+        elem.scrollTop = elem.scrollHeight;
+      },
+      onError: (streamedResponse) => {
+        accumulatedMessage = streamedResponse?.error_text
+        elem.innerText = accumulatedMessage
+      },
+      onEnd: onEndCallback
+    })
+  }
+
   $('#run-job-modal').find('#job-send').on('click', e => {
     const promptId = $('.gptPromptId').val()
     const job = $('.gptJob').html()
@@ -184,5 +214,18 @@
     if (value) {
       ids.map(id => $(id).show())
     }
+  })
+
+  $('.gptGenerateSolution').on('click', () => {
+    const job = $('.gptJob').html()
+    if (!job) {
+      return
+    }
+
+    const elem = document.querySelector('.gptJobSolution')
+
+    sendMessageSolution(job, elem, () => {
+      console.log('end')
+    })
   })
 })();

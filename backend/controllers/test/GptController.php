@@ -74,6 +74,7 @@ class GptController extends Controller
             $payload = Json::encode([
                 'job' => $createForm->job,
                 'promptId' => $createForm->promptId,
+                'solution' => $createForm->solution,
             ]);
 
             try {
@@ -111,11 +112,13 @@ class GptController extends Controller
             $payload = Json::encode([
                 'job' => $updateForm->job,
                 'promptId' => $updateForm->promptId,
+                'solution' => $updateForm->solution,
             ]);
 
             try {
                 $this->updateGptQuestionHandler->handle(new UpdateGptQuestionCommand($quizModel->id, $questionModel->id, $updateForm->name, $payload));
                 Yii::$app->session->setFlash('success', 'Вопрос успешно сохранен');
+                return $this->refresh();
             } catch (Exception $exception) {
                 Yii::$app->errorHandler->logException($exception);
                 Yii::$app->session->setFlash('error', $exception->getMessage());

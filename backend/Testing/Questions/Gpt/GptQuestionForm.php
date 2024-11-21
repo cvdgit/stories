@@ -11,13 +11,14 @@ abstract class GptQuestionForm extends Model
     public $name;
     public $job;
     public $promptId;
+    public $solution;
 
     public function rules(): array
     {
         return [
             [['name', 'job', 'promptId'], 'required'],
             ['name', 'string', 'max' => 1024],
-            ['job', 'string'],
+            [['job', 'solution'], 'string'],
             ['promptId', 'string', 'max' => 36],
         ];
     }
@@ -28,6 +29,7 @@ abstract class GptQuestionForm extends Model
             'name' => 'Вопрос',
             'job' => 'Текст задания',
             'promptId' => 'Промт для проверки ответа',
+            'solution' => 'Решение',
         ];
     }
 }

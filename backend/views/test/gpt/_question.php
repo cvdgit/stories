@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 use backend\assets\MainAsset;
 use backend\Testing\Questions\Gpt\Create\GptQuestionCreateForm;
+use backend\Testing\Questions\Gpt\Update\GptQuestionUpdateForm;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
 use yii\web\View;
 
 /**
  * @var View $this
- * @var GptQuestionCreateForm $formModel
+ * @var GptQuestionCreateForm|GptQuestionUpdateForm $formModel
  * @var bool $isNewRecord
  * @var array $prompts
  */
@@ -24,6 +25,12 @@ $this->registerCss($this->renderFile("@backend/views/test/gpt/_question.css"));
 $form = ActiveForm::begin(['id' => 'gpt-question-form']) ?>
 <?= $form->field($formModel, 'name')->textInput(['maxlength' => true]) ?>
 <?= $form->field($formModel, 'job')->textarea(['rows' => 10, 'class' => 'form-control gptJob']) ?>
+<div style="display: flex; flex-direction: row; align-items: start">
+    <?= $form->field($formModel, 'solution', ['options' => ['style' => 'flex: 1']])->textarea(['rows' => 6, 'class' => 'form-control gptJobSolution']) ?>
+    <button type="button" class="btn gptGenerateSolution" style="padding: 0">
+        <img style="width:30px" src="/img/chatgpt-icon.png" alt="">
+    </button>
+</div>
 <div>
     <?= $form->field($formModel, 'promptId')->dropDownList($prompts, ['prompt' => 'Выберите промт', 'class' => 'form-control gptPromptId']) ?>
     <div style="margin-bottom: 30px">
