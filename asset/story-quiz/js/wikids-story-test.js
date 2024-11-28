@@ -32,6 +32,7 @@ import AnswerHistorySender from "./components/AnswerHistorySender";
 import ImageGaps from "./ImageGaps/ImageGaps";
 import Grouping from "./Grouping";
 import GptQuestion from "./GptQuestion";
+import Panzoom from "../../app/panzoom.min"
 
 
 var plugins = [];

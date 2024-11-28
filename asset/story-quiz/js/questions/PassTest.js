@@ -2,6 +2,7 @@ import {_extends, shuffle} from "../common";
 import InnerDialog from "../components/Dialog";
 import passTestRegionContent from "./PassTestRegionContent";
 import passTestRegionCorrect from "./PassTestRegionCorrect";
+import panzoom from "../../../app/panzoom.old.min"
 
 const PassTest = function (test) {
   this.element = null;
