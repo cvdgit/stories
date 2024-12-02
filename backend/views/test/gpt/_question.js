@@ -114,7 +114,7 @@
     $('#prompt-create-modal').modal('show')
   })
 
-  async function sendMessage(promptId, job, userResponse, elem, onEndCallback) {
+  async function sendMessage(promptId, job, userResponse, solution, elem, onEndCallback) {
     let accumulatedMessage = ''
     return sendEventSourceMessage({
       url: '/admin/index.php?r=gpt/stream/question',
@@ -126,7 +126,8 @@
       body: JSON.stringify({
         promptId,
         job,
-        userResponse
+        userResponse,
+        solution
       }),
       onMessage: (streamedResponse) => {
         /*if (streamedResponse?.prompt_text) {
@@ -185,6 +186,8 @@
       return
     }
 
+    const solution = $('.gptJobSolution').val()
+
     const elem = document.createElement('div')
     elem.classList.add('run-job-message-item')
     elem.innerText = '...'
@@ -193,7 +196,7 @@
 
     $('#job-send-loader').css('display', 'flex')
 
-    sendMessage(promptId, job, userResponse, elem, () => {
+    sendMessage(promptId, job, userResponse, solution, elem, () => {
       $('#job-send-loader').css('display', 'none')
     })
   })

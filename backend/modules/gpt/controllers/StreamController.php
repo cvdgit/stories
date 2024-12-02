@@ -626,6 +626,8 @@ class StreamController extends Controller
         $job = $payload['job'] ?? null;
         $questionId = $payload['questionId'] ?? null;
 
+        $solutionText = $payload['solution'] ?? null;
+
         $solution = null;
         if ($questionId !== null) {
             $questionPayload = (new Query())
@@ -641,6 +643,10 @@ class StreamController extends Controller
             $job = $questionPayload['job'];
             $promptId = $questionPayload['promptId'];
             $solution = $questionPayload['solution'] ?? null;
+        } else {
+            if ($solutionText) {
+                $solution = $solutionText;
+            }
         }
 
         if (!$promptId) {
