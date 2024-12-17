@@ -97,5 +97,8 @@ return [
 
         '/learning-path/<id:[A-Za-z0-9_-]+>' => 'learning-path/default/index',
         '/learning-path/init/<id:[A-Za-z0-9_-]+>' => 'learning-path/default/init',
+
+        '/getcourse/mental-map/<id:[\w\d\-]+>' => 'getcourse/mental-map',
+        '/getcourse/quiz/<id>' => 'getcourse/quiz',
     ],
 ];

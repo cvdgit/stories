@@ -29,6 +29,7 @@ export default function MentalMap(element, deck, params) {
   params.slide_id = deck ? Number($(deck.getCurrentSlide()).attr('data-id')) : null
 
   const repetitionMode = Boolean(params?.repetitionMode)
+  const getCourseMode = Boolean(params?.getCourseMode)
 
   const voiceResponse = new VoiceResponse(new MissingWordsRecognition({}))
   voiceResponse.onResult(args => {
@@ -425,6 +426,10 @@ export default function MentalMap(element, deck, params) {
     return zoomContainer
   }
 
+  function historyIsDone(history) {
+    return history.reduce((all, val) => all && val.all > 0, true)
+  }
+
   function initPanZoom(element, mapWidth, mapHeight) {
     let initialZoom = 0.8
     const containerWidth = container.offsetWidth
@@ -514,6 +519,11 @@ export default function MentalMap(element, deck, params) {
 
             finishRepetition(params.mentalMapId)
           }
+        }
+
+        if (getCourseMode && historyIsDone(history)) {
+          const content = createFinishContent()
+          $(container).parents('.mental-map').append(content)
         }
       })
     }))
@@ -664,11 +674,17 @@ export default function MentalMap(element, deck, params) {
       zoom = initPanZoom(zoomWrap, json.map.width, json.map.height)
       element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
     }
+
+    if (getCourseMode && historyIsDone(history)) {
+      const content = createFinishContent()
+      $(container).parents('.mental-map').append(content)
+    }
   }
 
   /**
    * @param {HTMLElement} element
    * @param {string} lang
+   * @param text
    */
   function startRecording(element, lang, text) {
     const state = element.dataset.state
@@ -754,6 +770,19 @@ export default function MentalMap(element, deck, params) {
       <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background-color: rgba(255, 255, 255, 0.4); backdrop-filter: blur(4px);">
         <h2 style="margin-bottom: 20px">Ментальная карта пройдена</h2>
         <a class="btn" href="${params.repetitionBackUrl}">Назад к обучению</a>
+      </div>
+    `
+    return elem
+  }
+
+  function createFinishContent() {
+    const elem = document.createElement('div')
+    elem.classList.add('retelling-wrap')
+    elem.style.backgroundColor = 'transparent'
+    elem.style.padding = '0'
+    elem.innerHTML = `
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background-color: rgba(255, 255, 255, 0.4); backdrop-filter: blur(4px);">
+        <h2 style="margin-bottom: 20px">Ментальная карта пройдена</h2>
       </div>
     `
     return elem

@@ -32,6 +32,19 @@ $this->registerCss(<<<CSS
 .test-grid .summary {
     text-align: right;
 }
+.grid-actions-btn {
+  cursor: pointer;
+  background: none;
+  border: none;
+  line-height: 0;
+  opacity: .7;
+  padding: 10px;
+  width: 30px;
+}
+
+.dropdown-menu {
+  --bs-dropdown-item-padding-y: .6rem;
+}
 CSS
 );
 
