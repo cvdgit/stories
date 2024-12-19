@@ -98,7 +98,7 @@ class GetcourseController extends Controller
         if (Yii::$app->user->isGuest) {
             try {
                 Yii::$app->user->login($userModel, Yii::$app->params['user.rememberMeDuration']);
-                return ['success' => true];
+                return ['success' => true, 'student_id' => $userModel->getStudentID()];
             } catch (Exception $exception) {
                 return ['success' => false, 'message' => $exception->getMessage()];
             }
