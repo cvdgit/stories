@@ -26,9 +26,6 @@
 
   const id = window?.getCourseUserId
 
-  console.log(parent.document);
-  console.log(parent.document?.accountUserId);
-
   sendAuth(id).then(r => {
 
     if (!r?.success) {
