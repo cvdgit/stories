@@ -50,6 +50,8 @@ return [
                 'name' => '_identity',
                 'httpOnly' => true,
                 'domain' => $params['cookieDomain'],
+                'sameSite' => \yii\web\Cookie::SAME_SITE_NONE,
+                'secure' => true,
             ],
             'loginUrl' => ['/auth/login'],
             'on beforeLogout' => static function() {
@@ -64,6 +66,8 @@ return [
             'cookieParams' =>[
                 'httpOnly' => true,
                 'domain' => $params['cookieDomain'],
+                'sameSite' => \yii\web\Cookie::SAME_SITE_NONE,
+                'secure' => true,
             ],
         ],
         'log' => [
