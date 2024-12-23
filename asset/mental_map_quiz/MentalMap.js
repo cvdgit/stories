@@ -157,7 +157,7 @@ export default function MentalMap(element, deck, params) {
       if (voiceResponse.getStatus()) {
         voiceResponse.stop()
         const voiceLang = langStore.fromStore($(recordingWrap).find("#voice-lang option:selected").val())
-        startRecording(recordingWrap.querySelector('#start-recording'), voiceLang, stripTags(text.text))
+        startRecording(recordingWrap.querySelector('#start-recording'), voiceLang, stripTags(text.text), false)
       }
       ['#result_span', '#final_span', '#interim_span'].map(q => {
         detailTextWrap.querySelector(q).innerHTML = ''
@@ -237,7 +237,7 @@ export default function MentalMap(element, deck, params) {
 
       wrapper.querySelector('#start-recording').addEventListener('click', e => {
         const voiceLang = langStore.fromStore($(wrapper).find("#voice-lang option:selected").val())
-        startRecording(e.target, voiceLang, stripTags(text.text))
+        startRecording(e.target, voiceLang, stripTags(text.text), true)
       })
       wrapper.querySelector('#start-retelling').addEventListener('click', e => {
 
@@ -686,7 +686,7 @@ export default function MentalMap(element, deck, params) {
    * @param {string} lang
    * @param text
    */
-  function startRecording(element, lang, text) {
+  function startRecording(element, lang, text, makeRewrite) {
     const state = element.dataset.state
     if (!state) {
       $(document.getElementById("start-retelling-wrap")).hide()
@@ -724,7 +724,7 @@ export default function MentalMap(element, deck, params) {
         }
 
         const userResponse = $resultSpan.text().trim()
-        if (userResponse.length) {
+        if (userResponse.length && makeRewrite) {
           const content = createRewriteContent(() => {})
           $(element).parents('.mental-map-detail-container').append(content)
           sendMessage(
