@@ -157,7 +157,7 @@ export default function MentalMap(element, deck, params) {
       if (voiceResponse.getStatus()) {
         voiceResponse.stop()
         const voiceLang = langStore.fromStore($(recordingWrap).find("#voice-lang option:selected").val())
-        startRecording(recordingWrap.querySelector('#start-recording'), voiceLang)
+        startRecording(recordingWrap.querySelector('#start-recording'), voiceLang, stripTags(text))
       }
       ['#result_span', '#final_span', '#interim_span'].map(q => {
         detailTextWrap.querySelector(q).innerHTML = ''
