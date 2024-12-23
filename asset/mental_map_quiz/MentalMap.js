@@ -159,10 +159,10 @@ export default function MentalMap(element, deck, params) {
         const voiceLang = langStore.fromStore($(recordingWrap).find("#voice-lang option:selected").val())
         startRecording(recordingWrap.querySelector('#start-recording'), voiceLang, stripTags(text.text), false)
       }
-      ['#result_span', '#final_span', '#interim_span'].map(q => {
+      /*['#result_span', '#final_span', '#interim_span'].map(q => {
         detailTextWrap.querySelector(q).innerHTML = ''
         recordingWrap.querySelector('#start-retelling-wrap').style.display = 'none'
-      })
+      })*/
       recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
       recordingWrap.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%'
     }, () => {
