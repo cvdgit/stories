@@ -30,7 +30,7 @@ class StreamController extends Controller
 
     public function beforeAction($action): bool
     {
-        if ($action->id === "stream" || $action->id === "pdf" || $action->id === 'retelling-rewrite') {
+        if ($action->id === "stream" || $action->id === "pdf" || $action->id === 'retelling' || $action->id === 'retelling-rewrite') {
             $this->enableCsrfValidation = false;
         }
 
