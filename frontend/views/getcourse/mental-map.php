@@ -24,6 +24,12 @@ window.mentalMapId = '$mentalMapId';
 
 $this->registerCss($this->renderFile('@frontend/views/getcourse/mental-map.css'));
 $this->registerJs($this->renderFile('@frontend/views/getcourse/loader.js'));
+
+$this->registerCss(<<<CSS
+.slide-hints {
+    width: auto !important;
+}
+CSS);
 ?>
 <div style="height: 100%; display: flex; flex-direction: column">
     <div id="wrap" style="height: 100%; background-color: #eee; border: 1px #808080 solid; display: flex; align-items: center; flex-direction: column; justify-content: center">
