@@ -93,7 +93,8 @@ AppAsset::register($this);
                         ['label' => 'ChatGPT', 'url' => ['/gpt/default/index']],
                         ['label' => 'GPT feedback', 'url' => ['/gpt/feedback/list']],
                         ['label' => 'Pdf Chat', 'url' => ['/gpt/default/pdf']],
-                        ['label' => 'Карты знаний', 'url' => ['/learning-path/default']]
+                        ['label' => 'Карты знаний', 'url' => ['/learning-path/default']],
+                        ['label' => 'Промты', 'url' => ['/llm-prompt/index']],
                     ],
                 ]) ?>
                 <?php endif ?>
