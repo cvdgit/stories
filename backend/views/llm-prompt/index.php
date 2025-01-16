@@ -13,6 +13,7 @@ use yii\web\View;
 ?>
 <div>
     <?= GridView::widget([
+        'options' => ['class' => 'table-responsive'],
         'dataProvider' => $dataProvider
     ]) ?>
 </div>
