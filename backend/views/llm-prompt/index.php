@@ -10,6 +10,8 @@ use yii\web\View;
  * @var View $this
  * @var DataProviderInterface $dataProvider
  */
+
+$this->title = 'Промты';
 ?>
 <div>
     <?= GridView::widget([
