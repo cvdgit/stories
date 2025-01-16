@@ -14,6 +14,13 @@ use yii\web\View;
 <div>
     <?= GridView::widget([
         'options' => ['class' => 'table-responsive'],
-        'dataProvider' => $dataProvider
+        'dataProvider' => $dataProvider,
+        'columns' => [
+            'id',
+            'name',
+            'prompt:ntext',
+            'created_at:datetime',
+            'key',
+        ],
     ]) ?>
 </div>
