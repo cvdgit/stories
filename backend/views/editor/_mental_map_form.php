@@ -18,4 +18,5 @@ use yii\widgets\ActiveForm;
 <?php if ($new): ?>
 <?= $form->field($model, 'use_slide_image', ['inputOptions' => ['class' => 'form-control input-sm']])->checkbox() ?>
 <?php endif ?>
+<?= $form->field($model, 'tree_view', ['inputOptions' => ['class' => 'form-control input-sm']])->checkbox() ?>
 <?= $form->field($model, 'required', ['inputOptions' => ['class' => 'form-control input-sm']])->checkbox() ?>

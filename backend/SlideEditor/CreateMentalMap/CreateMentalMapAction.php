@@ -126,6 +126,7 @@ class CreateMentalMapAction extends Action
                         'id' => $mentalMapId,
                         'name' => $mentalMapForm->name,
                         'text' => $mentalMapForm->texts,
+                        'treeView' => $mentalMapForm->tree_view === '1',
                         'map' => [
                             'url' => $imageUrl,
                             'width' => $imageWidth,

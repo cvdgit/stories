@@ -10,6 +10,7 @@ import FragmentResultElement from "./components/FragmentResultElement";
 import sendEventSourceMessage from "../app/sendEventSourceMessage";
 import Panzoom from "../app/panzoom.min"
 import RewritePromptBtn from "./components/RewritePromptBtn";
+import TreeView from "./TreeView/TreeView";
 
 /**
  * @param element
@@ -465,6 +466,17 @@ export default function MentalMap(element, deck, params) {
     }
 
     const {mentalMap: json, history, rewritePrompt} = responseJson
+
+    const {treeView} = json
+
+    if (treeView) {
+      this.element.appendChild(TreeView({
+        name: json.name,
+        tree: json.treeData,
+        history: []
+      }, new VoiceResponse(new MissingWordsRecognition({}))))
+      return
+    }
 
     texts = json.map.images.map(image => {
       const {imageText, textFragments} = processImageText(image.text)

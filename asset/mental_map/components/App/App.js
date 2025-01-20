@@ -8,6 +8,7 @@ import ImagesReducer from "../../Lib/ImagesReducer";
 import Dialog from "../Dialog";
 import {CSSTransition} from "react-transition-group";
 import ScheduleReducer from "../../Lib/ScheduleReducer";
+import TreeView from "../TreeView";
 
 export const MentalMapContext = createContext({});
 export const ImagesContext = createContext({});
@@ -15,7 +16,7 @@ export const SchedulesContext = createContext({});
 
 export default function App({mentalMapId}) {
   const [loading, setLoading] = useState(true)
-  const [mentalMap, setMentalMap] = useState({})
+  //const [mentalMap, setMentalMap] = useState({})
   const [error, setError] = useState(null)
   const [state, dispatch] = useReducer(MentalMapReducer, {})
   const [imagesState, imagesDispatch] = useReducer(ImagesReducer, {})
@@ -30,13 +31,14 @@ export default function App({mentalMapId}) {
   const [formattedMapText, setFormattedMapText] = useState()
   const [settings, setSettings] = useState(state?.settings || {})
   const checkId = useId()
+  const [isTreeView, setIsTreeView] = useState(false)
 
   useEffect(() => {
     api
       .get(`/admin/index.php?r=mental-map/get&id=${mentalMapId}`)
       .then((response) => {
         setLoading(false);
-        setMentalMap(response.course);
+        //setMentalMap(response.course);
         dispatch({
           type: 'mental_map_loaded',
           mentalMap: response.mentalMap
@@ -46,6 +48,7 @@ export default function App({mentalMapId}) {
           images: response.images
         })
         setSchedules(response.schedules)
+        setIsTreeView(Boolean(response?.mentalMap?.treeView))
       })
       .catch(async (error) => setError(await parseError(error)))
   }, [])
@@ -76,7 +79,7 @@ export default function App({mentalMapId}) {
     const timeoutId = setTimeout(() => api
       .post('/admin/index.php?r=mental-map/update-settings', {
         payload: {
-          id: state.id,
+          id: mentalMapId,
           settings: state?.settings || {}
         }
       }), 500);
@@ -120,11 +123,14 @@ export default function App({mentalMapId}) {
       {loading
         ? <AppLoader/>
         : (
-          <MentalMapContext.Provider value={mentalMapContext}>
-            <ImagesContext.Provider value={imagesContext}>
-              <Editor/>
-            </ImagesContext.Provider>
-          </MentalMapContext.Provider>
+          isTreeView
+            ? <TreeView texts={formattedMapText}/>
+            :
+            <MentalMapContext.Provider value={mentalMapContext}>
+              <ImagesContext.Provider value={imagesContext}>
+                <Editor/>
+              </ImagesContext.Provider>
+            </MentalMapContext.Provider>
         )
       }
 

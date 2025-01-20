@@ -74,4 +74,11 @@ class MentalMap extends ActiveRecord
             return $item['id'] === $imageId;
         }))[0];
     }
+
+    public function updateTreeData(array $treeData): void
+    {
+        $payload = $this->payload;
+        $payload['treeData'] = $treeData;
+        $this->payload = $payload;
+    }
 }

@@ -1,0 +1,44 @@
+.author-layout__content {
+  word-wrap: break-word;
+  background: #fff;
+  min-height: 100vh;
+  overflow: hidden;
+  padding-top: 5rem;
+  position: relative;
+  transition: background .3s;
+  word-break: normal;
+}
+
+.rst__nodeContent {
+  right: 0;
+}
+
+.rst__rowLabel {
+  flex: 1 !important;
+}
+
+.rst__rowTitle {
+  display: flex;
+  width: 100%;
+}
+
+.rst__moveHandle, .rst__loadingHandle {
+  background-repeat: no-repeat;
+}
+
+.rst__rowContents {
+  align-items: start !important;
+  padding: 8px !important;
+}
+
+.rst__rowTitle textarea {
+  font-size: 16px;
+  font-weight: normal;
+  padding: 4px;
+  border: 0;
+}
+
+.rst__rowToolbar {
+  height: 100%;
+  align-items: center;
+}

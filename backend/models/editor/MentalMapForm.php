@@ -12,12 +12,14 @@ class MentalMapForm extends BaseForm
     public $name;
     public $texts;
     public $image;
+    public $tree_view;
 
     public function init(): void
     {
         parent::init();
         $this->name = 'Ментальная карта';
         $this->use_slide_image = true;
+        $this->tree_view = false;
     }
 
     /*public function scenarios()
@@ -32,7 +34,7 @@ class MentalMapForm extends BaseForm
         return array_merge(parent::rules(), [
             [['story_id', 'name'], 'required'],
             [['story_id', 'required'], 'integer'],
-            ['use_slide_image', 'boolean'],
+            [['use_slide_image', 'tree_view'], 'boolean'],
             ['texts', 'safe'],
             [['image', 'name'], 'string'],
             ['mental_map_id', 'string', 'max' => 36],
@@ -47,6 +49,7 @@ class MentalMapForm extends BaseForm
             'required' => 'Тест обязателен для прохождения',
             'use_slide_image' => 'Использовать изображение со слайда в качестве фона для ментальной карты',
             'name' => 'Название',
+            'tree_view' => 'Ментальная карта в виде дерева',
         ]);
     }
 

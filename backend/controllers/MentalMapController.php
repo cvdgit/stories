@@ -141,6 +141,60 @@ class MentalMapController extends Controller
     }
 
     /**
+     * @throws NotFoundHttpException
+     */
+    public function actionTreeInit(string $id, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+        $mentalMap = MentalMap::findOne($id);
+        if ($mentalMap === null) {
+            throw new NotFoundHttpException('Mental Map not found');
+        }
+        return [
+            'success' => true,
+            'payload' => ['treeData' => $mentalMap->payload['treeData'] ?? []],
+            'schedules' => $this->scheduleFetcher->getSchedules(),
+        ];
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     * @throws BadRequestHttpException
+     */
+    public function actionTreeSave(Request $request, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+        $payload = $request->post('payload');
+        if ($payload === null) {
+            throw new BadRequestHttpException('No data');
+        }
+        $mentalMapId = $payload['id'] ?? null;
+        if ($mentalMapId === null) {
+            throw new BadRequestHttpException('No mental map id');
+        }
+        $mentalMapModel = MentalMap::findOne($mentalMapId);
+        if ($mentalMapModel === null) {
+            throw new NotFoundHttpException('Mental Map not found');
+        }
+
+        $treeData = $payload['treeData'] ?? null;
+        if ($treeData === null) {
+            throw new BadRequestHttpException('No tree data');
+        }
+
+        try {
+            $mentalMapModel->updateTreeData($treeData);
+            if (!$mentalMapModel->save()) {
+                throw new DomainException('Mental Map tree update error');
+            }
+            return ['success' => true];
+        } catch (\Exception $exception) {
+            Yii::$app->errorHandler->logException($exception);
+            return ['success' => false, 'message' => $exception->getMessage()];
+        }
+    }
+
+    /**
      * @throws Exception
      */
     public function actionImage(Request $request, Response $response): array

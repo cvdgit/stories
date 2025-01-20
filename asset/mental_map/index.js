@@ -7,5 +7,5 @@ const root = ReactDOM.createRoot(
   document.getElementById('app')
 );
 root.render(
-  <App mentalMapId={window?.mentalMapId} />
+  <App mentalMapId={window?.mentalMapId}/>
 );
