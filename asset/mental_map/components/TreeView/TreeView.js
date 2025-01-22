@@ -1,11 +1,13 @@
-import React, {createContext, useEffect, useReducer, useState} from "react";
+import React, {createContext, useEffect, useReducer, useRef, useState} from "react";
 import {changeNodeAtPath, SortableTree} from "@nosferatu500/react-sortable-tree";
-import TextareaAutosize from 'react-textarea-autosize';
 import "./TreeView.css";
 import {addNodeUnderParent, removeNodeAtPath} from "./tree";
 import api, {parseError} from "../../Api";
 import TreeReducer from "../../Lib/TreeReducer";
 import {v4 as uuidv4} from 'uuid'
+import Dialog from "../Dialog";
+import {CSSTransition} from "react-transition-group";
+import {createWordsFormText, getTextBySelections} from "../Selection";
 
 export const TreeContext = createContext({});
 
@@ -15,6 +17,14 @@ export default function TreeView({texts}) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [state, dispatch] = useReducer(TreeReducer, {treeData: []})
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+  const [selectionMode, setSelectionMode] = useState(false)
+  const [currentText, setCurrentText] = useState(null)
+  const [currentWords, setCurrentWords] = useState([])
+  const textRef = useRef()
+  const selectionRef = useRef()
+  const [currentNode, setCurrentNode] = useState(null)
 
   const getNodeKey = ({treeIndex}) => treeIndex;
 
@@ -55,35 +65,48 @@ export default function TreeView({texts}) {
     }))
   }
 
+  useEffect(() => {
+    if (!currentWords.length) {
+      return
+    }
+    dispatch({type: 'update_tree', treeData: currentNode.changeHandler(getTextBySelections(currentWords))})
+  }, [JSON.stringify(currentWords)]);
+
+  const emitChange = (e) => {
+    dispatch({type: 'update_tree', treeData: currentNode.changeHandler(e.target.innerHTML)})
+  }
+
   return (
     <div className="author-layout__content">
       <TreeContext.Provider value={treeContext}>
-        <div
-          style={{paddingLeft: '3rem', paddingRight: '3rem', height: '100%', display: 'flex', flexDirection: 'column'}}>
+        <div className="tree-wrap">
           <div>
             <p>&nbsp;</p>
           </div>
-          <div style={{flex: '1', width: '80%', margin: '0 auto', display: 'flex', flexDirection: 'column'}}>
+          <div className="tree-inner">
             <SortableTree
               treeData={state.treeData}
-              rowHeight={100}
+              rowHeight={140}
               onChange={treeData => dispatch({type: 'update_tree', treeData})}
               generateNodeProps={({node, path}) => ({
                 title: (
-                  <TextareaAutosize
-                    style={{width: '100%', resize: 'none'}}
-                    onChange={
-                      event => {
-                        const title = event.target.value;
-                        const data = changeNodeAtPath({
+                  <div
+                    className="node-title"
+                    onClick={() => {
+                      setCurrentNode({
+                        ...node, changeHandler: (title) => changeNodeAtPath({
                           treeData: state.treeData,
                           path,
                           getNodeKey,
                           newNode: {...node, title},
                         })
-                        dispatch({type: 'update_tree', treeData: data})
-                      }
-                    } value={node.title}/>
+                      });
+                      setSelectionMode(false)
+                      setCurrentText(node.title)
+                      setOpen(true)
+                    }}
+                    dangerouslySetInnerHTML={{__html: node.title}}
+                  ></div>
                 ),
                 buttons: [
                   <button
@@ -148,10 +171,97 @@ export default function TreeView({texts}) {
                 Добавить
               </button>
               {state.treeData.length === 0 && (
-                <button onClick={createNodesFromTextHandler} className="button button--default button--header-done" type="button">Создать из текста</button>
+                <button onClick={createNodesFromTextHandler} className="button button--default button--header-done"
+                        type="button">Создать из текста</button>
               )}
             </div>
           </div>
+        </div>
+
+        <div>
+          <CSSTransition
+            in={open}
+            nodeRef={ref}
+            timeout={200}
+            classNames="dialog"
+            unmountOnExit
+          >
+            <Dialog nodeRef={ref} hideHandler={() => setOpen(false)}>
+              {currentNode && (<div>
+                  <div style={{display: 'flex', flexDirection: 'row'}}>
+                    <div style={{flex: '1', display: 'flex', flexDirection: 'column'}}>
+                      <div style={{marginBottom: '10px'}}>
+                        <button onClick={() => {
+                          setCurrentText(getTextBySelections(currentWords))
+                          setSelectionMode(false)
+                        }}
+                                className={`button button--default ${selectionMode ? 'button--outline' : 'button--header-done'} `}
+                                type="button">Редактировать
+                        </button>
+                        <button onClick={() => {
+                          setCurrentText(textRef.current.innerHTML)
+                          setCurrentWords(createWordsFormText(textRef.current.innerHTML))
+                          setSelectionMode(true)
+                        }}
+                                className={`button button--default ${selectionMode ? 'button--header-done' : 'button--outline'} `}
+                                type="button">Выделить
+                        </button>
+                      </div>
+                      {selectionMode ? (
+                        <div
+                          ref={selectionRef}
+                          className="textarea"
+                          style={{
+                            borderStyle: 'solid',
+                            maxHeight: '20rem',
+                            overflowY: 'auto'
+                          }}
+                        >
+                          {currentWords.map(word => {
+                            const {type} = word
+                            if (type === 'break') {
+                              return (<div key={word.id} className="line-sep"></div>)
+                            }
+                            return (
+                              <span
+                                key={word.id}
+                                onClick={() => {
+                                  setCurrentWords(prevState => [...prevState].map(w => {
+                                      if (w.id === word.id) {
+                                        w.hidden = !w.hidden
+                                      }
+                                      return w
+                                    })
+                                  )
+                                }}
+                                className={`text-item-word ${word.hidden ? 'selected' : ''}`}
+                              >{word.word}</span>
+                            )
+                          })}
+                        </div>
+                      ) : (
+                        <div
+                          ref={textRef}
+                          contentEditable="plaintext-only"
+                          className="textarea"
+                          dangerouslySetInnerHTML={{__html: currentText}}
+                          onInput={emitChange}
+                          onBlur={emitChange}
+                          onKeyUp={emitChange}
+                          onKeyDown={emitChange}
+                          style={{
+                            borderStyle: 'solid',
+                            maxHeight: '20rem',
+                            overflowY: 'auto'
+                          }}
+                        ></div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </Dialog>
+          </CSSTransition>
         </div>
       </TreeContext.Provider>
     </div>

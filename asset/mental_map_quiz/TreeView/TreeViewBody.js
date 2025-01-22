@@ -32,6 +32,7 @@ function createRow(node, level = 0) {
   }
 
   row.innerHTML = `<div class="node-status"></div>
+<div class="node-body">
 <div class="node-title">${node.title}</div>
 <div class="node-voice-response">
     <div>
@@ -41,23 +42,46 @@ function createRow(node, level = 0) {
     <div class="result_span"></div>
     <div class="retelling-response"></div>
 </div>
+</div>
 <div class="node-control"></div>
   `;
 
-  node.hasChildren && row.querySelector('.node-title').addEventListener('click', e => {
-    const parent = e.target.parentNode
-    const parentLevel = parent.dataset.level
-    const nextLevel = Number(parentLevel) + 1
-    let childRow = parent.nextSibling
-    while (childRow) {
-      if (childRow.dataset.level === nextLevel.toString()) {
-        childRow.classList.toggle('d-none')
-      } else {
-        break
-      }
-      childRow = childRow.nextSibling
+  row.querySelector('.node-title').addEventListener('click', e => {
+    if (!e.target.classList.contains('target-text')) {
+      return
+    }
+    if (e.target.classList.contains('selected')) {
+      row.querySelector('.node-control .gn').click()
     }
   })
+
+  if (node.hasChildren) {
+    const childToggle = document.createElement('div')
+    childToggle.classList.add('node-children-toggle')
+    childToggle.innerHTML = `
+<svg style="pointer-events: none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="chevron-down">
+  <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+</svg>
+<svg style="pointer-events: none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="chevron-up">
+  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
+</svg>
+`
+    childToggle.addEventListener('click', e => {
+      e.target.classList.toggle('show-children')
+      const parentLevel = row.dataset.level
+      const nextLevel = Number(parentLevel) + 1
+      let childRow = row.nextSibling
+      while (childRow) {
+        if (childRow.dataset.level === nextLevel.toString()) {
+          childRow.classList.toggle('d-none')
+        } else {
+          break
+        }
+        childRow = childRow.nextSibling
+      }
+    })
+    row.querySelector('.node-body').appendChild(childToggle)
+  }
 
   return row;
 }
@@ -90,12 +114,18 @@ function processTreeNodes(list, body, history, voiceResponse) {
         finalSpan.innerHTML = ''
         interimSpan.innerHTML = ''
         resultSpan.innerHTML = ''
+
+        rowElement.querySelectorAll('.target-text').forEach(el => el.classList.add('selected'))
+
         voiceResponse.onResult(args => {
           finalSpan.innerHTML = args.args?.result
           interimSpan.innerHTML = args.args?.interim
         })
       }
       if (action === 'stop') {
+
+        rowElement.querySelectorAll('.target-text').forEach(el => el.classList.remove('selected'))
+
         const userResponse = finalSpan.innerHTML
         if (!userResponse) {
           return

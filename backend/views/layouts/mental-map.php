@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use yii\helpers\Html;
 use yii\web\View;
 
 /**
@@ -16,7 +17,7 @@ use yii\web\View;
     <meta charset="<?= Yii::$app->charset ?>">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>123</title>
+    <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
 </head>
 <body>
