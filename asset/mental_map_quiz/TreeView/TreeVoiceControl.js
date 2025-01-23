@@ -4,7 +4,7 @@
  * @returns {HTMLDivElement}
  * @constructor
  */
-export default function TreeVoiceControl(voiceResponse, clickHandler) {
+export default function TreeVoiceControl(voiceResponse, startClickHandler, stopClickHandler) {
   const elem = document.createElement('div')
   elem.classList.add('question-voice')
   elem.style.bottom = '0'
@@ -30,10 +30,10 @@ export default function TreeVoiceControl(voiceResponse, clickHandler) {
       voiceResponse.stop((args) => {
         elem.querySelector('.gn').classList.remove('recording')
         elem.querySelector('.pulse-ring').remove()
-        clickHandler('stop', e.target)
+        stopClickHandler(e.target)
       })
     } else {
-      clickHandler('start', e.target)
+      startClickHandler(e.target)
       setTimeout(() => {
         voiceResponse.start(new Event('voiceResponseStart'), 'ru-RU', function () {
           const ring = document.createElement('div')

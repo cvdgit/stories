@@ -86,7 +86,7 @@ function createRow(node, level = 0) {
   return row;
 }
 
-function processTreeNodes(list, body, history, voiceResponse) {
+function processTreeNodes(list, body, history, voiceResponse, params) {
   for (const listItem of list) {
 
     const rowElement = body.querySelector(`.node-row[data-node-id='${listItem.id}']`)
@@ -108,88 +108,105 @@ function processTreeNodes(list, body, history, voiceResponse) {
     const finalSpan = voiceResponseElem.querySelector('.final_span')
     const interimSpan = voiceResponseElem.querySelector('.interim_span')
 
-    const treeVoiceControlElement = TreeVoiceControl(voiceResponse, (action, targetElement) => {
+    const startClickHandler = targetElement => {
+      finalSpan.innerHTML = ''
+      interimSpan.innerHTML = ''
+      resultSpan.innerHTML = ''
+      rowElement.querySelectorAll('.target-text').forEach(el => el.classList.add('selected'))
+      voiceResponse.onResult(args => {
+        finalSpan.innerHTML = args.args?.result
+        interimSpan.innerHTML = args.args?.interim
+      })
+    }
 
-      if (action === 'start') {
-        finalSpan.innerHTML = ''
-        interimSpan.innerHTML = ''
-        resultSpan.innerHTML = ''
+    const stopClickHandler = targetElement => {
 
-        rowElement.querySelectorAll('.target-text').forEach(el => el.classList.add('selected'))
+      rowElement.querySelectorAll('.target-text').forEach(el => el.classList.remove('selected'))
 
-        voiceResponse.onResult(args => {
-          finalSpan.innerHTML = args.args?.result
-          interimSpan.innerHTML = args.args?.interim
-        })
+      const userResponse = finalSpan.innerHTML
+      if (!userResponse) {
+        return
       }
-      if (action === 'stop') {
 
-        rowElement.querySelectorAll('.target-text').forEach(el => el.classList.remove('selected'))
+      const rootElement = targetElement.closest('.node-row')
+      const backdrop = createRewriteContent('Обработка ответа...')
+      rootElement.appendChild(backdrop.getElement())
 
-        const userResponse = finalSpan.innerHTML
-        if (!userResponse) {
-          return
-        }
-
-        const rootElement = targetElement.closest('.node-row')
-        const backdrop = createRewriteContent('Обработка ответа...')
-        rootElement.appendChild(backdrop.getElement())
-
-        sendMessage(
-          `/admin/index.php?r=gpt/stream/retelling-rewrite`,
-          {
-            userResponse,
-            slideTexts: listItem.title
-          },
-          (message) => resultSpan.innerText = message,
-          (error) => console.log('error', error),
-          () => {
-            if (resultSpan.innerText.length === 0) {
-              backdrop.remove()
-              return
-            }
-            retellingResponseSpan.innerText = ''
-            sendMessage(`/admin/index.php?r=gpt/stream/retelling`, {
-                userResponse: resultSpan.innerText,
-                slideTexts: listItem.title
-              },
-              (message) => retellingResponseSpan.innerText = message,
-              (error) => console.log('error', error),
-              () => {
-                backdrop.remove()
-
-                const json = processOutputAsJson(retellingResponseSpan.innerText)
-                if (json === null) {
-                  console.log('no json')
-                  return
-                }
-                const val = Number(json?.overall_similarity)
-
-                const historyItem = history.find(i => i.id === nodeId)
-                if (val > 50) {
-                  nodeStatusElement.innerHTML = nodeStatusSuccessHtml
-
-                  if (historyItem) {
-                    historyItem.done = true
-                  } else {
-                    history.push({id: nodeId, done: true})
-                  }
-
-                  processTreeNodes(list, body, history, voiceResponse)
-                } else {
-                  if (historyItem) {
-                    historyItem.done = false
-                  } else {
-                    history.push({id: nodeId, done: false})
-                  }
-                  nodeStatusElement.innerHTML = nodeStatusFailedHtml
-                }
-              }
-            )
+      sendMessage(
+        `/admin/index.php?r=gpt/stream/retelling-rewrite`,
+        {
+          userResponse,
+          slideTexts: listItem.title
+        },
+        (message) => resultSpan.innerText = message,
+        (error) => console.log('error', error),
+        () => {
+          if (resultSpan.innerText.length === 0) {
+            backdrop.remove()
+            return
           }
-        )
-      }
-    })
+          retellingResponseSpan.innerText = ''
+          sendMessage(`/admin/index.php?r=gpt/stream/retelling`, {
+              userResponse: resultSpan.innerText,
+              slideTexts: listItem.title
+            },
+            (message) => retellingResponseSpan.innerText = message,
+            (error) => console.log('error', error),
+            () => {
+
+              const content = rowElement.querySelector('.node-title').innerHTML
+
+              backdrop.remove()
+
+              const json = processOutputAsJson(retellingResponseSpan.innerText)
+              if (json === null) {
+                console.log('no json')
+                return
+              }
+              const val = Number(json?.overall_similarity)
+
+              const historyItem = history.find(i => i.id === nodeId)
+              if (val > 50) {
+                nodeStatusElement.innerHTML = nodeStatusSuccessHtml
+
+                if (historyItem) {
+                  historyItem.done = true
+                } else {
+                  history.push({id: nodeId, done: true})
+                }
+
+                processTreeNodes(list, body, history, voiceResponse, params)
+              } else {
+                if (historyItem) {
+                  historyItem.done = false
+                } else {
+                  history.push({id: nodeId, done: false})
+                }
+                nodeStatusElement.innerHTML = nodeStatusFailedHtml
+              }
+
+              saveUserResult({
+                ...params,
+                image_fragment_id: nodeId,
+                overall_similarity: Number(json?.overall_similarity),
+                text_hiding_percentage: 0, // textHidingPercentage,
+                text_target_percentage: 0, // textTargetPercentage,
+                content,
+              }).then(response => {
+                if (response && response?.success) {
+                  historyItem.all = response.history.all
+                  historyItem.hiding = response.history.hiding
+                  historyItem.target = response.history.target
+                }
+              })
+            }
+          )
+        }
+      )
+    }
+
+    const treeVoiceControlElement = TreeVoiceControl(voiceResponse, startClickHandler, stopClickHandler)
+
     rowElement.querySelector('.node-control').appendChild(treeVoiceControlElement)
 
     if (!rowElement.checkVisibility()) {
@@ -201,22 +218,6 @@ function processTreeNodes(list, body, history, voiceResponse) {
     }
 
     break
-
-    /*} else {
-      nodeStatusElement.innerHTML = historyItem.done ? nodeStatusSuccessHtml : nodeStatusFailedHtml
-
-      if (!historyItem.done) {
-
-        const treeVoiceControlElement = TreeVoiceControl(voiceResponse, (action, targetElement) => {
-          historyItem.done = true
-          processTreeNodes(list, body, history, voiceResponse)
-        })
-
-        rowElement.querySelector('.node-control').appendChild(treeVoiceControlElement)
-
-        break
-      }
-    }*/
   }
 }
 
@@ -227,7 +228,7 @@ function flatten(nodes, level = 0) {
   ])
 }
 
-export default function TreeViewBody(tree, voiceResponse, history) {
+export default function TreeViewBody(tree, voiceResponse, history, params) {
 
   const body = document.createElement('div')
   body.classList.add('tree-body')
@@ -237,8 +238,8 @@ export default function TreeViewBody(tree, voiceResponse, history) {
     body.appendChild(createRow(node))
   })
 
-  const sortedList = [...list].sort((a, b) => a.level - b.level)
-  processTreeNodes(sortedList, body, history, voiceResponse)
+  //const sortedList = [...list].sort((a, b) => a.level - b.level)
+  processTreeNodes(list, body, history, voiceResponse, params)
 
   return body
 }
@@ -283,4 +284,20 @@ function resetNodeRow(row) {
   ['.result_span', '.retelling-response', '.final_span', '.interim_span']
     .map(s => voiceResponseElem.querySelector(`${s}`).innerHTML = '')
   row.querySelector('.node-control').innerHTML = ''
+}
+
+async function saveUserResult(payload) {
+  const response = await fetch(`/mental-map/save`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'X-CSRF-Token': $('meta[name=csrf-token]').attr('content')
+    },
+    body: JSON.stringify(payload),
+  })
+  if (!response.ok) {
+    throw new Error(response.statusText)
+  }
+  return await response.json()
 }

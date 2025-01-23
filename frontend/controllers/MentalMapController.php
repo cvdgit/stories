@@ -79,17 +79,37 @@ class MentalMapController extends Controller
 
         $repetitionMode = $rawBody['repetition_mode'] ?? false;
 
-        if ($repetitionMode) {
-            $history = array_map(static function (array $image): array {
+
+        //$treeHistory = $this->createMentalMapTreeHistory($list, $mentalMap->uuid, $user->getId());
+        //die(print_r($treeHistory));
+
+        if ($mentalMap->isMentalMapAsTree()) {
+            $list = $this->flatten($mentalMap->getTreeData());
+            if (!$repetitionMode) {
+                $list = $this->createMentalMapTreeHistory($list, $mentalMap->uuid, $user->getId());
+            }
+            $history = array_map(static function (array $item): array {
                 return [
-                    'id' => $image['id'],
-                    'all' => 0,
-                    'hiding' => 0,
-                    'target' => 0,
+                    'id' => $item['id'],
+                    'done' => $item['done'] ?? false,
+                    //'all' => $item['all'] ?? 0,
+                    //'hiding' => $item['hiding'] ?? 0,
+                    //'target' => $item['target'] ?? 0,
                 ];
-            }, $mentalMap->getImages());
+            }, $list);
         } else {
-            $history = $this->createMentalMapHistory($mentalMap->getImages(), $mentalMap->uuid, $user->getId());
+            $items = $mentalMap->getImages();
+            if (!$repetitionMode) {
+                $items = $this->createMentalMapHistory($items, $mentalMap->uuid, $user->getId());
+            }
+            $history = array_map(static function (array $item): array {
+                return [
+                    'id' => $item['id'],
+                    'all' => $item['all'] ?? 0,
+                    'hiding' => $item['hiding'] ?? 0,
+                    'target' => $item['target'] ?? 0,
+                ];
+            }, $items);
         }
 
         $prompt = null;
@@ -228,6 +248,42 @@ class MentalMapController extends Controller
         }, $history);
     }
 
+    private function createMentalMapTreeHistory(array $nodeList, string $mentalMapId, int $userId): array
+    {
+        $history = array_map(static function (array $node): array {
+            return [
+                'id' => $node['id'],
+                'done' => false,
+            ];
+        }, $nodeList);
+
+        $rows = (new Query())
+            ->select([
+                'id' => 'h.image_fragment_id',
+                'all' => 'MAX(h.overall_similarity)',
+                'hiding' => 'MAX(h.text_hiding_percentage)',
+                'target' => 'MAX(h.text_target_percentage)',
+            ])
+            ->from(['h' => 'mental_map_history'])
+            ->where([
+                'h.mental_map_id' => $mentalMapId,
+                'h.user_id' => $userId,
+            ])
+            ->groupBy('h.image_fragment_id')
+            ->indexBy('id')
+            ->all();
+
+        return array_map(static function (array $item) use ($rows): array {
+            if (isset($rows[$item['id']])) {
+                $item['done'] = (int) $rows[$item['id']]['all'] > 50;
+                $item['all'] = (int) $rows[$item['id']]['all'];
+                $item['hiding'] = (int) $rows[$item['id']]['hiding'];
+                $item['target'] = (int) $rows[$item['id']]['target'];
+            }
+            return $item;
+        }, $history);
+    }
+
     public function actionFinish(Request $request, Response $response, WebUser $user): array
     {
         $response->format = Response::FORMAT_JSON;
@@ -262,5 +318,18 @@ class MentalMapController extends Controller
         $command->execute();
 
         return ['success' => true];
+    }
+
+    private function flatten(array $element): array
+    {
+        $flatArray = [];
+        foreach ($element as $key => $node) {
+            if (array_key_exists('children', $node)) {
+                $flatArray = array_merge($flatArray, $this->flatten($node['children'] ?? []));
+                unset($node['children']);
+            }
+            $flatArray[] = $node;
+        }
+        return $flatArray;
     }
 }

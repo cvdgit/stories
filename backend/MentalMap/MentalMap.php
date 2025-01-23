@@ -53,6 +53,38 @@ class MentalMap extends ActiveRecord
         return $this->payload['map']['images'] ?? [];
     }
 
+    public function isMentalMapAsTree(): bool
+    {
+        return $this->payload['treeView'] ?? false;
+    }
+
+    public function getTreeData(): array
+    {
+        return $this->payload['treeData'] ?? [];
+    }
+
+    private function flatten(array $element): array
+    {
+        $flatArray = [];
+        foreach ($element as $key => $node) {
+            if (array_key_exists('children', $node)) {
+                $flatArray = array_merge($flatArray, $this->flatten($node['children'] ?? []));
+                unset($node['children']);
+            }
+            $flatArray[] = $node;
+        }
+        return $flatArray;
+    }
+
+    public function getItems(): array
+    {
+        $items = $this->getImages();
+        if ($this->isMentalMapAsTree()) {
+            return $this->flatten($this->getTreeData());
+        }
+        return $items;
+    }
+
     public function updateMapText(string $text): void
     {
         $payload = $this->payload;

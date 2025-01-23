@@ -29,8 +29,18 @@ class MentalMap extends ActiveRecord
         if (count($history) === 0) {
             return false;
         }
-        return array_reduce($history, static function(bool $carry, array $item): bool {
+        return array_reduce($history, static function (bool $carry, array $item): bool {
             return $carry && (int) $item['all'] > 0;
         }, true);
+    }
+
+    public function isMentalMapAsTree(): bool
+    {
+        return $this->payload['treeView'] ?? false;
+    }
+
+    public function getTreeData(): array
+    {
+        return $this->payload['treeData'] ?? [];
     }
 }

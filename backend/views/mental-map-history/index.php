@@ -81,7 +81,7 @@ CSS,
                             </thead>
                             <tbody>
                             <?php
-                            foreach ($mentalMap->getImages() as $image): ?>
+                            foreach ($mentalMap->getItems() as $image): ?>
                                 <?php
                                 $imageData = array_values(
                                     array_filter(
@@ -93,7 +93,7 @@ CSS,
                                 )[0] ?? [];
                                 ?>
                                 <tr>
-                                    <td><?= $image['text']; ?></td>
+                                    <td><?= $image['text'] ?? $image['title']; ?></td>
                                     <td><?= $imageData['content'] ?? '-'; ?></td>
                                     <td><?= $imageData['all'] ?? '-'; ?></td>
                                     <td><?= $imageData['hiding'] ?? '-'; ?></td>

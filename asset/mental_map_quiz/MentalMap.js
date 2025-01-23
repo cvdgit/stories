@@ -473,7 +473,13 @@ export default function MentalMap(element, deck, params) {
       this.element.appendChild(TreeView({
         name: json.name,
         tree: json.treeData,
-        history: []
+        history,
+        params: {
+          story_id: params?.story_id,
+          slide_id: params?.slide_id,
+          mental_map_id: params.mentalMapId,
+          repetition_mode: repetitionMode,
+        }
       }, new VoiceResponse(new MissingWordsRecognition({}))))
       return
     }
