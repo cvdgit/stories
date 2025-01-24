@@ -16,6 +16,12 @@ class QuestionForm extends BaseForm
 
     public $lesson_id;
 
+    public function init(): void
+    {
+        parent::init();
+        $this->required = '1';
+    }
+
     public function scenarios()
     {
         $scenarios = parent::scenarios();

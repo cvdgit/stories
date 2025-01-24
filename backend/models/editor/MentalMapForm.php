@@ -20,6 +20,7 @@ class MentalMapForm extends BaseForm
         $this->name = 'Ментальная карта';
         $this->use_slide_image = true;
         $this->tree_view = false;
+        $this->required = true;
     }
 
     /*public function scenarios()
