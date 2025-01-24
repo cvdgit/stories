@@ -113,6 +113,10 @@ function processTreeNodes(list, body, history, voiceResponse, params) {
       interimSpan.innerHTML = ''
       resultSpan.innerHTML = ''
       rowElement.querySelectorAll('.target-text').forEach(el => el.classList.add('selected'))
+
+      rowElement.classList.add('current-row')
+      rowElement.parentNode.classList.add('do-recording')
+
       voiceResponse.onResult(args => {
         finalSpan.innerHTML = args.args?.result
         interimSpan.innerHTML = args.args?.interim
@@ -120,6 +124,9 @@ function processTreeNodes(list, body, history, voiceResponse, params) {
     }
 
     const stopClickHandler = targetElement => {
+
+      rowElement.classList.remove('current-row')
+      rowElement.parentNode.classList.remove('do-recording')
 
       rowElement.querySelectorAll('.target-text').forEach(el => el.classList.remove('selected'))
 

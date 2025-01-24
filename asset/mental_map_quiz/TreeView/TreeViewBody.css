@@ -7,6 +7,7 @@
   align-items: start;
   padding: 4px 10px;
   border-radius: 10px;
+  transition: all 200ms;
 }
 
 .node-title {
@@ -24,7 +25,7 @@
   background-color: #fff;
 }
 */
-.node-body:hover .node-children-toggle {
+.tree-body:not(.do-recording) .node-body:hover .node-children-toggle {
   height: 30px;
   opacity: 1;
   transition: all 200ms;
@@ -147,4 +148,21 @@
   cursor: pointer;
   opacity: 0;
   transition: all 200ms;
+}
+
+.current-row {
+  border: 1px #808080 solid;
+  transform: scale(1.05);
+  padding: 10px;
+  transition: all 200ms;
+}
+
+.do-recording > *:not(.current-row) {
+  filter: blur(4px);
+  opacity: .8;
+  transition: all 200ms;
+}
+
+.node-row[data-level='1'] .node-body {
+  padding-left: 30px;
 }

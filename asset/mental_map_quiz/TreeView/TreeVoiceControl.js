@@ -33,7 +33,9 @@ export default function TreeVoiceControl(voiceResponse, startClickHandler, stopC
         stopClickHandler(e.target)
       })
     } else {
-      startClickHandler(e.target)
+      if (startClickHandler(e.target) === false) {
+        return
+      }
       setTimeout(() => {
         voiceResponse.start(new Event('voiceResponseStart'), 'ru-RU', function () {
           const ring = document.createElement('div')
