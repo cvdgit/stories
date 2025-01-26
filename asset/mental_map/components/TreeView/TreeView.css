@@ -32,6 +32,7 @@
   align-items: start !important;
   padding: 8px !important;
   width: 100%;
+  flex: 1 !important;
 }
 
 .rst__rowTitle textarea {
