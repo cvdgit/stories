@@ -129,7 +129,7 @@ function processTreeNodes(list, body, history, voiceResponse, params) {
       rowElement.parentNode.classList.remove('do-recording')
       rowElement.querySelectorAll('.target-text').forEach(el => el.classList.remove('selected'))
 
-      const userResponse = 'Система состоит из модулей как <span class="target-text">«конструктор».</span> Можно автоматизировать процессы <span class="target-text">поэтапно,</span> начиная с наиболее <span class="target-text">актуальных.</span>' // finalSpan.innerHTML
+      const userResponse = finalSpan.innerHTML
       if (!userResponse) {
         return
       }
@@ -146,7 +146,6 @@ function processTreeNodes(list, body, history, voiceResponse, params) {
         },
         (message) => resultSpan.innerText = message,
         (error) => {
-          console.log('error', error)
           backdrop.setErrorText(error, () => {
             backdrop.remove()
             stopClickHandler(targetElement)
@@ -164,7 +163,6 @@ function processTreeNodes(list, body, history, voiceResponse, params) {
             },
             (message) => retellingResponseSpan.innerText = message,
             (error) => {
-              console.log('error', error)
               backdrop.setErrorText(error, () => {
                 backdrop.remove()
                 stopClickHandler(targetElement)
