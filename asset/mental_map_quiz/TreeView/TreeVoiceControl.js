@@ -13,7 +13,7 @@ export default function TreeVoiceControl(voiceResponse, startClickHandler, stopC
   elem.style.width = '60px'
   elem.style.height = '60px'
   elem.innerHTML = `<div class="question-voice__inner">
-            <div class="gn" style="width: 100%; height: 100%; margin: 0 auto">
+            <div data-toggle="tooltip" title="Нажмите, что бы начать запись с микрофона" class="gn" style="width: 100%; height: 100%; margin: 0 auto">
                 <div class="mc" style="pointer-events: none"></div>
             </div>
         </div>`

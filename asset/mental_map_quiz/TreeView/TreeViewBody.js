@@ -109,6 +109,12 @@ function processTreeNodes(list, body, history, voiceResponse, params) {
     const interimSpan = voiceResponseElem.querySelector('.interim_span')
 
     const startClickHandler = targetElement => {
+
+      $(rowElement.querySelector('.gn'))
+        .tooltip('hide')
+        .attr('title', 'Остановить запись')
+        .tooltip('fixTitle')
+
       finalSpan.innerHTML = ''
       interimSpan.innerHTML = ''
       resultSpan.innerHTML = ''
@@ -125,12 +131,23 @@ function processTreeNodes(list, body, history, voiceResponse, params) {
 
     const stopClickHandler = targetElement => {
 
+      $(rowElement.querySelector('.gn'))
+        .tooltip('hide')
+        .attr('title', 'Нажмите, что бы начать запись с микрофона')
+        .tooltip('fixTitle')
+
       rowElement.classList.remove('current-row')
       rowElement.parentNode.classList.remove('do-recording')
       rowElement.querySelectorAll('.target-text').forEach(el => el.classList.remove('selected'))
 
       const userResponse = finalSpan.innerHTML
       if (!userResponse) {
+        rowElement.closest('.mental-map').appendChild(createNotify('Речи не обнаружено'))
+        /*$(rowElement.querySelector('.gn'))
+          .tooltip('hide')
+          .attr('title', 'Речи не обнаружено')
+          .tooltip('fixTitle')
+          .tooltip('show')*/
         return
       }
 
@@ -182,7 +199,7 @@ function processTreeNodes(list, body, history, voiceResponse, params) {
               const val = Number(json?.overall_similarity)
 
               const historyItem = history.find(i => i.id === nodeId)
-              if (val > 50) {
+              if (val > 85) {
                 nodeStatusElement.innerHTML = nodeStatusSuccessHtml
 
                 if (historyItem) {
@@ -330,4 +347,21 @@ function stripTags(html) {
   const div = document.createElement('div');
   div.innerHTML = html;
   return div.textContent || div.innerText || '';
+}
+
+function createNotify(text) {
+  const div = document.createElement('div')
+  div.classList.add('mental-map-notify')
+  div.innerHTML = `
+<div style="display: flex">
+    <div class="mental-map-notify-text">${text}</div>
+    <button class="mental-map-notify-button" type="button"></button>
+</div>
+`
+
+  div.querySelector('.mental-map-notify-button').addEventListener('click', e => div.remove())
+
+  setTimeout(() => div.remove(), 5000)
+
+  return div
 }

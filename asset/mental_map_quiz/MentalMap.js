@@ -481,6 +481,11 @@ export default function MentalMap(element, deck, params) {
           repetition_mode: repetitionMode,
         }
       }, new VoiceResponse(new MissingWordsRecognition({}))))
+
+      $('[data-toggle="tooltip"]', this.element).tooltip({
+        container: 'body'
+      });
+
       return
     }
 
