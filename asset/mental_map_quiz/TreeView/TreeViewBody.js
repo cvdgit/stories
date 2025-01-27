@@ -127,10 +127,9 @@ function processTreeNodes(list, body, history, voiceResponse, params) {
 
       rowElement.classList.remove('current-row')
       rowElement.parentNode.classList.remove('do-recording')
-
       rowElement.querySelectorAll('.target-text').forEach(el => el.classList.remove('selected'))
 
-      const userResponse = finalSpan.innerHTML
+      const userResponse = 'Система состоит из модулей как <span class="target-text">«конструктор».</span> Можно автоматизировать процессы <span class="target-text">поэтапно,</span> начиная с наиболее <span class="target-text">актуальных.</span>' // finalSpan.innerHTML
       if (!userResponse) {
         return
       }
@@ -143,10 +142,16 @@ function processTreeNodes(list, body, history, voiceResponse, params) {
         `/admin/index.php?r=gpt/stream/retelling-rewrite`,
         {
           userResponse,
-          slideTexts: listItem.title
+          slideTexts: stripTags(listItem.title)
         },
         (message) => resultSpan.innerText = message,
-        (error) => console.log('error', error),
+        (error) => {
+          console.log('error', error)
+          backdrop.setErrorText(error, () => {
+            backdrop.remove()
+            stopClickHandler(targetElement)
+          })
+        },
         () => {
           if (resultSpan.innerText.length === 0) {
             backdrop.remove()
@@ -155,10 +160,16 @@ function processTreeNodes(list, body, history, voiceResponse, params) {
           retellingResponseSpan.innerText = ''
           sendMessage(`/admin/index.php?r=gpt/stream/retelling`, {
               userResponse: resultSpan.innerText,
-              slideTexts: listItem.title
+              slideTexts: stripTags(listItem.title)
             },
             (message) => retellingResponseSpan.innerText = message,
-            (error) => console.log('error', error),
+            (error) => {
+              console.log('error', error)
+              backdrop.setErrorText(error, () => {
+                backdrop.remove()
+                stopClickHandler(targetElement)
+              })
+            },
             () => {
 
               const content = rowElement.querySelector('.node-title').innerHTML
@@ -224,6 +235,8 @@ function processTreeNodes(list, body, history, voiceResponse, params) {
       }
     }
 
+    rowElement.scrollIntoView({block: 'start', behavior: 'smooth'});
+
     break
   }
 }
@@ -254,12 +267,11 @@ export default function TreeViewBody(tree, voiceResponse, history, params) {
 function createRewriteContent(text, hideCallback) {
   const wrap = document.createElement('div')
   wrap.classList.add('retelling-wrap')
-  wrap.style.backgroundColor = 'transparent'
-  wrap.style.padding = '0'
   wrap.innerHTML = `
-      <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; height: 100%; background-color: rgba(255, 255, 255, 0.5); backdrop-filter: blur(4px);">
-        <div style="margin-right: 30px; font-size: 24px" class="retelling-info-text">${text}</div>
-        <img src="/img/loading.gif" style="width: 50px" alt="..." />
+      <div class="retelling-status">
+        <div class="retelling-info-text">${text}</div>
+        <img class="retelling-loader" src="/img/loading.gif" alt="..." />
+        <button class="btn retelling-resend" type="button">Повторить</button>
       </div>
     `
   return {
@@ -268,6 +280,13 @@ function createRewriteContent(text, hideCallback) {
     },
     setText(text) {
       wrap.querySelector('.retelling-info-text').textContent = text
+    },
+    setErrorText(text, resendHandler) {
+      wrap.querySelector('.retelling-status').classList.add('retelling-status-error')
+      wrap.querySelector('.retelling-info-text').textContent = text
+      if (resendHandler !== undefined) {
+        wrap.querySelector('.retelling-resend').addEventListener('click', resendHandler)
+      }
     },
     remove() {
       wrap.remove()
@@ -307,4 +326,10 @@ async function saveUserResult(payload) {
     throw new Error(response.statusText)
   }
   return await response.json()
+}
+
+function stripTags(html) {
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return div.textContent || div.innerText || '';
 }

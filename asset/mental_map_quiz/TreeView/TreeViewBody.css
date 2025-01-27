@@ -166,3 +166,44 @@
 .node-row[data-level='1'] .node-body {
   padding-left: 30px;
 }
+
+.retelling-wrap {
+  background-color: transparent;
+  padding: 0;
+}
+
+.retelling-status {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.retelling-info-text {
+  margin-right: 30px;
+  font-size: 24px;
+}
+
+.retelling-loader {
+  width: 50px;
+}
+
+.retelling-status-error {
+  background-color: rgba(220, 53, 69, 1) !important;
+  color: white !important;
+}
+
+.retelling-status.retelling-status-error .retelling-loader {
+  display: none;
+}
+
+.retelling-resend {
+  display: none;
+}
+
+.retelling-status.retelling-status-error .retelling-resend {
+  display: block;
+}
