@@ -8,13 +8,14 @@
   padding: 4px 10px;
   border-radius: 10px;
   transition: all 200ms;
-  scroll-margin-top: 10px;
+  scroll-margin-top: 50px;
 }
 
 .node-title {
   font-size: 24px;
   line-height: 40px;
   user-select: none;
+  white-space: pre-wrap;
 }
 
 /*.node-row:hover {
@@ -207,4 +208,10 @@
 
 .retelling-status.retelling-status-error .retelling-resend {
   display: block;
+}
+
+.mental-map-notify {
+  position: absolute;
+  top: 0;
+  left: 50%;
 }
