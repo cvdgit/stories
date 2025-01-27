@@ -275,7 +275,7 @@ class MentalMapController extends Controller
 
         return array_map(static function (array $item) use ($rows): array {
             if (isset($rows[$item['id']])) {
-                $item['done'] = (int) $rows[$item['id']]['all'] > 50;
+                $item['done'] = (int) $rows[$item['id']]['all'] > 85;
                 $item['all'] = (int) $rows[$item['id']]['all'];
                 $item['hiding'] = (int) $rows[$item['id']]['hiding'];
                 $item['target'] = (int) $rows[$item['id']]['target'];
