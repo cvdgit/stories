@@ -21,6 +21,7 @@ use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\helpers\Json;
 use yii\rest\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Request;
 use yii\web\Response;
 use yii\web\User as WebUser;
@@ -79,10 +80,6 @@ class MentalMapController extends Controller
 
         $repetitionMode = $rawBody['repetition_mode'] ?? false;
 
-
-        //$treeHistory = $this->createMentalMapTreeHistory($list, $mentalMap->uuid, $user->getId());
-        //die(print_r($treeHistory));
-
         if ($mentalMap->isMentalMapAsTree()) {
             $list = $this->flatten($mentalMap->getTreeData());
             if (!$repetitionMode) {
@@ -92,9 +89,6 @@ class MentalMapController extends Controller
                 return [
                     'id' => $item['id'],
                     'done' => $item['done'] ?? false,
-                    //'all' => $item['all'] ?? 0,
-                    //'hiding' => $item['hiding'] ?? 0,
-                    //'target' => $item['target'] ?? 0,
                 ];
             }, $list);
         } else {
@@ -331,5 +325,30 @@ class MentalMapController extends Controller
             $flatArray[] = $node;
         }
         return $flatArray;
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionRestart(string $id, Response $response, WebUser $user): array
+    {
+        $response->format = Response::FORMAT_JSON;
+        $mentalMap = MentalMap::findOne($id);
+        if ($mentalMap === null) {
+            throw new NotFoundHttpException('Ментальная карта не найдена');
+        }
+
+        try {
+            $command = Yii::$app->db->createCommand();
+            $command->delete('mental_map_history', [
+                'mental_map_id' => $mentalMap->uuid,
+                'user_id' => $user->getId(),
+            ]);
+            $command->execute();
+            return ['success' => true];
+        } catch (Exception $exception) {
+            Yii::$app->errorHandler->logException($exception);
+            return ['success' => false, 'message' => 'Reset history error'];
+        }
     }
 }

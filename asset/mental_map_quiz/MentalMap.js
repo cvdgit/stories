@@ -468,9 +468,9 @@ export default function MentalMap(element, deck, params) {
     const {mentalMap: json, history, rewritePrompt} = responseJson
 
     const {treeView} = json
-
     if (treeView) {
       this.element.appendChild(TreeView({
+        id: json.id,
         name: json.name,
         tree: json.treeData,
         history,

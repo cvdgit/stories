@@ -265,18 +265,34 @@ function flatten(nodes, level = 0) {
 
 export default function TreeViewBody(tree, voiceResponse, history, params) {
 
-  const body = document.createElement('div')
-  body.classList.add('tree-body')
+  const init = () => {
+    const body = document.createElement('div')
+    body.classList.add('tree-body')
 
-  const list = flatten(tree)
-  list.map(node => {
-    body.appendChild(createRow(node))
-  })
+    const list = flatten(tree)
+    list.map(node => {
+      body.appendChild(createRow(node))
+    })
 
-  //const sortedList = [...list].sort((a, b) => a.level - b.level)
-  processTreeNodes(list, body, history, voiceResponse, params)
+    //const sortedList = [...list].sort((a, b) => a.level - b.level)
+    processTreeNodes(list, body, history, voiceResponse, params)
 
-  return body
+    return body
+  }
+
+  let body = init()
+
+  return {
+    getElement() {
+      return body
+    },
+    restart() {
+      body.remove()
+      history = []
+      body = init()
+      return body
+    }
+  }
 }
 
 function createRewriteContent(text, hideCallback) {
