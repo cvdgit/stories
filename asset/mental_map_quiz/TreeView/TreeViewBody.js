@@ -86,7 +86,7 @@ function createRow(node, level = 0) {
   return row;
 }
 
-function processTreeNodes(list, body, history, voiceResponse, params) {
+function processTreeNodes(list, body, history, voiceResponse, params, onEndHandler) {
   for (const listItem of list) {
 
     const rowElement = body.querySelector(`.node-row[data-node-id='${listItem.id}']`)
@@ -143,11 +143,6 @@ function processTreeNodes(list, body, history, voiceResponse, params) {
       const userResponse = finalSpan.innerHTML
       if (!userResponse) {
         rowElement.closest('.mental-map').appendChild(createNotify('Речи не обнаружено'))
-        /*$(rowElement.querySelector('.gn'))
-          .tooltip('hide')
-          .attr('title', 'Речи не обнаружено')
-          .tooltip('fixTitle')
-          .tooltip('show')*/
         return
       }
 
@@ -208,7 +203,7 @@ function processTreeNodes(list, body, history, voiceResponse, params) {
                   history.push({id: nodeId, done: true})
                 }
 
-                processTreeNodes(list, body, history, voiceResponse, params)
+                processTreeNodes(list, body, history, voiceResponse, params, onEndHandler)
               } else {
                 if (historyItem) {
                   historyItem.done = false
@@ -254,6 +249,11 @@ function processTreeNodes(list, body, history, voiceResponse, params) {
 
     break
   }
+
+  const allIsDone = history.reduce((all, val) => all && val.done, true)
+  if (allIsDone && typeof onEndHandler === "function") {
+    onEndHandler()
+  }
 }
 
 function flatten(nodes, level = 0) {
@@ -263,19 +263,11 @@ function flatten(nodes, level = 0) {
   ])
 }
 
-export default function TreeViewBody(tree, voiceResponse, history, params) {
+export default function TreeViewBody(tree, voiceResponse, history, params, onEndHandler) {
 
   const init = () => {
     const body = document.createElement('div')
     body.classList.add('tree-body')
-
-    const list = flatten(tree)
-    list.map(node => {
-      body.appendChild(createRow(node))
-    })
-
-    //const sortedList = [...list].sort((a, b) => a.level - b.level)
-    processTreeNodes(list, body, history, voiceResponse, params)
 
     return body
   }
@@ -286,10 +278,20 @@ export default function TreeViewBody(tree, voiceResponse, history, params) {
     getElement() {
       return body
     },
+    init() {
+      const list = flatten(tree)
+      list.map(node => {
+        body.appendChild(createRow(node))
+      })
+
+      //const sortedList = [...list].sort((a, b) => a.level - b.level)
+      processTreeNodes(list, body, history, voiceResponse, params, onEndHandler)
+    },
     restart() {
       body.remove()
-      history = []
+      history = history.map(h => ({...h, done: false, all: 0}))
       body = init()
+      this.init()
       return body
     }
   }

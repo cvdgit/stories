@@ -22,11 +22,8 @@ export default function TreeView({id, name, tree, history, params}, voiceRespons
   header.innerHTML = `<h2 class="h3 text-center">${name}</h2>`
   wrap.appendChild(header)
 
-  const body = TreeViewBody(tree, voiceResponse, history, params)
-  wrap.appendChild(body.getElement())
-
-  const allIsDone = history.reduce((all, val) => all && val.done, true)
-  if (allIsDone) {
+  const body = TreeViewBody(tree, voiceResponse, history, params, () => {
+    console.log('finish')
     const elem = createFinishContent(async () => {
       const response = await restartMentalMap(id)
       if (response?.success) {
@@ -35,7 +32,9 @@ export default function TreeView({id, name, tree, history, params}, voiceRespons
       }
     })
     wrap.appendChild(elem.getElement())
-  }
+  })
+  wrap.appendChild(body.getElement())
+  body.init()
 
   return wrap
 }
