@@ -57,7 +57,7 @@ class ImportQuestionService
         $wordIds = array_keys($wordIds);
         $words = TestWord::find()->where(['in', 'id', $wordIds])->all();
 
-        $wordProcessor = new DefaultWordProcessor($words, $form->number_answers);
+        $wordProcessor = new DefaultWordProcessor($words, (int)$form->number_answers);
         $questions = $this->processWordList($wordList->testWords, $wordProcessor);
         $this->createDefaultQuestions($testingId, $questions);
     }
