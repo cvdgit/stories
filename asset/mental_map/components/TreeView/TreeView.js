@@ -91,7 +91,7 @@ export default function TreeView({texts}) {
               generateNodeProps={({node, path}) => ({
                 title: (
                   <div
-                    style={{whiteSpace: "pre-wrap"}}
+                    style={{whiteSpace: "pre-wrap", overflow: "auto"}}
                     className="node-title"
                     onClick={() => {
                       setCurrentNode({
