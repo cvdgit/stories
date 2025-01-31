@@ -169,9 +169,14 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
             return
           }
           retellingResponseSpan.innerText = ''
-          sendMessage(`/admin/index.php?r=gpt/stream/retelling`, {
+          sendMessage(`/admin/index.php?r=gpt/stream/retelling-tree`, {
               userResponse: resultSpan.innerText,
-              slideTexts: stripTags(listItem.title)
+              slideTexts: stripTags(listItem.title),
+              importantWords: $(`<div>${listItem.title}</div>`)
+                .find('span.target-text')
+                .map((i, el) => removePunctuation($(el).text()))
+                .get()
+                .join(', ')
             },
             (message) => retellingResponseSpan.innerText = message,
             (error) => {
@@ -191,10 +196,11 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
                 console.log('no json')
                 return
               }
-              const val = Number(json?.overall_similarity)
+              const val = Number(json?.similarity_percentage)
+              const importantWordsPassed = Boolean(json?.all_important_words_included)
 
               const historyItem = history.find(i => i.id === nodeId)
-              if (val > 85) {
+              if (val > 85 && importantWordsPassed) {
                 nodeStatusElement.innerHTML = nodeStatusSuccessHtml
 
                 if (historyItem) {
@@ -216,7 +222,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
               saveUserResult({
                 ...params,
                 image_fragment_id: nodeId,
-                overall_similarity: Number(json?.overall_similarity),
+                overall_similarity: Number(json?.similarity_percentage),
                 text_hiding_percentage: 0, // textHidingPercentage,
                 text_target_percentage: 0, // textTargetPercentage,
                 content,
@@ -383,3 +389,5 @@ function createNotify(text) {
 
   return div
 }
+
+const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")

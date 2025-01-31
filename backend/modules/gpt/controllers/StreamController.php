@@ -394,21 +394,21 @@ class StreamController extends Controller
         $slideTexts = $payload["slideTexts"];
 
         $content = <<<TEXT
-            Исходный текст:
-            ```
-            $slideTexts
-            ```
-            Пересказ:
-            ```
-            $userResponse
-            ```
-            Изложи исходный текст полностью  по предложениям.
-            Укажи степень сходства каждого сведения исходного текста с пересказом в процентах.
-            Укажи общую степень сходства сведений исходного текста и пересказа в процентах.
-            Ответь в формате json.
-            В ответе не используй символы unicode.
-            Пример: {"sentences_similarity": [{"original": "Оригинальное предложение", "rewrite": "Предложение, пересказанное пользователем", "similarity": "Процент сходства, целое число"}], "overall_similarity": "Итоговый процент сходства, целое число"}
-            TEXT;
+Исходный текст:
+```
+$slideTexts
+```
+Пересказ:
+```
+$userResponse
+```
+Изложи исходный текст полностью  по предложениям.
+Укажи степень сходства каждого сведения исходного текста с пересказом в процентах.
+Укажи общую степень сходства сведений исходного текста и пересказа в процентах.
+Ответь в формате json.
+В ответе не используй символы unicode.
+Пример: {"sentences_similarity": [{"original": "Оригинальное предложение", "rewrite": "Предложение, пересказанное пользователем", "similarity": "Процент сходства, целое число"}], "overall_similarity": "Итоговый процент сходства, целое число"}
+TEXT;
 
         $message = [
             "role" => "user",
@@ -760,6 +760,71 @@ class StreamController extends Controller
         try {
             $this->chatEventStream->send(
                 "question",
+                Yii::$app->params["gpt.api.completions.host"],
+                Json::encode($fields),
+            );
+        } catch (Exception $ex) {
+            Yii::$app->errorHandler->logException($ex);
+        }
+    }
+
+    public function actionRetellingTree(Request $request): void
+    {
+        $payload = Json::decode($request->rawBody);
+        $userResponse = $payload["userResponse"];
+        $slideTexts = $payload["slideTexts"];
+        $importantWords = $payload['importantWords'] ?? '';
+
+        $content = <<<TEXT
+Ты занимаешься сравнением и анализом двух текстов - исходного и пересказа.
+Исходный текст:
+```
+$slideTexts
+```
+Пересказ:
+```
+$userResponse
+```
+```
+$importantWords
+```
+
+Твоя задача сравнить исходный текст и пересказ и вычислить степень сходства пересказа с исходным текстом в процентах.
+Также необходимо определить все ли важные слова есть в пересказе.
+
+В ответе не используй символы unicode.
+Ответь в формате json
+Пример:
+{
+  "similarity_percentage": integer // Результат сравнения,
+  "all_important_words_included": boolean, // true только если ВСЕ важные слова присутствуют в пересказе
+  "user_response": string, // пересказ
+  "important_words": [string] // важные слова, которые есть в пересказе
+}
+TEXT;
+
+        $message = [
+            "role" => "user",
+            "content" => trim($content),
+        ];
+
+        $fields = [
+            "input" => [
+                "messages" => [
+                    $message,
+                ],
+            ],
+            "config" => [
+                "metadata" => [
+                    "conversation_id" => Uuid::uuid4()->toString(),
+                ],
+            ],
+            "include_names" => [],
+        ];
+
+        try {
+            $this->chatEventStream->send(
+                "retelling",
                 Yii::$app->params["gpt.api.completions.host"],
                 Json::encode($fields),
             );

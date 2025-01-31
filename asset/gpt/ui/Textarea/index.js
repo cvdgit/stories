@@ -37,13 +37,13 @@ export const Textarea = forwardRef((props, ref) => {
   }
 
   const handleKeyPress = (event) => {
-    if (event.key === "Enter") {
+    /*if (event.key === "Enter") {
       event.preventDefault();
     }
     if (event.shiftKey && event.key === "Enter") {
       setContent(content + "\n");
       event.preventDefault();
-    }
+    }*/
   }
 
   return (
@@ -52,7 +52,7 @@ export const Textarea = forwardRef((props, ref) => {
         <textarea
           ref={ref}
           rows={rows}
-          style={{ height }}
+          style={{ height, maxHeight: '300px' }}
           onChange={handleChange}
           placeholder={placeholder}
           onKeyDown={handleKeyPress}

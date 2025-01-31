@@ -155,18 +155,18 @@ class ChatController extends Controller
                         "created_at" => time(),
                     ])
                     ->execute();
-                break;
+                return ['success' => true];
             case "modify":
                 break;
             case "remove":
                 $isUserMessage = (new Query())
                     ->from(["c" => "conversation"])
+                    ->innerJoin(["cm" => "conversation_message"], "c.uuid = cm.conversation_uuid")
                     ->where([
                         "c.uuid" => $payload["conversation_id"],
-                        "c.user_id" => $user->getId()
+                        "c.user_id" => $user->getId(),
+                        "cm.uuid" => $payload["id"],
                     ])
-                    ->innerJoin(["cm" => "conversation_message", "c.uuid = cm.conversation_uuid"])
-                    ->andWhere(["cm.uuid" => $payload["id"]])
                     ->exists();
                 if ($isUserMessage) {
                     \Yii::$app->db->createCommand()
@@ -174,10 +174,10 @@ class ChatController extends Controller
                             "uuid" => $payload["id"],
                         ])
                         ->execute();
+                    return ['success' => true];
                 }
-                break;
         }
 
-        return ["success" => true];
+        return ["success" => false];
     }
 }

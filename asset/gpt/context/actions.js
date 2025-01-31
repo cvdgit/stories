@@ -72,7 +72,7 @@ export default function action(state, dispatch) {
         const controller = new AbortController();
 
         try {
-
+          const messId = uuidv4()
           const res = await fetchStream({
             messages: messages.map((item) => {
               const {sentTime, id, ...rest} = item;
@@ -90,7 +90,7 @@ export default function action(state, dispatch) {
                     content,
                     role: "assistant",
                     sentTime: Date.now(),
-                    id: Date.now(),
+                    id: messId,
                   },
                 ],
               });
@@ -108,7 +108,7 @@ export default function action(state, dispatch) {
                 content,
                 role: "assistant",
                 sentTime: Date.now(),
-                id: Date.now(),
+                id: messId,
                 conversation_id: chat[currentChat].id
               })
             },
@@ -189,7 +189,7 @@ export default function action(state, dispatch) {
           : {
             role: "user",
             content,
-            id: Date.now(),
+            id: uuidv4(),
           };
       setState({is: {...state.is, typing: true}, typingMessage});
     },
@@ -210,6 +210,7 @@ export default function action(state, dispatch) {
       setState({
         chat,
       });
+      console.log(messages, chat, removedMessage)
       saveMessages("remove", {
         id: removedMessage[0].id,
         conversation_id: chat[state.currentChat].id
