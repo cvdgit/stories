@@ -832,7 +832,8 @@ p.wikids-test-description {
 }
 
 .test-recognition .recognition-result-wrapper {
-	min-height: 100px;
+  margin-bottom: 100px;
+  position: relative;
 }
 
 .test-recognition .recognition-repeat-word {
@@ -2207,4 +2208,66 @@ p.wikids-test-description {
   padding-bottom: 10px;
   font-size: 14px;
   border-bottom: 1px #808080 solid;
+}
+
+.recognition-voice-anim-wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+}
+
+#recognition-voice-anim {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: scale(.5);
+}
+
+#recognition-voice-anim.no-anim .bar {
+  animation-duration: unset !important;
+}
+
+.bar {
+  background: #52467b;
+  bottom: 1px;
+  height: 3px;
+  width: 10px;
+  margin: 0px 4px;
+  border-radius: 5px;
+  animation: sound 0ms -600ms linear infinite alternate;
+}
+
+@keyframes sound {
+  0% {
+    opacity: .35;
+    height: 3px;
+  }
+  100% {
+    opacity: 1;
+    height: 70px;
+  }
+}
+
+.bar:nth-child(1)  { left: 1px; animation-duration: 474ms; }
+.bar:nth-child(2)  { left: 15px; animation-duration: 433ms; }
+.bar:nth-child(3)  { left: 29px; animation-duration: 407ms; }
+.bar:nth-child(4)  { left: 43px; animation-duration: 458ms; }
+.bar:nth-child(5)  { left: 57px; animation-duration: 400ms; }
+.bar:nth-child(6)  { left: 71px; animation-duration: 427ms; }
+.bar:nth-child(7)  { left: 85px; animation-duration: 441ms; }
+.bar:nth-child(8)  { left: 99px; animation-duration: 419ms; }
+.bar:nth-child(9)  { left: 113px; animation-duration: 487ms; }
+.bar:nth-child(10) { left: 127px; animation-duration: 442ms; }
+
+.retelling-response {
+  display: none;
 }

@@ -5,6 +5,7 @@ const MissingWordsRecognition = function(config) {
   recorder.continuous = true;
   recorder.interimResults = true;
   recorder.lang = config.getRecordingLang() || 'ru-RU';
+  console.log(recorder.lang)
 
   var recognizing = false;
   var startTimestamp = null;
@@ -42,6 +43,13 @@ const MissingWordsRecognition = function(config) {
         finalTranscript = event.results[i][0].transcript;
       } else {
         interimTranscript += event.results[i][0].transcript;
+        dispatchEvent({
+          type: 'onInterimResult',
+          args: {
+            target: targetElement,
+            result: linebreak(interimTranscript),
+          }
+        });
       }
     }
 

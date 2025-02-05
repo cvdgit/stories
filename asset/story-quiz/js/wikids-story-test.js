@@ -2967,6 +2967,9 @@ function WikidsStoryTest(el, options) {
   };
 
   this.showNextButton = function () {
+    /*if (dom.controls.is(':hidden')) {
+      dom.controls.show()
+    }*/
     dom.nextButton.show();
   };
 
