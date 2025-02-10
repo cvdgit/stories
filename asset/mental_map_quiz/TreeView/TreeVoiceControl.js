@@ -42,10 +42,18 @@ export default function TreeVoiceControl(
 
   elem.querySelector('.gn').addEventListener('click', e => {
 
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
-
+    if ($(e.target).data('abort')) {
       mediaStream.getTracks().forEach( (track) => track.stop())
+      mediaRecorder.stop()
+      resetChunks()
+      elem.querySelector('.gn').classList.remove('recording')
+      elem.querySelector('.pulse-ring').remove()
+      stopClickHandler(e.target)
+      return
+    }
 
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaStream.getTracks().forEach( (track) => track.stop())
       mediaRecorder.stop()
       elem.querySelector('.gn').classList.remove('recording')
       elem.querySelector('.pulse-ring').remove()
@@ -74,7 +82,9 @@ export default function TreeVoiceControl(
 
         mediaRecorder.onstop = () => {
           if (typeof processChunksHandler === 'function') {
-            processChunksHandler(e.target, chunks, resetChunks)
+            const abort = $(e.target).data('abort')
+            $(e.target).data('abort', false)
+            processChunksHandler(e.target, chunks, resetChunks, abort)
           }
         }
 

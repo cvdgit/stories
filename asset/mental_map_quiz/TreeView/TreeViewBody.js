@@ -51,7 +51,9 @@ function createRow(node, level = 0) {
       return
     }
     if (e.target.classList.contains('selected')) {
-      row.querySelector('.node-control .gn').click()
+      const el = row.querySelector('.node-control .gn')
+      $(el).data('abort', true)
+      el.click()
     }
   })
 
@@ -241,7 +243,10 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
       voiceResponse,
       startClickHandler,
       stopClickHandler,
-      (targetElement, chunks, resetChunks) => {
+      (targetElement, chunks, resetChunks, abort) => {
+        if (abort) {
+          return
+        }
 
         const rootElement = targetElement.closest('.node-row')
         const backdrop = createRewriteContent('Обработка ответа...')
