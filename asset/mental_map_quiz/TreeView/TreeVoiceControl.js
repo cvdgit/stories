@@ -1,10 +1,17 @@
 /**
  * @param {VoiceResponse} voiceResponse
- * @param clickHandler
+ * @param startClickHandler
+ * @param stopClickHandler
+ * @param processChunksHandler
  * @returns {HTMLDivElement}
  * @constructor
  */
-export default function TreeVoiceControl(voiceResponse, startClickHandler, stopClickHandler) {
+export default function TreeVoiceControl(
+  voiceResponse,
+  startClickHandler,
+  stopClickHandler,
+  processChunksHandler
+) {
   const elem = document.createElement('div')
   elem.classList.add('question-voice')
   elem.style.bottom = '0'
@@ -18,15 +25,63 @@ export default function TreeVoiceControl(voiceResponse, startClickHandler, stopC
             </div>
         </div>`
 
-  if (voiceResponse.getStatus()) {
+  /*if (voiceResponse.getStatus()) {
     const ring = document.createElement('div')
     ring.classList.add('pulse-ring')
     elem.querySelector('.question-voice__inner').insertBefore(ring, elem.querySelector('.gn'))
     elem.querySelector('.gn').classList.add('recording')
-  }
+  }*/
+
+  /** @type {MediaRecorder|null} */
+  let mediaRecorder
+  /** @type {MediaStream|null} */
+  let mediaStream
+  let chunks = []
+
+  const resetChunks = () => chunks = []
 
   elem.querySelector('.gn').addEventListener('click', e => {
-    if (voiceResponse.getStatus()) {
+
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+
+      mediaStream.getTracks().forEach( (track) => track.stop())
+
+      mediaRecorder.stop()
+      elem.querySelector('.gn').classList.remove('recording')
+      elem.querySelector('.pulse-ring').remove()
+      stopClickHandler(e.target)
+      return
+    }
+
+    if (startClickHandler(e.target) === false) {
+      return
+    }
+
+    navigator.mediaDevices.getUserMedia({audio: true})
+      .then((stream) => {
+
+        mediaStream = stream
+
+        const ring = document.createElement('div')
+        ring.classList.add('pulse-ring')
+        elem.querySelector('.question-voice__inner').insertBefore(ring, elem.querySelector('.gn'))
+        elem.querySelector('.gn').classList.add('recording')
+
+        mediaRecorder = new MediaRecorder(stream, {mimeType: 'audio/webm'})
+        mediaRecorder.start()
+
+        mediaRecorder.ondataavailable = (e) => chunks.push(e.data)
+
+        mediaRecorder.onstop = () => {
+          if (typeof processChunksHandler === 'function') {
+            processChunksHandler(e.target, chunks, resetChunks)
+          }
+        }
+
+      })
+      .catch(error => console.log('error', error))
+
+    /*if (voiceResponse.getStatus()) {
       voiceResponse.stop((args) => {
         elem.querySelector('.gn').classList.remove('recording')
         elem.querySelector('.pulse-ring').remove()
@@ -44,7 +99,8 @@ export default function TreeVoiceControl(voiceResponse, startClickHandler, stopC
           elem.querySelector('.gn').classList.add('recording')
         });
       }, 500);
-    }
+    }*/
+
   })
 
   return elem

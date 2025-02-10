@@ -3,19 +3,19 @@ import TreeVoiceControl from "./TreeVoiceControl";
 import sendMessage from "../lib/sendMessage";
 
 const nodeStatusSuccessHtml = `
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+<div class="retelling-status-show"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
      stroke="currentColor" class="retelling-success">
     <path stroke-linecap="round" stroke-linejoin="round"
           d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-</svg>
+</svg></div>
 `
 
 const nodeStatusFailedHtml = `
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+<div class="retelling-status-show"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
      class="retelling-failed">
     <path stroke-linecap="round" stroke-linejoin="round"
           d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-</svg>
+</svg></div>
 `
 
 function createRow(node, level = 0) {
@@ -112,7 +112,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
 
       $(rowElement.querySelector('.gn'))
         .tooltip('hide')
-        .attr('title', 'Остановить запись')
+        .attr('title', 'Остановить запись и запустить проверку')
         .tooltip('fixTitle')
 
       finalSpan.innerHTML = ''
@@ -123,10 +123,10 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
       rowElement.classList.add('current-row')
       rowElement.parentNode.classList.add('do-recording')
 
-      voiceResponse.onResult(args => {
+      /*voiceResponse.onResult(args => {
         finalSpan.innerHTML = args.args?.result
         interimSpan.innerHTML = args.args?.interim
-      })
+      })*/
     }
 
     const stopClickHandler = targetElement => {
@@ -140,16 +140,13 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
       rowElement.parentNode.classList.remove('do-recording')
       rowElement.querySelectorAll('.target-text').forEach(el => el.classList.remove('selected'))
 
-      const userResponse = finalSpan.innerHTML
+      /*const userResponse = finalSpan.innerHTML
       if (!userResponse) {
         rowElement.closest('.mental-map').appendChild(createNotify('Речи не обнаружено'))
         return
-      }
+      }*/
 
-      const rootElement = targetElement.closest('.node-row')
-      const backdrop = createRewriteContent('Обработка ответа...')
-      rootElement.appendChild(backdrop.getElement())
-
+      /*
       sendMessage(
         `/admin/index.php?r=gpt/stream/retelling-rewrite`,
         {
@@ -236,10 +233,148 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
             }
           )
         }
-      )
+      )*/
     }
 
-    const treeVoiceControlElement = TreeVoiceControl(voiceResponse, startClickHandler, stopClickHandler)
+    // const treeVoiceControlElement = TreeVoiceControl(voiceResponse, startClickHandler, stopClickHandler)
+    const treeVoiceControlElement = TreeVoiceControl(
+      voiceResponse,
+      startClickHandler,
+      stopClickHandler,
+      (targetElement, chunks, resetChunks) => {
+
+        const rootElement = targetElement.closest('.node-row')
+        const backdrop = createRewriteContent('Обработка ответа...')
+        rootElement.appendChild(backdrop.getElement())
+
+        const blob = new Blob(chunks, {type: 'audio/webm'})
+
+        resetChunks()
+
+        const formData = new FormData()
+
+        const file = new File([blob], Math.floor(1000 + Math.random() * 9000) + '.webm', {
+          type: 'audio/webm',
+        })
+
+        formData.append('audio', file, (new Date().getTime()) + '.webm')
+        formData.append('_csrf-wikids', $('meta[name=csrf-token]').attr('content'))
+
+        fetch(`/audio/transcriptions`, {
+          method: 'POST',
+          body: formData,
+        })
+          .then((response) => {
+            if (!response.ok) {
+              rowElement.closest('.mental-map').appendChild(createNotify("HTTP error " + response.status))
+              backdrop.remove()
+              return
+            }
+            return response.json();
+          })
+          .then((response) => {
+            if (response && response?.success) {
+              const {text, error} = response?.data || {}
+              if (error) {
+                rowElement.closest('.mental-map').appendChild(createNotify(error.message))
+                backdrop.remove()
+                return
+              }
+              if (text) {
+                console.log(text)
+                resultSpan.innerText = text
+
+                if (resultSpan.innerText.length === 0) {
+                  backdrop.remove()
+                  return
+                }
+                retellingResponseSpan.innerText = ''
+                sendMessage(`/admin/index.php?r=gpt/stream/retelling-tree`, {
+                    userResponse: resultSpan.innerText,
+                    slideTexts: stripTags(listItem.title),
+                    importantWords: $(`<div>${listItem.title}</div>`)
+                      .find('span.target-text')
+                      .map((i, el) => removePunctuation($(el).text()))
+                      .get()
+                      .join(', ')
+                  },
+                  (message) => retellingResponseSpan.innerText = message,
+                  (error) => {
+                    backdrop.setErrorText(error, () => {
+                      backdrop.remove()
+                      stopClickHandler(targetElement)
+                    })
+                  },
+                  () => {
+
+                    const content = rowElement.querySelector('.node-title').innerHTML
+
+                    backdrop.remove()
+
+                    const json = processOutputAsJson(retellingResponseSpan.innerText)
+                    if (json === null) {
+                      console.log('no json')
+                      return
+                    }
+                    const val = Number(json?.similarity_percentage)
+                    const importantWordsPassed = Boolean(json?.all_important_words_included)
+
+                    const historyItem = history.find(i => i.id === nodeId)
+                    historyItem.json = retellingResponseSpan.innerHTML
+                    historyItem.user_response = resultSpan.innerHTML
+                    if (val > 85 && importantWordsPassed) {
+                      nodeStatusElement.innerHTML = nodeStatusSuccessHtml
+
+                      if (historyItem) {
+                        historyItem.done = true
+                      } else {
+                        history.push({id: nodeId, done: true})
+                      }
+
+                      processTreeNodes(list, body, history, voiceResponse, params, onEndHandler)
+                    } else {
+                      if (historyItem) {
+                        historyItem.done = false
+                      } else {
+                        history.push({id: nodeId, done: false})
+                      }
+                      nodeStatusElement.innerHTML = nodeStatusFailedHtml
+                    }
+
+                    nodeStatusElement.querySelector('.retelling-status-show').addEventListener('click', e => {
+                      const nodeId = e.target.closest('.node-row').dataset.nodeId
+                      const item = history.find(i => i.id === nodeId)
+                      const content = createRetellingFeedbackContent(listItem.title, item.user_response, item.json)
+                      rowElement.closest('.mental-map').appendChild(content)
+                    })
+
+                    saveUserResult({
+                      ...params,
+                      image_fragment_id: nodeId,
+                      overall_similarity: Number(json?.similarity_percentage),
+                      text_hiding_percentage: 0, // textHidingPercentage,
+                      text_target_percentage: 0, // textTargetPercentage,
+                      content,
+                      user_response: resultSpan.innerText,
+                      api_response: json
+                    }).then(response => {
+                      if (response && response?.success) {
+                        historyItem.all = response.history.all
+                        historyItem.hiding = response.history.hiding
+                        historyItem.target = response.history.target
+                      }
+                    })
+                  }
+                )
+              }
+            }
+          })
+          .catch(function (error) {
+            console.error("Error sending audio data to server:", error);
+            return false;
+          });
+      }
+    )
 
     rowElement.querySelector('.node-control').appendChild(treeVoiceControlElement)
 
@@ -286,11 +421,7 @@ export default function TreeViewBody(tree, voiceResponse, history, params, onEnd
     },
     init() {
       const list = flatten(tree)
-      list.map(node => {
-        body.appendChild(createRow(node))
-      })
-
-      //const sortedList = [...list].sort((a, b) => a.level - b.level)
+      list.map(node => body.appendChild(createRow(node)))
       processTreeNodes(list, body, history, voiceResponse, params, onEndHandler)
     },
     restart() {
@@ -391,3 +522,35 @@ function createNotify(text) {
 }
 
 const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
+
+function createRetellingFeedbackContent(text, userResponse, apiResponse) {
+  const wrap = document.createElement('div')
+  wrap.classList.add('feedback-content-wrap')
+  wrap.innerHTML = `<div class="feedback-content-backdrop"></div>
+<div class="feedback-content">
+    <div style="height: 100%; max-height: 100%; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden">
+        <div><div style="margin-bottom: 20px">
+                    <p style="font-weight: 500;color: black !important;">Исходный текст:</p>
+                    <p style="color: black !important">${text}</p>
+                </div>
+                <div style="margin-bottom: 20px">
+                    <p style="font-weight: 500; color: black !important">После обработки:</p>
+                    <p style="color: black !important">${userResponse}</p>
+                </div></div>
+
+        <div style="overflow-y: scroll">
+            <p style="font-weight: 500;">Результат сравнения:</p>
+            <div style="font-size: 2.2rem; text-align: left; line-height: 3rem">${apiResponse}</div>
+        </div>
+    </div>
+    <div style="display: flex; margin-top: 10px; flex-direction: row; align-items: center; justify-content: center">
+        <button type="button" class="btn close-dialog">OK</button>
+    </div>
+</div>
+    `
+
+  wrap.querySelector('.close-dialog')
+    .addEventListener('click', () => wrap.remove())
+
+  return wrap
+}
