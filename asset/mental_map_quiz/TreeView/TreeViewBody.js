@@ -322,7 +322,11 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
                       return
                     }
                     const val = Number(json?.similarity_percentage)
-                    const importantWordsPassed = Boolean(json?.all_important_words_included)
+                    let importantWordsPassed = true
+
+                    if (json?.all_important_words_included !== undefined) {
+                      importantWordsPassed = Boolean(json?.all_important_words_included)
+                    }
 
                     const historyItem = history.find(i => i.id === nodeId)
                     historyItem.json = retellingResponseSpan.innerHTML
