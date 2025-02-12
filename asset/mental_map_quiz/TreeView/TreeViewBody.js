@@ -88,7 +88,7 @@ function createRow(node, level = 0) {
   return row;
 }
 
-function processTreeNodes(list, body, history, voiceResponse, params, onEndHandler) {
+function processTreeNodes(list, body, history, voiceResponse, params, onEndHandler, dispatchEvent) {
   for (const listItem of list) {
 
     const rowElement = body.querySelector(`.node-row[data-node-id='${listItem.id}']`)
@@ -350,6 +350,10 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
                       nodeStatusElement.innerHTML = nodeStatusFailedHtml
                     }
 
+                    dispatchEvent('historyChange', {
+                      currentHistory: history
+                    })
+
                     nodeStatusElement.querySelector('.retelling-status-show').addEventListener('click', e => {
                       const nodeId = e.target.closest('.node-row').dataset.nodeId
                       const item = history.find(i => i.id === nodeId)
@@ -418,8 +422,14 @@ export default function TreeViewBody(tree, voiceResponse, history, params, onEnd
   const init = () => {
     const body = document.createElement('div')
     body.classList.add('tree-body')
-
     return body
+  }
+
+  function dispatchEvent(type, args) {
+    const event = document.createEvent('HTMLEvents', 1, 2);
+    event.initEvent(type, true, true);
+    extend(event, args);
+    body.dispatchEvent(event);
   }
 
   let body = init()
@@ -431,7 +441,7 @@ export default function TreeViewBody(tree, voiceResponse, history, params, onEnd
     init() {
       const list = flatten(tree)
       list.map(node => body.appendChild(createRow(node)))
-      processTreeNodes(list, body, history, voiceResponse, params, onEndHandler)
+      processTreeNodes(list, body, history, voiceResponse, params, onEndHandler, dispatchEvent)
     },
     restart() {
       body.remove()
@@ -439,6 +449,9 @@ export default function TreeViewBody(tree, voiceResponse, history, params, onEnd
       body = init()
       this.init()
       return body
+    },
+    on(type, listener, useCapture) {
+      body.addEventListener(type, listener, useCapture)
     }
   }
 }
@@ -562,4 +575,11 @@ function createRetellingFeedbackContent(text, userResponse, apiResponse) {
     .addEventListener('click', () => wrap.remove())
 
   return wrap
+}
+
+function extend(a, b) {
+  for (let i in b) {
+    a[i] = b[i];
+  }
+  return a;
 }
