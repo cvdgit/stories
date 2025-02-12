@@ -175,11 +175,6 @@
   padding-left: 30px;
 }
 
-.retelling-wrap {
-  background-color: transparent;
-  padding: 0;
-}
-
 .retelling-status {
   display: flex;
   flex-direction: row;
@@ -291,4 +286,8 @@
 
 .feedback-content p {
   color: black !important;
+}
+
+.retelling-status-show {
+  cursor: pointer;
 }

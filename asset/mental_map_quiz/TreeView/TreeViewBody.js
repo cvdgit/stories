@@ -122,6 +122,8 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
       resultSpan.innerHTML = ''
       rowElement.querySelectorAll('.target-text').forEach(el => el.classList.add('selected'))
 
+      rowElement.querySelector('.node-status').innerHTML = ''
+
       rowElement.classList.add('current-row')
       rowElement.parentNode.classList.add('do-recording')
 
@@ -257,11 +259,9 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
         resetChunks()
 
         const formData = new FormData()
-
         const file = new File([blob], Math.floor(1000 + Math.random() * 9000) + '.webm', {
           type: 'audio/webm',
         })
-
         formData.append('audio', file, (new Date().getTime()) + '.webm')
         formData.append('_csrf-wikids', $('meta[name=csrf-token]').attr('content'))
 
@@ -278,109 +278,115 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
             return response.json();
           })
           .then((response) => {
-            if (response && response?.success) {
-              const {text, error} = response?.data || {}
-              if (error) {
-                rowElement.closest('.mental-map').appendChild(createNotify(error.message))
-                backdrop.remove()
-                return
-              }
-              if (text) {
-                console.log(text)
-                resultSpan.innerText = text
+            if (!response?.success) {
+              return
+            }
 
-                if (resultSpan.innerText.length === 0) {
+            const {text, error} = response?.data || {}
+            if (error) {
+              rowElement.closest('.mental-map').appendChild(createNotify(error.message))
+              backdrop.remove()
+              return
+            }
+
+            resultSpan.innerText = text
+            if (!text) {
+              rowElement.closest('.mental-map').appendChild(createNotify('Нет текста в ответе'))
+              backdrop.remove()
+              return
+            }
+
+            console.log(text)
+
+            retellingResponseSpan.innerText = ''
+            sendMessage(`/admin/index.php?r=gpt/stream/retelling-tree`, {
+                userResponse: resultSpan.innerText,
+                slideTexts: stripTags(listItem.title),
+                importantWords: $(`<div>${listItem.title}</div>`)
+                  .find('span.target-text')
+                  .map((i, el) => removePunctuation($(el).text()))
+                  .get()
+                  .join(', ')
+              },
+              (message) => retellingResponseSpan.innerText = message,
+              (error) => {
+                backdrop.setErrorText(error, () => {
                   backdrop.remove()
+                  stopClickHandler(targetElement)
+                })
+              },
+              () => {
+
+                const content = rowElement.querySelector('.node-title').innerHTML
+
+                backdrop.remove()
+
+                const json = processOutputAsJson(retellingResponseSpan.innerText)
+                if (json === null) {
+                  console.log('no json')
                   return
                 }
-                retellingResponseSpan.innerText = ''
-                sendMessage(`/admin/index.php?r=gpt/stream/retelling-tree`, {
-                    userResponse: resultSpan.innerText,
-                    slideTexts: stripTags(listItem.title),
-                    importantWords: $(`<div>${listItem.title}</div>`)
-                      .find('span.target-text')
-                      .map((i, el) => removePunctuation($(el).text()))
-                      .get()
-                      .join(', ')
-                  },
-                  (message) => retellingResponseSpan.innerText = message,
-                  (error) => {
-                    backdrop.setErrorText(error, () => {
-                      backdrop.remove()
-                      stopClickHandler(targetElement)
-                    })
-                  },
-                  () => {
+                const val = Number(json?.similarity_percentage)
+                let importantWordsPassed = true
 
-                    const content = rowElement.querySelector('.node-title').innerHTML
+                if (json?.all_important_words_included !== undefined) {
+                  importantWordsPassed = Boolean(json?.all_important_words_included)
+                }
 
-                    backdrop.remove()
+                const historyItem = history.find(i => i.id === nodeId)
+                historyItem.json = retellingResponseSpan.innerHTML
+                historyItem.user_response = resultSpan.innerHTML
+                if (val > 85 && importantWordsPassed) {
+                  nodeStatusElement.innerHTML = nodeStatusSuccessHtml
 
-                    const json = processOutputAsJson(retellingResponseSpan.innerText)
-                    if (json === null) {
-                      console.log('no json')
-                      return
-                    }
-                    const val = Number(json?.similarity_percentage)
-                    let importantWordsPassed = true
-
-                    if (json?.all_important_words_included !== undefined) {
-                      importantWordsPassed = Boolean(json?.all_important_words_included)
-                    }
-
-                    const historyItem = history.find(i => i.id === nodeId)
-                    historyItem.json = retellingResponseSpan.innerHTML
-                    historyItem.user_response = resultSpan.innerHTML
-                    if (val > 85 && importantWordsPassed) {
-                      nodeStatusElement.innerHTML = nodeStatusSuccessHtml
-
-                      if (historyItem) {
-                        historyItem.done = true
-                      } else {
-                        history.push({id: nodeId, done: true})
-                      }
-
-                      processTreeNodes(list, body, history, voiceResponse, params, onEndHandler)
-                    } else {
-                      if (historyItem) {
-                        historyItem.done = false
-                      } else {
-                        history.push({id: nodeId, done: false})
-                      }
-                      nodeStatusElement.innerHTML = nodeStatusFailedHtml
-                    }
-
-                    dispatchEvent('historyChange', {
-                      currentHistory: history
-                    })
-
-                    nodeStatusElement.querySelector('.retelling-status-show').addEventListener('click', e => {
-                      const nodeId = e.target.closest('.node-row').dataset.nodeId
-                      const item = history.find(i => i.id === nodeId)
-                      const content = createRetellingFeedbackContent(listItem.title, item.user_response, item.json)
-                      rowElement.closest('.mental-map').appendChild(content)
-                    })
-
-                    saveUserResult({
-                      ...params,
-                      image_fragment_id: nodeId,
-                      overall_similarity: Number(json?.similarity_percentage),
-                      text_hiding_percentage: 0, // textHidingPercentage,
-                      text_target_percentage: 0, // textTargetPercentage,
-                      content,
-                      user_response: resultSpan.innerText,
-                      api_response: json
-                    }).then(response => {
-                      if (response && response?.success) {
-                        historyItem.all = response.history.all
-                        historyItem.hiding = response.history.hiding
-                        historyItem.target = response.history.target
-                      }
-                    })
+                  if (historyItem) {
+                    historyItem.done = true
+                  } else {
+                    history.push({id: nodeId, done: true})
                   }
-                )
+
+                  processTreeNodes(list, body, history, voiceResponse, params, onEndHandler)
+                } else {
+                  if (historyItem) {
+                    historyItem.done = false
+                  } else {
+                    history.push({id: nodeId, done: false})
+                  }
+                  nodeStatusElement.innerHTML = nodeStatusFailedHtml
+                }
+
+                dispatchEvent('historyChange', {
+                  currentHistory: history
+                })
+
+                nodeStatusElement.querySelector('.retelling-status-show')
+                  .addEventListener('click', e => {
+                    const nodeId = e.target.closest('.node-row').dataset.nodeId
+                    const item = history.find(i => i.id === nodeId)
+                    const content = createRetellingFeedbackContent(listItem.title, item.user_response, item.json)
+                    rowElement.closest('.mental-map').appendChild(content)
+                  })
+
+                saveUserResult({
+                  ...params,
+                  image_fragment_id: nodeId,
+                  overall_similarity: Number(json?.similarity_percentage),
+                  text_hiding_percentage: 0, // textHidingPercentage,
+                  text_target_percentage: 0, // textTargetPercentage,
+                  content,
+                  user_response: resultSpan.innerText,
+                  api_response: json
+                }).then(response => {
+                  if (response && response?.success) {
+                    historyItem.all = response.history.all
+                    historyItem.hiding = response.history.hiding
+                    historyItem.target = response.history.target
+                  }
+                })
               }
-            }
+            )
+
+
           })
           .catch(function (error) {
             console.error("Error sending audio data to server:", error);
@@ -459,6 +465,8 @@ export default function TreeViewBody(tree, voiceResponse, history, params, onEnd
 function createRewriteContent(text, hideCallback) {
   const wrap = document.createElement('div')
   wrap.classList.add('retelling-wrap')
+  wrap.style.backgroundColor = 'transparent'
+  wrap.style.padding = '0'
   wrap.innerHTML = `
       <div class="retelling-status">
         <div class="retelling-info-text">${text}</div>
