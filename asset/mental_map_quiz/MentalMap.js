@@ -131,6 +131,7 @@ export default function MentalMap(element, deck, params) {
 
   function mapImageClickHandler(image, texts, historyItem, rewritePrompt) {
     const detailImgWrap = document.createElement('div')
+    detailImgWrap.classList.add('image-item')
     const detailImg = document.createElement('img')
     detailImg.src = image.url
     detailImg.style.marginBottom = '10px'
@@ -272,7 +273,6 @@ export default function MentalMap(element, deck, params) {
 
             const textHidingPercentage = calcHiddenTextPercent(text)
             const textTargetPercentage = calcTargetTextPercent(text)
-            wrapper.querySelector('.result-item-value').innerHTML = `${val}% (${textHidingPercentage}% / ${textTargetPercentage}%)`
 
             const detailTextContent = detailText.cloneNode(true)
             detailTextContent.querySelector('.detail-text-actions').remove()
@@ -292,6 +292,11 @@ export default function MentalMap(element, deck, params) {
                 historyItem.all = response.history.all
                 historyItem.hiding = response.history.hiding
                 historyItem.target = response.history.target
+                historyItem.done = response.history.done
+
+                // wrapper.querySelector('.result-item-value').innerHTML = `${val}% (${textHidingPercentage}% / ${textTargetPercentage}%)`
+                wrapper.querySelector('.image-item > .result-item').remove()
+                wrapper.querySelector('.image-item').appendChild(FragmentResultElement(historyItem))
               }
             })
           }
@@ -428,7 +433,7 @@ export default function MentalMap(element, deck, params) {
   }
 
   function historyIsDone(history) {
-    return history.reduce((all, val) => all && val.all > 0, true)
+    return history.reduce((all, val) => all && val.done, true)
   }
 
   function initPanZoom(element, mapWidth, mapHeight) {
@@ -520,35 +525,39 @@ export default function MentalMap(element, deck, params) {
 
     const imageFirst = Boolean(json?.settings?.imageFirst)
 
+    function fragmentDialogHideHandler(image, historyItem) {
+      hideDialogHandler()
+
+      if (voiceResponse.getStatus()) {
+        voiceResponse.stop()
+      }
+
+      const el = container.querySelector(`[data-image-fragment-id='${image.id}']`)
+      el.querySelector('.image-item > .result-item').remove()
+      el.querySelector('.image-item').appendChild(FragmentResultElement(historyItem))
+      $(el.querySelector('.result-item')).tooltip()
+
+      appendAllTextWordElements(texts.find(t => t.id === image.id).words, el.querySelector('.text-item'))
+
+      if (repetitionMode) {
+        const done = mentalMapHistory.reduce((all, val) => all && val.done, true)
+        if (done) {
+          const content = createFinishRepetitionContent()
+          $(container).parents('.mental-map').append(content)
+          finishRepetition(params.mentalMapId)
+        }
+      }
+
+      if (/*getCourseMode &&*/ historyIsDone(history)) {
+        const content = createFinishContent()
+        $(container).parents('.mental-map').append(content)
+      }
+    }
+
     container.appendChild(AllTexts(texts, json.map.images, history, (image) => {
       const historyItem = history.find(h => h.id === image.id)
       const dialog = mapImageClickHandler(image, texts, historyItem, rewritePrompt)
-      dialog.onHide(() => {
-        hideDialogHandler()
-        if (voiceResponse.getStatus()) {
-          voiceResponse.stop()
-        }
-        const el = container.querySelector(`[data-image-fragment-id='${image.id}']`)
-        el.querySelector('.result-item-value').innerHTML = `${historyItem.all}% (${historyItem.hiding}% / ${historyItem.target}%)`
-        el.querySelector('.text-item').innerHTML = ''
-
-        appendAllTextWordElements(texts.find(t => t.id === image.id).words, el.querySelector('.text-item'))
-
-        if (repetitionMode) {
-          const done = mentalMapHistory.reduce((all, val) => all && val.all > 0, true)
-          if (done) {
-            const content = createFinishRepetitionContent()
-            $(container).parents('.mental-map').append(content)
-
-            finishRepetition(params.mentalMapId)
-          }
-        }
-
-        if (getCourseMode && historyIsDone(history)) {
-          const content = createFinishContent()
-          $(container).parents('.mental-map').append(content)
-        }
-      })
+      dialog.onHide(() => fragmentDialogHideHandler(image, historyItem))
     }))
 
     const toolbar = document.createElement('div')
@@ -569,24 +578,12 @@ export default function MentalMap(element, deck, params) {
         `${json.map.height}px`,
         json.map.images,
         (image) => {
-
           element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
-
           const historyItem = history.find(h => h.id === image.id)
           const dialog = mapImageClickHandler(image, texts, historyItem)
-
           dialog.onHide(() => {
             element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
-            hideDialogHandler()
-            if (voiceResponse.getStatus()) {
-              voiceResponse.stop()
-            }
-
-            const el = container.querySelector(`[data-image-fragment-id='${image.id}']`)
-            el.querySelector('.result-item-value').innerHTML = `${historyItem.all}% (${historyItem.hiding}% / ${historyItem.target}%)`
-            el.querySelector('.text-item').innerHTML = ''
-
-            appendAllTextWordElements(texts.find(t => t.id === image.id).words, el.querySelector('.text-item'))
+            fragmentDialogHideHandler(image, historyItem)
           })
         }
       )
@@ -698,7 +695,7 @@ export default function MentalMap(element, deck, params) {
       element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
     }
 
-    if (getCourseMode && historyIsDone(history)) {
+    if (/*getCourseMode &&*/ historyIsDone(history)) {
       const content = createFinishContent()
       $(container).parents('.mental-map').append(content)
     }
@@ -909,7 +906,7 @@ export default function MentalMap(element, deck, params) {
     run,
     canNext() {
       if (params?.mentalMapRequired) {
-        return mentalMapHistory.reduce((all, val) => all && val.all > 0, true)
+        return mentalMapHistory.reduce((all, val) => all && val.done, true)
       }
       return true
     }

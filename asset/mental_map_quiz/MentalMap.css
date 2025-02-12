@@ -266,3 +266,13 @@
   transition-timing-function: cubic-bezier(.4,0,.2,1);
   width: 100%;
 }
+
+.fragment-done {
+  background-color: #d1e7dd;
+  padding: 4px;
+  border-radius: 6px;
+  border: 1px #a3cfbb solid;
+  color: #0a3622;
+  font-weight: 500;
+  transition: all .2s;
+}

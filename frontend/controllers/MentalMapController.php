@@ -102,6 +102,7 @@ class MentalMapController extends Controller
                     'all' => $item['all'] ?? 0,
                     'hiding' => $item['hiding'] ?? 0,
                     'target' => $item['target'] ?? 0,
+                    'done' => ($item['all'] ?? 0) > 75
                 ];
             }, $items);
         }
@@ -195,6 +196,7 @@ class MentalMapController extends Controller
                     }
                 }
 
+                $fragmentHistory['done'] = (int) $fragmentHistory['all'] > 75;
                 return ['success' => true, 'history' => $fragmentHistory];
             } catch (Exception $ex) {
                 Yii::$app->errorHandler->logException($ex);
