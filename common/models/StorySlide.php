@@ -374,4 +374,15 @@ class StorySlide extends ActiveRecord
         $slide->link_slide_id = $sourceSlide->link_slide_id;
         return $slide;
     }
+
+    public static function slideKindText(int $kind): string
+    {
+        $kinds = [
+            self::KIND_SLIDE => 'Слайд',
+            self::KIND_LINK => 'Ссылка',
+            self::KIND_QUESTION => 'Тест',
+            self::KIND_MENTAL_MAP => 'Ментальная карта',
+        ];
+        return $kinds[$kind] ?? 'Unknown kind';
+    }
 }

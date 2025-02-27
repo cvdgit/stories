@@ -122,6 +122,8 @@ class StoryController extends Controller
                 'time' => 'MAX(t.created_at)',
                 't.slide_id',
                 'slideNumber' => 's.number',
+                'slideType' => 's.kind',
+                'slideStatus' => 's.status',
             ])
             ->from(['t' => 'story_student_stat'])
             ->leftJoin(['us' => 'user_student'], 't.student_id = us.id')
@@ -130,6 +132,8 @@ class StoryController extends Controller
             ->groupBy(['t.student_id', 't.session', 't.slide_id'])
             ->orderBy(['MAX(t.created_at)' => SORT_ASC]);
         $rows = $query->all();
+
+
 
         return $this->render('progress', [
             'rows' => $rows,

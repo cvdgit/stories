@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use common\helpers\SmartDate;
+use common\models\StorySlide;
 use modules\edu\widgets\AdminHeaderWidget;
 use modules\edu\widgets\AdminToolbarWidget;
 use yii\web\View;
@@ -22,7 +23,16 @@ $this->title = 'Прогресс прохождения истории в обу
 ]) ?>
 <div class="table-responsive">
     <table class="table table-bordered">
-        <thead></thead>
+        <thead>
+        <tr>
+            <th>Ученик</th>
+            <th>Сессия</th>
+            <th>Дата</th>
+            <th>Номер слайда</th>
+            <th>Слайд</th>
+            <th></th>
+        </tr>
+        </thead>
         <tbody>
             <?php foreach ($rows as $row): ?>
         <tr>
@@ -30,6 +40,8 @@ $this->title = 'Прогресс прохождения истории в обу
             <td><?= $row['sessionId'] ?></td>
             <td><?= SmartDate::dateSmart($row['time'], true) ?></td>
             <td><?= $row['slideNumber'] ?></td>
+            <td><?= StorySlide::slideKindText((int) $row['slideType']) ?></td>
+            <td><?= $row['slideStatus'] ?></td>
             <td></td>
         </tr>
         <?php endforeach; ?>
