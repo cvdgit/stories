@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use dosamigos\selectize\SelectizeAsset;
 use modules\edu\Story\AddStoryForm;
+use modules\edu\Story\EduStorySearch;
 use modules\edu\widgets\AdminHeaderWidget;
 use modules\edu\widgets\AdminToolbarWidget;
 use yii\bootstrap\ActiveForm;
@@ -17,6 +18,7 @@ use yii\web\View;
  * @var DataProviderInterface $dataProvider
  * @var AddStoryForm $formModel
  * @var string $json
+ * @var EduStorySearch $searchModel
  */
 
 SelectizeAsset::register($this);
@@ -35,6 +37,7 @@ $this->registerJs($this->renderFile('@modules/edu/views/admin/story/index.js'));
 
 <?= GridView::widget([
     'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
     'options' => ['class' => 'table-responsive', 'id' => 'story-list'],
     'summary' => false,
     'columns' => [
