@@ -46,7 +46,7 @@ class StoryTestsFetcher
                     /** @var $block TestBlock */
                     $testId = $block->getTestID();
                     if ($testId !== null) {
-                        $data[] = new SlideTest($slide->getId(), (int) $slide->getSlideNumber(), $testId);
+                        $data[] = new SlideTest($slide->getId(), (int) $slide->getSlideNumber(), (int) $testId);
                     }
                 }
 
