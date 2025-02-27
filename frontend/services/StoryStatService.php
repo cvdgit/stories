@@ -141,7 +141,7 @@ class StoryStatService
 
         $numberOfSlides = $this->getStorySlidesNumber($storyId);
         $numberOfSlides += $this->getStoryTestingNumber($storyId);
-        $numberOfSlides += count($mentalMapItems);
+        //$numberOfSlides += count($mentalMapItems);
         $numberOfSlides--;
 
         if (($storyProgress = StoryStudentProgress::findOne(['story_id' => $storyId, 'student_id' => $studentId],
