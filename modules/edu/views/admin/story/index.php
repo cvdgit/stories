@@ -74,6 +74,12 @@ $this->registerJs($this->renderFile('@modules/edu/views/admin/story/index.js'));
                 return $model['path'] ?? '<a href="" data-story-id="' . $model['id'] . '" class="text-danger">Выбрать</a>';
             },
         ],
+        [
+            'value' => static function(array $model): string {
+                return Html::a('Прогресс', ['/edu/admin/story/progress', 'id' => $model['id']]);
+            },
+            'format' => 'raw',
+        ],
     ],
 ]) ?>
 

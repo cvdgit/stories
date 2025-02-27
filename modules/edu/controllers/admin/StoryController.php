@@ -14,6 +14,8 @@ use modules\edu\services\LessonService;
 use modules\edu\Story\AddStoryForm;
 use modules\edu\Story\EduStorySearch;
 use Yii;
+use yii\db\Expression;
+use yii\db\Query;
 use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\Request;
@@ -108,5 +110,29 @@ class StoryController extends Controller
             }
         }
         return ['success' => false, 'message' => 'No data'];
+    }
+
+    public function actionProgress(int $id): string
+    {
+        $query = (new Query())
+            ->select([
+                't.student_id',
+                'studentName' => 'us.name',
+                'sessionId' => 't.session',
+                'time' => 'MAX(t.created_at)',
+                't.slide_id',
+                'slideNumber' => 's.number',
+            ])
+            ->from(['t' => 'story_student_stat'])
+            ->leftJoin(['us' => 'user_student'], 't.student_id = us.id')
+            ->leftJoin(['s' => 'story_slide'], 't.slide_id = s.id')
+            ->where(['t.story_id' => $id])
+            ->groupBy(['t.student_id', 't.session', 't.slide_id'])
+            ->orderBy(['MAX(t.created_at)' => SORT_ASC]);
+        $rows = $query->all();
+
+        return $this->render('progress', [
+            'rows' => $rows,
+        ]);
     }
 }
