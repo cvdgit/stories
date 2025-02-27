@@ -86,7 +86,7 @@ class StoryStatService
                 'status' => StorySlide::STATUS_VISIBLE,
             ])
             ->andWhere(['in', 'kind', [StorySlide::KIND_SLIDE, StorySlide::KIND_LINK]])
-            ->count('id');
+            ->count('DISTINCT id');
         return (int) $count;
     }
 
