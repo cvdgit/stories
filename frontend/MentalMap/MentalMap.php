@@ -34,6 +34,20 @@ class MentalMap extends ActiveRecord
         }, true);
     }
 
+    public static function calcHistoryPercent(array $history): int
+    {
+        if (count($history) === 0) {
+            return 100;
+        }
+        $doneItems = array_filter($history, static function(array $item): bool {
+            return $item['done'] || ($item['all'] ?? 0) > 85;
+        });
+        if (count($doneItems) === 0) {
+            return 0;
+        }
+        return count($doneItems) * 100 / count($history);
+    }
+
     public function isMentalMapAsTree(): bool
     {
         return $this->payload['treeView'] ?? false;

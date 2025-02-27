@@ -345,7 +345,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
                     history.push({id: nodeId, done: true})
                   }
 
-                  processTreeNodes(list, body, history, voiceResponse, params, onEndHandler)
+                  processTreeNodes(list, body, history, voiceResponse, params, onEndHandler, dispatchEvent)
                 } else {
                   if (historyItem) {
                     historyItem.done = false
@@ -375,7 +375,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
                   text_target_percentage: 0, // textTargetPercentage,
                   content,
                   user_response: resultSpan.innerText,
-                  api_response: json
+                  api_response: JSON.stringify(json)
                 }).then(response => {
                   if (response && response?.success) {
                     historyItem.all = response.history.all

@@ -2,17 +2,23 @@
 
 namespace modules\edu\controllers;
 
+use frontend\MentalMap\history\MentalMapHistoryFetcher;
+use frontend\MentalMap\history\MentalMapTreeHistoryFetcher;
+use frontend\MentalMap\MentalMap;
 use common\models\User;
 use common\rbac\UserRoles;
 use Exception;
 use modules\edu\models\EduStory;
 use modules\edu\models\EduStudent;
+use modules\edu\query\GetStoryTests\SlideMentalMap;
+use modules\edu\query\GetStoryTests\SlideTest;
 use modules\edu\query\GetStoryTests\StoryTestsFetcher;
 use modules\edu\query\StoryStudentProgressFetcher;
 use modules\edu\query\StudentClassFetcher;
 use modules\edu\services\StudentStatService;
 use Ramsey\Uuid\Uuid;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\db\Expression;
 use yii\db\Query;
 use yii\helpers\Url;
@@ -200,6 +206,7 @@ class DefaultController extends Controller
 
     /**
      * @throws NotFoundHttpException
+     * @throws InvalidConfigException
      */
     public function actionStoryStat(int $story_id, int $student_id, Response $response): array
     {
@@ -214,12 +221,12 @@ class DefaultController extends Controller
             throw new NotFoundHttpException('Ученик не найден');
         }
 
-        $storyTests = (new StoryTestsFetcher())->fetch($story->id);
-        $storyTestIds = array_map(static function ($item) {
+        $slideContent = (new StoryTestsFetcher())->fetch($story->id);
+
+        $storyTests = $slideContent->find(SlideTest::class);
+        $storyTestIds = array_map(static function (SlideTest $item): int {
             return $item->getTestId();
         }, $storyTests);
-
-        $progress = (new StoryStudentProgressFetcher())->fetch($story->id, $student->id);
 
         $testingRows = (new Query())
             ->select([
@@ -230,25 +237,67 @@ class DefaultController extends Controller
             ->from('story_test')
             ->leftJoin('student_question_progress', 'student_question_progress.test_id = story_test.id AND student_question_progress.student_id = :student', [':student' => $student->id])
             ->where(['in', 'story_test.id', $storyTestIds])
+            ->indexBy(['test_id'])
             ->all();
 
-        $testSlides = array_combine(
-            array_map(static function ($item) { return $item->getTestId(); }, $storyTests),
-            array_map(static function ($item) { return $item->getSlideNumber(); }, $storyTests)
-        );
+        $mentalMapIds = array_map(static function(SlideMentalMap $item): string {
+            return $item->getMentalMapId();
+        }, $slideContent->find(SlideMentalMap::class));
 
-        $testingRows = array_map(static function ($row) use ($testSlides) {
-            $row['slide_number'] = $testSlides[$row['test_id']];
-            return $row;
-        }, $testingRows);
+        $mentalMapProgress = [];
+        foreach ($mentalMapIds as $mentalMapId) {
+            $mentalMap = MentalMap::findOne($mentalMapId);
+            if ($mentalMap === null) {
+                continue;
+            }
+            $history = $mentalMap->isMentalMapAsTree()
+                ? (new MentalMapTreeHistoryFetcher())->fetch($mentalMap->uuid, $student->user_id, $mentalMap->getTreeData())
+                : (new MentalMapHistoryFetcher())->fetch($mentalMap->getImages(), $mentalMap->uuid, $student->user_id);
+            $mentalMapProgress[$mentalMapId] = [
+                'mental_map_id' => $mentalMap->uuid,
+                'mental_map_name' => $mentalMap->name,
+                'progress' => MentalMap::calcHistoryPercent($history),
+            ];
+        }
 
-        $data = [
-            'is_complete' => $story->isComplete($progress),
-            'progress' => $progress,
-            'tests' => $testingRows,
+        $contents = array_map(static function($item) use ($testingRows, $mentalMapProgress): array {
+
+            $contentId = '';
+            $contentName = '';
+            $progress = 0;
+
+            if ($item instanceof SlideTest) {
+                $testing = $testingRows[$item->getTestId()];
+                $contentId = $testing['test_id'];
+                $contentName = $testing['test_name'];
+                $progress = $testing['progress'];
+            }
+
+            if ($item instanceof SlideMentalMap) {
+                $mentalMap = $mentalMapProgress[$item->getMentalMapId()];
+                $contentId = $mentalMap['mental_map_id'];
+                $contentName = $mentalMap['mental_map_name'];
+                $progress = $mentalMap['progress'];
+            }
+
+            return [
+                'test_id' => $contentId,
+                'test_name' => $contentName,
+                'progress' => $progress,
+                'slide_number' => $item->getSlideNumber(),
+            ];
+        }, $slideContent->getContents());
+
+        $progress = (new StoryStudentProgressFetcher())->fetch($story->id, $student->id);
+
+        return [
+            'success' => true,
+            'data' => [
+                'is_complete' => $story->isComplete($progress),
+                'progress' => $progress,
+                'tests' => $contents,
+            ],
         ];
-
-        return ['success' => true, 'data' => $data];
     }
 
     /**

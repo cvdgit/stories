@@ -8,6 +8,8 @@ use common\models\Story;
 use common\models\User;
 use common\rbac\UserRoles;
 use Exception;
+use frontend\MentalMap\history\MentalMapHistoryFetcher;
+use frontend\MentalMap\history\MentalMapTreeHistoryFetcher;
 use frontend\MentalMap\MentalMap;
 use frontend\MentalMap\MentalMapHistoryForm;
 use frontend\MentalMap\repetition\MentalMapFinishCommand;
@@ -81,7 +83,8 @@ class MentalMapController extends Controller
         $repetitionMode = $rawBody['repetition_mode'] ?? false;
 
         if ($mentalMap->isMentalMapAsTree()) {
-            $list = $this->flatten($mentalMap->getTreeData());
+
+            /*$list = $this->flatten($mentalMap->getTreeData());
             if (!$repetitionMode) {
                 $list = $this->createMentalMapTreeHistory($list, $mentalMap->uuid, $user->getId());
             }
@@ -90,9 +93,11 @@ class MentalMapController extends Controller
                     'id' => $item['id'],
                     'done' => $item['done'] ?? false,
                 ];
-            }, $list);
+            }, $list);*/
+
+            $history = (new MentalMapTreeHistoryFetcher())->fetch($mentalMap->uuid, $user->getId(), $mentalMap->getTreeData(), $repetitionMode);
         } else {
-            $items = $mentalMap->getImages();
+            /*$items = $mentalMap->getImages();
             if (!$repetitionMode) {
                 $items = $this->createMentalMapHistory($items, $mentalMap->uuid, $user->getId());
             }
@@ -104,7 +109,9 @@ class MentalMapController extends Controller
                     'target' => $item['target'] ?? 0,
                     'done' => ($item['all'] ?? 0) > 75
                 ];
-            }, $items);
+            }, $items);*/
+
+            $history = (new MentalMapHistoryFetcher())->fetch($mentalMap->getImages(), $mentalMap->uuid, $user->getId(), $repetitionMode);
         }
 
         $prompt = null;
@@ -181,11 +188,12 @@ class MentalMapController extends Controller
                 $fragmentHistory = $query->one();
 
                 if (!$form->repetition_mode) {
-                    $history = $this->createMentalMapHistory(
+                    /*$history = $this->createMentalMapHistory(
                         $mentalMap->getImages(),
                         $mentalMap->uuid,
                         $user->getId(),
-                    );
+                    );*/
+                    $history = (new MentalMapHistoryFetcher())->fetch($mentalMap->getImages(), $mentalMap->uuid, $user->getId());
                     if (MentalMap::isDone($history)) {
                         $currentUser = User::findOne($user->getId());
                         if ($currentUser === null) {

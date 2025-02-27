@@ -135,7 +135,7 @@ class MentalMapController extends Controller
                     'width' => $imageWidth,
                     'height' => $imageHeight,
                 ];
-            }, $images),
+            }, array_values($images)),
             'schedules' => $this->scheduleFetcher->getSchedules(),
         ];
     }

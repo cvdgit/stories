@@ -7,7 +7,6 @@ import MentalMapReducer from "../../Lib/MentalMapReducer";
 import ImagesReducer from "../../Lib/ImagesReducer";
 import Dialog from "../Dialog";
 import {CSSTransition} from "react-transition-group";
-import ScheduleReducer from "../../Lib/ScheduleReducer";
 import TreeView from "../TreeView";
 
 export const MentalMapContext = createContext({});

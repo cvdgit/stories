@@ -4,17 +4,26 @@ declare(strict_types=1);
 
 namespace modules\edu\query\GetStoryTests;
 
-class SlideTest implements SlideContentItemInterface
+class SlideMentalMap implements SlideContentItemInterface
 {
+    /**
+     * @var int
+     */
     private $slideId;
+    /**
+     * @var int
+     */
     private $slideNumber;
-    private $testId;
+    /**
+     * @var string
+     */
+    private $mentalMapId;
 
-    public function __construct(int $slideId, int $slideNumber, int $testId)
+    public function __construct(int $slideId, int $slideNumber, string $mentalMapId)
     {
         $this->slideId = $slideId;
         $this->slideNumber = $slideNumber;
-        $this->testId = $testId;
+        $this->mentalMapId = $mentalMapId;
     }
 
     public function getSlideId(): int
@@ -27,8 +36,8 @@ class SlideTest implements SlideContentItemInterface
         return $this->slideNumber;
     }
 
-    public function getTestId(): int
+    public function getMentalMapId(): string
     {
-        return $this->testId;
+        return $this->mentalMapId;
     }
 }

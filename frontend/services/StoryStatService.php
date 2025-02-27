@@ -6,21 +6,41 @@ namespace frontend\services;
 
 use common\models\StorySlide;
 use common\models\StoryStudentProgress;
+use common\models\UserStudent;
+use DomainException;
 use frontend\components\ModelDomainException;
+use frontend\MentalMap\history\MentalMapHistoryFetcher;
+use frontend\MentalMap\history\MentalMapTreeHistoryFetcher;
+use frontend\MentalMap\MentalMap;
 use frontend\models\StoryStudentStatForm;
+use modules\edu\query\GetStoryTests\SlideMentalMap;
+use modules\edu\query\GetStoryTests\StoryTestsFetcher;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\db\Exception;
 use yii\db\Query;
+use yii\web\NotFoundHttpException;
 
 class StoryStatService
 {
+    /** @var UserStudent */
+    private $student;
+
     /**
+     * @param StoryStudentStatForm $form
      * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotFoundHttpException
      */
     public function saveStudentStat(StoryStudentStatForm $form): void
     {
         if (!$form->validate()) {
             throw ModelDomainException::create($form);
+        }
+
+        $this->student = UserStudent::findOne($form->student_id);
+        if ($this->student === null) {
+            throw new DomainException('Student not found');
         }
 
         $command = Yii::$app->db->createCommand();
@@ -33,7 +53,13 @@ class StoryStatService
         ]);
         $command->execute();
 
-        $this->calcStoryStudentPercent((int)$form->story_id, (int)$form->student_id);
+        $slideContent = (new StoryTestsFetcher())->fetch((int) $form->story_id);
+
+        $this->calcStoryStudentPercent(
+            (int) $form->story_id,
+            (int) $form->student_id,
+            $slideContent->find(SlideMentalMap::class),
+        );
     }
 
     private function getViewedSlidesNumber(int $storyId, int $studentId): int
@@ -48,7 +74,7 @@ class StoryStatService
             ])
             ->andWhere(['in', 'story_slide.kind', [StorySlide::KIND_SLIDE, StorySlide::KIND_LINK]])
             ->count('DISTINCT story_student_stat.slide_id');
-        return (int)$count;
+        return (int) $count;
     }
 
     private function getStorySlidesNumber(int $storyId): int
@@ -61,7 +87,7 @@ class StoryStatService
             ])
             ->andWhere(['in', 'kind', [StorySlide::KIND_SLIDE, StorySlide::KIND_LINK]])
             ->count('id');
-        return (int)$count;
+        return (int) $count;
     }
 
     private function getStoryTestingNumber(int $storyId): int
@@ -70,7 +96,7 @@ class StoryStatService
             ->from('story_story_test')
             ->where(['story_id' => $storyId])
             ->count('DISTINCT test_id');
-        return (int)$count;
+        return (int) $count;
     }
 
     private function getFinishedTestingNumber(int $storyId, int $studentId): int
@@ -81,21 +107,45 @@ class StoryStatService
             ->where(['story_story_test.story_id' => $storyId, 'student_question_progress.student_id' => $studentId])
             ->andWhere('student_question_progress.progress = 100')
             ->count('DISTINCT story_story_test.test_id');
-        return (int)$count;
+        return (int) $count;
     }
 
-    public function calcStoryStudentPercent(int $storyId, int $studentId): void
+    /**
+     * @param array<SlideMentalMap> $mentalMapItems
+     * @return int
+     */
+    private function getFinishedMentalMapsNumber(array $mentalMapItems): int
+    {
+        $doneNumber = 0;
+        foreach ($mentalMapItems as $item) {
+            $mentalMap = MentalMap::findOne($item->getMentalMapId());
+            if ($mentalMap !== null) {
+                if ($mentalMap->isMentalMapAsTree()) {
+                    $history = (new MentalMapTreeHistoryFetcher())->fetch($mentalMap->uuid, $this->student->user_id, $mentalMap->getTreeData());
+                } else {
+                    $history = (new MentalMapHistoryFetcher())->fetch($mentalMap->getImages(), $mentalMap->uuid, $this->student->user_id);
+                }
+                if (MentalMap::isDone($history)) {
+                    $doneNumber++;
+                }
+            }
+        }
+        return $doneNumber;
+    }
+
+    public function calcStoryStudentPercent(int $storyId, int $studentId, array $mentalMapItems): void
     {
         $viewedSlidesNumber = $this->getViewedSlidesNumber($storyId, $studentId);
-        $finishedTestingNumber = $this->getFinishedTestingNumber($storyId, $studentId);
-        $viewedSlidesNumber += $finishedTestingNumber;
+        $viewedSlidesNumber += $this->getFinishedTestingNumber($storyId, $studentId);
+        $viewedSlidesNumber += $this->getFinishedMentalMapsNumber($mentalMapItems);
 
         $numberOfSlides = $this->getStorySlidesNumber($storyId);
-        $numberOfTesting = $this->getStoryTestingNumber($storyId);
-        $numberOfSlides += $numberOfTesting;
+        $numberOfSlides += $this->getStoryTestingNumber($storyId);
+        $numberOfSlides += count($mentalMapItems);
         $numberOfSlides--;
 
-        if (($storyProgress = StoryStudentProgress::findOne(['story_id' => $storyId, 'student_id' => $studentId])) === null) {
+        if (($storyProgress = StoryStudentProgress::findOne(['story_id' => $storyId, 'student_id' => $studentId],
+            )) === null) {
             $storyProgress = StoryStudentProgress::create($storyId, $studentId);
         }
 
