@@ -233,6 +233,11 @@ export default function MentalMap(element, deck, params) {
     dialog.show(wrapper => {
       showDialogHandler()
 
+      $(wrapper).on('paste', (e) => {
+        e.preventDefault()
+        return false
+      })
+
       $(wrapper).find('.result-item-value').tooltip()
 
       $(wrapper).find(`#voice-lang`).val(langStore.get())
