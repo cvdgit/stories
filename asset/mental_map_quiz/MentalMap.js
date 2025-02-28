@@ -562,7 +562,7 @@ export default function MentalMap(element, deck, params) {
       }
 
       if (/*getCourseMode &&*/ historyIsDone(history)) {
-        const content = createFinishContent()
+        const content = createFinishContent(history, texts)
         $(container).parents('.mental-map').append(content)
       }
     }
@@ -709,7 +709,7 @@ export default function MentalMap(element, deck, params) {
     }
 
     if (/*getCourseMode &&*/ historyIsDone(history)) {
-      const content = createFinishContent()
+      const content = createFinishContent(history, texts)
       $(container).parents('.mental-map').append(content)
     }
   }
@@ -808,16 +808,47 @@ export default function MentalMap(element, deck, params) {
     return elem
   }
 
-  function createFinishContent() {
+  function createFinishContent(history, texts) {
     const elem = document.createElement('div')
     elem.classList.add('retelling-wrap')
     elem.style.backgroundColor = 'transparent'
     elem.style.padding = '0'
     elem.innerHTML = `
-      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background-color: rgba(255, 255, 255, 0.4); backdrop-filter: blur(4px);">
+      <div class="mental-map-done-wrap" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background-color: rgba(255, 255, 255, 0.4); backdrop-filter: blur(4px);">
         <h2 style="margin-bottom: 20px">Ментальная карта пройдена</h2>
       </div>
     `
+
+    const historyWrap = document.createElement('div')
+    historyWrap.style.width = '800px'
+    historyWrap.style.backgroundColor = 'white'
+    historyWrap.style.padding = '20px'
+    historyWrap.style.border = '1px #ddd solid'
+    historyWrap.style.borderRadius = '10px'
+    historyWrap.style.maxHeight = '500px'
+    historyWrap.style.overflowY = 'auto'
+    history.map(h => {
+
+      const el = document.createElement('div')
+      el.style.marginBottom = '10px'
+      el.style.display = 'flex'
+      el.style.flexDirection = 'row'
+      el.style.columnGap = '20px'
+
+      el.appendChild(FragmentResultElement(h))
+
+      const textEl = document.createElement('div')
+      textEl.classList.add('text-item')
+      textEl.style.flex = '1 1 auto'
+      textEl.style.textAlign = 'left'
+      textEl.innerHTML = texts.find(t => t.id = h.id)?.text
+      el.appendChild(textEl)
+
+      historyWrap.appendChild(el)
+    })
+
+    elem.querySelector('.mental-map-done-wrap').appendChild(historyWrap)
+
     return elem
   }
 
