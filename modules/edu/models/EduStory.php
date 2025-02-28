@@ -72,6 +72,9 @@ class EduStory extends ActiveRecord
             ];
             $data = str_replace($search, $replace, $data);
         }
+
+        $data .= '<section data-id="final-slide" data-background-color="#fff"></section>';
+
         return '<div class="slides">' . $data . '</div>';
     }
 
