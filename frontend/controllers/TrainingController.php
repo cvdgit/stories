@@ -197,7 +197,7 @@ class TrainingController extends UserController
         }
 
         $rows = $filterForm->search($studentId);
-        $mentalMapHistoryRows = (new MentalMapHistoryTargetWordsFetcher())->fetch($currentUser->id, $filterForm->getWeekStartDate(), $filterForm->getWeekEndDate());
+        $mentalMapHistoryRows = (new MentalMapHistoryTargetWordsFetcher())->fetch($targetStudent->user_id, $filterForm->getWeekStartDate(), $filterForm->getWeekEndDate());
 
         $stories = [];
         foreach ($rows as $row) {
