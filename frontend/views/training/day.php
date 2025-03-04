@@ -1,25 +1,40 @@
 <?php
+
+declare(strict_types=1);
+
+use dosamigos\datepicker\DatePicker;
+use frontend\components\learning\form\HistoryFilterForm;
 use yii\helpers\Html;
+use yii\web\JsExpression;
+use yii\web\View;
 use yii\widgets\ActiveForm;
 use frontend\components\learning\widget\HistoryWidget;
-/** @var array $models */
-/** @var array $columns */
-/** @var frontend\components\learning\form\HistoryFilterForm $filterModel */
+use yii\widgets\Pjax;
+
+/**
+ * @var View $this
+ * @var array $models
+ * @var array $columns
+ * @var HistoryFilterForm $filterModel
+ */
+
+$this->registerJs($this->renderFile('@frontend/views/training/day.js'));
 ?>
+<?php Pjax::begin(['id' => 'pjax-day-history']) ?>
 <div class="filter__wrap">
     <div class="row">
         <div class="col-md-2">
             <div class="filter-arrow__wrap filter-arrow--left">
                 <?= Html::a('<i class="glyphicon glyphicon-chevron-left"></i>', '#', [
                     'class' => 'filter-arrow__link',
-                    'onclick' => new \yii\web\JsExpression('$("#historyfilterform-action").val("prev"); $("#history-filter-form").submit(); return false'),
+                    'onclick' => new JsExpression('$("#historyfilterform-action").val("prev"); $("#history-filter-form").submit(); return false'),
                 ]) ?>
             </div>
         </div>
         <div class="col-md-8">
-            <?php $form = ActiveForm::begin(['id' => 'history-filter-form', 'options' => ['style' => 'display: flex; margin-right: 3rem']]) ?>
+            <?php $form = ActiveForm::begin(['id' => 'history-filter-form', 'method' => 'get', 'options' => ['style' => 'display: flex; margin-right: 3rem']]) ?>
             <div style="flex: 1; margin-right: 3rem">
-                <?= $form->field($filterModel, 'date')->widget(\dosamigos\datepicker\DatePicker::class, [
+                <?= $form->field($filterModel, 'date')->widget(DatePicker::class, [
                     'language' => 'ru',
                     'clientOptions' => [
                         'autoclose' => true,
@@ -29,7 +44,7 @@ use frontend\components\learning\widget\HistoryWidget;
                         'autocomplete' => 'off',
                     ],
                     'clientEvents' => [
-                        'changeDate' => new \yii\web\JsExpression('function() { $("#history-filter-form").submit(); }'),
+                        'changeDate' => new JsExpression('function() { $("#history-filter-form").submit(); }'),
                     ],
                 ])->label(false) ?>
             </div>
@@ -43,7 +58,7 @@ use frontend\components\learning\widget\HistoryWidget;
             <div class="filter-arrow__wrap filter-arrow--right">
                 <?= Html::a('<i class="glyphicon glyphicon-chevron-right"></i>', '#', [
                     'class' => 'filter-arrow__link',
-                    'onclick' => new \yii\web\JsExpression('$("#historyfilterform-action").val("next"); $("#history-filter-form").submit(); return false'),
+                    'onclick' => new JsExpression('$("#historyfilterform-action").val("next"); $("#history-filter-form").submit(); return false'),
                 ]) ?>
             </div>
         </div>
@@ -56,12 +71,4 @@ use frontend\components\learning\widget\HistoryWidget;
     'models' => $models,
 ]) ?>
 </div>
-<?php
-$this->registerJs(<<<JS
-(function() {
-    $('#historyfilterform-hours').on('change', function() {
-        $('#history-filter-form').submit();
-    });
-})();
-JS
-);
+<?php Pjax::end() ?>

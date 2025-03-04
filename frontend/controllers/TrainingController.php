@@ -62,7 +62,7 @@ class TrainingController extends UserController
         $studentId = $targetStudent->id;
 
         $filterForm = new HistoryFilterForm();
-        if ($request->isPost && $filterForm->load($request->post()) && $filterForm->validate()) {
+        if ($filterForm->load($request->get()) && $filterForm->validate()) {
             $filterForm->updateDate();
         }
 
@@ -165,7 +165,7 @@ class TrainingController extends UserController
 
             $models[] = $model;
         }
-
+//die(print_r($models));
         $students = array_merge($currentUser->students, $currentUser->parentStudents);
 
         return $this->render('index_new', [
@@ -192,7 +192,7 @@ class TrainingController extends UserController
         $studentId = $targetStudent->id;
 
         $filterForm = new WeekFilterForm();
-        if ($filterForm->load($request->post())) {
+        if ($filterForm->load($request->get())) {
             $filterForm->updateWeekDates();
         }
 

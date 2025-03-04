@@ -1,9 +1,18 @@
 <?php
+
+declare(strict_types=1);
+
 use yii\bootstrap\Nav;
-/** @var array $items */
-/** @var string $view */
-/** @var array $viewParams */
-/** @var yii\web\View $this */
+use yii\web\View;
+use yii\widgets\Pjax;
+
+/**
+ * @var array $items
+ * @var string $view
+ * @var array $viewParams
+ * @var View $this
+ */
+
 $title = 'Прогресс обучения';
 $this->setMetaTags($title,
     $title,
@@ -35,10 +44,14 @@ CSS
 <div>
     <h1>История <span>обучения</span></h1>
     <div class="history-nav">
+    <?php Pjax::begin(['id' => 'pjax-students']) ?>
         <?= Nav::widget([
             'options' => ['class' => 'nav nav-tabs material-tabs'],
             'items' => $items,
         ]) ?>
+    <?php Pjax::end() ?>
     </div>
-    <?= $this->render($view, $viewParams) ?>
+    <div class="history-content">
+        <?= $this->render($view, $viewParams) ?>
+    </div>
 </div>
