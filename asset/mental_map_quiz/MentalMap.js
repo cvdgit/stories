@@ -74,6 +74,10 @@ export default function MentalMap(element, deck, params) {
     })
   }
 
+  function getTargetWordsCount(detailTexts) {
+    return detailTexts.words.filter(w => w.type === 'word' && w?.target).length
+  }
+
   function calcHiddenTextPercent(detailTexts) {
     let totalCounter = 0;
     let hiddenCounter = 0;
@@ -100,6 +104,13 @@ export default function MentalMap(element, deck, params) {
       }
     })
     return targetCounter === 0 || targetHiddenCounter === 0 ? 0 : Math.round(targetHiddenCounter * 100 / targetCounter)
+  }
+
+  function canRecording(detailTexts) {
+    if (getTargetWordsCount(detailTexts) === 0) {
+      return true
+    }
+    return calcTargetTextPercent(detailTexts) === 100
   }
 
   function processOutputAsJson(output) {
@@ -166,6 +177,20 @@ export default function MentalMap(element, deck, params) {
         recordingWrap.querySelector('#start-retelling-wrap').style.display = 'none'
       })*/
       recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
+
+      const gm = recordingWrap.querySelector('#start-recording')
+
+      $(gm)
+        .removeAttr('title')
+        .tooltip('destroy')
+
+      gm.classList.remove('disabled')
+      if (!canRecording(text)) {
+        gm.classList.add('disabled')
+        $(gm)
+          .attr('title', 'Нужно закрыть все важные слова')
+          .tooltip()
+      }
       recordingWrap.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%'
     }, () => {
       recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
@@ -243,6 +268,10 @@ export default function MentalMap(element, deck, params) {
       $(wrapper).find(`#voice-lang`).val(langStore.get())
 
       wrapper.querySelector('#start-recording').addEventListener('click', e => {
+
+        if (!canRecording(text)) {
+          return
+        }
 
         if (!voiceResponse.getStatus()) {
           ['#result_span', '#final_span', '#interim_span'].map(q => {
@@ -550,7 +579,7 @@ export default function MentalMap(element, deck, params) {
       el.querySelector('.image-item').appendChild(FragmentResultElement(historyItem))
       $(el.querySelector('.result-item')).tooltip()
 
-      appendAllTextWordElements(texts.find(t => t.id === image.id).words, el.querySelector('.text-item'))
+      // appendAllTextWordElements(texts.find(t => t.id === image.id).words, el.querySelector('.text-item'))
 
       if (repetitionMode) {
         const done = mentalMapHistory.reduce((all, val) => all && val.done, true)

@@ -276,3 +276,9 @@
   font-weight: 500;
   transition: all .2s;
 }
+
+.gn.disabled {
+  transition: all ease-in-out 200ms;
+  opacity: .5;
+  cursor: not-allowed !important;
+}
