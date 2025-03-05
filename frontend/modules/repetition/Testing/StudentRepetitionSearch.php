@@ -47,7 +47,7 @@ class StudentRepetitionSearch extends Model
         return (new Query())
             ->select([
                 'id' => 't.uuid',
-                new Expression('t.name AS header'),
+                new Expression('t.name COLLATE utf8_general_ci AS header'),
                 'date' => $repetitionQuery,
                 'totalItems' => $scheduleTotalQuery,
                 'doneItems' => $repetitionDoneQuery,
@@ -93,7 +93,7 @@ class StudentRepetitionSearch extends Model
         return (new Query())
             ->select([
                 'id' => 't.id',
-                new Expression('t.header AS header'),
+                new Expression('t.header COLLATE utf8_general_ci AS header'),
                 'date' => $repetitionQuery,
                 'totalItems' => $scheduleTotalQuery,
                 'doneItems' => $repetitionDoneQuery,
