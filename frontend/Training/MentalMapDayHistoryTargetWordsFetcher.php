@@ -58,7 +58,7 @@ final class MentalMapDayHistoryTargetWordsFetcher
                 'question_count' => 0,
             ];
 
-            $itemIds = $row['itemIds'];
+            $itemIds = explode(',', $row['itemIds']);
             $contents = (new Query())
                 ->select(['content' => 'h.content'])
                 ->from(['h' => 'mental_map_history'])
