@@ -30,7 +30,7 @@ class MentalMap extends ActiveRecord
             return false;
         }
         return array_reduce($history, static function (bool $carry, array $item): bool {
-            return $carry && (int) $item['all'] > 0;
+            return $carry && (int) $item['all'] > 85;
         }, true);
     }
 

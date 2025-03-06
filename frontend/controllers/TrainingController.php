@@ -7,11 +7,14 @@ namespace frontend\controllers;
 use common\helpers\SmartDate;
 use common\models\User;
 use common\models\UserStudent;
+use DateTimeImmutable;
 use frontend\components\learning\form\HistoryFilterForm;
 use frontend\components\learning\form\WeekFilterForm;
 use frontend\components\UserController;
 use frontend\Training\FetchMentalMapHistoryTargetWords\MentalMapHistoryTargetWordsFetcher;
+use frontend\Training\MentalMapDayHistoryTargetWordsFetcher;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\web\NotFoundHttpException;
 use yii\web\Request;
 use yii\web\User as WebUser;
@@ -51,6 +54,7 @@ class TrainingController extends UserController
 
     /**
      * @throws NotFoundHttpException
+     * @throws InvalidConfigException
      */
     public function actionIndex(WebUser $user, Request $request, int $student_id = null): string
     {
@@ -78,6 +82,27 @@ class TrainingController extends UserController
                 ];
             }
             $stories[$storyId]['times'][] = [
+                'question_count' => $row['question_count'],
+                'hour' => $row['hour'],
+                'minute_div' => $row['minute_div'],
+            ];
+        }
+
+        $targetDate = Yii::$app->formatter->asDate($filterForm->date, 'php:Y-m-d');
+        $beginDate = (new DateTimeImmutable($targetDate))->setTime(0, 0);
+        $endDate = (new DateTimeImmutable($targetDate))->setTime(23, 59, 59);
+        $mentalMapHistoryRows = (new MentalMapDayHistoryTargetWordsFetcher())
+            ->fetch($targetStudent->user_id, $beginDate, $endDate, (int) $filterForm->hours);
+
+        foreach ($mentalMapHistoryRows as $row) {
+            $storyId = $row['story_id'];
+            if (!isset($stories[$storyId])) {
+                $stories[$storyId] = [
+                    'story_title' => $row['story_title'],
+                    'times' => [],
+                ];
+            }
+            $stories[$storyId]['dates'][] = [
                 'question_count' => $row['question_count'],
                 'hour' => $row['hour'],
                 'minute_div' => $row['minute_div'],
@@ -165,7 +190,7 @@ class TrainingController extends UserController
 
             $models[] = $model;
         }
-//die(print_r($models));
+
         $students = array_merge($currentUser->students, $currentUser->parentStudents);
 
         return $this->render('index_new', [
