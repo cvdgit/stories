@@ -71,7 +71,6 @@ class TrainingController extends UserController
         }
 
         $rows = $filterForm->search($studentId);
-
         $stories = [];
         foreach ($rows as $row) {
             $storyId = $row['story_id'];
@@ -93,7 +92,6 @@ class TrainingController extends UserController
         $endDate = (new DateTimeImmutable($targetDate))->setTime(23, 59, 59);
         $mentalMapHistoryRows = (new MentalMapDayHistoryTargetWordsFetcher())
             ->fetch($targetStudent->user_id, $beginDate, $endDate, (int) $filterForm->hours);
-
         foreach ($mentalMapHistoryRows as $row) {
             $storyId = $row['story_id'];
             if (!isset($stories[$storyId])) {
@@ -102,7 +100,7 @@ class TrainingController extends UserController
                     'times' => [],
                 ];
             }
-            $stories[$storyId]['dates'][] = [
+            $stories[$storyId]['times'][] = [
                 'question_count' => $row['question_count'],
                 'hour' => $row['hour'],
                 'minute_div' => $row['minute_div'],
