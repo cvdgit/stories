@@ -16,7 +16,7 @@ class DeployForm extends Model
         return [
             [['buildName', 'zipFile'], 'required'],
             ['buildName', 'string', 'max' => 50],
-            ['zipFile', 'file', 'extensions' => 'zip', 'maxSize' => 1024 * 1024 * 500],
+            ['zipFile', 'file', 'extensions' => 'zip', 'maxSize' => 1024 * 1024 * 1024],
         ];
     }
 
