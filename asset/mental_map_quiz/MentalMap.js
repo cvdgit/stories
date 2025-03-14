@@ -514,6 +514,9 @@ export default function MentalMap(element, deck, params) {
 
     const {mentalMap: json, history, rewritePrompt} = responseJson
 
+    mentalMapId = json.id
+    mentalMapHistory = history
+
     const {treeView} = json
     if (treeView) {
       this.element.appendChild(TreeView({
@@ -562,8 +565,6 @@ export default function MentalMap(element, deck, params) {
         words
       }
     })
-    mentalMapId = json.id
-    mentalMapHistory = history
 
     const imageFirst = Boolean(json?.settings?.imageFirst)
 
