@@ -8,9 +8,11 @@ use frontend\MentalMap\MentalMap;
 use common\models\User;
 use common\rbac\UserRoles;
 use Exception;
+use frontend\Retelling\Retelling;
 use modules\edu\models\EduStory;
 use modules\edu\models\EduStudent;
 use modules\edu\query\GetStoryTests\SlideMentalMap;
+use modules\edu\query\GetStoryTests\SlideRetelling;
 use modules\edu\query\GetStoryTests\SlideTest;
 use modules\edu\query\GetStoryTests\StoryTestsFetcher;
 use modules\edu\query\StoryStudentProgressFetcher;
@@ -260,7 +262,34 @@ class DefaultController extends Controller
             ];
         }
 
-        $contents = array_map(static function($item) use ($testingRows, $mentalMapProgress): array {
+        $retellingItems = $slideContent->find(SlideRetelling::class);
+
+        $retellingProgress = [];
+        foreach ($retellingItems as $retellingItem) {
+            $retelling = Retelling::findOne($retellingItem->getRetellingId());
+            if ($retelling === null) {
+                continue;
+            }
+            $completed = (new Query())
+                ->select([
+                    'overallSimilarity' => new Expression('MAX(rh.overall_similarity)'),
+                ])
+                ->from(['rh' => 'retelling_history'])
+                ->where([
+                    'story_id' => $story_id,
+                    'slide_id' => $retellingItem->getSlideId(),
+                    'user_id' => $student->user_id,
+                ])
+                ->andWhere('rh.overall_similarity >= 90')
+                ->scalar();
+            $retellingProgress[$retelling->id] = [
+                'retelling_id' => $retelling->id,
+                'retelling_name' => $retelling->name,
+                'progress' => $completed === null ? 0 : 100,
+            ];
+        }
+
+        $contents = array_map(static function($item) use ($testingRows, $mentalMapProgress, $retellingProgress): array {
 
             $contentId = '';
             $contentName = '';
@@ -278,6 +307,13 @@ class DefaultController extends Controller
                 $contentId = $mentalMap['mental_map_id'];
                 $contentName = $mentalMap['mental_map_name'];
                 $progress = $mentalMap['progress'];
+            }
+
+            if ($item instanceof SlideRetelling) {
+                $retelling = $retellingProgress[$item->getRetellingId()];
+                $contentId = $retelling['retelling_id'];
+                $contentName = $retelling['retelling_name'];
+                $progress = $retelling['progress'];
             }
 
             return [

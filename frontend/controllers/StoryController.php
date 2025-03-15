@@ -386,7 +386,7 @@ class StoryController extends Controller
         }
 
         $completedRetelling = [];
-        if (!Yii::$app->user->isGuest) {
+        /*if (!Yii::$app->user->isGuest) {
             $ids = (new Query())
                 ->select([
                     'slideId' => 'rh.slide_id',
@@ -403,7 +403,7 @@ class StoryController extends Controller
             $completedRetelling = array_map(static function (array $item): int {
                 return (int) $item['slideId'];
             }, $ids);
-        }
+        }*/
 
         return $this->renderAjax('_player', [
             'model' => $model,

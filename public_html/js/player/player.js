@@ -349,6 +349,13 @@ var WikidsPlayer = (function(document, $) {
                   }
                 }
 
+              if (window['retellingBuilder']) {
+                const instance = retellingBuilder.getInstance($(Reveal.getCurrentSlide()).attr('data-id'))
+                if (instance && !instance.canNext()) {
+                  return
+                }
+              }
+
               Reveal.next();
             }
         },
@@ -377,6 +384,7 @@ function onSlideMouseDown(e) {
         $target.parents("section[data-slide-view=new-question]").length ||
         $target.parents('.new-questions').length ||
         $target.parents('.mental-map').length ||
+        $target.parents('.retelling-block').length ||
         ($target[0].tagName === "IMG" && $target.attr("data-action") === "1") ||
         $target.hasClass("btn")||
         $target.parents(".wikids-slide-links").length ||

@@ -9,6 +9,7 @@ use backend\components\story\ButtonBlock;
 use backend\components\story\HTMLBLock;
 use backend\components\story\ImageBlock;
 use backend\components\story\MentalMapBlock;
+use backend\components\story\RetellingBlock;
 use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
 use backend\components\story\TransitionBlock;
@@ -20,6 +21,7 @@ use backend\components\story\writer\HTML\HTMLBlockMarkup;
 use backend\components\story\writer\HTML\ImageBlockMarkup;
 use backend\components\story\writer\HTML\MentalMapBlockMarkup;
 use backend\components\story\writer\HTML\ParagraphBlockMarkup;
+use backend\components\story\writer\HTML\RetellingBlockMarkup;
 use backend\components\story\writer\HTML\TestBlockMarkup;
 use backend\components\story\writer\HTML\TransitionBlockMarkup;
 use backend\components\story\writer\HTML\VideoBlockMarkup;
@@ -55,6 +57,9 @@ class BlockRenderer
                 break;
             case MentalMapBlock::class:
                 $markupClassName = MentalMapBlockMarkup::class;
+                break;
+            case RetellingBlock::class:
+                $markupClassName = RetellingBlockMarkup::class;
                 break;
             case VideoBlock::class:
             case VideoFileBlock::class:

@@ -15,6 +15,7 @@ module.exports = {
     pdf_chat: path.resolve(__dirname, 'asset/pdf_chat/index.js'),
     mental_map: path.resolve(__dirname, 'asset/mental_map/index.js'),
     mental_map_quiz: path.resolve(__dirname, 'asset/mental_map_quiz/index.js'),
+    retelling_quiz: path.resolve(__dirname, 'asset/retelling_quiz/index.js'),
     video: path.resolve(__dirname, 'asset/video/index.js'),
   },
   output: {

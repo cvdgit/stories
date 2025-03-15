@@ -7,10 +7,10 @@ let currentStoryId = null;
 
 let readySlides = [];
 
-export default function MentalMap() {
+export default function Retelling() {
   return {
 
-    id: 'mental_map',
+    id: 'retelling',
     deck: null,
     config: {},
 
@@ -27,14 +27,14 @@ export default function MentalMap() {
 
       const init = () => {
 
-        const elem = $('div.mental-map', deck.getCurrentSlide())
+        const elem = $('div.retelling-block', deck.getCurrentSlide())
         if (!elem.length) {
           return
         }
 
-        const mentalMapId = elem.attr('data-mental-map-id')
-        if (!mentalMapId) {
-          throw new Error('Mental map id not found')
+        const retellingId = elem.attr('data-retelling-id')
+        if (!retellingId) {
+          throw new Error('Retelling id not found')
         }
 
         const params = elem.data()
@@ -43,9 +43,9 @@ export default function MentalMap() {
 
         const slidesPLayer = new SlidesPlayer(deck)
 
-        const mentalMap = window.mentalMapBuilder.create(elem[0], deck, {
+        const retelling = retellingBuilder.create(elem[0], deck, {
           init: async () => {
-            const response = await fetch(`/mental-map/init`, {
+            const response = await fetch(`/retelling/init`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -54,31 +54,32 @@ export default function MentalMap() {
               },
               body: JSON.stringify({
                 story_id: params.story_id,
-                id: mentalMapId
+                slide_id: $(deck.getCurrentSlide()).attr('data-id'),
+                id: retellingId
               })
             })
 
             const json = await response.json()
-            return {mentalMap: json.mentalMap, history: json.history}
+            return {...json}
           },
           ...params
         }, $(deck.getCurrentSlide()).attr('data-id'))
-        mentalMap.run()
+        retelling.run()
       }
 
       readySlides = []
 
-      function initMentalMap() {
+      function initRetelling() {
         const currentSlideID = $(deck.getCurrentSlide()).attr('data-id');
-        if (readySlides[currentSlideID] && !$(deck.getCurrentSlide()).find('.mental-map').is(':empty')) {
+        if (readySlides[currentSlideID] && !$(deck.getCurrentSlide()).find('.retelling-block').is(':empty')) {
           return;
         }
         readySlides[currentSlideID] = true;
         init()
       }
 
-      deck.addEventListener('slidechanged', initMentalMap)
-      deck.addEventListener('ready', initMentalMap)
+      deck.addEventListener('slidechanged', initRetelling)
+      deck.addEventListener('ready', initRetelling)
     },
 
     backToStory() {

@@ -50,13 +50,13 @@ $buttons = [
 
 ];
 
-$retellingUsers = Yii::$app->params['retelling.access.users'] ?? [];
+/*$retellingUsers = Yii::$app->params['retelling.access.users'] ?? [];
 $canRetellingAccess = Yii::$app->user->can(UserRoles::ROLE_MODERATOR) || in_array(Yii::$app->user->getId(), $retellingUsers, true);
 
 if ($canRetellingAccess) {
     $buttons[] = new RetellingButton();
     $buttons[] = new RetellingAnswersButton();
-}
+}*/
 
 $plugins = [
     [
@@ -75,15 +75,17 @@ $plugins = [
     //['class' => \common\widgets\Reveal\Plugins\Recorder::class, 'story' => $model],
     ['class' => \common\widgets\Reveal\Plugins\SlideLinksView::class],
     ['class' => \common\widgets\Reveal\Plugins\MentalMap::class, 'storyId' => $model->id],
+
+    ['class' => Retelling::class, 'storyId' => $model->id],
 ];
 
 if (Yii::$app->request->get('from_game') === null) {
     $plugins[] = ['class' => \common\widgets\Reveal\Plugins\SlideState::class, 'storyID' => $model->id];
 }
 
-if ($canRetellingAccess) {
-    $plugins[] = ["class" => Retelling::class, 'storyId' => $model->id, 'completed' => $completedRetelling];
-}
+//if ($canRetellingAccess) {
+    //$plugins[] = ["class" => Retelling::class, 'storyId' => $model->id, 'completed' => $completedRetelling];
+//}
 
 if ($saveStat) {
     $plugins[] = ['class' => \common\widgets\Reveal\Plugins\Statistics::class, 'storyID' => $model->id];

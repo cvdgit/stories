@@ -25,6 +25,9 @@ use backend\services\StorySlideService;
 use backend\SlideEditor\CreateMentalMap\CreateMentalMapAction;
 use backend\SlideEditor\CreatePassTest\CreatePassTestAction;
 use backend\SlideEditor\CreateQuizBySlideText\CreateQuizAction;
+use backend\SlideEditor\CreateRetelling\CreateRetellingAction;
+use backend\SlideEditor\UpdateRetelling\LoadRetellingAction;
+use backend\SlideEditor\UpdateRetelling\UpdateRetellingAction;
 use common\models\Lesson;
 use common\models\StorySlide;
 use common\services\TransactionManager;
@@ -102,9 +105,12 @@ class EditorController extends BaseController
     public function actions(): array
     {
         return [
-            "gpt-quiz" => CreateQuizAction::class,
-            "create-pass-test" => CreatePassTestAction::class,
+            'gpt-quiz' => CreateQuizAction::class,
+            'create-pass-test' => CreatePassTestAction::class,
             'mental-map' => CreateMentalMapAction::class,
+            'retelling' => CreateRetellingAction::class,
+            'load-retelling' => LoadRetellingAction::class,
+            'update-retelling' => UpdateRetellingAction::class,
         ];
     }
 
@@ -262,9 +268,12 @@ class EditorController extends BaseController
         ]);
     }
 
-    public function actionForm(int $slide_id, string $block_id)
+    /**
+     * @throws InvalidConfigException
+     * @throws NotFoundHttpException
+     */
+    public function actionForm(int $slide_id, string $block_id): string
     {
-        /** @var StorySlide $slideModel */
         $slideModel = $this->findModel(StorySlide::class, $slide_id);
 
         $slide = (new HtmlSlideReader($slideModel->data))->load();
@@ -294,6 +303,7 @@ class EditorController extends BaseController
 
         $view = ($block->getType() === AbstractBlock::TYPE_VIDEO || $block->getType(
             ) === AbstractBlock::TYPE_VIDEOFILE) ? 'update_video' : 'update';
+
         return $this->renderAjax($view, [
             'model' => $form,
             'action' => ['editor/update-block/' . str_replace('_', '-', $block_type)],

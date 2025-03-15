@@ -12,6 +12,8 @@ use backend\components\story\MentalMapBlock;
 use backend\components\story\MentalMapBlockContent;
 use backend\components\story\reader\HTMLReader;
 use backend\components\story\reader\HtmlSlideReader;
+use backend\components\story\RetellingBlock;
+use backend\components\story\RetellingBlockContent;
 use backend\components\story\Slide;
 use backend\components\story\SlideContent;
 use backend\components\story\TestBlock;
@@ -24,6 +26,7 @@ use backend\models\editor\ImageForm;
 use backend\models\editor\MentalMapForm;
 use backend\models\ImageSlideBlock;
 use backend\models\video\VideoSource;
+use backend\SlideEditor\UpdateRetelling\UpdateRetellingForm;
 use common\models\LessonBlock;
 use common\models\slide\SlideKind;
 use common\models\slide\SlideStatus;
@@ -197,11 +200,23 @@ class StoryEditorService
     /**
      * @throws InvalidConfigException
      */
-    public function getSlideWithMentalMapBlockContent(int $slideId, string $mentalMapId, bool $required = false): string
+    public function getSlideWithMentalMapBlockContent(int $slideId, string $mentalMapId, bool $required = true): string
     {
         $slide = (new HtmlSlideReader(new SlideContent($slideId, 'mental-map')))->load();
         $block = $slide->createBlock(MentalMapBlock::class);
         $block->setContent((new MentalMapBlockContent($mentalMapId, $required))->render());
+        $slide->addBlock($block);
+        return (new HTMLWriter())->renderSlide($slide);
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function getSlideWithRetellingBlockContent(int $slideId, string $retellingId, bool $required = true): string
+    {
+        $slide = (new HtmlSlideReader(new SlideContent($slideId, 'retelling')))->load();
+        $block = $slide->createBlock(RetellingBlock::class);
+        $block->setContent((new RetellingBlockContent($retellingId, $required))->render());
         $slide->addBlock($block);
         return (new HTMLWriter())->renderSlide($slide);
     }
@@ -276,6 +291,25 @@ class StoryEditorService
         /** @var MentalMapBlock $block */
         $block = $slide->findBlockByID($form->block_id);
         $block->setContent((new MentalMapBlockContent($form->mental_map_id, $form->required === '1'))->render());
+
+        $writer = new HTMLWriter();
+        $model->updateData($writer->renderSlide($slide));
+
+        return str_replace('data-src=', 'src=', $writer->renderBlock($block));
+    }
+
+    public function updateRetellingBlock(int $slideId, string $blockId, string $retellingId, bool $required): string
+    {
+        $model = StorySlide::findSlide($slideId);
+        if ($model === null) {
+            throw new DomainException('Slide not found');
+        }
+        $reader = new HtmlSlideReader($model->data);
+        $slide = $reader->load();
+
+        /** @var RetellingBlock $block */
+        $block = $slide->findBlockByID($blockId);
+        $block->setContent((new RetellingBlockContent($retellingId, $required))->render());
 
         $writer = new HTMLWriter();
         $model->updateData($writer->renderSlide($slide));

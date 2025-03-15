@@ -7,6 +7,7 @@ use backend\components\story\HTMLBLock;
 use backend\components\story\ImageBlock;
 use backend\components\story\MentalMapBlockContent;
 use backend\components\story\reader\HtmlSlideReader;
+use backend\components\story\RetellingBlockContent;
 use backend\components\story\Slide;
 use backend\components\story\TestBlockContent;
 use backend\components\story\TextBlock;
@@ -14,6 +15,7 @@ use backend\components\story\VideoBlock;
 use backend\components\story\writer\HTMLWriter;
 use backend\MentalMap\MentalMap;
 use backend\models\video\VideoSource;
+use backend\Retelling\Retelling;
 use common\helpers\Url;
 use common\models\SlideVideo;
 use common\models\StorySlideImage;
@@ -108,6 +110,17 @@ class SlideModifier
                     $mentalMap = MentalMap::findOne($content->getId());
                     if ($mentalMap !== null) {
                         $title = $mentalMap->name;
+                    }
+                } catch (\Exception $ex) {}
+                $block->setContent($content->renderWithDescription($this->slide->getId(), $title));
+            }
+            if ($block->typeIs(AbstractBlock::TYPE_RETELLING)) {
+                $content = RetellingBlockContent::createFromHtml($block->getContent());
+                $title = null;
+                try {
+                    $retelling = Retelling::findOne($content->getId());
+                    if ($retelling !== null) {
+                        $title = $retelling->name;
                     }
                 } catch (\Exception $ex) {}
                 $block->setContent($content->renderWithDescription($this->slide->getId(), $title));

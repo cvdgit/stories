@@ -49,6 +49,13 @@ function SlidesPlayer(deck) {
           }
         }
 
+        if (deck.hasPlugin('retelling')) {
+          const instance = retellingBuilder.getInstance($(deck.getCurrentSlide()).attr('data-id'))
+          if (instance && !instance.canNext()) {
+            return
+          }
+        }
+
         deck.next();
       }
     },

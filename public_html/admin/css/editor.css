@@ -486,7 +486,7 @@ body {
 .wrap-editor-main .sl-block .new-questions,
 .slides-container .sl-block .new-questions {
     background-image: url(/img/education.png);
-    background-size: auto;
+    background-size: 50%;
     background-color: #222;
     background-repeat: no-repeat;
     background-position: 50% 50%;
@@ -908,8 +908,28 @@ body {
 .slides-container .sl-block .mental-map {
   width: 100%;
   height: 100%;
-  background-image: url(/img/education.png);
-  background-size: auto;
+  background-image: url(/img/mental-map.png);
+  background-size: 50%;
+  background-color: #222;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  opacity: 0.8;
+  color: #1baee1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 20px;
+  font-weight: 500;
+  position: absolute;
+  z-index: 99999;
+}
+
+.wrap-editor-main .sl-block .retelling-block,
+.slides-container .sl-block .retelling-block {
+  width: 100%;
+  height: 100%;
+  background-image: url(/img/retelling.png);
+  background-size: 50%;
   background-color: #222;
   background-repeat: no-repeat;
   background-position: 50% 50%;

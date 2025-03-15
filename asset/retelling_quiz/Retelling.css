@@ -1,0 +1,94 @@
+.retelling-block {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  flex: 1 1 auto;
+  justify-content: space-between;
+}
+
+.retelling-dialog-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.retelling-dialog-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+.retelling-content {
+  height: 100%;
+  position: relative;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1 1 auto;
+}
+
+.retelling-two-cols {
+  columns: 2;
+  height: 100%;
+}
+
+.retelling-answers-col {
+  height: 100%;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.retelling-answers {
+  overflow-y: auto;
+  font-size: 2.1rem;
+  line-height: 3.5rem;
+  flex: 1 1 auto;
+}
+
+.retelling-content-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 99999;
+  background-color: rgba(0, 0, 0, .1);
+  cursor: not-allowed;
+}
+
+.retelling-error {
+  font-size: 2rem;
+}
+
+.retelling-success {
+  color: #3c763d !important;
+}
+
+.retelling-voice-controls {
+  display: flex;
+  gap: 20px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.retelling-response-dialog {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, .5);
+}

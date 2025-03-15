@@ -1346,6 +1346,9 @@ const StoryEditor = (function () {
       typeIsMentalMap() {
         return this.getType() === 'mental_map'
       },
+      typeIsRetelling() {
+        return this.getType() === 'retelling'
+      },
       'getElement': function () {
         return this.element;
       },

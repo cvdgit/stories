@@ -9,6 +9,7 @@ use backend\components\story\ButtonBlock;
 use backend\components\story\HTMLBLock;
 use backend\components\story\ImageBlock;
 use backend\components\story\MentalMapBlock;
+use backend\components\story\RetellingBlock;
 use backend\components\story\Slide;
 use backend\components\story\Story;
 use backend\components\story\TestBlock;
@@ -84,6 +85,9 @@ class HTMLReader extends AbstractReader implements ReaderInterface
                     break;
                 case AbstractBlock::TYPE_MENTAL_MAP:
                     $this->loadBlockMentalMap($htmlBlock, $slide);
+                    break;
+                case AbstractBlock::TYPE_RETELLING:
+                    $this->loadBlockRetelling($htmlBlock, $slide);
                     break;
                 default:
             }
@@ -223,6 +227,20 @@ class HTMLReader extends AbstractReader implements ReaderInterface
     {
         $block = new MentalMapBlock();
         $block->setType(AbstractBlock::TYPE_MENTAL_MAP);
+
+        $element = pq($htmlBlock);
+
+        $this->loadBlockProperties($block, $element->attr('style'));
+        $block->setId(pq($htmlBlock)->attr('data-block-id'));
+        $block->setContent(pq($htmlBlock)->html());
+
+        $slide->addBlock($block);
+    }
+
+    private function loadBlockRetelling(\DOMElement $htmlBlock, Slide $slide): void
+    {
+        $block = new RetellingBlock();
+        $block->setType(AbstractBlock::TYPE_RETELLING);
 
         $element = pq($htmlBlock);
 

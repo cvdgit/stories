@@ -8,6 +8,7 @@ use backend\components\story\AbstractBlock;
 use backend\components\story\HTMLBLock;
 use backend\components\story\MentalMapBlockContent;
 use backend\components\story\reader\HTMLReader;
+use backend\components\story\RetellingBlockContent;
 use backend\components\story\TestBlock;
 use common\models\Story;
 use yii\base\InvalidConfigException;
@@ -53,6 +54,11 @@ class StoryTestsFetcher
                 if ($block->getType() === AbstractBlock::TYPE_MENTAL_MAP) {
                     $content = MentalMapBlockContent::createFromHtml($block->getContent());
                     $data[] = new SlideMentalMap($slide->getId(), (int) $slide->getSlideNumber(), $content->getId());
+                }
+
+                if ($block->getType() === AbstractBlock::TYPE_RETELLING) {
+                    $content = RetellingBlockContent::createFromHtml($block->getContent());
+                    $data[] = new SlideRetelling($slide->getId(), (int) $slide->getSlideNumber(), $content->getId());
                 }
             }
         }

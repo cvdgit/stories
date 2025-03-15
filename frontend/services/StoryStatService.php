@@ -13,11 +13,15 @@ use frontend\MentalMap\history\MentalMapHistoryFetcher;
 use frontend\MentalMap\history\MentalMapTreeHistoryFetcher;
 use frontend\MentalMap\MentalMap;
 use frontend\models\StoryStudentStatForm;
+use frontend\Retelling\Retelling;
+use modules\edu\models\EduStudent;
 use modules\edu\query\GetStoryTests\SlideMentalMap;
+use modules\edu\query\GetStoryTests\SlideRetelling;
 use modules\edu\query\GetStoryTests\StoryTestsFetcher;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\Exception;
+use yii\db\Expression;
 use yii\db\Query;
 use yii\web\NotFoundHttpException;
 
@@ -59,6 +63,7 @@ class StoryStatService
             (int) $form->story_id,
             (int) $form->student_id,
             $slideContent->find(SlideMentalMap::class),
+            $slideContent->find(SlideRetelling::class),
         );
     }
 
@@ -133,16 +138,52 @@ class StoryStatService
         return $doneNumber;
     }
 
-    public function calcStoryStudentPercent(int $storyId, int $studentId, array $mentalMapItems): void
+    /**
+     * @param int $storyId
+     * @param array<SlideRetelling> $retellingItems
+     * @return int
+     */
+    private function getFinishedRetellingNumber(int $storyId, array $retellingItems): int
+    {
+        $doneNumber = 0;
+        foreach ($retellingItems as $item) {
+            $retelling = Retelling::findOne($item->getRetellingId());
+            if ($retelling !== null) {
+                $completed = (new Query())
+                    ->select([
+                        'overallSimilarity' => new Expression('MAX(rh.overall_similarity)'),
+                    ])
+                    ->from(['rh' => 'retelling_history'])
+                    ->where([
+                        'story_id' => $storyId,
+                        'slide_id' => $item->getSlideId(),
+                        'user_id' => $this->student->user_id,
+                    ])
+                    ->andWhere('rh.overall_similarity >= 90')
+                    ->scalar();
+                if ($completed !== null) {
+                    $doneNumber++;
+                }
+            }
+        }
+        return $doneNumber;
+    }
+
+    public function calcStoryStudentPercent(
+        int $storyId,
+        int $studentId,
+        array $mentalMapItems,
+        array $retellingItems
+    ): void
     {
         $viewedSlidesNumber = $this->getViewedSlidesNumber($storyId, $studentId);
         $viewedSlidesNumber += $this->getFinishedTestingNumber($storyId, $studentId);
         $viewedSlidesNumber += $this->getFinishedMentalMapsNumber($mentalMapItems);
+        $viewedSlidesNumber += $this->getFinishedRetellingNumber($storyId, $retellingItems);
 
         $numberOfSlides = $this->getStorySlidesNumber($storyId);
         $numberOfSlides += $this->getStoryTestingNumber($storyId);
         $numberOfSlides += count($mentalMapItems);
-        // $numberOfSlides--;
 
         if (($storyProgress = StoryStudentProgress::findOne(['story_id' => $storyId, 'student_id' => $studentId],
             )) === null) {

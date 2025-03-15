@@ -15,8 +15,10 @@ import Background from "./plugins/Background";
 import NextStory from "./plugins/NextStory";
 import isMobile from "./is_mobile";
 import MentalMap from "./plugins/MentalMap";
+import Retelling from "./plugins/Retelling";
 
 window.mentalMapBuilder = new MentalMapManagerQuiz()
+window.retellingBuilder = new RetellingManagerQuiz()
 
 function onSlideMouseDown(e, player) {
 
@@ -28,6 +30,7 @@ function onSlideMouseDown(e, player) {
     $target.parents("section[data-slide-view=new-question]").length ||
     $target.parents('.new-questions').length ||
     $target.parents('.mental-map').length ||
+    $target.parents('.retelling-block').length ||
     ($target[0].tagName === "IMG" && $target.attr("data-action") === "1") ||
     $target.hasClass("btn")||
     $target.parents(".wikids-slide-links").length ||
@@ -87,6 +90,7 @@ window.initSlides = function() {
       Transition,
       Testing,
       MentalMap,
+      Retelling,
       LinksPlugin,
       VideoPlugin,
       ActionsPlugin,

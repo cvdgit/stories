@@ -14,6 +14,7 @@ abstract class AbstractBlock
     public const TYPE_VIDEO = 'video';
     public const TYPE_VIDEOFILE = 'videofile';
     public const TYPE_MENTAL_MAP = 'mental_map';
+    public const TYPE_RETELLING = 'retelling';
 
     protected $width;
     protected $height;

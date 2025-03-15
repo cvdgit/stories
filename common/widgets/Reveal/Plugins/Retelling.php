@@ -8,7 +8,7 @@ use common\widgets\Reveal\Dependency;
 
 class Retelling extends AbstractPlugin implements PluginInterface
 {
-    public $configName = 'retelling';
+    public $configName = 'retellingConfig';
     public $storyId;
     public $completed = [];
 
@@ -17,23 +17,24 @@ class Retelling extends AbstractPlugin implements PluginInterface
         return [
             $this->configName => [
                 'story_id' => $this->storyId,
-                'completed' => $this->completed,
+                // 'completed' => $this->completed,
             ],
         ];
     }
 
     public function pluginCssFiles(): array
     {
-        $dep = new Dependency('/js/player/plugins/retelling.css');
+        /*$dep = new Dependency('/js/player/plugins/retelling.css');
         return [
             $dep->src,
-        ];
+        ];*/
+        return [];
     }
 
     public function dependencies(): array
     {
         return [
-            new Dependency('/js/player/plugins/retelling.js'),
+            new Dependency('/js/player/plugins/retelling-quiz.js'),
         ];
     }
 }
