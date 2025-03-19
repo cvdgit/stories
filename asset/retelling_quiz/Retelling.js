@@ -57,7 +57,7 @@ export default function Retelling(element, deck, params) {
           finalSpan.innerText = ''
         }
 
-        if (resultText.length) {
+        if (resultSpan.innerText.length) {
           content.querySelector('#retelling_start-retelling').style.display = 'block'
         }
       }
