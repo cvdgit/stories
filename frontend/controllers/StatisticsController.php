@@ -55,8 +55,8 @@ class StatisticsController extends Controller
         if ($this->request->isPost && $form->load($this->request->post(), '')) {
 
             try {
-                $this->storyStatService->saveStudentStat($form);
-                return ['success' => true];
+                $stat = $this->storyStatService->saveStudentStat($form);
+                return ['success' => true, 'stat' => $stat];
             }
             catch (Exception $exception) {
                 Yii::$app->errorHandler->logException($exception);

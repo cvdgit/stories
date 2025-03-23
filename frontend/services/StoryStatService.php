@@ -14,7 +14,6 @@ use frontend\MentalMap\history\MentalMapTreeHistoryFetcher;
 use frontend\MentalMap\MentalMap;
 use frontend\models\StoryStudentStatForm;
 use frontend\Retelling\Retelling;
-use modules\edu\models\EduStudent;
 use modules\edu\query\GetStoryTests\SlideMentalMap;
 use modules\edu\query\GetStoryTests\SlideRetelling;
 use modules\edu\query\GetStoryTests\StoryTestsFetcher;
@@ -32,11 +31,12 @@ class StoryStatService
 
     /**
      * @param StoryStudentStatForm $form
+     * @return array
      * @throws Exception
      * @throws InvalidConfigException
      * @throws NotFoundHttpException
      */
-    public function saveStudentStat(StoryStudentStatForm $form): void
+    public function saveStudentStat(StoryStudentStatForm $form): array
     {
         if (!$form->validate()) {
             throw ModelDomainException::create($form);
@@ -59,7 +59,7 @@ class StoryStatService
 
         $slideContent = (new StoryTestsFetcher())->fetch((int) $form->story_id);
 
-        $this->calcStoryStudentPercent(
+        return $this->calcStoryStudentPercent(
             (int) $form->story_id,
             (int) $form->student_id,
             $slideContent->find(SlideMentalMap::class),
@@ -174,7 +174,7 @@ class StoryStatService
         int $studentId,
         array $mentalMapItems,
         array $retellingItems
-    ): void
+    ): array
     {
         $viewedSlidesNumber = $this->getViewedSlidesNumber($storyId, $studentId);
         $viewedSlidesNumber += $this->getFinishedTestingNumber($storyId, $studentId);
@@ -182,8 +182,15 @@ class StoryStatService
         $viewedSlidesNumber += $this->getFinishedRetellingNumber($storyId, $retellingItems);
 
         $numberOfSlides = $this->getStorySlidesNumber($storyId);
-        $numberOfSlides += $this->getStoryTestingNumber($storyId);
-        $numberOfSlides += count($mentalMapItems);
+
+        $numberOfTests = $this->getStoryTestingNumber($storyId);
+        $numberOfSlides += $numberOfTests;
+
+        $numberOfMentalMaps = count($mentalMapItems);
+        $numberOfSlides += $numberOfMentalMaps;
+
+        $numberOfRetelling = count($retellingItems);
+        $numberOfSlides += $numberOfRetelling;
 
         if (($storyProgress = StoryStudentProgress::findOne(['story_id' => $storyId, 'student_id' => $studentId],
             )) === null) {
@@ -196,5 +203,14 @@ class StoryStatService
         if (!$storyProgress->save()) {
             throw ModelDomainException::create($storyProgress);
         }
+
+        return [
+            'story' => [
+                'slide' => $numberOfSlides,
+                'test' => $numberOfTests,
+                'mental_map' => $numberOfMentalMaps,
+                'retelling' => $numberOfRetelling,
+            ],
+        ];
     }
 }
