@@ -299,7 +299,7 @@ class DefaultController extends Controller
                 $testing = $testingRows[$item->getTestId()];
                 $contentId = $testing['test_id'];
                 $contentName = $testing['test_name'];
-                $progress = $testing['progress'];
+                $progress = (int) $testing['progress'];
             }
 
             if ($item instanceof SlideMentalMap) {
