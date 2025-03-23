@@ -181,7 +181,9 @@ class StoryStatService
         $viewedSlidesNumber += $this->getFinishedMentalMapsNumber($mentalMapItems);
         $viewedSlidesNumber += $this->getFinishedRetellingNumber($storyId, $retellingItems);
 
-        $numberOfSlides = $this->getStorySlidesNumber($storyId);
+        $numberOfSlides = 0;
+        $numberOfStorySlides = $this->getStorySlidesNumber($storyId);
+        $numberOfSlides += $numberOfStorySlides;
 
         $numberOfTests = $this->getStoryTestingNumber($storyId);
         $numberOfSlides += $numberOfTests;
@@ -206,10 +208,11 @@ class StoryStatService
 
         return [
             'story' => [
-                'slide' => $numberOfSlides,
+                'slide' => $numberOfStorySlides,
                 'test' => $numberOfTests,
                 'mental_map' => $numberOfMentalMaps,
                 'retelling' => $numberOfRetelling,
+                'total' => $numberOfSlides,
             ],
         ];
     }
