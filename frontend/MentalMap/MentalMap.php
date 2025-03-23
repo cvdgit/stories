@@ -30,7 +30,7 @@ class MentalMap extends ActiveRecord
             return false;
         }
         return array_reduce($history, static function (bool $carry, array $item): bool {
-            return $carry && (int) $item['all'] > 85;
+            return $carry && (int) $item['all'] >= 80;
         }, true);
     }
 
@@ -40,7 +40,7 @@ class MentalMap extends ActiveRecord
             return 100;
         }
         $doneItems = array_filter($history, static function(array $item): bool {
-            return $item['done'] || ($item['all'] ?? 0) > 85;
+            return $item['done'] || ($item['all'] ?? 0) >= 80;
         });
         if (count($doneItems) === 0) {
             return 0;

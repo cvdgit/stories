@@ -19,7 +19,7 @@ class MentalMapHistoryFetcher
                 'all' => $item['all'] ?? 0,
                 'hiding' => $item['hiding'] ?? 0,
                 'target' => $item['target'] ?? 0,
-                'done' => ($item['all'] ?? 0) > 75,
+                'done' => ($item['all'] ?? 0) >= 80,
             ];
         }, $items ?? $fragments);
     }

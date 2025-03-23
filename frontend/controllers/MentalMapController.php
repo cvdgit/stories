@@ -204,7 +204,7 @@ class MentalMapController extends Controller
                     }
                 }
 
-                $fragmentHistory['done'] = (int) $fragmentHistory['all'] > 75;
+                $fragmentHistory['done'] = (int) $fragmentHistory['all'] >= 80;
                 return ['success' => true, 'history' => $fragmentHistory];
             } catch (Exception $ex) {
                 Yii::$app->errorHandler->logException($ex);
@@ -279,7 +279,7 @@ class MentalMapController extends Controller
 
         return array_map(static function (array $item) use ($rows): array {
             if (isset($rows[$item['id']])) {
-                $item['done'] = (int) $rows[$item['id']]['all'] > 85;
+                $item['done'] = (int) $rows[$item['id']]['all'] >= 80;
                 $item['all'] = (int) $rows[$item['id']]['all'];
                 $item['hiding'] = (int) $rows[$item['id']]['hiding'];
                 $item['target'] = (int) $rows[$item['id']]['target'];
