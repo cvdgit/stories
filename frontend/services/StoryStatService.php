@@ -176,7 +176,10 @@ class StoryStatService
         array $retellingItems
     ): array
     {
-        $viewedSlidesNumber = $this->getViewedSlidesNumber($storyId, $studentId);
+        $viewedSlidesNumber = 0;
+        $viewedStorySlidesNumber = $this->getViewedSlidesNumber($storyId, $studentId);
+        $viewedSlidesNumber += $viewedStorySlidesNumber;
+
         $viewedSlidesNumber += $this->getFinishedTestingNumber($storyId, $studentId);
         $viewedSlidesNumber += $this->getFinishedMentalMapsNumber($mentalMapItems);
         $viewedSlidesNumber += $this->getFinishedRetellingNumber($storyId, $retellingItems);
@@ -214,6 +217,9 @@ class StoryStatService
                 'retelling' => $numberOfRetelling,
                 'total' => $numberOfSlides,
             ],
+            'viewed' => [
+                'slide' => $viewedStorySlidesNumber,
+            ]
         ];
     }
 }
