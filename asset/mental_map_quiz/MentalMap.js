@@ -539,6 +539,16 @@ export default function MentalMap(element, deck, params) {
       return
     }
 
+    document.addEventListener('visibilitychange', e => {
+        if (voiceResponse.getStatus()) {
+          voiceResponse.stop()
+          const el = document.querySelector('#start-recording')
+          if (el) {
+            $(el).click()
+          }
+        }
+    })
+
     texts = json.map.images.map(image => {
       const {imageText, textFragments} = processImageText(image.text)
       const paragraphs = imageText.split('\n')
