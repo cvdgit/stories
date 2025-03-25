@@ -12,6 +12,53 @@ import Panzoom from "../app/panzoom.min"
 import RewritePromptBtn from "./components/RewritePromptBtn";
 import TreeView from "./TreeView/TreeView";
 
+function decodeHtml(html) {
+  const txt = document.createElement("textarea");
+  txt.innerHTML = html;
+  return txt.value;
+}
+
+function processImageText(text) {
+  const textFragments = new Map();
+  const reg = new RegExp(`<span[^>]*>(.*?)<\\/span>`, 'gm');
+  const imageText = decodeHtml(text.replace(/&nbsp;/g, ' ')).replace(reg, (match, p1) => {
+    const id = uuidv4()
+    textFragments.set(`${id}`, `${p1.trim()}`)
+    return `{${id}}`
+  })
+  return {
+    imageText,
+    textFragments
+  }
+}
+
+export function createWordItem(image) {
+  const {imageText, textFragments} = processImageText(image.text)
+  const paragraphs = imageText.split('\n')
+  const words = paragraphs.map(p => {
+    if (p === '') {
+      return [{type: 'break'}]
+    }
+    const words = p.split(' ').filter(w => w).map(word => {
+      if (word.indexOf('{') > -1) {
+        const id = word.toString().replace(/[^\w\-]+/gmui, '')
+        if (textFragments.has(id)) {
+          const reg = new RegExp(`{${id}}`)
+          word = word.replace(reg, textFragments.get(id))
+          return word.split(' ').map(w => ({id: uuidv4(), word: w, type: 'word', hidden: false, target: true}))
+        }
+      }
+      return [{id: uuidv4(), word, type: 'word', hidden: false}]
+    })
+    return [...(words.flat()), {type: 'break'}]
+  }).flat()
+  return {
+    id: image.id,
+    text: image.text,
+    words
+  }
+}
+
 /**
  * @param element
  * @param {Reveal|undefined} deck
@@ -83,7 +130,7 @@ export default function MentalMap(element, deck, params) {
     let hiddenCounter = 0;
     detailTexts.words.map(w => {
       if (w.type === 'word') {
-        totalCounter++
+        totalCounter++;
         if (w.hidden) {
           hiddenCounter++
         }
@@ -412,30 +459,10 @@ export default function MentalMap(element, deck, params) {
     return await response.json()
   }
 
-  function decodeHtml(html) {
-    const txt = document.createElement("textarea");
-    txt.innerHTML = html;
-    return txt.value;
-  }
-
   function stripTags(html) {
     const div = document.createElement('div');
     div.innerHTML = html;
     return div.textContent || div.innerText || '';
-  }
-
-  function processImageText(text) {
-    const textFragments = new Map();
-    const reg = new RegExp(`<span[^>]*>(.*?)<\\/span>`, 'gm');
-    const imageText = decodeHtml(text.replace(/&nbsp;/g, ' ')).replace(reg, (match, p1) => {
-      const id = uuidv4()
-      textFragments.set(`${id}`, `${p1.trim()}`)
-      return `{${id}}`
-    })
-    return {
-      imageText,
-      textFragments
-    }
   }
 
   function showMentalMapHandler(zoomWrap, closeMentalMapHandler) {
@@ -544,37 +571,12 @@ export default function MentalMap(element, deck, params) {
           voiceResponse.stop()
           const el = document.querySelector('#start-recording')
           if (el) {
-            $(el).click()
+            $(el).trigger('click')
           }
         }
     })
 
-    texts = json.map.images.map(image => {
-      const {imageText, textFragments} = processImageText(image.text)
-      const paragraphs = imageText.split('\n')
-      const words = paragraphs.map(p => {
-        if (p === '') {
-          return [{type: 'break'}]
-        }
-        const words = p.split(' ').filter(w => w).map(word => {
-          if (word.indexOf('{') > -1) {
-            const id = word.toString().replace(/[^\w\-]+/gmui, '')
-            if (textFragments.has(id)) {
-              const reg = new RegExp(`{${id}}`)
-              word = word.replace(reg, textFragments.get(id))
-              return word.split(' ').map(w => ({id: uuidv4(), word: w, type: 'word', hidden: false, target: true}))
-            }
-          }
-          return [{id: uuidv4(), word, type: 'word', hidden: false}]
-        })
-        return [...(words.flat()), {type: 'break'}]
-      }).flat()
-      return {
-        id: image.id,
-        text: image.text,
-        words
-      }
-    })
+    texts = json.map.images.map(image => createWordItem(image))
 
     const imageFirst = Boolean(json?.settings?.imageFirst)
 
@@ -600,6 +602,13 @@ export default function MentalMap(element, deck, params) {
           finishRepetition(params.mentalMapId)
         }
       }
+
+      texts = texts.map(t => {
+        if (t.id === image.id) {
+          return createWordItem(image)
+        }
+        return t
+      })
 
       if (/*getCourseMode &&*/ historyIsDone(history)) {
         const content = createFinishContent(history, texts)
