@@ -1610,7 +1610,11 @@ const StoryEditor = (function () {
     Reveal.slide(0);
     slidesManager.setActiveSlide($editor.find('section'), slideData);
     if (slideData.isLink) {
-      $editor.find('section').addClass('is-link');
+      $editor.find('section')
+        .attr('title', 'Перейти к исходному слайду')
+        .on('click', () => window.open(slideData.linkUrl, '_blank'))
+        .addClass('is-link')
+
       blockToolbar.hide();
       //slideMenu.hide();
     } else {

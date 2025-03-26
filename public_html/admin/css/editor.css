@@ -563,6 +563,7 @@ body {
     height: 100%;
     left: 0;
     top: 0;
+  cursor: pointer;
 }
 
 #story-editor section.is-link:before {

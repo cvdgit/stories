@@ -7,6 +7,7 @@ namespace backend\components\editor;
 use backend\components\SlideModifier;
 use common\models\StorySlide;
 use Exception;
+use yii\helpers\Url;
 
 class SlideListResponse
 {
@@ -33,11 +34,21 @@ class SlideListResponse
             ->addImageId()
             ->addDescription()
             ->render();
+
+        $linkUrl = null;
+        if ($s->link_slide_id !== null) {
+            $linkSlide = StorySlide::findOne($s->link_slide_id);
+            if ($linkSlide !== null) {
+                $linkUrl = Url::to(['/editor/edit', 'id' => $linkSlide->story_id, '#' => $s->link_slide_id]);
+            }
+        }
+
         return [
             'id' => $s->id,
             'slideNumber' => $s->number,
             'isLink' => $s->isLink(),
             'isQuestion' => $s->isQuestion(),
+            'linkUrl' => $linkUrl,
             'linkSlideID' => $s->link_slide_id,
             'isHidden' => $s->isHidden(),
             'data' => $slideData,
