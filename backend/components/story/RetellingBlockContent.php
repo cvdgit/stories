@@ -44,7 +44,7 @@ class RetellingBlockContent
 
     public function renderWithDescription(int $slideId, string $title = 'Пересказ'): string
     {
-        $link = Html::a($title, ['retelling/editor', 'id' => $this->id, 'from_slide' => $slideId]);
+        $link = Html::a($title, '#', ['data-retelling-action' => 'update']);
         return Html::tag('div', $link, [
             'class' => 'retelling-block',
             'data-retelling-id' => $this->id,

@@ -218,7 +218,8 @@ export default function Retelling(element, deck, params) {
   return {
     run,
     canNext() {
-      return params.completed
+      return !(params.retellingRequired && !params.completed);
+
     }
   }
 }

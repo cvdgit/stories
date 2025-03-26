@@ -626,6 +626,18 @@ $js = <<< JS
     $('[data-editor-show=slide]').on('click', function() {
         window.open(StoryEditor.getSlidePreviewUrl(), 'target=_blank');
     });
+
+    $('#story-editor').on('click', '[data-retelling-action=update]', e => {
+        e.preventDefault()
+        const blockId = $(e.target).parents('.sl-block').attr('data-block-id')
+        if (blockId) {
+            editorRetelling.showUpdateModal({
+                storyId: StoryEditor.getConfigValue('storyID'),
+                slideId: StoryEditor.getCurrentSlide().getID(),
+                blockId
+            })
+        }
+    })
 })();
 JS;
 $this->registerJs($js);
