@@ -45,7 +45,7 @@ class MentalMap extends ActiveRecord
         if (count($doneItems) === 0) {
             return 0;
         }
-        return count($doneItems) * 100 / count($history);
+        return (int) round(count($doneItems) * 100 / count($history));
     }
 
     public function isMentalMapAsTree(): bool
