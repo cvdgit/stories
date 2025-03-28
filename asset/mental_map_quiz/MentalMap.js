@@ -603,12 +603,12 @@ export default function MentalMap(element, deck, params) {
         }
       }
 
-      texts = texts.map(t => {
+      /*texts = texts.map(t => {
         if (t.id === image.id) {
           return createWordItem(image)
         }
         return t
-      })
+      })*/
 
       if (/*getCourseMode &&*/ historyIsDone(history)) {
         const content = createFinishContent(history, texts)
