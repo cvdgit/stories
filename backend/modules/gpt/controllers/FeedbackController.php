@@ -109,19 +109,23 @@ JSON;
         $dataProvider = new SqlDataProvider([
             "sql" => '
                 SELECT
-                    target,
-                    IF(input -> "$.input.question" IS NULL,
-                      JSON_UNQUOTE(JSON_EXTRACT(input, CONCAT("$.input.messages[", JSON_LENGTH(input ->> "$.input.messages") -1 ,"].content"))),
-                      JSON_UNQUOTE(input -> "$.input.question")
-                    ) AS `input`,
+                    t.target,
+                    IF(t.input -> "$.input.question" IS NULL,
+                      JSON_UNQUOTE(JSON_EXTRACT(t.input, CONCAT("$.input.messages[", JSON_LENGTH(input ->> "$.input.messages") -1 ,"].content"))),
+                      JSON_UNQUOTE(t.input -> "$.input.question")
+                    ) AS input,
                     CASE
-                        WHEN output->"$.final_output" IS NULL
-                        THEN JSON_UNQUOTE(output->"$.message")
-                        ELSE JSON_UNQUOTE(output->"$.final_output")
-                    END AS `output`,
-                    created_at
-                FROM llm_feedback
-                ORDER BY created_at DESC',
+                        WHEN t.output->"$.final_output" IS NULL
+                        THEN JSON_UNQUOTE(t.output->"$.message")
+                        ELSE JSON_UNQUOTE(t.output->"$.final_output")
+                    END AS output,
+                    t.score,
+                    t.created_at,
+                    IF(p.first_name IS NULL, u.email, CONCAT(p.last_name, " ", p.first_name)) AS user_name
+                FROM llm_feedback t
+                inner join user u ON u.id = t.user_id
+                left join profile p ON u.id = p.user_id
+                ORDER BY t.created_at DESC',
             "totalCount" => (new Query())->from("llm_feedback")->count()
         ]);
         return $this->render("list", [

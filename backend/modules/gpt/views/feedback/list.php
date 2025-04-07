@@ -18,9 +18,19 @@ $this->title = "GPT feedback";
     "dataProvider" => $dataProvider,
     "options" => ["class" => "table-responsive"],
     "columns" => [
-        "target",
-        "input",
-        "output",
-        "created_at:datetime",
+        'target',
+        'input',
+        'output',
+        [
+            'attribute' => 'score',
+            'value' => static function (array $model): string {
+    if ($model['score'] === '1') {
+        return '👍';
+    }
+    return '';
+            },
+        ],
+        'created_at:datetime',
+        'user_name'
     ],
 ]); ?>
