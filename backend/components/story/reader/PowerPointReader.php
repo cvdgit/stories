@@ -131,6 +131,7 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
     protected function loadShapeText(RichText $powerPointShape, Slide $slide): void
     {
         $block = new TextBlock();
+        $container = $powerPointShape->getContainer();
         if ($this->currentSlideBlockNumber === 1 && ($this->currentSlideNumber === 0 || $this->currentSlideNumber === $this->slideNumber - 1)) {
             $block->setType(AbstractBlock::TYPE_HEADER);
             $block->setWidth('1200px');
@@ -140,10 +141,21 @@ class PowerPointReader extends AbstractReader implements ReaderInterface
         }
         else {
             $block->setType(AbstractBlock::TYPE_TEXT);
-            $block->setWidth($powerPointShape->getWidth() . 'px');
+            $width = $powerPointShape->getWidth() === 0 ? 600 : $powerPointShape->getWidth();
+            $block->setWidth($width . 'px');
             $block->setHeight('auto');
-            $block->setLeft($powerPointShape->getOffsetX() . 'px');
-            $block->setTop($powerPointShape->getOffsetY() . 'px');
+
+            $offsetX = $powerPointShape->getOffsetX();
+            if ($offsetX === 0 && $container !== null) {
+                $offsetX = $container->getExtentX();
+            }
+            $block->setLeft($offsetX . 'px');
+
+            $offsetY = $powerPointShape->getOffsetY();
+            if ($offsetY === 0 && $container !== null) {
+                $offsetY = $container->getExtentY();
+            }
+            $block->setTop($offsetY . 'px');
         }
 
         $paragraphText = [];
