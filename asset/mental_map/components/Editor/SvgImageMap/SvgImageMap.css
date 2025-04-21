@@ -1,0 +1,222 @@
+
+.svg_select_shape {
+  stroke-width: 1;
+  stroke-dasharray: 10 10;
+  stroke: black;
+  stroke-opacity: 0.1;
+  pointer-events: none;
+  fill: none;
+}
+
+.svg_select_shape_pointSelect {
+  stroke-width: 1;
+  fill: none;
+  stroke-dasharray: 10 10;
+  stroke: black;
+  stroke-opacity: 0.8;
+  pointer-events: none;
+}
+
+.svg_select_handle {
+  stroke-width: 3;
+  stroke: black;
+  fill: none;
+}
+
+.svg_select_handle_rot {
+  fill: white;
+  stroke: black;
+  stroke-width: 1;
+  cursor: move;
+}
+
+.svg_select_handle_lt {
+  cursor: nw-resize;
+}
+
+.svg_select_handle_rt {
+  cursor: ne-resize;
+}
+
+.svg_select_handle_rb {
+  cursor: se-resize;
+}
+
+.svg_select_handle_lb {
+  cursor: sw-resize;
+}
+
+.svg_select_handle_t {
+  cursor: n-resize;
+}
+
+.svg_select_handle_r {
+  cursor: e-resize;
+}
+
+.svg_select_handle_b {
+  cursor: s-resize;
+}
+
+.svg_select_handle_l {
+  cursor: w-resize;
+}
+
+.svg_select_handle_point {
+  stroke: black;
+  stroke-width: 1;
+  cursor: move;
+  fill: white;
+}
+
+.svg_select_shape {
+  stroke-width: 1;
+  stroke-dasharray: 10 10;
+  stroke: #000;
+  stroke-opacity: .1;
+  pointer-events: none;
+  fill: none
+}
+
+.svg_select_shape_pointSelect {
+  stroke-width: 1;
+  fill: none;
+  stroke-dasharray: 10 10;
+  stroke: #000;
+  stroke-opacity: .8;
+  pointer-events: none
+}
+
+.svg_select_handle {
+  stroke-width: 3;
+  stroke: #000;
+  fill: none
+}
+
+.svg_select_handle_rot {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 1;
+  cursor: move
+}
+
+.svg_select_handle_lt {
+  cursor: nw-resize
+}
+
+.svg_select_handle_rt {
+  cursor: ne-resize
+}
+
+.svg_select_handle_rb {
+  cursor: se-resize
+}
+
+.svg_select_handle_lb {
+  cursor: sw-resize
+}
+
+.svg_select_handle_t {
+  cursor: n-resize
+}
+
+.svg_select_handle_r {
+  cursor: e-resize
+}
+
+.svg_select_handle_b {
+  cursor: s-resize
+}
+
+.svg_select_handle_l {
+  cursor: w-resize
+}
+
+.svg_select_handle_point {
+  stroke: #000;
+  stroke-width: 1;
+  cursor: move;
+  fill: #fff
+}
+
+.map-fragment {
+  stroke: #1baee1;
+  stroke-width: 3;
+  fill-color: #1baee1;
+  fill-opacity: 0.1;
+}
+
+.map-image {
+  outline: 3px solid #1baee1;
+}
+
+.btn {
+  display: inline-block;
+  margin-bottom: 0;
+  font-weight: normal;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  background-image: none;
+  border: 1px solid transparent;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  border-radius: 4px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.btn-group > .btn:first-child:not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.btn-group > .btn:last-child:not(:first-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.btn-group > .btn:first-child {
+  margin-left: 0;
+}
+
+.btn-group .btn + .btn {
+  margin-left: -1px;
+}
+
+.btn-group > .btn {
+  position: relative;
+  float: left;
+  z-index: 2;
+}
+
+.btn-group {
+  display: flex;
+  position: relative;
+  vertical-align: middle;
+}
+
+.btn-default.active {
+  color: #333;
+  background-color: #e6e6e6;
+  background-image: none;
+  border-color: #adadad;
+}
+
+.btn-default {
+  color: #333;
+  background-color: #fff;
+  border-color: #ccc;
+}
+
+[data-toggle="buttons"] > .btn input[type="radio"] {
+  position: absolute;
+  clip: rect(0, 0, 0, 0);
+  pointer-events: none;
+}

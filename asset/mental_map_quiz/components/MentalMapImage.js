@@ -28,13 +28,28 @@ export default function MentalMapImage(
     mapImgWrap.addEventListener('click', () => {
       imageClickHandler(image)
     })
-    const mapImg = document.createElement('img')
-    mapImg.setAttribute('title', image.text.replace(/<[^>]*>?/gm, ''))
-    mapImg.dataset.trigger = 'hover'
-    mapImg.dataset.placement = 'auto'
-    mapImg.dataset.container = 'body'
-    mapImg.src = image.url
-    mapImgWrap.appendChild(mapImg)
+
+    if (image.url) {
+      const mapImg = document.createElement('img')
+      mapImg.classList.add('map-img')
+      mapImg.setAttribute('title', image.text.replace(/<[^>]*>?/gm, ''))
+      mapImg.dataset.trigger = 'hover'
+      mapImg.dataset.placement = 'auto'
+      mapImg.dataset.container = 'body'
+      mapImg.src = image.url
+      mapImgWrap.appendChild(mapImg)
+    } else {
+      console.log(image.text.replace(/<[^>]*>?/gm, ''), image.text)
+      const div = document.createElement('div')
+      div.style.height = '100%'
+      div.classList.add('map-fragment', 'map-img')
+      div.setAttribute('title', image.text.replace(/<[^>]*>?/gm, ''))
+      div.dataset.trigger = 'hover'
+      div.dataset.placement = 'auto'
+      div.dataset.container = 'body'
+      mapImgWrap.appendChild(div)
+    }
+
     zoomWrap.appendChild(mapImgWrap)
   })
 

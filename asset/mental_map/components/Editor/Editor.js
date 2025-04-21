@@ -6,14 +6,17 @@ import ImageMap from "./ImageMap";
 import UploadImageMap from "./ImageMap/UploadImageMap";
 import UploadingImageMap from "./ImageMap/UploadingImageMap";
 import api from "../../Api";
+import SvgImageMap from "./SvgImageMap/SvgImageMap";
 
 export default function Editor() {
+  console.log('editor')
   const {state, dispatch} = useMentalMap()
   const {state: images, dispatch: imagesDispatch} = useImages()
   const mouseLocationRef = useRef({x: 0, y: 0})
   const [uploading, setUploading] = useState(false)
   const [file, setFile] = useState(null)
   const [imageMap, setImageMap] = useState(state.map)
+  const [newImages, setNewImages] = useState([])
 
   const logMousePosition = e => {
     mouseLocationRef.current.x = e.clientX;
@@ -94,7 +97,7 @@ export default function Editor() {
 
         <div className="author-layout author-layout--quiz">
           <div className="author-layout__sidebar author-layout__sidebar--scroll">
-            <Images/>
+            <Images setNewImages={setNewImages}/>
           </div>
           <div className="author-layout__container">
             <div className="author-layout__content">
@@ -104,7 +107,7 @@ export default function Editor() {
                     {uploading
                       ? <UploadingImageMap file={file} uploadCompleteHandler={uploadCompleteHandler}/>
                       : state.map.url
-                        ? <ImageMap mapImage={state.map}/>
+                        ? <SvgImageMap mapImage={state.map} newImages={newImages}/>
                         : <UploadImageMap imageUploadHandler={imageUploadHandler}/>
                     }
                   </div>

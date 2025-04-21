@@ -21,7 +21,7 @@ function shuffle(array) {
   return array;
 }
 
-export default function Images() {
+export default function Images({setNewImages}) {
   const {state, dispatch} = useMentalMap()
   const {state: images, dispatch: imagesDispatch} = useImages()
   const ref = useRef()
@@ -107,6 +107,7 @@ export default function Images() {
     let top = 10
     let w = left
     let imgNum = state.map.images.length
+    const ids = []
     imagesToAdd.map((si, index) => {
 
       w = w + si.width + 50
@@ -129,9 +130,12 @@ export default function Images() {
         }
       })
 
+      ids.push(si.id)
+
       imgNum++
     })
 
+    setNewImages(ids)
     setSelectedImages([])
   }
 

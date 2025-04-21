@@ -190,10 +190,23 @@ export default function MentalMap(element, deck, params) {
   function mapImageClickHandler(image, texts, historyItem, rewritePrompt) {
     const detailImgWrap = document.createElement('div')
     detailImgWrap.classList.add('image-item')
-    const detailImg = document.createElement('img')
-    detailImg.src = image.url
-    detailImg.style.marginBottom = '10px'
-    detailImgWrap.appendChild(detailImg)
+
+    if (image.url) {
+      const detailImg = document.createElement('img')
+      detailImg.src = image.url
+      detailImg.style.marginBottom = '10px'
+      detailImgWrap.appendChild(detailImg)
+    } else {
+      const div = document.createElement('div')
+      div.style.marginBottom = '10px'
+      div.style.padding = '20px'
+      div.style.cursor = 'pointer'
+      div.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+</svg>
+`
+      detailImgWrap.appendChild(div)
+    }
 
     detailImgWrap.appendChild(FragmentResultElement(historyItem))
 
@@ -684,7 +697,7 @@ export default function MentalMap(element, deck, params) {
 
       this.element.appendChild(zoomContainer)
 
-      $('.mental-map-img img').tooltip()
+      $('.mental-map-img .map-img').tooltip()
 
       let initialZoom = 0.8
       const containerWidth = container.offsetWidth
@@ -751,7 +764,7 @@ export default function MentalMap(element, deck, params) {
         element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
       })
       this.element.appendChild(zoomContainer)
-      $('.mental-map-img img').tooltip()
+      $('.mental-map-img .map-img').tooltip()
 
       zoom = initPanZoom(zoomWrap, json.map.width, json.map.height)
       element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)

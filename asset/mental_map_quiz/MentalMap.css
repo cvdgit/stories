@@ -21,7 +21,7 @@
   cursor: pointer;
 }
 
-.mental-map-img img {
+.mental-map-img .map-img {
   width: 100%;
   transition: transform .25s ease-in, opacity .25s linear;
 }
@@ -39,7 +39,7 @@
   pointer-events: none;
 }
 
-.mental-map-img img:hover {
+.mental-map-img .map-img:hover {
   transform: scale(1.05);
 }
 
@@ -281,4 +281,9 @@
   transition: all ease-in-out 200ms;
   opacity: .5;
   cursor: not-allowed !important;
+}
+
+.map-fragment {
+  border: 3px #1baee1 solid;
+  background-color: rgba(27, 174, 225, 0.1);
 }
