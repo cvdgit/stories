@@ -336,7 +336,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
                 const historyItem = history.find(i => i.id === nodeId)
                 historyItem.json = retellingResponseSpan.innerHTML
                 historyItem.user_response = resultSpan.innerHTML
-                if (val > 85 && importantWordsPassed) {
+                if (val >= 85 && importantWordsPassed) {
                   nodeStatusElement.innerHTML = nodeStatusSuccessHtml
 
                   if (historyItem) {
