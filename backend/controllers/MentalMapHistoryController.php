@@ -11,6 +11,7 @@ use backend\components\StorySideBarMenuItemsBuilder;
 use backend\MentalMap\MentalMap;
 use common\models\Story;
 use common\rbac\UserRoles;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use yii\db\Expression;
 use yii\db\Query;
 use yii\filters\AccessControl;
@@ -71,7 +72,8 @@ class MentalMapHistoryController extends Controller
                 'userId' => 'h.user_id',
                 'mentalMapId' => 'h.mental_map_id',
                 'imageFragmentId' => 'h.image_fragment_id',
-                'maxHistoryItemId' => new Expression("SUBSTRING_INDEX(GROUP_CONCAT(h.id ORDER BY h.overall_similarity DESC), ',', 1)")
+                'maxHistoryItemId' => new Expression("SUBSTRING_INDEX(GROUP_CONCAT(h.id ORDER BY h.overall_similarity DESC), ',', 1)"),
+                'maxThreshold' => new Expression('MAX(h.threshold)'),
             ])
             ->from(['h' => 'mental_map_history'])
             ->where([
@@ -90,6 +92,7 @@ class MentalMapHistoryController extends Controller
                 'target' => 'h2.text_target_percentage',
                 'content' => 'h2.content',
                 'createdAt' => 'h2.created_at',
+                'maxThreshold' => 't.maxThreshold',
             ])
             ->distinct()
             ->from(['h' => 'mental_map_history'])

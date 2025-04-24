@@ -73,6 +73,7 @@ CSS,
                             <tr>
                                 <th style="width: 30%">Фрагмент</th>
                                 <th style="width: 30%">Текст при ответе</th>
+                                <th>Порог</th>
                                 <th style="width: 10%">% сходства</th>
                                 <th style="width: 10%">% закрытия текста</th>
                                 <th style="width: 10%">% закрытия важного текста</th>
@@ -95,6 +96,7 @@ CSS,
                                 <tr>
                                     <td><?= $image['text'] ?? $image['title']; ?></td>
                                     <td><?= $imageData['content'] ?? '-'; ?></td>
+                                    <td><?= $imageData['maxThreshold'] ?? '-' ?></td>
                                     <td><?= $imageData['all'] ?? '-'; ?></td>
                                     <td><?= $imageData['hiding'] ?? '-'; ?></td>
                                     <td><?= $imageData['target'] ?? '-' ?></td>
