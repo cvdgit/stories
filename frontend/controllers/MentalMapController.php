@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace frontend\controllers;
 
-use common\models\Story;
+use common\components\MentalMapThreshold;
 use common\models\User;
 use common\rbac\UserRoles;
 use Exception;
@@ -81,37 +81,12 @@ class MentalMapController extends Controller
         }
 
         $repetitionMode = $rawBody['repetition_mode'] ?? false;
+        $threshold = MentalMapThreshold::getThreshold(Yii::$app->params, $mentalMap->payload);
 
         if ($mentalMap->isMentalMapAsTree()) {
-
-            /*$list = $this->flatten($mentalMap->getTreeData());
-            if (!$repetitionMode) {
-                $list = $this->createMentalMapTreeHistory($list, $mentalMap->uuid, $user->getId());
-            }
-            $history = array_map(static function (array $item): array {
-                return [
-                    'id' => $item['id'],
-                    'done' => $item['done'] ?? false,
-                ];
-            }, $list);*/
-
-            $history = (new MentalMapTreeHistoryFetcher())->fetch($mentalMap->uuid, $user->getId(), $mentalMap->getTreeData(), $repetitionMode);
+            $history = (new MentalMapTreeHistoryFetcher())->fetch($mentalMap->uuid, $user->getId(), $mentalMap->getTreeData(), $threshold, $repetitionMode);
         } else {
-            /*$items = $mentalMap->getImages();
-            if (!$repetitionMode) {
-                $items = $this->createMentalMapHistory($items, $mentalMap->uuid, $user->getId());
-            }
-            $history = array_map(static function (array $item): array {
-                return [
-                    'id' => $item['id'],
-                    'all' => $item['all'] ?? 0,
-                    'hiding' => $item['hiding'] ?? 0,
-                    'target' => $item['target'] ?? 0,
-                    'done' => ($item['all'] ?? 0) > 75
-                ];
-            }, $items);*/
-
-            $history = (new MentalMapHistoryFetcher())->fetch($mentalMap->getImages(), $mentalMap->uuid, $user->getId(), $repetitionMode);
+            $history = (new MentalMapHistoryFetcher())->fetch($mentalMap->getImages(), $mentalMap->uuid, $user->getId(), $threshold, $repetitionMode);
         }
 
         $prompt = null;
@@ -128,6 +103,7 @@ class MentalMapController extends Controller
             'mentalMap' => $mentalMap->payload,
             'history' => $history,
             'rewritePrompt' => $prompt,
+            'threshold' => MentalMapThreshold::getThreshold(Yii::$app->params, $mentalMap->payload),
         ];
     }
 
@@ -166,6 +142,7 @@ class MentalMapController extends Controller
                     'text_hiding_percentage' => $form->text_hiding_percentage,
                     'text_target_percentage' => $form->text_target_percentage,
                     'created_at' => time(),
+                    'threshold' => $form->threshold,
                 ]);
                 $command->execute();
 
@@ -187,14 +164,16 @@ class MentalMapController extends Controller
                     ->limit(1);
                 $fragmentHistory = $query->one();
 
+                $threshold = MentalMapThreshold::getThreshold(Yii::$app->params, $mentalMap->payload);
+
                 if (!$form->repetition_mode) {
                     /*$history = $this->createMentalMapHistory(
                         $mentalMap->getImages(),
                         $mentalMap->uuid,
                         $user->getId(),
                     );*/
-                    $history = (new MentalMapHistoryFetcher())->fetch($mentalMap->getImages(), $mentalMap->uuid, $user->getId());
-                    if (MentalMap::isDone($history)) {
+                    $history = (new MentalMapHistoryFetcher())->fetch($mentalMap->getImages(), $mentalMap->uuid, $user->getId(), $threshold);
+                    if (MentalMap::isDone($history, $threshold)) {
                         $currentUser = User::findOne($user->getId());
                         if ($currentUser === null) {
                         }
@@ -204,7 +183,7 @@ class MentalMapController extends Controller
                     }
                 }
 
-                $fragmentHistory['done'] = (int) $fragmentHistory['all'] >= 80;
+                $fragmentHistory['done'] = MentalMap::fragmentIsDone((int) $fragmentHistory['all'], $threshold);
                 return ['success' => true, 'history' => $fragmentHistory];
             } catch (Exception $ex) {
                 Yii::$app->errorHandler->logException($ex);

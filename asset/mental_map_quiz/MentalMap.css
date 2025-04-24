@@ -214,6 +214,9 @@
   padding: 10px;
   border-radius: 20px 20px 0 0;
   border-bottom: 1px #808080 solid;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .detail-text-actions {

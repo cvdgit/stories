@@ -187,7 +187,7 @@ export default function MentalMap(element, deck, params) {
 
   const langStore = new RecordingLangStore('ru-RU')
 
-  function mapImageClickHandler(image, texts, historyItem, rewritePrompt) {
+  function mapImageClickHandler(image, texts, historyItem, rewritePrompt, threshold) {
     const detailImgWrap = document.createElement('div')
     detailImgWrap.classList.add('image-item')
 
@@ -388,7 +388,8 @@ export default function MentalMap(element, deck, params) {
               text_hiding_percentage: textHidingPercentage,
               text_target_percentage: textTargetPercentage,
               content: detailTextContent.innerHTML,
-              repetition_mode: repetitionMode
+              repetition_mode: repetitionMode,
+              threshold
             }).then(response => {
               if (response && response?.success) {
                 historyItem.all = response.history.all
@@ -552,7 +553,7 @@ export default function MentalMap(element, deck, params) {
       return
     }
 
-    const {mentalMap: json, history, rewritePrompt} = responseJson
+    const {mentalMap: json, history, rewritePrompt, threshold} = responseJson
 
     mentalMapId = json.id
     mentalMapHistory = history
@@ -569,6 +570,7 @@ export default function MentalMap(element, deck, params) {
           slide_id: params?.slide_id,
           mental_map_id: params.mentalMapId,
           repetition_mode: repetitionMode,
+          threshold
         }
       }, new VoiceResponse(new MissingWordsRecognition({}))))
 
@@ -591,7 +593,7 @@ export default function MentalMap(element, deck, params) {
 
     texts = json.map.images.map(image => createWordItem(image))
 
-    const imageFirst = Boolean(json?.settings?.imageFirst)
+    const imageFirst = Boolean(json.settings?.imageFirst)
 
     function fragmentDialogHideHandler(image, historyItem) {
       hideDialogHandler()
@@ -631,7 +633,7 @@ export default function MentalMap(element, deck, params) {
 
     container.appendChild(AllTexts(texts, json.map.images, history, (image) => {
       const historyItem = history.find(h => h.id === image.id)
-      const dialog = mapImageClickHandler(image, texts, historyItem, rewritePrompt)
+      const dialog = mapImageClickHandler(image, texts, historyItem, rewritePrompt, threshold)
       dialog.onHide(() => fragmentDialogHideHandler(image, historyItem))
     }))
 
@@ -655,7 +657,7 @@ export default function MentalMap(element, deck, params) {
         (image) => {
           element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
           const historyItem = history.find(h => h.id === image.id)
-          const dialog = mapImageClickHandler(image, texts, historyItem)
+          const dialog = mapImageClickHandler(image, texts, historyItem, rewritePrompt, threshold)
           dialog.onHide(() => {
             element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
             fragmentDialogHideHandler(image, historyItem)
@@ -724,6 +726,14 @@ export default function MentalMap(element, deck, params) {
 
     toolbar.appendChild(mentalMapBtn)
 
+    const header = document.createElement('p')
+    header.style.marginLeft = '20px'
+    header.style.marginBottom = '0'
+    header.style.fontSize = '2.2rem';
+    header.style.lineHeight = '3rem';
+    header.innerHTML = `Точность пересказа установлена в <strong>${threshold}</strong>%`
+    toolbar.appendChild(header)
+
     this.element.appendChild(toolbar)
     this.element.appendChild(container)
 
@@ -741,7 +751,7 @@ export default function MentalMap(element, deck, params) {
           element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
 
           const historyItem = history.find(h => h.id === image.id)
-          const dialog = mapImageClickHandler(image, texts, historyItem)
+          const dialog = mapImageClickHandler(image, texts, historyItem, rewritePrompt, threshold)
 
           dialog.onHide(() => {
             element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)

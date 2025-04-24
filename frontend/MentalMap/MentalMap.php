@@ -24,23 +24,29 @@ class MentalMap extends ActiveRecord
         return $this->payload['map']['images'] ?? [];
     }
 
-    public static function isDone(array $history): bool
+    public static function isDone(array $history, int $threshold): bool
     {
         if (count($history) === 0) {
             return false;
         }
-        return array_reduce($history, static function (bool $carry, array $item): bool {
-            return $carry && (int) $item['all'] >= 80;
+        return array_reduce($history, static function (bool $carry, array $item) use ($threshold): bool {
+            return $carry && self::fragmentIsDone((int) $item['all'], $threshold);
         }, true);
     }
 
-    public static function calcHistoryPercent(array $history): int
+    public static function fragmentIsDone(int $value, int $threshold): bool
+    {
+        return $value >= $threshold;
+    }
+
+    public static function calcHistoryPercent(array $history, int $threshold): int
     {
         if (count($history) === 0) {
             return 100;
         }
-        $doneItems = array_filter($history, static function(array $item): bool {
-            return $item['done'] || ($item['all'] ?? 0) >= 80;
+        $doneItems = array_filter($history, static function(array $item) use ($threshold): bool {
+            $all = isset($item['all']) ? (int) $item['all'] : 0;
+            return $item['done'] || self::fragmentIsDone($all, $threshold);
         });
         if (count($doneItems) === 0) {
             return 0;

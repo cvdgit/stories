@@ -4,14 +4,21 @@ declare(strict_types=1);
 
 namespace frontend\MentalMap\history;
 
+use frontend\MentalMap\MentalMap;
 use yii\db\Query;
 
 class MentalMapTreeHistoryFetcher
 {
-    public function fetch(string $mentalMapId, int $userId, array $treeData, bool $repetitionMode = false): array {
+    public function fetch(
+        string $mentalMapId,
+        int $userId,
+        array $treeData,
+        int $threshold,
+        bool $repetitionMode = false
+    ): array {
         $list = $this->flatten($treeData);
         if (!$repetitionMode) {
-            $list = $this->createMentalMapTreeHistory($list, $mentalMapId, $userId);
+            $list = $this->createMentalMapTreeHistory($list, $mentalMapId, $userId, $threshold);
         }
         return array_map(static function (array $item): array {
             return [
@@ -22,8 +29,12 @@ class MentalMapTreeHistoryFetcher
         }, $list);
     }
 
-    private function createMentalMapTreeHistory(array $nodeList, string $mentalMapId, int $userId): array
-    {
+    private function createMentalMapTreeHistory(
+        array $nodeList,
+        string $mentalMapId,
+        int $userId,
+        int $threshold
+    ): array {
         $history = array_map(static function (array $node): array {
             return [
                 'id' => $node['id'],
@@ -47,12 +58,14 @@ class MentalMapTreeHistoryFetcher
             ->indexBy('id')
             ->all();
 
-        return array_map(static function (array $item) use ($rows): array {
+        return array_map(static function (array $item) use ($rows, $threshold): array {
             if (isset($rows[$item['id']])) {
-                $item['done'] = (int) $rows[$item['id']]['all'] >= 80;
-                $item['all'] = (int) $rows[$item['id']]['all'];
-                $item['hiding'] = (int) $rows[$item['id']]['hiding'];
-                $item['target'] = (int) $rows[$item['id']]['target'];
+                $row = $rows[$item['id']];
+                $all = isset($row['all']) ? (int) $row['all'] : 0;
+                $item['done'] = MentalMap::fragmentIsDone($all, $threshold);
+                $item['all'] = $all;
+                $item['hiding'] = isset($row['hiding']) ? (int) $row['hiding'] : 0;
+                $item['target'] = isset($row['target']) ? (int) $row['target'] : 0;
             }
             return $item;
         }, $history);

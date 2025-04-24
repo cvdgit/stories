@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace frontend\services;
 
+use common\components\MentalMapThreshold;
 use common\models\StorySlide;
 use common\models\StoryStudentProgress;
 use common\models\UserStudent;
@@ -125,12 +126,13 @@ class StoryStatService
         foreach ($mentalMapItems as $item) {
             $mentalMap = MentalMap::findOne($item->getMentalMapId());
             if ($mentalMap !== null) {
+                $threshold = MentalMapThreshold::getThreshold(Yii::$app->params, $mentalMap->payload);
                 if ($mentalMap->isMentalMapAsTree()) {
-                    $history = (new MentalMapTreeHistoryFetcher())->fetch($mentalMap->uuid, $this->student->user_id, $mentalMap->getTreeData());
+                    $history = (new MentalMapTreeHistoryFetcher())->fetch($mentalMap->uuid, $this->student->user_id, $mentalMap->getTreeData(), $threshold);
                 } else {
-                    $history = (new MentalMapHistoryFetcher())->fetch($mentalMap->getImages(), $mentalMap->uuid, $this->student->user_id);
+                    $history = (new MentalMapHistoryFetcher())->fetch($mentalMap->getImages(), $mentalMap->uuid, $this->student->user_id, $threshold);
                 }
-                if (MentalMap::isDone($history)) {
+                if (MentalMap::isDone($history, $threshold)) {
                     $doneNumber++;
                 }
             }

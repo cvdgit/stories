@@ -57,23 +57,9 @@ export default function DetailText(text, itemClickHandler, afterRandCallback, pr
         }
       }
       currentSpan.addEventListener('click', () => {
-
         word.hidden = !word.hidden
         currentSpan.classList.toggle('selected')
         itemClickHandler()
-
-        /*
-        if (voiceResponse.getStatus()) {
-          voiceResponse.stop()
-          startRecording(recordingWrap.querySelector('#start-recording'))
-        }
-        ['#result_span', '#final_span', '#interim_span'].map(q => {
-          detailTextWrap.querySelector(q).innerHTML = ''
-          recordingWrap.querySelector('#start-retelling-wrap').style.display = 'none'
-        })
-
-        recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text)
-        */
       })
       detailText.appendChild(currentSpan)
     }

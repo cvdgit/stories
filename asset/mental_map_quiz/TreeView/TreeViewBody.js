@@ -296,7 +296,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
               return
             }
 
-            console.log(text)
+            // console.log(text)
 
             retellingResponseSpan.innerText = ''
             sendMessage(`/admin/index.php?r=gpt/stream/retelling-tree`, {
@@ -326,17 +326,17 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
                   console.log('no json')
                   return
                 }
-                const val = Number(json?.similarity_percentage)
+                const val = Number(json.similarity_percentage)
                 let importantWordsPassed = true
 
-                if (json?.all_important_words_included !== undefined) {
-                  importantWordsPassed = Boolean(json?.all_important_words_included)
+                if (json.all_important_words_included !== undefined) {
+                  importantWordsPassed = Boolean(json.all_important_words_included)
                 }
 
                 const historyItem = history.find(i => i.id === nodeId)
                 historyItem.json = retellingResponseSpan.innerHTML
                 historyItem.user_response = resultSpan.innerHTML
-                if (val >= 85 && importantWordsPassed) {
+                if (val >= params.threshold && importantWordsPassed) {
                   nodeStatusElement.innerHTML = nodeStatusSuccessHtml
 
                   if (historyItem) {
@@ -370,14 +370,14 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
                 saveUserResult({
                   ...params,
                   image_fragment_id: nodeId,
-                  overall_similarity: Number(json?.similarity_percentage),
+                  overall_similarity: Number(json.similarity_percentage),
                   text_hiding_percentage: 0, // textHidingPercentage,
                   text_target_percentage: 0, // textTargetPercentage,
                   content,
                   user_response: resultSpan.innerText,
                   api_response: JSON.stringify(json)
                 }).then(response => {
-                  if (response && response?.success) {
+                  if (response && response.success) {
                     historyItem.all = response.history.all
                     historyItem.hiding = response.history.hiding
                     historyItem.target = response.history.target

@@ -4,22 +4,29 @@ declare(strict_types=1);
 
 namespace frontend\MentalMap\history;
 
+use frontend\MentalMap\MentalMap;
 use yii\db\Query;
 
 class MentalMapHistoryFetcher
 {
-    public function fetch(array $fragments, string $mentalMapId, int $userId, bool $repetitionMode = false): array
-    {
+    public function fetch(
+        array $fragments,
+        string $mentalMapId,
+        int $userId,
+        int $threshold,
+        bool $repetitionMode = false
+    ): array {
         if (!$repetitionMode) {
             $items = $this->createMentalMapHistory($fragments, $mentalMapId, $userId);
         }
-        return array_map(static function (array $item): array {
+        return array_map(static function (array $item) use ($threshold): array {
+            $all = isset($item['all']) ? (int) $item['all'] : 0;
             return [
                 'id' => $item['id'],
-                'all' => $item['all'] ?? 0,
-                'hiding' => $item['hiding'] ?? 0,
-                'target' => $item['target'] ?? 0,
-                'done' => ($item['all'] ?? 0) >= 80,
+                'all' => $all,
+                'hiding' => isset($item['hiding']) ? (int) $item['hiding'] : 0,
+                'target' => isset($item['target']) ? (int) $item['target'] : 0,
+                'done' => MentalMap::fragmentIsDone($all, $threshold),
             ];
         }, $items ?? $fragments);
     }

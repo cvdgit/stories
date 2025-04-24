@@ -5,7 +5,7 @@ import TreeViewBody from "./TreeViewBody";
  * @param name
  * @param tree
  * @param history
- * @param {{story_id: number|null, slide_id: number|null, mental_map_id: string}} params
+ * @param {{story_id: number|null, slide_id: number|null, mental_map_id: string, threshold: number}} params
  * @param {VoiceResponse} voiceResponse
  * @returns {HTMLDivElement}
  * @constructor

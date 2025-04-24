@@ -222,7 +222,7 @@ export default function App({mentalMapId}) {
                   type="checkbox"
                 /> При прохождении показывать изображение ментальной карты</label>
             </div>
-            <div>
+            <div style={{marginBottom: '20px'}}>
               <select value={String(state?.settings?.scheduleId)} onChange={(e) => {
                 settings.scheduleId = e.target.value === '' ? null : Number(e.target.value)
                 setSettings(settings)
@@ -235,6 +235,23 @@ export default function App({mentalMapId}) {
                 {schedules.map(s => (
                   <option key={s.id} value={s.id}>{s.name}</option>
                 ))}
+              </select>
+            </div>
+            <div>
+              <select value={String(state.settings?.threshold || '80')} onChange={(e) => {
+                settings.threshold = e.target.value === '' ? null : Number(e.target.value)
+                setSettings(settings)
+                dispatch({
+                  type: 'update_settings',
+                  payload: settings
+                })
+              }} style={{width: '100%', padding: '10px'}}>
+                <option value="">Выберите</option>
+                <option value="95">95</option>
+                <option value="80">80</option>
+                <option value="60">60</option>
+                <option value="40">40</option>
+                <option value="20">20</option>
               </select>
             </div>
           </div>

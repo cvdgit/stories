@@ -2,6 +2,7 @@
 
 namespace modules\edu\controllers;
 
+use common\components\MentalMapThreshold;
 use frontend\MentalMap\history\MentalMapHistoryFetcher;
 use frontend\MentalMap\history\MentalMapTreeHistoryFetcher;
 use frontend\MentalMap\MentalMap;
@@ -252,13 +253,14 @@ class DefaultController extends Controller
             if ($mentalMap === null) {
                 continue;
             }
+            $threshold = MentalMapThreshold::getThreshold(Yii::$app->params, $mentalMap->payload);
             $history = $mentalMap->isMentalMapAsTree()
-                ? (new MentalMapTreeHistoryFetcher())->fetch($mentalMap->uuid, $student->user_id, $mentalMap->getTreeData())
-                : (new MentalMapHistoryFetcher())->fetch($mentalMap->getImages(), $mentalMap->uuid, $student->user_id);
+                ? (new MentalMapTreeHistoryFetcher())->fetch($mentalMap->uuid, $student->user_id, $mentalMap->getTreeData(), $threshold)
+                : (new MentalMapHistoryFetcher())->fetch($mentalMap->getImages(), $mentalMap->uuid, $student->user_id, $threshold);
             $mentalMapProgress[$mentalMapId] = [
                 'mental_map_id' => $mentalMap->uuid,
                 'mental_map_name' => $mentalMap->name,
-                'progress' => MentalMap::calcHistoryPercent($history),
+                'progress' => MentalMap::calcHistoryPercent($history, $threshold),
             ];
         }
 
