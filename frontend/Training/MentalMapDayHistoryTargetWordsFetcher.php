@@ -80,7 +80,7 @@ final class MentalMapDayHistoryTargetWordsFetcher
     private function calcTargetFromContent(string $content): int
     {
         $document = phpQuery::newDocumentHTML($content);
-        $elements = $document->find('.selected');
+        $elements = $document->find('.word-target.selected');
         if ($elements->length === 0) {
             return 1;
         }
