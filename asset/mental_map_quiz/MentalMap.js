@@ -581,7 +581,8 @@ export default function MentalMap(element, deck, params) {
       return
     }
 
-    document.addEventListener('visibilitychange', e => {
+    /*document.addEventListener('visibilitychange', e => {
+      console.log('visibilitychange')
         if (voiceResponse.getStatus()) {
           voiceResponse.stop()
           const el = document.querySelector('#start-recording')
@@ -589,7 +590,17 @@ export default function MentalMap(element, deck, params) {
             $(el).trigger('click')
           }
         }
-    })
+    }, false)*/
+
+    window.addEventListener('blur', function() {
+      if (voiceResponse.getStatus()) {
+        voiceResponse.stop()
+        const el = document.querySelector('#start-recording')
+        if (el) {
+          $(el).trigger('click')
+        }
+      }
+    }, false);
 
     texts = json.map.images.map(image => createWordItem(image))
 
