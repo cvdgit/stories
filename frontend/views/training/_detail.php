@@ -14,6 +14,9 @@ use yii\web\View;
 
 $this->registerCss(
     <<<CSS
+.target-text {
+    font-weight: bold;
+}
 .text-item-word {
     display: inline-block;
     white-space: nowrap;
