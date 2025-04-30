@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace modules\edu\models;
 
 use common\models\User;
-use common\models\UserStudent;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
-use Yii;
+use modules\edu\Teacher\ClassBook\TeacherAccess\EduClassBookTeacherAccess;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -25,10 +26,10 @@ use yii\db\ActiveRecord;
  * @property EduClassProgram[] $classPrograms
  * @property EduStudent[] $students
  * @property User $user
+ * @property EduClassBookTeacherAccess[] $accessTeachers
  */
 class EduClassBook extends ActiveRecord
 {
-
     public function behaviors(): array
     {
         return [
@@ -53,17 +54,11 @@ class EduClassBook extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName(): string
     {
         return 'edu_class_book';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules(): array
     {
         return [
@@ -75,9 +70,6 @@ class EduClassBook extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels(): array
     {
         return [
@@ -174,7 +166,11 @@ class EduClassBook extends ActiveRecord
 
     public function getStudentCount(): int
     {
-        return $this->getStudents()->count();
+        $count = $this->getStudents()->count();
+        if ($count === null) {
+            return 0;
+        }
+        return (int) $count;
     }
 
     public function getTopicAccess(): ActiveQuery
@@ -186,5 +182,10 @@ class EduClassBook extends ActiveRecord
     {
         return $this->hasMany(EduTopic::class, ['id' => 'topic_id'])
             ->viaTable('edu_class_book_topic_access', ['class_book_id' => 'id']);
+    }
+
+    public function getAccessTeachers(): ActiveQuery
+    {
+        return $this->hasMany(EduClassBookTeacherAccess::class, ['class_book_id' => 'id']);
     }
 }

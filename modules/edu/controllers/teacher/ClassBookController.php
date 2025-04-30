@@ -18,6 +18,9 @@ use modules\edu\services\StudentService;
 use modules\edu\services\TeacherService;
 use modules\edu\Teacher\ClassBook\ManageTopics\ManageTopicsFormAction;
 use modules\edu\Teacher\ClassBook\ManageTopics\TopicAccessAction;
+use modules\edu\Teacher\ClassBook\TeacherAccess\RevokeAccessAction;
+use modules\edu\Teacher\ClassBook\TeacherAccess\TeacherAccessAction;
+use modules\edu\Teacher\ClassBook\TeacherAccess\TeacherAccessFormAction;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AjaxFilter;
@@ -26,6 +29,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Request;
 use yii\web\Response;
+use yii\web\User as WebUser;
 
 class ClassBookController extends Controller
 {
@@ -62,13 +66,16 @@ class ClassBookController extends Controller
         return [
             'manage-topics' => ManageTopicsFormAction::class,
             'save-topic-access' => TopicAccessAction::class,
+            'teacher-access' => TeacherAccessFormAction::class,
+            'grant-access' => TeacherAccessAction::class,
+            'revoke-access' => RevokeAccessAction::class,
         ];
     }
 
-    public function actionIndex(): string
+    public function actionIndex(WebUser $user): string
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => EduClassBook::findTeacherClassBooks(Yii::$app->user->getId()),
+            'query' => EduClassBook::findTeacherClassBooks($user->getId()),
             'sort' => [
                 'defaultOrder' => ['name' => SORT_ASC],
             ],

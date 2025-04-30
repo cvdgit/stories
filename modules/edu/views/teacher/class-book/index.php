@@ -3,12 +3,14 @@
 declare(strict_types=1);
 
 use modules\edu\models\EduClassBook;
+use modules\edu\Teacher\ClassBook\TeacherAccess\EduClassBookTeacherAccess;
 use modules\edu\widgets\grid\ArrowColumn;
 use modules\edu\widgets\TeacherMenuWidget;
 use yii\data\DataProviderInterface;
 use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\web\View;
+use yii\widgets\Pjax;
 
 /**
  * @var View $this
@@ -31,6 +33,7 @@ $this->registerJs($this->renderFile('@modules/edu/views/teacher/class-book/_prog
     </div>
 
     <div id="class-book-list">
+        <?php Pjax::begin(['id' => 'pjax-class-books']); ?>
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'summary' => false,
@@ -52,12 +55,23 @@ $this->registerJs($this->renderFile('@modules/edu/views/teacher/class-book/_prog
                     'attribute' => 'studentCount',
                 ],
                 [
+                    'label' => 'Доступ',
+                    'format' => 'raw',
+                    'value' => static function(EduClassBook $classBook): string {
+                        $names = array_map(static function(EduClassBookTeacherAccess $access): string {
+                            return $access->teacher->getProfileName();
+                        }, $classBook->getAccessTeachers()->with('teacher')->all());
+                        return (count($names) > 0 ? implode(', ', $names) . ' ' : '') . Html::a('<i class="glyphicon glyphicon-tasks" style="pointer-events: none"></i>', ['/edu/teacher/class-book/teacher-access', 'class_book_id' => $classBook->id], ['class' => 'teacher-access', 'data-pjax' => '0', 'title' => 'Настроить', 'style' => 'color: black']);
+                    }
+                ],
+                [
                     'class' => ArrowColumn::class,
                     'url' => static function($model) {
                         return ['/edu/teacher/class-book/students', 'id' => $model->id];
                     },
                 ],
             ],
-        ]); ?>
+        ]) ?>
+        <?php Pjax::end() ?>
     </div>
 </div>

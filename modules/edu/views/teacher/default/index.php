@@ -26,6 +26,7 @@ $this->title = 'Учительская доска';
                 <tr>
                     <th>Класс</th>
                     <th>Предмет</th>
+                    <th>Учитель</th>
                     <th></th>
                 </tr>
             </thead>
@@ -35,6 +36,7 @@ $this->title = 'Учительская доска';
                 <tr>
                     <td><?= $classBook->name ?></td>
                     <td><?= $classProgram->classProgram->program->name ?></td>
+                    <td><?= $classBook->user->getProfileName() ?></td>
                     <td>
                         <?= Html::a('<i class="glyphicon glyphicon-chevron-right" style="font-size: 24px"></i>', [
                             '/edu/teacher/default/class-program-stats',

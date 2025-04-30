@@ -17,6 +17,7 @@ use modules\edu\query\EduProgramStoriesFetcher;
 use modules\edu\query\StudentProgramLastActivityDateFetcher;
 use modules\edu\widgets\StudentStatWidget;
 use Yii;
+use yii\db\Query;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -34,9 +35,26 @@ class DefaultController extends Controller
         $this->testDetailService = $testDetailService;
     }
 
-    public function actionIndex(): string
+    public function actionIndex(WebUser $user): string
     {
-        $classBooks = EduClassBook::findTeacherClassBooks(Yii::$app->user->getId())
+        $teacherClassBookIds = (new Query())
+            ->select(['classBookId' => 't.id'])
+            ->from(['t' => 'edu_class_book'])
+            ->where(['t.user_id' => $user->getId()])
+            ->all();
+        $teacherClassBookIds = array_column($teacherClassBookIds, 'classBookId');
+
+        $accessClassBookIds = (new Query())
+            ->select([
+                'classBookId' => 't.class_book_id',
+            ])
+            ->from(['t' => 'edu_class_book_teacher_access'])
+            ->where(['t.teacher_id' => $user->getId()])
+            ->all();
+        $accessClassBookIds = array_column($accessClassBookIds, 'classBookId');
+
+        $classBookIds = array_merge($teacherClassBookIds, $accessClassBookIds);
+        $classBooks = EduClassBook::find()->where(['in', 'id', $classBookIds])
             ->orderBy(['name' => SORT_ASC])
             ->all();
         return $this->render('index', [

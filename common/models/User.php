@@ -502,4 +502,18 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $this->get_course_id = $getCourseId;
     }
+
+    /**
+     * @param int $userId
+     * @return User|null
+     */
+    public static function findUser(int $userId): ?User
+    {
+        $model = self::find()->where(['id' => $userId])->one();
+        if ($model === null) {
+            return null;
+        }
+        /** @var User $model */
+        return $model;
+    }
 }
