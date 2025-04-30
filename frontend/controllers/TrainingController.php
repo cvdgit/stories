@@ -266,13 +266,14 @@ class TrainingController extends UserController
             $currentDate = $targetDate->format('Y-m-d');
             $columns[] = [
                 'label' => SmartDate::dateSmart(strtotime($currentDate)),
+                'date' => $currentDate,
             ];
             $dates[] = $currentDate;
             $targetDate = $targetDate->modify('+1 day');
         }
 
         $models = [];
-        foreach ($stories as $story) {
+        foreach ($stories as $storyId => $story) {
 
             $model = [
                 $story['story_title'],
@@ -286,7 +287,7 @@ class TrainingController extends UserController
                     $questionCount = (int) $row['question_count'];
                     $questionDate = $row['target_date'];
                     if ($questionDate === $currentDate) {
-                        $value = $questionCount;
+                        $value = $questionCount . '@' . $storyId;
                     }
                 }
 
@@ -305,6 +306,7 @@ class TrainingController extends UserController
                 'filterModel' => $filterForm,
                 'columns' => $columns,
                 'models' => $models,
+                'studentId' => $studentId,
             ],
         ]);
     }
@@ -328,6 +330,58 @@ class TrainingController extends UserController
         $betweenBegin = new Expression("UNIX_TIMESTAMP('$startDate')");
 
         $endDate = $beginDate->modify('+' . $hours . ' minute');
+        $finishDate = $endDate->format('Y-m-d H:i:s');
+        $betweenEnd = new Expression("UNIX_TIMESTAMP('$finishDate')");
+
+        $data = (new Query())
+            ->select([])
+            ->from(['t' => 'mental_map_history'])
+            ->where([
+                't.story_id' => $story->id,
+                't.user_id' => $student->user_id,
+            ])
+            ->andWhere(['between', new Expression('t.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd])
+            ->orderBy(['t.created_at' => SORT_DESC])
+            ->all();
+
+        $mentalMapIds = array_map(static function(array $row): string {
+            return $row['mental_map_id'];
+        }, $data);
+        $mentalMapIds = array_unique($mentalMapIds);
+
+        $mentalMaps = [];
+        foreach ($mentalMapIds as $mentalMapId) {
+            $mentalMap = MentalMap::findOne($mentalMapId);
+            if ($mentalMap !== null) {
+                $mentalMaps[$mentalMapId] = $mentalMap;
+            }
+        }
+
+        return $this->renderAjax('_detail', [
+            'mentalMaps' => $mentalMaps,
+            'data' => $data,
+        ]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionDetailWeek(int $story_id, int $student_id, string $date): string
+    {
+        $story = Story::findOne($story_id);
+        if ($story === null) {
+            throw new NotFoundHttpException('История не найдена');
+        }
+        $student = UserStudent::findOne($student_id);
+        if ($student === null) {
+            throw new NotFoundHttpException('Ученик не найден');
+        }
+
+        $beginDate = new \DateTimeImmutable($date . ' 00:00:00');
+        $startDate = $beginDate->format('Y-m-d H:i:s');
+        $betweenBegin = new Expression("UNIX_TIMESTAMP('$startDate')");
+
+        $endDate = new \DateTimeImmutable($date . ' 23:59:59');
         $finishDate = $endDate->format('Y-m-d H:i:s');
         $betweenEnd = new Expression("UNIX_TIMESTAMP('$finishDate')");
 

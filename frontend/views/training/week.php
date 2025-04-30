@@ -15,6 +15,7 @@ use yii\widgets\Pjax;
  * @var array $columns
  * @var array $models
  * @var WeekFilterForm $filterModel
+ * @var int $studentId
  */
 
 $this->registerJs($this->renderFile('@frontend/views/training/week.js'));
@@ -54,6 +55,13 @@ $this->registerJs($this->renderFile('@frontend/views/training/week.js'));
     'caption' => 'Количество ответов в тестах (по неделям)',
     'columns' => $columns,
     'models' => $models,
+    'tableRowRenderCallback' => static function(string $value, array $column) use ($studentId, $filterModel): string {
+        if (strpos($value,'@') !== false) {
+            [$num, $storyId] = explode('@', $value);
+            $value = Html::a('<strong style="pointer-events: none">' . $num . '</strong>', ['/training/detail-week', 'story_id' => $storyId, 'student_id' => $studentId, 'date' => $column['date']], ['class' => 'detail-modal']);
+        }
+        return $value;
+    }
 ]) ?>
 </div>
 <?php Pjax::end() ?>

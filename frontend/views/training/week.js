@@ -20,4 +20,18 @@
     })
     return false
   })
+
+  const detailModal = new RemoteModal({id: 'week-detail-modal', title: 'История прохождения ментальных карт', dialogClassName: 'modal-lg'})
+  $('.history-content').on('click', '.detail-modal', e => {
+    e.preventDefault()
+    detailModal.show({
+      url: e.target.getAttribute('href'),
+      callback: function(response, status, xhr) {
+        if (status === 'error') {
+          $(this).text(xhr.responseText)
+          return
+        }
+      }
+    })
+  })
 })();

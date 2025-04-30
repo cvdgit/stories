@@ -9,7 +9,6 @@ use yii\db\Query;
 
 class WeekFilterForm extends Model
 {
-
     public $week;
     public $action;
 
@@ -88,7 +87,7 @@ class WeekFilterForm extends Model
     /**
      * @return \DateTime
      */
-    public function getWeekStartDate(): \DateTime
+    public function getWeekStartDate(): \DateTimeInterface
     {
         return $this->weekStartDate;
     }
@@ -96,7 +95,7 @@ class WeekFilterForm extends Model
     /**
      * @return \DateTime
      */
-    public function getWeekEndDate(): \DateTime
+    public function getWeekEndDate(): \DateTimeInterface
     {
         return $this->weekEndDate;
     }
