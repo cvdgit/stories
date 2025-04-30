@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace frontend\controllers;
 
 use common\helpers\SmartDate;
+use common\models\Story;
 use common\models\User;
 use common\models\UserStudent;
 use DateTimeImmutable;
@@ -15,6 +16,8 @@ use frontend\Training\FetchMentalMapHistoryTargetWords\MentalMapHistoryTargetWor
 use frontend\Training\MentalMapDayHistoryTargetWordsFetcher;
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\db\Expression;
+use yii\db\Query;
 use yii\web\NotFoundHttpException;
 use yii\web\Request;
 use yii\web\User as WebUser;
@@ -156,7 +159,7 @@ class TrainingController extends UserController
         }
 
         $models = [];
-        foreach ($stories as $story) {
+        foreach ($stories as $storyId => $story) {
 
             $model = [
                 $story['story_title'],
@@ -179,7 +182,7 @@ class TrainingController extends UserController
                     $hour = (int) $row['hour'];
                     $minuteDiv = (int) $row['minute_div'];
                     if ($hour === $timeHour && $minuteDiv === $timeMinuteDiv) {
-                        $value = $questionCount;
+                        $value = $questionCount . '@' . $storyId;
                     }
                 }
 
@@ -195,6 +198,7 @@ class TrainingController extends UserController
             'items' => $this->getNavItems('training/index', $students, $targetStudent->id),
             'view' => 'day',
             'viewParams' => [
+                'studentId' => $studentId,
                 'columns' => $columns,
                 'models' => $models,
                 'filterModel' => $filterForm,
@@ -302,5 +306,42 @@ class TrainingController extends UserController
                 'models' => $models,
             ],
         ]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionDetail(int $story_id, int $student_id, string $date, string $hours, string $time): string
+    {
+        $story = Story::findOne($story_id);
+        if ($story === null) {
+            throw new NotFoundHttpException('История не найдена');
+        }
+        $student = UserStudent::findOne($student_id);
+        if ($student === null) {
+            throw new NotFoundHttpException('Ученик не найден');
+        }
+
+        $beginDate = new \DateTime($date . ' ' . $time . ':00');
+        $startDate = $beginDate->format('Y-m-d H:i:s');
+        $betweenBegin = new Expression("UNIX_TIMESTAMP('$startDate')");
+
+        $endDate = $beginDate->modify('+' . $hours . ' minute');
+        $finishDate = $endDate->format('Y-m-d H:i:s');
+        $betweenEnd = new Expression("UNIX_TIMESTAMP('$finishDate')");
+
+        $query = (new Query())
+            ->select([])
+            ->from(['t' => 'mental_map_history'])
+            ->where([
+                't.story_id' => $story->id,
+                't.user_id' => $student->user_id,
+            ])
+            ->andWhere(['between', 't.created_at', $betweenBegin, $betweenEnd])
+            ->orderBy(['t.created_at' => SORT_DESC])
+            ->all();
+        var_dump($query);
+
+        return $this->renderAjax('_detail', []);
     }
 }

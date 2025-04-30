@@ -13,7 +13,7 @@ final class MentalMapDayHistoryTargetWordsFetcher
 {
     public function fetch(int $userId, DateTimeInterface $beginDate, DateTimeInterface $endDate, int $hours): array
     {
-        $startDate = $beginDate->format('Y-m-d H-i-s');
+        $startDate = $beginDate->format('Y-m-d H:i:s');
         $betweenBegin = new Expression("UNIX_TIMESTAMP('$startDate')");
         $finishDate = $endDate->format('Y-m-d H:i:s');
         $betweenEnd = new Expression("UNIX_TIMESTAMP('$finishDate')");

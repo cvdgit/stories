@@ -16,6 +16,7 @@ use yii\widgets\Pjax;
  * @var array $models
  * @var array $columns
  * @var HistoryFilterForm $filterModel
+ * @var int $studentId
  */
 
 $this->registerJs($this->renderFile('@frontend/views/training/day.js'));
@@ -69,6 +70,13 @@ $this->registerJs($this->renderFile('@frontend/views/training/day.js'));
     'caption' => 'Количество ответов в тестах (за день)',
     'columns' => $columns,
     'models' => $models,
+    'tableRowRenderCallback' => static function(string $value, array $column) use ($studentId, $filterModel): string {
+        if (strpos($value,'@') !== false) {
+            [$num, $storyId] = explode('@', $value);
+            $value = Html::a('<strong style="pointer-events: none">' . $num . '</strong>', ['/training/detail', 'story_id' => $storyId, 'student_id' => $studentId, 'date' => $filterModel->date, 'hours' => $filterModel->hours, 'time' => $column['label']], ['class' => 'detail-modal']);
+        }
+        return $value;
+    }
 ]) ?>
 </div>
 <?php Pjax::end() ?>

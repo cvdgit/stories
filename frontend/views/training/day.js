@@ -13,7 +13,6 @@
   })
 
   $('.history-content').on('submit', '#history-filter-form', e => {
-    console.log('subbbb')
     const formData = new FormData(e.target);
     const params = new URLSearchParams(formData);
     $.pjax.reload('#pjax-day-history', {
@@ -23,5 +22,19 @@
       url: '?' + params.toString()
     })
     return false
+  })
+
+  const detailModal = new RemoteModal({id: 'day-detail-modal', title: 'Детализация', dialogClassName: 'modal-lg'})
+  $('.history-content').on('click', '.detail-modal', e => {
+    e.preventDefault()
+    detailModal.show({
+      url: e.target.getAttribute('href'),
+      callback: function(response, status, xhr) {
+          if (status === 'error') {
+            $(this).text(xhr.responseText)
+            return
+          }
+      }
+    })
   })
 })();

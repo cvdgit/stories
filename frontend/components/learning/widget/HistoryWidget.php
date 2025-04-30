@@ -12,6 +12,7 @@ class HistoryWidget extends Widget
     public $caption;
     public $columns;
     public $models;
+    public $tableRowRenderCallback;
 
     public function run(): void
     {
@@ -69,6 +70,9 @@ class HistoryWidget extends Widget
         $cells = [];
         foreach ($this->columns as $index => $column) {
             $value = $model[$index] ?? '';
+            if ($this->tableRowRenderCallback) {
+                $value = call_user_func($this->tableRowRenderCallback, $value, $column);
+            }
             $cells[] = Html::tag('td', $value);
         }
         return Html::tag('tr', implode('', $cells));
