@@ -34,7 +34,7 @@ final class MentalMapDayHistoryTargetWordsFetcher
             ->where([
                 'h.user_id' => $userId,
             ])
-            ->andWhere(['between', 'h.created_at', $betweenBegin, $betweenEnd])
+            ->andWhere(['between', new Expression('h.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd])
             //->andWhere('h.overall_similarity >= 85')
             ->groupBy([
                 'h.story_id',

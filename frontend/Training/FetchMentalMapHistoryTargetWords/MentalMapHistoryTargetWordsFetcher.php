@@ -30,7 +30,7 @@ class MentalMapHistoryTargetWordsFetcher
             ->where([
                 'h.user_id' => $userId,
             ])
-            ->andWhere(['between', 'h.created_at', $betweenBegin, $betweenEnd])
+            ->andWhere(['between', new Expression('h.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd])
             ->orderBy(['h.created_at' => SORT_ASC]);
 
         $rows = $query->all();
