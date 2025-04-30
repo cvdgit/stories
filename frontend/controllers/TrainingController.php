@@ -111,6 +111,22 @@ class TrainingController extends UserController
             ];
         }
 
+        foreach ($stories as $i => $story) {
+            if (count($story['times']) === 0  || count($story['times']) === 1) {
+                continue;
+            }
+            $groupTimes = [];
+            foreach ($story['times'] as $time) {
+                $key = $time['hour'] . '@' . $time['minute_div'];
+                if (!isset($groupTimes[$key])) {
+                    $groupTimes[$key] = $time;
+                    continue;
+                }
+                $groupTimes[$key]['question_count'] += (int) $time['question_count'];
+            }
+            $stories[$i]['times'] = array_values($groupTimes);
+        }
+
         $minTimeHour = 0;
         $maxTimeHour = 0;
         foreach ($stories as $story) {
@@ -225,7 +241,6 @@ class TrainingController extends UserController
         }
 
         $rows = $filterForm->search($studentId);
-        $mentalMapHistoryRows = (new MentalMapHistoryTargetWordsFetcher())->fetch($targetStudent->user_id, $filterForm->getWeekStartDate(), $filterForm->getWeekEndDate());
 
         $stories = [];
         foreach ($rows as $row) {
@@ -242,6 +257,7 @@ class TrainingController extends UserController
             ];
         }
 
+        $mentalMapHistoryRows = (new MentalMapHistoryTargetWordsFetcher())->fetch($targetStudent->user_id, $filterForm->getWeekStartDate(), $filterForm->getWeekEndDate());
         foreach ($mentalMapHistoryRows as $row) {
             $storyId = $row['story_id'];
             if (!isset($stories[$storyId])) {
@@ -254,6 +270,22 @@ class TrainingController extends UserController
                 'question_count' => $row['question_count'],
                 'target_date' => $row['target_date'],
             ];
+        }
+
+        foreach ($stories as $i => $story) {
+            if (count($story['dates']) === 0  || count($story['dates']) === 1) {
+                continue;
+            }
+            $groupDates = [];
+            foreach ($story['dates'] as $date) {
+                $key = $date['target_date'];
+                if (!isset($groupDates[$key])) {
+                    $groupDates[$key] = $date;
+                    continue;
+                }
+                $groupDates[$key]['question_count'] += (int) $date['question_count'];
+            }
+            $stories[$i]['dates'] = array_values($groupDates);
         }
 
         $columns = [
