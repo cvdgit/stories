@@ -337,7 +337,7 @@ class TrainingController extends UserController
                 't.story_id' => $story->id,
                 't.user_id' => $student->user_id,
             ])
-            ->andWhere(['between', 't.created_at', $betweenBegin, $betweenEnd])
+            ->andWhere(['between', new Expression('t.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd])
             ->orderBy(['t.created_at' => SORT_DESC])
             ->all();
         var_dump($query);
