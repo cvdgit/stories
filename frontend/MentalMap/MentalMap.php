@@ -63,4 +63,11 @@ class MentalMap extends ActiveRecord
     {
         return $this->payload['treeData'] ?? [];
     }
+
+    public function findImageFromPayload(string $imageId): ?array
+    {
+        return array_values(array_filter($this->getImages(), static function (array $item) use ($imageId): bool {
+            return $item['id'] === $imageId;
+        }))[0];
+    }
 }

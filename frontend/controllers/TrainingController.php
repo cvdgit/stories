@@ -12,6 +12,7 @@ use DateTimeImmutable;
 use frontend\components\learning\form\HistoryFilterForm;
 use frontend\components\learning\form\WeekFilterForm;
 use frontend\components\UserController;
+use frontend\MentalMap\MentalMap;
 use frontend\Training\FetchMentalMapHistoryTargetWords\MentalMapHistoryTargetWordsFetcher;
 use frontend\Training\MentalMapDayHistoryTargetWordsFetcher;
 use Yii;
@@ -322,7 +323,7 @@ class TrainingController extends UserController
             throw new NotFoundHttpException('Ученик не найден');
         }
 
-        $beginDate = new \DateTime($date . ' ' . $time . ':00');
+        $beginDate = new \DateTimeImmutable($date . ' ' . $time . ':00');
         $startDate = $beginDate->format('Y-m-d H:i:s');
         $betweenBegin = new Expression("UNIX_TIMESTAMP('$startDate')");
 
@@ -330,7 +331,7 @@ class TrainingController extends UserController
         $finishDate = $endDate->format('Y-m-d H:i:s');
         $betweenEnd = new Expression("UNIX_TIMESTAMP('$finishDate')");
 
-        $query = (new Query())
+        $data = (new Query())
             ->select([])
             ->from(['t' => 'mental_map_history'])
             ->where([
@@ -340,8 +341,23 @@ class TrainingController extends UserController
             ->andWhere(['between', new Expression('t.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd])
             ->orderBy(['t.created_at' => SORT_DESC])
             ->all();
-        var_dump($query);
 
-        return $this->renderAjax('_detail', []);
+        $mentalMapIds = array_map(static function(array $row): string {
+            return $row['mental_map_id'];
+        }, $data);
+        $mentalMapIds = array_unique($mentalMapIds);
+
+        $mentalMaps = [];
+        foreach ($mentalMapIds as $mentalMapId) {
+            $mentalMap = MentalMap::findOne($mentalMapId);
+            if ($mentalMap !== null) {
+                $mentalMaps[$mentalMapId] = $mentalMap;
+            }
+        }
+
+        return $this->renderAjax('_detail', [
+            'mentalMaps' => $mentalMaps,
+            'data' => $data,
+        ]);
     }
 }
