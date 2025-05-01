@@ -66,8 +66,12 @@ class MentalMap extends ActiveRecord
 
     public function findImageFromPayload(string $imageId): ?array
     {
-        return array_values(array_filter($this->getImages(), static function (array $item) use ($imageId): bool {
+        $items = array_values(array_filter($this->getImages(), static function (array $item) use ($imageId): bool {
             return $item['id'] === $imageId;
-        }))[0];
+        }));
+        if (count($items) === 0) {
+            return null;
+        }
+        return $items[0];
     }
 }
