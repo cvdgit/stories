@@ -127,7 +127,7 @@ class HistoryFilterForm extends Model
     public static function createTimes(int $interval): array
     {
         $times = [];
-        for ($i = 1; $i <= 23; $i++) {
+        for ($i = 0; $i <= 23; $i++) {
             $hour = str_pad($i, 2, '0', STR_PAD_LEFT);
             for ($j = 0; $j < 60 / $interval; $j++) {
                 $minute = $interval * $j;

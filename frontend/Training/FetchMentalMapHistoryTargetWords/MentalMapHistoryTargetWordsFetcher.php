@@ -34,7 +34,23 @@ class MentalMapHistoryTargetWordsFetcher
             ->orderBy(['h.created_at' => SORT_ASC]);
 
         $rows = $query->all();
-        $processedData = [];
+
+        $rows = array_map(function(array $row): array {
+            $content = $row['historyContent'];
+            $questionCount = 0;
+            if (!empty($content)) {
+                $questionCount = $this->calcTargetFromContent($content);
+            }
+            return [
+                'story_id' => $row['storyId'],
+                'story_title' => $row['storyTitle'],
+                'question_count' => $questionCount,
+                'target_date' => $row['historyDate'],
+            ];
+        }, $rows);
+
+
+        /*$processedData = [];
         foreach ($rows as $row) {
             $date = $row['historyDate'];
             if (!isset($processedData[$date])) {
@@ -52,9 +68,9 @@ class MentalMapHistoryTargetWordsFetcher
             }
 
             $processedData[$date]['question_count'] += $this->calcTargetFromContent($content);
-        }
+        }*/
 
-        return $processedData;
+        return $rows;
     }
 
     private function calcTargetFromContent(string $content): int

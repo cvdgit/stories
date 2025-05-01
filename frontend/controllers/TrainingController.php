@@ -312,9 +312,7 @@ class TrainingController extends UserController
             ];
 
             foreach ($dates as $currentDate) {
-
                 $value = 0;
-
                 foreach ($story['dates'] as $row) {
                     $questionCount = (int) $row['question_count'];
                     $questionDate = $row['target_date'];
@@ -322,7 +320,6 @@ class TrainingController extends UserController
                         $value = $questionCount . '@' . $storyId;
                     }
                 }
-
                 $model[] = $value;
             }
 
