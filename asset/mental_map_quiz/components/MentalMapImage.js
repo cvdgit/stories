@@ -39,7 +39,6 @@ export default function MentalMapImage(
       mapImg.src = image.url
       mapImgWrap.appendChild(mapImg)
     } else {
-      console.log(image.text.replace(/<[^>]*>?/gm, ''), image.text)
       const div = document.createElement('div')
       div.style.height = '100%'
       div.classList.add('map-fragment', 'map-img')

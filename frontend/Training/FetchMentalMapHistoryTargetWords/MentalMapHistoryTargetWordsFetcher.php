@@ -77,9 +77,10 @@ class MentalMapHistoryTargetWordsFetcher
     {
         $document = phpQuery::newDocumentHTML($content);
         $elements = $document->find('.word-target.selected');
-        if ($elements->length === 0) {
+        $targetElements = $document->find('.target-text');
+        if ($elements->length === 0 && $targetElements->length === 0) {
             return 1;
         }
-        return $elements->length;
+        return $elements->length + $targetElements->length;
     }
 }

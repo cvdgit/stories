@@ -28,9 +28,10 @@ $this->registerCss(
 .word-target {
     font-weight: 600;
 }
-.text-item-word.selected {
+.text-item-word.selected, .user-response .target-text {
     color: #fff;
     border: 1px #808080 solid;
+    cursor: pointer;
 }
 CSS,
 );
@@ -53,8 +54,8 @@ CSS,
         <?php $fragment = $mentalMaps[$imageData['mental_map_id']]->findImageFromPayload($imageData['image_fragment_id']); ?>
             <tr>
                 <td><?= SmartDate::dateSmart($imageData['created_at'], true) ?></td>
-                <td><?= $fragment === null ? '-' : $fragment['text'] ?></td>
-                <td><?= $imageData['content'] ?></td>
+                <td><?= $fragment === null ? '-' : $fragment['text'] ?? $fragment['title'] ?></td>
+                <td class="user-response"><?= $imageData['content'] ?></td>
                 <td><?= $imageData['threshold'] ?></td>
                 <td><?= $imageData['overall_similarity'] ?></td>
                 <td><?= $imageData['text_hiding_percentage'] ?></td>

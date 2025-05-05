@@ -1,6 +1,7 @@
 import "./TreeViewBody.css"
 import TreeVoiceControl from "./TreeVoiceControl";
 import sendMessage from "../lib/sendMessage";
+import {calcHiddenTextPercent, createWordItem} from "../MentalMap";
 
 const nodeStatusSuccessHtml = `
 <div class="retelling-status-show"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -367,12 +368,21 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
                     rowElement.closest('.mental-map').appendChild(content)
                   })
 
+                const wordItems = createWordItem(listItem.title, listItem.id)
+                wordItems.words = [...wordItems.words].map(w => {
+                  if (w.type === 'word' && w.target === true) {
+                    w.hidden = true
+                  }
+                  return w
+                })
+                const textHidingPercentage = calcHiddenTextPercent(wordItems)
+
                 saveUserResult({
                   ...params,
                   image_fragment_id: nodeId,
                   overall_similarity: Number(json.similarity_percentage),
-                  text_hiding_percentage: 0, // textHidingPercentage,
-                  text_target_percentage: 0, // textTargetPercentage,
+                  text_hiding_percentage: textHidingPercentage,
+                  text_target_percentage: textHidingPercentage > 0 ? 100 : 0, // textTargetPercentage,
                   content,
                   user_response: resultSpan.innerText,
                   api_response: JSON.stringify(json)

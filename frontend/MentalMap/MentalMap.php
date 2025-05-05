@@ -66,12 +66,34 @@ class MentalMap extends ActiveRecord
 
     public function findImageFromPayload(string $imageId): ?array
     {
-        $items = array_values(array_filter($this->getImages(), static function (array $item) use ($imageId): bool {
+        $items = array_values(array_filter($this->getItems(), static function (array $item) use ($imageId): bool {
             return $item['id'] === $imageId;
         }));
         if (count($items) === 0) {
             return null;
         }
         return $items[0];
+    }
+
+    private function flatten(array $element): array
+    {
+        $flatArray = [];
+        foreach ($element as $key => $node) {
+            if (array_key_exists('children', $node)) {
+                $flatArray = array_merge($flatArray, $this->flatten($node['children'] ?? []));
+                unset($node['children']);
+            }
+            $flatArray[] = $node;
+        }
+        return $flatArray;
+    }
+
+    public function getItems(): array
+    {
+        $items = $this->getImages();
+        if ($this->isMentalMapAsTree()) {
+            return $this->flatten($this->getTreeData());
+        }
+        return $items;
     }
 }

@@ -32,8 +32,8 @@ function processImageText(text) {
   }
 }
 
-export function createWordItem(image) {
-  const {imageText, textFragments} = processImageText(image.text)
+export function createWordItem(itemText, itemId) {
+  const {imageText, textFragments} = processImageText(itemText)
   const paragraphs = imageText.split('\n')
   const words = paragraphs.map(p => {
     if (p === '') {
@@ -53,10 +53,24 @@ export function createWordItem(image) {
     return [...(words.flat()), {type: 'break'}]
   }).flat()
   return {
-    id: image.id,
-    text: image.text,
+    id: itemId,
+    text: itemText,
     words
   }
+}
+
+export function calcHiddenTextPercent(detailTexts) {
+  let totalCounter = 0;
+  let hiddenCounter = 0;
+  detailTexts.words.map(w => {
+    if (w.type === 'word') {
+      totalCounter++;
+      if (w.hidden) {
+        hiddenCounter++
+      }
+    }
+  })
+  return totalCounter === 0 || hiddenCounter === 0 ? 0 : Math.round(hiddenCounter * 100 / totalCounter)
 }
 
 /**
@@ -123,20 +137,6 @@ export default function MentalMap(element, deck, params) {
 
   function getTargetWordsCount(detailTexts) {
     return detailTexts.words.filter(w => w.type === 'word' && w?.target).length
-  }
-
-  function calcHiddenTextPercent(detailTexts) {
-    let totalCounter = 0;
-    let hiddenCounter = 0;
-    detailTexts.words.map(w => {
-      if (w.type === 'word') {
-        totalCounter++;
-        if (w.hidden) {
-          hiddenCounter++
-        }
-      }
-    })
-    return totalCounter === 0 || hiddenCounter === 0 ? 0 : Math.round(hiddenCounter * 100 / totalCounter)
   }
 
   function calcTargetTextPercent(detailTexts) {
@@ -602,7 +602,7 @@ export default function MentalMap(element, deck, params) {
       }
     }, false);
 
-    texts = json.map.images.map(image => createWordItem(image))
+    texts = json.map.images.map(image => createWordItem(image.text, image.id))
 
     const imageFirst = Boolean(json.settings?.imageFirst)
 
