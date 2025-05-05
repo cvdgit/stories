@@ -33,6 +33,9 @@ $this->registerCss(
     border: 1px #808080 solid;
     cursor: pointer;
 }
+.data-col {
+  font-size: 14px;
+}
 CSS,
 );
 ?>
@@ -53,13 +56,13 @@ CSS,
         <?php foreach ($data as $imageData): ?>
         <?php $fragment = $mentalMaps[$imageData['mental_map_id']]->findImageFromPayload($imageData['image_fragment_id']); ?>
             <tr>
-                <td><?= SmartDate::dateSmart($imageData['created_at'], true) ?></td>
-                <td><?= $fragment === null ? '-' : $fragment['text'] ?? $fragment['title'] ?></td>
-                <td class="user-response"><?= $imageData['content'] ?></td>
-                <td><?= $imageData['threshold'] ?></td>
-                <td><?= $imageData['overall_similarity'] ?></td>
-                <td><?= $imageData['text_hiding_percentage'] ?></td>
-                <td><?= $imageData['text_target_percentage'] ?></td>
+                <td class="data-col"><?= SmartDate::dateSmart($imageData['created_at'], true) ?></td>
+                <td class="data-col"><?= $fragment === null ? '-' : $fragment['text'] ?? $fragment['title'] ?></td>
+                <td class="data-col user-response"><?= $imageData['content'] ?></td>
+                <td class="data-col"><?= $imageData['threshold'] ?></td>
+                <td class="data-col <?= MentalMap::fragmentIsDone((int) $imageData['overall_similarity'], (int) $imageData['threshold']) ? 'bg-success' : 'bg-danger' ?>"><?= $imageData['overall_similarity'] ?></td>
+                <td class="data-col"><?= $imageData['text_hiding_percentage'] ?></td>
+                <td class="data-col"><?= $imageData['text_target_percentage'] ?></td>
             </tr>
         <?php endforeach; ?>
         </tbody>
