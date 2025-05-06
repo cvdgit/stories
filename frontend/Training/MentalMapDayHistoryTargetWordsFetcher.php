@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace frontend\Training;
 
+use common\components\MentalMapThreshold;
 use DateTimeInterface;
 use phpQuery;
 use yii\db\Expression;
@@ -35,7 +36,7 @@ final class MentalMapDayHistoryTargetWordsFetcher
                 'h.user_id' => $userId,
             ])
             ->andWhere(['between', new Expression('h.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd])
-            //->andWhere('h.overall_similarity >= 85')
+            ->andWhere(['>=', 'h.overall_similarity', MentalMapThreshold::DEFAULT_THRESHOLD])
             ->groupBy([
                 'h.story_id',
                 $hourExpression,

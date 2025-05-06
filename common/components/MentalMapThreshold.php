@@ -6,7 +6,7 @@ namespace common\components;
 
 final class MentalMapThreshold
 {
-    private const DEFAULT_THRESHOLD = 80;
+    public const DEFAULT_THRESHOLD = 80;
 
     public static function getDefaultThreshold(array $params): int
     {
