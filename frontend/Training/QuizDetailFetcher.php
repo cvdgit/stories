@@ -35,7 +35,6 @@ SELECT t.entity_name,
        t.test_id,
        t.entity_id AS questionId
 FROM user_question_history t
-INNER JOIN story_story_test t2 ON t.test_id = t2.test_id
 INNER JOIN story_test_question q ON t.entity_id = q.id
 WHERE
     t.student_id = :studentId
@@ -44,7 +43,7 @@ AND t.created_at + (3 * 60 * 60) BETWEEN $betweenBegin AND $betweenEnd
 ORDER BY t.created_at
 ";
         $command = Yii::$app->db->createCommand($sql, [
-            'studentId' => $studentId,
+            ':studentId' => $studentId,
         ]);
         $rows = $command->queryAll();
 
