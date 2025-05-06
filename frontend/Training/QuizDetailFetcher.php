@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace frontend\Training;
 
+use common\models\StoryTest;
 use Yii;
 use yii\db\Expression;
 use yii\db\Query;
@@ -56,6 +57,31 @@ ORDER BY t.created_at
             return (int) $row['test_id'];
         }, $rows);
         $quizIds = array_values(array_unique($quizIds));
+
+        $relatedQuizIds = array_map(static function(int $quizId): array {
+            $storyTest = StoryTest::findOne($quizId);
+            if ($storyTest && $storyTest->isSourceTests()) {
+                return array_map(static function(StoryTest $test): int {
+                    return $test->id;
+                }, $storyTest->relatedTests);
+            }
+            return [];
+        }, $quizIds);
+
+        $relatedQuizIds = array_filter($relatedQuizIds, static function(array $arr): bool {
+            return count($arr) > 0;
+        });
+
+        if (count($relatedQuizIds) > 0) {
+            $flatArray = [];
+            foreach ($relatedQuizIds as $relatedIds) {
+                $flatArray = array_merge($flatArray, $relatedIds);
+            }
+            $relatedQuizIds = array_unique($flatArray);
+        }
+
+        $quizIds = array_merge($quizIds, $relatedQuizIds);
+
         $sql = "
 SELECT q.story_test_id, q.name AS 'questionName', q.id AS 'questionId', q.type, a.name AS 'answerName', a.id AS 'answerId', a.is_correct AS 'correct'
 FROM story_test_question q
