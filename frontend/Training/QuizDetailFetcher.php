@@ -42,6 +42,7 @@ WHERE
 AND t.created_at + (3 * 60 * 60) BETWEEN $betweenBegin AND $betweenEnd
 ORDER BY t.created_at
 ";
+        die($sql);
         $command = Yii::$app->db->createCommand($sql, [
             ':studentId' => $studentId,
         ]);
