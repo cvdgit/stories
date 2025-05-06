@@ -21,7 +21,7 @@
     return false
   })
 
-  const detailModal = new RemoteModal({id: 'week-detail-modal', title: 'История прохождения ментальных карт', dialogClassName: 'modal-lg'})
+  const detailModal = new RemoteModal({id: 'week-detail-modal', title: 'Детализация', dialogClassName: 'modal-xl'})
   $('.history-content').on('click', '.detail-modal', e => {
     e.preventDefault()
     detailModal.show({

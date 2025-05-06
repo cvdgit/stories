@@ -2,69 +2,63 @@
 
 declare(strict_types=1);
 
-use common\helpers\SmartDate;
 use frontend\MentalMap\MentalMap;
+use yii\bootstrap\Tabs;
 use yii\web\View;
 
 /**
  * @var View $this
  * @var array $data
  * @var array<MentalMap> $mentalMaps
+ * @var string $title
+ * @var array $quizData
  */
 
-$this->registerCss(
-    <<<CSS
-.target-text {
-    font-weight: bold;
+$this->registerCss(<<<CSS
+.modal.modal-fullscreen {
+  padding: 0 !important;
 }
-.text-item-word {
-    display: inline-block;
-    white-space: nowrap;
-    margin-right: 8px;
-    user-select: none;
-    cursor: pointer;
-    margin-bottom: 6px;
+.modal.modal-fullscreen .modal-dialog {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
-.word-target {
-    font-weight: 600;
+.modal.modal-fullscreen .modal-content {
+  height: auto;
+  min-height: 100%;
+  border: 0 none;
+  border-radius: 0;
+  box-shadow: none;
 }
-.text-item-word.selected, .user-response .target-text {
-    color: #fff;
-    border: 1px #808080 solid;
-    cursor: pointer;
+.modal-body {
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
 }
-.data-col {
-  font-size: 14px;
+.material-tabs {
+margin-bottom: 12px;
 }
-CSS,
-);
+CSS);
 ?>
-<div class="table-responsive">
-    <table class="table table-bordered">
-        <thead>
-        <tr>
-            <th style="width: 10%">Дата</th>
-            <th style="width: 30%">Фрагмент</th>
-            <th style="width: 30%">Текст при ответе</th>
-            <th>Порог</th>
-            <th style="width: 10%">% сходства</th>
-            <th style="width: 10%">% закрытия текста</th>
-            <th style="width: 10%">% закрытия важного текста</th>
-        </tr>
-        </thead>
-        <tbody>
-        <?php foreach ($data as $imageData): ?>
-        <?php $fragment = $mentalMaps[$imageData['mental_map_id']]->findImageFromPayload($imageData['image_fragment_id']); ?>
-            <tr>
-                <td class="data-col"><?= SmartDate::dateSmart($imageData['created_at'], true) ?></td>
-                <td class="data-col"><?= $fragment === null ? '-' : $fragment['text'] ?? $fragment['title'] ?></td>
-                <td class="data-col user-response"><?= $imageData['content'] ?></td>
-                <td class="data-col"><?= $imageData['threshold'] ?></td>
-                <td class="data-col <?= MentalMap::fragmentIsDone((int) $imageData['overall_similarity'], (int) $imageData['threshold']) ? 'bg-success' : 'bg-danger' ?>"><?= $imageData['overall_similarity'] ?></td>
-                <td class="data-col"><?= $imageData['text_hiding_percentage'] ?></td>
-                <td class="data-col"><?= $imageData['text_target_percentage'] ?></td>
-            </tr>
-        <?php endforeach; ?>
-        </tbody>
-    </table>
+<div style="margin-bottom: 8px;"><?= $title ?></div>
+<div class="history-nav">
+    <?= Tabs::widget([
+        'options' => ['class' => 'nav nav-tabs material-tabs'],
+        'items' => [
+            [
+                'label' => 'Ментальные карты',
+                'content' => $this->render('_detail_mental_map_content', ['data' => $data, 'mentalMaps' => $mentalMaps],
+                ),
+                'active' => count($data) > 0,
+                'visible' => count($data) > 0,
+            ],
+            [
+                'label' => 'Тесты',
+                'content' => $this->render('_detail_quiz_content', ['data' => $quizData]),
+                'active' => count($data) === 0 && count($quizData) > 0,
+                'visible' => count($quizData) > 0,
+            ],
+        ],
+    ]) ?>
 </div>
+

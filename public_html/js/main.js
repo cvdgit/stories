@@ -95,7 +95,7 @@ $(document)
 function RemoteModal({id, title, dialogClassName}) {
 
   const content = `
-    <div class="modal fade" tabindex="-1" id="${id}">
+    <div class="modal fade modal-fullscreen" tabindex="-1" id="${id}">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header" style="display: flex; justify-content: space-between">

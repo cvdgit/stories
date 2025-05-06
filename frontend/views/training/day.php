@@ -21,19 +21,29 @@ use yii\widgets\Pjax;
 
 $this->registerJs($this->renderFile('@frontend/views/training/day.js'));
 ?>
-<?php Pjax::begin(['id' => 'pjax-day-history']) ?>
+<?php
+Pjax::begin(['id' => 'pjax-day-history']) ?>
 <div class="filter__wrap">
     <div class="row">
         <div class="col-md-2">
             <div class="filter-arrow__wrap filter-arrow--left">
                 <?= Html::a('<i class="glyphicon glyphicon-chevron-left"></i>', '#', [
                     'class' => 'filter-arrow__link',
-                    'onclick' => new JsExpression('$("#historyfilterform-action").val("prev"); $("#history-filter-form").submit(); return false'),
+                    'onclick' => new JsExpression(
+                        '$("#historyfilterform-action").val("prev"); $("#history-filter-form").submit(); return false',
+                    ),
                 ]) ?>
             </div>
         </div>
         <div class="col-md-8">
-            <?php $form = ActiveForm::begin(['id' => 'history-filter-form', 'method' => 'get', 'options' => ['style' => 'display: flex; margin-right: 3rem']]) ?>
+            <?php
+            $form = ActiveForm::begin(
+                [
+                    'id' => 'history-filter-form',
+                    'method' => 'get',
+                    'options' => ['style' => 'display: flex; margin-right: 3rem'],
+                ],
+            ) ?>
             <div style="flex: 1; margin-right: 3rem">
                 <?= $form->field($filterModel, 'date')->widget(DatePicker::class, [
                     'language' => 'ru',
@@ -53,30 +63,48 @@ $this->registerJs($this->renderFile('@frontend/views/training/day.js'));
                 <?= $form->field($filterModel, 'hours')->dropDownList($filterModel->getHoursDropdown())->label(false) ?>
                 <?= $form->field($filterModel, 'action')->hiddenInput()->label(false) ?>
             </div>
-            <?php ActiveForm::end() ?>
+            <?php
+            ActiveForm::end() ?>
         </div>
         <div class="col-md-2">
             <div class="filter-arrow__wrap filter-arrow--right">
                 <?= Html::a('<i class="glyphicon glyphicon-chevron-right"></i>', '#', [
                     'class' => 'filter-arrow__link',
-                    'onclick' => new JsExpression('$("#historyfilterform-action").val("next"); $("#history-filter-form").submit(); return false'),
+                    'onclick' => new JsExpression(
+                        '$("#historyfilterform-action").val("next"); $("#history-filter-form").submit(); return false',
+                    ),
                 ]) ?>
             </div>
         </div>
     </div>
 </div>
 <div class="table-responsive">
-<?= HistoryWidget::widget([
-    'caption' => 'Количество ответов в тестах (за день)',
-    'columns' => $columns,
-    'models' => $models,
-    'tableRowRenderCallback' => static function(string $value, array $column) use ($studentId, $filterModel): string {
-        if (strpos($value,'@') !== false) {
-            [$num, $storyId] = explode('@', $value);
-            $value = Html::a('<strong style="pointer-events: none">' . $num . '</strong>', ['/training/detail', 'story_id' => $storyId, 'student_id' => $studentId, 'date' => $filterModel->date, 'hours' => $filterModel->hours, 'time' => $column['label']], ['class' => 'detail-modal']);
-        }
-        return $value;
-    }
-]) ?>
+    <?= HistoryWidget::widget([
+        'caption' => 'Количество ответов в тестах (за день)',
+        'columns' => $columns,
+        'models' => $models,
+        'tableRowRenderCallback' => static function (string $value, array $column) use (
+            $studentId,
+            $filterModel
+        ): string {
+            if (strpos($value, '@') !== false) {
+                [$num, $storyId] = explode('@', $value);
+                $value = Html::a(
+                    '<strong style="pointer-events: none">' . $num . '</strong>',
+                    [
+                        '/training/detail',
+                        'story_id' => $storyId,
+                        'student_id' => $studentId,
+                        'date' => $filterModel->date,
+                        'hours' => $filterModel->hours,
+                        'time' => $column['label'],
+                    ],
+                    ['class' => 'detail-modal'],
+                );
+            }
+            return $value;
+        },
+    ]) ?>
 </div>
-<?php Pjax::end() ?>
+<?php
+Pjax::end() ?>

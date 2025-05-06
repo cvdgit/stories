@@ -15,6 +15,7 @@ use frontend\components\UserController;
 use frontend\MentalMap\MentalMap;
 use frontend\Training\FetchMentalMapHistoryTargetWords\MentalMapHistoryTargetWordsFetcher;
 use frontend\Training\MentalMapDayHistoryTargetWordsFetcher;
+use frontend\Training\QuizDetailFetcher;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\Expression;
@@ -386,9 +387,13 @@ class TrainingController extends UserController
             }
         }
 
+        $quizData = (new QuizDetailFetcher())->fetch($student->id, $story->id, "UNIX_TIMESTAMP('$startDate')", "UNIX_TIMESTAMP('$finishDate')");
+
         return $this->renderAjax('_detail', [
             'mentalMaps' => $mentalMaps,
             'data' => $data,
+            'title' => $story->title . ' - ' . $time . ' (' . $hours . ' мин.)',
+            'quizData' => $quizData,
         ]);
     }
 
@@ -438,9 +443,13 @@ class TrainingController extends UserController
             }
         }
 
+        $quizData = (new QuizDetailFetcher())->fetch($student->id, $story->id, "UNIX_TIMESTAMP('$startDate')", "UNIX_TIMESTAMP('$finishDate')");
+
         return $this->renderAjax('_detail', [
             'mentalMaps' => $mentalMaps,
             'data' => $data,
+            'title' => $story->title . ' - ' . Yii::$app->formatter->asDate($date),
+            'quizData' => $quizData,
         ]);
     }
 }
