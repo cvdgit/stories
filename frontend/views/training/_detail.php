@@ -49,14 +49,14 @@ CSS);
                 'label' => 'Ментальные карты',
                 'content' => $this->render('_detail_mental_map_content', ['data' => $data, 'mentalMaps' => $mentalMaps],
                 ),
-                'active' => true, //count($data) > 0,
-                //'visible' => count($data) > 0,
+                'active' => count($data) > 0,
+                'visible' => count($data) > 0,
             ],
             [
                 'label' => 'Тесты',
                 'content' => $this->render('_detail_quiz_content', ['data' => $quizData]),
-                'active' => false, // count($data) === 0 && count($quizData) > 0,
-                //'visible' => count($quizData) > 0,
+                'active' => count($data) === 0 && count($quizData) > 0,
+                'visible' => count($quizData) > 0,
             ],
         ],
     ]) ?>
