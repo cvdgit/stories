@@ -7,6 +7,10 @@ answerTypeInput.create = function(action) {
       return false;
     }
   });
+  $html.on('paste', (e) => {
+    e.preventDefault()
+    return false
+  })
   return $html;
 };
 
