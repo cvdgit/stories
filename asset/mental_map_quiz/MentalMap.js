@@ -671,9 +671,16 @@ export default function MentalMap(element, deck, params) {
           const dialog = mapImageClickHandler(image, texts, historyItem, rewritePrompt, threshold)
           dialog.onHide(() => {
             element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
+
+            const imgElem = zoomContainer.querySelector(`[data-img-id='${image.id}']`)
+            if (historyItem.done) {
+              imgElem.classList.add('fragment-item-done')
+            }
+
             fragmentDialogHideHandler(image, historyItem)
           })
-        }
+        },
+        mentalMapHistory
       )
 
       /*
@@ -775,7 +782,15 @@ export default function MentalMap(element, deck, params) {
 
           dialog.onHide(() => {
             element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
-            hideDialogHandler()
+
+            const imgElem = zoomContainer.querySelector(`[data-img-id='${image.id}']`)
+            if (historyItem.done) {
+              imgElem.classList.add('fragment-item-done')
+            }
+
+            fragmentDialogHideHandler(image, historyItem)
+
+            /*hideDialogHandler()
             if (voiceResponse.getStatus()) {
               voiceResponse.stop()
             }
@@ -784,9 +799,11 @@ export default function MentalMap(element, deck, params) {
             el.querySelector('.result-item-value').innerHTML = `${historyItem.all}% (${historyItem.hiding}% / ${historyItem.target}%)`
             el.querySelector('.text-item').innerHTML = ''
 
-            appendAllTextWordElements(texts.find(t => t.id === image.id).words, el.querySelector('.text-item'))
+            appendAllTextWordElements(texts.find(t => t.id === image.id).words, el.querySelector('.text-item'))*/
+
           })
-        }
+        },
+        mentalMapHistory
       )
       const zoomContainer = showMentalMapHandler(zoomWrap, () => {
         zoom.destroy()
@@ -803,6 +820,9 @@ export default function MentalMap(element, deck, params) {
     if (/*getCourseMode &&*/ historyIsDone(history)) {
       const content = createFinishContent(history, texts)
       $(container).parents('.mental-map').append(content)
+      if (imageFirst) {
+        element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
+      }
     }
   }
 
@@ -933,7 +953,7 @@ export default function MentalMap(element, deck, params) {
       textEl.classList.add('text-item')
       textEl.style.flex = '1 1 auto'
       textEl.style.textAlign = 'left'
-      textEl.innerHTML = texts.find(t => t.id = h.id)?.text
+      textEl.innerHTML = texts.find(t => t.id === h.id)?.text
       el.appendChild(textEl)
 
       historyWrap.appendChild(el)

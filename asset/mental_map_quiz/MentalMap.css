@@ -39,7 +39,7 @@
   pointer-events: none;
 }
 
-.mental-map-img .map-img:hover {
+.mental-map-img:not(.fragment-item-done):hover .map-img {
   transform: scale(1.05);
 }
 
@@ -311,4 +311,27 @@
 
 .tooltip {
   font-size: 1.6rem;
+}
+
+.fragment-item-done {
+  border: 4px #198754 solid !important;
+}
+
+.done-elem {
+  opacity: 0;
+  transition: transform .25s ease-in, opacity .25s linear;
+  position: absolute;
+  right: -20px;
+  top: -20px;
+  width: 40px;
+  height: 40px;
+  padding: 6px;
+  background-color: #198754;
+  color: white;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.fragment-item-done .done-elem {
+  opacity: 1;
 }

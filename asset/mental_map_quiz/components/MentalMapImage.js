@@ -10,7 +10,8 @@ export default function MentalMapImage(
   mapImageWidth,
   mapImageHeight,
   images,
-  imageClickHandler
+  imageClickHandler,
+  history
 ) {
 
   const zoomWrap = document.createElement('div')
@@ -26,6 +27,7 @@ export default function MentalMapImage(
   images.map(image => {
 
     const mapImgWrap = document.createElement('div')
+    mapImgWrap.dataset.imgId = image.id
     mapImgWrap.classList.add('mental-map-img')
     mapImgWrap.style.position = 'absolute'
     mapImgWrap.style.width = image.width + 'px'
@@ -37,29 +39,39 @@ export default function MentalMapImage(
       imageClickHandler(image)
     })
 
+    let mapFragment;
     if (image.url) {
-      const mapImg = document.createElement('img')
-      mapImg.classList.add('map-img')
-      mapImg.setAttribute('title', image.text.replace(/<[^>]*>?/gm, ''))
-      mapImg.dataset.trigger = 'hover'
-      mapImg.dataset.placement = 'auto'
-      mapImg.dataset.container = 'body'
-      mapImg.src = image.url
-      mapImgWrap.appendChild(mapImg)
+      mapFragment = document.createElement('img')
+      mapFragment.src = image.url
     } else {
-      const div = document.createElement('div')
-      div.style.height = '100%'
-      div.classList.add('map-fragment', 'map-img')
+      mapFragment = document.createElement('div')
+      mapFragment.classList.add('map-fragment')
+      mapFragment.style.height = '100%'
       const bgClassName = findBgClassName(image.bg)
       if (bgClassName) {
-        div.classList.add(bgClassName)
+        mapFragment.classList.add(bgClassName)
       }
-      div.setAttribute('title', image.text.replace(/<[^>]*>?/gm, ''))
-      div.dataset.trigger = 'hover'
-      div.dataset.placement = 'auto'
-      div.dataset.container = 'body'
-      mapImgWrap.appendChild(div)
     }
+
+    mapFragment.dataset.trigger = 'hover'
+    mapFragment.dataset.placement = 'auto'
+    mapFragment.dataset.container = 'body'
+    mapFragment.setAttribute('title', image.text.replace(/<[^>]*>?/gm, ''))
+    mapFragment.classList.add('map-img')
+
+    const doneElem = document.createElement('div')
+    doneElem.classList.add('done-elem')
+    doneElem.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+</svg>`
+    mapImgWrap.appendChild(doneElem)
+
+    const historyItem = history.find(h => h.id === image.id)
+    if (historyItem?.done) {
+      mapImgWrap.classList.add('fragment-item-done')
+    }
+
+    mapImgWrap.appendChild(mapFragment)
 
     zoomWrap.appendChild(mapImgWrap)
   })
