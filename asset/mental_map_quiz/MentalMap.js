@@ -497,7 +497,7 @@ export default function MentalMap(element, deck, params) {
     hideBtn.addEventListener('click', e => {
       $(e.target).toggleClass('img-hide')
       if ($(e.target).hasClass('img-hide')) {
-        $(zoomWrap).find('.mental-map-img img')
+        $(zoomWrap).find('.mental-map-img .map-img')
           .each((i, el) => $(el).css({opacity: '0'}))
         $(zoomWrap).find('.mental-map-img').each((i, el) => {
           $(el).append(`<span class="mental-map-point"></span>`)
@@ -505,7 +505,7 @@ export default function MentalMap(element, deck, params) {
         $(e.target).text('Показать')
       } else {
         $(zoomWrap).find('.mental-map-img span').remove()
-        $(zoomWrap).find('.mental-map-img img')
+        $(zoomWrap).find('.mental-map-img .map-img')
           .each((i, el) => $(el).css({opacity: '1'}))
         $(e.target).text('Скрыть')
       }
@@ -657,8 +657,8 @@ export default function MentalMap(element, deck, params) {
     let zoom
     mentalMapBtn.addEventListener('click', (e) => {
 
-      const zoomContainer = document.createElement('div')
-      zoomContainer.classList.add('zoom-container')
+      //const zoomContainer = document.createElement('div')
+      //zoomContainer.classList.add('zoom-container')
 
       const zoomWrap = MentalMapImage(
         json.map.url,
@@ -675,6 +675,8 @@ export default function MentalMap(element, deck, params) {
           })
         }
       )
+
+      /*
       zoomContainer.appendChild(zoomWrap)
 
       const closeBtn = document.createElement('button')
@@ -693,7 +695,7 @@ export default function MentalMap(element, deck, params) {
       hideBtn.addEventListener('click', e => {
         $(e.target).toggleClass('img-hide')
         if ($(e.target).hasClass('img-hide')) {
-          $(this.element).find('.mental-map-img img')
+          $(this.element).find('.mental-map-img .map-img')
             .each((i, el) => $(el).css({opacity: '0'}))
           $(this.element).find('.mental-map-img').each((i, el) => {
             $(el).append(`<span class="mental-map-point"></span>`)
@@ -701,12 +703,19 @@ export default function MentalMap(element, deck, params) {
           $(e.target).text('Показать')
         } else {
           $(this.element).find('.mental-map-img span').remove()
-          $(this.element).find('.mental-map-img img')
+          $(this.element).find('.mental-map-img .map-img')
             .each((i, el) => $(el).css({opacity: '1'}))
           $(e.target).text('Скрыть')
         }
       })
       zoomContainer.appendChild(hideBtn)
+       */
+
+      const zoomContainer = showMentalMapHandler(zoomWrap, () => {
+        zoom.destroy()
+        zoomContainer.remove()
+        element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
+      })
 
       this.element.appendChild(zoomContainer)
 

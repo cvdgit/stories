@@ -6,21 +6,21 @@ import {useMentalMap} from "../App/App";
 export default function ImageDialog({
                                       ref,
                                       setOpen,
-                                      currentImageItem
+                                      currentImageItem,
+                                      changeBgHandler
                                     }) {
   const textRef = useRef()
   const selectionRef = useRef()
   const [selectionMode, setSelectionMode] = useState(false)
   const [currentText, setCurrentText] = useState(currentImageItem.text)
   const [currentWords, setCurrentWords] = useState([])
+  const [bg, setBg] = useState(currentImageItem.bg)
   const {state, dispatch} = useMentalMap()
 
   useEffect(() => {
     if (!currentWords.length) {
       return
     }
-
-    console.log('update item')
     dispatch({
       type: 'update_mental_map_images',
       imageId: currentImageItem.id,
@@ -28,7 +28,6 @@ export default function ImageDialog({
         text: getTextBySelections(currentWords)
       }
     })
-
   }, [JSON.stringify(currentWords)]);
 
   const emitChange = (e) => {
@@ -122,6 +121,20 @@ export default function ImageDialog({
               </div>
             </div>
           </div>
+          {!currentImageItem.url && (
+            <div style={{marginRight: '20px', display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '10px 0'}}>
+              <span style={{marginRight: '10px'}}>Фон:</span>
+                <select value={String(bg || '')} onChange={(e) => {
+                  changeBgHandler(currentImageItem.id, e.target.value)
+                  setBg(e.target.value)
+                }} style={{padding: '10px'}}>
+                  <option value="">Прозрачный</option>
+                  <option value="blue">Blue</option>
+                  <option value="green">Green</option>
+                  <option value="red">Red</option>
+                </select>
+            </div>
+          )}
         </div>
       )}
     </Dialog>

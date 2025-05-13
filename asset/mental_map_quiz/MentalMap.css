@@ -290,3 +290,25 @@
   border: 3px #1baee1 solid;
   background-color: rgba(27, 174, 225, 0.1);
 }
+
+.fragment-bg-blue {
+  background-color: #cfe2ff;
+  opacity: 1;
+  border: 3px #9ec5fe solid;
+}
+
+.fragment-bg-red {
+  background-color: #f8d7da;
+  opacity: 1;
+  border: 3px #f1aeb5 solid;
+}
+
+.fragment-bg-green {
+  background-color: #d1e7dd;
+  opacity: 1;
+  border: 3px #a3cfbb solid;
+}
+
+.tooltip {
+  font-size: 1.6rem;
+}

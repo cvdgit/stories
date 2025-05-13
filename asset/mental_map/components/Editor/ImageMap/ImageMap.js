@@ -30,7 +30,6 @@ function processImageText(text) {
 
 function createWordsFormText(text) {
   const {imageText, textFragments} = processImageText(text)
-  console.log(imageText)
   const paragraphs = imageText.split('\n')
   const words = paragraphs.map(p => {
     if (p === '') {

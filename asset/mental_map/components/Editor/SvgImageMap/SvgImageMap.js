@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, {useRef, useState} from "react";
 import './SvgImageMap.css'
 import {useSvg, useSvgContainer} from "../../../Lib/svg-container/hook";
 import {SvgContainer} from "../../../Lib/svg-container";
@@ -10,6 +10,13 @@ import {useMentalMap} from "../../App/App";
 import DrawToggler from "./DrawToggler";
 
 let currentShape
+
+function findBgClassName(bg) {
+  if (!bg || bg === '') {
+    return '';
+  }
+  return `fragment-bg-${bg.toLowerCase()}`;
+}
 
 export default function SvgImageMap({mapImage, newImages}) {
   console.log('SvgImageMap render')
@@ -48,14 +55,12 @@ export default function SvgImageMap({mapImage, newImages}) {
     })
   }
 
-
-
   function createImageShape(image, id) {
     return image.attr({'class': 'map-fragment map-image', 'data-id': id})
   }
 
-  function createRectShape(rect, id) {
-    return rect.attr({'class': 'map-fragment', 'data-id': id})
+  function createRectShape(rect, id, bg) {
+    return rect.attr({'class': `map-fragment ${findBgClassName(bg)}`, 'data-id': id})
   }
 
   const onload = (svg, container) => {
@@ -78,7 +83,7 @@ export default function SvgImageMap({mapImage, newImages}) {
         shape = createImageShape(wrapGroup.image(i.url), i.id)
         shape.size(i.width, i.height)
       } else {
-        shape = createRectShape(wrapGroup.rect(i.width, i.height), i.id)
+        shape = createRectShape(wrapGroup.rect(i.width, i.height), i.id, i.bg)
       }
       shape.move(i.left, i.top)
       attachShapeEvents(shape, i)
@@ -103,6 +108,8 @@ export default function SvgImageMap({mapImage, newImages}) {
       });
       svg.zoom(.5, {x: 10, y: 10})
     }
+
+    const wrap = svg.find('#schemeWrap')
 
     svg
       .on('mousedown.map', e => {
@@ -149,10 +156,12 @@ export default function SvgImageMap({mapImage, newImages}) {
             .resize()
             .draggable()
 
+          wrap.put(currentShape)
+
           const {x: left, y: top, width, height} = currentShape.attr()
 
           const el = {
-            id: uuidv4(),
+            id: currentShape.attr('data-id'),
             left,
             top,
             width,
@@ -189,6 +198,21 @@ export default function SvgImageMap({mapImage, newImages}) {
     return elems
   }, [JSON.stringify(newImages)])
 
+  const changeBgHandler = (imageId, bg) => {
+    dispatch({
+      type: 'update_mental_map_images',
+      imageId,
+      payload: {
+        bg
+      }
+    })
+    const wrap = svgContainer.svg.find('#schemeWrap')
+    console.log(imageId, bg)
+    const el = wrap.findOne(`.map-fragment[data-id='${imageId}']`)
+    el.attr({'class': `map-fragment ${findBgClassName(bg)}`
+  })
+  }
+
   return (
     <>
       <div style={{margin: '20px 0'}}>
@@ -224,6 +248,7 @@ export default function SvgImageMap({mapImage, newImages}) {
           ref={ref}
           setOpen={setOpen}
           currentImageItem={mapImage.images.find(f => f.id === currentImageItem?.id)}
+          changeBgHandler={changeBgHandler}
         />
       </CSSTransition>
     </>

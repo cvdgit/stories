@@ -1,3 +1,10 @@
+function findBgClassName(bg) {
+  if (!bg || bg === '') {
+    return '';
+  }
+  return `fragment-bg-${bg.toLowerCase()}`;
+}
+
 export default function MentalMapImage(
   mapImageUrl,
   mapImageWidth,
@@ -17,6 +24,7 @@ export default function MentalMapImage(
   zoomWrap.appendChild(img)
 
   images.map(image => {
+
     const mapImgWrap = document.createElement('div')
     mapImgWrap.classList.add('mental-map-img')
     mapImgWrap.style.position = 'absolute'
@@ -42,6 +50,10 @@ export default function MentalMapImage(
       const div = document.createElement('div')
       div.style.height = '100%'
       div.classList.add('map-fragment', 'map-img')
+      const bgClassName = findBgClassName(image.bg)
+      if (bgClassName) {
+        div.classList.add(bgClassName)
+      }
       div.setAttribute('title', image.text.replace(/<[^>]*>?/gm, ''))
       div.dataset.trigger = 'hover'
       div.dataset.placement = 'auto'
