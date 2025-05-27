@@ -15,6 +15,8 @@ use yii\db\ActiveRecord;
  * @property int $created_at [int(11)]
  * @property int $updated_at [int(11)]
  * @property int|null $schedule_id
+ * @property string $map_type
+ * @property string|null $source_mental_map_id
  */
 class MentalMap extends ActiveRecord
 {
@@ -32,6 +34,15 @@ class MentalMap extends ActiveRecord
         $model->name = $name;
         $model->payload = $payload;
         $model->user_id = $userId;
+        $model->map_type = 'mental-map';
+        return $model;
+    }
+
+    public static function createMentalMapQuestions(string $uuid, string $name, array $payload, int $userId, string $sourceUuid): MentalMap
+    {
+        $model = self::create($uuid, $name, $payload, $userId);
+        $model->map_type = 'mental-map-questions';
+        $model->source_mental_map_id = $sourceUuid;
         return $model;
     }
 
@@ -100,6 +111,11 @@ class MentalMap extends ActiveRecord
         $this->schedule_id = $settings['scheduleId'] ?? null;
     }
 
+    public function getSettings(): array
+    {
+        return $this->payload['settings'] ?? [];
+    }
+
     public function findImageFromPayload(string $imageId): ?array
     {
         return array_values(array_filter($this->getImages(), static function (array $item) use ($imageId): bool {
@@ -111,6 +127,18 @@ class MentalMap extends ActiveRecord
     {
         $payload = $this->payload;
         $payload['treeData'] = $treeData;
+        $this->payload = $payload;
+    }
+
+    public function getQuestions(): array
+    {
+        return $this->payload['questions'] ?? [];
+    }
+
+    public function updateQuestions(array $fragments): void
+    {
+        $payload = $this->payload;
+        $payload['questions'] = $fragments;
         $this->payload = $payload;
     }
 }

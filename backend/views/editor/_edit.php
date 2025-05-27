@@ -26,6 +26,7 @@ $this->registerJs($this->renderFile("@backend/views/editor/_pass_test.js"));
 $this->registerJs($this->renderFile("@backend/views/editor/_mental_map.js"));
 $this->registerJs($this->renderFile("@backend/views/editor/_gpt_rewrite_text.js"));
 $this->registerJs($this->renderFile("@backend/views/editor/_retelling.js"));
+$this->registerJs($this->renderFile("@backend/views/editor/_mental_map_questions.js"));
 ?>
 <div class="wrap-editor">
     <div class="slides-sidebar">
@@ -229,6 +230,37 @@ $this->registerJs($this->renderFile("@backend/views/editor/_retelling.js"));
     </div>
 </div>
 
+    <div class="modal rounded-0 fade" tabindex="-1" id="mental-map-questions-modal" data-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="display: flex; justify-content: space-between">
+                    <h5 class="modal-title" style="margin-right: auto">...</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                </div>
+                <div class="modal-body d-flex">
+                    <div style="display: flex; flex-direction: row; column-gap: 20px">
+                        <div style="flex: 1"></div>
+                        <div style="flex: 1">
+                            <a id="mental-map-questions-generate" href="">Сгенерировать вопросы</a>
+                        </div>
+                    </div>
+                    <div id="mental-map-questions-items" style="display: flex; flex-direction: column; row-gap: 20px"></div>
+                </div>
+                <div class="modal-footer" style="position: relative">
+                    <div>
+                        <label for="mental-map-questions-required">
+                            Обязательный для прохождения <input checked id="mental-map-questions-required" type="checkbox">
+                        </label>
+                        <button type="button" class="btn btn-primary" id="mental-map-questions-action">...</button>
+                    </div>
+                    <div id="mental-map-questions-loader" style="display: none; position:absolute; align-items: center; justify-content: center; left: 0; top: 0; width: 100%; height: 100%; background-color: #fff">
+                        <img src="/img/loading.gif" width="30" alt="">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 <?php
 echo $this->render('modal/slide_link', ['storyModel' => $model]);
 echo $this->render('modal/image_from_file', ['storyModel' => $model]);
@@ -254,6 +286,7 @@ $js = <<< JS
 (function() {
 
     const editorRetelling = new EditorRetelling()
+    const mentalMapQuestions = new MentalMapQuestions()
 
     var editorConfig = $configJSON;
     editorConfig.onBlockUpdate = function(block, action, element) {
@@ -263,6 +296,16 @@ $js = <<< JS
                 storyId: StoryEditor.getConfigValue('storyID'),
                 slideId: StoryEditor.getCurrentSlide().getID(),
                 blockId: block.getID()
+            })
+            return
+        }
+
+        if (block.typeIsMentalMapQuestions()) {
+            mentalMapQuestions.showUpdateModal({
+                storyId: StoryEditor.getConfigValue('storyID'),
+                slideId: StoryEditor.getCurrentSlide().getID(),
+                blockId: block.getID(),
+                mentalMapId: $(block.getElement()).find('.mental-map').attr('data-mental-map-id')
             })
             return
         }
@@ -305,6 +348,25 @@ $js = <<< JS
             blockModifier.change()
         }})
     }
+
+    editorConfig.mentalMapQuestionsHandler = (block, blockModifier) => {
+        const id = $(block.getElement()).find('.mental-map').attr('data-mental-map-id')
+        if (!id) {
+            alert('Id not found')
+            return
+        }
+        const currentSlide = StoryEditor.getCurrentSlide();
+        if (!currentSlide) {
+            toastr.error("Нет слайда");
+            return;
+        }
+        mentalMapQuestions.showModal({
+            storyId: StoryEditor.getConfigValue('storyID'),
+            slideId: currentSlide.getID(),
+            id
+        })
+    }
+
     StoryEditor.initialize(editorConfig);
 
     function initSelectStoryWidget(root) {
@@ -635,6 +697,24 @@ $js = <<< JS
                 storyId: StoryEditor.getConfigValue('storyID'),
                 slideId: StoryEditor.getCurrentSlide().getID(),
                 blockId
+            })
+        }
+    })
+
+    $('#story-editor').on('click', '[data-mental-map-action=update-questions]', e => {
+        e.preventDefault()
+        const blockId = $(e.target).parents('.sl-block').attr('data-block-id')
+        const mentalMapId = $(e.target).parent().attr('data-mental-map-id')
+        if (!mentalMapId) {
+            alert('Id not found')
+            return
+        }
+        if (blockId) {
+            mentalMapQuestions.showUpdateModal({
+                storyId: StoryEditor.getConfigValue('storyID'),
+                slideId: StoryEditor.getCurrentSlide().getID(),
+                blockId,
+                mentalMapId
             })
         }
     })

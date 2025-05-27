@@ -201,12 +201,14 @@ function SlideManager(options) {
     this.setSlideView = function (view) {
       this.element.attr('data-slide-view', view);
     };
+    this.getSlideView = () => this.element.attr('data-slide-view')
     this.isSlideLink = function () {
       return this.data.isLink;
     };
   }
 
-  var currentSlide = null;
+  /** @var {SlideWrapper|null} */
+  let currentSlide = null;
   this.setActiveSlide = function (element, data) {
     currentSlide = new SlideWrapper(element, data);
   }
@@ -1018,6 +1020,10 @@ const StoryEditor = (function () {
         $list.append(createToolbarItemWithImage('Переписать', '/img/chatgpt-icon.png', 'gpt-rewrite'));
       }
 
+      if (activeBlock.typeIsMentalMap() && slidesManager.getActiveSlide().getSlideView() === 'mental-map') {
+        $list.append(createToolbarItemWithImage('Ментальная карта с вопросами', '/img/mental-map.png', 'mental-map-questions'));
+      }
+
       return $('<div/>', {'class': 'blocks-sidebar'}).append($list);
     }
 
@@ -1094,6 +1100,11 @@ const StoryEditor = (function () {
         'gpt-rewrite': () => {
           if (typeof params.gptRewriteHandler === 'function') {
             params.gptRewriteHandler(blockManager.getActive(), blockModifier)
+          }
+        },
+        'mental-map-questions': () => {
+          if (typeof params.mentalMapQuestionsHandler === 'function') {
+            params.mentalMapQuestionsHandler(blockManager.getActive(), blockModifier)
           }
         }
       }
@@ -1345,6 +1356,9 @@ const StoryEditor = (function () {
       },
       typeIsMentalMap() {
         return this.getType() === 'mental_map'
+      },
+      typeIsMentalMapQuestions() {
+        return this.typeIsMentalMap() && slidesManager.getActiveSlide().getSlideView() === 'mental-map-questions'
       },
       typeIsRetelling() {
         return this.getType() === 'retelling'
@@ -1681,7 +1695,9 @@ const StoryEditor = (function () {
   previewContainerSetHeight();*/
 
   window.addEventListener('resize', function () {
-    slideMenu.setPosition();
+    if (slideMenu) {
+      slideMenu.setPosition();
+    }
   });
 
   function SlideMenu($ed) {

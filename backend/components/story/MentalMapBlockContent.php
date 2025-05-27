@@ -20,10 +20,16 @@ class MentalMapBlockContent
      */
     private $required;
 
-    public function __construct(string $id, bool $required = false)
+    /**
+     * @var string
+     */
+    private $mapType;
+
+    public function __construct(string $id, bool $required = false, string $mapType = null)
     {
         $this->id = $id;
         $this->required = $required;
+        $this->mapType = $mapType ??  'mental-map';
     }
 
     public static function createFromHtml(string $html): MentalMapBlockContent
@@ -31,10 +37,11 @@ class MentalMapBlockContent
         $content = phpQuery::newDocumentHTML($html);
         $id = $content->find('.mental-map')->attr('data-mental-map-id');
         $required = $content->find('.mental-map')->attr('data-mental-map-required') === 'true';
+        $mapType = $content->find('.mental-map')->attr('data-mental-map-type');
         if (empty($id)) {
             throw new DomainException('Mental Map id undefined');
         }
-        return new self((string) $id, $required);
+        return new self((string) $id, $required, $mapType);
     }
 
     public function getId(): string
@@ -45,10 +52,14 @@ class MentalMapBlockContent
     public function renderWithDescription(int $slideId, string $title = 'Ментальная карта'): string
     {
         $link = Html::a($title, ['mental-map/editor', 'id' => $this->id, 'from_slide' => $slideId]);
+        if ($this->mapType === 'mental-map-questions') {
+            $link = Html::a($title, '#', ['data-mental-map-action' => 'update-questions']);
+        }
         return Html::tag('div', $link, [
             'class' => 'mental-map',
             'data-mental-map-id' => $this->id,
             'data-mental-map-required' => var_export($this->required, true),
+            'data-mental-map-type' => $this->mapType,
         ]);
     }
 
@@ -58,11 +69,17 @@ class MentalMapBlockContent
             'class' => 'mental-map',
             'data-mental-map-id' => $this->id,
             'data-mental-map-required' => var_export($this->required, true),
+            'data-mental-map-type' => $this->mapType,
         ]);
     }
 
     public function isRequired(): bool
     {
         return $this->required;
+    }
+
+    public function getMapType(): string
+    {
+        return $this->mapType;
     }
 }

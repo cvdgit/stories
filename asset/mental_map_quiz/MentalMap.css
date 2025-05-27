@@ -110,15 +110,27 @@
   display: flex;
   flex-direction: row;
   margin-bottom: 10px;
+  column-gap: 20px;
 }
 
 .image-item {
-  margin-right: 10px;
+  display: flex;
+  flex-direction: column;
+  width: 210px;
+}
+
+.image-item img {
+  max-width: 160px;
+}
+
+.image-item svg {
+  max-width: 160px;
 }
 
 .text-item {
   font-size: 2.2rem;
   line-height: 3rem;
+  flex: 1;
 }
 
 .text-item-word {

@@ -83,12 +83,6 @@ class MentalMapController extends Controller
         $repetitionMode = $rawBody['repetition_mode'] ?? false;
         $threshold = MentalMapThreshold::getThreshold(Yii::$app->params, $mentalMap->payload);
 
-        if ($mentalMap->isMentalMapAsTree()) {
-            $history = (new MentalMapTreeHistoryFetcher())->fetch($mentalMap->uuid, $user->getId(), $mentalMap->getTreeData(), $threshold, $repetitionMode);
-        } else {
-            $history = (new MentalMapHistoryFetcher())->fetch($mentalMap->getImages(), $mentalMap->uuid, $user->getId(), $threshold, $repetitionMode);
-        }
-
         $prompt = null;
         if ($user->can(UserRoles::ROLE_ADMIN)) {
             $prompt = (new Query())
@@ -98,9 +92,61 @@ class MentalMapController extends Controller
                 ->scalar();
         }
 
+        if ($mentalMap->mapTypeIsMentalMapQuestions()) {
+            $sourceMentalMap = MentalMap::findOne($mentalMap->source_mental_map_id);
+            if ($sourceMentalMap === null) {
+                return ['success' => false, 'message' => 'Source mental map not found'];
+            }
+
+            $payload = $mentalMap->payload;
+            $payload['map'] = $sourceMentalMap->getMapData();
+            $payload['treeView'] = $sourceMentalMap->isMentalMapAsTree();
+            $payload['treeData'] = $sourceMentalMap->getTreeData();
+            $payload['settings'] = $sourceMentalMap->getSettingsData();
+
+            if ($sourceMentalMap->isMentalMapAsTree()) {
+                $history = (new MentalMapTreeHistoryFetcher())->fetch(
+                    $mentalMap->uuid,
+                    $user->getId(),
+                    $sourceMentalMap->getTreeData(),
+                    $threshold,
+                    $repetitionMode
+                );
+            } else {
+                $history = (new MentalMapHistoryFetcher())->fetch(
+                    $sourceMentalMap->getImages(),
+                    $mentalMap->uuid,
+                    $user->getId(),
+                    $threshold,
+                    $repetitionMode
+                );
+            }
+        } else {
+            $payload = $mentalMap->payload;
+            if ($mentalMap->isMentalMapAsTree()) {
+                $history = (new MentalMapTreeHistoryFetcher())->fetch(
+                    $mentalMap->uuid,
+                    $user->getId(),
+                    $mentalMap->getTreeData(),
+                    $threshold,
+                    $repetitionMode
+                );
+            } else {
+                $history = (new MentalMapHistoryFetcher())->fetch(
+                    $mentalMap->getImages(),
+                    $mentalMap->uuid,
+                    $user->getId(),
+                    $threshold,
+                    $repetitionMode
+                );
+            }
+        }
+
+        $payload['mapTypeIsMentalMapQuestions'] = $mentalMap->mapTypeIsMentalMapQuestions();
+
         return [
             'success' => true,
-            'mentalMap' => $mentalMap->payload,
+            'mentalMap' => $payload,
             'history' => $history,
             'rewritePrompt' => $prompt,
             'threshold' => MentalMapThreshold::getThreshold(Yii::$app->params, $mentalMap->payload),

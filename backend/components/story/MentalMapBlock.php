@@ -47,6 +47,7 @@ class MentalMapBlock extends AbstractBlock
         return array_merge([
             'mental_map_id' => $content->getId(),
             'required' => $content->isRequired() ? '1' : '0',
+            'map_type' => $content->getMapType(),
         ], parent::getValues());
     }
 

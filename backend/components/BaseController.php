@@ -18,7 +18,7 @@ class BaseController extends Controller
      * @throws InvalidConfigException
      * @return T
      */
-    public function findModel(string $modelClassName, int $id): object
+    public function findModel(string $modelClassName, $id): object
     {
         $modelObject = Yii::createObject($modelClassName);
         if (($model = $modelObject::findOne($id)) !== null) {

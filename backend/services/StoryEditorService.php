@@ -200,11 +200,14 @@ class StoryEditorService
     /**
      * @throws InvalidConfigException
      */
-    public function getSlideWithMentalMapBlockContent(int $slideId, string $mentalMapId, bool $required = true): string
+    public function getSlideWithMentalMapBlockContent(int $slideId, string $mentalMapId, string $view, bool $required = true): string
     {
-        $slide = (new HtmlSlideReader(new SlideContent($slideId, 'mental-map')))->load();
+        if (!in_array($view, ['mental-map', 'mental-map-questions'])) {
+            throw new DomainException('Unknown mental map view');
+        }
+        $slide = (new HtmlSlideReader(new SlideContent($slideId, $view)))->load();
         $block = $slide->createBlock(MentalMapBlock::class);
-        $block->setContent((new MentalMapBlockContent($mentalMapId, $required))->render());
+        $block->setContent((new MentalMapBlockContent($mentalMapId, $required, $view))->render());
         $slide->addBlock($block);
         return (new HTMLWriter())->renderSlide($slide);
     }
@@ -290,7 +293,7 @@ class StoryEditorService
 
         /** @var MentalMapBlock $block */
         $block = $slide->findBlockByID($form->block_id);
-        $block->setContent((new MentalMapBlockContent($form->mental_map_id, $form->required === '1'))->render());
+        $block->setContent((new MentalMapBlockContent($form->mental_map_id, $form->required === '1', $slide->getView()))->render());
 
         $writer = new HTMLWriter();
         $model->updateData($writer->renderSlide($slide));

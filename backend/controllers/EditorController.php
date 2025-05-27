@@ -23,6 +23,7 @@ use backend\models\video\VideoSource;
 use backend\services\StoryLinksService;
 use backend\services\StorySlideService;
 use backend\SlideEditor\CreateMentalMap\CreateMentalMapAction;
+use backend\SlideEditor\CreateMentalMapQuestions\CreateMentalMapQuestionsAction;
 use backend\SlideEditor\CreatePassTest\CreatePassTestAction;
 use backend\SlideEditor\CreateQuizBySlideText\CreateQuizAction;
 use backend\SlideEditor\CreateRetelling\CreateRetellingAction;
@@ -111,6 +112,7 @@ class EditorController extends BaseController
             'retelling' => CreateRetellingAction::class,
             'load-retelling' => LoadRetellingAction::class,
             'update-retelling' => UpdateRetellingAction::class,
+            'mental-map-questions' => CreateMentalMapQuestionsAction::class,
         ];
     }
 

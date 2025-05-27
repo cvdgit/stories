@@ -1,7 +1,9 @@
 import "./TreeViewBody.css"
 import TreeVoiceControl from "./TreeVoiceControl";
 import sendMessage from "../lib/sendMessage";
-import {calcHiddenTextPercent, createWordItem} from "../MentalMap";
+import {calcHiddenTextPercent, createWordItem} from "../words";
+import {processOutputAsJson, stripTags} from "../common";
+import {calcSimilarityPercentage} from "../lib/calcSimilarity";
 
 const nodeStatusSuccessHtml = `
 <div class="retelling-status-show"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -90,6 +92,7 @@ function createRow(node, level = 0) {
 }
 
 function processTreeNodes(list, body, history, voiceResponse, params, onEndHandler, dispatchEvent) {
+  console.log('processTreeNodes call')
   for (const listItem of list) {
 
     const rowElement = body.querySelector(`.node-row[data-node-id='${listItem.id}']`)
@@ -297,104 +300,178 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
               return
             }
 
-            // console.log(text)
+            const similarityPercentage = calcSimilarityPercentage(
+              removePunctuation(listItem.title.toLowerCase()).trim(),
+              removePunctuation(text.toLowerCase()).trim()
+            )
 
-            retellingResponseSpan.innerText = ''
-            sendMessage(`/admin/index.php?r=gpt/stream/retelling-tree`, {
-                userResponse: resultSpan.innerText,
-                slideTexts: stripTags(listItem.title),
-                importantWords: $(`<div>${listItem.title}</div>`)
-                  .find('span.target-text')
-                  .map((i, el) => removePunctuation($(el).text()))
-                  .get()
-                  .join(', ')
-              },
-              (message) => retellingResponseSpan.innerText = message,
-              (error) => {
-                backdrop.setErrorText(error, () => {
+            if (similarityPercentage >= params.threshold) {
+              console.log('sim ok')
+
+              retellingResponseSpan.innerText = `{"similarity_percentage": ${similarityPercentage}, "all_important_words_included": true, "user_response": "${text}"}`
+
+              const content = rowElement.querySelector('.node-title').innerHTML
+              backdrop.remove()
+
+              const json = processOutputAsJson(retellingResponseSpan.innerText)
+              if (json === null) {
+                console.log('no json')
+                return
+              }
+
+              const historyItem = history.find(i => i.id === nodeId)
+              historyItem.json = retellingResponseSpan.innerHTML
+              historyItem.user_response = resultSpan.innerHTML
+
+              nodeStatusElement.innerHTML = nodeStatusSuccessHtml
+
+              if (historyItem) {
+                historyItem.done = true
+              } else {
+                history.push({id: nodeId, done: true})
+              }
+
+              processTreeNodes(list, body, history, voiceResponse, params, onEndHandler, dispatchEvent)
+
+              dispatchEvent('historyChange', {
+                currentHistory: history
+              })
+
+              nodeStatusElement.querySelector('.retelling-status-show')
+                .addEventListener('click', e => {
+                  const nodeId = e.target.closest('.node-row').dataset.nodeId
+                  const item = history.find(i => i.id === nodeId)
+                  const content = createRetellingFeedbackContent(listItem.title, item.user_response, item.json)
+                  rowElement.closest('.mental-map').appendChild(content)
+                })
+
+              const wordItems = createWordItem(listItem.title, listItem.id)
+              wordItems.words = [...wordItems.words].map(w => {
+                if (w.type === 'word' && w.target === true) {
+                  w.hidden = true
+                }
+                return w
+              })
+              const textHidingPercentage = calcHiddenTextPercent(wordItems)
+
+              saveUserResult({
+                ...params,
+                image_fragment_id: nodeId,
+                overall_similarity: Number(json.similarity_percentage),
+                text_hiding_percentage: textHidingPercentage,
+                text_target_percentage: textHidingPercentage > 0 ? 100 : 0, // textTargetPercentage,
+                content,
+                user_response: resultSpan.innerText,
+                api_response: JSON.stringify(json)
+              }).then(response => {
+                if (response && response.success) {
+                  historyItem.all = response.history.all
+                  historyItem.hiding = response.history.hiding
+                  historyItem.target = response.history.target
+                }
+              })
+            } else {
+
+              // console.log(text)
+
+              retellingResponseSpan.innerText = ''
+              sendMessage(`/admin/index.php?r=gpt/stream/retelling-tree`, {
+                  userResponse: resultSpan.innerText,
+                  slideTexts: stripTags(listItem.title),
+                  importantWords: $(`<div>${listItem.title}</div>`)
+                    .find('span.target-text')
+                    .map((i, el) => removePunctuation($(el).text()))
+                    .get()
+                    .join(', ')
+                },
+                (message) => retellingResponseSpan.innerText = message,
+                (error) => {
+                  backdrop.setErrorText(error, () => {
+                    backdrop.remove()
+                    stopClickHandler(targetElement)
+                  })
+                },
+                () => {
+
+                  const content = rowElement.querySelector('.node-title').innerHTML
+
                   backdrop.remove()
-                  stopClickHandler(targetElement)
-                })
-              },
-              () => {
 
-                const content = rowElement.querySelector('.node-title').innerHTML
+                  const json = processOutputAsJson(retellingResponseSpan.innerText)
+                  if (json === null) {
+                    console.log('no json')
+                    return
+                  }
+                  const val = Number(json.similarity_percentage)
+                  let importantWordsPassed = true
 
-                backdrop.remove()
-
-                const json = processOutputAsJson(retellingResponseSpan.innerText)
-                if (json === null) {
-                  console.log('no json')
-                  return
-                }
-                const val = Number(json.similarity_percentage)
-                let importantWordsPassed = true
-
-                if (json.all_important_words_included !== undefined) {
-                  importantWordsPassed = Boolean(json.all_important_words_included)
-                }
-
-                const historyItem = history.find(i => i.id === nodeId)
-                historyItem.json = retellingResponseSpan.innerHTML
-                historyItem.user_response = resultSpan.innerHTML
-                if (val >= params.threshold && importantWordsPassed) {
-                  nodeStatusElement.innerHTML = nodeStatusSuccessHtml
-
-                  if (historyItem) {
-                    historyItem.done = true
-                  } else {
-                    history.push({id: nodeId, done: true})
+                  if (json.all_important_words_included !== undefined) {
+                    importantWordsPassed = Boolean(json.all_important_words_included)
                   }
 
-                  processTreeNodes(list, body, history, voiceResponse, params, onEndHandler, dispatchEvent)
-                } else {
-                  if (historyItem) {
-                    historyItem.done = false
+                  const historyItem = history.find(i => i.id === nodeId)
+                  historyItem.json = retellingResponseSpan.innerHTML
+                  historyItem.user_response = resultSpan.innerHTML
+                  if (val >= params.threshold && importantWordsPassed) {
+                    nodeStatusElement.innerHTML = nodeStatusSuccessHtml
+
+                    if (historyItem) {
+                      historyItem.done = true
+                    } else {
+                      history.push({id: nodeId, done: true})
+                    }
+
+                    processTreeNodes(list, body, history, voiceResponse, params, onEndHandler, dispatchEvent)
+                    console.log('after processTreeNodes', json, historyItem)
                   } else {
-                    history.push({id: nodeId, done: false})
+                    if (historyItem) {
+                      historyItem.done = false
+                    } else {
+                      history.push({id: nodeId, done: false})
+                    }
+                    nodeStatusElement.innerHTML = nodeStatusFailedHtml
                   }
-                  nodeStatusElement.innerHTML = nodeStatusFailedHtml
-                }
 
-                dispatchEvent('historyChange', {
-                  currentHistory: history
-                })
-
-                nodeStatusElement.querySelector('.retelling-status-show')
-                  .addEventListener('click', e => {
-                    const nodeId = e.target.closest('.node-row').dataset.nodeId
-                    const item = history.find(i => i.id === nodeId)
-                    const content = createRetellingFeedbackContent(listItem.title, item.user_response, item.json)
-                    rowElement.closest('.mental-map').appendChild(content)
+                  dispatchEvent('historyChange', {
+                    currentHistory: history
                   })
 
-                const wordItems = createWordItem(listItem.title, listItem.id)
-                wordItems.words = [...wordItems.words].map(w => {
-                  if (w.type === 'word' && w.target === true) {
-                    w.hidden = true
-                  }
-                  return w
-                })
-                const textHidingPercentage = calcHiddenTextPercent(wordItems)
+                  nodeStatusElement.querySelector('.retelling-status-show')
+                    .addEventListener('click', e => {
+                      const nodeId = e.target.closest('.node-row').dataset.nodeId
+                      const item = history.find(i => i.id === nodeId)
+                      const content = createRetellingFeedbackContent(listItem.title, item.user_response, item.json)
+                      rowElement.closest('.mental-map').appendChild(content)
+                    })
 
-                saveUserResult({
-                  ...params,
-                  image_fragment_id: nodeId,
-                  overall_similarity: Number(json.similarity_percentage),
-                  text_hiding_percentage: textHidingPercentage,
-                  text_target_percentage: textHidingPercentage > 0 ? 100 : 0, // textTargetPercentage,
-                  content,
-                  user_response: resultSpan.innerText,
-                  api_response: JSON.stringify(json)
-                }).then(response => {
-                  if (response && response.success) {
-                    historyItem.all = response.history.all
-                    historyItem.hiding = response.history.hiding
-                    historyItem.target = response.history.target
-                  }
-                })
-              }
-            )
+                  const wordItems = createWordItem(listItem.title, listItem.id)
+                  wordItems.words = [...wordItems.words].map(w => {
+                    if (w.type === 'word' && w.target === true) {
+                      w.hidden = true
+                    }
+                    return w
+                  })
+                  const textHidingPercentage = calcHiddenTextPercent(wordItems)
+
+                  saveUserResult({
+                    ...params,
+                    image_fragment_id: nodeId,
+                    overall_similarity: Number(json.similarity_percentage),
+                    text_hiding_percentage: textHidingPercentage,
+                    text_target_percentage: textHidingPercentage > 0 ? 100 : 0, // textTargetPercentage,
+                    content,
+                    user_response: resultSpan.innerText,
+                    api_response: JSON.stringify(json)
+                  }).then(response => {
+                    if (response && response.success) {
+                      historyItem.all = response.history.all
+                      historyItem.hiding = response.history.hiding
+                      historyItem.target = response.history.target
+                    }
+                  })
+                }
+              )
+            }
 
 
           })
@@ -504,16 +581,6 @@ function createRewriteContent(text, hideCallback) {
   }
 }
 
-function processOutputAsJson(output) {
-  let json = null
-  try {
-    json = JSON.parse(output.replace(/```json\n?|```/g, ''))
-  } catch (ex) {
-
-  }
-  return json
-}
-
 function resetNodeRow(row) {
   row.querySelector('.node-status').innerHTML = ''
   const voiceResponseElem = row.querySelector('.node-voice-response');
@@ -536,12 +603,6 @@ async function saveUserResult(payload) {
     throw new Error(response.statusText)
   }
   return await response.json()
-}
-
-function stripTags(html) {
-  const div = document.createElement('div');
-  div.innerHTML = html;
-  return div.textContent || div.innerText || '';
 }
 
 function createNotify(text) {

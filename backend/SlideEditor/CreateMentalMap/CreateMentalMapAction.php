@@ -139,7 +139,7 @@ class CreateMentalMapAction extends Action
                         throw new BadRequestHttpException('Mental Map save exception');
                     }
 
-                    $data = $this->storyEditorService->getSlideWithMentalMapBlockContent($slideModel->id, $mentalMapId, $mentalMapForm->required === '1');
+                    $data = $this->storyEditorService->getSlideWithMentalMapBlockContent($slideModel->id, $mentalMapId, 'mental-map', $mentalMapForm->required === '1');
                     $slideModel->updateData($data);
                     if (!$slideModel->save()) {
                         throw new DomainException(

@@ -13,6 +13,9 @@ use yii\db\ActiveRecord;
  * @property int $user_id [int(11)]
  * @property int $created_at [int(11)]
  * @property int $updated_at [int(11)]
+ * @property int|null $schedule_id
+ * @property string $map_type
+ * @property string|null $source_mental_map_id
  */
 class MentalMap extends ActiveRecord
 {
@@ -64,6 +67,11 @@ class MentalMap extends ActiveRecord
         return $this->payload['treeData'] ?? [];
     }
 
+    public function getMapData(): array
+    {
+        return $this->payload['map'] ?? [];
+    }
+
     public function findImageFromPayload(string $imageId): ?array
     {
         $items = array_values(array_filter($this->getItems(), static function (array $item) use ($imageId): bool {
@@ -95,5 +103,15 @@ class MentalMap extends ActiveRecord
             return $this->flatten($this->getTreeData());
         }
         return $items;
+    }
+
+    public function mapTypeIsMentalMapQuestions(): bool
+    {
+        return $this->map_type === 'mental-map-questions';
+    }
+
+    public function getSettingsData(): array
+    {
+        return $this->payload['settings'] ?? [];
     }
 }

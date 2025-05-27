@@ -49,6 +49,7 @@
     "@svgdotjs/svg.resize.js": "^2.0.5",
     "@svgdotjs/svg.select.js": "^4.0.2",
     "bootstrap": "4.6.x",
+    "diff": "^8.0.2",
     "eventsource-parser": "^1.1.1",
     "fast-json-patch": "^3.1.1",
     "highlight.js": "^11.9.0",

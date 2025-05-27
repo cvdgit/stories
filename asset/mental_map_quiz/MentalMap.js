@@ -2,76 +2,19 @@ import './MentalMap.css'
 import InnerDialog from "./Dialog";
 import VoiceResponse from "./lib/VoiceResponse"
 import MissingWordsRecognition from "./lib/MissingWordsRecognition"
-import {v4 as uuidv4} from "uuid"
-import DetailText from "./components/DetailText";
-import AllTexts, {appendAllTextWordElements} from "./components/AllTexts";
+import AllTexts from "./components/AllTexts";
 import MentalMapImage from "./components/MentalMapImage";
 import FragmentResultElement from "./components/FragmentResultElement";
 import sendEventSourceMessage from "../app/sendEventSourceMessage";
 import Panzoom from "../app/panzoom.min"
-import RewritePromptBtn from "./components/RewritePromptBtn";
 import TreeView from "./TreeView/TreeView";
-
-function decodeHtml(html) {
-  const txt = document.createElement("textarea");
-  txt.innerHTML = html;
-  return txt.value;
-}
-
-function processImageText(text) {
-  const textFragments = new Map();
-  const reg = new RegExp(`<span[^>]*>(.*?)<\\/span>`, 'gm');
-  const imageText = decodeHtml(text.replace(/&nbsp;/g, ' ')).replace(reg, (match, p1) => {
-    const id = uuidv4()
-    textFragments.set(`${id}`, `${p1.trim()}`)
-    return `{${id}}`
-  })
-  return {
-    imageText,
-    textFragments
-  }
-}
-
-export function createWordItem(itemText, itemId) {
-  const {imageText, textFragments} = processImageText(itemText)
-  const paragraphs = imageText.split('\n')
-  const words = paragraphs.map(p => {
-    if (p === '') {
-      return [{type: 'break'}]
-    }
-    const words = p.split(' ').filter(w => w).map(word => {
-      if (word.indexOf('{') > -1) {
-        const id = word.toString().replace(/[^\w\-]+/gmui, '')
-        if (textFragments.has(id)) {
-          const reg = new RegExp(`{${id}}`)
-          word = word.replace(reg, textFragments.get(id))
-          return word.split(' ').map(w => ({id: uuidv4(), word: w, type: 'word', hidden: false, target: true}))
-        }
-      }
-      return [{id: uuidv4(), word, type: 'word', hidden: false}]
-    })
-    return [...(words.flat()), {type: 'break'}]
-  }).flat()
-  return {
-    id: itemId,
-    text: itemText,
-    words
-  }
-}
-
-export function calcHiddenTextPercent(detailTexts) {
-  let totalCounter = 0;
-  let hiddenCounter = 0;
-  detailTexts.words.map(w => {
-    if (w.type === 'word') {
-      totalCounter++;
-      if (w.hidden) {
-        hiddenCounter++
-      }
-    }
-  })
-  return totalCounter === 0 || hiddenCounter === 0 ? 0 : Math.round(hiddenCounter * 100 / totalCounter)
-}
+import MentalMapQuestions from "./questions";
+import DetailContentQuestions from "./content/DetailContentQuestions";
+import {calcHiddenTextPercent, calcTargetTextPercent, canRecording, createWordItem} from "./words";
+import DetailContent from "./content/DetailContent";
+import {processOutputAsJson, stripTags} from "./common";
+import FragmentResultQuestionsElement from "./content/FragmentResultQuestionsElement";
+import {calcSimilarityPercentage} from "./lib/calcSimilarity";
 
 /**
  * @param element
@@ -135,41 +78,6 @@ export default function MentalMap(element, deck, params) {
     })
   }
 
-  function getTargetWordsCount(detailTexts) {
-    return detailTexts.words.filter(w => w.type === 'word' && w?.target).length
-  }
-
-  function calcTargetTextPercent(detailTexts) {
-    let targetCounter = 0;
-    let targetHiddenCounter = 0;
-    detailTexts.words.map(w => {
-      if (w.type === 'word' && w?.target) {
-        targetCounter++
-        if (w.hidden) {
-          targetHiddenCounter++
-        }
-      }
-    })
-    return targetCounter === 0 || targetHiddenCounter === 0 ? 0 : Math.round(targetHiddenCounter * 100 / targetCounter)
-  }
-
-  function canRecording(detailTexts) {
-    if (getTargetWordsCount(detailTexts) === 0) {
-      return true
-    }
-    return calcTargetTextPercent(detailTexts) === 100
-  }
-
-  function processOutputAsJson(output) {
-    let json = null
-    try {
-      json = JSON.parse(output.replace(/```json\n?|```/g, ''))
-    } catch (ex) {
-
-    }
-    return json
-  }
-
   function RecordingLangStore(defaultLang) {
     let lang = defaultLang
     return {
@@ -187,240 +95,6 @@ export default function MentalMap(element, deck, params) {
 
   const langStore = new RecordingLangStore('ru-RU')
 
-  function mapImageClickHandler(image, texts, historyItem, rewritePrompt, threshold) {
-    const detailImgWrap = document.createElement('div')
-    detailImgWrap.classList.add('image-item')
-
-    if (image.url) {
-      const detailImg = document.createElement('img')
-      detailImg.src = image.url
-      detailImg.style.marginBottom = '10px'
-      detailImgWrap.appendChild(detailImg)
-    } else {
-      const div = document.createElement('div')
-      div.style.marginBottom = '10px'
-      div.style.padding = '20px'
-      div.style.cursor = 'pointer'
-      div.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-</svg>
-`
-      detailImgWrap.appendChild(div)
-    }
-
-    detailImgWrap.appendChild(FragmentResultElement(historyItem))
-
-    const text = texts.find(t => t.id === image.id)
-
-    const detailTextWrap = document.createElement('div')
-    detailTextWrap.classList.add('detail-text-wrap')
-
-    let promptBtn;
-    if (rewritePrompt) {
-      promptBtn = RewritePromptBtn(() => {
-        const content = createUpdatePromptContent(rewritePrompt, (currentPrompt, close) => {
-          rewritePrompt = currentPrompt
-          saveRewritePrompt(currentPrompt).then(r => close())
-        })
-        dialog.getWrapper().append(content)
-      })
-    }
-
-    const detailText = DetailText(text, () => {
-      if (voiceResponse.getStatus()) {
-        voiceResponse.stop()
-        const voiceLang = langStore.fromStore($(recordingWrap).find("#voice-lang option:selected").val())
-        startRecording(recordingWrap.querySelector('#start-recording'), voiceLang, stripTags(text.text), false)
-      }
-      /*['#result_span', '#final_span', '#interim_span'].map(q => {
-        detailTextWrap.querySelector(q).innerHTML = ''
-        recordingWrap.querySelector('#start-retelling-wrap').style.display = 'none'
-      })*/
-      recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
-
-      const gm = recordingWrap.querySelector('#start-recording')
-
-      $(gm)
-        .removeAttr('title')
-        .tooltip('destroy')
-
-      gm.classList.remove('disabled')
-      if (!canRecording(text)) {
-        gm.classList.add('disabled')
-        $(gm)
-          .attr('title', 'Нужно закрыть все важные слова')
-          .tooltip()
-      }
-      recordingWrap.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%'
-    }, () => {
-      recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
-      recordingWrap.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%'
-    }, promptBtn)
-    detailTextWrap.appendChild(detailText)
-
-    const recordingContainer = document.createElement('div')
-    recordingContainer.classList.add('recording-container')
-    recordingContainer.innerHTML = `
-      <div style="font-size: 2.2rem; line-height: 2.6rem; margin-bottom: 10px; color: #808080">Ответ ученика:</div>
-      <div style="background-color: #eee; font-size: 2.2rem; line-height: 3rem">
-            <span contenteditable="plaintext-only" id="result_span"
-                  class="recording-final" style="line-height: 3rem"></span>
-            <span contenteditable="plaintext-only" id="final_span"
-                  class="recording-result" style="line-height: 3rem"></span>
-            <span id="interim_span" class="recording-interim"></span>
-        </div>
-    `
-
-    detailTextWrap.appendChild(recordingContainer)
-
-    const detailContent = document.createElement('div')
-    detailContent.classList.add('mental-map-detail-content')
-    detailContent.appendChild(detailImgWrap)
-    detailContent.appendChild(detailTextWrap)
-
-    const detailContainerInner = document.createElement('div')
-    detailContainerInner.classList.add('mental-map-detail-container-inner')
-    detailContainerInner.appendChild(detailContent)
-
-    const recordingWrap = document.createElement('div')
-    recordingWrap.classList.add('recording-status')
-    recordingWrap.innerHTML = `<div class="mental-map-text-status">
-    <div style="margin-bottom: 10px">Текст скрыт на: <strong id="hidden-text-percent"></strong></div>
-    <div style="margin-bottom: 10px">Важный текст: <strong id="target-text-percent"></strong></div>
-    <div>Сходство: <strong id="similarity-percent"></strong></div>
-</div>
-<div style="display: flex; align-items: center;">
-    <select class="form-control" id="voice-lang" style="margin-right: 20px; font-size: 24px; height: auto">
-        <option value="ru-RU" selected>rus</option>
-        <option value="en-US">eng</option>
-    </select>
-    <div class="question-voice" style="bottom: 0; display: flex; position: relative;">
-        <div class="question-voice__inner">
-            <div id="start-recording" class="gn">
-                <div class="mc" style="pointer-events: none"></div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="retelling-container" id="start-retelling-wrap" style="display: none; text-align: center">
-    <button class="btn" type="button" id="start-retelling">Проверить</button>
-    <label style="display: block; font-weight: normal; font-size: 2.2rem; margin-top: 10px" for="clear-text"><input
-            style="transform: scale(1.5); margin-right: 10px" type="checkbox" id="clear-text" checked> без
-        знаков</label>
-</div>`
-    detailContainerInner.appendChild(recordingWrap)
-
-    const detailContainer = document.createElement('div')
-    detailContainer.classList.add('mental-map-detail-container')
-    detailContainer.appendChild(detailContainerInner)
-
-    const dialog = new InnerDialog($(container), {title: 'Изображение', content: detailContainer});
-    dialog.show(wrapper => {
-      showDialogHandler()
-
-      $(wrapper).on('paste', (e) => {
-        e.preventDefault()
-        return false
-      })
-
-      $(wrapper).find('.result-item-value').tooltip()
-
-      $(wrapper).find(`#voice-lang`).val(langStore.get())
-
-      wrapper.querySelector('#start-recording').addEventListener('click', e => {
-
-        if (!canRecording(text)) {
-          return
-        }
-
-        if (!voiceResponse.getStatus()) {
-          ['#result_span', '#final_span', '#interim_span'].map(q => {
-            wrapper.querySelector(q).innerHTML = ''
-            wrapper.querySelector('#start-retelling-wrap').style.display = 'none'
-          });
-        }
-
-        const voiceLang = langStore.fromStore($(wrapper).find("#voice-lang option:selected").val());
-        startRecording(e.target, voiceLang, stripTags(text.text), true)
-      })
-      wrapper.querySelector('#start-retelling').addEventListener('click', e => {
-
-        if (voiceResponse.getStatus()) {
-          voiceResponse.stop()
-        }
-
-        const userResponse = wrapper.querySelector('#result_span').innerText.trim()
-        if (!userResponse) {
-          alert("Ответ пользователя пуст")
-          return
-        }
-
-        const content = createRetellingContent(() => {
-          ['#result_span', '#final_span', '#interim_span'].map(q => {
-            wrapper.querySelector(q).innerHTML = ''
-            wrapper.querySelector('#start-retelling-wrap').style.display = 'none'
-          })
-        })
-        wrapper.querySelector('.mental-map-detail-container').appendChild(content)
-
-        const clearText = $(wrapper).find('#clear-text').is(':checked')
-
-        const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
-
-        startRetelling(clearText ? removePunctuation(userResponse) : userResponse, clearText ? removePunctuation(stripTags(text.text)) : stripTags(text.text)).then(response => {
-          const json = processOutputAsJson(wrapper.querySelector('#retelling-response').innerText)
-          if (json) {
-            const val = Number(json?.overall_similarity)
-            recordingWrap.querySelector('#similarity-percent').innerText = `${val}%`
-
-            const textHidingPercentage = calcHiddenTextPercent(text)
-            const textTargetPercentage = calcTargetTextPercent(text)
-
-            const detailTextContent = detailText.cloneNode(true)
-            detailTextContent.querySelector('.detail-text-actions').remove()
-
-            saveUserResult({
-              story_id: params?.story_id,
-              slide_id: params?.slide_id,
-              mental_map_id: mentalMapId,
-              image_fragment_id: image.id,
-              overall_similarity: Number(json?.overall_similarity),
-              text_hiding_percentage: textHidingPercentage,
-              text_target_percentage: textTargetPercentage,
-              content: detailTextContent.innerHTML,
-              repetition_mode: repetitionMode,
-              threshold
-            }).then(response => {
-              if (response && response?.success) {
-                historyItem.all = response.history.all
-                historyItem.hiding = response.history.hiding
-                historyItem.target = response.history.target
-                historyItem.done = response.history.done
-
-                // wrapper.querySelector('.result-item-value').innerHTML = `${val}% (${textHidingPercentage}% / ${textTargetPercentage}%)`
-                wrapper.querySelector('.image-item > .result-item').remove()
-                wrapper.querySelector('.image-item').appendChild(FragmentResultElement(historyItem))
-              }
-            })
-          }
-        })
-      })
-
-      recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
-      recordingWrap.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%'
-
-      wrapper.querySelector('#result_span').addEventListener('input', e => {
-        const text = e.target.innerText
-        const display = text.length > 0 ? 'block' : 'none'
-        if (display !== wrapper.querySelector('#start-retelling-wrap').style.display) {
-          wrapper.querySelector('#start-retelling-wrap').style.display = display
-        }
-      })
-    })
-
-    return dialog
-  }
-
   async function saveUserResult(payload) {
     const response = await fetch(`/mental-map/save`, {
       method: 'POST',
@@ -430,24 +104,6 @@ export default function MentalMap(element, deck, params) {
         'X-CSRF-Token': $('meta[name=csrf-token]').attr('content')
       },
       body: JSON.stringify(payload),
-    })
-    if (!response.ok) {
-      throw new Error(response.statusText)
-    }
-    return await response.json()
-  }
-
-  async function saveRewritePrompt(newPrompt) {
-    const response = await fetch(`/mental-map/update-rewrite-prompt`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'X-CSRF-Token': $('meta[name=csrf-token]').attr('content')
-      },
-      body: JSON.stringify({
-        prompt: newPrompt,
-      }),
     })
     if (!response.ok) {
       throw new Error(response.statusText)
@@ -471,12 +127,6 @@ export default function MentalMap(element, deck, params) {
       throw new Error(response.statusText)
     }
     return await response.json()
-  }
-
-  function stripTags(html) {
-    const div = document.createElement('div');
-    div.innerHTML = html;
-    return div.textContent || div.innerText || '';
   }
 
   function showMentalMapHandler(zoomWrap, closeMentalMapHandler) {
@@ -542,6 +192,259 @@ export default function MentalMap(element, deck, params) {
     })
   }
 
+  const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
+
+  function mapImageClickHandler({image, texts, historyItem, rewritePrompt, threshold, dialogHideHandler}) {
+    const text = texts.find(t => t.id === image.id)
+    const detailContainer = DetailContent({
+      image,
+      text,
+      historyItem,
+      rewritePrompt,
+      itemClickHandler: (recordingWrap) => {
+        if (voiceResponse.getStatus()) {
+          voiceResponse.stop()
+          const voiceLang = langStore.fromStore($(recordingWrap).find("#voice-lang option:selected").val())
+          startRecording(recordingWrap.querySelector('#start-recording'), voiceLang, stripTags(text.text), false)
+        }
+        recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
+
+        const gm = recordingWrap.querySelector('#start-recording')
+
+        $(gm)
+          .removeAttr('title')
+          .tooltip('destroy')
+
+        gm.classList.remove('disabled')
+        if (!canRecording(text)) {
+          gm.classList.add('disabled')
+          $(gm)
+            .attr('title', 'Нужно закрыть все важные слова')
+            .tooltip()
+        }
+        recordingWrap.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%'
+      }
+    })
+    const dialog = new InnerDialog($(container), {title: 'Изображение', content: detailContainer});
+    dialog.show(wrapper => {
+      showDialogHandler()
+
+      $(wrapper).on('paste', (e) => {
+        e.preventDefault()
+        return false
+      })
+
+      $(wrapper).find('.result-item-value').tooltip()
+
+      $(wrapper).find(`#voice-lang`).val(langStore.get())
+
+      wrapper.querySelector('#start-recording').addEventListener('click', e => {
+
+        if (!canRecording(text)) {
+          return
+        }
+
+        if (!voiceResponse.getStatus()) {
+          ['#result_span', '#final_span', '#interim_span'].map(q => {
+            wrapper.querySelector(q).innerHTML = ''
+            wrapper.querySelector('#start-retelling-wrap').style.display = 'none'
+          });
+        }
+
+        const voiceLang = langStore.fromStore($(wrapper).find("#voice-lang option:selected").val());
+        startRecording(e.target, voiceLang, stripTags(text.text), true, threshold)
+      })
+      wrapper.querySelector('#start-retelling').addEventListener('click', e => {
+
+        if (voiceResponse.getStatus()) {
+          voiceResponse.stop()
+        }
+
+        const userResponse = wrapper.querySelector('#result_span').innerText.trim()
+        if (!userResponse) {
+          alert("Ответ пользователя пуст")
+          return
+        }
+
+        const content = createRetellingContent(() => {
+          ['#result_span', '#final_span', '#interim_span'].map(q => {
+            wrapper.querySelector(q).innerHTML = ''
+            wrapper.querySelector('#start-retelling-wrap').style.display = 'none'
+          })
+        })
+        wrapper.querySelector('.mental-map-detail-container').appendChild(content)
+
+        const clearText = $(wrapper).find('#clear-text').is(':checked')
+
+        const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
+
+        startRetelling(
+          clearText ? removePunctuation(userResponse) : userResponse,
+          clearText ? removePunctuation(stripTags(text.text)) : stripTags(text.text),
+          threshold
+        ).then(response => {
+          const json = processOutputAsJson(wrapper.querySelector('#retelling-response').innerText)
+          if (json) {
+            const val = Number(json.overall_similarity)
+            wrapper.querySelector('#similarity-percent').innerText = `${val}%`
+
+            const textHidingPercentage = calcHiddenTextPercent(text)
+            const textTargetPercentage = calcTargetTextPercent(text)
+
+            const detailTextContent = wrapper.querySelector('.detail-text').cloneNode(true)
+            detailTextContent.querySelector('.detail-text-actions').remove()
+
+            saveUserResult({
+              story_id: params?.story_id,
+              slide_id: params?.slide_id,
+              mental_map_id: mentalMapId,
+              image_fragment_id: image.id,
+              overall_similarity: Number(json.overall_similarity),
+              text_hiding_percentage: textHidingPercentage,
+              text_target_percentage: textTargetPercentage,
+              content: detailTextContent.innerHTML,
+              repetition_mode: repetitionMode,
+              threshold
+            }).then(response => {
+              if (response && response?.success) {
+                historyItem.all = response.history.all
+                historyItem.hiding = response.history.hiding
+                historyItem.target = response.history.target
+                historyItem.done = response.history.done
+
+                // wrapper.querySelector('.result-item-value').innerHTML = `${val}% (${textHidingPercentage}% / ${textTargetPercentage}%)`
+                wrapper.querySelector('.image-item > .result-item').remove()
+                wrapper.querySelector('.image-item').appendChild(FragmentResultElement(historyItem))
+              }
+            })
+          }
+        })
+      })
+
+      wrapper.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
+      wrapper.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%'
+
+      wrapper.querySelector('#result_span').addEventListener('input', e => {
+        const text = e.target.innerText
+        const display = text.length > 0 ? 'block' : 'none'
+        if (display !== wrapper.querySelector('#start-retelling-wrap').style.display) {
+          wrapper.querySelector('#start-retelling-wrap').style.display = display
+        }
+      })
+    })
+    dialog.onHide(dialogHideHandler)
+  }
+
+  function mapImageClickHandlerQuestions({image, questionItem, historyItem, rewritePrompt, threshold, dialogHideHandler}) {
+    const detailContainer = DetailContentQuestions({
+      image,
+      questionItem,
+      historyItem,
+      rewritePrompt
+    })
+    const dialog = new InnerDialog($(container), {title: 'Изображение', content: detailContainer});
+    dialog.show(wrapper => {
+      showDialogHandler()
+
+      $(wrapper).on('paste', (e) => {
+        e.preventDefault()
+        return false
+      })
+
+      $(wrapper).find('.result-item-value').tooltip()
+
+      $(wrapper).find(`#voice-lang`).val(langStore.get())
+
+      wrapper.querySelector('#start-recording').addEventListener('click', e => {
+
+        if (!voiceResponse.getStatus()) {
+          ['#result_span', '#final_span', '#interim_span'].map(q => {
+            wrapper.querySelector(q).innerHTML = ''
+            wrapper.querySelector('#start-retelling-wrap').style.display = 'none'
+          });
+        }
+
+        const voiceLang = langStore.fromStore($(wrapper).find("#voice-lang option:selected").val());
+        startRecording(e.target, voiceLang, stripTags(image.text), true, threshold)
+      })
+
+      wrapper.querySelector('#start-retelling').addEventListener('click', e => {
+
+        if (voiceResponse.getStatus()) {
+          voiceResponse.stop()
+        }
+
+        const userResponse = wrapper.querySelector('#result_span').innerText.trim()
+        if (!userResponse) {
+          alert("Ответ пользователя пуст")
+          return
+        }
+
+        const content = createRetellingContent(() => {
+          ['#result_span', '#final_span', '#interim_span'].map(q => {
+            wrapper.querySelector(q).innerHTML = ''
+            wrapper.querySelector('#start-retelling-wrap').style.display = 'none'
+          })
+        })
+        wrapper.querySelector('.mental-map-detail-container').appendChild(content)
+
+        const clearText = $(wrapper).find('#clear-text').is(':checked')
+
+        const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
+
+        startRetelling(clearText ? removePunctuation(userResponse) : userResponse, clearText ? removePunctuation(stripTags(image.text)) : stripTags(image.text), threshold).then(response => {
+          const json = processOutputAsJson(wrapper.querySelector('#retelling-response').innerText)
+          if (json) {
+            const val = Number(json?.overall_similarity)
+            detailContainer.querySelector('#similarity-percent').innerText = `${val}%`
+
+            //const textHidingPercentage = calcHiddenTextPercent(text)
+            //const textTargetPercentage = calcTargetTextPercent(text)
+
+            const detailTextContent = detailContainer.querySelector('.detail-text').cloneNode(true)
+            detailTextContent.querySelector('.detail-text-actions')?.remove()
+
+            saveUserResult({
+              story_id: params?.story_id,
+              slide_id: params?.slide_id,
+              mental_map_id: mentalMapId,
+              image_fragment_id: image.id,
+              overall_similarity: Number(json?.overall_similarity),
+              text_hiding_percentage: 0,
+              text_target_percentage: 0,
+              content: detailTextContent.innerHTML,
+              repetition_mode: repetitionMode,
+              threshold
+            }).then(response => {
+              if (response && response?.success) {
+                historyItem.all = response.history.all
+                //historyItem.hiding = response.history.hiding
+                //historyItem.target = response.history.target
+                historyItem.done = response.history.done
+
+                // wrapper.querySelector('.result-item-value').innerHTML = `${val}% (${textHidingPercentage}% / ${textTargetPercentage}%)`
+                wrapper.querySelector('.image-item > .result-item').remove()
+                wrapper.querySelector('.image-item').appendChild(FragmentResultQuestionsElement(historyItem))
+              }
+            })
+          }
+        })
+      })
+
+      //recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
+      //recordingWrap.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%'
+
+      wrapper.querySelector('#result_span').addEventListener('input', e => {
+        const text = e.target.innerText
+        const display = text.length > 0 ? 'block' : 'none'
+        if (display !== wrapper.querySelector('#start-retelling-wrap').style.display) {
+          wrapper.querySelector('#start-retelling-wrap').style.display = display
+        }
+      })
+    })
+    dialog.onHide(dialogHideHandler)
+  }
+
   const run = async () => {
 
     let responseJson
@@ -554,7 +457,6 @@ export default function MentalMap(element, deck, params) {
     }
 
     const {mentalMap: json, history, rewritePrompt, threshold} = responseJson
-
     mentalMapId = json.id
     mentalMapHistory = history
 
@@ -581,17 +483,6 @@ export default function MentalMap(element, deck, params) {
       return
     }
 
-    /*document.addEventListener('visibilitychange', e => {
-      console.log('visibilitychange')
-        if (voiceResponse.getStatus()) {
-          voiceResponse.stop()
-          const el = document.querySelector('#start-recording')
-          if (el) {
-            $(el).trigger('click')
-          }
-        }
-    }, false)*/
-
     window.addEventListener('blur', function() {
       if (voiceResponse.getStatus()) {
         voiceResponse.stop()
@@ -601,6 +492,9 @@ export default function MentalMap(element, deck, params) {
         }
       }
     }, false);
+
+    const {mapTypeIsMentalMapQuestions, questions} = json
+    const mapQuestions = new MentalMapQuestions({typeIsMentalMapQuestions: mapTypeIsMentalMapQuestions, questions})
 
     texts = json.map.images.map(image => createWordItem(image.text, image.id))
 
@@ -643,9 +537,29 @@ export default function MentalMap(element, deck, params) {
     }
 
     container.appendChild(AllTexts(texts, json.map.images, history, (image) => {
+
       const historyItem = history.find(h => h.id === image.id)
-      const dialog = mapImageClickHandler(image, texts, historyItem, rewritePrompt, threshold)
-      dialog.onHide(() => fragmentDialogHideHandler(image, historyItem))
+      const questionItem = mapQuestions.findQuestion(image.id)
+      if (mapQuestions.typeIsMentalMapQuestions()) {
+        mapImageClickHandlerQuestions({
+          image,
+          questionItem,
+          historyItem,
+          rewritePrompt,
+          threshold,
+          dialogHideHandler: () => fragmentDialogHideHandler(image, historyItem)
+        })
+        return
+      }
+
+      mapImageClickHandler({
+        image,
+        texts,
+        historyItem,
+        rewritePrompt,
+        threshold,
+        dialogHideHandler: () => fragmentDialogHideHandler(image, historyItem)
+      })
     }))
 
     const toolbar = document.createElement('div')
@@ -667,17 +581,43 @@ export default function MentalMap(element, deck, params) {
         json.map.images,
         (image) => {
           element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
+
           const historyItem = history.find(h => h.id === image.id)
-          const dialog = mapImageClickHandler(image, texts, historyItem, rewritePrompt, threshold)
-          dialog.onHide(() => {
-            element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
+          const questionItem = mapQuestions.findQuestion(image.id)
 
-            const imgElem = zoomContainer.querySelector(`[data-img-id='${image.id}']`)
-            if (historyItem.done) {
-              imgElem.classList.add('fragment-item-done')
+          if (mapQuestions.typeIsMentalMapQuestions()) {
+            mapImageClickHandlerQuestions({
+              image,
+              questionItem,
+              historyItem,
+              rewritePrompt,
+              threshold,
+              dialogHideHandler: () => {
+                element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
+                const imgElem = zoomContainer.querySelector(`[data-img-id='${image.id}']`)
+                if (historyItem.done) {
+                  imgElem.classList.add('fragment-item-done')
+                }
+                fragmentDialogHideHandler(image, historyItem)
+              }
+            })
+            return
+          }
+
+          mapImageClickHandler({
+            image,
+            texts,
+            historyItem,
+            rewritePrompt,
+            threshold,
+            dialogHideHandler: () => {
+              element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
+              const imgElem = zoomContainer.querySelector(`[data-img-id='${image.id}']`)
+              if (historyItem.done) {
+                imgElem.classList.add('fragment-item-done')
+              }
+              fragmentDialogHideHandler(image, historyItem)
             }
-
-            fragmentDialogHideHandler(image, historyItem)
           })
         },
         mentalMapHistory
@@ -778,29 +718,41 @@ export default function MentalMap(element, deck, params) {
           element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
 
           const historyItem = history.find(h => h.id === image.id)
-          const dialog = mapImageClickHandler(image, texts, historyItem, rewritePrompt, threshold)
+          const questionItem = mapQuestions.findQuestion(image.id)
 
-          dialog.onHide(() => {
-            element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
+          if (mapQuestions.typeIsMentalMapQuestions()) {
+            mapImageClickHandlerQuestions({
+              image,
+              questionItem,
+              historyItem,
+              rewritePrompt,
+              threshold,
+              dialogHideHandler: () => {
+                element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
+                const imgElem = zoomContainer.querySelector(`[data-img-id='${image.id}']`)
+                if (historyItem.done) {
+                  imgElem.classList.add('fragment-item-done')
+                }
+                fragmentDialogHideHandler(image, historyItem)
+              }
+            })
+            return
+          }
 
-            const imgElem = zoomContainer.querySelector(`[data-img-id='${image.id}']`)
-            if (historyItem.done) {
-              imgElem.classList.add('fragment-item-done')
+          mapImageClickHandler({
+            image,
+            texts,
+            historyItem,
+            rewritePrompt,
+            threshold,
+            dialogHideHandler: () => {
+              element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
+              const imgElem = zoomContainer.querySelector(`[data-img-id='${image.id}']`)
+              if (historyItem.done) {
+                imgElem.classList.add('fragment-item-done')
+              }
+              fragmentDialogHideHandler(image, historyItem)
             }
-
-            fragmentDialogHideHandler(image, historyItem)
-
-            /*hideDialogHandler()
-            if (voiceResponse.getStatus()) {
-              voiceResponse.stop()
-            }
-
-            const el = container.querySelector(`[data-image-fragment-id='${image.id}']`)
-            el.querySelector('.result-item-value').innerHTML = `${historyItem.all}% (${historyItem.hiding}% / ${historyItem.target}%)`
-            el.querySelector('.text-item').innerHTML = ''
-
-            appendAllTextWordElements(texts.find(t => t.id === image.id).words, el.querySelector('.text-item'))*/
-
           })
         },
         mentalMapHistory
@@ -831,7 +783,7 @@ export default function MentalMap(element, deck, params) {
    * @param {string} lang
    * @param text
    */
-  function startRecording(element, lang, text, makeRewrite) {
+  function startRecording(element, lang, text, makeRewrite, threshold) {
     const state = element.dataset.state
     if (!state) {
       $(document.getElementById("start-retelling-wrap")).hide()
@@ -870,6 +822,12 @@ export default function MentalMap(element, deck, params) {
 
         const userResponse = $resultSpan.text().trim()
         if (userResponse.length && makeRewrite) {
+
+          const similarityPercentage = calcSimilarityPercentage(removePunctuation(text.toLowerCase()).trim(), removePunctuation(userResponse.toLowerCase()).trim())
+          if (similarityPercentage >= threshold) {
+            return
+          }
+
           const content = createRewriteContent(() => {})
           $(element).parents('.mental-map-detail-container').append(content)
           sendMessage(
@@ -964,32 +922,6 @@ export default function MentalMap(element, deck, params) {
     return elem
   }
 
-  function createUpdatePromptContent(prompt, saveHandler, closeHandler) {
-    const elem = document.createElement('div')
-    elem.classList.add('retelling-wrap')
-    elem.innerHTML = `
-<div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%">
-    <div class="textarea prompt-text" style="flex: 1" contenteditable="plaintext-only">${prompt}</div>
-    <div style="display: flex; flex-direction: row; justify-content: center; padding-top: 20px; align-items: center">
-        <button type="button" style="margin-right: 10px;" class="button prompt-save">Сохранить</button>
-        <button type="button" class="button prompt-close">Закрыть</button>
-    </div>
-</div>
-    `
-    elem.querySelector('.prompt-save').addEventListener('click', () => saveHandler(elem.querySelector('.prompt-text').textContent, close))
-
-    const close = () => {
-      elem.remove()
-      if (typeof closeHandler === 'function') {
-        closeHandler()
-      }
-    }
-
-    elem.querySelector('.prompt-close').addEventListener('click', close)
-
-    return elem
-  }
-
   function createRetellingContent(hideCallback) {
     const wrap = document.createElement('div')
     wrap.classList.add('retelling-wrap')
@@ -1010,13 +942,15 @@ export default function MentalMap(element, deck, params) {
     return wrap
   }
 
-  async function startRetelling(userResponse, targetText) {
+  async function startRetelling(userResponse, targetText, threshold) {
+
     const onMessage = message => {
       const el = document.getElementById("retelling-response")
       $(el).show()
       el.innerText = message
       el.scrollTop = el.scrollHeight
     }
+
     const onError = message => {
       const el = document.getElementById("retelling-response")
       $(el).show()
@@ -1028,6 +962,19 @@ export default function MentalMap(element, deck, params) {
       $(document.getElementById('voice-loader')).hide()
       $(document.getElementById('voice-finish')).show()
     }
+
+    const similarityPercentage = calcSimilarityPercentage(
+      removePunctuation(targetText.toLowerCase()).trim(),
+      removePunctuation(userResponse.toLowerCase()).trim()
+    )
+    if (similarityPercentage >= threshold) {
+      onMessage(`{"overall_similarity": ${similarityPercentage}`)
+      onEnd()
+      return new Promise((resolve, reject) => {
+        resolve({})
+      })
+    }
+
     return await sendMessage(`/admin/index.php?r=gpt/stream/retelling`, {
       userResponse,
       slideTexts: targetText
