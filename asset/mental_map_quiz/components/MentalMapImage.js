@@ -69,6 +69,9 @@ export default function MentalMapImage(
     const historyItem = history.find(h => h.id === image.id)
     if (historyItem?.done) {
       mapImgWrap.classList.add('fragment-item-done')
+      if (image.makeTransparent) {
+        mapImgWrap.classList.add('fragment-transparent')
+      }
     }
 
     mapImgWrap.appendChild(mapFragment)

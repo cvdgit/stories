@@ -1,5 +1,5 @@
 import Dialog from "../Dialog";
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useId, useRef, useState} from "react";
 import {createWordsFormText, getTextBySelections} from "../Selection";
 import {useMentalMap} from "../App/App";
 
@@ -7,7 +7,8 @@ export default function ImageDialog({
                                       ref,
                                       setOpen,
                                       currentImageItem,
-                                      changeBgHandler
+                                      changeBgHandler,
+                                      changeMakeTransparentHandler
                                     }) {
   const textRef = useRef()
   const selectionRef = useRef()
@@ -15,7 +16,9 @@ export default function ImageDialog({
   const [currentText, setCurrentText] = useState(currentImageItem.text)
   const [currentWords, setCurrentWords] = useState([])
   const [bg, setBg] = useState(currentImageItem.bg)
+  const [makeTransparent, setMakeTransparent] = useState(Boolean(currentImageItem.makeTransparent))
   const {state, dispatch} = useMentalMap()
+  const checkId = useId()
 
   useEffect(() => {
     if (!currentWords.length) {
@@ -122,8 +125,16 @@ export default function ImageDialog({
             </div>
           </div>
           {!currentImageItem.url && (
-            <div style={{marginRight: '20px', display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '10px 0'}}>
-              <span style={{marginRight: '10px'}}>Фон:</span>
+            <div style={{
+              marginRight: '20px',
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: '10px 0'
+            }}>
+              <div>
+                <span style={{marginRight: '10px'}}>Фон:</span>
                 <select value={String(bg || '')} onChange={(e) => {
                   changeBgHandler(currentImageItem.id, e.target.value)
                   setBg(e.target.value)
@@ -133,6 +144,19 @@ export default function ImageDialog({
                   <option value="green">Green</option>
                   <option value="red">Red</option>
                 </select>
+              </div>
+              <div>
+                <label htmlFor={checkId}>
+                  <input
+                    id={checkId}
+                    onChange={(e) => {
+                      changeMakeTransparentHandler(currentImageItem.id, e.target.checked)
+                      setMakeTransparent(e.target.checked)
+                    }}
+                    checked={Boolean(makeTransparent)}
+                    type="checkbox"
+                  /> Прозрачный фон при верном ответе</label>
+              </div>
             </div>
           )}
         </div>

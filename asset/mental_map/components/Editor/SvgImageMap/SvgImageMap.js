@@ -207,10 +207,20 @@ export default function SvgImageMap({mapImage, newImages}) {
       }
     })
     const wrap = svgContainer.svg.find('#schemeWrap')
-    console.log(imageId, bg)
     const el = wrap.findOne(`.map-fragment[data-id='${imageId}']`)
-    el.attr({'class': `map-fragment ${findBgClassName(bg)}`
-  })
+    el.attr({
+      'class': `map-fragment ${findBgClassName(bg)}`
+    })
+  }
+
+  const changeMakeTransparentHandler = (imageId, value) => {
+    dispatch({
+      type: 'update_mental_map_images',
+      imageId,
+      payload: {
+        makeTransparent: value
+      }
+    })
   }
 
   return (
@@ -249,6 +259,7 @@ export default function SvgImageMap({mapImage, newImages}) {
           setOpen={setOpen}
           currentImageItem={mapImage.images.find(f => f.id === currentImageItem?.id)}
           changeBgHandler={changeBgHandler}
+          changeMakeTransparentHandler={changeMakeTransparentHandler}
         />
       </CSSTransition>
     </>

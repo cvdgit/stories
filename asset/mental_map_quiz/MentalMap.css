@@ -347,3 +347,8 @@
 .fragment-item-done .done-elem {
   opacity: 1;
 }
+
+.fragment-transparent .map-fragment {
+  background-color: transparent;
+  border: 0 none;
+}

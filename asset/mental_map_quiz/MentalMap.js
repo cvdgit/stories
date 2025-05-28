@@ -597,6 +597,9 @@ export default function MentalMap(element, deck, params) {
                 const imgElem = zoomContainer.querySelector(`[data-img-id='${image.id}']`)
                 if (historyItem.done) {
                   imgElem.classList.add('fragment-item-done')
+                  if (image.makeTransparent) {
+                    imgElem.classList.add('fragment-transparent')
+                  }
                 }
                 fragmentDialogHideHandler(image, historyItem)
               }
@@ -615,6 +618,9 @@ export default function MentalMap(element, deck, params) {
               const imgElem = zoomContainer.querySelector(`[data-img-id='${image.id}']`)
               if (historyItem.done) {
                 imgElem.classList.add('fragment-item-done')
+                if (image.makeTransparent) {
+                  imgElem.classList.add('fragment-transparent')
+                }
               }
               fragmentDialogHideHandler(image, historyItem)
             }
@@ -732,6 +738,9 @@ export default function MentalMap(element, deck, params) {
                 const imgElem = zoomContainer.querySelector(`[data-img-id='${image.id}']`)
                 if (historyItem.done) {
                   imgElem.classList.add('fragment-item-done')
+                  if (image.makeTransparent) {
+                    imgElem.classList.add('fragment-transparent')
+                  }
                 }
                 fragmentDialogHideHandler(image, historyItem)
               }
@@ -750,6 +759,9 @@ export default function MentalMap(element, deck, params) {
               const imgElem = zoomContainer.querySelector(`[data-img-id='${image.id}']`)
               if (historyItem.done) {
                 imgElem.classList.add('fragment-item-done')
+                if (image.makeTransparent) {
+                  imgElem.classList.add('fragment-transparent')
+                }
               }
               fragmentDialogHideHandler(image, historyItem)
             }
@@ -968,7 +980,7 @@ export default function MentalMap(element, deck, params) {
       removePunctuation(userResponse.toLowerCase()).trim()
     )
     if (similarityPercentage >= threshold) {
-      onMessage(`{"overall_similarity": ${similarityPercentage}`)
+      onMessage(`{"overall_similarity": ${similarityPercentage}}`)
       onEnd()
       return new Promise((resolve, reject) => {
         resolve({})
