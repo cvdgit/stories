@@ -60,7 +60,12 @@ class MentalMapController extends BaseController
     {
         $response->format = Response::FORMAT_JSON;
         $mentalMap = $this->findModel(MentalMap::class, $id);
-        return ['success' => true, 'items' => $mentalMap->getItems()];
+        return [
+            'success' => true,
+            'items' => array_map(static function (array $item): array {
+                return ['id' => $item['id'], 'text' => $item['text'] ?? $item['title']];
+            }, $mentalMap->getItems()),
+        ];
     }
 
     /**
@@ -82,7 +87,9 @@ class MentalMapController extends BaseController
         $sourceMentalMap = $this->findModel(MentalMap::class, $mentalMap->source_mental_map_id);
         return [
             'success' => true,
-            'items' => $sourceMentalMap->getItems(),
+            'items' => array_map(static function (array $item): array {
+                return ['id' => $item['id'], 'text' => $item['text'] ?? $item['title']];
+            }, $sourceMentalMap->getItems()),
             'questions' => $mentalMap->getQuestions(),
             'required' => $content->isRequired(),
         ];

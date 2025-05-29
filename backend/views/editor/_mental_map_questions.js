@@ -200,7 +200,8 @@ function MentalMapQuestions() {
     $loader.css('display', 'none')
 
     const json = await fetchFragments(mentalMapId)
-    json.items.map(i => createFragmentItem({fragmentId: i.id, fragmentText: i.text}).appendTo($list))
+    json.items.map(i => createFragmentItem({fragmentId: i.id, fragmentText: i.text})
+      .appendTo($list))
 
     $modal
       .find('#mental-map-questions-action')
