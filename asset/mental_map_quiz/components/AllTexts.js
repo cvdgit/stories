@@ -1,4 +1,5 @@
 import FragmentResultElement from "./FragmentResultElement";
+import FragmentResultQuestionsElement from "../content/FragmentResultQuestionsElement";
 
 export function appendAllTextWordElements(words, container) {
   words.map(word => {
@@ -19,7 +20,7 @@ export function appendAllTextWordElements(words, container) {
   })
 }
 
-export default function AllTexts(texts, images, history, imageClickHandler) {
+export default function AllTexts(texts, images, history, imageClickHandler, isMentalMapQuestions) {
   const list = document.createElement('div')
   list.classList.add('mental-map-all-text-container')
   texts.map(textState => {
@@ -57,7 +58,8 @@ export default function AllTexts(texts, images, history, imageClickHandler) {
       imageItem.appendChild(div)
     }
 
-    imageItem.appendChild(FragmentResultElement(history.find(h => h.id === image.id)))
+    const historyItem = history.find(h => h.id === image.id)
+    imageItem.appendChild(isMentalMapQuestions ? FragmentResultQuestionsElement(historyItem) : FragmentResultElement(historyItem))
 
     item.appendChild(imageItem)
 

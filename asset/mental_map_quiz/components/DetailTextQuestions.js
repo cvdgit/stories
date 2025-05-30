@@ -6,8 +6,14 @@ export default function DetailTextQuestions(questionsText, promptBtn) {
 
   detailText.appendChild(DetailTextActions(undefined, promptBtn))
 
-  const textElem = document.createElement('p')
-  textElem.innerText = questionsText
+  const textElem = document.createElement('ol')
+  textElem.style.paddingLeft = '0'
+  questionsText.split('\n').map(t => {
+    const li = document.createElement('li')
+    li.style.marginBottom = '10px'
+    li.innerHTML = t
+    textElem.appendChild(li)
+  })
 
   detailText.appendChild(textElem)
   return detailText

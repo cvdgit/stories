@@ -225,7 +225,7 @@ export default function MentalMap(element, deck, params) {
         recordingWrap.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%'
       }
     })
-    const dialog = new InnerDialog($(container), {title: 'Изображение', content: detailContainer});
+    const dialog = new InnerDialog($(container), {title: 'Перескажите текст', content: detailContainer});
     dialog.show(wrapper => {
       showDialogHandler()
 
@@ -342,7 +342,7 @@ export default function MentalMap(element, deck, params) {
       historyItem,
       rewritePrompt
     })
-    const dialog = new InnerDialog($(container), {title: 'Изображение', content: detailContainer});
+    const dialog = new InnerDialog($(container), {title: 'Перескажите текст отвечая на вопросы', content: detailContainer});
     dialog.show(wrapper => {
       showDialogHandler()
 
@@ -445,6 +445,41 @@ export default function MentalMap(element, deck, params) {
     dialog.onHide(dialogHideHandler)
   }
 
+  async function restartMentalMap(id) {
+    const response = await fetch(`/mental-map/restart?id=${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-CSRF-Token': $('meta[name=csrf-token]').attr('content')
+      },
+    })
+    if (!response.ok) {
+      throw new Error(response.statusText)
+    }
+    return await response.json()
+  }
+
+  const restartHandler = async (id) => {
+    if (!confirm('Будет удалена история прохождения этой ментальной карты. Подтверждаете?')) {
+      return false
+    }
+
+    try {
+      const response = await restartMentalMap(id)
+      if (response.success) {
+        this.element.innerHTML = ''
+        container.innerHTML = ''
+        await run()
+        return true
+      }
+    } catch (ex) {
+      console.log(ex.message)
+    }
+
+    return false
+  }
+
   const run = async () => {
 
     let responseJson
@@ -531,7 +566,7 @@ export default function MentalMap(element, deck, params) {
       })*/
 
       if (/*getCourseMode &&*/ historyIsDone(history)) {
-        const content = createFinishContent(history, texts)
+        const content = createFinishContent(history, texts, mapQuestions.typeIsMentalMapQuestions(), () => restartHandler(mentalMapId))
         $(container).parents('.mental-map').append(content)
       }
     }
@@ -560,7 +595,7 @@ export default function MentalMap(element, deck, params) {
         threshold,
         dialogHideHandler: () => fragmentDialogHideHandler(image, historyItem)
       })
-    }))
+    }, mapQuestions.typeIsMentalMapQuestions()))
 
     const toolbar = document.createElement('div')
     toolbar.classList.add('mental-map-toolbar')
@@ -782,7 +817,7 @@ export default function MentalMap(element, deck, params) {
     }
 
     if (/*getCourseMode &&*/ historyIsDone(history)) {
-      const content = createFinishContent(history, texts)
+      const content = createFinishContent(history, texts, mapQuestions.typeIsMentalMapQuestions(), () => restartHandler(mentalMapId))
       $(container).parents('.mental-map').append(content)
       if (imageFirst) {
         element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
@@ -890,14 +925,14 @@ export default function MentalMap(element, deck, params) {
     return elem
   }
 
-  function createFinishContent(history, texts) {
+  function createFinishContent(history, texts, isMentalMapQuestions, restartHandler) {
     const elem = document.createElement('div')
     elem.classList.add('retelling-wrap')
     elem.style.backgroundColor = 'transparent'
     elem.style.padding = '0'
     elem.innerHTML = `
       <div class="mental-map-done-wrap" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background-color: rgba(255, 255, 255, 0.4); backdrop-filter: blur(4px);">
-        <h2 style="margin-bottom: 20px">Ментальная карта пройдена</h2>
+        <h2 style="margin-bottom: 20px; display: flex; align-items: center">Ментальная карта пройдена (<a class="mental-map-restart" style="font-size:20px" href="">пройти еще раз</a>)</h2>
       </div>
     `
 
@@ -917,7 +952,7 @@ export default function MentalMap(element, deck, params) {
       el.style.flexDirection = 'row'
       el.style.columnGap = '20px'
 
-      el.appendChild(FragmentResultElement(h))
+      el.appendChild(isMentalMapQuestions ? FragmentResultQuestionsElement(h) : FragmentResultElement(h))
 
       const textEl = document.createElement('div')
       textEl.classList.add('text-item')
@@ -930,6 +965,13 @@ export default function MentalMap(element, deck, params) {
     })
 
     elem.querySelector('.mental-map-done-wrap').appendChild(historyWrap)
+
+    elem.querySelector('.mental-map-restart').addEventListener('click', e => {
+      e.preventDefault()
+      if (restartHandler()) {
+        elem.remove()
+      }
+    })
 
     return elem
   }
