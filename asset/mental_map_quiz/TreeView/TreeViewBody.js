@@ -301,8 +301,8 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
             }
 
             const similarityPercentage = calcSimilarityPercentage(
-              removePunctuation(listItem.title.toLowerCase()).trim(),
-              removePunctuation(text.toLowerCase()).trim()
+              removePunctuation(stripTags(listItem.title).toLowerCase().trim()),
+              removePunctuation(stripTags(text).toLowerCase().trim())
             )
 
             if (similarityPercentage >= params.threshold) {
