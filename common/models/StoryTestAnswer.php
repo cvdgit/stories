@@ -237,4 +237,23 @@ class StoryTestAnswer extends ActiveRecord
         $newAnswer->story_question_id = $questionId;
         return $newAnswer;
     }
+
+    public static function findAnswer(int $questionId, int $answerId): ?StoryTestAnswer
+    {
+        /** @var StoryTestAnswer|null $model */
+        $model = self::find()->andWhere([
+            'id' => $answerId,
+            'story_question_id' => $questionId,
+        ])->one();
+        return $model;
+    }
+
+    public static function findAnswerByRegionId(string $id): ?StoryTestAnswer
+    {
+        /** @var StoryTestAnswer|null $model */
+        $model = self::find()->andWhere([
+            'region_id' => $id,
+        ])->one();
+        return $model;
+    }
 }

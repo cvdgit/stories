@@ -456,6 +456,7 @@ class StoryTestQuestion extends ActiveRecord
             QuestionType::IMAGE_GAPS => ['test/image-gaps/update', 'id' => $this->id],
             QuestionType::GROUPING => ['test/grouping/update', 'id' => $this->id],
             QuestionType::GPT_QUESTION => ['test/gpt/update', 'id' => $this->id],
+            QuestionType::MATH_QUESTION => ['test/math/update', 'id' => $this->id],
         ];
         return $updateQuestionMap[$this->type] ?? null;
     }

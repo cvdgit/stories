@@ -19,6 +19,7 @@ class QuestionRoutes
             'Изображение с пропусками' => self::getCreateImageGapsQuestionRoute($quizId),
             'Группировка элементов' => ['test/grouping/create', 'test_id' => $quizId],
             'ChatGPT вопрос' => ['test/gpt/create', 'test_id' => $quizId],
+            'Математические формулы' => ['test/math/create', 'test_id' => $quizId],
         ];
     }
 

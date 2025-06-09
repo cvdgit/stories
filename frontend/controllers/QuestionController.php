@@ -146,9 +146,13 @@ class QuestionController extends Controller
         }
 
         if ($test->isSourceTest()) {
-
-            $collection = (new TestBuilder($test, $test->getQuestionData($userHistory), $test->getQuestionDataCount(), $userStars, $fastMode))
-                ->build();
+            $collection = (new TestBuilder(
+                $test,
+                $test->getQuestionData($userHistory),
+                $test->getQuestionDataCount(),
+                $userStars,
+                $fastMode,
+            ))->build();
 
             $historyValues = [];
             if (count($userHistory) > 0 && $collection->count() > 0) {

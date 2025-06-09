@@ -32,6 +32,7 @@ import AnswerHistorySender from "./components/AnswerHistorySender";
 import ImageGaps from "./ImageGaps/ImageGaps";
 import Grouping from "./Grouping";
 import GptQuestion from "./GptQuestion";
+import MathQuestion from "./MathQuestion";
 import Panzoom from "../../app/panzoom.min"
 
 
@@ -110,6 +111,10 @@ function WikidsStoryTest(el, options) {
    * @type GptQuestion
    */
   this.gptQuestion = null;
+  /**
+   * @type MathQuestion
+   */
+  this.mathQuestion = null;
 
   setElementHtml(createLoader('Инициализация'));
 
@@ -685,6 +690,44 @@ function WikidsStoryTest(el, options) {
     return questionNeoParams[0]['animal'] || '';
   }
 
+  function createMathAnswer(answer, question) {
+    const correctNumber = Number(question.correct_number);
+    let type = "radio";
+    if (correctNumber > 1) {
+      type = "checkbox";
+    }
+    const $element = $("<input/>")
+      .attr("id", "answer" + answer.id)
+      .attr("type", type)
+      .attr("name", "qwe")
+      .attr("value", answer.id)
+      .data("answer", answer);
+    const $answer = $("<div/>").addClass("wikids-test-answer")
+      .on("click", function (e) {
+        var tagName = e.target.tagName;
+        var tags = ['INPUT', 'I'];
+        /*if (originalImageExists) {
+          tags.push('IMG');
+        }*/
+        if ($.inArray(tagName, tags) === -1) {
+          var $input = $(this).find("input");
+          $input.prop("checked", !$input.prop("checked"));
+        }
+
+        const key = 'q' + question.id;
+        questionAnswers[key] = getQuestionAnswers($(this).parent());
+        if (questionAnswers[key].length === parseInt(question.correct_number)) {
+          nextQuestion();
+        }
+      })
+      .append($element);
+    const $label = $("<label/>")
+      .attr("for", "answer" + answer.id)
+      .html(`<math-field read-only style="display:inline-block">${answer.name}</math-field>`);
+    $answer.append($label);
+    return $answer;
+  }
+
   function createAnswer(answer, question) {
 
     var questionType = question.type;
@@ -1108,6 +1151,7 @@ function WikidsStoryTest(el, options) {
       || questionViewImageGaps(question)
       || questionViewGrouping(question)
       || questionViewGpt(question)
+      || questionViewMath(question)
     ) {
       questionName = question.name;
     }
@@ -1255,6 +1299,9 @@ function WikidsStoryTest(el, options) {
           break;
         case "gpt_question":
           $answers = that.gptQuestion.createWrapper();
+          break;
+        case "math_question":
+          $answers = that.mathQuestion.createWrapper();
           break;
         default:
           $answers = createAnswers(getAnswersData(question), question);
@@ -1612,6 +1659,10 @@ function WikidsStoryTest(el, options) {
     return getQuestionView(question) === 'gpt_question';
   }
 
+  function questionViewMath(question) {
+    return getQuestionView(question) === 'math_question';
+  }
+
   function questionViewDragWords(question) {
     return getQuestionView(question) === 'drag-words';
   }
@@ -1830,7 +1881,8 @@ function WikidsStoryTest(el, options) {
          || questionViewImageGaps(currentQuestion)
          || testConfig.answerTypeIsMissingWords(currentQuestion)
          || questionViewGrouping(currentQuestion)
-        || questionViewGpt(currentQuestion)
+         || questionViewGpt(currentQuestion)
+         //|| questionViewMath(currentQuestion)
       ) {
 
         const decodeHtml = (html) => {
@@ -2185,6 +2237,7 @@ function WikidsStoryTest(el, options) {
       && !questionViewPoetry(currentQuestion)
       && !questionViewGrouping(currentQuestion)
       && !questionViewGpt(currentQuestion)
+      && !questionViewMath(currentQuestion)
     ) {
       $('.wikids-test-answers', currentQuestionElement)
         .empty()
@@ -2262,6 +2315,20 @@ function WikidsStoryTest(el, options) {
       }
       $('.seq-question', currentQuestionElement)
         .html(that.gptQuestion.create(currentQuestion, correctAnswerHandler, incorrectAnswerHandler));
+    }
+
+    if (questionViewMath(currentQuestion)) {
+      // $('.seq-question', currentQuestionElement).html(that.mathQuestion.create(currentQuestion));
+
+      const answersContainer = $('.wikids-test-answers', currentQuestionElement)
+      answersContainer.empty()
+      getAnswersData(currentQuestion).map(a => answersContainer.append(createMathAnswer(a, currentQuestion)))
+
+      that.mathQuestion.create(
+        currentQuestion,
+        $('.question-image', currentQuestionElement),
+        answersContainer
+      )
     }
 
     if (questionViewImageGaps(currentQuestion)) {
@@ -2572,6 +2639,8 @@ function WikidsStoryTest(el, options) {
       $elements.append(that.groupingQuestion.getContent(question))
     } else if (questionViewGpt(question)) {
       $elements.append(that.gptQuestion.getContent(question))
+    } else if (questionViewMath(question)) {
+      $elements.append(that.mathQuestion.getContent(question))
     } else if (questionViewImageGaps(question)) {
       $elements.append(that.imageGapsQuestion.getContent(question));
     } else if (questionViewDragWords(question)) {
@@ -3045,6 +3114,7 @@ WikidsStoryTest.mount(Poetry);
 WikidsStoryTest.mount(ImageGaps);
 WikidsStoryTest.mount(Grouping)
 WikidsStoryTest.mount(GptQuestion)
+WikidsStoryTest.mount(MathQuestion)
 
 WikidsStoryTest.getTests = function () {
   return tests;

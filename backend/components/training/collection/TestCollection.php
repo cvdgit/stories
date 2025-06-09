@@ -10,6 +10,7 @@ use backend\components\training\collection\build\DragWords;
 use backend\components\training\collection\build\GptQuestionBuilder;
 use backend\components\training\collection\build\Grouping;
 use backend\components\training\collection\build\ImageGaps;
+use backend\components\training\collection\build\MathQuestionBuilder;
 use backend\components\training\collection\build\PassTest;
 use backend\components\training\collection\build\Poetry;
 use backend\components\training\collection\build\Region;
@@ -45,6 +46,8 @@ class TestCollection extends BaseCollection
             $builder = new Grouping($questionData, $stars);
         } elseif ($type->isGptQuestion()) {
             $builder = new GptQuestionBuilder($questionData, $stars);
+        } elseif ($type->isMathQuestion()) {
+            $builder = new MathQuestionBuilder($questionData, $stars);
         } else {
             $builder = new Base($questionData, $stars, $this->testModel);
         }

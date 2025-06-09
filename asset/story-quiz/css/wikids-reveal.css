@@ -2271,3 +2271,9 @@ p.wikids-test-description {
 .retelling-response {
   display: none;
 }
+
+math-field[read-only] {
+  border: none;
+  background-color: transparent;
+  font-size: 3rem;
+}

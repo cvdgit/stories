@@ -17,6 +17,7 @@ module.exports = {
     mental_map_quiz: path.resolve(__dirname, 'asset/mental_map_quiz/index.js'),
     retelling_quiz: path.resolve(__dirname, 'asset/retelling_quiz/index.js'),
     video: path.resolve(__dirname, 'asset/video/index.js'),
+    math: path.resolve(__dirname, 'asset/math/math.js'),
   },
   output: {
     filename: '[name].js',
@@ -66,6 +67,10 @@ module.exports = {
       {
         test: /\.(png|jpg|gif)$/i,
         type: "asset",
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/i,
+        type: 'asset',
       },
     ],
   }
