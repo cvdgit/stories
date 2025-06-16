@@ -12,6 +12,9 @@ export default function TreeVoiceControl(
   stopClickHandler,
   processChunksHandler
 ) {
+
+  console.log('TreeVoiceControl call')
+
   const elem = document.createElement('div')
   elem.classList.add('question-voice')
   elem.style.bottom = '0'

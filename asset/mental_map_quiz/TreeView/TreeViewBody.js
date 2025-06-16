@@ -92,12 +92,20 @@ function createRow(node, level = 0) {
 }
 
 function processTreeNodes(list, body, history, voiceResponse, params, onEndHandler, dispatchEvent) {
-  console.log('processTreeNodes call')
+  console.log('processTreeNodes', history)
+
+  let showVoiceControl = false
+
   for (const listItem of list) {
 
     const rowElement = body.querySelector(`.node-row[data-node-id='${listItem.id}']`)
     const nodeId = rowElement.dataset.nodeId
     const historyItem = history.find(i => i.id === nodeId)
+
+    if (historyItem && historyItem.pending) {
+      console.log('pending')
+      continue
+    }
 
     resetNodeRow(rowElement)
 
@@ -105,6 +113,29 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
 
     if (historyItem && historyItem.done) {
       nodeStatusElement.innerHTML = nodeStatusSuccessHtml
+      continue
+    }
+
+    if (historyItem && historyItem.repeat) {
+      console.log('repeat')
+      nodeStatusElement.innerHTML = nodeStatusFailedHtml
+    }
+
+    const statusElem = nodeStatusElement.querySelector('.retelling-status-show')
+    if (statusElem) {
+      statusElem.addEventListener('click', e => {
+        const nodeId = e.target.closest('.node-row').dataset.nodeId
+        const item = history.find(i => i.id === nodeId)
+        const content = createRetellingFeedbackContent(listItem.title, item.user_response, item.json)
+        rowElement.closest('.mental-map').appendChild(content)
+      })
+    }
+
+    if (historyItem.done) {
+      continue
+    }
+
+    if (showVoiceControl) {
       continue
     }
 
@@ -116,135 +147,32 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
 
     const startClickHandler = targetElement => {
 
+      targetElement.closest('.node-row').classList.add('pending')
+      historyItem.pending = true
+
       $(rowElement.querySelector('.gn'))
         .tooltip('hide')
         .attr('title', 'Остановить запись и запустить проверку')
         .tooltip('fixTitle')
-
       finalSpan.innerHTML = ''
       interimSpan.innerHTML = ''
       resultSpan.innerHTML = ''
       rowElement.querySelectorAll('.target-text').forEach(el => el.classList.add('selected'))
-
       rowElement.querySelector('.node-status').innerHTML = ''
-
       rowElement.classList.add('current-row')
       rowElement.parentNode.classList.add('do-recording')
-
-      /*voiceResponse.onResult(args => {
-        finalSpan.innerHTML = args.args?.result
-        interimSpan.innerHTML = args.args?.interim
-      })*/
     }
 
     const stopClickHandler = targetElement => {
-
       $(rowElement.querySelector('.gn'))
         .tooltip('hide')
         .attr('title', 'Нажмите, что бы начать запись с микрофона')
         .tooltip('fixTitle')
-
       rowElement.classList.remove('current-row')
       rowElement.parentNode.classList.remove('do-recording')
       rowElement.querySelectorAll('.target-text').forEach(el => el.classList.remove('selected'))
-
-      /*const userResponse = finalSpan.innerHTML
-      if (!userResponse) {
-        rowElement.closest('.mental-map').appendChild(createNotify('Речи не обнаружено'))
-        return
-      }*/
-
-      /*
-      sendMessage(
-        `/admin/index.php?r=gpt/stream/retelling-rewrite`,
-        {
-          userResponse,
-          slideTexts: stripTags(listItem.title)
-        },
-        (message) => resultSpan.innerText = message,
-        (error) => {
-          backdrop.setErrorText(error, () => {
-            backdrop.remove()
-            stopClickHandler(targetElement)
-          })
-        },
-        () => {
-          if (resultSpan.innerText.length === 0) {
-            backdrop.remove()
-            return
-          }
-          retellingResponseSpan.innerText = ''
-          sendMessage(`/admin/index.php?r=gpt/stream/retelling-tree`, {
-              userResponse: resultSpan.innerText,
-              slideTexts: stripTags(listItem.title),
-              importantWords: $(`<div>${listItem.title}</div>`)
-                .find('span.target-text')
-                .map((i, el) => removePunctuation($(el).text()))
-                .get()
-                .join(', ')
-            },
-            (message) => retellingResponseSpan.innerText = message,
-            (error) => {
-              backdrop.setErrorText(error, () => {
-                backdrop.remove()
-                stopClickHandler(targetElement)
-              })
-            },
-            () => {
-
-              const content = rowElement.querySelector('.node-title').innerHTML
-
-              backdrop.remove()
-
-              const json = processOutputAsJson(retellingResponseSpan.innerText)
-              if (json === null) {
-                console.log('no json')
-                return
-              }
-              const val = Number(json?.similarity_percentage)
-              const importantWordsPassed = Boolean(json?.all_important_words_included)
-
-              const historyItem = history.find(i => i.id === nodeId)
-              if (val > 85 && importantWordsPassed) {
-                nodeStatusElement.innerHTML = nodeStatusSuccessHtml
-
-                if (historyItem) {
-                  historyItem.done = true
-                } else {
-                  history.push({id: nodeId, done: true})
-                }
-
-                processTreeNodes(list, body, history, voiceResponse, params, onEndHandler)
-              } else {
-                if (historyItem) {
-                  historyItem.done = false
-                } else {
-                  history.push({id: nodeId, done: false})
-                }
-                nodeStatusElement.innerHTML = nodeStatusFailedHtml
-              }
-
-              saveUserResult({
-                ...params,
-                image_fragment_id: nodeId,
-                overall_similarity: Number(json?.similarity_percentage),
-                text_hiding_percentage: 0, // textHidingPercentage,
-                text_target_percentage: 0, // textTargetPercentage,
-                content,
-              }).then(response => {
-                if (response && response?.success) {
-                  historyItem.all = response.history.all
-                  historyItem.hiding = response.history.hiding
-                  historyItem.target = response.history.target
-                }
-              })
-            }
-          )
-        }
-      )*/
     }
 
-    // const treeVoiceControlElement = TreeVoiceControl(voiceResponse, startClickHandler, stopClickHandler)
     const treeVoiceControlElement = TreeVoiceControl(
       voiceResponse,
       startClickHandler,
@@ -300,6 +228,8 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
               return
             }
 
+            historyItem.user_response = text
+
             const similarityPercentage = calcSimilarityPercentage(
               removePunctuation(stripTags(listItem.title).toLowerCase().trim()),
               removePunctuation(stripTags(text).toLowerCase().trim())
@@ -321,15 +251,19 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
 
               const historyItem = history.find(i => i.id === nodeId)
               historyItem.json = retellingResponseSpan.innerHTML
-              historyItem.user_response = resultSpan.innerHTML
+              //historyItem.user_response = resultSpan.innerHTML
 
+              //resetNodeRow(rowElement)
               nodeStatusElement.innerHTML = nodeStatusSuccessHtml
 
-              if (historyItem) {
+              //if (historyItem) {
                 historyItem.done = true
-              } else {
+                historyItem.repeat = false
+              /*} else {
                 history.push({id: nodeId, done: true})
-              }
+              }*/
+
+              historyItem.pending = false
 
               processTreeNodes(list, body, history, voiceResponse, params, onEndHandler, dispatchEvent)
 
@@ -337,13 +271,13 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
                 currentHistory: history
               })
 
-              nodeStatusElement.querySelector('.retelling-status-show')
+              /*nodeStatusElement.querySelector('.retelling-status-show')
                 .addEventListener('click', e => {
                   const nodeId = e.target.closest('.node-row').dataset.nodeId
                   const item = history.find(i => i.id === nodeId)
                   const content = createRetellingFeedbackContent(listItem.title, item.user_response, item.json)
                   rowElement.closest('.mental-map').appendChild(content)
-                })
+                })*/
 
               const wordItems = createWordItem(listItem.title, listItem.id)
               wordItems.words = [...wordItems.words].map(w => {
@@ -369,6 +303,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
                   historyItem.hiding = response.history.hiding
                   historyItem.target = response.history.target
                 }
+                //resetNodeRow(rowElement)
               })
             } else {
 
@@ -412,37 +347,46 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
                   const historyItem = history.find(i => i.id === nodeId)
                   historyItem.json = retellingResponseSpan.innerHTML
                   historyItem.user_response = resultSpan.innerHTML
+
                   if (val >= params.threshold && importantWordsPassed) {
+
                     nodeStatusElement.innerHTML = nodeStatusSuccessHtml
 
-                    if (historyItem) {
+                    //if (historyItem) {
                       historyItem.done = true
-                    } else {
+                      historyItem.repeat = false
+                    /*} else {
                       history.push({id: nodeId, done: true})
-                    }
+                    }*/
 
-                    processTreeNodes(list, body, history, voiceResponse, params, onEndHandler, dispatchEvent)
-                    console.log('after processTreeNodes', json, historyItem)
+                    //processTreeNodes(list, body, history, voiceResponse, params, onEndHandler, dispatchEvent)
+                    //console.log('after processTreeNodes', json, historyItem)
                   } else {
-                    if (historyItem) {
+                    //if (historyItem) {
                       historyItem.done = false
-                    } else {
+                      historyItem.repeat = true
+                    /*} else {
                       history.push({id: nodeId, done: false})
                     }
+                    */
                     nodeStatusElement.innerHTML = nodeStatusFailedHtml
                   }
+
+                  historyItem.pending = false
+                  processTreeNodes(list, body, history, voiceResponse, params, onEndHandler, dispatchEvent)
+                  console.log('after processTreeNodes', json, historyItem)
 
                   dispatchEvent('historyChange', {
                     currentHistory: history
                   })
 
-                  nodeStatusElement.querySelector('.retelling-status-show')
+                  /*nodeStatusElement.querySelector('.retelling-status-show')
                     .addEventListener('click', e => {
                       const nodeId = e.target.closest('.node-row').dataset.nodeId
                       const item = history.find(i => i.id === nodeId)
                       const content = createRetellingFeedbackContent(listItem.title, item.user_response, item.json)
                       rowElement.closest('.mental-map').appendChild(content)
-                    })
+                    })*/
 
                   const wordItems = createWordItem(listItem.title, listItem.id)
                   wordItems.words = [...wordItems.words].map(w => {
@@ -468,17 +412,28 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
                       historyItem.hiding = response.history.hiding
                       historyItem.target = response.history.target
                     }
+                    //resetNodeRow(rowElement)
                   })
                 }
               )
             }
 
+            const allIsDone = history.reduce((all, val) => all && val.done, true)
+            if (allIsDone && typeof onEndHandler === "function") {
+              console.log('all is done')
+              onEndHandler()
+            }
 
           })
           .catch(function (error) {
             console.error("Error sending audio data to server:", error);
             return false;
           });
+
+        //rootElement.classList.add('pending')
+        //historyItem.pending = true
+
+        processTreeNodes(list, body, history, voiceResponse, params, onEndHandler, dispatchEvent)
       }
     )
 
@@ -494,13 +449,14 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
 
     rowElement.scrollIntoView({block: 'start', behavior: 'smooth'});
 
-    break
+    showVoiceControl = true
+    //break
   }
 
-  const allIsDone = history.reduce((all, val) => all && val.done, true)
+  /*const allIsDone = history.reduce((all, val) => all && val.done, true)
   if (allIsDone && typeof onEndHandler === "function") {
     onEndHandler()
-  }
+  }*/
 }
 
 function flatten(nodes, level = 0) {
@@ -538,7 +494,7 @@ export default function TreeViewBody(tree, voiceResponse, history, params, onEnd
     },
     restart() {
       body.remove()
-      history = history.map(h => ({...h, done: false, all: 0}))
+      history = history.map(h => ({...h, done: false, all: 0, pending: false, repeat: false}))
       body = init()
       this.init()
       return body
