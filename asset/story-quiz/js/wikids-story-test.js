@@ -951,10 +951,10 @@ function WikidsStoryTest(el, options) {
   function createInputAnswer(question, answer) {
     var $elem = $('<div/>');
     if (testConfig.isSayCorrectAnswer() || testConfig.isAskQuestion()) {
-      var $repeat = '<a href="" title="Повторить слово" class="glyphicon glyphicon-repeat synthesis-question" style="top: 5px; right: 10px"><i></i></a>';
+      var $repeat = '<div style="display: flex; align-items: center; justify-content: center; padding: 10px 0"><a href="" title="Повторить текст" class="synthesis-question">Повторить</a></div>';
       $elem.append($repeat);
     }
-    $elem.append(answerTypeInput.create(nextQuestion));
+    $elem.append(answerTypeInput.create(nextQuestion, question, showQuestionImage, showOriginalImage));
     return $elem;
   }
 
