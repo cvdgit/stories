@@ -12,7 +12,11 @@ MathQuestion.prototype.createWrapper = function ({question, content} = {}) {
 
   var $answers = $("<div/>").addClass("wikids-test-answers");
 
-  var $wrapper = $('<div class="row row-no-gutters"><div class="col-md-4 question-image"></div><div class="col-md-8 question-wrapper"></div></div>');
+  var $wrapper = $(`
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center">
+<div class="question-image"></div>
+<div class="question-wrapper" style="min-width: 400px"></div>
+</div>`);
   $wrapper.find(".question-wrapper").append($answers);
   return $wrapper;
 
