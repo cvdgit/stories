@@ -2824,7 +2824,9 @@ function WikidsStoryTest(el, options) {
                 );
             } else {
               if (testConfig.answerTypeIsInput(question) && testConfig.isStrictAnswer()) {
-                $answerElement = $('<p/>').html(textDiff(answerText, userAnswer));
+                $answerElement = $('<p/>')
+                  .css('user-select', 'none')
+                  .html(textDiff(answerText, userAnswer));
               } else {
                 $answerElement = $('<p/>').html(answerText);
               }
@@ -2835,9 +2837,11 @@ function WikidsStoryTest(el, options) {
               $('<p/>').html('&nbsp;').appendTo($content);
               $('<p/>')
                 .text('Ваш ответ:')
+                .css('user-select', 'none')
                 .appendTo($content);
               $('<p/>')
                 .html(userAnswer)
+                .css('user-select', 'none')
                 .appendTo($content);
             }
 
