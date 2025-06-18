@@ -1,5 +1,8 @@
 import {_extends} from "../common";
 import 'mathlive';
+import {MathfieldElement} from "mathlive";
+
+MathfieldElement.fontsDirectory = '/build/fonts'
 
 function MathQuestion(test) {
   this.element = null;

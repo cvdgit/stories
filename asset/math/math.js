@@ -1,4 +1,4 @@
 import 'mathlive';
-//import {MathfieldElement} from "mathlive";
+import {MathfieldElement} from "mathlive";
 
-//MathfieldElement.fontsDirectory = '../fonts/mathlive'
+MathfieldElement.fontsDirectory = '/build/fonts'
