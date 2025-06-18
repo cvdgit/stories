@@ -72,7 +72,7 @@
         }
         else {
           toastr.success('Успешно');
-          //location.reload()
+          location.reload()
         }
       })
   });
