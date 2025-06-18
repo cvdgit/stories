@@ -27,7 +27,7 @@ class CreateMathQuestionHandler
      */
     public function handle(CreateMathQuestionCommand $command): void
     {
-        $question = StoryTestQuestion::create($command->getTestId(), $command->getName(), QuestionType::MATH_QUESTION);
+        $question = StoryTestQuestion::create($command->getTestId(), $command->getName(), QuestionType::MATH_QUESTION, null, 1);
         $question->regions = $command->getPayload();
         $question->weight = 1;
 

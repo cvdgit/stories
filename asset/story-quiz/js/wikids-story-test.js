@@ -2318,17 +2318,40 @@ function WikidsStoryTest(el, options) {
     }
 
     if (questionViewMath(currentQuestion)) {
-      // $('.seq-question', currentQuestionElement).html(that.mathQuestion.create(currentQuestion));
+      const {payload} = currentQuestion
 
       const answersContainer = $('.wikids-test-answers', currentQuestionElement)
       answersContainer.empty()
-      getAnswersData(currentQuestion).map(a => answersContainer.append(createMathAnswer(a, currentQuestion)))
 
-      that.mathQuestion.create(
-        currentQuestion,
-        $('.question-image', currentQuestionElement),
-        answersContainer
-      )
+      if (payload?.isInputAnswer) {
+        that.mathQuestion.createInput(
+          currentQuestion,
+          $('.question-image', currentQuestionElement),
+          answersContainer,
+          answer => {
+            if (answer === '') {
+              return
+            }
+            nextQuestion([answer], (q, a) => {
+              const correctAnswer = getCorrectAnswers(q)[0].name
+              const userAnswer = a[0]
+              return correctAnswer.toLowerCase().trim() === userAnswer.toLowerCase().trim()
+            })
+          }
+        )
+      } else {
+        let answers = getAnswersData(currentQuestion)
+        const mixAnswers = currentQuestion.mix_answers || 0;
+        if (parseInt(mixAnswers) === 1) {
+          answers = shuffle(answers);
+        }
+        answers.map(a => answersContainer.append(createMathAnswer(a, currentQuestion)))
+        that.mathQuestion.create(
+          currentQuestion,
+          $('.question-image', currentQuestionElement),
+          answersContainer
+        )
+      }
     }
 
     if (questionViewImageGaps(currentQuestion)) {
@@ -2885,6 +2908,7 @@ function WikidsStoryTest(el, options) {
       && !questionViewRegion(currentQuestion)
       && !questionViewPoetry(currentQuestion)
       && !questionViewGpt(currentQuestion)
+      && !questionViewMath(currentQuestion)
       && !testConfig.sourceIsNeo()) {
       dom.wrapper.removeClass('wikids-test--no-controls');
       dom.controls.show();

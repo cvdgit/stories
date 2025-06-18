@@ -92,21 +92,21 @@ class MathController extends BaseController
         $testing = $this->findModel(StoryTest::class, $test_id);
         $createForm = new MathQuestionCreateForm();
         if ($createForm->load($request->post(), '')) {
-
             if (!$createForm->validate()) {
                 return ['success' => false, 'message' => 'Not valid'];
             }
 
+            $isInputAnswer = (bool) $createForm->inputAnswer;
+
             $answers = Json::decode($createForm->answers);
-            $toInsertAnswers = [];
             foreach ($answers as $i => $answer) {
                 $answers[$i]['id'] = Uuid::uuid4()->toString();
-                $toInsertAnswers[] = $answers[$i];
             }
 
             $payload = Json::encode([
                 'job' => $createForm->job,
                 'answers' => $answers,
+                'isInputAnswer' => $isInputAnswer,
             ]);
 
             try {
@@ -161,9 +161,12 @@ class MathController extends BaseController
                 return ['success' => false, 'message' => 'Not valid'];
             }
 
-            $answers = Json::decode($updateForm->answers);
+            $isInputAnswer = (bool) $updateForm->inputAnswer;
+
             $toInsertAnswers = [];
             $toUpdateAnswers = [];
+
+            $answers = Json::decode($updateForm->answers);
             foreach ($answers as $i => $answer) {
                 $id = $answer['id'];
                 if ($id === '') {
@@ -177,6 +180,7 @@ class MathController extends BaseController
             $payload = Json::encode([
                 'job' => $updateForm->job,
                 'answers' => $answers,
+                'isInputAnswer' => $isInputAnswer,
             ]);
 
             try {

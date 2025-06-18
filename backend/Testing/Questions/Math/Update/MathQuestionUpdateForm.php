@@ -17,5 +17,9 @@ class MathQuestionUpdateForm extends MathQuestionForm
         $payload = Json::decode($question->regions);
         $this->job = $payload['job'];
         $this->answers = $payload['answers'] ?? [];
+        $this->inputAnswer = $payload['isInputAnswer'] ?? false;
+        /*if ($this->inputAnswer) {
+            $this->inputAnswerId = $this->answers[0]['id'];
+        }*/
     }
 }

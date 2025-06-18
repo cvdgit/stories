@@ -11,17 +11,20 @@ abstract class MathQuestionForm extends Model
     public $name;
     public $job;
     public $answers;
-    public $haveJob;
-    public $haveAnswers;
+    public $inputAnswer;
+    public $inputAnswerValue;
+    public $inputAnswerId;
 
     public function rules(): array
     {
         return [
-            [['name', 'haveJob', 'haveAnswers'], 'required'],
+            [['name'], 'required'],
             ['name', 'string', 'max' => 1024],
             [['job'], 'string'],
             ['answers', 'safe'],
-            [['haveJob', 'haveAnswers'], 'string'],
+            ['inputAnswer', 'boolean'],
+            ['inputAnswerValue', 'string', 'max' => 512],
+            ['inputAnswerId', 'string', 'max' => 36],
         ];
     }
 
@@ -31,8 +34,8 @@ abstract class MathQuestionForm extends Model
             'name' => 'Вопрос',
             'job' => 'Задание',
             'answers' => 'Варианты ответов',
-            'haveJob' => 'Задание',
-            'haveAnswers' => 'Варианты ответов',
+            'inputAnswer' => 'Ввод ответа пользователем',
+            'inputAnswerValue' => 'Значение',
         ];
     }
 }

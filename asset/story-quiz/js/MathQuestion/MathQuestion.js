@@ -38,6 +38,32 @@ MathQuestion.prototype.create = function (question, imageElement, answersElement
   return this.element;
 }
 
+MathQuestion.prototype.createInput = function (question, imageElement, answersContainer, handler) {
+  const {payload} = question
+  imageElement.empty()
+  imageElement.html(`<math-field read-only style="display:inline-block">${payload.job}</math-field>`)
+  answersContainer.append(`<div style="margin-top: 30px">
+<label for="" style="margin-right: 10px">Введите ответ и нажмите Enter:</label>
+<input spellcheck="false" class="answer-input" type="text">
+</div>`)
+
+  answersContainer.find('input')
+    .on('paste', e => {
+      e.preventDefault()
+      return false
+    })
+    .on('keypress', e => {
+      if (e.which === 13) {
+        handler(e.target.value)
+        return false;
+      }
+    })
+
+
+
+  return this.element
+}
+
 MathQuestion.prototype.getContent = function(question) {
   const {payload} = question
   const wrap = document.createElement('div')
