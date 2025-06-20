@@ -38,6 +38,9 @@ MathQuestion.prototype.create = function (question, imageElement, answersElement
 
   imageElement.html(`<math-field read-only style="display:inline-block">${payload.job}</math-field>`)
 
+  const mf = imageElement[0].querySelector('math-field')
+  mf.mathVirtualKeyboardPolicy = "manual";
+
   return this.element;
 }
 
@@ -45,16 +48,21 @@ MathQuestion.prototype.createInput = function (question, imageElement, answersCo
   const {payload} = question
   imageElement.empty()
   imageElement.html(`<math-field read-only style="display:inline-block">${payload.job}</math-field>`)
-  answersContainer.append(`<div style="margin-top: 30px">
+  /*answersContainer.append(`<div style="margin-top: 30px">
 <label for="" style="margin-right: 10px">Введите ответ и нажмите Enter:</label>
 <input spellcheck="false" class="answer-input" type="text">
+</div>`)*/
+
+  answersContainer.append(`<div style="margin-top: 30px">
+<label for="" style="margin-right: 10px">Введите ответ и нажмите Enter:</label>
+<math-field class="answer-input">
 </div>`)
 
-  answersContainer.find('input')
-    .on('paste', e => {
+  answersContainer.find('math-field')
+    /*.on('paste', e => {
       e.preventDefault()
       return false
-    })
+    })*/
     .on('keypress', e => {
       if (e.which === 13) {
         handler(e.target.value)

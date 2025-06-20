@@ -30,7 +30,7 @@ $form = ActiveForm::begin(['id' => 'math-question-form', 'action' => $action, 'e
 <?= $form->field($formModel, 'name')->textInput(['maxlength' => true, 'class' => 'form-control mathName']) ?>
 <div style="display: flex; flex-direction: column; flex-flow: column">
     <label style="display: block; font-weight: 700; padding-top: 4px; padding-bottom: 4px;">Задание</label>
-    <math-field id="formula">
+    <math-field id="formula" default-mode="math" smart-mode smart-fence>
         <?= $formModel->job ?>
     </math-field>
     <label style="display: block; font-weight: 700; padding-top: 20px; padding-bottom: 4px;">Задание в LaTeX</label>
@@ -46,12 +46,9 @@ $form = ActiveForm::begin(['id' => 'math-question-form', 'action' => $action, 'e
     <div id="input-answer-block" style="display: <?= $formModel->inputAnswer === true ? 'block' : 'none' ?>">
         <h4>Ответ:</h4>
         <div class="row">
-            <?= $form->field($formModel, 'inputAnswerValue', ['options' => ['class' => 'col-md-6']])
-                ->textInput([
-                    'maxlength' => true,
-                    'class' => 'form-control inputAnswerCheckValue',
-                    //'data-answer-id' => $formModel->inputAnswerId,
-                ]) ?>
+            <div class="col-md-6">
+                <math-field smart-mode class="inputAnswerCheckValue" style="display: block"><?= $formModel->inputAnswerValue ?></math-field>
+            </div>
         </div>
     </div>
 

@@ -2277,3 +2277,12 @@ math-field[read-only] {
   background-color: transparent;
   font-size: 3rem;
 }
+
+@media not (pointer: coarse) {
+  math-field[read-only]::part(virtual-keyboard-toggle),
+  math-field.answer-input::part(virtual-keyboard-toggle),
+  math-field[read-only]::part(menu-toggle),
+  math-field.answer-input::part(menu-toggle) {
+    display: none;
+  }
+}
