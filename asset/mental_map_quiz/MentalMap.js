@@ -129,7 +129,7 @@ export default function MentalMap(element, deck, params) {
     return await response.json()
   }
 
-  function showMentalMapHandler(zoomWrap, closeMentalMapHandler) {
+  function showMentalMapHandler(zoomWrap, closeMentalMapHandler, fastMode, fastModeChangeHandler) {
     const zoomContainer = document.createElement('div')
     zoomContainer.classList.add('zoom-container')
 
@@ -161,6 +161,12 @@ export default function MentalMap(element, deck, params) {
       }
     })
     zoomContainer.appendChild(hideBtn)
+
+    const fastWrapEl = document.createElement('div')
+    fastWrapEl.classList.add('mental-map-fast-wrap')
+    fastWrapEl.innerHTML = `<label>Быстрый режим<input type="checkbox" ${fastMode ? 'checked' : ''}></label>`
+    fastWrapEl.querySelector('input[type=checkbox]').addEventListener('click', fastModeChangeHandler)
+    zoomContainer.appendChild(fastWrapEl)
 
     return zoomContainer
   }
@@ -194,7 +200,7 @@ export default function MentalMap(element, deck, params) {
 
   const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
 
-  function mapImageClickHandler({image, texts, historyItem, rewritePrompt, threshold, dialogHideHandler}) {
+  function mapImageClickHandler({image, texts, historyItem, rewritePrompt, threshold, dialogHideHandler, fastMode}) {
     const text = texts.find(t => t.id === image.id)
     const detailContainer = DetailContent({
       image,
@@ -252,7 +258,13 @@ export default function MentalMap(element, deck, params) {
         }
 
         const voiceLang = langStore.fromStore($(wrapper).find("#voice-lang option:selected").val());
-        startRecording(e.target, voiceLang, stripTags(text.text), true, threshold)
+        startRecording(e.target, voiceLang, stripTags(text.text), true, threshold, () => {
+          if (fastMode) {
+            setTimeout(() => {
+              wrapper.querySelector('#start-retelling').click()
+            }, 100)
+          }
+        })
       })
       wrapper.querySelector('#start-retelling').addEventListener('click', e => {
 
@@ -315,6 +327,12 @@ export default function MentalMap(element, deck, params) {
                 // wrapper.querySelector('.result-item-value').innerHTML = `${val}% (${textHidingPercentage}% / ${textTargetPercentage}%)`
                 wrapper.querySelector('.image-item > .result-item').remove()
                 wrapper.querySelector('.image-item').appendChild(FragmentResultElement(historyItem))
+
+                if (fastMode) {
+                  if (historyItem.done) {
+                    dialog.hide()
+                  }
+                }
               }
             })
           }
@@ -335,7 +353,7 @@ export default function MentalMap(element, deck, params) {
     dialog.onHide(dialogHideHandler)
   }
 
-  function mapImageClickHandlerQuestions({image, questionItem, historyItem, rewritePrompt, threshold, dialogHideHandler}) {
+  function mapImageClickHandlerQuestions({image, questionItem, historyItem, rewritePrompt, threshold, dialogHideHandler, fastMode}) {
     const detailContainer = DetailContentQuestions({
       image,
       questionItem,
@@ -365,7 +383,13 @@ export default function MentalMap(element, deck, params) {
         }
 
         const voiceLang = langStore.fromStore($(wrapper).find("#voice-lang option:selected").val());
-        startRecording(e.target, voiceLang, stripTags(image.text), true, threshold)
+        startRecording(e.target, voiceLang, stripTags(image.text), true, threshold, () => {
+          if (fastMode) {
+            setTimeout(() => {
+              wrapper.querySelector('#start-retelling').click()
+            }, 100)
+          }
+        })
       })
 
       wrapper.querySelector('#start-retelling').addEventListener('click', e => {
@@ -531,6 +555,11 @@ export default function MentalMap(element, deck, params) {
     const {mapTypeIsMentalMapQuestions, questions} = json
     const mapQuestions = new MentalMapQuestions({typeIsMentalMapQuestions: mapTypeIsMentalMapQuestions, questions})
 
+    let fastMode = false
+    function fastModeChangeHandler(e) {
+      fastMode = e.target.checked
+    }
+
     texts = json.map.images.map(image => createWordItem(image.text, image.id))
 
     const imageFirst = Boolean(json.settings?.imageFirst)
@@ -582,7 +611,8 @@ export default function MentalMap(element, deck, params) {
           historyItem,
           rewritePrompt,
           threshold,
-          dialogHideHandler: () => fragmentDialogHideHandler(image, historyItem)
+          dialogHideHandler: () => fragmentDialogHideHandler(image, historyItem),
+          fastMode
         })
         return
       }
@@ -593,7 +623,8 @@ export default function MentalMap(element, deck, params) {
         historyItem,
         rewritePrompt,
         threshold,
-        dialogHideHandler: () => fragmentDialogHideHandler(image, historyItem)
+        dialogHideHandler: () => fragmentDialogHideHandler(image, historyItem),
+        fastMode
       })
     }, mapQuestions.typeIsMentalMapQuestions()))
 
@@ -637,7 +668,8 @@ export default function MentalMap(element, deck, params) {
                   }
                 }
                 fragmentDialogHideHandler(image, historyItem)
-              }
+              },
+              fastMode
             })
             return
           }
@@ -658,7 +690,8 @@ export default function MentalMap(element, deck, params) {
                 }
               }
               fragmentDialogHideHandler(image, historyItem)
-            }
+            },
+            fastMode
           })
         },
         mentalMapHistory
@@ -703,7 +736,7 @@ export default function MentalMap(element, deck, params) {
         zoom.destroy()
         zoomContainer.remove()
         element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
-      })
+      }, fastMode, fastModeChangeHandler)
 
       this.element.appendChild(zoomContainer)
 
@@ -778,7 +811,8 @@ export default function MentalMap(element, deck, params) {
                   }
                 }
                 fragmentDialogHideHandler(image, historyItem)
-              }
+              },
+              fastMode
             })
             return
           }
@@ -799,7 +833,8 @@ export default function MentalMap(element, deck, params) {
                 }
               }
               fragmentDialogHideHandler(image, historyItem)
-            }
+            },
+            fastMode
           })
         },
         mentalMapHistory
@@ -808,7 +843,7 @@ export default function MentalMap(element, deck, params) {
         zoom.destroy()
         zoomContainer.remove()
         element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
-      })
+      }, fastMode, fastModeChangeHandler)
       this.element.appendChild(zoomContainer)
       $('.mental-map-img .map-img').tooltip()
 
@@ -830,7 +865,7 @@ export default function MentalMap(element, deck, params) {
    * @param {string} lang
    * @param text
    */
-  function startRecording(element, lang, text, makeRewrite, threshold) {
+  function startRecording(element, lang, text, makeRewrite, threshold, stopHandler) {
     const state = element.dataset.state
     if (!state) {
       $(document.getElementById("start-retelling-wrap")).hide()
@@ -872,6 +907,9 @@ export default function MentalMap(element, deck, params) {
 
           const similarityPercentage = calcSimilarityPercentage(removePunctuation(text.toLowerCase()).trim(), removePunctuation(userResponse.toLowerCase()).trim())
           if (similarityPercentage >= threshold) {
+            if (typeof stopHandler === 'function') {
+              stopHandler()
+            }
             return
           }
 
@@ -891,6 +929,9 @@ export default function MentalMap(element, deck, params) {
             },
             () => {
               content.remove()
+              if (typeof stopHandler === 'function') {
+                stopHandler()
+              }
             }
           )
         }
@@ -994,6 +1035,38 @@ export default function MentalMap(element, deck, params) {
       }
     })
     return wrap
+  }
+
+  function createProcessContent(text, hideCallback) {
+    const wrap = document.createElement('div')
+    wrap.classList.add('retelling-wrap')
+    wrap.style.backgroundColor = 'transparent'
+    wrap.style.padding = '0'
+    wrap.innerHTML = `
+      <div class="retelling-status">
+        <div class="retelling-info-text">${text}</div>
+        <img class="retelling-loader" src="/img/loading.gif" alt="..." />
+        <button class="btn retelling-resend" type="button">Повторить</button>
+      </div>
+    `
+    return {
+      getElement() {
+        return wrap
+      },
+      setText(text) {
+        wrap.querySelector('.retelling-info-text').textContent = text
+      },
+      setErrorText(text, resendHandler) {
+        wrap.querySelector('.retelling-status').classList.add('retelling-status-error')
+        wrap.querySelector('.retelling-info-text').textContent = text
+        if (resendHandler !== undefined) {
+          wrap.querySelector('.retelling-resend').addEventListener('click', resendHandler)
+        }
+      },
+      remove() {
+        wrap.remove()
+      }
+    }
   }
 
   async function startRetelling(userResponse, targetText, threshold) {

@@ -93,6 +93,26 @@
   top: 70px;
 }
 
+.mental-map-fast-wrap {
+  position: absolute;
+  right: 10px;
+  top: 130px;
+}
+
+.mental-map-fast-wrap label {
+  font-size: 2rem;
+  line-height: 2.4rem;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.mental-map-fast-wrap input[type=checkbox] {
+  zoom: 1.4;
+  margin-left: 6px;
+  margin-top: 0;
+}
+
 .mental-map-all-text-container {
   display: flex;
   flex-direction: column;
