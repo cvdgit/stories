@@ -349,6 +349,12 @@ export default function MentalMap(element, deck, params) {
           wrapper.querySelector('#start-retelling-wrap').style.display = display
         }
       })
+
+      if (fastMode) {
+        setTimeout(() => {
+          wrapper.querySelector('#start-recording').click()
+        }, 100)
+      }
     })
     dialog.onHide(dialogHideHandler)
   }
@@ -465,6 +471,12 @@ export default function MentalMap(element, deck, params) {
           wrapper.querySelector('#start-retelling-wrap').style.display = display
         }
       })
+
+      if (fastMode) {
+        setTimeout(() => {
+          wrapper.querySelector('#start-recording').click()
+        }, 100)
+      }
     })
     dialog.onHide(dialogHideHandler)
   }
