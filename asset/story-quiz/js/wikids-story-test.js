@@ -2339,6 +2339,12 @@ function WikidsStoryTest(el, options) {
             })
           }
         )
+      } else if (payload?.isGapsQuestion) {
+        that.mathQuestion.createGapsQuestion(currentQuestion, $('.question-image', currentQuestionElement))
+        dom.nextButton.off("click").on("click", function () {
+          const answers = that.mathQuestion.userAnswers(currentQuestion, $('.question-image', currentQuestionElement))
+          nextQuestion(answers, (q, a) => that.mathQuestion.checkGapsAnswers(currentQuestion, $('.question-image', currentQuestionElement)))
+        })
       } else {
         let answers = getAnswersData(currentQuestion)
         const mixAnswers = currentQuestion.mix_answers || 0;
@@ -2908,7 +2914,7 @@ function WikidsStoryTest(el, options) {
       && !questionViewRegion(currentQuestion)
       && !questionViewPoetry(currentQuestion)
       && !questionViewGpt(currentQuestion)
-      && !questionViewMath(currentQuestion)
+      //&& !questionViewMath(currentQuestion)
       && !testConfig.sourceIsNeo()) {
       dom.wrapper.removeClass('wikids-test--no-controls');
       dom.controls.show();

@@ -15,6 +15,7 @@ use yii\web\View;
  * @var MathQuestionUpdateForm $formModel
  * @var StoryTestQuestion $questionModel
  * @var string $answers
+ * @var bool $isGapsQuestion
  */
 
 $this->title = 'Изменить вопрос';
@@ -27,11 +28,11 @@ $this->params['breadcrumbs'] = [
 <?= QuestionManageWidget::widget([
     'quizModel' => $quizModel,
     'currentModelId' => $questionModel->id,
-    'renderData' => $this->render('_question', [
+    'renderData' => $this->render($isGapsQuestion ? '_question_gaps' : '_question', [
         'formModel' => $formModel,
         'isNewRecord' => false,
         'testingId' => $quizModel->id,
-        'action' => Url::to(['/test/math/update-handler', 'id' => $questionModel->id]),
+        'action' => Url::to(['/test/math/update-handler', 'id' => $questionModel->id, 'gaps' => $isGapsQuestion ? '1': null]),
         'answers' => $answers,
     ]),
 ]) ?>

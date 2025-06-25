@@ -75,6 +75,34 @@ MathQuestion.prototype.createInput = function (question, imageElement, answersCo
   return this.element
 }
 
+MathQuestion.prototype.createGapsQuestion = function(question, imageElement) {
+  const {payload} = question
+  imageElement.empty()
+  imageElement.html(`<math-field read-only style="display:inline-block">${payload.job}</math-field>`)
+  return this.element
+}
+
+MathQuestion.prototype.checkGapsAnswers = function(question, elem) {
+  const {payload} = question
+  const mf = elem.find('math-field')[0]
+
+  let correct = true
+  payload.answers.map(a => {
+    correct = correct && (a.value === mf.getPromptValue(a.placeholder))
+  })
+
+  return correct
+}
+
+MathQuestion.prototype.userAnswers = function(question, elem) {
+  const {payload} = question
+  const mf = elem.find('math-field')[0]
+  const answers = payload.answers.map(a => {
+    return mf.getPromptValue(a.placeholder)
+  })
+  return answers
+}
+
 MathQuestion.prototype.getContent = function(question) {
   const {payload} = question
   const wrap = document.createElement('div')

@@ -8,6 +8,7 @@ use backend\components\BaseController;
 use backend\Testing\Questions\Math\Create\CreateMathQuestionCommand;
 use backend\Testing\Questions\Math\Create\CreateMathQuestionHandler;
 use backend\Testing\Questions\Math\Create\MathQuestionCreateForm;
+use backend\Testing\Questions\Math\MathPayload;
 use backend\Testing\Questions\Math\Update\MathQuestionUpdateForm;
 use common\models\StoryTest;
 use common\models\StoryTestAnswer;
@@ -65,7 +66,7 @@ class MathController extends BaseController
     /**
      * @throws NotFoundHttpException
      */
-    public function actionCreate(int $test_id): string
+    public function actionCreate(int $test_id, int $gaps = null): string
     {
         $testing = StoryTest::findOne($test_id);
         if ($testing === null) {
@@ -73,12 +74,14 @@ class MathController extends BaseController
         }
 
         $createForm = new MathQuestionCreateForm();
-        $createForm->name = 'Выполните задание';
+        $isGapsQuestion = (int) $gaps === 1;
+        $createForm->name = $isGapsQuestion ? 'Заполните пропуски в задании' : 'Выполните задание';
 
         return $this->render('create', [
             'quizModel' => $testing,
             'formModel' => $createForm,
             'answers' => Json::encode([]),
+            'isGapsQuestion' => $isGapsQuestion,
         ]);
     }
 
@@ -86,11 +89,12 @@ class MathController extends BaseController
      * @throws NotFoundHttpException
      * @throws InvalidConfigException
      */
-    public function actionCreateHandler(int $test_id, Request $request, Response $response): array
+    public function actionCreateHandler(int $test_id, Request $request, Response $response, int $gaps = null): array
     {
         $response->format = Response::FORMAT_JSON;
         $testing = $this->findModel(StoryTest::class, $test_id);
         $createForm = new MathQuestionCreateForm();
+        $isGapsQuestion = (int) $gaps === 1;
         if ($createForm->load($request->post(), '')) {
             if (!$createForm->validate()) {
                 return ['success' => false, 'message' => 'Not valid'];
@@ -103,16 +107,14 @@ class MathController extends BaseController
                 $answers[$i]['id'] = Uuid::uuid4()->toString();
             }
 
-            $payload = Json::encode([
-                'job' => $createForm->job,
-                'answers' => $answers,
-                'isInputAnswer' => $isInputAnswer,
-            ]);
+            $payload = new MathPayload($createForm->job, $answers, $isInputAnswer, $isGapsQuestion);
 
             try {
-                $this->createMathQuestionHandler->handle(new CreateMathQuestionCommand($testing->id, $createForm->name, $payload, $answers));
+                $this->createMathQuestionHandler->handle(
+                    new CreateMathQuestionCommand($testing->id, $createForm->name, $payload),
+                );
                 Yii::$app->session->setFlash('success', 'Вопрос успешно создан');
-                return ['success' => true, 'url' => Url::to(['test/update', 'id' => $testing->id])];
+                return ['success' => true, 'url' => Url::to(['test/update', 'id' => $testing->id, 'gaps' => $isGapsQuestion ? 1 : null])];
             } catch (Exception $exception) {
                 Yii::$app->errorHandler->logException($exception);
                 return ['success' => false, 'message' => $exception->getMessage()];
@@ -125,11 +127,12 @@ class MathController extends BaseController
      * @throws NotFoundHttpException
      * @throws InvalidConfigException
      */
-    public function actionUpdate(int $id): string
+    public function actionUpdate(int $id, int $gaps = null): string
     {
         $questionModel = $this->findModel(StoryTestQuestion::class, $id);
         $quizModel = $questionModel->storyTest;
         $updateForm = new MathQuestionUpdateForm($questionModel);
+        $isGapsQuestion = (int) $gaps === 1;
         return $this->render('update', [
             'quizModel' => $quizModel,
             'formModel' => $updateForm,
@@ -140,8 +143,10 @@ class MathController extends BaseController
                     'name' => $answer->name,
                     'correct' => $answer->is_correct === 1,
                     'questionId' => $questionModel->id,
+                    'placeholder' => $answer->description,
                 ];
             }, $questionModel->storyTestAnswers)),
+            'isGapsQuestion' => $isGapsQuestion,
         ]);
     }
 
@@ -149,11 +154,11 @@ class MathController extends BaseController
      * @throws InvalidConfigException
      * @throws NotFoundHttpException
      */
-    public function actionUpdateHandler(int $id, Request $request, Response $response): array
+    public function actionUpdateHandler(int $id, Request $request, Response $response, int $gaps = null): array
     {
         $response->format = Response::FORMAT_JSON;
         $questionModel = $this->findModel(StoryTestQuestion::class, $id);
-
+        $isGapsQuestion = (int) $gaps === 1;
         $updateForm = new MathQuestionUpdateForm($questionModel);
         if ($updateForm->load($request->post(), '')) {
 
@@ -177,11 +182,7 @@ class MathController extends BaseController
                 $toUpdateAnswers[] = $answer;
             }
 
-            $payload = Json::encode([
-                'job' => $updateForm->job,
-                'answers' => $answers,
-                'isInputAnswer' => $isInputAnswer,
-            ]);
+            $payload = (new MathPayload($updateForm->job, $answers, $isInputAnswer, $isGapsQuestion));
 
             try {
 
@@ -194,10 +195,11 @@ class MathController extends BaseController
                             'order' => 1,
                             'is_correct' => $insertAnswer['correct'] ? 1 : 0,
                             'region_id' => $insertAnswer['id'],
+                            'description' => $insertAnswer['placeholder'] ?? null
                         ];
                     }
                     $insertCommand = Yii::$app->db->createCommand();
-                    $insertCommand->batchInsert('story_test_answer', ['story_question_id', 'name', 'order', 'is_correct', 'region_id'], $toInsertRows);
+                    $insertCommand->batchInsert('story_test_answer', ['story_question_id', 'name', 'order', 'is_correct', 'region_id', 'description'], $toInsertRows);
                     $insertCommand->execute();
                 }
 
@@ -206,14 +208,18 @@ class MathController extends BaseController
                         $updateCommand = Yii::$app->db->createCommand();
                         $updateCommand->update(
                             'story_test_answer',
-                            ['name' => $updateAnswer['value'], 'is_correct' => $updateAnswer['correct'] ? 1 : 0],
+                            [
+                                'name' => $updateAnswer['value'],
+                                'is_correct' => $updateAnswer['correct'] ? 1 : 0,
+                                'description' => $updateAnswer['placeholder'] ?? null,
+                            ],
                             ['region_id' => $updateAnswer['id']],
                         );
                         $updateCommand->execute();
                     }
                 }
 
-                $questionModel->regions = $payload;
+                $questionModel->regions = Json::encode($payload->asArray());
                 if (!$questionModel->save()) {
                     throw new DomainException('Question save error');
                 }

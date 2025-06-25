@@ -13,6 +13,7 @@ use yii\web\View;
  * @var StoryTest $quizModel
  * @var MathQuestionCreateForm $formModel
  * @var string $answers
+ * @var bool $isGapsQuestion
  */
 
 $this->title = 'Новый вопрос';
@@ -25,10 +26,10 @@ $this->params['breadcrumbs'] = [
 <?= QuestionManageWidget::widget([
     'isCreate' => true,
     'quizModel' => $quizModel,
-    'renderData' => $this->render('_question', [
+    'renderData' => $this->render($isGapsQuestion ? '_question_gaps' : '_question', [
         'formModel' => $formModel,
         'isNewRecord' => true,
-        'action' => Url::to(['/test/math/create-handler', 'test_id' => $quizModel->id]),
+        'action' => Url::to(['/test/math/create-handler', 'test_id' => $quizModel->id, 'gaps' => $isGapsQuestion ? '1': null]),
         'answers' => $answers,
     ]),
 ]) ?>

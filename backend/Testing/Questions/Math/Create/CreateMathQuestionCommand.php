@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace backend\Testing\Questions\Math\Create;
 
+use backend\Testing\Questions\Math\MathPayload;
+
 class CreateMathQuestionCommand
 {
     /**
@@ -15,20 +17,15 @@ class CreateMathQuestionCommand
      */
     private $name;
     /**
-     * @var string
+     * @var MathPayload
      */
     private $payload;
-    /**
-     * @var array
-     */
-    private $answers;
 
-    public function __construct(int $testId, string $name, string $payload, array $answers)
+    public function __construct(int $testId, string $name, MathPayload $payload)
     {
         $this->testId = $testId;
         $this->name = $name;
         $this->payload = $payload;
-        $this->answers = $answers;
     }
 
     public function getTestId(): int
@@ -41,13 +38,8 @@ class CreateMathQuestionCommand
         return $this->name;
     }
 
-    public function getPayload(): string
+    public function getPayload(): MathPayload
     {
         return $this->payload;
-    }
-
-    public function getAnswers(): array
-    {
-        return $this->answers;
     }
 }

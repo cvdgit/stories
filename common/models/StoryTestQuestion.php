@@ -6,6 +6,7 @@ use backend\helpers\SelectSlideWidgetHelper;
 use backend\models\question\QuestionType;
 use backend\models\question\region\RegionImage;
 use backend\models\question\sequence\SortView;
+use backend\Testing\Questions\Math\MathPayload;
 use DomainException;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use Yii;
@@ -14,6 +15,7 @@ use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "story_test_question".
@@ -458,6 +460,14 @@ class StoryTestQuestion extends ActiveRecord
             QuestionType::GPT_QUESTION => ['test/gpt/update', 'id' => $this->id],
             QuestionType::MATH_QUESTION => ['test/math/update', 'id' => $this->id],
         ];
+
+        if ($this->type === QuestionType::MATH_QUESTION) {
+            $payload = MathPayload::fromPayload(Json::decode($this->regions));
+            if ($payload->isGapsQuestion()) {
+                return ['test/math/update', 'id' => $this->id, 'gaps' => 1];
+            }
+        }
+
         return $updateQuestionMap[$this->type] ?? null;
     }
 

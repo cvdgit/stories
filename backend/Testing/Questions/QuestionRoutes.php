@@ -20,6 +20,7 @@ class QuestionRoutes
             'Группировка элементов' => ['test/grouping/create', 'test_id' => $quizId],
             'ChatGPT вопрос' => ['test/gpt/create', 'test_id' => $quizId],
             'Математические формулы' => ['test/math/create', 'test_id' => $quizId],
+            'Математические формулы с пропусками' => ['test/math/create', 'test_id' => $quizId, 'gaps' => 1],
         ];
     }
 
