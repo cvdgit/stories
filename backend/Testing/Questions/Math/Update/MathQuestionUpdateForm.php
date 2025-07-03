@@ -18,6 +18,7 @@ class MathQuestionUpdateForm extends MathQuestionForm
         $payload = MathPayload::fromPayload(Json::decode($question->regions));
         $this->job = $payload->getJob();
         $this->answers = $payload->getAnswers();
+        $this->fragments = $payload->getFragments();
         $this->inputAnswer = $payload->isInputAnswer();
     }
 }

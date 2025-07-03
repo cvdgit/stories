@@ -13,6 +13,7 @@ use yii\web\View;
  * @var StoryTest $quizModel
  * @var MathQuestionCreateForm $formModel
  * @var string $answers
+ * @var string $fragments
  * @var bool $isGapsQuestion
  */
 
@@ -31,5 +32,6 @@ $this->params['breadcrumbs'] = [
         'isNewRecord' => true,
         'action' => Url::to(['/test/math/create-handler', 'test_id' => $quizModel->id, 'gaps' => $isGapsQuestion ? '1': null]),
         'answers' => $answers,
+        'fragments' => $fragments,
     ]),
 ]) ?>

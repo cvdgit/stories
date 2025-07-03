@@ -39,16 +39,37 @@ class CreateMathQuestionHandler
             }
 
             $toInsertRows = [];
-            foreach ($command->getPayload()->getAnswers() as $insertAnswer) {
-                $toInsertRows[] = [
-                    'story_question_id' => $question->id,
-                    'name' => $insertAnswer['value'],
-                    'order' => 1,
-                    'is_correct' => $insertAnswer['correct'] ? 1 : 0,
-                    'region_id' => $insertAnswer['id'],
-                    'description' => $insertAnswer['placeholder'] ?? null
-                ];
+            $payload = $command->getPayload();
+            if (count($payload->getFragments()) > 0) {
+                foreach ($payload->getFragments() as $fragment) {
+                    foreach ($fragment['placeholders'] as $placeholder) {
+                        $place = $placeholder['id'];
+                        $value = $placeholder['value'];
+                        if ($placeholder && $value) {
+                            $toInsertRows[] = [
+                                'story_question_id' => $question->id,
+                                'name' => $value,
+                                'order' => 1,
+                                'is_correct' => true,
+                                'region_id' => $fragment['id'],
+                                'description' => $place,
+                            ];
+                        }
+                    }
+                }
+            } else {
+                foreach ($command->getPayload()->getAnswers() as $insertAnswer) {
+                    $toInsertRows[] = [
+                        'story_question_id' => $question->id,
+                        'name' => $insertAnswer['value'],
+                        'order' => 1,
+                        'is_correct' => $insertAnswer['correct'] ? 1 : 0,
+                        'region_id' => $insertAnswer['id'],
+                        'description' => $insertAnswer['placeholder'] ?? null
+                    ];
+                }
             }
+
             $insertCommand = Yii::$app->db->createCommand();
             $insertCommand->batchInsert('story_test_answer', ['story_question_id', 'name', 'order', 'is_correct', 'region_id', 'description'], $toInsertRows);
             $insertCommand->execute();

@@ -81,6 +81,7 @@ class MathController extends BaseController
             'quizModel' => $testing,
             'formModel' => $createForm,
             'answers' => Json::encode([]),
+            'fragments' => Json::encode([]),
             'isGapsQuestion' => $isGapsQuestion,
         ]);
     }
@@ -102,12 +103,18 @@ class MathController extends BaseController
 
             $isInputAnswer = (bool) $createForm->inputAnswer;
 
-            $answers = Json::decode($createForm->answers);
-            foreach ($answers as $i => $answer) {
-                $answers[$i]['id'] = Uuid::uuid4()->toString();
+            $fragments = [];
+            $answers = [];
+            if ($createForm->fragments) {
+                $fragments = Json::decode($createForm->fragments);
+            } else {
+                $answers = Json::decode($createForm->answers);
+                foreach ($answers as $i => $answer) {
+                    $answers[$i]['id'] = Uuid::uuid4()->toString();
+                }
             }
 
-            $payload = new MathPayload($createForm->job, $answers, $isInputAnswer, $isGapsQuestion);
+            $payload = new MathPayload($createForm->job, $answers, $fragments, $isInputAnswer, $isGapsQuestion);
 
             try {
                 $this->createMathQuestionHandler->handle(
@@ -146,6 +153,7 @@ class MathController extends BaseController
                     'placeholder' => $answer->description,
                 ];
             }, $questionModel->storyTestAnswers)),
+            'fragments' => Json::encode($updateForm->fragments),
             'isGapsQuestion' => $isGapsQuestion,
         ]);
     }
@@ -171,22 +179,73 @@ class MathController extends BaseController
             $toInsertAnswers = [];
             $toUpdateAnswers = [];
 
-            $answers = Json::decode($updateForm->answers);
-            foreach ($answers as $i => $answer) {
-                $id = $answer['id'];
-                if ($id === '') {
-                    $answers[$i]['id'] = Uuid::uuid4()->toString();
-                    $toInsertAnswers[] = $answers[$i];
-                    continue;
+            $answers = [];
+            $fragments = [];
+
+            if ($updateForm->fragments !== '') {
+                $fragments = Json::decode($updateForm->fragments);
+                foreach ($fragments as $i => $fragment) {
+                    foreach ($fragment['placeholders'] as $j => $placeholder) {
+                        $isNew = ($placeholder['new'] ?? false) === true;
+                        if ($isNew) {
+                            unset($fragments[$i]['placeholders'][$j]['new']);
+                            $toInsertAnswers[] = $placeholder;
+                            continue;
+                        }
+                        $toUpdateAnswers[] = $placeholder;
+                    }
                 }
-                $toUpdateAnswers[] = $answer;
+            } else {
+                $answers = Json::decode($updateForm->answers);
+                foreach ($answers as $i => $answer) {
+                    $id = $answer['id'];
+                    if ($id === '') {
+                        $answers[$i]['id'] = Uuid::uuid4()->toString();
+                        $toInsertAnswers[] = $answers[$i];
+                        continue;
+                    }
+                    $toUpdateAnswers[] = $answer;
+                }
             }
 
-            $payload = (new MathPayload($updateForm->job, $answers, $isInputAnswer, $isGapsQuestion));
+            $payload = (new MathPayload($updateForm->job, $answers, $fragments, $isInputAnswer, $isGapsQuestion));
 
             try {
 
                 if (count($toInsertAnswers) > 0) {
+                    $toInsertRows = [];
+                    foreach ($toInsertAnswers as $insertAnswer) {
+                        $toInsertRows[] = [
+                            'story_question_id' => $questionModel->id,
+                            'name' => $insertAnswer['value'],
+                            'order' => 1,
+                            'is_correct' => true,
+                            'region_id' => null,
+                            'description' => $insertAnswer['id']
+                        ];
+                    }
+                    $insertCommand = Yii::$app->db->createCommand();
+                    $insertCommand->batchInsert('story_test_answer', ['story_question_id', 'name', 'order', 'is_correct', 'region_id', 'description'], $toInsertRows);
+                    $insertCommand->execute();
+                }
+
+                if (count($toUpdateAnswers) > 0) {
+                    foreach ($toUpdateAnswers as $updateAnswer) {
+                        $updateCommand = Yii::$app->db->createCommand();
+                        $updateCommand->update(
+                            'story_test_answer',
+                            [
+                                'name' => $updateAnswer['value'],
+                                //'is_correct' => $updateAnswer['correct'] ? 1 : 0,
+                                //'description' => $updateAnswer['id'] ?? null,
+                            ],
+                            ['description' => $updateAnswer['id']],
+                        );
+                        $updateCommand->execute();
+                    }
+                }
+
+                /*if (count($toInsertAnswers) > 0) {
                     $toInsertRows = [];
                     foreach ($toInsertAnswers as $insertAnswer) {
                         $toInsertRows[] = [
@@ -217,7 +276,7 @@ class MathController extends BaseController
                         );
                         $updateCommand->execute();
                     }
-                }
+                }*/
 
                 $questionModel->regions = Json::encode($payload->asArray());
                 if (!$questionModel->save()) {

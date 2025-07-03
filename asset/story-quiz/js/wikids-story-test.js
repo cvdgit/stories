@@ -1301,7 +1301,7 @@ function WikidsStoryTest(el, options) {
           $answers = that.gptQuestion.createWrapper();
           break;
         case "math_question":
-          $answers = that.mathQuestion.createWrapper();
+          $answers = that.mathQuestion.createWrapper(question);
           break;
         default:
           $answers = createAnswers(getAnswersData(question), question);
@@ -2340,10 +2340,10 @@ function WikidsStoryTest(el, options) {
           }
         )
       } else if (payload?.isGapsQuestion) {
-        that.mathQuestion.createGapsQuestion(currentQuestion, $('.question-image', currentQuestionElement))
+        that.mathQuestion.createGapsQuestion(currentQuestion, $('.math-gaps-wrap', currentQuestionElement))
         dom.nextButton.off("click").on("click", function () {
-          const answers = that.mathQuestion.userAnswers(currentQuestion, $('.question-image', currentQuestionElement))
-          nextQuestion(answers, (q, a) => that.mathQuestion.checkGapsAnswers(currentQuestion, $('.question-image', currentQuestionElement)))
+          const userAnswers = that.mathQuestion.userAnswers(currentQuestion, $('.math-gaps-wrap', currentQuestionElement))
+          nextQuestion(userAnswers, (q, a) => that.mathQuestion.checkGapsAnswers(currentQuestion, userAnswers))
         })
       } else {
         let answers = getAnswersData(currentQuestion)

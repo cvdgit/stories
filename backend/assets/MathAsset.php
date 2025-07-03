@@ -12,4 +12,8 @@ class MathAsset extends AssetBundle
     public $js = [
         '/build/math.js',
     ];
+
+    public $css = [
+        '/build/math.css',
+    ];
 }

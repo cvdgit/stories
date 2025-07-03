@@ -15,6 +15,7 @@ use yii\web\View;
  * @var MathQuestionUpdateForm $formModel
  * @var StoryTestQuestion $questionModel
  * @var string $answers
+ * @var string $fragments
  * @var bool $isGapsQuestion
  */
 
@@ -34,5 +35,6 @@ $this->params['breadcrumbs'] = [
         'testingId' => $quizModel->id,
         'action' => Url::to(['/test/math/update-handler', 'id' => $questionModel->id, 'gaps' => $isGapsQuestion ? '1': null]),
         'answers' => $answers,
+        'fragments' => $fragments,
     ]),
 ]) ?>

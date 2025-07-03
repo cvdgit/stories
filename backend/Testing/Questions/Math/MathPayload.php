@@ -15,6 +15,10 @@ class MathPayload
      */
     private $answers;
     /**
+     * @var array
+     */
+    private $fragments;
+    /**
      * @var bool
      */
     private $isInputAnswer;
@@ -23,10 +27,16 @@ class MathPayload
      */
     private $isGapsQuestion;
 
-    public function __construct(string $job, array $answers, bool $isInputAnswer, bool $isGapsQuestion)
-    {
+    public function __construct(
+        string $job,
+        array $answers,
+        array $fragments,
+        bool $isInputAnswer,
+        bool $isGapsQuestion
+    ) {
         $this->job = $job;
         $this->answers = $answers;
+        $this->fragments = $fragments;
         $this->isInputAnswer = $isInputAnswer;
         $this->isGapsQuestion = $isGapsQuestion;
     }
@@ -56,6 +66,7 @@ class MathPayload
         return [
             'job' => $this->job,
             'answers' => $this->answers,
+            'fragments' => $this->fragments,
             'isInputAnswer' => $this->isInputAnswer,
             'isGapsQuestion' => $this->isGapsQuestion,
         ];
@@ -63,6 +74,17 @@ class MathPayload
 
     public static function fromPayload(array $payload): self
     {
-        return new self($payload['job'], $payload['answers'], $payload['isInputAnswer'], $payload['isGapsQuestion']);
+        return new self(
+            $payload['job'],
+            $payload['answers'] ?? [],
+            $payload['fragments'] ?? [],
+            $payload['isInputAnswer'] ?? false,
+            $payload['isGapsQuestion'] ?? false,
+        );
+    }
+
+    public function getFragments(): array
+    {
+        return $this->fragments;
     }
 }

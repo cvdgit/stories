@@ -89,7 +89,7 @@ class StoryTestAnswer extends ActiveRecord
 
     public static function create(int $questionID, string $name, int $isCorrect, int $order = null, string $image = null): StoryTestAnswer
     {
-        $model = new self;
+        $model = new self();
         $model->story_question_id = $questionID;
         $model->name = $name;
         $model->is_correct = $isCorrect;

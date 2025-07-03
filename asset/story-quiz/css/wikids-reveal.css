@@ -2286,3 +2286,8 @@ math-field[read-only] {
     display: none;
   }
 }
+
+.math-gaps-wrap p {
+  font-weight: normal;
+  text-align: left;
+}

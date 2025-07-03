@@ -14,6 +14,7 @@ abstract class MathQuestionForm extends Model
     public $inputAnswer;
     public $inputAnswerValue;
     public $inputAnswerId;
+    public $fragments;
 
     public function rules(): array
     {
@@ -21,7 +22,7 @@ abstract class MathQuestionForm extends Model
             [['name'], 'required'],
             ['name', 'string', 'max' => 1024],
             [['job'], 'string'],
-            ['answers', 'safe'],
+            [['answers', 'fragments'], 'safe'],
             ['inputAnswer', 'boolean'],
             ['inputAnswerValue', 'string', 'max' => 512],
             ['inputAnswerId', 'string', 'max' => 36],

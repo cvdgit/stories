@@ -10,8 +10,13 @@ function MathQuestion(test) {
   this.deck = test.getDeck();
 }
 
-MathQuestion.prototype.createWrapper = function ({question, content} = {}) {
-  console.log('createWrapper', content)
+MathQuestion.prototype.createWrapper = function (question) {
+
+  const {payload} = question
+
+  if (payload.isGapsQuestion) {
+    return $(`<div class="math-gaps-wrap" style="display: flex; flex-direction: column"></div>`)
+  }
 
   var $answers = $("<div/>").addClass("wikids-test-answers");
 
@@ -77,18 +82,26 @@ MathQuestion.prototype.createInput = function (question, imageElement, answersCo
 
 MathQuestion.prototype.createGapsQuestion = function(question, imageElement) {
   const {payload} = question
+  console.log(payload)
   imageElement.empty()
-  imageElement.html(`<math-field read-only style="display:inline-block">${payload.job}</math-field>`)
+  imageElement.html(payload.job)
   return this.element
 }
 
-MathQuestion.prototype.checkGapsAnswers = function(question, elem) {
+MathQuestion.prototype.checkGapsAnswers = function(question, userAnswers) {
   const {payload} = question
-  const mf = elem.find('math-field')[0]
+
+  const userAnswer = userAnswers.reduce((total, current) => total.toString() + current.answer.toString(), '')
+  if (userAnswer.trim() === '') {
+    return false
+  }
 
   let correct = true
-  payload.answers.map(a => {
-    correct = correct && (a.value === mf.getPromptValue(a.placeholder))
+  payload.fragments.map(f => {
+    if (!f.placeholders.length) {
+      return
+    }
+    f.placeholders.map(p => correct && p.value === userAnswers.find(a => a.placeholder === p.id).answer)
   })
 
   return correct
@@ -96,10 +109,19 @@ MathQuestion.prototype.checkGapsAnswers = function(question, elem) {
 
 MathQuestion.prototype.userAnswers = function(question, elem) {
   const {payload} = question
-  const mf = elem.find('math-field')[0]
-  const answers = payload.answers.map(a => {
-    return mf.getPromptValue(a.placeholder)
+  let answers = []
+  elem.find('math-field').map((i, mf) => {
+    const fragmentId = mf.dataset.id
+    const fragment = payload.fragments.find(f => f.id === fragmentId)
+    if (!fragment.placeholders.length) {
+      return
+    }
+    answers = [...answers, ...fragment.placeholders.map(p => ({placeholder: p.id, answer: mf.getPromptValue(p.id)}))]
   })
+  const userAnswer = answers.reduce((total, current) => total.toString() + current.answer.toString(), '')
+  if (userAnswer.trim() === '') {
+    return []
+  }
   return answers
 }
 
@@ -124,7 +146,6 @@ MathQuestion.prototype.getContent = function(question) {
     el.innerHTML = `<math-field read-only style="display:inline-block">${a.name}</math-field>`
     wrap.querySelector('.math-correct-answers').appendChild(el)
   })
-
 
   return wrap
 }
