@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { SVG } from "@svgdotjs/svg.js";
 
 const SvgContainer = (props) => {
+  console.log('SvgContainer')
   const wrapper = useRef(null);
 
   useEffect(() => {
@@ -10,6 +11,7 @@ const SvgContainer = (props) => {
         let svg = SVG()
           .addTo(wrapper.current)
           .size(wrapper.current.offsetWidth, wrapper.current.offsetHeight)
+          .attr({'tabindex': '0'})
           .viewbox(0, 0, wrapper.current.offsetWidth - 10, wrapper.current.offsetHeight - 10);
         props.setHandles({ svg, container: wrapper.current });
         props.onload?.(svg, wrapper.current);
@@ -22,7 +24,7 @@ const SvgContainer = (props) => {
   if (props.height) style.height = props.height;
   if (props.width) style.width = props.width;
 
-  return <div tabIndex="0" onKeyDown={props.onKeyDown} ref={wrapper} style={style}></div>;
+  return <div id="map-container" tabIndex="0" onKeyDown={props.onKeyDown} ref={wrapper} style={style}></div>;
 }
 
 export { SvgContainer };

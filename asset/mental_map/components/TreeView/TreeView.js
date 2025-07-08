@@ -74,11 +74,17 @@ export default function TreeView({texts}) {
     if (!currentWords.length) {
       return
     }
-    dispatch({type: 'update_tree', treeData: currentNode.changeHandler(getTextBySelections(currentWords))})
+    dispatch({
+      type: 'update_tree',
+      treeData: currentNode.changeHandler(getTextBySelections(currentWords))
+    })
   }, [JSON.stringify(currentWords)]);
 
   const emitChange = (e) => {
-    dispatch({type: 'update_tree', treeData: currentNode.changeHandler(e.target.innerHTML)})
+    dispatch({
+      type: 'update_tree',
+      treeData: currentNode.changeHandler(e.target.innerHTML)
+    })
   }
 
   return (

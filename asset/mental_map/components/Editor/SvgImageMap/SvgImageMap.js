@@ -1,4 +1,4 @@
-import React, {useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import './SvgImageMap.css'
 import {useSvg, useSvgContainer} from "../../../Lib/svg-container/hook";
 import {SvgContainer} from "../../../Lib/svg-container";
@@ -10,6 +10,7 @@ import {useMentalMap} from "../../App/App";
 import DrawToggler from "./DrawToggler";
 
 let currentShape
+let svgZoom = 0.6
 
 function findBgClassName(bg) {
   if (!bg || bg === '') {
@@ -18,7 +19,7 @@ function findBgClassName(bg) {
   return `fragment-bg-${bg.toLowerCase()}`;
 }
 
-export default function SvgImageMap({mapImage, newImages}) {
+export default function SvgImageMap({mapImage, newImages, setNewImages}) {
   console.log('SvgImageMap render')
 
   const [open, setOpen] = useState(false)
@@ -29,6 +30,17 @@ export default function SvgImageMap({mapImage, newImages}) {
   const [drawMode, setDrawMode] = useState(false)
 
   const {setHandles, svgContainer} = useSvgContainer();
+
+  useEffect(() => {
+    const {width: mapImageWidth, height: mapImageHeight} = mapImage
+    const {width, height} = document.getElementById('map-container').getBoundingClientRect()
+    if (mapImageWidth > mapImageHeight) {
+      svgZoom = width / mapImageWidth
+    } else {
+      svgZoom = height / mapImageHeight
+    }
+    svgZoom -= 0.05
+  }, []);
 
   function attachShapeEvents(shape, item) {
     shape.on('dragend', e => {
@@ -64,7 +76,6 @@ export default function SvgImageMap({mapImage, newImages}) {
   }
 
   const onload = (svg, container) => {
-    console.log('SvgImageMap load')
 
     const wrapGroup = svg.group()
     wrapGroup.attr({
@@ -101,19 +112,23 @@ export default function SvgImageMap({mapImage, newImages}) {
       svg.panZoom(false)
     } else {
       svg.panZoom({
-        zoomFactor: 1,
+        zoomFactor: 0.1,
         zoomMin: 0.25,
         zoomMax: 2,
         margins: {left: 10, top: 10, right: 10, bottom: 10}
       });
-      svg.zoom(.5, {x: 10, y: 10})
+      svg.zoom(svgZoom, {x: 10, y: 10})
     }
+
+    svg.off('zoom').on('zoom', (ev) => {
+      const {level} = ev.detail
+      svgZoom = level
+    })
 
     const wrap = svg.find('#schemeWrap')
 
     svg
       .on('mousedown.map', e => {
-        console.log('mousedown')
 
         svg.find('.map-fragment').map(shape => shape.select(false).draggable(false))
         if (currentFragment) {
@@ -138,6 +153,8 @@ export default function SvgImageMap({mapImage, newImages}) {
             const shape = createRectShape(svg.rect(), uuidv4())
             shape.draw(e)
             currentShape = shape
+          } else {
+            setCurrentFragment(null)
           }
         }
       })
@@ -180,6 +197,7 @@ export default function SvgImageMap({mapImage, newImages}) {
           })
         }
         currentShape = null
+        setCurrentFragment(null)
       })
 
     return [];
@@ -190,7 +208,12 @@ export default function SvgImageMap({mapImage, newImages}) {
     const wrap = svg.find('#schemeWrap')
     newImages.map(id => {
       const item = mapImage.images.find(i => i.id === id)
-      const shape = createImageShape(wrap.image(item.url), item.id)
+      let shape;
+      if (item.url) {
+        shape = createImageShape(wrap.image(item.url), item.id)
+      } else {
+        shape = createRectShape(wrap.rect(), item.id, item.bg)
+      }
       shape.size(item.width, item.height)
       shape.move(item.left, item.top)
       attachShapeEvents(shape, item)
@@ -226,26 +249,44 @@ export default function SvgImageMap({mapImage, newImages}) {
   return (
     <>
       <div style={{margin: '20px 0'}}>
-        <DrawToggler onChangeHandler={(value) => setDrawMode(value !== 'move')} />
-      </div>
-      <div style={{height: '100%'}}>
-        <SvgContainer onKeyDown={(e) => {
-          if (e.keyCode === 46) {
-            if (confirm('Подтверждаете удаление?')) {
-              if (currentFragment) {
-                currentFragment
-                  .select(false)
-                  .draggable(false)
-                  .remove()
-                dispatch({
-                  type: 'remove_image_from_mental_map',
-                  imageId: currentFragment.attr('data-id'),
-                })
-                setCurrentFragment(null)
-              }
+        <DrawToggler
+          currentFragment={currentFragment}
+          onChangeHandler={(value) => setDrawMode(value !== 'move')}
+          onDeleteHandler={(e) => {
+            if (currentFragment && confirm('Подтверждаете удаление?')) {
+              currentFragment
+                .select(false)
+                .draggable(false)
+                .remove()
+              dispatch({
+                type: 'remove_image_from_mental_map',
+                imageId: currentFragment.attr('data-id'),
+              })
+              setCurrentFragment(null)
             }
-          }
-        }} setHandles={setHandles} width='100%' height='100%' margin='0 auto' onload={onload}/>
+          }}
+          onCopyHandler={(e) => {
+            if (currentFragment) {
+              const shape = SVG(currentFragment)
+              const im = {...state.map.images.find(i => i.id === shape.attr('data-id'))}
+              im.id = uuidv4()
+              im.left += 20
+              im.top += 20
+
+              dispatch({
+                type: 'add_image_to_mental_map',
+                payload: im
+              })
+
+              setNewImages(prevState => {
+                return [...prevState, im.id]
+              })
+            }
+          }}
+        />
+      </div>
+      <div style={{flex: '1'}}>
+        <SvgContainer onKeyDown={() => alert('123')} setHandles={setHandles} width='100%' height='100%' margin='0 auto' onload={onload}/>
       </div>
       <CSSTransition
         in={open}

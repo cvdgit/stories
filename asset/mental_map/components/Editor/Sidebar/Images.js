@@ -4,6 +4,7 @@ import Image from "./Image";
 import {useImages, useMentalMap} from "../../App/App";
 import {v4 as uuidv4} from 'uuid'
 import api from "../../../Api";
+import {formatTextWithLineNumbers} from "../../../Lib";
 
 function shuffle(array) {
   let counter = array.length;
@@ -76,13 +77,8 @@ export default function Images({setNewImages}) {
   }
 
   const moveSelectedImageHandler = () => {
-
-    const texts = (state.text || '')
-      .split("\n\n")
-      .filter(p => p !== '')
-
+    const texts = formatTextWithLineNumbers(state.text || '')
     const imagesToAdd = [...selectedImages]
-
     if (imagesToAdd.length === 0) {
       let imgNum = state.map.images.length
       if (imgNum < texts.length) {
