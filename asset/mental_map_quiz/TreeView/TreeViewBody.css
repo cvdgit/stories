@@ -172,7 +172,43 @@
 }
 
 .node-row[data-level='1'] .node-body {
-  padding-left: 30px;
+  padding-left: 20px;
+}
+
+.node-row[data-level='2'] .node-body {
+  padding-left: calc(20px * 2);
+}
+
+.node-row[data-level='3'] .node-body {
+  padding-left: calc(20px * 3);
+}
+
+.node-row[data-level='4'] .node-body {
+  padding-left: calc(20px * 4);
+}
+
+.node-row[data-level='5'] .node-body {
+  padding-left: calc(20px * 5);
+}
+
+.node-row[data-level='6'] .node-body {
+  padding-left: calc(20px * 6);
+}
+
+.node-row[data-level='7'] .node-body {
+  padding-left: calc(20px * 7);
+}
+
+.node-row[data-level='8'] .node-body {
+  padding-left: calc(20px * 8);
+}
+
+.node-row[data-level='9'] .node-body {
+  padding-left: calc(20px * 9);
+}
+
+.node-row[data-level='10'] .node-body {
+  padding-left: calc(20px * 10);
 }
 
 .retelling-status {
