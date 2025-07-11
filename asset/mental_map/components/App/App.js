@@ -57,7 +57,7 @@ export default function App({mentalMapId}) {
             <div>
               <Toolbar
                 mentalMapId={mentalMapId}
-                title={state.name}
+                currentTitle={state.name}
                 schedules={schedules}
                 setFormattedMapText={setFormattedMapText}
               />

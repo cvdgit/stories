@@ -103,6 +103,14 @@ class MentalMap extends ActiveRecord
         $this->payload = $payload;
     }
 
+    public function updateMapTitle(string $title): void
+    {
+        $payload = $this->payload;
+        $payload['name'] = $title;
+        $this->payload = $payload;
+        $this->name = $title;
+    }
+
     public function updateSettings(array $settings): void
     {
         $payload = $this->payload;
