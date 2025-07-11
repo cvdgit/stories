@@ -28,13 +28,6 @@ export default function TreeVoiceControl(
             </div>
         </div>`
 
-  /*if (voiceResponse.getStatus()) {
-    const ring = document.createElement('div')
-    ring.classList.add('pulse-ring')
-    elem.querySelector('.question-voice__inner').insertBefore(ring, elem.querySelector('.gn'))
-    elem.querySelector('.gn').classList.add('recording')
-  }*/
-
   /** @type {MediaRecorder|null} */
   let mediaRecorder
   /** @type {MediaStream|null} */
@@ -93,27 +86,6 @@ export default function TreeVoiceControl(
 
       })
       .catch(error => console.log('error', error))
-
-    /*if (voiceResponse.getStatus()) {
-      voiceResponse.stop((args) => {
-        elem.querySelector('.gn').classList.remove('recording')
-        elem.querySelector('.pulse-ring').remove()
-        stopClickHandler(e.target)
-      })
-    } else {
-      if (startClickHandler(e.target) === false) {
-        return
-      }
-      setTimeout(() => {
-        voiceResponse.start(new Event('voiceResponseStart'), 'ru-RU', function () {
-          const ring = document.createElement('div')
-          ring.classList.add('pulse-ring')
-          elem.querySelector('.question-voice__inner').insertBefore(ring, elem.querySelector('.gn'))
-          elem.querySelector('.gn').classList.add('recording')
-        });
-      }, 500);
-    }*/
-
   })
 
   return elem

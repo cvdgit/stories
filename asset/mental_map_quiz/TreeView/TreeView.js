@@ -1,16 +1,22 @@
 import TreeViewBody from "./TreeViewBody";
 
 /**
+ * @typedef {Object} Settings
+ * @property {boolean} [planTreeView]
+ */
+
+/**
  * @param id
  * @param name
  * @param tree
  * @param history
  * @param {{story_id: number|null, slide_id: number|null, mental_map_id: string, threshold: number}} params
+ * @param {Settings} settings
  * @param {VoiceResponse} voiceResponse
  * @returns {HTMLDivElement}
  * @constructor
  */
-export default function TreeView({id, name, tree, history, params}, voiceResponse) {
+export default function TreeView({id, name, tree, history, params, settings}, voiceResponse) {
 
   const wrap = document.createElement('div')
   wrap.style.display = 'flex'
@@ -61,7 +67,8 @@ export default function TreeView({id, name, tree, history, params}, voiceRespons
         }
       })
       wrap.appendChild(elem.getElement())
-    }
+    },
+    Boolean(settings.planTreeView)
   )
   wrap.appendChild(body.getElement())
 

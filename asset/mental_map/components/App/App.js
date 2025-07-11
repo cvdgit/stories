@@ -8,6 +8,7 @@ import ImagesReducer from "../../Lib/ImagesReducer";
 import TreeView from "../TreeView";
 import Toolbar from "../Toolbar";
 import {formatTextWithLineNumbers} from "../../Lib";
+import PlanTreeView from "../PlanTreeView";
 
 export const MentalMapContext = createContext({});
 export const ImagesContext = createContext({});
@@ -62,7 +63,7 @@ export default function App({mentalMapId}) {
               />
             </div>
             {isTreeView
-              ? <TreeView texts={formattedMapText}/>
+              ? state?.settings?.planTreeView ? <PlanTreeView texts={formattedMapText}/> : <TreeView texts={formattedMapText}/>
               : <ImagesContext.Provider value={imagesContext}>
                 {<Editor/>}
               </ImagesContext.Provider>}

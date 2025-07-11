@@ -21,17 +21,20 @@ const nodeStatusFailedHtml = `
 </svg></div>
 `
 
-function createRow(node, level = 0) {
+function createRow(node, level = 0, isPlanTreeView = false) {
 
   const row = document.createElement('div')
   row.dataset.nodeId = node.id
   row.dataset.level = node.level
   row.classList.add('node-row')
-  if (node.level > 0) {
-    row.classList.add('d-none')
-  }
-  if (node.hasChildren) {
-    row.classList.add('node-has-children')
+
+  if (!isPlanTreeView) {
+    if (node.level > 0) {
+      row.classList.add('d-none')
+    }
+    if (node.hasChildren) {
+      row.classList.add('node-has-children')
+    }
   }
 
   row.innerHTML = `<div class="node-status"></div>
@@ -60,10 +63,11 @@ function createRow(node, level = 0) {
     }
   })
 
-  if (node.hasChildren) {
-    const childToggle = document.createElement('div')
-    childToggle.classList.add('node-children-toggle')
-    childToggle.innerHTML = `
+  if (!isPlanTreeView) {
+    if (node.hasChildren) {
+      const childToggle = document.createElement('div')
+      childToggle.classList.add('node-children-toggle')
+      childToggle.innerHTML = `
 <svg style="pointer-events: none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="chevron-down">
   <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
 </svg>
@@ -71,39 +75,47 @@ function createRow(node, level = 0) {
   <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
 </svg>
 `
-    childToggle.addEventListener('click', e => {
-      e.target.classList.toggle('show-children')
-      const parentLevel = row.dataset.level
-      const nextLevel = Number(parentLevel) + 1
-      let childRow = row.nextSibling
-      while (childRow) {
-        if (childRow.dataset.level === nextLevel.toString()) {
-          childRow.classList.toggle('d-none')
-        } else {
-          break
+      childToggle.addEventListener('click', e => {
+        e.target.classList.toggle('show-children')
+        const parentLevel = row.dataset.level
+        const nextLevel = Number(parentLevel) + 1
+        let childRow = row.nextSibling
+        while (childRow) {
+          if (childRow.dataset.level === nextLevel.toString()) {
+            childRow.classList.toggle('d-none')
+          } else {
+            break
+          }
+          childRow = childRow.nextSibling
         }
-        childRow = childRow.nextSibling
-      }
-    })
-    row.querySelector('.node-body').appendChild(childToggle)
+      })
+      row.querySelector('.node-body').appendChild(childToggle)
+    }
   }
 
   return row;
 }
 
+function ItemWrapper(listItem, {isPlanTreeView}) {
+  return {
+    getTargetText() {
+      return isPlanTreeView ? listItem.description : listItem.title
+    }
+  }
+}
+
 function processTreeNodes(list, body, history, voiceResponse, params, onEndHandler, dispatchEvent) {
-  console.log('processTreeNodes', history)
 
   let showVoiceControl = false
 
   for (const listItem of list) {
+    const listItemWrapper = new ItemWrapper(listItem, {isPlanTreeView: params.isPlanTreeView})
 
     const rowElement = body.querySelector(`.node-row[data-node-id='${listItem.id}']`)
     const nodeId = rowElement.dataset.nodeId
     const historyItem = history.find(i => i.id === nodeId)
 
     if (historyItem && historyItem.pending) {
-      console.log('pending')
       continue
     }
 
@@ -117,7 +129,6 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
     }
 
     if (historyItem && historyItem.repeat) {
-      console.log('repeat')
       nodeStatusElement.innerHTML = nodeStatusFailedHtml
     }
 
@@ -126,7 +137,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
       statusElem.addEventListener('click', e => {
         const nodeId = e.target.closest('.node-row').dataset.nodeId
         const item = history.find(i => i.id === nodeId)
-        const content = createRetellingFeedbackContent(listItem.title, item.user_response, item.json)
+        const content = createRetellingFeedbackContent(listItemWrapper.getTargetText(), item.user_response, item.json)
         rowElement.closest('.mental-map').appendChild(content)
       })
     }
@@ -231,7 +242,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
             historyItem.user_response = text
 
             const similarityPercentage = calcSimilarityPercentage(
-              removePunctuation(stripTags(listItem.title).toLowerCase().trim()),
+              removePunctuation(stripTags(listItemWrapper.getTargetText()).toLowerCase().trim()),
               removePunctuation(stripTags(text).toLowerCase().trim())
             )
 
@@ -275,11 +286,11 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
                 .addEventListener('click', e => {
                   const nodeId = e.target.closest('.node-row').dataset.nodeId
                   const item = history.find(i => i.id === nodeId)
-                  const content = createRetellingFeedbackContent(listItem.title, item.user_response, item.json)
+                  const content = createRetellingFeedbackContent(listItemWrapper.getTargetText(), item.user_response, item.json)
                   rowElement.closest('.mental-map').appendChild(content)
                 })*/
 
-              const wordItems = createWordItem(listItem.title, listItem.id)
+              const wordItems = createWordItem(listItemWrapper.getTargetText(), listItem.id)
               wordItems.words = [...wordItems.words].map(w => {
                 if (w.type === 'word' && w.target === true) {
                   w.hidden = true
@@ -312,8 +323,8 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
               retellingResponseSpan.innerText = ''
               sendMessage(`/admin/index.php?r=gpt/stream/retelling-tree`, {
                   userResponse: resultSpan.innerText,
-                  slideTexts: stripTags(listItem.title),
-                  importantWords: $(`<div>${listItem.title}</div>`)
+                  slideTexts: stripTags(listItemWrapper.getTargetText()),
+                  importantWords: $(`<div>${listItemWrapper.getTargetText()}</div>`)
                     .find('span.target-text')
                     .map((i, el) => removePunctuation($(el).text()))
                     .get()
@@ -384,11 +395,11 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
                     .addEventListener('click', e => {
                       const nodeId = e.target.closest('.node-row').dataset.nodeId
                       const item = history.find(i => i.id === nodeId)
-                      const content = createRetellingFeedbackContent(listItem.title, item.user_response, item.json)
+                      const content = createRetellingFeedbackContent(listItemWrapper.getTargetText(), item.user_response, item.json)
                       rowElement.closest('.mental-map').appendChild(content)
                     })*/
 
-                  const wordItems = createWordItem(listItem.title, listItem.id)
+                  const wordItems = createWordItem(listItemWrapper.getTargetText(), listItem.id)
                   wordItems.words = [...wordItems.words].map(w => {
                     if (w.type === 'word' && w.target === true) {
                       w.hidden = true
@@ -427,6 +438,9 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
           })
           .catch(function (error) {
             console.error("Error sending audio data to server:", error);
+            console.log(error)
+            rowElement.closest('.mental-map').appendChild(createNotify(error))
+            backdrop.remove()
             return false;
           });
 
@@ -460,13 +474,13 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
 }
 
 function flatten(nodes, level = 0) {
-  return nodes.flatMap(({id, title, children}, index) => [
-    {id, title, level, index, hasChildren: (children || []).length > 0},
-    ...flatten(children || [], level + 1)
+  return nodes.flatMap((node, index) => [
+    {...node, level, index, hasChildren: (node.children || []).length > 0},
+    ...flatten(node.children || [], level + 1)
   ])
 }
 
-export default function TreeViewBody(tree, voiceResponse, history, params, onEndHandler) {
+export default function TreeViewBody(tree, voiceResponse, history, params, onEndHandler, isPlanTreeView) {
 
   const init = () => {
     const body = document.createElement('div')
@@ -483,13 +497,15 @@ export default function TreeViewBody(tree, voiceResponse, history, params, onEnd
 
   let body = init()
 
+  params.isPlanTreeView = isPlanTreeView
+
   return {
     getElement() {
       return body
     },
     init() {
       const list = flatten(tree)
-      list.map(node => body.appendChild(createRow(node)))
+      list.map(node => body.appendChild(createRow(node, 0, isPlanTreeView)))
       processTreeNodes(list, body, history, voiceResponse, params, onEndHandler, dispatchEvent)
     },
     restart() {

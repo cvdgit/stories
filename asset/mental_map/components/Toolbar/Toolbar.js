@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import TextDialog from "./TextDialog";
 import SettingsDialog from "./SettingsDialog";
 
-export default function Toolbar({title, mentalMapId, schedules, setFormattedMapText}) {
+export default function Toolbar({title, mentalMapId, schedules, setFormattedMapText, isTreeView}) {
   const [textDialogOpen, setTextDialogOpen] = useState(false)
   const [settingsDialogOpen, setSettingsDialogOpen] = useState(false)
   const [textFragmentCount, setTextFragmentCount] = useState(0)
@@ -36,7 +36,12 @@ export default function Toolbar({title, mentalMapId, schedules, setFormattedMapT
         open={textDialogOpen} setOpen={setTextDialogOpen}
         setFormattedMapTextGlobal={setFormattedMapText}
       />
-      <SettingsDialog schedules={schedules} mentalMapId={mentalMapId} open={settingsDialogOpen} setOpen={setSettingsDialogOpen} />
+      <SettingsDialog
+        schedules={schedules}
+        mentalMapId={mentalMapId}
+        open={settingsDialogOpen}
+        setOpen={setSettingsDialogOpen}
+      />
     </div>
   )
 }

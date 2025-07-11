@@ -544,7 +544,8 @@ export default function MentalMap(element, deck, params) {
           mental_map_id: params.mentalMapId,
           repetition_mode: repetitionMode,
           threshold
-        }
+        },
+        settings: json.settings || {}
       }, new VoiceResponse(new MissingWordsRecognition({}))))
 
       $('[data-toggle="tooltip"]', this.element).tooltip({

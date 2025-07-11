@@ -7,9 +7,12 @@ import {useMentalMap} from "../../App/App";
 export default function SettingsDialog({open, setOpen, mentalMapId, schedules}) {
   const settingsDialogRef = useRef();
   const checkId = useId();
+  const planCheckId = useId();
   const {state, dispatch} = useMentalMap();
   const isFirstRender = useRef(true);
   const [settings, setSettings] = useState(state?.settings || {});
+
+  const isTreeView = Boolean(state.treeView)
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -37,7 +40,7 @@ export default function SettingsDialog({open, setOpen, mentalMapId, schedules}) 
       <Dialog nodeRef={settingsDialogRef} hideHandler={() => setOpen(false)} style={{width: '60rem'}}>
         <h2 className="dialog-heading">Настройки</h2>
         <div style={{padding: '20px 0'}}>
-          <div style={{marginBlock: '20px'}}>
+          {!isTreeView && <div style={{marginBlock: '20px'}}>
             <label htmlFor={checkId}>
               <input
                 id={checkId}
@@ -52,7 +55,23 @@ export default function SettingsDialog({open, setOpen, mentalMapId, schedules}) 
                 checked={Boolean(state?.settings?.imageFirst)}
                 type="checkbox"
               /> При прохождении показывать изображение ментальной карты</label>
-          </div>
+          </div>}
+          {isTreeView && <div style={{marginBlock: '20px'}}>
+            <label htmlFor={planCheckId}>
+              <input
+                id={planCheckId}
+                onChange={(e) => {
+                  settings.planTreeView = !Boolean(state?.settings?.planTreeView)
+                  setSettings(settings)
+                  dispatch({
+                    type: 'update_settings',
+                    payload: settings
+                  })
+                }}
+                checked={Boolean(state?.settings?.planTreeView)}
+                type="checkbox"
+              /> Ментальная карта в виде плана</label>
+          </div>}
           <div style={{marginBottom: '20px'}}>
             <select value={String(state?.settings?.scheduleId)} onChange={(e) => {
               settings.scheduleId = e.target.value === '' ? null : Number(e.target.value)
