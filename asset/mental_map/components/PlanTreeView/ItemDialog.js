@@ -17,6 +17,7 @@ export default function ItemDialog({open, setOpen, currentNode, currentTitle, cu
 
   const emitChange = (e) => {
     setDescription(e.target.value)
+    setCurrentDescription(e.target.value)
   }
 
   useEffect(() => {
