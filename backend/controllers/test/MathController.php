@@ -176,6 +176,7 @@ class MathController extends BaseController
 
             $toInsertAnswers = [];
             $toUpdateAnswers = [];
+            $toDeleteAnswers = [];
 
             $answers = [];
             $fragments = [];
@@ -194,6 +195,14 @@ class MathController extends BaseController
                     }
                 }
             } else {
+
+                $existsAnswersIds = array_map(static function(StoryTestAnswer $a): array {
+                    return [
+                        'id' => $a->region_id ?? $a->description,
+                        'answer_id' => $a->id,
+                    ];
+                }, $questionModel->storyTestAnswers);
+
                 $answers = Json::decode($updateForm->answers);
                 foreach ($answers as $i => $answer) {
                     $id = $answer['id'];
@@ -203,6 +212,15 @@ class MathController extends BaseController
                         continue;
                     }
                     $toUpdateAnswers[] = $answer;
+                    $existsAnswersIds = array_filter($existsAnswersIds, static function(array $existsItem) use ($id): bool {
+                        return $existsItem['id'] !== $id;
+                    });
+                }
+
+                if (count($existsAnswersIds) > 0) {
+                    $toDeleteAnswers = array_map(static function(array $el): int {
+                        return $el['answer_id'];
+                    }, $existsAnswersIds);
                 }
             }
 
@@ -210,71 +228,84 @@ class MathController extends BaseController
 
             try {
 
-                if (count($toInsertAnswers) > 0) {
-                    $toInsertRows = [];
-                    foreach ($toInsertAnswers as $insertAnswer) {
-                        $toInsertRows[] = [
-                            'story_question_id' => $questionModel->id,
-                            'name' => $insertAnswer['value'],
-                            'order' => 1,
-                            'is_correct' => true,
-                            'region_id' => null,
-                            'description' => $insertAnswer['id']
-                        ];
-                    }
-                    $insertCommand = Yii::$app->db->createCommand();
-                    $insertCommand->batchInsert('story_test_answer', ['story_question_id', 'name', 'order', 'is_correct', 'region_id', 'description'], $toInsertRows);
-                    $insertCommand->execute();
-                }
-
-                if (count($toUpdateAnswers) > 0) {
-                    foreach ($toUpdateAnswers as $updateAnswer) {
-                        $updateCommand = Yii::$app->db->createCommand();
-                        $updateCommand->update(
+                if (!empty($updateForm->fragments)) {
+                    if (count($toInsertAnswers) > 0) {
+                        $toInsertRows = [];
+                        foreach ($toInsertAnswers as $insertAnswer) {
+                            $toInsertRows[] = [
+                                'story_question_id' => $questionModel->id,
+                                'name' => $insertAnswer['value'],
+                                'order' => 1,
+                                'is_correct' => true,
+                                'region_id' => $insertAnswer['id'],
+                                'description' => $insertAnswer['placeholder'],
+                            ];
+                        }
+                        $insertCommand = Yii::$app->db->createCommand();
+                        $insertCommand->batchInsert(
                             'story_test_answer',
-                            [
-                                'name' => $updateAnswer['value'],
-                                //'is_correct' => $updateAnswer['correct'] ? 1 : 0,
-                                //'description' => $updateAnswer['id'] ?? null,
-                            ],
-                            ['description' => $updateAnswer['id']],
+                            ['story_question_id', 'name', 'order', 'is_correct', 'region_id', 'description'],
+                            $toInsertRows
                         );
-                        $updateCommand->execute();
+                        $insertCommand->execute();
+                    }
+
+                    /*if (count($toUpdateAnswers) > 0) {
+                        foreach ($toUpdateAnswers as $updateAnswer) {
+                            $updateCommand = Yii::$app->db->createCommand();
+                            $updateCommand->update(
+                                'story_test_answer',
+                                [
+                                    'name' => $updateAnswer['value'],
+                                    //'is_correct' => $updateAnswer['correct'] ? 1 : 0,
+                                    //'description' => $updateAnswer['id'] ?? null,
+                                ],
+                                ['region_id' => $updateAnswer['id']],
+                            );
+                            $updateCommand->execute();
+                        }
+                    }*/
+                } else {
+
+                    if (count($toInsertAnswers) > 0) {
+                        $toInsertRows = [];
+                        foreach ($toInsertAnswers as $insertAnswer) {
+                            $toInsertRows[] = [
+                                'story_question_id' => $questionModel->id,
+                                'name' => $insertAnswer['value'],
+                                'order' => 1,
+                                'is_correct' => $insertAnswer['correct'] ? 1 : 0,
+                                'region_id' => $insertAnswer['id'],
+                                'description' => $insertAnswer['placeholder'] ?? null
+                            ];
+                        }
+                        $insertCommand = Yii::$app->db->createCommand();
+                        $insertCommand->batchInsert('story_test_answer', ['story_question_id', 'name', 'order', 'is_correct', 'region_id', 'description'], $toInsertRows);
+                        $insertCommand->execute();
+                    }
+
+                    if (count($toUpdateAnswers) > 0) {
+                        foreach ($toUpdateAnswers as $updateAnswer) {
+                            $updateCommand = Yii::$app->db->createCommand();
+                            $updateCommand->update(
+                                'story_test_answer',
+                                [
+                                    'name' => $updateAnswer['value'],
+                                    'is_correct' => $updateAnswer['correct'] ? 1 : 0,
+                                    'description' => $updateAnswer['placeholder'] ?? null,
+                                ],
+                                ['region_id' => $updateAnswer['id']],
+                            );
+                            $updateCommand->execute();
+                        }
+                    }
+
+                    if (count($toDeleteAnswers) > 0) {
+                        $deleteCommand = Yii::$app->db->createCommand();
+                        $deleteCommand->delete('story_test_answer', 'story_question_id = '. $questionModel->id. ' AND id IN ('.implode(',', $toDeleteAnswers).')');
+                        $deleteCommand->execute();
                     }
                 }
-
-                /*if (count($toInsertAnswers) > 0) {
-                    $toInsertRows = [];
-                    foreach ($toInsertAnswers as $insertAnswer) {
-                        $toInsertRows[] = [
-                            'story_question_id' => $questionModel->id,
-                            'name' => $insertAnswer['value'],
-                            'order' => 1,
-                            'is_correct' => $insertAnswer['correct'] ? 1 : 0,
-                            'region_id' => $insertAnswer['id'],
-                            'description' => $insertAnswer['placeholder'] ?? null
-                        ];
-                    }
-                    $insertCommand = Yii::$app->db->createCommand();
-                    $insertCommand->batchInsert('story_test_answer', ['story_question_id', 'name', 'order', 'is_correct', 'region_id', 'description'], $toInsertRows);
-                    $insertCommand->execute();
-                }
-
-                if (count($toUpdateAnswers) > 0) {
-                    foreach ($toUpdateAnswers as $updateAnswer) {
-                        $updateCommand = Yii::$app->db->createCommand();
-                        $updateCommand->update(
-                            'story_test_answer',
-                            [
-                                'name' => $updateAnswer['value'],
-                                'is_correct' => $updateAnswer['correct'] ? 1 : 0,
-                                'description' => $updateAnswer['placeholder'] ?? null,
-                            ],
-                            ['region_id' => $updateAnswer['id']],
-                        );
-                        $updateCommand->execute();
-                    }
-                }*/
 
                 $questionModel->regions = Json::encode($payload->asArray());
                 if (!$questionModel->save()) {
