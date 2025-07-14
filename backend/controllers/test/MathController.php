@@ -20,9 +20,7 @@ use Exception;
 use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\base\InvalidConfigException;
-use yii\db\Query;
 use yii\filters\AccessControl;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
@@ -182,7 +180,7 @@ class MathController extends BaseController
             $answers = [];
             $fragments = [];
 
-            if ($updateForm->fragments !== '') {
+            if (!empty($updateForm->fragments)) {
                 $fragments = Json::decode($updateForm->fragments);
                 foreach ($fragments as $i => $fragment) {
                     foreach ($fragment['placeholders'] as $j => $placeholder) {
@@ -305,7 +303,7 @@ class MathController extends BaseController
         $questionId = $payload['questionId'] ?? null;
         $answerId = $payload['answerId'] ?? null;
         if (!$questionId || !$answerId) {
-            throw new BadRequestHttpException();
+            throw new BadRequestHttpException('No ids');
         }
         $answer = StoryTestAnswer::findAnswerByRegionId($answerId);
         if ($answer === null) {
