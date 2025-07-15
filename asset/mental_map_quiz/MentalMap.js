@@ -14,7 +14,7 @@ import {calcHiddenTextPercent, calcTargetTextPercent, canRecording, createWordIt
 import DetailContent from "./content/DetailContent";
 import {processOutputAsJson, stripTags} from "./common";
 import FragmentResultQuestionsElement from "./content/FragmentResultQuestionsElement";
-import {calcSimilarityPercentage} from "./lib/calcSimilarity";
+import {calcSimilarityPercentage, SimilarityChecker} from "./lib/calcSimilarity";
 
 /**
  * @param element
@@ -918,8 +918,8 @@ export default function MentalMap(element, deck, params) {
         const userResponse = $resultSpan.text().trim()
         if (userResponse.length && makeRewrite) {
 
-          const similarityPercentage = calcSimilarityPercentage(removePunctuation(text.toLowerCase()).trim(), removePunctuation(userResponse.toLowerCase()).trim())
-          if (similarityPercentage >= threshold) {
+          const similarityChecker = new SimilarityChecker(threshold)
+          if (similarityChecker.check(text, userResponse)) {
             if (typeof stopHandler === 'function') {
               stopHandler()
             }
@@ -1103,7 +1103,15 @@ export default function MentalMap(element, deck, params) {
       $(document.getElementById('voice-finish')).show()
     }
 
-    const similarityPercentage = calcSimilarityPercentage(
+    const similarityChecker = new SimilarityChecker(threshold)
+    if (similarityChecker.check(targetText, userResponse)) {
+      onMessage(`{"overall_similarity": ${similarityChecker.getSimilarityPercentage()}}`)
+      onEnd()
+      return new Promise((resolve, reject) => {
+        resolve({})
+      })
+    }
+    /*const similarityPercentage = calcSimilarityPercentage(
       removePunctuation(targetText.toLowerCase()).trim(),
       removePunctuation(userResponse.toLowerCase()).trim()
     )
@@ -1113,7 +1121,7 @@ export default function MentalMap(element, deck, params) {
       return new Promise((resolve, reject) => {
         resolve({})
       })
-    }
+    }*/
 
     return await sendMessage(`/admin/index.php?r=gpt/stream/retelling`, {
       userResponse,

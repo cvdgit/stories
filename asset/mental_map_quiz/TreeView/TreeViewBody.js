@@ -3,7 +3,7 @@ import TreeVoiceControl from "./TreeVoiceControl";
 import sendMessage from "../lib/sendMessage";
 import {calcHiddenTextPercent, createWordItem} from "../words";
 import {processOutputAsJson, stripTags} from "../common";
-import {calcSimilarityPercentage} from "../lib/calcSimilarity";
+import {allImportantWordsIncluded, calcSimilarityPercentage, SimilarityChecker} from "../lib/calcSimilarity";
 
 const nodeStatusSuccessHtml = `
 <div class="retelling-status-show"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -109,7 +109,8 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
   let showVoiceControl = false
 
   for (const listItem of list) {
-    const listItemWrapper = new ItemWrapper(listItem, {isPlanTreeView: params.isPlanTreeView})
+    const listItemWrapper = new ItemWrapper(listItem, {isPlanTreeView: params.isPlanTreeView});
+    const similarityChecker = new SimilarityChecker(params.threshold)
 
     const rowElement = body.querySelector(`.node-row[data-node-id='${listItem.id}']`)
     const nodeId = rowElement.dataset.nodeId
@@ -241,15 +242,10 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
 
             historyItem.user_response = text
 
-            const similarityPercentage = calcSimilarityPercentage(
-              removePunctuation(stripTags(listItemWrapper.getTargetText()).toLowerCase().trim()),
-              removePunctuation(stripTags(text).toLowerCase().trim())
-            )
-
-            if (similarityPercentage >= params.threshold) {
+            if (similarityChecker.check(listItemWrapper.getTargetText(), text)) {
               console.log('sim ok')
 
-              retellingResponseSpan.innerText = `{"similarity_percentage": ${similarityPercentage}, "all_important_words_included": true, "user_response": "${text}"}`
+              retellingResponseSpan.innerText = `{"similarity_percentage": ${similarityChecker.getSimilarityPercentage()}, "all_important_words_included": true, "user_response": "${text}"}`
 
               const content = rowElement.querySelector('.node-title').innerHTML
               backdrop.remove()
