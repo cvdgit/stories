@@ -1,15 +1,17 @@
 import Dialog from "../Dialog";
-import React, {useEffect, useId, useRef, useState} from "react";
+import React, {forwardRef, useEffect, useId, useRef, useState} from "react";
 import {createWordsFormText, getTextBySelections} from "../Selection";
 import {useMentalMap} from "../App/App";
 
-export default function ImageDialog({
-                                      ref,
-                                      setOpen,
-                                      currentImageItem,
-                                      changeBgHandler,
-                                      changeMakeTransparentHandler
-                                    }) {
+const ImageDialog = forwardRef(function ImageDialog(props, ref) {
+
+  const {
+    setOpen,
+    currentImageItem,
+    changeBgHandler,
+    changeMakeTransparentHandler
+  } = props
+
   const textRef = useRef()
   const selectionRef = useRef()
   const [selectionMode, setSelectionMode] = useState(false)
@@ -79,10 +81,10 @@ export default function ImageDialog({
                     overflowY: 'auto'
                   }}
                 >
-                  {currentWords.map(word => {
+                  {currentWords.map((word, i) => {
                     const {type} = word
                     if (type === 'break') {
-                      return (<div key={word.id} className="line-sep"></div>)
+                      return (<div key={i} className="line-sep"></div>)
                     }
                     return (
                       <span
@@ -163,4 +165,6 @@ export default function ImageDialog({
       )}
     </Dialog>
   )
-}
+})
+
+export default ImageDialog;

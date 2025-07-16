@@ -24,7 +24,7 @@ const SvgContainer = (props) => {
   if (props.height) style.height = props.height;
   if (props.width) style.width = props.width;
 
-  return <div id="map-container" tabIndex="0" onKeyDown={props.onKeyDown} ref={wrapper} style={style}></div>;
+  return <div id="map-container" tabIndex="0" ref={wrapper} style={style}></div>;
 }
 
 export { SvgContainer };

@@ -286,7 +286,7 @@ export default function SvgImageMap({mapImage, newImages, setNewImages}) {
         />
       </div>
       <div style={{flex: '1'}}>
-        <SvgContainer onKeyDown={() => alert('123')} setHandles={setHandles} width='100%' height='100%' margin='0 auto' onload={onload}/>
+        <SvgContainer setHandles={setHandles} width='100%' height='100%' margin='0 auto' onload={onload}/>
       </div>
       <CSSTransition
         in={open}
