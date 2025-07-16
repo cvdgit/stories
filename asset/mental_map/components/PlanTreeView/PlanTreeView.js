@@ -12,6 +12,7 @@ import "./PlanTreeView.css";
 import "rc-tree/assets/index.css";
 import ItemDialog from "./ItemDialog";
 import {v4 as uuidv4} from "uuid";
+import {CSSTransition} from "react-transition-group";
 
 export const PlanTreeViewContext = createContext({});
 
@@ -31,6 +32,8 @@ export default function PlanTreeView({texts}) {
   const isFirstRender = useRef(true);
   const [currentTitle, setCurrentTitle] = useState('')
   const [currentDescription, setCurrentDescription] = useState('')
+  const [markedItems, setMarkedItems] = useState([])
+  const itemDialogRef = useRef()
 
   useEffect(() => {
     api
@@ -67,7 +70,7 @@ export default function PlanTreeView({texts}) {
   const createNodesFromTextHandler = () => {
     texts.map((t, i) => dispatch({
       type: 'add_node',
-      payload: {id: uuidv4(), title: ++i, description: t}
+      payload: {id: uuidv4(), title: t, description: t}
     }))
   }
 
@@ -83,15 +86,27 @@ export default function PlanTreeView({texts}) {
               title: (
                 <div
                   style={{whiteSpace: "pre-wrap", overflow: "auto"}}
-                  className="node-title"
+                  className={`node-title ${markedItems.includes(node.id) ? 'node-marked' : ''}`}
                   onClick={() => {
                     setCurrentNode({
-                      ...node, changeHandler: (values) => changeNodeAtPath({
-                        treeData: state.treeData,
-                        path,
-                        getNodeKey,
-                        newNode: {...node, ...values},
-                      })
+                      ...node, changeHandler: (values) => {
+                        if (node.title === values.title && node.description === values.description) {
+                          return state.treeData
+                        }
+                        setMarkedItems(prevState => {
+                          if (prevState.includes(node.id)) {
+                            return [...prevState]
+                          }
+                          prevState.push(node.id)
+                          return [...prevState]
+                        })
+                        return changeNodeAtPath({
+                          treeData: state.treeData,
+                          path,
+                          getNodeKey,
+                          newNode: {...node, ...values},
+                        })
+                      }
                     });
                     setCurrentTitle(node.title || '')
                     setCurrentDescription(node.description || '')
@@ -201,22 +216,33 @@ export default function PlanTreeView({texts}) {
         </div>
       </div>
 
-      <PlanTreeViewContext.Provider value={planTreeViewContext}>
-        {open && <ItemDialog
+
+      <CSSTransition
+        in={open}
+        nodeRef={itemDialogRef}
+        timeout={200}
+        classNames="dialog"
+        unmountOnExit
+      >
+        <ItemDialog
+          ref={itemDialogRef}
+          dialogProps={{addClassName: 'item-dialog'}}
           open={open}
           setOpen={setOpen}
           currentNode={currentNode}
           currentTitle={currentTitle}
           currentDescription={currentDescription}
           setCurrentDescription={setCurrentDescription}
+          markInit={currentNode ? markedItems.includes(currentNode.id) : false}
+          setMarkedItems={setMarkedItems}
           hideHandler={(values) => {
             dispatch({
               type: 'update_tree',
               treeData: currentNode.changeHandler(values)
             })
           }}
-        />}
-      </PlanTreeViewContext.Provider>
+        />
+      </CSSTransition>
     </div>
   )
 }

@@ -1,24 +1,41 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState, forwardRef} from 'react';
 import Dialog from "../Dialog";
 import {createWordsFormText, getTextBySelections} from "../Selection";
-import {CSSTransition} from "react-transition-group";
 import ContentEditable from "react-contenteditable";
 
-export default function ItemDialog({open, setOpen, currentNode, currentTitle, currentDescription, setCurrentDescription, hideHandler}) {
-  console.log('ItemDialog render')
+const ItemDialog = forwardRef(function ItemDialog(props, ref) {
+  const {
+    setOpen,
+    currentNode,
+    markInit,
+    currentTitle,
+    currentDescription,
+    setCurrentDescription,
+    hideHandler,
+    setMarkedItems
+  } = props
 
-  const ref = useRef()
   const [selectionMode, setSelectionMode] = useState(false)
   const selectionRef = useRef()
   const textRef = useRef()
   const [currentWords, setCurrentWords] = useState([])
-  const [title, setTitle] = useState(currentTitle || '')
-  const [description, setDescription] = useState(currentDescription || '')
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [mark, setMark] = useState(false)
 
   const emitChange = (e) => {
     setDescription(e.target.value)
     setCurrentDescription(e.target.value)
+    setMark(false)
   }
+
+  useEffect(() => {
+    if (currentNode) {
+      setTitle(currentNode.title)
+      setDescription(currentNode.description)
+      setMark(markInit)
+    }
+  }, [JSON.stringify(currentNode)]);
 
   useEffect(() => {
     if (!currentWords.length) {
@@ -29,30 +46,23 @@ export default function ItemDialog({open, setOpen, currentNode, currentTitle, cu
   }, [JSON.stringify(currentWords)]);
 
   return (
-    <CSSTransition
-      in={open}
-      nodeRef={ref}
-      timeout={200}
-      classNames="dialog"
-      unmountOnExit
-    >
-      <Dialog nodeRef={ref} hideHandler={() => {
-        hideHandler({
-          title,
-          description: currentDescription
-        })
-        setOpen(false)
-      }}>
-        {currentNode && (<div>
-            <div style={{display: 'flex', flexDirection: 'row'}}>
-              <div style={{flex: '1', display: 'flex', flexDirection: 'column'}}>
-
+    <Dialog nodeRef={ref} hideHandler={() => {
+      hideHandler({
+        title,
+        description: currentDescription
+      })
+      setOpen(false)
+    }} addContentClassName="item-content">
+      {currentNode && (<div style={{flex: '1', display: 'flex', flexDirection: 'column'}}>
+          <div style={{display: 'flex', height: '100%'}}>
+            <div style={{display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'space-between'}}>
+              <div>
                 <div style={{margin: '20px 0'}}>
                   <input className="textarea" style={{minHeight: 'auto'}} type="text" value={title} onChange={e => {
                     setTitle(e.target.value)
+                    setMark(false)
                   }}/>
                 </div>
-
                 <div style={{marginBottom: '10px'}}>
                   <button onClick={() => {
                     setDescription(getTextBySelections(currentWords))
@@ -70,13 +80,14 @@ export default function ItemDialog({open, setOpen, currentNode, currentTitle, cu
                           type="button">Выделить
                   </button>
                 </div>
+              </div>
+              <div style={{flex: '1'}}>
                 {selectionMode ? (
                   <div
                     ref={selectionRef}
                     className="textarea"
                     style={{
                       borderStyle: 'solid',
-                      maxHeight: '20rem',
                       overflowY: 'auto'
                     }}
                   >
@@ -111,7 +122,6 @@ export default function ItemDialog({open, setOpen, currentNode, currentTitle, cu
                     className="textarea"
                     style={{
                       borderStyle: 'solid',
-                      maxHeight: '20rem',
                       overflowY: 'auto'
                     }}
                   />
@@ -119,8 +129,19 @@ export default function ItemDialog({open, setOpen, currentNode, currentTitle, cu
               </div>
             </div>
           </div>
-        )}
-      </Dialog>
-    </CSSTransition>
+          {mark && <div className="dialog-action" style={{paddingTop: '1rem'}}>
+            <button onClick={() => {
+              setMarkedItems(prevState => {
+                return [...prevState].filter(id => id !== currentNode.id)
+              })
+              setOpen(false)
+            }} className="button button--default button--outline" type="button">Закрыть и снять выделение
+            </button>
+          </div>}
+        </div>
+      )}
+    </Dialog>
   )
-}
+})
+
+export default ItemDialog;

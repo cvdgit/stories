@@ -67,7 +67,7 @@
 
 .dialog__content {
   background: #fff;
-  box-shadow: 0 0.6rem 2rem rgba(0,0,0,.08);
+  box-shadow: 0 0.6rem 2rem rgba(0,0,0,.4);
   max-width: 100%;
   padding: 6rem;
   position: relative;

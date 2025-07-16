@@ -57,4 +57,20 @@
   cursor: pointer;
   font-weight: normal;
   white-space: normal;
+  padding: 0 4px;
+}
+
+.node-title.node-marked {
+  background-color: #d1e7dd;
+}
+
+.item-content {
+  height: 90%;
+}
+
+.dialog__content .export-dialog__content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }

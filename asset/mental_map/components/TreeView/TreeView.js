@@ -30,6 +30,7 @@ export default function TreeView({texts}) {
   const textRef = useRef()
   const selectionRef = useRef()
   const [currentNode, setCurrentNode] = useState(null)
+  const [markedItems, setMarkedItems] = useState([])
 
   const getNodeKey = ({treeIndex}) => treeIndex;
 
@@ -66,7 +67,7 @@ export default function TreeView({texts}) {
   const createNodesFromTextHandler = () => {
     texts.map(t => dispatch({
       type: 'add_node',
-      payload: {id: uuidv4(), title: t}
+      payload: {id: uuidv4(), title: t, description: t}
     }))
   }
 
@@ -103,15 +104,27 @@ export default function TreeView({texts}) {
                 title: (
                   <div
                     style={{whiteSpace: "pre-wrap", overflow: "auto"}}
-                    className="node-title"
+                    className={`node-title ${markedItems.includes(node.id) ? 'node-marked' : ''}`}
                     onClick={() => {
                       setCurrentNode({
-                        ...node, changeHandler: (title) => changeNodeAtPath({
-                          treeData: state.treeData,
-                          path,
-                          getNodeKey,
-                          newNode: {...node, title},
-                        })
+                        ...node, changeHandler: (title) => {
+                          if (node.title === title) {
+                            return state.treeData
+                          }
+                          setMarkedItems(prevState => {
+                            if (prevState.includes(node.id)) {
+                              return [...prevState]
+                            }
+                            prevState.push(node.id)
+                            return [...prevState]
+                          })
+                          return changeNodeAtPath({
+                            treeData: state.treeData,
+                            path,
+                            getNodeKey,
+                            newNode: {...node, title},
+                          })
+                        }
                       });
                       setSelectionMode(false)
                       setCurrentText(node.title)
@@ -229,10 +242,10 @@ export default function TreeView({texts}) {
             classNames="dialog"
             unmountOnExit
           >
-            <Dialog nodeRef={ref} hideHandler={() => setOpen(false)}>
-              {currentNode && (<div>
-                  <div style={{display: 'flex', flexDirection: 'row'}}>
-                    <div style={{flex: '1', display: 'flex', flexDirection: 'column'}}>
+            <Dialog nodeRef={ref} hideHandler={() => setOpen(false)} addContentClassName="item-content">
+              {currentNode && (<div style={{flex: '1', display: 'flex', flexDirection: 'column'}}>
+                  <div style={{display: 'flex', height: '100%'}}>
+                    <div style={{display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'space-between'}}>
                       <div style={{marginBottom: '10px'}}>
                         <button onClick={() => {
                           setCurrentText(getTextBySelections(currentWords))
@@ -250,20 +263,20 @@ export default function TreeView({texts}) {
                                 type="button">Выделить
                         </button>
                       </div>
+                      <div style={{flex: '1'}}>
                       {selectionMode ? (
                         <div
                           ref={selectionRef}
                           className="textarea"
                           style={{
                             borderStyle: 'solid',
-                            maxHeight: '20rem',
                             overflowY: 'auto'
                           }}
                         >
-                          {currentWords.map(word => {
+                          {currentWords.map((word, i) => {
                             const {type} = word
                             if (type === 'break') {
-                              return (<div key={word.id} className="line-sep"></div>)
+                              return (<div key={i} className="line-sep"></div>)
                             }
                             return (
                               <span
@@ -294,13 +307,22 @@ export default function TreeView({texts}) {
                           onKeyDown={emitChange}
                           style={{
                             borderStyle: 'solid',
-                            maxHeight: '20rem',
                             overflowY: 'auto'
                           }}
                         ></div>
                       )}
+                      </div>
                     </div>
                   </div>
+                  {markedItems.includes(currentNode.id) && <div className="dialog-action" style={{paddingTop: '1rem'}}>
+                    <button onClick={() => {
+                      setMarkedItems(prevState => {
+                        return [...prevState].filter(id => id !== currentNode.id)
+                      })
+                      setOpen(false)
+                    }} className="button button--default button--outline" type="button">Закрыть и снять выделение
+                    </button>
+                  </div>}
                 </div>
               )}
             </Dialog>
