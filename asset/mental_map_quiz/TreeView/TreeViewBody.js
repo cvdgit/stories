@@ -3,7 +3,7 @@ import TreeVoiceControl from "./TreeVoiceControl";
 import sendMessage from "../lib/sendMessage";
 import {calcHiddenTextPercent, createWordItem} from "../words";
 import {processOutputAsJson, stripTags} from "../common";
-import {allImportantWordsIncluded, calcSimilarityPercentage, SimilarityChecker} from "../lib/calcSimilarity";
+import {SimilarityChecker} from "../lib/calcSimilarity";
 
 const nodeStatusSuccessHtml = `
 <div class="retelling-status-show"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -26,7 +26,7 @@ function createRow(node, level = 0, isPlanTreeView = false) {
   const row = document.createElement('div')
   row.dataset.nodeId = node.id
   row.dataset.level = node.level
-  row.classList.add('node-row')
+  row.classList.add('node-row', 'folded')
 
   if (!isPlanTreeView) {
     if (node.level > 0) {
@@ -150,6 +150,8 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
     if (showVoiceControl) {
       continue
     }
+
+    rowElement.classList.remove('folded')
 
     const voiceResponseElem = rowElement.querySelector('.node-voice-response')
     const resultSpan = voiceResponseElem.querySelector('.result_span')
@@ -550,6 +552,9 @@ function createRewriteContent(text, hideCallback) {
 }
 
 function resetNodeRow(row) {
+  if (!row.classList.contains('folded')) {
+    row.classList.add('folded')
+  }
   row.querySelector('.node-status').innerHTML = ''
   const voiceResponseElem = row.querySelector('.node-voice-response');
   ['.result_span', '.retelling-response', '.final_span', '.interim_span']

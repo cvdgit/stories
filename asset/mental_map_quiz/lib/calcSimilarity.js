@@ -44,14 +44,9 @@ export function allImportantWordsIncluded(text, userResponse) {
     .find('span.target-text')
     .map((i, el) => removePunctuation($(el).text()))
     .get()
-  console.log('words', importantWords)
-  console.log('text', text, 'user', userResponse)
   if (importantWords.length === 0) {
     return true
   }
   userResponse = removePunctuation(userResponse)
-  return importantWords.every(word => {
-    console.log(word, userResponse.toString().indexOf(word) !== -1)
-    return userResponse.toString().indexOf(word) !== -1
-  })
+  return importantWords.every(word => userResponse.toString().indexOf(word) !== -1)
 }
