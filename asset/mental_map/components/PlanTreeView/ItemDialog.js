@@ -53,7 +53,7 @@ const ItemDialog = forwardRef(function ItemDialog(props, ref) {
       })
       setOpen(false)
     }} addContentClassName="item-content">
-      {currentNode && (<div style={{flex: '1', display: 'flex', flexDirection: 'column'}}>
+      {currentNode && (<div style={{flex: '1', display: 'flex', flexDirection: 'column', overflow: 'hidden', height: '100%'}}>
           <div style={{display: 'flex', height: '100%'}}>
             <div style={{display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'space-between'}}>
               <div>
@@ -81,7 +81,7 @@ const ItemDialog = forwardRef(function ItemDialog(props, ref) {
                   </button>
                 </div>
               </div>
-              <div style={{flex: '1'}}>
+              <div style={{flex: '1', overflowY: 'auto'}}>
                 {selectionMode ? (
                   <div
                     ref={selectionRef}

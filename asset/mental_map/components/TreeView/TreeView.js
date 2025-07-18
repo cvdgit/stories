@@ -243,7 +243,7 @@ export default function TreeView({texts}) {
             unmountOnExit
           >
             <Dialog nodeRef={ref} hideHandler={() => setOpen(false)} addContentClassName="item-content">
-              {currentNode && (<div style={{flex: '1', display: 'flex', flexDirection: 'column'}}>
+              {currentNode && (<div style={{flex: '1', display: 'flex', flexDirection: 'column', overflow: 'hidden', height: '100%'}}>
                   <div style={{display: 'flex', height: '100%'}}>
                     <div style={{display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'space-between'}}>
                       <div style={{marginBottom: '10px'}}>
@@ -263,7 +263,7 @@ export default function TreeView({texts}) {
                                 type="button">Выделить
                         </button>
                       </div>
-                      <div style={{flex: '1'}}>
+                      <div style={{flex: '1', overflowY: 'auto'}}>
                       {selectionMode ? (
                         <div
                           ref={selectionRef}
