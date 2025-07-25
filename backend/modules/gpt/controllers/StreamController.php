@@ -11,6 +11,7 @@ use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\db\Query;
 use yii\helpers\Json;
+use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\Request;
 use yii\web\Response;
@@ -387,11 +388,36 @@ class StreamController extends Controller
         }
     }
 
+    /**
+     * @throws BadRequestHttpException
+     */
+    private function findLlmPrompt(string $id): string
+    {
+        $value = (new Query())
+            ->select('prompt')
+            ->from('llm_prompt')
+            ->where(['id' => $id])
+            ->scalar();
+        if ($value === null || $value === false) {
+            throw new BadRequestHttpException('Prompt not found');
+        }
+        return (string) $value;
+    }
+
+    /**
+     * @throws BadRequestHttpException
+     */
     public function actionRetelling(Request $request): void
     {
         $payload = Json::decode($request->rawBody);
         $userResponse = $payload["userResponse"];
         $slideTexts = $payload["slideTexts"];
+
+        $defaultPrompt = $this->findLlmPrompt(Yii::$app->params['mental.map.retelling.prompt.id']);
+        $promptId = $payload['promptId'] ?? null;
+        if ($promptId !== null) {
+            $defaultPrompt = $this->findLlmPrompt($promptId);
+        }
 
         $content = <<<TEXT
 Исходный текст:
@@ -402,10 +428,9 @@ $slideTexts
 ```
 $userResponse
 ```
-Изложи исходный текст полностью  по предложениям.
-Укажи степень сходства каждого сведения исходного текста с пересказом в процентах.
-Укажи общую степень сходства сведений исходного текста и пересказа в процентах.
-Не добавляй ничего нового в пересказ. Используй пересказ как есть.
+
+$defaultPrompt
+
 Ответь в формате json.
 В ответе не используй символы unicode.
 Пример: {"sentences_similarity": [{"original": "Оригинальное предложение", "rewrite": "Предложение, пересказанное пользователем", "similarity": "Процент сходства, целое число"}], "overall_similarity": "Итоговый процент сходства, целое число"}
@@ -769,12 +794,21 @@ TEXT;
         }
     }
 
+    /**
+     * @throws BadRequestHttpException
+     */
     public function actionRetellingTree(Request $request): void
     {
         $payload = Json::decode($request->rawBody);
         $userResponse = $payload["userResponse"];
         $slideTexts = $payload["slideTexts"];
         $importantWords = $payload['importantWords'] ?? '';
+
+        $defaultPrompt = $this->findLlmPrompt(Yii::$app->params['mental.map.tree.retelling.prompt.id']);
+        $promptId = $payload['promptId'] ?? null;
+        if ($promptId !== null) {
+            $defaultPrompt = $this->findLlmPrompt($promptId);
+        }
 
         $content = <<<TEXT
 Ты занимаешься сравнением и анализом двух текстов - исходного и пересказа.
@@ -787,7 +821,7 @@ $slideTexts
 $userResponse
 ```
 
-Твоя задача сравнить исходный текст и пересказ и вычислить степень сходства пересказа с исходным текстом в процентах.
+$defaultPrompt
 
 В ответе не используй символы unicode.
 Ответь в формате json
@@ -814,7 +848,7 @@ $importantWords
 $userResponse
 ```
 
-Твоя задача сравнить исходный текст и пересказ и вычислить степень сходства пересказа с исходным текстом в процентах.
+$defaultPrompt
 Также необходимо определить все ли важные слова есть в пересказе.
 
 В ответе не используй символы unicode.

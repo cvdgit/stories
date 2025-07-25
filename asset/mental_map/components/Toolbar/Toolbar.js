@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import TextDialog from "./TextDialog";
 import SettingsDialog from "./SettingsDialog";
 import TitleChangeDialog from "./TitleChangeDialog";
+import Prompts from "./Prompts";
 
 export default function Toolbar({currentTitle, mentalMapId, schedules, setFormattedMapText}) {
   const [textDialogOpen, setTextDialogOpen] = useState(false)
@@ -9,6 +10,7 @@ export default function Toolbar({currentTitle, mentalMapId, schedules, setFormat
   const [titleDialogOpen, setTitleDialogOpen] = useState(false)
   const [textFragmentCount, setTextFragmentCount] = useState(0)
   const [title, setTitle] = useState(currentTitle || '')
+  const [promptsDialogOpen, setPromptsDialogOpen] = useState(false)
 
   const returnUrl = window.mentalMapReturnUrl || '/'
 
@@ -41,6 +43,11 @@ export default function Toolbar({currentTitle, mentalMapId, schedules, setFormat
         </div>
         <div className="app-header__btn-group">
           <button onClick={() => {
+            setPromptsDialogOpen(true)
+          }} className="button button--default button--header-done"
+                  type="button">Prompts
+          </button>
+          <button onClick={() => {
             setTextDialogOpen(true)
           }} className="button button--default button--header-done"
                   type="button">Текст {textFragmentCount > 0 && (<span> ({textFragmentCount})</span>)}
@@ -72,6 +79,7 @@ export default function Toolbar({currentTitle, mentalMapId, schedules, setFormat
         currentTitle={title}
         setCurrentTitle={setTitle}
       />
+      <Prompts promptsDialogOpen={promptsDialogOpen} setPromptsDialogOpen={setPromptsDialogOpen} />
     </div>
   )
 }

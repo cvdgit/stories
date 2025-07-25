@@ -293,7 +293,8 @@ export default function MentalMap(element, deck, params) {
         startRetelling(
           clearText ? removePunctuation(userResponse) : userResponse,
           clearText ? removePunctuation(stripTags(text.text)) : stripTags(text.text),
-          threshold
+          threshold,
+          image.promptId
         ).then(response => {
           const json = processOutputAsJson(wrapper.querySelector('#retelling-response').innerText)
           if (json) {
@@ -422,7 +423,7 @@ export default function MentalMap(element, deck, params) {
 
         const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
 
-        startRetelling(clearText ? removePunctuation(userResponse) : userResponse, clearText ? removePunctuation(stripTags(image.text)) : stripTags(image.text), threshold).then(response => {
+        startRetelling(clearText ? removePunctuation(userResponse) : userResponse, clearText ? removePunctuation(stripTags(image.text)) : stripTags(image.text), threshold, image.promptId).then(response => {
           const json = processOutputAsJson(wrapper.querySelector('#retelling-response').innerText)
           if (json) {
             const val = Number(json?.overall_similarity)
@@ -1082,7 +1083,7 @@ export default function MentalMap(element, deck, params) {
     }
   }
 
-  async function startRetelling(userResponse, targetText, threshold) {
+  async function startRetelling(userResponse, targetText, threshold, promptId) {
 
     const onMessage = message => {
       const el = document.getElementById("retelling-response")
@@ -1111,21 +1112,11 @@ export default function MentalMap(element, deck, params) {
         resolve({})
       })
     }
-    /*const similarityPercentage = calcSimilarityPercentage(
-      removePunctuation(targetText.toLowerCase()).trim(),
-      removePunctuation(userResponse.toLowerCase()).trim()
-    )
-    if (similarityPercentage >= threshold) {
-      onMessage(`{"overall_similarity": ${similarityPercentage}}`)
-      onEnd()
-      return new Promise((resolve, reject) => {
-        resolve({})
-      })
-    }*/
 
     return await sendMessage(`/admin/index.php?r=gpt/stream/retelling`, {
       userResponse,
-      slideTexts: targetText
+      slideTexts: targetText,
+      promptId
     }, onMessage, onError, onEnd)
   }
 

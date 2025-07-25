@@ -296,6 +296,7 @@ export default function SvgImageMap({mapImage, newImages, setNewImages}) {
         unmountOnExit
       >
         <ImageDialog
+          open={open}
           ref={ref}
           setOpen={setOpen}
           currentImageItem={mapImage.images.find(f => f.id === currentImageItem?.id)}

@@ -2,6 +2,7 @@ import Dialog from "../Dialog";
 import React, {forwardRef, useEffect, useId, useRef, useState} from "react";
 import {createWordsFormText, getTextBySelections} from "../Selection";
 import {useMentalMap} from "../App/App";
+import api from "../../Api";
 
 const ImageDialog = forwardRef(function ImageDialog(props, ref) {
 
@@ -9,7 +10,8 @@ const ImageDialog = forwardRef(function ImageDialog(props, ref) {
     setOpen,
     currentImageItem,
     changeBgHandler,
-    changeMakeTransparentHandler
+    changeMakeTransparentHandler,
+    open
   } = props
 
   const textRef = useRef()
@@ -21,6 +23,8 @@ const ImageDialog = forwardRef(function ImageDialog(props, ref) {
   const [makeTransparent, setMakeTransparent] = useState(Boolean(currentImageItem.makeTransparent))
   const {state, dispatch} = useMentalMap()
   const checkId = useId()
+  const [prompts, setPrompts] = useState([])
+  const [promptId, setPromptId] = useState(currentImageItem.promptId)
 
   useEffect(() => {
     if (!currentWords.length) {
@@ -45,6 +49,25 @@ const ImageDialog = forwardRef(function ImageDialog(props, ref) {
     })
   }
 
+  useEffect(() => {
+    if (!open) {
+      return
+    }
+
+    async function fetchPrompts() {
+      const response = await api.get('/admin/index.php?r=llm-prompt/get', {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      })
+      return response
+    }
+    fetchPrompts()
+      .then(response => {
+        setPrompts(response.prompts)
+      })
+
+  }, [open]);
+
   return (
     <Dialog nodeRef={ref} hideHandler={() => setOpen(false)}>
       {currentImageItem && (
@@ -54,6 +77,24 @@ const ImageDialog = forwardRef(function ImageDialog(props, ref) {
               <img src={currentImageItem.url} alt=""/>
             </div>
             <div style={{flex: '1', display: 'flex', flexDirection: 'column'}}>
+              <div style={{marginBottom: '10px'}}>
+                <label style={{paddingBottom: '4px', fontSize: '14px', display: 'block'}} htmlFor="">Prompt:</label>
+                <select className="textarea" value={promptId} onChange={(e) => {
+                  setPromptId(e.target.value)
+                  dispatch({
+                    type: 'update_mental_map_images',
+                    imageId: currentImageItem.id,
+                    payload: {
+                      promptId: e.target.value
+                    }
+                  })
+                }} style={{width: '100%', padding: '10px', minHeight: 'auto', height: 'auto'}}>
+                  <option value="">По умолчанию</option>
+                  {prompts.map((p, i) => (
+                    <option key={i} value={p.id}>{p.name}</option>
+                  ))}
+                </select>
+              </div>
               <div style={{marginBottom: '10px'}}>
                 <button onClick={() => {
                   setCurrentText(getTextBySelections(currentWords))

@@ -326,7 +326,8 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
                     .find('span.target-text')
                     .map((i, el) => removePunctuation($(el).text()))
                     .get()
-                    .join(', ')
+                    .join(', '),
+                  promptId: listItem.promptId
                 },
                 (message) => retellingResponseSpan.innerText = message,
                 (error) => {

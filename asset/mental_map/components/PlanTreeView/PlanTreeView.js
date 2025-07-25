@@ -90,9 +90,9 @@ export default function PlanTreeView({texts}) {
                   onClick={() => {
                     setCurrentNode({
                       ...node, changeHandler: (values) => {
-                        if (node.title === values.title && node.description === values.description) {
+                        /*if (node.title === values.title && node.description === values.description) {
                           return state.treeData
-                        }
+                        }*/
                         setMarkedItems(prevState => {
                           if (prevState.includes(node.id)) {
                             return [...prevState]
@@ -215,7 +215,6 @@ export default function PlanTreeView({texts}) {
           </div>
         </div>
       </div>
-
 
       <CSSTransition
         in={open}

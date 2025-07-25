@@ -2,6 +2,8 @@ import React, {useEffect, useRef, useState, forwardRef} from 'react';
 import Dialog from "../Dialog";
 import {createWordsFormText, getTextBySelections} from "../Selection";
 import ContentEditable from "react-contenteditable";
+import {stripTags} from "../../Lib";
+import api from "../../Api";
 
 const ItemDialog = forwardRef(function ItemDialog(props, ref) {
   const {
@@ -22,6 +24,8 @@ const ItemDialog = forwardRef(function ItemDialog(props, ref) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [mark, setMark] = useState(false)
+  const [prompts, setPrompts] = useState([])
+  const [promptId, setPromptId] = useState('')
 
   const emitChange = (e) => {
     setDescription(e.target.value)
@@ -31,9 +35,10 @@ const ItemDialog = forwardRef(function ItemDialog(props, ref) {
 
   useEffect(() => {
     if (currentNode) {
-      setTitle(currentNode.title)
+      setTitle(stripTags(currentNode.title))
       setDescription(currentNode.description)
       setMark(markInit)
+      setPromptId(currentNode.promptId || '')
     }
   }, [JSON.stringify(currentNode)]);
 
@@ -45,11 +50,31 @@ const ItemDialog = forwardRef(function ItemDialog(props, ref) {
     setCurrentDescription(getTextBySelections(currentWords))
   }, [JSON.stringify(currentWords)]);
 
+  useEffect(() => {
+    if (!open) {
+      return
+    }
+
+    async function fetchPrompts() {
+      const response = await api.get('/admin/index.php?r=llm-prompt/get', {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      })
+      return response
+    }
+    fetchPrompts()
+      .then(response => {
+        setPrompts(response.prompts)
+      })
+
+  }, [open]);
+
   return (
     <Dialog nodeRef={ref} hideHandler={() => {
       hideHandler({
         title,
-        description: currentDescription
+        description: currentDescription,
+        promptId
       })
       setOpen(false)
     }} addContentClassName="item-content">
@@ -58,10 +83,24 @@ const ItemDialog = forwardRef(function ItemDialog(props, ref) {
             <div style={{display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'space-between'}}>
               <div>
                 <div style={{margin: '20px 0'}}>
-                  <input className="textarea" style={{minHeight: 'auto'}} type="text" value={title} onChange={e => {
-                    setTitle(e.target.value)
-                    setMark(false)
-                  }}/>
+                  <div style={{marginBottom: '10px'}}>
+                    <label style={{paddingBottom: '4px', fontSize: '14px', display: 'block'}}
+                               htmlFor="">Заголовок:</label>
+                    <input className="textarea" style={{minHeight: 'auto'}} type="text" value={title} onChange={e => {
+                      setTitle(e.target.value)
+                      setMark(false)
+                    }}/></div>
+                  <div>
+                    <label style={{paddingBottom: '4px', fontSize: '14px', display: 'block'}} htmlFor="">Prompt:</label>
+                    <select className="textarea" value={promptId} onChange={(e) => {
+                      setPromptId(e.target.value)
+                    }} style={{width: '100%', padding: '10px', minHeight: 'auto'}}>
+                      <option value="">По умолчанию</option>
+                      {prompts.map((p, i) => (
+                        <option key={i} value={p.id}>{p.name}</option>
+                        ))}
+                    </select>
+                  </div>
                 </div>
                 <div style={{marginBottom: '10px'}}>
                   <button onClick={() => {

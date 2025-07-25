@@ -154,6 +154,11 @@ class MentalMapController extends Controller
             'success' => true,
             'payload' => ['treeData' => $mentalMap->payload['treeData'] ?? []],
             'schedules' => $this->scheduleFetcher->getSchedules(),
+            'prompts' => (new Query())
+                ->select('*')
+                ->from(['t' => 'llm_prompt'])
+                ->where(['t.key' => 'mental-map-tree'])
+                ->orderBy(['t.created_at' => SORT_DESC])->all(),
         ];
     }
 

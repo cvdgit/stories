@@ -1,7 +1,7 @@
 import React from "react";
 import './Dialog.css'
 
-function Dialog({children, nodeRef, hideHandler, addContentClassName, ...props}) {
+function Dialog({children, nodeRef, hideHandler, addContentClassName, controls, ...props}) {
   return (
     <div ref={nodeRef} className="dialog export-dialog-modal">
       <div onClick={hideHandler} className="dialog__overlay"></div>
@@ -12,6 +12,7 @@ function Dialog({children, nodeRef, hideHandler, addContentClassName, ...props})
         <div className="export-dialog__content">
           {children}
           <div className="dialog-action" style={{paddingTop: '1rem'}}>
+            {controls}
             <button onClick={hideHandler} className="button button--default button--outline" type="button">Закрыть</button>
           </div>
         </div>
