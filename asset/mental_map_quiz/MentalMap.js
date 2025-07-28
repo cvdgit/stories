@@ -14,7 +14,7 @@ import {calcHiddenTextPercent, calcTargetTextPercent, canRecording, createWordIt
 import DetailContent from "./content/DetailContent";
 import {processOutputAsJson, stripTags} from "./common";
 import FragmentResultQuestionsElement from "./content/FragmentResultQuestionsElement";
-import {calcSimilarityPercentage, SimilarityChecker} from "./lib/calcSimilarity";
+import {calcSimilarityPercentage, diffRetelling, SimilarityChecker} from "./lib/calcSimilarity";
 
 /**
  * @param element
@@ -229,6 +229,12 @@ export default function MentalMap(element, deck, params) {
             .tooltip()
         }
         recordingWrap.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%'
+      },
+      diffClickHandler: () => {
+        $(detailContainer).append(createDiffContent({
+          text: stripTags(image.text),
+          userResponse: detailContainer.querySelector('#result_span').innerText.trim()
+        }))
       }
     })
     const dialog = new InnerDialog($(container), {title: 'Перескажите текст', content: detailContainer});
@@ -1048,6 +1054,31 @@ export default function MentalMap(element, deck, params) {
         hideCallback()
       }
     })
+    return wrap
+  }
+
+  function createDiffContent({text, userResponse}) {
+    const wrap = document.createElement('div')
+    wrap.classList.add('retelling-wrap')
+    wrap.innerHTML = `
+        <div style="font-size: 2.2rem; text-align: left; line-height: 3rem; overflow-y: scroll; height: 100%; max-height: 100%;">
+          <div style="display: flex; flex-direction: column; height: 100%">
+            <div class="diff-text" style="flex: 1"></div>
+            <div class="diff-user-response" style="flex: 1"></div>
+            <div class="diff-diff" style="flex: 1"></div></div>
+</div>
+        <div style="display: flex; margin-top: 10px; flex-direction: row; align-items: center; justify-content: center">
+        <button type="button" class="button diff-dialog-close">Закрыть</button>
+        </div>
+    `
+    wrap.querySelector('.diff-dialog-close').addEventListener('click', () => {
+      wrap.remove()
+    })
+
+    wrap.querySelector('.diff-text').innerHTML = text
+    wrap.querySelector('.diff-user-response').innerHTML = userResponse
+    wrap.querySelector('.diff-diff').appendChild(diffRetelling(text, userResponse))
+
     return wrap
   }
 

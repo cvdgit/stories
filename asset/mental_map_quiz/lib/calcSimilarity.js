@@ -50,3 +50,18 @@ export function allImportantWordsIncluded(text, userResponse) {
   userResponse = removePunctuation(userResponse)
   return importantWords.every(word => userResponse.toString().indexOf(word) !== -1)
 }
+
+export function diffRetelling(text, userResponse) {
+  const diff = diffChars(text, userResponse);
+  const fragment = document.createDocumentFragment();
+  diff.forEach((part) => {
+    const color = part.added ? 'green' :
+      part.removed ? 'red' : 'grey';
+    const span = document.createElement('span');
+    span.style.color = color;
+    span.appendChild(document
+      .createTextNode(part.value));
+    fragment.appendChild(span);
+  });
+  return fragment
+}

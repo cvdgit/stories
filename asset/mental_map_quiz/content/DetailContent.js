@@ -84,7 +84,7 @@ function DetailText(text, itemClickHandler, afterRandCallback, promptBtn) {
   return detailText
 }
 
-export default function DetailContent({image, text, historyItem, rewritePrompt, itemClickHandler}) {
+export default function DetailContent({image, text, historyItem, rewritePrompt, itemClickHandler, diffClickHandler}) {
 
   const detailImgWrap = document.createElement('div')
   detailImgWrap.classList.add('image-item')
@@ -126,33 +126,9 @@ export default function DetailContent({image, text, historyItem, rewritePrompt, 
 
   detailText = DetailText(text, () => {
     itemClickHandler(recordingWrap)
-    /*if (voiceResponse.getStatus()) {
-      voiceResponse.stop()
-      const voiceLang = langStore.fromStore($(recordingWrap).find("#voice-lang option:selected").val())
-      startRecording(recordingWrap.querySelector('#start-recording'), voiceLang, stripTags(text.text), false)
-    }
-    recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
-
-    const gm = recordingWrap.querySelector('#start-recording')
-
-    $(gm)
-      .removeAttr('title')
-      .tooltip('destroy')
-
-    gm.classList.remove('disabled')
-    if (!canRecording(text)) {
-      gm.classList.add('disabled')
-      $(gm)
-        .attr('title', 'Нужно закрыть все важные слова')
-        .tooltip()
-    }
-    recordingWrap.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%'*/
-
   }, () => {
-
     recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
     recordingWrap.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%'
-
   }, promptBtn)
 
   detailTextWrap.appendChild(detailText)
@@ -160,7 +136,14 @@ export default function DetailContent({image, text, historyItem, rewritePrompt, 
   const recordingContainer = document.createElement('div')
   recordingContainer.classList.add('recording-container')
   recordingContainer.innerHTML = `
-      <div style="font-size: 2.2rem; line-height: 2.6rem; margin-bottom: 10px; color: #808080">Ответ ученика:</div>
+      <div style="font-size: 2.2rem; line-height: 2.6rem; margin-bottom: 10px; color: #808080; display: flex; flex-direction: row; justify-content: space-between; align-items: center">
+        <div>Ответ ученика:</div>
+        <div>
+        <button class="content-diff" type="button" style="width: 32px; height: 32px; border: 0 none; padding: 0"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+</svg>
+</button></div>
+      </div>
       <div style="background-color: #eee; font-size: 2.2rem; line-height: 3rem">
             <span contenteditable="plaintext-only" id="result_span"
                   class="recording-final" style="line-height: 3rem"></span>
@@ -170,10 +153,17 @@ export default function DetailContent({image, text, historyItem, rewritePrompt, 
         </div>
     `
 
-  detailTextWrap.appendChild(recordingContainer)
-
   const detailContent = document.createElement('div')
   detailContent.classList.add('mental-map-detail-content')
+
+  if (typeof diffClickHandler === 'function') {
+    recordingContainer.querySelector('.content-diff').addEventListener('click', e => {
+      diffClickHandler(detailContent)
+    })
+  }
+
+  detailTextWrap.appendChild(recordingContainer)
+
   detailContent.appendChild(detailImgWrap)
   detailContent.appendChild(detailTextWrap)
 
