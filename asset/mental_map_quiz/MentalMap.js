@@ -14,7 +14,7 @@ import {calcHiddenTextPercent, calcTargetTextPercent, canRecording, createWordIt
 import DetailContent from "./content/DetailContent";
 import {processOutputAsJson, stripTags} from "./common";
 import FragmentResultQuestionsElement from "./content/FragmentResultQuestionsElement";
-import {calcSimilarityPercentage, diffRetelling, SimilarityChecker} from "./lib/calcSimilarity";
+import {diffRetelling, SimilarityChecker} from "./lib/calcSimilarity";
 
 /**
  * @param element
@@ -262,9 +262,11 @@ export default function MentalMap(element, deck, params) {
             wrapper.querySelector('#start-retelling-wrap').style.display = 'none'
           });
         }
+        wrapper.querySelector('.content-diff').style.display = 'none';
 
         const voiceLang = langStore.fromStore($(wrapper).find("#voice-lang option:selected").val());
         startRecording(e.target, voiceLang, stripTags(text.text), true, threshold, () => {
+          wrapper.querySelector('.content-diff').style.display = 'inline-block';
           if (fastMode) {
             setTimeout(() => {
               wrapper.querySelector('#start-retelling').click()
@@ -354,6 +356,9 @@ export default function MentalMap(element, deck, params) {
         const display = text.length > 0 ? 'block' : 'none'
         if (display !== wrapper.querySelector('#start-retelling-wrap').style.display) {
           wrapper.querySelector('#start-retelling-wrap').style.display = display
+        }
+        if (display === 'none') {
+          wrapper.querySelector('.content-diff').style.display = 'none'
         }
       })
 
@@ -1062,7 +1067,7 @@ export default function MentalMap(element, deck, params) {
     wrap.classList.add('retelling-wrap')
     wrap.innerHTML = `
         <div style="font-size: 2.2rem; text-align: left; line-height: 3rem; overflow-y: scroll; height: 100%; max-height: 100%;">
-          <div style="display: flex; flex-direction: column; height: 100%">
+          <div style="display: flex; flex-direction: column; height: 100%; user-select: none">
             <div class="diff-text" style="flex: 1"></div>
             <div class="diff-user-response" style="flex: 1"></div>
             <div class="diff-diff" style="flex: 1"></div></div>
@@ -1077,7 +1082,7 @@ export default function MentalMap(element, deck, params) {
 
     wrap.querySelector('.diff-text').innerHTML = text
     wrap.querySelector('.diff-user-response').innerHTML = userResponse
-    wrap.querySelector('.diff-diff').appendChild(diffRetelling(text, userResponse))
+    wrap.querySelector('.diff-diff').appendChild(diffRetelling(text.toLowerCase(), userResponse.toLowerCase()))
 
     return wrap
   }
