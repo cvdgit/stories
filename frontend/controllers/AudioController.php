@@ -73,7 +73,7 @@ class AudioController extends Controller
 
         $data = [
             'file' => $file,
-            // 'model' => 'whisper-1',
+            'model' => 'whisper-1',
             // 'response_format' => 'text',
         ];
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
