@@ -6,6 +6,7 @@ namespace frontend\controllers;
 
 use common\models\AudioFile;
 use CURLFile;
+use DomainException;
 use Exception;
 use frontend\Transcriptions\TranscriptionsForm;
 use Yii;
@@ -50,7 +51,7 @@ class AudioController extends Controller
 
                 $fileName = $model->audio->baseName . '.' . $model->audio->extension;
                 if (!$model->audio->saveAs($audioFolder . '/' . $fileName)) {
-                    throw new \DomainException('Audio save error');
+                    throw new DomainException('Audio save error');
                 }
 
                 $apiResponse = $this->apiLocalRequest($audioFolder . '/' . $fileName);
@@ -81,7 +82,7 @@ class AudioController extends Controller
         $response = curl_exec($ch);
 
         if (curl_errno($ch)) {
-            echo 'Request Error:' . curl_error($ch);
+            throw new DomainException('Request Error:' . curl_error($ch));
         }
 
         curl_close($ch);
