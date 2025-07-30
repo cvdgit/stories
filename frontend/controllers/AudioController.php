@@ -69,7 +69,7 @@ class AudioController extends Controller
         $file = new CURLFile($filePath);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, Yii::$app->params['whisper.api.host']);
-        //curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json",]);
 
         $data = [
