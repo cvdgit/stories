@@ -415,7 +415,7 @@ class StreamController extends Controller
 
         $defaultPrompt = $this->findLlmPrompt(Yii::$app->params['mental.map.retelling.prompt.id']);
         $promptId = $payload['promptId'] ?? null;
-        if ($promptId !== null) {
+        if (!empty($promptId)) {
             $defaultPrompt = $this->findLlmPrompt($promptId);
         }
 
@@ -806,7 +806,7 @@ TEXT;
 
         $defaultPrompt = $this->findLlmPrompt(Yii::$app->params['mental.map.tree.retelling.prompt.id']);
         $promptId = $payload['promptId'] ?? null;
-        if ($promptId !== null) {
+        if (!empty($promptId)) {
             $defaultPrompt = $this->findLlmPrompt($promptId);
         }
 
