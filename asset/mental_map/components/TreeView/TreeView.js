@@ -10,9 +10,8 @@ import "./TreeView.css";
 import api, {parseError} from "../../Api";
 import TreeReducer from "../../Lib/TreeReducer";
 import {v4 as uuidv4} from 'uuid'
-import Dialog from "../Dialog";
 import {CSSTransition} from "react-transition-group";
-import {createWordsFormText, getTextBySelections} from "../Selection";
+import ItemDialog from "./ItemDialog";
 
 export const TreeContext = createContext({});
 
@@ -23,12 +22,7 @@ export default function TreeView({texts}) {
   const [error, setError] = useState(null)
   const [state, dispatch] = useReducer(TreeReducer, {treeData: []})
   const [open, setOpen] = useState(false)
-  const ref = useRef(null)
-  const [selectionMode, setSelectionMode] = useState(false)
-  const [currentText, setCurrentText] = useState(null)
-  const [currentWords, setCurrentWords] = useState([])
-  const textRef = useRef()
-  const selectionRef = useRef()
+  const itemDialogRef = useRef(null)
   const [currentNode, setCurrentNode] = useState(null)
   const [markedItems, setMarkedItems] = useState([])
 
@@ -71,23 +65,6 @@ export default function TreeView({texts}) {
     }))
   }
 
-  useEffect(() => {
-    if (!currentWords.length) {
-      return
-    }
-    dispatch({
-      type: 'update_tree',
-      treeData: currentNode.changeHandler(getTextBySelections(currentWords))
-    })
-  }, [JSON.stringify(currentWords)]);
-
-  const emitChange = (e) => {
-    dispatch({
-      type: 'update_tree',
-      treeData: currentNode.changeHandler(e.target.innerHTML)
-    })
-  }
-
   return (
     <div className="author-layout__content">
       <TreeContext.Provider value={treeContext}>
@@ -107,10 +84,7 @@ export default function TreeView({texts}) {
                     className={`node-title ${markedItems.includes(node.id) ? 'node-marked' : ''}`}
                     onClick={() => {
                       setCurrentNode({
-                        ...node, changeHandler: (title) => {
-                          if (node.title === title) {
-                            return state.treeData
-                          }
+                        ...node, changeHandler: (values) => {
                           setMarkedItems(prevState => {
                             if (prevState.includes(node.id)) {
                               return [...prevState]
@@ -122,12 +96,13 @@ export default function TreeView({texts}) {
                             treeData: state.treeData,
                             path,
                             getNodeKey,
-                            newNode: {...node, title},
+                            newNode: {...node, ...values},
                           })
                         }
                       });
-                      setSelectionMode(false)
-                      setCurrentText(node.title)
+                      //setSelectionMode(false)
+                      //setCurrentText(node.title)
+                      //setPromptId(node.promptId)
                       setOpen(true)
                     }}
                     dangerouslySetInnerHTML={{__html: node.title}}
@@ -237,95 +212,26 @@ export default function TreeView({texts}) {
         <div>
           <CSSTransition
             in={open}
-            nodeRef={ref}
+            nodeRef={itemDialogRef}
             timeout={200}
             classNames="dialog"
             unmountOnExit
           >
-            <Dialog nodeRef={ref} hideHandler={() => setOpen(false)} addContentClassName="item-content">
-              {currentNode && (<div style={{flex: '1', display: 'flex', flexDirection: 'column', overflow: 'hidden', height: '100%'}}>
-                  <div style={{display: 'flex', height: '100%'}}>
-                    <div style={{display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'space-between'}}>
-                      <div style={{marginBottom: '10px'}}>
-                        <button onClick={() => {
-                          setCurrentText(getTextBySelections(currentWords))
-                          setSelectionMode(false)
-                        }}
-                                className={`button button--default ${selectionMode ? 'button--outline' : 'button--header-done'} `}
-                                type="button">Редактировать
-                        </button>
-                        <button onClick={() => {
-                          setCurrentText(textRef.current.innerHTML)
-                          setCurrentWords(createWordsFormText(textRef.current.innerHTML))
-                          setSelectionMode(true)
-                        }}
-                                className={`button button--default ${selectionMode ? 'button--header-done' : 'button--outline'} `}
-                                type="button">Выделить
-                        </button>
-                      </div>
-                      <div style={{flex: '1', overflowY: 'auto'}}>
-                      {selectionMode ? (
-                        <div
-                          ref={selectionRef}
-                          className="textarea"
-                          style={{
-                            borderStyle: 'solid',
-                            overflowY: 'auto'
-                          }}
-                        >
-                          {currentWords.map((word, i) => {
-                            const {type} = word
-                            if (type === 'break') {
-                              return (<div key={i} className="line-sep"></div>)
-                            }
-                            return (
-                              <span
-                                key={word.id}
-                                onClick={() => {
-                                  setCurrentWords(prevState => [...prevState].map(w => {
-                                      if (w.id === word.id) {
-                                        w.hidden = !w.hidden
-                                      }
-                                      return w
-                                    })
-                                  )
-                                }}
-                                className={`text-item-word ${word.hidden ? 'selected' : ''}`}
-                              >{word.word}</span>
-                            )
-                          })}
-                        </div>
-                      ) : (
-                        <div
-                          ref={textRef}
-                          contentEditable="plaintext-only"
-                          className="textarea"
-                          dangerouslySetInnerHTML={{__html: currentText}}
-                          onInput={emitChange}
-                          onBlur={emitChange}
-                          onKeyUp={emitChange}
-                          onKeyDown={emitChange}
-                          style={{
-                            borderStyle: 'solid',
-                            overflowY: 'auto'
-                          }}
-                        ></div>
-                      )}
-                      </div>
-                    </div>
-                  </div>
-                  {markedItems.includes(currentNode.id) && <div className="dialog-action" style={{paddingTop: '1rem'}}>
-                    <button onClick={() => {
-                      setMarkedItems(prevState => {
-                        return [...prevState].filter(id => id !== currentNode.id)
-                      })
-                      setOpen(false)
-                    }} className="button button--default button--outline" type="button">Закрыть и снять выделение
-                    </button>
-                  </div>}
-                </div>
-              )}
-            </Dialog>
+            <ItemDialog
+              ref={itemDialogRef}
+              dialogProps={{addClassName: 'item-dialog'}}
+              open={open}
+              setOpen={setOpen}
+              currentNode={currentNode}
+              markInit={currentNode ? markedItems.includes(currentNode.id) : false}
+              setMarkedItems={setMarkedItems}
+              hideHandler={(values) => {
+                dispatch({
+                  type: 'update_tree',
+                  treeData: currentNode.changeHandler(values)
+                })
+              }}
+            />
           </CSSTransition>
         </div>
       </TreeContext.Provider>
