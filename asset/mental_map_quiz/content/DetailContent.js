@@ -84,7 +84,7 @@ function DetailText(text, itemClickHandler, afterRandCallback, promptBtn) {
   return detailText
 }
 
-export default function DetailContent({image, text, historyItem, rewritePrompt, itemClickHandler, diffClickHandler}) {
+export default function DetailContent({image, text, historyItem, rewritePrompt, itemClickHandler, diffClickHandler, hideText}) {
 
   const detailImgWrap = document.createElement('div')
   detailImgWrap.classList.add('image-item')
@@ -124,13 +124,22 @@ export default function DetailContent({image, text, historyItem, rewritePrompt, 
 
   let detailText
 
-  detailText = DetailText(text, () => {
-    itemClickHandler(recordingWrap)
-  }, () => {
-    recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
-    recordingWrap.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%'
-  }, promptBtn)
-
+  if (hideText) {
+    detailText = document.createElement('div')
+    detailText.innerText = 'Текст скрыт'
+    detailText.style.fontSize = '2.2rem'
+    detailText.style.lineHeight = '2.6rem'
+    detailText.style.marginBottom = '10px'
+    detailText.style.color = '#808080'
+  }
+  else {
+    detailText = DetailText(text, () => {
+      itemClickHandler(recordingWrap)
+    }, () => {
+      recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
+      recordingWrap.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%'
+    }, promptBtn)
+  }
   detailTextWrap.appendChild(detailText)
 
   const recordingContainer = document.createElement('div')

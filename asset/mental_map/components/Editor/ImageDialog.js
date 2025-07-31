@@ -5,7 +5,7 @@ import {useMentalMap} from "../App/App";
 import api from "../../Api";
 
 const ImageDialog = forwardRef(function ImageDialog(props, ref) {
-
+console.log('ImageDialog')
   const {
     setOpen,
     currentImageItem,
@@ -25,6 +25,10 @@ const ImageDialog = forwardRef(function ImageDialog(props, ref) {
   const checkId = useId()
   const [prompts, setPrompts] = useState([])
   const [promptId, setPromptId] = useState(currentImageItem.promptId)
+  const tooltipCheckId = useId();
+  const [tooltipState, setTooltipState] = useState(currentImageItem.tooltipState)
+  const [textState, setTextState] = useState(currentImageItem.textState)
+  const textCheckId = useId();
 
   useEffect(() => {
     if (!currentWords.length) {
@@ -65,7 +69,6 @@ const ImageDialog = forwardRef(function ImageDialog(props, ref) {
       .then(response => {
         setPrompts(response.prompts)
       })
-
   }, [open]);
 
   return (
@@ -94,6 +97,42 @@ const ImageDialog = forwardRef(function ImageDialog(props, ref) {
                     <option key={i} value={p.id}>{p.name}</option>
                   ))}
                 </select>
+              </div>
+              <div style={{marginBottom: '10px', display: 'flex', flexDirection: 'row'}}>
+                <div style={{flex: '1'}}>
+                  <label style={{display: 'block'}} htmlFor={tooltipCheckId}>Подсказка на изображении</label>
+                  <select id={tooltipCheckId} value={tooltipState} onChange={e => {
+                    setTooltipState(e.target.value)
+                    dispatch({
+                      type: 'update_mental_map_images',
+                      imageId: currentImageItem.id,
+                      payload: {
+                        tooltipState: e.target.value
+                      }
+                    })
+                  }}>
+                    <option value="">По умолчанию</option>
+                    <option value="hide">Скрыть</option>
+                    <option value="show">Показать</option>
+                  </select>
+                </div>
+                <div style={{flex: '1'}}>
+                  <label style={{display: 'block'}} htmlFor={textCheckId}>Текст при проговаривании</label>
+                  <select id={textCheckId} value={textState} onChange={e => {
+                    setTextState(e.target.value)
+                    dispatch({
+                      type: 'update_mental_map_images',
+                      imageId: currentImageItem.id,
+                      payload: {
+                        textState: e.target.value
+                      }
+                    })
+                  }}>
+                    <option value="">По умолчанию</option>
+                    <option value="hide">Скрыть</option>
+                    <option value="show">Показать</option>
+                  </select>
+                </div>
               </div>
               <div style={{marginBottom: '10px'}}>
                 <button onClick={() => {

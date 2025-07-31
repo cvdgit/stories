@@ -11,7 +11,8 @@ export default function MentalMapImage(
   mapImageHeight,
   images,
   imageClickHandler,
-  history
+  history,
+  hideTooltipChecker
 ) {
 
   const zoomWrap = document.createElement('div')
@@ -53,10 +54,18 @@ export default function MentalMapImage(
       }
     }
 
-    mapFragment.dataset.trigger = 'hover'
-    mapFragment.dataset.placement = 'auto'
-    mapFragment.dataset.container = 'body'
-    mapFragment.setAttribute('title', image.text.replace(/<[^>]*>?/gm, ''))
+    let hideTooltip = false;
+    if (typeof hideTooltipChecker === 'function') {
+      hideTooltip = hideTooltipChecker(image.tooltipState);
+    }
+
+    if (!hideTooltip) {
+      mapFragment.dataset.trigger = 'hover'
+      mapFragment.dataset.placement = 'auto'
+      mapFragment.dataset.container = 'body'
+      mapFragment.setAttribute('title', image.text.replace(/<[^>]*>?/gm, ''))
+    }
+
     mapFragment.classList.add('map-img')
 
     const doneElem = document.createElement('div')

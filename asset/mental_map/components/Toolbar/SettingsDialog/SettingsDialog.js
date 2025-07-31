@@ -8,6 +8,8 @@ export default function SettingsDialog({open, setOpen, mentalMapId, schedules}) 
   const settingsDialogRef = useRef();
   const checkId = useId();
   const planCheckId = useId();
+  const tooltipCheckId = useId();
+  const textCheckId = useId();
   const {state, dispatch} = useMentalMap();
   const isFirstRender = useRef(true);
   const [settings, setSettings] = useState(state?.settings || {});
@@ -39,8 +41,8 @@ export default function SettingsDialog({open, setOpen, mentalMapId, schedules}) 
     >
       <Dialog nodeRef={settingsDialogRef} hideHandler={() => setOpen(false)} style={{width: '60rem'}}>
         <h2 className="dialog-heading">Настройки</h2>
-        <div style={{padding: '20px 0'}}>
-          {!isTreeView && <div style={{marginBlock: '20px'}}>
+        <div style={{paddingTop: '20px'}}>
+          {!isTreeView && <div style={{marginBottom: '20px'}}>
             <label htmlFor={checkId}>
               <input
                 id={checkId}
@@ -56,7 +58,7 @@ export default function SettingsDialog({open, setOpen, mentalMapId, schedules}) 
                 type="checkbox"
               /> При прохождении показывать изображение ментальной карты</label>
           </div>}
-          {isTreeView && <div style={{marginBlock: '20px'}}>
+          {isTreeView && <div style={{marginBottom: '20px'}}>
             <label htmlFor={planCheckId}>
               <input
                 id={planCheckId}
@@ -87,7 +89,7 @@ export default function SettingsDialog({open, setOpen, mentalMapId, schedules}) 
               ))}
             </select>
           </div>
-          <div>
+          <div style={{marginBottom: '20px'}}>
             <select value={String(state.settings?.threshold || '80')} onChange={(e) => {
               settings.threshold = e.target.value === '' ? null : Number(e.target.value)
               setSettings(settings)
@@ -104,6 +106,40 @@ export default function SettingsDialog({open, setOpen, mentalMapId, schedules}) 
               <option value="20">20</option>
             </select>
           </div>
+
+          {!isTreeView && <div style={{marginBottom: '20px'}}>
+            <label htmlFor={tooltipCheckId}>
+              <input
+                id={tooltipCheckId}
+                onChange={(e) => {
+                  settings.hideTooltip = !Boolean(state.settings?.hideTooltip)
+                  setSettings(settings)
+                  dispatch({
+                    type: 'update_settings',
+                    payload: settings
+                  })
+                }}
+                checked={Boolean(state.settings?.hideTooltip)}
+                type="checkbox"
+              /> Скрывать подсказки на изображении</label>
+          </div>}
+
+          {!isTreeView && <div style={{marginBottom: '20px'}}>
+            <label htmlFor={textCheckId}>
+              <input
+                id={textCheckId}
+                onChange={(e) => {
+                  settings.hideText = !Boolean(state.settings?.hideText)
+                  setSettings(settings)
+                  dispatch({
+                    type: 'update_settings',
+                    payload: settings
+                  })
+                }}
+                checked={Boolean(state.settings?.hideText)}
+                type="checkbox"
+              /> Скрывать текст при проговаривании</label>
+          </div>}
         </div>
       </Dialog>
     </CSSTransition>

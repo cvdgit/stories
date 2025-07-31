@@ -200,8 +200,17 @@ export default function MentalMap(element, deck, params) {
 
   const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
 
-  function mapImageClickHandler({image, texts, historyItem, rewritePrompt, threshold, dialogHideHandler, fastMode}) {
+  function mapImageClickHandler({image, texts, historyItem, rewritePrompt, threshold, dialogHideHandler, fastMode, hideFragmentText}) {
     const text = texts.find(t => t.id === image.id)
+
+    let hideText = hideFragmentText;
+    if (image.textState === 'hide') {
+      hideText = true;
+    }
+    if (image.textState === 'show') {
+      hideText = false;
+    }
+
     const detailContainer = DetailContent({
       image,
       text,
@@ -235,7 +244,8 @@ export default function MentalMap(element, deck, params) {
           text: stripTags(image.text),
           userResponse: detailContainer.querySelector('#result_span').innerText.trim()
         }))
-      }
+      },
+      hideText
     })
     const dialog = new InnerDialog($(container), {title: 'Перескажите текст', content: detailContainer});
     dialog.show(wrapper => {
@@ -588,6 +598,18 @@ export default function MentalMap(element, deck, params) {
     texts = json.map.images.map(image => createWordItem(image.text, image.id))
 
     const imageFirst = Boolean(json.settings?.imageFirst)
+    const hideTooltip = Boolean(json.settings?.hideTooltip)
+    const hideFragmentText = Boolean(json.settings?.hideText)
+
+    function hideTooltipChecker(tooltipState) {
+      if (tooltipState === 'hide') {
+        return true;
+      }
+      if (tooltipState === 'show') {
+        return false;
+      }
+      return hideTooltip;
+    }
 
     function fragmentDialogHideHandler(image, historyItem) {
       hideDialogHandler()
@@ -649,7 +671,8 @@ export default function MentalMap(element, deck, params) {
         rewritePrompt,
         threshold,
         dialogHideHandler: () => fragmentDialogHideHandler(image, historyItem),
-        fastMode
+        fastMode,
+        hideFragmentText
       })
     }, mapQuestions.typeIsMentalMapQuestions()))
 
@@ -716,10 +739,12 @@ export default function MentalMap(element, deck, params) {
               }
               fragmentDialogHideHandler(image, historyItem)
             },
-            fastMode
+            fastMode,
+            hideFragmentText
           })
         },
-        mentalMapHistory
+        mentalMapHistory,
+        hideTooltipChecker
       )
 
       /*
@@ -859,10 +884,12 @@ export default function MentalMap(element, deck, params) {
               }
               fragmentDialogHideHandler(image, historyItem)
             },
-            fastMode
+            fastMode,
+            hideFragmentText
           })
         },
-        mentalMapHistory
+        mentalMapHistory,
+        hideTooltipChecker
       )
       const zoomContainer = showMentalMapHandler(zoomWrap, () => {
         zoom.destroy()
