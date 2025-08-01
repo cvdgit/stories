@@ -1,3 +1,6 @@
+import tippy from "tippy.js";
+import 'tippy.js/dist/tippy.css';
+
 function findBgClassName(bg) {
   if (!bg || bg === '') {
     return '';
@@ -60,10 +63,18 @@ export default function MentalMapImage(
     }
 
     if (!hideTooltip) {
-      mapFragment.dataset.trigger = 'hover'
-      mapFragment.dataset.placement = 'auto'
-      mapFragment.dataset.container = 'body'
-      mapFragment.setAttribute('title', image.text.replace(/<[^>]*>?/gm, ''))
+      /*mapImgWrap.dataset.trigger = 'hover click focus'
+      mapImgWrap.dataset.placement = 'auto'
+      mapImgWrap.dataset.container = '.story-container'
+      mapImgWrap.dataset.content = image.text.replace(/<[^>]*>?/gm, '')
+      mapImgWrap.setAttribute('title', '')*/
+      tippy(mapImgWrap, {
+        content: `<div style="font-size: 2.4rem; line-height: 3rem;">${image.text.replace(/<[^>]*>?/gm, '')}</div>`,
+        interactive: true,
+        allowHTML: true,
+        maxWidth: '50em',
+        //appendTo: () => document.body,
+      })
     }
 
     mapFragment.classList.add('map-img')

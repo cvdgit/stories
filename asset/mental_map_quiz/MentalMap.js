@@ -897,7 +897,7 @@ export default function MentalMap(element, deck, params) {
         element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
       }, fastMode, fastModeChangeHandler)
       this.element.appendChild(zoomContainer)
-      $('.mental-map-img .map-img').tooltip()
+      //$('.mental-map-img').popover()
 
       zoom = initPanZoom(zoomWrap, json.map.width, json.map.height)
       element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
