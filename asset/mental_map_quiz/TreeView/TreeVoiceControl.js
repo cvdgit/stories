@@ -2,15 +2,13 @@
  * @param {VoiceResponse} voiceResponse
  * @param startClickHandler
  * @param stopClickHandler
- * @param processChunksHandler
  * @returns {HTMLDivElement}
  * @constructor
  */
 export default function TreeVoiceControl(
   voiceResponse,
   startClickHandler,
-  stopClickHandler,
-  processChunksHandler
+  stopClickHandler
 ) {
 
   console.log('TreeVoiceControl call')
@@ -28,64 +26,37 @@ export default function TreeVoiceControl(
             </div>
         </div>`
 
-  /** @type {MediaRecorder|null} */
-  let mediaRecorder
-  /** @type {MediaStream|null} */
-  let mediaStream
-  let chunks = []
-
-  const resetChunks = () => chunks = []
-
   elem.querySelector('.gn').addEventListener('click', e => {
 
     if ($(e.target).data('abort')) {
-      mediaStream.getTracks().forEach( (track) => track.stop())
-      mediaRecorder.stop()
-      resetChunks()
       elem.querySelector('.gn').classList.remove('recording')
       elem.querySelector('.pulse-ring').remove()
+      delete elem.dataset.state
       stopClickHandler(e.target)
       return
     }
 
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
-      mediaStream.getTracks().forEach( (track) => track.stop())
-      mediaRecorder.stop()
-      elem.querySelector('.gn').classList.remove('recording')
-      elem.querySelector('.pulse-ring').remove()
+    const state = elem.dataset.state;
+    if (!state) {
+      if (startClickHandler(e.target) === false) {
+        return;
+      }
+      voiceResponse.start(new Event('voiceResponseStart'), 'ru-RU', function () {
+        elem.dataset.state = 'recording';
+        const ring = document.createElement('div');
+        ring.classList.add('pulse-ring');
+        elem.querySelector('.question-voice__inner').insertBefore(ring, elem.querySelector('.gn'));
+        elem.querySelector('.gn').classList.add('recording');
+      });
+      return;
+    }
+
+    elem.querySelector('.gn').classList.remove('recording')
+    elem.querySelector('.pulse-ring').remove()
+    voiceResponse.stop(() => {
+      delete elem.dataset.state
       stopClickHandler(e.target)
-      return
-    }
-
-    if (startClickHandler(e.target) === false) {
-      return
-    }
-
-    navigator.mediaDevices.getUserMedia({audio: true})
-      .then((stream) => {
-
-        mediaStream = stream
-
-        const ring = document.createElement('div')
-        ring.classList.add('pulse-ring')
-        elem.querySelector('.question-voice__inner').insertBefore(ring, elem.querySelector('.gn'))
-        elem.querySelector('.gn').classList.add('recording')
-
-        mediaRecorder = new MediaRecorder(stream, {mimeType: 'audio/webm'})
-        mediaRecorder.start()
-
-        mediaRecorder.ondataavailable = (e) => chunks.push(e.data)
-
-        mediaRecorder.onstop = () => {
-          if (typeof processChunksHandler === 'function') {
-            const abort = $(e.target).data('abort')
-            $(e.target).data('abort', false)
-            processChunksHandler(e.target, chunks, resetChunks, abort)
-          }
-        }
-
-      })
-      .catch(error => console.log('error', error))
+    })
   })
 
   return elem

@@ -173,10 +173,12 @@ export default function MissingWordsRecognition(config) {
     start,
     stop,
     addEventListener(type, eventHandler) {
-      const listener = {}
-      listener.type = type
-      listener.eventHandler = eventHandler
-      eventListeners.push(listener)
+      const existsListener = eventListeners.find(e => e.type === type)
+      if (existsListener) {
+        existsListener.eventHandler = eventHandler
+        return
+      }
+      eventListeners.push({type, eventHandler})
     },
     setCallback(type, callback) {
       callbacks[type] = callback

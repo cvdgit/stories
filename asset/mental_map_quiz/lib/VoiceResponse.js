@@ -18,6 +18,9 @@ VoiceResponse.prototype = {
   onResult(callback) {
     this.recognition.addEventListener('onResult', callback);
   },
+  onEnd(callback) {
+    this.recognition.addEventListener('onEnd', callback);
+  },
   getStatus() {
     return this.recognition.getStatus()
   }
