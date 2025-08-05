@@ -1,9 +1,9 @@
 import React, {useEffect, useRef, useState, forwardRef} from 'react';
 import Dialog from "../Dialog";
 import {createWordsFormText, getTextBySelections} from "../Selection";
-import ContentEditable from "react-contenteditable";
 import {stripTags} from "../../Lib";
 import api from "../../Api";
+import Editable from "../Editable";
 
 const ItemDialog = forwardRef(function ItemDialog(props, ref) {
   const {
@@ -19,7 +19,6 @@ const ItemDialog = forwardRef(function ItemDialog(props, ref) {
 
   const [selectionMode, setSelectionMode] = useState(false)
   const selectionRef = useRef()
-  const textRef = useRef()
   const [currentWords, setCurrentWords] = useState([])
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -27,9 +26,9 @@ const ItemDialog = forwardRef(function ItemDialog(props, ref) {
   const [prompts, setPrompts] = useState([])
   const [promptId, setPromptId] = useState('')
 
-  const emitChange = (e) => {
-    setDescription(e.target.value)
-    setCurrentDescription(e.target.value)
+  const emitChange = (content) => {
+    setDescription(content)
+    setCurrentDescription(content)
     setMark(false)
   }
 
@@ -153,17 +152,7 @@ const ItemDialog = forwardRef(function ItemDialog(props, ref) {
                     })}
                   </div>
                 ) : (
-                  <ContentEditable
-                    innerRef={textRef}
-                    html={description}
-                    onChange={emitChange}
-                    tagName="div"
-                    className="textarea"
-                    style={{
-                      borderStyle: 'solid',
-                      overflowY: 'auto'
-                    }}
-                  />
+                  <Editable content={description} changeHandler={emitChange} />
                 )}
               </div>
             </div>
