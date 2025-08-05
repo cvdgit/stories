@@ -28,7 +28,7 @@ class LlmPromptController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => [UserRoles::ROLE_ADMIN],
+                        'roles' => [UserRoles::ROLE_TEACHER],
                     ],
                 ],
             ],
