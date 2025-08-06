@@ -2,6 +2,7 @@
 
 namespace api\modules\v1\models;
 
+use api\modules\v1\FetchMentalMap\MentalMapFetcher;
 use common\helpers\Url;
 use common\models\Category;
 use common\models\Lesson;
@@ -78,7 +79,7 @@ class Story extends ActiveRecord
             },
             'author' => function() {
                 return $this->author->getProfileName();
-            }
+            },
         ];
     }
 
@@ -107,7 +108,7 @@ class Story extends ActiveRecord
 
     public function extraFields(): array
     {
-        return ['slides', 'allSlides', 'tests', 'lessons'];
+        return ['slides', 'allSlides', 'tests', 'lessons', 'maps'];
     }
 
     public function getCategories(): ActiveQuery
@@ -126,5 +127,10 @@ class Story extends ActiveRecord
     {
         return $this->hasMany(Lesson::class, ['story_id' => 'id'])
             ->orderBy(['order' => SORT_ASC]);
+    }
+
+    public function getMaps(): array
+    {
+        return (new MentalMapFetcher())->fetch($this->id);
     }
 }
