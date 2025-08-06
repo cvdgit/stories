@@ -6,7 +6,7 @@ use yii\web\AssetBundle;
 
 class MentalMapAsset extends AssetBundle
 {
-    public $basePath = '@webroot';
+    public $basePath = '@public';
     public $baseUrl = '@web';
 
     public $js = [
