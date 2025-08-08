@@ -136,6 +136,9 @@ console.log('ImageDialog')
               </div>
               <div style={{marginBottom: '10px'}}>
                 <button onClick={() => {
+                  if (!selectionMode) {
+                    return
+                  }
                   setCurrentText(getTextBySelections(currentWords))
                   setSelectionMode(false)
                 }}
@@ -143,6 +146,9 @@ console.log('ImageDialog')
                         type="button">Редактировать
                 </button>
                 <button onClick={() => {
+                  if (selectionMode) {
+                    return
+                  }
                   setCurrentText(textRef.current.innerHTML)
                   setCurrentWords(createWordsFormText(textRef.current.innerHTML))
                   setSelectionMode(true)

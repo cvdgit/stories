@@ -91,6 +91,9 @@ const ItemDialog = forwardRef(function ItemDialog(props, ref) {
                 </div>
                 <div style={{marginBottom: '10px'}}>
                   <button onClick={() => {
+                    if (!selectionMode) {
+                      return
+                    }
                     setTitle(getTextBySelections(currentWords))
                     setSelectionMode(false)
                   }}
@@ -98,6 +101,9 @@ const ItemDialog = forwardRef(function ItemDialog(props, ref) {
                           type="button">Редактировать
                   </button>
                   <button onClick={() => {
+                    if (selectionMode) {
+                      return
+                    }
                     setCurrentWords(createWordsFormText(title))
                     setSelectionMode(true)
                   }}
