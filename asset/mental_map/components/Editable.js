@@ -18,10 +18,10 @@ export default function Editable({content, changeHandler}) {
       onChange={e => changeHandler(e.target.value)}
       html={content}
       content={content}
-      onPasteCapture={(e) => {
+      /*onPasteCapture={(e) => {
         e.preventDefault();
         e.target.innerText = e.clipboardData.getData("text/plain");
-      }}
+      }}*/
     />
   )
 }
