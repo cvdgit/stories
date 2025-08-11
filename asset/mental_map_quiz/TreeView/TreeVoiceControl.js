@@ -31,8 +31,11 @@ export default function TreeVoiceControl(
     if ($(e.target).data('abort')) {
       elem.querySelector('.gn').classList.remove('recording')
       elem.querySelector('.pulse-ring').remove()
-      delete elem.dataset.state
-      stopClickHandler(e.target)
+      $(e.target).removeData('abort')
+      voiceResponse.stop(() => {
+        delete elem.dataset.state
+        stopClickHandler(e.target, true)
+      })
       return
     }
 

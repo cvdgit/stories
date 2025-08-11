@@ -184,7 +184,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
       // voiceResponse.onEnd(args => {})
     }
 
-    const stopClickHandler = async targetElement => {
+    const stopClickHandler = async (targetElement, abort) => {
 
       $(rowElement.querySelector('.gn'))
         .tooltip('hide')
@@ -193,6 +193,14 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
       rowElement.classList.remove('current-row')
       rowElement.parentNode.classList.remove('do-recording')
       rowElement.querySelectorAll('.target-text').forEach(el => el.classList.remove('selected'))
+
+      const historyItem = history.find(i => i.id === nodeId)
+
+      if (abort) {
+        targetElement.closest('.node-row').classList.remove('pending')
+        historyItem.pending = false
+        return
+      }
 
       if (finalSpan.innerHTML.trim().length) {
         resultSpan.innerHTML +=
@@ -237,7 +245,6 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
         }
       }
 
-      const historyItem = history.find(i => i.id === nodeId)
       historyItem.user_response = userResponse
 
       if (!responseIsSuccess) {
