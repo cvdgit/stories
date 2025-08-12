@@ -49,8 +49,11 @@ class MentalMapBlockContent
         return $this->id;
     }
 
-    public function renderWithDescription(int $slideId, string $title = 'Ментальная карта'): string
+    public function renderWithDescription(int $slideId, bool $isTreeMap, string $title = 'Ментальная карта'): string
     {
+        if ($isTreeMap) {
+            $title .= ' (дерево)';
+        }
         $link = Html::a($title, ['mental-map/editor', 'id' => $this->id, 'from_slide' => $slideId]);
         if ($this->mapType === 'mental-map-questions') {
             $link = Html::a($title, '#', ['data-mental-map-action' => 'update-questions']);

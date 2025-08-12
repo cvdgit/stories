@@ -335,3 +335,40 @@ const SimpleModal = function({id, title}) {
    */
   this.getElement = () => element;
 }
+
+window.modalHelper = {
+  btnLoading(elem) {
+    $(elem).attr("data-original-text", $(elem).html());
+    $(elem).prop("disabled", true);
+    $(elem).html('<i class="spinner-border spinner-border-sm"></i> Loading...');
+  },
+  btnReset(elem) {
+    $(elem).prop("disabled", false);
+    $(elem).html($(elem).attr("data-original-text"));
+  }
+}
+
+window.formHelper = {
+  sendForm(url, type, formData) {
+    return $.ajax({
+      url,
+      type,
+      data: formData,
+      dataType: 'json',
+      cache: false,
+      contentType: false,
+      processData: false
+    });
+  },
+  attachBeforeSubmit(form, callback) {
+    form
+      .on('beforeSubmit', function (e) {
+        e.preventDefault();
+        callback(form);
+        return false;
+      })
+      .on('submit', function (e) {
+        e.preventDefault();
+      });
+  }
+}

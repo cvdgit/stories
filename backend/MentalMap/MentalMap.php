@@ -149,4 +149,9 @@ class MentalMap extends ActiveRecord
         $payload['questions'] = $fragments;
         $this->payload = $payload;
     }
+
+    public function typeIsQuestions(): bool
+    {
+        return $this->map_type === 'mental-map-questions';
+    }
 }

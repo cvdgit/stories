@@ -20,6 +20,7 @@ use common\helpers\Url;
 use common\models\SlideVideo;
 use common\models\StorySlideImage;
 use common\models\StoryTest;
+use Exception;
 use yii\helpers\Html;
 
 class SlideModifier
@@ -99,20 +100,24 @@ class SlideModifier
                 try {
                     $testModel = StoryTest::findModel($content->getTestID());
                     $block->setContent($content->renderWithDescription([], $testModel->title));
-                } catch (\Exception $ex) {
+                } catch (Exception $ex) {
                     $block->setContent($content->renderWithDescription([], $ex->getMessage()));
                 }
             }
             if ($block->typeIs(AbstractBlock::TYPE_MENTAL_MAP)) {
                 $content = MentalMapBlockContent::createFromHtml($block->getContent());
                 $title = null;
+                $isTreeMap = false;
                 try {
                     $mentalMap = MentalMap::findOne($content->getId());
                     if ($mentalMap !== null) {
                         $title = $mentalMap->name;
+                        $isTreeMap = $mentalMap->isMentalMapAsTree();
                     }
-                } catch (\Exception $ex) {}
-                $block->setContent($content->renderWithDescription($this->slide->getId(), $title));
+                } catch (Exception $ex) {
+                    $title = 'Ментальная карта не найдена';
+                }
+                $block->setContent($content->renderWithDescription($this->slide->getId(), $isTreeMap, $title));
             }
             if ($block->typeIs(AbstractBlock::TYPE_RETELLING)) {
                 $content = RetellingBlockContent::createFromHtml($block->getContent());
@@ -122,7 +127,7 @@ class SlideModifier
                     if ($retelling !== null) {
                         $title = $retelling->name;
                     }
-                } catch (\Exception $ex) {}
+                } catch (Exception $ex) {}
                 $block->setContent($content->renderWithDescription($this->slide->getId(), $title));
             }
             if ($block->typeIs(AbstractBlock::TYPE_VIDEO) || $block->typeIs(AbstractBlock::TYPE_VIDEOFILE)) {
@@ -133,7 +138,7 @@ class SlideModifier
                 } else {
                     try {
                         $videoModel = SlideVideo::findModel(pathinfo($block->getVideoId(), PATHINFO_FILENAME));
-                    } catch (\Exception $ex) {
+                    } catch (Exception $ex) {
                     }
                 }
                 if ($videoModel !== null) {

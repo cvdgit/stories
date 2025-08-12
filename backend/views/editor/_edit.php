@@ -482,7 +482,42 @@ $js = <<< JS
     ]);
     editorPopover.attach('#create-slide-action', {'placement': 'right'}, [
         {'name': 'slide', 'title': 'Пустой слайд', 'click': StoryEditor.createSlide},
-        {'name': 'copy', 'title': 'Копия текущего слайда', 'click': StoryEditor.copySlide},
+        {'name': 'copy', 'title': 'Копия текущего слайда', 'click': () => {
+            const mentalMap = $(StoryEditor.getCurrentSlide().getElement()).find('.mental-map')
+            if (mentalMap.length) {
+
+                const modal = new RemoteModal({
+                    id: 'copy-mental-map-modal',
+                    title: 'Скопировать слайд с ментальной картой'
+                });
+
+                const mentalMapId = mentalMap.attr('data-mental-map-id')
+                modal.show({
+                  url: '/admin/index.php?r=editor/copy-slide/mental-map-form&id=' + mentalMapId + '&slide_id=' + StoryEditor.getCurrentSlide().getID(),
+                  callback: function() {
+                    const submitBtn = $(this).find('button[type=submit]');
+                    formHelper.attachBeforeSubmit($(this).find('form'), (form) => {
+                      modalHelper.btnLoading(submitBtn);
+                      formHelper
+                        .sendForm(form.attr('action'), form.attr('method'), new FormData(form[0]))
+                        .done(response => {
+                          if (response && response.success) {
+                            StoryEditor.loadSlides(response.id);
+                            modal.hide()
+                          }
+                          if (response && response.success === false) {
+                            alert(response.message);
+                          }
+                        })
+                        .always(() => modalHelper.btnReset(submitBtn));
+                    });
+                  }
+                })
+
+                return
+            }
+            StoryEditor.copySlide()
+        }},
         {'name': 'link', 'title': 'Ссылка на слайд', 'click': function() {
             $('#slide-link-modal').modal('show');
         }},

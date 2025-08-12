@@ -135,5 +135,4 @@ class SlideController extends BaseController
         $model->updateVisible($visible);
         return ['success' => true, 'status' => $visible];
     }
-
 }
