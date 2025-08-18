@@ -21,6 +21,7 @@ class QuestionRoutes
             'ChatGPT вопрос' => ['test/gpt/create', 'test_id' => $quizId],
             'Математические формулы' => ['test/math/create', 'test_id' => $quizId],
             'Математические формулы с пропусками' => ['test/math/create', 'test_id' => $quizId, 'gaps' => 1],
+            'Ступенчатый вопрос' => ['test/step/create', 'test_id' => $quizId],
         ];
     }
 

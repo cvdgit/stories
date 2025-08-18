@@ -101,7 +101,9 @@ MathQuestion.prototype.checkGapsAnswers = function(question, userAnswers) {
     if (!f.placeholders.length) {
       return
     }
-    f.placeholders.map(p => correct && p.value === userAnswers.find(a => a.placeholder === p.id).answer)
+    correct = correct && f.placeholders.reduce((placeCorrect, p) => {
+      return placeCorrect && p.value === answers.find(a => a.placeholder === p.id).answer
+    }, true)
   })
 
   return correct

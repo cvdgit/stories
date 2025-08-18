@@ -15,6 +15,7 @@ use backend\components\training\collection\build\PassTest;
 use backend\components\training\collection\build\Poetry;
 use backend\components\training\collection\build\Region;
 use backend\components\training\collection\build\Sequence;
+use backend\components\training\collection\build\StepQuestionBuilder;
 use common\models\StoryTest;
 
 class TestCollection extends BaseCollection
@@ -48,6 +49,8 @@ class TestCollection extends BaseCollection
             $builder = new GptQuestionBuilder($questionData, $stars);
         } elseif ($type->isMathQuestion()) {
             $builder = new MathQuestionBuilder($questionData, $stars);
+        } elseif ($type->isStepQuestion()) {
+            $builder = new StepQuestionBuilder($questionData, $stars);
         } else {
             $builder = new Base($questionData, $stars, $this->testModel);
         }

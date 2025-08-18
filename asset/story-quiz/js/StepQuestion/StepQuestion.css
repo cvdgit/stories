@@ -1,0 +1,78 @@
+.step-question {
+  margin-bottom: 10px;
+}
+.step-header {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  column-gap: 20px;
+  padding: 10px 0;
+}
+.step-steps {
+  display: flex;
+  flex-direction: column;
+  row-gap: 20px;
+}
+.step-answer-label {
+  display: block;
+}
+.step-job p,
+.step-question p {
+  font-weight: normal !important;
+}
+.step-step:not(.step-active,.step-correct) .step-answers,
+.step-step:not(.step-active,.step-correct) .step-job {
+  display: none;
+}
+
+.step-header {
+  padding: 10px;
+}
+
+.step-content {
+
+}
+
+.step-header {
+  background-color: #cff4fc;
+}
+
+.step-step {
+  transition: all 200ms;
+  opacity: .5;
+}
+
+.step-step.step-active,
+.step-step.step-correct,
+.step-step.step-incorrect {
+  opacity: 1;
+}
+
+.step-step.step-active .step-content {
+  border: 1px #cff4fc solid;
+  padding: 10px;
+}
+
+.step-step.step-correct .step-content {
+  padding: 10px;
+  border: 1px #cff4fc solid;
+}
+
+.step-index {
+  white-space: nowrap;
+}
+
+.step-status {
+  width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-status.step-status-correct svg {
+  color: rgba(25, 135, 84, 1)
+}
+
+.step-status.step-status-incorrect svg {
+  color: rgba(220, 53, 69, 1)
+}

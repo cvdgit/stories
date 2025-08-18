@@ -23,6 +23,7 @@ class QuestionType
     public const GROUPING = 12;
     public const GPT_QUESTION = 13;
     public const MATH_QUESTION = 14;
+    public const STEP_QUESTION = 15;
 
     private $type;
 
@@ -53,6 +54,7 @@ class QuestionType
             self::GROUPING => 'Группировка элементов',
             self::GPT_QUESTION => 'ChatGPT вопрос',
             self::MATH_QUESTION => 'Математические формулы',
+            self::STEP_QUESTION => 'Ступенчатый вопрос',
         ];
     }
 
@@ -114,5 +116,10 @@ class QuestionType
     public function isMathQuestion(): bool
     {
         return $this->type === self::MATH_QUESTION;
+    }
+
+    public function isStepQuestion(): bool
+    {
+        return $this->type === self::STEP_QUESTION;
     }
 }

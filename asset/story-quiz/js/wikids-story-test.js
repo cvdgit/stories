@@ -34,6 +34,7 @@ import Grouping from "./Grouping";
 import GptQuestion from "./GptQuestion";
 import MathQuestion from "./MathQuestion";
 import Panzoom from "../../app/panzoom.min"
+import StepQuestion from "./StepQuestion";
 
 
 var plugins = [];
@@ -115,6 +116,10 @@ function WikidsStoryTest(el, options) {
    * @type MathQuestion
    */
   this.mathQuestion = null;
+  /**
+   * @type StepQuestion
+   */
+  this.stepQuestion = null;
 
   setElementHtml(createLoader('Инициализация'));
 
@@ -1303,6 +1308,9 @@ function WikidsStoryTest(el, options) {
         case "math_question":
           $answers = that.mathQuestion.createWrapper(question);
           break;
+        case "step_question":
+          $answers = that.stepQuestion.createWrapper(question);
+          break;
         default:
           $answers = createAnswers(getAnswersData(question), question);
       }
@@ -1661,6 +1669,10 @@ function WikidsStoryTest(el, options) {
 
   function questionViewMath(question) {
     return getQuestionView(question) === 'math_question';
+  }
+
+  function questionViewStep(question) {
+    return getQuestionView(question) === 'step_question';
   }
 
   function questionViewDragWords(question) {
@@ -2360,6 +2372,13 @@ function WikidsStoryTest(el, options) {
       }
     }
 
+    if (questionViewStep(currentQuestion)) {
+      const [getUserAnswers, checkCorrectHandler] = that.stepQuestion.create(currentQuestion, $('.step-question-wrap', currentQuestionElement))
+      dom.nextButton.off("click").on("click", function () {
+        nextQuestion(getUserAnswers(), checkCorrectHandler)
+      })
+    }
+
     if (questionViewImageGaps(currentQuestion)) {
 
       let imageGapsAnswers = [];
@@ -2670,6 +2689,8 @@ function WikidsStoryTest(el, options) {
       $elements.append(that.gptQuestion.getContent(question))
     } else if (questionViewMath(question)) {
       $elements.append(that.mathQuestion.getContent(question))
+    } else if (questionViewStep(question)) {
+      $elements.append(that.stepQuestion.getContent(question))
     } else if (questionViewImageGaps(question)) {
       $elements.append(that.imageGapsQuestion.getContent(question));
     } else if (questionViewDragWords(question)) {
@@ -3149,6 +3170,7 @@ WikidsStoryTest.mount(ImageGaps);
 WikidsStoryTest.mount(Grouping)
 WikidsStoryTest.mount(GptQuestion)
 WikidsStoryTest.mount(MathQuestion)
+WikidsStoryTest.mount(StepQuestion)
 
 WikidsStoryTest.getTests = function () {
   return tests;
