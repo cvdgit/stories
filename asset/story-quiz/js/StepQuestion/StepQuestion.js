@@ -170,6 +170,8 @@ function processNextActiveStep(stepsState) {
 
 StepQuestion.prototype.create = function(question, container) {
   const {payload} = question;
+
+  container.empty()
   container.append(`<div class="step-question">${payload.job}</div>`)
   container.append(`<div class="step-steps"></div>`)
 
