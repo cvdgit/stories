@@ -493,7 +493,7 @@ function createNotify(text) {
   return div
 }
 
-const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
+const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
 
 function createRetellingFeedbackContent(text, userResponse, apiResponse) {
   const wrap = document.createElement('div')
