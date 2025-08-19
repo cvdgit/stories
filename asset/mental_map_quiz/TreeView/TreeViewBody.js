@@ -110,7 +110,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
 
   for (const listItem of list) {
     const listItemWrapper = new ItemWrapper(listItem, {isPlanTreeView: params.isPlanTreeView});
-    const similarityChecker = new SimilarityChecker(99)
+    const similarityChecker = new SimilarityChecker(params.threshold)
 
     const rowElement = body.querySelector(`.node-row[data-node-id='${listItem.id}']`)
     const nodeId = rowElement.dataset.nodeId
@@ -227,7 +227,10 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
         retellingResponseSpan.innerText = `{"similarity_percentage": ${similarityChecker.getSimilarityPercentage()}, "all_important_words_included": true, "user_response": "${userResponse}"}`
       }
 
-      if (!responseIsSuccess) {
+      const rewriteByPass = similarityChecker.getSimilarityPercentage() >= 90
+      console.log('rewriteByPass', rewriteByPass)
+
+      if (!responseIsSuccess && !rewriteByPass) {
         await sendMessage(
           `/admin/index.php?r=gpt/stream/retelling-rewrite`,
           {

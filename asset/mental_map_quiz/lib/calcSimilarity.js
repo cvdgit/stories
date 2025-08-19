@@ -4,15 +4,21 @@ const {diffChars} = require('diff');
 
 export function SimilarityChecker(threshold) {
   let similarityPercentage = 0;
+
   return {
     check(rawText, rawUserResponse) {
       const text = removePunctuation(stripTags(rawText).toLowerCase()).trim();
+      console.log('text:', text)
       const userResponse = removePunctuation(stripTags(rawUserResponse).toLowerCase()).trim();
+      console.log('response:', userResponse)
       similarityPercentage = calcSimilarityPercentage(text, userResponse);
+      console.log('percentage:', similarityPercentage)
       if (similarityPercentage < threshold) {
         return false
       }
-      return allImportantWordsIncluded(rawText.toLowerCase().trim(), userResponse)
+      const all = allImportantWordsIncluded(rawText.toLowerCase().trim(), userResponse)
+      console.log('all words:', all)
+      return all
     },
     getSimilarityPercentage() {
       return similarityPercentage;
@@ -37,7 +43,7 @@ export function calcSimilarityPercentage(text, userResponse) {
   return 100 - Math.round(diffCounter * 100 / text.length)
 }
 
-const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
+const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
 
 export function allImportantWordsIncluded(text, userResponse) {
   const importantWords = $(`<div>${text}</div>`)
