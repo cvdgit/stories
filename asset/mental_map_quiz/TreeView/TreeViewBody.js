@@ -254,10 +254,10 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
         retellingResponseSpan.innerText = ''
         await sendMessage(`/admin/index.php?r=gpt/stream/retelling-tree`, {
             userResponse,
-            slideTexts: stripTags(listItemWrapper.getTargetText()),
+            slideTexts: stripTags(listItemWrapper.getTargetText()).replaceAll('_', ' '),
             importantWords: $(`<div>${listItemWrapper.getTargetText()}</div>`)
               .find('span.target-text')
-              .map((i, el) => removePunctuation($(el).text()))
+              .map((i, el) => removePunctuation($(el).text()).replaceAll('_', ' '))
               .get()
               .join(', '),
             promptId: listItem.promptId
