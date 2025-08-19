@@ -110,7 +110,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
 
   for (const listItem of list) {
     const listItemWrapper = new ItemWrapper(listItem, {isPlanTreeView: params.isPlanTreeView});
-    const similarityChecker = new SimilarityChecker(params.threshold)
+    const similarityChecker = new SimilarityChecker(99)
 
     const rowElement = body.querySelector(`.node-row[data-node-id='${listItem.id}']`)
     const nodeId = rowElement.dataset.nodeId
