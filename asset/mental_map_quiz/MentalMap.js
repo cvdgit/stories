@@ -590,7 +590,7 @@ export default function MentalMap(element, deck, params) {
     const {mapTypeIsMentalMapQuestions, questions} = json
     const mapQuestions = new MentalMapQuestions({typeIsMentalMapQuestions: mapTypeIsMentalMapQuestions, questions})
 
-    let fastMode = false
+    let fastMode = true
     function fastModeChangeHandler(e) {
       fastMode = e.target.checked
     }
