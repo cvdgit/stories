@@ -44,12 +44,19 @@ export default function TreeVoiceControl(
       if (startClickHandler(e.target) === false) {
         return;
       }
+      console.log('tree voice start')
       voiceResponse.start(new Event('voiceResponseStart'), 'ru-RU', function () {
-        elem.dataset.state = 'recording';
-        const ring = document.createElement('div');
-        ring.classList.add('pulse-ring');
-        elem.querySelector('.question-voice__inner').insertBefore(ring, elem.querySelector('.gn'));
-        elem.querySelector('.gn').classList.add('recording');
+        console.log('tree voice recording')
+        elem.querySelector('.gn').classList.add('disabled')
+        setTimeout(() => {
+          elem.dataset.state = 'recording';
+          elem.querySelector('.gn').classList.remove('disabled')
+          const ring = document.createElement('div');
+          ring.classList.add('pulse-ring');
+          elem.querySelector('.question-voice__inner').insertBefore(ring, elem.querySelector('.gn'));
+          elem.querySelector('.gn').classList.add('recording');
+        }, 500)
+
       });
       return;
     }

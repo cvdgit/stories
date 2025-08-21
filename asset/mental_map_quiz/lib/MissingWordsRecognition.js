@@ -16,6 +16,7 @@ export default function MissingWordsRecognition(config) {
   const callbacks = {};
 
   recorder.onstart = function () {
+    console.log('recognition onstart')
     recognizing = true;
     dispatchEvent({type: 'onStart'});
     callCallback('onStart');
@@ -121,6 +122,7 @@ export default function MissingWordsRecognition(config) {
       recorder.stop();
       return;
     }
+    console.log('recognition start')
     finalTranscript = '';
     recorder.lang = lang
     recorder.start();

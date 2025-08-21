@@ -337,3 +337,7 @@
   text-overflow: ellipsis;
   white-space: pre;
 }
+
+.gn.disabled {
+  background-color: #ddd;
+}
