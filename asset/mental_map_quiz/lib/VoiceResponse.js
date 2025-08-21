@@ -4,10 +4,10 @@ export default function VoiceResponse(recognition) {
 
 VoiceResponse.prototype = {
   start(event, lang, startCallback) {
-    this.recognition.start(event, lang);
     if (typeof startCallback === 'function') {
       this.recognition.setCallback('onStart', startCallback);
     }
+    this.recognition.start(event, lang);
   },
   stop(endCallback) {
     if (typeof endCallback === 'function') {

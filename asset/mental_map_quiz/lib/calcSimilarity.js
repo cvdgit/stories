@@ -8,9 +8,9 @@ export function SimilarityChecker(threshold) {
   return {
     check(rawText, rawUserResponse) {
       const text = removePunctuation(stripTags(rawText).toLowerCase()).trim();
-      console.log('text:', text)
+      console.log('text:', rawText)
       const userResponse = removePunctuation(stripTags(rawUserResponse).toLowerCase()).trim();
-      console.log('response:', userResponse)
+      console.log('response:', rawUserResponse)
       similarityPercentage = calcSimilarityPercentage(text, userResponse);
       console.log('percentage:', similarityPercentage)
       if (similarityPercentage < threshold) {
