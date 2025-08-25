@@ -599,28 +599,6 @@ $js = <<< JS
                 });
               }
             })
-
-            /*$('#create-block-modal')
-                .off('loaded.bs.modal')
-                .on('loaded.bs.modal', function() {
-                    const storyId = StoryEditor.getConfigValue('storyID')
-                    attachBeforeSubmit($(this).find('form')[0], function(form) {
-                        const formData = new FormData(form)
-                        formData.append('MentalMapForm[texts]', texts)
-                        sendForm('/admin/index.php?r=editor/mental-map-ai&current_slide_id=' + currentSlideId + '&story_id=' + storyId, $(form).attr('method'), formData)
-                            .done(response => {
-                                if (response && response?.success) {
-                                  $('#create-block-modal').modal('hide')
-                                  StoryEditor.loadSlides(response?.slide_id)
-                                } else {
-                                  alert('error')
-                                }
-                            });
-                    });
-                })
-                .modal({
-                    remote: '/admin/index.php?r=editor/mental-map/create-ai-form&slide_id=' + currentSlideId
-                });*/
         }}
     ])
     editorPopover.attach('#create-slide-action', {'placement': 'right'}, [
