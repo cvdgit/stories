@@ -587,7 +587,7 @@ $js = <<< JS
                         .done(response => {
                             console.log(response)
                             if (response && response.success) {
-                                StoryEditor.loadSlides(response.id);
+                                StoryEditor.loadSlides(response.slide_id);
                                 modal.hide()
                             }
                             if (response && response.success === false) {
