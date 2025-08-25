@@ -8,33 +8,56 @@ use backend\components\BaseController;
 use backend\components\story\MentalMapBlock;
 use backend\components\story\MentalMapBlockContent;
 use backend\components\story\reader\HtmlSlideReader;
+use backend\MentalMap\EditorCreateAi\CreateAiMentalMapsForm;
 use backend\MentalMap\MentalMap;
 use backend\models\editor\MentalMapForm;
 use backend\services\StoryEditorService;
+use backend\services\StorySlideService;
 use backend\SlideEditor\CreateMentalMapQuestions\UpdateMentalMapQuestionsForm;
+use common\models\Story;
 use common\models\StorySlide;
 use common\rbac\UserRoles;
+use common\services\TransactionManager;
 use DomainException;
 use Exception;
+use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\filters\AccessControl;
 use yii\helpers\Json;
+use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Request;
 use yii\web\Response;
+use yii\web\User as WebUser;
 
 class MentalMapController extends BaseController
 {
     /**
      * @var StoryEditorService
      */
-    private $editorService;
+    private $storyEditorService;
+    /**
+     * @var TransactionManager
+     */
+    private $transactionManager;
+    /**
+     * @var StorySlideService
+     */
+    private $storySlideService;
 
-    public function __construct($id, $controller, StoryEditorService $editorService, $config = [])
-    {
+    public function __construct(
+        $id,
+        $controller,
+        StoryEditorService $editorService,
+        TransactionManager $transactionManager,
+        StorySlideService $storySlideService,
+        $config = []
+    ) {
         parent::__construct($id, $controller, $config);
-        $this->editorService = $editorService;
+        $this->storyEditorService = $editorService;
+        $this->transactionManager = $transactionManager;
+        $this->storySlideService = $storySlideService;
     }
 
     public function behaviors(): array
@@ -123,7 +146,7 @@ class MentalMapController extends BaseController
                 if (!$mentalMap->save()) {
                     throw new DomainException('MentalMap update error');
                 }
-                $html = $this->editorService->updateMentalMapBlock($updateMentalMapForm);
+                $html = $this->storyEditorService->updateMentalMapBlock($updateMentalMapForm);
                 return ['success' => true, 'block_id' => $updateForm->blockId, 'html' => $html];
             } catch (Exception $exception) {
                 Yii::$app->errorHandler->logException($exception);
@@ -131,6 +154,102 @@ class MentalMapController extends BaseController
             }
         }
 
+        return ['success' => false];
+    }
+
+    public function actionCreateAiForm(int $slide_id): string
+    {
+        $mentalMapForm = new CreateAiMentalMapsForm();
+        return $this->renderAjax('_create_ai', [
+            'formModel' => $mentalMapForm,
+        ]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionCreateAiHandler(Request $request, Response $response, WebUser $user): array
+    {
+        $response->format = Response::FORMAT_JSON;
+        $mentalMapForm = new CreateAiMentalMapsForm();
+        if ($mentalMapForm->load($request->post(), '')) {
+
+            if (!$mentalMapForm->validate()) {
+                return ['success' => false, 'message' => 'Not valid'];
+            }
+
+            $currentSlideModel = StorySlide::findOne($mentalMapForm->currentSlideId);
+            if ($currentSlideModel === null) {
+                throw new NotFoundHttpException('Слайд не найден');
+            }
+
+            $storyModel = $currentSlideModel->story;
+
+            $mentalMaps = Json::decode($mentalMapForm->mentalMaps);
+            $newSlideId = null;
+            foreach ($mentalMaps as $mentalMapRow) {
+                if ($newSlideId !== null) {
+                    $currentSlideModel = StorySlide::findOne($newSlideId);
+                    if ($currentSlideModel === null) {
+                        throw new NotFoundHttpException('Слайд не найден');
+                    }
+                }
+                try {
+                    $this->transactionManager->wrap(function () use ($mentalMapForm, &$newSlideId, $storyModel, $currentSlideModel, $user, $mentalMapRow) {
+
+                        $slideModel = $this->storySlideService->create($storyModel->id, 'empty', StorySlide::KIND_MENTAL_MAP);
+                        $slideModel->number = $currentSlideModel->number + 1;
+                        Story::insertSlideNumber($storyModel->id, $currentSlideModel->number);
+                        if (!$slideModel->save()) {
+                            throw new DomainException(
+                                'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
+                            );
+                        }
+
+                        $mentalMapId = Uuid::uuid4()->toString();
+
+                        $payload = [
+                            'id' => $mentalMapId,
+                            'name' => $mentalMapRow['title'],
+                            'text' => $mentalMapForm->text,
+                            'treeView' => true,
+                            'map' => [
+                                'url' => '/img/mental_map_blank.jpg',
+                                'width' => 1080,
+                                'height' => 720,
+                                'images' => [],
+                            ],
+                            'mapTypeIsMentalMapQuestions' => false,
+                            'treeData' => array_map(static function(string $textFragment): array {
+                                return [
+                                    'id' => Uuid::uuid4()->toString(),
+                                    'title' => $textFragment,
+                                ];
+                            }, $mentalMapRow['fragments']),
+                        ];
+
+                        $mentalMap = MentalMap::create($mentalMapId, $mentalMapRow['title'], $payload, $user->getId());
+                        if (!$mentalMap->save()) {
+                            throw new BadRequestHttpException('Mental Map save exception');
+                        }
+
+                        $data = $this->storyEditorService->getSlideWithMentalMapBlockContent($slideModel->id, $mentalMapId, 'mental-map', false);
+                        $slideModel->updateData($data);
+                        if (!$slideModel->save()) {
+                            throw new DomainException(
+                                'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
+                            );
+                        }
+                        $newSlideId = $slideModel->id;
+                    });
+                } catch (Exception $exception) {
+                    Yii::$app->errorHandler->logException($exception);
+                    return ["success" => false, "message" => $exception->getMessage()];
+                }
+            }
+
+            return ["success" => true, 'slide_id' => $newSlideId];
+        }
         return ['success' => false];
     }
 }

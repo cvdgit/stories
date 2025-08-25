@@ -27,6 +27,7 @@ $this->registerJs($this->renderFile("@backend/views/editor/_mental_map.js"));
 $this->registerJs($this->renderFile("@backend/views/editor/_gpt_rewrite_text.js"));
 $this->registerJs($this->renderFile("@backend/views/editor/_retelling.js"));
 $this->registerJs($this->renderFile("@backend/views/editor/_mental_map_questions.js"));
+$this->registerJs($this->renderFile("@backend/views/editor/mental-map/_create_ai.js"));
 ?>
 <div class="wrap-editor">
     <div class="slides-sidebar">
@@ -105,7 +106,7 @@ $this->registerJs($this->renderFile("@backend/views/editor/_mental_map_questions
                 <span class="glyphicon glyphicon-education icon"></span>
                 <span class="text">Тест</span>
             </li>
-            <li class="blocks-sidebar-item" data-block-type="mental_map">
+            <li class="blocks-sidebar-item" id="mental-map-item">
                 <span class="glyphicon glyphicon-equalizer icon"></span>
                 <span class="text">Ментальная карта</span>
             </li>
@@ -480,6 +481,159 @@ $js = <<< JS
             })
         }}
     ]);
+    editorPopover.attach('#mental-map-item', {placement: 'left'}, [
+        {name: 'mental-map', title: 'Ментальная карта', click: function() {
+            const currentSlide = StoryEditor.getCurrentSlide();
+            if (!currentSlide) {
+                toastr.error("Нет слайда");
+                return;
+            }
+            const texts = getSlideTextContent(currentSlide)
+            if (!texts.length) {
+                toastr.warning("Текст на слайде не найден");
+                return;
+            }
+
+            const images = getSlideImages(currentSlide)
+            let image = ''
+            if (images.length > 0) {
+                image = images[0]
+            }
+
+            $('#create-block-modal')
+                .off('loaded.bs.modal')
+                .on('loaded.bs.modal', function() {
+                    const storyId = StoryEditor.getConfigValue('storyID')
+                    const slideId = currentSlide.getID()
+                    attachBeforeSubmit($(this).find('form')[0], function(form) {
+                        const formData = new FormData(form)
+                        formData.append('MentalMapForm[texts]', texts)
+                        formData.append('MentalMapForm[image]', image)
+                            sendForm('/admin/index.php?r=editor/mental-map&current_slide_id=' + slideId + '&story_id=' + storyId, $(form).attr('method'), formData)
+                                .done(response => {
+                                    if (response && response?.success) {
+                                        $('#create-block-modal').modal('hide')
+                                      StoryEditor.loadSlides(response?.slide_id)
+                                    } else {
+                                      alert('error')
+                                    }
+                                });
+                        });
+                })
+                .modal({'remote': StoryEditor.getCreateBlockUrl('mental_map')});
+        }},
+        {name: 'mental-maps-ai', title: 'Ментальные карты AI', click: function() {
+            const currentSlide = StoryEditor.getCurrentSlide();
+            if (!currentSlide) {
+                return;
+            }
+            const texts = getSlideTextContent(currentSlide)
+            if (!texts.length) {
+                toastr.warning("Текст на слайде не найден");
+                return;
+            }
+
+            const currentSlideId = currentSlide.getID()
+
+            const modal = new RemoteModal({
+                id: 'create-mental-maps-ai-modal',
+                title: 'Ментальные карты AI'
+            });
+
+            modal.show({
+              url: '/admin/index.php?r=editor/mental-map/create-ai-form&slide_id=' + currentSlideId,
+              callback: function() {
+                const submitBtn = $(this).find('button[type=submit]');
+                formHelper.attachBeforeSubmit($(this).find('form'), (form) => {
+                  modalHelper.btnLoading(submitBtn);
+
+                  const mentalMapsAi = new MentalMapsAi()
+                  /*
+                  mentalMapsAi.createMentalMaps(texts, (content) => {
+                      console.log(content)
+                  })*/
+
+                  const content = JSON.parse(`[
+  "Строение организма человека",
+  "Объем образовательной деятельности, финансовое обеспечение которой осуществляется:",
+  "- за счет бюджетных ассигнований федерального бюджета – финансовое обеспечение не осуществляется;",
+  "- за счет бюджетов субъектов Российской Федерации – финансовое обеспечение не осуществляется;",
+  "- за счет местных бюджетов- финансовое обеспечение не осуществляется;",
+  "- по договорам об оказании платных образовательных услуг деятельность в 2023, 2024 году не осуществлялась;"
+]`)
+
+                  const mentalMaps = [
+                      {title: 'Ментальная карта', type: 'mental_map', fragments: []},
+                      {title: 'Ментальная карта (четные пропуски)', type: 'mental_map_even_fragments', fragments: []},
+                      {title: 'Ментальная карта (нечетные пропуски)', type: 'mental_map_odd_fragments', fragments: []}
+                  ]
+
+                  for (let i = 0; i < mentalMaps.length; i++) {
+                      const type = mentalMaps[i].type
+                      switch (type) {
+                          case 'mental_map':
+                              content.map(textFragment => mentalMaps[i].fragments.push(textFragment))
+                              break;
+                          case 'mental_map_even_fragments':
+                              content.map(textFragment => {
+                                  const words = mentalMapsAi.processFragment(textFragment)
+                                  mentalMaps[i].fragments.push(mentalMapsAi.hideWordsEven(words.words))
+                              })
+                              break;
+                          case 'mental_map_odd_fragments':
+                              content.map(textFragment => {
+                                  const words = mentalMapsAi.processFragment(textFragment)
+                                  mentalMaps[i].fragments.push(mentalMapsAi.hideWordsOdd(words.words))
+                              })
+                              break;
+                      }
+                  }
+
+                  const formData = new FormData(form[0])
+                  formData.append('mentalMaps', JSON.stringify(mentalMaps))
+                  formData.append('currentSlideId', currentSlideId)
+                  formData.append('text', texts)
+
+                  formHelper
+                    .sendForm(form.attr('action'), form.attr('method'), formData)
+                    .done(response => {
+                        console.log(response)
+                        if (response && response.success) {
+                            StoryEditor.loadSlides(response.id);
+                            modal.hide()
+                        }
+                        if (response && response.success === false) {
+                            alert(response.message);
+                        }
+                    })
+                    .always(() => modalHelper.btnReset(submitBtn));
+                });
+              }
+            })
+
+            /*$('#create-block-modal')
+                .off('loaded.bs.modal')
+                .on('loaded.bs.modal', function() {
+                    const storyId = StoryEditor.getConfigValue('storyID')
+                    attachBeforeSubmit($(this).find('form')[0], function(form) {
+                        const formData = new FormData(form)
+                        formData.append('MentalMapForm[texts]', texts)
+                        sendForm('/admin/index.php?r=editor/mental-map-ai&current_slide_id=' + currentSlideId + '&story_id=' + storyId, $(form).attr('method'), formData)
+                            .done(response => {
+                                if (response && response?.success) {
+                                  $('#create-block-modal').modal('hide')
+                                  StoryEditor.loadSlides(response?.slide_id)
+                                } else {
+                                  alert('error')
+                                }
+                            });
+                    });
+                })
+                .modal({
+                    remote: '/admin/index.php?r=editor/mental-map/create-ai-form&slide_id=' + currentSlideId
+                });*/
+        }}
+    ])
     editorPopover.attach('#create-slide-action', {'placement': 'right'}, [
         {'name': 'slide', 'title': 'Пустой слайд', 'click': StoryEditor.createSlide},
         {'name': 'copy', 'title': 'Копия текущего слайда', 'click': () => {
@@ -592,49 +746,6 @@ $js = <<< JS
         if (type === 'text') {
             const html = StoryEditor.createEmptyBlock(type);
             StoryEditor.createSlideBlock(html);
-            return
-        }
-
-        if (type === 'mental_map') {
-
-            const currentSlide = StoryEditor.getCurrentSlide();
-            if (!currentSlide) {
-                toastr.error("Нет слайда");
-                return;
-            }
-            const texts = getSlideTextContent(currentSlide)
-            if (!texts.length) {
-                toastr.warning("Текст на слайде не найден");
-                return;
-            }
-
-            const images = getSlideImages(currentSlide)
-            let image = ''
-            if (images.length > 0) {
-                image = images[0]
-            }
-
-            $('#create-block-modal')
-                .off('loaded.bs.modal')
-                .on('loaded.bs.modal', function() {
-                    const storyId = StoryEditor.getConfigValue('storyID')
-                    const slideId = currentSlide.getID()
-                    attachBeforeSubmit($(this).find('form')[0], function(form) {
-                        const formData = new FormData(form)
-                        formData.append('MentalMapForm[texts]', texts)
-                        formData.append('MentalMapForm[image]', image)
-                            sendForm('/admin/index.php?r=editor/mental-map&current_slide_id=' + slideId + '&story_id=' + storyId, $(form).attr('method'), formData)
-                                .done(response => {
-                                    if (response && response?.success) {
-                                        $('#create-block-modal').modal('hide')
-                                      StoryEditor.loadSlides(response?.slide_id)
-                                    } else {
-                                      alert('error')
-                                    }
-                                });
-                        });
-                })
-                .modal({'remote': StoryEditor.getCreateBlockUrl(type)});
             return
         }
 
