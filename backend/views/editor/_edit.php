@@ -547,66 +547,55 @@ $js = <<< JS
                 formHelper.attachBeforeSubmit($(this).find('form'), (form) => {
                   modalHelper.btnLoading(submitBtn);
 
-                  const mentalMapsAi = new MentalMapsAi()
-                  /*
-                  mentalMapsAi.createMentalMaps(texts, (content) => {
-                      console.log(content)
-                  })*/
-
-                  const content = JSON.parse(`[
-  "Строение организма человека",
-  "Объем образовательной деятельности, финансовое обеспечение которой осуществляется:",
-  "- за счет бюджетных ассигнований федерального бюджета – финансовое обеспечение не осуществляется;",
-  "- за счет бюджетов субъектов Российской Федерации – финансовое обеспечение не осуществляется;",
-  "- за счет местных бюджетов- финансовое обеспечение не осуществляется;",
-  "- по договорам об оказании платных образовательных услуг деятельность в 2023, 2024 году не осуществлялась;"
-]`)
-
                   const mentalMaps = [
                       {title: 'Ментальная карта', type: 'mental_map', fragments: []},
                       {title: 'Ментальная карта (четные пропуски)', type: 'mental_map_even_fragments', fragments: []},
                       {title: 'Ментальная карта (нечетные пропуски)', type: 'mental_map_odd_fragments', fragments: []}
                   ]
 
-                  for (let i = 0; i < mentalMaps.length; i++) {
-                      const type = mentalMaps[i].type
-                      switch (type) {
-                          case 'mental_map':
-                              content.map(textFragment => mentalMaps[i].fragments.push(textFragment))
-                              break;
-                          case 'mental_map_even_fragments':
-                              content.map(textFragment => {
-                                  const words = mentalMapsAi.processFragment(textFragment)
-                                  mentalMaps[i].fragments.push(mentalMapsAi.hideWordsEven(words.words))
-                              })
-                              break;
-                          case 'mental_map_odd_fragments':
-                              content.map(textFragment => {
-                                  const words = mentalMapsAi.processFragment(textFragment)
-                                  mentalMaps[i].fragments.push(mentalMapsAi.hideWordsOdd(words.words))
-                              })
-                              break;
+                  const mentalMapsAi = new MentalMapsAi()
+                  mentalMapsAi.createMentalMaps(texts, (content) => {
+                      const json = JSON.parse(content)
+                      for (let i = 0; i < mentalMaps.length; i++) {
+                        const type = mentalMaps[i].type
+                          switch (type) {
+                              case 'mental_map':
+                                  json.map(textFragment => mentalMaps[i].fragments.push(textFragment))
+                                  break;
+                              case 'mental_map_even_fragments':
+                                  json.map(textFragment => {
+                                      const words = mentalMapsAi.processFragment(textFragment)
+                                      mentalMaps[i].fragments.push(mentalMapsAi.hideWordsEven(words.words))
+                                  })
+                                  break;
+                              case 'mental_map_odd_fragments':
+                                  json.map(textFragment => {
+                                      const words = mentalMapsAi.processFragment(textFragment)
+                                      mentalMaps[i].fragments.push(mentalMapsAi.hideWordsOdd(words.words))
+                                  })
+                                  break;
+                          }
                       }
-                  }
 
-                  const formData = new FormData(form[0])
-                  formData.append('mentalMaps', JSON.stringify(mentalMaps))
-                  formData.append('currentSlideId', currentSlideId)
-                  formData.append('text', texts)
+                      const formData = new FormData(form[0])
+                      formData.append('mentalMaps', JSON.stringify(mentalMaps))
+                      formData.append('currentSlideId', currentSlideId)
+                      formData.append('text', texts)
 
-                  formHelper
-                    .sendForm(form.attr('action'), form.attr('method'), formData)
-                    .done(response => {
-                        console.log(response)
-                        if (response && response.success) {
-                            StoryEditor.loadSlides(response.id);
-                            modal.hide()
-                        }
-                        if (response && response.success === false) {
-                            alert(response.message);
-                        }
-                    })
-                    .always(() => modalHelper.btnReset(submitBtn));
+                      formHelper
+                        .sendForm(form.attr('action'), form.attr('method'), formData)
+                        .done(response => {
+                            console.log(response)
+                            if (response && response.success) {
+                                StoryEditor.loadSlides(response.id);
+                                modal.hide()
+                            }
+                            if (response && response.success === false) {
+                                alert(response.message);
+                            }
+                        })
+                        .always(() => modalHelper.btnReset(submitBtn));
+                      })
                 });
               }
             })
