@@ -114,4 +114,14 @@ class MentalMap extends ActiveRecord
     {
         return $this->payload['settings'] ?? [];
     }
+
+    public function getSettingsPromptId(): ?string
+    {
+        $settings = $this->getSettingsData();
+        $promptId = $settings['promptId'] ?? null;
+        if (empty($promptId)) {
+            return null;
+        }
+        return $promptId;
+    }
 }

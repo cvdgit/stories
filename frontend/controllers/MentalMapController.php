@@ -150,6 +150,7 @@ class MentalMapController extends Controller
             'history' => $history,
             'rewritePrompt' => $prompt,
             'threshold' => MentalMapThreshold::getThreshold(Yii::$app->params, $mentalMap->payload),
+            'promptId' => $mentalMap->getSettingsPromptId(),
         ];
     }
 

@@ -3,6 +3,7 @@ import TreeViewBody from "./TreeViewBody";
 /**
  * @typedef {Object} Settings
  * @property {boolean} [planTreeView]
+ * @property {string|null} [promptId]
  */
 
 /**
@@ -72,7 +73,8 @@ export default function TreeView({id, name, tree, history, params, settings}, vo
       })
       wrap.appendChild(elem.getElement())
     },
-    Boolean(settings.planTreeView)
+    Boolean(settings.planTreeView),
+    settings.promptId
   )
   wrap.appendChild(body.getElement())
 

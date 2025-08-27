@@ -81,7 +81,7 @@ console.log('ImageDialog')
             </div>
             <div style={{flex: '1', display: 'flex', flexDirection: 'column'}}>
               <div style={{marginBottom: '10px'}}>
-                <label style={{paddingBottom: '4px', fontSize: '14px', display: 'block'}} htmlFor="">Prompt:</label>
+                <label style={{paddingBottom: '4px', fontSize: '14px', display: 'block'}} htmlFor="">Проверочный промт:</label>
                 <select className="textarea" value={promptId} onChange={(e) => {
                   setPromptId(e.target.value)
                   dispatch({
@@ -92,7 +92,7 @@ console.log('ImageDialog')
                     }
                   })
                 }} style={{width: '100%', padding: '10px', minHeight: 'auto', height: 'auto'}}>
-                  <option value="">По умолчанию</option>
+                  <option value="">По умолчанию (значение из настроек)</option>
                   {prompts.map((p, i) => (
                     <option key={i} value={p.id}>{p.name}</option>
                   ))}

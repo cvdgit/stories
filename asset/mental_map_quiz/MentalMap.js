@@ -200,7 +200,7 @@ export default function MentalMap(element, deck, params) {
 
   const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
 
-  function mapImageClickHandler({image, texts, historyItem, rewritePrompt, threshold, dialogHideHandler, fastMode, hideFragmentText}) {
+  function mapImageClickHandler({image, texts, historyItem, rewritePrompt, threshold, dialogHideHandler, fastMode, hideFragmentText, settingsPromptId}) {
     const text = texts.find(t => t.id === image.id)
 
     let hideText = hideFragmentText;
@@ -312,7 +312,7 @@ export default function MentalMap(element, deck, params) {
           clearText ? removePunctuation(userResponse) : userResponse,
           clearText ? removePunctuation(stripTags(text.text)) : stripTags(text.text),
           threshold,
-          image.promptId
+          settingsPromptId || image.promptId
         ).then(response => {
           const json = processOutputAsJson(wrapper.querySelector('#retelling-response').innerText)
           if (json) {
@@ -600,6 +600,7 @@ export default function MentalMap(element, deck, params) {
     const imageFirst = Boolean(json.settings?.imageFirst)
     const hideTooltip = Boolean(json.settings?.hideTooltip)
     const hideFragmentText = Boolean(json.settings?.hideText)
+    const settingsPromptId = json.settings?.promptId
 
     function hideTooltipChecker(tooltipState) {
       if (tooltipState === 'hide') {
@@ -672,7 +673,8 @@ export default function MentalMap(element, deck, params) {
         threshold,
         dialogHideHandler: () => fragmentDialogHideHandler(image, historyItem),
         fastMode,
-        hideFragmentText
+        hideFragmentText,
+        settingsPromptId
       })
     }, mapQuestions.typeIsMentalMapQuestions()))
 
@@ -740,7 +742,8 @@ export default function MentalMap(element, deck, params) {
               fragmentDialogHideHandler(image, historyItem)
             },
             fastMode,
-            hideFragmentText
+            hideFragmentText,
+            settingsPromptId
           })
         },
         mentalMapHistory,
@@ -885,7 +888,8 @@ export default function MentalMap(element, deck, params) {
               fragmentDialogHideHandler(image, historyItem)
             },
             fastMode,
-            hideFragmentText
+            hideFragmentText,
+            settingsPromptId
           })
         },
         mentalMapHistory,

@@ -105,12 +105,12 @@ function ItemWrapper(listItem, {isPlanTreeView}) {
 }
 
 function processTreeNodes(list, body, history, voiceResponse, params, onEndHandler, dispatchEvent) {
+  console.log('processTreeNodes')
 
   let showVoiceControl = false
 
   for (const listItem of list) {
     const listItemWrapper = new ItemWrapper(listItem, {isPlanTreeView: params.isPlanTreeView});
-    const similarityChecker = new SimilarityChecker(params.threshold)
 
     const rowElement = body.querySelector(`.node-row[data-node-id='${listItem.id}']`)
     const nodeId = rowElement.dataset.nodeId
@@ -222,6 +222,8 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
       const backdrop = createRewriteContent('Обработка ответа...')
       rootElement.appendChild(backdrop.getElement())
 
+      const similarityChecker = new SimilarityChecker(params.threshold)
+
       let responseIsSuccess = similarityChecker.check(listItemWrapper.getTargetText(), userResponse)
       if (responseIsSuccess) {
         retellingResponseSpan.innerText = `{"similarity_percentage": ${similarityChecker.getSimilarityPercentage()}, "all_important_words_included": true, "user_response": "${userResponse}"}`
@@ -260,7 +262,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
               .map((i, el) => removePunctuation($(el).text()).replaceAll('_', ' '))
               .get()
               .join(', '),
-            promptId: listItem.promptId
+            promptId: params.settingsPromptId || listItem.promptId
           },
           (message) => retellingResponseSpan.innerText = message,
           (error) => {
@@ -379,7 +381,7 @@ function flatten(nodes, level = 0) {
   ])
 }
 
-export default function TreeViewBody(tree, voiceResponse, history, params, onEndHandler, isPlanTreeView) {
+export default function TreeViewBody(tree, voiceResponse, history, params, onEndHandler, isPlanTreeView, settingsPromptId) {
 
   const init = () => {
     const body = document.createElement('div')
@@ -397,6 +399,7 @@ export default function TreeViewBody(tree, voiceResponse, history, params, onEnd
   let body = init()
 
   params.isPlanTreeView = isPlanTreeView
+  params.settingsPromptId = settingsPromptId
 
   return {
     getElement() {

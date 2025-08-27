@@ -78,11 +78,11 @@ const ItemDialog = forwardRef(function ItemDialog(props, ref) {
               <div>
                 <div style={{margin: '20px 0'}}>
                   <div>
-                    <label style={{paddingBottom: '4px', fontSize: '14px', display: 'block'}} htmlFor="">Prompt:</label>
+                    <label style={{paddingBottom: '4px', fontSize: '14px', display: 'block'}} htmlFor="">Проверочный промт:</label>
                     <select className="textarea" value={promptId} onChange={(e) => {
                       setPromptId(e.target.value)
                     }} style={{width: '100%', padding: '10px', minHeight: 'auto'}}>
-                      <option value="">По умолчанию</option>
+                      <option value="">По умолчанию (значение из настроек)</option>
                       {prompts.map((p, i) => (
                         <option key={i} value={p.id}>{p.name}</option>
                         ))}
@@ -130,7 +130,10 @@ const ItemDialog = forwardRef(function ItemDialog(props, ref) {
                       return (
                         <span
                           key={word.id}
-                          onClick={() => {
+                          onClick={(e) => {
+                            if (e.ctrlKey) {
+                              console.log('click')
+                            }
                             setCurrentWords(prevState => [...prevState].map(w => {
                                 if (w.id === word.id) {
                                   w.hidden = !w.hidden

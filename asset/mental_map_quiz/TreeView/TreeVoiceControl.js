@@ -28,6 +28,10 @@ export default function TreeVoiceControl(
 
   elem.querySelector('.gn').addEventListener('click', e => {
 
+    if (elem.querySelector('.gn').classList.contains('disabled')) {
+      return
+    }
+
     if ($(e.target).data('abort')) {
       elem.querySelector('.gn').classList.remove('recording')
       elem.querySelector('.pulse-ring').remove()
@@ -44,9 +48,8 @@ export default function TreeVoiceControl(
       if (startClickHandler(e.target) === false) {
         return;
       }
-      console.log('tree voice start')
+
       voiceResponse.start(new Event('voiceResponseStart'), 'ru-RU', function () {
-        console.log('tree voice recording')
         elem.querySelector('.gn').classList.add('disabled')
         setTimeout(() => {
           elem.dataset.state = 'recording';
@@ -56,17 +59,21 @@ export default function TreeVoiceControl(
           elem.querySelector('.question-voice__inner').insertBefore(ring, elem.querySelector('.gn'));
           elem.querySelector('.gn').classList.add('recording');
         }, 500)
-
       });
       return;
     }
 
     elem.querySelector('.gn').classList.remove('recording')
     elem.querySelector('.pulse-ring').remove()
-    voiceResponse.stop(() => {
-      delete elem.dataset.state
-      stopClickHandler(e.target)
-    })
+    elem.querySelector('.gn').classList.add('disabled')
+
+    setTimeout(() => {
+      voiceResponse.stop(() => {
+        elem.querySelector('.gn').classList.remove('disabled')
+        delete elem.dataset.state
+        stopClickHandler(e.target)
+      })
+    }, 500)
   })
 
   return elem
