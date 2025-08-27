@@ -336,6 +336,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: pre;
+  opacity: .3;
 }
 
 .gn.disabled {
