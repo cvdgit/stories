@@ -126,8 +126,28 @@ class MentalMapHistoryController extends Controller
             'mentalMaps' => $mentalMaps,
             'historyByUser' => $historyByUser,
             'users' => array_values($users),
-            "sidebarMenuItems" => (new StorySideBarMenuItemsBuilder($storyModel))->build(),
-            "breadcrumbs" => (new StoryBreadcrumbsBuilder($storyModel, "Ментальные карты из истории"))->build(),
+            'sidebarMenuItems' => (new StorySideBarMenuItemsBuilder($storyModel))->build(),
+            'breadcrumbs' => (new StoryBreadcrumbsBuilder($storyModel, 'Ментальные карты из истории'))->build(),
+            'storyId' => $storyModel->id,
+        ]);
+    }
+
+    public function actionDetail(int $story_id, int $user_id, string $mental_map_id, string $fragment_id): string
+    {
+        $rows = (new Query())
+            ->select('*')
+            ->from('mental_map_history')
+            ->where([
+                'story_id' => $story_id,
+                'user_id' => $user_id,
+                'mental_map_id' => $mental_map_id,
+                'image_fragment_id' => $fragment_id,
+            ])
+            ->orderBy(['created_at' => SORT_DESC])
+            ->all();
+
+        return $this->renderAjax('detail', [
+            'rows' => $rows,
         ]);
     }
 }

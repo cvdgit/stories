@@ -14,6 +14,7 @@ use yii\web\View;
  * @var array $users
  * @var array $sidebarMenuItems
  * @var array $breadcrumbs
+ * @var int $storyId
  */
 
 $this->title = 'История прохождения ментальных карт';
@@ -42,6 +43,8 @@ $this->registerCss(
 }
 CSS,
 );
+
+$this->registerJs($this->renderFile('@backend/views/mental-map-history/index.js'));
 ?>
 <div>
     <div class="header-block">
@@ -68,7 +71,7 @@ CSS,
                 foreach ($mentalMaps as $mentalMap): ?>
                     <h3 class="h4"><?= $mentalMap->name; ?></h3>
                     <div class="table-responsive">
-                        <table class="table table-bordered">
+                        <table class="table table-bordered mental-map-table">
                             <thead>
                             <tr>
                                 <th style="width: 30%">Фрагмент</th>
@@ -97,7 +100,7 @@ CSS,
                                     <td><?= $image['text'] ?? $image['title']; ?></td>
                                     <td><?= $imageData['content'] ?? '-'; ?></td>
                                     <td><?= $imageData['maxThreshold'] ?? '-' ?></td>
-                                    <td><?= $imageData['all'] ?? '-'; ?></td>
+                                    <td><?= Html::a($imageData['all'] ?? '-', ['/mental-map-history/detail', 'story_id' => $storyId, 'user_id' => $user['id'], 'mental_map_id' => $mentalMap->uuid, 'fragment_id' => $image['id']], ['class' => 'show-detail']); ?></td>
                                     <td><?= $imageData['hiding'] ?? '-'; ?></td>
                                     <td><?= $imageData['target'] ?? '-' ?></td>
                                     <td><?= isset($imageData['createdAt']) ? SmartDate::dateSmart(
