@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace backend\modules\gpt\controllers;
 
 use backend\JsonSchema\JsonSchemaValidator;
+use backend\modules\gpt\Feedback\FeedbackForm;
 use common\rbac\UserRoles;
 use Yii;
 use yii\data\SqlDataProvider;
+use yii\db\Expression;
 use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\helpers\Json;
@@ -104,8 +106,31 @@ JSON;
         }
     }
 
-    public function actionList(): string
+    public function actionList(Request $request): string
     {
+        $filterModel = new FeedbackForm();
+        $userCondition = null;
+        if ($filterModel->load($request->get()) && $filterModel->validate()) {
+            if (!empty($filterModel->user_id)) {
+                $userCondition = 't.user_id = ' . $filterModel->user_id;
+            }
+        }
+
+        $rows = (new Query())
+            ->select([
+                'user_id' => new Expression('DISTINCT t.user_id'),
+                'user_name' => new Expression('IF(p.first_name IS NULL, u.email, CONCAT(p.last_name, " ", p.first_name))'),
+            ])
+            ->from(['t' => 'llm_feedback'])
+            ->innerJoin(['u' => 'user'], 'u.id = t.user_id')
+            ->leftJoin(['p' => 'profile'], 'p.user_id = u.id')
+            ->orderBy(['user_name' => SORT_ASC])
+            ->all();
+        $filterUsers = array_combine(
+            array_column($rows, 'user_id'),
+            array_column($rows, 'user_name'),
+        );
+
         $dataProvider = new SqlDataProvider([
             "sql" => '
                 SELECT
@@ -125,11 +150,15 @@ JSON;
                 FROM llm_feedback t
                 inner join user u ON u.id = t.user_id
                 left join profile p ON u.id = p.user_id
+                ' . ($userCondition === null ? '' : 'WHERE ' . $userCondition) . '
                 ORDER BY t.created_at DESC',
             "totalCount" => (new Query())->from("llm_feedback")->count()
         ]);
-        return $this->render("list", [
-            "dataProvider" => $dataProvider,
+
+        return $this->render('list', [
+            'dataProvider' => $dataProvider,
+            'filterModel' => $filterModel,
+            'filterUsers' => $filterUsers,
         ]);
     }
 }
