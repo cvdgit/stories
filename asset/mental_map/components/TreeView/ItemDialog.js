@@ -3,6 +3,8 @@ import Dialog from "../Dialog";
 import {createWordsFormText, getTextBySelections} from "../Selection";
 import api from "../../Api";
 import Editable from "../Editable";
+import {v4 as uuidv4} from 'uuid'
+import {wordClickHandler} from "../Selection/selection";
 
 const ItemDialog = forwardRef(function ItemDialog(props, ref) {
   const {
@@ -89,7 +91,7 @@ const ItemDialog = forwardRef(function ItemDialog(props, ref) {
                     </select>
                   </div>
                 </div>
-                <div style={{marginBottom: '10px'}}>
+                <div style={{marginBottom: '10px', display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
                   <button onClick={() => {
                     if (!selectionMode) {
                       return
@@ -110,6 +112,7 @@ const ItemDialog = forwardRef(function ItemDialog(props, ref) {
                           className={`button button--default ${selectionMode ? 'button--header-done' : 'button--outline'}`}
                           type="button">Выделить
                   </button>
+                  {selectionMode && <div style={{marginLeft: '20px', fontSize: '14px', color: '#808080'}}>Удерживайте CTRL, что бы объединить несколько пропусков в один</div>}
                 </div>
               </div>
               <div style={{flex: '1', overflowY: 'auto'}}>
@@ -131,16 +134,7 @@ const ItemDialog = forwardRef(function ItemDialog(props, ref) {
                         <span
                           key={word.id}
                           onClick={(e) => {
-                            if (e.ctrlKey) {
-                              console.log('click')
-                            }
-                            setCurrentWords(prevState => [...prevState].map(w => {
-                                if (w.id === word.id) {
-                                  w.hidden = !w.hidden
-                                }
-                                return w
-                              })
-                            )
+                            setCurrentWords(prevState => wordClickHandler(word, prevState, e.ctrlKey))
                           }}
                           className={`text-item-word ${word.hidden ? 'selected' : ''}`}
                         >{word.word}</span>

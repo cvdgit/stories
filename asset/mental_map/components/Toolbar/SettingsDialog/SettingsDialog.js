@@ -16,7 +16,7 @@ export default function SettingsDialog({open, setOpen, mentalMapId, schedules}) 
   const scheduleElemId = useId()
   const thresholdElemId = useId()
   const promptElemId = useId()
-  const [promptId, setPromptId] = useState(state.settings?.promptId)
+  const [promptId, setPromptId] = useState(state.settings?.promptId || '')
   const [prompts, setPrompts] = useState([])
 
   const isTreeView = Boolean(state.treeView)

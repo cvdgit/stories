@@ -3,6 +3,7 @@ import React, {forwardRef, useEffect, useId, useRef, useState} from "react";
 import {createWordsFormText, getTextBySelections} from "../Selection";
 import {useMentalMap} from "../App/App";
 import api from "../../Api";
+import {wordClickHandler} from "../Selection/selection";
 
 const ImageDialog = forwardRef(function ImageDialog(props, ref) {
 console.log('ImageDialog')
@@ -175,14 +176,8 @@ console.log('ImageDialog')
                     return (
                       <span
                         key={word.id}
-                        onClick={() => {
-                          setCurrentWords(prevState => [...prevState].map(w => {
-                              if (w.id === word.id) {
-                                w.hidden = !w.hidden
-                              }
-                              return w
-                            })
-                          )
+                        onClick={e => {
+                          setCurrentWords(prevState => wordClickHandler(word, prevState, e.ctrlKey))
                         }}
                         className={`text-item-word ${word.hidden ? 'selected' : ''}`}
                       >{word.word}</span>
@@ -208,7 +203,7 @@ console.log('ImageDialog')
               )}
               <div style={{marginTop: '2rem'}}>
                     <textarea className="textarea" onChange={() => {
-                    }} value={state.text} style={{minHeight: '300px'}}/>
+                    }} value={state.text} />
               </div>
             </div>
           </div>

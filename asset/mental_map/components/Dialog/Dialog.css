@@ -78,6 +78,7 @@
 .export-dialog-modal .dialog__content {
   padding: 3rem 4rem;
   width: 90rem;
+  max-height: 100%;
 }
 
 .dialog__close {

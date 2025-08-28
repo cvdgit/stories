@@ -23,7 +23,7 @@ function processImageText(text) {
 export function createWordsFormText(text) {
   const {imageText, textFragments} = processImageText(text)
   const paragraphs = imageText.split('\n')
-  const words = paragraphs.map(p => {
+  return paragraphs.map(p => {
     if (p === '') {
       return [{type: 'break'}]
     }
@@ -33,14 +33,15 @@ export function createWordsFormText(text) {
         if (textFragments.has(id)) {
           const reg = new RegExp(`{${id}}`)
           word = word.replace(reg, textFragments.get(id))
-          return word.split(' ').map(w => ({id: uuidv4(), word: w, type: 'word', hidden: true, target: true}))
+          // return word.split(' ').map(w => ({id: uuidv4(), word: w, type: 'word', hidden: true, target: true}))
+          const merge = word.split(' ').length > 1
+          return {id: uuidv4(), word, type: 'word', hidden: true, target: true, merge}
         }
       }
       return [{id: uuidv4(), word, type: 'word', hidden: false}]
     })
     return [...(words.flat()), {type: 'break'}]
   }).flat()
-  return words
 }
 
 /**
@@ -57,4 +58,59 @@ export function getTextBySelections(currentWords) {
     }
   })
   return text.trim()
+}
+
+export function wordClickHandler(word, prevState, ctrlKey) {
+  const state = [...prevState]
+    .map((w, j) => {
+      if (ctrlKey) {
+        if (w.id === word.id) {
+          let targetWord
+          const prevWord = prevState[j - 1]
+          if (prevWord && prevWord.hidden) {
+            targetWord = prevWord
+            targetWord.word += ` ${w.word}`
+            targetWord.merge = true
+            w.word = ''
+          }
+          const nextWord = prevState[j + 1]
+          if (nextWord && nextWord.hidden) {
+            if (!targetWord) {
+              targetWord = w
+            }
+            targetWord.word += ` ${nextWord.word}`
+            targetWord.merge = true
+            targetWord.hidden = !w.hidden
+            nextWord.word = ''
+          }
+        }
+        return w
+      }
+      if (w.id === word.id) {
+        w.hidden = !w.hidden
+        w.merge = false
+      }
+      return w
+    })
+    .filter(w => w.type === 'word' && w.word.trim().length > 0)
+
+  state
+    .filter((w, wordIndex) => {
+      const filtered = w.type === 'word' && !w.hidden && w.word.split(' ').length > 1
+      if (filtered) {
+        w.index = wordIndex
+      }
+      return filtered
+    })
+    .map(w => {
+      w.word.trim().split(' ').map((splitWord, splitIndex) => {
+        if (splitIndex === 0) {
+          w.word = splitWord
+          return
+        }
+        state.splice(w.index + splitIndex, 0, {...w, id: uuidv4(), word: splitWord})
+      })
+    })
+
+  return state
 }
