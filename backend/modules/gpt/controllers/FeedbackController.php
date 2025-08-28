@@ -110,9 +110,11 @@ JSON;
     {
         $filterModel = new FeedbackForm();
         $userCondition = null;
+        $totalQuery = (new Query())->from("llm_feedback");
         if ($filterModel->load($request->get()) && $filterModel->validate()) {
             if (!empty($filterModel->user_id)) {
                 $userCondition = 't.user_id = ' . $filterModel->user_id;
+                $totalQuery->andWhere(['user_id' => $filterModel->user_id]);
             }
         }
 
@@ -152,7 +154,7 @@ JSON;
                 left join profile p ON u.id = p.user_id
                 ' . ($userCondition === null ? '' : 'WHERE ' . $userCondition) . '
                 ORDER BY t.created_at DESC',
-            "totalCount" => (new Query())->from("llm_feedback")->count()
+            "totalCount" => $totalQuery->count(),
         ]);
 
         return $this->render('list', [
