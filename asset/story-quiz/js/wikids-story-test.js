@@ -2373,7 +2373,25 @@ function WikidsStoryTest(el, options) {
     }
 
     if (questionViewStep(currentQuestion)) {
-      const [getUserAnswers, checkCorrectHandler] = that.stepQuestion.create(currentQuestion, $('.step-question-wrap', currentQuestionElement))
+
+      const stepAnswerHandler = (stepId, stepName, correct, answers) => {
+        if (!correct) {
+          const historyData = createAnswerHistoryData(
+            currentQuestion.id,
+            stepName,
+            false,
+            createAnswerHistoryDataItems(answers, answer => [currentQuestion.id, answer])
+          )
+          writeAnswerHistory(historyData);
+        }
+      }
+
+      const [getUserAnswers, checkCorrectHandler] = that.stepQuestion
+        .create(
+          currentQuestion,
+          $('.step-question-wrap', currentQuestionElement),
+          stepAnswerHandler
+        )
       dom.nextButton.off("click").on("click", function () {
         nextQuestion(getUserAnswers(), checkCorrectHandler)
       })

@@ -5,8 +5,6 @@ import './StepQuestion.css';
 
 MathfieldElement.fontsDirectory = '/build/fonts'
 
-const stepQuestionState = new Map()
-
 function StepQuestion(test) {
   this.element = null;
   this.container = test.container;
@@ -14,32 +12,14 @@ function StepQuestion(test) {
 }
 
 StepQuestion.prototype.createWrapper = function (question) {
-  const {payload} = question
   return $(`<div class="step-question-wrap" style="display: flex; flex-direction: column; width: 100%; height: 100%"></div>`)
 };
 
 StepQuestion.prototype.getContent = function(question) {
-  const {payload} = question
   const wrap = document.createElement('div')
   wrap.style.display = 'flex'
   wrap.style.justifyContent = 'space-between'
   wrap.style.flexDirection = 'column'
-
-  /*wrap.innerHTML = `<div style="display: flex; flex-direction: column">
-    <h5>Задание:</h5>
-    <div style="display: flex; align-items: center; justify-content: center">
-    <math-field read-only style="display:inline-block">${payload.job}</math-field></div>
-    <h5>Верный ответ:</h5>
-    <div class="math-correct-answers" style="display: flex; flex-direction: column; row-gap: 10px; align-items: center; justify-content: center"></div>
-</div>
-  `;*/
-
-  /*(question.storyTestAnswers.filter(a => Number(a.is_correct) === 1) || []).map(a => {
-    const el = document.createElement('div')
-    el.innerHTML = `<math-field read-only style="display:inline-block">${a.name}</math-field>`
-    wrap.querySelector('.math-correct-answers').appendChild(el)
-  })*/
-
   return wrap
 }
 
@@ -168,7 +148,14 @@ function processNextActiveStep(stepsState) {
   return activeStepId
 }
 
-StepQuestion.prototype.create = function(question, container) {
+function processUserAnswers(step, userAnswers) {
+  if (step.isAnswerOptions) {
+    return userAnswers.map(answerId => step.answers.find(a => a.id === answerId).title)
+  }
+  return userAnswers.map(a => a.answer)
+}
+
+StepQuestion.prototype.create = function(question, container, stepResponseHandler) {
   const {payload} = question;
 
   container.empty()
@@ -206,6 +193,8 @@ StepQuestion.prototype.create = function(question, container) {
     const stateItem = stepsState.find(i => i.id === stepId)
     if (correct) {
 
+      stepResponseHandler(stepId, step.name, true, processUserAnswers(step, answers))
+
       stateItem.active = false
       stateItem.done = true
       stateItem.correct = true
@@ -221,7 +210,6 @@ StepQuestion.prototype.create = function(question, container) {
       const nextStepId = processNextActiveStep(stepsState)
 
       if (!nextStepId) {
-
         return
       }
 
@@ -237,6 +225,8 @@ StepQuestion.prototype.create = function(question, container) {
     if (step.isAnswerOptions && answers.length !== correctAnswersNumber) {
       return
     }
+
+    stepResponseHandler(stepId, step.name, false, processUserAnswers(step, answers))
 
     stateItem.active = true
     stateItem.done = true
@@ -254,9 +244,7 @@ StepQuestion.prototype.create = function(question, container) {
   payload.steps.map(step => {
     container.find('.step-steps')
       .append(
-        createStepElement(step, (id, values) => {
-          answerHandler(step.id, values)
-        }, stepsState.find(s => s.id === step.id))
+        createStepElement(step, answerHandler, stepsState.find(s => s.id === step.id))
       )
   })
 
