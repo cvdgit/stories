@@ -260,7 +260,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
             slideTexts: stripTags(listItemWrapper.getTargetText()).replaceAll('_', ' '),
             importantWords: $(`<div>${listItemWrapper.getTargetText()}</div>`)
               .find('span.target-text')
-              .map((i, el) => removePunctuation($(el).text()).replaceAll('_', ' '))
+              .map((i, el) => $(el).text().replaceAll('_', ' ').replaceAll(/[^\w+\-]+/g, ''))
               .get()
               .join(', '),
             promptId: params.settingsPromptId || listItem.promptId
