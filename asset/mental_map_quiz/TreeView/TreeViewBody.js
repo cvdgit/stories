@@ -233,12 +233,12 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
       console.log('rewriteByPass', rewriteByPass)
 
       if (!responseIsSuccess && !rewriteByPass) {
-        const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
+        //const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
         await sendMessage(
           `/admin/index.php?r=gpt/stream/retelling-rewrite`,
           {
-            userResponse: removePunctuation(userResponse),
-            slideTexts: removePunctuation(stripTags(listItemWrapper.getTargetText()))
+            userResponse: userResponse,
+            slideTexts: stripTags(listItemWrapper.getTargetText())
           },
           (message) => resultSpan.innerHTML = message,
           () => console.log('rewrite error'),
