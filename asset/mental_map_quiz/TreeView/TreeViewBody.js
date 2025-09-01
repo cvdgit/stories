@@ -255,12 +255,13 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
 
       if (!responseIsSuccess) {
         retellingResponseSpan.innerText = ''
+        const remPunctuation = text => text.replace(/[!"#$%&'()*+,./:;<=>?@[\]^`{|}«»~]/g, '').replace(/\s{2,}/g, " ")
         await sendMessage(`/admin/index.php?r=gpt/stream/retelling-tree`, {
             userResponse,
             slideTexts: stripTags(listItemWrapper.getTargetText()).replaceAll('_', ' '),
             importantWords: $(`<div>${listItemWrapper.getTargetText()}</div>`)
               .find('span.target-text')
-              .map((i, el) => $(el).text().replaceAll('_', ' ').replaceAll(/[^\w+\-]+/ug, ''))
+              .map((i, el) => remPunctuation($(el).text()).replaceAll('_', ' '))
               .get()
               .join(', '),
             promptId: params.settingsPromptId || listItem.promptId
