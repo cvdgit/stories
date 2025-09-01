@@ -229,10 +229,10 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
         retellingResponseSpan.innerText = `{"similarity_percentage": ${similarityChecker.getSimilarityPercentage()}, "all_important_words_included": true, "user_response": "${userResponse}"}`
       }
 
-      const rewriteByPass = similarityChecker.getSimilarityPercentage() >= 90
-      console.log('rewriteByPass', rewriteByPass)
+      //const rewriteByPass = similarityChecker.getSimilarityPercentage() >= 90
+      //console.log('rewriteByPass', rewriteByPass)
 
-      if (!responseIsSuccess && !rewriteByPass) {
+      if (!responseIsSuccess) {
         //const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
         await sendMessage(
           `/admin/index.php?r=gpt/stream/retelling-rewrite`,
