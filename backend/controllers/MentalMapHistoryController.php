@@ -206,7 +206,7 @@ class MentalMapHistoryController extends Controller
             ->from(['t2' => 'mental_map_history'])
             ->where('t2.mental_map_id = t.mental_map_id')
             ->andWhere('t2.image_fragment_id = t.image_fragment_id')
-            ->andWhere('t2.overall_similarity >= t2.threshold');
+            ->andWhere('t2.overall_similarity < t2.threshold');
 
         $rows = (new Query())
             ->select([
