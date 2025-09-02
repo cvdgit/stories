@@ -155,7 +155,6 @@ class MentalMapHistoryController extends Controller
             ])
             ->orderBy(['created_at' => SORT_DESC])
             ->all();
-
         return $this->renderAjax('detail', [
             'rows' => $rows,
         ]);
@@ -256,5 +255,33 @@ class MentalMapHistoryController extends Controller
             'success' => true,
             'rows' => $rows,
         ];
+    }
+
+    public function actionMapReportDetail(string $map_id, string $fragment_id): string
+    {
+        $rows = (new Query())
+            ->select([
+                'userName' => new Expression(
+                    "CASE WHEN p.id IS NULL THEN u.email ELSE CONCAT(p.last_name, ' ', p.first_name) END",
+                ),
+                'content' => 't.content',
+                'overall_similarity' => 't.overall_similarity',
+                'text_hiding_percentage' => 't.text_hiding_percentage',
+                'text_target_percentage' => 't.text_target_percentage',
+                'threshold' => 't.threshold',
+                'created_at' => 't.created_at',
+            ])
+            ->from(['t' => 'mental_map_history'])
+            ->innerJoin(['u' => 'user'], 'u.id = t.user_id')
+            ->leftJoin(['p' => 'profile'], 'u.id = p.user_id')
+            ->where([
+                't.mental_map_id' => $map_id,
+                't.image_fragment_id' => $fragment_id,
+            ])
+            ->orderBy(['t.created_at' => SORT_DESC])
+            ->all();
+        return $this->renderAjax('report_detail', [
+            'rows' => $rows,
+        ]);
     }
 }

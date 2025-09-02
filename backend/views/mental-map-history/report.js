@@ -22,12 +22,18 @@
         if (response && response.success) {
           response.rows.map(r => {
             const $row = $(elem).find(`tr[data-fragment-id=${r.fragmentId}]`)
-
-            $row.find('.fragment-count').text(r.fragmentsCount)
+            $row.find('.fragment-count')
+              .html(`<a class="show-detail" href="/admin/index.php?r=mental-map-history/map-report-detail&map_id=${id}&fragment_id=${r.fragmentId}">${r.fragmentsCount}</a>`)
             $row.find('.fragment-correct').text(r.fragmentsCorrectCount)
             $row.find('.fragment-users').text(r.userNames)
           })
         }
     })
+  })
+
+  const modal = RemoteModal({id: 'detail-modal', 'title': 'Detail', dialogClassName: 'modal-lg'})
+  $('table[data-map-id]').on('click', '.show-detail', e => {
+    e.preventDefault()
+    modal.show({url: e.target.getAttribute('href')})
   })
 })();
