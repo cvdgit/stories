@@ -17,6 +17,7 @@ use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 class MentalMapHistoryController extends Controller
 {
@@ -36,16 +37,11 @@ class MentalMapHistoryController extends Controller
     }
 
     /**
-     * @throws NotFoundHttpException
+     * @return array<array-key, string>
      */
-    public function actionIndex(int $story_id): string
+    private function getStoryMentalMapIds(string $slidesData): array
     {
-        $storyModel = Story::findOne($story_id);
-        if ($storyModel === null) {
-            throw new NotFoundHttpException('История не найдена');
-        }
-
-        $story = (new HTMLReader($storyModel->slidesData()))->load();
+        $story = (new HTMLReader($slidesData))->load();
         $mentalMapIds = [];
         foreach ($story->getSlides() as $slide) {
             foreach ($slide->getBlocks() as $block) {
@@ -58,6 +54,20 @@ class MentalMapHistoryController extends Controller
                 }
             }
         }
+        return $mentalMapIds;
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionIndex(int $story_id): string
+    {
+        $storyModel = Story::findOne($story_id);
+        if ($storyModel === null) {
+            throw new NotFoundHttpException('История не найдена');
+        }
+
+        $mentalMapIds = $this->getStoryMentalMapIds($storyModel->slidesData());
 
         $mentalMaps = [];
         foreach ($mentalMapIds as $mentalMapId) {
@@ -149,5 +159,103 @@ class MentalMapHistoryController extends Controller
         return $this->renderAjax('detail', [
             'rows' => $rows,
         ]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionReport(int $story_id): string
+    {
+        $storyModel = Story::findOne($story_id);
+        if ($storyModel === null) {
+            throw new NotFoundHttpException('История не найдена');
+        }
+
+        $mentalMapIds = $this->getStoryMentalMapIds($storyModel->slidesData());
+        $mentalMaps = MentalMap::find()
+            ->andWhere(['uuid' => $mentalMapIds])
+            ->orderBy(
+                new Expression(
+                    'FIELD (uuid, ' . implode(
+                        ',',
+                        array_map(static function (string $id): string {
+                            return "'$id'";
+                        }, $mentalMapIds),
+                    ) . ')',
+                ),
+            )
+            ->all();
+
+        return $this->render('report', [
+            'storyName' => $storyModel->title,
+            'mentalMaps' => $mentalMaps,
+        ]);
+    }
+
+    public function actionMapReport(string $id, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+
+        $mentalMap = MentalMap::findOne($id);
+        if ($mentalMap === null) {
+            return ['success' => false, 'rows' => []];
+        }
+
+        $failedFragmentsQuery= (new Query())
+            ->select(new Expression('COUNT(t2.id)'))
+            ->from(['t2' => 'mental_map_history'])
+            ->where('t2.mental_map_id = t.mental_map_id')
+            ->andWhere('t2.image_fragment_id = t.image_fragment_id')
+            ->andWhere('t2.overall_similarity >= threshold');
+
+        $rows = (new Query())
+            ->select([
+                'fragmentId' => 't.image_fragment_id',
+                'userIds' => new Expression('GROUP_CONCAT(DISTINCT t.user_id ORDER BY t.created_at ASC)'),
+                'fragmentsCount' => new Expression('COUNT(t.image_fragment_id)'),
+                'fragmentsCorrectCount' => $failedFragmentsQuery,
+            ])
+            ->from(['t' => 'mental_map_history'])
+            ->where([
+                't.mental_map_id' => $mentalMap->uuid,
+            ])
+            ->groupBy(['t.image_fragment_id'])
+            ->all();
+
+        $userIds = [];
+        array_map(static function(array $row) use (&$userIds): void {
+            foreach (explode(',', $row['userIds']) as $id) {
+                if (!in_array((int) $id, $userIds, true)) {
+                    $userIds[] = (int) $id;
+                }
+            }
+        }, $rows);
+
+        $users = [];
+        if (count($userIds) > 0) {
+            $users = (new Query())
+                ->select([
+                    'userId' => 'u.id',
+                    'userName' => new Expression(
+                        "CASE WHEN p.id IS NULL THEN u.email ELSE CONCAT(p.last_name, ' ', p.first_name) END",
+                    ),
+                ])
+                ->from(['u' => 'user'])
+                ->leftJoin(['p' => 'profile'], 'u.id = p.user_id')
+                ->where(['in', 'u.id', $userIds])
+                ->all();
+            $users = array_combine(array_column($users, 'userId'), array_column($users, 'userName'));
+            $rows = array_map(static function(array $row) use ($users): array {
+                $row['userNames'] = implode(', ', array_map(static function(int $userId) use ($users): string {
+                    return $users[$userId];
+                }, explode(',', $row['userIds'])));
+                return $row;
+            }, $rows);
+        }
+
+        return [
+            'success' => true,
+            'rows' => $rows,
+        ];
     }
 }

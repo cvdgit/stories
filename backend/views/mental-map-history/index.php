@@ -5,6 +5,7 @@ declare(strict_types=1);
 use backend\MentalMap\MentalMap;
 use common\helpers\SmartDate;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\web\View;
 
 /**
@@ -49,7 +50,7 @@ $this->registerJs($this->renderFile('@backend/views/mental-map-history/index.js'
 <div>
     <div class="header-block">
         <h1 style="font-size: 32px; margin: 0 0 0.5rem 0; font-weight: 500; line-height: 1.2"
-            class="h2"><?= $this->title ?></h1>
+            class="h2"><?= $this->title ?> (<a href="<?= Url::to(['/mental-map-history/report', 'story_id' => $storyId]) ?>">сводный отчет</a>)</h1>
     </div>
     <ul class="nav nav-tabs" role="tablist">
         <?php
