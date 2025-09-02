@@ -14,6 +14,12 @@ use backend\MentalMap\MentalMap;
 $this->title = 'Сводный отчет - ' . $storyName;
 
 $this->registerJs($this->renderFile('@backend/views/mental-map-history/report.js'));
+$this->registerCss(<<<CSS
+.mental-map-table .target-text {
+    border: 1px #808080 solid;
+}
+CSS
+);
 ?>
 <div>
     <div class="header-block">
