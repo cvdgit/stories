@@ -2393,6 +2393,24 @@ function WikidsStoryTest(el, options) {
           stepAnswerHandler
         )
       dom.nextButton.off("click").on("click", function () {
+
+        dom.nextButton
+          .attr('title', '')
+          .tooltip('destroy')
+
+        const correct = checkCorrectHandler()
+
+        if (!correct) {
+          setTimeout(() => {
+            dom.nextButton
+              .tooltip({trigger: 'click,hover'})
+              .attr('title', 'Нужно выполнить все задания')
+              .tooltip('fixTitle')
+              .tooltip('show')
+          }, 100)
+          return
+        }
+
         nextQuestion(getUserAnswers(), checkCorrectHandler)
       })
     }

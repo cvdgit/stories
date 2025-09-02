@@ -165,3 +165,7 @@ span > span.ML__container > div {
 #latex {
   font-size: 16px;
 }
+
+.grouping-item label {
+  margin-bottom: 0;
+}

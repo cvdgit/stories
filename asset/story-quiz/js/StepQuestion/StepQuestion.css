@@ -76,3 +76,9 @@
 .step-status.step-status-incorrect svg {
   color: rgba(220, 53, 69, 1)
 }
+
+.step-response {
+  padding-bottom: 20px;
+  color: #808080;
+  font-style: italic;
+}

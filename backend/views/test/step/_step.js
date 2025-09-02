@@ -302,7 +302,17 @@
     }
 
     this.newStep = (id) => {
-      const step = {id, name: '', job: '', answers: [], isAnswerOptions: false, fragments: [], index: state.steps.length + 1}
+      const step = {
+        id,
+        name: '',
+        job: '',
+        responsePass: '',
+        responseFail: '',
+        answers: [],
+        isAnswerOptions: false,
+        fragments: [],
+        index: state.steps.length + 1
+      }
       this.addStep(step)
       return step
     }
@@ -442,7 +452,7 @@
 
     this.container = container
 
-    this.appendStep = ({id, name, job, index, answers, isAnswerOptions}, updateStepHandler, addAnswerHandler, updateAnswerHandler, deleteHandler, deleteItemHandler) => {
+    this.appendStep = ({id, name, job, index, answers, isAnswerOptions, responsePass, responseFail}, updateStepHandler, addAnswerHandler, updateAnswerHandler, deleteHandler, deleteItemHandler) => {
       const html = `<div class="grouping-item" data-id="${id}">
     <div class="grouping-item-inner">
         <div style="width: 20px">
@@ -458,14 +468,14 @@
         <div style="min-width: 30px">
             <span class="group-number">${index}</span>
         </div>
-        <div style="width: 100%; height: 100%">
+        <div style="width: 100%; display: flex; flex-direction: column; row-gap: 20px">
             <div style="display: flex; flex-direction: row; justify-content: space-between">
-                <div style="width: 100%; height: 100%">
+                <div style="width: 100%">
                     <label class="control-label">Название:</label>
                     <input type="text" class="form-control step-name" value="${name}" />
                 </div>
                 <div style="display: flex; align-items: center; justify-content: center; width: 50px">
-                    <a style="width: 20px" href="#" class="delete-group text-danger">
+                    <a title="Удалить этап" style="width: 20px" href="#" class="delete-group text-danger">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                              stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -474,12 +484,14 @@
                     </a>
                 </div>
             </div>
-            <div style="padding: 20px 0">
-                <div style="margin-bottom: 20px; display: none" class="step-job-wrap">
+            <div style="display: flex; flex-direction: column; row-gap: 10px">
+                <div style="display: none" class="step-job-wrap">
                     <label class="control-label">Задание:</label>
-                    <div class="job-editor" style="min-height: 100px">${job}</div>
+                    <div>
+                        <div class="job-editor" style="min-height: 100px">${job}</div>
+                    </div>
                 </div>
-                <div style="margin-bottom: 10px">
+                <div>
                     <label><input class="step-answers-check" type="checkbox"> Варианты ответов</label>
                 </div>
                 <div style="display: none" class="step-answers-wrap">
@@ -493,6 +505,14 @@
                         <button class="btn btn-success btn-sm add-group-item" type="button">Добавить ответ</button>
                     </div>
                 </div>
+            </div>
+            <div style="width: 100%">
+                <label class="control-label">Текст при правильном ответе:</label>
+                <input type="text" class="form-control step-response-pass" value="${responsePass || ''}" />
+            </div>
+            <div style="width: 100%">
+                <label class="control-label">Текст при неправильном ответе:</label>
+                <input type="text" class="form-control step-response-fail" value="${responseFail || ''}" />
             </div>
         </div>
     </div>
@@ -522,6 +542,8 @@
         })
 
       $element.find('.step-name').on('input', e => updateStepHandler({name: e.target.value}))
+      $element.find('.step-response-pass').on('input', e => updateStepHandler({responsePass: e.target.value}))
+      $element.find('.step-response-fail').on('input', e => updateStepHandler({responseFail: e.target.value}))
 
       $element.find(".add-group-item").on("click", () => {
         if ($answersList.find(".no-group-items").length) {
@@ -571,7 +593,7 @@
         <div style="width: 100px; display: flex; align-items: center; justify-content: center"><label>Верный <input class="answer-correct" type="checkbox" ${answer.correct ? "checked" : ""}></label></div>
     </div>
     <div style="width: 50px; display: flex; align-items: center; justify-content: center">
-        <a style="width: 20px" href="#" class="group-item-delete text-danger">
+        <a title="Удалить вариант ответа" style="width: 20px" href="#" class="group-item-delete text-danger">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                  stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round"

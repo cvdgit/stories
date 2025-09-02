@@ -23,7 +23,7 @@ StepQuestion.prototype.getContent = function(question) {
   return wrap
 }
 
-function createStepElement({id, index, name, job, isAnswerOptions, answers, fragments}, changeHandler, stepState) {
+function createStepElement({id, index, name, job, isAnswerOptions, answers, fragments, responseFail, responsePass}, changeHandler, stepState) {
   const $elem = $('<div/>', {class: 'step-step', 'data-id': id})
   if (stepState.active) {
     $elem.addClass('step-active')
@@ -63,6 +63,11 @@ function createStepElement({id, index, name, job, isAnswerOptions, answers, frag
       })
       $content.append(`<div class="step-job">${job}</div>`)
     }
+
+    if (responsePass) {
+      $content.append(`<div class="step-response response-pass">${responsePass}</div>`)
+    }
+
     return $elem
   }
 
@@ -93,8 +98,10 @@ function createStepElement({id, index, name, job, isAnswerOptions, answers, frag
       }
       changeHandler(id, values, answers.filter(a => a.correct).length)
     })
+
+    $content.append(`<div class="step-response"></div>`)
   } else {
-    $content.append(`<div class="step-job"><div class="step-job-job">${job}</div><div class="step-job-check"></div></div>`)
+    $content.append(`<div class="step-job"><div class="step-job-job">${job}</div><div class="step-response"></div><div class="step-job-check"></div></div>`)
     const checkJobBtn = $('<button type="button" class="btn">Проверить</button>').on('click', () => {
       let mathAnswers = []
       $elem
@@ -126,6 +133,9 @@ function createStepElement({id, index, name, job, isAnswerOptions, answers, frag
   <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
 </svg>
 `)
+    if (responseFail) {
+      $content.find('.step-response').text(responseFail)
+    }
   }
 
   return $elem
