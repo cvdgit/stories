@@ -15,18 +15,19 @@
   }
 
   $('table[data-map-id]').each((i, elem) => {
-    $(elem).addClass('pending')
     const id = $(elem).attr('data-map-id')
-    fetchMapReport(id).then(response => {
-      if (response && response.success) {
-        response.rows.map(r => {
-          const $row = $(elem).find(`tr[data-fragment-id=${r.fragmentId}]`)
+    fetchMapReport(id)
+      .then(response => {
+        $(elem).removeClass('pending')
+        if (response && response.success) {
+          response.rows.map(r => {
+            const $row = $(elem).find(`tr[data-fragment-id=${r.fragmentId}]`)
 
-          $row.find('.fragment-count').text(r.fragmentsCount)
-          $row.find('.fragment-correct').text(r.fragmentsCorrectCount)
-          $row.find('.fragment-users').text(r.userNames)
-        })
-      }
+            $row.find('.fragment-count').text(r.fragmentsCount)
+            $row.find('.fragment-correct').text(r.fragmentsCorrectCount)
+            $row.find('.fragment-users').text(r.userNames)
+          })
+        }
     })
   })
 })();

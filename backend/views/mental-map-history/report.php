@@ -15,8 +15,20 @@ $this->title = 'Сводный отчет - ' . $storyName;
 
 $this->registerJs($this->renderFile('@backend/views/mental-map-history/report.js'));
 $this->registerCss(<<<CSS
+.mental-map-table {
+    position: relative;
+}
 .mental-map-table .target-text {
     border: 1px #808080 solid;
+}
+.mental-map-table.pending::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: url(/img/loading.gif) no-repeat center center;
 }
 CSS
 );
@@ -31,7 +43,7 @@ CSS
         foreach ($mentalMaps as $mentalMap): ?>
             <h3 class="h4"><?= $mentalMap->name ?></h3>
             <div class="table-responsive">
-                <table class="table table-bordered mental-map-table" data-map-id="<?= $mentalMap->uuid ?>">
+                <table class="table table-bordered mental-map-table pending" data-map-id="<?= $mentalMap->uuid ?>">
                     <thead>
                     <tr>
                         <th style="width: 30%">Фрагмент</th>
