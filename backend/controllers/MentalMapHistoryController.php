@@ -9,9 +9,11 @@ use backend\components\story\reader\HTMLReader;
 use backend\components\StoryBreadcrumbsBuilder;
 use backend\components\StorySideBarMenuItemsBuilder;
 use backend\MentalMap\MentalMap;
+use common\helpers\SmartDate;
 use common\models\Story;
 use common\rbac\UserRoles;
 use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
+use Yii;
 use yii\db\Expression;
 use yii\db\Query;
 use yii\filters\AccessControl;
@@ -264,6 +266,7 @@ class MentalMapHistoryController extends Controller
                 'userName' => new Expression(
                     "CASE WHEN p.id IS NULL THEN u.email ELSE CONCAT(p.last_name, ' ', p.first_name) END",
                 ),
+                'user_id' => 't.user_id',
                 'content' => 't.content',
                 'overall_similarity' => 't.overall_similarity',
                 'text_hiding_percentage' => 't.text_hiding_percentage',
@@ -283,5 +286,41 @@ class MentalMapHistoryController extends Controller
         return $this->renderAjax('report_detail', [
             'rows' => $rows,
         ]);
+    }
+
+    public function actionLog(int $user_id, string $date, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+
+        $dateFrom = new \DateTimeImmutable(Yii::$app->formatter->asDatetime($date));
+        $betweenBegin = new Expression("UNIX_TIMESTAMP('" . $dateFrom->format('Y-m-d H:i:00') . "')");
+        $betweenEnd = new Expression("UNIX_TIMESTAMP('" . $dateFrom->format('Y-m-d H:i:59') . "')");
+
+        $rows = (new Query())
+            ->select([
+                'created_at',
+                'input' => new Expression('IF(t.input -> "$.input.question" IS NULL,
+                      JSON_UNQUOTE(JSON_EXTRACT(t.input, CONCAT("$.input.messages[", JSON_LENGTH(input ->> "$.input.messages") -1 ,"].content"))),
+                      JSON_UNQUOTE(t.input -> "$.input.question")
+                    )'),
+                'output' => new Expression('CASE
+                        WHEN t.output->"$.final_output" IS NULL
+                        THEN JSON_UNQUOTE(t.output->"$.message")
+                        ELSE JSON_UNQUOTE(t.output->"$.final_output")
+                    END')
+            ])
+            ->from(['t' => 'llm_feedback'])
+            ->where([
+                'user_id' => $user_id,
+            ])
+            ->andWhere(['between', 't.created_at', $betweenBegin, $betweenEnd])
+            ->all();
+
+        $rows = array_map(static function(array $row): array {
+            $row['created_at'] = SmartDate::dateSmart($row['created_at'], true);
+            return $row;
+        }, $rows);
+
+        return ['success' => true, 'rows' => $rows];
     }
 }

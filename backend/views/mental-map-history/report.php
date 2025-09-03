@@ -30,6 +30,19 @@ $this->registerCss(<<<CSS
     bottom: 0;
     background: url(/img/loading.gif) no-repeat center center;
 }
+.detail-row pre {
+    text-wrap: auto;
+}
+.detail-rows {
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+}
+.detail-row-item {
+    display: flex;
+    flex-direction: row;
+    column-gap: 10px;
+}
 CSS
 );
 ?>
