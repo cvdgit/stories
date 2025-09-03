@@ -40,7 +40,9 @@
               .html(`<a class="show-detail" href="/admin/index.php?r=mental-map-history/map-report-detail&map_id=${id}&fragment_id=${r.fragmentId}">${r.fragmentsCount}</a>`)
             $row.find('.fragment-correct').text(r.fragmentsCorrectCount)
             $row.find('.fragment-users').text(r.userNames)
-            $row.find('.fragment-ratio').text(parseFloat(r.fragmentsCount / r.userIds.split(',').length).toFixed(1))
+
+            const ratio = parseFloat(r.fragmentsCount / r.userIds.split(',').length).toFixed(1)
+            $row.find('.fragment-ratio').html(ratio > 1.5 ? `<span class="label label-warning">${ratio}</span>` : `<span class="label label-primary">${ratio}</span>`)
           })
         }
     })
