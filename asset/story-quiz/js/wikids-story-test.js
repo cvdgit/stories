@@ -1987,7 +1987,20 @@ function WikidsStoryTest(el, options) {
       }
     }
 
-    if (!App.userIsGuest() && !that.options.fastMode) {
+    let writeToHistory = true
+    if (App.userIsGuest()) {
+      writeToHistory = false
+    }
+
+    if (that.options.fastMode) {
+      writeToHistory = false
+    }
+
+    if (that.options.repetitionMode) {
+      writeToHistory = true
+    }
+
+    if (writeToHistory) {
       var answerParams = {};
       var answerList = [];
       if (testConfig.sourceIsNeo()) {

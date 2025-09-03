@@ -6,6 +6,7 @@ namespace frontend\Training\FetchMentalMapHistoryTargetWords;
 
 use common\components\MentalMapThreshold;
 use DateTimeInterface;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use phpQuery;
 use yii\db\Expression;
 use yii\db\Query;
@@ -35,7 +36,23 @@ class MentalMapHistoryTargetWordsFetcher
             ->andWhere(['between', new Expression('h.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd])
             ->orderBy(['h.created_at' => SORT_ASC]);
 
-        $rows = $query->all();
+        $repetitionQuery = (new Query())
+            ->select([
+                'storyId' => new Expression('0'),
+                'storyTitle' => new Expression("'Повторения ментальных карт'"),
+                'historyContent' => 'h.content',
+                'historyDate' => new Expression("DATE_FORMAT(FROM_UNIXTIME(h.created_at + (3 * 60 * 60)), '%Y-%m-%d')"),
+            ])
+            ->from(['h' => 'mental_map_history'])
+            ->where('h.story_id IS NULL')
+            ->andWhere([
+                'h.user_id' => $userId,
+            ])
+            ->andWhere(['>=', 'h.overall_similarity', MentalMapThreshold::DEFAULT_THRESHOLD])
+            ->andWhere(['between', new Expression('h.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd])
+            ->orderBy(['h.created_at' => SORT_ASC]);
+
+        $rows = $query->union($repetitionQuery)->all();
 
         $rows = array_map(function(array $row): array {
             $content = $row['historyContent'];
