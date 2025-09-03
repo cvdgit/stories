@@ -40,6 +40,7 @@
               .html(`<a class="show-detail" href="/admin/index.php?r=mental-map-history/map-report-detail&map_id=${id}&fragment_id=${r.fragmentId}">${r.fragmentsCount}</a>`)
             $row.find('.fragment-correct').text(r.fragmentsCorrectCount)
             $row.find('.fragment-users').text(r.userNames)
+            $row.find('.fragment-ratio').text(r.userIds.split(',').length / r.fragmentsCount)
           })
         }
     })

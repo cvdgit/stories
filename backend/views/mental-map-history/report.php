@@ -62,6 +62,7 @@ CSS
                         <th style="width: 30%">Фрагмент</th>
                         <th>Всего попыток</th>
                         <th>Неправильных</th>
+                        <th>Отношение</th>
                         <th>Пользователи</th>
                     </tr>
                     </thead>
@@ -72,6 +73,7 @@ CSS
                             <td><?= $image['text'] ?? $image['title'] ?></td>
                             <td class="fragment-count"></td>
                             <td class="fragment-correct"></td>
+                            <td class="fragment-ratio"></td>
                             <td class="fragment-users"></td>
                         </tr>
                     <?php
