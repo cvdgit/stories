@@ -130,7 +130,7 @@ $this->registerJs(<<<JS
             throw new Error(json?.message || 'Error')
         }
 
-        return {mentalMap: json.mentalMap, history: json.history}
+        return {...json}
       },
       ...{
         repetitionMode: true,
