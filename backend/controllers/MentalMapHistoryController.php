@@ -314,6 +314,7 @@ class MentalMapHistoryController extends Controller
                 'user_id' => $user_id,
             ])
             ->andWhere(['between', 't.created_at + (3 * 60 * 60)', $betweenBegin, $betweenEnd])
+            ->orderBy(['t.created_at' => SORT_DESC])
             ->all();
 
         $rows = array_map(static function(array $row): array {
