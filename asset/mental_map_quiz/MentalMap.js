@@ -31,7 +31,7 @@ export default function MentalMap(element, deck, params) {
   let mentalMapId
 
   params = params || {}
-  params.slide_id = deck ? Number($(deck.getCurrentSlide()).attr('data-id')) : null
+  params.slide_id = params.slide_id || (deck ? Number($(deck.getCurrentSlide()).attr('data-id')) : null)
 
   const repetitionMode = Boolean(params?.repetitionMode)
   const getCourseMode = Boolean(params?.getCourseMode)
@@ -548,7 +548,7 @@ export default function MentalMap(element, deck, params) {
       this.element.appendChild(container)
       return
     }
-
+console.log(params)
     const {mentalMap: json, history, rewritePrompt, threshold} = responseJson
     mentalMapId = json.id
     mentalMapHistory = history

@@ -45,7 +45,25 @@ class RepetitionController extends Controller
         if ($mentalMap === null) {
             throw new NotFoundHttpException('Ментальная карта не найдена');
         }
+
+        $storyId = null;
+        $slideId = null;
+        $row = (new Query())
+            ->select(['story_id', 'slide_id'])
+            ->from(['h' => 'mental_map_history'])
+            ->where([
+                'h.mental_map_id' => $mentalMap->uuid,
+            ])
+            ->andWhere('h.story_id IS NOT NULL')
+            ->one();
+        if (!empty($row)) {
+            $storyId = (int) $row['story_id'];
+            $slideId = (int) $row['slide_id'];
+        }
+
         return $this->render('mental_map', [
+            'storyId' => $storyId,
+            'slideId' => $slideId,
             'mentalMap' => $mentalMap,
         ]);
     }

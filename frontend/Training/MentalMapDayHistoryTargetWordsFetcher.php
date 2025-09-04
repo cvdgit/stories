@@ -47,32 +47,7 @@ final class MentalMapDayHistoryTargetWordsFetcher
                 'minute_div' => SORT_ASC,
             ]);
 
-        $repetitionQuery = (new Query())
-            ->select([
-                'storyId' => new Expression('0'),
-                'itemIds' => "GROUP_CONCAT(h.id SEPARATOR ',')",
-                'storyTitle' => new Expression("'Повторения ментальных карт'"),
-                'hour' => $hourExpression,
-                'minute_div' => $minuteExpression,
-            ])
-            ->from(['h' => 'mental_map_history'])
-            ->where('h.story_id IS NULL')
-            ->andWhere([
-                'h.user_id' => $userId,
-            ])
-            ->andWhere(['between', new Expression('h.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd])
-            ->andWhere(['>=', 'h.overall_similarity', MentalMapThreshold::DEFAULT_THRESHOLD])
-            ->groupBy([
-                'storyId',
-                $hourExpression,
-                $minuteExpression
-            ])
-            ->orderBy([
-                'hour' => SORT_ASC,
-                'minute_div' => SORT_ASC,
-            ]);
-
-        $rows = $query->union($repetitionQuery)->all();
+        $rows = $query->all();
         $processedData = [];
         foreach ($rows as $row) {
 

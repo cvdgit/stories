@@ -11,7 +11,8 @@ use yii\web\View;
 /**
  * @var View $this
  * @var MentalMap $mentalMap
- * @var int $studentId
+ * @var int|null $storyId
+ * @var int|null $slideId
  */
 
 $this->title = 'Повторение ментальной карты';
@@ -88,7 +89,7 @@ CSS
     <div class="story-container">
         <div class="story-container-inner" id="story-container">
             <section class="run-test">
-                <div class="mental-map" data-mental-map-id="<?= $mentalMap->uuid ?>"></div>
+                <div class="mental-map" data-mental-map-id="<?= $mentalMap->uuid ?>" data-story_id="<?= $storyId ?>" data-slide_id="<?= $slideId ?>"></div>
             </section>
         </div>
     </div>
@@ -132,10 +133,8 @@ $this->registerJs(<<<JS
 
         return {...json}
       },
-      ...{
-        repetitionMode: true,
-        repetitionBackUrl: '/edu/student/index'
-      },
+      repetitionMode: true,
+      repetitionBackUrl: '/edu/student/index',
       ...elem.data()
     })
     mentalMap.run()
