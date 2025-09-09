@@ -460,6 +460,7 @@ class StoryTestQuestion extends ActiveRecord
             QuestionType::GPT_QUESTION => ['test/gpt/update', 'id' => $this->id],
             QuestionType::MATH_QUESTION => ['test/math/update', 'id' => $this->id],
             QuestionType::STEP_QUESTION => ['test/step/update', 'id' => $this->id],
+            QuestionType::COLUMN_QUESTION => ['test/column/update', 'id' => $this->id],
         ];
 
         if ($this->type === QuestionType::MATH_QUESTION) {

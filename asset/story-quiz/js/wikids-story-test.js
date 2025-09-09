@@ -35,6 +35,7 @@ import GptQuestion from "./GptQuestion";
 import MathQuestion from "./MathQuestion";
 import Panzoom from "../../app/panzoom.min"
 import StepQuestion from "./StepQuestion";
+import ColumnQuestion from "./ColumnQuestion";
 
 
 var plugins = [];
@@ -120,6 +121,10 @@ function WikidsStoryTest(el, options) {
    * @type StepQuestion
    */
   this.stepQuestion = null;
+  /**
+   * @type ColumnQuestion
+   */
+  this.columnQuestion = null;
 
   setElementHtml(createLoader('Инициализация'));
 
@@ -1311,6 +1316,9 @@ function WikidsStoryTest(el, options) {
         case "step_question":
           $answers = that.stepQuestion.createWrapper(question);
           break;
+        case "column_question":
+          $answers = that.columnQuestion.createWrapper(question);
+          break;
         default:
           $answers = createAnswers(getAnswersData(question), question);
       }
@@ -1673,6 +1681,10 @@ function WikidsStoryTest(el, options) {
 
   function questionViewStep(question) {
     return getQuestionView(question) === 'step_question';
+  }
+
+  function questionViewColumn(question) {
+    return getQuestionView(question) === 'column_question';
   }
 
   function questionViewDragWords(question) {
@@ -2428,6 +2440,20 @@ function WikidsStoryTest(el, options) {
       })
     }
 
+    if (questionViewColumn(currentQuestion)) {
+      const [getUserAnswers, checkCorrectHandler] = that.columnQuestion
+        .create(
+          currentQuestion,
+          $('.step-question-wrap', currentQuestionElement),
+          () => {}
+        )
+
+      dom.nextButton.off("click").on("click", function () {
+        const userAnswer = getUserAnswers()
+        nextQuestion([userAnswer], () => checkCorrectHandler(userAnswer))
+      })
+    }
+
     if (questionViewImageGaps(currentQuestion)) {
 
       let imageGapsAnswers = [];
@@ -2740,6 +2766,8 @@ function WikidsStoryTest(el, options) {
       $elements.append(that.mathQuestion.getContent(question))
     } else if (questionViewStep(question)) {
       $elements.append(that.stepQuestion.getContent(question))
+    } else if (questionViewColumn(question)) {
+      $elements.append(that.columnQuestion.getContent(question))
     } else if (questionViewImageGaps(question)) {
       $elements.append(that.imageGapsQuestion.getContent(question));
     } else if (questionViewDragWords(question)) {
@@ -3220,6 +3248,7 @@ WikidsStoryTest.mount(Grouping)
 WikidsStoryTest.mount(GptQuestion)
 WikidsStoryTest.mount(MathQuestion)
 WikidsStoryTest.mount(StepQuestion)
+WikidsStoryTest.mount(ColumnQuestion)
 
 WikidsStoryTest.getTests = function () {
   return tests;

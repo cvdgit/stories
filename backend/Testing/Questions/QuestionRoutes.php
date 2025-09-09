@@ -22,6 +22,7 @@ class QuestionRoutes
             'Математические формулы' => ['test/math/create', 'test_id' => $quizId],
             'Математические формулы с пропусками' => ['test/math/create', 'test_id' => $quizId, 'gaps' => 1],
             'Ступенчатый вопрос' => ['test/step/create', 'test_id' => $quizId],
+            'Решение в столбик' => ['test/column/create', 'test_id' => $quizId],
         ];
     }
 

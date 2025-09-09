@@ -6,6 +6,7 @@ namespace backend\components\training\collection;
 
 use backend\components\training\base\BaseQuestion;
 use backend\components\training\collection\build\Base;
+use backend\components\training\collection\build\ColumnQuestionBuilder;
 use backend\components\training\collection\build\DragWords;
 use backend\components\training\collection\build\GptQuestionBuilder;
 use backend\components\training\collection\build\Grouping;
@@ -51,6 +52,8 @@ class TestCollection extends BaseCollection
             $builder = new MathQuestionBuilder($questionData, $stars);
         } elseif ($type->isStepQuestion()) {
             $builder = new StepQuestionBuilder($questionData, $stars);
+        } elseif ($type->isColumnQuestion()) {
+            $builder = new ColumnQuestionBuilder($questionData, $stars);
         } else {
             $builder = new Base($questionData, $stars, $this->testModel);
         }
