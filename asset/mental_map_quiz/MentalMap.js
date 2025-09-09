@@ -335,8 +335,9 @@ export default function MentalMap(element, deck, params) {
               text_target_percentage: textTargetPercentage,
               content: detailTextContent.innerHTML,
               repetition_mode: repetitionMode,
-              threshold
-            }).then(response => {
+              threshold,
+              payload: json
+            })/*.then(response => {
               if (response && response?.success) {
                 historyItem.all = response.history.all
                 historyItem.hiding = response.history.hiding
@@ -353,7 +354,21 @@ export default function MentalMap(element, deck, params) {
                   }
                 }
               }
-            })
+            })*/
+
+            historyItem.all = Number(json.overall_similarity)
+            historyItem.hiding = textHidingPercentage
+            historyItem.target = textTargetPercentage
+            historyItem.done = Number(json.overall_similarity) >= threshold
+
+            wrapper.querySelector('.image-item > .result-item').remove()
+            wrapper.querySelector('.image-item').appendChild(FragmentResultElement(historyItem))
+
+            if (fastMode) {
+              if (historyItem.done) {
+                dialog.hide()
+              }
+            }
           }
         })
       })
@@ -466,8 +481,9 @@ export default function MentalMap(element, deck, params) {
               text_target_percentage: 0,
               content: detailTextContent.innerHTML,
               repetition_mode: repetitionMode,
-              threshold
-            }).then(response => {
+              threshold,
+              payload: json
+            })/*.then(response => {
               if (response && response?.success) {
                 historyItem.all = response.history.all
                 //historyItem.hiding = response.history.hiding
@@ -478,7 +494,21 @@ export default function MentalMap(element, deck, params) {
                 wrapper.querySelector('.image-item > .result-item').remove()
                 wrapper.querySelector('.image-item').appendChild(FragmentResultQuestionsElement(historyItem))
               }
-            })
+            })*/
+
+            historyItem.all = Number(json.overall_similarity)
+            historyItem.hiding = 0
+            historyItem.target = 0
+            historyItem.done = Number(json.overall_similarity) >= threshold
+
+            wrapper.querySelector('.image-item > .result-item').remove()
+            wrapper.querySelector('.image-item').appendChild(FragmentResultElement(historyItem))
+
+            if (fastMode) {
+              if (historyItem.done) {
+                dialog.hide()
+              }
+            }
           }
         })
       })
@@ -548,7 +578,7 @@ export default function MentalMap(element, deck, params) {
       this.element.appendChild(container)
       return
     }
-console.log(params)
+
     const {mentalMap: json, history, rewritePrompt, threshold} = responseJson
     mentalMapId = json.id
     mentalMapHistory = history

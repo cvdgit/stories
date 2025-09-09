@@ -331,15 +331,21 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
         text_target_percentage: textHidingPercentage > 0 ? 100 : 0, // textTargetPercentage,
         content,
         user_response: resultSpan.innerText,
-        api_response: JSON.stringify(json)
-      }).then(response => {
+        api_response: JSON.stringify(json),
+        payload: json,
+        all_important_words_included: importantWordsPassed
+      })/*.then(response => {
         if (response && response.success) {
           historyItem.all = response.history.all
           historyItem.hiding = response.history.hiding
           historyItem.target = response.history.target
         }
         //resetNodeRow(rowElement)
-      })
+      })*/
+
+      historyItem.all = Number(json.similarity_percentage)
+      historyItem.hiding = textHidingPercentage
+      historyItem.target = textHidingPercentage > 0 ? 100 : 0
 
       const allIsDone = history.reduce((all, val) => all && val.done, true)
       if (allIsDone && typeof onEndHandler === "function") {

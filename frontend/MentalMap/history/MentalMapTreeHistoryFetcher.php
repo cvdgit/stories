@@ -42,7 +42,7 @@ class MentalMapTreeHistoryFetcher
             ];
         }, $nodeList);
 
-        $rows = (new Query())
+        /*$oldRows = (new Query())
             ->select([
                 'id' => 'h.image_fragment_id',
                 'all' => 'MAX(h.overall_similarity)',
@@ -56,13 +56,61 @@ class MentalMapTreeHistoryFetcher
             ])
             ->groupBy('h.image_fragment_id')
             ->indexBy('id')
+            ->all();*/
+
+        $historyRows = (new Query())
+            ->select([
+                'id' => 'h.image_fragment_id',
+                'all' => 'h.overall_similarity',
+                'hiding' => 'h.text_hiding_percentage',
+                'target' => 'h.text_target_percentage',
+                'all_words' => 'h.all_important_words_included',
+            ])
+            ->from(['h' => 'mental_map_history'])
+            ->where([
+                'h.mental_map_id' => $mentalMapId,
+                'h.user_id' => $userId,
+            ])
+            ->andWhere("h.overall_similarity >= IFNULL(h.threshold, $threshold)")
+            ->orderBy(['all' => SORT_DESC])
             ->all();
 
-        return array_map(static function (array $item) use ($rows, $threshold): array {
+        $historyRowsByFragmentId = [];
+        foreach ($historyRows as $historyRow) {
+            $id = $historyRow['id'];
+            if (!isset($historyRowsByFragmentId[$id])) {
+                $historyRowsByFragmentId[$id] = [];
+            }
+            $historyRowsByFragmentId[$id][] = $historyRow;
+        }
+
+        $rows = [];
+        foreach ($historyRowsByFragmentId as $fragmentId => $rowsGroup) {
+
+            $allWordsDoneItems = array_filter($rowsGroup, static function(array $groupItem): bool {
+                return $groupItem['all_words'] === '1';
+            });
+            if (count($allWordsDoneItems) > 0) {
+                $rows[$fragmentId] = array_merge($allWordsDoneItems[0], ['done' => true]);
+                continue;
+            }
+
+            $allWordsFailItems = array_filter($rowsGroup, static function(array $groupItem): bool {
+                return $groupItem['all_words'] === '-1';
+            });
+            if (count($allWordsFailItems) > 0) {
+                $rows[$fragmentId] = array_merge($allWordsFailItems[0], ['done' => false]);
+                continue;
+            }
+
+            $rows[$fragmentId] = array_merge($rowsGroup[0], ['done' => true]);
+        }
+
+        return array_map(static function (array $item) use ($rows): array {
             if (isset($rows[$item['id']])) {
                 $row = $rows[$item['id']];
                 $all = isset($row['all']) ? (int) $row['all'] : 0;
-                $item['done'] = MentalMap::fragmentIsDone($all, $threshold);
+                $item['done'] = $row['done'];
                 $item['all'] = $all;
                 $item['hiding'] = isset($row['hiding']) ? (int) $row['hiding'] : 0;
                 $item['target'] = isset($row['target']) ? (int) $row['target'] : 0;

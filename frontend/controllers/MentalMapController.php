@@ -177,6 +177,10 @@ class MentalMapController extends Controller
 
             try {
                 $command = Yii::$app->db->createCommand();
+                $allWords = null;
+                if ($form->all_important_words_included !== null) {
+                    $allWords = $form->all_important_words_included === true ? 1 : -1;
+                }
                 $command->insert('mental_map_history', [
                     'id' => Uuid::uuid4()->toString(),
                     'story_id' => $form->story_id,
@@ -190,6 +194,8 @@ class MentalMapController extends Controller
                     'text_target_percentage' => $form->text_target_percentage,
                     'created_at' => time(),
                     'threshold' => $form->threshold,
+                    'all_important_words_included' => $allWords,
+                    'payload' => $form->payload,
                 ]);
                 $command->execute();
 

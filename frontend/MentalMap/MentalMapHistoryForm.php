@@ -18,6 +18,8 @@ class MentalMapHistoryForm extends Model
     public $text_target_percentage;
     public $repetition_mode;
     public $threshold;
+    public $all_important_words_included;
+    public $payload;
 
     public function rules(): array
     {
@@ -35,8 +37,8 @@ class MentalMapHistoryForm extends Model
                 ],
                 'integer',
             ],
-            ['repetition_mode', 'boolean'],
-            ['content', 'safe'],
+            [['repetition_mode', 'all_important_words_included'], 'boolean'],
+            [['content', 'payload'], 'safe'],
         ];
     }
 }
