@@ -24,8 +24,10 @@ ColumnQuestion.prototype.create = function(question, container, responseHandler)
 
   container.empty()
 
-  const {firstDigit, secondDigit, sign, result} = payload
-  const digits = Math.max(firstDigit.length, secondDigit.length)
+  const {sign, result} = payload
+  const firstDigit = String(payload.firstDigit)
+  const secondDigit = String(payload.secondDigit)
+  const digits = Math.max(String(firstDigit).length, String(secondDigit).length)
 
   const template = document.createElement('div')
   template.classList.add('template__container', 'template__container_small')

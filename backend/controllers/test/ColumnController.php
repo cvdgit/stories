@@ -8,6 +8,7 @@ use backend\components\BaseController;
 use backend\Testing\Questions\Column\Create\ColumnQuestionCreateForm;
 use backend\Testing\Questions\Column\Create\CreateColumnQuestionCommand;
 use backend\Testing\Questions\Column\Create\CreateColumnQuestionHandler;
+use backend\Testing\Questions\Column\Import\ImportColumnQuestionsForm;
 use backend\Testing\Questions\Column\Update\ColumnQuestionUpdateForm;
 use common\models\StoryTest;
 use common\models\StoryTestQuestion;
@@ -164,6 +165,95 @@ class ColumnController extends BaseController
                 Yii::$app->errorHandler->logException($exception);
                 return ['success' => false, 'message' => $exception->getMessage()];
             }
+        }
+        return ['success' => false, 'message' => 'No data'];
+    }
+
+    /**
+     * @throws InvalidConfigException
+     * @throws NotFoundHttpException
+     */
+    public function actionImportForm(int $test_id): string
+    {
+        $test = $this->findModel(StoryTest::class, $test_id);
+        $formModel = new ImportColumnQuestionsForm();
+        return $this->renderAjax('_import_form', [
+            'formModel' => $formModel,
+            'testId' => $test->id,
+        ]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     * @throws InvalidConfigException
+     * @throws Exception
+     */
+    public function actionImport(int $test_id, Request $request, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+        $testModel = $this->findModel(StoryTest::class, $test_id);
+        $formModel = new ImportColumnQuestionsForm();
+        if ($formModel->load($request->post())) {
+            if (!$formModel->validate()) {
+                return ['success' => false, 'message' => 'Not valid'];
+            }
+
+            $sign = null;
+            if (count($formModel->sign) === 1) {
+                $sign = $formModel->sign[0];
+            }
+
+            $questions = [];
+            for ($i = 0; $i < (int) $formModel->number; $i++) {
+
+                if ($sign === null) {
+                    $randSign = random_int(0, count($formModel->sign) - 1);
+                    $questionSign = $formModel->sign[$randSign] ?? '';
+                } else {
+                    $questionSign = $sign;
+                }
+
+                if ($questionSign === '') {
+                    continue;
+                }
+
+                $question = [];
+
+                if ($questionSign === '+') {
+                    $firstDigit = random_int((int) $formModel->firstDigitMin, (int) $formModel->firstDigitMax);
+                    $secondDigit = random_int((int) $formModel->secondDigitMin, (int) $formModel->secondDigitMax);
+                    $question['firstDigit'] = $firstDigit;
+                    $question['secondDigit'] = $secondDigit;
+                    $question['result'] = $firstDigit + $secondDigit;
+                    $question['name'] = 'Вычисли столбиком: ' . $firstDigit . ' + ' . $secondDigit;
+                }
+
+                if ($questionSign === '-') {
+                    $secondDigit = random_int((int) $formModel->firstDigitMin, (int) $formModel->firstDigitMax);
+                    $firstDigit = random_int($secondDigit, max($secondDigit, (int) $formModel->secondDigitMax));
+                    $question['firstDigit'] = $firstDigit;
+                    $question['secondDigit'] = $secondDigit;
+                    $question['result'] = $firstDigit - $secondDigit;
+                    $question['name'] = 'Вычисли столбиком: ' . $firstDigit . ' - ' . $secondDigit;
+                }
+
+                if (!isset($question['name'])) {
+                    continue;
+                }
+
+                $this->createColumnQuestionHandler->handle(new CreateColumnQuestionCommand(
+                    $testModel->id,
+                    $question['name'],
+                    (string) $question['result'],
+                    [
+                        'firstDigit' => $question['firstDigit'],
+                        'secondDigit' => $question['secondDigit'],
+                        'sign' => $questionSign,
+                        'result' => $question['result'],
+                    ],
+                ));
+            }
+            return ['success' => true];
         }
         return ['success' => false, 'message' => 'No data'];
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use backend\assets\MainAsset;
 use common\models\StoryTest;
 use common\models\StoryTestQuestion;
+use yii\bootstrap\Dropdown;
 use yii\data\DataProviderInterface;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
@@ -21,6 +22,7 @@ use yii\web\View;
 
 MainAsset::register($this);
 $this->registerJs($this->renderFile("@backend/views/test/_gpt_import.js"));
+$this->registerJs($this->renderFile("@backend/views/test/_column_import.js"));
 ?>
 <div>
     <div class="clearfix">
@@ -39,11 +41,21 @@ $this->registerJs($this->renderFile("@backend/views/test/_gpt_import.js"));
                 </div>
                 <?php endif ?>
             </div>
-            <div>
+            <div style="display: flex; flex-direction: row; column-gap: 20px">
                 <a data-quiz-id="<?= $model->id; ?>" id="gpt-import" class="btn" href="" style="padding: 0">
                     <img style="width:30px" src="/img/chatgpt-icon.png" alt="">
                 </a>
-                <?= Html::a('Импортировать вопросы из списка слов', ['test/import/from-word-list', 'test_id' => $model->id], ['class' => 'btn btn-default', 'style' => 'margin-left: 20px', 'id' => 'import-from-word-list']) ?>
+                <div class="dropdown pull-right">
+                    <a href="#" data-toggle="dropdown" class="dropdown-toggle btn btn-default">
+                        Импорт вопросов <b class="caret"></b>
+                    </a>
+                    <?= Dropdown::widget([
+                        'items' => [
+                            ['label' => 'Из списка слов', 'url' => ['test/import/from-word-list', 'test_id' => $model->id], 'linkOptions' => ['id' => 'import-from-word-list']],
+                            ['label' => 'Решение а столбик', 'url' => ['/test/column/import-form', 'test_id' => $model->id], 'linkOptions' => ['id' => 'import-column-questions']],
+                        ],
+                    ]) ?>
+                </div>
             </div>
         </div>
     </div>
