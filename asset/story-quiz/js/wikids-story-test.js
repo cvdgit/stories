@@ -2081,7 +2081,7 @@ function WikidsStoryTest(el, options) {
       }
       if (testConfig.sourceIsLocal() || testConfig.sourceIsTests()) {
 
-        if (testConfig.answerTypeIsInput(currentQuestion) || testConfig.answerTypeIsPassTest(currentQuestion)) {
+        if (testConfig.answerTypeIsInput(currentQuestion) || testConfig.answerTypeIsPassTest(currentQuestion) || testConfig.answerTypeIsColumn(currentQuestion)) {
           answerList = thisAnswer.map(function (answerText, index) {
             return {
               'answer_entity_id': index,
@@ -2441,16 +2441,35 @@ function WikidsStoryTest(el, options) {
     }
 
     if (questionViewColumn(currentQuestion)) {
-      const [getUserAnswers, checkCorrectHandler] = that.columnQuestion
+      const [getUserAnswers, getStepUserAnswers, checkCorrectHandler] = that.columnQuestion
         .create(
           currentQuestion,
           $('.step-question-wrap', currentQuestionElement),
           () => {}
         )
 
+      const checker = function (values) {
+        return function (value, index) {
+          /*if (convertAnswerToInt) {
+            value = parseInt(value)
+          }*/
+          return value === values.sort()[index];
+        }
+      }
+
       dom.nextButton.off("click").on("click", function () {
-        const userAnswer = getUserAnswers()
-        nextQuestion([userAnswer], () => checkCorrectHandler(userAnswer))
+
+        const userAnswers = [
+          getUserAnswers(),
+          ...(getStepUserAnswers().map(a => a.result.trim()))
+        ].filter(a => a !== '')
+
+        nextQuestion(userAnswers, (q) => {
+          const correctAnswers = getCorrectAnswers(q).map(a => a.name)
+          return (userAnswers.length === correctAnswers.length && userAnswers.sort().every(checker(correctAnswers)))
+        })
+
+        //nextQuestion([userAnswer], () => checkCorrectHandler(userAnswer))
       })
     }
 

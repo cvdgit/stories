@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace backend\Testing\Questions\Column\Create;
 
+use backend\Testing\Questions\Column\ColumnQuestionPayload;
+
 class CreateColumnQuestionCommand
 {
     /**
@@ -19,11 +21,11 @@ class CreateColumnQuestionCommand
      */
     private $answerName;
     /**
-     * @var array
+     * @var ColumnQuestionPayload
      */
     private $payload;
 
-    public function __construct(int $testId, string $name, string $answerName, array $payload)
+    public function __construct(int $testId, string $name, string $answerName, ColumnQuestionPayload $payload)
     {
         $this->testId = $testId;
         $this->name = $name;
@@ -46,7 +48,7 @@ class CreateColumnQuestionCommand
         return $this->answerName;
     }
 
-    public function getPayload(): array
+    public function getPayload(): ColumnQuestionPayload
     {
         return $this->payload;
     }

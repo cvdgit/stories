@@ -43,6 +43,10 @@
   transform: translateX(calc(100% - 16px));
 }
 
+.template__symbol_plus-helper {
+  transform: translateX(calc(300% - 16px));
+}
+
 .calculationRow__cell {
   width: 40px;
   height: 40px;

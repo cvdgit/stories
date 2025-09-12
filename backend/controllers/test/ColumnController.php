@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace backend\controllers\test;
 
 use backend\components\BaseController;
+use backend\Testing\Questions\Column\ColumnQuestionPayload;
 use backend\Testing\Questions\Column\Create\ColumnQuestionCreateForm;
 use backend\Testing\Questions\Column\Create\CreateColumnQuestionCommand;
 use backend\Testing\Questions\Column\Create\CreateColumnQuestionHandler;
@@ -83,12 +84,10 @@ class ColumnController extends BaseController
                 return ['success' => false, 'message' => 'Not valid'];
             }
 
-            $payload = [
-                'firstDigit' => $createForm->firstDigit,
-                'secondDigit' => $createForm->secondDigit,
-                'sign' => $createForm->sign,
-                'result' => $createForm->result,
-            ];
+            $payload = new ColumnQuestionPayload($createForm->firstDigit, $createForm->secondDigit, $createForm->sign, $createForm->result);
+            if ($payload->isMultiplySign()) {
+                $payload = $payload->withSteps();
+            }
 
             try {
                 $this->createColumnQuestionHandler->handle(
@@ -140,12 +139,16 @@ class ColumnController extends BaseController
 
             $questionModel->name = $updateForm->name;
 
-            $payload = [
-                'firstDigit' => $updateForm->firstDigit,
-                'secondDigit' => $updateForm->secondDigit,
-                'sign' => $updateForm->sign,
-                'result' => $updateForm->result,
-            ];
+            $payload = new ColumnQuestionPayload(
+                $updateForm->firstDigit,
+                $updateForm->secondDigit,
+                $updateForm->sign,
+                $updateForm->result,
+            );
+            if ($payload->isMultiplySign()) {
+                $payload = $payload->withSteps();
+            }
+
             $questionModel->regions = Json::encode($payload);
 
             $correctAnswer = $questionModel->storyTestAnswers[0];
@@ -203,7 +206,6 @@ class ColumnController extends BaseController
                 $sign = $formModel->sign[0];
             }
 
-            $questions = [];
             for ($i = 0; $i < (int) $formModel->number; $i++) {
 
                 if ($sign === null) {
@@ -217,40 +219,50 @@ class ColumnController extends BaseController
                     continue;
                 }
 
-                $question = [];
+                $payload = null;
 
                 if ($questionSign === '+') {
                     $firstDigit = random_int((int) $formModel->firstDigitMin, (int) $formModel->firstDigitMax);
                     $secondDigit = random_int((int) $formModel->secondDigitMin, (int) $formModel->secondDigitMax);
-                    $question['firstDigit'] = $firstDigit;
-                    $question['secondDigit'] = $secondDigit;
-                    $question['result'] = $firstDigit + $secondDigit;
-                    $question['name'] = 'Вычисли столбиком: ' . $firstDigit . ' + ' . $secondDigit;
+                    $payload = new ColumnQuestionPayload(
+                        (string) $firstDigit,
+                        (string) $secondDigit,
+                        '+',
+                        (string) ($firstDigit + $secondDigit)
+                    );
                 }
 
                 if ($questionSign === '-') {
                     $secondDigit = random_int((int) $formModel->firstDigitMin, (int) $formModel->firstDigitMax);
                     $firstDigit = random_int($secondDigit, max($secondDigit, (int) $formModel->secondDigitMax));
-                    $question['firstDigit'] = $firstDigit;
-                    $question['secondDigit'] = $secondDigit;
-                    $question['result'] = $firstDigit - $secondDigit;
-                    $question['name'] = 'Вычисли столбиком: ' . $firstDigit . ' - ' . $secondDigit;
+                    $payload = new ColumnQuestionPayload(
+                        (string) $firstDigit,
+                        (string) $secondDigit,
+                        '-',
+                        (string) ($firstDigit - $secondDigit)
+                    );
                 }
 
-                if (!isset($question['name'])) {
+                if ($questionSign === '*') {
+                    $firstDigit = random_int((int) $formModel->firstDigitMin, (int) $formModel->firstDigitMax);
+                    $secondDigit = random_int((int) $formModel->secondDigitMin, (int) $formModel->secondDigitMax);
+                    $payload = (new ColumnQuestionPayload(
+                        (string) $firstDigit,
+                        (string) $secondDigit,
+                        '*',
+                        (string) ($firstDigit * $secondDigit)
+                    ))->withSteps();
+                }
+
+                if ($payload === null) {
                     continue;
                 }
 
                 $this->createColumnQuestionHandler->handle(new CreateColumnQuestionCommand(
                     $testModel->id,
-                    $question['name'],
-                    (string) $question['result'],
-                    [
-                        'firstDigit' => $question['firstDigit'],
-                        'secondDigit' => $question['secondDigit'],
-                        'sign' => $questionSign,
-                        'result' => $question['result'],
-                    ],
+                    'Вычисли столбиком: ' . $payload->getFirstDigit() . ' ' . $payload->getSign() . ' ' . $payload->getSecondDigit(),
+                    $payload->getResult(),
+                    $payload,
                 ));
             }
             return ['success' => true];

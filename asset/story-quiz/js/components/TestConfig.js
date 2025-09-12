@@ -71,7 +71,8 @@ const TestConfig = function (data) {
     },
     getDescription: () => data.description,
     showDescriptionInQuestions: () => data.showDescriptionInQuestions,
-    answerTypeIsPassTest: (q) => parseInt(q['type']) === 8
+    answerTypeIsPassTest: (q) => parseInt(q['type']) === 8,
+    answerTypeIsColumn: (q) => parseInt(q['type']) === 16
   }
 }
 

@@ -35,15 +35,30 @@ class CreateColumnQuestionHandler
             if (!$question->save()) {
                 throw ModelDomainException::create($question);
             }
-            $columns = [
-                'story_question_id' => $question->id,
-                'name' => $command->getAnswerName(),
-                'order' => 1,
-                'is_correct' => true,
+
+            $answers = [
+                [
+                    'story_question_id' => $question->id,
+                    'name' => $command->getAnswerName(),
+                    'order' => 1,
+                    'is_correct' => true,
+                ],
             ];
-            $insertCommand = Yii::$app->db->createCommand();
-            $insertCommand->insert('story_test_answer', $columns);
-            $insertCommand->execute();
+
+            foreach ($command->getPayload()->getSteps() as $i => $step) {
+                $answers[] = [
+                    'story_question_id' => $question->id,
+                    'name' => $step['resultInt'],
+                    'order' => $i + 1,
+                    'is_correct' => true,
+                ];
+            }
+
+            if (count($answers) > 0) {
+                $insertCommand = Yii::$app->db->createCommand();
+                $insertCommand->batchInsert('story_test_answer', ['story_question_id', 'name', 'order', 'is_correct'], $answers);
+                $insertCommand->execute();
+            }
         });
     }
 }

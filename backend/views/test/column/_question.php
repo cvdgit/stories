@@ -20,14 +20,21 @@ MainAsset::register($this);
 $this->registerJs($this->renderFile("@backend/views/test/column/_column.js"));
 ?>
 <?php
-$form = ActiveForm::begin(['id' => 'column-question-form', 'action' => $action, 'enableClientValidation' => false]) ?>
+$form = ActiveForm::begin([
+    'id' => 'column-question-form',
+    'action' => $action,
+    'enableClientValidation' => false,
+    'options' => [
+        'data-model-name' => array_reverse(explode('\\', get_class($formModel)))[0],
+    ],
+]) ?>
 <?= $form->field($formModel, 'name')->textInput(['maxlength' => true, 'class' => 'form-control columnQuestionName']) ?>
 <div style="display: flex; flex-direction: row; margin-bottom: 20px; column-gap: 10px; align-items: center">
     <div>
         <?= $form->field($formModel, 'firstDigit')->textInput(['class' => 'form-control firstDigit']) ?>
     </div>
     <div>
-        <?= $form->field($formModel, 'sign')->dropDownList(['+' => '+', '-' => '-'], ['class' => 'form-control sign']) ?>
+        <?= $form->field($formModel, 'sign')->dropDownList(['+' => '+', '-' => '-', '*' => '*'], ['class' => 'form-control sign']) ?>
     </div>
     <div>
         <?= $form->field($formModel, 'secondDigit')->textInput(['class' => 'form-control secondDigit']) ?>

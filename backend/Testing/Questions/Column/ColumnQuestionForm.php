@@ -13,6 +13,7 @@ abstract class ColumnQuestionForm extends Model
     public $secondDigit;
     public $sign;
     public $result;
+    public $payload;
 
     public function rules(): array
     {
@@ -22,6 +23,7 @@ abstract class ColumnQuestionForm extends Model
             [['firstDigit', 'secondDigit', 'result'], 'integer', 'min' => 0],
             [['firstDigit', 'secondDigit'], 'string', 'min' => 2],
             ['sign', 'string', 'max' => 1],
+            ['payload', 'safe'],
         ];
     }
 
