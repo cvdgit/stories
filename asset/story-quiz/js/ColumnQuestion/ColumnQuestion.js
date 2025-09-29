@@ -196,7 +196,7 @@ function multiplyTemplate(template, {steps, digits, firstDigit, secondDigit, sho
       wrap.appendChild(createResultsRow(firstDigit.length + secondDigit.length + 1, {value: result, showValue: Boolean(showValue)}))
     } else {
       wrap.appendChild(createHelpersRow(digits, i + 1))
-      wrap.appendChild(createDigitsRow(digits + 1, {offset: 0, data: {step: step.step}, value: showValue ? String(step.resultInt) : null}))
+      wrap.appendChild(createDigitsRow(digits + 1, {offset: i, data: {step: step.step}, value: showValue ? String(step.resultInt) : null}))
       if (i === 0) {
         const symbolEl = document.createElement('div')
         symbolEl.classList.add('template__symbol', 'template__symbol_plus'/*, 'template__symbol_plus-helper'*/)

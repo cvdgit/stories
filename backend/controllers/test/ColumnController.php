@@ -12,6 +12,7 @@ use backend\Testing\Questions\Column\Create\CreateColumnQuestionHandler;
 use backend\Testing\Questions\Column\Import\ImportColumnQuestionsForm;
 use backend\Testing\Questions\Column\Update\ColumnQuestionUpdateForm;
 use common\models\StoryTest;
+use common\models\StoryTestAnswer;
 use common\models\StoryTestQuestion;
 use common\rbac\UserRoles;
 use DomainException;
@@ -130,9 +131,11 @@ class ColumnController extends BaseController
     {
         $response->format = Response::FORMAT_JSON;
         $questionModel = $this->findModel(StoryTestQuestion::class, $id);
+
+        $currentPayload = ColumnQuestionPayload::fromPayload(Json::decode($questionModel->regions));
+
         $updateForm = new ColumnQuestionUpdateForm($questionModel);
         if ($updateForm->load($request->post())) {
-
             if (!$updateForm->validate()) {
                 return ['success' => false, 'message' => 'Not valid'];
             }
@@ -149,18 +152,49 @@ class ColumnController extends BaseController
                 $payload = $payload->withSteps();
             }
 
+            if ((string) $currentPayload !== (string) $payload) {
+                try {
+                    if (!$questionModel->save()) {
+                        throw new DomainException('Question save error');
+                    }
+                    return ['success' => true];
+                } catch (Exception $exception) {
+                    Yii::$app->errorHandler->logException($exception);
+                    return ['success' => false, 'message' => $exception->getMessage()];
+                }
+            }
+
             $questionModel->regions = Json::encode($payload);
 
-            $correctAnswer = $questionModel->storyTestAnswers[0];
-            $correctAnswer->name = $updateForm->result;
+            StoryTestAnswer::deleteAll(['story_question_id' => $questionModel->id]);
+
+            $answers = [
+                [
+                    'story_question_id' => $questionModel->id,
+                    'name' => $payload->getResult(),
+                    'order' => 1,
+                    'is_correct' => true,
+                ],
+            ];
+
+            foreach ($payload->getSteps() as $i => $step) {
+                $answers[] = [
+                    'story_question_id' => $questionModel->id,
+                    'name' => $step['resultInt'],
+                    'order' => $i + 1,
+                    'is_correct' => true,
+                ];
+            }
 
             try {
                 if (!$questionModel->save()) {
                     throw new DomainException('Question save error');
                 }
 
-                if (!$correctAnswer->save()) {
-                    throw new DomainException('Answer save error');
+                if (count($answers) > 0) {
+                    $insertCommand = Yii::$app->db->createCommand();
+                    $insertCommand->batchInsert('story_test_answer', ['story_question_id', 'name', 'order', 'is_correct'], $answers);
+                    $insertCommand->execute();
                 }
 
                 return ['success' => true];

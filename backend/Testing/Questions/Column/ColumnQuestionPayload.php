@@ -145,4 +145,9 @@ class ColumnQuestionPayload implements \JsonSerializable
         $steps = self::multiplyColumnSteps($this->firstDigit, $this->secondDigit);
         return new self($this->firstDigit, $this->secondDigit, $this->sign, $this->result, $steps);
     }
+
+    public function __toString(): string
+    {
+        return $this->firstDigit . $this->sign . $this->secondDigit . '=' . $this->result;
+    }
 }
