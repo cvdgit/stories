@@ -110,13 +110,6 @@
 
   attachBeforeSubmit(document.getElementById('column-question-form'), (form) => {
     const formData = new FormData(form)
-
-    /*const sign = $('.sign').val()
-    if (sign === '*') {
-      const payload = multiplyColumnSteps(Number($('.firstDigit').val()), Number($('.secondDigit').val()))
-      formData.append(`${$(form).attr('data-model-name')}[payload]`, JSON.stringify(payload))
-    }*/
-
     sendForm($(form).attr('action'), $(form).attr('method'), formData)
       .done((response) => {
         if (response.url) {

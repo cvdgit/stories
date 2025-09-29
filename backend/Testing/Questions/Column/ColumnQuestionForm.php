@@ -21,7 +21,7 @@ abstract class ColumnQuestionForm extends Model
             [['name', 'firstDigit', 'secondDigit', 'sign', 'result'], 'required'],
             ['name', 'string', 'max' => 1024],
             [['firstDigit', 'secondDigit', 'result'], 'integer', 'min' => 0],
-            [['firstDigit', 'secondDigit'], 'string', 'min' => 2],
+            [['firstDigit', 'secondDigit'], 'string', 'min' => 1],
             ['sign', 'string', 'max' => 1],
             ['payload', 'safe'],
         ];

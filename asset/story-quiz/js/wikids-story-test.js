@@ -2787,6 +2787,8 @@ function WikidsStoryTest(el, options) {
       $elements.append(that.stepQuestion.getContent(question))
     } else if (questionViewColumn(question)) {
       $elements.append(that.columnQuestion.getContent(question))
+    } else if (questionViewColumn(question)) {
+      $elements.append(that.columnQuestion.getContent(question))
     } else if (questionViewImageGaps(question)) {
       $elements.append(that.imageGapsQuestion.getContent(question));
     } else if (questionViewDragWords(question)) {
