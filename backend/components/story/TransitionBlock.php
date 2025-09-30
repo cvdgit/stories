@@ -7,7 +7,7 @@ use backend\models\editor\TransitionForm;
 class TransitionBlock extends ButtonBlock
 {
 
-    /** @var integer */
+    /** @var int */
     protected $transition_story_id;
 
     /** @var string */
@@ -63,6 +63,7 @@ class TransitionBlock extends ButtonBlock
     public function create()
     {
         $block = new self();
+        $block->setType(AbstractBlock::TYPE_TRANSITION);
         $block->setWidth('auto');
         $block->setHeight('auto');
         $block->setTop('600px');
