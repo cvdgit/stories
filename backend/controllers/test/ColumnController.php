@@ -152,6 +152,8 @@ class ColumnController extends BaseController
                 $payload = $payload->withSteps();
             }
 
+            $questionModel->regions = Json::encode($payload);
+
             if ((string) $currentPayload !== (string) $payload) {
                 try {
                     if (!$questionModel->save()) {
@@ -163,8 +165,6 @@ class ColumnController extends BaseController
                     return ['success' => false, 'message' => $exception->getMessage()];
                 }
             }
-
-            $questionModel->regions = Json::encode($payload);
 
             StoryTestAnswer::deleteAll(['story_question_id' => $questionModel->id]);
 
