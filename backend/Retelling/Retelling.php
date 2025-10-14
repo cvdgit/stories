@@ -37,4 +37,18 @@ class Retelling extends ActiveRecord
         $newRetelling->updated_at = time();
         return $newRetelling;
     }
+
+    public static function create(UuidInterface $id, int $slideId, string $name, string $questions, bool $withQuestions, int $userId): self
+    {
+        $model = new self();
+        $model->id = $id->toString();
+        $model->slide_id = $slideId;
+        $model->name = $name;
+        $model->questions = $questions;
+        $model->with_questions = $withQuestions ? 1 : 0;
+        $model->created_by = $userId;
+        $model->created_at = time();
+        $model->updated_at = time();
+        return $model;
+    }
 }

@@ -92,7 +92,8 @@ export function wordClickHandler(word, prevState, ctrlKey) {
       }
       return w
     })
-    .filter(w => w.type === 'word' && w.word.trim().length > 0)
+    .filter(w => w.type === 'break' || (w.type === 'word' && w.word.trim().length > 0))
+    //.filter(w => w.type === 'word' && w.word.trim().length > 0)
 
   state
     .filter((w, wordIndex) => {

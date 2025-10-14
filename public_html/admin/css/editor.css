@@ -306,22 +306,31 @@ body {
 
 .slide-menu {
     position: absolute;
-    width: 216px;
     font-size: 18px;
 }
 
+.slide-menu-list {
+  display: flex;
+  flex-direction: row;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .slide-menu-item {
-    height: 36px;
-    width: 36px;
-    line-height: 36px;
-    list-style: none;
-    color: #fff;
-    vertical-align: middle;
-    background: rgba(20,20,20,0.8);
-    cursor: pointer;
-    text-align: center;
-    opacity: 0.5;
-    display: inline-block;
+  height: 36px;
+  width: 36px;
+  line-height: 36px;
+  list-style: none;
+  color: #fff;
+  vertical-align: middle;
+  background: rgba(20, 20, 20, 0.8);
+  cursor: pointer;
+  text-align: center;
+  opacity: 0.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .slide-menu-item:hover,
@@ -975,4 +984,138 @@ body {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, .02);
+}
+
+.content-mm-container {
+  display: flex;
+  flex-direction: column;
+  row-gap: 20px;
+}
+
+.content-mm-fragments {
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+}
+
+.content-mm-controls {}
+
+.text-item-word {
+  cursor: pointer;
+  display: inline-block;
+  margin-bottom: 6px;
+  margin-right: 8px;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.text-item-word.selected {
+  font-weight: 600;
+}
+
+.fragment-item {
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+  border: 1px #eee solid;
+  position: relative;
+}
+
+.fragment-item-number {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.fragment-item-words {
+  padding: 6px;
+}
+
+.fragment-item-header {
+  display: flex;
+  flex-direction: row;
+  column-gap: 10px;
+  background-color: #eee;
+  padding: 6px;
+}
+
+.fragment-item-controls {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+}
+
+.content-mm-maps {
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+}
+
+.content-mm-maps-item {
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+}
+
+.fragment-create {
+  bottom: -10px;
+  display: block;
+  height: 40px;
+  left: 0;
+  opacity: .001;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  transition: opacity .3s;
+  width: 100%;
+  z-index: 102;
+}
+
+.fragment-create-btn {
+  background: #000;
+  border: 0;
+  border-radius: 50%;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, .16);
+  color: #fff;
+  cursor: pointer;
+  font-family: lato, sans-serif;
+  font-size: 17px;
+  font-weight: 900;
+  height: 32px;
+  left: calc(50% - 15px);
+  line-height: 32px;
+  outline: none;
+  padding: 0;
+  pointer-events: all;
+  position: absolute;
+  text-align: center;
+  top: 13px;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 32px;
+}
+
+.fragment-item:hover .fragment-create {
+  opacity: .999;
+}
+
+.fragment-save {
+  display: none;
+}
+
+.fragment-item.fragment-editing .fragment-edit {
+  display: none;
+}
+
+.fragment-item.fragment-editing .fragment-save {
+  display: block;
+}
+
+.textarea .target-text {
+  font-weight: 600;
+}
+
+.content-mm-controls {
+  display: flex;
+  column-gap: 10px;
 }

@@ -17,7 +17,7 @@ import TreeViewBody from "./TreeViewBody";
  * @returns {HTMLDivElement}
  * @constructor
  */
-export default function TreeView({id, name, tree, history, params, settings}, voiceResponse) {
+export default function TreeView({id, name, tree, history, params, settings, onMentalMapChange}, voiceResponse) {
 
   const wrap = document.createElement('div')
   wrap.style.display = 'flex'
@@ -44,6 +44,7 @@ export default function TreeView({id, name, tree, history, params, settings}, vo
     if (response?.success) {
       wrap.appendChild(body.restart())
       header.querySelector('#clear-history').style.display = 'hidden'
+      onMentalMapChange(0)
     }
   })
 
@@ -82,6 +83,7 @@ export default function TreeView({id, name, tree, history, params, settings}, vo
     const {currentHistory} = args
     const clearHistory = currentHistory.some(h => h.done)
     header.querySelector('#clear-history').style.display = clearHistory ? 'block' : 'hidden'
+    onMentalMapChange(Math.round(currentHistory.filter(h => h.done).length * 100 / currentHistory.length))
   })
 
   body.init()

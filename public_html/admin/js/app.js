@@ -255,7 +255,9 @@ function RemoteModal({id, title, dialogClassName}) {
       element
         .off('show.bs.modal')
         .on('show.bs.modal', function() {
-          $(this).find('.modal-body').load(url, callback);
+          $(this).find('.modal-body').load(url, function() {
+            callback(this)
+          });
         });
       element.modal();
     },

@@ -9,6 +9,7 @@ use backend\components\SlideModifier;
 use backend\components\story\AbstractBlock;
 use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\TextBlock;
+use backend\MentalMap\MentalMapStorySlide;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
 use backend\models\editor\MentalMapForm;
@@ -341,8 +342,29 @@ class EditorController extends BaseController
     {
         $response->format = Response::FORMAT_JSON;
         $model = $this->findModel(Story::class, $story_id);
-        return array_map(static function (StorySlide $slide): array {
-            return (new SlideListResponse($slide))->asArray();
+
+        $slideIds = array_map(static function(StorySlide $slide): int {
+            return $slide->id;
+        }, $model->storySlides);
+        $haveMentalMapsBySlide = [];
+        if (count($slideIds) > 0) {
+            $slideMentalMaps = (new Query())
+                ->select([
+                    'slideId' => 't.slide_id',
+                    'maps' => 'COUNT(t.mental_map_id)',
+                ])
+                ->from(['t' => MentalMapStorySlide::tableName()])
+                ->where(['in', 't.slide_id', $slideIds])
+                ->groupBy(['t.slide_id'])
+                ->all();
+            $haveMentalMapsBySlide = array_combine(
+                array_column($slideMentalMaps, 'slideId'),
+                array_fill(0, count($slideMentalMaps), true)
+            );
+        }
+
+        return array_map(static function (StorySlide $slide) use ($haveMentalMapsBySlide): array {
+            return (new SlideListResponse($slide, $haveMentalMapsBySlide[$slide->id] ?? false))->asArray();
         }, $model->storySlides);
     }
 

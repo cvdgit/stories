@@ -21,6 +21,7 @@ use yii\web\View;
  * @var bool $userCanViewStory
  * @var bool $saveStat
  * @var array $completedRetelling
+ * @var array $contentMentalMaps
  */
 
 MainAsset::register($this);
@@ -77,6 +78,7 @@ $plugins = [
     ['class' => \common\widgets\Reveal\Plugins\MentalMap::class, 'storyId' => $model->id],
 
     ['class' => Retelling::class, 'storyId' => $model->id],
+    ['class' => \common\widgets\Reveal\Plugins\ContentMentalMap::class, 'storyId' => $model->id, 'mentalMaps' => $contentMentalMaps],
 ];
 
 if (Yii::$app->request->get('from_game') === null) {

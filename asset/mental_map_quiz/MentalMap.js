@@ -33,6 +33,8 @@ export default function MentalMap(element, deck, params) {
   params = params || {}
   params.slide_id = params.slide_id || (deck ? Number($(deck.getCurrentSlide()).attr('data-id')) : null)
 
+  let mentalMapUserProgress = 0
+
   const repetitionMode = Boolean(params?.repetitionMode)
   const getCourseMode = Boolean(params?.getCourseMode)
 
@@ -579,7 +581,8 @@ export default function MentalMap(element, deck, params) {
       return
     }
 
-    const {mentalMap: json, history, rewritePrompt, threshold} = responseJson
+    const {mentalMap: json, history, rewritePrompt, threshold, userProgress} = responseJson
+    mentalMapUserProgress = userProgress
     mentalMapId = json.id
     mentalMapHistory = history
 
@@ -597,7 +600,11 @@ export default function MentalMap(element, deck, params) {
           repetition_mode: repetitionMode,
           threshold
         },
-        settings: json.settings || {}
+        settings: json.settings || {},
+        onMentalMapChange: progress => {
+          console.log(progress)
+          mentalMapUserProgress = progress
+        }
       }, new VoiceResponse(new MissingWordsRecognition({}))))
 
       $('[data-toggle="tooltip"]', this.element).tooltip({
@@ -1248,6 +1255,9 @@ export default function MentalMap(element, deck, params) {
         return mentalMapHistory.reduce((all, val) => all && val.done, true)
       }
       return true
+    },
+    getUserProgress() {
+      return mentalMapUserProgress
     }
   }
 }

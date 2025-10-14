@@ -47,19 +47,19 @@ class StorySlide extends ActiveRecord
     public const KIND_MENTAL_MAP = 3;
     public const KIND_RETELLING = 5;
 
-    public static function tableName()
+    public static function tableName(): string
     {
         return '{{%story_slide}}';
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class,
         ];
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             [['story_id', 'data', 'number'], 'required'],
@@ -69,7 +69,7 @@ class StorySlide extends ActiveRecord
         ];
     }
 
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -269,17 +269,17 @@ class StorySlide extends ActiveRecord
 
     public function isLink(): bool
     {
-        return (int)$this->kind === self::KIND_LINK;
+        return $this->kind === self::KIND_LINK;
     }
 
     public function isQuestion(): bool
     {
-        return (int)$this->kind === self::KIND_QUESTION;
+        return $this->kind === self::KIND_QUESTION;
     }
 
-    public function blockArray()
+    public function blockArray(): array
     {
-        return array_map(function(StorySlideBlock $block) {
+        return array_map(static function(StorySlideBlock $block) {
             return [
                 'id' => $block->id,
                 'type' => 'button',
@@ -288,9 +288,9 @@ class StorySlide extends ActiveRecord
         }, $this->storySlideBlocks);
     }
 
-    public function isHidden()
+    public function isHidden(): bool
     {
-        return (int) $this->status === self::STATUS_HIDDEN;
+        return $this->status === self::STATUS_HIDDEN;
     }
 
     public function updateData(string $data): void

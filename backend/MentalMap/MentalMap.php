@@ -27,14 +27,14 @@ class MentalMap extends ActiveRecord
         ];
     }
 
-    public static function create(string $uuid, string $name, array $payload, int $userId): MentalMap
+    public static function create(string $uuid, string $name, array $payload, int $userId, string $type = 'mental-map'): MentalMap
     {
         $model = new self();
         $model->uuid = $uuid;
         $model->name = $name;
         $model->payload = $payload;
         $model->user_id = $userId;
-        $model->map_type = 'mental-map';
+        $model->map_type = $type;
         return $model;
     }
 

@@ -72,3 +72,44 @@
 .retelling-success {
   color: #3c763d !important;
 }
+
+.content-mm-wrap {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 999;
+}
+
+.content-mm-inner {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+  pointer-events: all !important;
+}
+
+.content-mm-item {
+  display: flex;
+  flex-direction: row;
+  column-gap: 10px;
+  background-color: rgba(153, 205, 80, .4);
+  padding: 4px;
+  border-radius: 10px;
+  transition: 200ms all;
+}
+
+.content-mm-item:hover {
+  background-color: rgba(153, 205, 80, .6);
+}
+
+.content-mm-name {
+  font-size: 2.4rem;
+  line-height: 3rem;
+  user-select: none;
+  cursor: pointer;
+}
+
+.content-mm-percent {
+  font-size: 2.4rem;
+  line-height: 3rem;
+}

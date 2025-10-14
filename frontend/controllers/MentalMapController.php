@@ -142,6 +142,14 @@ class MentalMapController extends Controller
             }
         }
 
+        $userProgress = 0;
+        if (count($history) > 0) {
+            $doneFragmentsCount = count(array_filter($history, static function (array $item): bool {
+                return $item['done'];
+            }));
+            $userProgress = round($doneFragmentsCount * 100 / count($history), 0, PHP_ROUND_HALF_UP);
+        }
+
         $payload['mapTypeIsMentalMapQuestions'] = $mentalMap->mapTypeIsMentalMapQuestions();
 
         return [
@@ -151,6 +159,7 @@ class MentalMapController extends Controller
             'rewritePrompt' => $prompt,
             'threshold' => MentalMapThreshold::getThreshold(Yii::$app->params, $mentalMap->payload),
             'promptId' => $mentalMap->getSettingsPromptId(),
+            'userProgress' => $userProgress,
         ];
     }
 
@@ -218,26 +227,32 @@ class MentalMapController extends Controller
                 $fragmentHistory = $query->one();
 
                 $threshold = MentalMapThreshold::getThreshold(Yii::$app->params, $mentalMap->payload);
+                $userProgress = 0;
 
                 if (!$form->repetition_mode) {
-                    /*$history = $this->createMentalMapHistory(
-                        $mentalMap->getImages(),
-                        $mentalMap->uuid,
-                        $user->getId(),
-                    );*/
                     $history = (new MentalMapHistoryFetcher())->fetch($mentalMap->getImages(), $mentalMap->uuid, $user->getId(), $threshold);
                     if (MentalMap::isDone($history, $threshold)) {
                         $currentUser = User::findOne($user->getId());
-                        if ($currentUser === null) {
+                        if ($currentUser !== null) {
+                            $this->startMentalMapRepetitionHandler->handle(
+                                new StartMentalMapRepetitionCommand($mentalMap->uuid, $currentUser->getStudentID()),
+                            );
                         }
-                        $this->startMentalMapRepetitionHandler->handle(
-                            new StartMentalMapRepetitionCommand($mentalMap->uuid, $currentUser->getStudentID()),
-                        );
+                    }
+                    if (count($history) > 0) {
+                        $doneFragmentsCount = count(array_filter($history, static function (array $item): bool {
+                            return $item['done'];
+                        }));
+                        $userProgress = round($doneFragmentsCount * 100 / count($history), 0, PHP_ROUND_HALF_UP);
                     }
                 }
 
                 $fragmentHistory['done'] = MentalMap::fragmentIsDone((int) $fragmentHistory['all'], $threshold);
-                return ['success' => true, 'history' => $fragmentHistory];
+                return [
+                    'success' => true,
+                    'history' => $fragmentHistory,
+                    'userProgress' => $userProgress,
+                ];
             } catch (Exception $ex) {
                 Yii::$app->errorHandler->logException($ex);
                 return ['success' => false, 'message' => 'При сохранении истории карты знаний произошла ошибка'];

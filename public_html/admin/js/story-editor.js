@@ -881,6 +881,7 @@ const StoryEditor = (function () {
         startupFocus: true,
         //forcePasteAsPlainText: true,
         disableNativeSpellChecker: false,
+        extraAllowedContent : 'span(*)[*]{*}',
         toolbarGroups: [
           {name: 'styles', groups: ['styles']},
           {name: 'colors', groups: ['colors']},
@@ -1017,7 +1018,7 @@ const StoryEditor = (function () {
       //}
 
       if (activeBlock.typeIsText()) {
-        $list.append(createToolbarItemWithImage('Переписать', '/img/chatgpt-icon.png', 'gpt-rewrite'));
+        $list.append(createToolbarItemWithImage('Нейросеть', '/img/chatgpt-icon.png', 'text-gpt-actions'));
       }
 
       if (activeBlock.typeIsMentalMap() && slidesManager.getActiveSlide().getSlideView() === 'mental-map') {
@@ -1068,9 +1069,22 @@ const StoryEditor = (function () {
             }
           }
         ]);
+        editorPopover.attach('li[data-toolbar-action=text-gpt-actions]', {placement: 'left'}, [
+          {
+            name: 'gpt-rewrite',
+            title: 'Переписать текст',
+            click: () => params.gptRewriteHandler(blockManager.getActive(), blockModifier)
+          },
+          {
+            name: 'gpt-speech-trainer',
+            title: 'Речевой тренажер',
+            click: () => params.gptSpeechTrainer(blockManager.getActive(), blockModifier)
+          },
+        ])
       },
       'onRemove': function () {
         editorPopover.detach('li[data-toolbar-action=align]');
+        editorPopover.detach('li[data-toolbar-action=text-gpt-actions]');
       },
       'actions': {
         'stretch': function () {
@@ -1096,11 +1110,6 @@ const StoryEditor = (function () {
         },
         'select-image': function () {
           config.onImageReplace(blockManager.getActive().getID());
-        },
-        'gpt-rewrite': () => {
-          if (typeof params.gptRewriteHandler === 'function') {
-            params.gptRewriteHandler(blockManager.getActive(), blockModifier)
-          }
         },
         'mental-map-questions': () => {
           if (typeof params.mentalMapQuestionsHandler === 'function') {

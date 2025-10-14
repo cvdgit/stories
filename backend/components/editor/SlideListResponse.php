@@ -13,8 +13,12 @@ class SlideListResponse
 {
     private $slide;
     private $slideModifier;
+    /**
+     * @var bool
+     */
+    private $haveSlideMentalMaps;
 
-    public function __construct(StorySlide $slide)
+    public function __construct(StorySlide $slide, bool $haveSlideMentalMaps = false)
     {
         $this->slide = $slide;
 
@@ -25,6 +29,7 @@ class SlideListResponse
         }
 
         $this->slideModifier = new SlideModifier($slide->id, $slideData);
+        $this->haveSlideMentalMaps = $haveSlideMentalMaps;
     }
 
     public function asArray(): array
@@ -56,6 +61,7 @@ class SlideListResponse
             'haveLinks' => (count($s->storySlideBlocks) > 0),
             'number' => $s->number,
             'haveNeoRelations' => (count($s->neoSlideRelations) > 0),
+            'haveMentalMaps' => $this->haveSlideMentalMaps,
         ];
     }
 }
