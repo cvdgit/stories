@@ -82,6 +82,12 @@
   border-bottom: 4px solid #333333;
 }
 
+.calculationRow_first {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 4px solid #333333;
+}
+
 .calculationRow__cell_result {
   border-color: #f9ac5f;
 }
