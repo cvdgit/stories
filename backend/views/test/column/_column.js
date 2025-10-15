@@ -112,13 +112,13 @@
     const formData = new FormData(form)
     sendForm($(form).attr('action'), $(form).attr('method'), formData)
       .done((response) => {
-        /*if (response.url) {
+        if (response.url) {
           location.replace(response.url);
         }
         else {
           toastr.success('Успешно');
           location.reload()
-        }*/
+        }
       })
   })
 })()

@@ -188,7 +188,7 @@ function multiplyTemplate(template, {steps, digits, firstDigit, secondDigit, sho
   el.classList.add('template__calculation')
   showValue = showValue || false
 
-  if (steps.length === 1 && (firstDigit.length === 1 || secondDigit.length === 1)) {
+  if (steps.length === 0) {
     template.querySelector('.secondDigitRow').classList.remove('calculationRow_last')
     const wrap = document.createElement('div')
     wrap.classList.add('calculationRow_first')

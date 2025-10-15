@@ -142,6 +142,9 @@ class ColumnQuestionPayload implements \JsonSerializable
 
     public function withSteps(): self
     {
+        if (mb_strlen($this->firstDigit) === 1 || mb_strlen($this->secondDigit) === 1) {
+            return new self($this->firstDigit, $this->secondDigit, $this->sign, $this->result, []);
+        }
         $steps = self::multiplyColumnSteps($this->firstDigit, $this->secondDigit);
         return new self($this->firstDigit, $this->secondDigit, $this->sign, $this->result, $steps);
     }

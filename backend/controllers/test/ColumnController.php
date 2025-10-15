@@ -154,7 +154,7 @@ class ColumnController extends BaseController
 
             $questionModel->regions = Json::encode($payload);
 
-            if ((string) $currentPayload !== (string) $payload) {
+            if ((string) $currentPayload === (string) $payload) {
                 try {
                     if (!$questionModel->save()) {
                         throw new DomainException('Question save error');
