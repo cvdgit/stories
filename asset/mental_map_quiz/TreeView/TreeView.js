@@ -88,7 +88,7 @@ export default function TreeView({id, name, tree, history, params, settings, onM
 
   body.init()
 
-  window.addEventListener('blur', function() {
+  const blurHandler = function() {
     if (voiceResponse.getStatus()) {
       voiceResponse.stop()
       const el = document.querySelector('.gn.recording')
@@ -96,9 +96,20 @@ export default function TreeView({id, name, tree, history, params, settings, onM
         $(el).data('abort', true).trigger('click')
       }
     }
-  }, false);
+  }
+  window.addEventListener('blur', blurHandler, false);
 
-  return wrap
+  return {
+    getElement() {
+      return wrap
+    },
+    destroy() {
+      window.removeEventListener('blur', blurHandler)
+      if (voiceResponse.getStatus()) {
+        voiceResponse.stop()
+      }
+    }
+  }
 }
 
 function createFinishContent(restartHandler) {

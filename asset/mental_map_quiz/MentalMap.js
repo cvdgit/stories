@@ -34,6 +34,7 @@ export default function MentalMap(element, deck, params) {
   params.slide_id = params.slide_id || (deck ? Number($(deck.getCurrentSlide()).attr('data-id')) : null)
 
   let mentalMapUserProgress = 0
+  let treeViewInstance;
 
   const repetitionMode = Boolean(params?.repetitionMode)
   const getCourseMode = Boolean(params?.getCourseMode)
@@ -588,7 +589,8 @@ export default function MentalMap(element, deck, params) {
 
     const {treeView} = json
     if (treeView) {
-      this.element.appendChild(TreeView({
+
+      treeViewInstance = new TreeView({
         id: json.id,
         name: json.name,
         tree: json.treeData,
@@ -602,10 +604,11 @@ export default function MentalMap(element, deck, params) {
         },
         settings: json.settings || {},
         onMentalMapChange: progress => {
-          console.log(progress)
           mentalMapUserProgress = progress
         }
-      }, new VoiceResponse(new MissingWordsRecognition({}))))
+      }, new VoiceResponse(new MissingWordsRecognition({})))
+
+      this.element.appendChild(treeViewInstance.getElement())
 
       $('[data-toggle="tooltip"]', this.element).tooltip({
         container: 'body'
@@ -613,6 +616,16 @@ export default function MentalMap(element, deck, params) {
 
       return
     }
+
+    window.addEventListener('blur', function() {
+      if (voiceResponse.getStatus()) {
+        voiceResponse.stop()
+        const el = document.querySelector('#start-recording')
+        if (el) {
+          $(el).trigger('click')
+        }
+      }
+    }, false);
 
     const {mapTypeIsMentalMapQuestions, questions} = json
     const mapQuestions = new MentalMapQuestions({typeIsMentalMapQuestions: mapTypeIsMentalMapQuestions, questions})
@@ -1248,6 +1261,14 @@ export default function MentalMap(element, deck, params) {
     },
     getUserProgress() {
       return mentalMapUserProgress
+    },
+    destroy() {
+      if (treeViewInstance) {
+        treeViewInstance.destroy()
+      }
+      if (voiceResponse.getStatus()) {
+        voiceResponse.stop()
+      }
     }
   }
 }

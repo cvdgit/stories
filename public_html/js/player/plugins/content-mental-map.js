@@ -26,6 +26,10 @@
 
     const hideDialog = () => {
 
+      if (typeof this.hideHandler === "function") {
+        this.hideHandler()
+      }
+
       Reveal.configure({keyboard: true})
 
       if ($(Reveal.getCurrentSlide()).find('.slide-hints-wrapper').length) {
@@ -35,10 +39,6 @@
           .remove()
       }
       $('.reveal .story-controls').show()
-
-      if (typeof this.hideHandler === "function") {
-        this.hideHandler()
-      }
     }
 
     this.show = () => {
@@ -110,7 +110,10 @@
       $element.find('.mental-map-loader').fadeOut().remove()
     })
 
-    feedbackDialog.onHide(() => onHideHandler(mentalMap.getUserProgress()))
+    feedbackDialog.onHide(() => {
+      mentalMap.destroy()
+      onHideHandler(mentalMap.getUserProgress())
+    })
 
     feedbackDialog.show()
   }
