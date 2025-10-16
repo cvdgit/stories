@@ -75,13 +75,14 @@
   function showMentalMapDialog(mentalMapId, onHideHandler) {
     const content = `<div class="retelling-content">
 <div class="mental-map" style="text-align: left"></div>
+<div class="mental-map-loader"></div>
 </div>`
 
     const feedbackDialog = new InnerDialog('', content)
 
     let mentalMap
 
-    feedbackDialog.onShow($element => {
+    feedbackDialog.onShow(async ($element) => {
       mentalMap = mentalMapBuilder.create($element.find('.mental-map')[0], Reveal, {
         init: async () => {
           const response = await fetch(`/mental-map/init`, {
@@ -105,7 +106,8 @@
           mentalMapId,
         }
       }, $(getCurrentSlide()).attr('data-id'))
-      mentalMap.run()
+      await mentalMap.run()
+      $element.find('.mental-map-loader').fadeOut().remove()
     })
 
     feedbackDialog.onHide(() => onHideHandler(mentalMap.getUserProgress()))
@@ -129,6 +131,7 @@
       const elem = $(`<div data-mm-id="${mentalMap.id}" class="content-mm-item"><div class="content-mm-name"></div><div class="content-mm-progress"></div></div>`)
       elem.find('.content-mm-name')
         .text(mentalMap.name)
+        .end()
         .on('click', e => {
           showMentalMapDialog(mentalMap.id, (progress) => elem.find('.content-mm-progress').text(`(${progress}%)`))
         })

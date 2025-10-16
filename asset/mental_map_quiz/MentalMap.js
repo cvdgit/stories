@@ -614,16 +614,6 @@ export default function MentalMap(element, deck, params) {
       return
     }
 
-    window.addEventListener('blur', function() {
-      if (voiceResponse.getStatus()) {
-        voiceResponse.stop()
-        const el = document.querySelector('#start-recording')
-        if (el) {
-          $(el).trigger('click')
-        }
-      }
-    }, false);
-
     const {mapTypeIsMentalMapQuestions, questions} = json
     const mapQuestions = new MentalMapQuestions({typeIsMentalMapQuestions: mapTypeIsMentalMapQuestions, questions})
 

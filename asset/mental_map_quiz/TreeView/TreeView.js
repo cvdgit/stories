@@ -88,6 +88,16 @@ export default function TreeView({id, name, tree, history, params, settings, onM
 
   body.init()
 
+  window.addEventListener('blur', function() {
+    if (voiceResponse.getStatus()) {
+      voiceResponse.stop()
+      const el = document.querySelector('.gn.recording')
+      if (el) {
+        $(el).data('abort', true).trigger('click')
+      }
+    }
+  }, false);
+
   return wrap
 }
 
