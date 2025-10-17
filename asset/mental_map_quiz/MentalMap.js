@@ -54,6 +54,8 @@ export default function MentalMap(element, deck, params) {
   const container = document.createElement('div')
   container.classList.add('mental-map-container')
 
+  this.element.innerHTML = `<div class="content-loader-wrap"><div><img width="30" src="/img/loading.gif" alt="loading..."> загрузка...</div></div>`
+
   const blockTypes = ['text', 'image']
 
   function showDialogHandler() {
@@ -608,6 +610,7 @@ export default function MentalMap(element, deck, params) {
         }
       }, new VoiceResponse(new MissingWordsRecognition({})))
 
+      this.element.innerHTML = ''
       this.element.appendChild(treeViewInstance.getElement())
 
       $('[data-toggle="tooltip"]', this.element).tooltip({
@@ -868,6 +871,7 @@ export default function MentalMap(element, deck, params) {
     header.innerHTML = `Точность пересказа установлена в <strong>${threshold}</strong>%`
     toolbar.appendChild(header)
 
+    this.element.innerHTML = ''
     this.element.appendChild(toolbar)
     this.element.appendChild(container)
 
