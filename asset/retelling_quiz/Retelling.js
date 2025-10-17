@@ -15,12 +15,15 @@ export default function Retelling(element, deck, params) {
   const container = document.createElement('div')
   container.classList.add('retelling-block')
 
+  this.element.innerHTML = `<div class="retelling-block-inner"><div><img width="30" src="/img/loading.gif" alt="loading..."> Загрузка пересказа...</div></div>`
+
   const run = async () => {
     let responseJson
     try {
       responseJson = await params.init()
     } catch (ex) {
       container.innerText = ex.message
+      this.element.innerHTML = ''
       this.element.appendChild(container)
       return
     }
@@ -158,6 +161,7 @@ export default function Retelling(element, deck, params) {
       }
     }, false);
 
+    this.element.innerHTML = ''
     this.element.appendChild(container)
   }
 
