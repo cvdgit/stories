@@ -54,4 +54,5 @@ export default function RetellingVoiceControl(
   })
 
   this.getElement = () => elem
+  this.triggerClick = () => $(elem.querySelector('.gn')).trigger('click')
 }

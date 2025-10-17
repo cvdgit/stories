@@ -144,6 +144,20 @@ export default function Retelling(element, deck, params) {
       container.appendChild(createFinishContent(`${params.all}%`, slideTexts))
     }
 
+    window.addEventListener('blur', function() {
+      if (voiceResponse.getStatus()) {
+        voiceResponse.stop()
+        voiceControl.triggerClick()
+        setTimeout(() => {
+          content.querySelector('#retelling_result_span').innerHTML = ''
+          content.querySelector('#retelling_final_span').innerHTML = ''
+          content.querySelector('#retelling_interim_span').innerHTML = ''
+          content.querySelector('#retelling_result_span').dispatchEvent(new Event('input', {bubbles: true}))
+          content.querySelector('#retelling_final_span').dispatchEvent(new Event('input', {bubbles: true}))
+        }, 500)
+      }
+    }, false);
+
     this.element.appendChild(container)
   }
 
