@@ -26,6 +26,10 @@ export default function TreeVoiceControl(
             </div>
         </div>`
 
+  function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   elem.querySelector('.gn').addEventListener('click', e => {
 
     if (elem.querySelector('.gn').classList.contains('disabled')) {
@@ -49,16 +53,16 @@ export default function TreeVoiceControl(
         return;
       }
 
+      elem.querySelector('.gn').classList.add('disabled')
       voiceResponse.start(new Event('voiceResponseStart'), 'ru-RU', function () {
-        elem.querySelector('.gn').classList.add('disabled')
-        setTimeout(() => {
+        //setTimeout(() => {
           elem.dataset.state = 'recording';
           elem.querySelector('.gn').classList.remove('disabled')
           const ring = document.createElement('div');
           ring.classList.add('pulse-ring');
           elem.querySelector('.question-voice__inner').insertBefore(ring, elem.querySelector('.gn'));
           elem.querySelector('.gn').classList.add('recording');
-        }, 500)
+        //}, 500)
       });
       return;
     }
@@ -67,13 +71,13 @@ export default function TreeVoiceControl(
     elem.querySelector('.pulse-ring').remove()
     elem.querySelector('.gn').classList.add('disabled')
 
-    setTimeout(() => {
+    //setTimeout(() => {
       voiceResponse.stop(() => {
         elem.querySelector('.gn').classList.remove('disabled')
         delete elem.dataset.state
         stopClickHandler(e.target)
       })
-    }, 500)
+    //}, 500)
   })
 
   return elem
