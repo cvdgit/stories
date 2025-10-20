@@ -170,7 +170,11 @@ class ImportQuestionService
                 $answers = [];
                 foreach ($questionDto->getAnswers() as $answerDto) {
                     /** @var AnswerDto $answerDto */
-                    $answers[] = StoryTestAnswer::createFromRelation($answerDto->getName(), $answerDto->isCorrect(), $answerDto->getDescription());
+                    $answers[] = StoryTestAnswer::createFromRelation(
+                        $answerDto->getName(),
+                        (int) $answerDto->isCorrect(),
+                        $answerDto->getDescription(),
+                    );
                 }
                 $question->storyTestAnswers = $answers;
                 if (!$question->save()) {
