@@ -73,7 +73,7 @@ class SpeechTrainer extends ActiveRecord
 
         $slideModel = StorySlide::findOne($this->retelling_slide_id);
         if ($slideModel === null) {
-            throw new DomainException('Слайд не найден');
+            return [];
         }
 
         $slide = (new HtmlSlideReader($slideModel->getSlideOrLinkData()))->load();
