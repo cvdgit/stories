@@ -75,7 +75,6 @@
   function showMentalMapDialog(mentalMapId, onHideHandler) {
     const content = `<div class="retelling-content">
 <div class="mental-map" style="text-align: left"></div>
-<div class="mental-map-loader"></div>
 </div>`
 
     const feedbackDialog = new InnerDialog('', content)
@@ -107,7 +106,6 @@
         }
       }, $(getCurrentSlide()).attr('data-id'))
       await mentalMap.run()
-      $element.find('.mental-map-loader').fadeOut().remove()
     })
 
     feedbackDialog.onHide(() => {
