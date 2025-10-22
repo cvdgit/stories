@@ -32,6 +32,11 @@ class StoryTestsFetcher
 
         $data = [];
         foreach ($story->getSlides() as $slide) {
+
+            if ($slide->getView() === '' || $slide->getView() === 'slide') {
+                $data[] = new Slide($slide->getId(), (int) $slide->getSlideNumber());
+            }
+
             foreach ($slide->getBlocks() as $block) {
                 if ($block->getType() === AbstractBlock::TYPE_HTML) {
                     /** @var $block HTMLBLock */

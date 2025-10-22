@@ -15,6 +15,7 @@ use frontend\MentalMap\history\MentalMapTreeHistoryFetcher;
 use frontend\MentalMap\MentalMap;
 use frontend\models\StoryStudentStatForm;
 use frontend\Retelling\Retelling;
+use modules\edu\query\GetStoryTests\Slide;
 use modules\edu\query\GetStoryTests\SlideMentalMap;
 use modules\edu\query\GetStoryTests\SlideRetelling;
 use modules\edu\query\GetStoryTests\StoryTestsFetcher;
@@ -65,6 +66,7 @@ class StoryStatService
             (int) $form->student_id,
             $slideContent->find(SlideMentalMap::class),
             $slideContent->find(SlideRetelling::class),
+            $slideContent->find(Slide::class)
         );
     }
 
@@ -175,7 +177,8 @@ class StoryStatService
         int $storyId,
         int $studentId,
         array $mentalMapItems,
-        array $retellingItems
+        array $retellingItems,
+        array $slideItems
     ): array
     {
         $viewedSlidesNumber = 0;
@@ -192,7 +195,7 @@ class StoryStatService
 
 
         $numberOfSlides = 0;
-        $numberOfStorySlides = $this->getStorySlidesNumber($storyId);
+        $numberOfStorySlides = count($slideItems); // $this->getStorySlidesNumber($storyId);
         $numberOfSlides += $numberOfStorySlides;
 
         $numberOfTests = $this->getStoryTestingNumber($storyId);
