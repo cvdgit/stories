@@ -431,3 +431,13 @@ a.lesson-item__wrap:hover .lesson-name span {
 .story-box .story-controls {
   right: 60px;
 }
+
+.reveal .progress {
+  height: 5px !important;
+  background-color: rgba(0, 0, 0, .1) !important;
+  border-radius: 0 !important;
+}
+
+.reveal .progress span {
+  background-color: #99cd50 !important;
+}
