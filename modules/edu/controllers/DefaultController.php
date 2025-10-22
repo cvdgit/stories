@@ -324,7 +324,7 @@ class DefaultController extends Controller
                 'progress' => $progress,
                 'slide_number' => $item->getSlideNumber(),
             ];
-        }, $slideContent->getContents());
+        }, $slideContent->getContents([SlideTest::class, SlideMentalMap::class, SlideRetelling::class]));
 
         $progress = (new StoryStudentProgressFetcher())->fetch($story->id, $student->id);
 
