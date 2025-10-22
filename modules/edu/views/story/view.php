@@ -140,10 +140,10 @@ $this->title = $story->title;
     </div>
 </div>
 
-<div class="story-box">
+<div class="story-box" style="height: auto">
     <div class="story-container">
         <div class="story-container-inner" id="story-container">
-            <div class="reveal" data-toggle="slides" style="border-radius: 15px">
+            <div class="reveal" data-toggle="slides">
                 <?= $story->slidesData() ?>
             </div>
         </div>

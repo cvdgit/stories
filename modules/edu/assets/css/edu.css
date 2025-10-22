@@ -427,3 +427,7 @@ a.lesson-item__wrap:hover .lesson-name span {
   color: #fff;
   border: 1px #808080 solid;
 }
+
+.story-box .story-controls {
+  right: 60px;
+}
