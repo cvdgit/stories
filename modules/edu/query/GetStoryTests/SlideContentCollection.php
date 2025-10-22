@@ -37,8 +37,8 @@ class SlideContentCollection
 
     public function getContents(array $classNames): array
     {
-        return array_filter($this->contents, static function (SlideContentItemInterface $item) use ($classNames): bool {
+        return array_values(array_filter($this->contents, static function (SlideContentItemInterface $item) use ($classNames): bool {
             return in_array(get_class($item), $classNames, true);
-        });
+        }));
     }
 }
