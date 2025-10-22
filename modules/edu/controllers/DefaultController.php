@@ -318,10 +318,6 @@ class DefaultController extends Controller
                 $progress = $retelling['progress'];
             }
 
-            if ($contentId === '') {
-                return;
-            }
-
             return [
                 'test_id' => $contentId,
                 'test_name' => $contentName,
