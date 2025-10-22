@@ -62,7 +62,7 @@ export default function MentalMap() {
             return {...json}
           },
           ...params
-        }, $(deck.getCurrentSlide()).attr('data-id'))
+        }, $(deck.getCurrentSlide()).attr('data-id'), MicrophoneChecker)
         mentalMap.run()
       }
 

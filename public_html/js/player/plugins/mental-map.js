@@ -43,7 +43,7 @@ const mentalMapBuilder = window.mentalMapBuilder = new MentalMapManagerQuiz();
       },
       ...mentalMapConfig,
       ...elem.data()
-    }, $(getCurrentSlide()).attr('data-id'))
+    }, $(getCurrentSlide()).attr('data-id'), MicrophoneChecker)
     mentalMap.run()
   }
 

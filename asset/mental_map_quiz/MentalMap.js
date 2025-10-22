@@ -23,7 +23,7 @@ import {diffRetelling, SimilarityChecker} from "./lib/calcSimilarity";
  * @returns {{run: ((function(): Promise<void>)|*)}}
  * @constructor
  */
-export default function MentalMap(element, deck, params) {
+export default function MentalMap(element, deck, params, microphoneChecker) {
 
   this.element = element
   let texts = []
@@ -54,7 +54,10 @@ export default function MentalMap(element, deck, params) {
   const container = document.createElement('div')
   container.classList.add('mental-map-container')
 
-  this.element.innerHTML = `<div class="content-loader-wrap"><div><img width="30" src="/img/loading.gif" alt="loading..."> загрузка...</div></div>`
+  const loader = document.createElement('div')
+  loader.classList.add('content-loader-wrap')
+  loader.innerHTML = `<div><img width="30" src="/img/loading.gif" alt="loading..."> загрузка...</div>`
+  this.element.appendChild(loader)
 
   const blockTypes = ['text', 'image']
 
@@ -573,13 +576,39 @@ export default function MentalMap(element, deck, params) {
     return false
   }
 
+  function createNoMicrophoneElement(message) {
+    const noMicroElem = document.createElement('div')
+    noMicroElem.classList.add('microphone-error')
+    noMicroElem.innerHTML = `<div style="padding: 20px; display: flex; flex-direction: column; row-gap: 10px; border-radius: 20px; background-color: RGBA(220, 53, 69, 1); color: white"><div>Микрофон недоступен:</div><div>${message}</div></div>`
+    return noMicroElem
+  }
+
   const run = async () => {
 
     let responseJson
     try {
+
       responseJson = await params.init()
+
+      if (microphoneChecker) {
+        const microphoneError = microphoneChecker.getError()
+        if (microphoneError) {
+          this.element.appendChild(createNoMicrophoneElement(microphoneError.name + ': ' + microphoneError.message))
+        }
+      }
+
+      /*await navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+        .then(function(stream) {
+          stream.getTracks().forEach(track => track.stop());
+        })
+        .catch(err=> {
+          //console.log('Микрофон недоступен:', err.name, err.message);
+          this.element.appendChild(createNoMicrophoneElement(err.name + ': ' + err.message))
+        });*/
+
     } catch (ex) {
       container.innerText = ex.message
+      loader.remove()
       this.element.appendChild(container)
       return
     }
@@ -610,7 +639,7 @@ export default function MentalMap(element, deck, params) {
         }
       }, new VoiceResponse(new MissingWordsRecognition({})))
 
-      this.element.innerHTML = ''
+      loader.remove()
       this.element.appendChild(treeViewInstance.getElement())
 
       $('[data-toggle="tooltip"]', this.element).tooltip({
@@ -871,7 +900,7 @@ export default function MentalMap(element, deck, params) {
     header.innerHTML = `Точность пересказа установлена в <strong>${threshold}</strong>%`
     toolbar.appendChild(header)
 
-    this.element.innerHTML = ''
+    loader.remove()
     this.element.appendChild(toolbar)
     this.element.appendChild(container)
 

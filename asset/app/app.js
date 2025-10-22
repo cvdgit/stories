@@ -59,3 +59,51 @@ window.sendEventSourceMessage = async function ({
 }
 
 window.uuidv4 = uuidv4
+
+window.MicrophoneChecker = (function () {
+
+  const MediaPermissionsErrorType = {};
+  (function (MediaPermissionsErrorType) {
+    /** (macOS) browser does not have permission to access cam/mic */
+    MediaPermissionsErrorType["SystemPermissionDenied"] = "SystemPermissionDenied";
+    /** user denied permission for site to access cam/mic */
+    MediaPermissionsErrorType["UserPermissionDenied"] = "UserPermissionDenied";
+    /** (Windows) browser does not have permission to access cam/mic OR camera is in use by another application or browser tab */
+    MediaPermissionsErrorType["CouldNotStartVideoSource"] = "CouldNotStartVideoSource";
+    /** all other errors */
+    MediaPermissionsErrorType["Generic"] = "Generic";
+  })(MediaPermissionsErrorType);
+
+  let error = null
+
+  navigator.mediaDevices.getUserMedia({audio: true, video: false})
+    .then(function (stream) {
+      stream.getTracks().forEach(track => track.stop());
+    })
+    .catch(err => {
+      const errName = err.name;
+      const errMessage = err.message;
+      let errorType = MediaPermissionsErrorType.Generic;
+      if (errName === 'NotAllowedError') {
+        if (errMessage === 'Permission denied by system') {
+          errorType = MediaPermissionsErrorType.SystemPermissionDenied;
+        } else if (errMessage === 'Permission denied' || errMessage === 'Permission dismissed') {
+          errorType = MediaPermissionsErrorType.UserPermissionDenied;
+        }
+      } else if (errName === 'NotReadableError') {
+        errorType = MediaPermissionsErrorType.CouldNotStartVideoSource;
+      }
+
+      error = {
+        type: errorType,
+        name: err.name,
+        message: err.message
+      }
+    });
+
+  return {
+    getError() {
+      return error
+    }
+  }
+})()

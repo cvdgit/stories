@@ -409,7 +409,19 @@ export default function TreeViewBody(tree, voiceResponse, history, params, onEnd
   params.isPlanTreeView = isPlanTreeView
   params.settingsPromptId = settingsPromptId
 
-  return {
+  voiceResponse.onError(({args}) => {
+    const row = body.querySelector('.node-row.current-row.pending')
+    if (row) {
+      body.classList.remove('do-recording')
+      const id = row.getAttribute('data-node-id')
+      const historyItem = history.find(h => h.id === id)
+      historyItem.pending = false
+      body.innerHTML = ''
+      API.init()
+    }
+  })
+
+  const API = {
     getElement() {
       return body
     },
@@ -429,6 +441,8 @@ export default function TreeViewBody(tree, voiceResponse, history, params, onEnd
       body.addEventListener(type, listener, useCapture)
     }
   }
+
+  return API
 }
 
 function createRewriteContent(text, hideCallback) {

@@ -44,7 +44,7 @@ const retellingBuilder = window.retellingBuilder = new RetellingManagerQuiz();
       },
       ...retellingConfig,
       ...elem.data()
-    }, $(getCurrentSlide()).attr('data-id'))
+    }, $(getCurrentSlide()).attr('data-id'), MicrophoneChecker)
     retelling.run()
   }
 

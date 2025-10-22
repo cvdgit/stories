@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace modules\edu\assets;
 
 use yii\web\AssetBundle;
@@ -18,8 +17,9 @@ class AppAsset extends AssetBundle
     public $depends = [
         YiiAsset::class,
         BootstrapAsset::class,
+        MainAsset::class,
     ];
     public $publishOptions = [
-        'forceCopy'=>true,
+        'forceCopy' => true,
     ];
 }

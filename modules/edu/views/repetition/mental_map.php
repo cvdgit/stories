@@ -136,7 +136,7 @@ $this->registerJs(<<<JS
       repetitionMode: true,
       repetitionBackUrl: '/edu/student/index',
       ...elem.data()
-    })
+    }, undefined, MicrophoneChecker)
     mentalMap.run()
 })();
 JS

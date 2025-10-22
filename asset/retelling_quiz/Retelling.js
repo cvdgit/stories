@@ -6,7 +6,7 @@ import VoiceResponse from "../mental_map_quiz/lib/VoiceResponse";
 import MissingWordsRecognition from "../mental_map_quiz/lib/MissingWordsRecognition";
 import CreateRetellingResponseDialog from "./CreateRetellingResponseDialog";
 
-export default function Retelling(element, deck, params) {
+export default function Retelling(element, deck, params, microphoneChecker) {
 
   this.element = element
   params = params || {}
@@ -15,15 +15,34 @@ export default function Retelling(element, deck, params) {
   const container = document.createElement('div')
   container.classList.add('retelling-block')
 
-  this.element.innerHTML = `<div class="retelling-block-inner"><div><img width="30" src="/img/loading.gif" alt="loading..."> Загрузка пересказа...</div></div>`
+  const loader = document.createElement('div')
+  loader.classList.add('retelling-block-inner')
+  loader.innerHTML = `<div><img width="30" src="/img/loading.gif" alt="loading..."> загрузка...</div>`
+  this.element.appendChild(loader)
+
+  function createNoMicrophoneElement(message) {
+    const noMicroElem = document.createElement('div')
+    noMicroElem.classList.add('microphone-error')
+    noMicroElem.innerHTML = `<div style="padding: 20px; display: flex; flex-direction: column; row-gap: 10px; border-radius: 20px; background-color: RGBA(220, 53, 69, 1); color: white"><div>Микрофон недоступен:</div><div>${message}</div></div>`
+    return noMicroElem
+  }
 
   const run = async () => {
     let responseJson
     try {
+
       responseJson = await params.init()
+
+      if (microphoneChecker) {
+        const microphoneError = microphoneChecker.getError()
+        if (microphoneError) {
+          this.element.appendChild(createNoMicrophoneElement(microphoneError.name + ': ' + microphoneError.message))
+        }
+      }
+
     } catch (ex) {
+      loader.remove()
       container.innerText = ex.message
-      this.element.innerHTML = ''
       this.element.appendChild(container)
       return
     }
@@ -161,7 +180,7 @@ export default function Retelling(element, deck, params) {
       }
     }, false);
 
-    this.element.innerHTML = ''
+    loader.remove()
     this.element.appendChild(container)
   }
 

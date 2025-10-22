@@ -26,10 +26,6 @@ export default function TreeVoiceControl(
             </div>
         </div>`
 
-  function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
   elem.querySelector('.gn').addEventListener('click', e => {
 
     if (elem.querySelector('.gn').classList.contains('disabled')) {

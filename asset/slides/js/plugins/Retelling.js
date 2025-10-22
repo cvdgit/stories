@@ -63,7 +63,7 @@ export default function Retelling() {
             return {...json}
           },
           ...params
-        }, $(deck.getCurrentSlide()).attr('data-id'))
+        }, $(deck.getCurrentSlide()).attr('data-id'), MicrophoneChecker)
         retelling.run()
       }
 
