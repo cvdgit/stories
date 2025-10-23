@@ -268,7 +268,7 @@ class ColumnController extends BaseController
 
                 if ($questionSign === '-') {
                     $firstDigit = random_int((int) $formModel->firstDigitMin, (int) $formModel->firstDigitMax);
-                    $secondDigit = random_int(min($firstDigit, (int) $formModel->secondDigitMin), (int) $formModel->secondDigitMax);
+                    $secondDigit = random_int(min($firstDigit, (int) $formModel->secondDigitMin), min($firstDigit, (int) $formModel->secondDigitMax));
                     $payload = new ColumnQuestionPayload(
                         (string) $firstDigit,
                         (string) $secondDigit,
