@@ -54,12 +54,12 @@ class TestController extends Controller
                     ],
                 ],
             ],
-            'verbs' => [
+            /*'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
-            ],
+            ],*/
         ];
     }
 
