@@ -382,7 +382,7 @@ p.wikids-test-description {
 }
 
 .sl-block[data-block-type=text] p {
-	padding: 0 10px;
+	/*padding: 0 10px;*/
 }
 
 .wikids-slide-links {
@@ -1979,6 +1979,10 @@ p.wikids-test-description {
   font-weight: normal;
   display: block;
   user-select: none;
+}
+
+.custom-control label * {
+  pointer-events: none;
 }
 
 .highlight.disabled {
