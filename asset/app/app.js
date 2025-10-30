@@ -74,34 +74,53 @@ window.MicrophoneChecker = (function () {
     MediaPermissionsErrorType["Generic"] = "Generic";
   })(MediaPermissionsErrorType);
 
+  let checkIsDone = false
   let error = null
 
-  navigator.mediaDevices.getUserMedia({audio: true, video: false})
-    .then(function (stream) {
-      stream.getTracks().forEach(track => track.stop());
-    })
-    .catch(err => {
-      const errName = err.name;
-      const errMessage = err.message;
-      let errorType = MediaPermissionsErrorType.Generic;
-      if (errName === 'NotAllowedError') {
-        if (errMessage === 'Permission denied by system') {
-          errorType = MediaPermissionsErrorType.SystemPermissionDenied;
-        } else if (errMessage === 'Permission denied' || errMessage === 'Permission dismissed') {
-          errorType = MediaPermissionsErrorType.UserPermissionDenied;
+  function check() {
+    return new Promise((resolve, reject) => navigator.mediaDevices.getUserMedia({audio: true, video: false})
+      .then(function (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        resolve(true);
+      })
+      .catch(err => {
+        const errName = err.name;
+        const errMessage = err.message;
+        let errorType = MediaPermissionsErrorType.Generic;
+        if (errName === 'NotAllowedError') {
+          if (errMessage === 'Permission denied by system') {
+            errorType = MediaPermissionsErrorType.SystemPermissionDenied;
+          } else if (errMessage === 'Permission denied' || errMessage === 'Permission dismissed') {
+            errorType = MediaPermissionsErrorType.UserPermissionDenied;
+          }
+        } else if (errName === 'NotReadableError') {
+          errorType = MediaPermissionsErrorType.CouldNotStartVideoSource;
         }
-      } else if (errName === 'NotReadableError') {
-        errorType = MediaPermissionsErrorType.CouldNotStartVideoSource;
-      }
-
-      error = {
-        type: errorType,
-        name: err.name,
-        message: err.message
-      }
-    });
+        error = {
+          type: errorType,
+          name: err.name,
+          message: err.message
+        }
+        reject({
+          type: errorType,
+          name: err.name,
+          message: err.message,
+        });
+      })
+    )
+  }
 
   return {
+    check(force = false) {
+      if (checkIsDone && !force) {
+        if (error) {
+          return new Promise((resolve, reject) => reject(error))
+        }
+        return new Promise((resolve, reject) => resolve(true))
+      }
+      checkIsDone = true;
+      return check();
+    },
     getError() {
       return error
     }

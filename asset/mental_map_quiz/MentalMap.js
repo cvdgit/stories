@@ -591,10 +591,10 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
       responseJson = await params.init()
 
       if (microphoneChecker) {
-        const microphoneError = microphoneChecker.getError()
-        if (microphoneError) {
-          this.element.appendChild(createNoMicrophoneElement(microphoneError.name + ': ' + microphoneError.message))
-        }
+        console.log(microphoneChecker)
+        microphoneChecker
+          .check()
+          .catch(error => this.element.appendChild(createNoMicrophoneElement(error.name + ': ' + error.message)));
       }
 
       /*await navigator.mediaDevices.getUserMedia({ audio: true, video: false })

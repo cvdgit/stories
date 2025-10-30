@@ -34,10 +34,9 @@ export default function Retelling(element, deck, params, microphoneChecker) {
       responseJson = await params.init()
 
       if (microphoneChecker) {
-        const microphoneError = microphoneChecker.getError()
-        if (microphoneError) {
-          this.element.appendChild(createNoMicrophoneElement(microphoneError.name + ': ' + microphoneError.message))
-        }
+        microphoneChecker
+          .check()
+          .catch(error => this.element.appendChild(createNoMicrophoneElement(error.name + ': ' + error.message)));
       }
 
     } catch (ex) {
