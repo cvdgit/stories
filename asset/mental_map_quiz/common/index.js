@@ -9,7 +9,7 @@ export function processOutputAsJson(output) {
   try {
     json = JSON.parse(output.replace(/```json\n?|```/g, ''))
   } catch (ex) {
-
+    console.log(ex.message)
   }
   return json
 }

@@ -211,7 +211,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
         finalSpan.innerHTML = ''
       }
 
-      let userResponse = resultSpan.innerHTML.trim()
+      let userResponse = resultSpan.innerHTML.trim();
       if (!userResponse.length) {
         return
       }
@@ -226,7 +226,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
 
       let responseIsSuccess = similarityChecker.check(listItemWrapper.getTargetText(), userResponse)
       if (responseIsSuccess) {
-        retellingResponseSpan.innerText = `{"similarity_percentage": ${similarityChecker.getSimilarityPercentage()}, "all_important_words_included": true, "user_response": "${userResponse}"}`
+        retellingResponseSpan.innerText = `{"similarity_percentage": ${similarityChecker.getSimilarityPercentage()}, "all_important_words_included": true, "user_response": "${JSON.stringify(userResponse)}"}`
       }
 
       //const rewriteByPass = similarityChecker.getSimilarityPercentage() >= 90
@@ -244,14 +244,14 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
           () => console.log('rewrite error'),
           () => console.log('rewrite end')
         )
-        userResponse = resultSpan.innerHTML.trim()
+        userResponse = resultSpan.innerHTML.trim();
         responseIsSuccess = similarityChecker.check(listItemWrapper.getTargetText(), userResponse)
         if (responseIsSuccess) {
-          retellingResponseSpan.innerText = `{"similarity_percentage": ${similarityChecker.getSimilarityPercentage()}, "all_important_words_included": true, "user_response": "${userResponse}"}`
+          retellingResponseSpan.innerText = `{"similarity_percentage": ${similarityChecker.getSimilarityPercentage()}, "all_important_words_included": true, "user_response": "${JSON.stringify(userResponse)}"}`
         }
       }
 
-      historyItem.user_response = userResponse
+      historyItem.user_response = userResponse;
 
       if (!responseIsSuccess) {
         retellingResponseSpan.innerText = ''
@@ -279,14 +279,13 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
 
       const content = rowElement.querySelector('.node-title').innerHTML
 
-      backdrop.remove()
-
-      console.log(retellingResponseSpan.innerText)
       const json = processOutputAsJson(retellingResponseSpan.innerText)
       if (json === null) {
-        console.log('no json')
+        backdrop.setErrorText('Json error', () => backdrop.remove())
         return
       }
+
+      backdrop.remove()
 
       const val = Number(json.similarity_percentage)
       let importantWordsPassed = true
