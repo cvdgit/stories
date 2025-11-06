@@ -281,6 +281,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
 
       backdrop.remove()
 
+      console.log(retellingResponseSpan.innerText)
       const json = processOutputAsJson(retellingResponseSpan.innerText)
       if (json === null) {
         console.log('no json')
