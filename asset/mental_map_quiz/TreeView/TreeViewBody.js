@@ -226,7 +226,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
 
       let responseIsSuccess = similarityChecker.check(listItemWrapper.getTargetText(), userResponse)
       if (responseIsSuccess) {
-        retellingResponseSpan.innerText = `{"similarity_percentage": ${similarityChecker.getSimilarityPercentage()}, "all_important_words_included": true, "user_response": "${JSON.stringify(userResponse)}"}`
+        retellingResponseSpan.innerText = `{"similarity_percentage": ${similarityChecker.getSimilarityPercentage()}, "all_important_words_included": true, "user_response": ${JSON.stringify(userResponse)}}`
       }
 
       //const rewriteByPass = similarityChecker.getSimilarityPercentage() >= 90
@@ -247,7 +247,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
         userResponse = resultSpan.innerHTML.trim();
         responseIsSuccess = similarityChecker.check(listItemWrapper.getTargetText(), userResponse)
         if (responseIsSuccess) {
-          retellingResponseSpan.innerText = `{"similarity_percentage": ${similarityChecker.getSimilarityPercentage()}, "all_important_words_included": true, "user_response": "${JSON.stringify(userResponse)}"}`
+          retellingResponseSpan.innerText = `{"similarity_percentage": ${similarityChecker.getSimilarityPercentage()}, "all_important_words_included": true, "user_response": ${JSON.stringify(userResponse)}}`
         }
       }
 
