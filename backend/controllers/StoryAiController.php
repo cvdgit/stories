@@ -110,7 +110,7 @@ class StoryAiController extends Controller
         $threadId = $payload['threadId'];
 
         try {
-            $story = Story::create($title, $user->getId(), [12]);
+            $story = Story::create($title, $user->getId(), [Yii::$app->params['ai.story.assist.category.id']]);
             $story->setIsAI();
             if (!$story->save()) {
                 throw new DomainException(
