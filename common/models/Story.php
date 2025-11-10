@@ -47,7 +47,8 @@ use yii\db\ActiveQuery;
  * @property int $video
  * @property int $published_at
  * @property int $have_neo_relation
- * @property int $access_by_link;
+ * @property int $access_by_link
+ * @property int $is_ai
  *
  * @property User $author
  * @property Tag[] $tags
@@ -418,7 +419,7 @@ class Story extends ActiveRecord
                 'id' => $slide->id,
                 'slideNumber' => $slide->number,
                 'data' => self::modifySlideData($slide->id, $slide->data),
-                'story' => $slide->isRelationPopulated('story') ? $slide->story->title : ''
+                'story' => $slide->isRelationPopulated('story') ? $slide->story->title : '',
             ];
         }, $models);
     }
@@ -846,7 +847,7 @@ class Story extends ActiveRecord
         $command->update(StorySlide::tableName(),
             ['link_slide_id' => new Expression('NULL'), 'kind' => StorySlide::KIND_SLIDE],
             'link_slide_id = :slideId',
-            [':slideId' => $slideId]
+            [':slideId' => $slideId],
         );
         $command->execute();
     }
@@ -861,5 +862,10 @@ class Story extends ActiveRecord
         return $this->getStoryStudentProgresses()
             ->andWhere(['student_id' => $studentId])
             ->one();
+    }
+
+    public function setIsAI(bool $value = true): void
+    {
+        $this->is_ai = $value === true ? 1 : 0;
     }
 }

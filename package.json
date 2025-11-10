@@ -55,6 +55,7 @@
     "highlight.js": "^11.9.0",
     "maphilight": "^1.4.2",
     "mathlive": "^0.105.3",
+    "nuqs": "^2.7.3",
     "plyr": "^3.6.12",
     "quill": "^2.0.3",
     "rc-tree": "^5.13.1",

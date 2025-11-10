@@ -21,7 +21,8 @@ class SlideContent
      */
     private $audioFileSrc;
 
-    public function __construct(int $id, string $view = '', string $audioFileSrc = '') {
+    public function __construct(int $id, string $view = '', string $audioFileSrc = '')
+    {
         $this->id = $id;
         $this->view = $view;
         $this->audioFileSrc = $audioFileSrc;

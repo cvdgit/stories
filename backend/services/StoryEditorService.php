@@ -18,6 +18,7 @@ use backend\components\story\Slide;
 use backend\components\story\SlideContent;
 use backend\components\story\TestBlock;
 use backend\components\story\TestBlockContent;
+use backend\components\story\TextBlock;
 use backend\components\story\VideoBlock;
 use backend\components\story\writer\HTMLWriter;
 use backend\components\StudyTaskFinalSlide;
@@ -54,54 +55,6 @@ class StoryEditorService
         $this->storyLinkService = $storyLinkService;
         $this->imageResizeService = $imageResizeService;
     }
-
-	/**
-    public function deleteBlock(int $slideID, string $blockID)
-    {
-        $model = StorySlide::findSlide($slideID);
-
-        $reader = new HtmlSlideReader($model->data);
-        $slide = $reader->load();
-
-        $block = $slide->findBlockByID($blockID);
-        if ($block->isTest()) {
-            $this->storyLinkService->deleteTestLink($model->story_id, $block->getTestID());
-        }
-
-        $slide->deleteBlock($blockID);
-
-        $writer = new HTMLWriter();
-        $html = $writer->renderSlide($slide);
-
-        $model->data = $html;
-        $model->save(false);
-
-        $haveVideo = $this->haveVideoBlock($model->story_id);
-        Story::updateVideo($model->story_id, $haveVideo ? 1 : 0);
-    }
-    */
-
-    /**
-	protected function haveVideoBlock(int $storyID)
-    {
-        $model = Story::findModel($storyID);
-        $haveVideo = false;
-        foreach ($model->storySlides as $slideModel) {
-            $reader = new HtmlSlideReader($slideModel->data);
-            $slide = $reader->load();
-            foreach ($slide->getBlocks() as $block) {
-                if ($block->getType() === AbstractBlock::TYPE_VIDEO) {
-                    $haveVideo = true;
-                    break;
-                }
-            }
-            if ($haveVideo) {
-                break;
-            }
-        }
-        return $haveVideo;
-    }
-    */
 
     public function createSlide(int $storyID, int $currentSlideID = -1, int $lessonId = null): int
     {
@@ -151,37 +104,6 @@ class StoryEditorService
         return $model->id;
     }
 
-    /*public function createSlideQuestion(int $storyID, int $questionID, int $currentSlideID = -1)
-    {
-
-        $reader = new HtmlSlideReader('');
-        $slide = $reader->load();
-        $slide->setView('question');
-
-        $block = $slide->createBlock(HTMLBLock::class);
-        $question = StoryTestQuestion::findModel($questionID);
-        $content = (new QuestionHTML($question))->loadHTML();
-        $block->setContent($content);
-        $slide->addBlock($block);
-
-        $writer = new HTMLWriter();
-        $html = $writer->renderSlide($slide);
-
-        $model = StorySlide::createSlide($storyID);
-        $model->kind = StorySlide::KIND_QUESTION;
-        $model->data = $html;
-
-        if ($currentSlideID !== -1) {
-            $currentSlide = StorySlide::findSlideByID($currentSlideID);
-            $this->updateSlideNumbers($storyID, $currentSlide->number);
-            $model->number = $currentSlide->number + 1;
-        }
-
-        $model->save();
-
-        return $model->id;
-    }*/
-
     /**
      * @throws InvalidConfigException
      */
@@ -223,17 +145,6 @@ class StoryEditorService
         $slide->addBlock($block);
         return (new HTMLWriter())->renderSlide($slide);
     }
-
-    /*public function newCreateSlideQuestion(int $storyID, array $params)
-    {
-        $model = StorySlide::createSlide($storyID);
-        $model->kind = StorySlide::KIND_QUESTION;
-        $model->data = $this->createQuestionBlock($params);
-        // $this->updateSlideNumbers($currentSlideModel->story_id, $currentSlideModel->number);
-        $model->number = 1;
-        $model->save();
-        return $model->id;
-    }*/
 
     public function copySlide(int $slideID, int $lessonId = null): int
     {
@@ -496,14 +407,6 @@ class StoryEditorService
         return str_replace('data-src=', 'src=', $writer->renderBlock($block));
     }
 
-    /*public function newUpdateBlock($form)
-    {
-        $model = StorySlideBlock::findBlock($form->block_id);
-        $model->title = $form->text;
-        $model->href = $form->url;
-        return $model->save(false);
-    }*/
-
     public function textFromStory(Story $model): string
     {
         $reader = new HTMLReader($model->slidesData());
@@ -625,5 +528,37 @@ class StoryEditorService
         $slide = (new HtmlSlideReader($slideContent))->load();
         $slide->addBlock($block);
         return (new HTMLWriter())->renderSlide($slide);
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function makeSlideWithText(int $slideId, string $text): string
+    {
+        $slide = (new HtmlSlideReader(new SlideContent($slideId, 'slide')))->load();
+        $block = $slide->createBlock(TextBlock::class);
+        $block->setText($text);
+        $block->setLeft('50px');
+        $block->setSizeAndPosition('600px', 'auto', '40px', '40px');
+        $slide->addBlock($block);
+        return (new HTMLWriter())->renderSlide($slide);
+    }
+
+    public function makeEmptySlide(): string
+    {
+        $slide = (new HtmlSlideReader(''))->load();
+        return (new HTMLWriter())->renderSlide($slide);
+    }
+
+    public function getTextBlockIds(string $slideContent): array
+    {
+        $slide = (new HtmlSlideReader($slideContent))->load();
+        $blockIds = [];
+        foreach ($slide->getBlocks() as $block) {
+            if ($block->typeIs(AbstractBlock::TYPE_TEXT)) {
+                $blockIds[] = $block->getId();
+            }
+        }
+        return $blockIds;
     }
 }

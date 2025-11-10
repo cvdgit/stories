@@ -18,6 +18,7 @@ module.exports = {
     retelling_quiz: path.resolve(__dirname, 'asset/retelling_quiz/index.js'),
     video: path.resolve(__dirname, 'asset/video/index.js'),
     math: path.resolve(__dirname, 'asset/math/math.js'),
+    storyCreateAssist: path.resolve(__dirname, 'asset/storyCreateAssist/index.js')
   },
   output: {
     filename: '[name].js',

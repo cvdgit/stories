@@ -14,6 +14,7 @@ use backend\Retelling\Retelling;
 use common\models\StorySlide;
 use DomainException;
 use Ramsey\Uuid\UuidInterface;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 
@@ -28,6 +29,7 @@ use yii\db\Query;
  *
  * @property-read array $contentRetelling
  * @property-read array $contentMentalMaps
+ * @property StorySlide $slide
  * @property-read array $contents
  */
 class SpeechTrainer extends ActiveRecord
@@ -121,5 +123,10 @@ class SpeechTrainer extends ActiveRecord
         $model->created_at = time();
         $model->updated_at = time();
         return $model;
+    }
+
+    public function getSlide(): ActiveQuery
+    {
+        return $this->hasOne(StorySlide::class, ['id' => 'slide_id']);
     }
 }

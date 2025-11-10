@@ -1,0 +1,17 @@
+*, :after, :before {
+  box-sizing: border-box;
+  border: 0 solid #e5e7eb;
+}
+
+body {
+  height: 100%;
+  counter-reset: katexEqnNo mmlEqnNo;
+  color: #f8f8f8;
+  background: #131318;
+  max-height: 100vh;
+  overflow-x: hidden;
+  margin: 0;
+  line-height: inherit;
+  font-family: 'Inter', sans-serif;
+  font-style: normal;
+}

@@ -19,9 +19,10 @@ use yii\widgets\Pjax;
 $this->title = 'Управление историями';
 ?>
 <h1 class="page-header"><?= Html::encode($this->title) ?></h1>
-<p>
+<div style="display: flex; flex-direction: row; column-gap: 10px; margin: 10px 0">
     <?= Html::a('Создать историю', ['create'], ['class' => 'btn btn-success']) ?>
-</p>
+    <?= Html::a('Создать историю (AI)', ['/story-ai/create'], ['class' => 'btn btn-primary']) ?>
+</div>
 
 <?= Nav::widget([
     'options' => ['class' => 'nav nav-tabs material-tabs'],

@@ -1,0 +1,343 @@
+import {useThreads} from "../Hooks/useThreads";
+import React, {createContext, useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
+import {useQueryState} from "nuqs";
+import {v4 as uuidv4} from 'uuid';
+import api from "../Api";
+import {fetchEventSource} from "@microsoft/fetch-event-source";
+import {applyPatch} from "fast-json-patch";
+import {createWordItem, getTextBySelections, hideWordsEven, hideWordsOdd} from "../../mental_map_quiz/words";
+
+const ThreadContext = createContext(undefined);
+
+let saveTimeoutId;
+
+export function ThreadProvider({children}) {
+  const {
+    isUserThreadsLoading,
+    userThreads,
+    getThreadById,
+    deleteThread,
+    createThread,
+    getCurrentThreadTitle,
+    setThreadTitle
+  } = useThreads('123abc');
+  const [messages, setMessages] = useState([]);
+  const [_threadId, setThreadId] = useQueryState('id');
+  const needSaveMessages = useRef(false);
+
+  useEffect(() => {
+    if (!_threadId) {
+      setThreadId(uuidv4());
+    }
+  }, [_threadId]);
+
+  const switchSelectedThread = useCallback((thread) => {
+    setThreadId(thread.id);
+    //streamStateRef.current = null;
+    //setIsStreaming(false);
+
+    if (!thread.messages) {
+      setMessages([]);
+      return;
+    }
+
+    setMessages(thread.messages);
+  }, [setThreadId]);
+
+  useEffect(() => {
+    if (!needSaveMessages.current) {
+      return;
+    }
+    if (saveTimeoutId) {
+      clearTimeout(saveTimeoutId);
+    }
+
+    needSaveMessages.current = false;
+    saveTimeoutId = setTimeout(() => api.post('/admin/index.php?r=story-ai/save-thread', {id: _threadId, messages, title: 'Без имени'}, {'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').getAttribute('content')}), 500);
+    return () => clearTimeout(saveTimeoutId);
+  }, [messages]);
+
+  const saveMessages = (threadId) => {
+    needSaveMessages.current = true;
+  }
+
+  const streamMessage = async (payload, onMessage, onEnd) => {
+    let streamedResponse = {};
+    let accumulatedMessage = '';
+    await fetchEventSource('/admin/index.php?r=gpt/stream/create-story', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'text/event-stream',
+        'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+      },
+      body: JSON.stringify(payload),
+      openWhenHidden: true,
+      onerror(err) {
+        throw err;
+      },
+      onmessage(msg) {
+        if (msg.event === "end") {
+          console.log("end")
+          onEnd && onEnd(accumulatedMessage)
+          return;
+        }
+        if (msg.event === "data" && msg.data) {
+          const chunk = JSON.parse(msg.data);
+          streamedResponse = applyPatch(
+            streamedResponse,
+            chunk.ops,
+          ).newDocument;
+
+          if (Array.isArray(streamedResponse?.streamed_output)) {
+            accumulatedMessage = streamedResponse.streamed_output.join("");
+          }
+
+          onMessage(accumulatedMessage);
+        }
+      },
+      onclose: () => {console.log('close')}
+    });
+  }
+
+  const createStoryFromText = async (threadId, id, payload) => {
+    const data = {
+      title: payload.title,
+      fragments: payload.fragments.map(f => {
+        const lines = []
+        lines.push(`<p><h2>${f.fragmentTitle}</h2></p>`)
+        f.sentences.map(s => {
+          lines.push(`<p><strong>${s.sentenceTitle}</strong><br/>${s.sentenceText}</p>`)
+        })
+        return {
+          id: f.id,
+          text: lines.join("\r\n")
+        };
+      }),
+      threadId
+    }
+    return await api.post('/admin/index.php?r=story-ai/create-story-handler', data, {
+      'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+    })
+  }
+
+  const createStory = async (threadId, text) => {
+    const messageId = uuidv4();
+    setMessages(prevMessages => [...prevMessages, {
+      id: messageId,
+      message: '',
+      type: 'ai',
+    }]);
+
+    try {
+
+      await streamMessage({threadId, text}, (message) => {
+        saveMessages(threadId);
+        setMessages(prevMessages => prevMessages.map(m => {
+          if (m.id === messageId) {
+            return {...m, message};
+          }
+          return m;
+        }));
+      }, async (accumulatedMessage) => {
+        const json = JSON.parse(accumulatedMessage);
+
+        saveMessages(threadId);
+
+        const payload = {...json, fragments: json.fragments.map(f => ({...f, id: uuidv4()}))};
+        const storyMessageId = uuidv4();
+        setMessages(prevMessages => [...prevMessages, {
+          id: storyMessageId,
+          message: 'Создание истории...',
+          type: 'story',
+          metadata: {payload},
+        }]);
+
+        const storyResponse = await createStoryFromText(threadId, storyMessageId, payload);
+        if (!storyResponse.success) {
+          saveMessages(threadId);
+          setMessages(prevMessages => prevMessages.map(m => {
+            if (m.id === storyMessageId) {
+              return {...m, message: storyResponse.message};
+            }
+            return m;
+          }));
+          return;
+        }
+
+        saveMessages(threadId);
+        setMessages(prevMessages => prevMessages.map(m => {
+          if (m.id === storyMessageId) {
+            return {...m, metadata: {...m.metadata, story: storyResponse.story}};
+          }
+          return m;
+        }));
+
+        setThreadTitle(threadId, storyResponse.story.title);
+      });
+
+    } catch (err) {
+      console.error(err);
+
+      /*updateMessage(uniqueId, {
+        message: `Error: ${err.message}`,
+        error: true
+      });*/
+
+    } finally {
+
+    }
+  };
+
+  const createRepetitionTrainer = async (threadId, metadata) => {
+    const messageId = uuidv4();
+    setMessages(prevMessages => [...prevMessages, {
+      id: messageId,
+      message: '',
+      type: 'repetition_trainer',
+      metadata: {}
+    }]);
+    saveMessages(threadId);
+
+    const {payload: json, story} = metadata;
+    const {id: storyId, slideMap, repetitionTrainer} = story;
+
+    const slideState = slideMap.map(({slideId}) => ({slideId, status: 'process'}))
+
+    saveMessages(threadId);
+    setMessages(prevMessages => prevMessages.map(m => {
+      if (m.id === messageId) {
+        return {...m, metadata: {...m.metadata, slides: slideState, storyId}};
+      }
+      return m;
+    }));
+
+    slideMap.map(({fragmentId, slideId}) => {
+
+      const contents = [...repetitionTrainer].map(({title, type}) => ({title, type, fragments: []}));
+
+      const slideFragment = json.fragments.find(({id}) => id === fragmentId);
+      const textFragments = [];
+      const fragments = slideFragment.sentences.map(({sentenceText}) => {
+        const fragmentId = uuidv4();
+        textFragments.push(sentenceText);
+        return {
+          id: fragmentId,
+          title: sentenceText,
+          words: createWordItem(sentenceText, fragmentId).words
+        }
+      });
+
+      for (let i = 0; i < contents.length; i++) {
+        const type = contents[i].type
+        switch (type) {
+          case 'mental-map':
+            structuredClone(fragments).map(f => contents[i].fragments.push({
+              id: f.id,
+              title: getTextBySelections(f.words)
+            }))
+            break;
+          case 'mental-map-even-fragments':
+            structuredClone(fragments).map(f => contents[i].fragments.push({
+              id: f.id,
+              title: hideWordsEven(f.words)
+            }))
+            break;
+          case 'mental-map-odd-fragments':
+            structuredClone(fragments).map(f => contents[i].fragments.push({
+              id: f.id,
+              title: hideWordsOdd(f.words)
+            }))
+            break;
+        }
+      }
+
+      const data = {
+        storyId,
+        slideId,
+        contents,
+        text: textFragments.join("\r\n")
+      };
+      api.post('/admin/index.php?r=story-ai/create-slide-content-handler', data, {
+        'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+      }).then(response => {
+
+        saveMessages(threadId);
+        setMessages(prevMessages => prevMessages.map(m => {
+          if (m.id === messageId) {
+            return {
+              ...m, metadata: {
+                ...m.metadata, slides: m.metadata.slides.map(s => {
+                  if (s.slideId === response.slideId) {
+                    return {...s, status: 'done'};
+                  }
+                  return s;
+                })
+              }
+            };
+          }
+          return m;
+        }));
+
+      });
+    })
+  }
+
+  const deleteRepetitionTrainer = async (threadId, messageId, storyId) => {
+    const response = await api.post('/admin/index.php?r=story-ai/remove-trainer', {storyId}, {
+      'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+    })
+    if (response.success) {
+      saveMessages(threadId);
+      setMessages(prevMessages => prevMessages.filter(m => m.id !== messageId));
+    }
+  }
+
+  const contextValue = useMemo(() => ({
+    threadsData: {
+      isUserThreadsLoading,
+      userThreads,
+      getThreadById,
+      deleteThread,
+      createThread,
+      getCurrentThreadTitle
+    },
+    messagesData: {
+      messages,
+      setMessages,
+      createStory,
+      createRepetitionTrainer,
+      deleteRepetitionTrainer,
+      switchSelectedThread,
+      saveMessages,
+    }
+  }), [
+    isUserThreadsLoading,
+    userThreads,
+    getThreadById,
+    deleteThread,
+    createThread,
+    getCurrentThreadTitle,
+    messages,
+    setMessages,
+    saveMessages,
+    createStory,
+    createRepetitionTrainer,
+    deleteRepetitionTrainer,
+    switchSelectedThread
+  ]);
+
+  return (
+    <ThreadContext.Provider value={contextValue}>
+      {children}
+    </ThreadContext.Provider>
+  );
+}
+
+export function useThreadContext() {
+  const context = useContext(ThreadContext);
+  if (context === undefined) {
+    throw new Error('useThreadContext must be used within a ThreadProvider');
+  }
+  return context;
+}

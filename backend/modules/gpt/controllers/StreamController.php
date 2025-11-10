@@ -9,6 +9,7 @@ use Exception;
 use frontend\GptChat\GptChatForm;
 use Ramsey\Uuid\Uuid;
 use Yii;
+use yii\base\ExitException;
 use yii\db\Query;
 use yii\helpers\Json;
 use yii\web\BadRequestHttpException;
@@ -885,6 +886,55 @@ TEXT;
         try {
             $this->chatEventStream->send(
                 "retelling",
+                Yii::$app->params["gpt.api.completions.host"],
+                Json::encode($fields),
+            );
+        } catch (Exception $ex) {
+            Yii::$app->errorHandler->logException($ex);
+        }
+    }
+
+    /**
+     * @throws ExitException
+     */
+    public function actionCreateStory(Request $request): void
+    {
+        $payload = Json::decode($request->rawBody);
+        $text = $payload['text'];
+
+        $content = (new Query())
+            ->select('t.prompt')
+            ->from(['t' => 'llm_prompt'])
+            ->where(['t.key' => 'create-story-from-text'])
+            ->scalar();
+
+        if (!$content) {
+            $this->flushError('Промт не найден');
+            Yii::$app->end();
+        }
+
+        $message = [
+            "role" => "user",
+            "content" => trim(str_replace(['{TEXT}'], [$text], $content)),
+        ];
+
+        $fields = [
+            "input" => [
+                "messages" => [
+                    $message,
+                ],
+            ],
+            "config" => [
+                "metadata" => [
+                    "conversation_id" => Uuid::uuid4()->toString(),
+                ],
+            ],
+            "include_names" => [],
+        ];
+
+        try {
+            $this->chatEventStream->send(
+                "create-story-from-text",
                 Yii::$app->params["gpt.api.completions.host"],
                 Json::encode($fields),
             );

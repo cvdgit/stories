@@ -1,0 +1,118 @@
+.container {
+  overflow: hidden;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  display: flex
+}
+
+.messagesWrap {
+  padding-bottom: 96px;
+  animation-timing-function: cubic-bezier(.4, 0, .2, 1);
+  animation-duration: .3s;
+  scrollbar-width: thin;
+  scrollbar-color: #4b5563 transparent;
+  transition-timing-function: cubic-bezier(.4, 0, .2, 1);
+  transition-duration: .3s;
+  transition-property: all;
+  background-color: inherit;
+  scroll-behavior: smooth;
+  overflow-y: auto;
+  flex: 1 1 0;
+  width: 100%;
+}
+
+.messagesInner {
+  padding-left: 96px;
+  max-width: 100%;
+  margin-top: 8px;
+}
+
+.messagesHeader {
+  padding: 16px 0;
+  max-width: 896px;
+  margin-left: 0;
+  margin-right: 0;
+  width: 100%;
+  display: flex;
+}
+
+.header {
+  padding-top: 10px;
+  font-size: 36px;
+  line-height: 40px;
+  border-radius: 24px;
+  margin-bottom: -25px;
+  color: rgb(255 255 255 / 1);
+  font-weight: 300;
+  background-color: inherit;
+  overflow-wrap: break-word;
+}
+
+.messagesContainer {
+  padding: 16px 0;
+  max-width: 896px;
+  margin-left: 0;
+  margin-right: 0;
+  width: 100%;
+  display: flex;
+}
+
+.message {
+  line-height: 28px;
+  max-width: 768px;
+  color: rgb(255 255 255 / 1);
+  background-color: inherit;
+  overflow-wrap: break-word;
+}
+
+.trashBtn {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(.4, 0, .2, 1);
+  transition-duration: .15s;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  padding: 8px;
+  white-space: nowrap;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  display: inline-flex;
+  cursor: pointer;
+  -webkit-appearance: button;
+  background-color: transparent;
+  background-image: none;
+  text-transform: none;
+  font-family: inherit;
+  font-feature-settings: inherit;
+  font-variation-settings: inherit;
+  margin: 0;
+}
+
+.trashBtn:hover {
+  color: hsl(0 0% 9%);
+  background-color: rgb(55 55 55 / 1);
+}
+
+.trashSvg {
+  animation-timing-function: cubic-bezier(.4, 0, 1, 1);
+  transition-timing-function: cubic-bezier(.4, 0, 1, 1);
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-duration: .15s;
+  color: rgb(87 87 87 / 1);
+  width: 16px;
+  height: 16px;
+  display: block;
+  vertical-align: middle;
+}
+
+.trashSvg:hover {
+  color: rgb(239 68 68 / 1);
+}
+
+.messageWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
