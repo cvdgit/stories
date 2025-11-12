@@ -5,11 +5,12 @@ import StoryMessage from "./StoryMessage";
 import RepetitionTrainerMessage from "./RepetitionTrainerMessage";
 import {useThreadContext} from "../../Context/ThreadProvider";
 import {useQueryState} from "nuqs";
+import ReadingTrainerMessage from "./ReadingTrainerMessage";
 
 export default function Messages({messages}) {
   const {threadsData, messagesData} = useThreadContext();
   const {getCurrentThreadTitle} = threadsData;
-  const {createRepetitionTrainer, deleteRepetitionTrainer} = messagesData;
+  const {createRepetitionTrainer, deleteRepetitionTrainer, createReadingTrainer} = messagesData;
   const [text, setText] = useState('');
   const [threadId, setThreadId] = useQueryState('id');
 
@@ -19,12 +20,19 @@ export default function Messages({messages}) {
         return <StoryMessage
           haveRepetitionTrainer={messages.find(m => m.type === 'repetition_trainer')}
           message={message}
-          createRepetitionTrainer={createRepetitionTrainer}
+          createReadingTrainer={createReadingTrainer}
           threadId={threadId}
         />
       }
       case 'repetition_trainer': {
         return <RepetitionTrainerMessage
+          message={message}
+          deleteRepetitionTrainer={deleteRepetitionTrainer}
+          threadId={threadId}
+        />
+      }
+      case 'reading_trainer': {
+        return <ReadingTrainerMessage
           message={message}
           deleteRepetitionTrainer={deleteRepetitionTrainer}
           threadId={threadId}

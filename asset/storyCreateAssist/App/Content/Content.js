@@ -8,7 +8,7 @@ export default function Content({messages}) {
     <div className={styles.content}>
       {messages.length
           ? <Messages messages={messages}/>
-          : <StartUpMessages createMessageHandler={() => {}}/>}
+          : <StartUpMessages/>}
     </div>
   )
 }

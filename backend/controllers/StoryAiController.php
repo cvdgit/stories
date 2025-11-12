@@ -105,60 +105,80 @@ class StoryAiController extends Controller
         $response->format = Response::FORMAT_JSON;
         $payload = Json::decode($request->rawBody);
 
+        $view = $payload['view'] ?? 'slide-full-text';
         $title = $payload['title'];
         $fragments = $payload['fragments'];
         $threadId = $payload['threadId'];
 
-        try {
-            $story = Story::create($title, $user->getId(), [Yii::$app->params['ai.story.assist.category.id']]);
-            $story->setIsAI();
-            if (!$story->save()) {
-                throw new DomainException(
-                    'Can\'t be saved Story model. Errors: ' . implode(', ', $story->getFirstErrors()),
-                );
-            }
+        $story = Story::create($title, $user->getId(), [Yii::$app->params['ai.story.assist.category.id']]);
+        $story->setIsAI();
 
-            $fragmentsToSlideMap = [];
-            foreach ($fragments as $fragment) {
+        try {
+
+            $storyResponse = [];
+
+            $this->transactionManager->wrap(function() use ($story, $fragments, $threadId, $view, &$storyResponse): void {
+
+                if (!$story->save()) {
+                    throw new DomainException(
+                        'Can\'t be saved Story model. Errors: ' . implode(', ', $story->getFirstErrors()),
+                    );
+                }
+
+                $headerSlide = StorySlide::createSlide($story->id);
+                $headerSlide->data = 'empty';
+                $headerSlide->kind = SlideKind::SLIDE;
+                if (!$headerSlide->save()) {
+                    throw new DomainException(
+                        'Can\'t be saved Story model. Errors: ' . implode(', ', $headerSlide->getFirstErrors()),
+                    );
+                }
+                $headerSlide->data = $this->storyEditorService->makeSlideWithHeader($headerSlide->id, $story->title . ' ➡️');
+                if (!$headerSlide->save()) {
+                    throw new DomainException(
+                        'Can\'t be saved Story model. Errors: ' . implode(', ', $headerSlide->getFirstErrors()),
+                    );
+                }
+
+                $fragmentsToSlideMap = [];
+                foreach ($fragments as $fragment) {
+                    $slide = StorySlide::createSlide($story->id);
+                    $slide->data = 'empty';
+                    $slide->kind = SlideKind::SLIDE;
+                    if (!$slide->save()) {
+                        throw new DomainException(
+                            'Can\'t be saved Story model. Errors: ' . implode(', ', $slide->getFirstErrors()),
+                        );
+                    }
+                    $slide->data = $this->storyEditorService->makeSlideWithText($slide->id, nl2br($fragment['text']), $view);
+                    if (!$slide->save()) {
+                        throw new DomainException(
+                            'Can\'t be saved Story model. Errors: ' . implode(', ', $slide->getFirstErrors()),
+                        );
+                    }
+
+                    $fragmentsToSlideMap[] = [
+                        'fragmentId' => $fragment['id'],
+                        'slideId' => $slide->id,
+                    ];
+                }
+
                 $slide = StorySlide::createSlide($story->id);
-                $slide->data = 'empty';
+                $slide->data = $this->storyEditorService->makeEmptySlide();
                 $slide->kind = SlideKind::SLIDE;
                 if (!$slide->save()) {
                     throw new DomainException(
                         'Can\'t be saved Story model. Errors: ' . implode(', ', $slide->getFirstErrors()),
                     );
                 }
-                $slide->data = $this->storyEditorService->makeSlideWithText($slide->id, $fragment['text']);
-                if (!$slide->save()) {
-                    throw new DomainException(
-                        'Can\'t be saved Story model. Errors: ' . implode(', ', $slide->getFirstErrors()),
-                    );
+
+                $thread = StoryThread::findOne($threadId);
+                if ($thread !== null) {
+                    $thread->setStory($story->id, $story->title);
+                    $thread->save();
                 }
 
-                $fragmentsToSlideMap[] = [
-                    'fragmentId' => $fragment['id'],
-                    'slideId' => $slide->id,
-                ];
-            }
-
-            $slide = StorySlide::createSlide($story->id);
-            $slide->data = $this->storyEditorService->makeEmptySlide();
-            $slide->kind = SlideKind::SLIDE;
-            if (!$slide->save()) {
-                throw new DomainException(
-                    'Can\'t be saved Story model. Errors: ' . implode(', ', $slide->getFirstErrors()),
-                );
-            }
-
-            $thread = StoryThread::findOne($threadId);
-            if ($thread !== null) {
-                $thread->setStory($story->id, $story->title);
-                $thread->save();
-            }
-
-            return [
-                'success' => true,
-                'story' => [
+                $storyResponse = [
                     'id' => $story->id,
                     'title' => $story->title,
                     'cover' => StoryCover::getListThumbPath($story->cover),
@@ -173,7 +193,12 @@ class StoryAiController extends Controller
                         ['title' => 'Ментальная карта (нечетные пропуски)', 'type' => 'mental-map-odd-fragments'],
                         ['title' => 'Пересказ', 'type' => 'retelling'],
                     ],
-                ],
+                ];
+            });
+
+            return [
+                'success' => true,
+                'story' => $storyResponse,
             ];
         } catch (Exception $exception) {
             Yii::$app->errorHandler->logException($exception);
@@ -440,5 +465,70 @@ class StoryAiController extends Controller
             Yii::$app->errorHandler->logException($exception);
             return ['success' => false, 'message' => $exception->getMessage()];
         }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function actionCreateSlideReadingHandler(Request $request, Response $response, WebUser $user): array
+    {
+        $response->format = Response::FORMAT_JSON;
+
+        $payload = Json::decode($request->rawBody);
+        $storyId = $payload['storyId'];
+        $slideId = $payload['slideId'];
+        $mentalMapContent = $payload['mentalMap'];
+        $text = $payload['text'];
+
+        $currentSlideModel = StorySlide::findOne($slideId);
+        if ($currentSlideModel === null) {
+            throw new NotFoundHttpException('Слайд не найден');
+        }
+
+        $this->transactionManager->wrap(function () use ($currentSlideModel, $mentalMapContent, $text, $user, $slideId): void {
+
+            $slideModel = $this->storySlideService->create($currentSlideModel->story_id, 'empty', StorySlide::KIND_MENTAL_MAP);
+            $slideModel->number = $currentSlideModel->number + 1;
+            Story::insertSlideNumber($currentSlideModel->story_id, $currentSlideModel->number);
+            if (!$slideModel->save()) {
+                throw new DomainException(
+                    'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
+                );
+            }
+
+            $mentalMapId = Uuid::uuid4();
+            $payload = MentalMapPayload::treeMentalMap(
+                $mentalMapId,
+                $mentalMapContent['title'],
+                $text, // preg_replace('/\<br(\s*)?\/?\>/i', "\n", $createForm->text),
+                array_map(static function (array $fragment): array {
+                    return [
+                        'id' => $fragment['id'],
+                        'title' => $fragment['title'],
+                    ];
+                }, $mentalMapContent['fragments']),
+            );
+
+            $mentalMap = MentalMap::create(
+                $mentalMapId->toString(),
+                $payload->getName(),
+                $payload->asArray(),
+                $user->getId(),
+            );
+            if (!$mentalMap->save()) {
+                throw new BadRequestHttpException('Mental Map save exception');
+            }
+
+            $data = $this->storyEditorService->getSlideWithMentalMapBlockContent($slideModel->id, $mentalMapId->toString(), 'mental-map', false);
+            $slideModel->updateData($data);
+            if (!$slideModel->save()) {
+                throw new DomainException(
+                    'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
+                );
+            }
+        });
+
+
+        return ['success' => true, 'slideId' => $slideId];
     }
 }

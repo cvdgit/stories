@@ -533,13 +533,25 @@ class StoryEditorService
     /**
      * @throws InvalidConfigException
      */
-    public function makeSlideWithText(int $slideId, string $text): string
+    public function makeSlideWithText(int $slideId, string $text, string $view): string
     {
         $slide = (new HtmlSlideReader(new SlideContent($slideId, 'slide')))->load();
         $block = $slide->createBlock(TextBlock::class);
         $block->setText($text);
-        $block->setLeft('50px');
-        $block->setSizeAndPosition('600px', 'auto', '40px', '40px');
+        $block->setSizeAndPosition('1200px', 'auto', '40px', '40px');
+        if ($view === 'slide-repetition-trainer') {
+            $block->setSizeAndPosition('600px', 'auto', '40px', '40px');
+        }
+        $slide->addBlock($block);
+        return (new HTMLWriter())->renderSlide($slide);
+    }
+
+    public function makeSlideWithHeader(int $slideId, string $text): string
+    {
+        $slide = (new HtmlSlideReader(new SlideContent($slideId, 'slide')))->load();
+        $block = $slide->createBlock(TextBlock::class);
+        $block->setText('<h2>' . $text . '</h2>');
+        $block->setSizeAndPosition('1000px', 'auto', '140px', '140px');
         $slide->addBlock($block);
         return (new HTMLWriter())->renderSlide($slide);
     }

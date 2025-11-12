@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./Messages.module.css";
 
-export default function StoryMessage({message, haveRepetitionTrainer, createRepetitionTrainer, threadId}) {
+export default function StoryMessage({message, haveRepetitionTrainer, createReadingTrainer, threadId}) {
   const {metadata} = message;
 
   return (
@@ -20,12 +20,6 @@ export default function StoryMessage({message, haveRepetitionTrainer, createRepe
                  href={metadata.story.viewUrl}
                  target="_blank">{metadata.story.title}</a>
             </div>
-          </div>
-          <div>
-            {!haveRepetitionTrainer && <button type="button" onClick={() => {
-              createRepetitionTrainer(threadId, metadata);
-            }}>Добавить речевой тренажер
-            </button>}
           </div>
         </>}
       </div>

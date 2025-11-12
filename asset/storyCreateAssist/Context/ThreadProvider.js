@@ -61,10 +61,10 @@ export function ThreadProvider({children}) {
     needSaveMessages.current = true;
   }
 
-  const streamMessage = async (payload, onMessage, onEnd) => {
+  const streamMessage = async (url, payload, onMessage, onEnd) => {
     let streamedResponse = {};
     let accumulatedMessage = '';
-    await fetchEventSource('/admin/index.php?r=gpt/stream/create-story', {
+    await fetchEventSource(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -74,6 +74,7 @@ export function ThreadProvider({children}) {
       body: JSON.stringify(payload),
       openWhenHidden: true,
       onerror(err) {
+        console.error(err);
         throw err;
       },
       onmessage(msg) {
@@ -100,7 +101,7 @@ export function ThreadProvider({children}) {
     });
   }
 
-  const createStoryFromText = async (threadId, id, payload) => {
+  const createRepetitionTrainerStoryFromText = async (threadId, id, payload) => {
     const data = {
       title: payload.title,
       fragments: payload.fragments.map(f => {
@@ -114,6 +115,18 @@ export function ThreadProvider({children}) {
           text: lines.join("\r\n")
         };
       }),
+      threadId,
+      view: 'slide-repetition-trainer'
+    }
+    return await api.post('/admin/index.php?r=story-ai/create-story-handler', data, {
+      'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+    })
+  }
+
+  const createStoryFromText = async (threadId, id, payload) => {
+    const data = {
+      title: payload.title,
+      fragments: payload.fragments.map(f => ({id: f.id, text: f.fragmentText})),
       threadId
     }
     return await api.post('/admin/index.php?r=story-ai/create-story-handler', data, {
@@ -131,7 +144,7 @@ export function ThreadProvider({children}) {
 
     try {
 
-      await streamMessage({threadId, text}, (message) => {
+      await streamMessage('/admin/index.php?r=gpt/story/create', {threadId, text}, (message) => {
         saveMessages(threadId);
         setMessages(prevMessages => prevMessages.map(m => {
           if (m.id === messageId) {
@@ -174,6 +187,8 @@ export function ThreadProvider({children}) {
         }));
 
         setThreadTitle(threadId, storyResponse.story.title);
+
+        await createReadingTrainer(threadId, {payload, story: storyResponse.story});
       });
 
     } catch (err) {
@@ -293,6 +308,162 @@ export function ThreadProvider({children}) {
     }
   }
 
+  const createRepetitionTrainerStory = async (threadId, text) => {
+    const messageId = uuidv4();
+    setMessages(prevMessages => [...prevMessages, {
+      id: messageId,
+      message: '',
+      type: 'ai',
+    }]);
+    try {
+
+      await streamMessage('/admin/index.php?r=gpt/story/create-for-trainer', {threadId, text}, (message) => {
+        saveMessages(threadId);
+        setMessages(prevMessages => prevMessages.map(m => {
+          if (m.id === messageId) {
+            return {...m, message};
+          }
+          return m;
+        }));
+      }, async (accumulatedMessage) => {
+        const json = JSON.parse(accumulatedMessage);
+
+        saveMessages(threadId);
+
+        const payload = {...json, fragments: json.fragments.map(f => ({...f, id: uuidv4()}))};
+        const storyMessageId = uuidv4();
+        setMessages(prevMessages => [...prevMessages, {
+          id: storyMessageId,
+          message: 'Создание истории...',
+          type: 'story',
+          metadata: {payload},
+        }]);
+
+        const storyResponse = await createRepetitionTrainerStoryFromText(threadId, storyMessageId, payload);
+        if (!storyResponse.success) {
+          saveMessages(threadId);
+          setMessages(prevMessages => prevMessages.map(m => {
+            if (m.id === storyMessageId) {
+              return {...m, message: storyResponse.message};
+            }
+            return m;
+          }));
+          return;
+        }
+
+        saveMessages(threadId);
+        setMessages(prevMessages => prevMessages.map(m => {
+          if (m.id === storyMessageId) {
+            return {...m, metadata: {...m.metadata, story: storyResponse.story}};
+          }
+          return m;
+        }));
+
+        setThreadTitle(threadId, storyResponse.story.title);
+
+        await createRepetitionTrainer(threadId, {payload, story: storyResponse.story});
+      });
+
+    } catch (err) {
+      console.error(err);
+
+      /*updateMessage(uniqueId, {
+        message: `Error: ${err.message}`,
+        error: true
+      });*/
+
+    } finally {
+
+    }
+  }
+
+  const createReadingTrainer = async (threadId, metadata) => {
+
+    const messageId = uuidv4();
+
+    setMessages(prevMessages => [...prevMessages, {
+      id: messageId,
+      message: '',
+      type: 'reading_trainer',
+      metadata: {}
+    }]);
+    saveMessages(threadId);
+
+    const {payload: json, story} = metadata;
+    const {id: storyId, slideMap} = story;
+
+    const slideState = slideMap.map(({slideId}) => ({slideId, status: 'process'}));
+
+    saveMessages(threadId);
+    setMessages(prevMessages => prevMessages.map(m => {
+      if (m.id === messageId) {
+        return {...m, metadata: {...m.metadata, slides: slideState, storyId}};
+      }
+      return m;
+    }));
+
+    const requests = [];
+    slideMap.map(({fragmentId, slideId}) => {
+
+      const contents = {title: 'Ментальная карта', type: 'mental-map', fragments: []};
+
+      const slideFragment = json.fragments.find(({id}) => id === fragmentId);
+
+      requests.push(
+        streamMessage(
+          '/admin/index.php?r=gpt/mental-map/text-fragments',
+          {text: slideFragment.fragmentText},
+          () => {
+          },
+          (fragmentsJsonText) => {
+
+            const fragments = JSON.parse(fragmentsJsonText).map(text => {
+              const fragmentId = uuidv4();
+              return {
+                id: fragmentId,
+                title: text,
+              }
+            });
+
+            const data = {
+              storyId,
+              slideId,
+              mentalMap: {...contents, fragments},
+              text: slideFragment.fragmentText
+            };
+            api.post('/admin/index.php?r=story-ai/create-slide-reading-handler', data, {
+              'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+            }).then(response => {
+
+              saveMessages(threadId);
+              setMessages(prevMessages => prevMessages.map(m => {
+                if (m.id === messageId) {
+                  return {
+                    ...m, metadata: {
+                      ...m.metadata, slides: m.metadata.slides.map(s => {
+                        if (s.slideId === response.slideId) {
+                          return {...s, status: 'done'};
+                        }
+                        return s;
+                      })
+                    }
+                  };
+                }
+                return m;
+              }));
+            });
+          }
+        )
+      )
+    })
+
+    Promise
+      .all(requests)
+      .then(values => {
+        console.log('all', values);
+      })
+  }
+
   const contextValue = useMemo(() => ({
     threadsData: {
       isUserThreadsLoading,
@@ -306,8 +477,10 @@ export function ThreadProvider({children}) {
       messages,
       setMessages,
       createStory,
+      createRepetitionTrainerStory,
       createRepetitionTrainer,
       deleteRepetitionTrainer,
+      createReadingTrainer,
       switchSelectedThread,
       saveMessages,
     }
@@ -322,8 +495,10 @@ export function ThreadProvider({children}) {
     setMessages,
     saveMessages,
     createStory,
+    createRepetitionTrainerStory,
     createRepetitionTrainer,
     deleteRepetitionTrainer,
+    createReadingTrainer,
     switchSelectedThread
   ]);
 

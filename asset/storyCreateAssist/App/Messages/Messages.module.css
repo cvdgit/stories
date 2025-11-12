@@ -116,3 +116,34 @@
   flex-direction: column;
   gap: 6px;
 }
+
+.itemButton {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(.4, 0, .2, 1);
+  transition-duration: .15s;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  padding: 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  justify-content: flex-start;
+  align-items: center;
+  display: inline-flex;
+  height: 32px;
+  cursor: pointer;
+  -webkit-appearance: button;
+  background-image: none;
+  text-transform: none;
+  font-family: inherit;
+  font-feature-settings: inherit;
+  font-variation-settings: inherit;
+  color: inherit;
+  margin: 0;
+  background-color: #43454a;
+}
+
+.itemButton:hover {
+  color: rgb(255 255 255 / 1);
+  background-color: rgb(57 57 57 / 1);
+}
