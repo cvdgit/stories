@@ -38,6 +38,16 @@ class MentalMap extends ActiveRecord
         return $model;
     }
 
+    public static function createFromPayload(string $id, MentalMapPayload $payload, int $userId): MentalMap
+    {
+        return self::create(
+            $id,
+            $payload->getName(),
+            $payload->asArray(),
+            $userId,
+        );
+    }
+
     public static function createMentalMapQuestions(string $uuid, string $name, array $payload, int $userId, string $sourceUuid): MentalMap
     {
         $model = self::create($uuid, $name, $payload, $userId);

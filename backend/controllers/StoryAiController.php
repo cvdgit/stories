@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace backend\controllers;
 
+use backend\AiStoryAssist\MentalMapBuilder;
 use backend\AiStoryAssist\StoryThread;
 use backend\AiStoryAssist\ThreadResponse;
 use backend\MentalMap\MentalMap;
@@ -51,6 +52,10 @@ class StoryAiController extends Controller
      * @var TransactionManager
      */
     private $transactionManager;
+    /**
+     * @var MentalMapBuilder
+     */
+    private $mentalMapBuilder;
 
     public function __construct(
         $id,
@@ -58,12 +63,14 @@ class StoryAiController extends Controller
         StoryEditorService $storyEditorService,
         StorySlideService $storySlideService,
         TransactionManager $transactionManager,
+        MentalMapBuilder $mentalMapBuilder,
         $config = []
     ) {
         parent::__construct($id, $module, $config);
         $this->storyEditorService = $storyEditorService;
         $this->storySlideService = $storySlideService;
         $this->transactionManager = $transactionManager;
+        $this->mentalMapBuilder = $mentalMapBuilder;
     }
 
     public function behaviors(): array
@@ -190,6 +197,7 @@ class StoryAiController extends Controller
                         ['title' => 'Ментальная карта', 'type' => 'mental-map'],
                         ['title' => 'Ментальная карта (четные пропуски)', 'type' => 'mental-map-even-fragments'],
                         ['title' => 'Ментальная карта (нечетные пропуски)', 'type' => 'mental-map-odd-fragments'],
+                        ['title' => 'Ментальная карта (план)', 'type' => 'mental-map-plan'],
                         ['title' => 'Пересказ', 'type' => 'retelling'],
                     ],
                 ];
@@ -259,17 +267,34 @@ class StoryAiController extends Controller
                 }
 
                 $mentalMapId = Uuid::uuid4();
-                $payload = MentalMapPayload::treeMentalMap(
-                    $mentalMapId,
-                    $contentRow['title'],
-                    $text, // preg_replace('/\<br(\s*)?\/?\>/i', "\n", $createForm->text),
-                    array_map(static function (array $fragment): array {
-                        return [
-                            'id' => $fragment['id'],
-                            'title' => $fragment['title'],
-                        ];
-                    }, $contentRow['fragments']),
-                );
+
+                if ($type === 'mental-map-plan') {
+                    $payload = MentalMapPayload::planMentalMap(
+                        $mentalMapId,
+                        $contentRow['title'],
+                        $text,
+                        array_map(static function (array $fragment): array {
+                            return [
+                                'id' => $fragment['id'],
+                                'title' => $fragment['title'],
+                                'description' => $fragment['description'],
+                            ];
+                        }, $contentRow['fragments']),
+                        Uuid::fromString(Yii::$app->params['ai.story.assist.plan.prompt.id']),
+                    );
+                } else {
+                    $payload = MentalMapPayload::treeMentalMap(
+                        $mentalMapId,
+                        $contentRow['title'],
+                        $text, // preg_replace('/\<br(\s*)?\/?\>/i', "\n", $createForm->text),
+                        array_map(static function (array $fragment): array {
+                            return [
+                                'id' => $fragment['id'],
+                                'title' => $fragment['title'],
+                            ];
+                        }, $contentRow['fragments']),
+                    );
+                }
 
                 $mentalMap = MentalMap::create(
                     $mentalMapId->toString(),
@@ -536,5 +561,65 @@ class StoryAiController extends Controller
 
 
         return ['success' => true, 'slideId' => $slideId];
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     * @throws Exception
+     */
+    public function actionCreateFinalMentalMapHandler(Request $request, Response $response, WebUser $user): array
+    {
+        $response->format = Response::FORMAT_JSON;
+
+        $payload = Json::decode($request->rawBody);
+        $storyId = $payload['storyId'];
+        $fragments = $payload['fragments'];
+
+        $story = Story::findOne($storyId);
+        if ($story === null) {
+            throw new NotFoundHttpException('Story not found');
+        }
+
+        $lastSlide = $story->storySlides[count($story->storySlides) - 2];
+
+        try {
+            $this->transactionManager->wrap(function () use ($story, $lastSlide, $user, $fragments): void {
+                $newTextSlide = $this->storySlideService->createAndInsertSlide(
+                    $story->id,
+                    SlideKind::SLIDE,
+                    $lastSlide->number,
+                    function (int $slideId): string {
+                        return $this->storyEditorService->makeSlideWithHeader(
+                            $slideId,
+                            'Осталось пройти последний тест ➡️'
+                        );
+                    },
+                );
+                $this->mentalMapBuilder->createPlanMentalMap(
+                    $mentalMapId = Uuid::uuid4(),
+                    'Итоговая ментальная карта',
+                    'text',
+                    $user->getId(),
+                    $fragments,
+                    Uuid::fromString(Yii::$app->params['ai.story.assist.plan.prompt.id']),
+                );
+                $this->storySlideService->createAndInsertSlide(
+                    $story->id,
+                    StorySlide::KIND_MENTAL_MAP,
+                    $newTextSlide->number,
+                    function (int $slideId) use ($mentalMapId): string {
+                        return $this->storyEditorService->getSlideWithMentalMapBlockContent(
+                            $slideId,
+                            $mentalMapId->toString(),
+                            'mental-map'
+                        );
+                    },
+                );
+            });
+            return ['success' => true];
+        } catch (Exception $exception) {
+            Yii::$app->errorHandler->logException($exception);
+            return ['success' => false, 'message' => $exception->getMessage()];
+        }
     }
 }

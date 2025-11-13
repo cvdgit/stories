@@ -7,6 +7,46 @@ import {fetchEventSource} from "@microsoft/fetch-event-source";
 import {applyPatch} from "fast-json-patch";
 import {createWordItem, getTextBySelections, hideWordsEven, hideWordsOdd} from "../../mental_map_quiz/words";
 
+async function streamMessage(url, payload, onMessage, onEnd) {
+  let streamedResponse = {};
+  let accumulatedMessage = '';
+  await fetchEventSource(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'text/event-stream',
+      'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+    },
+    body: JSON.stringify(payload),
+    openWhenHidden: true,
+    onerror(err) {
+      console.error(err);
+      throw err;
+    },
+    onmessage(msg) {
+      if (msg.event === "end") {
+        console.log("end")
+        onEnd && onEnd(accumulatedMessage)
+        return;
+      }
+      if (msg.event === "data" && msg.data) {
+        const chunk = JSON.parse(msg.data);
+        streamedResponse = applyPatch(
+          streamedResponse,
+          chunk.ops,
+        ).newDocument;
+
+        if (Array.isArray(streamedResponse?.streamed_output)) {
+          accumulatedMessage = streamedResponse.streamed_output.join("");
+        }
+
+        onMessage(accumulatedMessage);
+      }
+    },
+    onclose: () => {console.log('close')}
+  });
+}
+
 const ThreadContext = createContext(undefined);
 
 let saveTimeoutId;
@@ -61,46 +101,6 @@ export function ThreadProvider({children}) {
     needSaveMessages.current = true;
   }
 
-  const streamMessage = async (url, payload, onMessage, onEnd) => {
-    let streamedResponse = {};
-    let accumulatedMessage = '';
-    await fetchEventSource(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'text/event-stream',
-        'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').getAttribute('content')
-      },
-      body: JSON.stringify(payload),
-      openWhenHidden: true,
-      onerror(err) {
-        console.error(err);
-        throw err;
-      },
-      onmessage(msg) {
-        if (msg.event === "end") {
-          console.log("end")
-          onEnd && onEnd(accumulatedMessage)
-          return;
-        }
-        if (msg.event === "data" && msg.data) {
-          const chunk = JSON.parse(msg.data);
-          streamedResponse = applyPatch(
-            streamedResponse,
-            chunk.ops,
-          ).newDocument;
-
-          if (Array.isArray(streamedResponse?.streamed_output)) {
-            accumulatedMessage = streamedResponse.streamed_output.join("");
-          }
-
-          onMessage(accumulatedMessage);
-        }
-      },
-      onclose: () => {console.log('close')}
-    });
-  }
-
   const createRepetitionTrainerStoryFromText = async (threadId, id, payload) => {
     const data = {
       title: payload.title,
@@ -112,7 +112,7 @@ export function ThreadProvider({children}) {
         })
         return {
           id: f.id,
-          text: lines.join("\r\n")
+          text: lines.join('')
         };
       }),
       threadId,
@@ -227,18 +227,20 @@ export function ThreadProvider({children}) {
       return m;
     }));
 
+    const slideRequests = [];
     slideMap.map(({fragmentId, slideId}) => {
 
       const contents = [...repetitionTrainer].map(({title, type}) => ({title, type, fragments: []}));
 
       const slideFragment = json.fragments.find(({id}) => id === fragmentId);
       const textFragments = [];
-      const fragments = slideFragment.sentences.map(({sentenceText}) => {
+      const fragments = slideFragment.sentences.map(({sentenceText, sentenceTitle}) => {
         const fragmentId = uuidv4();
         textFragments.push(sentenceText);
         return {
           id: fragmentId,
-          title: sentenceText,
+          sentenceText,
+          sentenceTitle,
           words: createWordItem(sentenceText, fragmentId).words
         }
       });
@@ -264,6 +266,13 @@ export function ThreadProvider({children}) {
               title: hideWordsOdd(f.words)
             }))
             break;
+          case 'mental-map-plan':
+            structuredClone(fragments).map(({id, sentenceText, sentenceTitle}) => contents[i].fragments.push({
+              id,
+              title: sentenceTitle,
+              description: sentenceText
+            }))
+            break;
         }
       }
 
@@ -273,27 +282,46 @@ export function ThreadProvider({children}) {
         contents,
         text: textFragments.join("\r\n")
       };
-      api.post('/admin/index.php?r=story-ai/create-slide-content-handler', data, {
+
+      slideRequests.push(
+        api.post('/admin/index.php?r=story-ai/create-slide-content-handler', data, {
+          'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+        }).then(response => {
+
+          saveMessages(threadId);
+          setMessages(prevMessages => prevMessages.map(m => {
+            if (m.id === messageId) {
+              return {
+                ...m, metadata: {
+                  ...m.metadata, slides: m.metadata.slides.map(s => {
+                    if (s.slideId === response.slideId) {
+                      return {...s, status: 'done'};
+                    }
+                    return s;
+                  })
+                }
+              };
+            }
+            return m;
+          }));
+
+        })
+      )
+    })
+
+    Promise.all(slideRequests).then(() => {
+      const planPayload = {
+        storyId,
+        fragments: json.fragments.map(f => {
+          return {
+            id: f.id,
+            title: f.fragmentTitle,
+            description: f.sentences.map(({sentenceText}) => sentenceText).join("\r\n")
+          };
+        })
+      }
+      api.post('/admin/index.php?r=story-ai/create-final-mental-map-handler', planPayload, {
         'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').getAttribute('content')
-      }).then(response => {
-
-        saveMessages(threadId);
-        setMessages(prevMessages => prevMessages.map(m => {
-          if (m.id === messageId) {
-            return {
-              ...m, metadata: {
-                ...m.metadata, slides: m.metadata.slides.map(s => {
-                  if (s.slideId === response.slideId) {
-                    return {...s, status: 'done'};
-                  }
-                  return s;
-                })
-              }
-            };
-          }
-          return m;
-        }));
-
       });
     })
   }

@@ -29,6 +29,10 @@ class MentalMapPayload implements JsonSerializable
      * @var array
      */
     private $treeData;
+    /**
+     * @var array
+     */
+    private $settings = [];
 
     private function __construct(UuidInterface $id, string $name, string $text)
     {
@@ -41,6 +45,25 @@ class MentalMapPayload implements JsonSerializable
     {
         $obj = new self($id, $name, $text);
         $obj->treeView = true;
+        $obj->treeData = $treeData;
+        return $obj;
+    }
+
+    public static function planMentalMap(
+        UuidInterface $id,
+        string $name,
+        string $text,
+        array $treeData,
+        UuidInterface $promptId = null
+    ): self {
+        $obj = new self($id, $name, $text);
+        $obj->treeView = true;
+        $obj->settings = [
+            'planTreeView' => true,
+        ];
+        if ($promptId !== null) {
+            $obj->settings['promptId'] = $promptId->toString();
+        }
         $obj->treeData = $treeData;
         return $obj;
     }
@@ -60,6 +83,7 @@ class MentalMapPayload implements JsonSerializable
             ],
             'mapTypeIsMentalMapQuestions' => false,
             'treeData' => $this->treeData,
+            'settings' => $this->settings,
         ];
     }
 
