@@ -386,4 +386,9 @@ class StorySlide extends ActiveRecord
         ];
         return $kinds[$kind] ?? 'Unknown kind';
     }
+
+    public function setHidden(bool $hidden = true): void
+    {
+        $this->status = $hidden ? self::STATUS_HIDDEN : self::STATUS_VISIBLE;
+    }
 }

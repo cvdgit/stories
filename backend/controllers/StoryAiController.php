@@ -14,7 +14,6 @@ use backend\services\StoryEditorService;
 use backend\services\StorySlideService;
 use backend\SlideEditor\ContentMentalMap\SpeechTrainer;
 use common\components\StoryCover;
-use common\helpers\SmartDate;
 use common\models\slide\SlideKind;
 use common\models\Story;
 use common\models\StorySlide;
@@ -524,6 +523,13 @@ class StoryAiController extends Controller
             if (!$slideModel->save()) {
                 throw new DomainException(
                     'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
+                );
+            }
+
+            $currentSlideModel->setHidden();
+            if (!$currentSlideModel->save()) {
+                throw new DomainException(
+                    'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $currentSlideModel->getFirstErrors()),
                 );
             }
         });
