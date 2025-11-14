@@ -453,6 +453,7 @@ class StoryController extends Controller
                         0,
                         PHP_ROUND_HALF_UP,
                     ),
+                    'type' => $mentalMap->map_type,
                 ];
             }
         }

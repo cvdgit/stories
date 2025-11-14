@@ -118,8 +118,9 @@
 
   function init() {
 
-    const slideId = Number($(getCurrentSlide()).attr('data-id'))
-    const mentalMapsData = config.mentalMaps.find(m => m.slideId === slideId)
+    const slideId = Number($(getCurrentSlide()).attr('data-id'));
+    const mentalMapsData = config.mentalMaps.find(m => m.slideId === slideId);
+    const {mapOrder} = config;
 
     if (!mentalMapsData) {
       return
@@ -128,7 +129,11 @@
     const wrap = $('<div class="content-mm-wrap"><div class="content-mm-inner"></div></div>')
     wrap.find('.content-mm-inner').append('<h3 style="margin: 0; text-align: left">Речевой тренажёр:</h3>')
 
-    mentalMapsData.mentalMaps.map(mentalMap => {
+    mapOrder.map(type => {
+      const mentalMap = mentalMapsData.mentalMaps.find(m => m.type === type);
+      if (!mentalMap) {
+        return;
+      }
       const elem = $(`<div data-mm-id="${mentalMap.id}" class="content-mm-item"><div class="content-mm-name"></div><div class="content-mm-progress"></div></div>`)
       elem.find('.content-mm-name')
         .text(mentalMap.name)
@@ -138,7 +143,7 @@
         })
       elem.find('.content-mm-progress').text(`(${mentalMap.userProgress}%)`)
       wrap.find('.content-mm-inner').append(elem)
-    })
+    });
 
     $(getCurrentSlide()).append(wrap)
   }
