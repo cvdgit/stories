@@ -33,12 +33,23 @@ class StorySlideService
     /**
      * @throws Exception
      */
-    public function createAndInsertSlide(int $storyId, int $kind, int $afterSlideNumber, callable $setData): StorySlide
-    {
+    public function createAndInsertSlide(
+        int $storyId,
+        int $kind,
+        int $afterSlideNumber,
+        callable $setData,
+        array $attributes = []
+    ): StorySlide {
         $slide = StorySlide::createSlide($storyId);
         $slide->data = 'empty';
         $slide->kind = $kind;
         $slide->number = $afterSlideNumber + 1;
+
+        foreach ($attributes as $attrName => $attrValue) {
+            if ($slide->hasAttribute($attrName)) {
+                $slide->setAttribute($attrName, $attrValue);
+            }
+        }
 
         $this->transactionManager->wrap(static function () use ($slide, $storyId, $afterSlideNumber, $setData): void {
             Story::insertSlideNumber($storyId, $afterSlideNumber);

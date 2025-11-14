@@ -321,7 +321,7 @@ class StoryAiController extends Controller
     }
 
     /**
-     * @throws InvalidConfigException
+     * @throws Exception
      */
     private function createRetelling(int $storyId, int $currentSlideId, int $currentSlideNumber, int $userId): int
     {
@@ -333,29 +333,24 @@ class StoryAiController extends Controller
             false,
             $userId,
         );
-        if (!$retelling->save()) {
-            throw new DomainException('Retelling save error');
-        }
 
-        $slideModel = $this->storySlideService->create($storyId, 'empty', StorySlide::KIND_RETELLING);
-        $slideModel->number = $currentSlideNumber + 1;
-        Story::insertSlideNumber($storyId, $currentSlideNumber);
-        if (!$slideModel->save()) {
-            throw new DomainException(
-                'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
+        $retellingSlideId = null;
+        $this->transactionManager->wrap(function() use ($retelling, $storyId, $currentSlideNumber, &$retellingSlideId): void {
+            if (!$retelling->save()) {
+                throw new DomainException('Retelling save error');
+            }
+            $retellingSlide = $this->storySlideService->createAndInsertSlide(
+                $storyId,
+                StorySlide::KIND_RETELLING,
+                $currentSlideNumber,
+                function (int $slideId) use ($retelling): string {
+                    return $this->storyEditorService->getSlideWithRetellingBlockContent($slideId, $retelling->id);
+                }
             );
-        }
+            $retellingSlideId = $retellingSlide->id;
+        });
 
-        $data = $this->storyEditorService->getSlideWithRetellingBlockContent($slideModel->id, $retelling->id);
-
-        $slideModel->updateData($data);
-        if (!$slideModel->save()) {
-            throw new DomainException(
-                'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
-            );
-        }
-
-        return $slideModel->id;
+        return $retellingSlideId;
     }
 
     public function actionThreads(Response $response, WebUser $user): array
@@ -603,7 +598,7 @@ class StoryAiController extends Controller
                     $fragments,
                     Uuid::fromString(Yii::$app->params['ai.story.assist.plan.prompt.id']),
                 );
-                $this->storySlideService->createAndInsertSlide(
+                $mapSlide = $this->storySlideService->createAndInsertSlide(
                     $story->id,
                     StorySlide::KIND_MENTAL_MAP,
                     $newTextSlide->number,
@@ -614,6 +609,30 @@ class StoryAiController extends Controller
                             'mental-map'
                         );
                     },
+                );
+
+                $allText = implode("\r\n", array_map(static function (array $fragment): string {
+                    return $fragment['description'];
+                }, $fragments));
+                $newAllTextSlide = $this->storySlideService->createAndInsertSlide(
+                    $story->id,
+                    SlideKind::SLIDE,
+                    $mapSlide->number,
+                    function (int $slideId) use ($allText): string {
+                        return $this->storyEditorService->makeSlideWithText(
+                            $slideId,
+                            $allText,
+                            'all-text'
+                        );
+                    },
+                    ['status' => StorySlide::STATUS_HIDDEN]
+                );
+
+                $this->createRetelling(
+                    $story->id,
+                    $newAllTextSlide->id,
+                    $newAllTextSlide->number,
+                    $user->getId()
                 );
             });
             return ['success' => true];
