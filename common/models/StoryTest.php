@@ -127,7 +127,7 @@ class StoryTest extends ActiveRecord
             'strict_answer' => 'Строгое сравнение ответов',
             'input_voice' => 'Язык синтезатора ответов',
             'recording_lang' => 'Язык распознавания',
-            'shuffle_word_list' => 'Перемешивать элементы списка',
+            'shuffle_word_list' => 'Перемешивать вопросы',
             'remember_answers' => 'Запоминать ответы',
             'ask_question' => 'Произносить вопросы',
             'ask_question_lang' => 'Язык синтезатора вопросов',

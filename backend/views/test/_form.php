@@ -69,6 +69,10 @@ $opt = new TestTypeOptions($model->answer_type);
         <?= $form->field($model, 'shuffle_word_list')->checkbox() ?>
     </div>
 
+    <div class="default-block" style="display: <?= $model->isSourceTest() ? 'block' : 'none' ?>">
+        <?= $form->field($model, 'shuffle_word_list')->checkbox() ?>
+    </div>
+
     <?= $form->field($model, 'answer_type')->dropDownList(AnswerType::asArray()) ?>
 
     <?= $form->field($model, 'strict_answer', $opt->forGroup([AnswerType::INPUT]))
@@ -182,8 +186,10 @@ if (SOURCE_NEO) {
 source.on('change', function() {
     $('.remote-questions-block').hide();
     $('.word-list-block').hide();
+    $('.default-block').hide();
     switch ($(this).val()) {
         case '$sourceTest':
+            $('.default-block').show();
             break;
         case '$sourceNeo':
             $('.remote-questions-block').show();
