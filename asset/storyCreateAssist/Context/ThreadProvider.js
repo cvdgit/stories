@@ -7,7 +7,7 @@ import {fetchEventSource} from "@microsoft/fetch-event-source";
 import {applyPatch} from "fast-json-patch";
 import {createWordItem, getTextBySelections, hideWordsEven, hideWordsOdd} from "../../mental_map_quiz/words";
 
-async function streamMessage(url, payload, onMessage, onEnd) {
+async function streamMessage(url, payload, onMessage, onEnd, onError) {
   let streamedResponse = {};
   let accumulatedMessage = '';
   await fetchEventSource(url, {
@@ -21,7 +21,7 @@ async function streamMessage(url, payload, onMessage, onEnd) {
     openWhenHidden: true,
     onerror(err) {
       console.error(err);
-      throw err;
+      onError && onError(err);
     },
     onmessage(msg) {
       if (msg.event === "end") {
@@ -139,69 +139,64 @@ export function ThreadProvider({children}) {
     setMessages(prevMessages => [...prevMessages, {
       id: messageId,
       message: '',
-      type: 'ai',
+      type: 'ai-story',
+      status: 'idle'
     }]);
 
-    try {
-
-      await streamMessage('/admin/index.php?r=gpt/story/create', {threadId, text}, (message) => {
-        saveMessages(threadId);
-        setMessages(prevMessages => prevMessages.map(m => {
-          if (m.id === messageId) {
-            return {...m, message};
-          }
-          return m;
-        }));
-      }, async (accumulatedMessage) => {
-        const json = JSON.parse(accumulatedMessage);
-
-        saveMessages(threadId);
-
-        const payload = {...json, fragments: json.fragments.map(f => ({...f, id: uuidv4()}))};
-        const storyMessageId = uuidv4();
-        setMessages(prevMessages => [...prevMessages, {
-          id: storyMessageId,
-          message: 'Создание истории...',
-          type: 'story',
-          metadata: {payload},
-        }]);
-
-        const storyResponse = await createStoryFromText(threadId, storyMessageId, payload);
-        if (!storyResponse.success) {
-          saveMessages(threadId);
-          setMessages(prevMessages => prevMessages.map(m => {
-            if (m.id === storyMessageId) {
-              return {...m, message: storyResponse.message};
-            }
-            return m;
-          }));
-          return;
+    await streamMessage('/admin/index.php?r=gpt/story/create', {threadId, text}, (message) => {
+      saveMessages(threadId);
+      setMessages(prevMessages => prevMessages.map(m => {
+        if (m.id === messageId) {
+          return {...m, message};
         }
+        return m;
+      }));
+    }, async (accumulatedMessage) => {
+      const json = JSON.parse(accumulatedMessage);
 
+      saveMessages(threadId);
+
+      setMessages(prevMessages => prevMessages.map(m => {
+        if (m.id === messageId) {
+          return {...m, status: 'done'};
+        }
+        return m;
+      }));
+
+      const payload = {...json, fragments: json.fragments.map(f => ({...f, id: uuidv4()}))};
+      const storyMessageId = uuidv4();
+      setMessages(prevMessages => [...prevMessages, {
+        id: storyMessageId,
+        message: 'Создание истории...',
+        type: 'story',
+        metadata: {payload},
+      }]);
+
+      const storyResponse = await createStoryFromText(threadId, storyMessageId, payload);
+      if (!storyResponse.success) {
         saveMessages(threadId);
         setMessages(prevMessages => prevMessages.map(m => {
           if (m.id === storyMessageId) {
-            return {...m, metadata: {...m.metadata, story: storyResponse.story}};
+            return {...m, message: storyResponse.message};
           }
           return m;
         }));
+        return;
+      }
 
-        setThreadTitle(threadId, storyResponse.story.title);
+      saveMessages(threadId);
+      setMessages(prevMessages => prevMessages.map(m => {
+        if (m.id === storyMessageId) {
+          return {...m, metadata: {...m.metadata, story: storyResponse.story}};
+        }
+        return m;
+      }));
 
-        await createReadingTrainer(threadId, {payload, story: storyResponse.story});
-      });
+      setThreadTitle(threadId, storyResponse.story.title);
 
-    } catch (err) {
-      console.error(err);
+      await createReadingTrainer(threadId, {payload, story: storyResponse.story});
+    });
 
-      /*updateMessage(uniqueId, {
-        message: `Error: ${err.message}`,
-        error: true
-      });*/
-
-    } finally {
-
-    }
   };
 
   const createRepetitionTrainer = async (threadId, metadata) => {

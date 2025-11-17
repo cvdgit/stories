@@ -24,8 +24,9 @@ export default function StartUpMessages() {
     }).then(newThread => {
       const humanMessage = {
         id: uuidv4(),
-        message: 'Создать историю',
-        type: 'human',
+        message: 'Создать историю для чтения',
+        type: 'human_create_story',
+        metadata: {text}
       };
       setMessages(prevMessages => [...prevMessages, humanMessage]);
       saveMessages(threadId, humanMessage);
@@ -47,7 +48,8 @@ export default function StartUpMessages() {
       const humanMessage = {
         id: uuidv4(),
         message: 'Создать историю с речевым тренажером',
-        type: 'human',
+        type: 'human_create_story',
+        metadata: {text}
       };
       setMessages(prevMessages => [...prevMessages, humanMessage]);
       saveMessages(threadId, humanMessage);
