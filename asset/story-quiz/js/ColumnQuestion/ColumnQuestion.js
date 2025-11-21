@@ -18,7 +18,7 @@ ColumnQuestion.prototype.getContent = function(question) {
   const {sign, result, steps} = payload
   const firstDigit = String(payload.firstDigit)
   const secondDigit = String(payload.secondDigit)
-  const digits = Math.max(String(firstDigit).length, String(secondDigit).length)
+  const digits = Math.max(String(firstDigit).length, String(secondDigit).length, String(result).length)
 
   const template = createTemplate()
 
@@ -44,15 +44,20 @@ ColumnQuestion.prototype.getContent = function(question) {
         .appendChild(createDigitCell(secondDigit[secondDigit.length - 1 - i]))
     }
   } else {
-    for (let i = digits - 1; i >= 0; i--) {
-      template.querySelector('.helperRow')
-        .appendChild(createHelperCell(i === 0))
-      template.querySelector('.firstDigitRow')
-        .appendChild(createDigitCell(firstDigit[firstDigit.length - 1 - i], false, true))
-      template.querySelector('.secondDigitRow')
-        .appendChild(createDigitCell(secondDigit[secondDigit.length - 1 - i], false, true))
+    console.log('incorrect')
+    for (let i = digits; i > 0; i--) {
+      if (firstDigit[firstDigit.length - i]) {
+        template.querySelector('.helperRow')
+          .appendChild(createHelperCell(i === 0))
+        template.querySelector('.firstDigitRow')
+          .appendChild(createDigitCell(firstDigit[firstDigit.length - i], false, true))
+      }
+      if (secondDigit[secondDigit.length - i]) {
+        template.querySelector('.secondDigitRow')
+          .appendChild(createDigitCell(secondDigit[secondDigit.length - i], false, true))
+      }
       template.querySelector('.resultRow')
-        .appendChild(createResultCell(result[result.length - 1 - i], true))
+        .appendChild(createResultCell(result[result.length - i], true))
     }
   }
 
