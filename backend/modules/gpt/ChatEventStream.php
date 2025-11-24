@@ -79,7 +79,10 @@ class ChatEventStream
         }
 
         $command = Yii::$app->db->createCommand();
-        $runId = $streamedResponse->id ?? Uuid::uuid4()->toString();
+        $runId = $streamedResponse->id;
+        if (empty($runId)) {
+            $runId = Uuid::uuid4()->toString();
+        }
         $command->insert("llm_feedback", [
             "run_id" => $runId,
             "target" => $target,
