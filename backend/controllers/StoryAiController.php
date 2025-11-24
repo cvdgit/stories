@@ -15,6 +15,7 @@ use backend\services\StoryEditorService;
 use backend\services\StorySlideService;
 use backend\SlideEditor\ContentMentalMap\SpeechTrainer;
 use common\components\StoryCover;
+use common\helpers\Translit;
 use common\models\slide\SlideKind;
 use common\models\Story;
 use common\models\StorySlide;
@@ -115,7 +116,17 @@ class StoryAiController extends Controller
         $fragments = $payload['fragments'];
         $threadId = $payload['threadId'];
 
-        $story = Story::create($title, $user->getId(), [Yii::$app->params['ai.story.assist.category.id']]);
+        $alias = Translit::translit($title);
+        $foundStoryByAlias = Story::find()
+            ->where(['title' => trim($title)])
+            ->all();
+
+        if (count($foundStoryByAlias) > 0) {
+            $newTitle = $title . ' #' . (count($foundStoryByAlias) + 1);
+            $alias = Translit::translit($newTitle);
+        }
+
+        $story = Story::create($title, $user->getId(), [Yii::$app->params['ai.story.assist.category.id']], $alias);
         $story->setIsAI();
 
         try {

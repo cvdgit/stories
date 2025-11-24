@@ -628,7 +628,7 @@ class Story extends ActiveRecord
         return $this->save(false);
     }
 
-    public static function create(string $title, int $userID, array $categories)
+    public static function create(string $title, int $userID, array $categories, ?string $alias = null)
     {
         $model = new self();
         $model->loadDefaultValues();
@@ -638,6 +638,7 @@ class Story extends ActiveRecord
         $model->source_id = self::SOURCE_POWERPOINT;
         $model->story_categories = implode(',', $categories);
         $model->categories = $categories;
+        $model->alias = $alias;
         return $model;
     }
 
