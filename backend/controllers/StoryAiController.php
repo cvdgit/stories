@@ -24,7 +24,6 @@ use DomainException;
 use Exception;
 use Ramsey\Uuid\Uuid;
 use Yii;
-use yii\base\InvalidConfigException;
 use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\helpers\Json;
@@ -386,10 +385,17 @@ class StoryAiController extends Controller
         $messages = $payload['messages'];
         $text = $payload['text'];
 
-        $thread = StoryThread::create($id, 'Без имени', $user->getId(), $text, $messages);
-        if (!$thread->save()) {
-            throw new BadRequestHttpException('Story Thread save error');
+        $thread = StoryThread::findByUser($id, $user->getId());
+        if ($thread === null) {
+            $thread = StoryThread::create($id, 'Без имени', $user->getId(), $text, $messages);
+            if (!$thread->save()) {
+                throw new BadRequestHttpException('Story Thread save error');
+            }
+        } else {
+            $thread->updateThread($messages);
+            $thread->save();
         }
+
         return ThreadResponse::fromModel($thread);
     }
 
