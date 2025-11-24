@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace backend\modules\gpt;
 
 use gamringer\JSONPatch\Patch;
+use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\db\Exception;
 use yii\helpers\Json;
@@ -78,8 +79,9 @@ class ChatEventStream
         }
 
         $command = Yii::$app->db->createCommand();
+        $runId = $streamedResponse->id ?? Uuid::uuid4()->toString();
         $command->insert("llm_feedback", [
-            "run_id" => $streamedResponse->id,
+            "run_id" => $runId,
             "target" => $target,
             "user_id" => Yii::$app->user->getId(),
             "input" => Json::decode($fieldsJson),
