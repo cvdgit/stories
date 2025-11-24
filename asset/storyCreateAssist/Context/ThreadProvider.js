@@ -450,13 +450,18 @@ export function ThreadProvider({children}) {
           },
           (fragmentsJsonText) => {
 
-            const fragments = JSON.parse(processOutputAsJson(fragmentsJsonText)).map(text => {
-              const fragmentId = uuidv4();
-              return {
-                id: fragmentId,
-                title: text,
-              }
-            });
+            let fragments = []
+            try {
+              fragments = processOutputAsJson(fragmentsJsonText).map(text => {
+                const fragmentId = uuidv4();
+                return {
+                  id: fragmentId,
+                  title: text,
+                }
+              });
+            } catch (ex) {
+              throw new Error(ex.message);
+            }
 
             const data = {
               storyId,
