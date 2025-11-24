@@ -16,7 +16,7 @@ class M251031130039CreateStoryThreadTable extends Migration
         $this->createTable($this->tableName, [
             'id' => $this->string(36)->notNull(),
             'title' => $this->string(255)->notNull(),
-            'text' => $this->text()->null(),
+            'text longtext not null',
             'payload' => $this->json()->null(),
             'user_id' => $this->integer()->notNull(),
             'created_at' => $this->integer()->notNull(),

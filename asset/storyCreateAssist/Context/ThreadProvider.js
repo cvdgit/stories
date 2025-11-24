@@ -49,6 +49,16 @@ async function streamMessage(url, payload, onMessage, onEnd, onError) {
 
 const ThreadContext = createContext(undefined);
 
+function processOutputAsJson(output) {
+  let json = null
+  try {
+    json = JSON.parse(output.replace(/```json\n?|```/g, ''))
+  } catch (ex) {
+    console.log(ex.message)
+  }
+  return json
+}
+
 let saveTimeoutId;
 
 export function ThreadProvider({children}) {
@@ -440,7 +450,7 @@ export function ThreadProvider({children}) {
           },
           (fragmentsJsonText) => {
 
-            const fragments = JSON.parse(fragmentsJsonText).map(text => {
+            const fragments = JSON.parse(processOutputAsJson(fragmentsJsonText)).map(text => {
               const fragmentId = uuidv4();
               return {
                 id: fragmentId,
