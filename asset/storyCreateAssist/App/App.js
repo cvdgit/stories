@@ -18,7 +18,7 @@ function AppComponent() {
     }
 
     if (!threadId) {
-      hasCheckedThreadIdParam.current = true;
+      hasCheckedThreadIdParam.current = false;
       return;
     }
 
@@ -31,13 +31,15 @@ function AppComponent() {
           return;
         }
         switchSelectedThread(thread);
-        hasCheckedThreadIdParam.current = false;
       });
     } catch (e) {
       console.error("Failed to fetch thread in query param", e);
       setThreadId(null);
     }
-  }, [/*getThreadById, setThreadId, switchSelectedThread,*/ threadId]);
+    finally {
+      hasCheckedThreadIdParam.current = false;
+    }
+  }, [/*getThreadById*/ setThreadId, switchSelectedThread, threadId]);
 
   return (
     <>

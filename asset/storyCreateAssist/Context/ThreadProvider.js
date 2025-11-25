@@ -43,7 +43,9 @@ async function streamMessage(url, payload, onMessage, onEnd, onError) {
         onMessage(accumulatedMessage);
       }
     },
-    onclose: () => {console.log('close')}
+    onclose: () => {
+      console.log('close')
+    }
   });
 }
 
@@ -71,6 +73,7 @@ export function ThreadProvider({children}) {
     getCurrentThreadTitle,
     setThreadTitle
   } = useThreads('123abc');
+  const [isStreaming, setIsStreaming] = useState(false);
   const [messages, setMessages] = useState([]);
   const [_threadId, setThreadId] = useQueryState('id');
   const needSaveMessages = useRef(false);
@@ -84,7 +87,7 @@ export function ThreadProvider({children}) {
   const switchSelectedThread = useCallback((thread) => {
     setThreadId(thread.id);
     //streamStateRef.current = null;
-    //setIsStreaming(false);
+    setIsStreaming(false);
 
     if (!thread.messages) {
       setMessages([]);
@@ -103,7 +106,11 @@ export function ThreadProvider({children}) {
     }
 
     needSaveMessages.current = false;
-    saveTimeoutId = setTimeout(() => api.post('/admin/index.php?r=story-ai/save-thread', {id: _threadId, messages, title: 'Без имени'}, {'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').getAttribute('content')}), 500);
+    saveTimeoutId = setTimeout(() => api.post('/admin/index.php?r=story-ai/save-thread', {
+      id: _threadId,
+      messages,
+      title: 'Без имени'
+    }, {'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').getAttribute('content')}), 500);
     return () => clearTimeout(saveTimeoutId);
   }, [messages]);
 
@@ -145,6 +152,7 @@ export function ThreadProvider({children}) {
   }
 
   const createStory = async (threadId, text) => {
+
     const messageId = uuidv4();
     setMessages(prevMessages => [...prevMessages, {
       id: messageId,
@@ -153,60 +161,70 @@ export function ThreadProvider({children}) {
       status: 'idle'
     }]);
 
-    await streamMessage('/admin/index.php?r=gpt/story/create', {threadId, text}, (message) => {
-      saveMessages(threadId);
-      setMessages(prevMessages => prevMessages.map(m => {
-        if (m.id === messageId) {
-          return {...m, message};
-        }
-        return m;
-      }));
-    }, async (accumulatedMessage) => {
-      const json = JSON.parse(accumulatedMessage);
+    setIsStreaming(true);
 
-      saveMessages(threadId);
-
-      setMessages(prevMessages => prevMessages.map(m => {
-        if (m.id === messageId) {
-          return {...m, status: 'done'};
-        }
-        return m;
-      }));
-
-      const payload = {...json, fragments: json.fragments.map(f => ({...f, id: uuidv4()}))};
-      const storyMessageId = uuidv4();
-      setMessages(prevMessages => [...prevMessages, {
-        id: storyMessageId,
-        message: 'Создание истории...',
-        type: 'story',
-        metadata: {payload},
-      }]);
-
-      const storyResponse = await createStoryFromText(threadId, storyMessageId, payload);
-      if (!storyResponse.success) {
+    await streamMessage(
+      '/admin/index.php?r=gpt/story/create',
+      {threadId, text},
+      (message) => {
         saveMessages(threadId);
         setMessages(prevMessages => prevMessages.map(m => {
-          if (m.id === storyMessageId) {
-            return {...m, message: storyResponse.message};
+          if (m.id === messageId) {
+            return {...m, message};
           }
           return m;
         }));
-        return;
-      }
+      },
+      async (accumulatedMessage) => {
+        setIsStreaming(false);
+        const json = JSON.parse(accumulatedMessage);
 
-      saveMessages(threadId);
-      setMessages(prevMessages => prevMessages.map(m => {
-        if (m.id === storyMessageId) {
-          return {...m, metadata: {...m.metadata, story: storyResponse.story}};
+        saveMessages(threadId);
+
+        setMessages(prevMessages => prevMessages.map(m => {
+          if (m.id === messageId) {
+            return {...m, status: 'done'};
+          }
+          return m;
+        }));
+
+        const payload = {...json, fragments: json.fragments.map(f => ({...f, id: uuidv4()}))};
+        const storyMessageId = uuidv4();
+        setMessages(prevMessages => [...prevMessages, {
+          id: storyMessageId,
+          message: 'Создание истории...',
+          type: 'story',
+          metadata: {payload},
+        }]);
+
+        const storyResponse = await createStoryFromText(threadId, storyMessageId, payload);
+        if (!storyResponse.success) {
+          saveMessages(threadId);
+          setMessages(prevMessages => prevMessages.map(m => {
+            if (m.id === storyMessageId) {
+              return {...m, message: storyResponse.message};
+            }
+            return m;
+          }));
+          return;
         }
-        return m;
-      }));
 
-      setThreadTitle(threadId, storyResponse.story.title);
+        saveMessages(threadId);
+        setMessages(prevMessages => prevMessages.map(m => {
+          if (m.id === storyMessageId) {
+            return {...m, metadata: {...m.metadata, story: storyResponse.story}};
+          }
+          return m;
+        }));
 
-      await createReadingTrainer(threadId, {payload, story: storyResponse.story});
-    });
+        setThreadTitle(threadId, storyResponse.story.title);
 
+        await createReadingTrainer(threadId, {payload, story: storyResponse.story});
+      },
+      () => {
+        setIsStreaming(false);
+      }
+    );
   };
 
   const createRepetitionTrainer = async (threadId, metadata) => {
@@ -350,64 +368,67 @@ export function ThreadProvider({children}) {
     }]);
     try {
 
-      await streamMessage('/admin/index.php?r=gpt/story/create-for-trainer', {threadId, text}, (message) => {
-        saveMessages(threadId);
-        setMessages(prevMessages => prevMessages.map(m => {
-          if (m.id === messageId) {
-            return {...m, message};
-          }
-          return m;
-        }));
-      }, async (accumulatedMessage) => {
-        const json = JSON.parse(accumulatedMessage);
-
-        saveMessages(threadId);
-
-        const payload = {...json, fragments: json.fragments.map(f => ({...f, id: uuidv4()}))};
-        const storyMessageId = uuidv4();
-        setMessages(prevMessages => [...prevMessages, {
-          id: storyMessageId,
-          message: 'Создание истории...',
-          type: 'story',
-          metadata: {payload},
-        }]);
-
-        const storyResponse = await createRepetitionTrainerStoryFromText(threadId, storyMessageId, payload);
-        if (!storyResponse.success) {
+      setIsStreaming(true);
+      await streamMessage(
+        '/admin/index.php?r=gpt/story/create-for-trainer',
+        {threadId, text},
+        (message) => {
           saveMessages(threadId);
           setMessages(prevMessages => prevMessages.map(m => {
-            if (m.id === storyMessageId) {
-              return {...m, message: storyResponse.message};
+            if (m.id === messageId) {
+              return {...m, message};
             }
             return m;
           }));
-          return;
-        }
+        },
+        async (accumulatedMessage) => {
+          setIsStreaming(false);
+          const json = JSON.parse(accumulatedMessage);
 
-        saveMessages(threadId);
-        setMessages(prevMessages => prevMessages.map(m => {
-          if (m.id === storyMessageId) {
-            return {...m, metadata: {...m.metadata, story: storyResponse.story}};
+          saveMessages(threadId);
+
+          const payload = {...json, fragments: json.fragments.map(f => ({...f, id: uuidv4()}))};
+          const storyMessageId = uuidv4();
+          setMessages(prevMessages => [...prevMessages, {
+            id: storyMessageId,
+            message: 'Создание истории...',
+            type: 'story',
+            metadata: {payload},
+          }]);
+
+          const storyResponse = await createRepetitionTrainerStoryFromText(threadId, storyMessageId, payload);
+          if (!storyResponse.success) {
+            saveMessages(threadId);
+            setMessages(prevMessages => prevMessages.map(m => {
+              if (m.id === storyMessageId) {
+                return {...m, message: storyResponse.message};
+              }
+              return m;
+            }));
+            return;
           }
-          return m;
-        }));
 
-        setThreadTitle(threadId, storyResponse.story.title);
+          saveMessages(threadId);
+          setMessages(prevMessages => prevMessages.map(m => {
+            if (m.id === storyMessageId) {
+              return {...m, metadata: {...m.metadata, story: storyResponse.story}};
+            }
+            return m;
+          }));
 
-        await createRepetitionTrainer(threadId, {payload, story: storyResponse.story});
-      });
+          setThreadTitle(threadId, storyResponse.story.title);
+
+          await createRepetitionTrainer(threadId, {payload, story: storyResponse.story});
+        },
+        () => {
+          setIsStreaming(false);
+        }
+      );
 
     } catch (err) {
       console.error(err);
-
-      /*updateMessage(uniqueId, {
-        message: `Error: ${err.message}`,
-        error: true
-      });*/
-
-    } finally {
-
-    }
+      setIsStreaming(false);
+    } finally {}
   }
 
   const createReadingTrainer = async (threadId, metadata) => {
@@ -512,6 +533,7 @@ export function ThreadProvider({children}) {
       getCurrentThreadTitle
     },
     messagesData: {
+      isStreaming,
       messages,
       setMessages,
       createStory,
@@ -529,6 +551,7 @@ export function ThreadProvider({children}) {
     deleteThread,
     createThread,
     getCurrentThreadTitle,
+    isStreaming,
     messages,
     setMessages,
     saveMessages,
