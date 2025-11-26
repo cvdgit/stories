@@ -610,9 +610,9 @@ $js = <<< JS
 
             modal.show({
               url: '/admin/index.php?r=editor/mental-map/create-ai-form&slide_id=' + currentSlideId,
-              callback: function() {
-                const submitBtn = $(this).find('button[type=submit]');
-                formHelper.attachBeforeSubmit($(this).find('form'), (form) => {
+              callback: function(responseBody) {
+                const submitBtn = $(responseBody).find('button[type=submit]');
+                formHelper.attachBeforeSubmit($(responseBody).find('form'), (form) => {
                   modalHelper.btnLoading(submitBtn);
 
                   const mentalMaps = [
