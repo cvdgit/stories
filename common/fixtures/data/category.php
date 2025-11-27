@@ -123,4 +123,14 @@ return [
         'alias' => 'klassicheskaya-muzyka',
         'sort_order' => 0,
     ],
+    [
+        'id' => 36,
+        'tree' => 0,
+        'lft' => 17,
+        'rgt' => 18,
+        'depth' => 2,
+        'name' => 'Для списков слов',
+        'alias' => 'dlya-spiskov-slov',
+        'sort_order' => 0,
+    ],
 ];

@@ -79,18 +79,27 @@ class WordListService
         }
     }
 
-    public function create(CreateStoryForm $form, int $userID)
+    /**
+     * @throws Exception
+     */
+    public function create(CreateStoryForm $form, int $userID): void
     {
         $this->transactionManager->wrap(function() use ($form, $userID) {
 
-            $test = $this->storyTestService->createFromWordList($form->test_name, $form->word_list_id, $form->test_answer_type, $form->test_shuffle_word_list, $form->test_strict_answer);
+            $test = $this->storyTestService->createFromWordList(
+                $form->test_name,
+                (int) $form->word_list_id,
+                (int) $form->test_answer_type,
+                (int) $form->test_shuffle_word_list,
+                (int) $form->test_strict_answer
+            );
             if (!$test->save()) {
-                throw new Exception('Can\'t be saved StoryTest model. Errors: '. implode(', ', $test->getFirstErrors()));
+                throw new DomainException('Can\'t be saved StoryTest model. Errors: '. implode(', ', $test->getFirstErrors()));
             }
 
-            $story = $this->storyService->create($form->story_name, $userID, [36]);
+            $story = Story::create($form->story_name, $userID, [36]);
             if (!$story->save()) {
-                throw new Exception('Can\'t be saved Story model. Errors: '. implode(', ', $story->getFirstErrors()));
+                throw new DomainException('Can\'t be saved Story model. Errors: '. implode(', ', $story->getFirstErrors()));
             }
 
             $slide = $this->storySlideService->create($story->id, 'New questions', StorySlide::KIND_QUESTION);

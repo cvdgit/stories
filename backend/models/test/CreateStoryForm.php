@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\models\test;
 
 use common\models\test\AnswerType;
 use common\models\TestWordList;
+use DomainException;
 use yii\base\Model;
 
 class CreateStoryForm extends Model
 {
-
     public $word_list_id;
     public $test_name;
     public $test_answer_type;
@@ -16,18 +18,15 @@ class CreateStoryForm extends Model
     public $test_strict_answer;
     public $story_name;
 
-    private $wordList;
-
     public function __construct(TestWordList $wordList, $config = [])
     {
-        $this->wordList = $wordList;
         $this->word_list_id = $wordList->id;
         $this->test_name = $wordList->name;
         $this->story_name = $wordList->name;
         parent::__construct($config);
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             [['test_name', 'story_name', 'test_answer_type', 'word_list_id'], 'required'],
@@ -37,7 +36,7 @@ class CreateStoryForm extends Model
         ];
     }
 
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'test_name' => 'Название теста',
@@ -48,16 +47,15 @@ class CreateStoryForm extends Model
         ];
     }
 
-    public function create()
+    public function create(): void
     {
         if (!$this->validate()) {
-            throw new \DomainException('Not valid');
+            throw new DomainException('Not valid');
         }
     }
 
-    public function isAnswerTypeInput()
+    public function isAnswerTypeInput(): bool
     {
         return (int) $this->test_answer_type === AnswerType::INPUT;
     }
-
 }
