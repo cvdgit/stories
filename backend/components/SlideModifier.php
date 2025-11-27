@@ -121,14 +121,14 @@ class SlideModifier
             }
             if ($block->typeIs(AbstractBlock::TYPE_RETELLING)) {
                 $content = RetellingBlockContent::createFromHtml($block->getContent());
-                $title = null;
+                $title = 'Пересказ не найден';
                 try {
                     $retelling = Retelling::findOne($content->getId());
                     if ($retelling !== null) {
                         $title = $retelling->name;
                     }
                 } catch (Exception $ex) {
-                    $title = 'Пересказ не найден';
+                    $title = $ex->getMessage();
                 }
                 $block->setContent($content->renderWithDescription($this->slide->getId(), $title));
             }
