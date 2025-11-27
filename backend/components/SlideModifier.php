@@ -127,7 +127,9 @@ class SlideModifier
                     if ($retelling !== null) {
                         $title = $retelling->name;
                     }
-                } catch (Exception $ex) {}
+                } catch (Exception $ex) {
+                    $title = 'Пересказ не найден';
+                }
                 $block->setContent($content->renderWithDescription($this->slide->getId(), $title));
             }
             if ($block->typeIs(AbstractBlock::TYPE_VIDEO) || $block->typeIs(AbstractBlock::TYPE_VIDEOFILE)) {
