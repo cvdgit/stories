@@ -55,34 +55,35 @@
 
   window.EditorRetelling = function () {
 
-    const $modal = $('#retelling-modal')
+    const $modal = $('.retelling-modal-template')
 
-    function resetModal() {
-      $modal.find('#retelling-slide-text').html('')
-      $modal.find('#retelling-with-questions').prop('checked', false)
-      $modal.find('#retelling-questions-generate').css('display', 'none')
-      $modal.find('#retelling-questions').html('')
-      $modal.find('#retelling-required').prop('checked', true)
+    function resetModal($dialog) {
+      $dialog.find('.retelling-slide-text').html('')
+      $dialog.find('.retelling-with-questions').prop('checked', false)
+      $dialog.find('.retelling-questions-generate').css('display', 'none')
+      $dialog.find('.retelling-questions').html('')
+      $dialog.find('.retelling-required').prop('checked', true)
     }
 
-    $modal.find('#retelling-questions-generate').on('click', e => {
-      e.preventDefault()
+    function addGenerateEvents($dialog) {
+      $dialog.find('.retelling-questions-generate').on('click', e => {
+        e.preventDefault()
 
-      const text = $modal.find('#retelling-slide-text').text()
-      if (!text) {
-        return
-      }
-      sendMessage({
-          slideTexts: text
-        }, message => {
-          $modal.find('#retelling-questions').html(message)
-        },
-        () => console.log('end'))
-    })
-
-    $modal.find('#retelling-with-questions').on('click', e => {
-      $modal.find('#retelling-questions-generate').toggle()
-    })
+        const text = $dialog.find('.retelling-slide-text').text()
+        if (!text) {
+          return
+        }
+        sendMessage({
+            slideTexts: text
+          }, message => {
+            $dialog.find('.retelling-questions').html(message)
+          },
+          () => console.log('end'))
+      })
+      $dialog.find('.retelling-with-questions').on('click', e => {
+        $dialog.find('.retelling-questions-generate').toggle()
+      })
+    }
 
     /**
      * @param {int} storyId
@@ -124,27 +125,28 @@
 
     this.showModal = ({storyId, slideId, texts}) => {
 
-      $('.modal-title', $modal).text('Новый пересказ')
+      const $createModal = $modal.clone();
 
-      resetModal()
+      addGenerateEvents($createModal);
 
-      const $loader = $modal.find('#retelling-loader')
+      $('.modal-title', $createModal).text('Новый пересказ')
+
+      const $loader = $createModal.find('.retelling-loader')
       $loader.css('display', 'none')
 
-      $modal.find('#retelling-slide-text').html(texts)
+      $createModal.find('.retelling-slide-text').html(texts)
 
-      $modal.find('#retelling-action')
+      $createModal.find('.retelling-action')
         .text('Создать')
-        .off('click')
         .on('click', async e => {
 
-          const withQuestions = $modal.find('#retelling-with-questions').is(':checked')
-          const required = $modal.find('#retelling-required').is(':checked')
+          const withQuestions = $createModal.find('.retelling-with-questions').is(':checked')
+          const required = $createModal.find('.retelling-required').is(':checked')
 
           let questions = ''
           if (withQuestions) {
-            questions = $modal
-              .find('#retelling-questions')
+            questions = $createModal
+              .find('.retelling-questions')
               .text()
               .replace(/```\n?|```/g, '')
               .trim()
@@ -159,96 +161,95 @@
 
           const json = await createHandler(storyId, slideId, withQuestions, questions, required)
 
-          $modal.modal('hide')
+          $createModal.modal('hide')
           StoryEditor.loadSlides(json?.slide_id)
         })
 
-      $modal.modal('show')
+      $createModal.modal('show')
     }
 
     this.showUpdateModal = ({storyId, slideId, blockId}) => {
-      $('.modal-title', $modal).text('Изменить пересказ')
-      resetModal()
 
-      const $loader = $modal.find('#retelling-loader')
+      const $updateModal = $modal.clone();
+
+      addGenerateEvents($updateModal);
+      $('.modal-title', $updateModal).text('Изменить пересказ')
+
+      const $loader = $updateModal.find('.retelling-loader')
       $loader.css('display', 'none')
 
-      $modal
-        .find('#retelling-action')
-        .text('Сохранить')
-        .off('click')
+      $updateModal.find('.retelling-action').text('Сохранить')
 
-      $modal
-        .off('show.bs.modal')
+      $updateModal
         .on('show.bs.modal', async (e) => {
-        const {storyId, slideId, blockId} = e.relatedTarget
-        const response = await fetch(`/admin/index.php?r=editor/load-retelling&story_id=${storyId}&slide_id=${slideId}&block_id=${blockId}`, {
-          method: 'get',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': $('meta[name=csrf-token]').attr('content')
-          },
-        })
-        if (!response.ok) {
-          throw new Error('error')
-        }
-        const json = await response.json()
-        const {texts, withQuestions, questions, required, retellingId} = json?.retelling || {}
-
-        $modal.find('#retelling-slide-text').html(texts)
-        $modal.find('#retelling-with-questions').prop('checked', withQuestions)
-        if (withQuestions) {
-          $modal.find('#retelling-questions-generate').toggle()
-        }
-        $modal.find('#retelling-questions').html(questions)
-        $modal.find('#retelling-required').prop('checked', required)
-
-        $modal
-          .find('#retelling-action')
-          .on('click', async (e) => {
-
-            const withQuestions = $modal.find('#retelling-with-questions').is(':checked')
-            const required = $modal.find('#retelling-required').is(':checked')
-
-            let questions = ''
-            if (withQuestions) {
-              questions = $modal
-                .find('#retelling-questions')
-                .text()
-                .replace(/```\n?|```/g, '')
-                .trim()
-            }
-
-            if (withQuestions && !questions.length) {
-              alert('Нет вопросов')
-              return
-            }
-
-            $loader.css('display', 'flex')
-
-            let json
-            try {
-              json = await updateHandler(retellingId, slideId, blockId, withQuestions, questions, required)
-            } catch (ex) {
-              toastr.error(ex.message)
-              $loader.css('display', 'none')
-              return
-            }
-
-            if (!json.success) {
-              toastr.error(json?.message || 'Ошибка')
-              $loader.css('display', 'none')
-              return
-            }
-
-            StoryEditor.updateSlideBlock(json.block_id, json.html);
-            toastr.success('Блок успешно изменен');
-
-            $modal.modal('hide')
+          const {storyId, slideId, blockId} = e.relatedTarget
+          const response = await fetch(`/admin/index.php?r=editor/load-retelling&story_id=${storyId}&slide_id=${slideId}&block_id=${blockId}`, {
+            method: 'get',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': $('meta[name=csrf-token]').attr('content')
+            },
           })
-      })
+          if (!response.ok) {
+            throw new Error('error')
+          }
+          const json = await response.json()
+          const {texts, withQuestions, questions, required, retellingId} = json?.retelling || {}
 
-      $modal.modal('show', {storyId, slideId, blockId})
+          $updateModal.find('.retelling-slide-text').html(texts)
+          $updateModal.find('.retelling-with-questions').prop('checked', withQuestions)
+          if (withQuestions) {
+            $updateModal.find('.retelling-questions-generate').toggle()
+          }
+          $updateModal.find('.retelling-questions').html(questions)
+          $updateModal.find('.retelling-required').prop('checked', required)
+
+          $updateModal
+            .find('.retelling-action')
+            .on('click', async (e) => {
+
+              const withQuestions = $updateModal.find('.retelling-with-questions').is(':checked')
+              const required = $updateModal.find('.retelling-required').is(':checked')
+
+              let questions = ''
+              if (withQuestions) {
+                questions = $updateModal
+                  .find('.retelling-questions')
+                  .text()
+                  .replace(/```\n?|```/g, '')
+                  .trim()
+              }
+
+              if (withQuestions && !questions.length) {
+                alert('Нет вопросов')
+                return
+              }
+
+              $loader.css('display', 'flex')
+
+              let json
+              try {
+                json = await updateHandler(retellingId, slideId, blockId, withQuestions, questions, required)
+              } catch (ex) {
+                toastr.error(ex.message)
+                $loader.css('display', 'none')
+                return
+              }
+
+              if (!json.success) {
+                toastr.error(json?.message || 'Ошибка')
+                $loader.css('display', 'none')
+                return
+              }
+
+              StoryEditor.updateSlideBlock(json.block_id, json.html);
+              toastr.success('Блок успешно изменен');
+
+              $updateModal.modal('hide')
+            })
+        })
+
+      $updateModal.modal('show', {storyId, slideId, blockId})
     }
   }
 })()
