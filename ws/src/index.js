@@ -8,8 +8,8 @@ import { onConnection } from './socket_io/onConnection.js'
 import 'dotenv/config'
 
 const credentials = {
-  key: readFileSync(import.meta.dirname + '/../cert/frontend.key'),
-  cert: readFileSync(import.meta.dirname + '/../cert/frontend.crt')
+  key: readFileSync(import.meta.dirname + '/../cert/' + process.env.SSL_KEY_FILENAME),
+  cert: readFileSync(import.meta.dirname + '/../cert/' + process.env.SSL_CERT_FILENAME)
 };
 
 const app = express();

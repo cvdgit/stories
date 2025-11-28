@@ -5,6 +5,7 @@ services:
             dockerfile: ./Dockerfile
         volumes:
             - .:/app
+            - '${CERT_PATH}:/app/cert'
         working_dir: /app
         restart: unless-stopped
         ports:
