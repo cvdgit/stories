@@ -1,5 +1,8 @@
+version: "3.5"
 services:
-    wikids-ws:
+    wikidsws:
+        container_name: "wikidsws"
+        restart: "always"
         build:
             context: .
             dockerfile: ./Dockerfile
