@@ -58,7 +58,7 @@ use yii\helpers\Url;
         <?php else: ?>
         <div class="col-md-9">
             <div class="story-container">
-                <div class="story-container-inner" id="story-container">
+                <div class="story-container-inner" id="story-container" style="position: relative">
                     <div class="story-no-subscription"><span class="story-loader">Загрузка истории...</span></div>
                 </div>
             </div>

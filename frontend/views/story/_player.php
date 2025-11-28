@@ -6,8 +6,6 @@ use common\rbac\UserRoles;
 use common\widgets\Reveal\Plugins\Retelling;
 use common\widgets\Reveal\Plugins\SlideLinks;
 use common\widgets\Reveal\Plugins\Video;
-use common\widgets\RevealButtons\RetellingAnswersButton;
-use common\widgets\RevealButtons\RetellingButton;
 use frontend\assets\PlyrAsset;
 use frontend\assets\RecorderAsset;
 use frontend\widgets\FrontendRevealWidget;
@@ -22,6 +20,7 @@ use yii\web\View;
  * @var bool $saveStat
  * @var array $completedRetelling
  * @var array $contentMentalMaps
+ * @var int $userId
  */
 
 MainAsset::register($this);
@@ -80,6 +79,14 @@ $plugins = [
     ['class' => Retelling::class, 'storyId' => $model->id],
     ['class' => \common\widgets\Reveal\Plugins\ContentMentalMap::class, 'storyId' => $model->id, 'mentalMaps' => $contentMentalMaps],
 ];
+
+if ($model->isScreenRecorder()) {
+    $plugins[] = [
+        'class' => \common\widgets\Reveal\Plugins\ScreenRecorderPlugin::class,
+        'storyId' => $model->id,
+        'userId' => $userId,
+    ];
+}
 
 if (Yii::$app->request->get('from_game') === null) {
     $plugins[] = ['class' => \common\widgets\Reveal\Plugins\SlideState::class, 'storyID' => $model->id];

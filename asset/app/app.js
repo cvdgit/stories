@@ -1,6 +1,7 @@
 import {fetchEventSource} from '@microsoft/fetch-event-source';
 import {applyPatch} from "fast-json-patch";
 import { v4 as uuidv4 } from 'uuid';
+import io from 'socket.io-client'
 
 window.sendEventSourceMessage = async function ({
                                                   url,
@@ -126,3 +127,5 @@ window.MicrophoneChecker = (function () {
     }
   }
 })()
+
+window.io = io;

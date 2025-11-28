@@ -49,6 +49,7 @@ use yii\db\ActiveQuery;
  * @property int $have_neo_relation
  * @property int $access_by_link
  * @property int $is_ai
+ * @property int $is_screen_recorder
  *
  * @property User $author
  * @property Tag[] $tags
@@ -112,7 +113,7 @@ class Story extends ActiveRecord
             [['title'], 'trim'],
             [['body', 'cover', 'story_file', 'source_dropbox', 'source_powerpoint'], 'string'],
             [['user_id', 'sub_access', 'source_id', 'views_number', 'slides_number', 'audio', 'published_at'], 'integer'],
-            [['video', 'user_audio', 'episode', 'access_by_link'], 'integer'],
+            [['video', 'user_audio', 'episode', 'access_by_link', 'is_screen_recorder'], 'integer'],
             [['title', 'alias'], 'string', 'max' => 255],
             [['alias'], 'unique'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
@@ -150,6 +151,7 @@ class Story extends ActiveRecord
             'story_playlists' => 'Плейлисты',
             'published_at' => 'Дата публикации истории',
             'access_by_link' => 'Доступ по ссылке',
+            'is_screen_recorder' => 'Включить запись экрана',
         ];
     }
 
@@ -868,5 +870,10 @@ class Story extends ActiveRecord
     public function setIsAI(bool $value = true): void
     {
         $this->is_ai = $value === true ? 1 : 0;
+    }
+
+    public function isScreenRecorder(): bool
+    {
+        return (int) $this->is_screen_recorder === 1;
     }
 }

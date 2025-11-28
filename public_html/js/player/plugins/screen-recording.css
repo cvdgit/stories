@@ -1,0 +1,68 @@
+.screen-recording-overlay {
+  position: absolute;
+  background-color: white;
+  left: 0;
+  gap: 20px;
+  top: 0;
+  right: 0;
+  align-items: center;
+  justify-content: center;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+}
+
+.screen-recording-overlay.recording {
+  transition: all 200ms;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -50px;
+  height: auto;
+  bottom: unset;
+  right: unset;
+  width: auto;
+}
+
+.screen-recording-overlay.recording p,
+.screen-recording-overlay.recording .start-screen-recording {
+  display: none !important;
+}
+
+.screen-recording-overlay.recording .stop-screen-recording-wrap {
+  display: flex !important;
+}
+
+.start-screen-recording {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 200ms;
+}
+
+.start-screen-recording.pending img {
+  display: block !important;
+}
+
+.stop-screen-recording-wrap {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  border-radius: 10px;
+  background-color: #eee;
+  padding: 10px 20px;
+}
+
+.stop-screen-recording {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 200ms;
+}
+
+.stop-screen-recording.pending img {
+  display: block !important;
+}

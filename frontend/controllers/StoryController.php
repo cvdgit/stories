@@ -466,6 +466,7 @@ class StoryController extends Controller
             'saveStat' => $this->countersService->needUpdateCounters(),
             'completedRetelling' => $completedRetelling,
             'contentMentalMaps' => array_values($contentMentalMaps),
+            'userId' => $user->getId(),
         ]);
     }
 

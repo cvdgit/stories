@@ -57,6 +57,7 @@ $values = implode("\n", $values);
 ]) ?>
 
 <?= $form->field($model, 'sub_access')->checkBox() ?>
+<?= $form->field($model, 'is_screen_recorder')->checkBox() ?>
 <?= $form->field($model, 'tagNames')->widget(SelectizeTextInput::class, [
     'loadUrl' => ['tag/list'],
     'options' => ['class' => 'form-control'],
