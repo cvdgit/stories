@@ -177,7 +177,7 @@ export function ThreadProvider({children}) {
       },
       async (accumulatedMessage) => {
         setIsStreaming(false);
-        const json = JSON.parse(accumulatedMessage);
+        const json = processOutputAsJson(accumulatedMessage);
 
         saveMessages(threadId);
 

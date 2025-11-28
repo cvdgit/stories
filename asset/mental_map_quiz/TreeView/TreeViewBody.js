@@ -39,7 +39,7 @@ function createRow(node, level = 0, isPlanTreeView = false) {
 
   row.innerHTML = `<div class="node-status"></div>
 <div class="node-body">
-<div class="node-title">${node.title}</div>
+<div class="node-title">${node.title.replace(/\r?\n/g, "\r\n")}</div>
 <div class="node-voice-response">
     <div>
         <span class="final_span"></span>
