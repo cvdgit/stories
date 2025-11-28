@@ -9,6 +9,7 @@ services:
         volumes:
             - .:/app
             - '${CERT_PATH}:/app/cert'
+            - '/app/node_modules'
         working_dir: /app
         ports:
             - "4000:4000"
