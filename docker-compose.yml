@@ -48,11 +48,6 @@ services:
     networks:
         - gpt-network
 
-  site-ws:
-    extends:
-      file: ws/compose.yml
-      service: wikids-ws
-
 volumes:
     site-mysql-volume:
 
