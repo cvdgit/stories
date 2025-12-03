@@ -19,11 +19,15 @@
   transition: all 200ms;
   left: 50%;
   transform: translateX(-50%);
-  top: -50px;
+  top: -60px;
   height: auto;
   bottom: unset;
   right: unset;
   width: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
 }
 
 .screen-recording-overlay.recording p,
@@ -150,4 +154,10 @@
   width: 20px;
   height: 20px;
   color: red;
+}
+
+.screen-recording-overlay.recording .ws-status {
+  position: relative;
+  left: auto;
+  top: auto;
 }
