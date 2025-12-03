@@ -280,8 +280,8 @@ ${video.status === 'process' ? '<div class="videos-video-process"><img src="/img
         throw new Error('*** getDisplayMedia not supported')
       }
 
-      let voiceStream = 'unavailable';
-      /*if (navigator.mediaDevices.getUserMedia) {
+      let voiceStream;
+      if (navigator.mediaDevices.getUserMedia) {
         if (screenStream) {
           try {
             voiceStream = await navigator.mediaDevices.getUserMedia({
@@ -295,7 +295,7 @@ ${video.status === 'process' ? '<div class="videos-video-process"><img src="/img
         }
       } else {
         console.warn('*** getUserMedia not supported')
-      }*/
+      }
 
       if (!screenStream) {
         throw new Error('*** no screen stream')
