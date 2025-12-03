@@ -208,7 +208,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
 
   const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
 
-  function mapImageClickHandler({image, texts, historyItem, rewritePrompt, threshold, dialogHideHandler, fastMode, hideFragmentText, settingsPromptId}) {
+  function mapImageClickHandler({image, texts, historyItem, rewritePrompt, threshold, dialogHideHandler, fastMode, hideFragmentText, settingsPromptId, detailParams}) {
     const text = texts.find(t => t.id === image.id)
 
     let hideText = hideFragmentText;
@@ -253,7 +253,8 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
           userResponse: detailContainer.querySelector('#result_span').innerText.trim()
         }))
       },
-      hideText
+      hideText,
+      detailParams
     })
     const dialog = new InnerDialog($(container), {title: 'Перескажите текст', content: detailContainer});
     dialog.show(wrapper => {
@@ -264,7 +265,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         return false
       })
 
-      $(wrapper).find('.result-item-value').tooltip()
+      $(wrapper).find('.bs-tooltip').tooltip();
 
       $(wrapper).find(`#voice-lang`).val(langStore.get())
 
@@ -420,7 +421,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         return false
       })
 
-      $(wrapper).find('.result-item-value').tooltip()
+      $(wrapper).find('.bs-tooltip').tooltip()
 
       $(wrapper).find(`#voice-lang`).val(langStore.get())
 
@@ -597,15 +598,6 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
           .catch(error => this.element.appendChild(createNoMicrophoneElement(error.name + ': ' + error.message)));
       }
 
-      /*await navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-        .then(function(stream) {
-          stream.getTracks().forEach(track => track.stop());
-        })
-        .catch(err=> {
-          //console.log('Микрофон недоступен:', err.name, err.message);
-          this.element.appendChild(createNoMicrophoneElement(err.name + ': ' + err.message))
-        });*/
-
     } catch (ex) {
       container.innerText = ex.message
       loader.remove()
@@ -720,7 +712,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
       }
     }
 
-    container.appendChild(AllTexts(texts, json.map.images, history, (image) => {
+    container.appendChild(AllTexts(texts, json.map.images, history, (image, detailParams) => {
 
       const historyItem = history.find(h => h.id === image.id)
       const questionItem = mapQuestions.findQuestion(image.id)
@@ -746,7 +738,8 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         dialogHideHandler: () => fragmentDialogHideHandler(image, historyItem),
         fastMode,
         hideFragmentText,
-        settingsPromptId
+        settingsPromptId,
+        detailParams
       })
     }, mapQuestions.typeIsMentalMapQuestions()))
 
@@ -767,7 +760,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         `${json.map.width}px`,
         `${json.map.height}px`,
         json.map.images,
-        (image) => {
+        (image, detailParams) => {
           element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
 
           const historyItem = history.find(h => h.id === image.id)
@@ -815,7 +808,8 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
             },
             fastMode,
             hideFragmentText,
-            settingsPromptId
+            settingsPromptId,
+            detailParams
           })
         },
         mentalMapHistory,
@@ -904,7 +898,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
     this.element.appendChild(toolbar)
     this.element.appendChild(container)
 
-    $('.result-item-value').tooltip()
+    $('.bs-tooltip').tooltip()
 
     if (imageFirst) {
 
@@ -913,7 +907,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         `${json.map.width}px`,
         `${json.map.height}px`,
         json.map.images,
-        (image) => {
+        (image, detailParams) => {
 
           element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
 
@@ -962,7 +956,8 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
             },
             fastMode,
             hideFragmentText,
-            settingsPromptId
+            settingsPromptId,
+            detailParams
           })
         },
         mentalMapHistory,

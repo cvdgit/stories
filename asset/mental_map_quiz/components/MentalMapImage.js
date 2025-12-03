@@ -1,5 +1,6 @@
 import tippy from "tippy.js";
 import 'tippy.js/dist/tippy.css';
+import {buttons} from '../words'
 
 function findBgClassName(bg) {
   if (!bg || bg === '') {
@@ -68,8 +69,29 @@ export default function MentalMapImage(
       mapImgWrap.dataset.container = '.story-container'
       mapImgWrap.dataset.content = image.text.replace(/<[^>]*>?/gm, '')
       mapImgWrap.setAttribute('title', '')*/
+
+      const tip = document.createElement('div');
+      tip.style.fontSize = '2.4rem';
+      tip.style.lineHeight = '3rem';
+      tip.style.display = 'flex';
+      tip.style.flexDirection = 'column';
+      tip.innerHTML = `<div>${image.text.replace(/<[^>]*>?/gm, '')}</div><div class="hide-buttons-container">Скрыть текст:</div>`;
+
+      buttons.map(({name, percentage}) => {
+        const btn = document.createElement('button');
+        btn.classList.add('hide-words-btn', 'bs-tooltip');
+        btn.style.color = '#000';
+        btn.setAttribute('type', 'button');
+        btn.innerHTML = name;
+        btn.setAttribute('data-trigger', 'hover');
+        btn.setAttribute('data-container', 'body');
+        btn.setAttribute('title', `Скрыть текст на ${percentage}%`);
+        btn.addEventListener('click', e => imageClickHandler(image, {percentage}));
+        tip.querySelector('.hide-buttons-container').appendChild(btn);
+      });
+
       tippy(mapImgWrap, {
-        content: `<div style="font-size: 2.4rem; line-height: 3rem;">${image.text.replace(/<[^>]*>?/gm, '')}</div>`,
+        content: tip,
         interactive: true,
         allowHTML: true,
         maxWidth: '50em',

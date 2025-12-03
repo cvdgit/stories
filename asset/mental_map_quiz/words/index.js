@@ -164,3 +164,11 @@ export function hideWordsEven(words) {
   hideWords(el.querySelectorAll('.text-item-word'), words)
   return getTextBySelections(words)
 }
+
+export const buttons = [
+  {name: '20', percentage: 20},
+  {name: '40', percentage: 40},
+  {name: '60', percentage: 60},
+  {name: '80', percentage: 80},
+  {name: '100', percentage: 100}
+];

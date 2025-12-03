@@ -1,10 +1,13 @@
+export default function DetailTextActions(clickHandler, promptBtn, hideTextBlock) {
 
-export default function DetailTextActions(clickHandler, promptBtn) {
   const detailTextActions = document.createElement('div')
   detailTextActions.classList.add('detail-text-actions')
+  detailTextActions.innerHTML = `<div class="left-buttons"></div><div class="right-buttons"></div>`;
 
   if (promptBtn) {
-    detailTextActions.appendChild(promptBtn)
+    detailTextActions
+      .querySelector('.right-buttons')
+      .appendChild(promptBtn);
   }
 
   if (typeof clickHandler === 'function') {
@@ -12,7 +15,16 @@ export default function DetailTextActions(clickHandler, promptBtn) {
     randBtn.setAttribute('type', 'button')
     randBtn.textContent = 'Закрыть текст'
     randBtn.addEventListener('click', clickHandler)
-    detailTextActions.appendChild(randBtn)
+    detailTextActions
+      .querySelector('.right-buttons')
+      .appendChild(randBtn);
   }
+
+  if (hideTextBlock) {
+    detailTextActions
+      .querySelector('.left-buttons')
+      .appendChild(hideTextBlock);
+  }
+
   return detailTextActions
 }

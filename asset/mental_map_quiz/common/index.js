@@ -19,3 +19,5 @@ export function stripTags(html) {
   div.innerHTML = html;
   return div.textContent || div.innerText || '';
 }
+
+export const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ");

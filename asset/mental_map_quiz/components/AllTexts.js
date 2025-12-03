@@ -1,5 +1,6 @@
 import FragmentResultElement from "./FragmentResultElement";
 import FragmentResultQuestionsElement from "../content/FragmentResultQuestionsElement";
+import {buttons} from "../words";
 
 export function appendAllTextWordElements(words, container) {
   words.map(word => {
@@ -20,6 +21,27 @@ export function appendAllTextWordElements(words, container) {
   })
 }
 
+function createHideButtons(buttons, clickHandler) {
+  const wrap = document.createElement('div');
+  wrap.style.display = 'flex';
+  wrap.style.flexDirection = 'row';
+  wrap.style.gap = '10px';
+  wrap.style.fontSize = '22px';
+  wrap.style.lineHeight = '28px';
+  buttons.map(({name, percentage}) => {
+    const btn = document.createElement('button');
+    btn.classList.add('hide-words-btn', 'bs-tooltip');
+    btn.setAttribute('type', 'button');
+    btn.innerHTML = name;
+    btn.setAttribute('data-trigger', 'hover');
+    btn.setAttribute('data-container', 'body');
+    btn.setAttribute('title', `Скрыть текст на ${percentage}%`);
+    btn.addEventListener('click', e => clickHandler(percentage));
+    wrap.appendChild(btn);
+  });
+  return wrap;
+}
+
 export default function AllTexts(texts, images, history, imageClickHandler, isMentalMapQuestions) {
   const list = document.createElement('div')
   list.classList.add('mental-map-all-text-container')
@@ -30,13 +52,18 @@ export default function AllTexts(texts, images, history, imageClickHandler, isMe
 
     const imageItem = document.createElement('div')
     imageItem.classList.add('image-item')
+    imageItem.style.width = 'auto';
+    imageItem.style.maxWidth = '300px';
+    imageItem.style.gap = '15px';
+    imageItem.style.justifyContent = 'center';
+    imageItem.style.alignItems = 'center';
 
     const image = images.find(i => i.id === textState.id)
     item.dataset.imageFragmentId = image.id
 
     if (image.url) {
       const img = document.createElement('img')
-      img.style.marginBottom = '10px'
+      //img.style.marginBottom = '10px'
       img.src = image.url
       img.style.cursor = 'pointer'
       img.addEventListener('click', e => {
@@ -45,7 +72,7 @@ export default function AllTexts(texts, images, history, imageClickHandler, isMe
       imageItem.appendChild(img)
     } else {
       const div = document.createElement('div')
-      div.style.marginBottom = '10px'
+      //div.style.marginBottom = '10px'
       //div.style.padding = '20px'
       div.style.cursor = 'pointer'
       div.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -57,6 +84,8 @@ export default function AllTexts(texts, images, history, imageClickHandler, isMe
       })
       imageItem.appendChild(div)
     }
+
+    imageItem.appendChild(createHideButtons(buttons, (percentage) => imageClickHandler(image, {percentage})));
 
     const historyItem = history.find(h => h.id === image.id)
     imageItem.appendChild(isMentalMapQuestions ? FragmentResultQuestionsElement(historyItem) : FragmentResultElement(historyItem))

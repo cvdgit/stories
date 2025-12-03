@@ -1,8 +1,9 @@
 import {calcHiddenTextPercent, calcTargetTextPercent} from "../words";
 import FragmentResultElement from "../components/FragmentResultElement";
 import RewritePromptBtn, {createUpdatePromptContent, saveRewritePrompt} from "../components/RewritePromptBtn";
+import DetailText from "../components/DetailText";
 
-function DetailTextActions(clickHandler, promptBtn) {
+/*function DetailTextActions(clickHandler, promptBtn) {
   const detailTextActions = document.createElement('div')
   detailTextActions.classList.add('detail-text-actions')
   const randBtn = document.createElement('button')
@@ -14,9 +15,9 @@ function DetailTextActions(clickHandler, promptBtn) {
   }
   detailTextActions.appendChild(randBtn)
   return detailTextActions
-}
+}*/
 
-function DetailText(text, itemClickHandler, afterRandCallback, promptBtn) {
+/*function DetailText(text, itemClickHandler, afterRandCallback, promptBtn) {
   const detailText = document.createElement('div')
   detailText.classList.add('detail-text')
 
@@ -82,9 +83,9 @@ function DetailText(text, itemClickHandler, afterRandCallback, promptBtn) {
   })
 
   return detailText
-}
+}*/
 
-export default function DetailContent({image, text, historyItem, rewritePrompt, itemClickHandler, diffClickHandler, hideText}) {
+export default function DetailContent({image, text, historyItem, rewritePrompt, itemClickHandler, diffClickHandler, hideText, detailParams}) {
 
   const detailImgWrap = document.createElement('div')
   detailImgWrap.classList.add('image-item')
@@ -131,14 +132,13 @@ export default function DetailContent({image, text, historyItem, rewritePrompt, 
     detailText.style.lineHeight = '2.6rem'
     detailText.style.marginBottom = '10px'
     detailText.style.color = '#808080'
-  }
-  else {
+  } else {
     detailText = DetailText(text, () => {
       itemClickHandler(recordingWrap)
     }, () => {
       recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
       recordingWrap.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%'
-    }, promptBtn)
+    }, promptBtn, detailParams)
   }
   detailTextWrap.appendChild(detailText)
 

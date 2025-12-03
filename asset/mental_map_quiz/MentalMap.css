@@ -90,7 +90,7 @@
 
 .mental-map-hide-btn {
   position: absolute;
-  right: 0;
+  right: 10px;
   top: 70px;
 }
 
@@ -103,7 +103,7 @@
 .mental-map-fast-wrap label {
   font-size: 2rem;
   line-height: 2.4rem;
-  padding: 10px;
+  padding: 10px 0;
   display: flex;
   align-items: center;
 }
@@ -118,9 +118,10 @@
   display: flex;
   flex-direction: column;
   max-height: 100%;
-  padding: 10px;
+  gap: 20px;
   overflow-y: auto;
   text-align: left;
+  padding-top: 20px;
 }
 
 .mental-map-all-text-container .selected {
@@ -130,7 +131,6 @@
 .text-container-row {
   display: flex;
   flex-direction: row;
-  margin-bottom: 10px;
   column-gap: 20px;
 }
 
@@ -145,6 +145,7 @@
 }
 
 .image-item svg {
+  width: 150px;
   max-width: 160px;
 }
 
@@ -253,8 +254,10 @@
 }
 
 .detail-text-actions {
-  text-align: right;
   margin-bottom: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .zoom-container {
@@ -269,8 +272,8 @@
 
 .mental-map-close {
   position: absolute;
-  right: 0;
-  top: 0;
+  right: 10px;
+  top: 10px;
 }
 
 .result-item {
@@ -396,4 +399,12 @@
   justify-content: center;
   background-color: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(4px);
+}
+
+.hide-buttons-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-top: 20px;
+  align-items: center;
 }
