@@ -52,15 +52,15 @@ export default function DetailText(text, itemClickHandler, afterRandCallback, pr
 
   function hideWordsByPercentage(percentage) {
 
-    detailText.querySelectorAll('.text-item-word.selected')
+    detailText.querySelectorAll('.text-item-word.selected:not(.word-target)')
       .forEach(node => node.classList.remove('selected'));
 
     text.words
-      .filter(w => w.type === 'word')
+      .filter(w => w.type === 'word' && !w.target)
       .map(w => w.hidden = false);
 
     const words = text.words
-      .filter(w => w.type === 'word')
+      .filter(w => w.type === 'word' && !w.target)
       .filter(w => removePunctuation(stripTags(w.word)).trim().length > 1);
 
     const totalWords = words.length;
@@ -127,7 +127,9 @@ export default function DetailText(text, itemClickHandler, afterRandCallback, pr
       name: '100', percentage: 100, clickHandler: (percentage) => {
         detailText.querySelectorAll('.text-item-word:not(.selected)')
           .forEach(node => node.classList.add('selected'));
-        text.words.map(w => w.hidden = true);
+        text.words
+          .filter(w => w.type === 'word')
+          .map(w => w.hidden = true);
         afterRandCallback();
       }
     }
@@ -178,7 +180,15 @@ export default function DetailText(text, itemClickHandler, afterRandCallback, pr
 
   const {percentage} = detailParams || {};
   if (percentage) {
-    hideWordsByPercentage(percentage);
+    if (percentage === 100) {
+      detailText.querySelectorAll('.text-item-word:not(.selected)')
+        .forEach(node => node.classList.add('selected'));
+      text.words
+        .filter(w => w.type === 'word')
+        .map(w => w.hidden = true);
+    } else {
+      hideWordsByPercentage(percentage);
+    }
   }
 
   return detailText
