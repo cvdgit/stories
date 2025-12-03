@@ -111,3 +111,43 @@
   width: 50px;
   height: 50px;
 }
+
+.ws-status {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  display: flex;
+  background-color: #eeeeee;
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 14px;
+  transition: all 200ms;
+}
+
+.ws-status.ws-status-loading .ws-loading,
+.ws-status.ws-status-connect .ws-connect,
+.ws-status.ws-status-disconnect .ws-disconnect {
+  display: flex;
+}
+
+.ws-loading, .ws-connect, .ws-disconnect {
+  display: none;
+}
+
+.ws-loading, .ws-disconnect {
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+}
+
+.ws-connect svg {
+  width: 20px;
+  height: 20px;
+  color: green;
+}
+
+.ws-disconnect svg {
+  width: 20px;
+  height: 20px;
+  color: red;
+}

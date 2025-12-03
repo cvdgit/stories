@@ -103,37 +103,94 @@
     }
   }
 
+  function resetWsStatus(elem) {
+    [
+      'ws-status-loading',
+      'ws-status-connect',
+      'ws-status-disconnect'
+    ].map(className => $(elem).removeClass(className))
+  }
+
+  function wsStatusLoading(elem) {
+    resetWsStatus(elem);
+    $(elem).addClass('ws-status-loading');
+  }
+
+  function wsStatusConnected(elem) {
+    resetWsStatus(elem);
+    $(elem).addClass('ws-status-connect');
+  }
+
+  function wsStatusDisconnect(elem) {
+    resetWsStatus(elem);
+    $(elem).addClass('ws-status-disconnect');
+  }
+
   Reveal.addEventListener('ready', () => {
 
-    const $overlay = $(
-      `<div class="screen-recording-overlay">
-          <p style="font-size: 24px; line-height: 30px">Перед прохождением истории нужно разрешить запись экрана</p>
-          <p class="screen-recording-error-wrap" style="font-size: 24px; line-height: 30px; color: #dc3545; display: none">
-            <strong class="screen-recording-error"></strong>
-          </p>
-          <div class="start-screen-recording-wrap" style="display: flex; flex-direction: row; gap: 10px; align-items: center">
-          <button class="start-screen-recording btn" type="button">
-            Начать запись экрана <img alt="..." style="width: 20px; display: none" src="/img/loading.gif" />
-          </button>
-          <a class="show-screen-records" href="">Записи</a>
-</div>
-
-          <div class="stop-screen-recording-wrap" style="display: none">
-            <span>Идет запись... </span>
-            <span class="screen-recorder-timer">00:00:00</span>
-            <button class="stop-screen-recording btn btn-sm" type="button">
-              Стоп <img alt="..." style="width: 20px; display: none" src="/img/loading.gif" />
-            </button>
-            <a class="show-screen-records" href="">Записи</a>
-          </div>
-
-      </div>`
-    )
+    const $overlay = $(`<div class="screen-recording-overlay">
+    <div class="ws-status ws-status-loading">
+        <div class="ws-loading"><img alt="..." style="width: 20px" src="/img/loading.gif"/> подключение...</div>
+        <div class="ws-connect" title="Подключено">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                 stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z"/>
+            </svg>
+        </div>
+        <div class="ws-disconnect" title="Не удалось подключиться к серверу">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                 stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M11.412 15.655 9.75 21.75l3.745-4.012M9.257 13.5H3.75l2.659-2.849m2.048-2.194L14.25 2.25 12 10.5h8.25l-4.707 5.043M8.457 8.457 3 3m5.457 5.457 7.086 7.086m0 0L21 21"/>
+            </svg>
+            ошибка подключения
+        </div>
+    </div>
+    <p style="font-size: 24px; line-height: 30px">Перед прохождением истории нужно разрешить запись экрана</p>
+    <p class="screen-recording-error-wrap" style="font-size: 24px; line-height: 30px; color: #dc3545; display: none">
+        <strong class="screen-recording-error"></strong>
+    </p>
+    <div class="start-screen-recording-wrap" style="display: flex; flex-direction: row; gap: 10px; align-items: center">
+        <button class="start-screen-recording btn" type="button" disabled>
+            Начать запись экрана <img alt="..." style="width: 20px; display: none" src="/img/loading.gif"/>
+        </button>
+        <a class="show-screen-records" href="">Записи</a>
+    </div>
+    <div class="stop-screen-recording-wrap" style="display: none">
+        <span>Идет запись... </span>
+        <span class="screen-recorder-timer">00:00:00</span>
+        <button class="stop-screen-recording btn btn-sm" type="button">
+            Стоп <img alt="..." style="width: 20px; display: none" src="/img/loading.gif"/>
+        </button>
+    </div>
+</div>`)
 
     let dataChunks = [];
     let mediaRecorder;
 
     const socket = io(config.ws_host);
+
+    socket.on("connect", (socket) => {
+      $overlay
+        .find('.start-screen-recording')
+        .removeAttr('disabled');
+      wsStatusConnected($overlay.find('.ws-status'));
+    });
+
+    socket.on("disconnect", (socket) => {
+      $overlay
+        .find('.start-screen-recording')
+        .prop('disabled', true);
+      wsStatusDisconnect($overlay.find('.ws-status'));
+    });
+
+    socket.on("connect_error", (socket) => {
+      $overlay
+        .find('.start-screen-recording')
+        .prop('disabled', true);
+      wsStatusDisconnect($overlay.find('.ws-status'));
+    });
 
     async function fetchVideos({wsHost, storyId, userId}) {
       const response = await fetch(`${wsHost}/getScreenVideos/${storyId}/${userId}`)
