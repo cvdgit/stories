@@ -55,7 +55,6 @@ export default function AllTexts(texts, images, history, imageClickHandler, isMe
     imageItem.style.width = 'auto';
     imageItem.style.maxWidth = '300px';
     imageItem.style.gap = '15px';
-    imageItem.style.justifyContent = 'center';
     imageItem.style.alignItems = 'center';
 
     const image = images.find(i => i.id === textState.id)
