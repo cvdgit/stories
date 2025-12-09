@@ -636,7 +636,7 @@ TEXT;
 
         try {
             $this->chatEventStream->send(
-                "retelling",
+                "retelling-rewrite",
                 Yii::$app->params["gpt.api.completions.host"],
                 Json::encode($fields),
             );
