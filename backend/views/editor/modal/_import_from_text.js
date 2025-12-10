@@ -3,7 +3,7 @@
   function createPage(scale, content) {
     const $page = $('<div/>', {
       class: 'page',
-      contenteditable: 'plaintext-only'
+      contenteditable: 'true'
     })
     $page.css({
       width: '1280px',
@@ -117,7 +117,7 @@
   })
 
   async function createSlides(storyId, slideId, texts) {
-    const response = await fetch(`/admin/index.php?r=editor/import-from-text&current_slide_id=${slideId}&story_id=${storyId}`, {
+    const response = await fetch(`/admin/index.php?r=editor/import-from-text&story_id=${storyId}${slideId ? `&current_slide_id=${slideId}` : ''}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -146,7 +146,7 @@
       return
     }
 
-    createSlides(StoryEditor.getConfigValue('storyID'), StoryEditor.getCurrentSlide().getID(), texts)
+    createSlides(StoryEditor.getConfigValue('storyID'), StoryEditor.getCurrentSlide()?.getID(), texts)
       .then(response => {
         if (response && response?.success) {
           StoryEditor.loadSlides(response?.slide_id)

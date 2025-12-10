@@ -383,7 +383,7 @@ class EditorController extends BaseController
     /**
      * @throws NotFoundHttpException
      */
-    public function actionImportFromText(int $story_id, int $current_slide_id, Request $request, Response $response)
+    public function actionImportFromText(int $story_id, Request $request, Response $response, int $current_slide_id = null): array
     {
         $response->format = Response::FORMAT_JSON;
 
@@ -392,9 +392,12 @@ class EditorController extends BaseController
             return ['success' => false, 'message' => 'История не найдена'];
         }
 
-        $currentSlideModel = StorySlide::findOne($current_slide_id);
-        if ($currentSlideModel === null) {
-            return ['success' => false, 'message' => 'Слайд не найден'];
+        $currentSlideModel = null;
+        if ($current_slide_id !== null) {
+            $currentSlideModel = StorySlide::findOne($current_slide_id);
+            if ($currentSlideModel === null) {
+                return ['success' => false, 'message' => 'Слайд не найден'];
+            }
         }
 
         $jsonBody = Json::decode($request->rawBody, false);
@@ -414,13 +417,18 @@ class EditorController extends BaseController
 
                     $index = 1;
                     foreach ($texts as $text) {
+
                         $slideModel = $this->storySlideService->create(
                             $storyModel->id,
                             'empty',
                             StorySlide::KIND_SLIDE,
                         );
-                        $slideModel->number = $currentSlideModel->number + $index;
-                        //Story::insertSlideNumber($storyModel->id, $currentSlideModel->number);
+
+                        $slideModel->number = $index;
+                        if ($currentSlideModel !== null) {
+                            $slideModel->number = $currentSlideModel->number + $index;
+                        }
+
                         if (!$slideModel->save()) {
                             throw new DomainException(
                                 'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
@@ -449,13 +457,15 @@ class EditorController extends BaseController
                         $index++;
                     }
 
-                    $command = Yii::$app->db->createCommand();
-                    $next = $currentSlideModel->number + count($texts) + 1;
-                    foreach ($slides as $slide) {
-                        if ($slide['number'] > $currentSlideModel->number) {
-                            $command->update('{{%story_slide}}', ['number' => $next], ['id' => $slide['id']]);
-                            $command->execute();
-                            $next++;
+                    if ($currentSlideModel !== null) {
+                        $command = Yii::$app->db->createCommand();
+                        $next = $currentSlideModel->number + count($texts) + 1;
+                        foreach ($slides as $slide) {
+                            if ($slide['number'] > $currentSlideModel->number) {
+                                $command->update('{{%story_slide}}', ['number' => $next], ['id' => $slide['id']]);
+                                $command->execute();
+                                $next++;
+                            }
                         }
                     }
                 },

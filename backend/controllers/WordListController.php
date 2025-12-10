@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\components\SlideModifier;
 use backend\components\StoryTextFormatter;
 use backend\components\WordListFormatter;
 use backend\forms\WordListForm;
@@ -145,7 +146,10 @@ class WordListController extends Controller
         throw new NotFoundHttpException('Список слов не найден');
     }
 
-    protected function findStoryModel($id)
+    /**
+     * @throws NotFoundHttpException
+     */
+    private function findStoryModel(int $id): Story
     {
         if (($model = Story::findOne($id)) !== null) {
             return $model;
@@ -153,19 +157,29 @@ class WordListController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
+    /**
+     * @throws NotFoundHttpException
+     */
     public function actionMakeFromStoryByProposals(int $story_id)
     {
         Yii::$app->response->format = Response::FORMAT_RAW;
-        $model = $this->findStoryModel($story_id);
-        $texts = $this->storyService->textFromStory($model);
+        $story = $this->findStoryModel($story_id);
+        $texts = $this->storyService->textFromStory(
+            SlideModifier::slidesToHTML($story->getSlidesWithLinkData())
+        );
         return (new StoryTextFormatter($texts))->formatByProposals();
     }
 
+    /**
+     * @throws NotFoundHttpException
+     */
     public function actionMakeFromStoryByWords(int $story_id)
     {
         Yii::$app->response->format = Response::FORMAT_RAW;
-        $model = $this->findStoryModel($story_id);
-        $texts = $this->storyService->textFromStory($model);
+        $story = $this->findStoryModel($story_id);
+        $texts = $this->storyService->textFromStory(
+            SlideModifier::slidesToHTML($story->getSlidesWithLinkData())
+        );
         return (new StoryTextFormatter($texts))->formatByWords();
     }
 

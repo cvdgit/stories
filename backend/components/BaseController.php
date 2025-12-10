@@ -14,9 +14,9 @@ class BaseController extends Controller
     /**
      * @template T
      * @param class-string<T> $modelClassName
-     * @throws NotFoundHttpException
+     * @return T|object
      * @throws InvalidConfigException
-     * @return T
+     * @throws NotFoundHttpException
      */
     public function findModel(string $modelClassName, $id): object
     {

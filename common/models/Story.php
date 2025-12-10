@@ -370,6 +370,20 @@ class Story extends ActiveRecord
         return $this->hasMany(StorySlide::class, ['story_id' => 'id'])->orderBy(['number' => SORT_ASC]);
     }
 
+    public function getSlidesWithLinkData(): array
+    {
+        $slides = StorySlide::find()
+            ->where(['story_id' => $this->id])
+            ->orderBy(['number' => SORT_ASC])
+            ->all();
+        return array_map(static function (StorySlide $slide): array {
+            return [
+                'id' => $slide->id,
+                'data' => $slide->getSlideOrLinkData(),
+            ];
+        }, $slides);
+    }
+
     public static function modifySlideData(int $id, string $data): string
     {
         $search = [
@@ -875,5 +889,10 @@ class Story extends ActiveRecord
     public function isScreenRecorder(): bool
     {
         return (int) $this->is_screen_recorder === 1;
+    }
+
+    public function haveCover(): bool
+    {
+        return $this->cover !== null;
     }
 }

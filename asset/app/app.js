@@ -129,3 +129,26 @@ window.MicrophoneChecker = (function () {
 })()
 
 window.io = io;
+
+window.sendStreamMessage = function(url, payload, onMessage, onEndCallback) {
+  let accumulatedMessage = ''
+  return sendEventSourceMessage({
+    url,
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'text/event-stream',
+      'X-CSRF-Token': $("meta[name=csrf-token]").attr('content')
+    },
+    body: JSON.stringify(payload),
+    onMessage: (streamedResponse) => {
+      if (Array.isArray(streamedResponse?.streamed_output)) {
+        accumulatedMessage = streamedResponse.streamed_output.join("");
+      }
+      onMessage(accumulatedMessage)
+    },
+    onError: (streamedResponse) => {
+      console.log(streamedResponse)
+    },
+    onEnd: () => onEndCallback(accumulatedMessage)
+  })
+}

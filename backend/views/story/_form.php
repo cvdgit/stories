@@ -1,15 +1,31 @@
 <?php
+
+declare(strict_types=1);
+
+use backend\assets\MainAsset;
+use backend\models\StoryCoverUploadForm;
+use backend\models\StoryFileUploadForm;
 use common\components\StoryCover;
+use common\models\Story;
 use yii\helpers\Html;
+use yii\web\View;
 use yii\widgets\ActiveForm;
 use common\models\User;
 use dosamigos\selectize\SelectizeTextInput;
 use vova07\imperavi\Widget;
-/** @var $this yii\web\View */
-/** @var $model common\models\Story */
-/** @var $form yii\widgets\ActiveForm */
-/** @var $fileUploadForm backend\models\StoryFileUploadForm */
-/** @var $coverUploadForm backend\models\StoryCoverUploadForm */
+
+/**
+ * @var View $this
+ * @var Story $model
+ * @var ActiveForm $form
+ * @var StoryFileUploadForm $fileUploadForm
+ * @var StoryCoverUploadForm $coverUploadForm
+ * @var bool $isNew
+ */
+
+MainAsset::register($this);
+$this->registerCss($this->renderFile('@backend/views/story/_gen_cover.css'));
+$this->registerJs($this->renderFile('@backend/views/story/_gen_cover.js'));
 ?>
 <?php $form = ActiveForm::begin(); ?>
 <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
@@ -28,13 +44,22 @@ use vova07\imperavi\Widget;
     ],
 ]); ?>
 <?= $form->field($coverUploadForm, 'coverFile')->fileInput() ?>
-<?php if (!empty($model->cover)): ?>
-<div class="row">
-    <div class="col-xs-6 col-md-3">
-        <a href="#" class="thumbnail"><img src="<?= StoryCover::getListThumbPath($model->cover) ?>" alt="..."></a>
-    </div>
+
+<?php if (!$isNew): ?>
+<div style="margin-block: 10px">
+    <?php if ($model->haveCover()): ?>
+        <a style="display: inline-flex" data-story-cover="<?= $model->cover === null ? '' : StoryCover::getSourceFilePath($model->cover) ?>" data-story-id="<?= $model->id ?>" href="" class="thumbnail gen-cover">
+            <img style="max-width: 350px;" src="<?= StoryCover::getListThumbPath($model->cover) ?>" alt="...">
+        </a>
+    <?php else: ?>
+        <a style="display: inline-flex; align-items: center; gap: 6px;" class="btn gen-cover" data-story-id="<?= $model->id ?>" data-story-cover="<?= $model->cover === null ? '' : StoryCover::getSourceFilePath($model->cover) ?>" href="">
+            <img width="30px" src="/img/chatgpt-icon.png" alt="">
+            Сгенерировать обложку
+        </a>
+    <?php endif ?>
 </div>
 <?php endif ?>
+
 <?= $form->field($fileUploadForm, 'storyFile')->fileInput() ?>
 <?= $form->field($model, 'user_id')->dropDownList(User::getUserList(), ['prompt' => 'Выбрать', 'disabled' => !Yii::$app->user->can('admin')]) ?>
 <?php

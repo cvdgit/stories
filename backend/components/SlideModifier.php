@@ -18,6 +18,7 @@ use backend\models\video\VideoSource;
 use backend\Retelling\Retelling;
 use common\helpers\Url;
 use common\models\SlideVideo;
+use common\models\StorySlide;
 use common\models\StorySlideImage;
 use common\models\StoryTest;
 use Exception;
@@ -341,5 +342,26 @@ class SlideModifier
             'blocks' => $blocks,
             'links' => $links,
         ];
+    }
+
+    public static function slidesToHTML(array $slides): string
+    {
+        $data = [];
+        foreach ($slides as $slide) {
+            $slideData = $slide['data'];
+            $search = [
+                'data-id=""',
+                'data-id="0"',
+                'data-background-color="#000000"',
+            ];
+            $replace = [
+                'data-id="' . $slide['id'] . '"',
+                'data-id="' . $slide['id'] . '"',
+                'data-background-color="#fff"',
+            ];
+            $slideData = str_replace($search, $replace, $slideData);
+            $data[] = $slideData;
+        }
+        return '<div class="slides">' . implode(PHP_EOL, $data) . '</div>';
     }
 }

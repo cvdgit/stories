@@ -51,7 +51,7 @@ class StoryController extends Controller
                 "create-trainer-story-from-text",
                 Yii::$app->params["gpt.api.completions.host"],
                 Json::encode(
-                    new Fields([new Message('user', $content)])
+                    new Fields([new Message('user', $content)]),
                 ),
             );
         } catch (Exception $ex) {
@@ -80,7 +80,7 @@ class StoryController extends Controller
                 "create-story-from-text",
                 Yii::$app->params["gpt.api.completions.host"],
                 Json::encode(
-                    new Fields([new Message('user', $content)])
+                    new Fields([new Message('user', $content)]),
                 ),
             );
         } catch (Exception $ex) {
@@ -104,5 +104,31 @@ class StoryController extends Controller
         ];
         echo 'data: ' . Json::encode($ops) . "\n\n";
         flush();
+    }
+
+    public function actionForCoverPrompt(Request $request): void
+    {
+        $payload = Json::decode($request->rawBody);
+        $text = $payload['text'];
+        $content = <<<TEXT
+Есть текст:
+<текст>
+$text
+</текст>
+Сформируй промт для DALL·E-3 что бы сгенерировать обложку, соответсвтующую этому тексту.
+Используй максимально простые и понятные формалировки.
+Верни только промт.
+TEXT;
+        try {
+            $this->chatEventStream->send(
+                "story-for-cover-prompt",
+                Yii::$app->params["gpt.api.completions.host"],
+                Json::encode(
+                    new Fields([new Message('user', $content)]),
+                ),
+            );
+        } catch (Exception $ex) {
+            Yii::$app->errorHandler->logException($ex);
+        }
     }
 }

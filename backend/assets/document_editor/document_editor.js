@@ -523,9 +523,9 @@ window.DocumentEditor = (function () {
     let pastedData = clipboardData.getData('Text')
     e.preventDefault()
 
-    pastedData = pastedData.replace(/\n/g, ' ')
+    /*pastedData = pastedData.replace(/\n/g, ' ')
       .trim()
-      .replace(/\s+/g, ' ')
+      .replace(/\s+/g, ' ')*/
 
     document.execCommand('insertHTML', false, pastedData)
   }

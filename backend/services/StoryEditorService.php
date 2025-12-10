@@ -407,19 +407,19 @@ class StoryEditorService
         return str_replace('data-src=', 'src=', $writer->renderBlock($block));
     }
 
-    public function textFromStory(Story $model): string
+    public function textFromStory(string $slidesData): string
     {
-        $reader = new HTMLReader($model->slidesData());
+        $reader = new HtmlSlideReader($slidesData);
         $story = $reader->load();
         $text = [];
-        foreach ($story->getSlides() as $slide) {
-            foreach ($slide->getBlocks() as $block) {
-                if ($block->getType() === AbstractBlock::TYPE_HEADER) {
-                    $text[] = $block->getText();
-                }
-                if ($block->getType() === AbstractBlock::TYPE_TEXT) {
-                    $text[] = $block->getText();
-                }
+        foreach ($story->getBlocks() as $block) {
+            if ($block->getType() === AbstractBlock::TYPE_HEADER) {
+                /** @var TextBlock $block */
+                $text[] = $block->getText();
+            }
+            if ($block->getType() === AbstractBlock::TYPE_TEXT) {
+                /** @var TextBlock $block */
+                $text[] = $block->getText();
             }
         }
         return implode(PHP_EOL, $text);

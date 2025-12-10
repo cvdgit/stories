@@ -18,6 +18,7 @@ class EventStream
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POSTFIELDS => $fieldsJson,
+            CURLOPT_CONNECTTIMEOUT => 0,
             CURLOPT_HTTPHEADER => [
                 "Content-Type: application/json",
                 "Accept: text/event-stream"

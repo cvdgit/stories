@@ -3,17 +3,25 @@
 namespace backend\controllers;
 
 use backend\components\BaseController;
+use backend\components\SlideModifier;
 use backend\models\StoryAccessByLinkForm;
 use backend\models\StoryBatchCommandForm;
 use backend\models\StoryEpisodeOrderForm;
 use backend\models\WordListFromStoryForm;
+use backend\services\ImageService;
 use backend\services\StoryEditorService;
+use common\components\StoryCover;
 use common\models\story\StoryStatus;
+use common\services\TransactionManager;
 use Exception;
 use Yii;
+use yii\base\InvalidConfigException;
+use yii\helpers\FileHelper;
+use yii\helpers\Json;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use yii\web\RangeNotSatisfiableHttpException;
+use yii\web\Request;
 use yii\web\Response;
 use yii\web\UploadedFile;
 use yii\filters\AccessControl;
@@ -30,16 +38,28 @@ class StoryController extends BaseController
 
     public $service;
     protected $editorService;
+    /**
+     * @var ImageService
+     */
+    private $imageService;
+    /**
+     * @var TransactionManager
+     */
+    private $transactionManager;
 
     public function __construct($id,
                                 $module,
                                 StoryService $service,
                                 StoryEditorService $editorService,
+                                ImageService $imageService,
+                                TransactionManager $transactionManager,
                                 $config = [])
     {
         $this->service = $service;
         $this->editorService = $editorService;
         parent::__construct($id, $module, $config);
+        $this->imageService = $imageService;
+        $this->transactionManager = $transactionManager;
     }
 
     public function behaviors()
@@ -275,26 +295,18 @@ class StoryController extends BaseController
         return $this->redirect(['update', 'id' => $model->id]);
     }
 
-    public function actionText(int $id)
+    /**
+     * @throws RangeNotSatisfiableHttpException|NotFoundHttpException|InvalidConfigException
+     */
+    public function actionText(int $id): void
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $model = Story::findModel($id);
-        $text = $this->editorService->textFromStory($model);
-        Yii::$app->response->sendContentAsFile($text, $model->alias. '.txt');
+        $story = $this->findModel(Story::class, $id);
+        $text = $this->editorService->textFromStory(
+            SlideModifier::slidesToHTML($story->getSlidesWithLinkData()),
+        );
+        Yii::$app->response->sendContentAsFile($text, $story->alias. '.txt');
     }
-
-/*    public function actionAutocomplite(string $query)
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        return (new Query())
-            ->select(['title', 'id', "IF(cover IS NULL, '/img/story-1.jpg', CONCAT('/slides_cover/list/', cover)) AS cover"])
-            ->from(Story::tableName())
-            ->where(['like', 'title', $query])
-            ->andWhere('status <> :status', [':status' => StoryStatus::TASK])
-            ->orderBy(['title' => SORT_ASC])
-            ->limit(30)
-            ->all();
-    }*/
 
     public function actionCancelPublication($id)
     {
@@ -374,5 +386,79 @@ class StoryController extends BaseController
         }
         //$response->sendContentAsFile(json_encode($allStories, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 'slides.json');
         $response->sendContentAsFile(implode("\n\n", $allStories), 'slides.txt');
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     * @throws InvalidConfigException
+     */
+    public function actionGetText(int $id, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+        $story = $this->findModel(Story::class, $id);
+        return [
+            'text' => $this->editorService->textFromStory(
+                SlideModifier::slidesToHTML($story->getSlidesWithLinkData()),
+            ),
+        ];
+    }
+
+    public function actionSetCover(Request $request, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+        $payload = Json::decode($request->rawBody);
+        $storyId = (int) $payload['storyId'];
+        $imageUrl = $payload['imageUrl'];
+
+        try {
+
+            $story = $this->findModel(Story::class, $storyId);
+            $savePath = Yii::getAlias('@public/upload/gen-images/' . $story->id);
+            FileHelper::createDirectory($savePath);
+            $imageFilePath = $this->imageService->downloadImage($imageUrl, $savePath);
+            if (!file_exists($imageFilePath)) {
+                throw new \DomainException('Download image error');
+            }
+
+            $coverFilePath = StoryCover::getCoverFolderPath(true) . DIRECTORY_SEPARATOR . basename($imageFilePath);
+            if (!copy($imageFilePath, $coverFilePath)) {
+                throw new \DomainException('Copy image error');
+            }
+
+            StoryCover::create($imageFilePath);
+
+            $story->cover = basename($imageFilePath);
+            if (!$story->save(false)) {
+                throw new \DomainException('Save cover error');
+            }
+
+            return ['success' => true];
+
+        } catch (Exception $ex) {
+            Yii::$app->errorHandler->logException($ex);
+            return ['success' => false, 'message' => $ex->getMessage()];
+        }
+    }
+
+    public function actionSaveImage(Request $request, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+        $payload = Json::decode($request->rawBody);
+        $storyId = (int) $payload['storyId'];
+        $imageUrl = $payload['imageUrl'];
+
+        try {
+            $story = $this->findModel(Story::class, $storyId);
+            $savePath = Yii::getAlias('@public/upload/gen-images/' . $story->id);
+            FileHelper::createDirectory($savePath);
+            $imageFilePath = $this->imageService->downloadImage($imageUrl, $savePath);
+            if (!file_exists($imageFilePath)) {
+                throw new \DomainException('Download image error');
+            }
+            return ['success' => true, 'url' => '/upload/gen-images/' . $story->id . '/' . basename($imageFilePath)];
+        } catch (Exception $exception) {
+            Yii::$app->errorHandler->logException($exception);
+            return ['success' => false, 'message' => $exception->getMessage()];
+        }
     }
 }

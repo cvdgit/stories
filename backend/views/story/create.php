@@ -1,9 +1,20 @@
 <?php
+
+declare(strict_types=1);
+
+use backend\models\StoryCoverUploadForm;
+use backend\models\StoryFileUploadForm;
+use common\models\Story;
 use yii\helpers\Html;
-/* @var $this yii\web\View */
-/* @var $model common\models\Story */
-/* @var $coverUploadForm backend\models\StoryCoverUploadForm */
-/* @var $fileUploadForm backend\models\StoryFileUploadForm */
+use yii\web\View;
+
+/**
+ * @var View $this
+ * @var Story $model
+ * @var StoryCoverUploadForm $coverUploadForm
+ * @var StoryFileUploadForm $fileUploadForm
+ */
+
 $this->title = 'Создание истории';
 $this->params['breadcrumbs'] = [
     ['label' => 'Список историй', 'url' => ['index']],
@@ -17,6 +28,7 @@ $this->params['breadcrumbs'] = [
 		    'model' => $model,
 		    'coverUploadForm' => $coverUploadForm,
 		    'fileUploadForm' => $fileUploadForm,
+            'isNew' => true,
 		]) ?>
 	</div>
 	<div class="col-xs-6"></div>

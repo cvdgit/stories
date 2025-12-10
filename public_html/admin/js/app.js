@@ -291,11 +291,16 @@ function sendForm(url, type, formData) {
   });
 }
 
-const SimpleModal = function({id, title}) {
+const SimpleModal = function({id, title, size}) {
+
+  const sizes = {
+    lg: 'modal-lg',
+    auto: ''
+  };
 
   const content = `
     <div class="modal rounded-0 fade" tabindex="-1" id="${id}" data-backdrop="static">
-      <div class="modal-dialog modal-lg">
+      <div class="modal-dialog ${size ? sizes[size] : sizes.lg}">
         <div class="modal-content">
           <div class="modal-header" style="display: flex; justify-content: space-between">
             <h5 class="modal-title" style="margin-right: auto">${title}</h5>
@@ -315,11 +320,19 @@ const SimpleModal = function({id, title}) {
 
   const element = $('body').find(`div#${id}`);
 
+  const eventHandlers = {};
+
   element
     .off('show.bs.modal')
-    .on('show.bs.modal', () => {});
+    .on('show.bs.modal', () => {
+      if (typeof eventHandlers['show'] === 'function') {
+        eventHandlers['show'].call(element.find('.modal-body'));
+      }
+    });
   //.off('hide.bs.modal');
   //.on('hide.bs.modal', hideCallback);
+
+  this.on = (event, handler) => eventHandlers[event] = handler;
 
   this.show = ({body}) => {
     element.find('.modal-body')

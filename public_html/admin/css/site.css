@@ -667,3 +667,57 @@ body {
   margin: 0 auto;
   max-width: 100%;
 }
+
+.composeInput {
+  height: 36px !important;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  color: #000;
+  font-size: 14px;
+  line-height: 20px;
+  padding: 8px;
+  background-color: transparent;
+  border-style: none;
+  resize: none;
+  flex: 1 1 0%;
+  max-height: 160px;
+}
+
+.compose {
+  animation-timing-function: cubic-bezier(.4, 0, 1, 1);
+  transition-timing-function: cubic-bezier(.4, 0, 1, 1);
+  transition-property: opacity;
+  transition-duration: .15s;
+  box-shadow: 0 0 #0000, 0 0 #0000, 0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px -1px rgba(0,0,0,.1);
+  color: hsl(0 0% 98%);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  padding: 8px;
+  background-color: hsl(0 0% 9%);
+  border-radius: 6px;
+  white-space: nowrap;
+  justify-content: center;
+  align-items: center;
+  display: inline-flex;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.composeForm {
+  animation-timing-function: cubic-bezier(.4, 0, .2, 1);
+  animation-duration: .3s;
+  transition-timing-function: cubic-bezier(.4, 0, .2, 1);
+  transition-duration: .3s;
+  transition-property: all;
+  box-shadow: 0 0 #0000, 0 0 #0000, 0 1px 2px 0 rgba(0,0,0,.05);
+  padding: 10px;
+  background-color: #eee;
+  border-color: rgb(75 85 99 / 1);
+  border-width: 1px;
+  border-radius: 8px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  display: flex;
+}

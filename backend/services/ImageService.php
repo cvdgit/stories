@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
 
 namespace backend\services;
 
 use backend\models\editor\CropImageForm;
 use common\models\StorySlideImage;
-use http\Exception\RuntimeException;
 use Yii;
+use yii\base\Exception;
 use yii\helpers\FileHelper;
 
 class ImageService
@@ -43,6 +44,9 @@ class ImageService
         return $command->execute();
     }
 
+    /**
+     * @throws Exception
+     */
     public function downloadImage(string $url, string $savePath): string
     {
         $savePath = FileHelper::normalizePath($savePath);
@@ -54,9 +58,17 @@ class ImageService
         curl_setopt($ch, CURLOPT_BINARYTRANSFER,1);
         curl_setopt($ch,CURLOPT_USERAGENT,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36');
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+
         $raw = curl_exec($ch);
+        if ($raw === false) {
+            $errorCode = curl_errno($ch);
+            $errorMessage = curl_error($ch);
+            throw new \RuntimeException("cURL Error (Code: {$errorCode}): {$errorMessage}");
+        }
+
         $info = curl_getinfo($ch);
         curl_close($ch);
 

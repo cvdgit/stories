@@ -31,7 +31,7 @@ class StoryCover
 		self::createStoryThumbnail($filePath);
 	}
 
-	public static function delete($cover)
+	public static function delete(string $cover): void
 	{
 		$coverPath = self::getSourceFilePath($cover, true);
 		if (file_exists($coverPath)) {
@@ -52,7 +52,7 @@ class StoryCover
 		return ($absolute ? Yii::getAlias('@public') : '') . '/' . Yii::$app->params['coverFolder'];
 	}
 
-	public static function getSourceFilePath($cover, $absolute = false): string
+	public static function getSourceFilePath(string $cover, bool $absolute = false): string
 	{
 		return self::getCoverFolderPath($absolute) . '/' . $cover;
 	}

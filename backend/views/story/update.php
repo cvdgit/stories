@@ -78,6 +78,7 @@ $this->params['sidebarMenuItems'] = [
 		    'model' => $model,
 		    'coverUploadForm' => $coverUploadForm,
 		    'fileUploadForm' => $fileUploadForm,
+            'isNew' => false,
 		]) ?>
 	</div>
 	<div class="col-md-6">
