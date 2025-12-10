@@ -136,7 +136,7 @@
   flex-direction: row;
 }
 
-.gen-modal.gen-image .gen-modal-actions .gen-create-image-wrap {
+.gen-modal.gen-image .gen-modal-actions .gen-create-image-buttons {
   display: none;
 }
 
