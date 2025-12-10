@@ -50,7 +50,7 @@ export default function TreeVoiceControl(
       }
 
       elem.querySelector('.gn').classList.add('disabled')
-      voiceResponse.start(new Event('voiceResponseStart'), 'ru-RU', function () {
+      voiceResponse.start(new Event('voiceResponseStart'), null, function () {
         //setTimeout(() => {
           elem.dataset.state = 'recording';
           elem.querySelector('.gn').classList.remove('disabled')

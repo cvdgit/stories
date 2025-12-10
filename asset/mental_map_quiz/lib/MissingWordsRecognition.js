@@ -5,7 +5,9 @@ export default function MissingWordsRecognition(config) {
 
   recorder.continuous = true;
   recorder.interimResults = true;
-  recorder.lang = config.getRecordingLang?.() || 'ru-RU'; // en-US
+
+  const configLang = config.getRecordingLang?.() || 'ru-RU';
+  recorder.lang = configLang; // en-US
 
   let recognizing = false;
   let startTimestamp = null;
@@ -120,8 +122,9 @@ export default function MissingWordsRecognition(config) {
       recorder.stop();
       return;
     }
+
     finalTranscript = '';
-    recorder.lang = lang
+    recorder.lang = lang || configLang;
     recorder.start();
     startTimestamp = event.timeStamp;
     targetElement = event.target;

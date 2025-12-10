@@ -16,7 +16,9 @@ export default function SettingsDialog({open, setOpen, mentalMapId, schedules}) 
   const scheduleElemId = useId()
   const thresholdElemId = useId()
   const promptElemId = useId()
+  const recognitionElemId = useId();
   const [promptId, setPromptId] = useState(state.settings?.promptId || '')
+  const [recognitionLang, setRecognitionLang] = useState(state.settings?.recognitionLang || '');
   const [prompts, setPrompts] = useState([])
 
   const isTreeView = Boolean(state.treeView)
@@ -153,6 +155,23 @@ export default function SettingsDialog({open, setOpen, mentalMapId, schedules}) 
               {prompts.map((p, i) => (
                 <option key={i} value={p.id}>{p.name}</option>
               ))}
+            </select>
+          </div>
+
+          <div style={{marginBottom: '20px'}}>
+            <label htmlFor={recognitionElemId} style={{display: 'block', marginBottom: '2px'}}>Язык распознавания:</label>
+            <select id={recognitionElemId} value={recognitionLang} onChange={(e) => {
+              setRecognitionLang(e.target.value);
+              settings.recognitionLang = e.target.value === '' ? null : String(e.target.value);
+              setSettings(settings);
+              dispatch({
+                type: 'update_settings',
+                payload: settings
+              });
+            }} style={{width: '100%', padding: '10px'}}>
+              <option value="">По умолчанию</option>
+              <option value="ru-RU">Русский</option>
+              <option value="en-US">Английский</option>
             </select>
           </div>
 

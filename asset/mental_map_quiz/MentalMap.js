@@ -592,7 +592,6 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
       responseJson = await params.init()
 
       if (microphoneChecker) {
-        console.log(microphoneChecker)
         microphoneChecker
           .check()
           .catch(error => this.element.appendChild(createNoMicrophoneElement(error.name + ': ' + error.message)));
@@ -629,7 +628,11 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         onMentalMapChange: progress => {
           mentalMapUserProgress = progress
         }
-      }, new VoiceResponse(new MissingWordsRecognition({})))
+      }, new VoiceResponse(new MissingWordsRecognition({
+        getRecordingLang() {
+          return (json.settings || {}).recognitionLang || 'ru-RU';
+        }
+      })))
 
       loader.remove()
       this.element.appendChild(treeViewInstance.getElement())
