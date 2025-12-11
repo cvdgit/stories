@@ -201,7 +201,7 @@
   function createBody() {
     return $(`<div class="gen-modal">
     <div class="gen-modal-content-wrap">
-        <div class="gen-images"></div>
+        <div class="gen-images"><p class="gen-no-images">Нет сгенерированных изображений</p></div>
         <div class="gen-cover-img-container">
             <div class="gen-loader-wrap"><p>Генерация изображения...</p>
                 <img style="width: 50px;" alt="..." src="/img/loading.gif"/>
@@ -268,6 +268,10 @@
       $body.removeClass('gen-error')
         .addClass('gen-loading');
 
+      if ($body.find('.gen-no-images').length) {
+        $body.find('.gen-no-images').remove();
+      }
+
       const dialog = document.getElementById('gen-cover-modal');
       dialog.scrollTop = dialog.scrollHeight;
 
@@ -300,6 +304,10 @@
       }
       $body.removeClass('gen-error')
         .addClass('gen-loading');
+
+      if ($body.find('.gen-no-images').length) {
+        $body.find('.gen-no-images').remove();
+      }
 
       $body.find('.gen-system-message').text(prompt);
       $body.find('.gen-create-prompt').text('');
@@ -343,6 +351,9 @@
     modal.on('show', async function () {
 
       const {success, images} = await fetchGenImages(storyId);
+      if (images.length) {
+        $body.find('.gen-images').empty();
+      }
       images.map(({url, key}) => {
         createImageItem({
           imageUrl: url,

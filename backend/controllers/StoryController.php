@@ -481,6 +481,9 @@ class StoryController extends BaseController
         $response->format = Response::FORMAT_JSON;
         $story = $this->findModel(Story::class, $id);
         $imagesPath = Yii::getAlias('@public/upload/gen-images/' . $story->id);
+        if (!is_dir($imagesPath)) {
+            return ['success' => true, 'images' => []];
+        }
         return [
             'success' => true,
             'images' => array_map(static function (string $fileName) use ($story): array {
