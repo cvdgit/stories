@@ -48,11 +48,11 @@ $this->registerJs($this->renderFile('@backend/views/story/_gen_cover.js'));
 <?php if (!$isNew): ?>
 <div style="margin-block: 10px">
     <?php if ($model->haveCover()): ?>
-        <a style="display: inline-flex" data-story-cover="<?= $model->cover === null ? '' : StoryCover::getSourceFilePath($model->cover) ?>" data-story-id="<?= $model->id ?>" href="" class="thumbnail gen-cover">
+        <a style="display: inline-flex" data-story-cover="<?= $model->cover ?? '' ?>" data-story-id="<?= $model->id ?>" href="" class="thumbnail gen-cover">
             <img style="max-width: 350px;" src="<?= StoryCover::getListThumbPath($model->cover) ?>" alt="...">
         </a>
     <?php else: ?>
-        <a style="display: inline-flex; align-items: center; gap: 6px;" class="btn gen-cover" data-story-id="<?= $model->id ?>" data-story-cover="<?= $model->cover === null ? '' : StoryCover::getSourceFilePath($model->cover) ?>" href="">
+        <a style="display: inline-flex; align-items: center; gap: 6px;" class="btn gen-cover" data-story-id="<?= $model->id ?>" data-story-cover="<?= $model->cover ?? '' ?>" href="">
             <img width="30px" src="/img/chatgpt-icon.png" alt="">
             Сгенерировать обложку
         </a>

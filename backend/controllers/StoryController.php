@@ -13,6 +13,7 @@ use backend\services\StoryEditorService;
 use common\components\StoryCover;
 use common\models\story\StoryStatus;
 use common\services\TransactionManager;
+use DomainException;
 use Exception;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -413,23 +414,28 @@ class StoryController extends BaseController
         try {
 
             $story = $this->findModel(Story::class, $storyId);
-            $savePath = Yii::getAlias('@public/upload/gen-images/' . $story->id);
+            /*$savePath = Yii::getAlias('@public/upload/gen-images/' . $story->id);
             FileHelper::createDirectory($savePath);
             $imageFilePath = $this->imageService->downloadImage($imageUrl, $savePath);
             if (!file_exists($imageFilePath)) {
                 throw new \DomainException('Download image error');
+            }*/
+
+            $imageFilePath = str_replace('/admin', '', Yii::getAlias('@webroot')) . $imageUrl;
+            if (realpath($imageFilePath) !== $imageFilePath) {
+                throw new NotFoundHttpException('Изображение не найдено');
             }
 
             $coverFilePath = StoryCover::getCoverFolderPath(true) . DIRECTORY_SEPARATOR . basename($imageFilePath);
             if (!copy($imageFilePath, $coverFilePath)) {
-                throw new \DomainException('Copy image error');
+                throw new DomainException('Copy image error');
             }
 
             StoryCover::create($imageFilePath);
 
             $story->cover = basename($imageFilePath);
             if (!$story->save(false)) {
-                throw new \DomainException('Save cover error');
+                throw new DomainException('Save cover error');
             }
 
             return ['success' => true];
@@ -453,12 +459,36 @@ class StoryController extends BaseController
             FileHelper::createDirectory($savePath);
             $imageFilePath = $this->imageService->downloadImage($imageUrl, $savePath);
             if (!file_exists($imageFilePath)) {
-                throw new \DomainException('Download image error');
+                throw new DomainException('Download image error');
             }
-            return ['success' => true, 'url' => '/upload/gen-images/' . $story->id . '/' . basename($imageFilePath)];
+            return [
+                'success' => true,
+                'key' => basename($imageFilePath),
+                'url' => '/upload/gen-images/' . $story->id . '/' . basename($imageFilePath),
+            ];
         } catch (Exception $exception) {
             Yii::$app->errorHandler->logException($exception);
             return ['success' => false, 'message' => $exception->getMessage()];
         }
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     * @throws InvalidConfigException
+     */
+    public function actionGenImages(int $id, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+        $story = $this->findModel(Story::class, $id);
+        $imagesPath = Yii::getAlias('@public/upload/gen-images/' . $story->id);
+        return [
+            'success' => true,
+            'images' => array_map(static function (string $fileName) use ($story): array {
+                return [
+                    'key' => basename($fileName),
+                    'url' => '/upload/gen-images/' . $story->id . '/' . basename($fileName),
+                ];
+            }, FileHelper::findFiles($imagesPath)),
+        ];
     }
 }
