@@ -184,6 +184,9 @@
 .gen-images-image-wrap {
   padding: 10px;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .gen-images-image-wrap:hover .gen-images-image-actions{
@@ -237,4 +240,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.gen-edit-wrap {
+  display: none;
+  transition: all 200ms;
+}
+
+.gen-edit-wrap.edit-in {
+  display: block;
 }

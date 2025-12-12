@@ -13,6 +13,7 @@ use backend\services\StoryEditorService;
 use common\components\StoryCover;
 use common\models\story\StoryStatus;
 use common\services\TransactionManager;
+use CURLFile;
 use DomainException;
 use Exception;
 use Yii;
@@ -493,5 +494,54 @@ class StoryController extends BaseController
                 ];
             }, FileHelper::findFiles($imagesPath)),
         ];
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionEditImage(Request $request, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+        $payload = Json::decode($request->rawBody);
+        $prompt = $payload['prompt'];
+        $imageUrl = $payload['imageUrl'];
+
+        $imageFilePath = str_replace('/admin', '', Yii::getAlias('@webroot')) . $imageUrl;
+        if (realpath($imageFilePath) !== $imageFilePath) {
+            throw new NotFoundHttpException('Изображение не найдено');
+        }
+
+        $data = $this->apiLocalRequest($imageFilePath, $prompt);
+
+        return ['success' => true, 'data' => ['r' => $data]];
+    }
+
+    private function apiLocalRequest(string $filePath, string $prompt): string
+    {
+        $file = new CURLFile($filePath);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, Yii::$app->params['gpt.api.edit.image.host']);
+
+        $data = [
+            'prompt' => $prompt,
+            'file' => $file,
+        ];
+
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+        $response = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            throw new DomainException('Request Error:' . curl_error($ch));
+        }
+
+        curl_close($ch);
+
+        if ($response !== false) {
+            return $response;
+        }
+        return '';
     }
 }

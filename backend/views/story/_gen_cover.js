@@ -7,6 +7,21 @@
     size: 'auto'
   });
 
+  async function fetchRequest(method, url, payload) {
+    const response = await fetch(url, {
+      method,
+      headers: {
+        'X-CSRF-Token': $("meta[name=csrf-token]").attr('content'),
+        'Content-Type': 'application/json',
+      },
+      body: payload ? JSON.stringify(payload) : null
+    });
+    if (!response.ok) {
+      throw new Error('Fetch story text error');
+    }
+    return await response.json();
+  }
+
   async function fetchStoryText(storyId) {
     if (!storyId) {
       throw new Error('No params')
@@ -130,12 +145,43 @@
     return await response.json();
   }
 
+  async function editImage(prompt, imageUrl) {
+    const {success, data, message} = await fetchRequest(
+      'POST',
+      `/admin/index.php?r=story/edit-image`,
+      {prompt, imageUrl}
+    );
+    if (!success) {
+      throw new Error(`Edit Image request error: ${message}`);
+    }
+    const {status, images} = data;
+    if (status !== 'ok') {
+      throw new Error('Edit Image API request error: ' + JSON.stringify(data));
+    }
+    return images;
+  }
+
   function createImageItem({storyId, imageUrl, imageKey, active}) {
     const $imageItem = $(`<div class="gen-images-image-wrap">
     <div class="gen-image-image">
         <img style="width: 100px;" alt="..." src="/img/loading.gif"/>
     </div>
     <div class="gen-images-image-actions"></div>
+    <div class="gen-edit-wrap">
+        <form class="composeForm">
+            <textarea class="composeInput"></textarea>
+            <div style="flex-shrink: 0">
+                <button type="button" class=compose>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                                d="M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z"></path>
+                        <path d="M6 12h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </form>
+    </div>
 </div>`);
 
     const image = new Image();
@@ -156,6 +202,11 @@
         title: 'Сделать обложкой истории',
         classNames: 'gen-image-action',
         action: 'set-cover'
+      },
+      {
+        title: 'Изменить',
+        classNames: 'gen-image-action',
+        action: 'edit-image'
       },
       {
         title: 'Удалить',
@@ -189,11 +240,23 @@
 
     });
 
+    $imageItem.on('click', '[data-gen-action=edit-image]', e => {
+      e.preventDefault();
+      $imageItem.find('.gen-edit-wrap')
+        .toggleClass('edit-in');
+    });
+
     if (active) {
       $imageItem.append(
         `<div class="gen-image-active">Обложка истории</div>`
       )
     }
+
+    $imageItem.on('click', '.compose', async () => {
+      const prompt = $imageItem.find('.composeInput').val();
+      const response = await editImage(prompt, imageUrl);
+      console.log(response);
+    });
 
     return $imageItem;
   }
