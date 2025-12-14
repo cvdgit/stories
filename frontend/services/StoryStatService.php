@@ -88,7 +88,7 @@ class StoryStatService
     private function getViewedSlidesDetail(int $storyId, int $studentId): array
     {
         return (new Query())
-            ->select('DISTINCT story_student_stat.slide_id')
+            ->select(new Expression('DISTINCT story_student_stat.slide_id'))
             ->from('story_student_stat')
             ->innerJoin('story_slide', 'story_student_stat.slide_id = story_slide.id')
             ->where([
