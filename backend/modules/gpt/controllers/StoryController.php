@@ -110,6 +110,7 @@ class StoryController extends Controller
     {
         $payload = Json::decode($request->rawBody);
         $text = $payload['text'];
+        $text = strip_tags($text);
         $content = <<<TEXT
 Есть текст:
 <текст>
