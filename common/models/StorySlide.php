@@ -176,7 +176,7 @@ class StorySlide extends ActiveRecord
         return self::findOne($slideID);
     }
 
-    public static function findSlide(int $id)
+    public static function findSlide(int $id): StorySlide
     {
         if (($model = self::findOne($id)) !== null) {
             return $model;

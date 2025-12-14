@@ -21,6 +21,7 @@ use backend\components\story\TestBlockContent;
 use backend\components\story\TextBlock;
 use backend\components\story\VideoBlock;
 use backend\components\story\writer\HTMLWriter;
+use backend\components\story\writer\SlideRenderer;
 use backend\components\StudyTaskFinalSlide;
 use backend\models\editor\BaseForm;
 use backend\models\editor\ImageForm;
@@ -148,18 +149,22 @@ class StoryEditorService
 
     public function copySlide(int $slideID, int $lessonId = null): int
     {
-        /** @var StorySlide $slide */
-        $slide = StorySlide::findSlide($slideID);
-        $data = $slide->getSlideOrLinkData();
+        $slideModel = StorySlide::findSlide($slideID);
 
-        $newSlide = StorySlide::createSlide($slide->story_id);
-        $newSlide->data = $data;
-
-        Story::insertSlideNumber($slide->story_id, $slide->number);
-        $newSlide->number = $slide->number + 1;
-
+        $newSlide = StorySlide::createSlide($slideModel->story_id);
+        $newSlide->data = 'copy';
+        Story::insertSlideNumber($slideModel->story_id, $slideModel->number);
+        $newSlide->number = $slideModel->number + 1;
         if (!$newSlide->save()) {
             throw new DomainException('copySlide exception');
+        }
+
+        $slide = (new HtmlSlideReader($slideModel->data))->load();
+        $slide->setId($newSlide->id);
+
+        $newSlide->data = (new SlideRenderer())->render($slide);
+        if (!$newSlide->save()) {
+            throw new DomainException('copySlide update exception');
         }
 
         if ($lessonId !== null) {
