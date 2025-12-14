@@ -85,6 +85,21 @@ class StoryStatService
         return (int) $count;
     }
 
+    private function getViewedSlidesDetail(int $storyId, int $studentId): array
+    {
+        return (new Query())
+            ->select('DISTINCT story_student_stat.slide_id')
+            ->from('story_student_stat')
+            ->innerJoin('story_slide', 'story_student_stat.slide_id = story_slide.id')
+            ->where([
+                'story_student_stat.story_id' => $storyId,
+                'story_student_stat.student_id' => $studentId,
+                'story_slide.status' => StorySlide::STATUS_VISIBLE,
+            ])
+            ->andWhere(['in', 'story_slide.kind', [StorySlide::KIND_SLIDE, StorySlide::KIND_LINK]])
+            ->all();
+    }
+
     private function getStorySlidesNumber(int $storyId): int
     {
         $count = (new Query())
@@ -233,6 +248,7 @@ class StoryStatService
                 'test' => $finishedTestingNumber,
                 'mental_map' => $finishedMentalMapNumber,
                 'total' => $viewedSlidesNumber,
+                'detail' => $this->getViewedSlidesDetail($storyId, $studentId)
             ]
         ];
     }
