@@ -18,11 +18,9 @@ use backend\models\video\VideoSource;
 use backend\Retelling\Retelling;
 use common\helpers\Url;
 use common\models\SlideVideo;
-use common\models\StorySlide;
 use common\models\StorySlideImage;
 use common\models\StoryTest;
 use Exception;
-use yii\helpers\Html;
 
 class SlideModifier
 {

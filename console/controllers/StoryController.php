@@ -10,6 +10,7 @@ use backend\components\story\writer\HTMLWriter;
 use backend\services\StoryEditorService;
 use common\models\StorySlide;
 use common\models\StorySlideBlock;
+use yii\db\Expression;
 use yii\imagine\Image;
 use yii\console\Controller;
 use common\models\Story;
@@ -34,12 +35,12 @@ class StoryController extends Controller
 		$this->stdout('Всего историй - ' . count($models) . PHP_EOL);
 		foreach ($models as $model) {
 			$this->stdout($model->title . PHP_EOL);
-			
+
 			$coverPath = StoryCover::getSourceFilePath($model->cover, true);
 
 			$path = StoryCover::createListThumbnail($coverPath);
 			$this->stdout('[+] ' . $path . PHP_EOL);
-			
+
 			$path = StoryCover::createStoryThumbnail($coverPath);
 			$this->stdout('[+] ' . $path . PHP_EOL);
 		}
@@ -267,4 +268,16 @@ class StoryController extends Controller
         $this->stdout('Done!' . PHP_EOL);
     }
 
+    public function actionSlidesWithDiffIds(): void
+    {
+        $betweenBegin = new Expression("UNIX_TIMESTAMP('2025-10-01')");
+        $betweenEnd = new Expression("UNIX_TIMESTAMP('2025-12-31')");
+        $rows = (new Query())
+            ->select('*')
+            ->from(['t' => 'story_slide'])
+            ->where(['between', 't.created_at + (3 * 60 * 60)', $betweenBegin, $betweenEnd])
+            ->all();
+        $this->stdout('slides: ' . count($rows));
+        $this->stdout('Done!' . PHP_EOL);
+    }
 }
