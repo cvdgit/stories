@@ -1,4 +1,4 @@
-(function () {
+const StoryScreenRecorder = window.StoryScreenRecorder || (function () {
   const {screenRecorderConfig: config} = Reveal.getConfig();
 
   const session = uuidv4();
@@ -147,12 +147,11 @@
             ошибка подключения
         </div>
     </div>
-    <p style="font-size: 24px; line-height: 30px">Перед прохождением истории нужно разрешить запись экрана</p>
     <p class="screen-recording-error-wrap" style="font-size: 24px; line-height: 30px; color: #dc3545; display: none">
         <strong class="screen-recording-error"></strong>
     </p>
     <div class="start-screen-recording-wrap" style="display: flex; flex-direction: row; gap: 10px; align-items: center">
-        <button class="start-screen-recording btn" type="button" disabled>
+        <button class="start-screen-recording btn btn-small" type="button" disabled>
             Начать запись экрана <img alt="..." style="width: 20px; display: none" src="/img/loading.gif"/>
         </button>
         <a class="show-screen-records" href="">Записи</a>
@@ -160,7 +159,7 @@
     <div class="stop-screen-recording-wrap" style="display: none">
         <span>Идет запись... </span>
         <span class="screen-recorder-timer">00:00:00</span>
-        <button class="stop-screen-recording btn btn-sm" type="button">
+        <button class="stop-screen-recording btn btn-small" type="button">
             Стоп <img alt="..." style="width: 20px; display: none" src="/img/loading.gif"/>
         </button>
     </div>
@@ -363,7 +362,7 @@ ${video.status === 'process' ? '<div class="videos-video-process"><img src="/img
 
       const $content = $(`<div class="videos-container"></div>`);
 
-      const dialog = new InnerDialog($overlay, `Записи экрана (<a style="font-weight: 600" class="videos-load" href="">Обновить список</a>)`, $content);
+      const dialog = new InnerDialog($('.story-container'), `Записи экрана (<a style="font-weight: 600" class="videos-load" href="">Обновить список</a>)`, $content);
       dialog.onShow(async (container) => {
 
         await renderVideoList(container);
@@ -383,7 +382,12 @@ ${video.status === 'process' ? '<div class="videos-video-process"><img src="/img
       $overlay.find('.stop-screen-recording').removeClass('pending');
     }
 
-    $('#story-container').append($overlay);
+    $('.story-container-wrap').prepend($overlay);
   });
-})
-();
+
+  return {
+    start() {
+      console.log('api screen recording start');
+    }
+  }
+})();

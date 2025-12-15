@@ -48,7 +48,7 @@ use yii\helpers\Url;
         <?php endif ?>
     <div class="row row-no-gutters">
         <?php if ($playlist === null): ?>
-        <div class="col-md-12">
+        <div class="col-md-12 story-container-wrap" style="position: relative">
             <div class="story-container">
                 <div class="story-container-inner" id="story-container">
                     <div class="story-no-subscription"><span class="story-loader">Загрузка истории...</span></div>
