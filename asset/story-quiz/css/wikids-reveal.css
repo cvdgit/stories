@@ -128,6 +128,7 @@
   justify-content: space-between;
   overflow: hidden;
   flex-grow: 1;
+  padding: 14px 6px;
 }
 
 .wikids-test--no-controls {
