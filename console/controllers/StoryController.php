@@ -282,8 +282,8 @@ class StoryController extends Controller
                 continue;
             }
             $slide = (new HtmlSlideReader($row['data']))->load();
-            if ((int) $slide['id'] !== $slide->getId()) {
-                $this->stdout('diff: ' . $slide['id'] . PHP_EOL);
+            if ((int) $row['id'] !== $slide->getId()) {
+                $this->stdout('diff: ' . $row['id'] . PHP_EOL);
             }
         }
         $this->stdout('slides: ' . count($rows) . PHP_EOL);
