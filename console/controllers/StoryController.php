@@ -277,6 +277,15 @@ class StoryController extends Controller
             ->from(['t' => 'story_slide'])
             ->where(['between', 't.created_at + (3 * 60 * 60)', $betweenBegin, $betweenEnd])
             ->all();
+        foreach ($rows as $row) {
+            if ((int) $row['kind'] === StorySlide::KIND_LINK) {
+                continue;
+            }
+            $slide = (new HtmlSlideReader($row['data']))->load();
+            if ((int) $slide['id'] !== $slide->getId()) {
+                $this->stdout('diff: ' . $slide['id'] . PHP_EOL);
+            }
+        }
         $this->stdout('slides: ' . count($rows) . PHP_EOL);
         $this->stdout('Done!' . PHP_EOL);
     }
