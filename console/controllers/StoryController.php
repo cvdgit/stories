@@ -270,7 +270,7 @@ class StoryController extends Controller
 
     public function actionSlidesWithDiffIds(): void
     {
-        $betweenBegin = new Expression("UNIX_TIMESTAMP('2025-12-01')");
+        $betweenBegin = new Expression("UNIX_TIMESTAMP('2025-11-01')");
         $betweenEnd = new Expression("UNIX_TIMESTAMP('2025-12-31')");
         $rows = (new Query())
             ->select('*')
