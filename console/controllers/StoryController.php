@@ -270,14 +270,14 @@ class StoryController extends Controller
 
     public function actionSlidesWithDiffIds(): void
     {
-        $betweenBegin = new Expression("UNIX_TIMESTAMP('2025-10-01')");
+        $betweenBegin = new Expression("UNIX_TIMESTAMP('2025-12-01')");
         $betweenEnd = new Expression("UNIX_TIMESTAMP('2025-12-31')");
         $rows = (new Query())
             ->select('*')
             ->from(['t' => 'story_slide'])
             ->where(['between', 't.created_at + (3 * 60 * 60)', $betweenBegin, $betweenEnd])
             ->all();
-        $this->stdout('slides: ' . count($rows));
+        $this->stdout('slides: ' . count($rows) . PHP_EOL);
         $this->stdout('Done!' . PHP_EOL);
     }
 }
