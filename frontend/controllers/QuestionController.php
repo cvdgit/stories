@@ -172,7 +172,14 @@ class QuestionController extends Controller
             }
 
             $serializer = new Serializer($historyValues);
-            return $serializer->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount, $fastMode);
+            return array_merge(
+                $serializer->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount, $fastMode),
+                [
+                    'debug' => [
+                        'userHistory' => $userHistory,
+                    ]
+                ]
+            );
         }
 
         if ($test->isSourceTests()) {
