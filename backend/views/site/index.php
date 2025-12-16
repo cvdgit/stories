@@ -41,15 +41,15 @@ $this->registerJs($this->renderFile('@backend/views/site/index.js'));
                 <h4>Последние изменения</h4>
                 <div id="changelogs" style="min-height: 250px; max-height: 600px; overflow-y: auto; display: flex; flex-direction: column; row-gap: 20px">
                     <?php foreach ($changelog as $item): ?>
-                        <a class="changelog-item" href="<?= Url::to(['/changelog/default/view', 'id' => $item->getId()]) ?>" style="display: flex; flex-direction: row; justify-content: space-between">
-                            <h4 style="margin: 0"><?= Html::encode($item->getTitle()) ?></h4>
-                            <div style="display: flex; flex-direction: row; align-items: center">
-                                <?php if ($item->isNew()): ?>
-                                <span class="label label-info" style="margin-right: 10px">Новое</span>
-                                <?php endif ?>
-                                <p class="text-muted" class="time" style="margin: 0"><?= SmartDate::dateSmart($item->getCreated()->getTimestamp()) ?></p>
-                            </div>
-                        </a>
+                        <div style="display: flex; flex-direction: row; align-items: start; gap: 10px">
+                            <?php if ($item->isNew()): ?>
+                                <span class="label label-info" style="font-size: 100%; margin-top: 10px">Новое</span>
+                            <?php endif ?>
+                            <a class="changelog-item" href="<?= Url::to(['/changelog/default/view', 'id' => $item->getId()]) ?>" style="display: flex; flex-direction: row; justify-content: space-between; flex: 1">
+                                <h4><?= Html::encode($item->getTitle()) ?></h4>
+                                <p class="text-muted" class="time" style="margin: 10px 0 0 0; white-space: nowrap;"><?= SmartDate::dateSmart($item->getCreated()->getTimestamp()) ?></p>
+                            </a>
+                        </div>
                     <?php endforeach; ?>
                 </div>
             </div>
