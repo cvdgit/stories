@@ -386,8 +386,8 @@ $js = <<< JS
                         text: texts,
                         onUpdateHandler: text => {
                             modal.hide()
-                            block.getElement().find('.slide-paragraph').html(text)
-                            blockModifier.change()
+                            /*block.getElement().find('.slide-paragraph').html(text)
+                            blockModifier.change()*/
                         },
                         currentSlideId,
                         blockId: block.getID(),
@@ -653,7 +653,6 @@ $js = <<< JS
                       formHelper
                         .sendForm(form.attr('action'), form.attr('method'), formData)
                         .done(response => {
-                            console.log(response)
                             if (response && response.success) {
                                 StoryEditor.loadSlides(response.slide_id);
                                 modal.hide()
