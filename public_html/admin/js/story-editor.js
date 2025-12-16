@@ -798,6 +798,33 @@ const StoryEditor = (function () {
     }
   }, '.sl-block-image-control');
 
+  $editor[0].addEventListener('paste', e => {
+    e.preventDefault();
+    const availableTypes = e.clipboardData.types;
+
+    if (availableTypes.includes('text/html')) {
+      const html = e.clipboardData.getData('text/html');
+      console.log(html);
+    } else if (availableTypes.includes('text/plain')) {
+      const text = e.clipboardData.getData('text/plain');
+      if (text) {
+        appendBlock(
+          createEmptyBlock('text', text.replace(/(\r\n|\n|\r)/g, "<br>"))
+        );
+        blockModifier.change();
+      }
+    }
+
+    /*if (e.clipboardData.files.length > 0) {
+      console.log("Pasted content includes files.");
+      Array.from(e.clipboardData.files).forEach(file => {
+        if (file.type.startsWith('image/')) {
+          console.log("Pasted file is an image:", file.name);
+        }
+      });
+    }*/
+  });
+
   function createImageBlockControls() {
     return $('<div/>', {'class': 'sl-block-image-controls'})
       .append(
@@ -1906,7 +1933,7 @@ const StoryEditor = (function () {
     return config.getBlockFormAction + "&slide_id=" + slidesManager.getCurrentSlideID() + "&block_id=" + blockManager.getActive().getID();
   }
 
-  function createEmptyBlock(type) {
+  function createEmptyBlock(type, defaultText = 'Введите текст') {
     var block = $('<div/>', {
       'class': 'sl-block',
       'data-block-id': blockIDGenerator.generate(),
@@ -1920,10 +1947,7 @@ const StoryEditor = (function () {
       'css': {'z-index': 12, 'text-align': 'left'}
     });
 
-    $('<div/>', {
-      'class': 'slide-paragraph',
-      'html': '<p>Введите текст</p>'
-    })
+    $(`<div class="slide-paragraph"><p>${defaultText}</p></div>`)
       .appendTo(blockContent);
 
     blockContent.appendTo(block);
