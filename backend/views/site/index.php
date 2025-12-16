@@ -39,7 +39,7 @@ $this->registerJs($this->renderFile('@backend/views/site/index.js'));
             </div>
             <div class="col-lg-9">
                 <h4>Последние изменения</h4>
-                <div id="changelogs" style="min-height: 250px; max-height: 600px; overflow-y: auto; display: flex; flex-direction: column; row-gap: 10px">
+                <div id="changelogs" style="min-height: 250px; max-height: 600px; overflow-y: auto; display: flex; flex-direction: column">
                     <?php foreach ($changelog as $item): ?>
                         <div style="display: flex; flex-direction: row; align-items: start; gap: 10px">
                             <?php if ($item->isNew()): ?>
