@@ -37,6 +37,7 @@ class StoryController extends Controller
     {
         $payload = Json::decode($request->rawBody);
         $text = $payload['text'];
+        $text = strip_tags($text);
 
         $prompt = LlmPrompt::findByKey('create-trainer-story-from-text');
         if ($prompt === null) {
@@ -66,6 +67,7 @@ class StoryController extends Controller
     {
         $payload = Json::decode($request->rawBody);
         $text = $payload['text'];
+        $text = strip_tags($text);
 
         $prompt = LlmPrompt::findByKey('create-story-from-text');
         if ($prompt === null) {

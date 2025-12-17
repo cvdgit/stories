@@ -289,7 +289,7 @@ class StoryAiController extends Controller
                                 'title' => $fragment['title'],
                                 'description' => $fragment['description'],
                             ];
-                        }, $contentRow['fragments']),
+                        }, MentalMapPayload::filterEmptyFragments($contentRow['fragments'])),
                         Uuid::fromString(Yii::$app->params['ai.story.assist.plan.prompt.id']),
                     );
                 } else {
@@ -302,7 +302,7 @@ class StoryAiController extends Controller
                                 'id' => $fragment['id'],
                                 'title' => $fragment['title'],
                             ];
-                        }, $contentRow['fragments']),
+                        }, MentalMapPayload::filterEmptyFragments($contentRow['fragments'])),
                     );
                 }
 
@@ -542,7 +542,7 @@ class StoryAiController extends Controller
                         'id' => $fragment['id'],
                         'title' => $fragment['title'],
                     ];
-                }, $mentalMapContent['fragments']),
+                }, MentalMapPayload::filterEmptyFragments($mentalMapContent['fragments'])),
             );
 
             $mentalMap = MentalMap::create(

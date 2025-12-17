@@ -27,7 +27,7 @@ class MentalMapBuilder
                     'id' => $fragment['id'],
                     'title' => $fragment['title'],
                 ];
-            }, $fragments),
+            }, MentalMapPayload::filterEmptyFragments($fragments)),
         );
 
         $mentalMap = MentalMap::createFromPayload(
@@ -63,7 +63,7 @@ class MentalMapBuilder
                     'title' => $fragment['title'],
                     'description' => $fragment['description'],
                 ];
-            }, $fragments),
+            }, MentalMapPayload::filterEmptyFragments($fragments)),
             $promptId
         );
 

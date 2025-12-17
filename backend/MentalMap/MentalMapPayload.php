@@ -96,4 +96,13 @@ class MentalMapPayload implements JsonSerializable
     {
         return $this->name;
     }
+
+    public static function filterEmptyFragments(array $fragments, string $titleKey = 'title'): array
+    {
+        return array_values(
+            array_filter($fragments, static function (array $fragment) use ($titleKey): bool {
+                return trim($fragment[$titleKey]) !== '';
+            }),
+        );
+    }
 }

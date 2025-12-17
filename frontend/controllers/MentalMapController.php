@@ -230,7 +230,21 @@ class MentalMapController extends Controller
                 $userProgress = 0;
 
                 if (!$form->repetition_mode) {
-                    $history = (new MentalMapHistoryFetcher())->fetch($mentalMap->getImages(), $mentalMap->uuid, $user->getId(), $threshold);
+                    if ($mentalMap->isMentalMapAsTree()) {
+                        $history = (new MentalMapTreeHistoryFetcher())->fetch(
+                            $mentalMap->uuid,
+                            $user->getId(),
+                            $mentalMap->getTreeData(),
+                            $threshold
+                        );
+                    } else {
+                        $history = (new MentalMapHistoryFetcher())->fetch(
+                            $mentalMap->getImages(),
+                            $mentalMap->uuid,
+                            $user->getId(),
+                            $threshold
+                        );
+                    }
                     if (MentalMap::isDone($history, $threshold)) {
                         $currentUser = User::findOne($user->getId());
                         if ($currentUser !== null) {

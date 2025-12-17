@@ -322,7 +322,7 @@ class MentalMapController extends BaseController
                                 'id' => $fragment['id'],
                                 'title' => $fragment['title'],
                             ];
-                        }, $mentalMapRow['fragments']),
+                        }, MentalMapPayload::filterEmptyFragments($mentalMapRow['fragments'])),
                     );
 
                     $mentalMap = MentalMap::create(
