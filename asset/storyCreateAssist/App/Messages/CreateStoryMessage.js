@@ -11,7 +11,7 @@ export default function CreateStoryMessage({message}) {
       <div style={{cursor: 'pointer'}} onClick={toggleTextHandler}>
         {message.message}
       </div>
-      {showText && <div style={{maxHeight: '100px', overflowY: 'auto', position: 'relative'}}>{message.metadata?.text}</div>}
+      {showText && <div style={{width: '100%', maxHeight: '100px', overflowY: 'auto', position: 'relative', whiteSpace: 'pre-wrap'}}>{message.metadata?.text}</div>}
     </div>
   );
 }

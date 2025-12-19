@@ -1,0 +1,214 @@
+.dialog {
+  align-items: center;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  padding: 0 6rem;
+  position: fixed;
+  right: 0;
+  top: 0;
+  transform: translateZ(0);
+  z-index: 1001;
+}
+
+.dialog-enter .dialog__content,
+.dialog-enter .dialog__overlay {
+  opacity: 0
+}
+
+.dialog-enter .dialog__content {
+  transform: scale(0.9)
+}
+
+.dialog-enter-active .dialog__overlay {
+  opacity: 1;
+  transition: opacity .4s ease-out
+}
+
+.dialog-enter-active .dialog__content {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity .3s ease-out,transform .3s ease-out
+}
+
+.dialog-enter-active .dialog__overlay {
+  opacity: 1;
+  transition: opacity .4s ease-out
+}
+
+.dialog-exit .dialog__content,.dialog-exit .dialog__overlay {
+  opacity: 1
+}
+
+.dialog-exit .dialog__content {
+  transform: scale(1)
+}
+
+.dialog-exit-active .dialog__overlay {
+  opacity: 0;
+  transition: opacity .4s ease-out
+}
+
+.dialog-exit-active .dialog__content {
+  opacity: 0;
+  transform: scale(.97);
+  transition: opacity .15s ease-in,transform .15s ease-in
+}
+
+.dialog__overlay {
+  background: hsla(0,0%,100%,.7);
+  bottom: 0;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+}
+
+.dialog__content {
+  background: #fff;
+  box-shadow: 0 0.6rem 2rem rgba(0,0,0,.4);
+  max-width: 100%;
+  padding: 6rem;
+  position: relative;
+  /*transition: all 2s ease-in-out;*/
+  width: 63rem;
+  display: flex;
+}
+
+.export-dialog-modal .dialog__content {
+  padding: 3rem 4rem;
+  width: 90rem;
+  max-height: 98vh;
+}
+
+.dialog__close {
+  color: #8f8f8f;
+  cursor: pointer;
+  height: 3rem;
+  line-height: 3rem;
+  position: absolute;
+  right: 1rem;
+  text-align: center;
+  top: 1rem;
+  transition: color .3s;
+  width: 3rem;
+}
+
+.export-dialog-modal .export-dialog__content {
+  min-height: 0;
+  position: static;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  max-height: 100%;
+}
+
+.dialog-heading {
+  border-bottom: 0.1rem solid #eaeaeb;
+  color: rgba(0,0,0,.9);
+  font-size: 3.2rem;
+  font-weight: lighter;
+  margin-bottom: 1.4rem;
+  padding-bottom: 1rem;
+}
+
+.export-dialog-modal .export-dialog__text {
+  color: #6a6a6a;
+  font-weight: 300;
+  line-height: 1.63;
+}
+
+.export-dialog-modal .export-dialog__list {
+  list-style: disc;
+  color: #6a6a6a;
+  font-weight: 300;
+  margin: 0.5rem 0 0;
+  padding-left: 1.5rem;
+}
+
+.export-dialog__list-item {
+  font-style: italic;
+}
+
+.dialog-action {
+  padding-top: 5rem;
+  text-align: center;
+  transition: opacity .3s;
+}
+
+
+
+.export-flow {
+  left: 50%;
+  position: absolute;
+  text-align: center;
+  top: 50%;
+  transform: translate(-50%,-50%)
+}
+
+.export-flow__title {
+  font-size: 3.2rem;
+  font-weight: 300;
+  letter-spacing: -.1px;
+  margin-bottom: 1rem;
+  margin-top: 1.2rem
+}
+
+.export-flow__text {
+  color: #4a4a4a;
+  font-size: 1.3rem;
+  letter-spacing: .5px;
+  line-height: 1.77;
+  max-width: 50rem;
+  opacity: .8
+}
+
+.export-flow__button {
+  margin-top: 2.8rem
+}
+
+.export-flow__spinner {
+  animation: spin 1.5s linear infinite;
+  border: .2rem solid rgba(0,0,0,.5);
+  border-left-color: rgba(0,0,0,.15);
+  border-radius: 50%;
+  height: 51px;
+  margin: 0 auto;
+  width: 51px
+}
+
+.export-settings-completion {
+  border-bottom: 1px solid #c7c8c9
+}
+
+.export-settings-completion__input {
+  background: transparent;
+  border: none;
+  color: #3f474b;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  text-align: right;
+  width: 3.5rem
+}
+
+.export-settings__more .settings-label__text {
+  cursor: pointer;
+  padding-bottom: .1rem
+}
+
+.export-settings__link,.export-settings__more .settings-label__text {
+  border-bottom: .1rem solid;
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 1.7rem
+}
+
+.export-settings__link {
+  color: #000;
+  margin-left: 1rem;
+  text-decoration: none
+}

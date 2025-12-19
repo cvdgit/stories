@@ -359,6 +359,48 @@ export function ThreadProvider({children}) {
     }
   }
 
+  const createStoryByFragments = async (threadId, fragments) => {
+
+    saveMessages(threadId);
+
+    const payload = {
+      title: 'Название истории',
+      fragments: fragments.map(fragmentText => ({fragmentText, id: uuidv4()}))
+    };
+
+    const storyMessageId = uuidv4();
+    setMessages(prevMessages => [...prevMessages, {
+      id: storyMessageId,
+      message: 'Создание истории...',
+      type: 'story',
+      metadata: {payload},
+    }]);
+
+    const storyResponse = await createStoryFromText(threadId, storyMessageId, payload);
+    if (!storyResponse.success) {
+      saveMessages(threadId);
+      setMessages(prevMessages => prevMessages.map(m => {
+        if (m.id === storyMessageId) {
+          return {...m, message: storyResponse.message};
+        }
+        return m;
+      }));
+      return;
+    }
+
+    saveMessages(threadId);
+    setMessages(prevMessages => prevMessages.map(m => {
+      if (m.id === storyMessageId) {
+        return {...m, metadata: {...m.metadata, story: storyResponse.story}};
+      }
+      return m;
+    }));
+
+    setThreadTitle(threadId, storyResponse.story.title);
+
+    await createReadingTrainer(threadId, {payload, story: storyResponse.story});
+  }
+
   const createRepetitionTrainerStory = async (threadId, text) => {
     const messageId = uuidv4();
     setMessages(prevMessages => [...prevMessages, {
@@ -537,6 +579,7 @@ export function ThreadProvider({children}) {
       messages,
       setMessages,
       createStory,
+      createStoryByFragments,
       createRepetitionTrainerStory,
       createRepetitionTrainer,
       deleteRepetitionTrainer,
@@ -556,6 +599,7 @@ export function ThreadProvider({children}) {
     setMessages,
     saveMessages,
     createStory,
+    createStoryByFragments,
     createRepetitionTrainerStory,
     createRepetitionTrainer,
     deleteRepetitionTrainer,

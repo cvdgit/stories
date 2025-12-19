@@ -53,7 +53,7 @@ export default function Messages({messages}) {
       default: {
         return (
           <div className={styles.message}>
-            <div ref={ref} style={{maxHeight: '100px', overflowY: 'auto', position: 'relative'}}>
+            <div ref={ref} style={{maxHeight: '100px', overflowY: 'auto', position: 'relative', whiteSpace: 'pre-wrap'}}>
               {message.message}
             </div>
             {message.status === 'idle' && <div style={{color: 'oklch(0.6 0 0)', fontSize: '12px', lineHeight: '16px', display: 'flex', flexDirection: 'row', gap: '10px', alignItems: 'center'}}>
