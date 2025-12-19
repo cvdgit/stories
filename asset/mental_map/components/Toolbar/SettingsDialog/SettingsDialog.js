@@ -133,6 +133,8 @@ export default function SettingsDialog({open, setOpen, mentalMapId, schedules}) 
             }} style={{width: '100%', padding: '10px'}}>
               <option value="">Выберите</option>
               <option value="95">95</option>
+              <option value="90">90</option>
+              <option value="85">85</option>
               <option value="80">80</option>
               <option value="60">60</option>
               <option value="40">40</option>
