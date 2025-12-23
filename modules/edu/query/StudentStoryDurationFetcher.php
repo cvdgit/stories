@@ -50,7 +50,7 @@ class StudentStoryDurationFetcher
                 't.story_id' => $storyId,
                 't.student_id' => $studentId,
             ])
-            ->andWhere(['between', 't.created_at', $betweenBegin, $betweenEnd])
+            ->andWhere(['between', 't.created_at + (3 * 60 * 60)', $betweenBegin, $betweenEnd])
         ->groupBy('t.session');
 
         $slideContent = (new StoryTestsFetcher())->fetch($storyId);
@@ -67,7 +67,7 @@ class StudentStoryDurationFetcher
                 't.user_id' => $student->user_id,
             ])
             ->andWhere(['in', 't.mental_map_id', $storyMentalMapIds])
-            ->andWhere(['between', 't.created_at', $betweenBegin, $betweenEnd]);
+            ->andWhere(['between', 't.created_at + (3 * 60 * 60)', $betweenBegin, $betweenEnd]);
 
         $allQuery = $storyStatQuery->union($mentalMapHistoryQuery);
 
