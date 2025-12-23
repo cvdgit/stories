@@ -66,10 +66,10 @@ class StudentStoryDurationFetcher
                 't.story_id' => $storyId,
                 't.user_id' => $student->user_id,
             ])
-            //->andWhere(['in', 't.mental_map_id', $storyMentalMapIds])
+            ->andWhere(['in', 't.mental_map_id', $storyMentalMapIds])
             ->andWhere(['between', new Expression('t.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd]);
 
-        $allQuery = $storyStatQuery->union($mentalMapHistoryQuery);
+        $allQuery = $storyStatQuery->union($mentalMapHistoryQuery, true);
 
         $query = (new Query())
             ->select(new Expression('SEC_TO_TIME(SUM(t.sessionSec))'))
