@@ -67,6 +67,10 @@
 
       const href = e.target.getAttribute('href')
       $('#mental-map-detail-modal')
+        .on('hide.bs.modal', function () {
+          $(this).find('.modal-content').html('');
+          $(this).removeData('bs.modal');
+        })
         .modal({'remote': href})
     })
 })();
