@@ -4,21 +4,25 @@ declare(strict_types=1);
 
 namespace modules\edu\controllers\teacher;
 
-use backend\components\story\StoryMentalMapFetcher;
-use backend\MentalMap\FetchMentalMapUserHistory\MentalMapUserHistoryFetcher;
-use backend\MentalMap\MentalMap;
+use common\components\MentalMapThreshold;
+use common\helpers\SmartDate;
 use common\models\Story;
 use common\models\UserStudent;
 use common\rbac\UserRoles;
 use common\services\TestDetailService;
+use DateTimeImmutable;
+use Exception;
 use modules\edu\models\EduClassBook;
 use modules\edu\models\EduClassProgram;
 use modules\edu\query\EduProgramStoriesFetcher;
 use modules\edu\query\StudentProgramLastActivityDateFetcher;
 use modules\edu\widgets\StudentStatWidget;
 use Yii;
+use yii\db\Expression;
 use yii\db\Query;
+use yii\helpers\Json;
 use yii\helpers\Url;
+use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -75,7 +79,7 @@ class DefaultController extends Controller
             throw new NotFoundHttpException('Программа не найдена');
         }
 
-        $studentIds = array_map(static function($student) {
+        $studentIds = array_map(static function ($student) {
             return $student->id;
         }, $classBook->students);
 
@@ -86,7 +90,7 @@ class DefaultController extends Controller
         return $this->render('stats', [
             'classBook' => $classBook,
             'classProgram' => $classProgram,
-            'lastActivities'  => $lastActivities,
+            'lastActivities' => $lastActivities,
         ]);
     }
 
@@ -105,13 +109,15 @@ class DefaultController extends Controller
             throw new NotFoundHttpException('Ученик не найден');
         }
 
-        $testings = array_map(function($testing) use ($student) {
+        $testings = array_map(function ($testing) use ($student) {
             return [
                 'id' => $testing->id,
                 'name' => $testing->header,
                 'incorrect' => $this->testDetailService->getIncorrectCount($testing->id, $student->id),
-                'resource' => Url::to(['/edu/teacher/default/detail', 'test_id' => $testing->id, 'student_id' => $student->id]),
-                'progress' => $student->getProgress($testing->id)
+                'resource' => Url::to(
+                    ['/edu/teacher/default/detail', 'test_id' => $testing->id, 'student_id' => $student->id],
+                ),
+                'progress' => $student->getProgress($testing->id),
             ];
         }, $story->tests);
 
@@ -170,8 +176,9 @@ class DefaultController extends Controller
 
     /**
      * @throws NotFoundHttpException
+     * @throws BadRequestHttpException
      */
-    public function actionStoryMentalMaps(int $story_id, int $student_id): string
+    public function actionStoryMentalMaps(int $story_id, int $student_id, string $date): string
     {
         if (($story = Story::findOne($story_id)) === null) {
             throw new NotFoundHttpException('История не найдена');
@@ -181,26 +188,71 @@ class DefaultController extends Controller
             throw new NotFoundHttpException('Ученик не найден');
         }
 
-        $mentalMapIds = (new StoryMentalMapFetcher())->fetch($story->slidesData());
+        try {
+            $targetDate = (new DateTimeImmutable($date))->format('Y-m-d');
+            $betweenBegin = new Expression("UNIX_TIMESTAMP('$targetDate 00:00:00')");
+            $betweenEnd = new Expression("UNIX_TIMESTAMP('$targetDate 23:59:59')");
+        } catch (Exception $ex) {
+            throw new BadRequestHttpException('Incorrect date');
+        }
+
+        $query = (new Query())
+            ->select('*')
+            ->from(['h' => 'mental_map_history'])
+            ->where([
+                'h.user_id' => $student->user_id,
+                'h.story_id' => $story->id,
+            ])
+            ->andWhere(['between', new Expression('h.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd])
+            ->orderBy(['h.created_at' => SORT_ASC]);
+        $mentalMapHistoryData = $query->all();
+
+        $mentalMapIds = array_column($mentalMapHistoryData, 'mental_map_id');
+
+        $params = [
+            'storyTitle' => $story->title,
+            'studentName' => $student->getStudentName(),
+            'date' => SmartDate::dateSmart(strtotime($date)),
+        ];
 
         if (count($mentalMapIds) === 0) {
-            return 'В истории нет ментальных карт';
+            return $this->renderAjax('_mental_maps_history', array_merge($params, ['historyData' => []]));
         }
 
-        $data = [];
-        $mentalMaps = [];
-        foreach ($mentalMapIds as $mentalMapId) {
-            $mentalMap = MentalMap::findOne($mentalMapId);
-            if ($mentalMap !== null) {
-                $mentalMaps[] = $mentalMap;
-            }
-        }
+        return $this->renderAjax(
+            '_mental_maps_history',
+            array_merge(
+                $params,
+                [
+                    'historyData' => array_map(
+                        static function(array $row): array {
+                            $payload = Json::decode($row['payload'] ?? '[]');
+                            $userResponse = $payload['user_response'] ?? $row['content'];
 
-        $historyData = (new MentalMapUserHistoryFetcher())->fetch($story->id, $student->user_id);
+                            $threshold = $row['threshold'] ?? MentalMapThreshold::getDefaultThreshold(Yii::$app->params);
+                            $threshold = (int) $threshold;
 
-        return $this->renderAjax('_mental_maps', [
-            'mentalMaps' => $mentalMaps,
-            'historyData' => $historyData,
-        ]);
+                            $userSimilarity = (int) $row['overall_similarity'];
+                            $correct = $userSimilarity >= $threshold;
+
+                            $allImportantWordsIncluded = $row['all_important_words_included'];
+                            if ($allImportantWordsIncluded !== null && $correct) {
+                                $correct = (int) $allImportantWordsIncluded === 1;
+                            }
+                            return [
+                                'createdAt' => SmartDate::dateSmart($row['created_at'], true),
+                                'userResponse' => $userResponse,
+                                'correct' => $correct,
+                                'detail' => [
+                                    'threshold' => $threshold,
+                                    'userSimilarity' => $userSimilarity,
+                                ],
+                            ];
+                        },
+                        $mentalMapHistoryData
+                    ),
+                ],
+            ),
+        );
     }
 }

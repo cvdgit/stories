@@ -66,7 +66,7 @@
       e.preventDefault()
 
       const href = e.target.getAttribute('href')
-      $('#test-detail-modal')
+      $('#mental-map-detail-modal')
         .modal({'remote': href})
     })
 })();

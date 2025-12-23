@@ -151,6 +151,7 @@ $this->registerJs($this->renderFile('@modules/edu/widgets/views/_stat.js'));
                                                             '/edu/teacher/default/story-mental-maps',
                                                             'story_id' => $story->id,
                                                             'student_id' => $student->id,
+                                                            'date' => $item['date'],
                                                         ],
                                                     ) ?>">Показать</a>
                                                 </td>
@@ -193,7 +194,7 @@ $this->registerJs($this->renderFile('@modules/edu/widgets/views/_stat.js'));
 </div>
 
 <div class="modal remote fade" id="mental-map-detail-modal">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content"></div>
     </div>
 </div>
