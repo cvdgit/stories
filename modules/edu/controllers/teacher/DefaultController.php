@@ -7,6 +7,8 @@ namespace modules\edu\controllers\teacher;
 use common\components\MentalMapThreshold;
 use common\helpers\SmartDate;
 use common\models\Story;
+use common\models\UserQuestionAnswer;
+use common\models\UserQuestionHistory;
 use common\models\UserStudent;
 use common\rbac\UserRoles;
 use common\services\TestDetailService;
@@ -15,17 +17,18 @@ use Exception;
 use modules\edu\models\EduClassBook;
 use modules\edu\models\EduClassProgram;
 use modules\edu\query\EduProgramStoriesFetcher;
+use modules\edu\query\GetStoryTests\SlideTest;
+use modules\edu\query\GetStoryTests\StoryTestsFetcher;
 use modules\edu\query\StudentProgramLastActivityDateFetcher;
 use modules\edu\widgets\StudentStatWidget;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\db\Expression;
 use yii\db\Query;
 use yii\helpers\Json;
-use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\web\Response;
 use yii\web\User as WebUser;
 
 class DefaultController extends Controller
@@ -96,11 +99,11 @@ class DefaultController extends Controller
 
     /**
      * @throws NotFoundHttpException
+     * @throws InvalidConfigException
+     * @throws BadRequestHttpException
      */
-    public function actionStoryTesting(int $story_id, int $student_id): array
+    public function actionStoryTesting(int $story_id, int $student_id, string $date): string
     {
-        $this->response->format = Response::FORMAT_JSON;
-
         if (($story = Story::findOne($story_id)) === null) {
             throw new NotFoundHttpException('История не найдена');
         }
@@ -109,7 +112,49 @@ class DefaultController extends Controller
             throw new NotFoundHttpException('Ученик не найден');
         }
 
-        $testings = array_map(function ($testing) use ($student) {
+        try {
+            $targetDate = (new DateTimeImmutable($date))->format('Y-m-d');
+            $betweenBegin = new Expression("UNIX_TIMESTAMP('$targetDate 00:00:00')");
+            $betweenEnd = new Expression("UNIX_TIMESTAMP('$targetDate 23:59:59')");
+        } catch (Exception $ex) {
+            throw new BadRequestHttpException('Incorrect date');
+        }
+
+        $slideContent = (new StoryTestsFetcher())->fetch($story->id);
+        $storyTests = $slideContent->find(SlideTest::class);
+
+        $testIds = array_map(static function (SlideTest $test): int {
+            return $test->getTestId();
+        }, $storyTests);
+
+        $params = [
+            'storyTitle' => $story->title,
+            'studentName' => $student->getStudentName(),
+            'date' => SmartDate::dateSmart(strtotime($date)),
+        ];
+
+        if (count($testIds) === 0) {
+            return $this->renderAjax('_detail', array_merge($params, ['historyData' => []]));
+        }
+
+        $query = (new Query())
+            ->select([
+                'h.created_at AS question_date',
+                'h.entity_name AS question_name',
+                'h.correct_answer AS correct',
+                "GROUP_CONCAT(a.answer_entity_name SEPARATOR ', ') AS user_answers",
+            ])
+            ->from(['h' => UserQuestionHistory::tableName()])
+            ->leftJoin(['a' => UserQuestionAnswer::tableName()], 'h.id = a.question_history_id')
+            ->where(['in', 'h.test_id', $testIds])
+            ->andWhere(['h.student_id' => $student->id])
+            ->andWhere(['between', new Expression('h.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd])
+            ->orderBy(['h.created_at' => SORT_ASC])
+            ->groupBy('h.id');
+
+        $testingHistoryData = $query->all();
+
+        /*$testings = array_map(function ($testing) use ($student) {
             return [
                 'id' => $testing->id,
                 'name' => $testing->header,
@@ -119,9 +164,24 @@ class DefaultController extends Controller
                 ),
                 'progress' => $student->getProgress($testing->id),
             ];
-        }, $story->tests);
+        }, $story->tests);*/
 
-        return ['success' => true, 'data' => $testings];
+        return $this->renderAjax(
+            '_detail',
+            array_merge(
+                $params,
+                [
+                    'historyData' => array_map(static function(array $row): array {
+                        return [
+                            'createdAt' => SmartDate::dateSmart($row['question_date'], true),
+                            'question' => $row['question_name'],
+                            'answer' => $row['user_answers'],
+                            'correct' => (int) $row['correct'] === 1,
+                        ];
+                    }, $testingHistoryData)
+                ]
+            )
+        );
     }
 
     /**
@@ -166,7 +226,7 @@ class DefaultController extends Controller
         ]);
     }
 
-    public function actionDetail(int $test_id, int $student_id)
+    public function actionDetail(int $test_id, int $student_id): string
     {
         $rows = $this->testDetailService->getDetail($test_id, $student_id);
         return $this->renderAjax('_detail', [

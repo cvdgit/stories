@@ -30,15 +30,19 @@ class SlideContentCollection
      */
     public function find(string $className): array
     {
-        return array_filter($this->contents, static function (SlideContentItemInterface $item) use ($className): bool {
-            return get_class($item) === $className;
-        });
+        return array_values(
+            array_filter($this->contents, static function (SlideContentItemInterface $item) use ($className): bool {
+                return get_class($item) === $className;
+            }),
+        );
     }
 
     public function getContents(array $classNames): array
     {
-        return array_values(array_filter($this->contents, static function (SlideContentItemInterface $item) use ($classNames): bool {
-            return in_array(get_class($item), $classNames, true);
-        }));
+        return array_values(
+            array_filter($this->contents, static function (SlideContentItemInterface $item) use ($classNames): bool {
+                return in_array(get_class($item), $classNames, true);
+            }),
+        );
     }
 }

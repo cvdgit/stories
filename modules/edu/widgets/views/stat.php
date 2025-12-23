@@ -142,8 +142,9 @@ $this->registerJs($this->renderFile('@modules/edu/widgets/views/_stat.js'));
                                                             '/edu/teacher/default/story-testing',
                                                             'story_id' => $story->id,
                                                             'student_id' => $student->id,
+                                                            'date' => $item['date'],
                                                         ],
-                                                    ) ?>">Результаты</a>
+                                                    ) ?>">Показать</a>
                                                 </td>
                                                 <td>
                                                     <a class="show-mental-maps" href="<?= Url::to(
@@ -188,7 +189,7 @@ $this->registerJs($this->renderFile('@modules/edu/widgets/views/_stat.js'));
 </div>
 
 <div class="modal remote fade" id="test-detail-modal">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content"></div>
     </div>
 </div>
