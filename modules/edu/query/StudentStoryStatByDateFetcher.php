@@ -18,8 +18,8 @@ class StudentStoryStatByDateFetcher
             ])
             ->from('story_student_stat')
             ->where(['student_id' => $studentId])
-            ->groupBy(['targetDate'])
-            ->orderBy(['MAX(created_at)' => SORT_DESC]);
+            ->groupBy(['targetDate']);
+            //->orderBy(['MAX(created_at)' => SORT_DESC]);
 
         if ($programStoryIds !== null) {
             $query->andWhere(['in', 'story_id', $programStoryIds]);
