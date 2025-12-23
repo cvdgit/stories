@@ -9,6 +9,6 @@ class MainAsset extends AssetBundle
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $js = [
-        'build/main.js',
+        '/build/main.js',
     ];
 }
