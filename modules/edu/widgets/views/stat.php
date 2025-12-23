@@ -104,8 +104,8 @@ $this->registerJs($this->renderFile('@modules/edu/widgets/views/_stat.js'));
                                         <thead>
                                         <tr>
                                             <th class="col-md-4">История</th>
-                                            <th class="col-md-2">Прогресс</th>
-                                            <th class="col-md-2">Время</th>
+                                            <th class="col-md-2">Общий прогресс</th>
+                                            <th class="col-md-2">Время сессии</th>
                                             <th class="col-md-2">Ответов на вопросы / неправильных</th>
                                             <th class="col-md-2">Тесты</th>
                                             <th class="col-md-2">Ментальные карты</th>
