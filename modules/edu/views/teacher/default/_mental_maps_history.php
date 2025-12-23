@@ -22,7 +22,7 @@ use yii\web\View;
     <?php if (count($historyData) === 0): ?>
     <div>Нет данных</div>
     <?php else: ?>
-    <div>
+    <div style="display: flex; flex-direction: column; gap: 20px">
         <?php foreach ($historyData as $row): ?>
         <div style="display: flex; flex-direction: row; align-items: start; gap: 10px">
             <div style="white-space: nowrap"><?= $row['createdAt'] ?></div>
