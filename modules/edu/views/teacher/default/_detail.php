@@ -25,7 +25,7 @@ use yii\web\View;
         <div style="display: flex; flex-direction: column; gap: 20px">
             <?php foreach ($historyData as $row): ?>
                 <div style="display: flex; flex-direction: row; align-items: start; gap: 10px">
-                    <div style="white-space: nowrap; font-size: 16px; color: #909090; margin-top: 5px"><?= $row['createdAt'] ?></div>
+                    <div style="white-space: nowrap; font-size: 16px; color: #909090"><?= $row['createdAt'] ?></div>
                     <div style="flex: 1; font-size: 18px; line-height: 26px">
                         <div style="margin-bottom: 10px"><b>Вопрос:</b> <?= $row['question'] ?></div>
                         <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center">
