@@ -15,7 +15,6 @@ import DetailContent from "./content/DetailContent";
 import {processOutputAsJson, stripTags} from "./common";
 import FragmentResultQuestionsElement from "./content/FragmentResultQuestionsElement";
 import {diffRetelling, SimilarityChecker} from "./lib/calcSimilarity";
-import Reveal from 'reveal.js';
 
 /**
  * @param element
