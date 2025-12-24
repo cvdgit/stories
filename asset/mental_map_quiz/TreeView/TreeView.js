@@ -13,6 +13,7 @@ import TreeViewBody from "./TreeViewBody";
  * @param history
  * @param {{story_id: number|null, slide_id: number|null, mental_map_id: string, threshold: number}} params
  * @param {Settings} settings
+ * @param onMentalMapChange
  * @param {VoiceResponse} voiceResponse
  * @returns {HTMLDivElement}
  * @constructor

@@ -1,3 +1,4 @@
+import GlobalContext from "../../GlobalContext";
 
 function toUnixTS(ts) {
   return (new Date(ts).getTime() / 1000).toFixed(0);
@@ -14,7 +15,7 @@ function makeSessionId() {
 
 export default function Stat(config) {
 
-  const session = makeSessionId();
+  const session = GlobalContext.sessionId; // makeSessionId();
 
   function send(data) {
     return $.ajax({
@@ -52,6 +53,14 @@ export default function Stat(config) {
       if (ts > 0 && ev.indexh > 0) {
         return sendStatistics(ev);
       }
+    },
+    sendStat({slideId}) {
+      return send({
+        story_id: config.story_id,
+        slide_id: slideId,
+        student_id: config.student_id,
+        session
+      });
     }
   };
 };

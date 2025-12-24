@@ -16,6 +16,9 @@ import NextStory from "./plugins/NextStory";
 import isMobile from "./is_mobile";
 import MentalMap from "./plugins/MentalMap";
 import Retelling from "./plugins/Retelling";
+import GlobalContext from "./GlobalContext";
+
+GlobalContext.sessionId = uuidv4();
 
 window.mentalMapBuilder = new MentalMapManagerQuiz()
 window.retellingBuilder = new RetellingManagerQuiz()

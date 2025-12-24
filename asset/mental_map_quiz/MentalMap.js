@@ -15,6 +15,7 @@ import DetailContent from "./content/DetailContent";
 import {processOutputAsJson, stripTags} from "./common";
 import FragmentResultQuestionsElement from "./content/FragmentResultQuestionsElement";
 import {diffRetelling, SimilarityChecker} from "./lib/calcSimilarity";
+import Reveal from 'reveal.js';
 
 /**
  * @param element
@@ -365,6 +366,13 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
               }
             })*/
 
+            if (deck) {
+              if (deck.hasPlugin('stat')) {
+                const statPlugin = deck.getPlugin('stat');
+                statPlugin.sendStat({slideId: params.slide_id});
+              }
+            }
+
             historyItem.all = Number(json.overall_similarity)
             historyItem.hiding = textHidingPercentage
             historyItem.target = textTargetPercentage
@@ -626,8 +634,15 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         },
         settings: json.settings || {},
         onMentalMapChange: progress => {
-          mentalMapUserProgress = progress
-        }
+          mentalMapUserProgress = progress;
+          if (deck) {
+            if (deck.hasPlugin('stat')) {
+              const statPlugin = deck.getPlugin('stat');
+              statPlugin.sendStat({slideId: params.slide_id});
+            }
+          }
+        },
+        deck
       }, new VoiceResponse(new MissingWordsRecognition({
         getRecordingLang() {
           return (json.settings || {}).recognitionLang || 'ru-RU';
@@ -818,41 +833,6 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         mentalMapHistory,
         hideTooltipChecker
       )
-
-      /*
-      zoomContainer.appendChild(zoomWrap)
-
-      const closeBtn = document.createElement('button')
-      closeBtn.classList.add('btn', 'btn-small', 'mental-map-close')
-      closeBtn.textContent = 'Закрыть'
-      closeBtn.addEventListener('click', () => {
-        zoom.destroy()
-        zoomContainer.remove()
-        element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
-      })
-      zoomContainer.appendChild(closeBtn)
-
-      const hideBtn = document.createElement('button')
-      hideBtn.classList.add('btn', 'btn-small', 'mental-map-hide-btn')
-      hideBtn.textContent = 'Скрыть'
-      hideBtn.addEventListener('click', e => {
-        $(e.target).toggleClass('img-hide')
-        if ($(e.target).hasClass('img-hide')) {
-          $(this.element).find('.mental-map-img .map-img')
-            .each((i, el) => $(el).css({opacity: '0'}))
-          $(this.element).find('.mental-map-img').each((i, el) => {
-            $(el).append(`<span class="mental-map-point"></span>`)
-          })
-          $(e.target).text('Показать')
-        } else {
-          $(this.element).find('.mental-map-img span').remove()
-          $(this.element).find('.mental-map-img .map-img')
-            .each((i, el) => $(el).css({opacity: '1'}))
-          $(e.target).text('Скрыть')
-        }
-      })
-      zoomContainer.appendChild(hideBtn)
-       */
 
       const zoomContainer = showMentalMapHandler(zoomWrap, () => {
         zoom.destroy()
