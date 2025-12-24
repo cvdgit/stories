@@ -4,26 +4,17 @@ declare(strict_types=1);
 
 namespace modules\edu\query;
 
-use common\models\UserStudent;
-use modules\edu\query\GetStoryTests\SlideMentalMap;
-use modules\edu\query\GetStoryTests\StoryTestsFetcher;
-use yii\base\InvalidConfigException;
 use yii\db\Expression;
 use yii\db\Query;
-use yii\web\NotFoundHttpException;
 
 class StudentStoryDurationFetcher
 {
-    /**
-     * @throws InvalidConfigException
-     * @throws NotFoundHttpException
-     */
     public function fetch(int $studentId, int $storyId, string $targetDate): string
     {
         $betweenBegin = new Expression("UNIX_TIMESTAMP('$targetDate 00:00:00')");
         $betweenEnd = new Expression("UNIX_TIMESTAMP('$targetDate 23:59:59')");
 
-        /*$timeQuery = (new Query())
+        $timeQuery = (new Query())
             ->select([
                 'session_time' => 'MAX(story_student_stat.created_at) - MIN(story_student_stat.created_at)',
             ])
@@ -38,9 +29,7 @@ class StudentStoryDurationFetcher
             ])
             ->from(['t' => $timeQuery]);
 
-        return (string)$query->scalar();*/
-
-        $student = UserStudent::findOne($studentId);
+        /*$student = UserStudent::findOne($studentId);
         if ($student === null) {}
 
         $storyStatQuery = (new Query())
@@ -73,8 +62,8 @@ class StudentStoryDurationFetcher
 
         $query = (new Query())
             ->select(new Expression('SEC_TO_TIME(SUM(t.sessionSec))'))
-            ->from(['t' => $allQuery]);
+            ->from(['t' => $allQuery]);*/
 
-        return (string)$query->scalar();
+        return (string) $query->scalar();
     }
 }
