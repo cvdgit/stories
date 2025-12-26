@@ -176,11 +176,21 @@ class TrainingController extends UserController
             ];
         }
 
+        $storiesProgress = $this->fetchStoriesProgress(
+            $targetStudent->id,
+            array_keys($stories)
+        );
+
         $models = [];
         foreach ($stories as $storyId => $story) {
 
+            $info = '';
+            if (isset($storiesProgress[$storyId])) {
+                $info = '<span style="margin-left: 10px;" data-toggle="tooltip" class="glyphicon glyphicon-info-sign" title="История пройдена в обучении: ' . $storiesProgress[$storyId]['date'] . '"></span>';
+            }
+
             $model = [
-                $story['story_title'],
+                $story['story_title'] . $info,
             ];
 
             foreach ($times as $time) {
@@ -220,6 +230,7 @@ class TrainingController extends UserController
                 'columns' => $columns,
                 'models' => $models,
                 'filterModel' => $filterForm,
+                'storiesProgress' => $storiesProgress,
             ],
         ]);
     }
@@ -451,5 +462,34 @@ class TrainingController extends UserController
             'title' => $story->title . ' - ' . Yii::$app->formatter->asDate($date),
             'quizData' => $quizData,
         ]);
+    }
+
+    private function fetchStoriesProgress(int $studentId, array $storyIds): array
+    {
+        if (count($storyIds) === 0) {
+            return [];
+        }
+
+        $query = (new Query())
+            ->select([
+                'storyId' => 't.story_id',
+                'completeTime' => 't.updated_at',
+            ])
+            ->from(['t' => 'story_student_progress'])
+            ->where([
+                't.student_id' => $studentId,
+            ])
+            ->andWhere(['in', 't.story_id', $storyIds])
+            ->andWhere('t.progress = 100');
+        $rows = $query->all();
+
+        return array_combine(
+            array_column($rows, 'storyId'),
+            array_map(static function(array $row): array {
+                return [
+                    'date' => SmartDate::dateSmart((int) $row['completeTime'], true),
+                ];
+            }, $rows)
+        );
     }
 }

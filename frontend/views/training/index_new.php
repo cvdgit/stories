@@ -38,6 +38,9 @@ $this->registerCss(<<<CSS
 .history-nav {
     margin-bottom: 20px;
 }
+.tooltip {
+    font-size: 16px;
+}
 CSS
 );
 ?>
