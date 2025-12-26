@@ -22,7 +22,7 @@ $byTypeViewMap = [
     Slide::class => '_slide',
     SlideMentalMap::class => '_slide_mental_map',
     SlideTest::class => '_slide_test',
-    SlideRetelling::class => '_slide_test',
+    SlideRetelling::class => '_slide',
 ];
 ?>
 <div style="display: flex; flex-direction: column; gap: 20px; padding: 20px 0">
