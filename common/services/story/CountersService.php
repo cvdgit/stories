@@ -6,6 +6,7 @@ use common\models\Story;
 use common\models\StorySlide;
 use common\rbac\UserRoles;
 use Yii;
+use yii\db\Exception;
 use yii\db\Query;
 
 class CountersService
@@ -53,15 +54,23 @@ class CountersService
         }
     }
 
-    public function updateUserStoryHistory(int $userID, int $storyID)
+    /**
+     * @throws Exception
+     */
+    public function updateUserStoryHistory(int $userID, int $storyID): void
     {
-        $exists = (new Query())->from('{{%user_story_history}}')->where('user_id = :user AND story_id = :story', ['user' => $userID, 'story' => $storyID])->exists();
+        $exists = (new Query())->from('{{%user_story_history}}')->where(
+            'user_id = :user AND story_id = :story',
+            ['user' => $userID, 'story' => $storyID],
+        )->exists();
         $command = Yii::$app->db->createCommand();
         if ($exists) {
-            $command->update('{{%user_story_history}}', ['updated_at' => time()], ['user_id' => $userID, 'story_id' => $storyID]);
-        }
-        else {
-            $command->insert('{{%user_story_history}}', ['user_id' => $userID, 'story_id' => $storyID, 'updated_at' => time()]);
+            // $command->update('{{%user_story_history}}', ['updated_at' => time()], ['user_id' => $userID, 'story_id' => $storyID]);
+        } else {
+            $command->insert(
+                '{{%user_story_history}}',
+                ['user_id' => $userID, 'story_id' => $storyID, 'updated_at' => time()],
+            );
         }
         $command->execute();
     }
