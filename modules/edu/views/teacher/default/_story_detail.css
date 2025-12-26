@@ -1,0 +1,29 @@
+.slide-wrap {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.slide-inner {
+  border: 1px #ddd solid;
+  width: 100%;
+  padding: 0 10px;
+  position: relative;
+}
+
+.slide-inner[data-view=slide] {
+  aspect-ratio: 16 / 9;
+  height: 100%;
+  overflow: hidden;
+}
+
+.previously-viewed {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  padding: 6px;
+  border-radius: 6px;
+  background-color: #9aca4f;
+  color: #fff;
+  font-weight: 600;
+}

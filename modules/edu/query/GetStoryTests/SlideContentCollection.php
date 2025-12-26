@@ -37,6 +37,10 @@ class SlideContentCollection
         );
     }
 
+    /**
+     * @param array $classNames
+     * @return array<array-key, SlideContentItemInterface>
+     */
     public function getContents(array $classNames): array
     {
         return array_values(

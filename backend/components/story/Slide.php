@@ -22,6 +22,8 @@ class Slide
 
     /** @var string */
     protected $audioFile;
+    /** @var string */
+    private $content;
 
     /**
      * @return AbstractBlock[]
@@ -150,5 +152,15 @@ class Slide
         return array_filter($this->blocks, static function(AbstractBlock $block) {
             return $block->isVideo();
         });
+    }
+
+    public function setContent(string $content): void
+    {
+        $this->content = $content;
+    }
+
+    public function getContent(): string
+    {
+        return $this->content;
     }
 }

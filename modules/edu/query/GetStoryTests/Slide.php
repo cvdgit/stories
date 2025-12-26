@@ -14,11 +14,16 @@ class Slide implements SlideContentItemInterface
      * @var int
      */
     private $number;
+    /**
+     * @var string
+     */
+    private $content;
 
-    public function __construct(int $id, int $number)
+    public function __construct(int $id, int $number, string $content)
     {
         $this->id = $id;
         $this->number = $number;
+        $this->content = $content;
     }
 
     public function getSlideId(): int
@@ -29,5 +34,10 @@ class Slide implements SlideContentItemInterface
     public function getSlideNumber(): int
     {
         return $this->number;
+    }
+
+    public function getContent(): string
+    {
+        return $this->content;
     }
 }

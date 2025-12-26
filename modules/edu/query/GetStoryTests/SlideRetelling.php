@@ -18,12 +18,17 @@ class SlideRetelling implements SlideContentItemInterface
      * @var string
      */
     private $retellingId;
+    /**
+     * @var string
+     */
+    private $content;
 
-    public function __construct(int $slideId, int $slideNumber, string $retellingId)
+    public function __construct(int $slideId, int $slideNumber, string $retellingId, string $content)
     {
         $this->slideId = $slideId;
         $this->slideNumber = $slideNumber;
         $this->retellingId = $retellingId;
+        $this->content = $content;
     }
 
     public function getSlideId(): int
@@ -39,5 +44,10 @@ class SlideRetelling implements SlideContentItemInterface
     public function getRetellingId(): string
     {
         return $this->retellingId;
+    }
+
+    public function getContent(): string
+    {
+        return $this->content;
     }
 }

@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace modules\edu\controllers\teacher;
 
-use common\components\MentalMapThreshold;
 use common\helpers\SmartDate;
 use common\models\Story;
-use common\models\UserQuestionAnswer;
-use common\models\UserQuestionHistory;
 use common\models\UserStudent;
 use common\rbac\UserRoles;
 use common\services\TestDetailService;
@@ -17,15 +14,16 @@ use Exception;
 use modules\edu\models\EduClassBook;
 use modules\edu\models\EduClassProgram;
 use modules\edu\query\EduProgramStoriesFetcher;
+use modules\edu\query\GetStoryTests\Slide;
+use modules\edu\query\GetStoryTests\SlideMentalMap;
+use modules\edu\query\GetStoryTests\SlideRetelling;
 use modules\edu\query\GetStoryTests\SlideTest;
 use modules\edu\query\GetStoryTests\StoryTestsFetcher;
 use modules\edu\query\StudentProgramLastActivityDateFetcher;
+use modules\edu\Teacher\StudentsStat\DateStudentStatFetcher;
 use modules\edu\widgets\StudentStatWidget;
-use Yii;
 use yii\base\InvalidConfigException;
-use yii\db\Expression;
 use yii\db\Query;
-use yii\helpers\Json;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -113,19 +111,10 @@ class DefaultController extends Controller
         }
 
         try {
-            $targetDate = (new DateTimeImmutable($date))->format('Y-m-d');
-            $betweenBegin = new Expression("UNIX_TIMESTAMP('$targetDate 00:00:00')");
-            $betweenEnd = new Expression("UNIX_TIMESTAMP('$targetDate 23:59:59')");
+            $targetDate = new DateTimeImmutable($date);
         } catch (Exception $ex) {
             throw new BadRequestHttpException('Incorrect date');
         }
-
-        $slideContent = (new StoryTestsFetcher())->fetch($story->id);
-        $storyTests = $slideContent->find(SlideTest::class);
-
-        $testIds = array_map(static function (SlideTest $test): int {
-            return $test->getTestId();
-        }, $storyTests);
 
         $params = [
             'storyTitle' => $story->title,
@@ -133,54 +122,19 @@ class DefaultController extends Controller
             'date' => SmartDate::dateSmart(strtotime($date)),
         ];
 
-        if (count($testIds) === 0) {
+        $historyData = (new DateStudentStatFetcher())->fetchTestings(
+            $student->id,
+            $story->id,
+            $targetDate,
+        );
+
+        if (count($historyData) === 0) {
             return $this->renderAjax('_detail', array_merge($params, ['historyData' => []]));
         }
 
-        $query = (new Query())
-            ->select([
-                'h.created_at AS question_date',
-                'h.entity_name AS question_name',
-                'h.correct_answer AS correct',
-                "GROUP_CONCAT(a.answer_entity_name SEPARATOR ', ') AS user_answers",
-            ])
-            ->from(['h' => UserQuestionHistory::tableName()])
-            ->leftJoin(['a' => UserQuestionAnswer::tableName()], 'h.id = a.question_history_id')
-            ->where(['in', 'h.test_id', $testIds])
-            ->andWhere(['h.student_id' => $student->id])
-            ->andWhere(['between', new Expression('h.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd])
-            ->orderBy(['h.created_at' => SORT_ASC])
-            ->groupBy('h.id');
-
-        $testingHistoryData = $query->all();
-
-        /*$testings = array_map(function ($testing) use ($student) {
-            return [
-                'id' => $testing->id,
-                'name' => $testing->header,
-                'incorrect' => $this->testDetailService->getIncorrectCount($testing->id, $student->id),
-                'resource' => Url::to(
-                    ['/edu/teacher/default/detail', 'test_id' => $testing->id, 'student_id' => $student->id],
-                ),
-                'progress' => $student->getProgress($testing->id),
-            ];
-        }, $story->tests);*/
-
         return $this->renderAjax(
             '_detail',
-            array_merge(
-                $params,
-                [
-                    'historyData' => array_map(static function(array $row): array {
-                        return [
-                            'createdAt' => SmartDate::dateSmart($row['question_date'], true),
-                            'question' => $row['question_name'],
-                            'answer' => $row['user_answers'],
-                            'correct' => (int) $row['correct'] === 1,
-                        ];
-                    }, $testingHistoryData)
-                ]
-            )
+            array_merge($params, ['historyData' => $historyData]),
         );
     }
 
@@ -249,25 +203,10 @@ class DefaultController extends Controller
         }
 
         try {
-            $targetDate = (new DateTimeImmutable($date))->format('Y-m-d');
-            $betweenBegin = new Expression("UNIX_TIMESTAMP('$targetDate 00:00:00')");
-            $betweenEnd = new Expression("UNIX_TIMESTAMP('$targetDate 23:59:59')");
+            $targetDate = new DateTimeImmutable($date);
         } catch (Exception $ex) {
             throw new BadRequestHttpException('Incorrect date');
         }
-
-        $query = (new Query())
-            ->select('*')
-            ->from(['h' => 'mental_map_history'])
-            ->where([
-                'h.user_id' => $student->user_id,
-                'h.story_id' => $story->id,
-            ])
-            ->andWhere(['between', new Expression('h.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd])
-            ->orderBy(['h.created_at' => SORT_ASC]);
-        $mentalMapHistoryData = $query->all();
-
-        $mentalMapIds = array_column($mentalMapHistoryData, 'mental_map_id');
 
         $params = [
             'storyTitle' => $story->title,
@@ -275,44 +214,113 @@ class DefaultController extends Controller
             'date' => SmartDate::dateSmart(strtotime($date)),
         ];
 
-        if (count($mentalMapIds) === 0) {
+        $historyData = (new DateStudentStatFetcher())->fetchMentalMaps(
+            $student->user_id,
+            $story->id,
+            $targetDate,
+        );
+
+        if (count($historyData) === 0) {
             return $this->renderAjax('_mental_maps_history', array_merge($params, ['historyData' => []]));
         }
 
         return $this->renderAjax(
             '_mental_maps_history',
-            array_merge(
-                $params,
-                [
-                    'historyData' => array_map(
-                        static function(array $row): array {
-                            $payload = Json::decode($row['payload'] ?? '[]');
-                            $userResponse = $payload['user_response'] ?? $row['content'];
-
-                            $threshold = $row['threshold'] ?? MentalMapThreshold::getDefaultThreshold(Yii::$app->params);
-                            $threshold = (int) $threshold;
-
-                            $userSimilarity = (int) $row['overall_similarity'];
-                            $correct = $userSimilarity >= $threshold;
-
-                            $allImportantWordsIncluded = $row['all_important_words_included'];
-                            if ($allImportantWordsIncluded !== null && $correct) {
-                                $correct = (int) $allImportantWordsIncluded === 1;
-                            }
-                            return [
-                                'createdAt' => SmartDate::dateSmart($row['created_at'], true),
-                                'userResponse' => $userResponse,
-                                'correct' => $correct,
-                                'detail' => [
-                                    'threshold' => $threshold,
-                                    'userSimilarity' => $userSimilarity,
-                                ],
-                            ];
-                        },
-                        $mentalMapHistoryData
-                    ),
-                ],
-            ),
+            array_merge($params, ['historyData' => $historyData]),
         );
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     * @throws BadRequestHttpException
+     * @throws InvalidConfigException
+     */
+    public function actionStoryDetail(int $story_id, int $student_id, string $date): string
+    {
+        if (($story = Story::findOne($story_id)) === null) {
+            throw new NotFoundHttpException('История не найдена');
+        }
+
+        if (($student = UserStudent::findOne($student_id)) === null) {
+            throw new NotFoundHttpException('Ученик не найден');
+        }
+
+        try {
+            $targetDate = new DateTimeImmutable($date);
+        } catch (Exception $ex) {
+            throw new BadRequestHttpException('Incorrect date');
+        }
+
+        $statFetcher = new DateStudentStatFetcher();
+        $historyRows = $statFetcher->fetchSlides(
+            $student->id,
+            $story->id,
+            $targetDate,
+        );
+
+        $slideContent = (new StoryTestsFetcher())->fetch($story->id);
+        $slides = $slideContent->getContents([
+            Slide::class,
+            SlideMentalMap::class,
+            SlideTest::class,
+            SlideRetelling::class,
+        ]);
+
+        $mentalMapHistory = $statFetcher->fetchMentalMaps(
+            $student->user_id,
+            $story->id,
+            $targetDate,
+        );
+
+        $testsHistory = $statFetcher->fetchTestings(
+            $student->id,
+            $story->id,
+            $targetDate
+        );
+
+        $history = [];
+        foreach ($slides as $slide) {
+            $slideId = $slide->getSlideId();
+            $type = get_class($slide);
+            $historyItem = [
+                'slideNumber' => $slide->getSlideNumber(),
+                'type' => $type,
+                'history' => array_values(
+                    array_filter($historyRows, static function (array $row) use ($slideId): bool {
+                        return (int) $row['slide_id'] === $slideId;
+                    }),
+                ),
+            ];
+            if (count($historyItem['history']) === 0) {
+                continue;
+            }
+
+            $historyItem['previouslyViewed'] = false; // count($historyItem['history']) > 1;
+
+            if ($type === Slide::class) {
+                $historyItem['slide'] = $slide->getContent();
+            }
+            if ($type === SlideMentalMap::class) {
+                /** @var SlideMentalMap $slide */
+                $historyItem['mentalMaps'] = array_values(
+                    array_filter($mentalMapHistory, static function (array $row) use ($slide): bool {
+                        return $row['id'] === $slide->getMentalMapId();
+                    }),
+                );
+            }
+            if ($type === SlideTest::class) {
+                /** @var SlideTest $slide */
+                $historyItem['tests'] = array_values(
+                    array_filter($testsHistory, static function (array $row) use ($slide): bool {
+                        return $row['testId'] === $slide->getTestId();
+                    }),
+                );
+            }
+            $history[] = $historyItem;
+        }
+
+        return $this->renderAjax('_story_detail', [
+            'history' => $history,
+        ]);
     }
 }

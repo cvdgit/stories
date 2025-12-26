@@ -18,12 +18,17 @@ class SlideMentalMap implements SlideContentItemInterface
      * @var string
      */
     private $mentalMapId;
+    /**
+     * @var string
+     */
+    private $content;
 
-    public function __construct(int $slideId, int $slideNumber, string $mentalMapId)
+    public function __construct(int $slideId, int $slideNumber, string $mentalMapId, string $content)
     {
         $this->slideId = $slideId;
         $this->slideNumber = $slideNumber;
         $this->mentalMapId = $mentalMapId;
+        $this->content = $content;
     }
 
     public function getSlideId(): int
@@ -39,5 +44,10 @@ class SlideMentalMap implements SlideContentItemInterface
     public function getMentalMapId(): string
     {
         return $this->mentalMapId;
+    }
+
+    public function getContent(): string
+    {
+        return $this->content;
     }
 }

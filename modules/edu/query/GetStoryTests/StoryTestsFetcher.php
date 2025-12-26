@@ -34,7 +34,7 @@ class StoryTestsFetcher
         foreach ($story->getSlides() as $slide) {
 
             if ($slide->getView() === '' || $slide->getView() === 'slide') {
-                $data[] = new Slide($slide->getId(), (int) $slide->getSlideNumber());
+                $data[] = new Slide($slide->getId(), (int) $slide->getSlideNumber(), $slide->getContent());
             }
 
             foreach ($slide->getBlocks() as $block) {
@@ -44,7 +44,12 @@ class StoryTestsFetcher
                     $fragment = \phpQuery::newDocumentHTML($content);
                     $testId = $fragment->find('.new-questions')->attr('data-test-id');
                     if ($testId !== null) {
-                        $data[] = new SlideTest($slide->getId(), (int) $slide->getSlideNumber(), (int) $testId);
+                        $data[] = new SlideTest(
+                            $slide->getId(),
+                            (int) $slide->getSlideNumber(),
+                            (int) $testId,
+                            $content
+                        );
                     }
                 }
 
@@ -52,18 +57,33 @@ class StoryTestsFetcher
                     /** @var $block TestBlock */
                     $testId = $block->getTestID();
                     if ($testId !== null) {
-                        $data[] = new SlideTest($slide->getId(), (int) $slide->getSlideNumber(), (int) $testId);
+                        $data[] = new SlideTest(
+                            $slide->getId(),
+                            (int) $slide->getSlideNumber(),
+                            (int) $testId,
+                            'button'
+                        );
                     }
                 }
 
                 if ($block->getType() === AbstractBlock::TYPE_MENTAL_MAP) {
                     $content = MentalMapBlockContent::createFromHtml($block->getContent());
-                    $data[] = new SlideMentalMap($slide->getId(), (int) $slide->getSlideNumber(), $content->getId());
+                    $data[] = new SlideMentalMap(
+                        $slide->getId(),
+                        (int) $slide->getSlideNumber(),
+                        $content->getId(),
+                        $block->getContent()
+                    );
                 }
 
                 if ($block->getType() === AbstractBlock::TYPE_RETELLING) {
                     $content = RetellingBlockContent::createFromHtml($block->getContent());
-                    $data[] = new SlideRetelling($slide->getId(), (int) $slide->getSlideNumber(), $content->getId());
+                    $data[] = new SlideRetelling(
+                        $slide->getId(),
+                        (int) $slide->getSlideNumber(),
+                        $content->getId(),
+                        $block->getContent()
+                    );
                 }
             }
         }

@@ -50,6 +50,7 @@ class HTMLReader extends AbstractReader implements ReaderInterface
     private function loadSlide(string $htmlSlide, int $slideIndex): void
     {
         $slide = $this->story->createSlide();
+        $slide->setContent($htmlSlide);
         $slide->setSlideNumber($slideIndex);
         $slide->setView(pq($htmlSlide)->attr('data-slide-view') ?? '');
         $slide->id = (int) pq($htmlSlide)->attr('data-id');

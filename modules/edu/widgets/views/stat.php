@@ -106,9 +106,7 @@ $this->registerJs($this->renderFile('@modules/edu/widgets/views/_stat.js'));
                                             <th class="col-md-4">История</th>
                                             <th class="col-md-2">Общий прогресс</th>
                                             <th class="col-md-2">Время сессии</th>
-                                            <th class="col-md-2">Ответов на вопросы / неправильных</th>
-                                            <th class="col-md-2">Тесты</th>
-                                            <th class="col-md-2">Ментальные карты</th>
+                                            <th class="col-md-2">Содержимое</th>
                                             <th></th>
                                         </tr>
                                         </thead>
@@ -128,33 +126,14 @@ $this->registerJs($this->renderFile('@modules/edu/widgets/views/_stat.js'));
                                                         $item['date'],
                                                     ); ?></td>
                                                 <td>
-                                                    <?php
-                                                    $questionData = $questionFetcher->fetch(
-                                                        $student->id,
-                                                        (int) $storyId,
-                                                        $item['date'],
-                                                    ); ?>
-                                                    <?= $questionData['total'] . ($questionData['incorrect'] > 0 ? ' / ' . $questionData['incorrect'] : ''); ?>
-                                                </td>
-                                                <td>
-                                                    <a class="show-testing" href="<?= Url::to(
+                                                    <a class="show-detail btn-outline-info" href="<?= Url::to(
                                                         [
-                                                            '/edu/teacher/default/story-testing',
+                                                            '/edu/teacher/default/story-detail',
                                                             'story_id' => $story->id,
                                                             'student_id' => $student->id,
                                                             'date' => $item['date'],
                                                         ],
-                                                    ) ?>">Показать</a>
-                                                </td>
-                                                <td>
-                                                    <a class="show-mental-maps" href="<?= Url::to(
-                                                        [
-                                                            '/edu/teacher/default/story-mental-maps',
-                                                            'story_id' => $story->id,
-                                                            'student_id' => $student->id,
-                                                            'date' => $item['date'],
-                                                        ],
-                                                    ) ?>">Показать</a>
+                                                    ) ?>">Подробнее</a>
                                                 </td>
                                                 <td>
                                                     <?php

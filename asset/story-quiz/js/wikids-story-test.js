@@ -2113,6 +2113,13 @@ function WikidsStoryTest(el, options) {
       }
     }
 
+    if (that.getDeck()) {
+      if (that.getDeck().hasPlugin('stat')) {
+        const statPlugin = that.getDeck().getPlugin('stat');
+        statPlugin.sendStat({slideId: $(that.getDeck().getCurrentSlide()).attr('data-id')});
+      }
+    }
+
     if (!answerIsCorrect) {
 
       if (questionViewPoetry(currentQuestion)) {

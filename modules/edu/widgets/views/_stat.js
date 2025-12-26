@@ -1,7 +1,6 @@
 (function () {
   $('#edu-stats').on('click', '.show-testing', function (e) {
     e.preventDefault();
-
     const href = e.target.getAttribute('href');
     $('#test-detail-modal')
       .on('hide.bs.modal', function () {
@@ -23,7 +22,6 @@
   $('#edu-stats')
     .on('click', '.show-mental-maps', (e) => {
       e.preventDefault();
-
       const href = e.target.getAttribute('href');
       $('#mental-map-detail-modal')
         .on('hide.bs.modal', function () {
@@ -31,5 +29,15 @@
           $(this).removeData('bs.modal');
         })
         .modal({'remote': href});
-    })
+    });
+
+  $('#edu-stats').on('click', '.show-detail', e => {
+    e.preventDefault();
+    const dialog = new RemoteModal({
+      id: 'story-detail-dialog',
+      title: 'Содержимое истории, просмотренное в рамках сессии',
+      dialogClassName:'modal-lg'
+    });
+    dialog.show({url: e.target.getAttribute('href'), callback: () => {}});
+  });
 })();
