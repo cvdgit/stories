@@ -316,6 +316,9 @@ class DefaultController extends Controller
                     }),
                 );
             }
+            if ($type === SlideRetelling::class) {
+                $historyItem['slide'] = 'Пересказ';
+            }
             $history[] = $historyItem;
         }
 
