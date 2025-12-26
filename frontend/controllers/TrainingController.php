@@ -316,11 +316,21 @@ class TrainingController extends UserController
             $targetDate = $targetDate->modify('+1 day');
         }
 
+        $storiesProgress = $this->fetchStoriesProgress(
+            $targetStudent->id,
+            array_keys($stories)
+        );
+
         $models = [];
         foreach ($stories as $storyId => $story) {
 
+            $info = '';
+            if (isset($storiesProgress[$storyId])) {
+                $info = '<span style="margin-left: 10px;" data-toggle="tooltip" class="glyphicon glyphicon-info-sign" title="История пройдена в обучении: ' . $storiesProgress[$storyId]['date'] . '"></span>';
+            }
+
             $model = [
-                $story['story_title'],
+                $story['story_title'] . $info,
             ];
 
             foreach ($dates as $currentDate) {
