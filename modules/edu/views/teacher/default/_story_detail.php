@@ -5,6 +5,7 @@ declare(strict_types=1);
 use modules\edu\assets\RevealAsset;
 use modules\edu\query\GetStoryTests\Slide;
 use modules\edu\query\GetStoryTests\SlideMentalMap;
+use modules\edu\query\GetStoryTests\SlideRetelling;
 use modules\edu\query\GetStoryTests\SlideTest;
 use yii\web\View;
 
@@ -21,6 +22,7 @@ $byTypeViewMap = [
     Slide::class => '_slide',
     SlideMentalMap::class => '_slide_mental_map',
     SlideTest::class => '_slide_test',
+    SlideRetelling::class => '_slide_test',
 ];
 ?>
 <div style="display: flex; flex-direction: column; gap: 20px; padding: 20px 0">
