@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use common\models\StorySlide;
+
 return [
     [
         'id' => 1,
@@ -63,7 +65,7 @@ return [
         'status' => 1,
         'created_at' => '1678439665',
         'updated_at' => '1678439665',
-        'kind' => 0,
+        'kind' => StorySlide::KIND_QUESTION,
     ],
     [
         'id' => 7,

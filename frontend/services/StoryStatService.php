@@ -197,7 +197,7 @@ class StoryStatService
     ): array
     {
         $viewedSlidesNumber = 0;
-        $viewedStorySlidesNumber = $this->getViewedSlidesNumber($storyId, $studentId);
+        $viewedStorySlidesNumber = min(count($slideItems), $this->getViewedSlidesNumber($storyId, $studentId));
         $viewedSlidesNumber += $viewedStorySlidesNumber;
 
         $finishedTestingNumber = $this->getFinishedTestingNumber($storyId, $studentId);
