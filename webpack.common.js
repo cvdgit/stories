@@ -2,6 +2,7 @@ const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
+  stats: 'errors-only',
   entry: {
     quiz: path.resolve(__dirname, 'asset/quiz/quiz.js'),
     audio: path.resolve(__dirname, 'asset/question/audio.js'),
@@ -18,7 +19,8 @@ module.exports = {
     retelling_quiz: path.resolve(__dirname, 'asset/retelling_quiz/index.js'),
     video: path.resolve(__dirname, 'asset/video/index.js'),
     math: path.resolve(__dirname, 'asset/math/math.js'),
-    storyCreateAssist: path.resolve(__dirname, 'asset/storyCreateAssist/index.js')
+    storyCreateAssist: path.resolve(__dirname, 'asset/storyCreateAssist/index.js'),
+    reveal: path.resolve(__dirname, 'asset/reveal/index.js')
   },
   output: {
     filename: '[name].js',
@@ -39,6 +41,16 @@ module.exports = {
           "css-loader",
           "sass-loader",
         ],
+      },
+      {
+        test: /\.m?js$/,
+        resolve: {
+          fullySpecified: false,
+        },
+        include: /node_modules\/plyr/,
+        use: {
+          loader: 'babel-loader',
+        },
       },
       {
         test: /\.m?js$/,
