@@ -31,6 +31,7 @@ return [
             SimpleEventDispatcher::class => static function (Container $container) {
                 return new SimpleEventDispatcher($container, [
                     \frontend\events\StudentTestingFinish::class => [\frontend\modules\repetition\listeners\StartRepetitionListener::class],
+                    \frontend\events\RestartTestEvent::class => [\backend\Testing\RestartHandler\RestartTestHandler::class],
                 ]);
             },
         ],

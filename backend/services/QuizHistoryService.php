@@ -1,24 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\services;
 
 use common\models\StudentQuestionProgress;
 use common\models\UserQuestionAnswer;
 use common\models\UserQuestionHistory;
 use common\services\TransactionManager;
+use Exception;
+use frontend\events\RestartTestEvent;
 use Yii;
 use yii\db\Query;
 
 class QuizHistoryService
 {
-
     private $transactionManager;
+    private $events = [];
 
     public function __construct(TransactionManager $transactionManager)
     {
         $this->transactionManager = $transactionManager;
     }
 
+    /**
+     * @throws Exception
+     */
     public function clearHistory(int $quizId, int $studentId): void
     {
         $ids = (new Query())
@@ -32,12 +39,9 @@ class QuizHistoryService
             $ids = array_keys($ids);
         }
 
-        $command = Yii::$app->db->createCommand();
-
-        $this->transactionManager->wrap(function() use ($ids, $command, $quizId, $studentId) {
-
+        $this->transactionManager->wrap(function () use ($ids, $quizId, $studentId): void {
+            $command = Yii::$app->db->createCommand();
             if (count($ids) > 0) {
-
                 $command
                     ->delete(UserQuestionHistory::tableName(), ['id' => $ids])
                     ->execute();
@@ -46,13 +50,26 @@ class QuizHistoryService
                     ->delete(UserQuestionAnswer::tableName(), ['question_history_id' => $ids])
                     ->execute();
             }
-
             $command
                 ->delete(StudentQuestionProgress::tableName(), [
                     'student_id' => $studentId,
                     'test_id' => $quizId,
                 ])
                 ->execute();
+
+            $this->recordEvent(new RestartTestEvent($quizId, $studentId));
         });
+    }
+
+    public function releaseEvents(): array
+    {
+        $events = $this->events;
+        $this->events = [];
+        return $events;
+    }
+
+    private function recordEvent($event): void
+    {
+        $this->events[] = $event;
     }
 }

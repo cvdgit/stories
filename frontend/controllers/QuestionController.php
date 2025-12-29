@@ -6,6 +6,7 @@ use backend\components\training\base\Serializer;
 use backend\components\training\collection\TestBuilder;
 use backend\components\training\collection\WordTestBuilder;
 use backend\services\QuizHistoryService;
+use common\components\dispatchers\EventDispatcherInterface;
 use common\helpers\UserHelper;
 use common\models\StoryTest;
 use common\models\TestRememberAnswer;
@@ -33,12 +34,23 @@ class QuestionController extends Controller
      * @var QuestionProgressService
      */
     private $questionProgressService;
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
 
-    public function __construct($id, $module, QuizHistoryService $quizHistoryService, QuestionProgressService $questionProgressService, $config = [])
-    {
+    public function __construct(
+        $id,
+        $module,
+        QuizHistoryService $quizHistoryService,
+        QuestionProgressService $questionProgressService,
+        EventDispatcherInterface $eventDispatcher,
+        $config = []
+    ) {
         parent::__construct($id, $module, $config);
         $this->quizHistoryService = $quizHistoryService;
         $this->questionProgressService = $questionProgressService;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function actionInit(int $testId, int $userId = null, int $studentId = null): array
@@ -425,6 +437,7 @@ class QuestionController extends Controller
 
     /**
      * @throws NotFoundHttpException
+     * @throws ForbiddenHttpException
      */
     public function actionQuizRestart(int $quiz_id, int $student_id): array
     {
@@ -443,6 +456,7 @@ class QuestionController extends Controller
 
         try {
             $this->quizHistoryService->clearHistory($quizModel->id, $studentModel->id);
+            $this->eventDispatcher->dispatchAll($this->quizHistoryService->releaseEvents());
             return ['success' => true];
         }
         catch (Exception $exception) {
