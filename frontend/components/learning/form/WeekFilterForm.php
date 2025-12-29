@@ -43,19 +43,22 @@ class WeekFilterForm extends Model
      */
     private function calcWeekDates(): void
     {
-        /*$year = date('Y');
+        if ((int) $this->week === 1) {
+            $this->weekStartDate = DateTimeImmutable::createFromFormat(
+                'm-d-Y',
+                date('m-d-Y', strtotime('-' . $this->week . ' days'))
+            );
+            $this->weekEndDate = DateTimeImmutable::createFromFormat(
+                'm-d-Y',
+                date('m-d-Y', strtotime('+' . (6 - $this->week) . ' days'))
+            );
+            return;
+        }
+        $year = date('Y');
         $date = new \DateTime();
         $date->setISODate($year, $this->week);
         $this->weekStartDate = clone $date;
-        $this->weekEndDate = clone $date->modify('+6 days');*/
-        $this->weekStartDate = DateTimeImmutable::createFromFormat(
-            'm-d-Y',
-            date('m-d-Y', strtotime('-' . $this->week . ' days'))
-        );
-        $this->weekEndDate = DateTimeImmutable::createFromFormat(
-            'm-d-Y',
-            date('m-d-Y', strtotime('+' . (6 - $this->week) . ' days'))
-        );
+        $this->weekEndDate = clone $date->modify('+6 days');
     }
 
     public function search(int $studentId): array
