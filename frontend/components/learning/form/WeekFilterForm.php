@@ -2,6 +2,8 @@
 
 namespace frontend\components\learning\form;
 
+use DateTimeImmutable;
+use Exception;
 use Yii;
 use yii\base\Model;
 use yii\db\Expression;
@@ -23,7 +25,7 @@ class WeekFilterForm extends Model
 
     public function init(): void
     {
-        $this->week = date('W');
+        $this->week = (int) date('w');
         parent::init();
     }
 
@@ -36,13 +38,24 @@ class WeekFilterForm extends Model
         ];
     }
 
+    /**
+     * @throws Exception
+     */
     private function calcWeekDates(): void
     {
-        $year = date('Y');
+        /*$year = date('Y');
         $date = new \DateTime();
         $date->setISODate($year, $this->week);
         $this->weekStartDate = clone $date;
-        $this->weekEndDate = clone $date->modify('+6 days');
+        $this->weekEndDate = clone $date->modify('+6 days');*/
+        $this->weekStartDate = DateTimeImmutable::createFromFormat(
+            'm-d-Y',
+            date('m-d-Y', strtotime('-' . $this->week . ' days'))
+        );
+        $this->weekEndDate = DateTimeImmutable::createFromFormat(
+            'm-d-Y',
+            date('m-d-Y', strtotime('+' . (6 - $this->week) . ' days'))
+        );
     }
 
     public function search(int $studentId): array
@@ -64,7 +77,7 @@ class WeekFilterForm extends Model
         $betweenBegin = new Expression("UNIX_TIMESTAMP('$weekStartDate 00:00:00')");
         $weekEndDate = $this->weekEndDate->format('Y-m-d');
         $betweenEnd = new Expression("UNIX_TIMESTAMP('$weekEndDate 23:59:59')");
-        $historyQuery->andWhere(['between', 't.created_at', $betweenBegin, $betweenEnd]);
+        $historyQuery->andWhere(['between', 't.created_at + (3 * 60 * 60)', $betweenBegin, $betweenEnd]);
 
         $historyQuery->groupBy([
             't2.story_id',

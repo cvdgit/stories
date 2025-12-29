@@ -81,7 +81,7 @@ class HistoryFilterForm extends Model
         $targetDate = Yii::$app->formatter->asDate($this->date, 'php:Y-m-d');
         $betweenBegin = new Expression("UNIX_TIMESTAMP('$targetDate 00:00:00')");
         $betweenEnd = new Expression("UNIX_TIMESTAMP('$targetDate 23:59:59')");
-        $historyQuery->andWhere(['between', 't.created_at', $betweenBegin, $betweenEnd]);
+        $historyQuery->andWhere(['between', 't.created_at + (3 * 60 * 60)', $betweenBegin, $betweenEnd]);
 
         $historyQuery->groupBy([
             't2.story_id',

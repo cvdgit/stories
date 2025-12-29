@@ -113,7 +113,7 @@ class TrainingController extends UserController
         }
 
         foreach ($stories as $i => $story) {
-            if (count($story['times']) === 0  || count($story['times']) === 1) {
+            if (count($story['times']) === 0 || count($story['times']) === 1) {
                 continue;
             }
             $groupTimes = [];
@@ -133,7 +133,7 @@ class TrainingController extends UserController
         foreach ($stories as $story) {
             $storyTimes = $story['times'];
             if (count($storyTimes) > 0) {
-                $min = array_reduce($storyTimes, static function($min, $item) {
+                $min = array_reduce($storyTimes, static function ($min, $item) {
                     if ($item['hour'] < $min) {
                         return $item['hour'];
                     }
@@ -145,7 +145,7 @@ class TrainingController extends UserController
                 if ($min < $minTimeHour) {
                     $minTimeHour = $min;
                 }
-                $max = array_reduce($storyTimes, static function($max, $item) {
+                $max = array_reduce($storyTimes, static function ($max, $item) {
                     if ($item['hour'] > $max) {
                         return $item['hour'];
                     }
@@ -178,12 +178,11 @@ class TrainingController extends UserController
 
         $storiesProgress = $this->fetchStoriesProgress(
             $targetStudent->id,
-            array_keys($stories)
+            array_keys($stories),
         );
 
         $models = [];
         foreach ($stories as $storyId => $story) {
-
             $info = '';
             if (isset($storiesProgress[$storyId])) {
                 $info = '<span style="margin-left: 10px;" data-toggle="tooltip" class="glyphicon glyphicon-info-sign" title="История пройдена в обучении: ' . $storiesProgress[$storyId]['date'] . '"></span>';
@@ -194,7 +193,6 @@ class TrainingController extends UserController
             ];
 
             foreach ($times as $time) {
-
                 $timeHour = (int) $time['hour'];
                 if ($timeHour < $minTimeHour) {
                     continue;
@@ -269,7 +267,11 @@ class TrainingController extends UserController
             ];
         }
 
-        $mentalMapHistoryRows = (new MentalMapHistoryTargetWordsFetcher())->fetch($targetStudent->user_id, $filterForm->getWeekStartDate(), $filterForm->getWeekEndDate());
+        $mentalMapHistoryRows = (new MentalMapHistoryTargetWordsFetcher())->fetch(
+            $targetStudent->user_id,
+            $filterForm->getWeekStartDate(),
+            $filterForm->getWeekEndDate(),
+        );
         foreach ($mentalMapHistoryRows as $row) {
             $storyId = $row['story_id'];
             if (!isset($stories[$storyId])) {
@@ -285,7 +287,7 @@ class TrainingController extends UserController
         }
 
         foreach ($stories as $i => $story) {
-            if (count($story['dates']) === 0  || count($story['dates']) === 1) {
+            if (count($story['dates']) === 0 || count($story['dates']) === 1) {
                 continue;
             }
             $groupDates = [];
@@ -318,12 +320,11 @@ class TrainingController extends UserController
 
         $storiesProgress = $this->fetchStoriesProgress(
             $targetStudent->id,
-            array_keys($stories)
+            array_keys($stories),
         );
 
         $models = [];
         foreach ($stories as $storyId => $story) {
-
             $info = '';
             if (isset($storiesProgress[$storyId])) {
                 $info = '<span style="margin-left: 10px;" data-toggle="tooltip" class="glyphicon glyphicon-info-sign" title="История пройдена в обучении: ' . $storiesProgress[$storyId]['date'] . '"></span>';
@@ -395,7 +396,7 @@ class TrainingController extends UserController
             ->orderBy(['t.created_at' => SORT_DESC])
             ->all();
 
-        $mentalMapIds = array_map(static function(array $row): string {
+        $mentalMapIds = array_map(static function (array $row): string {
             return $row['mental_map_id'];
         }, $data);
         $mentalMapIds = array_unique($mentalMapIds);
@@ -408,7 +409,12 @@ class TrainingController extends UserController
             }
         }
 
-        $quizData = (new QuizDetailFetcher())->fetch($student->id, $story->id, "UNIX_TIMESTAMP('$startDate')", "UNIX_TIMESTAMP('$finishDate')");
+        $quizData = (new QuizDetailFetcher())->fetch(
+            $student->id,
+            $story->id,
+            "UNIX_TIMESTAMP('$startDate')",
+            "UNIX_TIMESTAMP('$finishDate')",
+        );
 
         return $this->renderAjax('_detail', [
             'mentalMaps' => $mentalMaps,
@@ -451,7 +457,7 @@ class TrainingController extends UserController
             ->orderBy(['t.created_at' => SORT_DESC])
             ->all();
 
-        $mentalMapIds = array_map(static function(array $row): string {
+        $mentalMapIds = array_map(static function (array $row): string {
             return $row['mental_map_id'];
         }, $data);
         $mentalMapIds = array_unique($mentalMapIds);
@@ -464,7 +470,12 @@ class TrainingController extends UserController
             }
         }
 
-        $quizData = (new QuizDetailFetcher())->fetch($student->id, $story->id, "UNIX_TIMESTAMP('$startDate')", "UNIX_TIMESTAMP('$finishDate')");
+        $quizData = (new QuizDetailFetcher())->fetch(
+            $student->id,
+            $story->id,
+            "UNIX_TIMESTAMP('$startDate')",
+            "UNIX_TIMESTAMP('$finishDate')",
+        );
 
         return $this->renderAjax('_detail', [
             'mentalMaps' => $mentalMaps,
@@ -495,11 +506,12 @@ class TrainingController extends UserController
 
         return array_combine(
             array_column($rows, 'storyId'),
-            array_map(static function(array $row): array {
+            array_map(static function (array $row): array {
                 return [
+                    'time' => $row['completeTime'],
                     'date' => SmartDate::dateSmart((int) $row['completeTime'], true),
                 ];
-            }, $rows)
+            }, $rows),
         );
     }
 }
