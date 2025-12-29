@@ -55,7 +55,7 @@ class WeekFilterForm extends Model
             return;
         }
         $year = date('Y');
-        $date = new \DateTime();
+        $date = new \DateTime('now');
         $date->setISODate($year, $this->week);
         $this->weekStartDate = clone $date;
         $this->weekEndDate = clone $date->modify('+6 days');
@@ -116,6 +116,16 @@ class WeekFilterForm extends Model
         return $this->weekEndDate;
     }
 
+    private function getWeeksInYear(int $year): int
+    {
+        $firstDay = strtotime("$year-01-01");
+        $dayOfWeek = (int) date('N', $firstDay);
+        if ($dayOfWeek === 4 || ($dayOfWeek === 3 && date('L', strtotime("$year-01-01")))) {
+            return 53;
+        }
+        return 52;
+    }
+
     public function updateWeekDates(): void
     {
         if (!$this->validate()) {
@@ -127,6 +137,9 @@ class WeekFilterForm extends Model
         }
         if ($this->action === self::ACTION_PREV) {
             $this->week--;
+            if ($this->week === 0) {
+                $this->week = $this->getWeeksInYear((int) date('Y'));
+            }
             $this->calcWeekDates();
         }
         $this->action = null;
