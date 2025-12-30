@@ -54,12 +54,14 @@ class MentalMapPayload implements JsonSerializable
         string $name,
         string $text,
         array $treeData,
-        UuidInterface $promptId = null
+        UuidInterface $promptId = null,
+        bool $accumulateFragments = false
     ): self {
         $obj = new self($id, $name, $text);
         $obj->treeView = true;
         $obj->settings = [
             'planTreeView' => true,
+            'accumulateFragments' => $accumulateFragments,
         ];
         if ($promptId !== null) {
             $obj->settings['promptId'] = $promptId->toString();
@@ -104,5 +106,26 @@ class MentalMapPayload implements JsonSerializable
                 return trim($fragment[$titleKey]) !== '';
             }),
         );
+    }
+
+    public static function accumulateFragments(array $fragments): array
+    {
+        $accumulationFragments = [];
+        foreach ($fragments as $i => $fragment) {
+            $accumulationFragments[] = array_reduce(
+                array_slice($fragments, 0, $i + 1),
+                static function (array $carry, array $item): array {
+                    if (count($carry) === 0) {
+                        return $item;
+                    }
+                    $carry['id'] = $item['id'];
+                    $carry['title'] .= "\r\n" . $item['title'];
+                    $carry['description'] .= "\r\n" . $item['description'];
+                    return $carry;
+                },
+                [],
+            );
+        }
+        return $accumulationFragments;
     }
 }

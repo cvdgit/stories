@@ -13,6 +13,7 @@ use common\models\StorySlide;
 use common\models\StoryTest;
 use common\models\User;
 use common\models\UserQuestionHistoryModel;
+use common\rbac\UserRoles;
 use common\services\story\CountersService;
 use common\services\StoryAudioService;
 use common\services\StoryFavoritesService;
@@ -426,6 +427,7 @@ class StoryController extends Controller
                 ->innerJoin(['t2' => MentalMap::tableName()], 't.mental_map_id = t2.uuid')
                 ->where(['in', 't.slide_id', $slideIds])
                 ->all();
+            $canEdit = $user->can(UserRoles::ROLE_TEACHER);
             foreach ($slideMentalMaps as $row) {
                 $slideId = (int) $row['slideId'];
                 if (!isset($contentMentalMaps[$slideId])) {
@@ -454,6 +456,9 @@ class StoryController extends Controller
                         PHP_ROUND_HALF_UP,
                     ),
                     'type' => $mentalMap->map_type,
+                    'edit' => $canEdit ? [
+                        'url' => Yii::$app->urlManagerBackend->createAbsoluteUrl(['/mental-map/editor', 'id' => $mentalMap->uuid]),
+                    ] : false,
                 ];
             }
         }

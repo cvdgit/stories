@@ -296,6 +296,13 @@ export function ThreadProvider({children}) {
               description: sentenceText
             }))
             break;
+          case 'mental-map-plan-accumulation':
+            structuredClone(fragments).map(({id, sentenceText, sentenceTitle}) => contents[i].fragments.push({
+              id,
+              title: sentenceTitle,
+              description: sentenceText
+            }))
+            break;
         }
       }
 

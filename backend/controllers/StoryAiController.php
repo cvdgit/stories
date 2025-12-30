@@ -208,6 +208,7 @@ class StoryAiController extends Controller
                         ['title' => 'Ментальная карта (четные пропуски)', 'type' => 'mental-map-even-fragments'],
                         ['title' => 'Ментальная карта (нечетные пропуски)', 'type' => 'mental-map-odd-fragments'],
                         ['title' => 'Ментальная карта (план)', 'type' => 'mental-map-plan'],
+                        ['title' => 'План с накоплением', 'type' => 'mental-map-plan-accumulation'],
                         ['title' => 'Пересказ', 'type' => 'retelling'],
                     ],
                 ];
@@ -291,6 +292,22 @@ class StoryAiController extends Controller
                             ];
                         }, MentalMapPayload::filterEmptyFragments($contentRow['fragments'])),
                         Uuid::fromString(Yii::$app->params['ai.story.assist.plan.prompt.id']),
+                    );
+                } else if ($type === 'mental-map-plan-accumulation') {
+                    $fragments = array_map(static function (array $fragment): array {
+                        return [
+                            'id' => $fragment['id'],
+                            'title' => $fragment['title'],
+                            'description' => $fragment['description'],
+                        ];
+                    }, MentalMapPayload::filterEmptyFragments($contentRow['fragments']));
+                    $payload = MentalMapPayload::planMentalMap(
+                        $mentalMapId,
+                        $contentRow['title'],
+                        $text,
+                        MentalMapPayload::accumulateFragments($fragments),
+                        Uuid::fromString(Yii::$app->params['ai.story.assist.plan.prompt.id']),
+                        true
                     );
                 } else {
                     $payload = MentalMapPayload::treeMentalMap(

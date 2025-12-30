@@ -85,10 +85,11 @@ const ItemDialog = forwardRef(function ItemDialog(props, ref) {
                   <div style={{marginBottom: '10px'}}>
                     <label style={{paddingBottom: '4px', fontSize: '14px', display: 'block'}}
                                htmlFor="">Заголовок:</label>
-                    <input className="textarea" style={{minHeight: 'auto'}} type="text" value={title} onChange={e => {
-                      setTitle(e.target.value)
-                      setMark(false)
-                    }}/></div>
+                    <Editable content={title} changeHandler={content => {
+                      setTitle(content);
+                      setMark(false);
+                    }} />
+                  </div>
                   <div>
                     <label style={{paddingBottom: '4px', fontSize: '14px', display: 'block'}} htmlFor="">Prompt:</label>
                     <select className="textarea" value={promptId} onChange={(e) => {

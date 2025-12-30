@@ -60,7 +60,7 @@ class MentalMapController extends Controller
     /**
      * @throws BadRequestHttpException
      */
-    public function actionEditor(string $id, int $from_slide, WebUser $user, Request $request): string
+    public function actionEditor(string $id, WebUser $user, Request $request, int $from_slide = null): string
     {
         $mentalMap = MentalMap::findOne($id);
         if ($mentalMap === null) {
