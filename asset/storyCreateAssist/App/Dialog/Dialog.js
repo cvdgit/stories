@@ -5,7 +5,7 @@ function Dialog({children, nodeRef, hideHandler, addContentClassName, controls, 
   return (
     <div ref={nodeRef} className="dialog export-dialog-modal">
       <div onClick={hideHandler} className="dialog__overlay"></div>
-      <div className={`dialog__content ${addContentClassName ? addContentClassName : ''}`} {...props} style={{overflowY: 'auto', minHeight: '40rem'}}>
+      <div className={`dialog__content ${addContentClassName ? addContentClassName : ''}`} {...props}>
         <div className="dialog__close" onClick={hideHandler}>
           <i className="icon icon-remove">&times;</i>
         </div>

@@ -23,6 +23,7 @@ use common\rbac\UserRoles;
 use common\services\TransactionManager;
 use DomainException;
 use Exception;
+use modules\edu\components\ArrayHelper;
 use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\db\Query;
@@ -203,14 +204,14 @@ class StoryAiController extends Controller
                     ),
                     'editUrl' => Url::to(['/story/update', 'id' => $story->id]),
                     'slideMap' => $fragmentsToSlideMap,
-                    'repetitionTrainer' => [
+                    /*'repetitionTrainer' => [
                         ['title' => 'Ментальная карта', 'type' => 'mental-map'],
                         ['title' => 'Ментальная карта (четные пропуски)', 'type' => 'mental-map-even-fragments'],
                         ['title' => 'Ментальная карта (нечетные пропуски)', 'type' => 'mental-map-odd-fragments'],
                         ['title' => 'Ментальная карта (план)', 'type' => 'mental-map-plan'],
                         ['title' => 'План с накоплением', 'type' => 'mental-map-plan-accumulation'],
                         ['title' => 'Пересказ', 'type' => 'retelling'],
-                    ],
+                    ],*/
                 ];
             });
 
@@ -247,16 +248,26 @@ class StoryAiController extends Controller
             throw new BadRequestHttpException('Text block not found');
         }
 
-        try {
-            $retellingSlideId = $this->createRetelling(
-                $currentSlideModel->story_id,
-                $currentSlideModel->id,
-                $currentSlideModel->number,
-                $user->getId(),
-            );
-        } catch (Exception $exception) {
-            Yii::$app->errorHandler->logException($exception);
-            throw new BadRequestHttpException($exception->getMessage());
+        $retellingRow = ArrayHelper::array_find(
+            $contents,
+            static function (array $contentRow): bool {
+                return $contentRow['type'] === 'retelling';
+            },
+        );
+
+        $retellingSlideId = null;
+        if ($retellingRow !== null) {
+            try {
+                $retellingSlideId = $this->createRetelling(
+                    $currentSlideModel->story_id,
+                    $currentSlideModel->id,
+                    $currentSlideModel->number,
+                    $user->getId(),
+                );
+            } catch (Exception $exception) {
+                Yii::$app->errorHandler->logException($exception);
+                throw new BadRequestHttpException($exception->getMessage());
+            }
         }
 
         $speechTrainer = SpeechTrainer::create(

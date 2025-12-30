@@ -143,7 +143,7 @@ const TextEditorDialog = forwardRef(({dialogProps, open, setOpen, text, createSt
   }, [pages])
 
   return (
-    <Dialog nodeRef={ref} hideHandler={() => setOpen(false)} addContentClassName="item-content">
+    <Dialog nodeRef={ref} hideHandler={() => setOpen(false)} addContentClassName="itemContent">
       <div style={{
         color: 'black',
         padding: '10px 0',

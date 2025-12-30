@@ -46,3 +46,40 @@
   padding: 16px;
   margin: 0;
 }
+
+.trashBtn {
+  opacity: 0;
+  transition-duration: .2s;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(.4,0,.2,1);
+  padding: 4px;
+  border-radius: 6px;
+  appearance: button;
+  font: inherit;
+  font-feature-settings: inherit;
+  font-variation-settings: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  background-color: #0000;
+  box-sizing: border-box;
+  border: 0 solid;
+  margin: 0;
+}
+
+.trashBtn:hover {
+  background-color: oklab(0.55 0.199388 0.092976 / 0.1);
+}
+
+.actionItem:hover .trashBtn {
+  opacity: 1;
+}
+
+.trashSvg {
+  color: oklch(60% 0 0);
+  width: 24px;
+  height: 24px;
+}
+
+.trashSvg:hover {
+  color: oklch(55% .22 25);
+}

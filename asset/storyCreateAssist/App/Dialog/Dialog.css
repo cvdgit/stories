@@ -212,3 +212,14 @@
   margin-left: 1rem;
   text-decoration: none
 }
+
+.itemContent {
+  overflow-y: auto;
+  min-height: 40rem
+}
+
+.smallContent {
+  width: auto !important;
+  min-height: unset !important;
+  color: black;
+}

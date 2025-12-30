@@ -112,7 +112,7 @@ class SpeechTrainer extends ActiveRecord
         string $name,
         int $slideId,
         string $blockId,
-        int $retellingSlideId
+        int $retellingSlideId = null
     ): self {
         $model = new self();
         $model->id = $id->toString();

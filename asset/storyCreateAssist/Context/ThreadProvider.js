@@ -237,8 +237,8 @@ export function ThreadProvider({children}) {
     }]);
     saveMessages(threadId);
 
-    const {payload: json, story} = metadata;
-    const {id: storyId, slideMap, repetitionTrainer} = story;
+    const {payload: json, story, repetitionTrainer} = metadata;
+    const {id: storyId, slideMap} = story;
 
     const slideState = slideMap.map(({slideId}) => ({slideId, status: 'process'}))
 
@@ -408,7 +408,8 @@ export function ThreadProvider({children}) {
     await createReadingTrainer(threadId, {payload, story: storyResponse.story});
   }
 
-  const createRepetitionTrainerStory = async (threadId, text) => {
+  const createRepetitionTrainerStory = async (threadId, text, repetitionTrainer) => {
+    console.log(repetitionTrainer)
     const messageId = uuidv4();
     setMessages(prevMessages => [...prevMessages, {
       id: messageId,
@@ -467,7 +468,11 @@ export function ThreadProvider({children}) {
 
           setThreadTitle(threadId, storyResponse.story.title);
 
-          await createRepetitionTrainer(threadId, {payload, story: storyResponse.story});
+          await createRepetitionTrainer(threadId, {
+            payload,
+            story: storyResponse.story,
+            repetitionTrainer
+          });
         },
         () => {
           setIsStreaming(false);
