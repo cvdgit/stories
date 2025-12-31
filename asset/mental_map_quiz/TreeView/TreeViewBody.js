@@ -105,7 +105,7 @@ function ItemWrapper(listItem, {isPlanTreeView}) {
 }
 
 function processTreeNodes(list, body, history, voiceResponse, params, onEndHandler, dispatchEvent) {
-  console.log('processTreeNodes')
+  console.log('processTreeNodes', params)
 
   let showVoiceControl = false
 
@@ -121,6 +121,9 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
     }
 
     resetNodeRow(rowElement)
+    if (params.accumulateFragments) {
+      rowElement.classList.add('accumulate-folder');
+    }
 
     const nodeStatusElement = rowElement.querySelector('.node-status')
 
@@ -151,7 +154,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
       continue
     }
 
-    rowElement.classList.remove('folded')
+    rowElement.classList.remove('folded', 'accumulate-folder');
 
     const voiceResponseElem = rowElement.querySelector('.node-voice-response')
     const resultSpan = voiceResponseElem.querySelector('.result_span')

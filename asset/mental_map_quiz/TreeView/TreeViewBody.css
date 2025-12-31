@@ -339,6 +339,10 @@
   opacity: .3;
 }
 
+.node-row.accumulate-folder .node-title {
+  height: auto !important;
+}
+
 .gn.disabled {
   background-color: #ddd;
 }

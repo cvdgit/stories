@@ -69,7 +69,7 @@ export default function TreeView({id, name, tree, history, params, settings, onM
     tree,
     voiceResponse,
     history,
-    params,
+    {...params, ...settings},
     () => {
       const elem = createFinishContent(async () => {
         const response = await restartMentalMap(id)
