@@ -20,6 +20,7 @@ use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\Expression;
 use yii\db\Query;
+use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use yii\web\Request;
 use yii\web\User as WebUser;
@@ -44,13 +45,13 @@ class TrainingController extends UserController
         return $targetStudent;
     }
 
-    private function getNavItems(string $route, array $students, int $activeStudentId): array
+    private function getNavItems(array $students, int $activeStudentId, callable $callback): array
     {
         $items = [];
         foreach ($students as $student) {
             $items[] = [
                 'label' => $student->name,
-                'url' => [$route, 'student_id' => $student->id],
+                'url' => $callback($student),
                 'active' => $student->id === $activeStudentId,
             ];
         }
@@ -221,7 +222,11 @@ class TrainingController extends UserController
         $students = array_merge($currentUser->students, $currentUser->parentStudents);
 
         return $this->render('index_new', [
-            'items' => $this->getNavItems('training/index', $students, $targetStudent->id),
+            'items' => $this->getNavItems($students, $targetStudent->id, static function (UserStudent $student) use ($request): string {
+                return Url::to(array_merge(['index', 'student_id' => $student->id], [
+                    'day' => $request->get('day'),
+                ]));
+            },),
             'view' => 'day',
             'viewParams' => [
                 'studentId' => $studentId,
@@ -234,7 +239,7 @@ class TrainingController extends UserController
     }
 
     /**
-     * @throws NotFoundHttpException|\DateMalformedStringException
+     * @throws NotFoundHttpException
      */
     public function actionWeek(Request $request, WebUser $user, int $student_id = null): string
     {
@@ -246,8 +251,8 @@ class TrainingController extends UserController
         $studentId = $targetStudent->id;
 
         $filterForm = new WeekFilterForm();
-        if ($filterForm->load($request->get())) {
-            $filterForm->updateWeekDates();
+        if ($filterForm->load($request->get(), '') && !$filterForm->validate()) {
+            $filterForm->initDates();
         }
 
         $rows = $filterForm->search($studentId);
@@ -352,13 +357,24 @@ class TrainingController extends UserController
         $students = array_merge($currentUser->students, $currentUser->parentStudents);
 
         return $this->render('index_new', [
-            'items' => $this->getNavItems('training/week', $students, $targetStudent->id),
+            'items' => $this->getNavItems(
+                $students,
+                $targetStudent->id,
+                static function (UserStudent $student) use ($request): string {
+                    return Url::to(array_merge(['week', 'student_id' => $student->id], [
+                        'year' => $request->get('year'),
+                        'week' => $request->get('week'),
+                    ]));
+                },
+            ),
             'view' => 'week',
             'viewParams' => [
                 'filterModel' => $filterForm,
                 'columns' => $columns,
                 'models' => $models,
                 'studentId' => $studentId,
+                'prevUrl' => Url::to(array_merge(['week', 'student_id' => $studentId], $filterForm->getPrevWeek())),
+                'nextUrl' => Url::to(array_merge(['week', 'student_id' => $studentId], $filterForm->getNextWeek())),
             ],
         ]);
     }

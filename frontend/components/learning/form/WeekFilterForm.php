@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace frontend\components\learning\form;
 
 use DateTimeImmutable;
-use Exception;
+use DateTimeInterface;
 use Yii;
 use yii\base\Model;
 use yii\db\Expression;
@@ -11,59 +13,42 @@ use yii\db\Query;
 
 class WeekFilterForm extends Model
 {
+    public $year;
     public $week;
-    public $action;
 
-    public const ACTION_PREV = 'prev';
-    public const ACTION_NEXT = 'next';
-
-    /** @var \DateTime */
+    /** @var DateTimeInterface */
     private $weekStartDate;
 
-    /** @var \DateTime */
+    /** @var DateTimeInterface */
     private $weekEndDate;
 
     public function init(): void
     {
-        $this->week = (int) date('w');
         parent::init();
+        $this->initDates();
+    }
+
+    public function initDates(): void
+    {
+        $this->week = (int) date('W');
+        $this->year = (int) date('Y');
     }
 
     public function rules(): array
     {
         return [
-            [['week'], 'required'],
-            [['week'], 'integer'],
-            ['action', 'in', 'range' => [self::ACTION_NEXT, self::ACTION_PREV]],
+            [['year', 'week'], 'required'],
+            [['year', 'week'], 'integer'],
+            ['year', 'default', 'value' => (int) date('W')],
+            ['week', 'default', 'value' => (int) date('Y')],
         ];
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function calcWeekDates(): void
-    {
-        if ((int) $this->week === 1) {
-            $this->weekStartDate = DateTimeImmutable::createFromFormat(
-                'm-d-Y',
-                date('m-d-Y', strtotime('-' . $this->week . ' days'))
-            );
-            $this->weekEndDate = DateTimeImmutable::createFromFormat(
-                'm-d-Y',
-                date('m-d-Y', strtotime('+' . (6 - $this->week) . ' days'))
-            );
-            return;
-        }
-        $year = date('Y');
-        $date = new \DateTime('now');
-        $date->setISODate($year, $this->week);
-        $this->weekStartDate = clone $date;
-        $this->weekEndDate = clone $date->modify('+6 days');
     }
 
     public function search(int $studentId): array
     {
-        $this->calcWeekDates();
+        $this->weekStartDate = new DateTimeImmutable();
+        $this->weekStartDate = $this->weekStartDate->setISODate((int) $this->year, (int) $this->week);
+        $this->weekEndDate = $this->weekStartDate->modify('+6 days');
 
         $historyQuery = new Query();
         $historyQuery->select([
@@ -100,18 +85,12 @@ class WeekFilterForm extends Model
         return $query->all();
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getWeekStartDate(): \DateTimeInterface
+    public function getWeekStartDate(): DateTimeInterface
     {
         return $this->weekStartDate;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getWeekEndDate(): \DateTimeInterface
+    public function getWeekEndDate(): DateTimeInterface
     {
         return $this->weekEndDate;
     }
@@ -126,25 +105,6 @@ class WeekFilterForm extends Model
         return 52;
     }
 
-    public function updateWeekDates(): void
-    {
-        if (!$this->validate()) {
-            throw new \DomainException('WeekFilterForm not valid');
-        }
-        if ($this->action === self::ACTION_NEXT) {
-            $this->week++;
-            $this->calcWeekDates();
-        }
-        if ($this->action === self::ACTION_PREV) {
-            $this->week--;
-            if ($this->week === 0) {
-                $this->week = $this->getWeeksInYear((int) date('Y'));
-            }
-            $this->calcWeekDates();
-        }
-        $this->action = null;
-    }
-
     public function getWeekDatesText(): string
     {
         $dayStart = $this->weekStartDate->format('d');
@@ -155,6 +115,32 @@ class WeekFilterForm extends Model
         if ($monthStart === $monthEnd) {
             return "$dayStart-" . Yii::$app->formatter->asDate($this->weekEndDate->format('d.m.Y'), 'php:d F');
         }
-        return Yii::$app->formatter->asDate($this->weekStartDate->format('d.m.Y'), 'php:d F') . ' - ' . Yii::$app->formatter->asDate($this->weekEndDate->format('d.m.Y'), 'php:d F');
+        return Yii::$app->formatter->asDate(
+                $this->weekStartDate->format('d.m.Y'),
+                'php:d F',
+            ) . ' - ' . Yii::$app->formatter->asDate($this->weekEndDate->format('d.m.Y'), 'php:d F');
+    }
+
+    public function getPrevWeek(): array
+    {
+        $year = (int) $this->year;
+        $week = (int) $this->week - 1;
+        if ($week <= 0) {
+            $year--;
+            $week = $this->getWeeksInYear($year);
+        }
+        return ['year' => $year, 'week' => $week];
+    }
+
+    public function getNextWeek(): array
+    {
+        $year = (int) $this->year;
+        $week = (int) $this->week + 1;
+        $weeks = $this->getWeeksInYear($year);
+        if ($week > $weeks) {
+            $year++;
+            $week = 1;
+        }
+        return ['year' => $year, 'week' => $week];
     }
 }
