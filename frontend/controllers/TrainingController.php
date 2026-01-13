@@ -184,6 +184,7 @@ class TrainingController extends UserController
 
         $storiesProgress = $this->fetchStoriesProgress(
             $targetStudent->id,
+            $targetStudent->user_id,
             array_keys($stories),
         );
 
@@ -191,7 +192,7 @@ class TrainingController extends UserController
         foreach ($stories as $storyId => $story) {
             $info = '';
             if (isset($storiesProgress[$storyId])) {
-                $info = '<span style="margin-left: 10px;" data-toggle="tooltip" class="glyphicon glyphicon-info-sign" title="История пройдена в обучении: ' . $storiesProgress[$storyId]['date'] . '"></span>';
+                $info = $this->storyProgressTooltipText($storiesProgress[$storyId]);
             }
 
             $model = [
@@ -214,8 +215,6 @@ class TrainingController extends UserController
                     $hour = (int) $row['hour'];
                     $minuteDiv = (int) $row['minute_div'];
                     if ($hour === $timeHour && $minuteDiv === $timeMinuteDiv) {
-                        //dd($filterForm->date, $time, $filterForm->hours);
-                        //$value = $questionCount . '@' . $storyId;
                         [$hour, $minute] = explode(':', $time['time']);
                         $periodDateFrom = (new DateTimeImmutable($filterForm->date))->setTime((int) $hour, (int) $minute);
                         $periodDateTo = $periodDateFrom->modify("+{$filterForm->hours} minutes");
@@ -226,8 +225,8 @@ class TrainingController extends UserController
                                 $targetStudent->id,
                                 $storyId,
                                 $periodDateFrom,
-                                $periodDateTo
-                            )
+                                $periodDateTo,
+                            ),
                         ];
                     }
                 }
@@ -257,12 +256,12 @@ class TrainingController extends UserController
                 'prevUrl' => Url::to(array_merge(
                     ['index', 'student_id' => $studentId],
                     $filterForm->getPrevDate(),
-                    ['hours' => $filterForm->hours]
+                    ['hours' => $filterForm->hours],
                 )),
                 'nextUrl' => Url::to(array_merge(
                     ['index', 'student_id' => $studentId],
                     $filterForm->getNextDate(),
-                    ['hours' => $filterForm->hours]
+                    ['hours' => $filterForm->hours],
                 )),
             ],
         ]);
@@ -356,6 +355,7 @@ class TrainingController extends UserController
 
         $storiesProgress = $this->fetchStoriesProgress(
             $targetStudent->id,
+            $targetStudent->user_id,
             array_keys($stories),
         );
 
@@ -363,7 +363,7 @@ class TrainingController extends UserController
         foreach ($stories as $storyId => $story) {
             $info = '';
             if (isset($storiesProgress[$storyId])) {
-                $info = '<span style="margin-left: 10px;" data-toggle="tooltip" class="glyphicon glyphicon-info-sign" title="История пройдена в обучении: ' . $storiesProgress[$storyId]['date'] . '"></span>';
+                $info = $this->storyProgressTooltipText($storiesProgress[$storyId]);
             }
 
             $model = [
@@ -383,8 +383,8 @@ class TrainingController extends UserController
                                 $targetStudent->id,
                                 $storyId,
                                 (new DateTimeImmutable($questionDate))->setTime(0, 0),
-                                (new DateTimeImmutable($questionDate))->setTime(23, 59, 59)
-                            )
+                                (new DateTimeImmutable($questionDate))->setTime(23, 59, 59),
+                            ),
                         ];
                     }
                 }
@@ -541,7 +541,7 @@ class TrainingController extends UserController
         ]);
     }
 
-    private function fetchStoriesProgress(int $studentId, array $storyIds): array
+    private function fetchStoriesProgress(int $studentId, int $userId, array $storyIds): array
     {
         if (count($storyIds) === 0) {
             return [];
@@ -549,6 +549,7 @@ class TrainingController extends UserController
 
         $query = (new Query())
             ->select([
+                new Expression("'edu' AS place"),
                 'storyId' => 't.story_id',
                 'completeTime' => 't.updated_at',
             ])
@@ -558,17 +559,42 @@ class TrainingController extends UserController
             ])
             ->andWhere(['in', 't.story_id', $storyIds])
             ->andWhere('t.progress = 100');
-        $rows = $query->all();
+
+        $storyQuery = (new Query())
+            ->select([
+                new Expression("'story' AS place"),
+                'storyId' => 't.story_id',
+                'completeTime' => 't.updated_at',
+            ])
+            ->from(['t' => 'user_story_history'])
+            ->where([
+                't.user_id' => $userId,
+            ])
+            ->andWhere(['in', 't.story_id', $storyIds])
+            ->andWhere('t.percent = 100');
+
+        $rows = $query->union($storyQuery)->all();
 
         return array_combine(
             array_column($rows, 'storyId'),
             array_map(static function (array $row): array {
                 return [
+                    'place' => 'edu',
                     'time' => $row['completeTime'],
                     'date' => SmartDate::dateSmart((int) $row['completeTime'], true),
                 ];
             }, $rows),
         );
+    }
+
+    private function storyProgressTooltipText(array $data): string
+    {
+        $tip = 'История пройдена в обучении';
+        if ($data['place'] === 'story') {
+            $tip = 'История пройдена на сайте';
+        }
+        $tip .= ': ' . $data['date'];
+        return '<span style="margin-left: 10px;" data-toggle="tooltip" class="glyphicon glyphicon-info-sign" title="' . $tip . '"></span>';
     }
 
     /**
