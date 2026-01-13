@@ -9,7 +9,6 @@ use yii\web\JsExpression;
 use yii\web\View;
 use yii\widgets\ActiveForm;
 use frontend\components\learning\widget\HistoryWidget;
-use yii\widgets\Pjax;
 
 /**
  * @var View $this
@@ -17,28 +16,28 @@ use yii\widgets\Pjax;
  * @var array $columns
  * @var HistoryFilterForm $filterModel
  * @var int $studentId
+ * @var string $prevUrl
+ * @var string $nextUrl
  */
 
 $this->registerJs($this->renderFile('@frontend/views/training/day.js'));
 ?>
-<?php
-Pjax::begin(['id' => 'pjax-day-history']) ?>
 <div class="filter__wrap">
     <div class="row">
         <div class="col-md-2">
             <div class="filter-arrow__wrap filter-arrow--left">
-                <?= Html::a('<i class="glyphicon glyphicon-chevron-left"></i>', '#', [
-                    'class' => 'filter-arrow__link',
-                    'onclick' => new JsExpression(
-                        '$("#historyfilterform-action").val("prev"); $("#history-filter-form").submit(); return false',
-                    ),
-                ]) ?>
+                <?= Html::a(
+                    '<i class="glyphicon glyphicon-chevron-left"></i>',
+                    $prevUrl,
+                    ['class' => 'filter-arrow__link']
+                ) ?>
             </div>
         </div>
         <div class="col-md-8">
             <?php
             $form = ActiveForm::begin(
                 [
+                    'action' => ['index', 'student_id' => $studentId],
                     'id' => 'history-filter-form',
                     'method' => 'get',
                     'options' => ['style' => 'display: flex; margin-right: 3rem'],
@@ -53,6 +52,7 @@ Pjax::begin(['id' => 'pjax-day-history']) ?>
                     ],
                     'options' => [
                         'autocomplete' => 'off',
+                        'name' => 'date',
                     ],
                     'clientEvents' => [
                         'changeDate' => new JsExpression('function() { $("#history-filter-form").submit(); }'),
@@ -60,20 +60,18 @@ Pjax::begin(['id' => 'pjax-day-history']) ?>
                 ])->label(false) ?>
             </div>
             <div>
-                <?= $form->field($filterModel, 'hours')->dropDownList($filterModel->getHoursDropdown())->label(false) ?>
-                <?= $form->field($filterModel, 'action')->hiddenInput()->label(false) ?>
+                <?= $form->field($filterModel, 'hours')->dropDownList($filterModel->getHoursDropdown(), ['name' => 'hours'])->label(false) ?>
             </div>
             <?php
             ActiveForm::end() ?>
         </div>
         <div class="col-md-2">
             <div class="filter-arrow__wrap filter-arrow--right">
-                <?= Html::a('<i class="glyphicon glyphicon-chevron-right"></i>', '#', [
-                    'class' => 'filter-arrow__link',
-                    'onclick' => new JsExpression(
-                        '$("#historyfilterform-action").val("next"); $("#history-filter-form").submit(); return false',
-                    ),
-                ]) ?>
+                <?= Html::a(
+                    '<i class="glyphicon glyphicon-chevron-right"></i>',
+                    $nextUrl,
+                    ['class' => 'filter-arrow__link']
+                ) ?>
             </div>
         </div>
     </div>
@@ -83,28 +81,30 @@ Pjax::begin(['id' => 'pjax-day-history']) ?>
         'caption' => 'Количество ответов в тестах (за день)',
         'columns' => $columns,
         'models' => $models,
-        'tableRowRenderCallback' => static function (string $value, array $column) use (
+        'tableRowRenderCallback' => static function ($value, array $column) use (
             $studentId,
             $filterModel
         ): string {
-            if (strpos($value, '@') !== false) {
-                [$num, $storyId] = explode('@', $value);
+            if (is_array($value)) {
                 $value = Html::a(
-                    '<strong style="pointer-events: none">' . $num . '</strong>',
+                    $value['count'],
                     [
                         '/training/detail',
-                        'story_id' => $storyId,
+                        'story_id' => $value['storyId'],
                         'student_id' => $studentId,
                         'date' => $filterModel->date,
                         'hours' => $filterModel->hours,
                         'time' => $column['label'],
                     ],
-                    ['class' => 'detail-modal'],
+                    [
+                        'class' => 'detail-modal',
+                        'style' => 'font-weight: 600',
+                        'title' => $value['testRestarts'],
+                        'data-toggle' => 'tooltip',
+                    ],
                 );
             }
-            return $value;
+            return (string) $value;
         },
     ]) ?>
 </div>
-<?php
-Pjax::end() ?>

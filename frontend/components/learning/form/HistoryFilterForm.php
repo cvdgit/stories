@@ -1,29 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace frontend\components\learning\form;
 
+use DateInterval;
+use DateTimeImmutable;
+use DateTimeInterface;
+use Exception;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\db\Expression;
 use yii\db\Query;
 
 class HistoryFilterForm extends Model
 {
-
     public $date;
     public $hours;
-    public $action;
 
-    public const ACTION_CHANGE = 'change';
-    public const ACTION_PREV = 'prev';
-    public const ACTION_NEXT = 'next';
+    /** @var DateTimeInterface */
+    private $targetDate;
 
     public function init(): void
     {
+        $this->initDates();
+        parent::init();
+    }
+
+    public function initDates(): void
+    {
         $this->date = date('d.m.Y');
         $this->hours = 60;
-        $this->resetAction();
-        parent::init();
     }
 
     public function rules(): array
@@ -32,38 +40,18 @@ class HistoryFilterForm extends Model
             [['date', 'hours'], 'required'],
             [['date'], 'date', 'format' => 'd.m.yyyy'],
             ['hours', 'integer'],
-            ['action', 'in', 'range' => [self::ACTION_CHANGE, self::ACTION_NEXT, self::ACTION_PREV]],
+            ['hours', 'in', 'range' => array_keys($this->getHoursDropdown())],
         ];
     }
 
-    public function getFormattedDate(): string
-    {
-        return date('Y-m-d', strtotime($this->date));
-    }
-
     /**
-     * @throws \Exception
+     * @throws InvalidConfigException
+     * @throws Exception
      */
-    public function setDateNext(): void
-    {
-        $this->date = (new \DateTimeImmutable($this->date))->add(\DateInterval::createFromDateString('1 day'))->format('d.m.Y');
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function setDatePrev(): void
-    {
-        $this->date = (new \DateTimeImmutable($this->date))->add(\DateInterval::createFromDateString('-1 day'))->format('d.m.Y');
-    }
-
-    public function resetAction(): void
-    {
-        $this->action = self::ACTION_CHANGE;
-    }
-
     public function search(int $studentId): array
     {
+        $this->targetDate = new DateTimeImmutable($this->date);
+
         $historyQuery = new Query();
         $hourExpression = new Expression("hour(FROM_UNIXTIME(t.created_at + (3 * 60 * 60)))");
         $minuteExpression = new Expression("minute(FROM_UNIXTIME(t.created_at + (3 * 60 * 60))) DIV $this->hours");
@@ -78,15 +66,14 @@ class HistoryFilterForm extends Model
         $historyQuery->innerJoin(['q' => 'story_test_question'], 't.entity_id = q.id');
         $historyQuery->where(['t.student_id' => $studentId, 't.correct_answer' => 1]);
 
-        $targetDate = Yii::$app->formatter->asDate($this->date, 'php:Y-m-d');
-        $betweenBegin = new Expression("UNIX_TIMESTAMP('$targetDate 00:00:00')");
-        $betweenEnd = new Expression("UNIX_TIMESTAMP('$targetDate 23:59:59')");
+        $betweenBegin = new Expression("UNIX_TIMESTAMP('{$this->targetDate->format('Y-m-d')} 00:00:00')");
+        $betweenEnd = new Expression("UNIX_TIMESTAMP('{$this->targetDate->format('Y-m-d')} 23:59:59')");
         $historyQuery->andWhere(['between', 't.created_at + (3 * 60 * 60)', $betweenBegin, $betweenEnd]);
 
         $historyQuery->groupBy([
             't2.story_id',
             $hourExpression,
-            $minuteExpression
+            $minuteExpression,
         ]);
         $historyQuery->orderBy([
             'hour' => SORT_ASC,
@@ -107,18 +94,6 @@ class HistoryFilterForm extends Model
         return $query->all();
     }
 
-    public function updateDate(): void
-    {
-        if ($this->action === self::ACTION_NEXT) {
-            $this->setDateNext();
-        }
-        if ($this->action === self::ACTION_PREV) {
-            $this->setDatePrev();
-        }
-        $this->resetAction();
-        //$this->date = $this->getFormattedDate();
-    }
-
     public function getHoursDropdown(): array
     {
         return [60 => '1 час', 30 => '30 минут', 20 => '20 минут'];
@@ -128,7 +103,7 @@ class HistoryFilterForm extends Model
     {
         $times = [];
         for ($i = 0; $i <= 23; $i++) {
-            $hour = str_pad($i, 2, '0', STR_PAD_LEFT);
+            $hour = str_pad((string) $i, 2, '0', STR_PAD_LEFT);
             for ($j = 0; $j < 60 / $interval; $j++) {
                 $minute = $interval * $j;
                 $time = [
@@ -140,5 +115,17 @@ class HistoryFilterForm extends Model
             }
         }
         return $times;
+    }
+
+    public function getPrevDate(): array
+    {
+        $prevDate = $this->targetDate->add(DateInterval::createFromDateString('-1 day'));
+        return ['date' => $prevDate->format('d.m.Y')];
+    }
+
+    public function getNextDate(): array
+    {
+        $nextDate = $this->targetDate->add(DateInterval::createFromDateString('+1 day'));
+        return ['date' => $nextDate->format('d.m.Y')];
     }
 }

@@ -9,13 +9,17 @@ use common\models\Story;
 use common\models\User;
 use common\models\UserStudent;
 use DateTimeImmutable;
+use DateTimeInterface;
 use frontend\components\learning\form\HistoryFilterForm;
 use frontend\components\learning\form\WeekFilterForm;
+use frontend\components\learning\widget\TableRow;
 use frontend\components\UserController;
 use frontend\MentalMap\MentalMap;
 use frontend\Training\FetchMentalMapHistoryTargetWords\MentalMapHistoryTargetWordsFetcher;
 use frontend\Training\MentalMapDayHistoryTargetWordsFetcher;
 use frontend\Training\QuizDetailFetcher;
+use modules\edu\query\GetStoryTests\SlideTest;
+use modules\edu\query\GetStoryTests\StoryTestsFetcher;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\Expression;
@@ -61,6 +65,7 @@ class TrainingController extends UserController
     /**
      * @throws NotFoundHttpException
      * @throws InvalidConfigException
+     * @throws \Exception
      */
     public function actionIndex(WebUser $user, Request $request, int $student_id = null): string
     {
@@ -72,8 +77,8 @@ class TrainingController extends UserController
         $studentId = $targetStudent->id;
 
         $filterForm = new HistoryFilterForm();
-        if ($filterForm->load($request->get()) && $filterForm->validate()) {
-            $filterForm->updateDate();
+        if ($filterForm->load($request->get(), '') && !$filterForm->validate()) {
+            $filterForm->initDates();
         }
 
         $rows = $filterForm->search($studentId);
@@ -209,7 +214,21 @@ class TrainingController extends UserController
                     $hour = (int) $row['hour'];
                     $minuteDiv = (int) $row['minute_div'];
                     if ($hour === $timeHour && $minuteDiv === $timeMinuteDiv) {
-                        $value = $questionCount . '@' . $storyId;
+                        //dd($filterForm->date, $time, $filterForm->hours);
+                        //$value = $questionCount . '@' . $storyId;
+                        [$hour, $minute] = explode(':', $time['time']);
+                        $periodDateFrom = (new DateTimeImmutable($filterForm->date))->setTime((int) $hour, (int) $minute);
+                        $periodDateTo = $periodDateFrom->modify("+{$filterForm->hours} minutes");
+                        $value = [
+                            'count' => $questionCount,
+                            'storyId' => $storyId,
+                            'testRestarts' => $this->fetchStoryTestRestarts(
+                                $targetStudent->id,
+                                $storyId,
+                                $periodDateFrom,
+                                $periodDateTo
+                            )
+                        ];
                     }
                 }
 
@@ -222,9 +241,10 @@ class TrainingController extends UserController
         $students = array_merge($currentUser->students, $currentUser->parentStudents);
 
         return $this->render('index_new', [
-            'items' => $this->getNavItems($students, $targetStudent->id, static function (UserStudent $student) use ($request): string {
+            'items' => $this->getNavItems($students, $targetStudent->id, static function (UserStudent $student) use ($filterForm): string {
                 return Url::to(array_merge(['index', 'student_id' => $student->id], [
-                    'day' => $request->get('day'),
+                    'date' => $filterForm->date,
+                    'hours' => $filterForm->hours,
                 ]));
             },),
             'view' => 'day',
@@ -234,12 +254,23 @@ class TrainingController extends UserController
                 'models' => $models,
                 'filterModel' => $filterForm,
                 'storiesProgress' => $storiesProgress,
+                'prevUrl' => Url::to(array_merge(
+                    ['index', 'student_id' => $studentId],
+                    $filterForm->getPrevDate(),
+                    ['hours' => $filterForm->hours]
+                )),
+                'nextUrl' => Url::to(array_merge(
+                    ['index', 'student_id' => $studentId],
+                    $filterForm->getNextDate(),
+                    ['hours' => $filterForm->hours]
+                )),
             ],
         ]);
     }
 
     /**
      * @throws NotFoundHttpException
+     * @throws \Exception
      */
     public function actionWeek(Request $request, WebUser $user, int $student_id = null): string
     {
@@ -345,7 +376,16 @@ class TrainingController extends UserController
                     $questionCount = (int) $row['question_count'];
                     $questionDate = $row['target_date'];
                     if ($questionDate === $currentDate) {
-                        $value = $questionCount . '@' . $storyId;
+                        $value = [
+                            'count' => $questionCount,
+                            'storyId' => $storyId,
+                            'testRestarts' => $this->fetchStoryTestRestarts(
+                                $targetStudent->id,
+                                $storyId,
+                                (new DateTimeImmutable($questionDate))->setTime(0, 0),
+                                (new DateTimeImmutable($questionDate))->setTime(23, 59, 59)
+                            )
+                        ];
                     }
                 }
                 $model[] = $value;
@@ -360,10 +400,10 @@ class TrainingController extends UserController
             'items' => $this->getNavItems(
                 $students,
                 $targetStudent->id,
-                static function (UserStudent $student) use ($request): string {
+                static function (UserStudent $student) use ($filterForm): string {
                     return Url::to(array_merge(['week', 'student_id' => $student->id], [
-                        'year' => $request->get('year'),
-                        'week' => $request->get('week'),
+                        'year' => $filterForm->year,
+                        'week' => $filterForm->week,
                     ]));
                 },
             ),
@@ -529,5 +569,46 @@ class TrainingController extends UserController
                 ];
             }, $rows),
         );
+    }
+
+    /**
+     * @throws InvalidConfigException
+     * @throws NotFoundHttpException
+     */
+    private function fetchStoryTestRestarts(int $studentId, int $storyId, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): string
+    {
+        $slideContent = (new StoryTestsFetcher())->fetch($storyId);
+        $tests = $slideContent->find(SlideTest::class);
+        if (count($tests) === 0) {
+            return '';
+        }
+        $testIds = array_map(static function(SlideTest $test): int {
+            return $test->getTestId();
+        }, $tests);
+
+        $betweenBegin = new Expression("UNIX_TIMESTAMP('{$dateFrom->format('Y-m-d H:i:s')}')");
+        $betweenEnd = new Expression("UNIX_TIMESTAMP('{$dateTo->format('Y-m-d H:i:s')}')");
+        $query = (new Query())
+            ->select([
+                'testId' => 't.test_id',
+                'testName' => 'q.title',
+                'restartTime' => 't.created_at',
+            ])
+            ->from(['t' => 'test_restart_log'])
+            ->innerJoin(['q' => 'story_test'], 't.test_id = q.id')
+            ->where([
+                't.student_id' => $studentId,
+            ])
+            ->andWhere(['in', 't.test_id', $testIds])
+            ->andWhere(['between', new Expression('t.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd]);
+        $rows = $query->all();
+        if (count($rows) === 0) {
+            return '';
+        }
+
+        $values = array_map(static function(array $value): string {
+            return $value['testName'] . ' - ' . SmartDate::dateSmart($value['restartTime'], true);
+        }, $rows);
+        return 'Тесты, начатые заново:' . PHP_EOL . implode(PHP_EOL, $values);
     }
 }

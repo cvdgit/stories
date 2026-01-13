@@ -58,23 +58,27 @@ $this->registerJs($this->renderFile('@frontend/views/training/week.js'));
         'caption' => 'Количество ответов в тестах (по неделям)',
         'columns' => $columns,
         'models' => $models,
-        'tableRowRenderCallback' => static function (string $value, array $column) use (
+        'tableRowRenderCallback' => static function ($value, array $column) use (
             $studentId
         ): string {
-            if (strpos($value, '@') !== false) {
-                [$num, $storyId] = explode('@', $value);
-                $value = Html::a(
-                    '<strong style="pointer-events: none">' . $num . '</strong>',
+            if (is_array($value)) {
+                return Html::a(
+                    $value['count'],
                     [
                         '/training/detail-week',
-                        'story_id' => $storyId,
+                        'story_id' => $value['storyId'],
                         'student_id' => $studentId,
                         'date' => $column['date'],
                     ],
-                    ['class' => 'detail-modal'],
+                    [
+                        'class' => 'detail-modal',
+                        'style' => 'font-weight: 600',
+                        'title' => $value['testRestarts'],
+                        'data-toggle' => 'tooltip',
+                    ],
                 );
             }
-            return $value;
+            return (string) $value;
         },
     ]) ?>
 </div>
