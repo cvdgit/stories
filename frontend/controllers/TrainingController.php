@@ -18,6 +18,7 @@ use frontend\MentalMap\MentalMap;
 use frontend\Training\FetchMentalMapHistoryTargetWords\MentalMapHistoryTargetWordsFetcher;
 use frontend\Training\MentalMapDayHistoryTargetWordsFetcher;
 use frontend\Training\QuizDetailFetcher;
+use modules\edu\query\GetStoryTests\SlideMentalMap;
 use modules\edu\query\GetStoryTests\SlideTest;
 use modules\edu\query\GetStoryTests\StoryTestsFetcher;
 use Yii;
@@ -221,7 +222,7 @@ class TrainingController extends UserController
                         $value = [
                             'count' => $questionCount,
                             'storyId' => $storyId,
-                            'testRestarts' => $this->fetchStoryTestRestarts(
+                            'testRestarts' => $this->fetchStoryContentRestarts(
                                 $targetStudent->id,
                                 $storyId,
                                 $periodDateFrom,
@@ -379,7 +380,7 @@ class TrainingController extends UserController
                         $value = [
                             'count' => $questionCount,
                             'storyId' => $storyId,
-                            'testRestarts' => $this->fetchStoryTestRestarts(
+                            'testRestarts' => $this->fetchStoryContentRestarts(
                                 $targetStudent->id,
                                 $storyId,
                                 (new DateTimeImmutable($questionDate))->setTime(0, 0),
@@ -601,17 +602,63 @@ class TrainingController extends UserController
      * @throws InvalidConfigException
      * @throws NotFoundHttpException
      */
-    private function fetchStoryTestRestarts(int $studentId, int $storyId, DateTimeInterface $dateFrom, DateTimeInterface $dateTo): string
-    {
+    private function fetchStoryContentRestarts(
+        int $studentId,
+        int $storyId,
+        DateTimeInterface $dateFrom,
+        DateTimeInterface $dateTo
+    ): string {
         $slideContent = (new StoryTestsFetcher())->fetch($storyId);
-        $tests = $slideContent->find(SlideTest::class);
-        if (count($tests) === 0) {
-            return '';
+
+        $testRows = $this->fetchStoryTestRestarts(
+            $studentId,
+            $slideContent->find(SlideTest::class),
+            $dateFrom,
+            $dateTo,
+        );
+
+        $values = array_map(static function (array $value): string {
+            return $value['testName'] . ' - ' . SmartDate::dateSmart($value['restartTime'], true);
+        }, $testRows);
+
+        $result = '';
+
+        if (count($testRows) > 0) {
+            $result = 'Тесты, начатые заново:' . PHP_EOL . implode(PHP_EOL, $values);
         }
-        $testIds = array_map(static function(SlideTest $test): int {
+
+        $mentalMapRows = $this->fetchStoryMentalMapRestarts(
+            $studentId,
+            $slideContent->find(SlideMentalMap::class),
+            $dateFrom,
+            $dateTo,
+        );
+        $values = array_map(static function (array $value): string {
+            return $value['mentalMapName'] . ' - ' . SmartDate::dateSmart($value['restartTime'], true);
+        }, $mentalMapRows);
+
+        if (count($mentalMapRows) > 0) {
+            if ($result !== '') {
+                $result .= PHP_EOL;
+            }
+            $result .= 'Ментальные карты, начатые заново:' . PHP_EOL . implode(PHP_EOL, $values);
+        }
+
+        return $result;
+    }
+
+    private function fetchStoryTestRestarts(
+        int $studentId,
+        array $tests,
+        DateTimeInterface $dateFrom,
+        DateTimeInterface $dateTo
+    ): array {
+        if (count($tests) === 0) {
+            return [];
+        }
+        $testIds = array_map(static function (SlideTest $test): int {
             return $test->getTestId();
         }, $tests);
-
         $betweenBegin = new Expression("UNIX_TIMESTAMP('{$dateFrom->format('Y-m-d H:i:s')}')");
         $betweenEnd = new Expression("UNIX_TIMESTAMP('{$dateTo->format('Y-m-d H:i:s')}')");
         $query = (new Query())
@@ -627,14 +674,36 @@ class TrainingController extends UserController
             ])
             ->andWhere(['in', 't.test_id', $testIds])
             ->andWhere(['between', new Expression('t.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd]);
-        $rows = $query->all();
-        if (count($rows) === 0) {
-            return '';
-        }
+        return $query->all();
+    }
 
-        $values = array_map(static function(array $value): string {
-            return $value['testName'] . ' - ' . SmartDate::dateSmart($value['restartTime'], true);
-        }, $rows);
-        return 'Тесты, начатые заново:' . PHP_EOL . implode(PHP_EOL, $values);
+    private function fetchStoryMentalMapRestarts(
+        int $studentId,
+        array $mentalMaps,
+        DateTimeInterface $dateFrom,
+        DateTimeInterface $dateTo
+    ): array {
+        if (count($mentalMaps) === 0) {
+            return [];
+        }
+        $mentalMapIds = array_map(static function (SlideMentalMap $mentalMap): string {
+            return $mentalMap->getMentalMapId();
+        }, $mentalMaps);
+        $betweenBegin = new Expression("UNIX_TIMESTAMP('{$dateFrom->format('Y-m-d H:i:s')}')");
+        $betweenEnd = new Expression("UNIX_TIMESTAMP('{$dateTo->format('Y-m-d H:i:s')}')");
+        $query = (new Query())
+            ->select([
+                'mentalMapId' => 't.mental_map_id',
+                'mentalMapName' => 'm.name',
+                'restartTime' => 't.created_at',
+            ])
+            ->from(['t' => 'mental_map_restart_log'])
+            ->innerJoin(['m' => 'mental_map'], 't.mental_map_id = m.uuid')
+            ->where([
+                't.student_id' => $studentId,
+            ])
+            ->andWhere(['in', 't.mental_map_id', $mentalMapIds])
+            ->andWhere(['between', new Expression('t.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd]);
+        return $query->all();
     }
 }

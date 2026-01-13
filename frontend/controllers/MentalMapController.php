@@ -6,7 +6,9 @@ namespace frontend\controllers;
 
 use common\components\MentalMapThreshold;
 use common\models\User;
+use common\models\UserStudent;
 use common\rbac\UserRoles;
+use common\services\TransactionManager;
 use Exception;
 use frontend\MentalMap\history\MentalMapHistoryFetcher;
 use frontend\MentalMap\history\MentalMapTreeHistoryFetcher;
@@ -23,6 +25,7 @@ use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\helpers\Json;
 use yii\rest\Controller;
+use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Request;
 use yii\web\Response;
@@ -38,17 +41,23 @@ class MentalMapController extends Controller
      * @var MentalMapFinishHandler
      */
     private $mentalMapFinishHandler;
+    /**
+     * @var TransactionManager
+     */
+    private $transactionManager;
 
     public function __construct(
         $id,
         $module,
         StartMentalMapRepetitionHandler $startMentalMapRepetitionHandler,
         MentalMapFinishHandler $mentalMapFinishHandler,
+        TransactionManager $transactionManager,
         $config = []
     ) {
         parent::__construct($id, $module, $config);
         $this->startMentalMapRepetitionHandler = $startMentalMapRepetitionHandler;
         $this->mentalMapFinishHandler = $mentalMapFinishHandler;
+        $this->transactionManager = $transactionManager;
     }
 
     public function behaviors(): array
@@ -110,7 +119,7 @@ class MentalMapController extends Controller
                     $user->getId(),
                     $sourceMentalMap->getTreeData(),
                     $threshold,
-                    $repetitionMode
+                    $repetitionMode,
                 );
             } else {
                 $history = (new MentalMapHistoryFetcher())->fetch(
@@ -118,7 +127,7 @@ class MentalMapController extends Controller
                     $mentalMap->uuid,
                     $user->getId(),
                     $threshold,
-                    $repetitionMode
+                    $repetitionMode,
                 );
             }
         } else {
@@ -129,7 +138,7 @@ class MentalMapController extends Controller
                     $user->getId(),
                     $mentalMap->getTreeData(),
                     $threshold,
-                    $repetitionMode
+                    $repetitionMode,
                 );
             } else {
                 $history = (new MentalMapHistoryFetcher())->fetch(
@@ -137,7 +146,7 @@ class MentalMapController extends Controller
                     $mentalMap->uuid,
                     $user->getId(),
                     $threshold,
-                    $repetitionMode
+                    $repetitionMode,
                 );
             }
         }
@@ -235,14 +244,14 @@ class MentalMapController extends Controller
                             $mentalMap->uuid,
                             $user->getId(),
                             $mentalMap->getTreeData(),
-                            $threshold
+                            $threshold,
                         );
                     } else {
                         $history = (new MentalMapHistoryFetcher())->fetch(
                             $mentalMap->getImages(),
                             $mentalMap->uuid,
                             $user->getId(),
-                            $threshold
+                            $threshold,
                         );
                     }
                     if (MentalMap::isDone($history, $threshold)) {
@@ -400,6 +409,7 @@ class MentalMapController extends Controller
 
     /**
      * @throws NotFoundHttpException
+     * @throws BadRequestHttpException
      */
     public function actionRestart(string $id, Response $response, WebUser $user): array
     {
@@ -409,13 +419,33 @@ class MentalMapController extends Controller
             throw new NotFoundHttpException('Ментальная карта не найдена');
         }
 
+        $student = UserStudent::findMainByUserId($user->getId());
+        if ($student === null) {
+            throw new BadRequestHttpException('User not found');
+        }
+
         try {
-            $command = Yii::$app->db->createCommand();
-            $command->delete('mental_map_history', [
-                'mental_map_id' => $mentalMap->uuid,
-                'user_id' => $user->getId(),
-            ]);
-            $command->execute();
+            $this->transactionManager->wrap(static function () use ($mentalMap, $user, $student): void {
+
+                $restartCommand = Yii::$app->db->createCommand();
+                $restartCommand->delete('mental_map_history', [
+                    'mental_map_id' => $mentalMap->uuid,
+                    'user_id' => $user->getId(),
+                ]);
+                $restartCommand->execute();
+
+                $command = Yii::$app->db->createCommand();
+                $command->insert(
+                    'mental_map_restart_log',
+                    [
+                        'id' => Uuid::uuid4()->toString(),
+                        'mental_map_id' => $mentalMap->uuid,
+                        'student_id' => $student->id,
+                        'created_at' => time(),
+                    ],
+                );
+                $command->execute();
+            });
             return ['success' => true];
         } catch (Exception $exception) {
             Yii::$app->errorHandler->logException($exception);

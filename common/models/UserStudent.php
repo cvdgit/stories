@@ -196,4 +196,16 @@ class UserStudent extends ActiveRecord
     {
         return $this->hasMany(EduClassBookStudent::class, ['student_id' => 'id']);
     }
+
+    public static function findMainByUserId(int $userId): ?self
+    {
+        /** @var UserStudent|null $model */
+        $model = self::find()
+            ->where([
+                'user_id' => $userId,
+                'status' => self::STATUS_MAIN,
+            ])
+            ->one();
+        return $model;
+    }
 }
