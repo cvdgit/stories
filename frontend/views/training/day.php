@@ -98,7 +98,7 @@ $this->registerJs($this->renderFile('@frontend/views/training/day.js'));
                     ],
                     [
                         'class' => 'detail-modal',
-                        'style' => 'font-weight: 600',
+                        'style' => 'font-weight: 600; ' . ($value['testRestarts'] ? 'color: rgba(220,53,69,1)' : ''),
                         'title' => $value['testRestarts'],
                         'data-toggle' => 'tooltip',
                     ],
