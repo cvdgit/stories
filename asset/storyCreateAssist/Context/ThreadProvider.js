@@ -125,7 +125,8 @@ export function ThreadProvider({children}) {
         const lines = []
         lines.push(`<p><h2>${f.fragmentTitle}</h2></p>`)
         f.sentences.map(s => {
-          lines.push(`<p><strong>${s.sentenceTitle}</strong><br/>${s.sentenceText}</p>`)
+          // <strong>${s.sentenceTitle}</strong><br/>
+          lines.push(`<p>${s.sentenceText}</p>`)
         })
         return {
           id: f.id,

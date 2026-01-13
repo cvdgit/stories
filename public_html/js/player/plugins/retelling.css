@@ -78,6 +78,7 @@
   right: 0;
   top: 0;
   z-index: 999;
+  background-color: white;
 }
 
 .content-mm-inner {
@@ -86,6 +87,26 @@
   flex-direction: column;
   row-gap: 10px;
   /*pointer-events: all !important;*/
+}
+
+.content-mm-inner .content-mm-item {
+  display: none;
+}
+
+.content-mm-header:hover ~ .content-mm-item,
+.content-mm-inner:hover > .content-mm-item {
+  display: flex;
+}
+
+.content-mm-header {
+  margin: 0;
+  text-align: left;
+
+  background-color: rgba(153, 205, 80, .4);
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 8px 12px;
 }
 
 .content-mm-item {

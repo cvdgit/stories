@@ -127,7 +127,7 @@
     }
 
     const wrap = $('<div class="content-mm-wrap"><div class="content-mm-inner"></div></div>')
-    wrap.find('.content-mm-inner').append('<h3 style="margin: 0; text-align: left">Речевой тренажёр:</h3>')
+    wrap.find('.content-mm-inner').append('<h3 class="content-mm-header">Речевой тренажёр</h3>')
 
     mapOrder.map(type => {
       const mentalMap = mentalMapsData.mentalMaps.find(m => m.type === type);

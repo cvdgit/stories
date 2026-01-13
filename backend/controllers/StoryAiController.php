@@ -382,7 +382,7 @@ class StoryAiController extends Controller
                 StorySlide::KIND_RETELLING,
                 $currentSlideNumber,
                 function (int $slideId) use ($retelling): string {
-                    return $this->storyEditorService->getSlideWithRetellingBlockContent($slideId, $retelling->id);
+                    return $this->storyEditorService->getSlideWithRetellingBlockContent($slideId, $retelling->id, false);
                 }
             );
             $retellingSlideId = $retellingSlide->id;
