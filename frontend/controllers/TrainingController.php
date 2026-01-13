@@ -579,7 +579,7 @@ class TrainingController extends UserController
             array_column($rows, 'storyId'),
             array_map(static function (array $row): array {
                 return [
-                    'place' => 'edu',
+                    'place' => $row['place'],
                     'time' => $row['completeTime'],
                     'date' => SmartDate::dateSmart((int) $row['completeTime'], true),
                 ];
