@@ -87,6 +87,9 @@ class HistoryWidget extends Widget
                     $total[$index] = 0;
                 }
                 $value = $model[$index] ?? '0';
+                if (is_array($value)) {
+                    $value = $value['count'];
+                }
                 $total[$index] += (int) $value;
             }
         }
