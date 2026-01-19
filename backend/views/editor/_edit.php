@@ -841,9 +841,13 @@ $js = <<< JS
             const id = StoryEditor.createSlideBlock(html);
             const block = StoryEditor.findBlockByID(id);
             const payload = JSON.parse(block.getElement().find('.table-of-contents-payload').text());
+            const slidesMap = new Map();
+            $('#slides-list > [data-slide-id]')
+                .each((i, el) => slidesMap.set(Number($(el).attr('data-slide-id')), i + 1));
             TableOfContentsPlugin.initEdit(
                 payload,
-                block.getElement().find('.table-of-contents')
+                block.getElement().find('.table-of-contents'),
+                slidesMap
             );
             return;
         }
@@ -969,10 +973,13 @@ $js = <<< JS
 
         const elem = $(target).parents('.table-of-contents');
         const payload = JSON.parse(elem.find('.table-of-contents-payload').text());
+        const slidesMap = new Map();
+        $('#slides-list > [data-slide-id]')
+            .each((i, el) => slidesMap.set(Number($(el).attr('data-slide-id')), i + 1));
         const updatePayloadHandler = (p) => {
             elem.find('.table-of-contents-payload').text(JSON.stringify(p));
             StoryEditor.change();
-            TableOfContentsPlugin.initEdit(p, elem);
+            TableOfContentsPlugin.initEdit(p, elem, slidesMap);
         }
 
         fetch('/admin/index.php?r=editor/slides&story_id=' + StoryEditor.getConfigValue('storyID'), {
