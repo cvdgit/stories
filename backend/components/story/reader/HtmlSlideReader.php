@@ -11,6 +11,7 @@ use backend\components\story\ImageBlock;
 use backend\components\story\MentalMapBlock;
 use backend\components\story\RetellingBlock;
 use backend\components\story\Slide;
+use backend\components\story\TableOfContentsBlock;
 use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
 use backend\components\story\TransitionBlock;
@@ -75,6 +76,9 @@ class HtmlSlideReader implements ReaderInterface
                 case AbstractBlock::TYPE_VIDEO:
                 case AbstractBlock::TYPE_VIDEOFILE:
                     $this->loadBlockVideo($htmlBlock);
+                    break;
+                case AbstractBlock::TYPE_TABLE_OF_CONTENTS:
+                    $this->loadBlockTableOfContents($htmlBlock);
                     break;
                 default:
             }
@@ -240,6 +244,17 @@ class HtmlSlideReader implements ReaderInterface
     {
         $block = new MentalMapBlock();
         $block->setType(AbstractBlock::TYPE_MENTAL_MAP);
+        $element = pq($htmlBlock);
+        $this->loadBlockProperties($block, (string) $element->attr('style'));
+        $block->setId((string) pq($htmlBlock)->attr('data-block-id'));
+        $block->setContent((string) pq($htmlBlock)->find('.sl-block-content:eq(0)')->html());
+        $this->slide->addBlock($block);
+    }
+
+    private function loadBlockTableOfContents(\DOMElement $htmlBlock): void
+    {
+        $block = new TableOfContentsBlock();
+        $block->setType(AbstractBlock::TYPE_TABLE_OF_CONTENTS);
         $element = pq($htmlBlock);
         $this->loadBlockProperties($block, (string) $element->attr('style'));
         $block->setId((string) pq($htmlBlock)->attr('data-block-id'));

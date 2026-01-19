@@ -295,6 +295,7 @@ const SimpleModal = function({id, title, size}) {
 
   const sizes = {
     lg: 'modal-lg',
+    xl: 'modal-xl',
     auto: ''
   };
 

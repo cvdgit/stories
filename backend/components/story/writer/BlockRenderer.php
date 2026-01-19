@@ -10,6 +10,7 @@ use backend\components\story\HTMLBLock;
 use backend\components\story\ImageBlock;
 use backend\components\story\MentalMapBlock;
 use backend\components\story\RetellingBlock;
+use backend\components\story\TableOfContentsBlock;
 use backend\components\story\TestBlock;
 use backend\components\story\TextBlock;
 use backend\components\story\TransitionBlock;
@@ -22,6 +23,7 @@ use backend\components\story\writer\HTML\ImageBlockMarkup;
 use backend\components\story\writer\HTML\MentalMapBlockMarkup;
 use backend\components\story\writer\HTML\ParagraphBlockMarkup;
 use backend\components\story\writer\HTML\RetellingBlockMarkup;
+use backend\components\story\writer\HTML\TableOfContentsBlockMarkup;
 use backend\components\story\writer\HTML\TestBlockMarkup;
 use backend\components\story\writer\HTML\TransitionBlockMarkup;
 use backend\components\story\writer\HTML\VideoBlockMarkup;
@@ -64,6 +66,9 @@ class BlockRenderer
             case VideoBlock::class:
             case VideoFileBlock::class:
             $markupClassName = VideoBlockMarkup::class;
+                break;
+            case TableOfContentsBlock::class:
+                $markupClassName = TableOfContentsBlockMarkup::class;
                 break;
         }
         return (new $markupClassName($block))->markup();

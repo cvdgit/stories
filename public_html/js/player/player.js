@@ -384,6 +384,7 @@ function onSlideMouseDown(e) {
         $target.parents("section[data-slide-view=new-question]").length ||
         $target.parents('.new-questions').length ||
       $target.parents('.content-mm-wrap').length ||
+      $target.parents('.table-of-contents').length ||
         $target.parents('.mental-map').length ||
         $target.parents('.retelling-block').length ||
         ($target[0].tagName === "IMG" && $target.attr("data-action") === "1") ||

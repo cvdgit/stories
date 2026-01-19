@@ -78,6 +78,7 @@ $plugins = [
 
     ['class' => Retelling::class, 'storyId' => $model->id],
     ['class' => \common\widgets\Reveal\Plugins\ContentMentalMap::class, 'storyId' => $model->id, 'mentalMaps' => $contentMentalMaps],
+    ['class' => \common\widgets\Reveal\Plugins\TableOfContents::class],
 ];
 
 if ($model->isScreenRecorder()) {

@@ -181,8 +181,14 @@ class StoryAiController extends Controller
                 }
 
                 $slide = StorySlide::createSlide($story->id);
-                $slide->data = $this->storyEditorService->makeEmptySlide();
+                $slide->data = 'empty';
                 $slide->kind = SlideKind::SLIDE;
+                if (!$slide->save()) {
+                    throw new DomainException(
+                        'Can\'t be saved Story model. Errors: ' . implode(', ', $slide->getFirstErrors()),
+                    );
+                }
+                $slide->data = $this->storyEditorService->makeEmptySlide($slide->id);
                 if (!$slide->save()) {
                     throw new DomainException(
                         'Can\'t be saved Story model. Errors: ' . implode(', ', $slide->getFirstErrors()),

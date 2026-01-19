@@ -69,7 +69,18 @@ class SlideController extends BaseController
         $slide = $this->editorService->processData($data);
         foreach ($slide->getBlocks() as $block) {
             if ($block->getType() === AbstractBlock::TYPE_HTML) {
-                $data = str_replace('data-slide-view=""', 'data-slide-view="new-question"', $data);
+                $data = str_replace(
+                    'data-slide-view=""',
+                    'data-slide-view="new-question"',
+                    $data
+                );
+            }
+            if ($block->getType() === AbstractBlock::TYPE_TABLE_OF_CONTENTS) {
+                $data = str_replace(
+                    'data-slide-view=""',
+                    'data-slide-view="' . AbstractBlock::TYPE_TABLE_OF_CONTENTS . '"',
+                    $data
+                );
             }
         }
 

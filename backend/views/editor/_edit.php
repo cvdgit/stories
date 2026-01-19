@@ -30,6 +30,7 @@ $this->registerJs($this->renderFile("@backend/views/editor/_mental_map_common.js
 $this->registerJs($this->renderFile("@backend/views/editor/_mental_map_questions.js"));
 $this->registerJs($this->renderFile("@backend/views/editor/mental-map/_create_ai.js"));
 $this->registerJs($this->renderFile("@backend/views/editor/_content_mental_map.js"));
+$this->registerJs($this->renderFile("@backend/views/editor/_table_of_contents.js"));
 ?>
 <div class="wrap-editor">
     <div class="slides-sidebar">
@@ -92,6 +93,10 @@ $this->registerJs($this->renderFile("@backend/views/editor/_content_mental_map.j
 <div class="blocks-sidebars">
     <div class="blocks-sidebar hide visible">
         <ul>
+            <li class="blocks-sidebar-item" data-block-type="table-of-contents">
+                <span class="glyphicon glyphicon-tasks icon"></span>
+                <span class="text">Оглавление</span>
+            </li>
             <li class="blocks-sidebar-item" data-block-type="text">
                 <span class="glyphicon glyphicon-text-size icon"></span>
                 <span class="text">Текст</span>
@@ -341,6 +346,21 @@ $js = <<< JS
     }
     editorConfig.onReady = function() {
         $('.page-loader').addClass('loaded');
+    }
+
+    editorConfig.onSlideLoad = (elem) => {
+        const type = elem.find('[data-block-type]').attr('data-block-type');
+        if (type === 'table-of-contents') {
+            const payload = JSON.parse(elem.find('.table-of-contents-payload').text());
+            const slidesMap = new Map();
+            $('#slides-list > [data-slide-id]')
+                .each((i, el) => slidesMap.set(Number($(el).attr('data-slide-id')), i + 1));
+            TableOfContentsPlugin.initEdit(
+                payload,
+                elem.find('.table-of-contents'),
+                slidesMap
+            );
+        }
     }
 
     const gptRewriteText = new GptRewriteText()
@@ -816,6 +836,18 @@ $js = <<< JS
             return
         }
 
+        if (type === 'table-of-contents') {
+            const html = StoryEditor.createTableOfContentsBlock();
+            const id = StoryEditor.createSlideBlock(html);
+            const block = StoryEditor.findBlockByID(id);
+            const payload = JSON.parse(block.getElement().find('.table-of-contents-payload').text());
+            TableOfContentsPlugin.initEdit(
+                payload,
+                block.getElement().find('.table-of-contents')
+            );
+            return;
+        }
+
         if (type === 'retelling') {
 
             const currentSlide = StoryEditor.getCurrentSlide();
@@ -929,6 +961,25 @@ $js = <<< JS
                 mentalMapId
             })
         }
+    })
+
+    const tableOfContents = new TableOfContents();
+    $('#story-editor').on('click', '[data-block-type=table-of-contents] .table-of-contents-edit', ({preventDefault, target}) => {
+        preventDefault();
+
+        const elem = $(target).parents('.table-of-contents');
+        const payload = JSON.parse(elem.find('.table-of-contents-payload').text());
+        const updatePayloadHandler = (p) => {
+            elem.find('.table-of-contents-payload').text(JSON.stringify(p));
+            StoryEditor.change();
+            TableOfContentsPlugin.initEdit(p, elem);
+        }
+
+        tableOfContents.show(
+            payload,
+            StoryEditor.slides(),
+            updatePayloadHandler
+        );
     })
 })();
 JS;

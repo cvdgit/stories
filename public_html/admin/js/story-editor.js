@@ -620,6 +620,7 @@ function ContentCleaner(editor) {
       }
     });
 
+    data.find('.table-of-contents-inner').remove();
     data.find('.sl-block-transform').remove();
     data.find('.sl-block-image-controls').remove();
     data.find('.ui-resizable-handle').remove();
@@ -1155,6 +1156,15 @@ const StoryEditor = (function () {
   }
 
   function makeDraggable(element) {
+
+    const blockId = $(element).attr('data-block-id');
+    if (blockId) {
+      const block = blockManager.find(blockId);
+      if (block && block.typeIsTableOfContents()) {
+        return;
+      }
+    }
+
     var containmentArea = $editor.find('section');
     var config = {
       start: function (event) {
@@ -1259,6 +1269,9 @@ const StoryEditor = (function () {
   }
 
   function makeResizableBlock(block) {
+    if (block.typeIsTableOfContents()) {
+      return;
+    }
     var config = {};
     if (block.typeIsText()) {
       config = {
@@ -1377,6 +1390,9 @@ const StoryEditor = (function () {
       },
       'isPlaceholder': function () {
         return (this.typeIsImage() && !this.getElement().find('img').length);
+      },
+      typeIsTableOfContents() {
+        return this.getType() === 'table-of-contents';
       },
       'typeIsVideo': function () {
         return this.getType() === 'video' || this.getType() === 'videofile';
@@ -1557,7 +1573,7 @@ const StoryEditor = (function () {
 
   blockManager.addEventListener('onBlockCreate', function (e) {
     if (e.block.typeIsHtml()) {
-      // При создании блока с тестом, изменить тип слайда с на new-question
+      // При создании блока с тестом, изменить тип слайда на new-question
       slidesManager.getActiveSlide().setSlideView('new-question');
     }
     setActiveBlock(e.block.getElement());
@@ -1646,6 +1662,13 @@ const StoryEditor = (function () {
       $('.slides', $editor).html(data.data);
       Reveal.sync();
       Reveal.slide(0);
+
+      if (typeof config.onSlideLoad === 'function') {
+        config.onSlideLoad(
+          $editor.find('.slides section.present')
+        );
+      }
+
       slidesManager.setActiveSlide($editor.find('section'), data);
       slideMenu.init(data);
       makeDraggable($editor.find('.sl-block'));
@@ -1658,6 +1681,13 @@ const StoryEditor = (function () {
     $('.slides', $editor).html(slideData.data);
     Reveal.sync();
     Reveal.slide(0);
+
+    if (typeof config.onSlideLoad === 'function') {
+      config.onSlideLoad(
+        $editor.find('.slides section.present')
+      );
+    }
+
     slidesManager.setActiveSlide($editor.find('section'), slideData);
     if (slideData.isLink) {
       $editor.find('section')
@@ -2055,837 +2085,48 @@ const StoryEditor = (function () {
       blockContent.appendTo(block)
 
       return block[0].outerHTML;
+    },
+
+    createTableOfContentsBlock() {
+      const block = $('<div/>', {
+        class: 'sl-block',
+        'data-block-id': blockIDGenerator.generate(),
+        'data-block-type': 'table-of-contents',
+        css: {width: '1280px', height: '720px', left: 0, top: 0}
+      });
+      const blockContent = $('<div/>', {
+        class: 'sl-block-content',
+        'data-placeholder': 'div',
+        'data-placeholder-text': 'Text',
+        css: {'z-index': 12, 'text-align': 'left'}
+      });
+
+      const id = uuidv4();
+      $(
+        `<div class="table-of-contents">
+    <script class="table-of-contents-payload" type="application/json">{
+        "title": "Оглавление",
+        "groups": []
+    }</script>
+</div>`
+      ).appendTo(blockContent);
+
+      blockContent.appendTo(block);
+
+      return block[0].outerHTML;
+    },
+
+    change() {
+      blockModifier.change();
+    },
+
+    slides() {
+      const slides = [];
+      slidesManager.slides.forEach(s => slides.push(s));
+      return [...slides]
+        .filter(s => !s.haveTableOfContents)
+        .filter(s => !s.isHidden)
+        .sort((a, b) => a.slideNumber - b.slideNumber);
     }
   };
 })();
-
-/*
-(function(editor, $, console) {
-    "use strict";
-
-    var $modal = $("#slide-question-modal");
-
-    editor.createSlideQuestion = function() {
-        $modal.modal("show");
-    };
-
-    editor.addQuestion = function() {
-        var questionID = $("#story-question-list").val();
-        if (!questionID) {
-            $modal.modal("hide");
-            return;
-        }
-        $.getJSON(editor.getConfigValue("createSlideQuestionAction"), {
-            "question_id": questionID,
-            "current_slide_id": editor.getCurrentSlideID()
-        }).done(function(data) {
-            editor.loadSlides(data.id);
-        });
-        $modal.modal("hide");
-    };
-})(StoryEditor, jQuery, console);*/
-
-/*
-(function(editor, $, console) {
-    "use strict";
-
-    editor.createQuestions = function(params, callback) {
-        params = params || {};
-        params.story_id = editor.getStoryID();
-        params.after_slide_id = editor.getCurrentSlideID();
-        $.getJSON(editor.getConfigValue("createNewSlideQuestionAction"), params).done(function(data) {
-            if (typeof callback === 'function') {
-                callback();
-            }
-            editor.loadSlides(data.id);
-        });
-    };
-
-})(StoryEditor, jQuery, console);*/
-
-/** Blocks */
-/*(function(editor, $, console) {
-    "use strict";
-
-    editor.newCreateBlock = function() {
-        $.getJSON(editor.getConfigValue("newCreateBlockAction"), {
-            "slide_id": editor.getCurrentSlideID()
-        }).done(function(data) {
-            console.log(data);
-            //editor.loadSlide(editor.getCurrentSlideID(), true);
-        });
-    };
-
-})(StoryEditor, jQuery, console);*/
-
-/** Images */
-/*
-var ImageFromStory = (function(editor, $, console) {
-    "use strict";
-
-    var config = {
-        addImagesAction: ""
-    };
-
-    function extend(a, b) {
-        for (var i in b) {
-            a[i] = b[i];
-        }
-        return a;
-    }
-
-    function dispatchEvent(type, args) {
-        var event = document.createEvent("HTMLEvents", 1, 2);
-        event.initEvent(type, true, true);
-        extend(event, args);
-        document.dispatchEvent(event);
-    }
-
-    function changeImageStory(storyID) {
-        var promise = $.ajax({
-            "url": editor.getConfigValue("storyImagesAction") + "&story_id=" + storyID,
-            "type": "GET",
-            "dataType": "json"
-        });
-        promise.done(function(data) {
-            dispatchEvent('onChangeStory', {
-                'data': data
-            });
-        });
-    }
-
-    function addImages(image) {
-        return $.ajax({
-            "url": config.addImagesAction + "&slide_id=" + editor.getCurrentSlideID() + "&image=" + image,
-            "type": "GET",
-            "dataType": "json"
-        });
-    }
-
-    return {
-        'init': function(params) {
-            config = params;
-        },
-        'changeImageStory': changeImageStory,
-        'addImages': addImages,
-        'addEventListener': function(type, listener, useCapture) {
-            if ('addEventListener' in window) {
-                document.addEventListener(type, listener, useCapture);
-            }
-        },
-    };
-})(StoryEditor, jQuery, console);
-*/
-
-/** Collections */
-/*
-(function(editor, $, console) {
-    "use strict";
-
-    var config = {
-        setImageAction: "",
-        accounts: []
-    };
-
-    var $modal = $("#slide-collections-modal");
-
-    var currentPageNumber,
-        currentCollectionID,
-        currentAccount;
-
-    var $collectionList = $("#collection-list", $modal);
-    var $cardList = $("#collection-card-list", $modal);
-
-    var mode = "",
-        backupImage = "";
-
-    function drawCollectionCards(collectionID, listID, account) {
-
-        currentCollectionID = collectionID;
-        account = account || currentAccount;
-
-        var $tabCardList = $(".collection_card_list", "#" + listID);
-        $tabCardList.empty();
-        var promise = $.ajax({
-            "url": "/admin/index.php?r=yandex/cards" + "&board_id=" + collectionID  + "&account=" + account,
-            "type": "GET",
-            "dataType": "json"
-        });
-        promise.done(function(data) {
-            if (data && data.results) {
-                data.results.forEach(function (card) {
-                    var img = $("<img/>").attr("src", card.content[0].source.url);
-                    var $item = $('<div class="col-xs-6 col-md-3"><a href="#" class="thumbnail">' + img.prop("outerHTML") + '</a></div>');
-                    $item
-                        .find("a.thumbnail")
-                        .on("click", function(e) {
-                            e.preventDefault();
-                            addImage(card.content[0].source.url, card.content[0].content.url, account, card.board.id, card.board.title);
-                        });
-                    $tabCardList.append($item);
-                });
-            }
-            else {
-                $tabCardList.append('<div class="col-md-12">Изображения в итории не найдены</div>');
-            }
-        });
-        promise.fail(function(data) {
-            var response = data.responseJSON;
-            toastr.error(response.message, response.name);
-        });
-    }
-
-    function drawCollections(collections) {
-        var $tabCollectionList = $(".collection_list", "#yandex-collection");
-        $tabCollectionList.empty();
-        collections.forEach(function(collection) {
-            $("<a/>")
-                .attr("href", "#")
-                .html('<span class="label label-lg label-primary">' + collection.title + '</span> ')
-                .css("font-size", "1.7rem")
-                .on("click", function (e) {
-                    e.preventDefault();
-                    drawCollectionCards(collection.id, 'yandex-collection');
-                })
-                .appendTo($tabCollectionList);
-        });
-    }
-
-    function drawPagination(reload) {
-        reload = reload || false;
-        var $pageList = $("#collection-page-list");
-        if (reload) {
-            $pageList.empty();
-        }
-        $(".collection_list", "#yandex-collection").empty();
-        getCollections()
-            .done(function(data) {
-                if (data && data.results) {
-                    if (!$pageList.find('li').length) {
-                        var pageCount = Math.ceil(data.count / 100),
-                            pages = [];
-                        for (var i = 1; i <= pageCount; i++) {
-                            pages.push(i);
-                        }
-                        pages.forEach(function (page) {
-                            $('<li/>')
-                                .addClass(page === currentPageNumber ? 'active' : '')
-                                .append($('<a/>')
-                                    .attr("href", "#")
-                                    .text(page)
-                                    .on("click", function (e) {
-                                        e.preventDefault();
-                                        var $link = $(this);
-                                        $("li", $pageList).removeClass('active');
-                                        $link.parent().addClass('active');
-                                        $collectionList.empty();
-                                        $cardList.empty();
-                                        getCollections(page).done(function (data) {
-                                            if (data && data.results) {
-                                                drawCollections(data.results, 'yandex-collection');
-                                            }
-                                        });
-                                    }))
-                                .appendTo($pageList);
-                        });
-                        drawCollections(data.results, 'yandex-collection');
-                    }
-                }
-            })
-            .fail(function(data) {
-                var response = data.responseJSON;
-                toastr.error(response.message, response.name);
-            });
-    }
-
-    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-        var $tab = $(e.target);
-        if ($tab.attr("href").substr(1) === 'yandex-collection') {
-            if (!currentAccount) {
-                currentAccount = config.accounts[0];
-            }
-            drawPagination();
-        }
-    });
-
-    $modal.on('show.bs.modal', function() {
-
-        backupImage = $(this).data("backupImage");
-
-        var $tabCollectionList = $(".collection_list", "#story-collection");
-        $tabCollectionList.empty();
-        var promise = $.ajax({
-            "url": "/admin/index.php?r=editor/image/get-used-collections&story_id=" + editor.getConfigValue('storyID'),
-            "type": "GET",
-            "dataType": "json"
-        });
-        promise.done(function(data) {
-            if (data && data.success) {
-                if (!data.result.length) {
-                    $("<p/>")
-                        .text("В историю не добавлено изображений из коллекций")
-                        .appendTo($tabCollectionList);
-                }
-                else {
-                    data.result.forEach(function (collection) {
-                        $("<a/>")
-                            .attr("href", "#")
-                            .html('<span class="label label-lg label-primary">' + collection.collection_name + '</span> ')
-                            .css("font-size", "1.7rem")
-                            .on("click", function (e) {
-                                e.preventDefault();
-                                drawCollectionCards(collection.collection_id, 'story-collection', collection.collection_account);
-                            })
-                            .appendTo($tabCollectionList);
-                    });
-                }
-            }
-        });
-    });
-
-    editor.initCollectionsModule = function(params) {
-        config = params;
-    };
-
-    $("a[data-account]", $modal).on("click", function(e) {
-        e.preventDefault();
-        currentAccount = $(this).attr("data-account");
-        drawPagination(true);
-    });
-
-    editor.slideCollectionsModal = function() {
-        mode = "";
-        $modal
-            .data("backupImage", "")
-            .modal("show");
-    };
-
-    editor.slideCollectionsBackupModal = function(imageID) {
-        mode = "backup";
-        $modal
-            .data("backupImage", imageID)
-            .modal("show");
-    };
-
-    function getCollections(page) {
-        page = page || 1;
-        currentPageNumber = page;
-        return $.get('/admin/index.php?r=yandex/boards&page=' + page + '&account=' + currentAccount);
-    }
-
-    function addImage(source_url, content_url, collection_account, collection_id, collection_name) {
-        if (mode === "backup") {
-            addBackupImage(source_url, content_url, collection_account, collection_id, collection_name);
-        }
-        else {
-            addCollectionImage(source_url, content_url, collection_account, collection_id, collection_name);
-        }
-    }
-
-    function addCollectionImage(source_url, content_url, collection_account, collection_id, collection_name) {
-        var promise = $.ajax({
-            "url": "/admin/index.php?r=editor/image/set",
-            "type": "POST",
-            "data": {
-                "slide_id": editor.getCurrentSlideID(),
-                "collection_account": collection_account,
-                "collection_id": collection_id,
-                "collection_name": collection_name,
-                "content_url": content_url,
-                "source_url": source_url
-            },
-            "dataType": "json"
-        });
-        promise.done(function(data) {
-            if (data && data.success) {
-                $modal.modal("hide");
-                data.image['what'] = 'collection';
-                ImageCropper.showModal(data.image);
-            }
-        });
-    }
-
-    function addBackupImage(source_url, content_url, collection_account, collection_id, collection_name) {
-        var promise = $.ajax({
-            "url": "/admin/index.php?r=editor/image/backup&image_id=" + backupImage,
-            "type": "POST",
-            "data": {
-                "slide_id": editor.getCurrentSlideID(),
-                "collection_account": collection_account,
-                "collection_id": collection_id,
-                "collection_name": collection_name,
-                "content_url": content_url,
-                "source_url": source_url
-            },
-            "dataType": "json"
-        });
-        promise.done(function(data) {
-            if (data && data.success) {
-                $modal.modal("hide");
-            }
-        });
-    }
-
-})(StoryEditor, jQuery, console);
-*/
-
-/** Cropper */
-/*
-var ImageCropper = (function(editor, $) {
-
-    var $modal = $('#image-crop-modal'),
-        sourceImage = {},
-        aspectRatio = NaN;
-
-    function showModal(image, ratio) {
-        sourceImage = image;
-        aspectRatio = ratio || EditorImage.aspectRatio();
-        $modal.modal('show');
-    }
-
-    var cropper;
-
-    $modal.on('shown.bs.modal', function() {
-
-        var $img = $('<img/>').attr('src', sourceImage.url);
-        $img.appendTo($('#crop-image-container', this));
-
-        var options = {
-            aspectRatio: aspectRatio,
-            dragMode: 'none',
-            background: false,
-            zoomOnWheel: false,
-            zoomOnTouch: false,
-        };
-        cropper = new Cropper($img[0], options);
-    });
-
-    $modal.on('hide.bs.modal', function() {
-        if (cropper) {
-            cropper.destroy();
-        }
-        $('#crop-image-container', this).find('img').remove();
-    });
-
-    // Обрезать и сохранить изображение
-    function crop() {
-        cropper.getCroppedCanvas().toBlob(function (blob) {
-            var formData = new FormData(),
-                params = EditorImage.getParams();
-            formData.append('slide_id', editor.getCurrentSlideID());
-            formData.append('croppedImage', blob);
-            formData.append('croppedImageID', sourceImage.id);
-            formData.append('what', sourceImage.what);
-            formData.append('left', params.left);
-            formData.append('top', params.top);
-            formData.append('width', params.width);
-            formData.append('height', params.height);
-            $.ajax('/admin/index.php?r=editor/image/cropper-save', {
-                method: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function () {
-                    editor.loadSlide(editor.getCurrentSlideID(), true);
-                    $modal.modal('hide');
-                },
-                error: function () {
-                    console.log('Upload error');
-                }
-            });
-        });
-    }
-
-    // Сохранение изображения без обрезки
-    function save() {
-
-        var formData = new FormData();
-        formData.append('slide_id', editor.getCurrentSlideID());
-        formData.append('imagePath', sourceImage.url);
-        formData.append('imageID', sourceImage.id);
-        formData.append('what', sourceImage.what);
-
-        $.ajax('/admin/index.php?r=editor/image/save', {
-            method: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function () {
-                editor.loadSlide(editor.getCurrentSlideID(), true);
-                $modal.modal('hide');
-            },
-            error: function () {
-                console.log('Upload error');
-            }
-        });
-    }
-
-    return {
-        'showModal': showModal,
-        'crop': crop,
-        'save': save
-    };
-})(StoryEditor, jQuery);
-*/
-
-/*
-var EditorImage = (function($, editor) {
-
-    var element,
-        drawingRect,
-        selectedRect;
-
-    var canvasOffsetLeft = 0,
-        canvasOffsetTop = 0,
-        drawStartX = 0,
-        drawStartY = 0;
-
-    function getScale() {
-        return Reveal.getScale();
-    }
-
-    function pointX(x) {
-        return (x - canvasOffsetLeft) / getScale();
-    }
-
-    function pointY(y) {
-        return (y - canvasOffsetTop) / getScale();
-    }
-
-    function startDrawRect(e) {
-
-        var offset = element.offset();
-        canvasOffsetLeft = offset.left;
-        canvasOffsetTop = offset.top;
-
-        drawStartX = pointX(e.pageX);
-        drawStartY = pointY(e.pageY);
-        drawingRect = createRect(drawStartX, drawStartY, 0, 0);
-
-        element.on('mousemove.wikids', drawRect);
-        element.on('mouseup.wikids', endDrawRect);
-    }
-
-    function drawRect(e) {
-        var currentX = pointX(e.pageX);
-        var currentY = pointY(e.pageY);
-        var position = calculateRectPos(drawStartX, drawStartY, currentX, currentY);
-        drawingRect.css(position);
-    }
-
-    function endDrawRect(e) {
-
-        var currentX = pointX(e.pageX);
-        var currentY = pointY(e.pageY);
-        var position = calculateRectPos(drawStartX, drawStartY, currentX, currentY);
-        if (position.width < 10 || position.height < 10) {
-            drawingRect.remove();
-        }
-        else {
-            drawingRect.css(position);
-            selectRect(drawingRect);
-        }
-        element.off('mousemove.wikids');
-        element.off('mouseup.wikids');
-    }
-
-    var params = {};
-
-    function createRect(x, y, w, h) {
-        var rect = $('<div/>')
-            .addClass('rect')
-            .css({
-                left: x,
-                top: y,
-                width: w,
-                height: h
-            });
-        rect.on('click', function() {
-            var $el = $(this);
-            params = {
-                left: parseInt($el.css('left')),
-                top: parseInt($el.css('top')),
-                width: parseFloat($el.css('width')),
-                height: parseFloat($el.css('height'))
-            };
-            EditorImageDialog.show();
-        });
-        rect.appendTo(element);
-        return rect;
-    }
-
-    function selectRect(rect) {
-        selectedRect && selectedRect.removeClass('selected');
-        selectedRect = rect;
-        selectedRect.addClass('selected');
-    }
-
-    function calculateRectPos(startX, startY, endX, endY) {
-        var width = endX - startX;
-        var height = endY - startY;
-        var posX = startX;
-        var posY = startY;
-        if (width < 0) {
-            width = Math.abs(width);
-            posX -= width;
-        }
-        if (height < 0) {
-            height = Math.abs(height);
-            posY -= height;
-        }
-        return {
-            left: posX,
-            top: posY,
-            width: width,
-            height: height
-        };
-    }
-
-    function init(el) {
-        element = el;
-        $(document)
-            .off('mousedown.wikids')
-            .on('mousedown.wikids', element, function(e) {
-                var target = e.target;
-                if (target.tagName !== 'SECTION') {
-                    return;
-                }
-
-                $('div.rect', element).remove();
-
-                startDrawRect(e);
-            });
-    }
-
-    function destroy() {
-        $(document).off('mousedown.wikids');
-        $('div.rect', element).remove();
-    }
-
-    return {
-        'init': init,
-        'getParams': function() {
-            return params;
-        },
-        'aspectRatio': function() {
-            return (params.width / params.height).toFixed(2);
-        },
-        'destroy': destroy
-    };
-})(jQuery, StoryEditor);*/
-
-/*
-var EditorImageDialog = (function(editor, $, console) {
-    "use strict";
-
-    var dialog = $('#create-image-modal');
-
-    $('#image-from-file', dialog).on('click', function() {
-        dialog.modal('hide');
-        ImageFromFile.show();
-    });
-
-    $('#image-from-story', dialog).on('click', function() {
-        dialog.modal('hide');
-        ImageFromStoryDialog.show();
-    });
-
-    $('#image-from-collection', dialog).on('click', function() {
-        dialog.modal('hide');
-        editor.slideCollectionsModal();
-    });
-
-    $('#image-from-url', dialog).on('click', function() {
-        dialog.modal('hide');
-        imageFromUrlDialog.show();
-    });
-
-    return {
-        'show': function() {
-            dialog.modal('show');
-        },
-        'hide': function() {
-            dialog.modal('hide');
-        }
-    };
-})(StoryEditor, jQuery, console);*/
-
-/*var ImageFromFile = (function() {
-    "use strict";
-
-    var dialog = $('#image-from-file-modal');
-
-    dialog.on('show.bs.modal', function() {
-        $('form', this).trigger('reset');
-    });
-
-    return {
-        'show': function() {
-            dialog.modal('show');
-        },
-        'hide': function() {
-            dialog.modal('hide');
-        }
-    };
-})();*/
-
-/*
-var ImageFromStoryDialog = (function(module, $, editor) {
-    "use strict";
-
-    var dialog = $('#image-from-story-modal');
-
-    var $images = $('#story-images-list', dialog);
-    module.addEventListener('onChangeStory', function(event) {
-        var data = event.data;
-        $images.empty();
-        if (data && data.length) {
-            data.forEach(function (image) {
-                var img = $("<img/>").attr("src", image);
-                $images.append('<div class="col-xs-6 col-md-3"><a href="#" class="thumbnail">' + img.prop("outerHTML") + '</a></div>');
-            });
-        }
-        else {
-            $images.append('<div class="col-md-12">Изображения в итории не найдены</div>');
-        }
-    });
-
-    $("#story-images-list", dialog).on("click", "a.thumbnail", function(e) {
-        e.preventDefault();
-
-        dialog.modal('hide');
-        var imageSrc = $("img", this).attr("src");
-
-        var image = {
-            'url': imageSrc,
-            'id': imageSrc.split('\\').pop().split('/').pop(),
-            'what': 'story'
-        };
-        ImageCropper.showModal(image);
-    });
-
-    return {
-        'show': function() {
-            dialog.modal('show');
-        },
-        'hide': function() {
-            dialog.modal('hide');
-        }
-    };
-})(ImageFromStory, jQuery, StoryEditor);
-*/
-
-/*
-var EditorImageUploader = (function(editor) {
-    "use strict";
-
-    function uploadImageHandler(form) {
-        return $.ajax({
-            url: form.attr("action"),
-            type: form.attr("method"),
-            data: new FormData(form[0]),
-            cache: false,
-            contentType: false,
-            processData: false
-        });
-    }
-
-    return {
-        'uploadImageHandler': uploadImageHandler
-    };
-})(StoryEditor);*/
-
-/*
-var SlideImageUploader = (function(uploader, editor, dialog) {
-    "use strict";
-
-    function uploadHandler(form) {
-        uploader.uploadImageHandler(form).done(function(data) {
-            if (data && data.success) {
-                dialog.hide();
-                data.image['what'] = 'file';
-                ImageCropper.showModal(data.image);
-            }
-        });
-    }
-
-    return {
-        'uploadHandler': uploadHandler
-    };
-})(EditorImageUploader, StoryEditor);
-*/
-
-/*var StoryImageFromUrl = (function() {
-
-})();*/
-
-
-/*
-function StoryDialog(selector, options) {
-    "use strict";
-
-    this.dialog = $(selector);
-    this.options = options || {};
-    this.dialog.on('show.bs.modal', options.onShow);
-    this.dialog.on('shown.bs.modal', options.onShown);
-
-    var that = this;
-    this.dialog.find('form').submit(function(e) {
-        e.preventDefault();
-        var formData = new FormData(this),
-            $form = $(this);
-        options.submit(that, formData, $form.attr('method'), $form.attr('action'));
-    });
-}
-
-StoryDialog.prototype.show = function() {
-    "use strict";
-
-    this.dialog.modal('show');
-};
-
-StoryDialog.prototype.hide = function() {
-    "use strict";
-
-    this.dialog.modal('hide');
-};
-*/
-
-/*
-var imageFromUrlDialog = new StoryDialog('#image-from-url-modal', {
-    'onShow': function() {
-        $('input[type=text]:eq(0)', this).val('');
-    },
-    'onShown': function() {
-        $('input[type=text]:eq(0)', this).focus();
-    },
-    'submit': function(dialog, formData, method, action) {
-        var promise = $.ajax({
-            'url': action,
-            'type': method,
-            'data': formData,
-            'cache': false,
-            'contentType': false,
-            'processData': false
-        });
-        promise.done(function(data) {
-            if (data) {
-                if (data.success) {
-                    dialog.hide();
-                    data.image['what'] = 'collection';
-                    ImageCropper.showModal(data.image);
-                }
-                else {
-                    toastr.error(JSON.stringify(data.errors));
-                }
-            }
-            else {
-                toastr.error('Неизвестная ошибка');
-            }
-        });
-        promise.fail(function(data) {
-            toastr.error(data.responseJSON.message);
-        });
-    }
-});*/
-

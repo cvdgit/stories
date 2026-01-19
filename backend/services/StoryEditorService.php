@@ -561,9 +561,10 @@ class StoryEditorService
         return (new HTMLWriter())->renderSlide($slide);
     }
 
-    public function makeEmptySlide(): string
+    public function makeEmptySlide(int $slideId): string
     {
         $slide = (new HtmlSlideReader(''))->load();
+        $slide->setId($slideId);
         return (new HTMLWriter())->renderSlide($slide);
     }
 

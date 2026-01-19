@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\controllers;
 
 use backend\components\BaseController;
@@ -9,7 +11,6 @@ use backend\components\SlideModifier;
 use backend\components\story\AbstractBlock;
 use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\TextBlock;
-use backend\MentalMap\MentalMapStorySlide;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
 use backend\models\editor\MentalMapForm;
@@ -35,6 +36,9 @@ use common\models\StorySlide;
 use common\services\TransactionManager;
 use DomainException;
 use Exception;
+use modules\edu\query\GetStoryTests\SlideMentalMap;
+use modules\edu\query\GetStoryTests\SlideTableOfContents;
+use modules\edu\query\GetStoryTests\StoryTestsFetcher;
 use Yii;
 use Yii\base\InvalidConfigException;
 use yii\db\Query;
@@ -148,7 +152,11 @@ class EditorController extends BaseController
             );
     }
 
-    public function actionEdit($id)
+    /**
+     * @throws InvalidConfigException
+     * @throws NotFoundHttpException
+     */
+    public function actionEdit(int $id): string
     {
         $model = $this->findModel(Story::class, $id);
         $this->layout = 'editor';
@@ -158,6 +166,9 @@ class EditorController extends BaseController
         ]);
     }
 
+    /**
+     * @throws NotFoundHttpException
+     */
     public function actionLesson(string $uuid): string
     {
         $this->layout = 'editor';
@@ -178,7 +189,7 @@ class EditorController extends BaseController
         ]);
     }
 
-    public function actionLoadSlide(int $story_id, int $slide_id = -1)
+    public function actionLoadSlide(int $story_id, int $slide_id = -1): array
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         if ($slide_id === -1) {
@@ -188,7 +199,7 @@ class EditorController extends BaseController
         }
         if ($model->isLink()) {
             $linkSlide = StorySlide::findSlideByID($model->link_slide_id);
-            $model->data = $linkSlide->data;
+            $model->data = $linkSlide === null ? 'Slide not found' : $linkSlide->data;
         }
         $slideData = (new SlideModifier($model->id, $model->data))
             ->addImageId()
@@ -314,7 +325,7 @@ class EditorController extends BaseController
         ]);
     }
 
-    public function actionCreateSlideLink()
+    public function actionCreateSlideLink(): array
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $form = new SlideLinkForm();
@@ -343,32 +354,34 @@ class EditorController extends BaseController
         $response->format = Response::FORMAT_JSON;
         $model = $this->findModel(Story::class, $story_id);
 
-        $slideIds = array_map(static function(StorySlide $slide): int {
-            return $slide->id;
-        }, $model->storySlides);
-        $haveMentalMapsBySlide = [];
-        if (count($slideIds) > 0) {
-            $slideMentalMaps = (new Query())
-                ->select([
-                    'slideId' => 't.slide_id',
-                    'maps' => 'COUNT(t.mental_map_id)',
-                ])
-                ->from(['t' => MentalMapStorySlide::tableName()])
-                ->where(['in', 't.slide_id', $slideIds])
-                ->groupBy(['t.slide_id'])
-                ->all();
-            $haveMentalMapsBySlide = array_combine(
-                array_column($slideMentalMaps, 'slideId'),
-                array_fill(0, count($slideMentalMaps), true)
-            );
-        }
+        $slideContent = (new StoryTestsFetcher())->fetch($model->id);
+        $mentalMapSlideIds = array_map(
+            static function(SlideMentalMap $m): int {
+                return $m->getSlideId();
+            },
+            $slideContent->find(SlideMentalMap::class)
+        );
+        $tableOfContentsSlideIds = array_map(
+            static function(SlideTableOfContents $m): int {
+                return $m->getSlideId();
+            },
+            $slideContent->find(SlideTableOfContents::class)
+        );
 
-        return array_map(static function (StorySlide $slide) use ($haveMentalMapsBySlide): array {
-            return (new SlideListResponse($slide, $haveMentalMapsBySlide[$slide->id] ?? false))->asArray();
+        return array_map(static function (StorySlide $slide) use ($mentalMapSlideIds, $tableOfContentsSlideIds): array {
+            return (new SlideListResponse(
+                $slide,
+                in_array($slide->id, $mentalMapSlideIds, true),
+                in_array($slide->id, $tableOfContentsSlideIds, true)
+            ))->asArray();
         }, $model->storySlides);
     }
 
-    public function actionSaveSlideSource()
+    /**
+     * @throws NotFoundHttpException
+     * @throws InvalidConfigException
+     */
+    public function actionSaveSlideSource(): array
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $model = new SlideSourceForm();
@@ -380,9 +393,6 @@ class EditorController extends BaseController
         return ['success' => false];
     }
 
-    /**
-     * @throws NotFoundHttpException
-     */
     public function actionImportFromText(int $story_id, Request $request, Response $response, int $current_slide_id = null): array
     {
         $response->format = Response::FORMAT_JSON;

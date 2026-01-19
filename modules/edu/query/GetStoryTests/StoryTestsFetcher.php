@@ -85,6 +85,14 @@ class StoryTestsFetcher
                         $block->getContent()
                     );
                 }
+
+                if ($block->getType() === AbstractBlock::TYPE_TABLE_OF_CONTENTS) {
+                    $data[] = new SlideTableOfContents(
+                        $slide->getId(),
+                        (int) $slide->getSlideNumber(),
+                        $block->getContent()
+                    );
+                }
             }
         }
 
