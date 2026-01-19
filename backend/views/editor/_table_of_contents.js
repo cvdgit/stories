@@ -247,7 +247,7 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
 
     const payload = new Payload(data);
 
-    const $body = $(`<div style="display: grid; grid-template-columns: 200px 1fr; gap: 20px; width: 100%">
+    const $body = $(`<div style="display: grid; grid-template-columns: 300px 1fr; gap: 20px; width: 100%">
     <div id="col-left" style="overflow-y: auto">
         <div style="margin: 20px 0; display: flex; flex-direction: column; gap: 10px">
             <h4 class="h4">Слайды без групп</h4>

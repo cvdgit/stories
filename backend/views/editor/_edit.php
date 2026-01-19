@@ -975,11 +975,23 @@ $js = <<< JS
             TableOfContentsPlugin.initEdit(p, elem);
         }
 
-        tableOfContents.show(
-            payload,
-            StoryEditor.slides(),
-            updatePayloadHandler
-        );
+        fetch('/admin/index.php?r=editor/slides&story_id=' + StoryEditor.getConfigValue('storyID'), {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': $("meta[name=csrf-token]").attr('content')
+            }
+        })
+            .then(response => response.json())
+            .then(slides => {
+                tableOfContents.show(
+                    payload,
+                    slides
+                        .filter(s => !s.haveTableOfContents)
+                        .filter(s => !s.isHidden)
+                        .sort((a, b) => a.slideNumber - b.slideNumber),
+                    updatePayloadHandler
+                );
+            });
     })
 })();
 JS;
