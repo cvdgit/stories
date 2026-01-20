@@ -78,7 +78,11 @@ $plugins = [
 
     ['class' => Retelling::class, 'storyId' => $model->id],
     ['class' => \common\widgets\Reveal\Plugins\ContentMentalMap::class, 'storyId' => $model->id, 'mentalMaps' => $contentMentalMaps],
-    ['class' => \common\widgets\Reveal\Plugins\TableOfContents::class],
+    [
+        'class' => \common\widgets\Reveal\Plugins\TableOfContents::class,
+        'storyId' => $model->id,
+        'userId' => $userId,
+    ],
 ];
 
 if ($model->isScreenRecorder()) {

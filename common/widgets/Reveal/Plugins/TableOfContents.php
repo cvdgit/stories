@@ -8,14 +8,16 @@ use common\widgets\Reveal\Dependency;
 
 class TableOfContents extends AbstractPlugin implements PluginInterface
 {
+    public $storyId;
+    public $userId;
     public $configName = 'tableOfContentsConfig';
-    public $edit = false;
 
     public function pluginConfig(): array
     {
         return [
             $this->configName => [
-                'edit' => $this->edit,
+                'storyId' => $this->storyId,
+                'userId' => $this->userId,
             ],
         ];
     }

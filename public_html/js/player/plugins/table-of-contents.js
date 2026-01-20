@@ -1,13 +1,91 @@
 window.TableOfContentsPlugin = (function() {
 
   const {tableOfContentsConfig: config} = Reveal.getConfig();
-  const {edit: editMode} = config;
+  const {storyId, userId} = config;
+
+  const getDashProps = (progress) => {
+
+    const size = 16;
+    const center = size / 2,
+      radius = 7;
+
+    const dashArray = 2 * Math.PI * radius;
+    return {
+      dashArray,
+      dashOffset: dashArray * ((100 - progress) / 100)
+    };
+  }
+
+  const LessonCircleProgress = (progress) => {
+
+    const done = progress >= 100;
+    const dash = getDashProps(progress);
+
+    return `
+    <span class="lesson-progress-circle">
+      <svg xmlns="https://www.w3.org/2000/svg" fill="none" focusable="false" role="img" viewBox="0 0 16 16" class="svg-pi" style="width: 100%; height: 100%; overflow: visible">
+        <circle
+          class="svg-pi-track"
+          cx="8"
+          cy="8"
+          fill="transparent"
+          r="7"
+          stroke-width="2"
+        />
+        <circle
+            class="svg-pi-indicator ${done ? 'lesson-progress-circle__done' : ''}"
+            cx="8"
+            cy="8"
+            fill="transparent"
+            r="7"
+            stroke-width="2"
+            stroke-dasharray=${dash.dashArray}
+            stroke-dashoffset=${dash.dashOffset}
+            transform="rotate(-89.9, 8, 8)"
+          />
+          <path class="lesson-progress-circle__pass ${done ? 'lesson-progress-circle__pass--done lesson-progress-circle__pass--visible' : ''}" d="M11.3227 6.65905C11.6133 6.37599 11.6347 5.89413 11.3705 5.58277C11.1063 5.27141 10.6566 5.24847 10.366 5.53152L6.93323 8.87512L5.6338 7.60944C5.3432 7.32639 4.89345 7.34933 4.62927 7.66069C4.36509 7.97205 4.38651 8.45391 4.67711 8.73697L6.45488 10.4686C6.72611 10.7328 7.14034 10.7328 7.41157 10.4686L11.3227 6.65905Z"></path>
+      </svg>
+    </span>
+  `;
+  };
+
+  const UpdateLessonCircleProgress = (elem, progress) => {
+
+    const done = progress >= 100;
+    const dash = getDashProps(progress);
+
+    elem.querySelector('.svg-pi-indicator').setAttribute('stroke-dasharray', dash.dashArray);
+    elem.querySelector('.svg-pi-indicator').setAttribute('stroke-dashoffset', dash.dashOffset);
+
+    if (done) {
+      elem.querySelector('.svg-pi-indicator').classList.add('lesson-progress-circle__done');
+      elem.querySelector('.lesson-progress-circle__pass').classList.add('lesson-progress-circle__pass--done');
+      elem.querySelector('.lesson-progress-circle__pass').classList.add('lesson-progress-circle__pass--visible');
+    }
+  }
 
   function getCurrentSlide() {
     return Reveal.getCurrentSlide();
   }
 
+  async function fetchUserHistory(storyId, userId) {
+    const response = await fetch(`/story/history-by-slide?storyId=${storyId}&userId=${userId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-CSRF-Token': $('meta[name=csrf-token]').attr('content')
+      },
+    })
+    if (!response.ok) {
+      throw new Error(response.statusText)
+    }
+    return await response.json()
+  }
+
   function init(payload, container) {
+    console.debug('TableOfContentsPlugin.init');
+
     if (container.find('.table-of-contents-inner').length) {
       container.find('.table-of-contents-inner').remove();
     }
@@ -30,6 +108,20 @@ window.TableOfContentsPlugin = (function() {
       payload,
       slidesMap
     );
+
+    fetchUserHistory(storyId, userId)
+      .then(response => {
+        if (!response.success) {
+          return;
+        }
+        response.data.map(({slideId, progress}) => {
+          const $elem = container
+            .find(`.table-of-contents-content [data-slide-id='${slideId}'] .lesson-progress-circle`);
+          if ($elem.length) {
+            UpdateLessonCircleProgress($elem[0], progress);
+          }
+        });
+      });
   }
 
   function initTableOfContents() {
@@ -73,7 +165,7 @@ window.TableOfContentsPlugin = (function() {
 
         const slideNumber = slidesMap.get(id);
 
-        const $slide = $(`<div class="slide-content-wrap">
+        const $slide = $(`<div data-slide-id="${id}" class="slide-content-wrap">
 <div style="position: relative; width: 50px; margin-bottom: 16px;">
 <svg xmlns="http://www.w3.org/2000/svg" width="51" height="32" fill="none" style="color: rgb(244, 242, 238)"><path fill="currentColor" d="M33.62 1.252A6 6 0 0 0 29.953 0H6a6 6 0 0 0-6 6v20a6 6 0 0 0 6 6h23.953a6 6 0 0 0 3.667-1.252l16.02-12.374a3 3 0 0 0 0-4.748z"></path></svg>
 <span style="font-size: 14px; line-height: 32px; top: 0; left: 14px; position: absolute">${slideNumber}</span>
@@ -83,14 +175,26 @@ window.TableOfContentsPlugin = (function() {
         $slide.on('click', e => {
           location.hash = `#/${slideNumber}`;
         });
+
+        $slide.append(
+          `<div style="position: absolute; top: 11px; right: 11px; width: 40px; height: 40px">${LessonCircleProgress(0)}</div>`
+        );
+
         $row.append($slide);
       });
       $container.append($row);
     });
   }
 
-  Reveal.addEventListener('slidechanged', initTableOfContents);
-  Reveal.addEventListener('ready', initTableOfContents);
+  Reveal.addEventListener('slidechanged', () => {
+    initTableOfContents();
+  });
+  Reveal.addEventListener('ready', ({indexh, indexv}) => {
+    if (Number(indexh) > 0 || Number(indexv) > 0) {
+      return;
+    }
+    initTableOfContents();
+  });
 
   return {
     init,

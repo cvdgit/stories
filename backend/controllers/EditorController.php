@@ -11,6 +11,7 @@ use backend\components\SlideModifier;
 use backend\components\story\AbstractBlock;
 use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\TextBlock;
+use backend\MentalMap\MentalMapStorySlide;
 use backend\models\editor\ButtonForm;
 use backend\models\editor\ImageForm;
 use backend\models\editor\MentalMapForm;
@@ -355,12 +356,7 @@ class EditorController extends BaseController
         $model = $this->findModel(Story::class, $story_id);
 
         $slideContent = (new StoryTestsFetcher())->fetch($model->id);
-        $mentalMapSlideIds = array_map(
-            static function(SlideMentalMap $m): int {
-                return $m->getSlideId();
-            },
-            $slideContent->find(SlideMentalMap::class)
-        );
+
         $tableOfContentsSlideIds = array_map(
             static function(SlideTableOfContents $m): int {
                 return $m->getSlideId();
@@ -368,10 +364,30 @@ class EditorController extends BaseController
             $slideContent->find(SlideTableOfContents::class)
         );
 
-        return array_map(static function (StorySlide $slide) use ($mentalMapSlideIds, $tableOfContentsSlideIds): array {
+        $slideIds = array_map(static function(StorySlide $slide): int {
+            return $slide->id;
+        }, $model->storySlides);
+        $haveMentalMapsBySlide = [];
+        if (count($slideIds) > 0) {
+            $slideMentalMaps = (new Query())
+                ->select([
+                    'slideId' => 't.slide_id',
+                    'maps' => 'COUNT(t.mental_map_id)',
+                ])
+                ->from(['t' => MentalMapStorySlide::tableName()])
+                ->where(['in', 't.slide_id', $slideIds])
+                ->groupBy(['t.slide_id'])
+                ->all();
+            $haveMentalMapsBySlide = array_combine(
+                array_column($slideMentalMaps, 'slideId'),
+                array_fill(0, count($slideMentalMaps), true)
+            );
+        }
+
+        return array_map(static function (StorySlide $slide) use ($haveMentalMapsBySlide, $tableOfContentsSlideIds): array {
             return (new SlideListResponse(
                 $slide,
-                in_array($slide->id, $mentalMapSlideIds, true),
+                $haveMentalMapsBySlide[$slide->id] ?? false,
                 in_array($slide->id, $tableOfContentsSlideIds, true)
             ))->asArray();
         }, $model->storySlides);

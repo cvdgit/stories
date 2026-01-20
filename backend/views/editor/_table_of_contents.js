@@ -154,7 +154,6 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
       }
       const {data, slideNumber} = slide;
       const slideElem = createSlideElem({id, data, title, slideNumber}, true);
-      //initDeck(slideElem.find('.reveal')[0]);
       $element.find('.table-of-contents-group-slides').append(slideElem);
     });
 
@@ -226,7 +225,6 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
           {id, data, title: `Слайд ${slideNumber}`, slideNumber},
           false
         );
-        //initDeck(slideElem.find('.reveal')[0]);
         $list.append(slideElem);
       });
 
@@ -250,7 +248,7 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
     const $body = $(`<div style="display: grid; grid-template-columns: 300px 1fr; gap: 20px; width: 100%">
     <div id="col-left" style="overflow-y: auto">
         <div style="margin: 20px 0; display: flex; flex-direction: column; gap: 10px">
-            <h4 class="h4">Слайды без групп</h4>
+            <h4 class="h4">Слайды истории</h4>
             <div class="table-of-contents-all-slides"
                  style="display: flex; flex-direction: column; padding: 10px; min-height: 140px; background-color: #eee; gap: 20px; width: 100%;"></div>
         </div>

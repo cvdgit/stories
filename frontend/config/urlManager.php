@@ -52,6 +52,7 @@ return [
         'story/store-test-result' => 'story/store-test-result',
         'story/init-story-player' => 'story/init-story-player',
         'story/myaudio' => 'story/myaudio',
+        'story/history-by-slide' => 'story/history-by-slide',
         'story/<alias:[\w\-]+>/<list:\d+>' => 'story/view',
         'story/<alias:[\w\-]+>' => 'story/view',
 

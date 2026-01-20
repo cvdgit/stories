@@ -31,8 +31,8 @@ use frontend\models\StoryLikeForm;
 use frontend\models\StoryLikeSearch;
 use frontend\models\StoryTrackModel;
 use frontend\models\UserStorySearch;
+use frontend\TableOfContents\UserHistoryAction;
 use Yii;
-use yii\db\Expression;
 use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -104,7 +104,17 @@ class StoryController extends Controller
         parent::__construct($id, $module, $config);
     }
 
-    private function findSectionModel(string $alias): ?SiteSection
+    public function actions(): array
+    {
+        return [
+            'history-by-slide' => UserHistoryAction::class,
+        ];
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    private function findSectionModel(string $alias): SiteSection
     {
         if (($model = SiteSection::findOne(['alias' => $alias])) !== null && $model->isVisible()) {
             return $model;
@@ -112,7 +122,10 @@ class StoryController extends Controller
         throw new NotFoundHttpException('Страница не найдена');
     }
 
-    private function findCategoryModel(string $alias): ?Category
+    /**
+     * @throws NotFoundHttpException
+     */
+    private function findCategoryModel(string $alias): Category
     {
         if (($model = Category::findOne(['alias' => $alias])) !== null) {
             return $model;
@@ -120,7 +133,10 @@ class StoryController extends Controller
         throw new NotFoundHttpException('Страница не найдена');
     }
 
-    public function actionIndex(string $section)
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionIndex(string $section): string
     {
         $sectionModel = $this->findSectionModel($section);
         $this->getView()->setMetaTags(
