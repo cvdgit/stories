@@ -5,7 +5,6 @@ namespace frontend\controllers;
 use backend\components\book\BookStoryGenerator;
 use backend\components\training\base\Serializer;
 use backend\components\training\collection\TestBuilder;
-use common\components\MentalMapThreshold;
 use common\helpers\UserHelper;
 use common\models\Playlist;
 use common\models\SiteSection;
@@ -21,9 +20,7 @@ use common\services\StoryLikeService;
 use common\services\QuestionsService;
 use frontend\components\StoryRenderParams;
 use frontend\GptChat\GptChatForm;
-use frontend\MentalMap\history\MentalMapTreeHistoryFetcher;
-use frontend\MentalMap\MentalMap;
-use frontend\MentalMap\MentalMapStorySlide;
+use frontend\MentalMap\Content\ContentMentalMapsFetcher;
 use frontend\models\CreateStoryTestRun;
 use frontend\models\MyAudioStoriesSearch;
 use frontend\models\StoryFavoritesSearch;
@@ -33,7 +30,6 @@ use frontend\models\StoryTrackModel;
 use frontend\models\UserStorySearch;
 use frontend\TableOfContents\UserHistoryAction;
 use Yii;
-use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use common\models\Story;
@@ -386,7 +382,7 @@ class StoryController extends Controller
         return ['success' => true, 'correctAnswer' => $correctAnswer];
     }
 
-    public function actionInitStoryPlayer(int $id, WebUser $user)
+    public function actionInitStoryPlayer(int $id, WebUser $user): string
     {
         if (Yii::$app->user->isGuest) {
             $model = Story::findModel(Yii::$app->params['story.needSignup.id']);
@@ -431,53 +427,11 @@ class StoryController extends Controller
             return $slide->id;
         }, $model->storySlides);
 
-        $contentMentalMaps = [];
-        if (count($slideIds) > 0) {
-            $slideMentalMaps = (new Query())
-                ->select([
-                    'slideId' => 't.slide_id',
-                    'mentalMapId' => 't.mental_map_id',
-                    'mentalMapName' => 't2.name',
-                ])
-                ->from(['t' => MentalMapStorySlide::tableName()])
-                ->innerJoin(['t2' => MentalMap::tableName()], 't.mental_map_id = t2.uuid')
-                ->where(['in', 't.slide_id', $slideIds])
-                ->all();
-            $canEdit = $user->can(UserRoles::ROLE_TEACHER);
-            foreach ($slideMentalMaps as $row) {
-                $slideId = (int) $row['slideId'];
-                if (!isset($contentMentalMaps[$slideId])) {
-                    $contentMentalMaps[$slideId] = [
-                        'slideId' => $slideId,
-                        'mentalMaps' => [],
-                    ];
-                }
-
-                $mentalMap = MentalMap::findOne($row['mentalMapId']);
-                if ($mentalMap === null) {
-                    continue;
-                }
-
-                $threshold = MentalMapThreshold::getThreshold(Yii::$app->params, $mentalMap->payload);
-                $history = (new MentalMapTreeHistoryFetcher())->fetch($mentalMap->uuid, $user->getId(), $mentalMap->getTreeData(), $threshold);
-
-                $contentMentalMaps[$slideId]['mentalMaps'][] = [
-                    'id' => $mentalMap->uuid,
-                    'name' => $mentalMap->name,
-                    'userProgress' => round(
-                        count(array_filter($history, static function (array $item): bool {
-                            return $item['done'];
-                        })) * 100 / count($history),
-                        0,
-                        PHP_ROUND_HALF_UP,
-                    ),
-                    'type' => $mentalMap->map_type,
-                    'edit' => $canEdit ? [
-                        'url' => Yii::$app->urlManagerBackend->createAbsoluteUrl(['/mental-map/editor', 'id' => $mentalMap->uuid]),
-                    ] : false,
-                ];
-            }
-        }
+        $contentMentalMaps = (new ContentMentalMapsFetcher())->fetch(
+            $slideIds,
+            $user->getId(),
+            $user->can(UserRoles::ROLE_TEACHER)
+        );
 
         return $this->renderAjax('_player', [
             'model' => $model,
@@ -486,7 +440,7 @@ class StoryController extends Controller
             'playlistID' => Yii::$app->request->get('list'),
             'saveStat' => $this->countersService->needUpdateCounters(),
             'completedRetelling' => $completedRetelling,
-            'contentMentalMaps' => array_values($contentMentalMaps),
+            'contentMentalMaps' => $contentMentalMaps,
             'userId' => $user->getId(),
         ]);
     }

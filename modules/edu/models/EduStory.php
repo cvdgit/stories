@@ -33,6 +33,8 @@ use yii\db\Query;
  * @property int $published_at [int(11)]
  * @property int $have_neo_relation [tinyint(3)]
  * @property int $access_by_link [tinyint(3)]
+ *
+ * @property EduStorySlide[] $storySlides
  */
 class EduStory extends ActiveRecord
 {
@@ -93,5 +95,11 @@ class EduStory extends ActiveRecord
     public function isComplete(int $progress): bool
     {
         return $progress === 100;
+    }
+
+    public function getStorySlides(): ActiveQuery
+    {
+        return $this->hasMany(EduStorySlide::class, ['story_id' => 'id'])
+            ->orderBy(['number' => SORT_ASC]);
     }
 }

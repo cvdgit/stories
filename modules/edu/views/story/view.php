@@ -18,6 +18,7 @@ use yii\web\View;
  * @var int $programId
  * @var array $backRoute
  * @var int $studentId
+ * @var array $contentMentalMaps
  */
 
 $storyId = $story->id;
@@ -66,6 +67,17 @@ $config = [
         'story_id' => $storyId,
         'program_id' => $programId,
         'student_id' => $studentId,
+    ],
+    'content-mental-map' => [
+        'story_id' => $storyId,
+        'mentalMaps' => $contentMentalMaps,
+        'mapOrder' => [
+            'mental-map',
+            'mental-map-even-fragments',
+            'mental-map-odd-fragments',
+            'mental-map-plan',
+            'mental-map-plan-accumulation',
+        ],
     ],
 ];
 

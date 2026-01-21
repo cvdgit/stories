@@ -1,0 +1,85 @@
+.retelling-dialog-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  flex: 1 1 auto;
+  justify-content: space-between;
+}
+
+.retelling-dialog-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.retelling-dialog-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+.content-mm-wrap {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 999;
+  background-color: white;
+}
+
+.content-mm-inner {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+  /*pointer-events: all !important;*/
+}
+
+.content-mm-inner .content-mm-item {
+  display: none;
+}
+
+.content-mm-header:hover ~ .content-mm-item,
+.content-mm-inner:hover > .content-mm-item {
+  display: flex;
+}
+
+.content-mm-header {
+  margin: 0;
+  text-align: left;
+
+  background-color: rgba(153, 205, 80, .4);
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 8px 12px;
+}
+
+.content-mm-item {
+  display: flex;
+  flex-direction: row;
+  column-gap: 10px;
+  background-color: rgba(153, 205, 80, .4);
+  padding: 4px;
+  border-radius: 10px;
+  transition: 200ms all;
+  user-select: none;
+  cursor: pointer;
+}
+
+.content-mm-item:hover {
+  background-color: rgba(153, 205, 80, .6);
+}
+
+.content-mm-name {
+  font-size: 2.4rem;
+  line-height: 3rem;
+}
+
+.content-mm-percent {
+  font-size: 2.4rem;
+  line-height: 3rem;
+}

@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace modules\edu\controllers;
 
 use common\rbac\UserRoles;
+use frontend\MentalMap\Content\ContentMentalMapsFetcher;
 use modules\edu\components\TopicAccessManager;
 use modules\edu\models\EduClassProgram;
 use modules\edu\models\EduStory;
+use modules\edu\models\EduStorySlide;
 use modules\edu\query\StudentClassFetcher;
 use Yii;
 use yii\db\Query;
-use yii\filters\AccessControl;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\User as WebUser;
 
 class StoryController extends Controller
 {
@@ -51,7 +53,7 @@ class StoryController extends Controller
      * @throws BadRequestHttpException
      * @throws ForbiddenHttpException
      */
-    public function actionView(int $id, int $program_id): string
+    public function actionView(int $id, int $program_id, WebUser $user): string
     {
         if (($story = EduStory::findOne($id)) === null) {
             throw new NotFoundHttpException('История не найдена');
@@ -108,11 +110,21 @@ class StoryController extends Controller
             $this->accessManager->checkAccessLesson($program->id, (int) $lessonId, $studentId, (int) $topicId);
         }
 
+        $slideIds = array_map(static function(EduStorySlide $slide): int {
+            return $slide->id;
+        }, $story->storySlides);
+
+        $contentMentalMaps = (new ContentMentalMapsFetcher())->fetch(
+            $slideIds,
+            $user->getId()
+        );
+
         return $this->render('view', [
             'story' => $story,
             'programId' => $program_id,
             'backRoute' => $backRoute,
             'studentId' => $studentId,
+            'contentMentalMaps' => $contentMentalMaps,
         ]);
     }
 }

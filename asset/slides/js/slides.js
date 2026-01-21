@@ -15,6 +15,7 @@ import Background from "./plugins/Background";
 import NextStory from "./plugins/NextStory";
 import isMobile from "./is_mobile";
 import MentalMap from "./plugins/MentalMap";
+import ContentMentalMap from "./plugins/ContentMentalMap";
 import Retelling from "./plugins/Retelling";
 import GlobalContext from "./GlobalContext";
 
@@ -32,6 +33,7 @@ function onSlideMouseDown(e, player) {
   if ($target.parents("section[data-slide-view=question]").length ||
     $target.parents("section[data-slide-view=new-question]").length ||
     $target.parents('.new-questions').length ||
+    $target.parents('.content-mm-wrap').length ||
     $target.parents('.mental-map').length ||
     $target.parents('.retelling-block').length ||
     ($target[0].tagName === "IMG" && $target.attr("data-action") === "1") ||
@@ -94,6 +96,7 @@ window.initSlides = function() {
       Transition,
       Testing,
       MentalMap,
+      ContentMentalMap,
       Retelling,
       LinksPlugin,
       VideoPlugin,
