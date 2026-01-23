@@ -179,7 +179,7 @@ window.TableOfContentsPlugin = (function() {
 
       const $row = $(`<div style="display: grid; grid-auto-flow: column; align-items: center; overflow-x: auto; grid-auto-columns: 200px; gap: 4px; margin-bottom: 30px;"></div>`)
 
-      cards.map(({id, name}) => {
+      (cards || []).map(({id, name}) => {
 
         const cardSlides = slides.filter(s => s.cardId === id);
         if (cardSlides.length === 0) {
