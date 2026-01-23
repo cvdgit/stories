@@ -158,28 +158,53 @@ window.TableOfContentsPlugin = (function() {
     }
 
     if ($prevTableOfContentsSlide.find('.table-of-contents').length) {
+
       const payload = JSON.parse(
         $prevTableOfContentsSlide.find('.table-of-contents > .table-of-contents-payload').text()
       );
+
+      const $title = $(
+        `<div class="table-of-contents-caption">
+<div class="caption-group-card contents-index" style="font-weight: 600">${payload.title}</div>
+</div>`
+      );
+
       const id = Number($(getCurrentSlide()).attr('data-id'));
 
-      const contents = [payload.title];
+      for (const group of payload.groups) {
+        const $group = $('<div class="caption-group"/>');
+        group.cards.map(({id, name}) => {
+          const $card = $(`<div class="caption-group-card" data-group-card-id="${id}" />`)
+            .text(name)
+            .on('click', ({target}) => {
+              if ($(target).hasClass('active-slide')) {
+                return;
+              }
+              const cardSlides = group.slides.filter(s => s.cardId === id);
+              location.hash = '#/' + ($('.story-container-wrap .slides').find(`section[data-id=${cardSlides[0].id}]`).index() + 1)
+            });
+          $group.append($card);
+        });
+        $title.append($group);
+      }
+
+      let activeCardId;
       for (const group of payload.groups) {
         const slide = group.slides.find(s => Number(s.id) === id);
         if (slide) {
-          contents.push(group.name);
           const card = group.cards.find(c => c.id === slide.cardId);
           if (card) {
-            contents.push(card.name);
+            activeCardId = card.id;
           }
           break;
         }
       }
 
-      const $title = $(
-        `<div class="table-of-contents-caption"><span style="font-weight: normal">Оглавление:</span> ${contents.join(' / ')}</div>`
-      );
-      $title.on('click', () => location.hash = '#/' + ($prevTableOfContentsSlide.index() + 1));
+      if (activeCardId) {
+        $title.find(`[data-group-card-id='${activeCardId}']`).addClass('active-slide');
+      }
+
+      $title.find('.contents-index').on('click', () => location.hash = '#/' + ($prevTableOfContentsSlide.index() + 1));
       $('.story-container-wrap').prepend($title);
     }
   }
