@@ -1076,18 +1076,19 @@ body {
 .fragment-create-btn {
   background: #000;
   border: 0;
-  border-radius: 50%;
+  border-radius: 10px;
   box-shadow: 0 6px 10px rgba(0, 0, 0, .16);
   color: #fff;
   cursor: pointer;
   font-family: lato, sans-serif;
   font-size: 17px;
-  font-weight: 900;
+  font-weight: 600;
   height: 32px;
-  left: calc(50% - 15px);
-  line-height: 32px;
+  /*left: calc(50% - 15px);*/
+  left: 50%;
+  transform: translate(-50%, 0);
   outline: none;
-  padding: 0;
+  padding: 6px;
   pointer-events: all;
   position: absolute;
   text-align: center;
@@ -1095,9 +1096,14 @@ body {
   -webkit-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  width: 32px;
+  /*width: 32px;*/
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.table-of-contents-group:hover > .fragment-create,
+.table-of-contents-group-card:hover > .fragment-create,
 .fragment-item:hover .fragment-create {
   opacity: .999;
 }
@@ -1174,4 +1180,21 @@ body {
   background-size: 80px;
   position: absolute;
   z-index: 999;
+}
+
+.table-of-contents-group {
+  position: relative;
+  padding: 20px 0;
+}
+
+.table-of-contents-cards {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.table-of-contents-group-card {
+  padding: 0 20px 30px 20px;
+  position: relative;
+  margin-bottom: 20px;
 }

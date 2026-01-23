@@ -84,7 +84,6 @@ window.TableOfContentsPlugin = (function() {
   }
 
   function init(payload, container) {
-    console.debug('TableOfContentsPlugin.init');
 
     if (container.find('.table-of-contents-inner').length) {
       container.find('.table-of-contents-inner').remove();
@@ -114,9 +113,26 @@ window.TableOfContentsPlugin = (function() {
         if (!response.success) {
           return;
         }
-        response.data.map(({slideId, progress}) => {
+
+        const cardsMap = new Map();
+        payload.groups.map(({cards, slides}) => {
+          cards.map(({id}) => {
+            const cardSlides = slides.filter(s => s.cardId === id);
+            if (!cardSlides.length) {
+              cardsMap.set(id, 100);
+              return;
+            }
+            const progress = cardSlides.reduce((total, cardSlide) => {
+              const slide = response.data.find(({slideId}) => Number(slideId) === Number(cardSlide.id));
+              return total + Number(slide.progress);
+            }, 0);
+            cardsMap.set(id, Math.round(progress / cardSlides.length));
+          });
+        });
+
+        cardsMap.forEach((progress, cardId) => {
           const $elem = container
-            .find(`.table-of-contents-content [data-slide-id='${slideId}'] .lesson-progress-circle`);
+            .find(`.table-of-contents-content [data-group-card-id='${cardId}'] .lesson-progress-circle`);
           if ($elem.length) {
             UpdateLessonCircleProgress($elem[0], progress);
           }
@@ -154,25 +170,34 @@ window.TableOfContentsPlugin = (function() {
   }
 
   function createContent($container, payload, slidesMap) {
-    (payload.groups || []).map(({name, slides}) => {
+    let i = 1;
+    (payload.groups || []).map(({name, slides, cards}) => {
 
       $container.append(
         `<div style="margin-bottom: 16px; font-size: 16px; line-height: 24px; font-weight: 700;">${name}</div>`
       );
 
       const $row = $(`<div style="display: grid; grid-auto-flow: column; align-items: center; overflow-x: auto; grid-auto-columns: 200px; gap: 4px; margin-bottom: 30px;"></div>`)
-      slides.map(({id, title}) => {
 
-        const slideNumber = slidesMap.get(id);
+      cards.map(({id, name}) => {
 
-        const $slide = $(`<div data-slide-id="${id}" class="slide-content-wrap">
+        const cardSlides = slides.filter(s => s.cardId === id);
+        if (cardSlides.length === 0) {
+          return;
+        }
+
+        const slideIds = cardSlides.map(s => s.id).join(',');
+
+        const $slide = $(`<div data-group-card-id="${id}" data-slide-id="${slideIds}" class="slide-content-wrap">
 <div style="position: relative; width: 50px; margin-bottom: 16px;">
 <svg xmlns="http://www.w3.org/2000/svg" width="51" height="32" fill="none" style="color: rgb(244, 242, 238)"><path fill="currentColor" d="M33.62 1.252A6 6 0 0 0 29.953 0H6a6 6 0 0 0-6 6v20a6 6 0 0 0 6 6h23.953a6 6 0 0 0 3.667-1.252l16.02-12.374a3 3 0 0 0 0-4.748z"></path></svg>
-<span style="font-size: 14px; line-height: 32px; top: 0; left: 14px; position: absolute">${slideNumber}</span>
+<span style="font-size: 14px; line-height: 32px; top: 0; left: 14px; position: absolute">${i}</span>
 </div>
-<div style="font-size: 14px; line-height: 20px">${title}</div>
+<div style="font-size: 14px; line-height: 20px">${name}</div>
 </div>`);
-        $slide.on('click', e => {
+
+        const slideNumber = slidesMap.get(Number(cardSlides[0].id));
+        $slide.on('click', () => {
           location.hash = `#/${slideNumber}`;
         });
 
@@ -181,6 +206,8 @@ window.TableOfContentsPlugin = (function() {
         );
 
         $row.append($slide);
+
+        i++;
       });
       $container.append($row);
     });

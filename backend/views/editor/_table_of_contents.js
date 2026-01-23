@@ -7,6 +7,11 @@ function TableOfContents() {
   });
 
   function createSlideElem({id, data, title, slideNumber}, inGroup) {
+    /*
+    <div style="display: flex; flex-direction: row; justify-content: space-between; gap: 10px; align-items: center">
+        <input style="flex: 1" class="slide-name" type="text" value="${title}" />
+    </div>
+     */
     return $(`<div data-slide-id="${id}" class="table-of-contents-slide reveal-slide-init ${inGroup ? 'in-group' : ''}">
     <div style="display: flex; flex-direction: row; justify-content: space-between; gap: 10px; align-items: center">
         #${slideNumber}
@@ -14,9 +19,6 @@ function TableOfContents() {
     </div>
     <div style="position: relative; width: 100%; aspect-ratio: 16 / 9; border: 1px solid #666">
         <div class="thumb-reveal reveal"><div class="slides">${data}</div></div>
-    </div>
-    <div style="display: flex; flex-direction: row; justify-content: space-between; gap: 10px; align-items: center">
-        <input style="flex: 1" class="slide-name" type="text" value="${title}" />
     </div>
 </div>`);
   }
@@ -61,11 +63,8 @@ function TableOfContents() {
     this.getTitle = () => rawData.title;
     this.getGroups = () => rawData.groups;
     this.addGroup = group => this.getGroups().push(group);
-    this.createGroup = (id, name, slides = []) => ({
-      id,
-      name,
-      slides
-    });
+    this.createGroup = (id, name, slides = [], cards = []) => ({id, name, slides, cards});
+    this.createGroupCard = (id, name) => ({id, name});
     this.getPayload = () => {
        return {
          ...rawData,
@@ -81,7 +80,7 @@ function TableOfContents() {
        }
     };
     this.insertEmptyAfterGroup = afterId => {
-      const group = this.createGroup(uuidv4(), 'Слайды', []);
+      const group = this.createGroup(uuidv4(), 'Слайды', [], [this.createGroupCard(uuidv4(), 'Новая карточка')]);
       if (afterId) {
         const index = this.getGroups().findIndex(f => f.id === afterId);
         this.getGroups().splice(index + 1, 0, group);
@@ -89,6 +88,17 @@ function TableOfContents() {
       }
       this.getGroups().unshift(group);
       return group;
+    }
+    this.insertEmptyAfterCard = (groupId, afterCardId) => {
+      const card = this.createGroupCard(uuidv4(), 'Новая карточка');
+      const group = this.getGroup(groupId);
+      if (afterCardId) {
+        const index = group.cards.findIndex(c => c.id === afterCardId);
+        group.cards.splice(index + 1, 0, card);
+        return card;
+      }
+      group.cards.unshift(card);
+      return card;
     }
     this.getGroup = (id) => this.getGroups().find(g => g.id === id);
 
@@ -130,31 +140,68 @@ function TableOfContents() {
       group.name = name;
     }
 
-    this.updateSlideName = (id, name) => {
+    /*this.updateSlideName = (id, name) => {
       const slide = this.findSlideInGroups(id);
       slide.title = name;
+    }*/
+    this.updateGroupCardName = (groupId, cardId, name) => {
+      const group = this.getGroup(groupId);
+      const card = group.cards.find(c => c.id === cardId);
+      card.name = name;
     }
   }
 
-  function createGroupElement({id, name, slides}, allSlides, canRemove) {
-    const $element = $(`
-<div data-group-id="${id}" class="table-of-contents-group fragment-item" style="padding: 10px; margin-bottom: 20px;">
-<h4 style="display: flex; flex-direction: row; justify-content: space-between; align-items: center">
-<input type="text" class="form-control group-name" value="${name}" />
-${canRemove ? `<button title="Удалить группу" class="remove-group" type="button"><i class="glyphicon glyphicon-trash"></i></button>` : ''}
+  function createGroupCardElement({id, name}, slides, findSlide) {
+    const $element = $(`<div data-group-card-id="${id}" class="table-of-contents-group-card">
+<h4>
+<input type="text" class="form-control group-card-name" value="${name}">
 </h4>
 <div class="table-of-contents-group-slides" style="display: grid; padding: 10px; min-height: 140px; background-color: #eee; gap: 20px; grid-template-columns: 1fr 1fr 1fr 1fr; width: 100%;"></div>
-</div>
-`);
+    </div>`);
 
-    slides.map(({id, title}) => {
-      const slide = allSlides.find(s => s.id === id);
+    slides.map(({id}) => {
+      const slide = findSlide(id);
       if (!slide) {
         return;
       }
       const {data, slideNumber} = slide;
-      const slideElem = createSlideElem({id, data, title, slideNumber}, true);
+      const slideElem = createSlideElem({id, data, slideNumber}, true);
       $element.find('.table-of-contents-group-slides').append(slideElem);
+    });
+
+    return $element;
+  }
+
+  function createGroupElement({id, name, slides, cards}, allSlides, canRemove) {
+    const $element = $(`
+<div data-group-id="${id}" class="table-of-contents-group">
+<h4 style="display: flex; flex-direction: row; justify-content: space-between; align-items: center">
+<input type="text" class="form-control group-name" value="${name}" />
+${canRemove ? `<button title="Удалить группу" class="remove-group" type="button"><i class="glyphicon glyphicon-trash"></i></button>` : ''}
+</h4>
+<h5>Карточки:</h5>
+<div class="table-of-contents-cards"></div>
+</div>
+`);
+
+    $element.find('.table-of-contents-cards').append(`<div class="fragment-item" style="border: 0 none; min-height: 30px">
+    <div style="position: relative">
+        <div class="fragment-create">
+            <button type="button" class="fragment-create-btn create-group-card">+ новая карточка</button>
+        </div>
+    </div>
+</div>
+`);
+
+    cards.map(({id, name}) => {
+      const $card = createGroupCardElement(
+        {id, name},
+        slides.filter(s => s.cardId === id),
+        slideId => allSlides.find(s => Number(s.id) === Number(slideId))
+      );
+      $card
+        .append(`<div class="fragment-create"><button type="button" class="fragment-create-btn create-group-card">+ новая карточка</button></div>`);
+      $element.find('.table-of-contents-cards').append($card);
     });
 
     return $element;
@@ -167,20 +214,24 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
       placeholder: 'ui-state-highlight',
       receive: ({target, toElement}) => {
         const $element = $(toElement).parents('[data-slide-id]:eq(0)');
-        const id = $element.attr('data-slide-id');
-        const groupId = $(target).parent().attr('data-group-id');
-        let slide = payloadManager.findSlideInGroups(id);
+        const slideId = $element.attr('data-slide-id');
+        const groupId = $(target).parents('[data-group-id]').attr('data-group-id');
+        const cardId = $(target).parents('[data-group-card-id]').attr('data-group-card-id');
+
+        let slide = payloadManager.findSlideInGroups(slideId);
         if (!slide) {
-          const rawSlide = findSlide(Number(id));
+          const rawSlide = findSlide(Number(slideId));
           slide = {
             id: rawSlide.id,
             title: `Слайд ${rawSlide.slideNumber}`,
             slideNumber: rawSlide.slideNumber,
-            data: rawSlide.data
+            data: rawSlide.data,
+            cardId,
           }
           payloadManager.appendSlideToGroup(groupId, slide);
           return
         }
+        slide.cardId = cardId;
         payloadManager.moveSlide(groupId, slide);
       },
       remove: ({toElement}) => {
@@ -192,15 +243,24 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
   function drawGroups($contentItemList, payloadManager, allSlides) {
 
     $contentItemList.empty();
-    $contentItemList.append(`<div class="fragment-item" style="border: 0 none"><div class="fragment-create"><button type="button" class="fragment-create-btn">+</button></div></div>`);
-    payloadManager.getGroups().map((group, i) =>  {
+    $contentItemList.append(`<div class="fragment-item" style="border: 0 none; min-height: 30px">
+    <div style="position: relative">
+        <div class="fragment-create">
+            <button type="button" class="fragment-create-btn create-group">+ новая группа</button>
+        </div>
+    </div>
+</div>
+`);
+    payloadManager.getGroups().map(group =>  {
       const $fragmentElem = createGroupElement(
         group,
         allSlides,
         payloadManager.getGroups().length > 1
       );
       $contentItemList.append($fragmentElem);
-      $fragmentElem.append(`<div class="fragment-create"><button type="button" class="fragment-create-btn">+</button></div>`);
+      $fragmentElem.append(`<div class="fragment-create"><button type="button" class="fragment-create-btn create-group">+ новая группа</button></div>`);
+
+
     });
 
     initGroupSortable(
@@ -276,7 +336,10 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
 
     if (payload.getGroups().length === 0) {
       payload.addGroup(
-        payload.createGroup(uuidv4(), 'Слайды', [])
+        payload.createGroup(
+          uuidv4(), 'Новая группа', [], [
+            payload.createGroupCard(uuidv4(), 'Слайды'),
+          ])
       );
     }
 
@@ -299,10 +362,10 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
       payload.updateTitle(target.value);
     });
 
-    $body.on('click', '.fragment-create-btn', ({target}) => {
+    $body.on('click', '.create-group', ({target}) => {
 
       const $target = $(target);
-      const id = $target.parents('.fragment-item').attr('data-group-id');
+      const id = $target.parents('[data-group-id]').attr('data-group-id');
 
       const group = payload.insertEmptyAfterGroup(id);
 
@@ -311,7 +374,7 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
         allSlides,
         payload.getGroups().length > 1
       );
-      $groupElem.append(`<div class="fragment-create"><button type="button" class="fragment-create-btn">+</button></div>`);
+      $groupElem.append(`<div class="fragment-create"><button type="button" class="fragment-create-btn create-group">+ новая группа</button></div>`);
 
       initGroupSortable(
         $groupElem.find('.table-of-contents-group-slides'),
@@ -320,12 +383,43 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
       );
 
       if (id) {
-        $target.parents('.fragment-item').after($groupElem);
+        $target.parents('.table-of-contents-group').after($groupElem);
         return;
       }
 
-      $target.parents('.fragment-item').before(`<div class="fragment-item" style="border: 0 none"><div class="fragment-create"><button type="button" class="fragment-create-btn">+</button></div></div>`);
+      $target.parents('.fragment-item').before(`<div class="fragment-item" style="border: 0 none"><div class="fragment-create"><button type="button" class="fragment-create-btn create-group">+ новая группа</button></div></div>`);
       $target.parents('.fragment-item').before($groupElem);
+      $target.parents('.fragment-item').remove();
+    });
+
+    $body.on('click', '.create-group-card', ({target}) => {
+      const $target = $(target);
+      const groupId = $target.parents('[data-group-id]').attr('data-group-id');
+      const cardId = $target.parents('[data-group-card-id]').attr('data-group-card-id');
+
+      const card = payload.insertEmptyAfterCard(groupId, cardId);
+
+      const $card = createGroupCardElement(
+        card,
+        [],
+        slideId => allSlides.find(s => Number(s.id) === Number(slideId))
+      );
+      $card.append(`<div class="fragment-create"><button type="button" class="fragment-create-btn create-group-card">+ новая карточка</button></div>`);
+
+      initGroupSortable(
+        $card.find('.table-of-contents-group-slides'),
+        payload,
+        (id) => allSlides.find(s => Number(s.id) === Number(id))
+      );
+
+      if (cardId) {
+        $target.parents('.table-of-contents-group-card').after($card);
+        return;
+      }
+
+      $target.parents('.fragment-item').before(`<div class="fragment-item" style="border: 0 none"><div class="fragment-create"><button type="button" class="fragment-create-btn create-group-card">+ новая карточка</button></div></div>`);
+      $target.parents('.fragment-item').before($card);
+      $target.parents('.fragment-item').remove();
     });
 
     $body.on('click', '.remove-slide', ({target}) => {
@@ -362,10 +456,11 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
       payload.updateGroupName(id, target.value);
     });
 
-    $body.on('input', '.slide-name', ({target}) => {
-      const $element = $(target).parents('[data-slide-id]:eq(0)');
-      const id = $element.attr('data-slide-id');
-      payload.updateSlideName(id, target.value);
+    $body.on('input', '.group-card-name', ({target}) => {
+      const $target = $(target);
+      const groupId = $target.parents('[data-group-id]:eq(0)').attr('data-group-id');
+      const cardId = $target.parents('[data-group-card-id]:eq(0)').attr('data-group-card-id');
+      payload.updateGroupCardName(groupId, cardId, target.value);
     });
 
     $body.find('.table-of-contents-save').on('click', () => {
