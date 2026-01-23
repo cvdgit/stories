@@ -177,7 +177,7 @@ window.TableOfContentsPlugin = (function() {
         `<div style="margin-bottom: 16px; font-size: 16px; line-height: 24px; font-weight: 700;">${name}</div>`
       );
 
-      const $row = $(`<div style="display: grid; grid-auto-flow: column; align-items: center; overflow-x: auto; grid-auto-columns: 200px; gap: 4px; margin-bottom: 30px;"></div>`)
+      const $row = $(`<div style="display: grid; grid-auto-flow: column; align-items: center; overflow-x: auto; grid-auto-columns: 200px; gap: 4px; margin-bottom: 30px;"></div>`);
 
       (cards || []).map(({id, name}) => {
 
