@@ -193,7 +193,7 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
 </div>
 `);
 
-    cards.map(({id, name}) => {
+    (cards || []).map(({id, name}) => {
       const $card = createGroupCardElement(
         {id, name},
         slides.filter(s => s.cardId === id),
