@@ -177,7 +177,7 @@ window.TableOfContentsPlugin = (function() {
       }
 
       const $title = $(
-        `<div class="table-of-contents-caption">${contents.join(' / ')}</div>`
+        `<div class="table-of-contents-caption"><span style="font-weight: normal">Оглавление:</span> ${contents.join(' / ')}</div>`
       );
       $title.on('click', () => location.hash = '#/' + ($prevTableOfContentsSlide.index() + 1));
       $('.story-container-wrap').prepend($title);
