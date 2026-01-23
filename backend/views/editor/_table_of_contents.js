@@ -130,6 +130,12 @@ function TableOfContents() {
       rawData.groups = rawData.groups.filter(g => g.id !== id);
     }
 
+    this.removeGroupCard = (groupId, cardId) => {
+      const group = this.getGroup(groupId);
+      group.cards = group.cards.filter(c => c.id !== cardId);
+      group.slides = group.slides.filter(s => s.cardId !== cardId);
+    }
+
     this.updateTitle = (title) => {
       rawData.title = title;
     }
@@ -417,7 +423,7 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
         return;
       }
 
-      $target.parents('.fragment-item').before(`<div class="fragment-item" style="border: 0 none"><div class="fragment-create"><button type="button" class="fragment-create-btn create-group-card">+ новая карточка</button></div></div>`);
+      $target.parents('.fragment-item').before(`<div class="fragment-item" style="border: 0 none; min-height: 30px"><div style="position: relative"><div class="fragment-create"><button type="button" class="fragment-create-btn create-group-card">+ новая карточка</button></div></div></div>`);
       $target.parents('.fragment-item').before($card);
       $target.parents('.fragment-item').remove();
     });
@@ -442,6 +448,26 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
 
       const id = $element.attr('data-group-id');
       payload.removeGroup(id);
+      $element.remove();
+
+      drawGroups($body.find('.table-of-contents-groups'), payload, allSlides);
+      drawAllSlidesGroup($body.find('.table-of-contents-all-slides'), payload, allSlides);
+
+      initSlideDecks();
+    });
+
+    $body.on('click', '.remove-group-card', ({target}) => {
+
+      const $element = $(target).parents('[data-group-card-id]:eq(0)');
+      if ($element.find('.table-of-contents-group-slides > .table-of-contents-slide').length) {
+        if (!confirm('Подтверждаете?')) {
+          return;
+        }
+      }
+
+      const groupId = $(target).parents('[data-group-id]:eq(0)').attr('data-group-id');
+      const id = $element.attr('data-group-card-id');
+      payload.removeGroupCard(groupId, id);
       $element.remove();
 
       drawGroups($body.find('.table-of-contents-groups'), payload, allSlides);
