@@ -88,7 +88,7 @@ export default function StartUpMessages() {
     }
     const repetitionTrainer = settings.filter(s => s.create);
     if (!repetitionTrainer.length) {
-      alert('Не выбрано содежимое истории');
+      alert('Не выбрано содержимое истории');
       return;
     }
 

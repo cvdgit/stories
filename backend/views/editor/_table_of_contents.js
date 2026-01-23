@@ -44,7 +44,6 @@ function TableOfContents() {
       showNotes: false,
       shuffle: false,
       loop: false,
-      hash: true,
       hashOneBasedIndex: true,
       rtl: false,
       help: false,
@@ -153,8 +152,9 @@ function TableOfContents() {
 
   function createGroupCardElement({id, name}, slides, findSlide) {
     const $element = $(`<div data-group-card-id="${id}" class="table-of-contents-group-card">
-<h4>
+<h4 style="display: flex; flex-direction: row; justify-content: space-between; align-items: center">
 <input type="text" class="form-control group-card-name" value="${name}">
+<button title="Удалить карточку" class="remove-group-card" type="button"><i class="glyphicon glyphicon-trash"></i></button>
 </h4>
 <div class="table-of-contents-group-slides" style="display: grid; padding: 10px; min-height: 140px; background-color: #eee; gap: 20px; grid-template-columns: 1fr 1fr 1fr 1fr; width: 100%;"></div>
     </div>`);
@@ -175,11 +175,11 @@ function TableOfContents() {
   function createGroupElement({id, name, slides, cards}, allSlides, canRemove) {
     const $element = $(`
 <div data-group-id="${id}" class="table-of-contents-group">
-<h4 style="display: flex; flex-direction: row; justify-content: space-between; align-items: center">
+<h4 style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;margin-bottom: 20px;">
 <input type="text" class="form-control group-name" value="${name}" />
 ${canRemove ? `<button title="Удалить группу" class="remove-group" type="button"><i class="glyphicon glyphicon-trash"></i></button>` : ''}
 </h4>
-<h5>Карточки:</h5>
+<h4>Карточки:</h4>
 <div class="table-of-contents-cards"></div>
 </div>
 `);
@@ -307,8 +307,8 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
 
     const $body = $(`<div style="display: grid; grid-template-columns: 300px 1fr; gap: 20px; width: 100%">
     <div id="col-left" style="overflow-y: auto">
-        <div style="margin: 20px 0; display: flex; flex-direction: column; gap: 10px">
-            <h4 class="h4">Слайды истории</h4>
+        <div style="display: flex; flex-direction: column; gap: 10px">
+            <h4 class="h4" style="margin-top: 0">Слайды истории</h4>
             <div class="table-of-contents-all-slides"
                  style="display: flex; flex-direction: column; padding: 10px; min-height: 140px; background-color: #eee; gap: 20px; width: 100%;"></div>
         </div>
@@ -325,7 +325,7 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
             />
         </div>
         <div style="margin: 20px 0; display: flex; flex-direction: column; gap: 10px">
-            <h4 class="h4">Группы слайдов</h4>
+            <h4 class="h4" style="margin: 0">Группы слайдов</h4>
             <div class="table-of-contents-groups"></div>
         </div>
         <div style="padding: 20px 0; display: flex; flex-direction: row; justify-content: end">

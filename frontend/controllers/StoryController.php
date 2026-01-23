@@ -423,15 +423,20 @@ class StoryController extends Controller
             }, $ids);
         }*/
 
-        $slideIds = array_map(static function(StorySlide $slide): int {
-            return $slide->id;
-        }, $model->storySlides);
+        $contentMentalMaps = [];
 
-        $contentMentalMaps = (new ContentMentalMapsFetcher())->fetch(
-            $slideIds,
-            $user->getId(),
-            $user->can(UserRoles::ROLE_TEACHER)
-        );
+        if (!$user->isGuest) {
+
+            $slideIds = array_map(static function (StorySlide $slide): int {
+                return $slide->id;
+            }, $model->storySlides);
+
+            $contentMentalMaps = (new ContentMentalMapsFetcher())->fetch(
+                $slideIds,
+                $user->getId(),
+                $user->can(UserRoles::ROLE_TEACHER)
+            );
+        }
 
         return $this->renderAjax('_player', [
             'model' => $model,
