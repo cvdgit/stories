@@ -161,8 +161,23 @@ window.TableOfContentsPlugin = (function() {
       const payload = JSON.parse(
         $prevTableOfContentsSlide.find('.table-of-contents > .table-of-contents-payload').text()
       );
+      const id = Number($(getCurrentSlide()).attr('data-id'));
+
+      const contents = [payload.title];
+      for (const group of payload.groups) {
+        const slide = group.slides.find(s => Number(s.id) === id);
+        if (slide) {
+          contents.push(group.name);
+          const card = group.cards.find(c => c.id === slide.cardId);
+          if (card) {
+            contents.push(card.name);
+          }
+          break;
+        }
+      }
+
       const $title = $(
-        `<div class="table-of-contents-caption">${payload.title}</div>`
+        `<div class="table-of-contents-caption">${contents.join(' / ')}</div>`
       );
       $title.on('click', () => location.hash = '#/' + ($prevTableOfContentsSlide.index() + 1));
       $('.story-container-wrap').prepend($title);
