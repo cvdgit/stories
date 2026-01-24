@@ -307,7 +307,7 @@ const SimpleModal = function({id, title, size}) {
             <h5 class="modal-title" style="margin-right: auto">${title}</h5>
             <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
           </div>
-          <div class="modal-body d-flex">...</div>
+          <div class="modal-body d-flex" style="height: 100%">...</div>
         </div>
       </div>
     </div>

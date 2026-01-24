@@ -311,15 +311,15 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
 
     const payload = new Payload(data);
 
-    const $body = $(`<div style="display: grid; grid-template-columns: 300px 1fr; gap: 20px; width: 100%">
-    <div id="col-left" style="overflow-y: auto">
+    const $body = $(`<div style="display: flex; flex-direction: row; gap: 20px; width: 100%; height: 100%; max-height: 100%;">
+    <div id="col-left" style="width: 300px; overflow-y: auto">
         <div style="display: flex; flex-direction: column; gap: 10px">
             <h4 class="h4" style="margin-top: 0">Слайды истории</h4>
             <div class="table-of-contents-all-slides"
                  style="display: flex; flex-direction: column; padding: 10px; min-height: 140px; background-color: #eee; gap: 20px; width: 100%;"></div>
         </div>
     </div>
-    <div id="col-right" style="flex: 1">
+    <div id="col-right" style="flex: 1; overflow-y: auto">
         <div class="form-group">
             <label for="tableOfContentsTitle">Название</label>
             <input
@@ -495,16 +495,63 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
     });
 
     dialog.on('show', () => {
-      const left = document.getElementById('col-left');
+      /*const left = document.getElementById('col-left');
       const right = document.getElementById('col-right');
+      const leftWrapper = document.getElementById('leftWrapper');
+      const scrollContainer = $('#tableOfContentsModal')[0];
+      console.log(scrollContainer)
+      let topOffset = 0;
       const syncHeight = () => {
-        const height = right.offsetHeight;
-        left.style.maxHeight = height + 'px';
+        left.style.height = right.offsetHeight + 'px';
       };
-      syncHeight();
-      const observer = new ResizeObserver(syncHeight);
+
+      const observer = new ResizeObserver(updateAll);
       observer.observe(right);
+
       window.addEventListener('resize', syncHeight);
+
+      function updatePosition() {
+        const containerRect = scrollContainer.getBoundingClientRect();
+        const wrapperRect = leftWrapper.getBoundingClientRect();
+        const rightRect = right.getBoundingClientRect();
+
+        const scrollTop = scrollContainer.scrollTop;
+
+        const wrapperTop =
+          wrapperRect.top - containerRect.top + scrollTop;
+
+        const wrapperBottom = wrapperTop + right.offsetHeight;
+
+        const currentTop = scrollTop;
+
+        if (
+          currentTop > wrapperTop &&
+          currentTop + left.offsetHeight < wrapperBottom
+        ) {
+          // "sticky"
+          left.style.position = 'absolute';
+          left.style.top = (currentTop - wrapperTop) + 'px';
+          left.style.left = '0';
+          left.style.width = '100%';
+        } else if (currentTop + left.offsetHeight >= wrapperBottom) {
+          // стоп внизу
+          left.style.position = 'absolute';
+          left.style.top = (right.offsetHeight - left.offsetHeight) + 'px';
+        } else {
+          // исходное состояние
+          left.style.position = 'relative';
+        }
+        console.log(scrollTop)
+      }
+
+      function updateAll() {
+        syncHeight();
+        updatePosition();
+      }
+
+      updateAll();
+
+      $('#tableOfContentsModal').on('scroll', updatePosition);*/
     })
 
     dialog.show({body: $body});
