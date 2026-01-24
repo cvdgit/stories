@@ -312,30 +312,29 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
     const payload = new Payload(data);
 
     const $body = $(`<div style="display: flex; flex-direction: row; gap: 20px; width: 100%; height: 100%; max-height: 100%;">
-    <div id="col-left" style="width: 300px; overflow-y: auto">
-        <div style="display: flex; flex-direction: column; gap: 10px">
+    <div id="col-left" style="width: 300px">
+        <div style="display: flex; flex-direction: column; gap: 10px; max-height: 100%">
             <h4 class="h4" style="margin-top: 0">Слайды истории</h4>
-            <div class="table-of-contents-all-slides"
-                 style="display: flex; flex-direction: column; padding: 10px; min-height: 140px; background-color: #eee; gap: 20px; width: 100%;"></div>
+            <div class="table-of-contents-all-slides"></div>
         </div>
     </div>
-    <div id="col-right" style="flex: 1; overflow-y: auto">
-        <div class="form-group">
-            <label for="tableOfContentsTitle">Название</label>
-            <input
-                    id="tableOfContentsTitle"
-                    style="max-width: 50%"
-                    class="table-of-contents-title form-control"
-                    type="text"
-                    value="${payload.getTitle() || 'Оглавление'}"
-            />
-        </div>
-        <div style="margin: 20px 0; display: flex; flex-direction: column; gap: 10px">
-            <h4 class="h4" style="margin: 0">Группы слайдов</h4>
-            <div class="table-of-contents-groups"></div>
-        </div>
-        <div style="padding: 20px 0; display: flex; flex-direction: row; justify-content: end">
+    <div id="col-right" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center">
+            <div class="form-group" style="flex: 1">
+                <label for="tableOfContentsTitle">Название</label>
+                <input
+                        id="tableOfContentsTitle"
+                        style="max-width: 50%"
+                        class="table-of-contents-title form-control"
+                        type="text"
+                        value="${payload.getTitle() || 'Оглавление'}"
+                />
+            </div>
             <button class="btn btn-primary table-of-contents-save" type="button">Сохранить</button>
+        </div>
+        <div style="margin: 20px 0; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; gap: 10px; max-height: 100%">
+            <h4 class="h4" style="margin: 0">Группы слайдов</h4>
+            <div class="table-of-contents-groups" style="overflow-y: auto; flex: 1"></div>
         </div>
     </div>
 </div>`);
@@ -493,66 +492,6 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
       updateHandler(payload.getPayload());
       dialog.hide();
     });
-
-    dialog.on('show', () => {
-      /*const left = document.getElementById('col-left');
-      const right = document.getElementById('col-right');
-      const leftWrapper = document.getElementById('leftWrapper');
-      const scrollContainer = $('#tableOfContentsModal')[0];
-      console.log(scrollContainer)
-      let topOffset = 0;
-      const syncHeight = () => {
-        left.style.height = right.offsetHeight + 'px';
-      };
-
-      const observer = new ResizeObserver(updateAll);
-      observer.observe(right);
-
-      window.addEventListener('resize', syncHeight);
-
-      function updatePosition() {
-        const containerRect = scrollContainer.getBoundingClientRect();
-        const wrapperRect = leftWrapper.getBoundingClientRect();
-        const rightRect = right.getBoundingClientRect();
-
-        const scrollTop = scrollContainer.scrollTop;
-
-        const wrapperTop =
-          wrapperRect.top - containerRect.top + scrollTop;
-
-        const wrapperBottom = wrapperTop + right.offsetHeight;
-
-        const currentTop = scrollTop;
-
-        if (
-          currentTop > wrapperTop &&
-          currentTop + left.offsetHeight < wrapperBottom
-        ) {
-          // "sticky"
-          left.style.position = 'absolute';
-          left.style.top = (currentTop - wrapperTop) + 'px';
-          left.style.left = '0';
-          left.style.width = '100%';
-        } else if (currentTop + left.offsetHeight >= wrapperBottom) {
-          // стоп внизу
-          left.style.position = 'absolute';
-          left.style.top = (right.offsetHeight - left.offsetHeight) + 'px';
-        } else {
-          // исходное состояние
-          left.style.position = 'relative';
-        }
-        console.log(scrollTop)
-      }
-
-      function updateAll() {
-        syncHeight();
-        updatePosition();
-      }
-
-      updateAll();
-
-      $('#tableOfContentsModal').on('scroll', updatePosition);*/
-    })
 
     dialog.show({body: $body});
   }

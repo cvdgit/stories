@@ -1139,6 +1139,17 @@ body {
   gap: 10px;
 }
 
+.table-of-contents-all-slides {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  min-height: 140px;
+  background-color: #eee;
+  gap: 20px;
+  width: 100%;
+  overflow-y: auto;
+}
+
 .table-of-contents-slide .remove-slide,
 .table-of-contents-slide .slide-name {
   display: none;
@@ -1225,4 +1236,12 @@ body {
   flex: 1;
   display: flex;
   overflow: hidden;
+}
+
+.table-of-contents-groups .fragment-item:first-child {
+  margin-top: 30px;
+}
+
+.table-of-contents-groups .table-of-contents-group:last-child {
+  margin-bottom: 80px;
 }
