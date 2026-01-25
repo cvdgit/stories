@@ -51,6 +51,7 @@
   flex-direction: row;
   overflow-y: auto;
   margin-bottom: 10px;
+  align-items: center;
 }
 
 .table-of-contents-content {
@@ -103,6 +104,7 @@
 .caption-group {
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 
 .caption-group-card {
@@ -110,10 +112,10 @@
   transition: 200ms all;
   height: 100%;
   cursor: pointer;
-  max-width: 300px;
+  /*max-width: 300px;
   white-space: nowrap;
   text-overflow: ellipsis;
-  overflow: hidden;
+  overflow: hidden;*/
 }
 
 .caption-group-card-index {
