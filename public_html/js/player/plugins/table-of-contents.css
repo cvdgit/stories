@@ -35,21 +35,22 @@
 }
 
 .table-of-contents-caption {
-  position: absolute;
+  /*position: absolute;*/
   /*font-weight: 600;*/
   /*cursor: pointer;*/
   user-select: none;
   /*padding: 6px;*/
   /*border-radius: 10px;*/
-  left: 0;
+  /*left: 0;*/
   /*transform: translate(-50%, 0);*/
-  top: -25px;
-  z-index: 2;
+  /*top: -25px;
+  z-index: 2;*/
   background-color: #eee;
   width: 100%;
   display: flex;
   flex-direction: row;
   overflow: hidden;
+  margin-bottom: 10px;
 }
 
 .table-of-contents-content {
