@@ -165,7 +165,7 @@ window.TableOfContentsPlugin = (function() {
 
       const $title = $(
         `<div class="table-of-contents-caption">
-<div class="caption-group-card contents-index" style="font-weight: 600">${payload.title}</div>
+<div class="caption-group-card-index contents-index">${payload.title}</div>
 </div>`
       );
 
