@@ -348,7 +348,7 @@ $js = <<< JS
         $('.page-loader').addClass('loaded');
     }
 
-    editorConfig.onSlideLoad = (elem) => {
+    editorConfig.onSlideLoad = (elem, {contentMentalMapsBlockId}) => {
         const type = elem.find('[data-block-type]').attr('data-block-type');
         if (type === 'table-of-contents') {
             const payload = JSON.parse(elem.find('.table-of-contents-payload').text());
@@ -359,6 +359,58 @@ $js = <<< JS
                 payload,
                 elem.find('.table-of-contents'),
                 slidesMap
+            );
+        }
+
+        if (contentMentalMapsBlockId) {
+            const handler = $(
+                `<div style="position: absolute; right: 20px; top: 20px; background-color: rgba(153, 205, 80, .4); border-radius: 10px; cursor: pointer; font-weight: 600; padding: 8px 12px;">Речевой тренажёр</div>`
+            );
+            handler.on('click', () => {
+                const currentSlide = StoryEditor.getCurrentSlide();
+                if (!currentSlide) {
+                    return;
+                }
+                const texts = getSlideTextContent(currentSlide)
+                if (!texts.length) {
+                    toastr.warning("Текст на слайде не найден");
+                    return;
+                }
+                const currentSlideId = currentSlide.getID();
+                const modal = new RemoteModal({
+                    id: 'create-content-mental-maps-modal',
+                    title: 'Речевой тренажер на основе контента'
+                });
+                modal.show({
+                    url: '/admin/index.php?r=editor/mental-map/content-form&slide_id=' + currentSlideId + '&block_id=' + contentMentalMapsBlockId,
+                    callback: async (element) => {
+                        const contentMentalMap = new ContentMentalMap()
+                        const contentItems = window.contentItems || []
+                        const container = $(element).find('.content-mm-container')
+                        if (contentItems.length > 0) {
+
+                            await contentMentalMap.updateFragments({
+                                contentItems,
+                                container,
+                                text: texts,
+                                onUpdateHandler: text => modal.hide(),
+                                currentSlideId,
+                                blockId: contentMentalMapsBlockId,
+                                onDeleteHandler: success => {
+                                    if (success) {
+                                        toastr.success('Успешно')
+                                    }
+                                    modal.hide()
+                                    StoryEditor.loadSlides(currentSlideId)
+                                }
+                            })
+                            return
+                        }
+                    }
+                });
+            });
+            elem.append(
+                handler
             );
         }
     }

@@ -14,15 +14,15 @@ class SlideListResponse
     private $slide;
     private $slideModifier;
     /**
-     * @var bool
+     * @var string|null
      */
-    private $haveSlideMentalMaps;
+    private $contentMentalMapsBlockId;
     /**
      * @var bool
      */
     private $haveTableOfContents;
 
-    public function __construct(StorySlide $slide, bool $haveSlideMentalMaps = false, bool $haveTableOfContents = false)
+    public function __construct(StorySlide $slide, string $contentMentalMapsBlockId = null, bool $haveTableOfContents = false)
     {
         $this->slide = $slide;
 
@@ -33,7 +33,7 @@ class SlideListResponse
         }
 
         $this->slideModifier = new SlideModifier($slide->id, $slideData);
-        $this->haveSlideMentalMaps = $haveSlideMentalMaps;
+        $this->contentMentalMapsBlockId = $contentMentalMapsBlockId;
         $this->haveTableOfContents = $haveTableOfContents;
     }
 
@@ -66,7 +66,7 @@ class SlideListResponse
             'haveLinks' => (count($s->storySlideBlocks) > 0),
             'number' => $s->number,
             'haveNeoRelations' => (count($s->neoSlideRelations) > 0),
-            'haveMentalMaps' => $this->haveSlideMentalMaps,
+            'contentMentalMapsBlockId' => $this->contentMentalMapsBlockId,
             'haveTableOfContents' => $this->haveTableOfContents,
         ];
     }

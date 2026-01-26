@@ -1678,7 +1678,8 @@ const StoryEditor = (function () {
 
       if (typeof config.onSlideLoad === 'function') {
         config.onSlideLoad(
-          $editor.find('.slides section.present')
+          $editor.find('.slides section.present'),
+          {contentMentalMapsBlockId: data?.contentMentalMapsBlockId}
         );
       }
 
@@ -1697,7 +1698,8 @@ const StoryEditor = (function () {
 
     if (typeof config.onSlideLoad === 'function') {
       config.onSlideLoad(
-        $editor.find('.slides section.present')
+        $editor.find('.slides section.present'),
+        {contentMentalMapsBlockId: slideData?.contentMentalMapsBlockId}
       );
     }
 
@@ -1739,7 +1741,6 @@ const StoryEditor = (function () {
         blockToolbar.hide();
         slideMenu.hide();
       }
-      console.log('after slides load')
     });
   }
 

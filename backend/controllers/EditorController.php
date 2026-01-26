@@ -372,22 +372,27 @@ class EditorController extends BaseController
             $slideMentalMaps = (new Query())
                 ->select([
                     'slideId' => 't.slide_id',
+                    'blockId' => 't.block_id',
                     'maps' => 'COUNT(t.mental_map_id)',
                 ])
                 ->from(['t' => MentalMapStorySlide::tableName()])
                 ->where(['in', 't.slide_id', $slideIds])
-                ->groupBy(['t.slide_id'])
+                ->groupBy(['t.slide_id', 't.block_id'])
                 ->all();
-            $haveMentalMapsBySlide = array_combine(
+            $haveMentalMapsBySlide = [];
+            foreach ($slideMentalMaps as $map) {
+                $haveMentalMapsBySlide[$map['slideId']] = $map['blockId'];
+            }
+            /*$haveMentalMapsBySlide = array_combine(
                 array_column($slideMentalMaps, 'slideId'),
                 array_fill(0, count($slideMentalMaps), true)
-            );
+            );*/
         }
 
         return array_map(static function (StorySlide $slide) use ($haveMentalMapsBySlide, $tableOfContentsSlideIds): array {
             return (new SlideListResponse(
                 $slide,
-                $haveMentalMapsBySlide[$slide->id] ?? false,
+                $haveMentalMapsBySlide[$slide->id] ?? null,
                 in_array($slide->id, $tableOfContentsSlideIds, true)
             ))->asArray();
         }, $model->storySlides);
