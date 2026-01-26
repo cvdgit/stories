@@ -363,6 +363,21 @@ $js = <<< JS
         }
     }
 
+    editorConfig.slideUpdateHandler = (content) => {
+        const type = content.find('[data-block-type]').attr('data-block-type');
+        if (type === 'table-of-contents') {
+            const payload = JSON.parse(content.find('.table-of-contents-payload').text());
+            const slidesMap = new Map();
+            $('#slides-list > [data-slide-id]')
+                .each((i, el) => slidesMap.set(Number($(el).attr('data-slide-id')), i + 1));
+            TableOfContentsPlugin.initEdit(
+                payload,
+                content.find('.table-of-contents'),
+                slidesMap
+            );
+        }
+    };
+
     const gptRewriteText = new GptRewriteText()
     editorConfig.gptRewriteHandler = (block, blockModifier) => {
         const content = getSlideTextContent(StoryEditor.getCurrentSlide())

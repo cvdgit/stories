@@ -652,7 +652,8 @@ body {
     display: none;
 }
 
-#story-editor h1 {
+#story-editor h1,
+#slides-list h1 {
     color: inherit;
 }
 

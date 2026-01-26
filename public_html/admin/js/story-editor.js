@@ -182,6 +182,12 @@ function SlideManager(options) {
 
   this.$slidesList = $('#slides-list');
 
+  this.onSlideUpdate = (slideContent) => {
+    if (typeof options.slideUpdateHandler === "function") {
+      options.slideUpdateHandler(slideContent);
+    }
+  }
+
   function SlideWrapper(element, data) {
     this.element = element;
     this.data = data;
@@ -374,6 +380,10 @@ SlideManager.prototype = {
 
         $element.appendTo(that.$slidesList);
         that.decks[slide.id] = makeReveal($element.find('.reveal')[0]);
+
+        that.onSlideUpdate(
+          $element.find('.reveal .slides > section')
+        );
       });
 
       that.$slidesList.sortable({
@@ -479,6 +489,9 @@ SlideManager.prototype = {
     this.$slidesList
       .find('div[data-slide-id=' + id + '].thumb-reveal-wrapper .reveal .slides')
       .html(data);
+    this.onSlideUpdate(
+      this.$slidesList.find(`div[data-slide-id='${id}']`).find('.reveal .slides section')
+    );
     this.decks[id].sync();
   }
 }
@@ -978,13 +991,13 @@ const StoryEditor = (function () {
   function initialize(params) {
 
     config = params;
-
     slideMenu = new SlideMenu($editor);
 
     slidesManager = new SlideManager({
       'story_id': params['storyID'],
       'endpoint': params['slidesEndpoint'],
-      'lesson_id': params['lessonID']
+      'lesson_id': params['lessonID'],
+      slideUpdateHandler: params.slideUpdateHandler
     });
     contentCleaner = new ContentCleaner($editor);
     blockModifier = new BlockModifier(new DataModifier(slidesManager, contentCleaner));
@@ -1726,6 +1739,7 @@ const StoryEditor = (function () {
         blockToolbar.hide();
         slideMenu.hide();
       }
+      console.log('after slides load')
     });
   }
 
