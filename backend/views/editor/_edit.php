@@ -429,8 +429,8 @@ $js = <<< JS
                     text: texts,
                     onCreateHandler: text => {
                         modal.hide()
-                        block.getElement().find('.slide-paragraph').html(text)
-                        blockModifier.change()
+                        /*block.getElement().find('.slide-paragraph').html(text)
+                        blockModifier.change()*/
                         StoryEditor.loadSlides(currentSlideId)
                     }
                 })
