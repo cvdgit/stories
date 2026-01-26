@@ -56,6 +56,8 @@
 
 .table-of-contents-content {
   overflow-y: auto;
+  width: 100%;
+  height: 100%;
 }
 
 .lesson-progress-circle {
@@ -129,4 +131,25 @@
 .caption-group-card.active-slide {
   font-weight: 600;
   background-color: #99cd50;
+}
+
+.table-of-contents-group-slides:empty::before {
+  content: 'Нет слайдов. Перетащите слайды в эту область';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: #aaa;
+  font-weight: 600;
+}
+
+.table-of-contents-content:empty::before {
+  content: 'Содержимое отсутствует';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: #aaa;
+  font-weight: 600;
+  font-size: 20px;
 }

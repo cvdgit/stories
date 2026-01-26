@@ -318,7 +318,7 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
             <div class="table-of-contents-all-slides"></div>
         </div>
     </div>
-    <div id="col-right" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between">
+    <div id="col-right" style="flex: 1; display: flex; flex-direction: column">
         <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center">
             <div class="form-group" style="flex: 1">
                 <label for="tableOfContentsTitle">Название</label>
