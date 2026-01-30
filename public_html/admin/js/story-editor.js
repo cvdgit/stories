@@ -634,6 +634,7 @@ function ContentCleaner(editor) {
     });
 
     data.find('.table-of-contents-inner').remove();
+    data.find('.content-mm-handler').remove();
     data.find('.sl-block-transform').remove();
     data.find('.sl-block-image-controls').remove();
     data.find('.ui-resizable-handle').remove();
@@ -812,13 +813,24 @@ const StoryEditor = (function () {
     }
   }, '.sl-block-image-control');
 
+  function stripTags(html) {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.textContent || div.innerText || '';
+  }
+
   $editor[0].addEventListener('paste', e => {
     e.preventDefault();
     const availableTypes = e.clipboardData.types;
 
     if (availableTypes.includes('text/html')) {
       const html = e.clipboardData.getData('text/html');
-      console.log(html);
+      if (html) {
+        appendBlock(
+          createEmptyBlock('text', stripTags(html.trim().replace(/<\s*br\s*\/?>/gi, "\n")).replace(/(\r\n|\n|\r)/g, "<br>"))
+        );
+        blockModifier.change();
+      }
     } else if (availableTypes.includes('text/plain')) {
       const text = e.clipboardData.getData('text/plain');
       if (text) {
