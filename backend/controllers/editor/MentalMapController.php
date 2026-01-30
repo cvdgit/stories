@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace backend\controllers\editor;
 
 use backend\components\BaseController;
+use backend\components\story\AbstractBlock;
 use backend\components\story\MentalMapBlock;
 use backend\components\story\MentalMapBlockContent;
 use backend\components\story\reader\HtmlSlideReader;
+use backend\components\story\RetellingBlock;
+use backend\components\story\RetellingBlockContent;
+use backend\components\story\writer\HTMLWriter;
 use backend\MentalMap\EditorCreateAi\CreateAiMentalMapsForm;
 use backend\MentalMap\MentalMap;
 use backend\MentalMap\MentalMapPayload;
@@ -19,12 +23,14 @@ use backend\services\StorySlideService;
 use backend\SlideEditor\ContentMentalMap\ContentMentalMapForm;
 use backend\SlideEditor\ContentMentalMap\SpeechTrainer;
 use backend\SlideEditor\CreateMentalMapQuestions\UpdateMentalMapQuestionsForm;
+use backend\StoryContent\SpeechTrainer\SpeechTrainerService;
 use common\models\Story;
 use common\models\StorySlide;
 use common\rbac\UserRoles;
 use common\services\TransactionManager;
 use DomainException;
 use Exception;
+use modules\edu\components\ArrayHelper;
 use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -37,6 +43,8 @@ use yii\web\NotFoundHttpException;
 use yii\web\Request;
 use yii\web\Response;
 use yii\web\User as WebUser;
+
+use function PHPUnit\Framework\containsEqual;
 
 class MentalMapController extends BaseController
 {
@@ -52,6 +60,10 @@ class MentalMapController extends BaseController
      * @var StorySlideService
      */
     private $storySlideService;
+    /**
+     * @var SpeechTrainerService
+     */
+    private $speechTrainerService;
 
     public function __construct(
         $id,
@@ -59,12 +71,14 @@ class MentalMapController extends BaseController
         StoryEditorService $editorService,
         TransactionManager $transactionManager,
         StorySlideService $storySlideService,
+        SpeechTrainerService $speechTrainerService,
         $config = []
     ) {
         parent::__construct($id, $controller, $config);
         $this->storyEditorService = $editorService;
         $this->transactionManager = $transactionManager;
         $this->storySlideService = $storySlideService;
+        $this->speechTrainerService = $speechTrainerService;
     }
 
     public function behaviors(): array
@@ -280,25 +294,42 @@ class MentalMapController extends BaseController
                 throw new NotFoundHttpException('Слайд не найден');
             }
 
-            try {
-                $retellingSlideId = $this->createRetelling(
-                    $currentSlideModel->story_id,
-                    $currentSlideModel->id,
-                    $currentSlideModel->number,
-                    $user->getId()
-                );
-            } catch (Exception $exception) {
-                Yii::$app->errorHandler->logException($exception);
-                throw new BadRequestHttpException($exception->getMessage());
+            $retellingRow = ArrayHelper::array_find(
+                $mentalMaps,
+                static function (array $contentRow): bool {
+                    return $contentRow['type'] === 'retelling';
+                },
+            );
+
+            $retellingSlideId = null;
+            if ($retellingRow !== null) {
+                try {
+                    $retellingSlideId = $this->speechTrainerService->createRetelling(
+                        $currentSlideModel->story_id,
+                        $currentSlideModel->id,
+                        $currentSlideModel->number,
+                        $user->getId(),
+                        (bool) $retellingRow['required']
+                    );
+                } catch (Exception $exception) {
+                    Yii::$app->errorHandler->logException($exception);
+                    throw new BadRequestHttpException($exception->getMessage());
+                }
             }
 
-            $speechTrainer = SpeechTrainer::create(
-                Uuid::uuid4(),
-                'Речевой тренажёр',
-                $currentSlideModel->id,
-                $createForm->blockId,
-                $retellingSlideId
-            );
+            $speechTrainers = SpeechTrainer::findAllBySlide($currentSlideModel->id);
+            if (count($speechTrainers) > 0) {
+                $speechTrainer = $speechTrainers[0];
+                $speechTrainer->setRetellingSlideId($retellingSlideId);
+            } else {
+                $speechTrainer = SpeechTrainer::create(
+                    Uuid::uuid4(),
+                    'Речевой тренажёр',
+                    $currentSlideModel->id,
+                    $createForm->blockId,
+                    $retellingSlideId,
+                );
+            }
             if (!$speechTrainer->save()) {
                 throw new BadRequestHttpException('Speech Trainer save error');
             }
@@ -336,13 +367,12 @@ class MentalMapController extends BaseController
                         throw new BadRequestHttpException('Mental Map save exception');
                     }
 
-                    $command = Yii::$app->db->createCommand();
-                    $command->insert('mental_map_story_slide', [
-                        'mental_map_id' => $mentalMap->uuid,
-                        'slide_id' => $createForm->slideId,
-                        'block_id' => $createForm->blockId,
-                    ]);
-                    $command->execute();
+                    $this->speechTrainerService->createMentalMapSlideRow(
+                        Uuid::fromString($mentalMap->uuid),
+                        (int) $createForm->slideId,
+                        $createForm->blockId,
+                        (bool) $mentalMapRow['required'],
+                    );
                 });
             }
 
@@ -350,44 +380,6 @@ class MentalMapController extends BaseController
         }
 
         return ['success' => false];
-    }
-
-    /**
-     * @throws InvalidConfigException
-     */
-    private function createRetelling(int $storyId, int $currentSlideId, int $currentSlideNumber, int $userId): int
-    {
-        $retelling = Retelling::create(
-            Uuid::uuid4(),
-            $currentSlideId,
-            'Перескажите текст',
-            '',
-            false,
-            $userId
-        );
-        if (!$retelling->save()) {
-            throw new DomainException('Retelling save error');
-        }
-
-        $slideModel = $this->storySlideService->create($storyId, 'empty', StorySlide::KIND_RETELLING);
-        $slideModel->number = $currentSlideNumber + 1;
-        Story::insertSlideNumber($storyId, $currentSlideNumber);
-        if (!$slideModel->save()) {
-            throw new DomainException(
-                'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
-            );
-        }
-
-        $data = $this->storyEditorService->getSlideWithRetellingBlockContent($slideModel->id, $retelling->id);
-
-        $slideModel->updateData($data);
-        if (!$slideModel->save()) {
-            throw new DomainException(
-                'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
-            );
-        }
-
-         return $slideModel->id;
     }
 
     public function actionContentForm(int $slide_id, string $block_id): string
@@ -400,8 +392,18 @@ class MentalMapController extends BaseController
         if ($speechTrainer !== null) {
             $contents = $speechTrainer->getContents();
         }
+        $mapOrder = SpeechTrainer::getStoryEditorAllTypes();
         return $this->renderAjax('_content', [
             'contents' => $contents,
+            'mapOrder' => array_map(
+                static function (string $type) use ($mapOrder): array {
+                    return [
+                        'type' => $type,
+                        'title' => $mapOrder[$type] ?? 'Unknown type',
+                    ];
+                },
+                array_keys($mapOrder),
+            ),
         ]);
     }
 
@@ -488,6 +490,93 @@ class MentalMapController extends BaseController
 
         if (count($slideMentalMapIds) > 0) {
             MentalMap::deleteAll(['in', 'uuid', $slideMentalMapIds]);
+        }
+
+        return ['success' => true];
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     * @throws BadRequestHttpException
+     */
+    public function actionContentRequired(int $slide_id, string $id, string $type, Request $request, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+
+        if (!SpeechTrainer::isValidType($type)) {
+            throw new BadRequestHttpException('Unknown type');
+        }
+
+        $payload = Json::decode($request->rawBody);
+        $required = $payload['required'];
+
+        $storySlide = StorySlide::findOne($slide_id);
+        if ($storySlide === null) {
+            throw new NotFoundHttpException('Slide not found');
+        }
+
+        if ($type === SpeechTrainer::TYPE_RETELLING) {
+
+            $retelling = Retelling::findOne($id);
+            if ($retelling === null) {
+                throw new NotFoundHttpException('Retelling not found');
+            }
+
+            $speechTrainers = SpeechTrainer::findAllBySlide($storySlide->id);
+            foreach ($speechTrainers as $speechTrainer) {
+
+                if ($speechTrainer->retelling_slide_id === null) {
+                    continue;
+                }
+
+                $retellingSlide = StorySlide::findOne($speechTrainer->retelling_slide_id);
+                if ($retellingSlide === null) {
+                    continue;
+                }
+
+                $slide = (new HtmlSlideReader($retellingSlide->getSlideOrLinkData()))->load();
+                /** @var RetellingBlock|null $retellingBlock */
+                $retellingBlock = null;
+                foreach ($slide->getBlocks() as $slideBlock) {
+                    if ($slideBlock->typeIs(AbstractBlock::TYPE_RETELLING)) {
+                        $retellingBlock = $slideBlock;
+                    }
+                }
+                if ($retellingBlock === null) {
+                    continue;
+                }
+
+                $retellingContent = RetellingBlockContent::createFromHtml($retellingBlock->getContent());
+                if ($retellingContent->getId() !== $retelling->id) {
+                    continue;
+                }
+
+                $retellingBlock->setContent(
+                    (new RetellingBlockContent($retelling->id, $required))->render()
+                );
+
+                $retellingSlide->data = (new HTMLWriter())->renderSlide($slide);
+                if (!$retellingSlide->save()) {
+                    throw new BadRequestHttpException('Retelling save error');
+                }
+            }
+
+            return ['success' => true];
+        }
+
+        $mentalMap = MentalMap::findOne($id);
+        if ($mentalMap === null) {
+            throw new NotFoundHttpException('Mental map not found');
+        }
+
+        $mentalMapRow = MentalMapStorySlide::findMentalMapRow($storySlide->id, $mentalMap->uuid);
+        if ($mentalMapRow === null) {
+            throw new NotFoundHttpException('Mental Map Story Slide not found');
+        }
+
+        $mentalMapRow->setRequired($required);
+        if (!$mentalMapRow->save()) {
+            throw new BadRequestHttpException('Save error');
         }
 
         return ['success' => true];

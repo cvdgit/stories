@@ -27,13 +27,12 @@ class ContentMentalMapsFetcher
                 'slideId' => 't.slide_id',
                 'mentalMapId' => 't.mental_map_id',
                 'mentalMapName' => 't2.name',
+                'mapRequired' => 't.required',
             ])
             ->from(['t' => MentalMapStorySlide::tableName()])
             ->innerJoin(['t2' => MentalMap::tableName()], 't.mental_map_id = t2.uuid')
             ->where(['in', 't.slide_id', $slideIds])
             ->all();
-
-        // $canEdit = $user->can(UserRoles::ROLE_TEACHER);
 
         $contentMentalMaps = [];
         foreach ($slideMentalMaps as $row) {
@@ -75,6 +74,7 @@ class ContentMentalMapsFetcher
                         ['/mental-map/editor', 'id' => $mentalMap->uuid],
                     ),
                 ] : false,
+                'required' => $row['mapRequired'] === '1',
             ];
         }
 

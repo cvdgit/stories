@@ -10,10 +10,10 @@ use backend\AiStoryAssist\ThreadResponse;
 use backend\MentalMap\MentalMap;
 use backend\MentalMap\MentalMapPayload;
 use backend\MentalMap\MentalMapStorySlide;
-use backend\Retelling\Retelling;
 use backend\services\StoryEditorService;
 use backend\services\StorySlideService;
 use backend\SlideEditor\ContentMentalMap\SpeechTrainer;
+use backend\StoryContent\SpeechTrainer\SpeechTrainerService;
 use common\components\StoryCover;
 use common\helpers\Translit;
 use common\models\slide\SlideKind;
@@ -57,6 +57,10 @@ class StoryAiController extends Controller
      * @var MentalMapBuilder
      */
     private $mentalMapBuilder;
+    /**
+     * @var SpeechTrainerService
+     */
+    private $speechTrainerService;
 
     public function __construct(
         $id,
@@ -65,6 +69,7 @@ class StoryAiController extends Controller
         StorySlideService $storySlideService,
         TransactionManager $transactionManager,
         MentalMapBuilder $mentalMapBuilder,
+        SpeechTrainerService $speechTrainerService,
         $config = []
     ) {
         parent::__construct($id, $module, $config);
@@ -72,6 +77,7 @@ class StoryAiController extends Controller
         $this->storySlideService = $storySlideService;
         $this->transactionManager = $transactionManager;
         $this->mentalMapBuilder = $mentalMapBuilder;
+        $this->speechTrainerService = $speechTrainerService;
     }
 
     public function behaviors(): array
@@ -264,11 +270,12 @@ class StoryAiController extends Controller
         $retellingSlideId = null;
         if ($retellingRow !== null) {
             try {
-                $retellingSlideId = $this->createRetelling(
+                $retellingSlideId = $this->speechTrainerService->createRetelling(
                     $currentSlideModel->story_id,
                     $currentSlideModel->id,
                     $currentSlideModel->number,
                     $user->getId(),
+                    $retellingRow['required'],
                 );
             } catch (Exception $exception) {
                 Yii::$app->errorHandler->logException($exception);
@@ -351,50 +358,16 @@ class StoryAiController extends Controller
                     throw new BadRequestHttpException('Mental Map save exception');
                 }
 
-                $command = Yii::$app->db->createCommand();
-                $command->insert('mental_map_story_slide', [
-                    'mental_map_id' => $mentalMap->uuid,
-                    'slide_id' => $slideId,
-                    'block_id' => $blockId,
-                ]);
-                $command->execute();
+                $this->speechTrainerService->createMentalMapSlideRow(
+                    Uuid::fromString($mentalMap->uuid),
+                    (int) $slideId,
+                    $blockId,
+                    (bool) $contentRow['required'],
+                );
             });
         }
 
         return ['success' => true, 'slideId' => $slideId];
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function createRetelling(int $storyId, int $currentSlideId, int $currentSlideNumber, int $userId): int
-    {
-        $retelling = Retelling::create(
-            Uuid::uuid4(),
-            $currentSlideId,
-            'Перескажите текст',
-            '',
-            false,
-            $userId,
-        );
-
-        $retellingSlideId = null;
-        $this->transactionManager->wrap(function() use ($retelling, $storyId, $currentSlideNumber, &$retellingSlideId): void {
-            if (!$retelling->save()) {
-                throw new DomainException('Retelling save error');
-            }
-            $retellingSlide = $this->storySlideService->createAndInsertSlide(
-                $storyId,
-                StorySlide::KIND_RETELLING,
-                $currentSlideNumber,
-                function (int $slideId) use ($retelling): string {
-                    return $this->storyEditorService->getSlideWithRetellingBlockContent($slideId, $retelling->id, false);
-                }
-            );
-            $retellingSlideId = $retellingSlide->id;
-        });
-
-        return $retellingSlideId;
     }
 
     public function actionThreads(Response $response, WebUser $user): array
@@ -679,11 +652,12 @@ class StoryAiController extends Controller
                     ['status' => StorySlide::STATUS_HIDDEN]
                 );
 
-                $this->createRetelling(
+                $this->speechTrainerService->createRetelling(
                     $story->id,
                     $newAllTextSlide->id,
                     $newAllTextSlide->number,
-                    $user->getId()
+                    $user->getId(),
+                    true
                 );
             });
             return ['success' => true];

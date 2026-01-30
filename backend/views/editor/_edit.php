@@ -364,7 +364,7 @@ $js = <<< JS
 
         if (contentMentalMapsBlockId) {
             const handler = $(
-                `<div style="position: absolute; right: 20px; top: 20px; background-color: rgba(153, 205, 80, .4); border-radius: 10px; cursor: pointer; font-weight: 600; padding: 8px 12px;">Речевой тренажёр</div>`
+                `<div class="content-mm-handler" style="position: absolute; right: 20px; top: 20px; background-color: rgba(153, 205, 80, .4); border-radius: 10px; cursor: pointer; font-weight: 600; padding: 8px 12px;">Речевой тренажёр</div>`
             );
             handler.on('click', () => {
                 const currentSlide = StoryEditor.getCurrentSlide();
@@ -379,14 +379,16 @@ $js = <<< JS
                 const currentSlideId = currentSlide.getID();
                 const modal = new RemoteModal({
                     id: 'create-content-mental-maps-modal',
-                    title: 'Речевой тренажер на основе контента'
+                    title: 'Речевой тренажер на основе контента',
+                    dialogClassName: 'modal-lg'
                 });
                 modal.show({
                     url: '/admin/index.php?r=editor/mental-map/content-form&slide_id=' + currentSlideId + '&block_id=' + contentMentalMapsBlockId,
                     callback: async (element) => {
-                        const contentMentalMap = new ContentMentalMap()
-                        const contentItems = window.contentItems || []
-                        const container = $(element).find('.content-mm-container')
+                        const contentMentalMap = new ContentMentalMap();
+                        const contentItems = window.contentItems || [];
+                        const mapOrder = window.mapOrder || [];
+                        const container = $(element).find('.content-mm-container');
                         if (contentItems.length > 0) {
 
                             await contentMentalMap.updateFragments({
@@ -455,16 +457,18 @@ $js = <<< JS
 
         const modal = new RemoteModal({
             id: 'create-content-mental-maps-modal',
-            title: 'Речевой тренажер на основе контента'
+            title: 'Речевой тренажер на основе контента',
+            dialogClassName: 'modal-lg'
         })
 
         modal.show({
             url: '/admin/index.php?r=editor/mental-map/content-form&slide_id=' + currentSlideId + '&block_id=' + block.getID(),
             callback: async (element) => {
 
-                const contentMentalMap = new ContentMentalMap()
-                const contentItems = window.contentItems || []
-                const container = $(element).find('.content-mm-container')
+                const contentMentalMap = new ContentMentalMap();
+                const contentItems = window.contentItems || [];
+                const mapOrder = window.mapOrder || [];
+                const container = $(element).find('.content-mm-container');
 
                 if (contentItems.length > 0) {
                     await contentMentalMap.updateFragments({
@@ -496,10 +500,9 @@ $js = <<< JS
                     text: texts,
                     onCreateHandler: text => {
                         modal.hide()
-                        /*block.getElement().find('.slide-paragraph').html(text)
-                        blockModifier.change()*/
                         StoryEditor.loadSlides(currentSlideId)
-                    }
+                    },
+                    mapOrder
                 })
             }
         })

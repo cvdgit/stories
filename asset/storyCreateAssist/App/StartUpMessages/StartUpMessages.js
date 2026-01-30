@@ -9,12 +9,12 @@ import TextEditorDialog from "../Editor/TextEditorDialog";
 import TrainerSettingsDialog from "./TrainerSettingsDialog";
 
 const mentalMaps = [
-  {title: 'Ментальная карта', type: 'mental-map', create: true},
-  {title: 'Ментальная карта (четные пропуски)', type: 'mental-map-even-fragments', create: true},
-  {title: 'Ментальная карта (нечетные пропуски)', type: 'mental-map-odd-fragments', create: true},
-  {title: 'Ментальная карта (план)', type: 'mental-map-plan', create: true},
-  {title: 'План с накоплением', type: 'mental-map-plan-accumulation', create: true},
-  {title: 'Пересказ', type: 'retelling', create: true},
+  {title: 'Ментальная карта', type: 'mental-map', create: true, required: false},
+  {title: 'Ментальная карта (четные пропуски)', type: 'mental-map-even-fragments', create: true, required: false},
+  {title: 'Ментальная карта (нечетные пропуски)', type: 'mental-map-odd-fragments', create: true, required: false},
+  {title: 'Ментальная карта (план)', type: 'mental-map-plan', create: true, required: false},
+  {title: 'План с накоплением', type: 'mental-map-plan-accumulation', create: true, required: false},
+  {title: 'Пересказ', type: 'retelling', create: true, required: false},
 ];
 
 export default function StartUpMessages() {

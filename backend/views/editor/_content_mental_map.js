@@ -116,12 +116,12 @@ function ContentMentalMap() {
     return $fragmentElem
   }
 
-  const mentalMaps = [
+  /*const mentalMaps = [
     {title: 'Ментальная карта', type: 'mental-map', fragments: []},
     {title: 'Ментальная карта (четные пропуски)', type: 'mental-map-even-fragments', fragments: []},
     {title: 'Ментальная карта (нечетные пропуски)', type: 'mental-map-odd-fragments', fragments: []},
     {title: 'Пересказ', type: 'retelling'},
-  ]
+  ]*/
 
   function drawFragments($contentItemList, fragmentsManager) {
     $contentItemList.empty()
@@ -220,7 +220,7 @@ function ContentMentalMap() {
     })
   }
 
-  this.createFragments = async ({currentSlideId, blockId, container, text, onCreateHandler}) => {
+  this.createFragments = async ({currentSlideId, blockId, container, text, onCreateHandler, mapOrder}) => {
 
     const $statusElem = $('<div style="font-size: 14px" />')
     container.append($statusElem)
@@ -254,17 +254,33 @@ function ContentMentalMap() {
     const $mapsContainer = $('<div class="content-mm-maps"/>')
     container.append($mapsContainer)
 
-    $mapsContainer.append('<div style="font-weight: 500; font-size: 18px">Создать:<div/>')
-    mentalMaps.map(m => {
-      $mapsContainer.append(`<div class="content-mm-maps-item"><label><input type="checkbox" checked disabled> ${m.title}</label></div>`)
-    })
+    $mapsContainer.append('<div style="font-weight: 500; font-size: 18px">Создать:<div/>');
+    console.log(mapOrder);
+    mapOrder.map(({type, title}) => {
+      //$mapsContainer.append(`<div class="content-mm-maps-item"><label><input type="checkbox" checked disabled> ${m.title}</label></div>`)
+      const $item = $(`
+<div data-content-type="${type}" class="content-mm-maps-item" style="flex-direction: row; justify-content: space-between">
+<label><input class="content-item-selected" type="checkbox" checked disabled> ${title}</label>
+<label class="content-item-required-wrap"><input class="content-item-required" type="checkbox"> Обязательно</label>
+</div>
+`);
+      $mapsContainer.append($item);
+    });
 
     const $controls = $('<div class="content-mm-controls"/>')
     container.append($controls)
     $('<button class="btn btn-primary">Создать речевой тренажер</button>')
       .on('click', e => {
 
-        const toCreateMaps = mentalMaps.map(({title, type}) => ({title, type, fragments: []}))
+        const toCreateMaps = $mapsContainer
+          .find('.content-mm-maps-item .content-item-selected:checked')
+          .map((i, el) => ({
+            title: $(el).parent().text().trim(),
+            type: $(el).parents('.content-mm-maps-item').attr('data-content-type'),
+            fragments: [],
+            required: $(el).parents('.content-mm-maps-item').find('.content-item-required').is(':checked')
+          }))
+          .get();
 
         const mentalMapsAi = new MentalMapsAi()
         for (let i = 0; i < toCreateMaps.length; i++) {
@@ -344,7 +360,7 @@ function ContentMentalMap() {
 
     $('<button class="btn btn-primary">Сформировать фрагменты (AI)</button>')
       .on('click', () => {
-        $contentItemList.html(`<img width="32" height="32" src="/img/loading.gif" />`)
+        $contentItemList.html(`<img alt="..." width="32" height="32" src="/img/loading.gif" />`)
         sendMessage({text}, () => {}, content => {
           const textFragments = JSON.parse(content)
           fragmentsManager.loadTextFragments(textFragments.map(title => ({id: uuidv4(), title})))
@@ -369,8 +385,37 @@ function ContentMentalMap() {
 
     $mapsContainer.append('<div style="font-weight: 500; font-size: 18px">Существующие ментальные карты/пересказ:<div/>')
 
-    mentalMaps.map(m => {
-      $mapsContainer.append(`<div class="content-mm-maps-item"><label><input type="checkbox" checked disabled> ${m.title}</label></div>`)
+    contentItems.map(({id, title, type, required}) => {
+      const $item = $(`
+<div data-content-id="${id}" class="content-mm-maps-item" style="flex-direction: row; justify-content: space-between">
+<label><input type="checkbox" checked disabled> ${title}</label>
+<label class="content-item-required-wrap"><input class="content-item-required" type="checkbox" ${required ? 'checked' : ''}> Обязательно</label>
+</div>
+`);
+      $item.find('.content-item-required').on('change', e => {
+        $(e.target).prop('disabled', true);
+        sendRequest(
+          `/admin/index.php?r=editor/mental-map/content-required&slide_id=${currentSlideId}&id=${id}&type=${type}`,
+          'post',
+          {'Content-Type': 'application/json'},
+          {required: e.target.checked}
+        ).then(response => {
+          if (response.success) {
+            $item.find('.content-item-required-wrap')
+              .popover({placement: 'top', title: '', content: 'Сохранено', trigger: 'manual'})
+              .popover('show');
+            setTimeout(() => {
+              $item.find('.content-item-required-wrap')
+                .popover('hide')
+                .popover('destroy')
+                .removeAttr('data-original-title');
+              $(e.target).removeAttr('disabled');
+            }, 500);
+          }
+        });
+      });
+
+      $mapsContainer.append($item);
     })
 
     const $controls = $('<div class="content-mm-controls"/>')

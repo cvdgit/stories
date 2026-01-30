@@ -1,0 +1,17 @@
+.contentRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.contentRow:hover {
+  background-color: #eee;
+}
+
+.rowLabel {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+}

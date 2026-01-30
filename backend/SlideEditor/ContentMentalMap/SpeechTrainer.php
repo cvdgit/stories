@@ -16,7 +16,6 @@ use DomainException;
 use Ramsey\Uuid\UuidInterface;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use yii\db\Query;
 
 /**
  * @property string $id
@@ -34,6 +33,54 @@ use yii\db\Query;
  */
 class SpeechTrainer extends ActiveRecord
 {
+    public const TYPE_MENTAL_MAP = 'mental-map';
+    public const TYPE_MENTAL_MAP_EVEN_FRAGMENTS = 'mental-map-even-fragments';
+    public const TYPE_MENTAL_MAP_ODD_FRAGMENTS = 'mental-map-odd-fragments';
+    public const TYPE_MENTAL_MAP_PLAN = 'mental-map-plan';
+    public const TYPE_MENTAL_MAP_PLAN_ACCUMULATION = 'mental-map-plan-accumulation';
+    public const TYPE_RETELLING = 'retelling';
+
+    public static function getAllTypes(): array
+    {
+        return [
+            self::TYPE_MENTAL_MAP => 'Ментальная карта',
+            self::TYPE_MENTAL_MAP_EVEN_FRAGMENTS => 'Ментальная карта (четные пропуски)',
+            self::TYPE_MENTAL_MAP_ODD_FRAGMENTS => 'Ментальная карта (нечетные пропуски)',
+            self::TYPE_MENTAL_MAP_PLAN => 'Ментальная карта (план)',
+            self::TYPE_MENTAL_MAP_PLAN_ACCUMULATION => 'План с накоплением',
+            self::TYPE_RETELLING => 'Пересказ',
+        ];
+    }
+
+    public static function isValidType(string $type): bool
+    {
+        return isset(self::getAllTypes()[$type]);
+    }
+
+    public static function getStoryEditorAllTypes(): array
+    {
+        return array_filter(
+            self::getAllTypes(),
+            static function (string $type): bool {
+                return !in_array(
+                    $type,
+                    [self::TYPE_MENTAL_MAP_PLAN, self::TYPE_MENTAL_MAP_PLAN_ACCUMULATION],
+                    true,
+                );
+            },
+            ARRAY_FILTER_USE_KEY,
+        );
+    }
+
+    /**
+     * @param int $slideId
+     * @return array<array-key, SpeechTrainer>
+     */
+    public static function findAllBySlide(int $slideId): array
+    {
+        return self::find()->where(['slide_id' => $slideId])->all();
+    }
+
     public function getContents(): array
     {
         return array_merge($this->getContentMentalMaps(), $this->getContentRetelling());
@@ -41,27 +88,22 @@ class SpeechTrainer extends ActiveRecord
 
     public function getContentMentalMaps(): array
     {
-        $slideMentalMapIds = (new Query())
-            ->select('t.mental_map_id')
-            ->from(['t' => MentalMapStorySlide::tableName()])
-            ->where([
-                't.slide_id' => $this->slide_id,
-                't.block_id' => $this->block_id,
-            ])
-            ->all();
-        $slideMentalMapIds = array_column($slideMentalMapIds, 'mental_map_id');
-
+        $slideMentalMapRows = MentalMapStorySlide::findMentalMapRows(
+            $this->slide_id,
+            $this->block_id,
+        );
         $mentalMaps = [];
-        foreach ($slideMentalMapIds as $slideMentalMapId) {
-            $mentalMap = MentalMap::findOne($slideMentalMapId);
+        foreach ($slideMentalMapRows as $slideMentalMapRow) {
+            $mentalMap = MentalMap::findOne($slideMentalMapRow->mental_map_id);
             if ($mentalMap === null) {
                 continue;
             }
             $mentalMaps[] = [
-                'id' => $slideMentalMapId,
+                'id' => $slideMentalMapRow->mental_map_id,
                 'title' => $mentalMap->name,
                 'type' => $mentalMap->map_type,
                 'fragments' => $mentalMap->getTreeData(),
+                'required' => $slideMentalMapRow->getRequired(),
             ];
         }
         return $mentalMaps;
@@ -103,6 +145,7 @@ class SpeechTrainer extends ActiveRecord
                 'id' => $retelling->id,
                 'title' => $retelling->name,
                 'type' => 'retelling',
+                'required' => $content->isRequired(),
             ],
         ];
     }
@@ -128,5 +171,10 @@ class SpeechTrainer extends ActiveRecord
     public function getSlide(): ActiveQuery
     {
         return $this->hasOne(StorySlide::class, ['id' => 'slide_id']);
+    }
+
+    public function setRetellingSlideId(int $slideId): void
+    {
+        $this->retelling_slide_id = $slideId;
     }
 }

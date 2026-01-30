@@ -254,7 +254,7 @@ export function ThreadProvider({children}) {
     const slideRequests = [];
     slideMap.map(({fragmentId, slideId}) => {
 
-      const contents = [...repetitionTrainer].map(({title, type}) => ({title, type, fragments: []}));
+      const contents = [...repetitionTrainer].map(({title, type, required}) => ({title, type, required, fragments: []}));
 
       const slideFragment = json.fragments.find(({id}) => id === fragmentId);
       const textFragments = [];
@@ -410,7 +410,6 @@ export function ThreadProvider({children}) {
   }
 
   const createRepetitionTrainerStory = async (threadId, text, repetitionTrainer) => {
-    console.log(repetitionTrainer)
     const messageId = uuidv4();
     setMessages(prevMessages => [...prevMessages, {
       id: messageId,

@@ -56,6 +56,17 @@ function SlidesPlayer(deck) {
           }
         }
 
+        if (deck.hasPlugin('content-mental-map')) {
+          const currentSlideId = Number($(deck.getCurrentSlide()).attr('data-id'));
+          const plugin = deck.getPlugin('content-mental-map');
+          if (!plugin.canNext(currentSlideId)) {
+            $('.custom-navigate-right')
+              .popover({placement: 'top', title: 'Информация', content: 'Необходимо пройти речевой тренажёр', trigger: 'focus hover'})
+              .popover('show');
+            return;
+          }
+        }
+
         deck.next();
       }
     },
