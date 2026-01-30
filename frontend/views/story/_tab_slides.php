@@ -50,7 +50,7 @@ use yii\helpers\Url;
         <?php if ($playlist === null): ?>
         <div class="col-md-12 story-container-wrap" style="position: relative">
             <div class="story-container">
-                <div class="story-container-inner" id="story-container">
+                <div class="story-container-inner <?= $model->isAI() ? 'ai-story' : '' ?>" id="story-container">
                     <div class="story-no-subscription"><span class="story-loader">Загрузка истории...</span></div>
                 </div>
             </div>

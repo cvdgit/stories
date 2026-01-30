@@ -895,4 +895,9 @@ class Story extends ActiveRecord
     {
         return $this->cover !== null;
     }
+
+    public function isAI(): bool
+    {
+        return (int) $this->is_ai === 1;
+    }
 }
