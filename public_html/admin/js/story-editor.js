@@ -821,6 +821,10 @@ const StoryEditor = (function () {
 
   $editor[0].addEventListener('paste', e => {
     e.preventDefault();
+    if (blockManager.getActive()) {
+      return;
+    }
+
     const availableTypes = e.clipboardData.types;
 
     if (availableTypes.includes('text/html')) {
