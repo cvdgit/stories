@@ -359,10 +359,10 @@ var WikidsPlayer = (function(document, $) {
               if (window['ContentMentalMapsPlugin']) {
                 const currentSlideId = Number($(Reveal.getCurrentSlide()).attr('data-id'));
                 if (!window.ContentMentalMapsPlugin.canNext(currentSlideId)) {
-                  console.log('ssssshow')
                   $('.custom-navigate-right')
-                    .popover({placement: 'top', title: 'Информация', content: 'Необходимо пройти речевой тренажёр', trigger: 'focus hover'})
+                    .popover({placement: 'top', title: 'Информация', content: 'Необходимо пройти речевой тренажёр', trigger: 'manual'})
                     .popover('show');
+                  setTimeout(() => $('.custom-navigate-right').popover('hide'), 1000);
                   return;
                 }
               }

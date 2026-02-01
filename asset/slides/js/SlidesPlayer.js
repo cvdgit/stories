@@ -61,8 +61,9 @@ function SlidesPlayer(deck) {
           const plugin = deck.getPlugin('content-mental-map');
           if (!plugin.canNext(currentSlideId)) {
             $('.custom-navigate-right')
-              .popover({placement: 'top', title: 'Информация', content: 'Необходимо пройти речевой тренажёр', trigger: 'focus hover'})
+              .popover({placement: 'top', title: 'Информация', content: 'Необходимо пройти речевой тренажёр', trigger: 'manual'})
               .popover('show');
+            setTimeout(() => $('.custom-navigate-right').popover('hide'), 1000);
             return;
           }
         }
