@@ -2214,9 +2214,9 @@ img.lazy {
     font-weight: 600;
   }
 
-  section {
+  /*section {
     padding: 30px 0;
-  }
+  }*/
 
   section h2.header-h2 {
     margin-bottom: 10px;
@@ -2442,9 +2442,9 @@ img.lazy {
     border-radius: 1.5rem;
   }
 
-  section {
+  /*section {
     padding: 30px 0;
-  }
+  }*/
 
   section h2.header-h2 {
     margin-bottom: 10px;
