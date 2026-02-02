@@ -3,8 +3,7 @@
   function initPlugin() {
     const $slide = $(Reveal.getCurrentSlide());
     $slide.find(`[data-block-type='text']`).each((i, el) => {
-      const {top} = el.getBoundingClientRect();
-      console.log(top, el.style.top);
+      const top = Number((el.style.top || '').replace(/\D+/, ''));
       el.style.maxHeight = `calc(100% - ${top}px)`;
     });
   }
