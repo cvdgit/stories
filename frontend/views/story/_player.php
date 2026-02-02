@@ -115,6 +115,10 @@ if (($model->isAudioStory() || $model->isUserAudioStory(Yii::$app->user->id)) &&
     ];
 }
 
+if ($model->isAI()) {
+    $plugins[] = ['class' => \common\widgets\Reveal\Plugins\AIStoryPlugin::class];
+}
+
 echo FrontendRevealWidget::widget([
     'storyId' => $model->id,
     'data' => $model->slidesData(),
