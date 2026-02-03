@@ -48,7 +48,6 @@ final class MentalMapDayHistoryTargetWordsFetcher
             ]);
 
         $rows = $query->all();
-        die(print_r($rows));
         $processedData = [];
         foreach ($rows as $row) {
 
