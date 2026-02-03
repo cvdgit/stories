@@ -118,7 +118,7 @@ class TrainingController extends UserController
                 'minute_div' => $row['minute_div'],
             ];
         }
-
+die(print_r($stories));
         foreach ($stories as $i => $story) {
             if (count($story['times']) === 0 || count($story['times']) === 1) {
                 continue;
@@ -308,6 +308,7 @@ class TrainingController extends UserController
             $filterForm->getWeekStartDate(),
             $filterForm->getWeekEndDate(),
         );
+
         foreach ($mentalMapHistoryRows as $row) {
             $storyId = $row['story_id'];
             if (!isset($stories[$storyId])) {
