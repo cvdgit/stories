@@ -367,6 +367,80 @@ export function ThreadProvider({children}) {
     }
   }
 
+  const createSpeechTrainerByFragments = async (threadId, fragments, repetitionTrainer) => {
+
+    const messageId = uuidv4();
+    setMessages(prevMessages => [...prevMessages, {
+      id: messageId,
+      message: '',
+      type: 'ai',
+    }]);
+
+    try {
+      setIsStreaming(true);
+      await streamMessage(
+        '/admin/index.php?r=gpt/story/create-for-trainer-by-fragments',
+        {threadId, fragments},
+        (message) => {
+          saveMessages(threadId);
+          setMessages(prevMessages => prevMessages.map(m => {
+            if (m.id === messageId) {
+              return {...m, message};
+            }
+            return m;
+          }));
+        },
+        async (accumulatedMessage) => {
+          setIsStreaming(false);
+          const json = JSON.parse(accumulatedMessage);
+
+          saveMessages(threadId);
+
+          const payload = {...json, fragments: json.fragments.map(f => ({...f, id: uuidv4()}))};
+          const storyMessageId = uuidv4();
+          setMessages(prevMessages => [...prevMessages, {
+            id: storyMessageId,
+            message: 'Создание истории...',
+            type: 'story',
+            metadata: {payload},
+          }]);
+
+          const storyResponse = await createRepetitionTrainerStoryFromText(threadId, storyMessageId, payload);
+          if (!storyResponse.success) {
+            saveMessages(threadId);
+            setMessages(prevMessages => prevMessages.map(m => {
+              if (m.id === storyMessageId) {
+                return {...m, message: storyResponse.message};
+              }
+              return m;
+            }));
+            return;
+          }
+
+          saveMessages(threadId);
+          setMessages(prevMessages => prevMessages.map(m => {
+            if (m.id === storyMessageId) {
+              return {...m, metadata: {...m.metadata, story: storyResponse.story}};
+            }
+            return m;
+          }));
+
+          setThreadTitle(threadId, storyResponse.story.title);
+
+          await createRepetitionTrainer(threadId, {
+            payload,
+            story: storyResponse.story,
+            repetitionTrainer
+          });
+        },
+        () => setIsStreaming(false)
+      );
+    } catch (err) {
+      console.error(err);
+      setIsStreaming(false);
+    }
+  }
+
   const createStoryByFragments = async (threadId, fragments) => {
 
     saveMessages(threadId);
@@ -592,6 +666,7 @@ export function ThreadProvider({children}) {
       setMessages,
       createStory,
       createStoryByFragments,
+      createSpeechTrainerByFragments,
       createRepetitionTrainerStory,
       createRepetitionTrainer,
       deleteRepetitionTrainer,
@@ -612,6 +687,7 @@ export function ThreadProvider({children}) {
     saveMessages,
     createStory,
     createStoryByFragments,
+    createSpeechTrainerByFragments,
     createRepetitionTrainerStory,
     createRepetitionTrainer,
     deleteRepetitionTrainer,

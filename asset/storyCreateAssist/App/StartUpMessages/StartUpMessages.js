@@ -26,7 +26,8 @@ export default function StartUpMessages() {
     saveMessages,
     createStory,
     createRepetitionTrainerStory,
-    createStoryByFragments
+    createStoryByFragments,
+    createSpeechTrainerByFragments
   } = messagesData;
   const [text, setText] = useState('');
   const [threadId, setThreadId] = useQueryState('id');
@@ -79,6 +80,35 @@ export default function StartUpMessages() {
       saveMessages(threadId, humanMessage);
 
       createStoryByFragments(threadId, fragments);
+    });
+  }
+
+  const createSpeechTrainerFromEditorHandler = fragments => {
+    if (!fragments.length) {
+      return;
+    }
+
+    const repetitionTrainer = settings.filter(s => s.create);
+    if (!repetitionTrainer.length) {
+      alert('Не выбрано содержимое истории');
+      return;
+    }
+
+    createThread({
+      id: threadId,
+      messages: [],
+      text: fragments.join('\n\n'),
+    }).then(newThread => {
+      const humanMessage = {
+        id: uuidv4(),
+        message: 'Создать историю с речевым тренажером',
+        type: 'human_create_story',
+        metadata: {text}
+      };
+      setMessages(prevMessages => [...prevMessages, humanMessage]);
+      saveMessages(threadId, humanMessage);
+
+      createSpeechTrainerByFragments(threadId, fragments, repetitionTrainer);
     });
   }
 
@@ -164,6 +194,7 @@ export default function StartUpMessages() {
             open={open}
             text={text}
             createStoryFromEditorHandler={createStoryFromEditorHandler}
+            createSpeechTrainerFromEditorHandler={createSpeechTrainerFromEditorHandler}
             setOpen={setOpen}
           />
         </CSSTransition>

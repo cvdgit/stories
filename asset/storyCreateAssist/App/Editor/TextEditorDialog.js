@@ -79,7 +79,7 @@ const Page = ({text, pageIndex, onInput}) => {
   </div>
 }
 
-const TextEditorDialog = forwardRef(({dialogProps, open, setOpen, text, createStoryFromEditorHandler}, ref) => {
+const TextEditorDialog = forwardRef(({dialogProps, open, setOpen, text, createStoryFromEditorHandler, createSpeechTrainerFromEditorHandler}, ref) => {
   const [allText, setAllText] = useState(text);
   const [pages, setPages] = useState([]);
   const [chunkSize, setChunkSize] = useState(1500);
@@ -113,7 +113,7 @@ const TextEditorDialog = forwardRef(({dialogProps, open, setOpen, text, createSt
 
   const splitByChunksHandler = () => {
     const newPages = [];
-    splitTextIntoChunks(text, Math.round(text.length / chunkSize))
+    splitTextIntoChunks(text, Math.ceil(text.length / chunkSize))
       .map(chunkText => newPages.push(chunkText.trim()));
     setPages(newPages);
   }
@@ -125,6 +125,14 @@ const TextEditorDialog = forwardRef(({dialogProps, open, setOpen, text, createSt
     setOpen(false);
     createStoryFromEditorHandler(pages.filter(text => text.trim() !== ''));
   };
+
+  const createSpeechTrainerStoryHandler = () => {
+    if (!pages.length) {
+      return;
+    }
+    setOpen(false);
+    createSpeechTrainerFromEditorHandler(pages.filter(text => text.trim() !== ''));
+  }
 
   const handleInput = useCallback((e, pageIndex) => {
     const pageText = e.currentTarget.innerText;
@@ -167,6 +175,9 @@ const TextEditorDialog = forwardRef(({dialogProps, open, setOpen, text, createSt
         </div>
         <button onClick={createRepetitionStoryHandler} className="button button--default button--outline"
                 type="button">Создать историю для чтения
+        </button>
+        <button onClick={createSpeechTrainerStoryHandler} className="button button--default button--outline"
+                type="button">Создать речевой тренажер
         </button>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'auto', flex: '1'}}>

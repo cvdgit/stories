@@ -63,6 +63,48 @@ class StoryController extends Controller
     /**
      * @throws ExitException
      */
+    public function actionCreateForTrainerByFragments(Request $request): void
+    {
+        $payload = Json::decode($request->rawBody);
+        $fragments = $payload['fragments'] ?? [];
+
+        $fragments = array_map(static function (string $text): string {
+            $text = strip_tags($text);
+            $text = preg_replace('/\s+/', ' ', $text);
+            return trim($text);
+        }, $fragments);
+
+        $prompt = LlmPrompt::findByKey('create-trainer-story-from-fragments');
+        if ($prompt === null) {
+            $this->flushError('Промт не найден');
+            Yii::$app->end();
+        }
+
+        $text = implode(PHP_EOL, array_map(
+            static function(string $text): string {
+                return '<fragment>' . $text . '</fragment>';
+            },
+            $fragments
+        ));
+
+        $content = trim(str_replace(['{TEXT}'], [$text], $prompt->prompt));
+
+        try {
+            $this->chatEventStream->send(
+                "create-trainer-story-from-fragments",
+                Yii::$app->params["gpt.api.completions.host"],
+                Json::encode(
+                    new Fields([new Message('user', $content)]),
+                ),
+            );
+        } catch (Exception $ex) {
+            Yii::$app->errorHandler->logException($ex);
+        }
+    }
+
+    /**
+     * @throws ExitException
+     */
     public function actionCreate(Request $request): void
     {
         $payload = Json::decode($request->rawBody);
@@ -114,14 +156,14 @@ class StoryController extends Controller
         $text = $payload['text'];
         $text = strip_tags($text);
         $content = <<<TEXT
-Есть текст:
-<текст>
-$text
-</текст>
-Сформируй промт для DALL·E-3 что бы сгенерировать обложку, соответсвтующую этому тексту.
-Используй максимально простые и понятные формалировки.
-Верни только промт.
-TEXT;
+            Есть текст:
+            <текст>
+            $text
+            </текст>
+            Сформируй промт для DALL·E-3 что бы сгенерировать обложку, соответсвтующую этому тексту.
+            Используй максимально простые и понятные формалировки.
+            Верни только промт.
+            TEXT;
         try {
             $this->chatEventStream->send(
                 "story-for-cover-prompt",
