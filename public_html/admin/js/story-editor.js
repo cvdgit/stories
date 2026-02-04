@@ -245,7 +245,7 @@ SlideManager.prototype = {
     var formData = new FormData();
     formData.append('SlidesOrder[story_id]', this.storyId);
     formData.append('SlidesOrder[lesson_id]', this.lessonId);
-    this.$slidesList.find('[data-slide-id]').each(function (i) {
+    this.$slidesList.find('.thumb-reveal-wrapper[data-slide-id]').each(function (i) {
       formData.append('SlidesOrder[slides][' + i + ']', $(this).attr('data-slide-id'));
       formData.append('SlidesOrder[order][' + i + ']', (++i).toString());
     });
