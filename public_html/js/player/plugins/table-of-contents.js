@@ -125,7 +125,7 @@ window.TableOfContentsPlugin = (function() {
             const progress = cardSlides.reduce((total, cardSlide) => {
               const slide = response.data.find(({slideId}) => Number(slideId) === Number(cardSlide.id));
               if (!slide) {
-                console.log('no slide', cardSlide);
+                return total + 100;
               }
               return total + Number(slide.progress);
             }, 0);
