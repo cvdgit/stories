@@ -12,6 +12,7 @@ use frontend\Retelling\Retelling;
 use modules\edu\query\GetStoryTests\Slide;
 use modules\edu\query\GetStoryTests\SlideMentalMap;
 use modules\edu\query\GetStoryTests\SlideRetelling;
+use modules\edu\query\GetStoryTests\SlideTest;
 use modules\edu\query\GetStoryTests\StoryTestsFetcher;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -88,6 +89,15 @@ class TableOfContentsStatusFetcher
                 'type' => 'retelling',
                 'slideId' => $retellingItem->getSlideId(),
                 'progress' => $progress,
+            ];
+        }
+
+        $tests = $slideContent->find(SlideTest::class);
+        foreach ($tests as $testItem) {
+            $history[] = [
+                'type' => 'test',
+                'slideId' => $testItem->getSlideId(),
+                'progress' => 0,
             ];
         }
 
