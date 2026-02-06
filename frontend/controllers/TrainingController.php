@@ -609,6 +609,7 @@ class TrainingController extends UserController
         DateTimeInterface $dateFrom,
         DateTimeInterface $dateTo
     ): string {
+        return '';
         $slideContent = (new StoryTestsFetcher())->fetch($storyId);
 
         $testRows = $this->fetchStoryTestRestarts(
