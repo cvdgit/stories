@@ -25,7 +25,9 @@ final class MentalMapDayHistoryTargetWordsFetcher
         $query = (new Query())
             ->select([
                 'storyId' => 'h.story_id',
-                'itemIds' => "GROUP_CONCAT(h.id SEPARATOR ',')",
+                // 'itemIds' => "GROUP_CONCAT(h.id SEPARATOR ',')",
+                'itemId' => 'h.id',
+                'itemContent' => 'h.content',
                 'storyTitle' => 's.title',
                 'hour' => $hourExpression,
                 'minute_div' => $minuteExpression,
@@ -37,19 +39,37 @@ final class MentalMapDayHistoryTargetWordsFetcher
             ])
             ->andWhere(['between', new Expression('h.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd])
             ->andWhere(['>=', 'h.overall_similarity', MentalMapThreshold::DEFAULT_THRESHOLD])
-            ->groupBy([
+            /*->groupBy([
                 'h.story_id',
                 $hourExpression,
                 $minuteExpression
-            ])
+            ])*/
             ->orderBy([
+                'story_id' => SORT_ASC,
                 'hour' => SORT_ASC,
                 'minute_div' => SORT_ASC,
             ]);
 
         $rows = $query->all();
+
         $processedData = [];
         foreach ($rows as $row) {
+            $key = $row['storyId'] . ':' . $row['hour'] . ':' . $row['minute_div'];
+            $item = [
+                'story_id' => (int) $row['storyId'],
+                'story_title' => $row['storyTitle'],
+                'hour' => (int) $row['hour'],
+                'minute_div' => (int) $row['minute_div'],
+                'question_count' => $this->calcTargetFromContent($row['itemContent']),
+            ];
+            if (isset($processedData[$key])) {
+                $processedData[$key]['question_count'] += $this->calcTargetFromContent($row['itemContent']);
+                continue;
+            }
+            $processedData[$key] = $item;
+        }
+
+        /*foreach ($rows as $row) {
 
             $item = [
                 'story_id' => $row['storyId'],
@@ -73,7 +93,7 @@ final class MentalMapDayHistoryTargetWordsFetcher
 
             $item['question_count'] = $questionCount;
             $processedData[] = $item;
-        }
+        }*/
 
         return $processedData;
     }
