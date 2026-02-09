@@ -125,12 +125,24 @@ class StoryAiController extends Controller
 
         $alias = Translit::translit($title);
         $foundStoryByAlias = Story::find()
-            ->where(['title' => trim($title)])
-            ->all();
-
-        if (count($foundStoryByAlias) > 0) {
-            $newTitle = $title . ' #' . (count($foundStoryByAlias) + 1);
-            $alias = Translit::translit($newTitle);
+            ->where(['alias' => trim($alias)])
+            ->one();
+        if ($foundStoryByAlias !== null) {
+            $foundNewAlias = false;
+            while (!$foundNewAlias) {
+                $matches = [];
+                if (preg_match('/-(\d+)$/', $alias, $matches)) {
+                    $number = (int) $matches[1];
+                    $number++;
+                    $alias = preg_replace('/-(\d+)$/', '-' . $number, $alias);
+                } else {
+                    $alias .= '-2';
+                }
+                $foundStoryByAlias = Story::find()
+                    ->where(['alias' => trim($alias)])
+                    ->one();
+                $foundNewAlias = $foundStoryByAlias === null;
+            }
         }
 
         $story = Story::create($title, $user->getId(), [Yii::$app->params['ai.story.assist.category.id']], $alias);
