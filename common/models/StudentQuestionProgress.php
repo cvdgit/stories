@@ -103,4 +103,13 @@ class StudentQuestionProgress extends ActiveRecord
     {
         $this->events[] = $event;
     }
+
+    public static function findProgress(int $testId, int $studentId): int
+    {
+        $model = self::findProgressModel($studentId, $testId);
+        if ($model === null) {
+            return 0;
+        }
+        return $model->progress;
+    }
 }

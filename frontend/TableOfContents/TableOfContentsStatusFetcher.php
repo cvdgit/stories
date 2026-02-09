@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace frontend\TableOfContents;
 
 use common\components\MentalMapThreshold;
+use common\models\StudentQuestionProgress;
 use frontend\MentalMap\history\MentalMapHistoryFetcher;
 use frontend\MentalMap\history\MentalMapTreeHistoryFetcher;
 use frontend\MentalMap\MentalMap;
@@ -26,7 +27,7 @@ class TableOfContentsStatusFetcher
      * @throws NotFoundHttpException
      * @throws InvalidConfigException
      */
-    public function fetch(int $storyId, int $userId): array
+    public function fetch(int $storyId, int $userId, int $studentId): array
     {
         $slideContent = (new StoryTestsFetcher())->fetch($storyId);
 
@@ -97,7 +98,10 @@ class TableOfContentsStatusFetcher
             $history[] = [
                 'type' => 'test',
                 'slideId' => $testItem->getSlideId(),
-                'progress' => 0,
+                'progress' => StudentQuestionProgress::findProgress(
+                    $testItem->getTestId(),
+                    $studentId
+                ),
             ];
         }
 

@@ -140,6 +140,10 @@ window.TableOfContentsPlugin = (function() {
             UpdateLessonCircleProgress($elem[0], progress);
           }
         });
+      })
+      .catch(error => {
+        container
+          .find(`.table-of-contents-content .lesson-progress-circle .svg-pi-track`).css('stroke', '#dc3545');
       });
   }
 

@@ -498,6 +498,7 @@ body {
 }
 
 .wrap-editor-main .sl-block .new-questions,
+#tableOfContentsModal .sl-block .new-questions,
 .slides-container .sl-block .new-questions {
     background-image: url(/img/education.png);
     background-size: 50%;
@@ -516,6 +517,7 @@ body {
 }
 
 .wrap-editor-main .sl-block .wikids-video-player,
+#tableOfContentsModal .sl-block .wikids-video-player,
 .slides-container .sl-block .wikids-video-player {
     background-image: url(/img/youtube.png);
     background-size: auto;
