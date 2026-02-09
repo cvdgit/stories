@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace frontend\TableOfContents;
 
 use common\models\UserStudent;
+use frontend\SpeechTrainer\SpeechTrainerContentsFetcher;
 use yii\base\Action;
 use yii\base\InvalidConfigException;
 use yii\web\BadRequestHttpException;
@@ -26,7 +27,7 @@ class UserHistoryAction extends Action
             throw new BadRequestHttpException('Student not found');
         }
 
-        $data = (new TableOfContentsStatusFetcher())->fetch(
+        $data = (new TableOfContentsStatusFetcher(new SpeechTrainerContentsFetcher()))->fetch(
             $storyId,
             $user->getId(),
             $student->id,

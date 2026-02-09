@@ -10,6 +10,8 @@ use frontend\MentalMap\history\MentalMapHistoryFetcher;
 use frontend\MentalMap\history\MentalMapTreeHistoryFetcher;
 use frontend\MentalMap\MentalMap;
 use frontend\Retelling\Retelling;
+use frontend\SpeechTrainer\SpeechTrainerContentsFetcher;
+use modules\edu\components\ArrayHelper;
 use modules\edu\query\GetStoryTests\Slide;
 use modules\edu\query\GetStoryTests\SlideMentalMap;
 use modules\edu\query\GetStoryTests\SlideRetelling;
@@ -24,6 +26,16 @@ use yii\web\NotFoundHttpException;
 class TableOfContentsStatusFetcher
 {
     /**
+     * @var SpeechTrainerContentsFetcher
+     */
+    private $speechTrainerContentsFetcher;
+
+    public function __construct(SpeechTrainerContentsFetcher $speechTrainerContentsFetcher)
+    {
+        $this->speechTrainerContentsFetcher = $speechTrainerContentsFetcher;
+    }
+
+    /**
      * @throws NotFoundHttpException
      * @throws InvalidConfigException
      */
@@ -31,18 +43,43 @@ class TableOfContentsStatusFetcher
     {
         $slideContent = (new StoryTestsFetcher())->fetch($storyId);
 
-        $history = [];
-
         $slides = $slideContent->find(Slide::class);
+
+        $contents = $this->speechTrainerContentsFetcher->fetch(
+            array_map(static function (Slide $slideItem): int {
+                return $slideItem->getSlideId();
+            }, $slides),
+            $userId,
+        );
+
+        $history = [];
         foreach ($slides as $slide) {
+            $contentRow = ArrayHelper::array_find(
+                $contents,
+                static function(array $content) use ($slide): bool {
+                    return $content['slideId'] === $slide->getSlideId();
+                }
+            );
+            $progress = 0;
+            if ($contentRow) {
+                $progress = round(
+                    count(array_filter($contentRow['mentalMaps'], static function (array $item): bool {
+                        return (int) $item['userProgress'] === 100;
+                    })) * 100 / count($contentRow['mentalMaps']),
+                    0,
+                    PHP_ROUND_HALF_UP,
+                );
+            } else {
+                $progress = $this->slideViewProgress(
+                    $storyId,
+                    $slide->getSlideId(),
+                    $userId,
+                );
+            }
             $history[] = [
                 'type' => 'slide',
                 'slideId' => $slide->getSlideId(),
-                'progress' => $this->slideViewProgress(
-                    $storyId,
-                    $slide->getSlideId(),
-                    $userId
-                ),
+                'progress' => $progress,
             ];
         }
 
@@ -55,9 +92,19 @@ class TableOfContentsStatusFetcher
 
             $threshold = MentalMapThreshold::getThreshold(Yii::$app->params, $mentalMap->payload);
             if ($mentalMap->isMentalMapAsTree()) {
-                $mapHistory = (new MentalMapTreeHistoryFetcher())->fetch($mentalMap->uuid, $userId, $mentalMap->getTreeData(), $threshold);
+                $mapHistory = (new MentalMapTreeHistoryFetcher())->fetch(
+                    $mentalMap->uuid,
+                    $userId,
+                    $mentalMap->getTreeData(),
+                    $threshold,
+                );
             } else {
-                $mapHistory = (new MentalMapHistoryFetcher())->fetch($mentalMap->getImages(), $mentalMap->uuid, $userId, $threshold);
+                $mapHistory = (new MentalMapHistoryFetcher())->fetch(
+                    $mentalMap->getImages(),
+                    $mentalMap->uuid,
+                    $userId,
+                    $threshold,
+                );
             }
             $progress = MentalMap::calcHistoryPercent($mapHistory, $threshold);
             $history[] = [
@@ -100,7 +147,7 @@ class TableOfContentsStatusFetcher
                 'slideId' => $testItem->getSlideId(),
                 'progress' => StudentQuestionProgress::findProgress(
                     $testItem->getTestId(),
-                    $studentId
+                    $studentId,
                 ),
             ];
         }

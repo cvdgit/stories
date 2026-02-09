@@ -2,42 +2,28 @@
 
 declare(strict_types=1);
 
-namespace frontend\MentalMap\Content;
+namespace frontend\SpeechTrainer;
 
 use common\components\MentalMapThreshold;
+use frontend\MentalMap\Content\StorySlidesContentsFetcher;
 use frontend\MentalMap\history\MentalMapTreeHistoryFetcher;
 use frontend\MentalMap\MentalMap;
-use frontend\MentalMap\MentalMapStorySlide;
 use Yii;
-use yii\db\Query;
 
-class ContentMentalMapsFetcher
+class SpeechTrainerContentsFetcher
 {
     /**
      * @param array<array-key, int> $slideIds
      */
-    public function fetch(array $slideIds, int $userId, $canEdit = false): array
+    public function fetch(array $slideIds, int $userId, bool $required = true): array
     {
-        if (count($slideIds) === 0) {
+        $contents = (new StorySlidesContentsFetcher())->fetch($slideIds, $required);
+        if (count($contents) === 0) {
             return [];
         }
-
-        $slideMentalMaps = (new Query())
-            ->select([
-                'slideId' => 't.slide_id',
-                'mentalMapId' => 't.mental_map_id',
-                'mentalMapName' => 't2.name',
-                'mapRequired' => 't.required',
-            ])
-            ->from(['t' => MentalMapStorySlide::tableName()])
-            ->innerJoin(['t2' => MentalMap::tableName()], 't.mental_map_id = t2.uuid')
-            ->where(['in', 't.slide_id', $slideIds])
-            ->all();
-
         $contentMentalMaps = [];
-        foreach ($slideMentalMaps as $row) {
-            $slideId = (int) $row['slideId'];
-
+        foreach ($contents as $content) {
+            $slideId = $content->getSlideId();
             if (!isset($contentMentalMaps[$slideId])) {
                 $contentMentalMaps[$slideId] = [
                     'slideId' => $slideId,
@@ -45,7 +31,7 @@ class ContentMentalMapsFetcher
                 ];
             }
 
-            $mentalMap = MentalMap::findOne($row['mentalMapId']);
+            $mentalMap = MentalMap::findOne($content->getMentalMapId()->toString());
             if ($mentalMap === null) {
                 continue;
             }
@@ -71,18 +57,9 @@ class ContentMentalMapsFetcher
 
             $contentMentalMaps[$slideId]['mentalMaps'][] = [
                 'id' => $mentalMap->uuid,
-                'name' => $mentalMap->name,
                 'userProgress' => $userProgress,
-                'type' => $mentalMap->map_type,
-                'edit' => $canEdit ? [
-                    'url' => Yii::$app->urlManagerBackend->createAbsoluteUrl(
-                        ['/mental-map/editor', 'id' => $mentalMap->uuid],
-                    ),
-                ] : false,
-                'required' => $row['mapRequired'] === '1',
             ];
         }
-
-        return array_values($contentMentalMaps);
+        return $contentMentalMaps;
     }
 }
