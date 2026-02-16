@@ -24,6 +24,29 @@ function ContentMentalMap() {
     })
   }
 
+  async function streamMessage(payload, onMessage, onEndCallback) {
+    let accumulatedMessage = ''
+    return sendEventSourceMessage({
+      url: '/admin/index.php?r=gpt/story/speech-trainer-sentences',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'text/event-stream',
+        'X-CSRF-Token': $("meta[name=csrf-token]").attr('content')
+      },
+      body: JSON.stringify(payload),
+      onMessage: (streamedResponse) => {
+        if (Array.isArray(streamedResponse?.streamed_output)) {
+          accumulatedMessage = streamedResponse.streamed_output.join("");
+        }
+        onMessage(accumulatedMessage)
+      },
+      onError: (streamedResponse) => {
+        console.log(streamedResponse)
+      },
+      onEnd: () => onEndCallback(accumulatedMessage)
+    })
+  }
+
   function wordClickHandler(word, prevState, ctrlKey) {
     const state = [...prevState]
       .map((w, j) => {
@@ -115,13 +138,6 @@ function ContentMentalMap() {
 
     return $fragmentElem
   }
-
-  /*const mentalMaps = [
-    {title: 'Ментальная карта', type: 'mental-map', fragments: []},
-    {title: 'Ментальная карта (четные пропуски)', type: 'mental-map-even-fragments', fragments: []},
-    {title: 'Ментальная карта (нечетные пропуски)', type: 'mental-map-odd-fragments', fragments: []},
-    {title: 'Пересказ', type: 'retelling'},
-  ]*/
 
   function drawFragments($contentItemList, fragmentsManager) {
     $contentItemList.empty()
@@ -220,6 +236,16 @@ function ContentMentalMap() {
     })
   }
 
+  function processOutputAsJson(output) {
+    let json = null
+    try {
+      json = JSON.parse(output.replace(/```json\n?|```/g, ''))
+    } catch (ex) {
+      console.log(ex.message)
+    }
+    return json
+  }
+
   this.createFragments = async ({currentSlideId, blockId, container, text, onCreateHandler, mapOrder}) => {
 
     const $statusElem = $('<div style="font-size: 14px" />')
@@ -240,10 +266,10 @@ function ContentMentalMap() {
     container.append($contentItemList)
 
     const textFragments = text
-      .split('\n')
+      .split('\n\n')
       .map(t => decodeHtmlEntities(t))
       .map(t => t.trim())
-      .filter(t => t.length > 0)
+      .filter(t => t.length > 0);
 
     const fragmentsManager = new FragmentsManager()
     fragmentsManager.loadTextFragments(textFragments.map(title => ({id: uuidv4(), title})))
@@ -255,12 +281,10 @@ function ContentMentalMap() {
     container.append($mapsContainer)
 
     $mapsContainer.append('<div style="font-weight: 500; font-size: 18px">Создать:<div/>');
-    console.log(mapOrder);
     mapOrder.map(({type, title}) => {
-      //$mapsContainer.append(`<div class="content-mm-maps-item"><label><input type="checkbox" checked disabled> ${m.title}</label></div>`)
       const $item = $(`
 <div data-content-type="${type}" class="content-mm-maps-item" style="flex-direction: row; justify-content: space-between">
-<label><input class="content-item-selected" type="checkbox" checked disabled> ${title}</label>
+<label><input class="content-item-selected" type="checkbox" checked> ${title}</label>
 <label class="content-item-required-wrap"><input class="content-item-required" type="checkbox"> Обязательно</label>
 </div>
 `);
@@ -270,7 +294,13 @@ function ContentMentalMap() {
     const $controls = $('<div class="content-mm-controls"/>')
     container.append($controls)
     $('<button class="btn btn-primary">Создать речевой тренажер</button>')
-      .on('click', e => {
+      .on('click', async ({target}) => {
+
+        const $btn = $(target);
+        $btn.prop('disabled', true);
+
+        const $loader = $('<div style="display: flex; align-items: center; gap: 10px">Создание речевого тренажера... <img style="height: 30px" src="/img/loading.gif" alt=""></div>')
+        $controls.append($loader);
 
         const toCreateMaps = $mapsContainer
           .find('.content-mm-maps-item .content-item-selected:checked')
@@ -281,6 +311,34 @@ function ContentMentalMap() {
             required: $(el).parents('.content-mm-maps-item').find('.content-item-required').is(':checked')
           }))
           .get();
+
+        const sendAIRequest = toCreateMaps
+          .filter(({type}) => type === 'mental-map-plan' || type === 'mental-map-plan-accumulation')
+          .length > 0;
+
+        let sentences;
+        if (sendAIRequest) {
+          const allText = fragmentsManager.getFragments().map(({title}) => title).join('\n');
+          await streamMessage(
+            {text: allText},
+            () => {},
+            sentencesJson => {
+              try {
+                sentences = processOutputAsJson(sentencesJson).map(({sentenceText, sentenceTitle}) => {
+                  const fragmentId = uuidv4();
+                  return {
+                    id: fragmentId,
+                    sentenceText,
+                    sentenceTitle,
+                    words: createWordItem(sentenceText, fragmentId).words
+                  }
+                });
+              } catch (ex) {
+                throw new Error(ex.message);
+              }
+            }
+          );
+        }
 
         const mentalMapsAi = new MentalMapsAi()
         for (let i = 0; i < toCreateMaps.length; i++) {
@@ -304,6 +362,20 @@ function ContentMentalMap() {
                 title: mentalMapsAi.hideWordsOdd(f.words)
               }))
               break;
+            case 'mental-map-plan':
+              structuredClone(sentences).map(({id, sentenceText, sentenceTitle}) => toCreateMaps[i].fragments.push({
+                id,
+                title: sentenceTitle,
+                description: sentenceText
+              }))
+              break;
+            case 'mental-map-plan-accumulation':
+              structuredClone(sentences).map(({id, sentenceText, sentenceTitle}) => toCreateMaps[i].fragments.push({
+                id,
+                title: sentenceTitle,
+                description: sentenceText
+              }))
+              break;
           }
         }
 
@@ -318,6 +390,7 @@ function ContentMentalMap() {
         formHelper.sendForm('/admin/index.php?r=editor/mental-map/create-content-handler', 'POST', formData)
           .done(response => {
             if (response && response.success) {
+              $loader.remove();
               onCreateHandler(text)
               toastr.success('Успешно')
               return

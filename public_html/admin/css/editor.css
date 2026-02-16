@@ -1142,6 +1142,7 @@ body {
 .content-mm-controls {
   display: flex;
   column-gap: 10px;
+  justify-content: space-between;
 }
 
 .table-of-contents-slide {

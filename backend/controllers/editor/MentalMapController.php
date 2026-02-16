@@ -392,7 +392,7 @@ class MentalMapController extends BaseController
         if ($speechTrainer !== null) {
             $contents = $speechTrainer->getContents();
         }
-        $mapOrder = SpeechTrainer::getStoryEditorAllTypes();
+        $mapOrder = SpeechTrainer::getAllTypes();
         return $this->renderAjax('_content', [
             'contents' => $contents,
             'mapOrder' => array_map(

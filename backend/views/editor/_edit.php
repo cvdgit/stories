@@ -546,10 +546,21 @@ $js = <<< JS
         return "<div>" + texts.join(`\\n`) + "</div>"
     }
 
+    function stripTags(html) {
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        return div.textContent || div.innerText || '';
+    }
+
     function getSlideTextContent(slide) {
         const texts = [];
         slide.getElement().find(`div[data-block-type="text"]`).map((i, el) => {
-            const text = $(el).find(".slide-paragraph").text().trim();
+            let text = $(el)
+              .find(".slide-paragraph")
+              .html();
+            text = text.replace(/<\s*br\s*\/?>/gi, '');
+            text = stripTags(text);
+            text = text.trim();
             if (text.length) {
                 texts.push(text);
             }

@@ -57,21 +57,6 @@ class SpeechTrainer extends ActiveRecord
         return isset(self::getAllTypes()[$type]);
     }
 
-    public static function getStoryEditorAllTypes(): array
-    {
-        return array_filter(
-            self::getAllTypes(),
-            static function (string $type): bool {
-                return !in_array(
-                    $type,
-                    [self::TYPE_MENTAL_MAP_PLAN, self::TYPE_MENTAL_MAP_PLAN_ACCUMULATION],
-                    true,
-                );
-            },
-            ARRAY_FILTER_USE_KEY,
-        );
-    }
-
     /**
      * @param int $slideId
      * @return array<array-key, SpeechTrainer>
