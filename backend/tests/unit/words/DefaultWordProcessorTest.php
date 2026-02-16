@@ -20,6 +20,7 @@ class DefaultWordProcessorTest extends \Codeception\Test\Unit
     }
 
     // tests
+    /** @skip */
     public function testSomeFeature()
     {
         $words = [

@@ -7,13 +7,16 @@ namespace backend\controllers;
 use backend\AiStoryAssist\MentalMapBuilder;
 use backend\AiStoryAssist\StoryThread;
 use backend\AiStoryAssist\ThreadResponse;
+use backend\components\story\TableOfContentsBlockContent;
 use backend\MentalMap\MentalMap;
-use backend\MentalMap\MentalMapPayload;
 use backend\MentalMap\MentalMapStorySlide;
 use backend\services\StoryEditorService;
 use backend\services\StorySlideService;
 use backend\SlideEditor\ContentMentalMap\SpeechTrainer;
 use backend\StoryContent\SpeechTrainer\SpeechTrainerService;
+use backend\TableOfContents\TableOfContentsGroup;
+use backend\TableOfContents\TableOfContentsPayload;
+use backend\TableOfContents\TableOfContentsService;
 use common\components\StoryCover;
 use common\helpers\Translit;
 use common\models\slide\SlideKind;
@@ -61,6 +64,10 @@ class StoryAiController extends Controller
      * @var SpeechTrainerService
      */
     private $speechTrainerService;
+    /**
+     * @var TableOfContentsService
+     */
+    private $tableOfContentsService;
 
     public function __construct(
         $id,
@@ -70,6 +77,7 @@ class StoryAiController extends Controller
         TransactionManager $transactionManager,
         MentalMapBuilder $mentalMapBuilder,
         SpeechTrainerService $speechTrainerService,
+        TableOfContentsService $tableOfContentsService,
         $config = []
     ) {
         parent::__construct($id, $module, $config);
@@ -78,6 +86,7 @@ class StoryAiController extends Controller
         $this->transactionManager = $transactionManager;
         $this->mentalMapBuilder = $mentalMapBuilder;
         $this->speechTrainerService = $speechTrainerService;
+        $this->tableOfContentsService = $tableOfContentsService;
     }
 
     public function behaviors(): array
@@ -121,6 +130,7 @@ class StoryAiController extends Controller
         $view = $payload['view'] ?? 'slide-full-text';
         $title = $payload['title'];
         $fragments = $payload['fragments'];
+        $contents = $payload['contents'] ?? null;
         $threadId = $payload['threadId'];
 
         $alias = Translit::translit($title);
@@ -145,7 +155,12 @@ class StoryAiController extends Controller
             }
         }
 
-        $story = Story::create($title, $user->getId(), [Yii::$app->params['ai.story.assist.category.id']], $alias);
+        $story = Story::create(
+            $title,
+            $user->getId(),
+            [Yii::$app->params['ai.story.assist.category.id']],
+            $alias,
+        );
         $story->setIsAI();
 
         try {
@@ -160,37 +175,35 @@ class StoryAiController extends Controller
                     );
                 }
 
-                $headerSlide = StorySlide::createSlide($story->id);
-                $headerSlide->data = 'empty';
-                $headerSlide->kind = SlideKind::SLIDE;
-                if (!$headerSlide->save()) {
-                    throw new DomainException(
-                        'Can\'t be saved Story model. Errors: ' . implode(', ', $headerSlide->getFirstErrors()),
-                    );
-                }
-                $headerSlide->data = $this->storyEditorService->makeSlideWithHeader($headerSlide->id, $story->title . ' ➡️');
-                if (!$headerSlide->save()) {
-                    throw new DomainException(
-                        'Can\'t be saved Story model. Errors: ' . implode(', ', $headerSlide->getFirstErrors()),
-                    );
-                }
+                $this->storySlideService->createSlide(
+                    $story->id,
+                    SlideKind::SLIDE,
+                    1,
+                    function (int $slideId) use ($story): string {
+                        return $this->storyEditorService->makeSlideWithHeader(
+                            $slideId,
+                            $story->title . ' ➡️',
+                        );
+                    },
+                );
 
                 $fragmentsToSlideMap = [];
+                $number = 2;
                 foreach ($fragments as $fragment) {
-                    $slide = StorySlide::createSlide($story->id);
-                    $slide->data = 'empty';
-                    $slide->kind = SlideKind::SLIDE;
-                    if (!$slide->save()) {
-                        throw new DomainException(
-                            'Can\'t be saved Story model. Errors: ' . implode(', ', $slide->getFirstErrors()),
-                        );
-                    }
-                    $slide->data = $this->storyEditorService->makeSlideWithText($slide->id, nl2br($fragment['text']), $view);
-                    if (!$slide->save()) {
-                        throw new DomainException(
-                            'Can\'t be saved Story model. Errors: ' . implode(', ', $slide->getFirstErrors()),
-                        );
-                    }
+
+                    $slide = $this->storySlideService->createSlide(
+                        $story->id,
+                        SlideKind::SLIDE,
+                        $number,
+                        function (int $slideId) use ($fragment, $view): string {
+                            return $this->storyEditorService->makeSlideWithText(
+                                $slideId,
+                                nl2br($fragment['text']),
+                                $view,
+                            );
+                        },
+                    );
+                    $number++;
 
                     $fragmentsToSlideMap[] = [
                         'fragmentId' => $fragment['id'],
@@ -198,20 +211,14 @@ class StoryAiController extends Controller
                     ];
                 }
 
-                $slide = StorySlide::createSlide($story->id);
-                $slide->data = 'empty';
-                $slide->kind = SlideKind::SLIDE;
-                if (!$slide->save()) {
-                    throw new DomainException(
-                        'Can\'t be saved Story model. Errors: ' . implode(', ', $slide->getFirstErrors()),
-                    );
-                }
-                $slide->data = $this->storyEditorService->makeEmptySlide($slide->id);
-                if (!$slide->save()) {
-                    throw new DomainException(
-                        'Can\'t be saved Story model. Errors: ' . implode(', ', $slide->getFirstErrors()),
-                    );
-                }
+                $this->storySlideService->createSlide(
+                    $story->id,
+                    SlideKind::SLIDE,
+                    $number,
+                    function (int $slideId): string {
+                        return $this->storyEditorService->makeEmptySlide($slideId);
+                    },
+                );
 
                 $thread = StoryThread::findOne($threadId);
                 if ($thread !== null) {
@@ -228,16 +235,50 @@ class StoryAiController extends Controller
                     ),
                     'editUrl' => Url::to(['/story/update', 'id' => $story->id]),
                     'slideMap' => $fragmentsToSlideMap,
-                    /*'repetitionTrainer' => [
-                        ['title' => 'Ментальная карта', 'type' => 'mental-map'],
-                        ['title' => 'Ментальная карта (четные пропуски)', 'type' => 'mental-map-even-fragments'],
-                        ['title' => 'Ментальная карта (нечетные пропуски)', 'type' => 'mental-map-odd-fragments'],
-                        ['title' => 'Ментальная карта (план)', 'type' => 'mental-map-plan'],
-                        ['title' => 'План с накоплением', 'type' => 'mental-map-plan-accumulation'],
-                        ['title' => 'Пересказ', 'type' => 'retelling'],
-                    ],*/
                 ];
             });
+
+            if ($contents !== null) {
+                $tableOfContentsPayload = new TableOfContentsPayload('Оглавление');
+                foreach ($contents as $contentGroup) {
+                    $group = new TableOfContentsGroup(Uuid::uuid4(), $contentGroup['name']);
+                    foreach ($contentGroup['cards'] as $card) {
+                        $group->addCard($cardId = Uuid::uuid4(), $card['name']);
+                        foreach ($card['slides'] as $cardSlideId) {
+                            $slideMap = ArrayHelper::array_find(
+                                $storyResponse['slideMap'],
+                                static function (array $row) use ($cardSlideId): bool {
+                                    return $row['fragmentId'] === $cardSlideId;
+                                },
+                            );
+                            if ($slideMap) {
+                                $group->addSlide(
+                                    $slideMap['slideId'],
+                                    '',
+                                    1,
+                                    $cardId
+                                );
+                            }
+                        }
+                    }
+                    $tableOfContentsPayload->addGroup($group);
+                }
+
+                $this->storySlideService->createAndInsertSlide(
+                    $story->id,
+                    SlideKind::SLIDE,
+                    1,
+                    function (int $slideId) use ($tableOfContentsPayload): string {
+                        return $this->storyEditorService->makeSlideWithTableOfContents(
+                            $slideId,
+                            (new TableOfContentsBlockContent(
+                                Uuid::uuid4()->toString(),
+                                Json::encode($tableOfContentsPayload),
+                            ))->render(),
+                        );
+                    },
+                );
+            }
 
             return [
                 'success' => true,
@@ -265,6 +306,17 @@ class StoryAiController extends Controller
         $currentSlideModel = StorySlide::findOne($slideId);
         if ($currentSlideModel === null) {
             throw new NotFoundHttpException('Слайд не найден');
+        }
+
+        $story = Story::findOne($storyId);
+        if ($story === null) {
+            throw new NotFoundHttpException('История не найдена');
+        }
+
+        $tableOfContentsItems = $this->tableOfContentsService->getStoryTableOfContents($story->id);
+        $tableOfContentsItem = null;
+        if (count($tableOfContentsItems) > 0) {
+            $tableOfContentsItem = $tableOfContentsItems[0];
         }
 
         $textBlockIds = $this->storyEditorService->getTextBlockIds($currentSlideModel->data);
@@ -295,6 +347,14 @@ class StoryAiController extends Controller
             }
         }
 
+        if ($retellingSlideId !== null && $tableOfContentsItem !== null) {
+            $this->tableOfContentsService->updateTableOfContentsSlide(
+                $tableOfContentsItem,
+                $currentSlideModel->id,
+                [$currentSlideModel->id, $retellingSlideId]
+            );
+        }
+
         $speechTrainer = SpeechTrainer::create(
             Uuid::uuid4(),
             'Речевой тренажёр',
@@ -314,64 +374,29 @@ class StoryAiController extends Controller
                 }
 
                 $mentalMapId = Uuid::uuid4();
-
-                if ($type === 'mental-map-plan') {
-                    $payload = MentalMapPayload::planMentalMap(
+                if ($type === 'mental-map-plan' || $type === 'mental-map-plan-accumulation') {
+                    $this->mentalMapBuilder->createPlanMentalMap(
                         $mentalMapId,
                         $contentRow['title'],
                         $text,
-                        array_map(static function (array $fragment): array {
-                            return [
-                                'id' => $fragment['id'],
-                                'title' => $fragment['title'],
-                                'description' => $fragment['description'],
-                            ];
-                        }, MentalMapPayload::filterEmptyFragments($contentRow['fragments'])),
+                        $user->getId(),
+                        $contentRow['fragments'],
                         Uuid::fromString(Yii::$app->params['ai.story.assist.plan.prompt.id']),
-                    );
-                } else if ($type === 'mental-map-plan-accumulation') {
-                    $fragments = array_map(static function (array $fragment): array {
-                        return [
-                            'id' => $fragment['id'],
-                            'title' => $fragment['title'],
-                            'description' => $fragment['description'],
-                        ];
-                    }, MentalMapPayload::filterEmptyFragments($contentRow['fragments']));
-                    $payload = MentalMapPayload::planMentalMap(
-                        $mentalMapId,
-                        $contentRow['title'],
-                        $text,
-                        MentalMapPayload::accumulateFragments($fragments),
-                        Uuid::fromString(Yii::$app->params['ai.story.assist.plan.prompt.id']),
-                        true
+                        $type,
                     );
                 } else {
-                    $payload = MentalMapPayload::treeMentalMap(
+                    $this->mentalMapBuilder->createTreeMentalMap(
                         $mentalMapId,
                         $contentRow['title'],
-                        $text, // preg_replace('/\<br(\s*)?\/?\>/i', "\n", $createForm->text),
-                        array_map(static function (array $fragment): array {
-                            return [
-                                'id' => $fragment['id'],
-                                'title' => $fragment['title'],
-                            ];
-                        }, MentalMapPayload::filterEmptyFragments($contentRow['fragments'])),
+                        $text,
+                        $user->getId(),
+                        $contentRow['fragments'],
+                        $type
                     );
-                }
-
-                $mentalMap = MentalMap::create(
-                    $mentalMapId->toString(),
-                    $payload->getName(),
-                    $payload->asArray(),
-                    $user->getId(),
-                    $type,
-                );
-                if (!$mentalMap->save()) {
-                    throw new BadRequestHttpException('Mental Map save exception');
                 }
 
                 $this->speechTrainerService->createMentalMapSlideRow(
-                    Uuid::fromString($mentalMap->uuid),
+                    $mentalMapId,
                     (int) $slideId,
                     $blockId,
                     (bool) $contentRow['required'],
@@ -530,8 +555,8 @@ class StoryAiController extends Controller
         $response->format = Response::FORMAT_JSON;
 
         $payload = Json::decode($request->rawBody);
-        $storyId = $payload['storyId'];
-        $slideId = $payload['slideId'];
+        $storyId = (int) $payload['storyId'];
+        $slideId = (int) $payload['slideId'];
         $mentalMapContent = $payload['mentalMap'];
         $text = $payload['text'];
 
@@ -540,56 +565,58 @@ class StoryAiController extends Controller
             throw new NotFoundHttpException('Слайд не найден');
         }
 
-        $this->transactionManager->wrap(function () use ($currentSlideModel, $mentalMapContent, $text, $user, $slideId): void {
+        $story = Story::findOne($storyId);
+        if ($story === null) {
+            throw new NotFoundHttpException('История не найдена');
+        }
 
-            $slideModel = $this->storySlideService->create($currentSlideModel->story_id, 'empty', StorySlide::KIND_MENTAL_MAP);
-            $slideModel->number = $currentSlideModel->number + 1;
-            Story::insertSlideNumber($currentSlideModel->story_id, $currentSlideModel->number);
-            if (!$slideModel->save()) {
-                throw new DomainException(
-                    'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
+        $tableOfContentsItems = $this->tableOfContentsService->getStoryTableOfContents($story->id);
+        $tableOfContentsItem = null;
+        if (count($tableOfContentsItems) > 0) {
+            $tableOfContentsItem = $tableOfContentsItems[0];
+        }
+
+        $this->transactionManager->wrap(
+            function () use ($currentSlideModel, $mentalMapContent, $text, $user, $tableOfContentsItem): void {
+                $this->mentalMapBuilder->createTreeMentalMap(
+                    $mentalMapId = Uuid::uuid4(),
+                    $mentalMapContent['title'],
+                    $text,
+                    $user->getId(),
+                    $mentalMapContent['fragments']
                 );
-            }
-
-            $mentalMapId = Uuid::uuid4();
-            $payload = MentalMapPayload::treeMentalMap(
-                $mentalMapId,
-                $mentalMapContent['title'],
-                $text, // preg_replace('/\<br(\s*)?\/?\>/i', "\n", $createForm->text),
-                array_map(static function (array $fragment): array {
-                    return [
-                        'id' => $fragment['id'],
-                        'title' => $fragment['title'],
-                    ];
-                }, MentalMapPayload::filterEmptyFragments($mentalMapContent['fragments'])),
-            );
-
-            $mentalMap = MentalMap::create(
-                $mentalMapId->toString(),
-                $payload->getName(),
-                $payload->asArray(),
-                $user->getId(),
-            );
-            if (!$mentalMap->save()) {
-                throw new BadRequestHttpException('Mental Map save exception');
-            }
-
-            $data = $this->storyEditorService->getSlideWithMentalMapBlockContent($slideModel->id, $mentalMapId->toString(), 'mental-map', false);
-            $slideModel->updateData($data);
-            if (!$slideModel->save()) {
-                throw new DomainException(
-                    'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
+                $mapSlide = $this->storySlideService->createAndInsertSlide(
+                    $currentSlideModel->story_id,
+                    StorySlide::KIND_MENTAL_MAP,
+                    $currentSlideModel->number,
+                    function (int $slideId) use ($mentalMapId): string {
+                        return $this->storyEditorService->getSlideWithMentalMapBlockContent(
+                            $slideId,
+                            $mentalMapId->toString(),
+                            'mental-map',
+                            false,
+                        );
+                    },
                 );
-            }
+                $currentSlideModel->setHidden();
+                if (!$currentSlideModel->save()) {
+                    throw new DomainException(
+                        'Can\'t be saved StorySlide model. Errors: ' . implode(
+                            ', ',
+                            $currentSlideModel->getFirstErrors(),
+                        ),
+                    );
+                }
 
-            $currentSlideModel->setHidden();
-            if (!$currentSlideModel->save()) {
-                throw new DomainException(
-                    'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $currentSlideModel->getFirstErrors()),
-                );
-            }
-        });
-
+                if ($tableOfContentsItem !== null) {
+                    $this->tableOfContentsService->updateTableOfContentsSlide(
+                        $tableOfContentsItem,
+                        $currentSlideModel->id,
+                        [$mapSlide->id]
+                    );
+                }
+            },
+        );
 
         return ['success' => true, 'slideId' => $slideId];
     }
@@ -622,7 +649,7 @@ class StoryAiController extends Controller
                     function (int $slideId): string {
                         return $this->storyEditorService->makeSlideWithHeader(
                             $slideId,
-                            'Осталось пройти последний тест ➡️'
+                            'Осталось пройти последний тест ➡️',
                         );
                     },
                 );
@@ -642,7 +669,7 @@ class StoryAiController extends Controller
                         return $this->storyEditorService->getSlideWithMentalMapBlockContent(
                             $slideId,
                             $mentalMapId->toString(),
-                            'mental-map'
+                            'mental-map',
                         );
                     },
                 );
@@ -658,10 +685,10 @@ class StoryAiController extends Controller
                         return $this->storyEditorService->makeSlideWithText(
                             $slideId,
                             $allText,
-                            'all-text'
+                            'all-text',
                         );
                     },
-                    ['status' => StorySlide::STATUS_HIDDEN]
+                    ['status' => StorySlide::STATUS_HIDDEN],
                 );
 
                 $this->speechTrainerService->createRetelling(
@@ -669,7 +696,7 @@ class StoryAiController extends Controller
                     $newAllTextSlide->id,
                     $newAllTextSlide->number,
                     $user->getId(),
-                    true
+                    true,
                 );
             });
             return ['success' => true];

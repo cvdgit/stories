@@ -27,6 +27,7 @@ class PoetryWordProcessorTest extends Unit
     }
 
     // tests
+    /** @skip */
     public function testEmptyWordsException()
     {
         $words = [

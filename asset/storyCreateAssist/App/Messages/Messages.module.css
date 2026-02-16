@@ -148,3 +148,68 @@
   color: rgb(255 255 255 / 1);
   background-color: rgb(57 57 57 / 1);
 }
+
+
+.actionItem {
+  animation-timing-function: cubic-bezier(.4, 0, 1, 1);
+  transition-timing-function: cubic-bezier(.4, 0, 1, 1);
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-duration: .15s;
+  box-shadow: 0 0 #0000, 0 0 #0000, 0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px -1px rgba(0,0,0,.1);
+  color: hsl(0 0% 3.9%);
+  background-color: rgb(40 40 40 / 1);
+  border-color: rgb(75 85 99 / 1);
+  border-width: 1px;
+  border-radius: 12px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.actionItemTitle {
+  color: rgb(229 231 235 / 1);
+  letter-spacing: -.35px;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  padding: 16px;
+  margin: 0;
+}
+
+.settingsBtn {
+  opacity: 0;
+  transition-duration: .2s;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(.4,0,.2,1);
+  padding: 4px;
+  border-radius: 6px;
+  appearance: button;
+  font: inherit;
+  font-feature-settings: inherit;
+  font-variation-settings: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  background-color: #0000;
+  box-sizing: border-box;
+  border: 0 solid;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.settingsBtn:hover {
+  background-color: oklab(0.55 0.199388 0.092976 / 0.1);
+}
+
+.actionItem:hover .settingsBtn {
+  opacity: 1;
+}
+
+.settingsSvg {
+  color: oklch(60% 0 0);
+  width: 24px;
+  height: 24px;
+}
+
+.settingsSvg:hover {
+  color: oklch(55% .22 25);
+}

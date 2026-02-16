@@ -131,11 +131,18 @@ class StorySlide extends ActiveRecord
             ->max('number') + 1;
     }
 
-    public static function createSlide(int $storyID)
+    public static function createSlide(int $storyId, int $number = null): self
     {
         $slide = new self();
-        $slide->story_id = $storyID;
-        $slide->number = (new Query())->from(self::tableName())->where('story_id = :story', [':story' => $storyID])->max('number') + 1;
+        $slide->story_id = $storyId;
+        if ($number === null) {
+            $slide->number = (new Query())
+                    ->from(self::tableName())
+                    ->where(['story_id' => $storyId])
+                    ->max('number') + 1;
+        } else {
+            $slide->number = $number;
+        }
         return $slide;
     }
 

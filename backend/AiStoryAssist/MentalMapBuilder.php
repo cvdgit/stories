@@ -16,7 +16,8 @@ class MentalMapBuilder
         string $title,
         string $text,
         int $userId,
-        array $fragments
+        array $fragments,
+        string $type = MentalMap::TYPE_MENTAL_MAP
     ): MentalMap {
         $payload = MentalMapPayload::treeMentalMap(
             $id,
@@ -34,6 +35,7 @@ class MentalMapBuilder
             $id->toString(),
             $payload,
             $userId,
+            $type,
         );
 
         if (!$mentalMap->save()) {
@@ -51,7 +53,8 @@ class MentalMapBuilder
         string $text,
         int $userId,
         array $fragments,
-        UuidInterface $promptId = null
+        UuidInterface $promptId = null,
+        string $type = MentalMap::TYPE_MENTAL_MAP_PLAN
     ): MentalMap {
         $payload = MentalMapPayload::planMentalMap(
             $id,
@@ -64,13 +67,15 @@ class MentalMapBuilder
                     'description' => $fragment['description'],
                 ];
             }, MentalMapPayload::filterEmptyFragments($fragments)),
-            $promptId
+            $promptId,
+            $type === MentalMap::TYPE_MENTAL_MAP_PLAN_ACCUMULATION,
         );
 
         $mentalMap = MentalMap::createFromPayload(
             $id->toString(),
             $payload,
             $userId,
+            $type,
         );
 
         if (!$mentalMap->save()) {

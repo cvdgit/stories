@@ -163,4 +163,21 @@ class Slide
     {
         return $this->content;
     }
+
+    /**
+     * @template T
+     * @param class-string<T> $className
+     * @return array<T>
+     */
+    public function findBlocksByClassName(string $className): array
+    {
+        return array_values(
+            array_filter(
+                $this->blocks,
+                static function (AbstractBlock $block) use ($className): bool {
+                    return get_class($block) === $className;
+                },
+            ),
+        );
+    }
 }

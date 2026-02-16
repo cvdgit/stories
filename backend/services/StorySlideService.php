@@ -71,4 +71,38 @@ class StorySlideService
 
         return $slide;
     }
+
+    /**
+     * @throws Exception
+     */
+    public function createSlide(
+        int $storyId,
+        int $kind,
+        int $number,
+        callable $setData,
+        array $attributes = []
+    ): StorySlide {
+        $slide = StorySlide::createSlide($storyId, $number);
+        $slide->data = 'empty';
+        $slide->kind = $kind;
+        foreach ($attributes as $attrName => $attrValue) {
+            if ($slide->hasAttribute($attrName)) {
+                $slide->setAttribute($attrName, $attrValue);
+            }
+        }
+        $this->transactionManager->wrap(static function () use ($slide, $storyId, $setData): void {
+            if (!$slide->save()) {
+                throw new DomainException(
+                    'Can\'t be saved Story model. Errors: ' . implode(', ', $slide->getFirstErrors()),
+                );
+            }
+            $slide->data = $setData($slide->id);
+            if (!$slide->save()) {
+                throw new DomainException(
+                    'Can\'t be saved Story model. Errors: ' . implode(', ', $slide->getFirstErrors()),
+                );
+            }
+        });
+        return $slide;
+    }
 }

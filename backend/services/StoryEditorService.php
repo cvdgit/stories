@@ -16,6 +16,7 @@ use backend\components\story\RetellingBlock;
 use backend\components\story\RetellingBlockContent;
 use backend\components\story\Slide;
 use backend\components\story\SlideContent;
+use backend\components\story\TableOfContentsBlock;
 use backend\components\story\TestBlock;
 use backend\components\story\TestBlockContent;
 use backend\components\story\TextBlock;
@@ -578,5 +579,17 @@ class StoryEditorService
             }
         }
         return $blockIds;
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function makeSlideWithTableOfContents(int $slideId, string $content): string
+    {
+        $slide = (new HtmlSlideReader(new SlideContent($slideId, 'table-of-contents')))->load();
+        $block = $slide->createBlock(TableOfContentsBlock::class);
+        $block->setContent($content);
+        $slide->addBlock($block);
+        return (new HTMLWriter())->renderSlide($slide);
     }
 }

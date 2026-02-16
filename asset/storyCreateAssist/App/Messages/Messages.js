@@ -7,24 +7,42 @@ import {useThreadContext} from "../../Context/ThreadProvider";
 import {useQueryState} from "nuqs";
 import ReadingTrainerMessage from "./ReadingTrainerMessage";
 import CreateStoryMessage from "./CreateStoryMessage";
+import StoryFragmentsMessage from "./StoryFragmentsMessage";
+import ReadingStoryFragmentsMessage from "./ReadingStoryFragmentsMessage";
+import RawTextMessage from "./MessageType/RawTextMessage";
 
 export default function Messages({messages}) {
   const {threadsData, messagesData} = useThreadContext();
   const {getCurrentThreadTitle} = threadsData;
-  const {createRepetitionTrainer, deleteRepetitionTrainer, createReadingTrainer} = messagesData;
+  const {
+    createRepetitionTrainer,
+    deleteRepetitionTrainer,
+    createReadingTrainer,
+    setMessages,
+    saveMessages,
+  } = messagesData;
   const [text, setText] = useState('');
   const [threadId, setThreadId] = useQueryState('id');
   const ref = useRef(null);
+  const messagesRef = useRef(null);
 
   useEffect(() => {
-    if (!ref.current) {
+    if (!messagesRef.current) {
       return;
     }
-    ref.current.scrollTop = ref.current.scrollHeight
+    messagesRef.current.scrollTop = messagesRef.current.scrollHeight
   }, [messages])
 
   function renderMessage(message) {
     switch (message.type) {
+      case 'raw-text': {
+        return <RawTextMessage
+          threadId={threadId}
+          message={message}
+          speechTrainer
+        />;
+      }
+
       case 'story': {
         return <StoryMessage
           haveRepetitionTrainer={messages.find(m => m.type === 'repetition_trainer')}
@@ -49,6 +67,12 @@ export default function Messages({messages}) {
       }
       case 'human_create_story': {
         return <CreateStoryMessage message={message} />
+      }
+      case 'story_as_tree': {
+        return <StoryFragmentsMessage message={message} threadId={threadId} />
+      }
+      case 'reading-story-as-fragments': {
+        return <ReadingStoryFragmentsMessage message={message} />
       }
       default: {
         return (
@@ -81,7 +105,7 @@ export default function Messages({messages}) {
 
   return (
     <div className={styles.container}>
-      <div className={styles.messagesWrap}>
+      <div className={styles.messagesWrap} ref={messagesRef}>
         <div className={styles.messagesInner}>
           <div className={styles.messagesHeader}>
             <div className={styles.header}>

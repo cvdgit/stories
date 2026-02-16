@@ -14,10 +14,15 @@ class TableOfContentsBlockContent
      * @var string
      */
     private $id;
+    /**
+     * @var string
+     */
+    private $payload;
 
-    public function __construct(string $id)
+    public function __construct(string $id, string $payload)
     {
         $this->id = $id;
+        $this->payload = $payload;
     }
 
     public static function createFromHtml(string $html): self
@@ -27,7 +32,8 @@ class TableOfContentsBlockContent
         if (empty($id)) {
             throw new DomainException('Mental Map id undefined');
         }
-        return new self((string) $id);
+        $payload = $content->find('.table-of-contents .table-of-contents-payload')->text();
+        return new self((string) $id, $payload);
     }
 
     public function getId(): string
@@ -45,9 +51,18 @@ class TableOfContentsBlockContent
 
     public function render(): string
     {
-        return Html::tag('div', '', [
-            'class' => 'table-of-contents',
-            'data-table-of-contents-id' => $this->id,
-        ]);
+        return Html::tag(
+            'div',
+            '<script class="table-of-contents-payload" type="application/json">' . $this->payload . '</script>',
+            [
+                'class' => 'table-of-contents',
+                'data-table-of-contents-id' => $this->id,
+            ],
+        );
+    }
+
+    public function getPayload(): string
+    {
+        return $this->payload;
     }
 }

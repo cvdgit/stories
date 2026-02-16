@@ -20,6 +20,13 @@ use yii\db\ActiveRecord;
  */
 class MentalMap extends ActiveRecord
 {
+    public const TYPE_MENTAL_MAP = 'mental-map';
+    public const TYPE_MENTAL_MAP_EVEN_FRAGMENTS = 'mental-map-even-fragments';
+    public const TYPE_MENTAL_MAP_ODD_FRAGMENTS = 'mental-map-odd-fragments';
+    public const TYPE_MENTAL_MAP_PLAN = 'mental-map-plan';
+    public const TYPE_MENTAL_MAP_PLAN_ACCUMULATION = 'mental-map-plan-accumulation';
+    public const TYPE_MENTAL_MAP_QUESTIONS = 'mental-map-questions';
+
     public function behaviors(): array
     {
         return [
@@ -27,8 +34,13 @@ class MentalMap extends ActiveRecord
         ];
     }
 
-    public static function create(string $uuid, string $name, array $payload, int $userId, string $type = 'mental-map'): MentalMap
-    {
+    public static function create(
+        string $uuid,
+        string $name,
+        array $payload,
+        int $userId,
+        string $type = self::TYPE_MENTAL_MAP
+    ): self {
         $model = new self();
         $model->uuid = $uuid;
         $model->name = $name;
@@ -38,20 +50,26 @@ class MentalMap extends ActiveRecord
         return $model;
     }
 
-    public static function createFromPayload(string $id, MentalMapPayload $payload, int $userId): MentalMap
+    public static function createFromPayload(string $id, MentalMapPayload $payload, int $userId, string $type): self
     {
         return self::create(
             $id,
             $payload->getName(),
             $payload->asArray(),
             $userId,
+            $type
         );
     }
 
-    public static function createMentalMapQuestions(string $uuid, string $name, array $payload, int $userId, string $sourceUuid): MentalMap
-    {
+    public static function createMentalMapQuestions(
+        string $uuid,
+        string $name,
+        array $payload,
+        int $userId,
+        string $sourceUuid
+    ): self {
         $model = self::create($uuid, $name, $payload, $userId);
-        $model->map_type = 'mental-map-questions';
+        $model->map_type = self::TYPE_MENTAL_MAP_QUESTIONS;
         $model->source_mental_map_id = $sourceUuid;
         return $model;
     }
@@ -162,6 +180,6 @@ class MentalMap extends ActiveRecord
 
     public function typeIsQuestions(): bool
     {
-        return $this->map_type === 'mental-map-questions';
+        return $this->map_type === self::TYPE_MENTAL_MAP_QUESTIONS;
     }
 }
