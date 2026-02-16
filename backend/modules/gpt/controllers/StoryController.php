@@ -84,7 +84,7 @@ class StoryController extends Controller
             static function(string $text): string {
                 return '<fragment>' . $text . '</fragment>';
             },
-            $fragments
+            $fragments,
         ));
 
         $content = trim(str_replace(['{TEXT}'], [$text], $prompt->prompt));
@@ -167,6 +167,33 @@ class StoryController extends Controller
         try {
             $this->chatEventStream->send(
                 "story-for-cover-prompt",
+                Yii::$app->params["gpt.api.completions.host"],
+                Json::encode(
+                    new Fields([new Message('user', $content)]),
+                ),
+            );
+        } catch (Exception $ex) {
+            Yii::$app->errorHandler->logException($ex);
+        }
+    }
+
+    public function actionSpeechTrainerSentences(Request $request): void
+    {
+        $payload = Json::decode($request->rawBody);
+        $text = $payload['text'];
+        $text = strip_tags($text);
+
+        $prompt = LlmPrompt::findByKey('speech-trainer-sentences');
+        if ($prompt === null) {
+            $this->flushError('Промт не найден');
+            Yii::$app->end();
+        }
+
+        $content = trim(str_replace(['{TEXT}'], [$text], $prompt->prompt));
+
+        try {
+            $this->chatEventStream->send(
+                "speech-trainer-sentences",
                 Yii::$app->params["gpt.api.completions.host"],
                 Json::encode(
                     new Fields([new Message('user', $content)]),
