@@ -41,6 +41,7 @@ export default function markdownAstToTree(tokens) {
     if (token.type === 'inline' && pendingLevel) {
       const node = {
         header: token.content.trim(),
+        level: pendingLevel,
         content: '',
         children: []
       };

@@ -71,10 +71,11 @@ export default function RawTextMessage({message, threadId}) {
       return m;
     }));
 
+    const payload = storyPayloadBuilder(tree);
     await createStoryForSpeechTrainer(
       threadId,
-      findFirstHeader(tree) || 'Название истории',
-      storyPayloadBuilder(tree),
+      payload.title || 'Название истории',
+      payload,
       repetitionTrainer
     );
   };

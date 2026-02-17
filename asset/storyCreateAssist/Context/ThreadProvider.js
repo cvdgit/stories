@@ -292,7 +292,11 @@ export function ThreadProvider({children}) {
   function fragmentContentWithoutHeaders(content) {
     const el = document.createElement('div');
     el.innerHTML = content;
-    return el.querySelector('p').innerText;
+    const p = el.querySelector('p');
+    if (!p) {
+      return '';
+    }
+    return p.innerText.trim();
   }
 
   function fragmentContentHeader(content) {
@@ -331,10 +335,16 @@ export function ThreadProvider({children}) {
       const contents = [...repetitionTrainer].map(({title, type, required}) => ({title, type, required, fragments: []}));
       const slideFragment = json.fragments.find(({id}) => id === fragmentId);
 
+      console.log(slideFragment);
+      const fragmentText = fragmentContentWithoutHeaders(slideFragment.text);
+      if (!fragmentText) {
+        throw new Error('no fragment text');
+      }
+
       slideRequests.push(
         streamMessage(
           '/admin/index.php?r=gpt/story/speech-trainer-sentences',
-          {text: fragmentContentWithoutHeaders(slideFragment.text)},
+          {text: fragmentText},
           () => {},
           (sentencesJson) => {
 
