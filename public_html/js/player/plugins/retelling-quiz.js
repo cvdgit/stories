@@ -48,7 +48,7 @@ const retellingBuilder = window.retellingBuilder = new RetellingManagerQuiz();
     retelling.run()
   }
 
-  function initMentalMap() {
+  function initRetelling() {
     const currentSlideID = $(getCurrentSlide()).attr('data-id')
     if (readySlides[currentSlideID]) {
       return;
@@ -57,6 +57,14 @@ const retellingBuilder = window.retellingBuilder = new RetellingManagerQuiz();
     init();
   }
 
-  Reveal.addEventListener('slidechanged', initMentalMap)
-  Reveal.addEventListener('ready', initMentalMap)
+  Reveal.addEventListener('slidechanged', () => {
+    initRetelling();
+    retellingBuilder.destroyInstances();
+  });
+  Reveal.addEventListener('ready', ({indexh, indexv}) => {
+    if (Number(indexh) > 0 || Number(indexv) > 0) {
+      return;
+    }
+    initRetelling();
+  })
 })()

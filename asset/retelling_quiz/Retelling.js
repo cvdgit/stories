@@ -30,15 +30,12 @@ export default function Retelling(element, deck, params, microphoneChecker) {
   const run = async () => {
     let responseJson
     try {
-
       responseJson = await params.init()
-
       if (microphoneChecker) {
         microphoneChecker
           .check()
           .catch(error => this.element.appendChild(createNoMicrophoneElement(error.name + ': ' + error.message)));
       }
-
     } catch (ex) {
       loader.remove()
       container.innerText = ex.message
@@ -165,22 +162,27 @@ export default function Retelling(element, deck, params, microphoneChecker) {
       container.appendChild(createFinishContent(`${params.all}%`, slideTexts))
     }
 
-    window.addEventListener('blur', function() {
-      if (voiceResponse.getStatus()) {
-        voiceResponse.stop()
-        voiceControl.triggerClick()
-        setTimeout(() => {
-          content.querySelector('#retelling_result_span').innerHTML = ''
-          content.querySelector('#retelling_final_span').innerHTML = ''
-          content.querySelector('#retelling_interim_span').innerHTML = ''
-          content.querySelector('#retelling_result_span').dispatchEvent(new Event('input', {bubbles: true}))
-          content.querySelector('#retelling_final_span').dispatchEvent(new Event('input', {bubbles: true}))
-        }, 500)
+    function destroy(content, voiceResponse, voiceControl) {
+      if (!voiceResponse.getStatus()) {
+        return;
       }
-    }, false);
+      voiceResponse.stop();
+      voiceControl.triggerClick();
+      setTimeout(() => {
+        content.querySelector('#retelling_result_span').innerHTML = '';
+        content.querySelector('#retelling_final_span').innerHTML = '';
+        content.querySelector('#retelling_interim_span').innerHTML = '';
+        content.querySelector('#retelling_result_span').dispatchEvent(new Event('input', {bubbles: true}));
+        content.querySelector('#retelling_final_span').dispatchEvent(new Event('input', {bubbles: true}));
+      }, 500);
+    }
+
+    window.addEventListener('blur', () => destroy(content, voiceResponse, voiceControl));
 
     loader.remove()
-    this.element.appendChild(container)
+    this.element.appendChild(container);
+
+    return () => destroy(content, voiceResponse, voiceControl);
   }
 
   function processOutputAsJson(output) {
@@ -252,10 +254,17 @@ export default function Retelling(element, deck, params, microphoneChecker) {
   }
 
   return {
-    run,
+    destroyHandler: null,
+    async run() {
+      this.destroyHandler = await run();
+    },
     canNext() {
       return !(params.retellingRequired && !params.completed);
-
+    },
+    destroy() {
+      if (this.destroyHandler) {
+        this.destroyHandler();
+      }
     }
   }
 }
