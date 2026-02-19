@@ -124,6 +124,7 @@ echo FrontendRevealWidget::widget([
     'data' => $model->slidesData(),
     'canViewStory' => $userCanViewStory,
     'assets' => [
+        \common\assets\StoryPluginsAsset::class,
         PlyrAsset::class,
         RecorderAsset::class,
         \common\assets\panzoom\PanzoomAsset::class,

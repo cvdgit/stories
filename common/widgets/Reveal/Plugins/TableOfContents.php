@@ -24,9 +24,7 @@ class TableOfContents extends AbstractPlugin implements PluginInterface
 
     public function pluginCssFiles(): array
     {
-        return [
-            (new Dependency('/js/player/plugins/table-of-contents.css'))->src,
-        ];
+        return [];
     }
 
     public function dependencies(): array

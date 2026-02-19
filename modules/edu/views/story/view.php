@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use common\assets\StoryPluginsAsset;
 use common\helpers\Url;
 use common\rbac\UserRoles;
 use frontend\assets\MentalMapAsset;
@@ -79,6 +80,10 @@ $config = [
             'mental-map-plan-accumulation',
         ],
     ],
+    'table-of-contents' => [
+        'storyId' => $storyId,
+        'userId' => Yii::$app->user->id,
+    ],
 ];
 
 $configJson = Json::encode($config);
@@ -88,6 +93,7 @@ window.WikidsRevealConfig = $configJson;
 JS
 );
 
+StoryPluginsAsset::register($this);
 TestAsset::register($this);
 MentalMapAsset::register($this);
 RetellingAsset::register($this);
@@ -152,7 +158,7 @@ $this->title = $story->title;
     </div>
 </div>
 
-<div class="story-box" style="height: auto">
+<div class="story-box story-container-wrap" style="height: auto; position: relative">
     <div class="story-container">
         <div class="story-container-inner" id="story-container">
             <div class="reveal" data-toggle="slides">

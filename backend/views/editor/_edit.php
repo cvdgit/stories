@@ -5,6 +5,7 @@ declare(strict_types=1);
 use backend\assets\MainAsset;
 use backend\assets\StoryEditorAsset;
 use backend\widgets\BackendRevealWidget;
+use common\assets\StoryPluginsAsset;
 use common\models\Story;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -20,6 +21,7 @@ use yii\web\View;
 
 StoryEditorAsset::register($this);
 MainAsset::register($this);
+StoryPluginsAsset::register($this);
 
 $this->registerJs($this->renderFile("@backend/views/editor/_gpt_slide_text.js"));
 $this->registerJs($this->renderFile("@backend/views/editor/_pass_test.js"));
@@ -355,7 +357,7 @@ $js = <<< JS
             const slidesMap = new Map();
             $('#slides-list > [data-slide-id]')
                 .each((i, el) => slidesMap.set(Number($(el).attr('data-slide-id')), i + 1));
-            TableOfContentsPlugin.initEdit(
+            window.TableOfContents.editorInit(
                 payload,
                 elem.find('.table-of-contents'),
                 slidesMap
@@ -424,7 +426,7 @@ $js = <<< JS
             const slidesMap = new Map();
             $('#slides-list > [data-slide-id]')
                 .each((i, el) => slidesMap.set(Number($(el).attr('data-slide-id')), i + 1));
-            TableOfContentsPlugin.initEdit(
+            window.TableOfContents.editorInit(
                 payload,
                 content.find('.table-of-contents'),
                 slidesMap
@@ -925,7 +927,7 @@ $js = <<< JS
             const slidesMap = new Map();
             $('#slides-list > [data-slide-id]')
                 .each((i, el) => slidesMap.set(Number($(el).attr('data-slide-id')), i + 1));
-            TableOfContentsPlugin.initEdit(
+            window.TableOfContents.editorInit(
                 payload,
                 block.getElement().find('.table-of-contents'),
                 slidesMap
@@ -1060,7 +1062,7 @@ $js = <<< JS
         const updatePayloadHandler = (p) => {
             elem.find('.table-of-contents-payload').text(JSON.stringify(p));
             StoryEditor.change();
-            TableOfContentsPlugin.initEdit(p, elem, slidesMap);
+            window.TableOfContents.editorInit(p, elem, slidesMap);
         }
 
         fetch('/admin/index.php?r=editor/slides&story_id=' + StoryEditor.getConfigValue('storyID'), {

@@ -17,6 +17,7 @@ import isMobile from "./is_mobile";
 import MentalMap from "./plugins/MentalMap";
 import ContentMentalMap from "./plugins/ContentMentalMap";
 import Retelling from "./plugins/Retelling";
+import TableOfContents from "./plugins/TableOfContents";
 import GlobalContext from "./GlobalContext";
 
 GlobalContext.sessionId = uuidv4();
@@ -34,6 +35,7 @@ function onSlideMouseDown(e, player) {
     $target.parents("section[data-slide-view=new-question]").length ||
     $target.parents('.new-questions').length ||
     $target.parents('.content-mm-wrap').length ||
+    $target.parents('.table-of-contents').length ||
     $target.parents('.mental-map').length ||
     $target.parents('.retelling-block').length ||
     ($target[0].tagName === "IMG" && $target.attr("data-action") === "1") ||
@@ -97,6 +99,7 @@ window.initSlides = function() {
       Testing,
       MentalMap,
       ContentMentalMap,
+      TableOfContents,
       Retelling,
       LinksPlugin,
       VideoPlugin,

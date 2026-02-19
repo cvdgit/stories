@@ -20,7 +20,8 @@ module.exports = {
     video: path.resolve(__dirname, 'asset/video/index.js'),
     math: path.resolve(__dirname, 'asset/math/math.js'),
     storyCreateAssist: path.resolve(__dirname, 'asset/storyCreateAssist/index.js'),
-    reveal: path.resolve(__dirname, 'asset/reveal/index.js')
+    reveal: path.resolve(__dirname, 'asset/reveal/index.js'),
+    storyPlugins: path.resolve(__dirname, 'asset/storyPlugins/index.js')
   },
   output: {
     filename: '[name].js',
