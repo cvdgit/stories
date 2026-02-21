@@ -34,7 +34,7 @@ export default function RawTextMessage({message, threadId}) {
   const createStoryForReadingHandler = async () => {
     const {markdown} = metadata;
     const md = markdownit();
-    const ast = md.parse(markdown);
+    const ast = md.parse(markdown, {});
     const tree = markdownAstToTree(ast);
 
     setMessages(prevMessages => prevMessages.map(m => {
@@ -55,7 +55,7 @@ export default function RawTextMessage({message, threadId}) {
 
     const {markdown} = metadata;
     const md = markdownit();
-    const ast = md.parse(markdown);
+    const ast = md.parse(markdown, {});
     const tree = markdownAstToTree(ast);
 
     const repetitionTrainer = settings.filter(s => s.create);
