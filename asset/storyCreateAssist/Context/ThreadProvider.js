@@ -43,6 +43,10 @@ async function streamMessage(url, payload, onMessage, onEnd, onError) {
 
         onMessage(accumulatedMessage);
       }
+
+      if (msg.event === "error" && msg.data) {
+        onError(msg.data)
+      }
     },
     onclose: () => {
       console.log('close')
@@ -656,22 +660,117 @@ export function ThreadProvider({children}) {
     } finally {}
   }
 
+  function setSlideMessageStatus(messageId, slideId, status) {
+    setMessages(prevMessages => prevMessages.map(m => {
+      if (m.id === messageId) {
+        return {
+          ...m, metadata: {
+            ...m.metadata, slides: m.metadata.slides.map(s => {
+              if (s.slideId === slideId) {
+                return {...s, status};
+              }
+              return s;
+            })
+          }
+        };
+      }
+      return m;
+    }));
+  }
+
+  const createReadingTrainerSlide = async (threadId, messageId, storyId, slideId) => {
+    saveMessages(threadId);
+    setSlideMessageStatus(messageId, slideId, 'process');
+    await streamReadingTrainerSlide(
+      threadId,
+      messageId,
+      storyId,
+      slideId
+    );
+  }
+
+  const streamReadingTrainerSlide = async (threadId, messageId, storyId, slideId, slideText) => {
+
+    if (!slideText) {
+      const message = messages.find(m => m.id === messageId);
+      const {metadata} = message;
+      const slideItem = metadata.slides.find(s => s.slideId === slideId);
+      slideText = slideItem?.slideText;
+    }
+
+    if (!slideText) {
+      saveMessages(threadId);
+      setSlideMessageStatus(messageId, slideId, 'error');
+      throw new Error('Reading trainer slide text empty');
+    }
+
+    const contents = {title: 'Ментальная карта', type: 'mental-map', fragments: []};
+
+    return streamMessage(
+      '/admin/index.php?r=gpt/mental-map/text-fragments',
+      {text: fragmentContentWithoutHeaders(slideText)},
+      () => {
+      },
+      (fragmentsJsonText) => {
+
+        let fragments = []
+        try {
+          fragments = processOutputAsJson(fragmentsJsonText).map(text => {
+            const fragmentId = uuidv4();
+            return {
+              id: fragmentId,
+              title: text,
+            }
+          });
+        } catch (ex) {
+          throw new Error(ex.message);
+        }
+
+        const data = {
+          storyId,
+          slideId,
+          mentalMap: {...contents, fragments},
+          text: slideText
+        };
+        api.post('/admin/index.php?r=story-ai/create-slide-reading-handler', data, {
+          'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+        }).then(response => {
+          saveMessages(threadId);
+          setSlideMessageStatus(messageId, slideId, 'done');
+        });
+      },
+      () => {
+        saveMessages(threadId);
+        setSlideMessageStatus(messageId, slideId, 'error');
+      }
+    )
+  }
+
   const createReadingTrainer = async (threadId, metadata) => {
 
     const messageId = uuidv4();
 
-    setMessages(prevMessages => [...prevMessages, {
+    saveMessages(threadId);
+
+    const message = {
       id: messageId,
       message: '',
       type: 'reading_trainer',
       metadata: {}
-    }]);
-    saveMessages(threadId);
+    }
+    setMessages(prevMessages => [...prevMessages, message]);
 
     const {payload: json, story} = metadata;
     const {id: storyId, slideMap} = story;
 
-    const slideState = slideMap.map(({slideId}) => ({slideId, status: 'process'}));
+    const slideState = slideMap.map(({fragmentId, slideId}) => {
+      const slideFragment = json.fragments.find(({id}) => id === fragmentId);
+      return {
+        slideId,
+        slideText: slideFragment.text,
+        status: 'process'
+      };
+    });
 
     saveMessages(threadId);
     setMessages(prevMessages => prevMessages.map(m => {
@@ -682,61 +781,18 @@ export function ThreadProvider({children}) {
     }));
 
     const requests = [];
-    slideMap.map(({fragmentId, slideId}) => {
-      const contents = {title: 'Ментальная карта', type: 'mental-map', fragments: []};
-      const slideFragment = json.fragments.find(({id}) => id === fragmentId);
+    slideMap.map(({slideId}) => {
+      const stateItem = slideState.find(i => i.slideId === slideId);
       requests.push(
-        streamMessage(
-          '/admin/index.php?r=gpt/mental-map/text-fragments',
-          {text: fragmentContentWithoutHeaders(slideFragment.text)},
-          () => {
-          },
-          (fragmentsJsonText) => {
-
-            let fragments = []
-            try {
-              fragments = processOutputAsJson(fragmentsJsonText).map(text => {
-                const fragmentId = uuidv4();
-                return {
-                  id: fragmentId,
-                  title: text,
-                }
-              });
-            } catch (ex) {
-              throw new Error(ex.message);
-            }
-
-            const data = {
-              storyId,
-              slideId,
-              mentalMap: {...contents, fragments},
-              text: slideFragment.text
-            };
-            api.post('/admin/index.php?r=story-ai/create-slide-reading-handler', data, {
-              'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').getAttribute('content')
-            }).then(response => {
-
-              saveMessages(threadId);
-              setMessages(prevMessages => prevMessages.map(m => {
-                if (m.id === messageId) {
-                  return {
-                    ...m, metadata: {
-                      ...m.metadata, slides: m.metadata.slides.map(s => {
-                        if (s.slideId === response.slideId) {
-                          return {...s, status: 'done'};
-                        }
-                        return s;
-                      })
-                    }
-                  };
-                }
-                return m;
-              }));
-            });
-          }
+        streamReadingTrainerSlide(
+          threadId,
+          messageId,
+          storyId,
+          slideId,
+          stateItem?.slideText
         )
-      )
-    })
+      );
+    });
 
     Promise
       .all(requests)
@@ -848,7 +904,8 @@ export function ThreadProvider({children}) {
       splitTextForReading,
       splitTextForSpeechTrainer,
       createStoryForReading,
-      createStoryForSpeechTrainer
+      createStoryForSpeechTrainer,
+      createReadingTrainerSlide
     }
   }), [
     isUserThreadsLoading,
@@ -872,7 +929,8 @@ export function ThreadProvider({children}) {
     createSpeechTrainer,
     deleteRepetitionTrainer,
     createReadingTrainer,
-    switchSelectedThread
+    switchSelectedThread,
+    createReadingTrainerSlide
   ]);
 
   return (
