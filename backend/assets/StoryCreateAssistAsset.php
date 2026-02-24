@@ -8,7 +8,7 @@ use yii\web\AssetBundle;
 
 class StoryCreateAssistAsset extends AssetBundle
 {
-    public $basePath = '@webroot';
+    public $basePath = '@public';
     public $baseUrl = '@web';
     public $css = [
         '/build/storyCreateAssist.css',
