@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace backend\controllers\editor;
 
+use backend\AiStoryAssist\MentalMapBuilder;
 use backend\components\BaseController;
 use backend\components\story\AbstractBlock;
 use backend\components\story\MentalMapBlock;
@@ -64,6 +65,10 @@ class MentalMapController extends BaseController
      * @var SpeechTrainerService
      */
     private $speechTrainerService;
+    /**
+     * @var MentalMapBuilder
+     */
+    private $mentalMapBuilder;
 
     public function __construct(
         $id,
@@ -72,6 +77,7 @@ class MentalMapController extends BaseController
         TransactionManager $transactionManager,
         StorySlideService $storySlideService,
         SpeechTrainerService $speechTrainerService,
+        MentalMapBuilder $mentalMapBuilder,
         $config = []
     ) {
         parent::__construct($id, $controller, $config);
@@ -79,6 +85,7 @@ class MentalMapController extends BaseController
         $this->transactionManager = $transactionManager;
         $this->storySlideService = $storySlideService;
         $this->speechTrainerService = $speechTrainerService;
+        $this->mentalMapBuilder = $mentalMapBuilder;
     }
 
     public function behaviors(): array
@@ -204,8 +211,6 @@ class MentalMapController extends BaseController
                 throw new NotFoundHttpException('Слайд не найден');
             }
 
-            $storyModel = $currentSlideModel->story;
-
             $mentalMaps = Json::decode($mentalMapForm->mentalMaps);
             $newSlideId = null;
             foreach ($mentalMaps as $mentalMapRow) {
@@ -216,52 +221,29 @@ class MentalMapController extends BaseController
                     }
                 }
                 try {
-                    $this->transactionManager->wrap(function () use ($mentalMapForm, &$newSlideId, $storyModel, $currentSlideModel, $user, $mentalMapRow) {
-
-                        $slideModel = $this->storySlideService->create($storyModel->id, 'empty', StorySlide::KIND_MENTAL_MAP);
-                        $slideModel->number = $currentSlideModel->number + 1;
-                        Story::insertSlideNumber($storyModel->id, $currentSlideModel->number);
-                        if (!$slideModel->save()) {
-                            throw new DomainException(
-                                'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
-                            );
-                        }
-
-                        $mentalMapId = Uuid::uuid4()->toString();
-
-                        $payload = [
-                            'id' => $mentalMapId,
-                            'name' => $mentalMapRow['title'],
-                            'text' => $mentalMapForm->text,
-                            'treeView' => true,
-                            'map' => [
-                                'url' => '/img/mental_map_blank.jpg',
-                                'width' => 1080,
-                                'height' => 720,
-                                'images' => [],
-                            ],
-                            'mapTypeIsMentalMapQuestions' => false,
-                            'treeData' => array_map(static function(string $textFragment): array {
-                                return [
-                                    'id' => Uuid::uuid4()->toString(),
-                                    'title' => $textFragment,
-                                ];
-                            }, $mentalMapRow['fragments']),
-                        ];
-
-                        $mentalMap = MentalMap::create($mentalMapId, $mentalMapRow['title'], $payload, $user->getId());
-                        if (!$mentalMap->save()) {
-                            throw new BadRequestHttpException('Mental Map save exception');
-                        }
-
-                        $data = $this->storyEditorService->getSlideWithMentalMapBlockContent($slideModel->id, $mentalMapId, 'mental-map', false);
-                        $slideModel->updateData($data);
-                        if (!$slideModel->save()) {
-                            throw new DomainException(
-                                'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
-                            );
-                        }
-                        $newSlideId = $slideModel->id;
+                    $this->transactionManager->wrap(function () use ($mentalMapForm, &$newSlideId, $currentSlideModel, $user, $mentalMapRow) {
+                        $this->mentalMapBuilder->createTreeMentalMap(
+                            $mentalMapId = Uuid::uuid4(),
+                            $mentalMapRow['title'],
+                            $mentalMapForm->text,
+                            $user->getId(),
+                            $mentalMapRow['fragments'],
+                            $mentalMapRow['type']
+                        );
+                        $mapSlide = $this->storySlideService->createAndInsertSlide(
+                            $currentSlideModel->story_id,
+                            StorySlide::KIND_MENTAL_MAP,
+                            $currentSlideModel->number,
+                            function (int $slideId) use ($mentalMapId): string {
+                                return $this->storyEditorService->getSlideWithMentalMapBlockContent(
+                                    $slideId,
+                                    $mentalMapId->toString(),
+                                    'mental-map',
+                                    false,
+                                );
+                            },
+                        );
+                        $newSlideId = $mapSlide->id;
                     });
                 } catch (Exception $exception) {
                     Yii::$app->errorHandler->logException($exception);
@@ -442,7 +424,7 @@ class MentalMapController extends BaseController
                         'id' => $fragment['id'],
                         'title' => $fragment['title'],
                     ];
-                }, $mentalMapRow['fragments']));
+                }, MentalMapPayload::filterEmptyFragments($mentalMapRow['fragments'])));
 
                 if (!$mentalMap->save()) {
                     throw new BadRequestHttpException('Mental Map save exception');

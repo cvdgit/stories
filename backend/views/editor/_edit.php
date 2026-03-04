@@ -731,18 +731,27 @@ $js = <<< JS
                         const type = mentalMaps[i].type
                           switch (type) {
                               case 'mental_map':
-                                  json.map(textFragment => mentalMaps[i].fragments.push(textFragment))
+                                  json.map(textFragment => mentalMaps[i].fragments.push({
+                                    id: uuidv4(),
+                                    title: textFragment
+                                  }))
                                   break;
                               case 'mental_map_even_fragments':
                                   json.map(textFragment => {
                                       const words = mentalMapsAi.processFragment(textFragment)
-                                      mentalMaps[i].fragments.push(mentalMapsAi.hideWordsEven(words.words))
+                                      mentalMaps[i].fragments.push({
+                                        id: uuidv4(),
+                                        title: mentalMapsAi.hideWordsEven(words.words)
+                                      })
                                   })
                                   break;
                               case 'mental_map_odd_fragments':
                                   json.map(textFragment => {
                                       const words = mentalMapsAi.processFragment(textFragment)
-                                      mentalMaps[i].fragments.push(mentalMapsAi.hideWordsOdd(words.words))
+                                      mentalMaps[i].fragments.push({
+                                        id: uuidv4(),
+                                        title: mentalMapsAi.hideWordsOdd(words.words)
+                                      })
                                   })
                                   break;
                           }
