@@ -25,7 +25,6 @@ use backend\SlideEditor\ContentMentalMap\ContentMentalMapForm;
 use backend\SlideEditor\ContentMentalMap\SpeechTrainer;
 use backend\SlideEditor\CreateMentalMapQuestions\UpdateMentalMapQuestionsForm;
 use backend\StoryContent\SpeechTrainer\SpeechTrainerService;
-use common\models\Story;
 use common\models\StorySlide;
 use common\rbac\UserRoles;
 use common\services\TransactionManager;
@@ -44,8 +43,6 @@ use yii\web\NotFoundHttpException;
 use yii\web\Request;
 use yii\web\Response;
 use yii\web\User as WebUser;
-
-use function PHPUnit\Framework\containsEqual;
 
 class MentalMapController extends BaseController
 {
@@ -326,31 +323,30 @@ class MentalMapController extends BaseController
                     }
 
                     $mentalMapId = Uuid::uuid4();
-                    $payload = MentalMapPayload::treeMentalMap(
-                        $mentalMapId,
-                        $mentalMapRow['title'],
-                        preg_replace('/\<br(\s*)?\/?\>/i', "\n", $createForm->text),
-                        array_map(static function(array $fragment): array {
-                            return [
-                                'id' => $fragment['id'],
-                                'title' => $fragment['title'],
-                            ];
-                        }, MentalMapPayload::filterEmptyFragments($mentalMapRow['fragments'])),
-                    );
 
-                    $mentalMap = MentalMap::create(
-                        $mentalMapId->toString(),
-                        $payload->getName(),
-                        $payload->asArray(),
-                        $user->getId(),
-                        $mentalMapRow['type'],
-                    );
-                    if (!$mentalMap->save()) {
-                        throw new BadRequestHttpException('Mental Map save exception');
+                    if ($type === 'mental-map-plan' || $type === 'mental-map-plan-accumulation') {
+                        $this->mentalMapBuilder->createPlanMentalMap(
+                            $mentalMapId,
+                            $mentalMapRow['title'],
+                            preg_replace('/\<br(\s*)?\/?\>/i', "\n", $createForm->text),
+                            $user->getId(),
+                            $mentalMapRow['fragments'],
+                            Uuid::fromString(Yii::$app->params['ai.story.assist.plan.prompt.id']),
+                            $type,
+                        );
+                    } else {
+                        $this->mentalMapBuilder->createTreeMentalMap(
+                            $mentalMapId,
+                            $mentalMapRow['title'],
+                            preg_replace('/\<br(\s*)?\/?\>/i', "\n", $createForm->text),
+                            $user->getId(),
+                            $mentalMapRow['fragments'],
+                            $type
+                        );
                     }
 
                     $this->speechTrainerService->createMentalMapSlideRow(
-                        Uuid::fromString($mentalMap->uuid),
+                        $mentalMapId,
                         (int) $createForm->slideId,
                         $createForm->blockId,
                         (bool) $mentalMapRow['required'],
