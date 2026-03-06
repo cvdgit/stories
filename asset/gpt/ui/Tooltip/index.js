@@ -1,8 +1,7 @@
 import React, {useMemo} from "react";
-import PropTypes from 'prop-types'
 import "./Tooltip.scss";
 
-export function Tooltip({text, className, children, position}) {
+export function Tooltip({text, className, children, position = 'top'}) {
   const memoizedChildren = useMemo(() => children, [children]);
   return (
     <div className={`tooltip ${className}`}>
@@ -14,12 +13,4 @@ export function Tooltip({text, className, children, position}) {
       </div>
     </div>
   );
-}
-
-Tooltip.defaultProps = {
-  position: 'top'
-}
-
-Tooltip.propTypes = {
-  position: PropTypes.string,
 }

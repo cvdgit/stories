@@ -1,8 +1,7 @@
 import React from 'react';
 import "./Loading.css";
 
-export function Loading(props) {
-  const {text, type, color} = props
+export function Loading({text, type = 'circle', color}) {
 
   return (
     <div className="loading">
@@ -14,9 +13,4 @@ export function Loading(props) {
       </div>
     </div>
   )
-}
-
-Loading.defaultProps = {
-  type: 'circle', // normal|circle
-  text: null
 }
