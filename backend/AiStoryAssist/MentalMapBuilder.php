@@ -56,17 +56,25 @@ class MentalMapBuilder
         UuidInterface $promptId = null,
         string $type = MentalMap::TYPE_MENTAL_MAP_PLAN
     ): MentalMap {
-        $payload = MentalMapPayload::planMentalMap(
-            $id,
-            $title,
-            $text,
-            array_map(static function (array $fragment): array {
+
+        $fragments = MentalMapPayload::filterEmptyFragments($fragments);
+        if ($type === MentalMap::TYPE_MENTAL_MAP_PLAN_ACCUMULATION) {
+            $fragments = MentalMapPayload::accumulateFragments($fragments);
+        } else {
+            $fragments = array_map(static function (array $fragment): array {
                 return [
                     'id' => $fragment['id'],
                     'title' => $fragment['title'],
                     'description' => $fragment['description'],
                 ];
-            }, MentalMapPayload::filterEmptyFragments($fragments)),
+            }, $fragments);
+        }
+
+        $payload = MentalMapPayload::planMentalMap(
+            $id,
+            $title,
+            $text,
+            $fragments,
             $promptId,
             $type === MentalMap::TYPE_MENTAL_MAP_PLAN_ACCUMULATION,
         );
