@@ -55,9 +55,9 @@ class StatisticsController extends Controller
                     if ($model->isLastSlide()) {
                         $status = StudyTaskProgressStatus::DONE;
                     }
-                    StudyTaskProgressStatus::setStatus($model->study_task_id, $user->getId(), $status);
+                    StudyTaskProgressStatus::setStatus((int) $model->study_task_id, $user->getId(), $status);
                 } else {
-                    $this->countersService->calculateStoryHistoryPercentage($user->id, $model->story_id);
+                    $this->countersService->calculateStoryHistoryPercentage($user->id, (int) $model->story_id);
                 }
             }
             return ['success' => true];
