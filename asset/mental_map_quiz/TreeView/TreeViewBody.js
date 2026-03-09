@@ -105,7 +105,6 @@ function ItemWrapper(listItem, {isPlanTreeView}) {
 }
 
 function processTreeNodes(list, body, history, voiceResponse, params, onEndHandler, dispatchEvent) {
-  console.log('processTreeNodes', params)
 
   let showVoiceControl = false
 
@@ -313,10 +312,6 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
       processTreeNodes(list, body, history, voiceResponse, params, onEndHandler, dispatchEvent)
       console.log('after processTreeNodes', json, historyItem)
 
-      dispatchEvent('historyChange', {
-        currentHistory: history
-      })
-
       const wordItems = createWordItem(listItemWrapper.getTargetText(), listItem.id)
       wordItems.words = [...wordItems.words].map(w => {
         if (w.type === 'word' && w.target === true) {
@@ -326,7 +321,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
       })
       const textHidingPercentage = calcHiddenTextPercent(wordItems)
 
-      saveUserResult({
+      await saveUserResult({
         ...params,
         image_fragment_id: nodeId,
         overall_similarity: Number(json.similarity_percentage),
@@ -345,6 +340,10 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
         }
         //resetNodeRow(rowElement)
       })*/
+
+      dispatchEvent('historyChange', {
+        currentHistory: history
+      })
 
       historyItem.all = Number(json.similarity_percentage)
       historyItem.hiding = textHidingPercentage

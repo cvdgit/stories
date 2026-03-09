@@ -111,6 +111,11 @@ class StoryController extends Controller
         $text = $payload['text'];
         $text = strip_tags($text);
 
+        if (!$text) {
+            $this->flushError('no text');
+            Yii::$app->end();
+        }
+
         $prompt = LlmPrompt::findByKey('create-story-from-text');
         if ($prompt === null) {
             $this->flushError('Промт не найден');

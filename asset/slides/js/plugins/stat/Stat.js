@@ -47,11 +47,23 @@ export default function Stat(config) {
     }
   }
 
+  function dispatchEvent(type, args) {
+    const event = new CustomEvent(type, {
+      detail: args,
+      cancelable: true,
+      bubbles: true
+    });
+    document.dispatchEvent(event);
+  }
+
   return {
     slideChangeEvent(ev) {
       const ts = toUnixTS(ev.timeStamp);
       if (ts > 0 && ev.indexh > 0) {
-        return sendStatistics(ev);
+        return sendStatistics(ev).then(() => dispatchEvent('sendStatEvent', {
+          story_id: config.story_id,
+          student_id: config.student_id,
+        }));
       }
     },
     sendStat({slideId}) {
@@ -60,7 +72,12 @@ export default function Stat(config) {
         slide_id: slideId,
         student_id: config.student_id,
         session
-      });
+      }).then(() => {
+        dispatchEvent('sendStatEvent', {
+          story_id: config.story_id,
+          student_id: config.student_id,
+        });
+      })
     }
   };
 };

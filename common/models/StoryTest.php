@@ -2,7 +2,6 @@
 
 namespace common\models;
 
-use backend\components\question\base\Answer;
 use backend\models\test\TestRepeat;
 use common\helpers\Url;
 use common\models\test\AnswerType;
@@ -552,5 +551,59 @@ class StoryTest extends ActiveRecord
             ->from('story_test_question')
             ->where(['story_test_id' => $this->id])
             ->scalar();
+    }
+
+    public function calculateWeightsQuestions(): int
+    {
+        if ($this->source === SourceType::NEO) {
+            return 1;
+        }
+
+        if ($this->source === SourceType::LIST) {
+            return count($this->wordList->testWords);
+        }
+
+        if ($this->source === SourceType::TESTS) {
+            $total = 0;
+            array_map(static function(StoryTest $test) use (&$total): int {
+                $total += array_reduce(
+                    $test->storyTestQuestions,
+                    static function(int $carry, StoryTestQuestion $question): int {
+                        return $carry + $question->weight;
+                    },
+                    0
+                );
+            }, $this->relatedTests);
+            return $total;
+        }
+
+        return array_reduce(
+            $this->storyTestQuestions,
+            static function(int $carry, StoryTestQuestion $question): int {
+                return $carry + $question->weight;
+            },
+            0
+        );
+    }
+
+    public function calculateNumberOfQuestions(): int
+    {
+        if ($this->source === SourceType::NEO) {
+            return 0;
+        }
+
+        if ($this->source === SourceType::LIST) {
+            return count($this->wordList->testWords);
+        }
+
+        if ($this->source === SourceType::TESTS) {
+            $total = 0;
+            array_map(static function (StoryTest $test) use (&$total): int {
+                $total += count($test->storyTestQuestions);
+            }, $this->relatedTests);
+            return $total;
+        }
+
+        return count($this->storyTestQuestions);
     }
 }

@@ -1,0 +1,20 @@
+.required-stories {
+  display: table;
+  width: 100%;
+}
+.required-story-row {
+  display: table-row;
+}
+.required-story-row:not(.required-story-row-header):hover {
+  background-color: #eee;
+}
+.required-story-cell {
+  padding: 20px 10px;
+  min-height: 50px;
+  display: table-cell;
+}
+
+.required-story-row-header .required-story-cell {
+  font-weight: 600;
+  white-space: nowrap;
+}

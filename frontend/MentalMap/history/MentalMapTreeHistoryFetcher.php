@@ -84,6 +84,23 @@ class MentalMapTreeHistoryFetcher
             $historyRowsByFragmentId[$id][] = $historyRow;
         }
 
+        $rows = $this->filterUserHistoryGroupByCorrect($historyRowsByFragmentId);
+
+        return array_map(static function (array $item) use ($rows): array {
+            if (isset($rows[$item['id']])) {
+                $row = $rows[$item['id']];
+                $all = isset($row['all']) ? (int) $row['all'] : 0;
+                $item['done'] = $row['done'];
+                $item['all'] = $all;
+                $item['hiding'] = isset($row['hiding']) ? (int) $row['hiding'] : 0;
+                $item['target'] = isset($row['target']) ? (int) $row['target'] : 0;
+            }
+            return $item;
+        }, $history);
+    }
+
+    public function filterUserHistoryGroupByCorrect(array $historyRowsByFragmentId): array
+    {
         $rows = [];
         foreach ($historyRowsByFragmentId as $fragmentId => $rowsGroup) {
 
@@ -105,18 +122,7 @@ class MentalMapTreeHistoryFetcher
 
             $rows[$fragmentId] = array_merge($rowsGroup[0], ['done' => true]);
         }
-
-        return array_map(static function (array $item) use ($rows): array {
-            if (isset($rows[$item['id']])) {
-                $row = $rows[$item['id']];
-                $all = isset($row['all']) ? (int) $row['all'] : 0;
-                $item['done'] = $row['done'];
-                $item['all'] = $all;
-                $item['hiding'] = isset($row['hiding']) ? (int) $row['hiding'] : 0;
-                $item['target'] = isset($row['target']) ? (int) $row['target'] : 0;
-            }
-            return $item;
-        }, $history);
+        return $rows;
     }
 
     private function flatten(array $element): array

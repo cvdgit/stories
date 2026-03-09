@@ -141,6 +141,13 @@ export default function Retelling(element, deck, params, microphoneChecker) {
               if (params.completed) {
                 container.appendChild(createFinishContent(`${params.all}%`, slideTexts))
               }
+
+              if (deck) {
+                if (deck.hasPlugin('stat')) {
+                  const statPlugin = deck.getPlugin('stat');
+                  statPlugin.sendStat({slideId: params.slide_id});
+                }
+              }
             })
           }
         },

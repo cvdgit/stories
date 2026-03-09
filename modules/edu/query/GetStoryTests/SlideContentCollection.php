@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace modules\edu\query\GetStoryTests;
 
+use IteratorAggregate;
+use Traversable;
 use yii\base\InvalidConfigException;
 
-class SlideContentCollection
+class SlideContentCollection implements IteratorAggregate
 {
     private $contents;
 
@@ -48,5 +50,19 @@ class SlideContentCollection
                 return in_array(get_class($item), $classNames, true);
             }),
         );
+    }
+
+    public function add(SlideContentItemInterface $item): void
+    {
+        $this->contents[] = $item;
+    }
+
+    public function getIterator(): Traversable
+    {
+        return (function () {
+            foreach ($this->contents as $val) {
+                yield get_class($val) => $val;
+            }
+        })();
     }
 }

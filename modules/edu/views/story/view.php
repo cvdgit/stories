@@ -10,6 +10,8 @@ use frontend\assets\RetellingAsset;
 use frontend\assets\SlidesAsset;
 use frontend\assets\TestAsset;
 use modules\edu\models\EduStory;
+use modules\edu\RequiredStory\repo\RequiredStory;
+use modules\edu\RequiredStory\repo\RequiredStorySession;
 use yii\helpers\Json;
 use yii\web\View;
 
@@ -20,6 +22,9 @@ use yii\web\View;
  * @var array $backRoute
  * @var int $studentId
  * @var array $contentMentalMaps
+ * @var RequiredStory|null $requiredStory
+ * @var RequiredStorySession|null $requiredStorySession
+ * @var array $requiredStoryStat
  */
 
 $storyId = $story->id;
@@ -157,6 +162,19 @@ $this->title = $story->title;
         </div>
     </div>
 </div>
+
+<?php if ($requiredStory !== null): ?>
+    <div style="margin: 15px auto 20px; width: 1060px; height: auto; position: relative">
+        <h3>Обязательная история</h3>
+        <?= $this->render('_required_story_stat', [
+            'sessionFact' => $requiredStorySession->getFact(),
+            'sessionPlan' => $requiredStorySession->getPlan(),
+            'sessionIsCompleted' => $requiredStorySession->isCompleted(),
+            'plan' => $requiredStoryStat['plan'],
+            'fact' => $requiredStoryStat['fact'],
+        ]) ?>
+    </div>
+<?php endif ?>
 
 <div class="story-box story-container-wrap" style="height: auto; position: relative">
     <div class="story-container">

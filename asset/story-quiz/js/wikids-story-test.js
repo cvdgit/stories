@@ -1836,7 +1836,7 @@ function WikidsStoryTest(el, options) {
   }
 
   // Ответ на вопрос
-  function nextQuestion(preparedAnswers, checkAnswersCallback) {
+  async function nextQuestion(preparedAnswers, checkAnswersCallback) {
 
     console.debug('WikidsStoryTest.nextQuestion');
     if (!Array.isArray(preparedAnswers)) {
@@ -2037,7 +2037,7 @@ function WikidsStoryTest(el, options) {
           'progress': testProgress.calcPercent(),
           'stars': questionsRepeat.number(currentQuestion)
         };
-        $.post('/question/answer', answerParams);
+        await $.post('/question/answer', answerParams);
       }
       if (testConfig.sourceIsWord() && !testConfig.answerTypeIsInput(currentQuestion)) {
         answerList = answer.map(function (answerText) {
@@ -2057,7 +2057,7 @@ function WikidsStoryTest(el, options) {
           'progress': testProgress.calcPercent(),
           'stars': questionsRepeat.number(currentQuestion)
         };
-        $.post('/question/answer', answerParams);
+        await $.post('/question/answer', answerParams);
       }
       if (testConfig.sourceIsWord() && testConfig.answerTypeIsInput(currentQuestion)) {
         answerList = answer.map(function (answerText) {
@@ -2077,7 +2077,7 @@ function WikidsStoryTest(el, options) {
           'progress': testProgress.calcPercent(),
           'stars': questionsRepeat.number(currentQuestion)
         };
-        $.post('/question/answer', answerParams);
+        await $.post('/question/answer', answerParams);
       }
       if (testConfig.sourceIsLocal() || testConfig.sourceIsTests()) {
 
@@ -2109,7 +2109,7 @@ function WikidsStoryTest(el, options) {
           'progress': testProgress.calcPercent(),
           'stars': questionsRepeat.number(currentQuestion)
         };
-        $.post('/question/answer', answerParams);
+        await $.post('/question/answer', answerParams);
       }
     }
 

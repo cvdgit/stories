@@ -8,7 +8,6 @@ use yii\base\Model;
 
 class StoryStudentStatForm extends Model
 {
-
     public $story_id;
     public $student_id;
     public $slide_id;

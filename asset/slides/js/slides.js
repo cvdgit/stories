@@ -120,5 +120,24 @@ window.initSlides = function() {
     }
   })
 
+  let timeout;
+  document.addEventListener('sendStatEvent', ({detail}) => {
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(async () => {
+      const elem = document.getElementById('required-story-stat');
+      if (!elem) {
+        return;
+      }
+      const {story_id: storyId, student_id: studentId} = detail;
+      const stat = await Api.get(`/edu/student/required-story-stat?studentId=${studentId}&storyId=${storyId}`);
+      if (!stat?.success) {
+        return;
+      }
+      elem.outerHTML = stat.content;
+    }, 500);
+  })
+
   return deck;
 }

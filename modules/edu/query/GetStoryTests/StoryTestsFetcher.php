@@ -11,12 +11,12 @@ use backend\components\story\reader\HTMLReader;
 use backend\components\story\RetellingBlockContent;
 use backend\components\story\TestBlock;
 use common\models\Story;
+use frontend\MentalMap\Content\StorySlidesContentsFetcher;
 use yii\base\InvalidConfigException;
 use yii\web\NotFoundHttpException;
 
 class StoryTestsFetcher
 {
-
     /**
      * @throws NotFoundHttpException
      * @throws InvalidConfigException
@@ -35,6 +35,8 @@ class StoryTestsFetcher
 
             if ($slide->getView() === '' || $slide->getView() === 'slide') {
                 $data[] = new Slide($slide->getId(), (int) $slide->getSlideNumber(), $slide->getContent());
+
+
             }
 
             foreach ($slide->getBlocks() as $block) {
@@ -48,7 +50,7 @@ class StoryTestsFetcher
                             $slide->getId(),
                             (int) $slide->getSlideNumber(),
                             (int) $testId,
-                            $content
+                            $content,
                         );
                     }
                 }
@@ -61,7 +63,7 @@ class StoryTestsFetcher
                             $slide->getId(),
                             (int) $slide->getSlideNumber(),
                             (int) $testId,
-                            'button'
+                            'button',
                         );
                     }
                 }
@@ -72,7 +74,7 @@ class StoryTestsFetcher
                         $slide->getId(),
                         (int) $slide->getSlideNumber(),
                         $content->getId(),
-                        $block->getContent()
+                        $block->getContent(),
                     );
                 }
 
@@ -82,7 +84,7 @@ class StoryTestsFetcher
                         $slide->getId(),
                         (int) $slide->getSlideNumber(),
                         $content->getId(),
-                        $block->getContent()
+                        $block->getContent(),
                     );
                 }
 
@@ -90,12 +92,38 @@ class StoryTestsFetcher
                     $data[] = new SlideTableOfContents(
                         $slide->getId(),
                         (int) $slide->getSlideNumber(),
-                        $block->getContent()
+                        $block->getContent(),
                     );
                 }
             }
         }
 
         return new SlideContentCollection($data);
+    }
+
+    /**
+     * @throws InvalidConfigException
+     * @throws NotFoundHttpException
+     */
+    public function fetchWithSpeechTrainerMentalMaps(int $storyId, bool $onlyRequired = true): SlideContentCollection
+    {
+        $collection = $this->fetch($storyId);
+        $slideIds = array_map(static function (Slide $contentItem): int {
+            return $contentItem->getSlideId();
+        }, $collection->find(Slide::class));
+        if (count($slideIds) > 0) {
+            $contents = (new StorySlidesContentsFetcher())->fetch($slideIds, $onlyRequired);
+            foreach ($contents as $item) {
+                $collection->add(
+                    new SlideMentalMap(
+                        $item->getSlideId(),
+                        0,
+                        $item->getMentalMapId()->toString(),
+                        $item->getBlockId(),
+                    ),
+                );
+            }
+        }
+        return $collection;
     }
 }

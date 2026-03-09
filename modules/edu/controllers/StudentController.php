@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace modules\edu\controllers;
 
 use common\models\UserStudent;
+use DateTimeImmutable;
+use Exception;
 use modules\edu\components\TopicAccessManager;
 use modules\edu\models\EduClass;
 use modules\edu\models\EduClassBook;
@@ -11,6 +15,9 @@ use modules\edu\models\EduLesson;
 use modules\edu\models\EduTopic;
 use modules\edu\query\StudentClassFetcher;
 use modules\edu\RepetitionApiInterface;
+use modules\edu\RequiredStory\repo\RequiredStoriesRepository;
+use modules\edu\RequiredStory\RequiredStoriesService;
+use modules\edu\StoryContent\StoryContentService;
 use modules\edu\widgets\StudentToolbarWidget;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -19,6 +26,7 @@ use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 class StudentController extends Controller
 {
@@ -28,6 +36,18 @@ class StudentController extends Controller
     private $repetitionApi;
 
     private $studentClassFetcher;
+    /**
+     * @var RequiredStoriesRepository
+     */
+    private $requiredStoriesRepository;
+    /**
+     * @var RequiredStoriesService
+     */
+    private $requiredStoriesService;
+    /**
+     * @var StoryContentService
+     */
+    private $storyContentService;
 
     public function __construct(
         $id,
@@ -35,15 +55,21 @@ class StudentController extends Controller
         TopicAccessManager $topicAccessManager,
         RepetitionApiInterface $repetitionApi,
         StudentClassFetcher $studentClassFetcher,
+        RequiredStoriesRepository $requiredStoriesRepository,
+        RequiredStoriesService $requiredStoriesService,
+        StoryContentService $storyContentService,
         $config = []
     ) {
         parent::__construct($id, $module, $config);
         $this->topicAccessManager = $topicAccessManager;
         $this->repetitionApi = $repetitionApi;
         $this->studentClassFetcher = $studentClassFetcher;
+        $this->requiredStoriesRepository = $requiredStoriesRepository;
+        $this->requiredStoriesService = $requiredStoriesService;
+        $this->storyContentService = $storyContentService;
     }
 
-    /*    public function behaviors(): array
+    /*public function behaviors(): array
         {
             return [
                 'access' => [
@@ -136,6 +162,7 @@ class StudentController extends Controller
             'dataProvider' => $dataProvider,
             'repetitionDataProvider' => $repetitionDataProvider,
             'classBookId' => $studentClassBookId,
+            'requiredStoriesWidgetConfig' => ['studentId' => $student->id],
         ]);
     }
 
@@ -257,5 +284,40 @@ class StudentController extends Controller
     private function renderStudentToolbarWidget(UserStudent $student, EduClass $class): string
     {
         return StudentToolbarWidget::widget(['studentName' => $student->name, 'studentClassName' => $class->name]);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function actionRequiredStoryStat(int $studentId, int $storyId, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+
+        $requiredStory = $this->requiredStoriesRepository->findRequiredStory($storyId, $studentId);
+        if ($requiredStory === null) {
+            return ['success' => false];
+        }
+
+        $requiredStorySession = $this->requiredStoriesService->initSession(
+            $studentId,
+            $storyId,
+            $requiredStory->getId(),
+            $requiredStory->getMetadata(),
+            new DateTimeImmutable()
+        );
+        $requiredStoryStat = [
+            'sessionFact' => $requiredStorySession->getFact(),
+            'sessionPlan' => $requiredStorySession->getPlan(),
+            'sessionIsCompleted' => $requiredStorySession->isCompleted(),
+            'plan' => $this->storyContentService->getStoryTotalContentItems($storyId),
+            'fact' => $this->storyContentService->getStudentFactContentItemsCount(
+                $studentId,
+                $storyId,
+            ),
+        ];
+        return [
+            'success' => true,
+            'content' => $this->renderPartial('../story/_required_story_stat', $requiredStoryStat),
+        ];
     }
 }

@@ -19,6 +19,11 @@ use yii\bootstrap\Nav;
                 'url' => ['/edu/teacher/class-book/index'],
                 'active' => Yii::$app->controller->id === 'teacher/class-book'
             ],
+            [
+                'label' => 'Обязательные истории',
+                'url' => ['/edu/teacher/required-story/index'],
+                'active' => Yii::$app->controller->id === 'teacher/required-story'
+            ],
         ],
     ]) ?>
 </div>

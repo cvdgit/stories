@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use common\models\UserStudent;
 use modules\edu\models\EduClass;
+use modules\edu\RequiredStory\widgets\StudentRequiredStories\StudentRequiredStoriesWidget;
 use yii\data\DataProviderInterface;
 use yii\web\View;
 use yii\widgets\ListView;
@@ -16,6 +17,7 @@ use yii\widgets\ListView;
  * @var DataProviderInterface $repetitionDataProvider
  * @var string $studentToolbarWidget
  * @var int|null $classBookId
+ * @var array $requiredStoriesWidgetConfig
  */
 
 $this->title = $student->name;
@@ -23,8 +25,10 @@ $this->title = $student->name;
 <div class="container">
     <?= $studentToolbarWidget; ?>
 
+    <?= StudentRequiredStoriesWidget::widget($requiredStoriesWidgetConfig) ?>
+
     <div class="header-block">
-        <h1 style="font-size: 32px; margin: 0; font-weight: 500; line-height: 1.2" class="h2">Повторение</h1>
+        <h2 style="font-size: 32px; margin: 0; font-weight: 500; line-height: 1.2" class="h2">Повторение</h2>
     </div>
 
     <div>
@@ -40,7 +44,7 @@ $this->title = $student->name;
     </div>
 
     <div class="header-block">
-        <h1 style="font-size: 32px; margin: 0; font-weight: 500; line-height: 1.2" class="h2">Обучение</h1>
+        <h2 style="font-size: 32px; margin: 0; font-weight: 500; line-height: 1.2" class="h2">Обучение</h2>
     </div>
 
     <div style="margin-bottom: 40px">

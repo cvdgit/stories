@@ -346,8 +346,16 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
               repetition_mode: repetitionMode,
               threshold,
               payload: json
-            })/*.then(response => {
-              if (response && response?.success) {
+            }).then(response => {
+
+              if (deck) {
+                if (deck.hasPlugin('stat')) {
+                  const statPlugin = deck.getPlugin('stat');
+                  statPlugin.sendStat({slideId: params.slide_id});
+                }
+              }
+              
+              /*if (response && response?.success) {
                 historyItem.all = response.history.all
                 historyItem.hiding = response.history.hiding
                 historyItem.target = response.history.target
@@ -362,15 +370,8 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
                     dialog.hide()
                   }
                 }
-              }
-            })*/
-
-            if (deck) {
-              if (deck.hasPlugin('stat')) {
-                const statPlugin = deck.getPlugin('stat');
-                statPlugin.sendStat({slideId: params.slide_id});
-              }
-            }
+              }*/
+            });
 
             historyItem.all = Number(json.overall_similarity)
             historyItem.hiding = textHidingPercentage
@@ -499,8 +500,16 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
               repetition_mode: repetitionMode,
               threshold,
               payload: json
-            })/*.then(response => {
-              if (response && response?.success) {
+            }).then(response => {
+
+              if (deck) {
+                if (deck.hasPlugin('stat')) {
+                  const statPlugin = deck.getPlugin('stat');
+                  statPlugin.sendStat({slideId: params.slide_id});
+                }
+              }
+              
+              /*if (response && response?.success) {
                 historyItem.all = response.history.all
                 //historyItem.hiding = response.history.hiding
                 //historyItem.target = response.history.target
@@ -509,8 +518,8 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
                 // wrapper.querySelector('.result-item-value').innerHTML = `${val}% (${textHidingPercentage}% / ${textTargetPercentage}%)`
                 wrapper.querySelector('.image-item > .result-item').remove()
                 wrapper.querySelector('.image-item').appendChild(FragmentResultQuestionsElement(historyItem))
-              }
-            })*/
+              }*/
+            })
 
             historyItem.all = Number(json.overall_similarity)
             historyItem.hiding = 0

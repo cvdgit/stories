@@ -10,7 +10,6 @@ use Yii;
 
 class EduAccessChecker
 {
-
     public function canUserAccess(int $userId = null): bool
     {
         if ($userId === null) {
