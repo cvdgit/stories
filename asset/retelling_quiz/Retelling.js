@@ -1,10 +1,9 @@
 import './Retelling.css'
 import CreateRetelling from "./CreateRetelling";
-import CreateRetellingAnswers from "./CreateRetellingAnswers";
 import RetellingVoiceControl from "./RetellingVoiceControl";
 import VoiceResponse from "../mental_map_quiz/lib/VoiceResponse";
 import MissingWordsRecognition from "../mental_map_quiz/lib/MissingWordsRecognition";
-import CreateRetellingResponseDialog from "./CreateRetellingResponseDialog";
+import RetellingResponse from "./RetellingResponse";
 
 export default function Retelling(element, deck, params, microphoneChecker) {
 
@@ -47,89 +46,56 @@ export default function Retelling(element, deck, params, microphoneChecker) {
     params.completed = Boolean(responseJson?.completed)
     params.all = Number(responseJson?.all)
 
-    const header = document.createElement('div')
+    /*const header = document.createElement('div')
     header.classList.add('retelling-dialog-header')
-    header.innerHTML = 'Пересказ'
-
-    this.element.appendChild(header)
+    header.innerHTML = 'Перескажите текст с предыдущего слайда';
+    this.element.appendChild(header)*/
 
     const body = document.createElement('div')
     body.classList.add('retelling-dialog-body')
 
-    const voiceResponse = new VoiceResponse(new MissingWordsRecognition({}))
+    const voiceResponse = new VoiceResponse(new MissingWordsRecognition({}));
     const voiceControl = new RetellingVoiceControl(
       voiceResponse,
-      (targetElement) => {},
-      (targetElement) => {
-
-        const resultSpan = content.querySelector('#retelling_result_span')
-        const finalSpan = content.querySelector('#retelling_final_span')
-
-        const finalText = finalSpan.innerText.trim()
-        const resultText = resultSpan.innerText.trim()
-
-        if (finalText.length) {
-          resultSpan.innerText = resultText.length
-            ? resultText + "\n" + finalText
-            : finalText
-          finalSpan.innerText = ''
-        }
-
-        if (resultSpan.innerText.length) {
-          content.querySelector('#retelling_start-retelling').style.display = 'block'
+      () => {
+        content.switchRecording();
+        content.resetUserInput();
+      },
+      () => {
+        const userResponse = content.processUserResponse();
+        if (userResponse.length) {
+          content.switchRetelling();
+          startRetelling();
         }
       }
-    )
+    );
 
-    const content = withQuestions
-      ? CreateRetellingAnswers(voiceControl, questions)
-      : CreateRetelling(voiceControl)
+    const retellingResponse = new RetellingResponse(() => {
+      content.switchStartUp();
+      content.resetUserInput();
+    });
 
-    voiceResponse.onResult((args) => {
-      const finalSpan = content.querySelector('#retelling_final_span')
-      if (finalSpan) {
-        finalSpan.innerHTML = args.args?.result
-      }
-      const interimSpan = content.querySelector('#retelling_interim_span')
-      if (interimSpan) {
-        interimSpan.innerHTML = args.args?.interim
-      }
-    })
+    const content = new CreateRetelling(
+      voiceControl,
+      retellingResponse,
+      {withQuestions, questions}
+    );
 
-    content.querySelector('#retelling_result_span').addEventListener('input', e => {
-      const text = e.target.innerText.trim()
-      const display = text.length > 0 ? 'block' : 'none'
-      const btn = content.querySelector('#retelling_start-retelling')
-      if (display !== btn.style.display) {
-        btn.style.display = display
-      }
-    })
-
-    content.querySelector('#retelling_final_span').addEventListener('input', e => {
-      const display = content.querySelector('#retelling_result_span').innerText.trim().length > 0 ? 'block' : 'none'
-      const btn = content.querySelector('#retelling_start-retelling')
-      if (display !== btn.style.display) {
-        btn.style.display = display
-      }
-    })
-
-    content.querySelector('#retelling_start-retelling').addEventListener('click', e => {
+    const startRetelling = async () => {
       if (voiceResponse.getStatus()) {
         voiceResponse.stop()
       }
 
-      const userResponse = content.querySelector("#retelling_result_span").innerText.trim()
+      const userResponse = content.getUserResponse();
       if (!userResponse) {
-        alert('Ответ пользователя пуст')
-        return
+        alert('Ответ пользователя пуст');
+        return;
       }
 
-      const responseDialog = CreateRetellingResponseDialog(
+      await retellingResponse.send(
         userResponse,
         slideTexts,
-        (response) => {
-          const json = processOutputAsJson(response)
-          if (json) {
+          json => {
             saveUserResult({
               overall_similarity: Number(json?.overall_similarity),
               content: slideTexts,
@@ -141,7 +107,6 @@ export default function Retelling(element, deck, params, microphoneChecker) {
               if (params.completed) {
                 container.appendChild(createFinishContent(`${params.all}%`, slideTexts))
               }
-
               if (deck) {
                 if (deck.hasPlugin('stat')) {
                   const statPlugin = deck.getPlugin('stat');
@@ -150,72 +115,38 @@ export default function Retelling(element, deck, params, microphoneChecker) {
               }
             })
           }
-        },
-        () => {
-          if (params.completed) {
-            container.appendChild(createFinishContent(`${params.all}%`, slideTexts))
-          }
-        }
-      )
-      content.appendChild(responseDialog)
-    })
-
-    body.appendChild(content)
-
-    container.appendChild(header)
-    container.appendChild(body)
-
-    if (params.completed) {
-      container.appendChild(createFinishContent(`${params.all}%`, slideTexts))
+      );
     }
+
+    body.appendChild(content.render());
+
+    //container.appendChild(header)
+    container.appendChild(body)
 
     function destroy(content, voiceResponse, voiceControl) {
       if (!voiceResponse.getStatus()) {
         return;
       }
-      voiceResponse.stop();
       voiceControl.triggerClick();
-      setTimeout(() => {
-        content.querySelector('#retelling_result_span').innerHTML = '';
-        content.querySelector('#retelling_final_span').innerHTML = '';
-        content.querySelector('#retelling_interim_span').innerHTML = '';
-        content.querySelector('#retelling_result_span').dispatchEvent(new Event('input', {bubbles: true}));
-        content.querySelector('#retelling_final_span').dispatchEvent(new Event('input', {bubbles: true}));
-      }, 500);
+      content.resetUserInput();
     }
 
-    window.addEventListener('blur', () => destroy(content, voiceResponse, voiceControl));
+    if (params.completed) {
+      container.appendChild(createFinishContent(`${params.all}%`, slideTexts))
+    } else {
+      content.switchStartUp();
+      window.addEventListener('blur', () => destroy(content, voiceResponse, voiceControl));
+    }
 
-    loader.remove()
+    loader.remove();
     this.element.appendChild(container);
 
     return () => destroy(content, voiceResponse, voiceControl);
   }
 
-  function processOutputAsJson(output) {
-    let json = null
-    try {
-      json = JSON.parse(output.replace(/```json\n?|```/g, ''))
-    } catch (ex) {
-
-    }
-    return json
-  }
-
   async function saveUserResult(payload) {
-    const response = await fetch(`/retelling/save`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'X-CSRF-Token': $('meta[name=csrf-token]').attr('content')
-      },
-      body: JSON.stringify(payload),
-    })
-    if (!response.ok) {
-      throw new Error(response.statusText)
-    }
-    return await response.json()
+    const response = await Api.post(`/retelling/save`, payload);
+    return await response.json();
   }
 
   function createFinishContent(all, texts) {

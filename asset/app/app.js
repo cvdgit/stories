@@ -152,3 +152,7 @@ window.sendStreamMessage = function(url, payload, onMessage, onEndCallback) {
     onEnd: () => onEndCallback(accumulatedMessage)
   })
 }
+
+window.processOutputAsJson = function (output) {
+  return JSON.parse(output.replace(/```json\n?|```/g, ''));
+}

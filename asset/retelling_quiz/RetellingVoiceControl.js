@@ -13,17 +13,22 @@ export default function RetellingVoiceControl(
 ) {
 
   const elem = document.createElement('div')
-  elem.classList.add('retelling-voice-controls')
-  elem.innerHTML = `<select id="retelling-voice-lang">
-    <option value="ru-RU" selected>rus</option>
-    <option value="en-US">eng</option>
-</select>
-<div data-toggle="tooltip" title="Нажмите, что бы начать запись с микрофона" class="question-voice" style="display: block; position:relative; bottom: 0; margin: 0">
+  elem.classList.add('retelling-voice-controls');
+  elem.style.flexDirection = 'column';
+  elem.innerHTML = `
+<div data-toggle="tooltip" title="Нажмите, что бы начать запись с микрофона" class="question-voice" style="display: flex; position:relative; bottom: 0; margin: 20px 0">
     <div class="question-voice__inner">
         <div class="gn">
             <div class="mc"></div>
         </div>
     </div>
+</div>
+<div class="retelling-input-language">
+Язык ввода:
+<select id="retelling-voice-lang">
+    <option value="ru-RU" selected>Русский</option>
+    <option value="en-US">Английский</option>
+</select>
 </div>
   `
 
@@ -54,5 +59,11 @@ export default function RetellingVoiceControl(
   })
 
   this.getElement = () => elem
-  this.triggerClick = () => $(elem.querySelector('.gn')).trigger('click')
+  this.triggerClick = () => {
+    voiceResponse.stop(() => {
+      elem.querySelector('.gn').classList.remove('recording');
+      elem.querySelector('.pulse-ring').remove();
+    });
+  }
+  this.voiceResponseOnResult = (callback) => voiceResponse.onResult(callback);
 }
