@@ -9,6 +9,7 @@ import TreeViewBody from "./TreeViewBody";
 /**
  * @param id
  * @param name
+ * @param {string|null} infoText
  * @param tree
  * @param history
  * @param {{story_id: number|null, slide_id: number|null, mental_map_id: string, threshold: number}} params
@@ -18,7 +19,7 @@ import TreeViewBody from "./TreeViewBody";
  * @returns {HTMLDivElement}
  * @constructor
  */
-export default function TreeView({id, name, tree, history, params, settings, onMentalMapChange}, voiceResponse) {
+export default function TreeView({id, name, infoText, tree, history, params, settings, onMentalMapChange}, voiceResponse) {
 
   const wrap = document.createElement('div')
   wrap.style.display = 'flex'
@@ -60,6 +61,18 @@ export default function TreeView({id, name, tree, history, params, settings, onM
   }
 
   wrap.appendChild(header)
+
+  if (infoText) {
+    const infoTextElement = document.createElement('div');
+    infoTextElement.style.fontSize = '24px';
+    infoTextElement.style.lineHeight = '40px';
+    infoTextElement.style.border = '1px #ddd solid';
+    infoTextElement.style.padding = '8px 0';
+    infoTextElement.style.borderRadius = '8px';
+    infoTextElement.style.marginBottom = '8px';
+    infoTextElement.innerHTML = infoText;
+    wrap.appendChild(infoTextElement);
+  }
 
   $(wrap).find("[data-toggle='tooltip']").tooltip({
     container: 'body'

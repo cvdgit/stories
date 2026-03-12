@@ -354,7 +354,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
                   statPlugin.sendStat({slideId: params.slide_id});
                 }
               }
-              
+
               /*if (response && response?.success) {
                 historyItem.all = response.history.all
                 historyItem.hiding = response.history.hiding
@@ -508,7 +508,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
                   statPlugin.sendStat({slideId: params.slide_id});
                 }
               }
-              
+
               /*if (response && response?.success) {
                 historyItem.all = response.history.all
                 //historyItem.hiding = response.history.hiding
@@ -632,6 +632,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         id: json.id,
         name: json.name,
         tree: json.treeData,
+        infoText: json.infoText,
         history,
         params: {
           story_id: params?.story_id,

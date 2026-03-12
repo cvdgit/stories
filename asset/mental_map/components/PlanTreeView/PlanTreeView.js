@@ -13,11 +13,13 @@ import "rc-tree/assets/index.css";
 import ItemDialog from "./ItemDialog";
 import {v4 as uuidv4} from "uuid";
 import {CSSTransition} from "react-transition-group";
+import InfoText from "../InfoText/InfoText";
+import {useMentalMap} from "../App/App";
 
 export const PlanTreeViewContext = createContext({});
 
 const CustomPlaceholder = () => (
-  <div style={{ textAlign: 'center', padding: '20px', color: '#888' }}>
+  <div style={{textAlign: 'center', padding: '20px', color: '#888'}}>
     Нет элементов
   </div>
 );
@@ -33,7 +35,10 @@ export default function PlanTreeView({texts}) {
   const [currentTitle, setCurrentTitle] = useState('')
   const [currentDescription, setCurrentDescription] = useState('')
   const [markedItems, setMarkedItems] = useState([])
-  const itemDialogRef = useRef()
+  const itemDialogRef = useRef(null);
+  const {state: mentalMapState, dispatch: mentalMapDispatch} = useMentalMap();
+  const [mapInfoText, setMapInfoText] = useState(mentalMapState?.infoText?.toString())
+  const firstUpdate = useRef(true)
 
   useEffect(() => {
     api
@@ -74,11 +79,27 @@ export default function PlanTreeView({texts}) {
     }))
   }
 
+  useEffect(() => {
+    if (firstUpdate.current) {
+      firstUpdate.current = false;
+      return;
+    }
+    const timeoutId = setTimeout(() => api
+      .post('/admin/index.php?r=mental-map/update-map-info-text', {
+        payload: {
+          id: mentalMapState.id,
+          infoText: mapInfoText
+        }
+      }), 500);
+    return () => clearTimeout(timeoutId);
+  }, [mapInfoText]);
+
   return (
     <div className="author-layout__content">
       <div className="tree-wrap">
         <div className="tree-inner">
-         <SortableTree
+          <InfoText defaultText={mapInfoText} changeTextHandler={text => setMapInfoText(text)} />
+          <SortableTree
             placeholderRenderer={CustomPlaceholder}
             treeData={state.treeData}
             onChange={treeData => dispatch({type: 'update_tree', treeData})}

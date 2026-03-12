@@ -12,6 +12,8 @@ import TreeReducer from "../../Lib/TreeReducer";
 import {v4 as uuidv4} from 'uuid'
 import {CSSTransition} from "react-transition-group";
 import ItemDialog from "./ItemDialog";
+import InfoText from "../InfoText/InfoText";
+import {useMentalMap} from "../App/App";
 
 export const TreeContext = createContext({});
 
@@ -25,6 +27,9 @@ export default function TreeView({texts}) {
   const itemDialogRef = useRef(null)
   const [currentNode, setCurrentNode] = useState(null)
   const [markedItems, setMarkedItems] = useState([])
+  const {state: mentalMapState, dispatch: mentalMapDispatch} = useMentalMap();
+  const [mapInfoText, setMapInfoText] = useState(mentalMapState?.infoText?.toString())
+  const firstUpdate = useRef(true)
 
   const getNodeKey = ({treeIndex}) => treeIndex;
 
@@ -65,14 +70,27 @@ export default function TreeView({texts}) {
     }))
   }
 
+  useEffect(() => {
+    if (firstUpdate.current) {
+      firstUpdate.current = false;
+      return;
+    }
+    const timeoutId = setTimeout(() => api
+      .post('/admin/index.php?r=mental-map/update-map-info-text', {
+        payload: {
+          id: mentalMapState.id,
+          infoText: mapInfoText
+        }
+      }), 500);
+    return () => clearTimeout(timeoutId);
+  }, [mapInfoText]);
+
   return (
     <div className="author-layout__content">
       <TreeContext.Provider value={treeContext}>
         <div className="tree-wrap">
-          <div>
-            <p>&nbsp;</p>
-          </div>
           <div className="tree-inner">
+            <InfoText defaultText={mapInfoText} changeTextHandler={text => setMapInfoText(text)} />
             <SortableTree
               treeData={state.treeData}
               rowHeight={140}
