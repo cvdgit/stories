@@ -31,7 +31,7 @@ const Editor = forwardRef(
       ref.current = quill;
 
       if (defaultValueRef.current) {
-        quill.setText(defaultValueRef.current);
+        quill.clipboard.dangerouslyPasteHTML(defaultValueRef.current);
       }
 
       quill.on(Quill.events.TEXT_CHANGE, (...args) => {
