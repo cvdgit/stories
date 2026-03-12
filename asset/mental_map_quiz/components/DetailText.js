@@ -39,7 +39,14 @@ function createHideButtons(buttons) {
     btn.innerHTML = name;
     btn.setAttribute('data-trigger', 'hover');
     btn.setAttribute('data-container', 'body');
-    btn.setAttribute('title', `Скрыть текст на ${percentage}%`);
+    let title = `Скрыть текст на ${percentage}%`;
+    if (percentage === 0) {
+      title = 'Показать текст';
+    }
+    if (percentage === 100) {
+      title = 'Скрыть весь текст';
+    }
+    btn.setAttribute('title', title);
     btn.addEventListener('click', e => clickHandler(percentage));
     wrap.appendChild(btn);
   });
@@ -91,6 +98,16 @@ export default function DetailText(text, itemClickHandler, afterRandCallback, pr
   }
 
   const buttons = [
+    {
+      name: '0', percentage: 0, clickHandler: (percentage) => {
+        detailText.querySelectorAll('.text-item-word.selected')
+          .forEach(node => node.classList.remove('selected'));
+        text.words
+          .filter(w => w.type === 'word')
+          .map(w => w.hidden = false);
+        afterRandCallback();
+      }
+    },
     {
       name: '20',
       percentage: 20,

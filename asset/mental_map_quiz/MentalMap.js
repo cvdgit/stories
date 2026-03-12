@@ -254,7 +254,15 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         }))
       },
       hideText,
-      detailParams
+      detailParams,
+      stopRecordingHandler: (recordingWrap) => {
+        if (!voiceResponse.getStatus()) {
+          return;
+        }
+        voiceResponse.stop();
+        const voiceLang = langStore.fromStore($(recordingWrap).find("#voice-lang option:selected").val());
+        startRecording(recordingWrap.querySelector('#start-recording'), voiceLang, stripTags(text.text), false);
+      },
     })
     const dialog = new InnerDialog($(container), {title: 'Перескажите текст', content: detailContainer});
     dialog.show(wrapper => {
