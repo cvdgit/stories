@@ -70,6 +70,7 @@ export default function TreeView({id, name, infoText, tree, history, params, set
     infoTextElement.style.padding = '8px 0';
     infoTextElement.style.borderRadius = '8px';
     infoTextElement.style.marginBottom = '8px';
+    infoTextElement.style.textAlign = 'left';
     infoTextElement.innerHTML = infoText;
     wrap.appendChild(infoTextElement);
   }
