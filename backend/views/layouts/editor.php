@@ -1,10 +1,18 @@
 <?php
-/* @var $this yii\web\View */
-/* @var $content string */
+
+declare(strict_types=1);
+
 use backend\assets\AppAsset;
 use common\rbac\UserRoles;
 use yii\helpers\Html;
 use yii\helpers\Json;
+use yii\web\View;
+
+/**
+ * @var View $this
+ * @var string $content
+ */
+
 AppAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
@@ -18,7 +26,7 @@ AppAsset::register($this);
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
     <script>
-        var WikidsConfig = {
+        const WikidsConfig = {
             'user': {
                 'isGuest': <?= Json::encode(Yii::$app->user->isGuest) ?>,
                 'isModerator': <?= Json::encode(Yii::$app->user->can(UserRoles::ROLE_MODERATOR)) ?>
@@ -45,7 +53,7 @@ AppAsset::register($this);
             "hideMethod": "fadeOut"
         }
 JS;
-    $this->registerJs($js, \yii\web\View::POS_END);
+    $this->registerJs($js, View::POS_END);
     ?>
 </head>
 <body>

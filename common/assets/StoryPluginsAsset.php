@@ -8,7 +8,7 @@ use yii\web\AssetBundle;
 
 class StoryPluginsAsset extends AssetBundle
 {
-    public $basePath = '@webroot';
+    public $basePath = '@public';
     public $baseUrl = '@web';
     public $js = [
         '/build/storyPlugins.js',

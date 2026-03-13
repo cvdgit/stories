@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\assets;
 
 use yii\bootstrap\BootstrapPluginAsset;
