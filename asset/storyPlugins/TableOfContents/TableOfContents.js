@@ -238,12 +238,8 @@ TableOfContents.initDeckEvent = function (deck, config) {
                   return;
                 }
 
-
-                $(target)
-                  .siblings()
-                  .removeClass('active-slide')
-                  .end()
-                  .addClass('active-slide');
+                $title.find('.active-slide').removeClass('active-slide');
+                $(target).addClass('active-slide');
 
                 const cardSlides = group.slides.filter(s => s.cardId === id);
                 location.hash = '#/' + ($('.story-container-wrap .slides').find(`section[data-id=${cardSlides[0].id}]`).index() + 1)
@@ -279,10 +275,7 @@ TableOfContents.initDeckEvent = function (deck, config) {
 
       $title.find('.contents-index').on('click', () => location.hash = '#/' + ($prevTableOfContentsSlide.index() + 1));
       $('.story-container-wrap').prepend($title);
-      return;
     }
-
-
   }
 }
 

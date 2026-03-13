@@ -335,7 +335,7 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
                   />
               </div>
               <label for="disableNav">
-              Отключить панель навигации <input checked="${payload.isDisableNav()}" class="disable-nav" type="checkbox" id="disableNav">
+              Отключить панель навигации <input ${payload.isDisableNav() ? 'checked' : ''} class="disable-nav" type="checkbox" id="disableNav">
 </label>
             </div>
             <button class="btn btn-primary table-of-contents-save" type="button">Сохранить</button>
