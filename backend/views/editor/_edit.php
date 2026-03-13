@@ -1025,8 +1025,14 @@ $js = <<< JS
         }
     });
 
-    $('[data-editor-show=slide]').on('click', function() {
-        window.open(StoryEditor.getSlidePreviewUrl(), 'target=_blank');
+    $('[data-editor-show=slide]').on('click', () => {
+        const slidesMap = new Map();
+        $('#slides-list > [data-slide-id]:not(.slide-hidden)')
+            .each((i, el) => slidesMap.set(Number($(el).attr('data-slide-id')), i + 1));
+        const url = StoryEditor.getSlidePreviewUrl(slidesMap);
+        if (url) {
+            window.open(url, '_blank');
+        }
     });
 
     $('#story-editor').on('click', '[data-retelling-action=update]', e => {

@@ -2069,14 +2069,18 @@ const StoryEditor = (function () {
     loadSlides,
     loadSlide,
 
-    'getSlidePreviewUrl': function () {
-      var url = getConfigValue('storyUrl') + '#/';
-      var activeSlide = slidesManager.getActiveSlide();
-      if (activeSlide) {
-        var number = parseInt(activeSlide.getNumber());
-        if (number > 1) {
-          url += number;
-        }
+    'getSlidePreviewUrl': function (slidesMap) {
+      const activeSlide = slidesManager.getActiveSlide();
+      if (!activeSlide) {
+        return;
+      }
+      const number = slidesMap.get(Number(activeSlide.getID()));
+      if (!number) {
+        return;
+      }
+      const url = getConfigValue('storyUrl');
+      if (number > 1) {
+        return `${url}#/${number}`;
       }
       return url;
     },
