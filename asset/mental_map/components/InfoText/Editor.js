@@ -35,7 +35,7 @@ const Editor = forwardRef(
       }
 
       quill.on(Quill.events.TEXT_CHANGE, (...args) => {
-        onTextChangeRef.current?.(ref.current.getSemanticHTML());
+        onTextChangeRef.current?.(ref.current.getSemanticHTML().replace(/&nbsp;/g, ' '));
       });
 
       quill.on(Quill.events.SELECTION_CHANGE, (...args) => {
