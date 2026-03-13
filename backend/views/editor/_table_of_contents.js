@@ -60,6 +60,7 @@ function TableOfContents() {
     rawData.groups = rawData.groups || [];
 
     this.getTitle = () => rawData.title;
+    this.isDisableNav = () => rawData.isDisableNav || false;
     this.getGroups = () => rawData.groups;
     this.addGroup = group => this.getGroups().push(group);
     this.createGroup = (id, name, slides = [], cards = []) => ({id, name, slides, cards});
@@ -139,6 +140,8 @@ function TableOfContents() {
     this.updateTitle = (title) => {
       rawData.title = title;
     }
+
+    this.setDisableNav = disableNav => rawData.disableNav = disableNav;
 
     this.updateGroupName = (id, name) => {
       const group = this.getGroup(id);
@@ -319,16 +322,21 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
         </div>
     </div>
     <div id="col-right" style="flex: 1; display: flex; flex-direction: column">
-        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center">
-            <div class="form-group" style="flex: 1">
-                <label for="tableOfContentsTitle">Название</label>
-                <input
-                        id="tableOfContentsTitle"
-                        style="max-width: 50%"
-                        class="table-of-contents-title form-control"
-                        type="text"
-                        value="${payload.getTitle() || 'Оглавление'}"
-                />
+        <div style="display: flex; flex-direction: row; justify-content: space-between; gap: 20px; align-items: center">
+            <div style="display: flex; flex-direction: column; flex: 1">
+              <div class="form-group" style="flex: 1">
+                  <label for="tableOfContentsTitle">Название</label>
+                  <input
+                          id="tableOfContentsTitle"
+                          style="max-width: 80%"
+                          class="table-of-contents-title form-control"
+                          type="text"
+                          value="${payload.getTitle() || 'Оглавление'}"
+                  />
+              </div>
+              <label for="disableNav">
+              Отключить панель навигации <input checked="${payload.isDisableNav()}" class="disable-nav" type="checkbox" id="disableNav">
+</label>
             </div>
             <button class="btn btn-primary table-of-contents-save" type="button">Сохранить</button>
         </div>
@@ -486,6 +494,10 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
       const groupId = $target.parents('[data-group-id]:eq(0)').attr('data-group-id');
       const cardId = $target.parents('[data-group-card-id]:eq(0)').attr('data-group-card-id');
       payload.updateGroupCardName(groupId, cardId, target.value);
+    });
+
+    $body.on('change', '.disable-nav', ({target}) => {
+      payload.setDisableNav(target.checked);
     });
 
     $body.find('.table-of-contents-save').on('click', () => {

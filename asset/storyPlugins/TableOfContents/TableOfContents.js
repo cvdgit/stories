@@ -190,11 +190,13 @@ export default function TableOfContents() {
 }
 
 TableOfContents.initDeckEvent = function (deck, config) {
-  if ($('.story-container-wrap .table-of-contents-caption').length) {
-    $('.story-container-wrap .table-of-contents-caption').remove();
-  }
 
   if ($(deck.getCurrentSlide()).find(`[data-block-type='table-of-contents']`).length > 0) {
+
+    if ($('.story-container-wrap .table-of-contents-caption').length) {
+      $('.story-container-wrap .table-of-contents-caption').remove();
+    }
+
     const payload = JSON.parse($(deck.getCurrentSlide()).find('.table-of-contents-payload').text());
     init(
       payload,
@@ -215,49 +217,72 @@ TableOfContents.initDeckEvent = function (deck, config) {
       $prevTableOfContentsSlide.find('.table-of-contents > .table-of-contents-payload').text()
     );
 
-    const $title = $(
-      `<div class="table-of-contents-caption">
+    if (!$('.story-container-wrap .table-of-contents-caption').length) {
+      const $title = $(
+        `<div class="table-of-contents-caption">
 <div class="caption-group-card-index contents-index">${payload.title}</div>
 </div>`
-    );
+      );
 
-    const id = Number($(deck.getCurrentSlide()).attr('data-id'));
+      if (payload.disableNav !== true) {
 
-    for (const group of payload.groups) {
-      const $group = $('<div class="caption-group"/>');
-      group.cards.map(({id, name}) => {
-        const $card = $(`<div class="caption-group-card" data-group-card-id="${id}" />`)
-          .text(name)
-          .on('click', ({target}) => {
-            if ($(target).hasClass('active-slide')) {
-              return;
-            }
-            const cardSlides = group.slides.filter(s => s.cardId === id);
-            location.hash = '#/' + ($('.story-container-wrap .slides').find(`section[data-id=${cardSlides[0].id}]`).index() + 1)
+        const id = Number($(deck.getCurrentSlide()).attr('data-id'));
+
+        for (const group of payload.groups) {
+          const $group = $('<div class="caption-group"/>');
+          group.cards.map(({id, name}) => {
+            const $card = $(`<div class="caption-group-card" data-group-card-id="${id}" />`)
+              .text(name)
+              .on('click', ({target}) => {
+                if ($(target).hasClass('active-slide')) {
+                  return;
+                }
+
+
+                $(target)
+                  .siblings()
+                  .removeClass('active-slide')
+                  .end()
+                  .addClass('active-slide');
+
+                const cardSlides = group.slides.filter(s => s.cardId === id);
+                location.hash = '#/' + ($('.story-container-wrap .slides').find(`section[data-id=${cardSlides[0].id}]`).index() + 1)
+              });
+            $group.append($card);
           });
-        $group.append($card);
-      });
-      $title.append($group);
-    }
-
-    let activeCardId;
-    for (const group of payload.groups) {
-      const slide = group.slides.find(s => Number(s.id) === id);
-      if (slide) {
-        const card = group.cards.find(c => c.id === slide.cardId);
-        if (card) {
-          activeCardId = card.id;
+          $title.append($group);
         }
-        break;
+
+        let activeCardId;
+        for (const group of payload.groups) {
+          const slide = group.slides.find(s => Number(s.id) === id);
+          if (slide) {
+            const card = group.cards.find(c => c.id === slide.cardId);
+            if (card) {
+              activeCardId = card.id;
+            }
+            break;
+          }
+        }
+
+        if (activeCardId) {
+          $title
+            .find(`[data-group-card-id='${activeCardId}']`)
+            .addClass('active-slide');
+          setTimeout(() => $title.find('.active-slide')[0].scrollIntoView({
+            behavior: 'smooth',
+            block:    'nearest',
+            inline:   'center'
+          }), 100);
+        }
       }
+
+      $title.find('.contents-index').on('click', () => location.hash = '#/' + ($prevTableOfContentsSlide.index() + 1));
+      $('.story-container-wrap').prepend($title);
+      return;
     }
 
-    if (activeCardId) {
-      $title.find(`[data-group-card-id='${activeCardId}']`).addClass('active-slide');
-    }
 
-    $title.find('.contents-index').on('click', () => location.hash = '#/' + ($prevTableOfContentsSlide.index() + 1));
-    $('.story-container-wrap').prepend($title);
   }
 }
 
