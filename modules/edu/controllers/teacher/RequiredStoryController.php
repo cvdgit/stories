@@ -22,6 +22,7 @@ use modules\edu\RequiredStory\repo\RequiredStoriesRepository;
 use modules\edu\RequiredStory\repo\RequiredStoryMetadata;
 use modules\edu\RequiredStory\repo\RequiredStoryStatus;
 use modules\edu\StoryContent\StoryContentService;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -211,7 +212,7 @@ class RequiredStoryController extends Controller
         $response->format = Response::FORMAT_JSON;
         return (new Query())
             ->select([
-                'title' => 'us.name',
+                'title' => new Expression("CONCAT(us.name, ' (', cb.name, ')')"),
                 'email' => 'u.email',
                 'id' => 'us.id',
                 'cover' => new Expression("'/img/no_avatar.png'"),
@@ -219,6 +220,8 @@ class RequiredStoryController extends Controller
             ->from(['sl' => 'student_login'])
             ->innerJoin(['us' => EduStudent::tableName()], 'sl.student_id = us.id')
             ->innerJoin(['u' => EduUser::tableName()], 'us.user_id = u.id')
+            ->innerJoin(['t' => 'edu_class_book_student'], 't.student_id = us.id')
+            ->innerJoin(['cb' => 'edu_class_book'], 't.class_book_id = cb.id')
             ->where([
                 'or',
                 ['like', 'us.name', $query],
