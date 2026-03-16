@@ -226,6 +226,7 @@ class RequiredStoryController extends Controller
                 ['like', 'u.email', $query],
             ])
             ->andWhere(['u.status' => 10])
+            ->andWhere(['exists', (new Query())->from(['t' => 'edu_class_book_student'])->where('t.student_id = us.id')])
             ->orderBy(['us.name' => SORT_ASC])
             ->limit(30)
             ->all();
