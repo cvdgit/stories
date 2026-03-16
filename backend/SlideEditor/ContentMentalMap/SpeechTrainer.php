@@ -39,6 +39,7 @@ class SpeechTrainer extends ActiveRecord
     public const TYPE_MENTAL_MAP_PLAN = 'mental-map-plan';
     public const TYPE_MENTAL_MAP_PLAN_ACCUMULATION = 'mental-map-plan-accumulation';
     public const TYPE_RETELLING = 'retelling';
+    public const TYPE_MENTAL_MAP_PLAN_TRANSLATE = 'mental-map-plan-translate';
 
     public static function getAllTypes(): array
     {
@@ -48,6 +49,7 @@ class SpeechTrainer extends ActiveRecord
             self::TYPE_MENTAL_MAP_ODD_FRAGMENTS => 'Ментальная карта (нечетные пропуски)',
             self::TYPE_MENTAL_MAP_PLAN => 'Ментальная карта (план)',
             self::TYPE_MENTAL_MAP_PLAN_ACCUMULATION => 'План с накоплением',
+            self::TYPE_MENTAL_MAP_PLAN_TRANSLATE => 'Ментальная карта (план) - перевод',
             self::TYPE_RETELLING => 'Пересказ',
         ];
     }
@@ -89,6 +91,7 @@ class SpeechTrainer extends ActiveRecord
                 'type' => $mentalMap->map_type,
                 'fragments' => $mentalMap->getTreeData(),
                 'required' => $slideMentalMapRow->getRequired(),
+                'editUrl' => \Yii::$app->urlManager->createAbsoluteUrl(['/mental-map/editor', 'id' => $slideMentalMapRow->mental_map_id])
             ];
         }
         return $mentalMaps;

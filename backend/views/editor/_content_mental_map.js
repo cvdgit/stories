@@ -1,52 +1,6 @@
 
 function ContentMentalMap() {
 
-  async function sendMessage(payload, onMessage, onEndCallback) {
-    let accumulatedMessage = ''
-    return sendEventSourceMessage({
-      url: '/admin/index.php?r=gpt/mental-map/text-fragments',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'text/event-stream',
-        'X-CSRF-Token': $("meta[name=csrf-token]").attr('content')
-      },
-      body: JSON.stringify(payload),
-      onMessage: (streamedResponse) => {
-        if (Array.isArray(streamedResponse?.streamed_output)) {
-          accumulatedMessage = streamedResponse.streamed_output.join("");
-        }
-        onMessage(accumulatedMessage)
-      },
-      onError: (streamedResponse) => {
-        console.log(streamedResponse)
-      },
-      onEnd: () => onEndCallback(accumulatedMessage)
-    })
-  }
-
-  async function streamMessage(payload, onMessage, onEndCallback) {
-    let accumulatedMessage = ''
-    return sendEventSourceMessage({
-      url: '/admin/index.php?r=gpt/story/speech-trainer-sentences',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'text/event-stream',
-        'X-CSRF-Token': $("meta[name=csrf-token]").attr('content')
-      },
-      body: JSON.stringify(payload),
-      onMessage: (streamedResponse) => {
-        if (Array.isArray(streamedResponse?.streamed_output)) {
-          accumulatedMessage = streamedResponse.streamed_output.join("");
-        }
-        onMessage(accumulatedMessage)
-      },
-      onError: (streamedResponse) => {
-        console.log(streamedResponse)
-      },
-      onEnd: () => onEndCallback(accumulatedMessage)
-    })
-  }
-
   function wordClickHandler(word, prevState, ctrlKey) {
     const state = [...prevState]
       .map((w, j) => {
@@ -254,11 +208,16 @@ function ContentMentalMap() {
     $('<button class="btn btn-primary">Сформировать фрагменты (AI)</button>')
       .on('click', () => {
         $contentItemList.html(`<img width="32" height="32" src="/img/loading.gif" />`)
-        sendMessage({text}, () => {}, content => {
-          const textFragments = JSON.parse(content)
-          fragmentsManager.loadTextFragments(textFragments.map(title => ({id: uuidv4(), title})))
-          drawFragments($contentItemList, fragmentsManager)
-        })
+        window.sendStreamMessage(
+          `/admin/index.php?r=gpt/mental-map/text-fragments`,
+          {text},
+          () => {},
+          content => {
+            const textFragments = window.processOutputAsJson(content);
+            fragmentsManager.loadTextFragments(textFragments.map(title => ({id: uuidv4(), title})));
+            drawFragments($contentItemList, fragmentsManager);
+          }
+        );
       })
       .appendTo($statusElem)
 
@@ -316,10 +275,12 @@ function ContentMentalMap() {
           .filter(({type}) => type === 'mental-map-plan' || type === 'mental-map-plan-accumulation')
           .length > 0;
 
+        const allText = fragmentsManager.getFragments().map(({title}) => title).join('\n');
+
         let sentences;
         if (sendAIRequest) {
-          const allText = fragmentsManager.getFragments().map(({title}) => title).join('\n');
-          await streamMessage(
+          await window.sendStreamMessage(
+            `/admin/index.php?r=gpt/story/speech-trainer-sentences`,
             {text: allText},
             () => {},
             sentencesJson => {
@@ -330,6 +291,33 @@ function ContentMentalMap() {
                     id: fragmentId,
                     sentenceText,
                     sentenceTitle,
+                    words: createWordItem(sentenceText, fragmentId).words
+                  }
+                });
+              } catch (ex) {
+                throw new Error(ex.message);
+              }
+            }
+          );
+        }
+
+        const sendTranslateAIRequest = toCreateMaps
+          .filter(({type}) => type === 'mental-map-plan-translate')
+          .length > 0;
+        let translateSentences;
+        if (sendTranslateAIRequest) {
+          await window.sendStreamMessage(
+            `/admin/index.php?r=gpt/story/speech-trainer-translate`,
+            {text: allText},
+            () => {},
+            sentencesJson => {
+              try {
+                translateSentences = processOutputAsJson(sentencesJson).map(({sentenceText, sentenceTranslateText}) => {
+                  const fragmentId = uuidv4();
+                  return {
+                    id: fragmentId,
+                    sentenceText,
+                    sentenceTitle: sentenceTranslateText,
                     words: createWordItem(sentenceText, fragmentId).words
                   }
                 });
@@ -376,6 +364,13 @@ function ContentMentalMap() {
                 description: sentenceText
               }))
               break;
+            case 'mental-map-plan-translate':
+              structuredClone(translateSentences).map(({id, sentenceText, sentenceTitle}) => toCreateMaps[i].fragments.push({
+                id,
+                title: sentenceTitle,
+                description: sentenceText
+              }))
+              break;
           }
         }
 
@@ -401,31 +396,6 @@ function ContentMentalMap() {
       .appendTo($controls)
   }
 
-  async function sendRequest(url, method, headers, payload, formData) {
-    let body = null
-    if (payload) {
-      body = JSON.stringify(payload)
-    }
-    if (formData) {
-      body = formData
-    }
-    const response = await fetch(url, {
-      method,
-      cache: 'no-cache',
-      headers: {
-        'X-CSRF-Token': $('meta[name=csrf-token]').attr('content'),
-        ...(headers || {})
-      },
-      body
-    })
-
-    if (!response.ok) {
-      throw new Error('error - ' + response.statusText)
-    }
-
-    return await response.json()
-  }
-
   this.updateFragments = async ({contentItems, container, text, onUpdateHandler, currentSlideId, blockId, onDeleteHandler}) => {
 
     const $statusElem = $('<div style="font-size: 14px" />')
@@ -434,18 +404,23 @@ function ContentMentalMap() {
     $('<button class="btn btn-primary">Сформировать фрагменты (AI)</button>')
       .on('click', () => {
         $contentItemList.html(`<img alt="..." width="32" height="32" src="/img/loading.gif" />`)
-        sendMessage({text}, () => {}, content => {
-          const textFragments = JSON.parse(content)
-          fragmentsManager.loadTextFragments(textFragments.map(title => ({id: uuidv4(), title})))
-          drawFragments($contentItemList, fragmentsManager)
-        })
+        window.sendStreamMessage(
+          `/admin/index.php?r=gpt/mental-map/text-fragments`,
+          {text},
+          () => {},
+          content => {
+            const textFragments = window.processOutputAsJson(content);
+            fragmentsManager.loadTextFragments(textFragments.map(title => ({id: uuidv4(), title})));
+            drawFragments($contentItemList, fragmentsManager);
+          }
+        );
       })
       .appendTo($statusElem)
 
     const mentalMap = contentItems.find(m => m.type === 'mental-map')
 
     const fragmentsManager = new FragmentsManager()
-    fragmentsManager.loadTextFragments(mentalMap.fragments)
+    fragmentsManager.loadTextFragments(mentalMap?.fragments || [])
 
     const $contentItemList = $('<div class="content-mm-fragments"/>')
     container.append($contentItemList)
@@ -458,35 +433,47 @@ function ContentMentalMap() {
 
     $mapsContainer.append('<div style="font-weight: 500; font-size: 18px">Существующие ментальные карты/пересказ:<div/>')
 
-    contentItems.map(({id, title, type, required}) => {
+    contentItems.map(({id, title, type, required, editUrl}) => {
       const $item = $(`
 <div data-content-id="${id}" class="content-mm-maps-item" style="flex-direction: row; justify-content: space-between">
+<div class="content-item-title" style="display: flex; flex-direction: row; gap: 10px; align-items: center">
 <label><input type="checkbox" checked disabled> ${title}</label>
+</div>
 <label class="content-item-required-wrap"><input class="content-item-required" type="checkbox" ${required ? 'checked' : ''}> Обязательно</label>
 </div>
 `);
-      $item.find('.content-item-required').on('change', e => {
+
+      $item.find('.content-item-required').on('change', async (e) => {
         $(e.target).prop('disabled', true);
-        sendRequest(
+        const response = await window.Api.post(
           `/admin/index.php?r=editor/mental-map/content-required&slide_id=${currentSlideId}&id=${id}&type=${type}`,
-          'post',
-          {'Content-Type': 'application/json'},
           {required: e.target.checked}
-        ).then(response => {
-          if (response.success) {
+        );
+        if (response.success) {
+          $item.find('.content-item-required-wrap')
+            .popover({placement: 'top', title: '', content: 'Сохранено', trigger: 'manual'})
+            .popover('show');
+          setTimeout(() => {
             $item.find('.content-item-required-wrap')
-              .popover({placement: 'top', title: '', content: 'Сохранено', trigger: 'manual'})
-              .popover('show');
-            setTimeout(() => {
-              $item.find('.content-item-required-wrap')
-                .popover('hide')
-                .popover('destroy')
-                .removeAttr('data-original-title');
-              $(e.target).removeAttr('disabled');
-            }, 500);
-          }
-        });
+              .popover('hide')
+              .popover('destroy')
+              .removeAttr('data-original-title');
+            $(e.target).removeAttr('disabled');
+          }, 500);
+        }
       });
+
+      if (type !== 'retelling') {
+        $item.find('.content-item-title').append(
+          `<a href="${editUrl}" title="Редактор" target="_blank">
+            <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                 stroke-width="1.5" stroke="currentColor" class="size-6" style="margin-left: 10px;">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path>
+            </svg>
+          </a>`
+        )
+      }
 
       $mapsContainer.append($item);
     })
@@ -549,7 +536,7 @@ function ContentMentalMap() {
         if (!confirm('Подтверждаете?')) {
           return
         }
-        const response = await sendRequest(`/admin/index.php?r=editor/mental-map/delete&slide_id=${currentSlideId}&block_id=${blockId}`, 'get')
+        const response = await window.Api.get(`/admin/index.php?r=editor/mental-map/delete&slide_id=${currentSlideId}&block_id=${blockId}`);
         onDeleteHandler(response?.success)
       })
       .appendTo($controls)

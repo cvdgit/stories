@@ -318,13 +318,14 @@ class MentalMapController extends BaseController
                 $this->transactionManager->wrap(function() use ($mentalMapRow, $createForm, $user): void {
 
                     $type = $mentalMapRow['type'];
-                    if ($type === 'retelling') {
+                    if ($type === SpeechTrainer::TYPE_RETELLING) {
                         return;
                     }
 
                     $mentalMapId = Uuid::uuid4();
-
-                    if ($type === 'mental-map-plan' || $type === 'mental-map-plan-accumulation') {
+                    if ($type === SpeechTrainer::TYPE_MENTAL_MAP_PLAN
+                        || $type === SpeechTrainer::TYPE_MENTAL_MAP_PLAN_ACCUMULATION
+                        || $type === SpeechTrainer::TYPE_MENTAL_MAP_PLAN_TRANSLATE) {
                         $this->mentalMapBuilder->createPlanMentalMap(
                             $mentalMapId,
                             $mentalMapRow['title'],
@@ -341,7 +342,7 @@ class MentalMapController extends BaseController
                             preg_replace('/\<br(\s*)?\/?\>/i', "\n", $createForm->text),
                             $user->getId(),
                             $mentalMapRow['fragments'],
-                            $type
+                            $type,
                         );
                     }
 

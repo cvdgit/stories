@@ -156,3 +156,73 @@ window.sendStreamMessage = function(url, payload, onMessage, onEndCallback) {
 window.processOutputAsJson = function (output) {
   return JSON.parse(output.replace(/```json\n?|```/g, ''));
 }
+
+window.Api = (function() {
+
+  function isJsonResponse(response) {
+    const type = response.headers.get('content-type');
+    return type && type.includes('application/json');
+  }
+
+  function sendRequest(url, method, headers, data, formData) {
+
+    const common = {
+      method,
+      headers: {
+        Accept: 'application/json',
+        'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').getAttribute('content'),
+        ...headers,
+      },
+    };
+
+    const body =
+      data !== null
+        ? {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        }
+        : {headers: {}};
+
+    if (formData) {
+      body.headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      };
+      body.body = formData;
+    }
+
+    return fetch(url, {
+      ...common,
+      ...body,
+      cache: 'no-cache',
+      headers: {
+        ...common.headers,
+        ...(body.headers),
+      },
+    }).then((response) => {
+      if (response.ok) {
+        return response;
+      }
+      throw response;
+    })
+      .then((response) => {
+        if (isJsonResponse(response)) {
+          return response.json();
+        }
+        return response.text();
+      });
+  }
+
+  return {
+    async get(url) {
+      return await sendRequest(url, 'GET', {});
+    },
+    async post(url, payload) {
+      return await sendRequest(url, 'POST', {}, payload);
+    },
+    async postForm(url, payload) {
+
+    }
+  }
+})();

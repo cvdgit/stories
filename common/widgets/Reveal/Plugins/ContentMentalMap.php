@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace common\widgets\Reveal\Plugins;
 
+use backend\SlideEditor\ContentMentalMap\SpeechTrainer;
 use common\widgets\Reveal\Dependency;
 
 class ContentMentalMap extends AbstractPlugin implements PluginInterface
@@ -18,13 +19,9 @@ class ContentMentalMap extends AbstractPlugin implements PluginInterface
             $this->configName => [
                 'story_id' => $this->storyId,
                 'mentalMaps' => $this->mentalMaps,
-                'mapOrder' => [
-                    'mental-map',
-                    'mental-map-even-fragments',
-                    'mental-map-odd-fragments',
-                    'mental-map-plan',
-                    'mental-map-plan-accumulation',
-                ],
+                'mapOrder' => array_keys(
+                    SpeechTrainer::getAllTypes()
+                ),
             ],
         ];
     }

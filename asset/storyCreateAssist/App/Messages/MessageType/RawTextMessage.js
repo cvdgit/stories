@@ -14,6 +14,7 @@ const mentalMaps = [
   {title: 'Ментальная карта (нечетные пропуски)', type: 'mental-map-odd-fragments', create: true, required: false},
   {title: 'Ментальная карта (план)', type: 'mental-map-plan', create: true, required: false},
   {title: 'План с накоплением', type: 'mental-map-plan-accumulation', create: true, required: false},
+  {title: 'План с переводом', type: 'mental-map-plan-translate', create: false, required: false},
   {title: 'Пересказ', type: 'retelling', create: true, required: false},
 ];
 
