@@ -211,24 +211,52 @@ TableOfContents.initDeckEvent = function (deck, config) {
     return;
   }
 
+  function findCardIdBySlideId(groups, slideId) {
+    let activeCardId;
+    for (const group of groups) {
+      const slide = group.slides.find(s => Number(s.id) === Number(slideId));
+      if (slide) {
+        const card = group.cards.find(c => c.id === slide.cardId);
+        if (card) {
+          activeCardId = card.id;
+        }
+        break;
+      }
+    }
+    return activeCardId;
+  }
+
   if ($prevTableOfContentsSlide.find('.table-of-contents').length) {
 
     const payload = JSON.parse(
       $prevTableOfContentsSlide.find('.table-of-contents > .table-of-contents-payload').text()
     );
+    const {groups, disableNav} = payload;
 
-    if (!$('.story-container-wrap .table-of-contents-caption').length) {
+    const slideId = Number($(deck.getCurrentSlide()).attr('data-id'));
+    const activeCardId = findCardIdBySlideId(groups, slideId);
+
+    if ($('.story-container-wrap .table-of-contents-caption').length) {
+      if (activeCardId) {
+        $('.story-container-wrap .table-of-contents-caption')
+          .find('.active-slide')
+          .removeClass('active-slide')
+          .end()
+          .find(`[data-group-card-id='${activeCardId}']`)
+          .addClass('active-slide');
+      }
+      return;
+    }
+
       const $title = $(
         `<div class="table-of-contents-caption">
 <div class="caption-group-card-index contents-index">${payload.title}</div>
 </div>`
       );
 
-      if (payload.disableNav !== true) {
+      if (disableNav !== true) {
 
-        const id = Number($(deck.getCurrentSlide()).attr('data-id'));
-
-        for (const group of payload.groups) {
+        for (const group of groups) {
           const $group = $('<div class="caption-group"/>');
           group.cards.map(({id, name}) => {
             const $card = $(`<div class="caption-group-card" data-group-card-id="${id}" />`)
@@ -249,18 +277,6 @@ TableOfContents.initDeckEvent = function (deck, config) {
           $title.append($group);
         }
 
-        let activeCardId;
-        for (const group of payload.groups) {
-          const slide = group.slides.find(s => Number(s.id) === id);
-          if (slide) {
-            const card = group.cards.find(c => c.id === slide.cardId);
-            if (card) {
-              activeCardId = card.id;
-            }
-            break;
-          }
-        }
-
         if (activeCardId) {
           $title
             .find(`[data-group-card-id='${activeCardId}']`)
@@ -276,7 +292,7 @@ TableOfContents.initDeckEvent = function (deck, config) {
       $title.find('.contents-index').on('click', () => location.hash = '#/' + ($prevTableOfContentsSlide.index() + 1));
       $('.story-container-wrap').prepend($title);
     }
-  }
+
 }
 
 TableOfContents.editorInit = function (payload, container, slidesMap) {
