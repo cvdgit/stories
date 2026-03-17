@@ -248,4 +248,39 @@ class StoryController extends Controller
             Yii::$app->errorHandler->logException($ex);
         }
     }
+
+    /**
+     * @throws ExitException
+     */
+    public function actionSpeechTrainerQuestion(Request $request): void
+    {
+        $payload = Json::decode($request->rawBody);
+        $text = $payload['text'];
+        $text = strip_tags($text);
+
+        if (!$text) {
+            $this->flushError('no text');
+            Yii::$app->end();
+        }
+
+        $prompt = LlmPrompt::findByKey('speech-trainer-sentences-question');
+        if ($prompt === null) {
+            $this->flushError('Промт не найден');
+            Yii::$app->end();
+        }
+
+        $content = trim(str_replace(['{TEXT}'], [$text], $prompt->prompt));
+
+        try {
+            $this->chatEventStream->send(
+                "speech-trainer-sentences-question",
+                Yii::$app->params["gpt.api.completions.host"],
+                Json::encode(
+                    new Fields([new Message('user', $content)]),
+                ),
+            );
+        } catch (Exception $ex) {
+            Yii::$app->errorHandler->logException($ex);
+        }
+    }
 }

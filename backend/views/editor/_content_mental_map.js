@@ -328,6 +328,33 @@ function ContentMentalMap() {
           );
         }
 
+        const sendQuestionAIRequest = toCreateMaps
+          .filter(({type}) => type === 'mental-map-plan-question')
+          .length > 0;
+        let questionSentences;
+        if (sendQuestionAIRequest) {
+          await window.sendStreamMessage(
+            `/admin/index.php?r=gpt/story/speech-trainer-question`,
+            {text: allText},
+            () => {},
+            sentencesJson => {
+              try {
+                questionSentences = processOutputAsJson(sentencesJson).map(({sentenceText, sentenceQuestion}) => {
+                  const fragmentId = uuidv4();
+                  return {
+                    id: fragmentId,
+                    sentenceText,
+                    sentenceTitle: sentenceQuestion,
+                    words: createWordItem(sentenceText, fragmentId).words
+                  }
+                });
+              } catch (ex) {
+                throw new Error(ex.message);
+              }
+            }
+          );
+        }
+
         const mentalMapsAi = new MentalMapsAi()
         for (let i = 0; i < toCreateMaps.length; i++) {
           const type = toCreateMaps[i].type
@@ -366,6 +393,13 @@ function ContentMentalMap() {
               break;
             case 'mental-map-plan-translate':
               structuredClone(translateSentences).map(({id, sentenceText, sentenceTitle}) => toCreateMaps[i].fragments.push({
+                id,
+                title: sentenceTitle,
+                description: sentenceText
+              }))
+              break;
+            case 'mental-map-plan-question':
+              structuredClone(questionSentences).map(({id, sentenceText, sentenceTitle}) => toCreateMaps[i].fragments.push({
                 id,
                 title: sentenceTitle,
                 description: sentenceText

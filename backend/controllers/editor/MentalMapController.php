@@ -323,9 +323,7 @@ class MentalMapController extends BaseController
                     }
 
                     $mentalMapId = Uuid::uuid4();
-                    if ($type === SpeechTrainer::TYPE_MENTAL_MAP_PLAN
-                        || $type === SpeechTrainer::TYPE_MENTAL_MAP_PLAN_ACCUMULATION
-                        || $type === SpeechTrainer::TYPE_MENTAL_MAP_PLAN_TRANSLATE) {
+                    if (SpeechTrainer::typeIsPlanMentalMap($type)) {
                         $this->mentalMapBuilder->createPlanMentalMap(
                             $mentalMapId,
                             $mentalMapRow['title'],

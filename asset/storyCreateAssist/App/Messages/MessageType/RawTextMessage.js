@@ -15,6 +15,7 @@ const mentalMaps = [
   {title: 'Ментальная карта (план)', type: 'mental-map-plan', create: true, required: false},
   {title: 'План с накоплением', type: 'mental-map-plan-accumulation', create: true, required: false},
   {title: 'План с переводом', type: 'mental-map-plan-translate', create: false, required: false},
+  {title: 'План с вопросами', type: 'mental-map-plan-question', create: false, required: false},
   {title: 'Пересказ', type: 'retelling', create: true, required: false},
 ];
 

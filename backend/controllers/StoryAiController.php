@@ -374,7 +374,7 @@ class StoryAiController extends Controller
                 }
 
                 $mentalMapId = Uuid::uuid4();
-                if ($type === 'mental-map-plan' || $type === 'mental-map-plan-accumulation') {
+                if (SpeechTrainer::typeIsPlanMentalMap($type)) {
                     $this->mentalMapBuilder->createPlanMentalMap(
                         $mentalMapId,
                         $contentRow['title'],

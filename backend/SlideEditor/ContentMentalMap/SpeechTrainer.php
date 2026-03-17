@@ -40,6 +40,7 @@ class SpeechTrainer extends ActiveRecord
     public const TYPE_MENTAL_MAP_PLAN_ACCUMULATION = 'mental-map-plan-accumulation';
     public const TYPE_RETELLING = 'retelling';
     public const TYPE_MENTAL_MAP_PLAN_TRANSLATE = 'mental-map-plan-translate';
+    public const TYPE_MENTAL_MAP_PLAN_QUESTION = 'mental-map-plan-question';
 
     public static function getAllTypes(): array
     {
@@ -49,7 +50,8 @@ class SpeechTrainer extends ActiveRecord
             self::TYPE_MENTAL_MAP_ODD_FRAGMENTS => 'Ментальная карта (нечетные пропуски)',
             self::TYPE_MENTAL_MAP_PLAN => 'Ментальная карта (план)',
             self::TYPE_MENTAL_MAP_PLAN_ACCUMULATION => 'План с накоплением',
-            self::TYPE_MENTAL_MAP_PLAN_TRANSLATE => 'Ментальная карта (план) - перевод',
+            self::TYPE_MENTAL_MAP_PLAN_TRANSLATE => 'План с переводом (английский, русский)',
+            self::TYPE_MENTAL_MAP_PLAN_QUESTION => 'План с вопросами к предложениям',
             self::TYPE_RETELLING => 'Пересказ',
         ];
     }
@@ -91,7 +93,7 @@ class SpeechTrainer extends ActiveRecord
                 'type' => $mentalMap->map_type,
                 'fragments' => $mentalMap->getTreeData(),
                 'required' => $slideMentalMapRow->getRequired(),
-                'editUrl' => \Yii::$app->urlManager->createAbsoluteUrl(['/mental-map/editor', 'id' => $slideMentalMapRow->mental_map_id])
+                'editUrl' => \Yii::$app->urlManager->createAbsoluteUrl(['/mental-map/editor', 'id' => $slideMentalMapRow->mental_map_id]),
             ];
         }
         return $mentalMaps;
@@ -164,5 +166,16 @@ class SpeechTrainer extends ActiveRecord
     public function setRetellingSlideId(int $slideId): void
     {
         $this->retelling_slide_id = $slideId;
+    }
+
+    public static function typeIsPlanMentalMap(string $type): bool
+    {
+        $types = [
+            self::TYPE_MENTAL_MAP_PLAN,
+            self::TYPE_MENTAL_MAP_PLAN_ACCUMULATION,
+            self::TYPE_MENTAL_MAP_PLAN_TRANSLATE,
+            self::TYPE_MENTAL_MAP_PLAN_QUESTION
+        ];
+        return in_array($type, $types);
     }
 }

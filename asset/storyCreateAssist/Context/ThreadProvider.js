@@ -383,6 +383,31 @@ export function ThreadProvider({children}) {
       return sentences;
     }
 
+    async function streamQuestionSentences(fragmentText) {
+      let sentences;
+      await streamMessage(
+        '/admin/index.php?r=gpt/story/speech-trainer-question',
+        {text: fragmentText},
+        () => {},
+        async (sentencesJson) => {
+          try {
+            sentences = processOutputAsJson(sentencesJson).map(({sentenceText, sentenceQuestion}) => {
+              const fragmentId = uuidv4();
+              return {
+                id: fragmentId,
+                sentenceText,
+                sentenceTitle: sentenceQuestion,
+                words: createWordItem(sentenceText, fragmentId).words
+              }
+            });
+          } catch (ex) {
+            throw new Error(ex.message);
+          }
+        }
+      );
+      return sentences;
+    }
+
     const slideRequests = [];
     slideMap.map(({fragmentId, slideId}) => {
 
@@ -394,96 +419,118 @@ export function ThreadProvider({children}) {
         throw new Error('no fragment text');
       }
 
-      const promises = [
-        streamSentences(fragmentText)
-      ];
+      const promises = [null, null, null];
+
+      promises[0] = streamSentences(fragmentText)
 
       const sendTranslateAIRequest = contents
         .filter(({type}) => type === 'mental-map-plan-translate')
         .length > 0;
       if (sendTranslateAIRequest) {
-        promises.push(
-          streamTranslateSentences(fragmentText)
-        );
+        promises[1] = streamTranslateSentences(fragmentText);
+      }
+
+      const sendQuestionAIRequest = contents
+        .filter(({type}) => type === 'mental-map-plan-question')
+        .length > 0;
+      if (sendQuestionAIRequest) {
+        promises[2] = streamQuestionSentences(fragmentText);
       }
 
       slideRequests.push(
         Promise.all(promises)
-          .then(async ([sentences, translateSentences]) => {
+          .then(async (requests) => {
 
-          for (let i = 0; i < contents.length; i++) {
-            const type = contents[i].type
-            switch (type) {
-              case 'mental-map':
-                structuredClone(sentences).map(f => contents[i].fragments.push({
-                  id: f.id,
-                  title: getTextBySelections(f.words)
-                }))
-                break;
-              case 'mental-map-even-fragments':
-                structuredClone(sentences).map(f => contents[i].fragments.push({
-                  id: f.id,
-                  title: hideWordsEven(f.words)
-                }))
-                break;
-              case 'mental-map-odd-fragments':
-                structuredClone(sentences).map(f => contents[i].fragments.push({
-                  id: f.id,
-                  title: hideWordsOdd(f.words)
-                }))
-                break;
-              case 'mental-map-plan':
-                structuredClone(sentences).map(({id, sentenceText, sentenceTitle}) => contents[i].fragments.push({
-                  id,
-                  title: sentenceTitle,
-                  description: sentenceText
-                }))
-                break;
-              case 'mental-map-plan-accumulation':
-                structuredClone(sentences).map(({id, sentenceText, sentenceTitle}) => contents[i].fragments.push({
-                  id,
-                  title: sentenceTitle,
-                  description: sentenceText
-                }))
-                break;
-              case 'mental-map-plan-translate':
-                structuredClone(translateSentences).map(({id, sentenceText, sentenceTitle}) => contents[i].fragments.push({
-                  id,
-                  title: sentenceTitle,
-                  description: sentenceText
-                }))
-                break;
-            }
-          }
+            const [sentences, translateSentences, questionSentences] = requests;
 
-          const data = {
-            storyId,
-            slideId,
-            contents,
-            text: fragmentContentWithoutHeaders(slideFragment.text)
-          };
-          await api.post('/admin/index.php?r=story-ai/create-slide-content-handler', data, {
-            'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').getAttribute('content')
-          }).then(response => {
-            saveMessages(threadId);
-            setMessages(prevMessages => prevMessages.map(m => {
-              if (m.id === messageId) {
-                return {
-                  ...m, metadata: {
-                    ...m.metadata, slides: m.metadata.slides.map(s => {
-                      if (s.slideId === response.slideId) {
-                        return {...s, status: 'done'};
-                      }
-                      return s;
-                    })
-                  }
-                };
+            for (let i = 0; i < contents.length; i++) {
+              const type = contents[i].type
+              switch (type) {
+                case 'mental-map':
+                  structuredClone(sentences).map(f => contents[i].fragments.push({
+                    id: f.id,
+                    title: getTextBySelections(f.words)
+                  }))
+                  break;
+                case 'mental-map-even-fragments':
+                  structuredClone(sentences).map(f => contents[i].fragments.push({
+                    id: f.id,
+                    title: hideWordsEven(f.words)
+                  }))
+                  break;
+                case 'mental-map-odd-fragments':
+                  structuredClone(sentences).map(f => contents[i].fragments.push({
+                    id: f.id,
+                    title: hideWordsOdd(f.words)
+                  }))
+                  break;
+                case 'mental-map-plan':
+                  structuredClone(sentences).map(({id, sentenceText, sentenceTitle}) => contents[i].fragments.push({
+                    id,
+                    title: sentenceTitle,
+                    description: sentenceText
+                  }))
+                  break;
+                case 'mental-map-plan-accumulation':
+                  structuredClone(sentences).map(({id, sentenceText, sentenceTitle}) => contents[i].fragments.push({
+                    id,
+                    title: sentenceTitle,
+                    description: sentenceText
+                  }))
+                  break;
+                case 'mental-map-plan-translate':
+                  structuredClone(translateSentences).map(({
+                                                             id,
+                                                             sentenceText,
+                                                             sentenceTitle
+                                                           }) => contents[i].fragments.push({
+                    id,
+                    title: sentenceTitle,
+                    description: sentenceText
+                  }))
+                  break;
+                case 'mental-map-plan-question':
+                  structuredClone(questionSentences).map(({
+                                                            id,
+                                                            sentenceText,
+                                                            sentenceTitle
+                                                          }) => contents[i].fragments.push({
+                    id,
+                    title: sentenceTitle,
+                    description: sentenceText
+                  }))
+                  break;
               }
-              return m;
-            }));
+            }
+
+            const data = {
+              storyId,
+              slideId,
+              contents,
+              text: fragmentContentWithoutHeaders(slideFragment.text)
+            };
+            await api.post('/admin/index.php?r=story-ai/create-slide-content-handler', data, {
+              'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+            }).then(response => {
+              saveMessages(threadId);
+              setMessages(prevMessages => prevMessages.map(m => {
+                if (m.id === messageId) {
+                  return {
+                    ...m, metadata: {
+                      ...m.metadata, slides: m.metadata.slides.map(s => {
+                        if (s.slideId === response.slideId) {
+                          return {...s, status: 'done'};
+                        }
+                        return s;
+                      })
+                    }
+                  };
+                }
+                return m;
+              }));
+            })
           })
-        })
-      )
+      );
     });
 
     Promise.all(slideRequests).then(allResponses => {
