@@ -18,11 +18,11 @@ export default function storyPayloadBuilder(tree) {
   };
 
   let currentGroup;
-  let currentLevel;
+  let currentLevel = 0;
   processNodes(
     tree,
     ({level, header, content, children}) => {
-      if (payload.title === null && level === 1) {
+      if (payload.title === null) {
         payload.title = header;
       }
 

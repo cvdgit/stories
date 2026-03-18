@@ -1,7 +1,6 @@
 import api from "../Api";
 
 export async function createStoryHandler(threadId, title, payload) {
-  console.log(threadId, title, payload)
   const data = {
     threadId,
     ...payload
