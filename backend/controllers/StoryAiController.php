@@ -36,6 +36,7 @@ use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\debug\Module;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Request;
 use yii\web\Response;
@@ -256,7 +257,7 @@ class StoryAiController extends Controller
                                     $slideMap['slideId'],
                                     '',
                                     1,
-                                    $cardId
+                                    $cardId,
                                 );
                             }
                         }
@@ -351,7 +352,7 @@ class StoryAiController extends Controller
             $this->tableOfContentsService->updateTableOfContentsSlide(
                 $tableOfContentsItem,
                 $currentSlideModel->id,
-                [$currentSlideModel->id, $retellingSlideId]
+                [$currentSlideModel->id, $retellingSlideId],
             );
         }
 
@@ -391,7 +392,7 @@ class StoryAiController extends Controller
                         $text,
                         $user->getId(),
                         $contentRow['fragments'],
-                        $type
+                        $type,
                     );
                 }
 
@@ -470,6 +471,30 @@ class StoryAiController extends Controller
             }
         }
         return ['success' => true, 'saved' => $saved, 'payload' => $payload];
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     * @throws ForbiddenHttpException
+     * @throws \Throwable
+     */
+    public function actionRemoveStory(int $storyId, Response $response, WebUser $user): array
+    {
+        $response->format = Response::FORMAT_JSON;
+        $story = Story::findOne($storyId);
+        if ($story === null) {
+            throw new NotFoundHttpException('Story not found');
+        }
+        if ($story->user_id !== $user->getId()) {
+            throw new ForbiddenHttpException('Forbidden');
+        }
+        try {
+            $story->delete();
+            return ['success' => true];
+        } catch (Exception $exception) {
+            Yii::$app->errorHandler->logException($exception);
+            return ['success' => false, 'message' => $exception->getMessage()];
+        }
     }
 
     /**
@@ -583,7 +608,7 @@ class StoryAiController extends Controller
                     $mentalMapContent['title'],
                     $text,
                     $user->getId(),
-                    $mentalMapContent['fragments']
+                    $mentalMapContent['fragments'],
                 );
                 $mapSlide = $this->storySlideService->createAndInsertSlide(
                     $currentSlideModel->story_id,
@@ -612,7 +637,7 @@ class StoryAiController extends Controller
                     $this->tableOfContentsService->updateTableOfContentsSlide(
                         $tableOfContentsItem,
                         $currentSlideModel->id,
-                        [$mapSlide->id]
+                        [$mapSlide->id],
                     );
                 }
             },

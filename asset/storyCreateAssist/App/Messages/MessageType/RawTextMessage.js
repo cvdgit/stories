@@ -19,7 +19,7 @@ const mentalMaps = [
   {title: 'Пересказ', type: 'retelling', create: true, required: false},
 ];
 
-export default function RawTextMessage({message, threadId}) {
+export default function RawTextMessage({message, threadId, haveStory}) {
   const {messagesData} = useThreadContext();
   const {
     createStoryForReading,
@@ -120,7 +120,7 @@ export default function RawTextMessage({message, threadId}) {
             </div>
           </div>}
 
-          {(message.divided && !message.withStory) && <div style={{display: 'flex', gap: '20px'}}>
+          {(message.divided && !haveStory) && <div style={{display: 'flex', gap: '20px'}}>
             <div className={styles.actionItem} onClick={createStoryForReadingHandler}>
               <h3 className={styles.actionItemTitle}>Создать историю для чтения</h3>
             </div>

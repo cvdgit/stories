@@ -17,6 +17,7 @@ export default function Messages({messages}) {
   const {
     createRepetitionTrainer,
     deleteRepetitionTrainer,
+    deleteStory,
     createReadingTrainer,
     setMessages,
     saveMessages,
@@ -40,14 +41,15 @@ export default function Messages({messages}) {
           threadId={threadId}
           message={message}
           speechTrainer
+          haveStory={messages.find(m => m.type === 'story')}
         />;
       }
 
       case 'story': {
         return <StoryMessage
-          haveRepetitionTrainer={messages.find(m => m.type === 'repetition_trainer')}
+          haveContents={messages.find(m => m.type === 'repetition_trainer' || m.type === 'reading_trainer')}
           message={message}
-          createReadingTrainer={createReadingTrainer}
+          deleteStoryHandler={deleteStory}
           threadId={threadId}
         />
       }

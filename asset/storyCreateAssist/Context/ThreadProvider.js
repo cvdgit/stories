@@ -560,6 +560,33 @@ export function ThreadProvider({children}) {
     }
   }
 
+  const deleteStory = async (threadId, messageId, storyId) => {
+    setMessages(prevMessages => prevMessages.map(m => {
+      if (m.id === messageId) {
+        return {...m, error: false, errorText: null};
+      }
+      return m;
+    }));
+    let response;
+    try {
+      response = await api.get(`/admin/index.php?r=story-ai/remove-story&storyId=${storyId}`, {
+        'X-CSRF-Token': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+      });
+    } catch (e) {
+      saveMessages(threadId);
+      setMessages(prevMessages => prevMessages.map(m => {
+        if (m.id === messageId) {
+          return {...m, error: true, errorText: `Error ${e.status} - ${e.statusText}`};
+        }
+        return m;
+      }));
+    }
+    if (response?.success) {
+      saveMessages(threadId);
+      setMessages(prevMessages => prevMessages.filter(m => m.id !== messageId));
+    }
+  }
+
   const createSpeechTrainerByFragments = async (threadId, fragments, repetitionTrainer) => {
 
     const messageId = uuidv4();
@@ -990,6 +1017,7 @@ export function ThreadProvider({children}) {
       createRepetitionTrainerStory,
       createRepetitionTrainer: createSpeechTrainer,
       deleteRepetitionTrainer,
+      deleteStory,
       createReadingTrainer,
       switchSelectedThread,
       saveMessages,
@@ -1020,6 +1048,7 @@ export function ThreadProvider({children}) {
     createRepetitionTrainerStory,
     createSpeechTrainer,
     deleteRepetitionTrainer,
+    deleteStory,
     createReadingTrainer,
     switchSelectedThread,
     createReadingTrainerSlide
