@@ -72,7 +72,6 @@ return [
 
         'comment/reply/<id:\d+>' => 'comment/reply',
 
-        '/image-get/<path>' => 'image/get',
         'image/<id:[\w\d]+' => 'image/view',
         //'image/<id>' => 'image/view',
 
