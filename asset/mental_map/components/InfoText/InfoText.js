@@ -8,7 +8,6 @@ const Delta = Quill.import('delta');
 
 export default function InfoText({defaultText, changeTextHandler}) {
   const quillRef = useRef(null);
-console.log(defaultText);
   return (
     <div style={{margin: '20px'}}>
       <h3 className="dialog-heading" style={{fontSize: '2.2rem'}}>Закрепленный текст</h3>

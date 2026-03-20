@@ -3,6 +3,12 @@ import Quill from 'quill';
 import "quill/dist/quill.core.css";
 import "quill/dist/quill.snow.css";
 
+const fontSizeArr = ['', '6pt', '8pt', '9pt', '10pt', '11pt', '12pt',
+  '14pt', '16pt', '20pt', '22pt', '24pt', '26pt', '28pt', '36pt', '48pt', '72pt'];
+const Size = Quill.import('attributors/style/size');
+Size.whitelist = fontSizeArr;
+Quill.register(Size, true);
+
 const Editor = forwardRef(
   ({readOnly, defaultValue, onTextChange, onSelectionChange}, ref) => {
     const containerRef = useRef(null);
@@ -26,6 +32,21 @@ const Editor = forwardRef(
       );
       const quill = new Quill(editorContainer, {
         theme: 'snow',
+        modules: {
+          toolbar: {
+            container: [
+              //[{header: [1, 2, 3, false]}],
+              [{'size': fontSizeArr}],
+              ["bold", "italic", "underline", "strike"],
+              ["blockquote", "code-block"],
+              [{list: "ordered"}, {list: "bullet"}],
+              [{script: "sub"}, {script: "super"}],
+              [{color: []}, {background: []}],
+              [{align: []}],
+              ["clean"]
+            ]
+          }
+        }
       });
 
       ref.current = quill;

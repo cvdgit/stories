@@ -366,3 +366,8 @@ textarea {
   border-width: 1px;
   border-color: rgb(176 190 197 / 1);
 }
+
+.ql-size .ql-picker-label[data-value]::before,
+.ql-size .ql-picker-item[data-value]::before {
+  content: attr(data-value) !important;
+}
