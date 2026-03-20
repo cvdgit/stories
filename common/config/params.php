@@ -40,7 +40,6 @@ return [
             '/edu/story/<id:\d+>' => 'edu/story/view',
             '/learning-path/<id:[A-Za-z0-9_-]+>' => 'learning-path/default/index',
             '/video/player/<id>' => 'video/view',
-            '/image-get/<path>' => 'image/get',
         ],
     ],
 
