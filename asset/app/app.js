@@ -187,12 +187,12 @@ window.Api = (function() {
 
     if (formData) {
       body.headers = {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        //'Content-Type': 'application/x-www-form-urlencoded',
       };
       body.body = formData;
     }
 
-    return fetch(url, {
+    const init = {
       ...common,
       ...body,
       cache: 'no-cache',
@@ -200,7 +200,11 @@ window.Api = (function() {
         ...common.headers,
         ...(body.headers),
       },
-    }).then((response) => {
+    };
+
+    console.log(init);
+
+    return fetch(url, init).then((response) => {
       if (response.ok) {
         return response;
       }
@@ -221,8 +225,8 @@ window.Api = (function() {
     async post(url, payload) {
       return await sendRequest(url, 'POST', {}, payload);
     },
-    async postForm(url, payload) {
-
+    async postForm(url, formData) {
+      return await sendRequest(url, 'POST', {}, null, formData);
     }
   }
 })();

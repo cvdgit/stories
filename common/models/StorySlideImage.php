@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace common\models;
 
-use DomainException;
 use Yii;
+use yii\base\Exception;
+use yii\base\InvalidConfigException;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use yii\db\Query;
 
 /**
  * This is the model class for table "story_slide_image".
@@ -31,43 +34,31 @@ use yii\db\Query;
  */
 class StorySlideImage extends ActiveRecord
 {
+    public const STATUS_SUCCESS = 0;
+    public const STATUS_ERROR = 1;
 
-    const STATUS_SUCCESS = 0;
-    const STATUS_ERROR = 1;
-
-    public function init()
+    /**
+     * @throws Exception
+     */
+    public function init(): void
     {
         $this->hash = Yii::$app->security->generateRandomString();
         parent::init();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'story_slide_image';
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class,
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
-    {
-        return [];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -81,48 +72,56 @@ class StorySlideImage extends ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
-    public function getSlides()
+    public function getSlides(): ActiveQuery
     {
-        return $this->hasMany(StorySlide::class, ['id' => 'slide_id'])->viaTable('image_slide_block', ['image_id' => 'id']);
+        return $this->hasMany(StorySlide::class, ['id' => 'slide_id'])->viaTable(
+            'image_slide_block',
+            ['image_id' => 'id'],
+        );
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @throws InvalidConfigException
      */
-    public function getLinkImages()
+    public function getLinkImages(): ActiveQuery
     {
         return $this->hasMany(__CLASS__, ['id' => 'link_image_id'])->viaTable('image_link', ['image_id' => 'id']);
     }
 
-    public static function findModel($id)
+    public static function findModel(int $id): ?self
     {
-        if (($model = self::findOne($id)) !== null) {
-            return $model;
-        }
-        throw new DomainException('Изображение не найдено');
+        /** @var StorySlideImage|null $model */
+        $model = self::findOne($id);
+        return $model;
     }
 
-    public static function findByHash(string $hash): ?StorySlideImage
+    public static function findByHash(string $hash): ?self
     {
-        if (($model = self::findOne(['hash' => $hash])) !== null) {
-            return $model;
-        }
-        throw new DomainException('Изображение не найдено');
+        /** @var StorySlideImage|null $model */
+        $model = self::findOne(['hash' => $hash]);
+        return $model;
     }
 
-    public static function findByPath(string $folder, string $fileName): ?StorySlideImage
+    public static function findByPath(string $folder, string $fileName): ?self
     {
-        if (($model = self::findOne(['folder' => $folder, 'filename' => $fileName])) !== null) {
-            return $model;
-        }
-        throw new DomainException('Изображение не найдено');
+        /** @var StorySlideImage|null $model */
+        $model = self::findOne(['folder' => $folder, 'filename' => $fileName]);
+        return $model;
     }
 
-    public static function createImage(int $rootFolderID, string $folder, $filename = null, $mimeType = null, $contentUrl = null, $sourceUrl = null, $collectionAccount = null, $collectionID = null, $collectionName = null): StorySlideImage
-    {
+    public static function createImage(
+        int $rootFolderID,
+        string $folder,
+        $filename = null,
+        $mimeType = null,
+        $contentUrl = null,
+        $sourceUrl = null,
+        $collectionAccount = null,
+        $collectionID = null,
+        $collectionName = null
+    ): self {
         $image = new self;
         $image->root_folder_id = $rootFolderID;
         $image->folder = $folder;
@@ -136,10 +135,10 @@ class StorySlideImage extends ActiveRecord
         return $image;
     }
 
-    public static function create(string $imageId, string $fileName, string $folder, string $extension): self
+    public static function create(string $imageId, string $fileName, string $folder, string $extension, int $rootFolderId = 3): self
     {
         $image = new self;
-        $image->root_folder_id = 3;
+        $image->root_folder_id = $rootFolderId;
         $image->hash = $imageId;
         $image->folder = $folder;
         $image->filename = $fileName;
@@ -163,12 +162,12 @@ class StorySlideImage extends ActiveRecord
             ->all();
     }*/
 
-    public function isSuccess()
+    public function isSuccess(): bool
     {
-        return (int)$this->status === self::STATUS_SUCCESS;
+        return $this->status === self::STATUS_SUCCESS;
     }
 
-    public function afterDelete()
+    public function afterDelete(): void
     {
         $filePath = Yii::getAlias('@public/admin/upload/') . $this->folder . '/' . $this->hash . '.jpeg';
         if (file_exists($filePath)) {
@@ -177,17 +176,17 @@ class StorySlideImage extends ActiveRecord
         parent::afterDelete();
     }
 
-    public function imageUrl()
+    public function imageUrl(): string
     {
         return Yii::$app->urlManagerFrontend->createAbsoluteUrl(['image/view', 'id' => $this->hash]);
     }
 
-    public function getFullPath()
+    public function getFullPath(): string
     {
         return Yii::getAlias('@public/admin/upload/') . $this->folder . '/' . $this->hash . '.jpeg';
     }
 
-    public function getShortPath()
+    public function getShortPath(): string
     {
         return '/' . $this->folder . '/' . $this->hash . '.jpeg';
     }
@@ -214,22 +213,12 @@ class StorySlideImage extends ActiveRecord
 
     public static function findImageByPath(string $path): ?self
     {
-        $image = null;
         if (strpos($path, '://') !== false) {
             $query = parse_url($path, PHP_URL_QUERY);
             parse_str($query, $result);
             $imageHash = $result['id'];
-            try {
-                $image = self::findByHash($imageHash);
-            }
-            catch (\Exception $ex) {}
+            return self::findByHash($imageHash);
         }
-        else {
-            try {
-                $image = self::findByPath(basename(dirname($path)), basename($path));
-            }
-            catch (\Exception $ex) {}
-        }
-        return $image;
+        return self::findByPath(basename(dirname($path)), basename($path));
     }
 }

@@ -24,13 +24,15 @@
   padding: 16px;
   border-radius: 16px;
   cursor: pointer;
-  max-height: 160px;
+  /*max-height: 160px;*/
   height: 100%;
   position: relative;
   transition: all 200ms;
+  border: 2px rgb(235, 231, 224) solid;
 }
 
-.slide-content-wrap:hover {
+.slide-content-wrap:hover,
+.slide-content-wrap:hover .card-name {
   background-color: rgb(249 227 219 / 1);
 }
 
@@ -152,4 +154,42 @@
   color: #aaa;
   font-weight: 600;
   font-size: 20px;
+}
+
+.card-slide-number {
+  position: relative;
+  width: 50px;
+  margin-bottom: 16px;
+  transition: all 200ms;
+}
+
+.slide-content-wrap.card-with-image .card-slide-number {
+  visibility: hidden;
+}
+
+.slide-content-wrap.card-with-image:hover .card-slide-number {
+  visibility: visible;
+}
+
+.slide-content-wrap.card-with-image {
+  background-position: 50%;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.card-name {
+  font-size: 14px;
+  line-height: 20px;
+  background-color: rgb(235, 231, 224);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-flex;
+}
+
+.slide-content-wrap.card-with-image .card-name {
+  background-color: rgba(235, 231, 224, .7);
+}
+
+.slide-content-wrap.card-with-image:hover .card-name {
+  background-color: rgba(249, 227, 219, 1);
 }

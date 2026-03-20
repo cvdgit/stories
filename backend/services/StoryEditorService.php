@@ -333,7 +333,7 @@ class StoryEditorService
                 $form->fullImagePath = $imagePath;
             }
             elseif (!empty($form->image_id)) {
-                $form->imageModel = StorySlideImage::findModel($form->image_id);
+                $form->imageModel = StorySlideImage::findModel((int) $form->image_id);
                 $form->imagePath = $form->imageModel->imageUrl();
                 $form->fullImagePath = $form->imageModel->getImagePath();
             }

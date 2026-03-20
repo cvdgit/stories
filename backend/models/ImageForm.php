@@ -47,7 +47,7 @@ class ImageForm extends Model
     public function getModel()
     {
         if ($this->_model === null) {
-            $this->_model = StorySlideImage::findModel($this->model_id);
+            $this->_model = StorySlideImage::findModel((int) $this->model_id);
         }
         return $this->_model;
     }

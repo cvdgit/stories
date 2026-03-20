@@ -19,8 +19,10 @@ use common\models\StorySlideImage;
 use common\rbac\UserRoles;
 use Imagine\Image\ManipulatorInterface;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\filters\AccessControl;
 use yii\imagine\Image;
+use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\UploadedFile;
@@ -55,7 +57,10 @@ class ImageController extends BaseController
         ];
     }
 
-    public function beforeAction($action)
+    /**
+     * @throws BadRequestHttpException
+     */
+    public function beforeAction($action): bool
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return parent::beforeAction($action);
@@ -145,7 +150,7 @@ class ImageController extends BaseController
     {
         $thumbUrl = $imageModel->getImageThumbPath();
         $thumbPath = $imageModel->getImageThumbPath(true);
-        if (!file_exists($thumbPath)) {
+        if (file_exists($imageModel->getImagePath()) && !file_exists($thumbPath)) {
             Image::thumbnail($imageModel->getImagePath(), 200, 200, ManipulatorInterface::THUMBNAIL_INSET)
                 ->save($thumbPath, ['quality' => 100]);
         }
@@ -163,9 +168,12 @@ class ImageController extends BaseController
         return $resultItem;
     }
 
-    public function actionGetImages(int $story_id)
+    /**
+     * @throws InvalidConfigException
+     * @throws NotFoundHttpException
+     */
+    public function actionGetImages(int $story_id): array
     {
-        /** @var Story $storyModel */
         $storyModel = $this->findModel(Story::class, $story_id);
         $result = [];
         foreach ($storyModel->storyImages as $model) {

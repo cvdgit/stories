@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace common\services;
 
-use http\Exception\RuntimeException;
 use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\base\Exception;
@@ -40,7 +39,7 @@ class FileUploadService
         }
 
         if (!$file->saveAs($filePath)) {
-            throw new RuntimeException('Ошибка при загрузке файла со схемой');
+            throw new \RuntimeException('Ошибка при загрузке файла со схемой');
         }
 
         return new File($folder, $fileName, $extension, $fileName . '.' . $extension, $file->size);

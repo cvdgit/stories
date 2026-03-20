@@ -157,16 +157,22 @@ function TableOfContents() {
       const card = group.cards.find(c => c.id === cardId);
       card.name = name;
     }
+
+    this.updateGroupCardImage = (groupId, cardId, image) => {
+      const group = this.getGroup(groupId);
+      const card = group.cards.find(c => c.id === cardId);
+      card.image = image;
+      return card;
+    }
   }
 
-  function createGroupCardElement({id, name}, slides, findSlide) {
-    const $element = $(`<div data-group-card-id="${id}" class="table-of-contents-group-card">
-<h4 style="display: flex; flex-direction: row; justify-content: space-between; align-items: center">
-<input type="text" class="form-control group-card-name" value="${name}">
-<button title="Удалить карточку" class="remove-group-card" type="button"><i class="glyphicon glyphicon-trash"></i></button>
-</h4>
-<div class="table-of-contents-group-slides" style="display: grid; padding: 10px; min-height: 140px; background-color: #eee; gap: 20px; grid-template-columns: 1fr 1fr 1fr 1fr; width: 100%;"></div>
-    </div>`);
+  function createGroupCardElement({id, name, image}, slides, findSlide) {
+    const $element = $(`
+<div data-group-card-id="${id}" class="table-of-contents-group-card">
+    <h4 class="card-header"></h4>
+    <div class="table-of-contents-group-slides"></div>
+</div>
+`);
 
     slides.map(({id}) => {
       const slide = findSlide(id);
@@ -178,7 +184,57 @@ function TableOfContents() {
       $element.find('.table-of-contents-group-slides').append(slideElem);
     });
 
+    $element.find('.card-header').append(
+      drawCardHeader({id, name, image})
+    );
+
     return $element;
+  }
+
+  function drawCardHeader({id, name, image}) {
+    const element = document.createElement('div');
+    element.classList.add('card-header-inner');
+
+    element.innerHTML = `<input type="text" class="form-control group-card-name" value="${name}">`;
+
+    if (image) {
+      const figure = document.createElement('div');
+      figure.style.position = 'relative';
+      figure.style.width = '150px';
+      figure.style.textAlign = 'center';
+      figure.innerHTML = `<p style="font-size: 14px">Картинка карточки</p><figure class="card-image" style="background-image: url(${image});"></figure>`;
+      element.prepend(figure);
+      const deleteElement = document.createElement('a');
+      deleteElement.classList.add('card-image-delete')
+      deleteElement.href = '';
+      deleteElement.innerText = 'Удалить';
+      deleteElement.style.fontSize = '14px';
+      deleteElement.style.color = 'rgba(220, 53, 69, 1)';
+      figure.append(deleteElement);
+    } else {
+      const uploader = document.createElement('button');
+      uploader.type = 'button';
+      uploader.classList.add('table-of-contents-card-img-btn');
+      uploader.innerHTML = `
+<label for="image${id}">
+<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="image" class="table-of-contents-card-img-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M0 96C0 60.7 28.7 32 64 32H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96zM323.8 202.5c-4.5-6.6-11.9-10.5-19.8-10.5s-15.4 3.9-19.8 10.5l-87 127.6L170.7 297c-4.6-5.7-11.5-9-18.7-9s-14.2 3.3-18.7 9l-64 80c-5.8 7.2-6.9 17.1-2.9 25.4s12.4 13.6 21.6 13.6h96 32H424c8.9 0 17.1-4.9 21.2-12.8s3.6-17.4-1.4-24.7l-120-176zM112 192a48 48 0 1 0 0-96 48 48 0 1 0 0 96z"></path></svg>
+</label>
+<input class="table-of-contents-card-img-file" accept="image/png, image/gif, image/jpeg, image/svg+xml, image/bmp, image/tiff"
+                     id="image${id}" type="file" style="display: none"/>
+      `;
+      element.prepend(uploader);
+    }
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.title = 'Удалить карточку';
+    removeBtn.classList.add('remove-group-card');
+    removeBtn.innerHTML = '<i class="glyphicon glyphicon-trash"></i>'
+
+    const fragment = document.createDocumentFragment();
+    fragment.appendChild(element);
+    fragment.appendChild(removeBtn);
+    return fragment;
   }
 
   function createGroupElement({id, name, slides, cards}, allSlides, canRemove) {
@@ -202,9 +258,9 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
 </div>
 `);
 
-    (cards || []).map(({id, name}) => {
+    (cards || []).map(({id, name, image}) => {
       const $card = createGroupCardElement(
-        {id, name},
+        {id, name, image},
         slides.filter(s => s.cardId === id),
         slideId => allSlides.find(s => Number(s.id) === Number(slideId))
       );
@@ -268,8 +324,6 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
       );
       $contentItemList.append($fragmentElem);
       $fragmentElem.append(`<div class="fragment-create"><button type="button" class="fragment-create-btn create-group">+ новая группа</button></div>`);
-
-
     });
 
     initGroupSortable(
@@ -498,6 +552,52 @@ ${canRemove ? `<button title="Удалить группу" class="remove-group" 
 
     $body.on('change', '.disable-nav', ({target}) => {
       payload.setDisableNav(target.checked);
+    });
+
+    $body.on('change', '.table-of-contents-card-img-file', async ({target}) => {
+      const $target = $(target);
+      const groupId = $target.parents('[data-group-id]').attr('data-group-id');
+      const cardId = $target.parents('[data-group-card-id]').attr('data-group-card-id');
+      const file = target.files[0];
+
+      const formData = new FormData();
+      formData.append('card_id', cardId);
+      formData.append('image', file);
+
+      const response = await window.Api.postForm('/admin/index.php?r=editor/table-of-contents/card-image', formData);
+      if (response && response.success) {
+        const {thumbnail} = response;
+        const card = payload.updateGroupCardImage(groupId, cardId, thumbnail);
+        updateHandler(payload.getPayload());
+        $(`[data-group-card-id='${card.id}']`)
+          .find('.card-header')
+          .empty()
+          .append(
+            drawCardHeader(card)
+          );
+      }
+    });
+
+    $body.on('click', '.card-image-delete', (e) => {
+      e.preventDefault();
+
+      if (!confirm('Подтверждаете?')) {
+        return;
+      }
+
+      const $target = $(e.target);
+      const groupId = $target.parents('[data-group-id]').attr('data-group-id');
+      const cardId = $target.parents('[data-group-card-id]').attr('data-group-card-id');
+
+      const card = payload.updateGroupCardImage(groupId, cardId, null);
+      updateHandler(payload.getPayload());
+
+      $(`[data-group-card-id='${card.id}']`)
+        .find('.card-header')
+        .empty()
+        .append(
+          drawCardHeader(card)
+        );
     });
 
     $body.find('.table-of-contents-save').on('click', () => {

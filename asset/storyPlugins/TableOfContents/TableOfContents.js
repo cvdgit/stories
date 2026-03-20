@@ -87,7 +87,7 @@ function createContent($container, payload, slidesMap) {
 
     const $row = $(`<div style="display: grid; grid-auto-flow: column; align-items: center; overflow-x: auto; grid-auto-columns: 200px; gap: 4px; margin-bottom: 30px;"></div>`);
 
-    (cards || []).map(({id, name}) => {
+    (cards || []).map(({id, name, image}) => {
 
       const cardSlides = slides.filter(s => s.cardId === id);
       if (cardSlides.length === 0) {
@@ -96,12 +96,12 @@ function createContent($container, payload, slidesMap) {
 
       const slideIds = cardSlides.map(s => s.id).join(',');
 
-      const $slide = $(`<div data-group-card-id="${id}" data-slide-id="${slideIds}" class="slide-content-wrap">
-<div style="position: relative; width: 50px; margin-bottom: 16px;">
+      const $slide = $(`<div ${image ? `style="background-image: url(${image});"` : ''} data-group-card-id="${id}" data-slide-id="${slideIds}" class="slide-content-wrap ${image ? 'card-with-image' : ''}">
+<div class="card-slide-number">
 <svg xmlns="http://www.w3.org/2000/svg" width="51" height="32" fill="none" style="color: rgb(244, 242, 238)"><path fill="currentColor" d="M33.62 1.252A6 6 0 0 0 29.953 0H6a6 6 0 0 0-6 6v20a6 6 0 0 0 6 6h23.953a6 6 0 0 0 3.667-1.252l16.02-12.374a3 3 0 0 0 0-4.748z"></path></svg>
 <span style="font-size: 14px; line-height: 32px; top: 0; left: 14px; position: absolute">${i}</span>
 </div>
-<div style="font-size: 14px; line-height: 20px">${name}</div>
+<div class="card-name">${name}</div>
 </div>`);
 
       const slideNumber = slidesMap.get(Number(cardSlides[0].id));
