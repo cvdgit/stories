@@ -25,10 +25,12 @@ use yii\helpers\Url;
     <?= $model->getCreatedDate()->format('d.m.Y H:i:s') ?>
 </div>
 <div class="required-story-cell">
-    <a style="padding: 4px 8px; border-radius: 4px" class="required-story-edit btn-primary"
-       href="<?= Url::to(['/edu/teacher/required-story/edit', 'id' => $model->getId()->toString()],
-       ) ?>">Редактировать</a> |
-    <a style="padding: 4px 8px; border-radius: 4px" class="required-story-delete btn-danger"
-       href="<?= Url::to(['/edu/teacher/required-story/delete', 'id' => $model->getId()->toString()],
-       ) ?>">Удалить</a>
+    <div style="display: flex; flex-direction: row; gap: 10px">
+        <a style="padding: 4px 8px; border-radius: 4px" class="required-story-edit btn-primary"
+           href="<?= Url::to(['/edu/teacher/required-story/edit', 'id' => $model->getId()->toString()],
+           ) ?>">Редактировать</a> |
+        <a style="padding: 4px 8px; border-radius: 4px" class="required-story-delete btn-danger"
+           href="<?= Url::to(['/edu/teacher/required-story/delete', 'id' => $model->getId()->toString()],
+           ) ?>">Удалить</a>
+    </div>
 </div>

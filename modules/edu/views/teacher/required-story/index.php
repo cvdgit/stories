@@ -31,7 +31,7 @@ $this->registerJs($this->renderFile('@modules/edu/views/teacher/required-story/i
         </div>
     </div>
 
-    <div id="required-stories-wrap" style="margin-bottom: 50px;">
+    <div id="required-stories-wrap" class="table-responsive" style="margin-bottom: 50px;">
         <?php Pjax::begin(['id' => 'pjax-required-stories']); ?>
         <?= ListView::widget([
             'dataProvider' => $dataProvider,
