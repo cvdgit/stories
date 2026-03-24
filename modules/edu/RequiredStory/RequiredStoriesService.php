@@ -164,6 +164,11 @@ class RequiredStoriesService
         return $session;
     }
 
+    public function findStudentSession(UuidInterface $requiredStoryId, DateTimeInterface $date): ?RequiredStorySession
+    {
+        return $this->requiredStorySessionRepository->find($requiredStoryId, $date);
+    }
+
     /**
      * @throws NotFoundHttpException
      * @throws InvalidConfigException

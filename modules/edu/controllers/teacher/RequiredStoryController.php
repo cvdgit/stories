@@ -19,8 +19,10 @@ use modules\edu\RequiredStory\Edit\EditRequiredStoryCommand;
 use modules\edu\RequiredStory\Edit\EditRequiredStoryHandler;
 use modules\edu\RequiredStory\Edit\RequiredStoryEditForm;
 use modules\edu\RequiredStory\repo\RequiredStoriesRepository;
+use modules\edu\RequiredStory\repo\RequiredStoryItem;
 use modules\edu\RequiredStory\repo\RequiredStoryMetadata;
 use modules\edu\RequiredStory\repo\RequiredStoryStatus;
+use modules\edu\RequiredStory\RequiredStoriesService;
 use modules\edu\StoryContent\StoryContentService;
 use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use Ramsey\Uuid\Uuid;
@@ -59,6 +61,10 @@ class RequiredStoryController extends Controller
      * @var DeleteRequiredStoryHandler
      */
     private $deleteRequiredStoryHandler;
+    /**
+     * @var RequiredStoriesService
+     */
+    private $requiredStoriesService;
 
     public function __construct(
         $id,
@@ -68,6 +74,7 @@ class RequiredStoryController extends Controller
         EditRequiredStoryHandler $editRequiredStoryHandler,
         CreateRequiredStoryHandler $createRequiredStoryHandler,
         DeleteRequiredStoryHandler $deleteRequiredStoryHandler,
+        RequiredStoriesService $requiredStoriesService,
         $config = []
     ) {
         parent::__construct($id, $module, $config);
@@ -76,6 +83,7 @@ class RequiredStoryController extends Controller
         $this->editRequiredStoryHandler = $editRequiredStoryHandler;
         $this->createRequiredStoryHandler = $createRequiredStoryHandler;
         $this->deleteRequiredStoryHandler = $deleteRequiredStoryHandler;
+        $this->requiredStoriesService = $requiredStoriesService;
     }
 
     /**
@@ -83,8 +91,32 @@ class RequiredStoryController extends Controller
      */
     public function actionIndex(): string
     {
+        $models = $this->requiredStoriesRepository->findAll();
+        $models = array_map(function(RequiredStoryItem $model) {
+            $session = $this->requiredStoriesService->findStudentSession(
+                $model->getId(),
+                new DateTimeImmutable('now', new DateTimeZone('Europe/Moscow'))
+            );
+            $stat = [
+                'sessionFact' => 0,
+                'sessionPlan' => 0,
+                'sessionIsComplete' => false,
+                'fact' => $this->storyContentService->getStudentFactContentItemsCount(
+                    $model->getStudentId(),
+                    $model->getStoryId()
+                ),
+                'plan' => $this->storyContentService->getStoryTotalContentItems($model->getStoryId()),
+            ];
+            if ($session !== null) {
+                $stat['sessionFact'] = $session->getFact();
+                $stat['sessionPlan'] = $session->getPlan();
+                $stat['sessionIsCompleted'] = $session->isCompleted();
+            }
+            return [$model, $stat];
+        }, $models);
+
         $dataProvider = new ArrayDataProvider([
-            'allModels' => $this->requiredStoriesRepository->findAll(),
+            'allModels' => $models,
             'pagination' => false,
         ]);
         return $this->render('index', [

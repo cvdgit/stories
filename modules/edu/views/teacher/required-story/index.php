@@ -45,6 +45,7 @@ $this->registerJs($this->renderFile('@modules/edu/views/teacher/required-story/i
 <div class="required-story-cell">Статус</div>
 <div class="required-story-cell">История</div>
 <div class="required-story-cell">Ученик</div>
+<div class="required-story-cell">Прогресс</div>
 <div class="required-story-cell">Дата начала</div>
 <div class="required-story-cell">Дата создания</div>
 <div class="required-story-cell">Действия</div>

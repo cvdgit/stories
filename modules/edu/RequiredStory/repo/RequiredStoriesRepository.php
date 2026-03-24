@@ -83,7 +83,9 @@ class RequiredStoriesRepository
         $query = (new Query())
             ->select([
                 'id' => 't.id',
+                'storyId' => 's.id',
                 'storyTitle' => 's.title',
+                'studentId' => 'student.id',
                 'studentName' => 'student.name',
                 'startedAt' => 't.started_at',
                 'createdAt' => 't.created_at',

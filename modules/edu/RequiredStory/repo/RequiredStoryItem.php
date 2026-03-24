@@ -36,10 +36,20 @@ class RequiredStoryItem
      * @var RequiredStoryStatus
      */
     private $status;
+    /**
+     * @var int
+     */
+    private $storyId;
+    /**
+     * @var int
+     */
+    private $studentId;
 
     public function __construct(
         UuidInterface $id,
+        int $storyId,
         string $storyTitle,
+        int $studentId,
         string $studentName,
         DateTimeInterface $startedDate,
         DateTimeInterface $createdDate,
@@ -51,6 +61,8 @@ class RequiredStoryItem
         $this->startedDate = $startedDate;
         $this->createdDate = $createdDate;
         $this->status = $status;
+        $this->storyId = $storyId;
+        $this->studentId = $studentId;
     }
 
     /**
@@ -60,7 +72,9 @@ class RequiredStoryItem
     {
         return new self(
             Uuid::fromString($row['id']),
+            (int) $row['storyId'],
             $row['storyTitle'],
+            (int) $row['studentId'],
             $row['studentName'],
             (new DateTimeImmutable('@' . $row['startedAt'])),
             (new DateTimeImmutable('@' . $row['createdAt'])),
@@ -96,5 +110,15 @@ class RequiredStoryItem
     public function getStatus(): RequiredStoryStatus
     {
         return $this->status;
+    }
+
+    public function getStoryId(): int
+    {
+        return $this->storyId;
+    }
+
+    public function getStudentId(): int
+    {
+        return $this->studentId;
     }
 }
