@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace frontend\components\learning\form;
 
+use common\models\UserQuestionHistoryModel;
 use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -65,6 +66,7 @@ class HistoryFilterForm extends Model
         $historyQuery->innerJoin(['t2' => 'story_story_test'], 't.test_id = t2.test_id');
         $historyQuery->innerJoin(['q' => 'story_test_question'], 't.entity_id = q.id');
         $historyQuery->where(['t.student_id' => $studentId, 't.correct_answer' => 1]);
+        $historyQuery->andWhere("(t.location IS NULL OR t.location = '" . UserQuestionHistoryModel::LOCATION_EDUCATION . "')");
 
         $betweenBegin = new Expression("UNIX_TIMESTAMP('{$this->targetDate->format('Y-m-d')} 00:00:00')");
         $betweenEnd = new Expression("UNIX_TIMESTAMP('{$this->targetDate->format('Y-m-d')} 23:59:59')");

@@ -84,6 +84,7 @@ export default function ContentMentalMap() {
 
     feedbackDialog.onShow(async ($element) => {
       mentalMap = window.mentalMapBuilder.create($element.find('.mental-map')[0], deck, {
+        location: 'education',
         init: async () => {
           const response = await fetch(`/mental-map/init`, {
             method: 'POST',

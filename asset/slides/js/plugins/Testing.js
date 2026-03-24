@@ -54,6 +54,7 @@ export default function Testing() {
           'dataParams': {'testId': test_id},
           'forSlide': true,
           'fromSlideId': $(deck.getCurrentSlide()).attr('data-id'),
+          'location': 'education',
           'deck': deck,
           init: () => {
             return $.ajax({
@@ -98,6 +99,7 @@ export default function Testing() {
           'forSlide': false,
           'required': params.testRequired,
           'deck': deck,
+          'location': 'education',
           init: function() {
             return $.getJSON('/question/init', params);
           },

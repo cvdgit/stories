@@ -353,7 +353,8 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
               content: detailTextContent.innerHTML,
               repetition_mode: repetitionMode,
               threshold,
-              payload: json
+              payload: json,
+              location: params.location
             }).then(response => {
 
               if (deck) {
@@ -507,7 +508,8 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
               content: detailTextContent.innerHTML,
               repetition_mode: repetitionMode,
               threshold,
-              payload: json
+              payload: json,
+              location: params.location
             }).then(response => {
 
               if (deck) {
@@ -647,7 +649,8 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
           slide_id: params?.slide_id,
           mental_map_id: params.mentalMapId,
           repetition_mode: repetitionMode,
-          threshold
+          threshold,
+          location: params.location
         },
         settings: json.settings || {},
         onMentalMapChange: progress => {

@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace common\models;
 
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 
@@ -20,28 +23,25 @@ use yii\db\Query;
  * @property int $correct_answer
  * @property int $created_at
  * @property int $test_id
- * @property int $stars;
+ * @property int $stars
+ * @property string|null $location
  *
  * @property UserQuestionAnswer[] $userQuestionAnswers
  * @property UserStudent $student
  */
 class UserQuestionHistory extends ActiveRecord
 {
-
     public $correct_answers;
     public $max_created_at;
     public $answers;
     public $progress;
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'user_question_history';
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             [
@@ -51,17 +51,14 @@ class UserQuestionHistory extends ActiveRecord
         ];
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             [['answers', 'progress'], 'safe'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -79,36 +76,31 @@ class UserQuestionHistory extends ActiveRecord
         ];
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUserQuestionAnswers()
+    public function getUserQuestionAnswers(): ActiveQuery
     {
         return $this->hasMany(UserQuestionAnswer::class, ['question_history_id' => 'id']);
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStudent()
+    public function getStudent(): ActiveQuery
     {
         return $this->hasOne(UserStudent::class, ['id' => 'student_id']);
     }
 
-    public static function create(int $studentID,
-                                  int $testID,
-                                  int $questionTopicID,
-                                  string $questionTopicName,
-                                  int $entityID,
-                                  string $entityName,
-                                  int $relationID,
-                                  string $relationName,
-                                  int $correctAnswer,
-                                  $progress,
-                                  $stars
-    ): UserQuestionHistory
-    {
-        $model = new self;
+    public static function create(
+        int $studentID,
+        int $testID,
+        int $questionTopicID,
+        string $questionTopicName,
+        int $entityID,
+        string $entityName,
+        int $relationID,
+        string $relationName,
+        int $correctAnswer,
+        $progress,
+        $stars,
+        string $location = null
+    ): self {
+        $model = new self();
         $model->student_id = $studentID;
         $model->test_id = $testID;
         $model->question_topic_id = $questionTopicID;
@@ -120,11 +112,20 @@ class UserQuestionHistory extends ActiveRecord
         $model->correct_answer = $correctAnswer;
         $model->progress = $progress;
         $model->stars = $stars;
+        $model->location = $location;
         return $model;
     }
 
-    public static function createWordList(int $studentID, int $testID, int $entityID, string $entityName, int $correctAnswer, $progress, $stars)
-    {
+    public static function createWordList(
+        int $studentID,
+        int $testID,
+        int $entityID,
+        string $entityName,
+        int $correctAnswer,
+        $progress,
+        $stars,
+        string $location = null
+    ): self {
         $model = new self;
         $model->student_id = $studentID;
         $model->test_id = $testID;
@@ -134,6 +135,7 @@ class UserQuestionHistory extends ActiveRecord
         $model->progress = $progress;
         $model->question_topic_id = 0;
         $model->stars = $stars;
+        $model->location = $location;
         return $model;
     }
 
@@ -148,17 +150,17 @@ class UserQuestionHistory extends ActiveRecord
         parent::afterSave($insert, $changedAttributes);
     }*/
 
-    public static function clearTestHistory(int $studentID, int $testID)
+    public static function clearTestHistory(int $studentID, int $testID): void
     {
         self::deleteAll('student_id = :student AND test_id = :test', [':student' => $studentID, ':test' => $testID]);
     }
 
-    public static function clearAllTestHistory(int $testID)
+    public static function clearAllTestHistory(int $testID): void
     {
         self::deleteAll('test_id = :test', [':test' => $testID]);
     }
 
-    public static function getTestStudents(int $testID)
+    public static function getTestStudents(int $testID): array
     {
         $query = (new Query())
             ->select('student_id')
@@ -166,10 +168,9 @@ class UserQuestionHistory extends ActiveRecord
             ->from(self::tableName())
             ->where('test_id = :test', [':test' => $testID]);
         $ids = $query->all();
-        $ids = array_map(static function($row) {
+        $ids = array_map(static function ($row) {
             return $row['student_id'];
         }, $ids);
         return UserStudent::find()->where(['in', 'id', $ids])->all();
     }
-
 }

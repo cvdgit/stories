@@ -104,6 +104,7 @@ $('#run-test-modal').on('loaded.bs.modal', function() {
         'dataUrl': '/question/get',
         'dataParams': params,
         'forSlide': false,
+        'location': 'wikids',
         init: function() {
             return $.getJSON('/question/init', params);
         }

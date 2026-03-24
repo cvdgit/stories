@@ -100,6 +100,7 @@ $this->registerJs(<<<JS
         forSlide: false,
         repetitionMode: true,
         repetitionBackUrl: '/edu/student/index',
+        location: 'education',
         init: () => $.getJSON('/question/init', params),
         onInitialized: () => test.addEventListener('finish', event => {
             console.log(event);

@@ -24,7 +24,6 @@ use modules\edu\RequiredStory\repo\RequiredStoryMetadata;
 use modules\edu\RequiredStory\repo\RequiredStoryStatus;
 use modules\edu\RequiredStory\RequiredStoriesService;
 use modules\edu\StoryContent\StoryContentService;
-use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\base\InvalidConfigException;

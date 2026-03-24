@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace common\models;
 
 use common\models\test\SourceType;
+use DomainException;
 use yii\base\Model;
 use yii\db\Query;
 
 class UserQuestionHistoryModel extends Model
 {
+    public const LOCATION_EDUCATION = 'education';
 
     public $source;
     public $student_id;
@@ -21,65 +25,88 @@ class UserQuestionHistoryModel extends Model
     public $progress;
     public $test_id;
     public $stars;
+    public $location;
 
     public $answers;
 
-    public function rules()
+    public function rules(): array
     {
         return [
             [['source', 'student_id', 'test_id', 'entity_id', 'entity_name'], 'required'],
-            [['source', 'student_id', 'test_id', 'question_topic_id', 'entity_id', 'relation_id', 'correct_answer'], 'integer'],
+            [
+                ['source', 'student_id', 'test_id', 'question_topic_id', 'entity_id', 'relation_id', 'correct_answer'],
+                'integer',
+            ],
             [['question_topic_name', 'relation_name'], 'string', 'max' => 255],
             [['entity_name'], 'string', 'max' => 512],
-            [['test_id'], 'exist', 'skipOnError' => true, 'targetClass' => StoryTest::class, 'targetAttribute' => ['test_id' => 'id']],
-            [['student_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserStudent::class, 'targetAttribute' => ['student_id' => 'id']],
+            [
+                ['test_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => StoryTest::class,
+                'targetAttribute' => ['test_id' => 'id'],
+            ],
+            [
+                ['student_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => UserStudent::class,
+                'targetAttribute' => ['student_id' => 'id'],
+            ],
             ['answers', 'safe'],
             ['progress', 'integer', 'min' => 0, 'max' => 100],
             [['stars'], 'integer'],
+            ['location', 'string', 'max' => 10],
         ];
     }
 
-    public function createUserQuestionHistory()
+    public function createUserQuestionHistory(): int
     {
         if (!$this->validate()) {
-            throw new \DomainException('User question history data is not valid');
+            throw new DomainException('User question history data is not valid');
         }
         $model = UserQuestionHistory::create(
-            $this->student_id,
-            $this->test_id,
-            $this->question_topic_id,
+            (int) $this->student_id,
+            (int) $this->test_id,
+            (int) $this->question_topic_id,
             $this->question_topic_name,
-            $this->entity_id,
+            (int) $this->entity_id,
             $this->entity_name,
-            $this->relation_id,
+            (int) $this->relation_id,
             $this->relation_name,
-            $this->correct_answer,
+            (int) $this->correct_answer,
             $this->progress,
-            $this->stars
+            $this->stars,
+            $this->location,
         );
-        $model->save();
+        if (!$model->save()) {
+            throw new DomainException('User question history save error');
+        }
         return $model->id;
     }
 
-    public function createWordListQuestionHistory()
+    public function createWordListQuestionHistory(): int
     {
         if (!$this->validate()) {
-            throw new \DomainException('User question history data is not valid');
+            throw new DomainException('User question history data is not valid');
         }
         $model = UserQuestionHistory::createWordList(
-            $this->student_id,
-            $this->test_id,
-            $this->entity_id,
+            (int) $this->student_id,
+            (int) $this->test_id,
+            (int) $this->entity_id,
             $this->entity_name,
-            $this->correct_answer,
+            (int) $this->correct_answer,
             $this->progress,
-            $this->stars
+            $this->stars,
+            $this->location,
         );
-        $model->save();
+        if (!$model->save()) {
+            throw new DomainException('User question history save error');
+        }
         return $model->id;
     }
 
-    public function createUserQuestionAnswers(int $questionAnswerID)
+    public function createUserQuestionAnswers(int $questionAnswerID): array
     {
         $models = [];
         if (count($this->answers) > 0) {
@@ -96,7 +123,7 @@ class UserQuestionHistoryModel extends Model
         return $models;
     }
 
-    public function getUserQuestionHistory(int $testID)
+    public function getUserQuestionHistory(int $testID): array
     {
         $query = (new Query())
             ->select([
@@ -137,15 +164,15 @@ class UserQuestionHistoryModel extends Model
             ->select([
                 'tbl.questionID AS question_id',
                 'tbl.entityID AS entity_id',
-                'tbl2.stars AS stars'
+                'tbl2.stars AS stars',
             ])
             ->from(['tbl' => $query])
             ->innerJoin(['tbl2' => UserQuestionHistory::tableName()], 'tbl2.id = tbl.questionID')
-            ->having('tbl2.stars >= '  . $repeat);
+            ->having('tbl2.stars >= ' . $repeat);
         return $leadQuery->all();
     }
 
-    public function getUserQuestionHistoryWithOutRelation(int $testID)
+    public function getUserQuestionHistoryWithOutRelation(int $testID): array
     {
         $query = (new Query())
             ->select(['t.entity_id', 't2.answer_entity_id'])
@@ -159,7 +186,7 @@ class UserQuestionHistoryModel extends Model
         return $query->all();
     }
 
-    public function getUserHistoryStarsCount(int $testID)
+    public function getUserHistoryStarsCount(int $testID): int
     {
         $stars = $this->getUserQuestionHistoryStars3($testID);
         $ids = [];
@@ -173,7 +200,7 @@ class UserQuestionHistoryModel extends Model
         return $total;
     }
 
-    public function getUserHistoryStarsCountLocal(int $testID)
+    public function getUserHistoryStarsCountLocal(int $testID): int
     {
         $stars = $this->getUserQuestionHistoryStarsLocal($testID);
         $ids = [];
@@ -187,7 +214,7 @@ class UserQuestionHistoryModel extends Model
         return $total;
     }
 
-    public function getUserQuestionHistoryStars2(int $testID)
+    public function getUserQuestionHistoryStars2(int $testID): array
     {
         return (new Query())
             ->select(['t.entity_id', 't.relation_id', 't2.answer_entity_id', 'COUNT(t2.answer_entity_id) AS stars'])
@@ -201,7 +228,7 @@ class UserQuestionHistoryModel extends Model
             ->all();
     }
 
-    public function getUserQuestionHistoryStars3(int $testID)
+    public function getUserQuestionHistoryStars3(int $testID): array
     {
         $query = (new Query())
             ->select([
@@ -222,7 +249,7 @@ class UserQuestionHistoryModel extends Model
                 'tbl.entityID AS entity_id',
                 'tbl.relationID AS relation_id',
                 'tbl.answerEntityID AS answer_entity_id',
-                'tbl2.stars AS stars'
+                'tbl2.stars AS stars',
             ])
             ->from(['tbl' => $query])
             ->innerJoin(['tbl2' => UserQuestionHistory::tableName()], 'tbl2.id = tbl.questionID');
@@ -244,17 +271,23 @@ class UserQuestionHistoryModel extends Model
             ->select([
                 'tbl.questionID AS question_id',
                 'tbl.entityID AS entity_id',
-                'tbl2.stars AS stars'
+                'tbl2.stars AS stars',
             ])
             ->from(['tbl' => $query])
             ->innerJoin(['tbl2' => UserQuestionHistory::tableName()], 'tbl2.id = tbl.questionID');
         return $leadQuery->all();
     }
 
-    public function getUserContinentsData(int $testID)
+    public function getUserContinentsData(int $testID): array
     {
         $subQuery = (new Query())
-            ->select(['t.entity_name AS entityName', 't.relation_name AS relationName', 't2.answer_entity_name AS answerEntityName'])
+            ->select(
+                [
+                    't.entity_name AS entityName',
+                    't.relation_name AS relationName',
+                    't2.answer_entity_name AS answerEntityName',
+                ],
+            )
             ->from(['t' => UserQuestionHistory::tableName()])
             ->innerJoin(['t2' => UserQuestionAnswer::tableName()], 't2.question_history_id = t.id')
             ->where('t.student_id = :student', [':student' => $this->student_id])
@@ -269,7 +302,7 @@ class UserQuestionHistoryModel extends Model
         return $query->all();
     }
 
-    public function getUserAnimalsData(int $testID)
+    public function getUserAnimalsData(int $testID): array
     {
         $query = (new Query())
             ->select(['t.entity_name', 't.relation_name', 't2.answer_entity_name'])
@@ -282,7 +315,7 @@ class UserQuestionHistoryModel extends Model
         return $query->all();
     }
 
-    public function isSourceTest()
+    public function isSourceTest(): bool
     {
         return (int) $this->source === SourceType::TEST;
     }
@@ -292,17 +325,17 @@ class UserQuestionHistoryModel extends Model
         return (int) $this->source === SourceType::TESTS;
     }
 
-    public function isSourceWordList()
+    public function isSourceWordList(): bool
     {
         return (int) $this->source === SourceType::LIST;
     }
 
-    public function isSourceNeo()
+    public function isSourceNeo(): bool
     {
         return (int) $this->source === SourceType::NEO;
     }
 
-    public function getDetail(int $testID)
+    public function getDetail(int $testID): array
     {
         $query = (new Query())
             ->select([
@@ -326,8 +359,7 @@ class UserQuestionHistoryModel extends Model
             ])
             ->from(['tbl' => $query])
             ->innerJoin(['tbl2' => UserQuestionHistory::tableName()], 'tbl2.id = tbl.questionID')
-        ->orderBy(['tbl2.created_at' => SORT_ASC]);
+            ->orderBy(['tbl2.created_at' => SORT_ASC]);
         return $leadQuery->all();
     }
-
 }

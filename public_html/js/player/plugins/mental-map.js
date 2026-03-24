@@ -24,6 +24,7 @@ const mentalMapBuilder = window.mentalMapBuilder = new MentalMapManagerQuiz();
     }
 
     const mentalMap = mentalMapBuilder.create(elem[0], Reveal, {
+      location: 'wikids',
       init: async () => {
         const response = await fetch(`/mental-map/init`, {
           method: 'POST',

@@ -87,6 +87,7 @@ window.ContentMentalMapsPlugin = (function() {
 
     feedbackDialog.onShow(async ($element) => {
       mentalMap = mentalMapBuilder.create($element.find('.mental-map')[0], Reveal, {
+        location: 'wikids',
         init: async () => {
           const response = await fetch(`/mental-map/init`, {
             method: 'POST',

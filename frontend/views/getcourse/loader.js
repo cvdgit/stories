@@ -79,6 +79,7 @@
     const mentalMapBuilder = window.mentalMapBuilder = new MentalMapManagerQuiz();
 
     const mentalMap = mentalMapBuilder.create(elem, undefined, {
+      location: 'getcourse',
       init: async () => {
         const response = await fetch(`/mental-map/init`, {
           method: 'POST',
@@ -116,6 +117,7 @@
       dataUrl: '/question/get',
       dataParams: {...elem.dataset},
       forSlide: false,
+      location: 'getcourse',
       //repetitionMode: false,
       init: () => $.getJSON('/question/init', {...elem.dataset}),
       onInitialized: () => test.addEventListener('finish', event => {

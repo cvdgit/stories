@@ -44,6 +44,7 @@ export default function MentalMap() {
         const slidesPLayer = new SlidesPlayer(deck)
 
         const mentalMap = window.mentalMapBuilder.create(elem[0], deck, {
+          location: 'education',
           init: async () => {
             const response = await fetch(`/mental-map/init`, {
               method: 'POST',

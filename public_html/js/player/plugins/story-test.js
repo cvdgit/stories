@@ -41,7 +41,8 @@ var TestSlide = (function() {
             'dataParams': {'testId': test_id},
             'forSlide': true,
             'deck': Reveal,
-          fromSlideId: slideId,
+            fromSlideId: slideId,
+            location: 'wikids',
             init: function() {
               return $.ajax({
                 "url": config.initAction + '?testId=' + test_id,
@@ -143,6 +144,7 @@ var Education = (function() {
       'dataParams': params,
       'forSlide': false,
       'required': params.testRequired,
+      'location': 'wikids',
       init: function() {
         return $.getJSON('/question/init', params);
       },

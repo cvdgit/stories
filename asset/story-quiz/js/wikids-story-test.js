@@ -2035,7 +2035,8 @@ function WikidsStoryTest(el, options) {
           'correct_answer': answerIsCorrect ? 1 : 0,
           'answers': answerList,
           'progress': testProgress.calcPercent(),
-          'stars': questionsRepeat.number(currentQuestion)
+          'stars': questionsRepeat.number(currentQuestion),
+          'location': options.location
         };
         await $.post('/question/answer', answerParams);
       }
@@ -2055,7 +2056,8 @@ function WikidsStoryTest(el, options) {
           'correct_answer': answerIsCorrect ? 1 : 0,
           'answers': answerList,
           'progress': testProgress.calcPercent(),
-          'stars': questionsRepeat.number(currentQuestion)
+          'stars': questionsRepeat.number(currentQuestion),
+          'location': options.location
         };
         await $.post('/question/answer', answerParams);
       }
@@ -2075,7 +2077,8 @@ function WikidsStoryTest(el, options) {
           'correct_answer': answerIsCorrect ? 1 : 0,
           'answers': answerList,
           'progress': testProgress.calcPercent(),
-          'stars': questionsRepeat.number(currentQuestion)
+          'stars': questionsRepeat.number(currentQuestion),
+          'location': options.location
         };
         await $.post('/question/answer', answerParams);
       }
@@ -2107,7 +2110,8 @@ function WikidsStoryTest(el, options) {
           'correct_answer': answerIsCorrect ? 1 : 0,
           'answers': answerList,
           'progress': testProgress.calcPercent(),
-          'stars': questionsRepeat.number(currentQuestion)
+          'stars': questionsRepeat.number(currentQuestion),
+          'location': options.location
         };
         await $.post('/question/answer', answerParams);
       }
@@ -2203,7 +2207,8 @@ function WikidsStoryTest(el, options) {
       'student_id': currentStudent.id,
       'answers': answers,
       'progress': testProgress.calcPercent(),
-      'stars': questionsRepeat.number(currentQuestion)
+      'stars': questionsRepeat.number(currentQuestion),
+      'location': options.location
     };
     data = {...data, ...changes};
     return data;

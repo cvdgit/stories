@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace frontend\Training\FetchMentalMapHistoryTargetWords;
 
 use common\components\MentalMapThreshold;
+use common\models\UserQuestionHistoryModel;
 use DateTimeInterface;
-use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use phpQuery;
 use yii\db\Expression;
 use yii\db\Query;
@@ -34,6 +34,7 @@ class MentalMapHistoryTargetWordsFetcher
             ])
             ->andWhere(['>=', 'h.overall_similarity', MentalMapThreshold::DEFAULT_THRESHOLD])
             ->andWhere(['between', new Expression('h.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd])
+            ->andWhere("(h.location IS NULL OR h.location = '" . UserQuestionHistoryModel::LOCATION_EDUCATION . "')")
             ->orderBy(['h.created_at' => SORT_ASC]);
 
         $rows = $query->all();

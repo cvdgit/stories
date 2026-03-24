@@ -108,6 +108,7 @@ $this->registerJs(<<<JS
     }
 
     const mentalMap = mentalMapBuilder.create(elem[0], undefined, {
+      location: 'education',
       init: async () => {
         const response = await fetch(`/mental-map/init`, {
           method: 'POST',
