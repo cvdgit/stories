@@ -55,7 +55,7 @@ class SelectUserWidget extends Widget
                     $this->userModel->id => [
                         'data-data' => $this->getOptionData(
                             $this->userModel->id,
-                            $this->userModel->username,
+                            $this->userModel->getProfileName(),
                             $this->userModel->email,
                             '/img/no_avatar.png',
                         ),
