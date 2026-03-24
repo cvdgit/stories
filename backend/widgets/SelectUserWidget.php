@@ -49,7 +49,7 @@ class SelectUserWidget extends Widget
         ];
 
         if ($this->userModel !== null) {
-            $this->widgetOptions['items'] = [$this->userModel->id => $this->userModel->username];
+            $this->widgetOptions['items'] = [$this->userModel->id => $this->userModel->getProfileName()];
             $this->widgetOptions['options'] = [
                 'options' => [
                     $this->userModel->id => [
