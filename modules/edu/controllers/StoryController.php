@@ -110,7 +110,9 @@ class StoryController extends Controller
 
         $requiredStorySession = null;
         $requiredStoryStat = ['plan' => 0, 'fact' => 0];
-        if ($requiredStory !== null) {
+        $requiredStoryIsDone = $this->requiredStoriesService->storyIsDone($studentId, $story->id);
+
+        if ($requiredStory !== null && $requiredStoryIsDone === false) {
             $requiredStorySession = $this->requiredStoriesService->initSession(
                 $studentId,
                 $story->id,
@@ -185,6 +187,7 @@ class StoryController extends Controller
             'requiredStory' => $requiredStory,
             'requiredStorySession' => $requiredStorySession,
             'requiredStoryStat' => $requiredStoryStat,
+            'requiredStoryIsDone' => $requiredStoryIsDone,
         ]);
     }
 }

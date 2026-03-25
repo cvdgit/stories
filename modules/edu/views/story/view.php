@@ -25,6 +25,7 @@ use yii\web\View;
  * @var RequiredStory|null $requiredStory
  * @var RequiredStorySession|null $requiredStorySession
  * @var array $requiredStoryStat
+ * @var bool $requiredStoryIsDone
  */
 
 $storyId = $story->id;
@@ -165,7 +166,8 @@ $this->title = $story->title;
 
 <?php if ($requiredStory !== null): ?>
     <div style="margin: 15px auto 20px; width: 1060px; height: auto; position: relative">
-        <h3>Обязательная история</h3>
+        <h3>Обязательная история<?= $requiredStoryIsDone ? ' - <b style="color: #99cd50">пройдена</b>' : '' ?></h3>
+        <?php if ($requiredStoryIsDone === false): ?>
         <?= $this->render('_required_story_stat', [
             'sessionFact' => $requiredStorySession->getFact(),
             'sessionPlan' => $requiredStorySession->getPlan(),
@@ -173,6 +175,7 @@ $this->title = $story->title;
             'plan' => $requiredStoryStat['plan'],
             'fact' => $requiredStoryStat['fact'],
         ]) ?>
+        <?php endif ?>
     </div>
 <?php endif ?>
 

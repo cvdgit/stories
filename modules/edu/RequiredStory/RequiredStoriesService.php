@@ -195,4 +195,16 @@ class RequiredStoriesService
         }
         $metadata->setChunks($chunks);
     }
+
+    public function storyIsDone(int $studentId, int $storyId): bool
+    {
+        $progress = StoryStudentProgress::findOne([
+            'student_id' => $studentId,
+            'story_id' => $storyId,
+        ]);
+        if ($progress === null) {
+            return false;
+        }
+        return $progress->statusIsDone();
+    }
 }
