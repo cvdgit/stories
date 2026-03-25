@@ -153,6 +153,10 @@ class RequiredStoryController extends Controller
             'days' => $requiredStory->getDays(),
             'metadata' => Json::encode($requiredStory->getMetadata()),
             'status' => (string) $requiredStory->getStatus(),
+            'storyStudentFact' => $this->storyContentService->getStudentFactContentItemsCount(
+                $requiredStory->getStudentId(),
+                $requiredStory->getStoryId(),
+            ),
         ]);
 
         $students = [];
@@ -291,12 +295,20 @@ class RequiredStoryController extends Controller
      * @throws InvalidConfigException
      * @throws NotFoundHttpException
      */
-    public function actionGetStoryContentsTotal(int $storyId, Response $response): array
+    public function actionGetStoryContentsTotal(int $storyId, Response $response, int $studentId = null): array
     {
         $response->format = Response::FORMAT_JSON;
-        return [
+        $result = [
             'total' => $this->storyContentService->getStoryTotalContentItems($storyId),
+            'fact' => 0,
         ];
+        if ($studentId !== null) {
+            $result['fact'] = $this->storyContentService->getStudentFactContentItemsCount(
+                $studentId,
+                $storyId,
+            );
+        }
+        return $result;
     }
 
     public function actionDelete(string $id, Response $response, WebUser $user): array

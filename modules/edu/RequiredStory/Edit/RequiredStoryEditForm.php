@@ -17,6 +17,7 @@ class RequiredStoryEditForm extends Model
     public $days;
     public $metadata;
     public $status;
+    public $storyStudentFact;
 
     public function rules(): array
     {

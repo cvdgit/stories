@@ -82,7 +82,7 @@ class SelectUserWidget extends Widget
             $this->widgetOptions['options']['options'] = $options;
         }
 
-        //$this->clientOptions['onChange'] = new JsExpression($this->onChange);
+        $this->clientOptions['onChange'] = new JsExpression($this->onChange);
         $this->clientOptions['render']['option'] = $this->renderOptionExpression();
         $this->widgetOptions['clientOptions'] = $this->clientOptions;
     }

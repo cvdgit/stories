@@ -17,7 +17,7 @@
   }
 
   async function reloadMetadata(storyId) {
-    const response = await window.Api.get(`/edu/teacher/required-story/get-story-contents-total?storyId=${storyId}`);
+    const response = await window.Api.get(`/edu/teacher/required-story/get-story-contents-total?storyId=${storyId}&studentId=${selectedStudentId}`);
     const total = Number(response?.total);
     if (isNaN(total) || total === 0) {
       throw new Error('No story items');
@@ -26,14 +26,27 @@
     if (isNaN(days) || days === 0) {
       throw new Error('Days error');
     }
+
+    $('#studentFactAnswersWrap').show();
+    const studentFactAnswers = Number(response?.fact);
+    $('#studentFactAnswers').text(studentFactAnswers);
+
+    const useStudentAnswers = $('#useStudentFactAnswers').is(':checked');
+    let answersTotal = total;
+    if (useStudentAnswers) {
+      answersTotal -= studentFactAnswers;
+    }
+
     const metadata = {
-      total: Number(response?.total),
-      chunks: splitNumber(total, days).map(n => ({n})),
+      total,
+      chunks: splitNumber(answersTotal, days).map(n => ({n})),
     };
     $('.required-story-metadata').val(JSON.stringify(metadata));
     $('#metadata-container')
       .empty()
       .append(drawMetadata(metadata));
+
+
   }
 
   window.requiredSelectStory = async (storyId) => {
@@ -43,17 +56,22 @@
     await reloadMetadata(storyId);
   }
 
+  let selectedStudentId;
+  window.requiredSelectStudent = async (studentId) => {
+    selectedStudentId = studentId;
+  }
+
   function drawMetadata(metadata) {
     const $elem = $('<div/>')
-      .append(`<p>Всего вопросов в истории: <b>${metadata.total}</b> <button class="reload-meta" title="Обновить" type="button"><i class="glyphicon glyphicon-refresh"></i></button></p>`)
+      .append(`<p>Всего вопросов в истории: <b style="margin-right: 10px">${metadata.total}</b> <button class="reload-meta" title="Обновить" type="button"><i class="glyphicon glyphicon-refresh"></i></button></p>`)
       .append(`
 <p>
 Учитываются:
-<ul>
-<li>Слайды с информацией</li>
-<li>Вопросы в тестах</li>
-<li>Фрагменты ментальных карт</li>
-<li>Фрагменты обязательных ментальных карт речевого тренажера</li>
+<ul style="margin-bottom: 30px">
+<li style="margin-bottom: 6px">Слайды с информацией</li>
+<li style="margin-bottom: 6px">Вопросы в тестах</li>
+<li style="margin-bottom: 6px">Фрагменты ментальных карт</li>
+<li style="margin-bottom: 6px">Фрагменты обязательных ментальных карт речевого тренажера</li>
 <li>Пересказы</li>
 </ul>
 </p>
@@ -79,6 +97,26 @@
     return $elem;
   }
 
+  function changeDaysEventHandler($container, useStudentFact, days) {
+    const metadata = JSON.parse($container.find('.required-story-metadata').val());
+    const studentFactAnswers = Number($container.find('#studentFactAnswers').text());
+
+    let total = metadata.total;
+    if (useStudentFact) {
+      total -= studentFactAnswers;
+    }
+
+    metadata.chunks = splitNumber(total, Number(days)).map(n => ({n}));
+
+    $container.find('.required-story-metadata').val(JSON.stringify(metadata));
+
+    $container.find('#metadata-container')
+      .empty()
+      .append(
+        drawMetadata(metadata)
+      );
+  }
+
   $('#required-stories-wrap')
     .on('click', '.required-story-edit', e => {
       e.preventDefault();
@@ -96,16 +134,23 @@
             drawMetadata(metadata)
           );
 
-          $(this).find('.required-story-days').on('input', e => {
-            const metadata = JSON.parse($('.required-story-metadata').val());
-            metadata.chunks = splitNumber(metadata.total, Number(e.target.value)).map(n => ({n}));
-            $('.required-story-metadata').val(JSON.stringify(metadata));
-            $(this).find('#metadata-container')
-              .empty()
-              .append(
-                drawMetadata(metadata)
-              );
-          });
+          $(this).find('.required-story-days').on(
+            'input',
+            e => changeDaysEventHandler(
+              $(this),
+              $(this).find('#useStudentFactAnswers').is(':checked'),
+              e.target.value
+            )
+          );
+
+          $(this).find('#useStudentFactAnswers').on(
+            'change',
+              e => changeDaysEventHandler(
+                $(this),
+                e.target.checked,
+                $(this).find('.required-story-days').val()
+              )
+          );
 
           const $form = $(this).find('form');
           attachBeforeSubmit($form[0], async (form) => {
@@ -157,16 +202,23 @@
       url: $(e.target).attr('href'),
       callback: function() {
 
-        $(this).find('.required-story-days').on('input', e => {
-          const metadata = JSON.parse($('.required-story-metadata').val());
-          metadata.chunks = splitNumber(metadata.total, Number(e.target.value)).map(n => ({n}));
-          $('.required-story-metadata').val(JSON.stringify(metadata));
-          $(this).find('#metadata-container')
-            .empty()
-            .append(
-              drawMetadata(metadata)
-            );
-        });
+        $(this).find('.required-story-days').on(
+          'input',
+          e => changeDaysEventHandler(
+            $(this),
+            $(this).find('#useStudentFactAnswers').is(':checked'),
+            e.target.value
+          )
+        );
+
+        $(this).find('#useStudentFactAnswers').on(
+          'change',
+          e => changeDaysEventHandler(
+            $(this),
+            e.target.checked,
+            $(this).find('.required-story-days').val()
+          )
+        );
 
         const $form = $(this).find('form');
         attachBeforeSubmit($form[0], async (form) => {

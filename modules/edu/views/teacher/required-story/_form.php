@@ -22,6 +22,7 @@ use yii\web\View;
             <div class="studentIdValue" style="flex: 1">
                 <?= $form->field($formModel, 'studentId')->widget(SelectUserWidget::class, [
                     'loadUrl' => ['/edu/teacher/required-story/select-students'],
+                    'onChange' => 'requiredSelectStudent',
                     'userModel' => $userModel,
                 ]) ?>
             </div>
@@ -40,6 +41,13 @@ use yii\web\View;
         <?= $form->field($formModel, 'status')->dropDownList(RequiredStoryStatus::values(), ['prompt' => 'Выберите состояние']) ?>
     </div>
     <div style="flex: 1">
+        <div id="studentFactAnswersWrap" style="margin-bottom: 20px; display: <?= empty($formModel->storyStudentFact) ? 'none' : 'block' ?>">
+            <div style="margin-bottom: 10px">Пройдено учеником на текущий момент: <b id="studentFactAnswers"><?= $formModel->storyStudentFact ?></b></div>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 10px">
+                <label style="margin: 0" for="useStudentFactAnswers">Учитывать пройденные:</label>
+                <input id="useStudentFactAnswers" style="margin: 0" type="checkbox">
+            </div>
+        </div>
         <div id="metadata-container"></div>
         <?= $form->field($formModel, 'metadata')->hiddenInput(['class' => 'required-story-metadata'])->label(false)->error(false) ?>
     </div>

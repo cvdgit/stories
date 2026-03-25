@@ -202,8 +202,6 @@ window.Api = (function() {
       },
     };
 
-    console.log(init);
-
     return fetch(url, init).then((response) => {
       if (response.ok) {
         return response;
