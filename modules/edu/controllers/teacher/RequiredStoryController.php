@@ -321,13 +321,28 @@ class RequiredStoryController extends Controller
 
     /**
      * @throws BadRequestHttpException
+     * @throws NotFoundHttpException
      */
     public function actionSessions(string $id): string
     {
         if (!Uuid::isValid($id)) {
             throw new BadRequestHttpException('Id error');
         }
+        $requiredStory = $this->requiredStoriesRepository->findById(Uuid::fromString($id));
+        if ($requiredStory === null) {
+            throw new NotFoundHttpException('Required story not found');
+        }
+        $story = EduStory::findOne($requiredStory->getStoryId());
+        if ($story === null) {
+            throw new NotFoundHttpException('Story not found');
+        }
+        $student = EduStudent::findOne($requiredStory->getStudentId());
+        if ($student === null) {
+            throw new NotFoundHttpException('Student not found');
+        }
         return $this->renderAjax('_sessions', [
+            'story' => $story,
+            'student' => $student,
             'sessions' => $this->requiredStorySessionRepository->findByRequiredStoryId(
                 Uuid::fromString($id)
             ),
