@@ -14,7 +14,7 @@ use yii\helpers\Html;
  */
 ?>
 <div>
-    <h3><?= Html::encode($story->title) ?> - <?= Html::encode($student->name) ?></h3>
+    <h3 style="margin-bottom: 20px"><?= Html::encode($story->title) ?> - <?= Html::encode($student->name) ?></h3>
     <table class="table table-sm table-hover table-bordered">
         <thead>
         <tr>
