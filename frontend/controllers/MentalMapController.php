@@ -214,6 +214,7 @@ class MentalMapController extends Controller
                     'threshold' => $form->threshold,
                     'all_important_words_included' => $allWords,
                     'payload' => $form->payload,
+                    'location' => $form->location
                 ]);
                 $command->execute();
 

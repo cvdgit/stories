@@ -20,6 +20,7 @@ class MentalMapHistoryForm extends Model
     public $threshold;
     public $all_important_words_included;
     public $payload;
+    public $location;
 
     public function rules(): array
     {
@@ -39,6 +40,7 @@ class MentalMapHistoryForm extends Model
             ],
             [['repetition_mode', 'all_important_words_included'], 'boolean'],
             [['content', 'payload'], 'safe'],
+            ['location', 'string', 'max' => 10],
         ];
     }
 }
