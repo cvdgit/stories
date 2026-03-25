@@ -21,6 +21,7 @@ use modules\edu\RequiredStory\Edit\RequiredStoryEditForm;
 use modules\edu\RequiredStory\repo\RequiredStoriesRepository;
 use modules\edu\RequiredStory\repo\RequiredStoryItem;
 use modules\edu\RequiredStory\repo\RequiredStoryMetadata;
+use modules\edu\RequiredStory\repo\RequiredStorySessionRepository;
 use modules\edu\RequiredStory\repo\RequiredStoryStatus;
 use modules\edu\RequiredStory\RequiredStoriesService;
 use modules\edu\StoryContent\StoryContentService;
@@ -64,11 +65,16 @@ class RequiredStoryController extends Controller
      * @var RequiredStoriesService
      */
     private $requiredStoriesService;
+    /**
+     * @var RequiredStorySessionRepository
+     */
+    private $requiredStorySessionRepository;
 
     public function __construct(
         $id,
         $module,
         RequiredStoriesRepository $requiredStoriesRepository,
+        RequiredStorySessionRepository $requiredStorySessionRepository,
         StoryContentService $storyContentService,
         EditRequiredStoryHandler $editRequiredStoryHandler,
         CreateRequiredStoryHandler $createRequiredStoryHandler,
@@ -83,6 +89,7 @@ class RequiredStoryController extends Controller
         $this->createRequiredStoryHandler = $createRequiredStoryHandler;
         $this->deleteRequiredStoryHandler = $deleteRequiredStoryHandler;
         $this->requiredStoriesService = $requiredStoriesService;
+        $this->requiredStorySessionRepository = $requiredStorySessionRepository;
     }
 
     /**
@@ -94,7 +101,7 @@ class RequiredStoryController extends Controller
         $models = array_map(function(RequiredStoryItem $model) {
             $session = $this->requiredStoriesService->findStudentSession(
                 $model->getId(),
-                new DateTimeImmutable('now', new DateTimeZone('Europe/Moscow'))
+                new DateTimeImmutable('now', new DateTimeZone('Europe/Moscow')),
             );
             $stat = [
                 'sessionFact' => 0,
@@ -102,7 +109,7 @@ class RequiredStoryController extends Controller
                 'sessionIsComplete' => false,
                 'fact' => $this->storyContentService->getStudentFactContentItemsCount(
                     $model->getStudentId(),
-                    $model->getStoryId()
+                    $model->getStoryId(),
                 ),
                 'plan' => $this->storyContentService->getStoryTotalContentItems($model->getStoryId()),
             ];
@@ -302,13 +309,28 @@ class RequiredStoryController extends Controller
             $this->deleteRequiredStoryHandler->handle(
                 new DeleteRequiredStoryCommand(
                     Uuid::fromString($id),
-                    $user->getId()
-                )
+                    $user->getId(),
+                ),
             );
         } catch (Exception $exception) {
             Yii::$app->errorHandler->logException($exception);
             return ['success' => false, 'message' => $exception->getMessage()];
         }
         return ['success' => true];
+    }
+
+    /**
+     * @throws BadRequestHttpException
+     */
+    public function actionSessions(string $id): string
+    {
+        if (!Uuid::isValid($id)) {
+            throw new BadRequestHttpException('Id error');
+        }
+        return $this->renderAjax('_sessions', [
+            'sessions' => $this->requiredStorySessionRepository->findByRequiredStoryId(
+                Uuid::fromString($id)
+            ),
+        ]);
     }
 }

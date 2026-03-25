@@ -134,6 +134,17 @@
       }
       toastr.error(response.message || 'Ошибка');
     })
+    .on('click', '.required-story-stat', e => {
+      const dialog = new RemoteModal({
+        id: 'required-story-sessions-modal',
+        title: 'Сессии ученика',
+        dialogClassName: 'modal-lg'
+      });
+      dialog.show({
+        url: $(e.target).attr('data-required-story-url'),
+        callback: function() {}
+      });
+    });
 
   $('.required-story-create').on('click', e => {
     e.preventDefault();

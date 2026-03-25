@@ -6,6 +6,7 @@ namespace modules\edu\RequiredStory\repo;
 
 use DateTimeInterface;
 use modules\edu\RequiredStory\RequiredStorySessionModel;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Yii;
 use yii\db\Exception;
@@ -81,5 +82,25 @@ class RequiredStorySessionRepository
     private function formatDate(DateTimeInterface $date): string
     {
         return $date->format('Y-m-d');
+    }
+
+    public function findByRequiredStoryId(UuidInterface $requiredStoryId): array
+    {
+        $rows = (new Query())
+            ->select('*')
+            ->from(['t' => RequiredStorySessionModel::tableName()])
+            ->where([
+                'required_story_id' => $requiredStoryId->toString(),
+            ])
+            ->orderBy(['created_at' => SORT_DESC])
+            ->all();
+        return array_map(static function (array $row) {
+            return new RequiredStorySession(
+                Uuid::fromString($row['required_story_id']),
+                $row['date'],
+                (int) $row['plan'],
+                (int) $row['fact'],
+            );
+        }, $rows);
     }
 }

@@ -22,7 +22,11 @@ use yii\helpers\Url;
     <?= $requiredStoryItem->getStudentName() ?>
 </div>
 <div class="required-story-cell">
-    <div id="required-story-stat" style="display: flex; flex-direction: column; gap: 10px">
+    <div
+        data-required-story-url="<?= Url::to(['/edu/teacher/required-story/sessions', 'id' => $requiredStoryItem->getId()->toString()]) ?>"
+        class="required-story-stat"
+        style="display: flex; flex-direction: column; gap: 10px"
+    >
         <div style="display: flex; flex-direction: row; gap: 10px; align-items: center">Сегодня: <?= $stat['sessionFact'] ?> из <?= $stat['sessionPlan'] ?></div>
         <div>Всего: <?= $stat['fact'] ?> из <?= $stat['plan'] ?></div>
     </div>

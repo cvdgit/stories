@@ -4,6 +4,7 @@
 }
 .required-story-row {
   display: table-row;
+  transition: all 200ms;
 }
 .required-story-row:not(.required-story-row-header):hover {
   background-color: #eee;
@@ -17,4 +18,22 @@
 .required-story-row-header .required-story-cell {
   font-weight: 600;
   white-space: nowrap;
+}
+
+.required-story-stat {
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 200ms;
+}
+
+.required-story-stat:hover {
+  color: #fff;
+  background-color: #337ab7;
+  border-color: #2e6da4;
+}
+
+.required-story-stat > * {
+  pointer-events: none;
 }
