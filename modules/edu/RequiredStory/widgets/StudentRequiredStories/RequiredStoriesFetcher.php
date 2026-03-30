@@ -48,7 +48,7 @@ class RequiredStoriesFetcher
             ])
             ->andWhere(new Expression('IFNULL(p.progress, 0) < 100'))
             ->andWhere(['t.status' => (string) RequiredStoryStatus::open()])
-            ->andWhere(['<=', new Expression('t.started_at + (3 * 60 * 60)'), new Expression('UNIX_TIMESTAMP()')])
+            ->andWhere(['<=', new Expression('t.started_at'), new Expression('UNIX_TIMESTAMP() + (3 * 60 * 60)')])
             ->orderBy(['t.started_at' => SORT_ASC]);
 
         $rows = $query->all();
