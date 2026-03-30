@@ -16,7 +16,7 @@ use yii\helpers\Url;
            href="<?= Url::toRoute(['/edu/story/view', 'id' => $model->getStoryId()]) ?>"
            data-pjax="0" style="gap: 10px">
             <div class="story-item-image">
-                <div class="story-image" style="background-image: url(<?= $model->getStoryCover() ?>)">
+                <div class="story-image" style="background-image: url(<?= $model->getStoryCover() ?>); background-size: contain">
                     <div class="story-image__icon"></div>
                 </div>
                 <div class="story-item-image-overlay">
