@@ -136,7 +136,7 @@ window.initSlides = function() {
       if (!stat?.success) {
         return;
       }
-      setTimeout(() => elem.outerHTML = stat.content);
+      elem.innerHTML = stat.content;
     }, 700);
   })
 
