@@ -266,6 +266,7 @@ class UserQuestionHistoryModel extends Model
             ->from(['t' => UserQuestionHistory::tableName()])
             ->where('t.student_id = :student', [':student' => $this->student_id])
             ->andWhere('t.test_id = :test', [':test' => $testID])
+            ->andWhere('t.correct_answer = 1')
             ->groupBy(['t.entity_id']);
         $leadQuery = (new Query())
             ->select([
