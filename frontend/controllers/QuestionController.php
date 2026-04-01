@@ -189,8 +189,7 @@ class QuestionController extends Controller
                 [
                     'debug' => [
                         //'userHistory' => $userHistory,
-                        'collectionTotal' => $collection->getTotal(),
-                        'userStarsCount' => $userStarsCount,
+                        'rows' => $userQuestionHistoryModel->getUserQuestionHistoryStarsLocal($test->id)
                     ]
                 ]
             );
