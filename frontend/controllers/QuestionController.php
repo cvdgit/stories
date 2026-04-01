@@ -188,7 +188,8 @@ class QuestionController extends Controller
                 $serializer->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount, $fastMode),
                 [
                     'debug' => [
-                        'userHistory' => $userHistory,
+                        //'userHistory' => $userHistory,
+                        'historyValues' => $historyValues,
                     ]
                 ]
             );
