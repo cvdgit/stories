@@ -135,7 +135,7 @@ window.initSlides = function() {
       if (!stat?.success) {
         return;
       }
-      elem.innerHTML = stat.content;
+      elem.outerHTML = stat.content;
     }, 500);
   })
 

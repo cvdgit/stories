@@ -15,6 +15,9 @@ export default function StatPlugin() {
 
     init(deck) {
       deck.addEventListener('slidechanged', (event) => {
+        if (!event.previousSlide) {
+          return;
+        }
         if (!$(event.previousSlide).hasClass('next-story')) {
           const promise = stat.slideChangeEvent(event);
           if (promise) {
