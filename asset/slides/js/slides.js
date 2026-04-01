@@ -136,8 +136,8 @@ window.initSlides = function() {
       if (!stat?.success) {
         return;
       }
-      elem.outerHTML = stat.content;
-    }, 1000);
+      setTimeout(() => elem.outerHTML = stat.content);
+    }, 700);
   })
 
   return deck;
