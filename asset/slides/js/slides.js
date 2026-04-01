@@ -137,7 +137,7 @@ window.initSlides = function() {
         return;
       }
       elem.outerHTML = stat.content;
-    }, 500);
+    }, 1000);
   })
 
   return deck;
