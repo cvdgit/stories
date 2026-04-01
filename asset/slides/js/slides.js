@@ -124,6 +124,7 @@ window.initSlides = function() {
   document.addEventListener('sendStatEvent', ({detail}) => {
     if (timeout) {
       clearTimeout(timeout);
+      timeout = null;
     }
     timeout = setTimeout(async () => {
       const elem = document.getElementById('required-story-stat');
