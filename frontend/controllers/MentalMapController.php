@@ -214,7 +214,8 @@ class MentalMapController extends Controller
                     'threshold' => $form->threshold,
                     'all_important_words_included' => $allWords,
                     'payload' => $form->payload,
-                    'location' => $form->location
+                    'location' => $form->location,
+                    'seconds' => $form->seconds,
                 ]);
                 $command->execute();
 
@@ -224,6 +225,7 @@ class MentalMapController extends Controller
                         'all' => 'h.overall_similarity',
                         'hiding' => 'h.text_hiding_percentage',
                         'target' => 'h.text_target_percentage',
+                        'seconds' => 'h.seconds',
                     ])
                     ->from(['h' => 'mental_map_history'])
                     ->where([

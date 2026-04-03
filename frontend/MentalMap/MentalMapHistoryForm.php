@@ -21,6 +21,7 @@ class MentalMapHistoryForm extends Model
     public $all_important_words_included;
     public $payload;
     public $location;
+    public $seconds;
 
     public function rules(): array
     {
@@ -35,6 +36,7 @@ class MentalMapHistoryForm extends Model
                     'text_target_percentage',
                     'slide_id',
                     'threshold',
+                    'seconds',
                 ],
                 'integer',
             ],

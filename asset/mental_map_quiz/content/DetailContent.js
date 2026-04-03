@@ -116,11 +116,14 @@ export default function DetailContent({
     <div style="margin-bottom: 10px">Важный текст: <strong id="target-text-percent"></strong></div>
     <div>Сходство: <strong id="similarity-percent"></strong></div>
 </div>
-<div style="display: flex; align-items: center;">
-    <select class="form-control" id="voice-lang" style="margin-right: 20px; font-size: 24px; height: auto">
-        <option value="ru-RU" selected>rus</option>
-        <option value="en-US">eng</option>
-    </select>
+<div style="display: flex; align-items: center; gap: 20px">
+    <div>
+      <select class="form-control" id="voice-lang" style="font-size: 24px; height: auto">
+          <option value="ru-RU" selected>rus</option>
+          <option value="en-US">eng</option>
+      </select>
+      <span class="fragment-timer">00:00:00</span>
+    </div>
     <div class="question-voice" style="bottom: 0; display: flex; position: relative;">
         <div class="question-voice__inner">
             <div id="start-recording" class="gn">

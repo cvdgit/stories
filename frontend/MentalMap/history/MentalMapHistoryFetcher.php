@@ -27,6 +27,7 @@ class MentalMapHistoryFetcher
                 'hiding' => isset($item['hiding']) ? (int) $item['hiding'] : 0,
                 'target' => isset($item['target']) ? (int) $item['target'] : 0,
                 'done' => MentalMap::fragmentIsDone($all, $threshold),
+                'seconds' => isset($item['seconds']) ? (int) $item['seconds'] : 0,
             ];
         }, $items ?? $fragments);
     }
@@ -39,6 +40,7 @@ class MentalMapHistoryFetcher
                 'all' => 0,
                 'hiding' => 0,
                 'target' => 0,
+                'seconds' => 0,
             ];
         }, $images);
 
@@ -48,6 +50,7 @@ class MentalMapHistoryFetcher
                 'all' => 'MAX(h.overall_similarity)',
                 'hiding' => 'MAX(h.text_hiding_percentage)',
                 'target' => 'MAX(h.text_target_percentage)',
+                'seconds' => 'AVG(h.seconds)',
             ])
             ->from(['h' => 'mental_map_history'])
             ->where([
@@ -63,6 +66,7 @@ class MentalMapHistoryFetcher
                 $item['all'] = (int) $rows[$item['id']]['all'];
                 $item['hiding'] = (int) $rows[$item['id']]['hiding'];
                 $item['target'] = (int) $rows[$item['id']]['target'];
+                $item['seconds'] = (int) $rows[$item['id']]['seconds'];
             }
             return $item;
         }, $history);

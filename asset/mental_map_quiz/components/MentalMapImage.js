@@ -1,6 +1,7 @@
 import tippy from "tippy.js";
 import 'tippy.js/dist/tippy.css';
 import {buttons} from '../words'
+import MapImageStatus from "./MapImageStatus";
 
 function findBgClassName(bg) {
   if (!bg || bg === '') {
@@ -24,7 +25,8 @@ export default function MentalMapImage(
   zoomWrap.style.width = mapImageWidth
   zoomWrap.style.height = mapImageHeight
 
-  const img = document.createElement('img')
+  const img = document.createElement('img');
+  img.classList.add('map-bg-image');
   img.src = mapImageUrl
   img.style.height = '100%'
   zoomWrap.appendChild(img)
@@ -117,6 +119,11 @@ export default function MentalMapImage(
     }
 
     mapImgWrap.appendChild(mapFragment)
+
+    mapImgWrap.appendChild(MapImageStatus.render({
+      hiding: historyItem?.hiding,
+      seconds: historyItem?.seconds
+    }));
 
     zoomWrap.appendChild(mapImgWrap)
   })
