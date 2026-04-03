@@ -96,7 +96,7 @@ export default function MentalMapImage(
         content: tip,
         interactive: true,
         allowHTML: true,
-        maxWidth: '50em',
+        maxWidth: '70em',
         //appendTo: () => document.body,
       })
     }
