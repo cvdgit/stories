@@ -413,7 +413,7 @@
   align-items: center;
 }
 
-.map-bg-image + .mental-map-img:hover,
+.map-bg-image:has(~ .mental-map-img:hover),
 .map-bg-image:hover {
   border: 1px #808080 solid;
 }
