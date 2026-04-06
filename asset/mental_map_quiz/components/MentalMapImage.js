@@ -122,7 +122,8 @@ export default function MentalMapImage(
 
     mapImgWrap.appendChild(MapImageStatus.render({
       hiding: historyItem?.hiding,
-      seconds: historyItem?.seconds
+      seconds: historyItem?.seconds,
+      hidingPrev: historyItem?.hidingPrev,
     }));
 
     zoomWrap.appendChild(mapImgWrap)

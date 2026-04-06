@@ -870,7 +870,8 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
                   }
                   MapImageStatus.update(imgElem.querySelector('.map-user-status'), {
                     hiding: historyItem.hiding,
-                    seconds: historyItem.seconds
+                    seconds: historyItem.seconds,
+                    hidingPrev: historyItem.hidingPrev,
                   });
                 }
                 fragmentDialogHideHandler(image, historyItem)
@@ -896,7 +897,8 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
                 }
                 MapImageStatus.update(imgElem.querySelector('.map-user-status'), {
                   hiding: historyItem.hiding,
-                  seconds: historyItem.seconds
+                  seconds: historyItem.seconds,
+                  hidingPrev: historyItem.hidingPrev,
                 });
               }
               fragmentDialogHideHandler(image, historyItem)
@@ -993,7 +995,8 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
                   }
                   MapImageStatus.update(imgElem.querySelector('.map-user-status'), {
                     hiding: historyItem.hiding,
-                    seconds: historyItem.seconds
+                    seconds: historyItem.seconds,
+                    hidingPrev: historyItem.hidingPrev,
                   });
                 }
                 fragmentDialogHideHandler(image, historyItem)
@@ -1019,7 +1022,8 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
                 }
                 MapImageStatus.update(imgElem.querySelector('.map-user-status'), {
                   hiding: historyItem.hiding,
-                  seconds: historyItem.seconds
+                  seconds: historyItem.seconds,
+                  hidingPrev: historyItem.hidingPrev,
                 });
               }
               fragmentDialogHideHandler(image, historyItem)

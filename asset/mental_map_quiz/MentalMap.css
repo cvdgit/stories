@@ -421,7 +421,6 @@
 .map-user-status {
   pointer-events: none;
   cursor: default;
-
   margin-top: 10px;
   border-radius: 6px;
   font-size: 20px;
@@ -431,6 +430,7 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
 }
 
 .map-user-status:has(.map-user-status-hiding:empty) {
@@ -446,4 +446,8 @@
 
 .fragment-timer {
   font-size: 20px;
+}
+
+.map-user-status-hiding-add {
+  color: #198754;
 }
