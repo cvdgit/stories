@@ -944,7 +944,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         maxScale: 2,
       });*/
 
-      initPanZoom(zoomWrap, json.map.width, json.map.height);
+      zoom = initPanZoom(zoomWrap, json.map.width, json.map.height);
       element.parentElement.addEventListener('wheel', zoom.zoomWithWheel);
     })
 
