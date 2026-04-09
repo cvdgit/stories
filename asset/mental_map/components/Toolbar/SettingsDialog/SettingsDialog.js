@@ -7,6 +7,7 @@ import {useMentalMap} from "../../App/App";
 export default function SettingsDialog({open, setOpen, mentalMapId, schedules}) {
   const settingsDialogRef = useRef();
   const checkId = useId();
+  const presentationModeId = useId();
   const planCheckId = useId();
   const tooltipCheckId = useId();
   const textCheckId = useId();
@@ -72,6 +73,22 @@ export default function SettingsDialog({open, setOpen, mentalMapId, schedules}) 
       <Dialog nodeRef={settingsDialogRef} hideHandler={() => setOpen(false)} style={{width: '60rem'}}>
         <h2 className="dialog-heading">Настройки</h2>
         <div style={{paddingTop: '20px'}}>
+          {!isTreeView && <div style={{marginBottom: '10px'}}>
+            <label htmlFor={presentationModeId}>
+              <input
+                id={presentationModeId}
+                onChange={(e) => {
+                  settings.presentationMode = !Boolean(state?.settings?.presentationMode)
+                  setSettings(settings)
+                  dispatch({
+                    type: 'update_settings',
+                    payload: settings
+                  })
+                }}
+                checked={Boolean(state?.settings?.presentationMode)}
+                type="checkbox"
+              /> Режим презентации</label>
+          </div>}
           {!isTreeView && <div style={{marginBottom: '10px'}}>
             <label htmlFor={checkId}>
               <input

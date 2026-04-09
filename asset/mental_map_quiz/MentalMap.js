@@ -17,6 +17,7 @@ import FragmentResultQuestionsElement from "./content/FragmentResultQuestionsEle
 import {diffRetelling, SimilarityChecker} from "./lib/calcSimilarity";
 import MapImageStatus from "./components/MapImageStatus";
 import SecondTimer from "./components/SecondTimer";
+import MentalMapPresentationMode from "./PresentationMode";
 
 /**
  * @param element
@@ -58,7 +59,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
 
   const loader = document.createElement('div')
   loader.classList.add('content-loader-wrap')
-  loader.innerHTML = `<div><img width="30" src="/img/loading.gif" alt="loading..."> загрузка...</div>`
+  loader.innerHTML = `<div style="display: flex; flex-direction: row; gap: 20px; align-items: center">Загрузка ментальной карты... <img width="50" src="/img/loading.gif" alt="loading"></div>`
   this.element.appendChild(loader)
 
   const blockTypes = ['text', 'image']
@@ -684,6 +685,15 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
     mentalMapId = json.id
     mentalMapHistory = history
 
+    const saveHistoryParams = {
+      story_id: params?.story_id,
+      slide_id: params?.slide_id,
+      mental_map_id: params.mentalMapId,
+      repetition_mode: repetitionMode,
+      threshold,
+      location: params.location
+    };
+
     const {treeView} = json
     if (treeView) {
 
@@ -693,14 +703,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         tree: json.treeData,
         infoText: json.infoText,
         history,
-        params: {
-          story_id: params?.story_id,
-          slide_id: params?.slide_id,
-          mental_map_id: params.mentalMapId,
-          repetition_mode: repetitionMode,
-          threshold,
-          location: params.location
-        },
+        params: saveHistoryParams,
         settings: json.settings || {},
         onMentalMapChange: progress => {
           mentalMapUserProgress = progress;
@@ -728,6 +731,92 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
       return
     }
 
+    const {mapTypeIsMentalMapQuestions, questions} = json;
+    const mapQuestions = new MentalMapQuestions({typeIsMentalMapQuestions: mapTypeIsMentalMapQuestions, questions});
+
+    let fastMode = true;
+    function fastModeChangeHandler(e) {
+      fastMode = e.target.checked;
+    }
+
+    texts = json.map.images.map(image => createWordItem(image.text, image.id));
+
+    const imageFirst = Boolean(json.settings?.imageFirst);
+    const hideTooltip = Boolean(json.settings?.hideTooltip);
+    const hideFragmentText = Boolean(json.settings?.hideText);
+    const settingsPromptId = json.settings?.promptId;
+
+    const {settings} = json;
+    const isPresentationMode = Boolean(settings?.presentationMode);
+    if (isPresentationMode) {
+
+      loader.remove();
+      treeViewInstance = MentalMapPresentationMode(
+        this.element,
+        {
+          mapUrl: json.map.url,
+          mapWidth: `${json.map.width}px`,
+          mapHeight: `${json.map.height}px`,
+          images: json.map.images,
+          promptId: settings?.promptId,
+          threshold
+        },
+        new VoiceResponse(new MissingWordsRecognition({
+          getRecordingLang() {
+            return (json.settings || {}).recognitionLang || 'ru-RU';
+          }
+        })),
+        (payload) => {
+          return saveUserResult({
+            ...saveHistoryParams,
+            ...payload
+          }).then(response => {
+            if (response.success) {
+              if (deck) {
+                if (deck.hasPlugin('stat')) {
+                  const statPlugin = deck.getPlugin('stat');
+                  statPlugin.sendStat({slideId: params.slide_id});
+                }
+              }
+            }
+
+            if (historyIsDone(history)) {
+              const content = createFinishContent(
+                history,
+                texts,
+                mapQuestions.typeIsMentalMapQuestions(),
+                () => restartHandler(mentalMapId)
+              );
+              $(this.element).append(content)
+              if (imageFirst) {
+                element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
+              }
+            }
+          })
+        },
+        history
+      );
+
+      $('[data-toggle="tooltip"]', this.element).tooltip({
+        container: 'body'
+      });
+
+      if (historyIsDone(history)) {
+        const content = createFinishContent(
+          history,
+          texts,
+          mapQuestions.typeIsMentalMapQuestions(),
+          () => restartHandler(mentalMapId)
+        );
+        $(this.element).append(content)
+        if (imageFirst) {
+          element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
+        }
+      }
+
+      return;
+    }
+
     window.addEventListener('blur', function() {
       if (voiceResponse.getStatus()) {
         voiceResponse.stop()
@@ -737,21 +826,6 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         }
       }
     }, false);
-
-    const {mapTypeIsMentalMapQuestions, questions} = json
-    const mapQuestions = new MentalMapQuestions({typeIsMentalMapQuestions: mapTypeIsMentalMapQuestions, questions})
-
-    let fastMode = true
-    function fastModeChangeHandler(e) {
-      fastMode = e.target.checked
-    }
-
-    texts = json.map.images.map(image => createWordItem(image.text, image.id))
-
-    const imageFirst = Boolean(json.settings?.imageFirst)
-    const hideTooltip = Boolean(json.settings?.hideTooltip)
-    const hideFragmentText = Boolean(json.settings?.hideText)
-    const settingsPromptId = json.settings?.promptId
 
     function hideTooltipChecker(tooltipState) {
       if (tooltipState === 'hide') {
@@ -910,7 +984,27 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
           })
         },
         mentalMapHistory,
-        hideTooltipChecker
+        hideTooltipChecker,
+        ({id, makeTransparent}, mapImgWrap) => {
+          const historyItem = history.find(h => h.id === id);
+          if (!historyItem) {
+            return;
+          }
+          if (!historyItem.done) {
+            return;
+          }
+          mapImgWrap.classList.add('fragment-item-done');
+          if (makeTransparent) {
+            mapImgWrap.classList.add('fragment-transparent');
+          }
+          mapImgWrap.appendChild(
+            MapImageStatus.render({
+              hiding: historyItem.hiding,
+              seconds: historyItem.seconds,
+              hidingPrev: historyItem.hidingPrev,
+            })
+          );
+        }
       )
 
       const zoomContainer = showMentalMapHandler(zoomWrap, () => {
@@ -1035,7 +1129,27 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
           })
         },
         mentalMapHistory,
-        hideTooltipChecker
+        hideTooltipChecker,
+        ({id, makeTransparent}, mapImgWrap) => {
+          const historyItem = history.find(h => h.id === id);
+          if (!historyItem) {
+            return;
+          }
+          if (!historyItem.done) {
+            return;
+          }
+          mapImgWrap.classList.add('fragment-item-done');
+          if (makeTransparent) {
+            mapImgWrap.classList.add('fragment-transparent');
+          }
+          mapImgWrap.appendChild(
+            MapImageStatus.render({
+              hiding: historyItem.hiding,
+              seconds: historyItem.seconds,
+              hidingPrev: historyItem.hidingPrev,
+            })
+          );
+        }
       )
       const zoomContainer = showMentalMapHandler(zoomWrap, () => {
         zoom.destroy()

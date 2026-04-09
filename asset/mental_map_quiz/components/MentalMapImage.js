@@ -17,7 +17,9 @@ export default function MentalMapImage(
   images,
   imageClickHandler,
   history,
-  hideTooltipChecker
+  hideTooltipChecker,
+  onImageRender,
+  showPercentButtons = true
 ) {
 
   const zoomWrap = document.createElement('div')
@@ -66,6 +68,7 @@ export default function MentalMapImage(
     }
 
     if (!hideTooltip) {
+
       /*mapImgWrap.dataset.trigger = 'hover click focus'
       mapImgWrap.dataset.placement = 'auto'
       mapImgWrap.dataset.container = '.story-container'
@@ -77,27 +80,31 @@ export default function MentalMapImage(
       tip.style.lineHeight = '3rem';
       tip.style.display = 'flex';
       tip.style.flexDirection = 'column';
-      tip.innerHTML = `<div>${image.text.replace(/<[^>]*>?/gm, '')}</div><div class="hide-buttons-container">Скрыть текст:</div>`;
+      tip.innerHTML = `<div>${image.text.replace(/<[^>]*>?/gm, '')}</div>`;
 
-      buttons.map(({name, percentage}) => {
-        const btn = document.createElement('button');
-        btn.classList.add('hide-words-btn', 'bs-tooltip');
-        btn.style.color = '#000';
-        btn.setAttribute('type', 'button');
-        btn.innerHTML = name;
-        btn.setAttribute('data-trigger', 'hover');
-        btn.setAttribute('data-container', 'body');
-        btn.setAttribute('title', `Скрыть текст на ${percentage}%`);
-        btn.addEventListener('click', e => imageClickHandler(image, {percentage}));
-        tip.querySelector('.hide-buttons-container').appendChild(btn);
-      });
+      if (showPercentButtons) {
+        tip.innerHTML += `<div class="hide-buttons-container">Скрыть текст:</div>`;
+        buttons.map(({name, percentage}) => {
+          const btn = document.createElement('button');
+          btn.classList.add('hide-words-btn', 'bs-tooltip');
+          btn.style.color = '#000';
+          btn.setAttribute('type', 'button');
+          btn.innerHTML = name;
+          btn.setAttribute('data-trigger', 'hover');
+          btn.setAttribute('data-container', 'body');
+          btn.setAttribute('title', `Скрыть текст на ${percentage}%`);
+          btn.addEventListener('click', e => imageClickHandler(image, {percentage}));
+          tip.querySelector('.hide-buttons-container').appendChild(btn);
+        });
+      }
 
       tippy(mapImgWrap, {
         content: tip,
         interactive: true,
         allowHTML: true,
         maxWidth: '60em',
-        //appendTo: () => document.body,
+        //popperOptions: { strategy: 'fixed' }
+        appendTo: () => document.querySelector('.zoom-container'),
       })
     }
 
@@ -110,21 +117,9 @@ export default function MentalMapImage(
 </svg>`
     mapImgWrap.appendChild(doneElem)
 
-    const historyItem = history.find(h => h.id === image.id)
-    if (historyItem?.done) {
-      mapImgWrap.classList.add('fragment-item-done')
-      if (image.makeTransparent) {
-        mapImgWrap.classList.add('fragment-transparent')
-      }
-    }
-
     mapImgWrap.appendChild(mapFragment)
 
-    mapImgWrap.appendChild(MapImageStatus.render({
-      hiding: historyItem?.hiding,
-      seconds: historyItem?.seconds,
-      hidingPrev: historyItem?.hidingPrev,
-    }));
+    onImageRender(image, mapImgWrap);
 
     zoomWrap.appendChild(mapImgWrap)
   })
