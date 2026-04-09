@@ -25,6 +25,7 @@ use modules\edu\RequiredStory\repo\RequiredStorySessionRepository;
 use modules\edu\RequiredStory\repo\RequiredStoryStatus;
 use modules\edu\RequiredStory\RequiredStoriesService;
 use modules\edu\StoryContent\StoryContentService;
+use modules\edu\Teacher\ClassBook\TeacherAccess\UserItem;
 use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -160,11 +161,22 @@ class RequiredStoryController extends Controller
         ]);
 
         $students = [];
+
+        $selectedStudent = EduStudent::findOne($requiredStory->getStudentId());
+        if ($selectedStudent === null) {
+            throw new NotFoundHttpException('Student not found');
+        }
+
         return $this->renderAjax('_edit_form', [
             'formModel' => $editForm,
             'students' => $students,
             'storyModel' => EduStory::findOne($requiredStory->getStoryId()),
-            'studentModel' => EduStudent::findOne($requiredStory->getStudentId())->user,
+            'studentModel' => new UserItem(
+                $selectedStudent->id,
+                $selectedStudent->name,
+                $selectedStudent->user->email,
+                $selectedStudent->user->getProfilePhoto(),
+            ),
         ]);
     }
 

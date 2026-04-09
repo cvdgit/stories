@@ -24,6 +24,7 @@ use yii\db\ActiveRecord;
  * @property int $last_activity [int(11)]
  *
  * @property EduStudent[] $students
+ * @property Profile|null $profile
  */
 class EduUser extends ActiveRecord
 {
@@ -43,6 +44,18 @@ class EduUser extends ActiveRecord
             return $this->profile->getFullName();
         }
         return $this->username;
+    }
+
+    public function getProfilePhoto(): string
+    {
+        $noAvatar = '/img/avatar.png';
+        if ($this->profile !== null) {
+            $profilePhoto = $this->profile->profilePhoto;
+            if ($profilePhoto !== null) {
+                return $profilePhoto->getThumbFileUrl('file', 'list', $noAvatar);
+            }
+        }
+        return $noAvatar;
     }
 
     public function getStudents(): ActiveQuery

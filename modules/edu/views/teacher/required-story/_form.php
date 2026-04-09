@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use backend\widgets\SelectStoryWidget;
-use backend\widgets\SelectUserWidget;
 use modules\edu\RequiredStory\repo\RequiredStoryStatus;
+use modules\edu\widgets\SelectItemsWidget;
 use yii\bootstrap\ActiveForm;
 use yii\web\View;
 
@@ -20,7 +20,7 @@ use yii\web\View;
     <div style="flex: 1; display: flex; flex-direction: column; gap: 10px">
         <div style="display: flex; flex-direction: row; justify-content: space-between">
             <div class="studentIdValue" style="flex: 1">
-                <?= $form->field($formModel, 'studentId')->widget(SelectUserWidget::class, [
+                <?= $form->field($formModel, 'studentId')->widget(SelectItemsWidget::class, [
                     'loadUrl' => ['/edu/teacher/required-story/select-students'],
                     'onChange' => 'requiredSelectStudent',
                     'userModel' => $userModel,
