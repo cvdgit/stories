@@ -104,7 +104,7 @@ export default function MentalMapImage(
         allowHTML: true,
         maxWidth: '60em',
         //popperOptions: { strategy: 'fixed' }
-        appendTo: () => document.querySelector('.zoom-container'),
+        //appendTo: () => document.querySelector('.zoom-container'),
       })
     }
 
