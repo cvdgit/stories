@@ -17,6 +17,12 @@
   }
 
   async function reloadMetadata(storyId) {
+    if (!selectedStudentId) {
+      selectedStudentId = $('.required-story-student-id').val();
+    }
+    if (!selectedStudentId) {
+      throw new Error('Student id not found');
+    }
     const response = await window.Api.get(`/edu/teacher/required-story/get-story-contents-total?storyId=${storyId}&studentId=${selectedStudentId}`);
     const total = Number(response?.total);
     if (isNaN(total) || total === 0) {

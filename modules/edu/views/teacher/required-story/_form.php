@@ -50,5 +50,6 @@ use yii\web\View;
         </div>
         <div id="metadata-container"></div>
         <?= $form->field($formModel, 'metadata')->hiddenInput(['class' => 'required-story-metadata'])->label(false)->error(false) ?>
+        <?= $form->field($formModel, 'studentId')->hiddenInput(['class' => 'required-story-student-id'])->label(false)->error(false) ?>
     </div>
 </div>
