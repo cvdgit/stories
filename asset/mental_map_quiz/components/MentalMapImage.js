@@ -80,7 +80,9 @@ export default function MentalMapImage(
       tip.style.lineHeight = '3rem';
       tip.style.display = 'flex';
       tip.style.flexDirection = 'column';
-      tip.innerHTML = `<div>${image.text.replace(/<[^>]*>?/gm, '')}</div>`;
+      tip.style.maxHeight = '300px'
+      tip.style.overflowY = 'auto';
+      tip.innerHTML = `<div style="user-select: none">${image.text.replace(/<[^>]*>?/gm, '')}</div>`;
 
       if (showPercentButtons) {
         tip.innerHTML += `<div class="hide-buttons-container">Скрыть текст:</div>`;
@@ -103,8 +105,7 @@ export default function MentalMapImage(
         interactive: true,
         allowHTML: true,
         maxWidth: '60em',
-        //popperOptions: { strategy: 'fixed' }
-        //appendTo: () => document.querySelector('.zoom-container'),
+        appendTo: () => document.body,
       })
     }
 
