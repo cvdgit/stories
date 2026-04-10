@@ -19,6 +19,7 @@ console.log('ImageDialog')
   const selectionRef = useRef()
   const [selectionMode, setSelectionMode] = useState(false)
   const [currentText, setCurrentText] = useState(currentImageItem.text)
+  const [currentTitle, setCurrentTitle] = useState(currentImageItem.title || '');
   const [currentWords, setCurrentWords] = useState([])
   const [bg, setBg] = useState(currentImageItem.bg)
   const [makeTransparent, setMakeTransparent] = useState(Boolean(currentImageItem.makeTransparent))
@@ -81,6 +82,19 @@ console.log('ImageDialog')
               <img src={currentImageItem.url} alt=""/>
             </div>
             <div style={{flex: '1', display: 'flex', flexDirection: 'column'}}>
+              <div style={{marginBottom: '10px'}}>
+                <label style={{paddingBottom: '4px', fontSize: '14px', display: 'block'}} htmlFor="">Заголовок:</label>
+                <input value={currentTitle} onChange={(e) => {
+                  setCurrentTitle(e.target.value);
+                  dispatch({
+                    type: 'update_mental_map_images',
+                    imageId: currentImageItem.id,
+                    payload: {
+                      title: e.target.value
+                    }
+                  });
+                }} className="textarea" style={{minHeight: 'auto', padding: '10px', height: 'auto'}} type="text"/>
+              </div>
               <div style={{marginBottom: '10px'}}>
                 <label style={{paddingBottom: '4px', fontSize: '14px', display: 'block'}} htmlFor="">Проверочный промт:</label>
                 <select className="textarea" value={promptId} onChange={(e) => {

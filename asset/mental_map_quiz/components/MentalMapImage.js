@@ -60,6 +60,9 @@ export default function MentalMapImage(
       if (bgClassName) {
         mapFragment.classList.add(bgClassName)
       }
+      if (image.title) {
+        mapFragment.innerText = image.title;
+      }
     }
 
     let hideTooltip = false;

@@ -325,6 +325,11 @@
 .map-fragment {
   border: 3px #1baee1 solid;
   background-color: rgba(27, 174, 225, 0.1);
+  font-size: 2rem;
+  line-height: 2.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .fragment-bg-blue {
