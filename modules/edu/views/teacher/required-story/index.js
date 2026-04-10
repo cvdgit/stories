@@ -65,6 +65,7 @@
   let selectedStudentId;
   window.requiredSelectStudent = async (studentId) => {
     selectedStudentId = studentId;
+    $('.required-story-student-id').val(studentId).blur();
   }
 
   function drawMetadata(metadata) {
