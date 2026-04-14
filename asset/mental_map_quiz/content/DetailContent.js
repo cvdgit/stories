@@ -12,7 +12,8 @@ export default function DetailContent({
                                         diffClickHandler,
                                         hideText,
                                         detailParams,
-                                        stopRecordingHandler
+                                        stopRecordingHandler,
+  onWordsChanged
                                       }) {
 
   const detailImgWrap = document.createElement('div')
@@ -61,13 +62,20 @@ export default function DetailContent({
     detailText.style.marginBottom = '10px'
     detailText.style.color = '#808080'
   } else {
-    detailText = DetailText(text, () => {
+
+    const detailTextComponent = new DetailText(text, () => {
       itemClickHandler(recordingWrap)
     }, () => {
       stopRecordingHandler(recordingWrap);
       recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%';
       recordingWrap.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%';
-    }, promptBtn, detailParams)
+    }, promptBtn, detailParams);
+
+    if (typeof onWordsChanged === 'function') {
+      detailTextComponent.onWordsChanged(onWordsChanged);
+    }
+
+    detailText = detailTextComponent.render();
   }
   detailTextWrap.appendChild(detailText)
 

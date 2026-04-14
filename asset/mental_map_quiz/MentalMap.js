@@ -18,6 +18,7 @@ import {diffRetelling, SimilarityChecker} from "./lib/calcSimilarity";
 import MapImageStatus from "./components/MapImageStatus";
 import SecondTimer from "./components/SecondTimer";
 import MentalMapPresentationMode from "./PresentationMode";
+import FragmentState from "./FragmentState";
 
 /**
  * @param element
@@ -212,10 +213,14 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
     })
   }
 
+  const fragmentState = new FragmentState(params.mentalMapId);
+
+
   const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
 
   function mapImageClickHandler({image, texts, historyItem, rewritePrompt, threshold, dialogHideHandler, fastMode, hideFragmentText, settingsPromptId, detailParams}) {
-    const text = texts.find(t => t.id === image.id)
+
+    const text = texts.find(t => t.id === image.id);
 
     let hideText = hideFragmentText;
     if (image.textState === 'hide') {
@@ -223,6 +228,16 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
     }
     if (image.textState === 'show') {
       hideText = false;
+    }
+
+    if (!hideText) {
+      const prevWords = fragmentState.get(
+        image.id,
+        image.text
+      );
+      if (prevWords) {
+        text.words = prevWords;
+      }
     }
 
     const timer = new SecondTimer();
@@ -259,7 +274,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
             .attr('title', 'Нужно закрыть все важные слова')
             .tooltip()
         }
-        recordingWrap.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%'
+        recordingWrap.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%';
       },
       diffClickHandler: () => {
         $(detailContainer).append(createDiffContent({
@@ -283,6 +298,13 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
           false
         );
       },
+      onWordsChanged: (args) => {
+        fragmentState.set(
+          image.id,
+          image.text,
+          text.words
+        );
+      }
     })
     const dialog = new InnerDialog($(container), {title: 'Перескажите текст', content: detailContainer});
     dialog.show(wrapper => {
@@ -913,9 +935,6 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
     let zoom
     mentalMapBtn.addEventListener('click', (e) => {
 
-      //const zoomContainer = document.createElement('div')
-      //zoomContainer.classList.add('zoom-container')
-
       const zoomWrap = MentalMapImage(
         json.map.url,
         `${json.map.width}px`,
@@ -1016,27 +1035,6 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
       this.element.appendChild(zoomContainer)
 
       $('.mental-map-img .map-img').tooltip()
-
-      /*let initialZoom = 0.8
-      const containerWidth = container.offsetWidth
-      const containerHeight = container.offsetHeight
-
-      if (json.map.height > containerHeight) {
-        initialZoom = containerHeight / json.map.height;
-      } else {
-        initialZoom = 1;
-      }
-
-      if (json.map.width > containerWidth) {
-        initialZoom = containerWidth / json.map.width;
-      }
-
-      zoom = Panzoom(zoomWrap, {
-        excludeClass: 'mental-map-img',
-        startScale: initialZoom,
-        minScale: 0.4,
-        maxScale: 2,
-      });*/
 
       zoom = initPanZoom(zoomWrap, json.map.width, json.map.height);
       element.parentElement.addEventListener('wheel', zoom.zoomWithWheel);
@@ -1197,7 +1195,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
     } else {
       voiceResponse.stop(function (args) {
 
-        element.parentNode.querySelector('.pulse-ring').remove()
+        element.parentNode.querySelector('.pulse-ring')?.remove();
         element.classList.remove('recording')
         delete element.dataset.state
 

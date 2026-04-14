@@ -84,7 +84,12 @@ export default function AllTexts(texts, images, history, imageClickHandler, isMe
       imageItem.appendChild(div)
     }
 
-    imageItem.appendChild(createHideButtons(buttons, (percentage) => imageClickHandler(image, {percentage})));
+    imageItem.appendChild(
+      createHideButtons(
+        buttons,
+        (percentage) => imageClickHandler(image, {percentage})
+      )
+    );
 
     const historyItem = history.find(h => h.id === image.id)
     imageItem.appendChild(isMentalMapQuestions ? FragmentResultQuestionsElement(historyItem) : FragmentResultElement(historyItem))

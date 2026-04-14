@@ -49,6 +49,7 @@
     "@svgdotjs/svg.panzoom.js": "^2.1.2",
     "@svgdotjs/svg.resize.js": "^2.0.5",
     "@svgdotjs/svg.select.js": "^4.0.2",
+    "blueimp-md5": "^2.19.0",
     "bootstrap": "4.6.x",
     "diff": "^8.0.2",
     "eventsource-parser": "^3.0.6",

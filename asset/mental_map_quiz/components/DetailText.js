@@ -1,5 +1,6 @@
 import DetailTextActions from "./DetailTextActions";
 import {stripTags, removePunctuation} from "../common";
+import {EventEmitter} from "events";
 
 function hideWordsHandler(nodeList, hideHandler) {
   let hideWord = false;
@@ -54,6 +55,13 @@ function createHideButtons(buttons) {
 }
 
 export default function DetailText(text, itemClickHandler, afterRandCallback, promptBtn, detailParams) {
+
+  const eventEmitter = new EventEmitter();
+
+  function emitWordsChangedEvent(words) {
+    eventEmitter.emit('wordsChanged', {words});
+  }
+
   const detailText = document.createElement('div')
   detailText.classList.add('detail-text')
 
@@ -95,6 +103,8 @@ export default function DetailText(text, itemClickHandler, afterRandCallback, pr
       const word = text.words.find(w => w.id === wordId);
       word.hidden = true;
     });
+
+    emitWordsChangedEvent(text.words);
   }
 
   const buttons = [
@@ -105,6 +115,7 @@ export default function DetailText(text, itemClickHandler, afterRandCallback, pr
         text.words
           .filter(w => w.type === 'word')
           .map(w => w.hidden = false);
+        emitWordsChangedEvent(text.words);
         afterRandCallback();
       }
     },
@@ -147,6 +158,7 @@ export default function DetailText(text, itemClickHandler, afterRandCallback, pr
         text.words
           .filter(w => w.type === 'word')
           .map(w => w.hidden = true);
+        emitWordsChangedEvent(text.words);
         afterRandCallback();
       }
     }
@@ -159,6 +171,7 @@ export default function DetailText(text, itemClickHandler, afterRandCallback, pr
         const word = text.words.find(w => w.id === id);
         word.hidden = true;
       });
+      emitWordsChangedEvent(text.words);
       afterRandCallback();
     },
     promptBtn,
@@ -189,24 +202,32 @@ export default function DetailText(text, itemClickHandler, afterRandCallback, pr
       currentSpan.addEventListener('click', () => {
         word.hidden = !word.hidden
         currentSpan.classList.toggle('selected')
-        itemClickHandler()
+        itemClickHandler();
+        emitWordsChangedEvent(text.words);
       })
       detailText.appendChild(currentSpan)
     }
   })
 
-  const {percentage} = detailParams || {};
-  if (percentage) {
-    if (percentage === 100) {
-      detailText.querySelectorAll('.text-item-word:not(.selected)')
-        .forEach(node => node.classList.add('selected'));
-      text.words
-        .filter(w => w.type === 'word')
-        .map(w => w.hidden = true);
-    } else {
-      hideWordsByPercentage(percentage);
+  return {
+    render() {
+      const {percentage} = detailParams || {};
+      if (percentage) {
+        if (percentage === 100) {
+          detailText.querySelectorAll('.text-item-word:not(.selected)')
+            .forEach(node => node.classList.add('selected'));
+          text.words
+            .filter(w => w.type === 'word')
+            .map(w => w.hidden = true);
+          emitWordsChangedEvent(text.words);
+        } else {
+          hideWordsByPercentage(percentage);
+        }
+      }
+      return detailText;
+    },
+    onWordsChanged(listener) {
+      eventEmitter.on('wordsChanged', listener);
     }
   }
-
-  return detailText
 }
