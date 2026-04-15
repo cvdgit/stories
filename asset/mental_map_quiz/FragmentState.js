@@ -13,12 +13,12 @@ function FragmentState(mentalMapId) {
   return {
     get(fragmentId, fragmentText) {
 
-      const fragments = localStorage.getItem(mentalMapId);
-      if (!fragments) {
+      const fragments = JSON.parse(localStorage.getItem(mentalMapId) || '[]');
+      if (fragments.length === 0) {
         return;
       }
 
-      const fragment = JSON.parse(fragments).find(f => f.id === fragmentId);
+      const fragment = fragments.find(f => f.id === fragmentId);
       if (!fragment) {
         return;
       }
