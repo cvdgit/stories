@@ -27,6 +27,8 @@ use common\models\StoryTestQuestion;
 use common\services\TransactionManager;
 use DomainException;
 use Exception;
+use modules\edu\query\GetStoryTests\SlideMentalMap;
+use modules\edu\query\GetStoryTests\StoryTestsFetcher;
 use Ramsey\Uuid\Uuid;
 use yii\web\NotFoundHttpException;
 
@@ -90,17 +92,22 @@ class ImportHandler
 
         $slideNumber = $this->getStartSlideNumber(
             $toStory,
-            $command->getInsertAfterSlideId()
+            $command->getInsertAfterSlideId(),
         );
 
-        $this->transactionManager->wrap(function () use ($command, $fromStory, $toStory, $slideNumber) {
+        $contents = (new StoryTestsFetcher())->fetch($fromStory->id);
+        $mentalMapSlideIds = array_map(static function (SlideMentalMap $slideMentalMap) {
+            return $slideMentalMap->getSlideId();
+        }, $contents->find(SlideMentalMap::class));
+
+        $this->transactionManager->wrap(function () use ($command, $fromStory, $toStory, $slideNumber, $mentalMapSlideIds) {
             foreach ($command->getSlides() as $slideId) {
                 $fromSlide = StorySlide::findStorySlide($fromStory->id, (int) $slideId);
                 if ($fromSlide === null) {
                     throw new NotFoundHttpException('Слайд не найден');
                 }
 
-                if ($fromSlide->kind === StorySlide::KIND_MENTAL_MAP) {
+                if ($fromSlide->kind === StorySlide::KIND_MENTAL_MAP && in_array($fromSlide->id, $mentalMapSlideIds, true)) {
                     $this->copyMentalMapSlide(
                         $toStory->id,
                         $slideNumber,
@@ -322,8 +329,8 @@ class ImportHandler
             new ImportCommand(
                 $quiz->id,
                 $newQuizId = $newQuiz->id,
-                $quizQuestionIds
-            )
+                $quizQuestionIds,
+            ),
         );
 
         $this->storySlideService->createSlide(
@@ -333,7 +340,7 @@ class ImportHandler
             function (int $slideId) use ($newQuizId): string {
                 return $this->storyEditorService->createQuestionBlock(
                     $slideId,
-                    $newQuizId
+                    $newQuizId,
                 );
             },
         );
