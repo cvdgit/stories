@@ -33,6 +33,7 @@ $this->registerJs($this->renderFile("@backend/views/editor/_mental_map_questions
 $this->registerJs($this->renderFile("@backend/views/editor/mental-map/_create_ai.js"));
 $this->registerJs($this->renderFile("@backend/views/editor/_content_mental_map.js"));
 $this->registerJs($this->renderFile("@backend/views/editor/_table_of_contents.js"));
+$this->registerJs($this->renderFile("@backend/views/editor/_import_slides_from_story.js"));
 ?>
 <div class="wrap-editor">
     <div class="slides-sidebar">
@@ -856,7 +857,13 @@ $js = <<< JS
         }},
         {name: 'importFromText', title: 'Импортировать из текста', click: () => {
             $('#import-from-text-modal').modal('show')
-        }}
+        }},
+        {'name': 'import-slides', 'title': 'Импортировать слайды', 'click': function() {
+            ImportSlidesFromStory.showModal({
+              storyId: StoryEditor.getConfigValue('storyID'),
+              slideId: StoryEditor.getCurrentSlide()?.getID()
+            });
+        }},
     ]);
     editorPopover.attach('#create-image-block', {'placement': 'left'}, [
         {'name': 'from_file', 'title': 'Из файла', 'click': function() {

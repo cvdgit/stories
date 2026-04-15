@@ -571,7 +571,7 @@ class StoryTest extends ActiveRecord
                     static function(int $carry, StoryTestQuestion $question): int {
                         return $carry + $question->weight;
                     },
-                    0
+                    0,
                 );
             }, $this->relatedTests);
             return $total;
@@ -582,7 +582,7 @@ class StoryTest extends ActiveRecord
             static function(int $carry, StoryTestQuestion $question): int {
                 return $carry + $question->weight;
             },
-            0
+            0,
         );
     }
 
@@ -605,5 +605,15 @@ class StoryTest extends ActiveRecord
         }
 
         return count($this->storyTestQuestions);
+    }
+
+    public function makeCopy(int $userId): self
+    {
+        $new = new self();
+        $new->attributes = $this->attributes;
+        $new->created_at = time();
+        $new->updated_at = time();
+        $new->created_by = $userId;
+        return $new;
     }
 }

@@ -35,8 +35,6 @@ class StoryTestsFetcher
 
             if ($slide->getView() === '' || $slide->getView() === 'slide') {
                 $data[] = new Slide($slide->getId(), (int) $slide->getSlideNumber(), $slide->getContent());
-
-
             }
 
             foreach ($slide->getBlocks() as $block) {

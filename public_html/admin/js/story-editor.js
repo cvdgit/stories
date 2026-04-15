@@ -192,7 +192,7 @@ function SlideManager(options) {
     this.element = element;
     this.data = data;
     this.getID = function () {
-      return this.element.attr('data-id');
+      return Number(this.element.attr('data-id'));
     };
     this.getElement = function () {
       return this.element;

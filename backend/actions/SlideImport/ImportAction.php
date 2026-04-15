@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace backend\actions\SlideImport;
 
 use common\models\Story;
+use Exception;
 use yii\base\Action;
 use yii\web\NotFoundHttpException;
 use yii\web\Request;
 use yii\web\Response;
+use yii\web\User as WebUser;
 
 class ImportAction extends Action
 {
@@ -24,14 +26,16 @@ class ImportAction extends Action
     /**
      * @throws NotFoundHttpException
      */
-    public function run(int $story_id, Request $request, Response $response)
+    public function run(int $story_id, Request $request, Response $response, WebUser $user)
     {
         $story = Story::findOne($story_id);
         if ($story === null) {
             throw new NotFoundHttpException('История не найдена');
         }
 
-        $importForm = new SlideImportForm();
+        $importForm = new SlideImportForm([
+            'userId' => $user->getId(),
+        ]);
         if ($importForm->load($request->post(), '')) {
             $response->format = Response::FORMAT_JSON;
 
@@ -40,9 +44,18 @@ class ImportAction extends Action
             }
 
             try {
-                $this->importHandler->handle($importForm);
+                $this->importHandler->handle(
+                    new SlidesImportCommand(
+                        (int) $importForm->from_story_id,
+                        (int) $importForm->to_story_id,
+                        $user->getId(),
+                        $importForm->slides,
+                        null,
+                        $importForm->delete_slides,
+                    ),
+                );
                 return ['success' => true, 'message' => 'Слайды успешно импортированы'];
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 return ['success' => false, 'message' => 'Импорт не удался по причине: ' . $exception->getMessage()];
             }
         }

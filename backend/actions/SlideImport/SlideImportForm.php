@@ -12,12 +12,13 @@ class SlideImportForm extends Model
     public $to_story_id;
     public $slides;
     public $delete_slides;
+    public $userId;
 
     public function rules(): array
     {
         return [
             [['from_story_id', 'to_story_id', 'slides'], 'required'],
-            [['from_story_id', 'to_story_id'], 'integer'],
+            [['from_story_id', 'to_story_id', 'userId'], 'integer'],
             ['slides', 'each', 'rule' => ['integer']],
             ['delete_slides', 'boolean'],
         ];

@@ -398,4 +398,18 @@ class StorySlide extends ActiveRecord
     {
         $this->status = $hidden ? self::STATUS_HIDDEN : self::STATUS_VISIBLE;
     }
+
+    /**
+     * @param int $storyId
+     * @return StorySlide[]
+     */
+    public static function findStorySlides(int $storyId): array
+    {
+        return self::find()
+            ->where([
+                'story_id' => $storyId,
+            ])
+            ->orderBy(['number' => SORT_ASC])
+            ->all();
+    }
 }

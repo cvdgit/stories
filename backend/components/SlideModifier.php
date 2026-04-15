@@ -9,6 +9,7 @@ use backend\components\story\MentalMapBlockContent;
 use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\RetellingBlockContent;
 use backend\components\story\Slide;
+use backend\components\story\TableOfContentsBlock;
 use backend\components\story\TestBlockContent;
 use backend\components\story\TextBlock;
 use backend\components\story\VideoBlock;
@@ -87,6 +88,22 @@ class SlideModifier
                 }
             }
         }
+        return $this;
+    }
+
+    public function withEmptyTableOfContents(): self
+    {
+        $blockIds = [];
+        foreach ($this->slide->getBlocks() as $block) {
+            if ($block->getType() === AbstractBlock::TYPE_TABLE_OF_CONTENTS) {
+                /** @var $block TableOfContentsBlock */
+                $blockIds[] = $block->getId();
+            }
+        }
+        foreach ($blockIds as $blockId) {
+            $this->slide->deleteBlock($blockId);
+        }
+        $this->slide->setView('');
         return $this;
     }
 
