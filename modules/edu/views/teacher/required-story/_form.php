@@ -14,6 +14,7 @@ use yii\web\View;
  * @var $formModel
  * @var $userModel
  * @var $storyModel
+ * @var array $students
  */
 ?>
 <div style="display: flex; flex-direction: row; gap: 20px">
@@ -24,6 +25,7 @@ use yii\web\View;
                     'loadUrl' => ['/edu/teacher/required-story/select-students'],
                     'onChange' => 'requiredSelectStudent',
                     'userModel' => $userModel,
+                    'userModels' => $students,
                 ]) ?>
             </div>
         </div>

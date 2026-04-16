@@ -31,6 +31,7 @@ $this->registerJs('window.requiredStoryMetadata = ' . $formModel->metadata, View
         'formModel' => $formModel,
         'userModel' => $studentModel,
         'storyModel' => $storyModel,
+        'students' => [],
     ]) ?>
     <div style="padding: 20px 0">
         <?= $form->field($formModel, 'id')->hiddenInput()->label(false) ?>

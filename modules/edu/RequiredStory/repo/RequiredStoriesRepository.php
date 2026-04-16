@@ -78,7 +78,7 @@ class RequiredStoriesRepository
      * @return list<RequiredStoryItem>
      * @throws Exception
      */
-    public function findAll(): array
+    public function findAll(int $studentId = null): array
     {
         $query = (new Query())
             ->select([
@@ -95,9 +95,51 @@ class RequiredStoriesRepository
             ->innerJoin(['s' => EduStory::tableName()], 't.story_id = s.id')
             ->innerJoin(['student' => EduStudent::tableName()], 't.student_id = student.id')
             ->orderBy(['t.created_at' => SORT_DESC]);
+
+        if ($studentId !== null) {
+            $query->andWhere(['t.student_id' => $studentId]);
+        }
+
         return array_map(
             static function (array $row) {
                 return RequiredStoryItem::fromArray($row);
+            },
+            $query->all(),
+        );
+    }
+
+    /**
+     * @return array<array-key, int>
+     */
+    public function findStudentIds(int $teacherId = null): array
+    {
+        $query = (new Query())
+            ->select(['studentId' => new Expression('DISTINCT t.student_id')])
+            ->from(['t' => RequiredStoryModel::tableName()])
+            ->innerJoin(['student' => EduStudent::tableName()], 't.student_id = student.id');
+        if ($teacherId !== null) {
+            $query->andWhere(['t.created_by' => $teacherId]);
+        }
+        return array_column($query->all(), 'studentId');
+    }
+
+    public function findAllByStories(): array
+    {
+        $query = (new Query())
+            ->select([
+                'storyId' => 's.id',
+                'storyTitle' => 's.title',
+                'studentIds' => "GROUP_CONCAT(t.student_id SEPARATOR ',')",
+                'studentNames' => "GROUP_CONCAT(student.name SEPARATOR ',')",
+            ])
+            ->from(['t' => RequiredStoryModel::tableName()])
+            ->innerJoin(['s' => EduStory::tableName()], 't.story_id = s.id')
+            ->innerJoin(['student' => EduStudent::tableName()], 't.student_id = student.id')
+            ->groupBy(['t.story_id'])
+            ->orderBy(['t.story_id' => SORT_DESC]);
+        return array_map(
+            static function (array $row) {
+                return ByStoriesItem::fromArray($row);
             },
             $query->all(),
         );

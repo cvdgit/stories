@@ -90,7 +90,7 @@ class StorySlideService
                 $slide->setAttribute($attrName, $attrValue);
             }
         }
-        $this->transactionManager->wrap(static function () use ($slide, $storyId, $setData): void {
+        $this->transactionManager->wrap(static function () use ($slide, $setData): void {
             if (!$slide->save()) {
                 throw new DomainException(
                     'Can\'t be saved Story model. Errors: ' . implode(', ', $slide->getFirstErrors()),

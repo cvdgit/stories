@@ -51,8 +51,6 @@
     $('#metadata-container')
       .empty()
       .append(drawMetadata(metadata));
-
-
   }
 
   window.requiredSelectStory = async (storyId) => {

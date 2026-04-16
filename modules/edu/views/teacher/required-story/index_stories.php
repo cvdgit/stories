@@ -50,19 +50,14 @@ $this->registerJs($this->renderFile('@modules/edu/views/teacher/required-story/i
         <?= ListView::widget([
             'dataProvider' => $dataProvider,
             'summary' => false,
-            'itemView' => '_required_story_row',
+            'itemView' => '_required_story_row_stories',
             'itemOptions' => ['class' => 'required-story-row'],
             'layout' => <<<HTML
 {summary}
 <div class="required-stories">
 <div class="required-story-row required-story-row-header">
-<div class="required-story-cell">Статус</div>
 <div class="required-story-cell">История</div>
-<div class="required-story-cell">Ученик</div>
-<div class="required-story-cell">Прогресс</div>
-<div class="required-story-cell">Дата начала</div>
-<div class="required-story-cell">Дата создания</div>
-<div class="required-story-cell">Действия</div>
+<div class="required-story-cell">Ученики</div>
 </div>
 {items}
 </div>

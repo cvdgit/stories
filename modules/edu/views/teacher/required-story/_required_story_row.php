@@ -7,9 +7,9 @@ use yii\helpers\Url;
 
 /**
  * @var array $model
+ * @var RequiredStoryItem $requiredStoryItem
+ * @var array $stat
  */
-/** @var RequiredStoryItem $requiredStoryItem */
-/** @var array $stat */
 [$requiredStoryItem, $stat] = $model;
 ?>
 <div class="required-story-cell">

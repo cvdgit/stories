@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace modules\edu\controllers\teacher;
 
+use common\models\StoryStudentProgress;
 use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
@@ -18,13 +19,16 @@ use modules\edu\RequiredStory\Delete\DeleteRequiredStoryHandler;
 use modules\edu\RequiredStory\Edit\EditRequiredStoryCommand;
 use modules\edu\RequiredStory\Edit\EditRequiredStoryHandler;
 use modules\edu\RequiredStory\Edit\RequiredStoryEditForm;
+use modules\edu\RequiredStory\repo\ByStoriesItem;
 use modules\edu\RequiredStory\repo\RequiredStoriesRepository;
+use modules\edu\RequiredStory\repo\RequiredStory;
 use modules\edu\RequiredStory\repo\RequiredStoryItem;
 use modules\edu\RequiredStory\repo\RequiredStoryMetadata;
 use modules\edu\RequiredStory\repo\RequiredStorySessionRepository;
 use modules\edu\RequiredStory\repo\RequiredStoryStatus;
 use modules\edu\RequiredStory\RequiredStoriesService;
 use modules\edu\StoryContent\StoryContentService;
+use modules\edu\StoryProgress\StoryProgressFetcher;
 use modules\edu\Teacher\ClassBook\TeacherAccess\UserItem;
 use Ramsey\Uuid\Uuid;
 use Yii;
@@ -70,6 +74,10 @@ class RequiredStoryController extends Controller
      * @var RequiredStorySessionRepository
      */
     private $requiredStorySessionRepository;
+    /**
+     * @var StoryProgressFetcher
+     */
+    private $storyProgressFetcher;
 
     public function __construct(
         $id,
@@ -81,6 +89,7 @@ class RequiredStoryController extends Controller
         CreateRequiredStoryHandler $createRequiredStoryHandler,
         DeleteRequiredStoryHandler $deleteRequiredStoryHandler,
         RequiredStoriesService $requiredStoriesService,
+        StoryProgressFetcher $storyProgressFetcher,
         $config = []
     ) {
         parent::__construct($id, $module, $config);
@@ -91,14 +100,57 @@ class RequiredStoryController extends Controller
         $this->deleteRequiredStoryHandler = $deleteRequiredStoryHandler;
         $this->requiredStoriesService = $requiredStoriesService;
         $this->requiredStorySessionRepository = $requiredStorySessionRepository;
+        $this->storyProgressFetcher = $storyProgressFetcher;
     }
 
     /**
      * @throws Exception
      */
-    public function actionIndex(): string
+    public function actionIndex(WebUser $user, int $studentId = null): string
     {
-        $models = $this->requiredStoriesRepository->findAll();
+        $studentIds = $this->requiredStoriesRepository->findStudentIds($user->getId());
+        $students = EduStudent::find()->where(['in', 'id', $studentIds])->all();
+
+        if ($studentId === null) {
+            $models = $this->requiredStoriesRepository->findAllByStories();
+            $models = array_map(function (ByStoriesItem $model) {
+                $stat = $this->storyProgressFetcher->fetchStudentsStoryStatus(
+                    $model->getStoryId(),
+                    $model->getStudentIds()
+                );
+                return [$model, $stat];
+            }, $models);
+
+            $dataProvider = new ArrayDataProvider([
+                'allModels' => $models,
+                'pagination' => false,
+            ]);
+            return $this->render('index_stories', [
+                'students' => $students,
+                'dataProvider' => $dataProvider,
+                'activeStudentId' => null,
+            ]);
+        }
+
+        $models = $this->requiredStoriesRepository->findAll($studentId);
+
+        $storyIds = array_map(static function (RequiredStoryItem $requiredStory) {
+            return $requiredStory->getStoryId();
+        }, $models);
+
+        $progressModels = StoryStudentProgress::find()
+            ->where(['student_id' => $studentId])
+            ->andWhere(['in', 'story_id', $storyIds])
+            ->all();
+        $storyDoneProgress = array_combine(
+            array_map(static function (StoryStudentProgress $progress) {
+                return $progress->story_id;
+            }, $progressModels),
+            array_map(static function (StoryStudentProgress $progress) {
+                return $progress->statusIsDone();
+            }, $progressModels),
+        );
+
         $models = array_map(function(RequiredStoryItem $model) {
             $session = $this->requiredStoriesService->findStudentSession(
                 $model->getId(),
@@ -127,7 +179,9 @@ class RequiredStoryController extends Controller
             'pagination' => false,
         ]);
         return $this->render('index', [
+            'students' => $students,
             'dataProvider' => $dataProvider,
+            'activeStudentId' => $studentId,
         ]);
     }
 
@@ -216,15 +270,27 @@ class RequiredStoryController extends Controller
      * @throws InvalidConfigException
      * @throws Exception
      */
-    public function actionCreate(): string
+    public function actionCreate(WebUser $user): string
     {
         $createForm = new RequiredStoryCreateForm([
             'days' => 1,
             'startDate' => Yii::$app->formatter->asDate('now', 'php:Y-m-d'),
             'status' => (string) RequiredStoryStatus::open(),
         ]);
+
+        $studentIds = $this->requiredStoriesRepository->findStudentIds($user->getId());
+        $students = EduStudent::find()->where(['in', 'id', $studentIds])->all();
+
         return $this->renderAjax('_create_form', [
             'formModel' => $createForm,
+            'students' => array_map(static function(EduStudent $student) {
+                return new UserItem(
+                    $student->id,
+                    $student->name,
+                    $student->user->email,
+                    $student->user->getProfilePhoto(),
+                );
+            }, $students),
         ]);
     }
 

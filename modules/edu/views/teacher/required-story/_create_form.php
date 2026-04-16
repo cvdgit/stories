@@ -12,6 +12,7 @@ use yii\web\View;
 /**
  * @var View $this
  * @var RequiredStoryCreateForm $formModel
+ * @var array $students
  */
 ?>
 <div style="text-align: initial">
@@ -25,6 +26,7 @@ use yii\web\View;
         'formModel' => $formModel,
         'userModel' => null,
         'storyModel' => null,
+        'students' => $students,
     ]) ?>
     <div style="padding: 20px 0">
         <button type="submit" class="btn btn-small">Создать</button>
