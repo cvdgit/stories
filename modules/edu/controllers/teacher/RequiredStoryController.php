@@ -108,7 +108,7 @@ class RequiredStoryController extends Controller
      */
     public function actionIndex(WebUser $user, int $studentId = null): string
     {
-        $studentIds = $this->requiredStoriesRepository->findStudentIds($user->getId());
+        $studentIds = $this->requiredStoriesRepository->findStudentIds();
         $students = EduStudent::find()->where(['in', 'id', $studentIds])->all();
 
         if ($studentId === null) {
