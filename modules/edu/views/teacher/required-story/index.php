@@ -16,6 +16,8 @@ use yii\widgets\Pjax;
  * @var DataProviderInterface $dataProvider
  * @var EduStudent[] $students
  * @var int|null $activeStudentId
+ * @var int $todayPlan
+ * @var int $todayFact
  */
 
 $this->title = 'Обязательные истории';
@@ -47,6 +49,13 @@ $this->registerJs($this->renderFile('@modules/edu/views/teacher/required-story/i
 
     <div id="required-stories-wrap" class="table-responsive" style="margin-bottom: 50px;">
         <?php Pjax::begin(['id' => 'pjax-required-stories']); ?>
+        <div style="padding: 20px 10px; display: flex; justify-content: center">
+            <div style="border: 1px #808080 solid; padding: 10px 20px; border-radius: 10px; display: flex; flex-direction: column; gap: 8px">
+                <h2 class="h3" style="margin: 0;">На сегодня</h2>
+                <div>План: <b><?= $todayPlan ?></b></div>
+                <div>Факт: <b><?= $todayFact ?></b></div>
+            </div>
+        </div>
         <?= ListView::widget([
             'dataProvider' => $dataProvider,
             'summary' => false,
@@ -58,7 +67,6 @@ $this->registerJs($this->renderFile('@modules/edu/views/teacher/required-story/i
 <div class="required-story-row required-story-row-header">
 <div class="required-story-cell">Статус</div>
 <div class="required-story-cell">История</div>
-<div class="required-story-cell">Ученик</div>
 <div class="required-story-cell">Прогресс</div>
 <div class="required-story-cell">Дата начала</div>
 <div class="required-story-cell">Дата создания</div>

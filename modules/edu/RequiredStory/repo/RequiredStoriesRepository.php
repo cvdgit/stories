@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace modules\edu\RequiredStory\repo;
 
+use DateTimeImmutable;
 use Exception;
 use modules\edu\models\EduStory;
 use modules\edu\models\EduStudent;
@@ -106,6 +107,28 @@ class RequiredStoriesRepository
             },
             $query->all(),
         );
+    }
+
+    /**
+     * @param int $studentId
+     * @return StudentStoryItem[]
+     */
+    public function findAllByStudent(int $studentId): array
+    {
+        $query = (new Query())
+            ->select([
+                'id' => 't.id',
+                'storyId' => 't.story_id',
+            ])
+            ->from(['t' => RequiredStoryModel::tableName()])
+            ->where([
+                't.student_id' => $studentId,
+            ])
+            ->andWhere(['t.status' => (string) RequiredStoryStatus::open()])
+            ->andWhere(['<=', new Expression('t.started_at'), new Expression('UNIX_TIMESTAMP() + (3 * 60 * 60)')]);
+        return array_map(static function(array $row) {
+            return StudentStoryItem::fromArray($row);
+        }, $query->all());
     }
 
     /**

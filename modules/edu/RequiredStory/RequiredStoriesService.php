@@ -11,9 +11,11 @@ use Exception;
 use modules\edu\query\GetStoryTests\Slide;
 use modules\edu\RequiredStory\repo\RequiredStoriesRepository;
 use modules\edu\RequiredStory\repo\RequiredStory;
+use modules\edu\RequiredStory\repo\RequiredStoryItem;
 use modules\edu\RequiredStory\repo\RequiredStoryMetadata;
 use modules\edu\RequiredStory\repo\RequiredStorySession;
 use modules\edu\RequiredStory\repo\RequiredStorySessionRepository;
+use modules\edu\RequiredStory\repo\StudentStoryItem;
 use modules\edu\RequiredStory\widgets\StudentRequiredStories\RequiredStoriesFetcher;
 use modules\edu\StoryContent\StoryContentService;
 use Ramsey\Uuid\UuidInterface;
@@ -206,5 +208,46 @@ class RequiredStoriesService
             return false;
         }
         return $progress->statusIsDone();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getStudentFact(int $studentId, DateTimeInterface $date): int
+    {
+        $requiredStoryIds = array_map(static function(StudentStoryItem $item) {
+            return $item->getId()->toString();
+        }, $this->repo->findAllByStudent($studentId));
+        $sessions = $this->requiredStorySessionRepository->findAll(
+            $requiredStoryIds,
+            $date,
+        );
+        return array_reduce($sessions, static function(int $total, RequiredStorySession $session) {
+            return $total + $session->getFact();
+        }, 0);
+    }
+
+    /**
+     * @throws \yii\db\Exception
+     * @throws InvalidConfigException
+     * @throws NotFoundHttpException
+     * @throws Exception
+     */
+    public function getStudentPlan(int $studentId): int
+    {
+        $requiredStoryItems = $this->repo->findAllByStudent($studentId);
+        $total = 0;
+        foreach ($requiredStoryItems as $item) {
+            $collection = $this->storyContentService->getStudentFactContentItemsDetail(
+                $studentId,
+                $item->getStoryId(),
+            );
+            $requiredStory = $this->repo->findById($item->getId());
+            if ($requiredStory === null) {
+                continue;
+            }
+            $total += $requiredStory->getMetadata()->getCurrentPlan($collection->getTotalItems());
+        }
+        return $total;
     }
 }

@@ -174,6 +174,12 @@ class RequiredStoryController extends Controller
             return [$model, $stat];
         }, $models);
 
+        $todayPlan = $this->requiredStoriesService->getStudentPlan($studentId);
+        $todayFact = $this->requiredStoriesService->getStudentFact(
+            $studentId,
+            new DateTimeImmutable('now', new DateTimeZone('Europe/Moscow'))
+        );
+
         $dataProvider = new ArrayDataProvider([
             'allModels' => $models,
             'pagination' => false,
@@ -182,6 +188,8 @@ class RequiredStoryController extends Controller
             'students' => $students,
             'dataProvider' => $dataProvider,
             'activeStudentId' => $studentId,
+            'todayPlan' => $todayPlan,
+            'todayFact' => $todayFact,
         ]);
     }
 

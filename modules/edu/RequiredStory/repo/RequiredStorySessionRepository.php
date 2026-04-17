@@ -103,4 +103,29 @@ class RequiredStorySessionRepository
             );
         }, $rows);
     }
+
+    /**
+     * @param array $requiredStoryIds
+     * @param DateTimeInterface $date
+     * @return RequiredStorySession[]
+     */
+    public function findAll(array $requiredStoryIds, DateTimeInterface $date): array
+    {
+        $rows = (new Query())
+            ->select('*')
+            ->from(['t' => RequiredStorySessionModel::tableName()])
+            ->where(['in', 'required_story_id', $requiredStoryIds])
+            ->andWhere([
+                'date' => $this->formatDate($date),
+            ])
+            ->all();
+        return array_map(static function(array $row) {
+            return new RequiredStorySession(
+                Uuid::fromString($row['required_story_id']),
+                $row['date'],
+                (int) $row['plan'],
+                (int) $row['fact'],
+            );
+        }, $rows);
+    }
 }

@@ -19,9 +19,6 @@ use yii\helpers\Url;
     <?= $requiredStoryItem->getStoryTitle() ?>
 </div>
 <div class="required-story-cell">
-    <?= $requiredStoryItem->getStudentName() ?>
-</div>
-<div class="required-story-cell">
     <div
         data-required-story-url="<?= Url::to(['/edu/teacher/required-story/sessions', 'id' => $requiredStoryItem->getId()->toString()]) ?>"
         class="required-story-stat"

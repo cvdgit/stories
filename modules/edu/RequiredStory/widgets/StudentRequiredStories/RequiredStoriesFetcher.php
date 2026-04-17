@@ -6,6 +6,7 @@ namespace modules\edu\RequiredStory\widgets\StudentRequiredStories;
 
 use common\models\StoryStudentProgress;
 use DateTimeImmutable;
+use DateTimeZone;
 use Exception;
 use modules\edu\models\EduStory;
 use modules\edu\RequiredStory\repo\RequiredStorySessionRepository;
@@ -57,7 +58,7 @@ class RequiredStoriesFetcher
             $requiredStory = WidgetRequiredStory::fromArray($row);
             $session = $this->requiredStorySessionRepository->find(
                 $requiredStory->getId(),
-                new DateTimeImmutable()
+                new DateTimeImmutable('now', new DateTimeZone('Europe/Moscow'))
             );
             if ($session !== null) {
                 $requiredStory->setSession($session);
