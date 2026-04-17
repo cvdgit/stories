@@ -106,7 +106,7 @@ class RequiredStoryController extends Controller
     /**
      * @throws Exception
      */
-    public function actionIndex(WebUser $user, int $studentId = null): string
+    public function actionIndex(int $studentId = null): string
     {
         $studentIds = $this->requiredStoriesRepository->findStudentIds();
         $students = EduStudent::find()->where(['in', 'id', $studentIds])->all();
@@ -116,7 +116,7 @@ class RequiredStoryController extends Controller
             $models = array_map(function (ByStoriesItem $model) {
                 $stat = $this->storyProgressFetcher->fetchStudentsStoryStatus(
                     $model->getStoryId(),
-                    $model->getStudentIds()
+                    $model->getStudentIds(),
                 );
                 return [$model, $stat];
             }, $models);
@@ -151,12 +151,21 @@ class RequiredStoryController extends Controller
             }, $progressModels),
         );
 
-        $models = array_map(function(RequiredStoryItem $model) {
+        $models = array_map(function (RequiredStoryItem $model) use ($storyDoneProgress) {
+            $storyIsDone = $storyDoneProgress[$model->getStoryId()] ?? false;
+            if ($storyIsDone) {
+                return [
+                    $model,
+                    ['done' => true],
+                ];
+            }
+
             $session = $this->requiredStoriesService->findStudentSession(
                 $model->getId(),
                 new DateTimeImmutable('now', new DateTimeZone('Europe/Moscow')),
             );
             $stat = [
+                'done' => false,
                 'sessionFact' => 0,
                 'sessionPlan' => 0,
                 'sessionIsComplete' => false,
@@ -177,7 +186,7 @@ class RequiredStoryController extends Controller
         $todayPlan = $this->requiredStoriesService->getStudentPlan($studentId);
         $todayFact = $this->requiredStoriesService->getStudentFact(
             $studentId,
-            new DateTimeImmutable('now', new DateTimeZone('Europe/Moscow'))
+            new DateTimeImmutable('now', new DateTimeZone('Europe/Moscow')),
         );
 
         $dataProvider = new ArrayDataProvider([
@@ -291,7 +300,7 @@ class RequiredStoryController extends Controller
 
         return $this->renderAjax('_create_form', [
             'formModel' => $createForm,
-            'students' => array_map(static function(EduStudent $student) {
+            'students' => array_map(static function (EduStudent $student) {
                 return new UserItem(
                     $student->id,
                     $student->name,
@@ -357,7 +366,8 @@ class RequiredStoryController extends Controller
                 ['like', 'u.email', $query],
             ])
             ->andWhere(['u.status' => 10])
-            ->andWhere(['exists', (new Query())->from(['t' => 'edu_class_book_student'])->where('t.student_id = us.id')])
+            ->andWhere(['exists', (new Query())->from(['t' => 'edu_class_book_student'])->where('t.student_id = us.id')],
+            )
             ->orderBy(['us.name' => SORT_ASC])
             ->limit(30)
             ->all();
@@ -442,7 +452,7 @@ class RequiredStoryController extends Controller
             'story' => $story,
             'student' => $student,
             'sessions' => $this->requiredStorySessionRepository->findByRequiredStoryId(
-                Uuid::fromString($id)
+                Uuid::fromString($id),
             ),
         ]);
     }

@@ -24,8 +24,12 @@ use yii\helpers\Url;
         class="required-story-stat"
         style="display: flex; flex-direction: column; gap: 10px"
     >
+        <?php if ($stat['done']): ?>
+        <div>Пройдена</div>
+        <?php else: ?>
         <div style="display: flex; flex-direction: row; gap: 10px; align-items: center">Сегодня: <?= $stat['sessionFact'] ?> из <?= $stat['sessionPlan'] ?></div>
         <div>Всего: <?= $stat['fact'] ?> из <?= $stat['plan'] ?></div>
+        <?php endif ?>
     </div>
 </div>
 <div class="required-story-cell">
