@@ -376,13 +376,21 @@ class RequiredStoryController extends Controller
     public function actionSelectStories(string $query, Response $response): array
     {
         $response->format = Response::FORMAT_JSON;
+        $eduQuery = (new Query())
+            ->from(['t' => 'edu_lesson_story'])
+            ->where('t.story_id = s.id');
         return (new Query())
             ->select(
-                ['title', 'id', "IF(cover IS NULL, '/img/story-1.jpg', CONCAT('/slides_cover/list/', cover)) AS cover"],
+                [
+                    's.title',
+                    's.id',
+                    "IF(s.cover IS NULL, '/img/story-1.jpg', CONCAT('/slides_cover/list/', s.cover)) AS cover",
+                ],
             )
-            ->from(EduStory::tableName())
-            ->where(['like', 'title', $query])
-            ->orderBy(['title' => SORT_ASC])
+            ->from(['s' => EduStory::tableName()])
+            ->where(['exists', $eduQuery])
+            ->andWhere(['like', 's.title', $query])
+            ->orderBy(['s.title' => SORT_ASC])
             ->limit(30)
             ->all();
     }
