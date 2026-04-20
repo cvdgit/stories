@@ -49,13 +49,13 @@ $this->registerJs($this->renderFile('@modules/edu/views/teacher/required-story/i
 
     <div id="required-stories-wrap" class="table-responsive" style="margin-bottom: 50px;">
         <?php Pjax::begin(['id' => 'pjax-required-stories']); ?>
-        <div style="padding: 20px 10px; display: flex; justify-content: center">
+        <!--div style="padding: 20px 10px; display: flex; justify-content: center">
             <div style="border: 1px #808080 solid; padding: 10px 20px; border-radius: 10px; display: flex; flex-direction: column; gap: 8px">
                 <h2 class="h3" style="margin: 0;">На сегодня</h2>
-                <div>План: <b><?= $todayPlan ?></b></div>
-                <div>Факт: <b><?= $todayFact ?></b></div>
+                <div>План: <b><?php // $todayPlan ?></b></div>
+                <div>Факт: <b><?php // $todayFact ?></b></div>
             </div>
-        </div>
+        </div-->
         <?= ListView::widget([
             'dataProvider' => $dataProvider,
             'summary' => false,
