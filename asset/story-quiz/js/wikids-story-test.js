@@ -2799,8 +2799,6 @@ function WikidsStoryTest(el, options) {
       $elements.append(that.stepQuestion.getContent(question))
     } else if (questionViewColumn(question)) {
       $elements.append(that.columnQuestion.getContent(question))
-    } else if (questionViewColumn(question)) {
-      $elements.append(that.columnQuestion.getContent(question))
     } else if (questionViewImageGaps(question)) {
       $elements.append(that.imageGapsQuestion.getContent(question));
     } else if (questionViewDragWords(question)) {
@@ -3064,11 +3062,16 @@ function WikidsStoryTest(el, options) {
 
     var isLastQuestion = (testQuestions.length === 0);
     // var actionRelated = incorrectAnswerActionRelated();
-    var showCorrectAnswerPageCondition = testConfig.sourceIsWord()
+
+    let showCorrectAnswerPageCondition = testConfig.sourceIsWord()
       && !testConfig.answerTypeIsNumPad(currentQuestion)
       && !testConfig.answerTypeIsRecording(currentQuestion)
       && !testConfig.answerTypeIsInput(currentQuestion)
       && !testConfig.answerTypeIsMissingWords(currentQuestion);
+
+    if (questionViewColumn(currentQuestion)) {
+      showCorrectAnswerPageCondition = testConfig.showCorrectResponse();
+    }
 
     if (isLastQuestion) {
 

@@ -53,6 +53,7 @@ use yii\helpers\ArrayHelper;
  * @property int $voice_response
  * @property int $show_descr_in_questions
  * @property int $schedule_id
+ * @property int $show_correct_response
  *
  * @property StoryTestQuestion[] $storyTestQuestions
  * @property Story[] $stories
@@ -98,7 +99,7 @@ class StoryTest extends ActiveRecord
             [['title', 'question_list_name', 'header', 'question_params', 'incorrect_answer_text', 'input_voice', 'recording_lang', 'ask_question_lang'], 'string', 'max' => 255],
             [['description_text'], 'string'],
             [['question_list', 'sortable'], 'safe'],
-            [['repeat', 'say_correct_answer', 'voice_response', 'show_descr_in_questions', 'schedule_id'], 'integer'],
+            [['repeat', 'say_correct_answer', 'voice_response', 'show_descr_in_questions', 'show_correct_response', 'schedule_id'], 'integer'],
             ['repeat', 'in', 'range' => TestRepeat::getForRange()],
         ];
     }
@@ -139,6 +140,7 @@ class StoryTest extends ActiveRecord
             'voice_response' => 'Ввод ответа голосом',
             'show_descr_in_questions' => 'Показывать описание в каждом вопросе',
             'schedule_id' => 'Расписание повторения',
+            'show_correct_response' => 'Показывать правильный ответ при неправильном (только для решения в столбик)',
         ];
     }
 
