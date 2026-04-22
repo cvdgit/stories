@@ -33,18 +33,61 @@ class MentalMapPayload implements JsonSerializable
      * @var array
      */
     private $settings = [];
+    /**
+     * @var MentalMapPayloadImage|null
+     */
+    private $mapImage;
 
     private function __construct(UuidInterface $id, string $name, string $text)
     {
         $this->id = $id;
         $this->name = $name;
         $this->text = $text;
+        $this->mapImage = new MentalMapPayloadImage(
+            '/img/mental_map_blank.jpg',
+            1280,
+            720,
+        );
+    }
+
+    public static function mentalMap(
+        UuidInterface $id,
+        string $name,
+        string $text,
+        ?MentalMapPayloadImage $mapImage = null
+    ): self {
+        $obj = new self($id, $name, $text);
+        if ($mapImage !== null) {
+            $obj->mapImage = $mapImage;
+        }
+        return $obj;
     }
 
     public static function treeMentalMap(UuidInterface $id, string $name, string $text, array $treeData): self
     {
         $obj = new self($id, $name, $text);
         $obj->treeView = true;
+        $obj->treeData = $treeData;
+        return $obj;
+    }
+
+    public static function treeDialogMentalMap(
+        UuidInterface $id,
+        string $name,
+        string $text,
+        array $treeData,
+        UuidInterface $promptId = null
+    ): self {
+        $obj = new self($id, $name, $text);
+        $obj->treeView = true;
+        $obj->treeData = $treeData;
+        $obj->settings = [
+            'planTreeView' => true,
+            'treeDialog' => true,
+        ];
+        if ($promptId !== null) {
+            $obj->settings['promptId'] = $promptId->toString();
+        }
         $obj->treeData = $treeData;
         return $obj;
     }
@@ -77,12 +120,7 @@ class MentalMapPayload implements JsonSerializable
             'name' => $this->name,
             'text' => $this->text,
             'treeView' => $this->treeView,
-            'map' => [
-                'url' => '/img/mental_map_blank.jpg',
-                'width' => 1080,
-                'height' => 720,
-                'images' => [],
-            ],
+            'map' => $this->mapImage,
             'mapTypeIsMentalMapQuestions' => false,
             'treeData' => $this->treeData,
             'settings' => $this->settings,

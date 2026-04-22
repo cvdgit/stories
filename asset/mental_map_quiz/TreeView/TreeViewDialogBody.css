@@ -1,0 +1,13 @@
+
+.tree-dialog-body .retelling-success, .tree-dialog-body .retelling-failed {
+  opacity: 0;
+  transition: all 200ms;
+}
+
+.tree-dialog-body .node-row-done .retelling-success {
+  opacity: 1;
+}
+
+.tree-dialog-body .node-row-fail .retelling-failed {
+  opacity: 1;
+}

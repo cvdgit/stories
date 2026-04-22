@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace backend\SlideEditor\CreateMentalMap;
 
+use backend\AiStoryAssist\MentalMapBuilder;
 use backend\MentalMap\MentalMap;
+use backend\MentalMap\MentalMapPayload;
+use backend\MentalMap\MentalMapPayloadImage;
 use backend\models\editor\MentalMapForm;
 use backend\services\ImageService;
 use backend\services\StoryEditorService;
@@ -43,6 +46,10 @@ class CreateMentalMapAction extends Action
      * @var ImageService
      */
     private $imageService;
+    /**
+     * @var MentalMapBuilder
+     */
+    private $mentalMapBuilder;
 
     public function __construct(
         $id,
@@ -51,6 +58,7 @@ class CreateMentalMapAction extends Action
         StoryEditorService $storyEditorService,
         TransactionManager $transactionManager,
         ImageService $imageService,
+        MentalMapBuilder $mentalMapBuilder,
         $config = []
     ) {
         parent::__construct($id, $controller, $config);
@@ -58,6 +66,7 @@ class CreateMentalMapAction extends Action
         $this->storyEditorService = $storyEditorService;
         $this->transactionManager = $transactionManager;
         $this->imageService = $imageService;
+        $this->mentalMapBuilder = $mentalMapBuilder;
     }
 
     /**
@@ -87,7 +96,65 @@ class CreateMentalMapAction extends Action
             try {
                 $this->transactionManager->wrap(function () use ($mentalMapForm, &$newSlideId, $storyModel, $currentSlideModel, $user) {
 
-                    $slideModel = $this->storySlideService->create($storyModel->id, 'empty', StorySlide::KIND_MENTAL_MAP);
+                    $mentalMapId = Uuid::uuid4();
+                    if ($mentalMapForm->isMentalMap()) {
+
+                        $mapImageUrl = $mentalMapForm->image;
+                        $mapImage = null;
+                        if (!empty($mapImageUrl) && $mentalMapForm->isUserSlideImage()) {
+                            $path = $this->downloadMentalMapImage(
+                                $mapImageUrl,
+                                $mentalMapId->toString()
+                            );
+                            $imageUrl = '/upload/mental-map/' . $mentalMapId . '/' . pathinfo($path, PATHINFO_BASENAME);
+                            [$imageWidth, $imageHeight] = getimagesize($path);
+                            $mapImage = new MentalMapPayloadImage($imageUrl, $imageWidth, $imageHeight);
+                        }
+
+                        $this->mentalMapBuilder->createMentalMap(
+                            $mentalMapId,
+                            $mentalMapForm->name,
+                            $mentalMapForm->texts,
+                            $user->getId(),
+                            $mapImage
+                        );
+                    }
+
+                    if ($mentalMapForm->isTreeMentalMap()) {
+                        $this->mentalMapBuilder->createTreeMentalMap(
+                            $mentalMapId,
+                            $mentalMapForm->name,
+                            $mentalMapForm->texts,
+                            $user->getId(),
+                            [],
+                        );
+                    }
+
+                    if ($mentalMapForm->isTreeDialogPlanMentalMap()) {
+                        $this->mentalMapBuilder->createTreeDialogMentalMap(
+                            $mentalMapId,
+                            $mentalMapForm->name,
+                            $mentalMapForm->texts,
+                            $user->getId(),
+                            [],
+                        );
+                    }
+
+                    $newSlide = $this->storySlideService->createAndInsertSlide(
+                        $storyModel->id,
+                        StorySlide::KIND_MENTAL_MAP,
+                        $currentSlideModel->number,
+                        function(int $slideId) use ($mentalMapId, $mentalMapForm) {
+                            return $this->storyEditorService->getSlideWithMentalMapBlockContent(
+                                $slideId,
+                                $mentalMapId->toString(),
+                                'mental-map',
+                                $mentalMapForm->isRequired(),
+                            );
+                        },
+                    );
+
+                    /*$slideModel = $this->storySlideService->create($storyModel->id, 'empty', StorySlide::KIND_MENTAL_MAP);
                     $slideModel->number = $currentSlideModel->number + 1;
                     Story::insertSlideNumber($storyModel->id, $currentSlideModel->number);
                     if (!$slideModel->save()) {
@@ -145,8 +212,9 @@ class CreateMentalMapAction extends Action
                         throw new DomainException(
                             'Can\'t be saved StorySlide model. Errors: ' . implode(', ', $slideModel->getFirstErrors()),
                         );
-                    }
-                    $newSlideId = $slideModel->id;
+                    }*/
+
+                    $newSlideId = $newSlide->id;
                 });
 
                 return ["success" => true, 'slide_id' => $newSlideId];
@@ -156,5 +224,19 @@ class CreateMentalMapAction extends Action
             }
         }
         return ['success' => false, 'message' => 'No data'];
+    }
+
+    /**
+     * @throws \yii\base\Exception
+     */
+    private function downloadMentalMapImage(string $mapImageUrl, string $mentalMapId): string
+    {
+        $uploadsDir = Yii::getAlias('@public/upload');
+        $mentalMapDir = $uploadsDir . '/mental-map/' . $mentalMapId;
+        FileHelper::createDirectory($mentalMapDir);
+        if (filter_var($mapImageUrl, FILTER_VALIDATE_URL) === false) {
+            $mapImageUrl = Url::homeUrl() . $mapImageUrl;
+        }
+        return $this->imageService->downloadImage($mapImageUrl, $mentalMapDir);
     }
 }

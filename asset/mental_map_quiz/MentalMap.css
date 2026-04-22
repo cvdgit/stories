@@ -436,11 +436,17 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  height: auto;
 }
 
-.map-user-status:has(.map-user-status-hiding:empty) {
+.map-user-status:has(.map-user-status-hiding:empty),
+.map-user-status:has(.map-user-status-hiding:empty) .map-user-status-hiding,
+.map-user-status:has(.map-user-status-hiding:empty) .map-user-status-time {
   visibility: hidden;
   opacity: 0;
+  height: 0;
+  padding: 0;
+  margin-top: 0;
 }
 
 .map-user-status-hiding,

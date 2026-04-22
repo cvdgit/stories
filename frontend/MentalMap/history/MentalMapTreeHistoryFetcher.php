@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace frontend\MentalMap\history;
 
+use DateTimeImmutable;
+use DateTimeZone;
 use frontend\MentalMap\MentalMap;
+use yii\db\Expression;
 use yii\db\Query;
 
 class MentalMapTreeHistoryFetcher
@@ -24,7 +27,11 @@ class MentalMapTreeHistoryFetcher
             return [
                 'id' => $item['id'],
                 'all' => $item['all'] ?? 0,
+                'hiding' => isset($item['hiding']) ? (int) $item['hiding'] : 0,
+                'target' => isset($item['target']) ? (int) $item['target'] : 0,
                 'done' => $item['done'] ?? false,
+                'seconds' => isset($item['seconds']) ? (int) $item['seconds'] : 0,
+                'hidingPrev' => $item['hidingPrev'],
             ];
         }, $list);
     }
@@ -39,6 +46,11 @@ class MentalMapTreeHistoryFetcher
             return [
                 'id' => $node['id'],
                 'done' => false,
+                'all' => 0,
+                'hiding' => 0,
+                'hidingPrev' => 0,
+                'target' => 0,
+                'seconds' => 0,
             ];
         }, $nodeList);
 
@@ -58,13 +70,25 @@ class MentalMapTreeHistoryFetcher
             ->indexBy('id')
             ->all();*/
 
+        $today = (new DateTimeImmutable('now', new DateTimeZone('Europe/Moscow')))
+                ->setTime(0, 0)
+                ->format('U') . ' + (3 * 60 * 60)';
+        $hidingBeforeQuery = (new Query())
+            ->select(new Expression('MAX(t.text_hiding_percentage)'))
+            ->from(['t' => 'mental_map_history'])
+            ->where('t.image_fragment_id = h.image_fragment_id')
+            ->andWhere('t.overall_similarity >= IFNULL(t.threshold, 0)')
+            ->andWhere(['<=', new Expression('t.created_at'), new Expression($today)]);
+
         $historyRows = (new Query())
             ->select([
                 'id' => 'h.image_fragment_id',
                 'all' => 'h.overall_similarity',
                 'hiding' => 'h.text_hiding_percentage',
+                'hidingPrev' => $hidingBeforeQuery,
                 'target' => 'h.text_target_percentage',
                 'all_words' => 'h.all_important_words_included',
+                'seconds' => 'h.seconds',
             ])
             ->from(['h' => 'mental_map_history'])
             ->where([
@@ -92,6 +116,8 @@ class MentalMapTreeHistoryFetcher
                 $all = isset($row['all']) ? (int) $row['all'] : 0;
                 $item['done'] = $row['done'];
                 $item['all'] = $all;
+                $item['hidingPrev'] = (int) $rows[$item['id']]['hidingPrev'];
+                $item['seconds'] = (int) $rows[$item['id']]['seconds'];
                 $item['hiding'] = isset($row['hiding']) ? (int) $row['hiding'] : 0;
                 $item['target'] = isset($row['target']) ? (int) $row['target'] : 0;
             }

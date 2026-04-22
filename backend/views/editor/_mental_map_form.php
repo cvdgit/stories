@@ -10,7 +10,7 @@ use yii\widgets\ActiveForm;
  * @var View $this
  * @var ActiveForm $form
  * @var MentalMapForm $model
- * @var Bool $new
+ * @var bool $new
  */
 ?>
 <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
@@ -18,5 +18,5 @@ use yii\widgets\ActiveForm;
 <?php if ($new): ?>
 <?= $form->field($model, 'use_slide_image', ['inputOptions' => ['class' => 'form-control input-sm']])->checkbox() ?>
 <?php endif ?>
-<?= $form->field($model, 'tree_view', ['inputOptions' => ['class' => 'form-control input-sm']])->checkbox() ?>
+<?= $form->field($model, 'treeMapKind', ['inputOptions' => ['class' => 'form-control input-sm']])->dropDownList(MentalMapForm::mapValues(), ['prompt' => 'Выберите']) ?>
 <?= $form->field($model, 'required', ['inputOptions' => ['class' => 'form-control input-sm']])->checkbox() ?>

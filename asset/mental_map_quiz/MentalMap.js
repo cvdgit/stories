@@ -215,10 +215,20 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
 
   const fragmentState = new FragmentState(params.mentalMapId);
 
-
   const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
 
-  function mapImageClickHandler({image, texts, historyItem, rewritePrompt, threshold, dialogHideHandler, fastMode, hideFragmentText, settingsPromptId, detailParams}) {
+  function mapImageClickHandler({
+                                  image,
+                                  texts,
+                                  historyItem,
+                                  rewritePrompt,
+                                  threshold,
+                                  dialogHideHandler,
+                                  fastMode,
+                                  hideFragmentText,
+                                  settingsPromptId,
+                                  detailParams
+                                }) {
 
     const text = texts.find(t => t.id === image.id);
 
@@ -719,6 +729,10 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
     const {treeView} = json
     if (treeView) {
 
+      const treeTexts = TreeView
+        .flatten(json.treeData)
+        .map(image => createWordItem(image.description || '', image.id));
+
       treeViewInstance = new TreeView({
         id: json.id,
         name: json.name,
@@ -736,15 +750,56 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
             }
           }
         },
-        deck
+        deck,
+        itemClickHandler: (item) => {
+
+          const image = {
+            ...item,
+            textState: 'show',
+          };
+
+          const historyItem = history.find(h => h.id === item.id);
+
+          mapImageClickHandler({
+            image,
+            texts: treeTexts,
+            historyItem,
+            rewritePrompt,
+            threshold,
+            dialogHideHandler: () => {
+
+              const imgElem = container.querySelector(`[data-node-id='${image.id}']`);
+              imgElem.classList.remove('node-row-done', 'node-row-fail');
+
+              if (historyItem.done) {
+                imgElem.classList.add('node-row-done');
+                MapImageStatus.update(imgElem.querySelector('.map-user-status'), {
+                  hiding: historyItem.hiding,
+                  seconds: historyItem.seconds,
+                  hidingPrev: historyItem.hidingPrev,
+                });
+              }
+
+              fragmentDialogHideHandler(image, historyItem);
+            },
+            fastMode: true,
+            hideFragmentText: false,
+            settingsPromptId: json.settings?.promptId
+          });
+
+        }
       }, new VoiceResponse(new MissingWordsRecognition({
         getRecordingLang() {
           return (json.settings || {}).recognitionLang || 'ru-RU';
         }
-      })))
+      })));
 
       loader.remove()
-      this.element.appendChild(treeViewInstance.getElement())
+
+      container.appendChild(
+        treeViewInstance.getElement()
+      );
+      this.element.appendChild(container);
 
       $('[data-toggle="tooltip"]', this.element).tooltip({
         container: 'body'
@@ -866,12 +921,12 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         voiceResponse.stop()
       }
 
-      const el = container.querySelector(`[data-image-fragment-id='${image.id}']`)
-      el.querySelector('.image-item > .result-item').remove()
-      el.querySelector('.image-item').appendChild(FragmentResultElement(historyItem))
-      $(el.querySelector('.result-item')).tooltip()
-
-      // appendAllTextWordElements(texts.find(t => t.id === image.id).words, el.querySelector('.text-item'))
+      const el = container.querySelector(`[data-image-fragment-id='${image.id}']`);
+      if (el) {
+        el.querySelector('.image-item > .result-item').remove();
+        el.querySelector('.image-item').appendChild(FragmentResultElement(historyItem));
+        $(el.querySelector('.result-item')).tooltip();
+      }
 
       if (repetitionMode) {
         const done = mentalMapHistory.reduce((all, val) => all && val.done, true)
@@ -881,13 +936,6 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
           finishRepetition(params.mentalMapId)
         }
       }
-
-      /*texts = texts.map(t => {
-        if (t.id === image.id) {
-          return createWordItem(image)
-        }
-        return t
-      })*/
 
       if (/*getCourseMode &&*/ historyIsDone(history)) {
         const content = createFinishContent(history, texts, mapQuestions.typeIsMentalMapQuestions(), () => restartHandler(mentalMapId))

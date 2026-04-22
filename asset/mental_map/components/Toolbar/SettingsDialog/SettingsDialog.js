@@ -9,6 +9,7 @@ export default function SettingsDialog({open, setOpen, mentalMapId, schedules}) 
   const checkId = useId();
   const presentationModeId = useId();
   const planCheckId = useId();
+  const recordingDialogCheckId = useId();
   const tooltipCheckId = useId();
   const textCheckId = useId();
   const {state, dispatch} = useMentalMap();
@@ -120,6 +121,22 @@ export default function SettingsDialog({open, setOpen, mentalMapId, schedules}) 
                 checked={Boolean(state?.settings?.planTreeView)}
                 type="checkbox"
               /> Ментальная карта в виде плана</label>
+          </div>}
+          {isTreeView && <div style={{marginBottom: '20px'}}>
+            <label htmlFor={recordingDialogCheckId}>
+              <input
+                id={recordingDialogCheckId}
+                onChange={() => {
+                  settings.treeDialog = !Boolean(state?.settings?.treeDialog);
+                  setSettings(settings);
+                  dispatch({
+                    type: 'update_settings',
+                    payload: settings
+                  });
+                }}
+                checked={Boolean(state?.settings?.treeDialog)}
+                type="checkbox"
+              /> Показывать диалог для записи</label>
           </div>}
           <div style={{marginBottom: '10px'}}>
             <label style={{display: 'block', marginBottom: '2px'}} htmlFor={scheduleElemId}>Расписание повторений:</label>

@@ -26,6 +26,7 @@ class MentalMap extends ActiveRecord
     public const TYPE_MENTAL_MAP_PLAN = 'mental-map-plan';
     public const TYPE_MENTAL_MAP_PLAN_ACCUMULATION = 'mental-map-plan-accumulation';
     public const TYPE_MENTAL_MAP_QUESTIONS = 'mental-map-questions';
+    public const TYPE_MENTAL_MAP_TREE_DIALOG = 'mental-map-tree-dialog';
 
     public function behaviors(): array
     {

@@ -12,34 +12,29 @@ class MentalMapForm extends BaseForm
     public $name;
     public $texts;
     public $image;
-    public $tree_view;
+    public $treeMapKind;
+
+    private const MAP_TREE = 'tree';
+    private const MAP_TREE_DIALOG_PLAN = 'tree-dialog-plan';
 
     public function init(): void
     {
         parent::init();
         $this->name = 'Ментальная карта';
         $this->use_slide_image = true;
-        $this->tree_view = false;
         $this->required = true;
     }
-
-    /*public function scenarios()
-    {
-        $scenarios = parent::scenarios();
-        $scenarios['update'] = ['story_id', 'slide_id', 'test_id', 'block_id', 'required', 'lesson_id'];
-        return $scenarios;
-    }*/
 
     public function rules(): array
     {
         return array_merge(parent::rules(), [
             [['story_id', 'name'], 'required'],
             [['story_id', 'required'], 'integer'],
-            [['use_slide_image', 'tree_view'], 'boolean'],
+            [['use_slide_image'], 'boolean'],
+            ['treeMapKind', 'in', 'range' => array_keys(self::mapValues())],
             ['texts', 'safe'],
             [['image', 'name'], 'string'],
             ['mental_map_id', 'string', 'max' => 36],
-            //[['story_id', 'test_id'], 'unique', 'targetAttribute' => ['story_id', 'test_id'], 'targetClass' => StoryStoryTest::class, 'message' => 'Невозможно добавить т.к. этот тест в эту историю уже добавлен', 'on' => 'default'],
         ]);
     }
 
@@ -50,35 +45,40 @@ class MentalMapForm extends BaseForm
             'required' => 'Тест обязателен для прохождения',
             'use_slide_image' => 'Использовать изображение со слайда в качестве фона для ментальной карты',
             'name' => 'Название',
-            'tree_view' => 'Ментальная карта в виде дерева',
+            'treeMapKind' => 'Ментальная карта',
         ]);
     }
 
-    /*public function afterCreate(StorySlide $slideModel): void
+    public function isRequired(): bool
     {
-        parent::afterCreate($slideModel);
-        $model = StoryStoryTest::create($slideModel->story_id, $this->test_id);
-        if (!$model->validate()) {
-            throw new \DomainException('Model not valid');
-        }
-        $model->save(false);
-        $slideModel->setQuestionSlide();
-    }*/
-
-    /*public function haveTest(): bool
-    {
-        return !empty($this->test_id);
+        return $this->required === '1';
     }
 
-    public function getTestName(): string
+    public function isMentalMap(): bool
     {
-        if (!$this->haveTest()) {
-            return '';
-        }
-        $test = StoryTest::findOne($this->test_id);
-        if ($test === null) {
-            return '';
-        }
-        return $test->title;
-    }*/
+        return empty($this->treeMapKind);
+    }
+
+    public function isTreeMentalMap(): bool
+    {
+        return $this->treeMapKind === self::MAP_TREE;
+    }
+
+    public function isTreeDialogPlanMentalMap(): bool
+    {
+        return $this->treeMapKind === self::MAP_TREE_DIALOG_PLAN;
+    }
+
+    public static function mapValues(): array
+    {
+        return [
+            self::MAP_TREE => 'В виде дерева',
+            self::MAP_TREE_DIALOG_PLAN => 'В виде дерева с диалогом (план)',
+        ];
+    }
+
+    public function isUserSlideImage(): bool
+    {
+        return $this->use_slide_image === '1';
+    }
 }

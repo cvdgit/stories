@@ -80,6 +80,7 @@ MapImageStatus.update = function (container, {hiding, seconds, hidingPrev}) {
   const secondsElem = container.querySelector('.map-user-status-time');
   if (secondsElem) {
     const currentSeconds = Number(secondsElem.getAttribute('data-value'));
+    console.log(Number(seconds), currentSeconds, Number(seconds) > currentSeconds);
     if (Number(seconds) > currentSeconds) {
       hidingElem.setAttribute('data-value', seconds);
       secondsElem.innerHTML = formatTime(seconds);

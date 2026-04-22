@@ -1,9 +1,11 @@
 import TreeViewBody from "./TreeViewBody";
+import TreeViewDialogBody from "./TreeViewDialogBody";
 
 /**
  * @typedef {Object} Settings
- * @property {boolean} [planTreeView]
- * @property {string|null} [promptId]
+ * @property {boolean} planTreeView
+ * @property {boolean} treeDialog
+ * @property {string|null} promptId
  */
 
 /**
@@ -19,9 +21,9 @@ import TreeViewBody from "./TreeViewBody";
  * @returns {HTMLDivElement}
  * @constructor
  */
-export default function TreeView({id, name, infoText, tree, history, params, settings, onMentalMapChange}, voiceResponse) {
+function TreeView({id, name, infoText, tree, history, params, settings, onMentalMapChange, itemClickHandler}, voiceResponse) {
 
-  const wrap = document.createElement('div')
+  const wrap = document.createElement('div');
   wrap.style.display = 'flex'
   wrap.style.height = '100%'
   wrap.style.overflow = 'hidden'
@@ -67,7 +69,7 @@ export default function TreeView({id, name, infoText, tree, history, params, set
     infoTextElement.style.fontSize = '24px';
     infoTextElement.style.lineHeight = '40px';
     infoTextElement.style.border = '1px #ddd solid';
-    infoTextElement.style.padding = '8px 0';
+    infoTextElement.style.padding = '12px';
     infoTextElement.style.borderRadius = '8px';
     infoTextElement.style.marginBottom = '8px';
     infoTextElement.style.textAlign = 'left';
@@ -79,24 +81,35 @@ export default function TreeView({id, name, infoText, tree, history, params, set
     container: 'body'
   })
 
-  const body = TreeViewBody(
-    tree,
-    voiceResponse,
-    history,
-    {...params, ...settings},
-    () => {
-      const elem = createFinishContent(async () => {
-        const response = await restartMentalMap(id)
-        if (response?.success) {
-          wrap.appendChild(body.restart())
-          elem.destroy()
-        }
-      })
-      wrap.appendChild(elem.getElement())
-    },
-    Boolean(settings.planTreeView),
-    settings.promptId
-  )
+  let body;
+  if (settings.treeDialog) {
+    body = TreeViewDialogBody({
+      tree,
+      voiceResponse,
+      history,
+      itemClickHandler
+    });
+  } else {
+    body = TreeViewBody(
+      tree,
+      voiceResponse,
+      history,
+      {...params, ...settings},
+      () => {
+        const elem = createFinishContent(async () => {
+          const response = await restartMentalMap(id)
+          if (response?.success) {
+            wrap.appendChild(body.restart())
+            elem.destroy()
+          }
+        })
+        wrap.appendChild(elem.getElement())
+      },
+      Boolean(settings.planTreeView),
+      settings.promptId
+    );
+  }
+
   wrap.appendChild(body.getElement())
 
   body.on('historyChange', args => {
@@ -130,6 +143,13 @@ export default function TreeView({id, name, infoText, tree, history, params, set
       }
     }
   }
+}
+
+TreeView.flatten = function (nodes, level = 0) {
+  return nodes.flatMap((node, index) => [
+    {...node, level, index, hasChildren: (node.children || []).length > 0},
+    ...TreeView.flatten(node.children || [], level + 1)
+  ]);
 }
 
 function createFinishContent(restartHandler) {
@@ -170,3 +190,5 @@ async function restartMentalMap(id) {
   }
   return await response.json()
 }
+
+export default TreeView;
