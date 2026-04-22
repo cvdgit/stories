@@ -3070,7 +3070,7 @@ function WikidsStoryTest(el, options) {
       && !testConfig.answerTypeIsMissingWords(currentQuestion);
 
     if (questionViewColumn(currentQuestion)) {
-      showCorrectAnswerPageCondition = testConfig.showCorrectResponse();
+      showCorrectAnswerPageCondition = testConfig.hideCorrectResponse();
     }
 
     if (isLastQuestion) {

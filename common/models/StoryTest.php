@@ -140,7 +140,7 @@ class StoryTest extends ActiveRecord
             'voice_response' => 'Ввод ответа голосом',
             'show_descr_in_questions' => 'Показывать описание в каждом вопросе',
             'schedule_id' => 'Расписание повторения',
-            'show_correct_response' => 'Показывать правильный ответ при неправильном (только для решения в столбик)',
+            'show_correct_response' => 'Скрывать правильный ответ при неправильном (только для решения в столбик)',
         ];
     }
 

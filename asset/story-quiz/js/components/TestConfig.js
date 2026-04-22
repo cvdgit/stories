@@ -73,8 +73,8 @@ const TestConfig = function (data) {
     showDescriptionInQuestions: () => data.showDescriptionInQuestions,
     answerTypeIsPassTest: (q) => parseInt(q['type']) === 8,
     answerTypeIsColumn: (q) => parseInt(q['type']) === 16,
-    showCorrectResponse() {
-      return Boolean(data.showCorrectResponse);
+    hideCorrectResponse() {
+      return Boolean(data.hideCorrectResponse);
     }
   }
 }

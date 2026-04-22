@@ -50,7 +50,7 @@ class Serializer
                     'sayCorrectAnswer' => filter_var($test->say_correct_answer, FILTER_VALIDATE_BOOLEAN),
                     'voiceResponse' => filter_var($test->voice_response, FILTER_VALIDATE_BOOLEAN),
                     'showDescriptionInQuestions' => filter_var($test->show_descr_in_questions, FILTER_VALIDATE_BOOLEAN),
-                    'showCorrectResponse' => filter_var($test->show_correct_response, FILTER_VALIDATE_BOOLEAN),
+                    'hideCorrectResponse' => filter_var($test->show_correct_response, FILTER_VALIDATE_BOOLEAN),
                 ],
                 'students' => $students,
                 'stories' => $stories,
