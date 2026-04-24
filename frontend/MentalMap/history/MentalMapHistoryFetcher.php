@@ -28,6 +28,7 @@ class MentalMapHistoryFetcher
             return [
                 'id' => $item['id'],
                 'all' => $all,
+                'allPrev' => (int) ($item['allPrev'] ?? 0),
                 'hiding' => isset($item['hiding']) ? (int) $item['hiding'] : 0,
                 'target' => isset($item['target']) ? (int) $item['target'] : 0,
                 'done' => MentalMap::fragmentIsDone($all, $threshold),
@@ -46,6 +47,7 @@ class MentalMapHistoryFetcher
             return [
                 'id' => $image['id'],
                 'all' => 0,
+                'allPrev' => 0,
                 'hiding' => 0,
                 'hidingPrev' => 0,
                 'target' => 0,
@@ -63,10 +65,17 @@ class MentalMapHistoryFetcher
             ->andWhere('t.overall_similarity >= IFNULL(t.threshold, 0)')
             ->andWhere(['<=', new Expression('t.created_at'), new Expression($today)]);
 
+        $allBeforeQuery = (new Query())
+            ->select(new Expression('MAX(t.overall_similarity)'))
+            ->from(['t' => 'mental_map_history'])
+            ->where('t.image_fragment_id = h.image_fragment_id')
+            ->andWhere(['<=', new Expression('t.created_at'), new Expression($today)]);
+
         $rows = (new Query())
             ->select([
                 'id' => 'h.image_fragment_id',
                 'all' => 'MAX(h.overall_similarity)',
+                'allPrev' => $allBeforeQuery,
                 'hiding' => 'MAX(h.text_hiding_percentage)',
                 'hidingPrev' => $hidingBeforeQuery,
                 'target' => 'MAX(h.text_target_percentage)',
@@ -84,6 +93,7 @@ class MentalMapHistoryFetcher
         return array_map(static function (array $item) use ($rows): array {
             if (isset($rows[$item['id']])) {
                 $item['all'] = (int) $rows[$item['id']]['all'];
+                $item['allPrev'] = (int) $rows[$item['id']]['allPrev'];
                 $item['hiding'] = (int) $rows[$item['id']]['hiding'];
                 $item['hidingPrev'] = (int) $rows[$item['id']]['hidingPrev'];
                 $item['target'] = (int) $rows[$item['id']]['target'];

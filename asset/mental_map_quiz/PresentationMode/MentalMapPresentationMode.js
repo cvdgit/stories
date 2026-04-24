@@ -1,7 +1,7 @@
 import './style.css';
 import MentalMapImage from "../components/MentalMapImage";
-import RecordingPanel from "./RecordingPanel";
-import {userResponseChecker} from "../lib/userResponseProcessChain";
+import PresentationItemHandler from "./PresentationItemHandler";
+import MapImageStatus from "../components/MapImageStatus";
 
 function createHideImagesButton(zoomWrap) {
   const hideBtn = document.createElement('button');
@@ -83,7 +83,14 @@ function MentalMapPresentationMode(container, {
   );
 
   let zoom;
-  let isRecording = false;
+
+  const presentationHandler = new PresentationItemHandler(
+    container,
+    voiceResponse,
+    {promptId, threshold},
+    saveUserHistoryHandler,
+    history
+  );
 
   const zoomWrap = MentalMapImage(
     mapUrl,
@@ -92,81 +99,9 @@ function MentalMapPresentationMode(container, {
     images,
     image => {
 
-      if (isRecording) {
-        return;
-      }
-
-      isRecording = true;
-
-      const recordingPanelElement = new RecordingPanel(
-        voiceResponse,
-        async userResponse => {
-
-          container.querySelectorAll(`[data-img-id]`).forEach(el => el._tippy.enable());
-
-          if (!userResponse) {
-            isRecording = false;
-            container.querySelector('.fragment-recording-wrap').remove();
-            return;
-          }
-
-          const response = await userResponseChecker(
-            image.text,
-            userResponse,
-            threshold,
-            promptId || image.promptId
-          );
-
-          const json = window.processOutputAsJson(response);
-
-          const val = Number(json.similarity_percentage);
-
-          let importantWordsPassed = true;
-          if (json.all_important_words_included !== undefined) {
-            importantWordsPassed = Boolean(json.all_important_words_included);
-          }
-
-          const done = val >= threshold && importantWordsPassed;
-
-          const historyItem = history.find(h => h.id === image.id);
-          if (historyItem) {
-            historyItem.done = done;
-            historyItem.all = Number(json.similarity_percentage);
-            historyItem.hiding = 100;
-            historyItem.target = 100;
-          }
-
-          saveUserHistoryHandler({
-            image_fragment_id: image.id,
-            overall_similarity: Number(json.similarity_percentage),
-            text_hiding_percentage: 100,
-            text_target_percentage: 100,
-            content: image.text,
-            user_response: userResponse,
-            api_response: JSON.stringify(json),
-            payload: json,
-            all_important_words_included: importantWordsPassed
-          });
-
-          if (done) {
-            const imgElem = zoomContainer.querySelector(`[data-img-id='${image.id}']`);
-            imgElem.classList.add('fragment-item-done');
-            if (image.makeTransparent) {
-              imgElem.classList.add('fragment-transparent');
-            }
-          }
-
-          isRecording = false;
-          container.querySelector('.fragment-recording-wrap').remove();
-        },
-        () => {
-          container.querySelectorAll(`[data-img-id]`).forEach(el => el._tippy.disable());
-        }
-      );
-
       container.querySelector('.zoom-container')
         .appendChild(
-          recordingPanelElement
+          presentationHandler.handle(image)
         );
     },
     [],
@@ -185,13 +120,13 @@ function MentalMapPresentationMode(container, {
           mapImgWrap.classList.add('fragment-transparent');
         }
 
-        /*mapImgWrap.appendChild(
+        mapImgWrap.appendChild(
           MapImageStatus.render({
-            hiding: historyItem.hiding,
+            hiding: historyItem.all,
             seconds: historyItem.seconds,
-            hidingPrev: historyItem.hidingPrev,
+            hidingPrev: historyItem.allPrev,
           })
-        );*/
+        );
       }
     },
     false

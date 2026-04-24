@@ -79,31 +79,33 @@ export default function MentalMapImage(
       mapImgWrap.setAttribute('title', '')*/
 
       const tip = document.createElement('div');
-      tip.style.fontSize = '2.4rem';
-      tip.style.lineHeight = '3rem';
+      tip.style.fontSize = '1.8rem';
+      tip.style.lineHeight = '2.4rem';
       tip.style.display = 'flex';
       tip.style.flexDirection = 'column';
-      tip.style.maxHeight = '300px'
       tip.style.overflowY = 'auto';
-      tip.innerHTML = `<div style="user-select: none">${image.text.replace(/<[^>]*>?/gm, '')}</div>`;
+      tip.innerHTML = `<div style="user-select: none; max-height: 200px; overflow-y: auto">${image.text.replace(/<[^>]*>?/gm, '')}</div>`;
 
       if (showPercentButtons) {
         tip.innerHTML += `<div class="hide-buttons-container">Скрыть текст:</div>`;
         buttons.map(({name, percentage}) => {
           const btn = document.createElement('button');
-          btn.classList.add('hide-words-btn', 'bs-tooltip');
-          btn.style.color = '#000';
+          btn.classList.add('hide-words-btn', 'bs-tooltip', 'btn-link');
+          btn.style.color = '#fff';
           btn.setAttribute('type', 'button');
           btn.innerHTML = name;
           btn.setAttribute('data-trigger', 'hover');
           btn.setAttribute('data-container', 'body');
           btn.setAttribute('title', `Скрыть текст на ${percentage}%`);
-          btn.addEventListener('click', e => imageClickHandler(image, {percentage}));
+          btn.addEventListener('click', e => {
+            tippyInstance.hide();
+            imageClickHandler(image, {percentage})
+          });
           tip.querySelector('.hide-buttons-container').appendChild(btn);
         });
       }
 
-      tippy(mapImgWrap, {
+      const tippyInstance = tippy(mapImgWrap, {
         content: tip,
         interactive: true,
         allowHTML: true,

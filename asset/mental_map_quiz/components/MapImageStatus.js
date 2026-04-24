@@ -62,6 +62,8 @@ MapImageStatus.render = function ({hiding, seconds, hidingPrev}) {
 MapImageStatus.update = function (container, {hiding, seconds, hidingPrev}) {
   const hidingElem = container.querySelector('.map-user-status-hiding');
   if (hidingElem) {
+    hidingElem.innerHTML = '';
+    hidingElem.setAttribute('data-value', '');
     const currentHiding = Number(hidingElem.getAttribute('data-value'));
     if (Number(hiding) > currentHiding) {
       hidingElem.setAttribute('data-value', hiding);
@@ -70,7 +72,8 @@ MapImageStatus.update = function (container, {hiding, seconds, hidingPrev}) {
   }
   const hidingAddElem = container.querySelector('.map-user-status-hiding-add');
   if (hidingAddElem) {
-    let hidingAddLabel = '';
+    hidingAddElem.innerHTML = '';
+      let hidingAddLabel = '';
     const hidingAdd = hiding - Number(hidingPrev);
     if (hidingAdd > 0) {
       hidingAddLabel = `+${hidingAdd}%`;
@@ -79,10 +82,11 @@ MapImageStatus.update = function (container, {hiding, seconds, hidingPrev}) {
   }
   const secondsElem = container.querySelector('.map-user-status-time');
   if (secondsElem) {
+    secondsElem.innerHTML = '';
+    secondsElem.setAttribute('data-value', '');
     const currentSeconds = Number(secondsElem.getAttribute('data-value'));
-    console.log(Number(seconds), currentSeconds, Number(seconds) > currentSeconds);
     if (Number(seconds) > currentSeconds) {
-      hidingElem.setAttribute('data-value', seconds);
+      secondsElem.setAttribute('data-value', seconds);
       secondsElem.innerHTML = formatTime(seconds);
     }
   }

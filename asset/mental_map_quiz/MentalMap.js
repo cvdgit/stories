@@ -14,14 +14,20 @@ import {calcHiddenTextPercent, calcTargetTextPercent, canRecording, createWordIt
 import DetailContent from "./content/DetailContent";
 import {processOutputAsJson, stripTags} from "./common";
 import FragmentResultQuestionsElement from "./content/FragmentResultQuestionsElement";
-import {diffRetelling, SimilarityChecker} from "./lib/calcSimilarity";
+import {diffRetelling} from "./lib/calcSimilarity";
 import MapImageStatus from "./components/MapImageStatus";
 import SecondTimer from "./components/SecondTimer";
 import MentalMapPresentationMode from "./PresentationMode";
 import FragmentState from "./FragmentState";
+import PresentationItemHandler from "./PresentationMode/PresentationItemHandler";
+import {showDialogHandler, hideDialogHandler} from "./itemClickHandlers/dialogHandlers";
+import startRecording from "./itemClickHandlers/startRecording";
+import createRetellingContent from "./itemClickHandlers/createRetellingContent";
+import startRetelling from "./itemClickHandlers/startRetelling";
+import saveUserResult from "./itemClickHandlers/saveUserResult";
 
 /**
- * @param element
+ * @param {HTMLElement} element
  * @param {Reveal|undefined} deck
  * @param params
  * @returns {{run: ((function(): Promise<void>)|*)}}
@@ -29,7 +35,7 @@ import FragmentState from "./FragmentState";
  */
 export default function MentalMap(element, deck, params, microphoneChecker) {
 
-  this.element = element
+  this.element = element;
   let texts = []
   let mentalMapHistory = []
   let mentalMapId
@@ -63,36 +69,6 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
   loader.innerHTML = `<div style="display: flex; flex-direction: row; gap: 20px; align-items: center">Загрузка ментальной карты... <img width="50" src="/img/loading.gif" alt="loading"></div>`
   this.element.appendChild(loader)
 
-  const blockTypes = ['text', 'image']
-
-  function showDialogHandler() {
-    if (!deck) {
-      return
-    }
-    deck.configure({keyboard: false});
-    $('.reveal .story-controls').hide();
-    blockTypes.map(blockType => {
-      $(deck.getCurrentSlide()).find(`div.sl-block[data-block-type=${blockType}]`).css('zIndex', '-1')
-    })
-  }
-
-  function hideDialogHandler() {
-    if (!deck) {
-      return
-    }
-    if ($(deck.getCurrentSlide()).find('.slide-hints-wrapper').length) {
-      return
-    }
-    if (voiceResponse.getStatus()) {
-      voiceResponse.stop();
-    }
-    deck.configure({keyboard: true})
-    $('.reveal .story-controls').show();
-    blockTypes.map(blockType => {
-      $(deck.getCurrentSlide()).find(`div.sl-block[data-block-type=${blockType}]`).css('zIndex', 'auto')
-    })
-  }
-
   function RecordingLangStore(defaultLang) {
     let lang = defaultLang
     return {
@@ -109,22 +85,6 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
   }
 
   const langStore = new RecordingLangStore('ru-RU')
-
-  async function saveUserResult(payload) {
-    const response = await fetch(`/mental-map/save`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'X-CSRF-Token': $('meta[name=csrf-token]').attr('content')
-      },
-      body: JSON.stringify(payload),
-    })
-    if (!response.ok) {
-      throw new Error(response.statusText)
-    }
-    return await response.json()
-  }
 
   async function finishRepetition(mentalMapId) {
     const response = await fetch(`/mental-map/finish`, {
@@ -144,7 +104,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
     return await response.json()
   }
 
-  function showMentalMapHandler(zoomWrap, closeMentalMapHandler, fastMode, fastModeChangeHandler) {
+  function showMentalMapHandler(zoomWrap, closeMentalMapHandler, fastMode, fastModeChangeHandler, presentationModeChangeHandler) {
     const zoomContainer = document.createElement('div')
     zoomContainer.classList.add('zoom-container')
 
@@ -175,15 +135,28 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         $(e.target).text('Скрыть')
       }
     })
-    zoomContainer.appendChild(hideBtn)
 
-    const fastWrapEl = document.createElement('div')
-    fastWrapEl.classList.add('mental-map-fast-wrap')
-    fastWrapEl.innerHTML = `<label>Быстрый режим<input type="checkbox" ${fastMode ? 'checked' : ''}></label>`
-    fastWrapEl.querySelector('input[type=checkbox]').addEventListener('click', fastModeChangeHandler)
-    zoomContainer.appendChild(fastWrapEl)
+    const fastWrapEl = document.createElement('div');
+    fastWrapEl.classList.add('mental-map-fast-wrap');
 
-    return zoomContainer
+    fastWrapEl.appendChild(closeBtn);
+    fastWrapEl.appendChild(hideBtn);
+
+    const fastBox = document.createElement('label');
+    fastBox.innerHTML = `Быстрый режим<input type="checkbox" ${fastMode ? 'checked' : ''}>`;
+    fastBox.querySelector('input[type=checkbox]')
+      .addEventListener('click', fastModeChangeHandler);
+    fastWrapEl.appendChild(fastBox);
+
+    const presentationBox = document.createElement('label');
+    presentationBox.innerHTML = `Режим презентации<input type="checkbox"></label>`;
+    presentationBox.querySelector('input[type=checkbox]')
+      .addEventListener('click', presentationModeChangeHandler);
+    fastWrapEl.appendChild(presentationBox);
+
+    zoomContainer.appendChild(fastWrapEl);
+
+    return zoomContainer;
   }
 
   function historyIsDone(history) {
@@ -263,10 +236,12 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
           timer.stop();
           const voiceLang = langStore.fromStore($(recordingWrap).find("#voice-lang option:selected").val())
           startRecording(
+            voiceResponse,
             recordingWrap.querySelector('#start-recording'),
             voiceLang,
             stripTags(text.text),
-            false
+            false,
+            threshold
           );
         }
         recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
@@ -302,10 +277,12 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         timer.stop();
         const voiceLang = langStore.fromStore($(recordingWrap).find("#voice-lang option:selected").val());
         startRecording(
+          voiceResponse,
           recordingWrap.querySelector('#start-recording'),
           voiceLang,
           stripTags(text.text),
-          false
+          false,
+          threshold
         );
       },
       onWordsChanged: (args) => {
@@ -318,7 +295,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
     })
     const dialog = new InnerDialog($(container), {title: 'Перескажите текст', content: detailContainer});
     dialog.show(wrapper => {
-      showDialogHandler()
+      showDialogHandler(deck);
 
       $(wrapper).on('paste', (e) => {
         e.preventDefault()
@@ -351,6 +328,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
 
         const voiceLang = langStore.fromStore($(wrapper).find("#voice-lang option:selected").val());
         startRecording(
+          voiceResponse,
           e.target,
           voiceLang,
           stripTags(text.text),
@@ -498,7 +476,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
     })
     const dialog = new InnerDialog($(container), {title: 'Перескажите текст отвечая на вопросы', content: detailContainer});
     dialog.show(wrapper => {
-      showDialogHandler()
+      showDialogHandler(deck);
 
       $(wrapper).on('paste', (e) => {
         e.preventDefault()
@@ -526,6 +504,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
 
         const voiceLang = langStore.fromStore($(wrapper).find("#voice-lang option:selected").val());
         startRecording(
+          voiceResponse,
           e.target,
           voiceLang,
           stripTags(image.text),
@@ -816,6 +795,29 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
       fastMode = e.target.checked;
     }
 
+    let presentationMode = false;
+    const presentationModeChangeHandler = ({target}) => {
+      presentationMode = target.checked;
+      const elements = this.element.querySelectorAll('.zoom-wrap [data-img-id]');
+      elements.forEach(elem => {
+        const elemId = elem.dataset.imgId;
+        const historyItem = history.find(h => h.id === elemId);
+        if (presentationMode) {
+          MapImageStatus.update(elem.querySelector('.map-user-status'), {
+            hiding: historyItem.all,
+            seconds: historyItem.seconds,
+            hidingPrev: historyItem.allPrev,
+          });
+          return;
+        }
+        MapImageStatus.update(elem.querySelector('.map-user-status'), {
+          hiding: historyItem.hiding,
+          seconds: historyItem.seconds,
+          hidingPrev: historyItem.hidingPrev,
+        });
+      });
+    }
+
     texts = json.map.images.map(image => createWordItem(image.text, image.id));
 
     const imageFirst = Boolean(json.settings?.imageFirst);
@@ -857,7 +859,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
               }
             }
 
-            if (historyIsDone(history)) {
+            /*if (historyIsDone(history)) {
               const content = createFinishContent(
                 history,
                 texts,
@@ -868,7 +870,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
               if (imageFirst) {
                 element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
               }
-            }
+            }*/
           })
         },
         history
@@ -878,7 +880,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         container: 'body'
       });
 
-      if (historyIsDone(history)) {
+      /*if (historyIsDone(history)) {
         const content = createFinishContent(
           history,
           texts,
@@ -889,7 +891,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         if (imageFirst) {
           element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
         }
-      }
+      }*/
 
       return;
     }
@@ -915,7 +917,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
     }
 
     function fragmentDialogHideHandler(image, historyItem) {
-      hideDialogHandler()
+      hideDialogHandler(deck, voiceResponse);
 
       if (voiceResponse.getStatus()) {
         voiceResponse.stop()
@@ -980,7 +982,47 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
     const mentalMapBtn = document.createElement('button')
     mentalMapBtn.classList.add('btn', 'btn-small', 'mental-map-btn')
     mentalMapBtn.textContent = 'Ментальная карта'
-    let zoom
+    let zoom;
+
+    const presentationHandler = new PresentationItemHandler(
+      this.element,
+      new VoiceResponse(new MissingWordsRecognition({
+        getRecordingLang() {
+          return (json.settings || {}).recognitionLang || 'ru-RU';
+        }
+      })),
+      {promptId: settings?.promptId, threshold},
+      (payload) => {
+        return saveUserResult({
+          ...saveHistoryParams,
+          ...payload
+        }).then(response => {
+          if (response.success) {
+            if (deck) {
+              if (deck.hasPlugin('stat')) {
+                const statPlugin = deck.getPlugin('stat');
+                statPlugin.sendStat({slideId: params.slide_id});
+              }
+            }
+          }
+
+          if (historyIsDone(history)) {
+            const content = createFinishContent(
+              history,
+              texts,
+              mapQuestions.typeIsMentalMapQuestions(),
+              () => restartHandler(mentalMapId)
+            );
+            $(this.element).append(content)
+            if (imageFirst) {
+              element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
+            }
+          }
+        })
+      },
+      history
+    );
+
     mentalMapBtn.addEventListener('click', (e) => {
 
       const zoomWrap = MentalMapImage(
@@ -991,9 +1033,16 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         (image, detailParams) => {
           element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
 
-          const historyItem = history.find(h => h.id === image.id)
-          const questionItem = mapQuestions.findQuestion(image.id)
+          const historyItem = history.find(h => h.id === image.id);
+          if (presentationMode) {
+            this.element.querySelector('.zoom-container')
+              .appendChild(
+                presentationHandler.handle(image)
+              );
+            return;
+          }
 
+          const questionItem = mapQuestions.findQuestion(image.id)
           if (mapQuestions.typeIsMentalMapQuestions()) {
             mapImageClickHandlerQuestions({
               image,
@@ -1037,9 +1086,9 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
                   imgElem.classList.add('fragment-transparent')
                 }
                 MapImageStatus.update(imgElem.querySelector('.map-user-status'), {
-                  hiding: historyItem.hiding,
+                  hiding: presentationMode ? historyItem.all : historyItem.hiding,
                   seconds: historyItem.seconds,
-                  hidingPrev: historyItem.hidingPrev,
+                  hidingPrev: presentationMode ? historyItem.allPrev : historyItem.hidingPrev,
                 });
               }
               fragmentDialogHideHandler(image, historyItem)
@@ -1057,6 +1106,15 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
           if (!historyItem) {
             return;
           }
+
+          mapImgWrap.appendChild(
+            MapImageStatus.render({
+              hiding: presentationMode ? historyItem.all : historyItem.hiding,
+              seconds: historyItem.seconds,
+              hidingPrev: presentationMode ? historyItem.allPrev : historyItem.hidingPrev,
+            })
+          );
+
           if (!historyItem.done) {
             return;
           }
@@ -1064,21 +1122,20 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
           if (makeTransparent) {
             mapImgWrap.classList.add('fragment-transparent');
           }
-          mapImgWrap.appendChild(
-            MapImageStatus.render({
-              hiding: historyItem.hiding,
-              seconds: historyItem.seconds,
-              hidingPrev: historyItem.hidingPrev,
-            })
-          );
         }
-      )
+      );
 
-      const zoomContainer = showMentalMapHandler(zoomWrap, () => {
-        zoom.destroy()
-        zoomContainer.remove()
-        element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
-      }, fastMode, fastModeChangeHandler)
+      const zoomContainer = showMentalMapHandler(
+        zoomWrap,
+        () => {
+          zoom.destroy()
+          zoomContainer.remove()
+          element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
+        },
+        fastMode,
+        fastModeChangeHandler,
+        presentationModeChangeHandler
+      );
 
       this.element.appendChild(zoomContainer)
 
@@ -1115,9 +1172,16 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
 
           element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
 
-          const historyItem = history.find(h => h.id === image.id)
-          const questionItem = mapQuestions.findQuestion(image.id)
+          const historyItem = history.find(h => h.id === image.id);
+          if (presentationMode) {
+            this.element.querySelector('.zoom-container')
+              .appendChild(
+                presentationHandler.handle(image)
+              );
+            return;
+          }
 
+          const questionItem = mapQuestions.findQuestion(image.id)
           if (mapQuestions.typeIsMentalMapQuestions()) {
             mapImageClickHandlerQuestions({
               image,
@@ -1161,9 +1225,9 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
                   imgElem.classList.add('fragment-transparent')
                 }
                 MapImageStatus.update(imgElem.querySelector('.map-user-status'), {
-                  hiding: historyItem.hiding,
+                  hiding: presentationMode ? historyItem.all : historyItem.hiding,
                   seconds: historyItem.seconds,
-                  hidingPrev: historyItem.hidingPrev,
+                  hidingPrev: presentationMode ? historyItem.allPrev : historyItem.hidingPrev,
                 });
               }
               fragmentDialogHideHandler(image, historyItem)
@@ -1181,6 +1245,15 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
           if (!historyItem) {
             return;
           }
+
+          mapImgWrap.appendChild(
+            MapImageStatus.render({
+              hiding: presentationMode ? historyItem.all : historyItem.hiding,
+              seconds: historyItem.seconds,
+              hidingPrev: presentationMode ? historyItem.allPrev : historyItem.hidingPrev,
+            })
+          );
+
           if (!historyItem.done) {
             return;
           }
@@ -1188,22 +1261,22 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
           if (makeTransparent) {
             mapImgWrap.classList.add('fragment-transparent');
           }
-          mapImgWrap.appendChild(
-            MapImageStatus.render({
-              hiding: historyItem.hiding,
-              seconds: historyItem.seconds,
-              hidingPrev: historyItem.hidingPrev,
-            })
-          );
         }
-      )
-      const zoomContainer = showMentalMapHandler(zoomWrap, () => {
-        zoom.destroy()
-        zoomContainer.remove()
-        element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
-      }, fastMode, fastModeChangeHandler)
+      );
+
+      const zoomContainer = showMentalMapHandler(
+        zoomWrap,
+        () => {
+          zoom.destroy()
+          zoomContainer.remove()
+          element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
+        },
+        fastMode,
+        fastModeChangeHandler,
+        presentationModeChangeHandler
+      );
+
       this.element.appendChild(zoomContainer)
-      //$('.mental-map-img').popover()
 
       zoom = initPanZoom(zoomWrap, json.map.width, json.map.height)
       element.parentElement.addEventListener('wheel', zoom.zoomWithWheel)
@@ -1216,101 +1289,6 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
       }
     }
-  }
-
-  /**
-   * @param {HTMLElement} element
-   * @param {string} lang
-   * @param text
-   * @param {boolean} makeRewrite
-   * @param {int} threshold
-   * @param {function(): void} stopHandler
-   */
-  function startRecording(element, lang, text, makeRewrite, threshold, stopHandler) {
-    const state = element.dataset.state
-    if (!state) {
-      $(document.getElementById("start-retelling-wrap")).hide()
-      setTimeout(function () {
-        voiceResponse.start(new Event('voiceResponseStart'), lang, function () {
-          element.dataset.state = 'recording'
-          element.classList.add('recording')
-
-          const ring = document.createElement('div')
-          ring.classList.add('pulse-ring')
-          element.parentNode.insertBefore(ring, element)
-        });
-      }, 500);
-    } else {
-      voiceResponse.stop(function (args) {
-
-        element.parentNode.querySelector('.pulse-ring')?.remove();
-        element.classList.remove('recording')
-        delete element.dataset.state
-
-        const $resultSpan = $(document.getElementById("result_span"))
-        const $finalSpan = $(document.getElementById("final_span"))
-
-        if ($finalSpan.text().trim().length) {
-          $resultSpan.text(
-            $resultSpan.text().trim().length
-              ? $resultSpan.text().trim() + "\n" + $finalSpan.text().trim()
-              : $finalSpan.text().trim()
-          )
-          $finalSpan.empty()
-        }
-
-        if ($resultSpan.text().trim().length) {
-          $(document.getElementById("start-retelling-wrap")).show()
-        }
-
-        const userResponse = $resultSpan.text().trim()
-        if (userResponse.length && makeRewrite) {
-
-          const similarityChecker = new SimilarityChecker(threshold)
-          if (similarityChecker.check(text, userResponse)) {
-            if (typeof stopHandler === 'function') {
-              stopHandler()
-            }
-            return
-          }
-
-          const content = createRewriteContent(() => {})
-          $(element).parents('.mental-map-detail-container').append(content)
-          sendMessage(
-            `/admin/index.php?r=gpt/stream/retelling-rewrite`,
-            {
-              userResponse,
-              slideTexts: text
-            },
-            (message) => {
-              $resultSpan.text(message)
-            },
-            () => {
-              content.remove()
-            },
-            () => {
-              content.remove()
-              if (typeof stopHandler === 'function') {
-                stopHandler()
-              }
-            }
-          )
-        }
-      })
-    }
-  }
-
-  function createRewriteContent(hideCallback) {
-    const wrap = document.createElement('div')
-    wrap.classList.add('retelling-wrap')
-    wrap.style.backgroundColor = 'transparent'
-    wrap.style.padding = '0'
-    wrap.innerHTML = `
-      <div style="display: flex; align-items: center; justify-content: center; height: 100%; background-color: rgba(255, 255, 255, 0.4); backdrop-filter: blur(4px);">
-        <img src="/img/loading.gif" style="width: 100px" />
-      </div>
-    `
-    return wrap
   }
 
   function createFinishRepetitionContent() {
@@ -1378,26 +1356,6 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
     return elem
   }
 
-  function createRetellingContent(hideCallback) {
-    const wrap = document.createElement('div')
-    wrap.classList.add('retelling-wrap')
-    wrap.innerHTML = `
-        <div contenteditable="plaintext-only" id="retelling-response"
-             style="font-size: 2.2rem; text-align: left; line-height: 3rem; overflow-y: scroll; height: 100%; max-height: 100%;"></div>
-        <div style="display: flex; margin-top: 10px; flex-direction: row; align-items: center; justify-content: center">
-            <img id="voice-loader" height="50px" src="/img/loading.gif" alt="">
-            <button style="display: none" id="voice-finish" type="button" class="btn">OK</button>
-        </div>
-    `
-    wrap.querySelector('#voice-finish').addEventListener('click', () => {
-      wrap.remove()
-      if (typeof hideCallback === 'function') {
-        hideCallback()
-      }
-    })
-    return wrap
-  }
-
   function createDiffContent({text, userResponse}) {
     const wrap = document.createElement('div')
     wrap.classList.add('retelling-wrap')
@@ -1453,43 +1411,6 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         wrap.remove()
       }
     }
-  }
-
-  async function startRetelling(userResponse, targetText, threshold, promptId) {
-
-    const onMessage = message => {
-      const el = document.getElementById("retelling-response")
-      $(el).show()
-      el.innerText = message
-      el.scrollTop = el.scrollHeight
-    }
-
-    const onError = message => {
-      const el = document.getElementById("retelling-response")
-      $(el).show()
-      el.innerText = message
-      $(document.getElementById('voice-loader')).hide()
-      $(document.getElementById('voice-finish')).show()
-    }
-    const onEnd = () => {
-      $(document.getElementById('voice-loader')).hide()
-      $(document.getElementById('voice-finish')).show()
-    }
-
-    const similarityChecker = new SimilarityChecker(threshold)
-    if (similarityChecker.check(targetText, userResponse)) {
-      onMessage(`{"overall_similarity": ${similarityChecker.getSimilarityPercentage()}}`)
-      onEnd()
-      return new Promise((resolve, reject) => {
-        resolve({})
-      })
-    }
-
-    return await sendMessage(`/admin/index.php?r=gpt/stream/retelling`, {
-      userResponse,
-      slideTexts: targetText,
-      promptId
-    }, onMessage, onError, onEnd)
   }
 
   async function sendMessage(url, payload, onMessage, onError, onEnd) {

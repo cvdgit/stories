@@ -6,6 +6,7 @@ namespace frontend\MentalMap\history;
 
 use DateTimeImmutable;
 use DateTimeZone;
+use Exception;
 use frontend\MentalMap\MentalMap;
 use yii\db\Expression;
 use yii\db\Query;
@@ -27,6 +28,7 @@ class MentalMapTreeHistoryFetcher
             return [
                 'id' => $item['id'],
                 'all' => $item['all'] ?? 0,
+                'allPrev' => $item['allPrev'],
                 'hiding' => isset($item['hiding']) ? (int) $item['hiding'] : 0,
                 'target' => isset($item['target']) ? (int) $item['target'] : 0,
                 'done' => $item['done'] ?? false,
@@ -36,6 +38,9 @@ class MentalMapTreeHistoryFetcher
         }, $list);
     }
 
+    /**
+     * @throws Exception
+     */
     private function createMentalMapTreeHistory(
         array $nodeList,
         string $mentalMapId,
@@ -47,6 +52,7 @@ class MentalMapTreeHistoryFetcher
                 'id' => $node['id'],
                 'done' => false,
                 'all' => 0,
+                'allPrev' => 0,
                 'hiding' => 0,
                 'hidingPrev' => 0,
                 'target' => 0,
@@ -80,10 +86,17 @@ class MentalMapTreeHistoryFetcher
             ->andWhere('t.overall_similarity >= IFNULL(t.threshold, 0)')
             ->andWhere(['<=', new Expression('t.created_at'), new Expression($today)]);
 
+        $allBeforeQuery = (new Query())
+            ->select(new Expression('MAX(t.overall_similarity)'))
+            ->from(['t' => 'mental_map_history'])
+            ->where('t.image_fragment_id = h.image_fragment_id')
+            ->andWhere(['<=', new Expression('t.created_at'), new Expression($today)]);
+
         $historyRows = (new Query())
             ->select([
                 'id' => 'h.image_fragment_id',
                 'all' => 'h.overall_similarity',
+                'allPrev' => $allBeforeQuery,
                 'hiding' => 'h.text_hiding_percentage',
                 'hidingPrev' => $hidingBeforeQuery,
                 'target' => 'h.text_target_percentage',
@@ -116,6 +129,7 @@ class MentalMapTreeHistoryFetcher
                 $all = isset($row['all']) ? (int) $row['all'] : 0;
                 $item['done'] = $row['done'];
                 $item['all'] = $all;
+                $item['allPrev'] = (int) ($row['allPrev'] ?? 0);
                 $item['hidingPrev'] = (int) $rows[$item['id']]['hidingPrev'];
                 $item['seconds'] = (int) $rows[$item['id']]['seconds'];
                 $item['hiding'] = isset($row['hiding']) ? (int) $row['hiding'] : 0;
