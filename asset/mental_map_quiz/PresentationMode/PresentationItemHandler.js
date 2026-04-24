@@ -48,15 +48,15 @@ function PresentationItemHandler(container, voiceResponse, {threshold, promptId}
           if (historyItem) {
             historyItem.done = done;
             historyItem.all = Number(json.similarity_percentage);
-            historyItem.hiding = 100;
-            historyItem.target = 100;
+            historyItem.hiding = 0;
+            historyItem.target = 0;
           }
 
           saveUserHistoryHandler({
             image_fragment_id: image.id,
             overall_similarity: Number(json.similarity_percentage),
-            text_hiding_percentage: 100,
-            text_target_percentage: 100,
+            text_hiding_percentage: 0,
+            text_target_percentage: 0,
             content: image.text,
             user_response: userResponse,
             api_response: JSON.stringify(json),
