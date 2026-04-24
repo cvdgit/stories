@@ -18,7 +18,7 @@ function PresentationItemHandler(container, voiceResponse, {threshold, promptId}
         voiceResponse,
         async userResponse => {
 
-          container.querySelectorAll(`[data-img-id]`).forEach(el => el._tippy.enable());
+          container.querySelectorAll(`[data-img-id]`).forEach(el => el._tippy && el._tippy.enable());
 
           if (!userResponse) {
             isRecording = false;
@@ -76,7 +76,7 @@ function PresentationItemHandler(container, voiceResponse, {threshold, promptId}
           container.querySelector('.fragment-recording-wrap').remove();
         },
         () => {
-          container.querySelectorAll(`[data-img-id]`).forEach(el => el._tippy.disable());
+          container.querySelectorAll(`[data-img-id]`).forEach(el => el._tippy && el._tippy.disable());
         }
       );
     }
