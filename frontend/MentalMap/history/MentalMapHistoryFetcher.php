@@ -62,6 +62,7 @@ class MentalMapHistoryFetcher
             ->select(new Expression('MAX(t.text_hiding_percentage)'))
             ->from(['t' => 'mental_map_history'])
             ->where('t.image_fragment_id = h.image_fragment_id')
+            ->andWhere('t.user_id = h.user_id')
             ->andWhere('t.overall_similarity >= IFNULL(t.threshold, 0)')
             ->andWhere(['<=', new Expression('t.created_at'), new Expression($today)]);
 
@@ -69,6 +70,7 @@ class MentalMapHistoryFetcher
             ->select(new Expression('MAX(t.overall_similarity)'))
             ->from(['t' => 'mental_map_history'])
             ->where('t.image_fragment_id = h.image_fragment_id')
+            ->andWhere('t.user_id = h.user_id')
             ->andWhere(['<=', new Expression('t.created_at'), new Expression($today)]);
 
         $rows = (new Query())
