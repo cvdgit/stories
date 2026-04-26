@@ -109,7 +109,7 @@ class MentalMapTreeHistoryFetcher
                 'h.user_id' => $userId,
             ])
             ->andWhere("h.overall_similarity >= IFNULL(h.threshold, $threshold)")
-            ->orderBy(['all' => SORT_DESC])
+            ->orderBy(['hiding' => SORT_DESC])
             ->all();
 
         $historyRowsByFragmentId = [];
