@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace frontend\controllers;
 
 use common\components\MentalMapThreshold;
+use common\helpers\SmartDate;
 use common\models\User;
 use common\models\UserStudent;
 use common\rbac\UserRoles;
@@ -454,5 +455,41 @@ class MentalMapController extends Controller
             Yii::$app->errorHandler->logException($exception);
             return ['success' => false, 'message' => 'Reset history error'];
         }
+    }
+
+    public function actionItemLog(string $id, Response $response, WebUser $user): array
+    {
+        $response->format = Response::FORMAT_JSON;
+
+        if (!Uuid::isValid($id)) {
+            return [];
+        }
+
+        $rows = (new Query())
+            ->select([
+                'all' => 'h.overall_similarity',
+                // 'allPrev' => $allBeforeQuery,
+                'hiding' => 'h.text_hiding_percentage',
+                // 'hidingPrev' => $hidingBeforeQuery,
+                'target' => 'h.text_target_percentage',
+                'all_words' => 'h.all_important_words_included',
+                'seconds' => 'h.seconds',
+                'threshold' => 'h.threshold',
+                'date' => 'h.created_at',
+                'payload' => 'h.payload',
+            ])
+            ->from(['h' => 'mental_map_history'])
+            ->where([
+                'h.image_fragment_id' => $id,
+                'h.user_id' => $user->getId(),
+            ])
+            ->orderBy(['h.created_at' => SORT_DESC])
+            ->all();
+
+        return array_map(static function(array $row) {
+            $row['payload'] = Json::decode($row['payload']);
+            $row['date'] = SmartDate::dateSmart($row['date'], true);
+            return $row;
+        }, $rows);
     }
 }

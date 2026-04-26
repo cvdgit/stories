@@ -11,3 +11,7 @@
 .tree-dialog-body .node-row-fail .retelling-failed {
   opacity: 1;
 }
+
+.tree-dialog-body .map-user-status {
+  pointer-events: all;
+}

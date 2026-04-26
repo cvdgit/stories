@@ -42,6 +42,10 @@ function flatten(nodes, level = 0) {
   ])
 }
 
+async function getHistoryLog(id) {
+  return await window.Api.get(`/mental-map/item-log?id=${id}`);
+}
+
 export default function TreeViewDialogBody({tree, voiceResponse, history, itemClickHandler, params, onEndHandler, isPlanTreeView, settingsPromptId}) {
 
   function init() {
@@ -83,6 +87,13 @@ export default function TreeViewDialogBody({tree, voiceResponse, history, itemCl
           row.querySelector('.node-title').addEventListener('click', e => {
             itemClickHandler({id: node.id, description: node.description});
           });
+
+          const stat = row.querySelector('.map-user-status-hiding');
+          if (stat) {
+            stat.addEventListener('click', async () => {
+              console.log(await getHistoryLog(node.id));
+            });
+          }
 
           body.appendChild(row);
         }
