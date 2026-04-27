@@ -22,6 +22,7 @@ class MentalMapHistoryForm extends Model
     public $payload;
     public $location;
     public $seconds;
+    public $all_hiding_percentage;
 
     public function rules(): array
     {
@@ -34,6 +35,7 @@ class MentalMapHistoryForm extends Model
                     'overall_similarity',
                     'text_hiding_percentage',
                     'text_target_percentage',
+                    'all_hiding_percentage',
                     'slide_id',
                     'threshold',
                     'seconds',

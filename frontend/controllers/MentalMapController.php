@@ -218,6 +218,7 @@ class MentalMapController extends Controller
                     'payload' => $form->payload,
                     'location' => $form->location,
                     'seconds' => $form->seconds,
+                    'all_hiding_percentage' => $form->all_hiding_percentage,
                 ]);
                 $command->execute();
 
@@ -262,7 +263,7 @@ class MentalMapController extends Controller
                 $fragmentHistory = ArrayHelper::array_find($history, static function (array $item) use ($form) {
                     return $item['id'] === $form->image_fragment_id;
                 });
-                
+
                 if (!$form->repetition_mode) {
                     if (MentalMap::isDone($history, $threshold)) {
                         $currentUser = User::findOne($user->getId());

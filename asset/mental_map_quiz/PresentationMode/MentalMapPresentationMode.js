@@ -122,9 +122,9 @@ function MentalMapPresentationMode(container, {
 
         mapImgWrap.appendChild(
           MapImageStatus.render({
-            hiding: historyItem.all,
+            hiding: historyItem.allTextClosed,
             seconds: historyItem.seconds,
-            hidingPrev: historyItem.allPrev,
+            hidingPrev: historyItem.allTextClosedPrev,
           })
         );
       }

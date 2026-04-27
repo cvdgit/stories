@@ -13,6 +13,9 @@ use yii\db\Query;
 
 class MentalMapHistoryFetcher
 {
+    /**
+     * @throws Exception
+     */
     public function fetch(
         array $fragments,
         string $mentalMapId,
@@ -28,7 +31,8 @@ class MentalMapHistoryFetcher
             return [
                 'id' => $item['id'],
                 'all' => $all,
-                'allPrev' => (int) ($item['allPrev'] ?? 0),
+                'allTextClosed' => (int) ($item['allTextClosed'] ?? 0),
+                'allTextClosedPrev' => (int) ($item['allTextClosedPrev'] ?? 0),
                 'hiding' => isset($item['hiding']) ? (int) $item['hiding'] : 0,
                 'target' => isset($item['target']) ? (int) $item['target'] : 0,
                 'done' => MentalMap::fragmentIsDone($all, $threshold),
@@ -47,7 +51,8 @@ class MentalMapHistoryFetcher
             return [
                 'id' => $image['id'],
                 'all' => 0,
-                'allPrev' => 0,
+                'allTextClosed' => 0,
+                'allTextClosedPrev' => 0,
                 'hiding' => 0,
                 'hidingPrev' => 0,
                 'target' => 0,
@@ -58,6 +63,7 @@ class MentalMapHistoryFetcher
         $today = (new DateTimeImmutable('now', new DateTimeZone('Europe/Moscow')))
                 ->setTime(0, 0)
                 ->format('U') . ' + (3 * 60 * 60)';
+
         $hidingBeforeQuery = (new Query())
             ->select(new Expression('MAX(t.text_hiding_percentage)'))
             ->from(['t' => 'mental_map_history'])
@@ -67,7 +73,7 @@ class MentalMapHistoryFetcher
             ->andWhere(['<=', new Expression('t.created_at'), new Expression($today)]);
 
         $allBeforeQuery = (new Query())
-            ->select(new Expression('MAX(t.overall_similarity)'))
+            ->select(new Expression('MAX(t.all_hiding_percentage)'))
             ->from(['t' => 'mental_map_history'])
             ->where('t.image_fragment_id = h.image_fragment_id')
             ->andWhere('t.user_id = h.user_id')
@@ -77,7 +83,8 @@ class MentalMapHistoryFetcher
             ->select([
                 'id' => 'h.image_fragment_id',
                 'all' => 'MAX(h.overall_similarity)',
-                'allPrev' => $allBeforeQuery,
+                'allTextClosed' => 'MAX(h.all_hiding_percentage)',
+                'allTextClosedPrev' => $allBeforeQuery,
                 'hiding' => 'MAX(h.text_hiding_percentage)',
                 'hidingPrev' => $hidingBeforeQuery,
                 'target' => 'MAX(h.text_target_percentage)',
@@ -95,7 +102,8 @@ class MentalMapHistoryFetcher
         return array_map(static function (array $item) use ($rows): array {
             if (isset($rows[$item['id']])) {
                 $item['all'] = (int) $rows[$item['id']]['all'];
-                $item['allPrev'] = (int) $rows[$item['id']]['allPrev'];
+                $item['allTextClosed'] = (int) $rows[$item['id']]['allTextClosed'];
+                $item['allTextClosedPrev'] = (int) $rows[$item['id']]['allTextClosedPrev'];
                 $item['hiding'] = (int) $rows[$item['id']]['hiding'];
                 $item['hidingPrev'] = (int) $rows[$item['id']]['hidingPrev'];
                 $item['target'] = (int) $rows[$item['id']]['target'];

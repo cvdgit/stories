@@ -48,11 +48,12 @@ function PresentationItemHandler(container, voiceResponse, {threshold, promptId}
           if (historyItem) {
             historyItem.done = done;
             historyItem.all = Number(json.similarity_percentage);
+            historyItem.allTextClosed = Number(json.similarity_percentage);
             historyItem.hiding = 0;
             historyItem.target = 0;
           }
 
-          saveUserHistoryHandler({
+          const historyResponse = await saveUserHistoryHandler({
             image_fragment_id: image.id,
             overall_similarity: Number(json.similarity_percentage),
             text_hiding_percentage: 0,
@@ -61,8 +62,18 @@ function PresentationItemHandler(container, voiceResponse, {threshold, promptId}
             user_response: userResponse,
             api_response: JSON.stringify(json),
             payload: json,
-            all_important_words_included: importantWordsPassed
+            all_important_words_included: importantWordsPassed,
+            all_hiding_percentage: Number(json.similarity_percentage),
           });
+
+          const {history: responseHistoryItem} = historyResponse;
+          historyItem.all = responseHistoryItem.all;
+          historyItem.hiding = responseHistoryItem.hiding;
+          historyItem.target = responseHistoryItem.target;
+          historyItem.done = responseHistoryItem.done;
+          historyItem.seconds = responseHistoryItem.seconds;
+          historyItem.allTextClosed = responseHistoryItem.allTextClosed;
+          historyItem.allTextClosedPrev = responseHistoryItem.allTextClosedPrev;
 
           if (done) {
             const imgElem = container.querySelector(`.zoom-container [data-img-id='${image.id}']`);

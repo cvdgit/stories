@@ -789,9 +789,9 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         const historyItem = history.find(h => h.id === elemId);
         if (presentationMode) {
           MapImageStatus.update(elem.querySelector('.map-user-status'), {
-            hiding: historyItem.all,
+            hiding: historyItem.allTextClosed,
             seconds: historyItem.seconds,
-            hidingPrev: historyItem.allPrev,
+            hidingPrev: historyItem.allTextClosedPrev,
           });
           return;
         }
@@ -977,8 +977,8 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         }
       })),
       {promptId: settings?.promptId, threshold},
-      (payload) => {
-        return saveUserResult({
+      async (payload) => {
+        return await saveUserResult({
           ...saveHistoryParams,
           ...payload
         }).then(response => {
@@ -991,7 +991,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
             }
           }
 
-          if (historyIsDone(history)) {
+          /*if (historyIsDone(history)) {
             const content = createFinishContent(
               history,
               texts,
@@ -1002,7 +1002,8 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
             if (imageFirst) {
               element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
             }
-          }
+          }*/
+          return response;
         })
       },
       history
