@@ -20,6 +20,7 @@ use frontend\MentalMap\repetition\MentalMapFinishForm;
 use frontend\MentalMap\repetition\MentalMapFinishHandler;
 use frontend\MentalMap\repetition\StartMentalMapRepetitionCommand;
 use frontend\MentalMap\repetition\StartMentalMapRepetitionHandler;
+use modules\edu\components\ArrayHelper;
 use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\db\Query;
@@ -220,7 +221,7 @@ class MentalMapController extends Controller
                 ]);
                 $command->execute();
 
-                $query = (new Query())
+                /*$query = (new Query())
                     ->select([
                         'id' => 'h.image_fragment_id',
                         'all' => 'h.overall_similarity',
@@ -237,27 +238,32 @@ class MentalMapController extends Controller
                     ])
                     ->orderBy(['h.created_at' => SORT_DESC])
                     ->limit(1);
-                $fragmentHistory = $query->one();
+                $fragmentHistory = $query->one();*/
 
                 $threshold = MentalMapThreshold::getThreshold(Yii::$app->params, $mentalMap->payload);
                 $userProgress = 0;
 
+                if ($mentalMap->isMentalMapAsTree()) {
+                    $history = (new MentalMapTreeHistoryFetcher())->fetch(
+                        $mentalMap->uuid,
+                        $user->getId(),
+                        $mentalMap->getTreeData(),
+                        $threshold,
+                    );
+                } else {
+                    $history = (new MentalMapHistoryFetcher())->fetch(
+                        $mentalMap->getImages(),
+                        $mentalMap->uuid,
+                        $user->getId(),
+                        $threshold,
+                    );
+                }
+
+                $fragmentHistory = ArrayHelper::array_find($history, static function (array $item) use ($form) {
+                    return $item['id'] === $form->image_fragment_id;
+                });
+                
                 if (!$form->repetition_mode) {
-                    if ($mentalMap->isMentalMapAsTree()) {
-                        $history = (new MentalMapTreeHistoryFetcher())->fetch(
-                            $mentalMap->uuid,
-                            $user->getId(),
-                            $mentalMap->getTreeData(),
-                            $threshold,
-                        );
-                    } else {
-                        $history = (new MentalMapHistoryFetcher())->fetch(
-                            $mentalMap->getImages(),
-                            $mentalMap->uuid,
-                            $user->getId(),
-                            $threshold,
-                        );
-                    }
                     if (MentalMap::isDone($history, $threshold)) {
                         $currentUser = User::findOne($user->getId());
                         if ($currentUser !== null) {
