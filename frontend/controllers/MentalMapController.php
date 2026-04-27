@@ -218,7 +218,7 @@ class MentalMapController extends Controller
                     'payload' => $form->payload,
                     'location' => $form->location,
                     'seconds' => $form->seconds,
-                    'all_hiding_percentage' => $form->all_hiding_percentage,
+                    'all_hiding_percentage' => $form->all_hiding_percentage ?? 0,
                 ]);
                 $command->execute();
 
