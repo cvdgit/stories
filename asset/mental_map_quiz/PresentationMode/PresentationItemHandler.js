@@ -1,5 +1,6 @@
 import RecordingPanel from "./RecordingPanel";
 import {userResponseChecker} from "../lib/userResponseProcessChain";
+import MapImageStatus from "../components/MapImageStatus";
 
 function PresentationItemHandler(container, voiceResponse, {threshold, promptId}, saveUserHistoryHandler, history) {
 
@@ -75,8 +76,16 @@ function PresentationItemHandler(container, voiceResponse, {threshold, promptId}
           historyItem.allTextClosed = responseHistoryItem.allTextClosed;
           historyItem.allTextClosedPrev = responseHistoryItem.allTextClosedPrev;
 
-          if (done) {
-            const imgElem = container.querySelector(`.zoom-container [data-img-id='${image.id}']`);
+          const imgElem = container.querySelector(`.zoom-container [data-img-id='${image.id}']`);
+          if (imgElem) {
+            MapImageStatus.update(imgElem.querySelector('.map-user-status'), {
+              hiding: historyItem.allTextClosed,
+              seconds: historyItem.seconds,
+              hidingPrev: historyItem.allTextClosedPrev,
+            });
+          }
+
+          if (done && imgElem) {
             imgElem.classList.add('fragment-item-done');
             if (image.makeTransparent) {
               imgElem.classList.add('fragment-transparent');
