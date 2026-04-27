@@ -343,7 +343,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
             }
           })
       })
-      wrapper.querySelector('#start-retelling').addEventListener('click', e => {
+      wrapper.querySelector('#start-retelling').addEventListener('click', async () => {
 
         if (voiceResponse.getStatus()) {
           voiceResponse.stop()
@@ -367,81 +367,66 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
 
         const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
 
-        startRetelling(
+        await startRetelling(
           clearText ? removePunctuation(userResponse) : userResponse,
           clearText ? removePunctuation(stripTags(text.text)) : stripTags(text.text),
           threshold,
           settingsPromptId || image.promptId
-        ).then(response => {
-          const json = processOutputAsJson(wrapper.querySelector('#retelling-response').innerText)
-          if (json) {
-            const val = Number(json.overall_similarity)
-            wrapper.querySelector('#similarity-percent').innerText = `${val}%`
+        );
 
-            const textHidingPercentage = calcHiddenTextPercent(text)
-            const textTargetPercentage = calcTargetTextPercent(text)
+        const json = processOutputAsJson(wrapper.querySelector('#retelling-response').innerText);
+        if (!json) {
+          throw new Error('no json');
+        }
 
-            const detailTextContent = wrapper.querySelector('.detail-text').cloneNode(true)
-            detailTextContent.querySelector('.detail-text-actions').remove()
+        const val = Number(json.overall_similarity);
+        wrapper.querySelector('#similarity-percent').innerText = `${val}%`;
 
-            saveUserResult({
-              story_id: params?.story_id,
-              slide_id: params?.slide_id,
-              mental_map_id: mentalMapId,
-              image_fragment_id: image.id,
-              overall_similarity: Number(json.overall_similarity),
-              text_hiding_percentage: textHidingPercentage,
-              text_target_percentage: textTargetPercentage,
-              content: detailTextContent.innerHTML,
-              repetition_mode: repetitionMode,
-              threshold,
-              payload: json,
-              location: params.location,
-              seconds: timer.getTimerSeconds()
-            }).then(response => {
+        const textHidingPercentage = calcHiddenTextPercent(text);
+        const textTargetPercentage = calcTargetTextPercent(text);
 
-              if (deck) {
-                if (deck.hasPlugin('stat')) {
-                  const statPlugin = deck.getPlugin('stat');
-                  statPlugin.sendStat({slideId: params.slide_id});
-                }
-              }
+        const detailTextContent = wrapper.querySelector('.detail-text').cloneNode(true);
+        detailTextContent.querySelector('.detail-text-actions').remove();
 
-              /*if (response && response?.success) {
-                historyItem.all = response.history.all
-                historyItem.hiding = response.history.hiding
-                historyItem.target = response.history.target
-                historyItem.done = response.history.done
+        const historyResponse = await saveUserResult({
+          story_id: params?.story_id,
+          slide_id: params?.slide_id,
+          mental_map_id: mentalMapId,
+          image_fragment_id: image.id,
+          overall_similarity: Number(json.overall_similarity),
+          text_hiding_percentage: textHidingPercentage,
+          text_target_percentage: textTargetPercentage,
+          content: detailTextContent.innerHTML,
+          repetition_mode: repetitionMode,
+          threshold,
+          payload: json,
+          location: params.location,
+          seconds: timer.getTimerSeconds()
+        });
 
-                // wrapper.querySelector('.result-item-value').innerHTML = `${val}% (${textHidingPercentage}% / ${textTargetPercentage}%)`
-                wrapper.querySelector('.image-item > .result-item').remove()
-                wrapper.querySelector('.image-item').appendChild(FragmentResultElement(historyItem))
-
-                if (fastMode) {
-                  if (historyItem.done) {
-                    dialog.hide()
-                  }
-                }
-              }*/
-            });
-
-            historyItem.all = Number(json.overall_similarity);
-            historyItem.hiding = textHidingPercentage;
-            historyItem.target = textTargetPercentage;
-            historyItem.done = Number(json.overall_similarity) >= threshold;
-            historyItem.seconds = timer.getTimerSeconds();
-
-            wrapper.querySelector('.image-item > .result-item').remove()
-            wrapper.querySelector('.image-item').appendChild(FragmentResultElement(historyItem))
-
-            if (fastMode) {
-              if (historyItem.done) {
-                dialog.hide()
-              }
-            }
+        if (deck) {
+          if (deck.hasPlugin('stat')) {
+            const statPlugin = deck.getPlugin('stat');
+            statPlugin.sendStat({slideId: params.slide_id});
           }
-        })
-      })
+        }
+
+        const {history: responseHistoryItem} = historyResponse;
+        historyItem.all = responseHistoryItem.all; // Number(json.overall_similarity);
+        historyItem.hiding = responseHistoryItem.hiding; // textHidingPercentage;
+        historyItem.target = responseHistoryItem.target; // textTargetPercentage;
+        historyItem.done = responseHistoryItem.done; // Number(json.overall_similarity) >= threshold;
+        historyItem.seconds = responseHistoryItem.seconds; // timer.getTimerSeconds();
+
+        wrapper.querySelector('.image-item > .result-item').remove()
+        wrapper.querySelector('.image-item').appendChild(FragmentResultElement(historyItem))
+
+        if (fastMode) {
+          if (historyItem.done) {
+            dialog.hide();
+          }
+        }
+      });
 
       wrapper.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
       wrapper.querySelector('#target-text-percent').innerText = calcTargetTextPercent(text) + '%'
