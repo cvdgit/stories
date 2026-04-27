@@ -1095,9 +1095,9 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
 
           mapImgWrap.appendChild(
             MapImageStatus.render({
-              hiding: presentationMode ? historyItem.all : historyItem.hiding,
+              hiding: presentationMode ? historyItem.allTextClosed : historyItem.hiding,
               seconds: historyItem.seconds,
-              hidingPrev: presentationMode ? historyItem.allPrev : historyItem.hidingPrev,
+              hidingPrev: presentationMode ? historyItem.allTextClosedPrev : historyItem.hidingPrev,
             })
           );
 
