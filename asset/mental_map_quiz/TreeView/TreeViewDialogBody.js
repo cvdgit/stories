@@ -85,7 +85,11 @@ export default function TreeViewDialogBody({tree, voiceResponse, history, itemCl
           }), historyItem.done);
 
           row.querySelector('.node-title').addEventListener('click', e => {
-            itemClickHandler({id: node.id, description: node.description});
+            itemClickHandler({
+              id: node.id,
+              text: node.description,
+              description: node.description
+            });
           });
 
           const stat = row.querySelector('.map-user-status-hiding');
