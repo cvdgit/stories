@@ -1,7 +1,8 @@
 
 .tree-dialog-body {
   padding-left: 150px;
-  padding-right: 0;
+  padding-right: 10px;
+  width: 100%;
 }
 
 .tree-dialog-body .node-title {
