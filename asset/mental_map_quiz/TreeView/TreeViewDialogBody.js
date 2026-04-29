@@ -2,6 +2,50 @@ import "./TreeViewBody.css";
 import "./TreeViewDialogBody.css";
 import MapImageStatus from "../components/MapImageStatus";
 
+function buildTree(nodes, renderNodeContent) {
+  const container = document.createElement("div");
+
+  nodes.forEach(node => {
+    const nodeEl = document.createElement("div");
+    nodeEl.className = "tree-node";
+    nodeEl.dataset.nodeId = node.id;
+
+    const struct = document.createElement("div");
+    struct.className = "node-struct";
+
+    const slot = document.createElement("div");
+    slot.className = "node-slot";
+
+    slot.appendChild(renderNodeContent(node));
+
+    struct.appendChild(slot);
+    nodeEl.appendChild(struct);
+
+    if (node.children && node.children.length) {
+      const children = document.createElement("div");
+      children.className = "children";
+
+      children.appendChild(buildTree(node.children, renderNodeContent));
+      nodeEl.appendChild(children);
+
+      const toggle = document.createElement("div");
+      toggle.className = "toggle toggle__collapseButton";
+      struct.appendChild(toggle);
+      toggle.addEventListener("click", () => {
+        nodeEl.classList.toggle("collapsed");
+        toggle.classList.remove('toggle__collapseButton', 'toggle__expandButton');
+        toggle.classList.add(
+          nodeEl.classList.contains('collapsed') ? 'toggle__expandButton' : 'toggle__collapseButton'
+        )
+      });
+    }
+
+    container.appendChild(nodeEl);
+  });
+
+  return container;
+}
+
 function createRow(node, status, done) {
 
   const row = document.createElement('div')
@@ -13,7 +57,8 @@ function createRow(node, status, done) {
     row.classList.add('node-row-done');
   }
 
-  row.innerHTML = `<div class="node-status"></div>
+  row.innerHTML = `
+<div class="node-status"></div>
 <div class="node-body">
 <div class="node-title" style="cursor: pointer">${node.title.replace(/\r?\n/g, "\r\n")}</div>
 </div>
@@ -62,7 +107,36 @@ export default function TreeViewDialogBody({tree, voiceResponse, history, itemCl
       return body
     },
     init() {
-      const list = flatten(tree);
+
+      body.appendChild(
+        buildTree(tree, (node) => {
+          const historyItem = history.find(({id}) => id === node.id);
+          const row = createRow(node, MapImageStatus.render({
+            hiding: historyItem.hiding || 0,
+            seconds: historyItem.seconds || 0,
+            hidingPrev: historyItem.hidingPrev || 0,
+          }), historyItem.done);
+
+          row.querySelector('.node-title').addEventListener('click', e => {
+            itemClickHandler({
+              id: node.id,
+              text: node.description,
+              description: node.description
+            });
+          });
+
+          const stat = row.querySelector('.map-user-status-hiding');
+          if (stat) {
+            stat.addEventListener('click', async () => {
+              console.log(await getHistoryLog(node.id));
+            });
+          }
+
+          return row;
+        })
+      );
+
+      /*const list = flatten(tree);
       list.map(
         node => {
 
@@ -90,7 +164,7 @@ export default function TreeViewDialogBody({tree, voiceResponse, history, itemCl
 
           body.appendChild(row);
         }
-      );
+      );*/
     },
     restart() {
       body.remove()

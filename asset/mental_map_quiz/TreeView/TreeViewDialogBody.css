@@ -1,6 +1,6 @@
 
 .tree-dialog-body {
-  padding-left: 150px;
+  padding-left: 20px;
   padding-right: 10px;
   width: 100%;
 }
@@ -15,27 +15,22 @@
   transition: all 200ms;
 }
 
-.tree-dialog-body .node-row-done .retelling-success {
-  /*opacity: 1;*/
-}
-
-.tree-dialog-body .node-row-fail .retelling-failed {
-  /*opacity: 1;*/
-}
-
 .tree-dialog-body .map-user-status {
   pointer-events: all;
   font-size: 18px;
   line-height: 22px;
   background-color: unset;
   justify-content: right;
-  margin-top: 4px;
+  margin-top: 0;
 }
 
 .tree-dialog-body .node-status {
-  width: 150px;
+  width: auto;
   height: auto;
-  left: -150px;
+  left: unset;
+  display: flex;
+  justify-content: space-between;
+  position: relative;
 }
 
 .tree-dialog-body .node-row:hover {
@@ -44,4 +39,81 @@
 
 .tree-dialog-body .map-user-status .map-user-status-time {
   display: none !important;
+}
+
+.tree-dialog-body .node-row {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-bottom: 0;
+}
+
+.tree-dialog-body .node-body {
+  flex: 1;
+}
+
+
+
+.tree-node {
+  position: relative;
+}
+
+.node-slot {
+  width: 100%;
+}
+
+.node-struct {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding-left: 20px;
+}
+
+.children {
+  margin-left: 20px;
+  position: relative;
+}
+
+.toggle {
+  appearance: none;
+  border: none;
+  position: absolute;
+  border-radius: 100%;
+  box-shadow: 0 0 0 1px #000;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  top: 50%;
+  translate: -50% -50%;
+  cursor: pointer;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-repeat: no-repeat;
+  background-position: center;
+  left: -10px;
+}
+
+.toggle__expandButton {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCI+PGNpcmNsZSBjeD0iOSIgY3k9IjkiIHI9IjgiIGZpbGw9IiNGRkYiLz48ZyBzdHJva2U9IiM5ODk4OTgiIHN0cm9rZS13aWR0aD0iMS45IiA+PHBhdGggZD0iTTQuNSA5aDkiLz48cGF0aCBkPSJNOSA0LjV2OSIvPjwvZz4KPC9zdmc+);
+}
+
+.toggle__collapseButton {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCI+PGNpcmNsZSBjeD0iOSIgY3k9IjkiIHI9IjgiIGZpbGw9IiNGRkYiLz48ZyBzdHJva2U9IiM5ODk4OTgiIHN0cm9rZS13aWR0aD0iMS45IiA+PHBhdGggZD0iTTQuNSA5aDkiLz48L2c+Cjwvc3ZnPg==);
+}
+
+.tree-node.collapsed > .children {
+  display: none;
+}
+
+.node-slot,
+.node-row {
+  margin-left: 0;
+}
+
+.tree-node {
+  position: relative;
+  padding-left: 20px;
 }
