@@ -1,17 +1,46 @@
 
+.tree-dialog-body {
+  padding-left: 150px;
+  padding-right: 0;
+}
+
+.tree-dialog-body .node-title {
+  font-size: 20px;
+  line-height: 34px;
+}
+
 .tree-dialog-body .retelling-success, .tree-dialog-body .retelling-failed {
   opacity: 0;
   transition: all 200ms;
 }
 
 .tree-dialog-body .node-row-done .retelling-success {
-  opacity: 1;
+  /*opacity: 1;*/
 }
 
 .tree-dialog-body .node-row-fail .retelling-failed {
-  opacity: 1;
+  /*opacity: 1;*/
 }
 
 .tree-dialog-body .map-user-status {
   pointer-events: all;
+  font-size: 18px;
+  line-height: 22px;
+  background-color: unset;
+  justify-content: right;
+  margin-top: 4px;
+}
+
+.tree-dialog-body .node-status {
+  width: 150px;
+  height: auto;
+  left: -150px;
+}
+
+.tree-dialog-body .node-row:hover {
+  background-color: #eee;
+}
+
+.tree-dialog-body .map-user-status .map-user-status-time {
+  display: none !important;
 }
