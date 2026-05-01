@@ -55,26 +55,6 @@
 
 
 
-.tree-node {
-  position: relative;
-}
-
-.node-slot {
-  width: 100%;
-}
-
-.node-struct {
-  display: flex;
-  align-items: center;
-  position: relative;
-  padding-left: 20px;
-}
-
-.children {
-  margin-left: 20px;
-  position: relative;
-}
-
 .toggle {
   appearance: none;
   border: none;
@@ -93,7 +73,8 @@
   justify-content: center;
   background-repeat: no-repeat;
   background-position: center;
-  left: -10px;
+  left: -22px;
+  z-index: 1;
 }
 
 .toggle__expandButton {
@@ -104,16 +85,96 @@
   background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCI+PGNpcmNsZSBjeD0iOSIgY3k9IjkiIHI9IjgiIGZpbGw9IiNGRkYiLz48ZyBzdHJva2U9IiM5ODk4OTgiIHN0cm9rZS13aWR0aD0iMS45IiA+PHBhdGggZD0iTTQuNSA5aDkiLz48L2c+Cjwvc3ZnPg==);
 }
 
-.tree-node.collapsed > .children {
-  display: none;
-}
-
-.node-slot,
-.node-row {
-  margin-left: 0;
-}
-
-.tree-node {
+.tree-row {
+  display: flex;
+  align-items: stretch;
   position: relative;
-  padding-left: 20px;
+  min-width: 100%;
+  white-space: nowrap;
+  text-align: start;
+}
+
+.tree-structure {
+  display: flex;
+  align-items: center;
+}
+
+/* базовый блок */
+.tree-line,
+.tree-join {
+  width: 44px;
+  height: 100%;
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* вертикальная линия │ */
+.line-vertical::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #ccc;
+  inset-inline-start: 50%;
+}
+
+/* ├ */
+.join-middle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #ccc;
+  inset-inline-start: 50%;
+}
+
+.join-middle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 50%;
+  inset-inline-end: 0;
+  height: 1px;
+  background: #ccc;
+}
+
+/* └ */
+.join-last::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  height: 50%;
+  width: 1px;
+  background: #ccc;
+  inset-inline-start: 50%;
+}
+
+.join-last::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 50%;
+  height: 1px;
+  inset-inline-end: 0;
+  background: #ccc;
+}
+
+/* toggle */
+.tree-toggle {
+  width: 16px;
+  cursor: pointer;
+  text-align: center;
+}
+
+/* content */
+.tree-content {
+  flex: 1;
+  position: relative;
+}
+
+.tree-dialog-body .node-body {
+  padding-left: 0 !important;
 }

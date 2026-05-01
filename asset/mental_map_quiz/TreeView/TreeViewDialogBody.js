@@ -2,50 +2,6 @@ import "./TreeViewBody.css";
 import "./TreeViewDialogBody.css";
 import MapImageStatus from "../components/MapImageStatus";
 
-function buildTree(nodes, renderNodeContent) {
-  const container = document.createElement("div");
-
-  nodes.forEach(node => {
-    const nodeEl = document.createElement("div");
-    nodeEl.className = "tree-node";
-    nodeEl.dataset.nodeId = node.id;
-
-    const struct = document.createElement("div");
-    struct.className = "node-struct";
-
-    const slot = document.createElement("div");
-    slot.className = "node-slot";
-
-    slot.appendChild(renderNodeContent(node));
-
-    struct.appendChild(slot);
-    nodeEl.appendChild(struct);
-
-    if (node.children && node.children.length) {
-      const children = document.createElement("div");
-      children.className = "children";
-
-      children.appendChild(buildTree(node.children, renderNodeContent));
-      nodeEl.appendChild(children);
-
-      const toggle = document.createElement("div");
-      toggle.className = "toggle toggle__collapseButton";
-      struct.appendChild(toggle);
-      toggle.addEventListener("click", () => {
-        nodeEl.classList.toggle("collapsed");
-        toggle.classList.remove('toggle__collapseButton', 'toggle__expandButton');
-        toggle.classList.add(
-          nodeEl.classList.contains('collapsed') ? 'toggle__expandButton' : 'toggle__collapseButton'
-        )
-      });
-    }
-
-    container.appendChild(nodeEl);
-  });
-
-  return container;
-}
-
 function createRow(node, status, done) {
 
   const row = document.createElement('div')
@@ -74,6 +30,129 @@ function flatten(nodes, level = 0) {
     {...node, level, index, hasChildren: (node.children || []).length > 0},
     ...flatten(node.children || [], level + 1)
   ])
+}
+
+function flattenTree(nodes, level = 0, parentExpanded = true, parentLastChilds = []) {
+  let result = [];
+
+  nodes.forEach((node, index) => {
+    const isLastChild = index === nodes.length - 1;
+
+    const currentParentLastChilds = [...parentLastChilds, isLastChild];
+
+    result.push({
+      ...node,
+      level,
+      isLastChild,
+      parentLastChilds,
+      isVisible: parentExpanded
+    });
+
+    if (node.children?.length) {
+      result = result.concat(
+        flattenTree(
+          node.children,
+          level + 1,
+          parentExpanded && node.expanded,
+          currentParentLastChilds
+        )
+      );
+    }
+  });
+
+  return result;
+}
+
+function renderStructure(node) {
+  const container = document.createElement('div');
+  container.className = 'tree-structure';
+
+  node.parentLastChilds.forEach(isLast => {
+    const line = document.createElement('div');
+    line.className = 'tree-line';
+    if (!isLast) {
+      line.classList.add('line-vertical');
+    }
+    container.appendChild(line);
+  });
+
+  const join = document.createElement('div');
+  join.className = 'tree-join';
+
+  join.classList.add(
+    node.isLastChild ? 'join-last' : 'join-middle'
+  );
+
+  container.appendChild(join);
+
+  return container;
+}
+
+function renderRow(node, renderCustomNode, toggleHandler) {
+  const row = document.createElement('div');
+  row.className = 'tree-row';
+  row.dataset.id = node.id;
+
+  if (!node.isVisible) {
+    row.style.display = 'none';
+  }
+
+  const structure = renderStructure(node);
+
+  const content = document.createElement('div');
+  content.className = 'tree-content';
+
+  if (node.children?.length) {
+    const toggle = document.createElement('div');
+    toggle.className = 'toggle toggle__collapseButton';
+    toggle.dataset.toggleId = node.id;
+    toggle.onclick = () => {
+      toggleHandler(node.id);
+    }
+    content.appendChild(toggle);
+  }
+
+  content.appendChild(renderCustomNode(node));
+
+  row.appendChild(structure);
+  row.appendChild(content);
+
+  return row;
+}
+
+function findNode(nodes, id) {
+  for (const node of nodes) {
+    if (node.id === id) return node;
+    if (node.children?.length) {
+      const found = findNode(node.children, id);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+function updateVisibility(tree) {
+  const list = flattenTree(tree);
+  list.forEach(node => {
+    const row = document.querySelector(`[data-id="${node.id}"]`);
+    if (!row) return;
+    row.style.display = node.isVisible ? '' : 'none';
+    const toggle = row.querySelector('.toggle');
+    if (toggle && node.children?.length) {
+      toggle.classList.remove('toggle__collapseButton', 'toggle__expandButton');
+      toggle.classList.add(
+        node.expanded ? 'toggle__collapseButton' : 'toggle__expandButton'
+      );
+    }
+  });
+}
+
+function toggleNode(tree, nodeId) {
+  const node = findNode(tree, nodeId);
+  node.expanded = !node.expanded;
+  updateVisibility(
+    tree
+  );
 }
 
 async function getHistoryLog(id) {
@@ -108,7 +187,43 @@ export default function TreeViewDialogBody({tree, voiceResponse, history, itemCl
     },
     init() {
 
-      body.appendChild(
+      const list = flattenTree(tree);
+      list.map(node => {
+
+        const historyItem = history.find(({id}) => id === node.id);
+        const row = createRow(node, MapImageStatus.render({
+          hiding: historyItem.hiding || 0,
+          seconds: historyItem.seconds || 0,
+          hidingPrev: historyItem.hidingPrev || 0,
+        }), historyItem.done);
+
+        row.querySelector('.node-title').addEventListener('click', e => {
+          itemClickHandler({
+            id: node.id,
+            text: node.description,
+            description: node.description
+          });
+        });
+
+        const stat = row.querySelector('.map-user-status-hiding');
+        if (stat) {
+          stat.addEventListener('click', async () => {
+            console.log(await getHistoryLog(node.id));
+          });
+        }
+
+        body.appendChild(
+          renderRow(
+            node,
+            () => row,
+            nodeId => {
+              toggleNode(tree, nodeId);
+            }
+          )
+        );
+      });
+
+      /*body.appendChild(
         buildTree(tree, (node) => {
           const historyItem = history.find(({id}) => id === node.id);
           const row = createRow(node, MapImageStatus.render({
@@ -134,7 +249,7 @@ export default function TreeViewDialogBody({tree, voiceResponse, history, itemCl
 
           return row;
         })
-      );
+      );*/
 
       /*const list = flatten(tree);
       list.map(
