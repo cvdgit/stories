@@ -170,7 +170,7 @@ class WordListService
     {
         $this->transactionManager->wrap(function() use ($storyId, $items, $wordList) {
             $story = Story::findModel($storyId);
-            $this->storyEditorService->deleteFinalSlide($story->id);
+            //$this->storyEditorService->deleteFinalSlide($story->id);
             $this->processItems($story->id, $items, $wordList);
             $this->storyEditorService->createFinalSlide($story->id);
         });
