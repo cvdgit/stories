@@ -104,7 +104,7 @@ function renderRow(node, renderCustomNode, toggleHandler) {
 
   if (node.children?.length) {
     const toggle = document.createElement('div');
-    toggle.className = 'toggle toggle__collapseButton';
+    toggle.classList.add('toggle', node.expanded ? 'toggle__collapseButton' : 'toggle__expandButton');
     toggle.dataset.toggleId = node.id;
     toggle.onclick = () => {
       toggleHandler(node.id);
