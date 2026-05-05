@@ -37,12 +37,14 @@ function flattenTree(nodes, level = 0, parentExpanded = true, parentLastChilds =
 
   nodes.forEach((node, index) => {
     const isLastChild = index === nodes.length - 1;
+    const isFirstChild = level === 0 && index === 0;
 
     const currentParentLastChilds = [...parentLastChilds, isLastChild];
 
     result.push({
       ...node,
       level,
+      isFirstChild,
       isLastChild,
       parentLastChilds,
       isVisible: parentExpanded
@@ -82,6 +84,10 @@ function renderStructure(node) {
   join.classList.add(
     node.isLastChild ? 'join-last' : 'join-middle'
   );
+
+  if (node.isFirstChild) {
+    join.classList.add('join-first');
+  }
 
   container.appendChild(join);
 

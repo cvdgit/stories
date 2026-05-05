@@ -162,6 +162,10 @@
   background: #ccc;
 }
 
+.join-first::before {
+  top: 50%;
+}
+
 /* toggle */
 .tree-toggle {
   width: 16px;
