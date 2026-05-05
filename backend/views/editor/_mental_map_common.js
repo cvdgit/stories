@@ -86,3 +86,150 @@ function getTextBySelections(currentWords) {
   })
   return text.trim()
 }
+
+async function processContentMentalMaps(toCreateMaps, fragments) {
+
+  const sendAIRequest = toCreateMaps
+    .filter(({type}) => type === 'mental-map-plan' || type === 'mental-map-plan-accumulation')
+    .length > 0;
+
+  const allText = fragments.map(({title}) => title).join('\n');
+
+  let sentences;
+  if (sendAIRequest) {
+    await window.sendStreamMessage(
+      `/admin/index.php?r=gpt/story/speech-trainer-sentences`,
+      {text: allText},
+      () => {},
+      sentencesJson => {
+        try {
+          sentences = window.processOutputAsJson(sentencesJson).map(({sentenceText, sentenceTitle}) => {
+            const fragmentId = uuidv4();
+            return {
+              id: fragmentId,
+              sentenceText,
+              sentenceTitle,
+              words: createWordItem(sentenceText, fragmentId).words
+            }
+          });
+        } catch (ex) {
+          throw new Error(ex.message);
+        }
+      }
+    );
+  }
+
+  const sendTranslateAIRequest = toCreateMaps
+    .filter(({type}) => type === 'mental-map-plan-translate')
+    .length > 0;
+  let translateSentences;
+  if (sendTranslateAIRequest) {
+    await window.sendStreamMessage(
+      `/admin/index.php?r=gpt/story/speech-trainer-translate`,
+      {text: allText},
+      () => {},
+      sentencesJson => {
+        try {
+          translateSentences = processOutputAsJson(sentencesJson).map(({sentenceText, sentenceTranslateText}) => {
+            const fragmentId = uuidv4();
+            return {
+              id: fragmentId,
+              sentenceText,
+              sentenceTitle: sentenceTranslateText,
+              words: createWordItem(sentenceText, fragmentId).words
+            }
+          });
+        } catch (ex) {
+          throw new Error(ex.message);
+        }
+      }
+    );
+  }
+
+  const sendQuestionAIRequest = toCreateMaps
+    .filter(({type}) => type === 'mental-map-plan-question')
+    .length > 0;
+  let questionSentences;
+  if (sendQuestionAIRequest) {
+    await window.sendStreamMessage(
+      `/admin/index.php?r=gpt/story/speech-trainer-question`,
+      {text: allText},
+      () => {},
+      sentencesJson => {
+        try {
+          questionSentences = processOutputAsJson(sentencesJson).map(({sentenceText, sentenceQuestion}) => {
+            const fragmentId = uuidv4();
+            return {
+              id: fragmentId,
+              sentenceText,
+              sentenceTitle: sentenceQuestion,
+              words: createWordItem(sentenceText, fragmentId).words
+            }
+          });
+        } catch (ex) {
+          throw new Error(ex.message);
+        }
+      }
+    );
+  }
+
+  const mentalMapsAi = new MentalMapsAi()
+  for (let i = 0; i < toCreateMaps.length; i++) {
+    const type = toCreateMaps[i].type
+    switch (type) {
+      case 'mental-map':
+        structuredClone(fragments).map(f => toCreateMaps[i].fragments.push({
+          id: f.id,
+          title: getTextBySelections(f.words)
+        }))
+        break;
+      case 'mental-map-even-fragments':
+        structuredClone(fragments).map(f => toCreateMaps[i].fragments.push({
+          id: f.id,
+          title: mentalMapsAi.hideWordsEven(f.words)
+        }))
+        break;
+      case 'mental-map-odd-fragments':
+        structuredClone(fragments).map(f => toCreateMaps[i].fragments.push({
+          id: f.id,
+          title: mentalMapsAi.hideWordsOdd(f.words)
+        }))
+        break;
+      case 'mental-map-plan':
+        structuredClone(sentences).map(({id, sentenceText, sentenceTitle}) => toCreateMaps[i].fragments.push({
+          id,
+          title: sentenceTitle,
+          description: sentenceText
+        }))
+        break;
+      case 'mental-map-plan-accumulation':
+        structuredClone(sentences).map(({id, sentenceText, sentenceTitle}) => toCreateMaps[i].fragments.push({
+          id,
+          title: sentenceTitle,
+          description: sentenceText
+        }))
+        break;
+      case 'mental-map-plan-translate':
+        structuredClone(translateSentences).map(({id, sentenceText, sentenceTitle}) => toCreateMaps[i].fragments.push({
+          id,
+          title: sentenceTitle,
+          description: sentenceText
+        }))
+        break;
+      case 'mental-map-plan-question':
+        structuredClone(questionSentences).map(({id, sentenceText, sentenceTitle}) => toCreateMaps[i].fragments.push({
+          id,
+          title: sentenceTitle,
+          description: sentenceText
+        }))
+        break;
+    }
+  }
+
+  const text = fragments.map(f => getTextBySelections(f.words)).join('<br/>');
+
+  return {
+    text,
+    mentalMaps: JSON.stringify(toCreateMaps)
+  }
+}

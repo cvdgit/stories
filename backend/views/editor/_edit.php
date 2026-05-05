@@ -571,6 +571,21 @@ $js = <<< JS
         return texts.join(`\\n`)
     }
 
+    function getSlideTextContentArray(slide) {
+        const texts = [];
+        slide.getElement().find(`div[data-block-type="text"]`).map((i, el) => {
+            $(el)
+              .find(".slide-paragraph > *")
+              .map((i, el) => {
+                  let elementText = stripTags(el.innerHTML.replace(/<\s*br\s*\/?>/gi, '').replace(/\t/g, '')).trim();
+                  if (elementText.length) {
+                      texts.push(elementText);
+                  }
+              });
+        });
+        return texts;
+    }
+
     function getSlideImages(slide) {
         const urls = [];
         slide.getElement().find(`div[data-block-type="image"]`).map((i, el) => {
@@ -699,7 +714,7 @@ $js = <<< JS
             if (!currentSlide) {
                 return;
             }
-            const texts = getSlideTextContent(currentSlide)
+            const texts = getSlideTextContentArray(currentSlide)
             if (!texts.length) {
                 toastr.warning("Текст на слайде не найден");
                 return;
@@ -709,13 +724,27 @@ $js = <<< JS
 
             const modal = new RemoteModal({
                 id: 'create-mental-maps-ai-modal',
-                title: 'Ментальные карты AI'
+                title: 'Ментальные карты AI',
+                dialogClassName: 'modal-lg'
             });
 
             modal.show({
               url: '/admin/index.php?r=editor/mental-map/create-ai-form&slide_id=' + currentSlideId,
               callback: function(responseBody) {
-                const submitBtn = $(responseBody).find('button[type=submit]');
+
+                  const mentalMapsAi = new MentalMapsAi();
+                  mentalMapsAi.show(
+                      responseBody,
+                      window.mentalMapsOrder,
+                      texts,
+                      currentSlideId,
+                      () => {
+                          modal.hide();
+                          StoryEditor.loadSlides(currentSlideId);
+                      }
+                  );
+
+                /*const submitBtn = $(responseBody).find('button[type=submit]');
                 formHelper.attachBeforeSubmit($(responseBody).find('form'), (form) => {
                   modalHelper.btnLoading(submitBtn);
 
@@ -776,7 +805,7 @@ $js = <<< JS
                         })
                         .always(() => modalHelper.btnReset(submitBtn));
                       })
-                });
+                });*/
               }
             })
         }}

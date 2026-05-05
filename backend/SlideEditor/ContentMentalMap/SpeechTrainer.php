@@ -42,9 +42,9 @@ class SpeechTrainer extends ActiveRecord
     public const TYPE_MENTAL_MAP_PLAN_TRANSLATE = 'mental-map-plan-translate';
     public const TYPE_MENTAL_MAP_PLAN_QUESTION = 'mental-map-plan-question';
 
-    public static function getAllTypes(): array
+    public static function getAllTypes(bool $onlyMentalMaps = false): array
     {
-        return [
+        $items = [
             self::TYPE_MENTAL_MAP => 'Ментальная карта',
             self::TYPE_MENTAL_MAP_EVEN_FRAGMENTS => 'Ментальная карта (четные пропуски)',
             self::TYPE_MENTAL_MAP_ODD_FRAGMENTS => 'Ментальная карта (нечетные пропуски)',
@@ -54,6 +54,16 @@ class SpeechTrainer extends ActiveRecord
             self::TYPE_MENTAL_MAP_PLAN_QUESTION => 'План с вопросами к предложениям',
             self::TYPE_RETELLING => 'Пересказ',
         ];
+        if ($onlyMentalMaps === true) {
+            return array_filter(
+                $items,
+                static function (string $key) {
+                    return $key !== self::TYPE_RETELLING;
+                },
+                ARRAY_FILTER_USE_KEY
+            );
+        }
+        return $items;
     }
 
     public static function isValidType(string $type): bool
@@ -174,7 +184,7 @@ class SpeechTrainer extends ActiveRecord
             self::TYPE_MENTAL_MAP_PLAN,
             self::TYPE_MENTAL_MAP_PLAN_ACCUMULATION,
             self::TYPE_MENTAL_MAP_PLAN_TRANSLATE,
-            self::TYPE_MENTAL_MAP_PLAN_QUESTION
+            self::TYPE_MENTAL_MAP_PLAN_QUESTION,
         ];
         return in_array($type, $types);
     }

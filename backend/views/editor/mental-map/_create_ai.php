@@ -2,22 +2,25 @@
 
 declare(strict_types=1);
 
-use yii\bootstrap\ActiveForm;
-use yii\bootstrap\Html;
+use yii\helpers\Json;
+use yii\web\View;
 
+/**
+ * @var View $this
+ * @var array $mapOrder
+ */
+
+$this->registerJs('window.mentalMapsOrder = ' . Json::encode($mapOrder));
+$this->registerCss(
+    $this->renderFile('@backend/views/editor/mental-map/_create_ai.css')
+);
 ?>
-<?php $form = ActiveForm::begin([
-    'id' => 'mental-maps-ai-form',
-    'action' => ['/editor/mental-map/create-ai-handler']
-]) ?>
-<div style="display: flex; flex-direction: column; row-gap: 20px; margin-bottom: 20px">
-    <div>Ментальная карта без пропусков</div>
-    <div>Ментальная карта с нечетными пропусками</div>
-    <div>Ментальная карта с четными пропусками</div>
-</div>
 <div>
-    <?= Html::submitButton('Создать', ['class' => 'btn btn-primary']) ?>
-    <button class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+    <div class="content-editor-wrap">
+        <div id="content-editor" class="text-content"></div>
+    </div>
+    <div class="ai-mental-maps-order"></div>
 </div>
-<?php ActiveForm::end() ?>
-
+<div style="margin-block: 20px; text-align: center">
+    <button id="ai-maps-create" class="btn btn-primary" type="button">Создать ментальные карты</button>
+</div>

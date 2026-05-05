@@ -1,0 +1,23 @@
+.modal-body {
+  transition: all 200ms;
+}
+
+.text-content {
+  min-height: 150px;
+  margin-bottom: 20px;
+}
+
+.fragment {
+  padding: 8px;
+  margin-bottom: 8px;
+  border: 1px solid #808080;
+  outline: none;
+}
+
+.fragment.dragging {
+  opacity: 0.4;
+}
+
+.fragment.over {
+  border: 1px dashed #000;
+}

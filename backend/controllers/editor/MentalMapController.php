@@ -185,8 +185,18 @@ class MentalMapController extends BaseController
     public function actionCreateAiForm(int $slide_id): string
     {
         $mentalMapForm = new CreateAiMentalMapsForm();
+        $mapOrder = SpeechTrainer::getAllTypes(true);
         return $this->renderAjax('_create_ai', [
             'formModel' => $mentalMapForm,
+            'mapOrder' => array_map(
+                static function (string $type) use ($mapOrder): array {
+                    return [
+                        'type' => $type,
+                        'title' => $mapOrder[$type] ?? 'Unknown type',
+                    ];
+                },
+                array_keys($mapOrder),
+            ),
         ]);
     }
 
@@ -196,7 +206,71 @@ class MentalMapController extends BaseController
     public function actionCreateAiHandler(Request $request, Response $response, WebUser $user): array
     {
         $response->format = Response::FORMAT_JSON;
-        $mentalMapForm = new CreateAiMentalMapsForm();
+
+        $createForm = new CreateAiMentalMapsForm();
+        if ($createForm->load($request->post(), '')) {
+            if (!$createForm->validate()) {
+                return ['success' => false, 'message' => 'Not valid'];
+            }
+
+            $mentalMaps = Json::decode($createForm->mentalMaps);
+
+            $currentSlideModel = StorySlide::findOne($createForm->currentSlideId);
+            if ($currentSlideModel === null) {
+                throw new NotFoundHttpException('Слайд не найден');
+            }
+
+            foreach ($mentalMaps as $mentalMapRow) {
+
+                $this->transactionManager->wrap(function() use ($mentalMapRow, $createForm, $user, $currentSlideModel): void {
+
+                    $type = $mentalMapRow['type'];
+
+                    $mentalMapId = Uuid::uuid4();
+
+                    if (SpeechTrainer::typeIsPlanMentalMap($type)) {
+                        $this->mentalMapBuilder->createPlanMentalMap(
+                            $mentalMapId,
+                            $mentalMapRow['title'],
+                            preg_replace('/\<br(\s*)?\/?\>/i', "\n", $createForm->text),
+                            $user->getId(),
+                            $mentalMapRow['fragments'],
+                            Uuid::fromString(Yii::$app->params['ai.story.assist.plan.prompt.id']),
+                            $type,
+                        );
+                    } else {
+                        $this->mentalMapBuilder->createTreeMentalMap(
+                            $mentalMapId,
+                            $mentalMapRow['title'],
+                            preg_replace('/\<br(\s*)?\/?\>/i', "\n", $createForm->text),
+                            $user->getId(),
+                            $mentalMapRow['fragments'],
+                            $type,
+                        );
+                    }
+
+                    $this->storySlideService->createAndInsertSlide(
+                        $currentSlideModel->story_id,
+                        StorySlide::KIND_MENTAL_MAP,
+                        $currentSlideModel->number,
+                        function (int $slideId) use ($mentalMapId): string {
+                            return $this->storyEditorService->getSlideWithMentalMapBlockContent(
+                                $slideId,
+                                $mentalMapId->toString(),
+                                'mental-map',
+                                false,
+                            );
+                        },
+                    );
+                });
+            }
+
+            return ['success' => true];
+        }
+
+        return ['success' => false];
+
+        /*$mentalMapForm = new CreateAiMentalMapsForm();
         if ($mentalMapForm->load($request->post(), '')) {
 
             if (!$mentalMapForm->validate()) {
@@ -250,7 +324,7 @@ class MentalMapController extends BaseController
 
             return ["success" => true, 'slide_id' => $newSlideId];
         }
-        return ['success' => false];
+        return ['success' => false];*/
     }
 
     /**
