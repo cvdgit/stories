@@ -9,6 +9,7 @@ use backend\components\story\HTMLBLock;
 use backend\components\story\MentalMapBlockContent;
 use backend\components\story\reader\HTMLReader;
 use backend\components\story\RetellingBlockContent;
+use backend\components\story\SlideView;
 use backend\components\story\TestBlock;
 use common\models\Story;
 use frontend\MentalMap\Content\StorySlidesContentsFetcher;
@@ -33,8 +34,13 @@ class StoryTestsFetcher
         $data = [];
         foreach ($story->getSlides() as $slide) {
 
-            if ($slide->getView() === '' || $slide->getView() === 'slide') {
-                $data[] = new Slide($slide->getId(), (int) $slide->getSlideNumber(), $slide->getContent());
+            if ($slide->getView() === '' || $slide->getView() === 'slide' || $slide->getView() === SlideView::FINAL_SLIDE) {
+                $data[] = new Slide(
+                    $slide->getId(),
+                    (int) $slide->getSlideNumber(),
+                    $slide->getContent(),
+                    $slide->getView() === SlideView::FINAL_SLIDE
+                );
             }
 
             foreach ($slide->getBlocks() as $block) {

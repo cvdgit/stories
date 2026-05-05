@@ -18,12 +18,17 @@ class Slide implements SlideContentItemInterface
      * @var string
      */
     private $content;
+    /**
+     * @var bool
+     */
+    private $isFinal;
 
-    public function __construct(int $id, int $number, string $content)
+    public function __construct(int $id, int $number, string $content, bool $isFinal = false)
     {
         $this->id = $id;
         $this->number = $number;
         $this->content = $content;
+        $this->isFinal = $isFinal;
     }
 
     public function getSlideId(): int
@@ -39,5 +44,10 @@ class Slide implements SlideContentItemInterface
     public function getContent(): string
     {
         return $this->content;
+    }
+
+    public function isFinal(): bool
+    {
+        return $this->isFinal;
     }
 }

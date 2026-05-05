@@ -40,6 +40,7 @@ use common\models\StoryStoryTest;
 use common\models\test\SourceType;
 use DomainException;
 use common\models\Story;
+use modules\edu\query\GetStoryTests\StoryTestsFetcher;
 use yii\base\InvalidConfigException;
 use yii\db\Query;
 use yii\web\NotFoundHttpException;
@@ -464,8 +465,29 @@ class StoryEditorService
         $finalSlide->updateData($html);
     }
 
+    /**
+     * @throws NotFoundHttpException
+     * @throws InvalidConfigException
+     */
     public function deleteFinalSlide(int $storyId): void
     {
+        /*
+        $contents = (new StoryTestsFetcher())->fetch($storyId);
+        $finalSlides = array_values(
+            array_filter(
+                $contents->find(\modules\edu\query\GetStoryTests\Slide::class),
+                static function (\modules\edu\query\GetStoryTests\Slide $slide) {
+                    return $slide->isFinal();
+                },
+            ),
+        );
+        $finalSlideIds = array_map(static function(\modules\edu\query\GetStoryTests\Slide $slide) {
+            return $slide->getSlideId();
+        }, $finalSlides);
+        if (count($finalSlideIds) > 0) {
+            StorySlide::deleteAll(['in', 'id', $finalSlideIds]);
+        }
+         */
         StorySlide::deleteAll('story_id = :story AND kind = :kind', [':story' => $storyId, ':kind' => SlideKind::FINAL_SLIDE]);
     }
 
