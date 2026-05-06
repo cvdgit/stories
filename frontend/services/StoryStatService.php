@@ -248,7 +248,7 @@ class StoryStatService
                 'test' => $finishedTestingNumber,
                 'mental_map' => $finishedMentalMapNumber,
                 'total' => $viewedSlidesNumber,
-                'detail' => $this->getViewedSlidesDetail($storyId, $studentId)
+                'detail' => [], // $this->getViewedSlidesDetail($storyId, $studentId)
             ]
         ];
     }
