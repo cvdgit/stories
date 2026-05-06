@@ -149,7 +149,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
     fastWrapEl.appendChild(fastBox);
 
     const presentationBox = document.createElement('label');
-    presentationBox.innerHTML = `Режим презентации<input type="checkbox"></label>`;
+    presentationBox.innerHTML = `Режим презентации<input type="checkbox">`;
     presentationBox.querySelector('input[type=checkbox]')
       .addEventListener('click', presentationModeChangeHandler);
     fastWrapEl.appendChild(presentationBox);
@@ -676,10 +676,19 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
       return
     }
 
-    const {mentalMap: json, history, rewritePrompt, threshold, userProgress} = responseJson
-    mentalMapUserProgress = userProgress
-    mentalMapId = json.id
-    mentalMapHistory = history
+    const {mentalMap: json, history, rewritePrompt, threshold, userProgress} = responseJson;
+    mentalMapUserProgress = userProgress;
+    mentalMapId = json.id;
+    mentalMapHistory = history;
+    const {mapTypeIsMentalMapQuestions, questions} = json;
+    const mapQuestions = new MentalMapQuestions({typeIsMentalMapQuestions: mapTypeIsMentalMapQuestions, questions});
+
+    const imageFirst = Boolean(json.settings?.imageFirst);
+    const hideTooltip = Boolean(json.settings?.hideTooltip);
+    const hideFragmentText = Boolean(json.settings?.hideText);
+    const settingsPromptId = json.settings?.promptId;
+
+    const {settings} = json;
 
     const saveHistoryParams = {
       story_id: params?.story_id,
@@ -690,8 +699,72 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
       location: params.location
     };
 
+    const presentationHandler = new PresentationItemHandler(
+      this.element,
+      new VoiceResponse(new MissingWordsRecognition({
+        getRecordingLang() {
+          return (json.settings || {}).recognitionLang || 'ru-RU';
+        }
+      })),
+      {promptId: settings?.promptId, threshold},
+      async (payload) => {
+        return await saveUserResult({
+          ...saveHistoryParams,
+          ...payload
+        }).then(response => {
+          if (response.success) {
+            if (deck) {
+              if (deck.hasPlugin('stat')) {
+                const statPlugin = deck.getPlugin('stat');
+                statPlugin.sendStat({slideId: params.slide_id});
+              }
+            }
+          }
+
+          /*if (historyIsDone(history)) {
+            const content = createFinishContent(
+              history,
+              texts,
+              mapQuestions.typeIsMentalMapQuestions(),
+              () => restartHandler(mentalMapId)
+            );
+            $(this.element).append(content)
+            if (imageFirst) {
+              element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
+            }
+          }*/
+          return response;
+        })
+      },
+      history
+    );
+
     const {treeView} = json
     if (treeView) {
+
+      let treePresentationMode = false;
+      const treePresentationModeHandler = ({target}) => {
+        treePresentationMode = target.checked;
+
+        const elements = this.element.querySelectorAll('.tree-row');
+        elements.forEach(elem => {
+          const elemId = elem.dataset.imgId;
+          const historyItem = history.find(h => h.id === elemId);
+          if (treePresentationMode) {
+            MapImageStatus.update(elem.querySelector('.map-user-status'), {
+              hiding: historyItem.allTextClosed,
+              seconds: historyItem.seconds,
+              hidingPrev: historyItem.allTextClosedPrev,
+            });
+            return;
+          }
+          MapImageStatus.update(elem.querySelector('.map-user-status'), {
+            hiding: historyItem.hiding,
+            seconds: historyItem.seconds,
+            hidingPrev: historyItem.hidingPrev,
+          });
+        });
+      }
 
       const treeTexts = TreeView
         .flatten(json.treeData)
@@ -724,6 +797,17 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
 
           const historyItem = history.find(h => h.id === item.id);
 
+          if (treePresentationMode) {
+            if (presentationHandler.isRecording()) {
+              return;
+            }
+            this.element.querySelector('.mental-map-container')
+              .appendChild(
+                presentationHandler.handle(image)
+              );
+            return;
+          }
+
           mapImageClickHandler({
             image,
             texts: treeTexts,
@@ -751,7 +835,8 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
             settingsPromptId: json.settings?.promptId
           });
 
-        }
+        },
+        treePresentationModeHandler
       }, new VoiceResponse(new MissingWordsRecognition({
         getRecordingLang() {
           return (json.settings || {}).recognitionLang || 'ru-RU';
@@ -771,9 +856,6 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
 
       return
     }
-
-    const {mapTypeIsMentalMapQuestions, questions} = json;
-    const mapQuestions = new MentalMapQuestions({typeIsMentalMapQuestions: mapTypeIsMentalMapQuestions, questions});
 
     let fastMode = true;
     function fastModeChangeHandler(e) {
@@ -805,12 +887,6 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
 
     texts = json.map.images.map(image => createWordItem(image.text, image.id));
 
-    const imageFirst = Boolean(json.settings?.imageFirst);
-    const hideTooltip = Boolean(json.settings?.hideTooltip);
-    const hideFragmentText = Boolean(json.settings?.hideText);
-    const settingsPromptId = json.settings?.promptId;
-
-    const {settings} = json;
     const isPresentationMode = Boolean(settings?.presentationMode);
     if (isPresentationMode) {
 
@@ -968,46 +1044,6 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
     mentalMapBtn.classList.add('btn', 'btn-small', 'mental-map-btn')
     mentalMapBtn.textContent = 'Ментальная карта'
     let zoom;
-
-    const presentationHandler = new PresentationItemHandler(
-      this.element,
-      new VoiceResponse(new MissingWordsRecognition({
-        getRecordingLang() {
-          return (json.settings || {}).recognitionLang || 'ru-RU';
-        }
-      })),
-      {promptId: settings?.promptId, threshold},
-      async (payload) => {
-        return await saveUserResult({
-          ...saveHistoryParams,
-          ...payload
-        }).then(response => {
-          if (response.success) {
-            if (deck) {
-              if (deck.hasPlugin('stat')) {
-                const statPlugin = deck.getPlugin('stat');
-                statPlugin.sendStat({slideId: params.slide_id});
-              }
-            }
-          }
-
-          /*if (historyIsDone(history)) {
-            const content = createFinishContent(
-              history,
-              texts,
-              mapQuestions.typeIsMentalMapQuestions(),
-              () => restartHandler(mentalMapId)
-            );
-            $(this.element).append(content)
-            if (imageFirst) {
-              element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
-            }
-          }*/
-          return response;
-        })
-      },
-      history
-    );
 
     mentalMapBtn.addEventListener('click', (e) => {
 

@@ -7,7 +7,9 @@ function PresentationItemHandler(container, voiceResponse, {threshold, promptId}
   let isRecording = false;
 
   return {
-
+    isRecording() {
+      return isRecording;
+    },
     handle(image) {
       if (isRecording) {
         return;
@@ -50,14 +52,14 @@ function PresentationItemHandler(container, voiceResponse, {threshold, promptId}
             historyItem.done = done;
             historyItem.all = Number(json.similarity_percentage);
             historyItem.allTextClosed = Number(json.similarity_percentage);
-            historyItem.hiding = 0;
+            historyItem.hiding = 100;
             historyItem.target = 0;
           }
 
           const historyResponse = await saveUserHistoryHandler({
             image_fragment_id: image.id,
             overall_similarity: Number(json.similarity_percentage),
-            text_hiding_percentage: 0,
+            text_hiding_percentage: 100,
             text_target_percentage: 0,
             content: image.text,
             user_response: userResponse,
@@ -76,7 +78,7 @@ function PresentationItemHandler(container, voiceResponse, {threshold, promptId}
           historyItem.allTextClosed = responseHistoryItem.allTextClosed;
           historyItem.allTextClosedPrev = responseHistoryItem.allTextClosedPrev;
 
-          const imgElem = container.querySelector(`.zoom-container [data-img-id='${image.id}']`);
+          const imgElem = container.querySelector(`[data-img-id='${image.id}']`);
           if (imgElem) {
             MapImageStatus.update(imgElem.querySelector('.map-user-status'), {
               hiding: historyItem.allTextClosed,

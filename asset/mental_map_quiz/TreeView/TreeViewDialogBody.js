@@ -97,7 +97,7 @@ function renderStructure(node) {
 function renderRow(node, renderCustomNode, toggleHandler) {
   const row = document.createElement('div');
   row.className = 'tree-row';
-  row.dataset.id = node.id;
+  row.dataset.imgId = node.id;
 
   if (!node.isVisible) {
     row.style.display = 'none';
@@ -140,7 +140,7 @@ function findNode(nodes, id) {
 function updateVisibility(tree) {
   const list = flattenTree(tree);
   list.forEach(node => {
-    const row = document.querySelector(`[data-id="${node.id}"]`);
+    const row = document.querySelector(`[data-img-id="${node.id}"]`);
     if (!row) return;
     row.style.display = node.isVisible ? '' : 'none';
     const toggle = row.querySelector('.toggle');
