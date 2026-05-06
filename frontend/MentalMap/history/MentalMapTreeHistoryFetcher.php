@@ -28,7 +28,8 @@ class MentalMapTreeHistoryFetcher
             return [
                 'id' => $item['id'],
                 'all' => $item['all'] ?? 0,
-                'allPrev' => $item['allPrev'],
+                'allTextClosed' => (int) ($item['allTextClosed'] ?? 0),
+                'allTextClosedPrev' => (int) ($item['allTextClosedPrev'] ?? 0),
                 'hiding' => isset($item['hiding']) ? (int) $item['hiding'] : 0,
                 'target' => isset($item['target']) ? (int) $item['target'] : 0,
                 'done' => $item['done'] ?? false,
@@ -52,7 +53,8 @@ class MentalMapTreeHistoryFetcher
                 'id' => $node['id'],
                 'done' => false,
                 'all' => 0,
-                'allPrev' => 0,
+                'allTextClosed' => 0,
+                'allTextClosedPrev' => 0,
                 'hiding' => 0,
                 'hidingPrev' => 0,
                 'target' => 0,
@@ -79,6 +81,7 @@ class MentalMapTreeHistoryFetcher
         $today = (new DateTimeImmutable('now', new DateTimeZone('Europe/Moscow')))
                 ->setTime(0, 0)
                 ->format('U') . ' + (3 * 60 * 60)';
+
         $hidingBeforeQuery = (new Query())
             ->select(new Expression('MAX(t.text_hiding_percentage)'))
             ->from(['t' => 'mental_map_history'])
@@ -88,7 +91,7 @@ class MentalMapTreeHistoryFetcher
             ->andWhere(['<=', new Expression('t.created_at'), new Expression($today)]);
 
         $allBeforeQuery = (new Query())
-            ->select(new Expression('MAX(t.overall_similarity)'))
+            ->select(new Expression('MAX(t.all_hiding_percentage)'))
             ->from(['t' => 'mental_map_history'])
             ->where('t.image_fragment_id = h.image_fragment_id')
             ->andWhere('t.user_id = h.user_id')
@@ -98,7 +101,8 @@ class MentalMapTreeHistoryFetcher
             ->select([
                 'id' => 'h.image_fragment_id',
                 'all' => 'h.overall_similarity',
-                'allPrev' => $allBeforeQuery,
+                'allTextClosed' => 'h.all_hiding_percentage',
+                'allTextClosedPrev' => $allBeforeQuery,
                 'hiding' => 'h.text_hiding_percentage',
                 'hidingPrev' => $hidingBeforeQuery,
                 'target' => 'h.text_target_percentage',
@@ -131,7 +135,8 @@ class MentalMapTreeHistoryFetcher
                 $all = isset($row['all']) ? (int) $row['all'] : 0;
                 $item['done'] = $row['done'];
                 $item['all'] = $all;
-                $item['allPrev'] = (int) ($row['allPrev'] ?? 0);
+                $item['allTextClosed'] = (int) $rows[$item['id']]['allTextClosed'];
+                $item['allTextClosedPrev'] = (int) $rows[$item['id']]['allTextClosedPrev'];
                 $item['hidingPrev'] = (int) $rows[$item['id']]['hidingPrev'];
                 $item['seconds'] = (int) $rows[$item['id']]['seconds'];
                 $item['hiding'] = isset($row['hiding']) ? (int) $row['hiding'] : 0;
