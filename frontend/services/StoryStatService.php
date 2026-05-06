@@ -140,7 +140,7 @@ class StoryStatService
     private function getFinishedMentalMapsNumber(array $mentalMapItems): int
     {
         $doneNumber = 0;
-        /*foreach ($mentalMapItems as $item) {
+        foreach ($mentalMapItems as $item) {
             $mentalMap = MentalMap::findOne($item->getMentalMapId());
             if ($mentalMap !== null) {
                 $threshold = MentalMapThreshold::getThreshold(Yii::$app->params, $mentalMap->payload);
@@ -153,7 +153,7 @@ class StoryStatService
                     $doneNumber++;
                 }
             }
-        }*/
+        }
         return $doneNumber;
     }
 
