@@ -114,7 +114,7 @@ class MentalMapTreeHistoryFetcher
                 'h.mental_map_id' => $mentalMapId,
                 'h.user_id' => $userId,
             ])
-            ->andWhere("h.overall_similarity >= IFNULL(h.threshold, $threshold)")
+            //->andWhere("h.overall_similarity >= IFNULL(h.threshold, $threshold)")
             ->orderBy(['hiding' => SORT_DESC])
             ->all();
 
