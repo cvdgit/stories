@@ -71,15 +71,14 @@ class StatisticsController extends Controller
         $form = new StoryStudentStatForm();
         if ($request->isPost && $form->load($request->post(), '')) {
             try {
-                $stat = [];
-                /*$stat = $this->storyStatService->saveStudentStat($form);
+                $stat = $this->storyStatService->saveStudentStat($form);
                 $this->updateSessionHandler->handle(
                     new UpdateSessionCommand(
                         (int) $form->student_id,
                         (int) $form->story_id,
                         new DateTimeImmutable('now', new DateTimeZone('Europe/Moscow'))
                     )
-                );*/
+                );
                 return ['success' => true, 'stat' => $stat];
             } catch (Exception $exception) {
                 Yii::$app->errorHandler->logException($exception);
