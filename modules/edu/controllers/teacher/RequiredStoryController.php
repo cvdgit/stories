@@ -491,9 +491,9 @@ class RequiredStoryController extends Controller
         if ($session === null) {
             return ['success' => false, 'message' => 'Session not found'];
         }
-        if ($session->getFact() > 0) {
+        /*if ($session->getFact() > 0) {
             return ['success' => false, 'message' => 'Невозможно удалить т.к. сессия содержит фактические данные'];
-        }
+        }*/
 
         try {
             $this->requiredStorySessionRepository->delete(
