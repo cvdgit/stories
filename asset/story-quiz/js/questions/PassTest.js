@@ -227,7 +227,7 @@ function checkHandler($target, check, fragmentId, $content, maxPrevItems, fragme
 
     const next = $content.find('.highlight:not(.highlight-done,.highlight-fail):eq(0)');
     if (next.length && next.hasClass('disabled') && (!next.hasClass('highlight-done'))) {
-      next[0].scrollIntoView({block: "start", behavior: "smooth"});
+      //next[0].scrollIntoView({block: "start", behavior: "smooth"});
       next.removeClass('disabled');
       next.removeAttr('disabled');
       next.find('.dropdown-toggle').removeClass('disabled');
@@ -346,7 +346,7 @@ function contentReplaceToCorrect(content, fragments) {
   return content;
 }
 
-PassTest.prototype.create = function (question, fragmentAnswerCallback) {
+PassTest.prototype.create = function (question, fragmentAnswerCallback, hideCorrectAnswer) {
 
   const {fragments} = question.payload;
   let {content} = question.payload;
@@ -497,11 +497,17 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
     const value = $target.siblings('label').html().trim();
 
     $target.parents('.highlight:eq(0)').find('.dropdown-toggle').html(value);
+    $target.parents('.highlight:eq(0)').find('.dropdown-toggle').dropdown('toggle');
 
     const fragmentId = $target.parents('.highlight:eq(0)').attr('data-fragment-id');
-    const check = checkFragmentValueIsCorrect(fragmentId, value, fragments);
 
-    $target.parents('.highlight:eq(0)').find('.dropdown-toggle').dropdown('toggle');
+    if (hideCorrectAnswer) {
+      $target.parents('.highlight:eq(0)').addClass('highlight-done');
+      fragmentAction($target.parents('.highlight:eq(0)'), true, fragmentId, $content, question['max_prev_items']);
+      return;
+    }
+
+    const check = checkFragmentValueIsCorrect(fragmentId, value, fragments);
 
     if (viewIsOne) {
       oneFragmentAction($target.parents('.highlight:eq(0)'), check, fragmentId, question['max_prev_items']);
@@ -539,9 +545,21 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
     const fragment = fragments.find(elem => elem.id === fragmentId);
     if (values.length === fragment.items.filter(item => item.correct).length) {
 
-      const check = checkFragmentValueIsCorrect(fragmentId, values, fragments);
-
       $elem.find('.dropdown-toggle').dropdown('toggle');
+
+      if (hideCorrectAnswer) {
+        $target.parents('.highlight:eq(0)').addClass('highlight-done');
+        fragmentAction(
+          $target.parents('.highlight:eq(0)'),
+          true,
+          fragmentId,
+          $content,
+          question['max_prev_items']
+        );
+        return;
+      }
+
+      const check = checkFragmentValueIsCorrect(fragmentId, values, fragments);
 
       if (viewIsOne) {
         oneFragmentAction($target.parents('.highlight:eq(0)'), check, fragmentId, question['max_prev_items'])
@@ -558,6 +576,12 @@ PassTest.prototype.create = function (question, fragmentAnswerCallback) {
   this.element.on('change', 'input[type=text]', (e) => {
     const value = e.target.value;
     const fragmentId = $(e.target).attr('data-fragment-id');
+
+    if (hideCorrectAnswer) {
+      fragmentAction($(e.target), true, fragmentId, $content, question['max_prev_items']);
+      return;
+    }
+
     const check = checkFragmentValueIsCorrect(fragmentId, value, fragments);
 
     if (viewIsOne) {

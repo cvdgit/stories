@@ -2321,10 +2321,11 @@ function WikidsStoryTest(el, options) {
       };
 
       $('.seq-question', currentQuestionElement)
-        .html(that.passTestQuestion.create(currentQuestion, fragmentAnswerCallback));
+        .html(that.passTestQuestion.create(currentQuestion, fragmentAnswerCallback, testConfig.hideCorrectResponse()));
 
       dom.nextButton.off("click").on("click", function () {
         const answer = that.passTestQuestion.getUserAnswers(currentQuestion?.item_view, currentQuestion.payload);
+        console.log(answer);
         nextQuestion(answer);
       });
     }
@@ -3069,7 +3070,12 @@ function WikidsStoryTest(el, options) {
       && !testConfig.answerTypeIsInput(currentQuestion)
       && !testConfig.answerTypeIsMissingWords(currentQuestion);
 
-    if (questionViewColumn(currentQuestion)) {
+    if (
+      questionViewColumn(currentQuestion)
+      || questionViewDefault(currentQuestion)
+      || questionViewDragWords(currentQuestion)
+      || questionViewPassTest(currentQuestion)
+    ) {
       showCorrectAnswerPageCondition = testConfig.hideCorrectResponse();
     }
 
