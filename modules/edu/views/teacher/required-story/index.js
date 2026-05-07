@@ -192,7 +192,20 @@
       });
       dialog.show({
         url: $(e.target).attr('data-required-story-url'),
-        callback: function() {}
+        callback: function(bodyHtml) {
+          $(this).on('click', '.remove-session', async e => {
+            e.preventDefault();
+            if (!confirm('Подтверждаете?')) {
+              return;
+            }
+            const response = await window.Api.get(e.target.getAttribute('href'));
+            if (response.success) {
+              $(e.target).parents('tr:eq(0)').remove();
+              return;
+            }
+            toastr.error(response.message || 'Произошла ошибка');
+          });
+        }
       });
     });
 

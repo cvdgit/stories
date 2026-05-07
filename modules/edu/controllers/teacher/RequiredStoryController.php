@@ -441,6 +441,7 @@ class RequiredStoryController extends Controller
     /**
      * @throws BadRequestHttpException
      * @throws NotFoundHttpException
+     * @throws Exception
      */
     public function actionSessions(string $id): string
     {
@@ -466,5 +467,42 @@ class RequiredStoryController extends Controller
                 Uuid::fromString($id),
             ),
         ]);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function actionRemoveSession(int $studentId, string $requiredStoryId, string $date, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+        $requiredStory = $this->requiredStoriesRepository->findById(
+            Uuid::fromString($requiredStoryId)
+        );
+        if ($requiredStory === null) {
+            return ['success' => false, 'message' => 'Required story not found'];
+        }
+        if ($requiredStory->getStudentId() !== $studentId) {
+            return ['success' => false, 'message' => 'Required story is not owned by user'];
+        }
+        $session = $this->requiredStorySessionRepository->find(
+            $requiredStory->getId(),
+            new DateTimeImmutable($date)
+        );
+        if ($session === null) {
+            return ['success' => false, 'message' => 'Session not found'];
+        }
+        if ($session->getFact() > 0) {
+            return ['success' => false, 'message' => 'Невозможно удалить т.к. сессия содержит фактические данные'];
+        }
+
+        try {
+            $this->requiredStorySessionRepository->delete(
+                $session
+            );
+            return ['success' => true];
+        } catch (Exception $exception) {
+            Yii::$app->errorHandler->logException($exception);
+            return ['success' => false, 'message' => $exception->getMessage()];
+        }
     }
 }

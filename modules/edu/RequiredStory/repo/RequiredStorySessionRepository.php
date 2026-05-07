@@ -79,6 +79,19 @@ class RequiredStorySessionRepository
         $command->execute();
     }
 
+    /**
+     * @throws Exception
+     */
+    public function delete(RequiredStorySession $session): void
+    {
+        $command = Yii::$app->db->createCommand();
+        $command->delete(
+            RequiredStorySessionModel::tableName(),
+            ['required_story_id' => $session->getRequiredStoryId()->toString(), 'date' => $session->getDate()],
+        );
+        $command->execute();
+    }
+
     private function formatDate(DateTimeInterface $date): string
     {
         return $date->format('Y-m-d');
