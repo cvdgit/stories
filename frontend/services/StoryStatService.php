@@ -143,7 +143,7 @@ class StoryStatService
         foreach ($mentalMapItems as $item) {
             $mentalMap = MentalMap::findOne($item->getMentalMapId());
             if ($mentalMap !== null) {
-                /*$threshold = MentalMapThreshold::getThreshold(Yii::$app->params, $mentalMap->payload);
+                $threshold = MentalMapThreshold::getThreshold(Yii::$app->params, $mentalMap->payload);
                 if ($mentalMap->isMentalMapAsTree()) {
                     $history = (new MentalMapTreeHistoryFetcher())->fetch($mentalMap->uuid, $this->student->user_id, $mentalMap->getTreeData(), $threshold);
                 } else {
@@ -151,8 +151,7 @@ class StoryStatService
                 }
                 if (MentalMap::isDone($history, $threshold)) {
                     $doneNumber++;
-                }*/
-                $doneNumber++;
+                }
             }
         }
         return $doneNumber;
