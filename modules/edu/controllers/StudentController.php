@@ -6,6 +6,7 @@ namespace modules\edu\controllers;
 
 use common\models\UserStudent;
 use DateTimeImmutable;
+use DateTimeZone;
 use Exception;
 use modules\edu\components\TopicAccessManager;
 use modules\edu\models\EduClass;
@@ -123,6 +124,7 @@ class StudentController extends Controller
 
     /**
      * @throws ForbiddenHttpException|BadRequestHttpException
+     * @throws Exception
      */
     public function actionIndex(): string
     {
@@ -162,7 +164,10 @@ class StudentController extends Controller
             'dataProvider' => $dataProvider,
             'repetitionDataProvider' => $repetitionDataProvider,
             'classBookId' => $studentClassBookId,
-            'requiredStoriesWidgetConfig' => ['studentId' => $student->id],
+            'requiredStoriesWidgetConfig' => [
+                'studentId' => $student->id,
+                'startDate' => new DateTimeImmutable('now', new DateTimeZone('Europe/Moscow'))
+            ],
         ]);
     }
 

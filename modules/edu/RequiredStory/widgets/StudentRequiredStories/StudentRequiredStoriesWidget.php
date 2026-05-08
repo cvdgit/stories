@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace modules\edu\RequiredStory\widgets\StudentRequiredStories;
 
+use DateTimeImmutable;
 use Exception;
 use modules\edu\RequiredStory\RequiredStoriesService;
 use yii\base\Widget;
@@ -12,6 +13,8 @@ class StudentRequiredStoriesWidget extends Widget
 {
     /** @var int */
     public $studentId;
+    /** @var DateTimeImmutable */
+    public $startDate;
 
     /**
      * @var RequiredStoriesService
@@ -29,8 +32,23 @@ class StudentRequiredStoriesWidget extends Widget
      */
     public function run(): string
     {
+        $dataProvider = $this->requiredStoriesService->fetchForStudentWidget(
+            $this->studentId,
+            $this->startDate
+        );
+
+        $title = 'Обязательные истории на сегодня';
+        if (count($dataProvider->getModels()) === 0) {
+            $title = 'Обязательные истории на завтра';
+            $dataProvider = $this->requiredStoriesService->fetchForStudentWidget(
+                $this->studentId,
+                $this->startDate->modify('+1day')
+            );
+        }
+
         return $this->render('student-required-stories', [
-            'dataProvider' => $this->requiredStoriesService->fetchForStudentWidget($this->studentId),
+            'dataProvider' => $dataProvider,
+            'title' => $title,
         ]);
     }
 }

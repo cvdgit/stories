@@ -6,6 +6,7 @@ namespace modules\edu\RequiredStory\widgets\StudentRequiredStories;
 
 use common\models\StoryStudentProgress;
 use DateTimeImmutable;
+use DateTimeInterface;
 use DateTimeZone;
 use Exception;
 use modules\edu\models\EduStory;
@@ -31,8 +32,10 @@ class RequiredStoriesFetcher
      * @return WidgetRequiredStory[]
      * @throws Exception
      */
-    public function fetchAllForWidget(int $studentId): array
+    public function fetchAllForWidget(int $studentId, DateTimeInterface $startDate): array
     {
+        $queryStartDate = $startDate->setTime(0, 0)->format('U') . ' + (3 * 60 * 60)';
+
         $query = (new Query())
             ->select([
                 'id' => 't.id',
@@ -49,7 +52,7 @@ class RequiredStoriesFetcher
             ])
             ->andWhere(new Expression('IFNULL(p.progress, 0) < 100'))
             ->andWhere(['t.status' => (string) RequiredStoryStatus::open()])
-            ->andWhere(['<=', new Expression('t.started_at'), new Expression('UNIX_TIMESTAMP() + (3 * 60 * 60)')])
+            ->andWhere(['<=', new Expression('t.started_at'), new Expression($queryStartDate)])
             ->orderBy(['t.started_at' => SORT_ASC]);
 
         $rows = $query->all();

@@ -55,11 +55,11 @@ class RequiredStoriesService
     /**
      * @throws Exception
      */
-    public function fetchForStudentWidget(int $studentId): DataProviderInterface
+    public function fetchForStudentWidget(int $studentId, DateTimeInterface $startDate): DataProviderInterface
     {
         $requiredStories = (new RequiredStoriesFetcher(
             $this->requiredStorySessionRepository,
-        ))->fetchAllForWidget($studentId);
+        ))->fetchAllForWidget($studentId, $startDate);
         return new ArrayDataProvider([
             'allModels' => $requiredStories,
             'pagination' => false,

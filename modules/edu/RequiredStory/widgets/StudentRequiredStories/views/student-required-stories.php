@@ -9,10 +9,11 @@ use yii\widgets\ListView;
 /**
  * @var View $this
  * @var DataProviderInterface $dataProvider
+ * @var string $title
  */
 ?>
 <div class="header-block">
-    <h2 style="font-size: 32px; margin: 0; font-weight: 500; line-height: 1.2" class="h2">Обязательные истории</h2>
+    <h2 style="font-size: 32px; margin: 0; font-weight: 500; line-height: 1.2" class="h2"><?= $title ?></h2>
 </div>
 <div class="story-list" style="margin-bottom: 40px">
     <?= ListView::widget([
