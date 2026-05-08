@@ -193,7 +193,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
         .attr('title', 'Нажмите, что бы начать запись с микрофона')
         .tooltip('fixTitle')
       rowElement.classList.remove('current-row')
-      rowElement.parentNode.classList.remove('do-recording')
+      rowElement.parentNode?.classList.remove('do-recording')
       rowElement.querySelectorAll('.target-text').forEach(el => el.classList.remove('selected'))
 
       const historyItem = history.find(i => i.id === nodeId)
