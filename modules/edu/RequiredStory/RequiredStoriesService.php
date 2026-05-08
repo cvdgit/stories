@@ -7,6 +7,7 @@ namespace modules\edu\RequiredStory;
 use common\models\StoryStudentProgress;
 use DateTimeImmutable;
 use DateTimeInterface;
+use DateTimeZone;
 use Exception;
 use modules\edu\query\GetStoryTests\Slide;
 use modules\edu\RequiredStory\repo\RequiredStoriesRepository;
@@ -22,6 +23,8 @@ use Ramsey\Uuid\UuidInterface;
 use yii\base\InvalidConfigException;
 use yii\data\ArrayDataProvider;
 use yii\data\DataProviderInterface;
+use yii\db\Expression;
+use yii\db\Query;
 use yii\web\NotFoundHttpException;
 
 class RequiredStoriesService
@@ -236,6 +239,30 @@ class RequiredStoriesService
     public function getStudentPlan(int $studentId): int
     {
         $requiredStoryItems = $this->repo->findAllByStudent($studentId);
+
+        $storyIds = array_map(static function (StudentStoryItem $item) {
+            return $item->getStoryId();
+        }, $requiredStoryItems);
+
+        $today = (new DateTimeImmutable('now', new DateTimeZone('Europe/Moscow')))
+                ->setTime(0, 0)
+                ->format('U') . ' + (3 * 60 * 60)';
+        $query = (new Query())
+            ->select(['storyId' => 't.story_id'])
+            ->from(['t' => 'story_student_progress'])
+            ->where(['in', 't.story_id', $storyIds])
+            ->andWhere(['t.student_id' => $studentId])
+            ->andWhere('t.progress = 100')
+            ->andWhere(['<=', new Expression('t.updated_at'), new Expression($today)]);
+        $completedStories = array_column($query->all(), 'storyId');
+
+        $requiredStoryItems = array_filter(
+            $requiredStoryItems,
+            static function(StudentStoryItem $item) use ($completedStories) {
+                return !in_array($item->getStoryId(), $completedStories);
+            }
+        );
+
         $total = 0;
         foreach ($requiredStoryItems as $item) {
             $collection = $this->storyContentService->getStudentFactContentItemsDetail(
