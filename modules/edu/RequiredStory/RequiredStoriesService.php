@@ -256,12 +256,16 @@ class RequiredStoriesService
             ->andWhere(['<=', new Expression('t.updated_at'), new Expression($today)]);
         $completedStories = array_column($query->all(), 'storyId');
 
-        $requiredStoryItems = array_filter(
-            $requiredStoryItems,
-            static function(StudentStoryItem $item) use ($completedStories) {
-                return !in_array($item->getStoryId(), $completedStories);
-            }
-        );
+        if (count($completedStories) > 0) {
+            $requiredStoryItems = array_values(
+                array_filter(
+                    $requiredStoryItems,
+                    static function (StudentStoryItem $item) use ($completedStories) {
+                        return !in_array($item->getStoryId(), $completedStories);
+                    },
+                ),
+            );
+        }
 
         $total = 0;
         foreach ($requiredStoryItems as $item) {
