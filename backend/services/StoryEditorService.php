@@ -457,7 +457,7 @@ class StoryEditorService
      */
     public function createFinalSlide(int $storyId): void
     {
-        $finalSlide = StorySlide::createSlideFull($storyId, 'Final slide', null, SlideStatus::VISIBLE, SlideKind::FINAL_SLIDE);
+        $finalSlide = StorySlide::createSlideFull($storyId, 'Final slide', null, SlideStatus::VISIBLE/*, SlideKind::FINAL_SLIDE*/);
         if (!$finalSlide->save()) {
             throw new DomainException('Can\'t be saved StorySlide model. Errors: '. implode(', ', $finalSlide->getFirstErrors()));
         }
