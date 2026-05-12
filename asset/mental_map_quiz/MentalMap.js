@@ -854,7 +854,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         container: 'body'
       });
 
-      return
+      return treeViewInstance.destroy
     }
 
     let fastMode = true;
@@ -1460,7 +1460,10 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
   }
 
   return {
-    run,
+    destroyHandler: null,
+    async run() {
+      this.destroyHandler = await run();
+    },
     canNext() {
       if (params?.mentalMapRequired) {
         return mentalMapHistory.reduce((all, val) => all && val.done, true)
@@ -1471,12 +1474,17 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
       return mentalMapUserProgress
     },
     destroy() {
-      if (treeViewInstance) {
+
+      if (this.destroyHandler) {
+        this.destroyHandler();
+      }
+
+      /*if (treeViewInstance) {
         treeViewInstance.destroy()
       }
       if (voiceResponse.getStatus()) {
         voiceResponse.stop()
-      }
+      }*/
     }
   }
 }

@@ -441,6 +441,17 @@ export default function TreeViewBody(tree, voiceResponse, history, params, onEnd
     },
     on(type, listener, useCapture) {
       body.addEventListener(type, listener, useCapture)
+    },
+    destroy() {
+      const row = body.querySelector('.node-row.current-row');
+      if (!row) {
+        return;
+      }
+      const el = row.querySelector('.node-control .gn');
+      if (el) {
+        $(el).data('abort', true);
+        el.click();
+      }
     }
   }
 

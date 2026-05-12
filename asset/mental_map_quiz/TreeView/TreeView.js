@@ -150,10 +150,7 @@ function TreeView({id, name, infoText, tree, history, params, settings, onMental
       return wrap
     },
     destroy() {
-      window.removeEventListener('blur', blurHandler)
-      if (voiceResponse.getStatus()) {
-        voiceResponse.stop()
-      }
+      blurHandler();
     }
   }
 }

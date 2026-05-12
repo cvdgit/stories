@@ -57,6 +57,14 @@ const mentalMapBuilder = window.mentalMapBuilder = new MentalMapManagerQuiz();
     init();
   }
 
-  Reveal.addEventListener('slidechanged', initMentalMap)
-  Reveal.addEventListener('ready', initMentalMap)
+  Reveal.addEventListener('slidechanged', () => {
+    initMentalMap();
+    mentalMapBuilder.destroyInstances();
+  })
+  Reveal.addEventListener('ready', ({indexh, indexv}) => {
+    if (Number(indexh) > 0 || Number(indexv) > 0) {
+      return;
+    }
+    initMentalMap();
+  })
 })()

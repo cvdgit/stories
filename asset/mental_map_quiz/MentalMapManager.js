@@ -10,6 +10,11 @@ export default function MentalMapManager() {
     },
     getInstance(slideId) {
       return instances[slideId]
+    },
+    destroyInstances() {
+      Object.keys(instances).forEach(key => {
+        instances[key].destroy();
+      });
     }
   }
 }

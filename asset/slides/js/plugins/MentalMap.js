@@ -78,8 +78,16 @@ export default function MentalMap() {
         init()
       }
 
-      deck.addEventListener('slidechanged', initMentalMap)
-      deck.addEventListener('ready', initMentalMap)
+      deck.addEventListener('slidechanged', () => {
+        initMentalMap();
+        window.mentalMapBuilder.destroyInstances();
+      });
+      deck.addEventListener('ready', ({indexh, indexv}) => {
+        if (Number(indexh) > 0 || Number(indexv) > 0) {
+          return;
+        }
+        initMentalMap();
+      });
     },
 
     backToStory() {
