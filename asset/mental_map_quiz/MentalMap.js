@@ -190,6 +190,19 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
 
   const removePunctuation = text => text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}–«»~]/g, '').replace(/\s{2,}/g, " ")
 
+  function blurHandler() {
+    if (!voiceResponse.getStatus()) {
+      return;
+    }
+    voiceResponse.stop()
+    const el = document.querySelector('#start-recording')
+    if (el) {
+      $(el)
+        .data('abort', true)
+        .trigger('click');
+    }
+  }
+
   function mapImageClickHandler({
                                   image,
                                   texts,
@@ -312,6 +325,8 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
           return
         }
 
+        window.addEventListener('blur', blurHandler, false);
+
         if (voiceResponse.getStatus()) {
           timer.stop();
         } else {
@@ -335,11 +350,11 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
           true,
           threshold,
           () => {
+            window.removeEventListener('blur', blurHandler);
             wrapper.querySelector('.content-diff').style.display = 'inline-block';
-            if (fastMode) {
-              setTimeout(() => {
-                wrapper.querySelector('#start-retelling').click()
-              }, 100)
+            const startRetellingElem = wrapper.querySelector('#start-retelling');
+            if (fastMode && !$(wrapper.querySelector('#start-recording')).data('abort')) {
+              setTimeout(() => startRetellingElem.click(), 100);
             }
           })
       })
@@ -957,7 +972,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
       return;
     }
 
-    window.addEventListener('blur', function() {
+    /*window.addEventListener('blur', function() {
       if (voiceResponse.getStatus()) {
         voiceResponse.stop()
         const el = document.querySelector('#start-recording')
@@ -965,7 +980,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
           $(el).trigger('click')
         }
       }
-    }, false);
+    }, false);*/
 
     function hideTooltipChecker(tooltipState) {
       if (tooltipState === 'hide') {

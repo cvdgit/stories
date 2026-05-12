@@ -143,7 +143,6 @@ function TreeView({id, name, infoText, tree, history, params, settings, onMental
       }
     }
   }
-  window.addEventListener('blur', blurHandler, false);
 
   return {
     getElement() {

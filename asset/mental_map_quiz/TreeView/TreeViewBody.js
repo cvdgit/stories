@@ -161,7 +161,19 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
     const finalSpan = voiceResponseElem.querySelector('.final_span')
     const interimSpan = voiceResponseElem.querySelector('.interim_span')
 
+    const blurHandler = function() {
+      if (voiceResponse.getStatus()) {
+        voiceResponse.stop()
+        const el = document.querySelector('.gn.recording')
+        if (el) {
+          $(el).data('abort', true).trigger('click')
+        }
+      }
+    }
+
     const startClickHandler = targetElement => {
+
+      window.addEventListener('blur', blurHandler, false);
 
       targetElement.closest('.node-row').classList.add('pending')
       historyItem.pending = true
@@ -187,6 +199,8 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
     }
 
     const stopClickHandler = async (targetElement, abort) => {
+
+      window.removeEventListener('blur', blurHandler);
 
       $(rowElement.querySelector('.gn'))
         .tooltip('hide')

@@ -27,9 +27,15 @@ function RecordingPanel(voiceResponse, processUserResponse, onStartCallback) {
   const interimSpan = element.querySelector('.interim_span');
   const resultSpan = element.querySelector('.result_span');
 
+  function blurHandler() {
+    voiceControl.stop(true);
+  }
+
   const voiceControl = new PresentationVoiceControl(
     voiceResponse,
     () => {
+
+      window.addEventListener('blur', blurHandler);
       element.querySelector('.fragment-recording-status').innerHTML = 'Идет запись';
 
       finalSpan.innerHTML = '';
@@ -43,7 +49,9 @@ function RecordingPanel(voiceResponse, processUserResponse, onStartCallback) {
 
       onStartCallback();
     },
-    async () => {
+    async (el, abort) => {
+
+      window.removeEventListener('blur', blurHandler);
 
       if (finalSpan.innerHTML.trim().length) {
         resultSpan.innerHTML +=
@@ -57,7 +65,7 @@ function RecordingPanel(voiceResponse, processUserResponse, onStartCallback) {
       element.querySelector('.fragment-recording-status').innerHTML = 'Обработка ответа...';
       element.querySelector('.fragment-recording-recorder').style.display = 'none';
 
-      processUserResponse(userResponse);
+      processUserResponse(abort ? '' : userResponse);
     }
   );
 

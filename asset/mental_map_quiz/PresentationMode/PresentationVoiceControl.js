@@ -46,7 +46,7 @@ export default function PresentationVoiceControl(
     voiceResponse.stop(() => {
       elem.querySelector('.gn').classList.remove('disabled');
       delete elem.dataset.state;
-      stopClickHandler(elem.querySelector('.gn'));
+      stopClickHandler(elem.querySelector('.gn'), abort);
     });
   }
 
