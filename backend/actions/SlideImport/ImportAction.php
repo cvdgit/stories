@@ -51,7 +51,7 @@ class ImportAction extends Action
                         $user->getId(),
                         $importForm->slides,
                         null,
-                        $importForm->delete_slides,
+                        $importForm->isDeleteSlides(),
                     ),
                 );
                 return ['success' => true, 'message' => 'Слайды успешно импортированы'];

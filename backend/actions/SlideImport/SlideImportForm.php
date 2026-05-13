@@ -23,4 +23,9 @@ class SlideImportForm extends Model
             ['delete_slides', 'boolean'],
         ];
     }
+
+    public function isDeleteSlides(): bool
+    {
+        return $this->delete_slides === '1';
+    }
 }
