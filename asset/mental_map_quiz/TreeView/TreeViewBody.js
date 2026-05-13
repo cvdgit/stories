@@ -4,6 +4,7 @@ import sendMessage from "../lib/sendMessage";
 import {calcHiddenTextPercent, createWordItem} from "../words";
 import {processOutputAsJson, stripTags} from "../common";
 import {SimilarityChecker} from "../lib/calcSimilarity";
+import createMouseWindowTracker from "../lib/createMouseWindowTracker";
 
 const nodeStatusSuccessHtml = `
 <div class="retelling-status-show"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -171,7 +172,12 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
       }
     }
 
+    let tracker;
+
     const startClickHandler = targetElement => {
+
+      tracker = createMouseWindowTracker();
+      tracker.on("leave", blurHandler);
 
       window.addEventListener('blur', blurHandler, false);
 
@@ -199,6 +205,10 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
     }
 
     const stopClickHandler = async (targetElement, abort) => {
+
+      if (tracker) {
+        tracker.destroy();
+      }
 
       window.removeEventListener('blur', blurHandler);
 
