@@ -180,7 +180,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
       tracker.on("leave", blurHandler);
 
       if (!tracker.isFullscreen()) {
-        alert('no fullscreen');
+        alert('Нужно развернуть окно браузера на весь экран');
         return false;
       }
 
