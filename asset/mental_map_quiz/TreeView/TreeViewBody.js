@@ -179,6 +179,11 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
       tracker = createMouseWindowTracker();
       tracker.on("leave", blurHandler);
 
+      if (!tracker.isFullscreen()) {
+        alert('no fullscreen');
+        return false;
+      }
+
       window.addEventListener('blur', blurHandler, false);
 
       targetElement.closest('.node-row').classList.add('pending')

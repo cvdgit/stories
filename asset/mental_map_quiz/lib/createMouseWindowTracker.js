@@ -1,14 +1,37 @@
 export default function createMouseWindowTracker() {
   let isMouseInsideWindow = true;
+  let isFullscreenWindow = checkFullscreen();
 
   const listeners = {
     leave: [],
-    enter: []
+    enter: [],
+    fullscreen: [],
+    windowed: []
   };
 
-  function emit(eventName) {
+  function emit(eventName, value) {
     for (const callback of listeners[eventName]) {
-      callback();
+      callback(value);
+    }
+  }
+
+  function checkFullscreen() {
+    const threshold = 8;
+    return (
+      Math.abs(window.screenX) <= threshold &&
+      Math.abs(window.screenY) <= threshold &&
+      Math.abs(window.outerWidth - screen.availWidth) <= threshold &&
+      Math.abs(window.outerHeight - screen.availHeight) <= threshold
+    );
+  }
+
+  function updateFullscreenState() {
+    const newState = checkFullscreen();
+
+    if (newState !== isFullscreenWindow) {
+      isFullscreenWindow = newState;
+
+      emit(isFullscreenWindow ? "fullscreen" : "windowed");
     }
   }
 
@@ -44,11 +67,17 @@ export default function createMouseWindowTracker() {
     }
   }
 
+  function handleResize() {
+    updateFullscreenState();
+  }
+
   document.addEventListener("mouseout", handleMouseOut);
   window.addEventListener("mouseenter", handleMouseEnter);
 
   document.addEventListener("visibilitychange", handleVisibilityChange);
   window.addEventListener("blur", handleBlur);
+
+  window.addEventListener("resize", handleResize);
 
   return {
     on(eventName, callback) {
@@ -68,6 +97,10 @@ export default function createMouseWindowTracker() {
       return isMouseInsideWindow;
     },
 
+    isFullscreen() {
+      return isFullscreenWindow;
+    },
+
     destroy() {
       document.removeEventListener("mouseout", handleMouseOut);
       window.removeEventListener("mouseenter", handleMouseEnter);
@@ -78,9 +111,11 @@ export default function createMouseWindowTracker() {
       );
 
       window.removeEventListener("blur", handleBlur);
+      window.removeEventListener("resize", handleResize);
 
-      listeners.leave = [];
-      listeners.enter = [];
+      for (const key in listeners) {
+        listeners[key] = [];
+      }
     }
   };
 }
