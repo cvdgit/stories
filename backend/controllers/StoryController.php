@@ -452,7 +452,7 @@ class StoryController extends BaseController
         $response->format = Response::FORMAT_JSON;
         $payload = Json::decode($request->rawBody);
         $storyId = (int) $payload['storyId'];
-        $imageUrl = $payload['imageUrl'];
+        $imageUrl = Yii::$app->params['gpt.api.host'] . $payload['imageUrl'];
 
         try {
             $story = $this->findModel(Story::class, $storyId);
