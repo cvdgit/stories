@@ -48,7 +48,8 @@
         'X-CSRF-Token': $("meta[name=csrf-token]").attr('content'),
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({prompt})
+      body: JSON.stringify({prompt}),
+      signal: AbortSignal.timeout(60000)
     });
     if (!response.ok) {
       throw new Error('Fetch story test error');
