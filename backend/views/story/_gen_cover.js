@@ -192,7 +192,7 @@
         .find('.gen-image-image')
         .empty()
         .append(
-          $(`<img class="gen-img" style="max-width: 100%;" alt="..." src="${image.src}"/>`)
+          $(`<img class="gen-img" data-url="${imageUrl}" style="max-width: 100%;" alt="..." src="${image.src}"/>`)
         );
     }
     image.onerror = (error) =>
@@ -238,7 +238,6 @@
       if (!confirm('Подтверждаете?')) {
         return;
       }
-
     });
 
     $imageItem.on('click', '[data-gen-action=edit-image]', e => {
@@ -252,12 +251,6 @@
         `<div class="gen-image-active">Обложка истории</div>`
       )
     }
-
-    $imageItem.on('click', '.compose', async () => {
-      const prompt = $imageItem.find('.composeInput').val();
-      const response = await editImage(prompt, imageUrl);
-      console.log(response);
-    });
 
     return $imageItem;
   }
@@ -409,6 +402,29 @@
         if (response?.success) {
           location.reload();
         }
+      });
+    });
+
+    $body.on('click', '.compose', async e => {
+
+      const prompt = $(e.target).parents('.composeForm').find('.composeInput').val();
+      if (!prompt) {
+        return;
+      }
+
+      $body.removeClass('gen-error')
+        .addClass('gen-loading');
+
+      const dialog = document.getElementById('gen-cover-modal');
+      dialog.scrollTop = dialog.scrollHeight;
+
+      const imageUrl = $(e.target).parents('.gen-images-image-wrap').find('.gen-img').data('url');
+      const images = await editImage(prompt, imageUrl);
+
+      saveGenImage(storyId, images[0].url).then(({url, key}) => {
+        $body.removeClass('gen-loading gen-error');
+        createImageItem({imageUrl: url, imageKey: key, storyId})
+          .appendTo($body.find('.gen-images'));
       });
     });
 

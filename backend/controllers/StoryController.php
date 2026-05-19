@@ -513,7 +513,7 @@ class StoryController extends BaseController
 
         $data = $this->apiLocalRequest($imageFilePath, $prompt);
 
-        return ['success' => true, 'data' => ['r' => $data]];
+        return ['success' => true, 'data' => Json::decode($data)];
     }
 
     private function apiLocalRequest(string $filePath, string $prompt): string
@@ -529,7 +529,7 @@ class StoryController extends BaseController
 
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 0);
 
         $response = curl_exec($ch);
 
