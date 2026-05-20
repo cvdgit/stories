@@ -18,6 +18,7 @@ import MentalMap from "./plugins/MentalMap";
 import ContentMentalMap from "./plugins/ContentMentalMap";
 import Retelling from "./plugins/Retelling";
 import TableOfContents from "./plugins/TableOfContents";
+import SpeakSlideText from "./plugins/SpeakSlideText";
 import GlobalContext from "./GlobalContext";
 
 GlobalContext.sessionId = uuidv4();
@@ -36,6 +37,7 @@ function onSlideMouseDown(e, player) {
     $target.parents('.new-questions').length ||
     $target.parents('.content-mm-wrap').length ||
     $target.parents('.table-of-contents').length ||
+    $target.parents('section[speakSlideText]') ||
     $target.parents('.mental-map').length ||
     $target.parents('.retelling-block').length ||
     ($target[0].tagName === "IMG" && $target.attr("data-action") === "1") ||
@@ -107,7 +109,8 @@ window.initSlides = function() {
       SlideLinksPlugin,
       StatPlugin,
       Background,
-      NextStory
+      NextStory,
+      SpeakSlideText
     ]
   });
 

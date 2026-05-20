@@ -68,6 +68,18 @@ function SlidesPlayer(deck) {
           }
         }
 
+        if (deck.hasPlugin('speak-slide-text')) {
+          const currentSlideId = Number($(deck.getCurrentSlide()).attr('data-id'));
+          const plugin = deck.getPlugin('speak-slide-text');
+          if (!plugin.canNext()) {
+            $('.custom-navigate-right')
+              .popover({placement: 'top', title: 'Информация', content: 'Необходимо пересказать текст со слайда', trigger: 'manual'})
+              .popover('show');
+            setTimeout(() => $('.custom-navigate-right').popover('hide'), 1000);
+            return;
+          }
+        }
+
         deck.next();
       }
     },

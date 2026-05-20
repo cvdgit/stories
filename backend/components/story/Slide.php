@@ -24,6 +24,10 @@ class Slide
     protected $audioFile;
     /** @var string */
     private $content;
+    /**
+     * @var array|null
+     */
+    private $settings;
 
     /**
      * @return AbstractBlock[]
@@ -179,5 +183,15 @@ class Slide
                 },
             ),
         );
+    }
+
+    public function setSettings(array $settings): void
+    {
+        $this->settings = $settings;
+    }
+
+    public function getSettings(): array
+    {
+        return $this->settings ?? [];
     }
 }

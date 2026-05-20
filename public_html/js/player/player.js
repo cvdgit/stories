@@ -370,6 +370,16 @@ var WikidsPlayer = (function(document, $) {
                 }
               }
 
+              if (window['SpeakSlideTextPlugin']) {
+                if (!window.SpeakSlideTextPlugin.canNext()) {
+                  $('.custom-navigate-right')
+                    .popover({placement: 'top', title: 'Информация', content: 'Необходимо пересказать текст со слайда', trigger: 'manual'})
+                    .popover('show');
+                  setTimeout(() => $('.custom-navigate-right').popover('hide'), 1000);
+                  return;
+                }
+              }
+
               Reveal.next();
             }
         },
@@ -399,6 +409,7 @@ function onSlideMouseDown(e) {
         $target.parents('.new-questions').length ||
       $target.parents('.content-mm-wrap').length ||
       $target.parents('.table-of-contents').length ||
+      $target.parents('section[speakSlideText]') ||
         $target.parents('.mental-map').length ||
         $target.parents('.retelling-block').length ||
         ($target[0].tagName === "IMG" && $target.attr("data-action") === "1") ||

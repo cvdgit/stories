@@ -9,7 +9,7 @@ use yii\base\InvalidConfigException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
-class BaseController extends Controller
+abstract class BaseController extends Controller
 {
     /**
      * @template T

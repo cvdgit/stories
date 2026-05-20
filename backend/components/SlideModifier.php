@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace backend\components;
 
 use backend\components\story\AbstractBlock;
@@ -28,20 +30,26 @@ class SlideModifier
     /** @var Slide */
     private $slide;
 
-    public function __construct(int $slideID, string $slideData)
+    public function __construct(int $slideId, string $slideData, array $settings = null)
     {
         $search = [
             'data-id=""',
+            'data-id="0"',
             'data-background-color="#000000"',
         ];
         $replace = [
-            'data-id="' . $slideID . '"',
+            'data-id="' . $slideId . '"',
+            'data-id="' . $slideId . '"',
             'data-background-color="#fff"',
         ];
         $slideData = str_replace($search, $replace, $slideData);
 
         $this->slide = (new HtmlSlideReader($slideData))->load();
-        $this->slide->setId($slideID);
+        $this->slide->setId($slideId);
+
+        if ($settings !== null) {
+            $this->slide->setSettings($settings);
+        }
     }
 
     public function addImageParams(): self

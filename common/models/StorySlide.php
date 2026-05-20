@@ -26,6 +26,7 @@ use yii\db\Query;
  * @property int $updated_at
  * @property int $kind
  * @property int $link_slide_id
+ * @property array|null $settings
  *
  * @property NeoSlideRelations[] $neoSlideRelations
  * @property StoryFeedback[] $storyFeedbacks
@@ -411,5 +412,10 @@ class StorySlide extends ActiveRecord
             ])
             ->orderBy(['number' => SORT_ASC])
             ->all();
+    }
+
+    public function updateSettings(array $settings): void
+    {
+        $this->settings = $settings;
     }
 }

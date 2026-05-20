@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace common\models;
 
+use backend\components\SlideModifier;
 use backend\models\links\BlockType;
 use common\components\StoryCover;
 use common\helpers\Url;
@@ -19,6 +20,7 @@ use dosamigos\taggable\Taggable;
 use common\helpers\Translit;
 use yii\db\Expression;
 use yii\db\Query;
+use yii\helpers\Json;
 use yii\web\NotFoundHttpException;
 use yii\db\ActiveQuery;
 
@@ -443,7 +445,7 @@ class Story extends ActiveRecord
     public function slidesData(bool $withoutQuestions = false): string
     {
         $slides = (new Query())->from('{{%story_slide}} AS t1')
-            ->select(['t1.data', 't2.data AS link_data', 't1.id'])
+            ->select(['t1.data', 't2.data AS link_data', 't1.id', 't1.settings'])
             ->leftJoin('{{%story_slide}} t2', 't2.id = t1.link_slide_id')
             ->where('t1.`story_id` = :story', [':story' => $this->id])
             ->andWhere('t1.`status` = :status', [':status' => 1])
@@ -458,7 +460,7 @@ class Story extends ActiveRecord
             if ($slideData === 'link') {
                 continue;
             }
-            $data .= $slideData;
+            /*$data .= $slideData;
             $search = [
                 'data-id=""',
                 'data-id="0"',
@@ -469,7 +471,13 @@ class Story extends ActiveRecord
                 'data-id="' . $slide['id'] . '"',
                 'data-background-color="#fff"',
             ];
-            $data = str_replace($search, $replace, $data);
+            $data = str_replace($search, $replace, $data);*/
+
+            $data .= (new SlideModifier(
+                (int) $slide['id'],
+                $slideData,
+                $slide['settings'] === null ? null : Json::decode($slide['settings'])
+            ))->render();
         }
         return '<div class="slides">' . $data . '</div>';
     }

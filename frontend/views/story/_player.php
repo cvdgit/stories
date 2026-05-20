@@ -21,6 +21,7 @@ use yii\web\View;
  * @var array $completedRetelling
  * @var array $contentMentalMaps
  * @var int $userId
+ * @var array $speakTextSlides
  */
 
 MainAsset::register($this);
@@ -82,6 +83,12 @@ $plugins = [
         'class' => \common\widgets\Reveal\Plugins\TableOfContents::class,
         'storyId' => $model->id,
         'userId' => $userId,
+    ],
+    [
+        'class' => \common\widgets\Reveal\Plugins\SpeakSlideText::class,
+        'storyId' => $model->id,
+        'userId' => $userId,
+        'speakTextSlides' => $speakTextSlides,
     ],
 ];
 

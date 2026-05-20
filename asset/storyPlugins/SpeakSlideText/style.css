@@ -1,0 +1,36 @@
+section[speakSlideText] .slide-paragraph p {
+  user-select: none;
+}
+
+section[speakSlideText] .slide-paragraph {
+  transition: all 200ms;
+}
+
+section[speakSlideText] .slide-paragraph {
+  padding: 10px;
+}
+
+section[speakSlideText] .slide-paragraph:hover {
+  background-color: #e0e0e0;
+  border-radius: 8px;
+}
+
+.speak-slide-text-info {
+  position: absolute;
+  right: 10px;
+  background-color: #fff;
+  padding: 4px;
+  border-radius: 8px;
+  margin-right: 4px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  z-index: 999;
+  font-size: 20px;
+}
+
+.speak-slide-text-info-icon {
+  width: 30px;
+  height: 30px;
+}

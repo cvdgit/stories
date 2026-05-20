@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use backend\components\book\BookStoryGenerator;
 use backend\components\training\base\Serializer;
 use backend\components\training\collection\TestBuilder;
+use backend\SlideEditor\SlideSettings\SlideSettingsPayload;
 use common\helpers\UserHelper;
 use common\models\Playlist;
 use common\models\SiteSection;
@@ -18,6 +19,7 @@ use common\services\StoryAudioService;
 use common\services\StoryFavoritesService;
 use common\services\StoryLikeService;
 use common\services\QuestionsService;
+use common\widgets\Reveal\Plugins\SpeakSlideText;
 use frontend\components\StoryRenderParams;
 use frontend\GptChat\GptChatForm;
 use frontend\MentalMap\Content\ContentMentalMapsFetcher;
@@ -30,6 +32,8 @@ use frontend\models\StoryTrackModel;
 use frontend\models\UserStorySearch;
 use frontend\TableOfContents\UserHistoryAction;
 use Yii;
+use yii\db\Expression;
+use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use common\models\Story;
@@ -424,6 +428,7 @@ class StoryController extends Controller
         }*/
 
         $contentMentalMaps = [];
+        $speakTextSlides = [];
 
         if (!$user->isGuest) {
 
@@ -436,6 +441,36 @@ class StoryController extends Controller
                 $user->getId(),
                 $user->can(UserRoles::ROLE_TEACHER)
             );
+
+            $ids = (new Query())
+                ->select([
+                    'slideId' => 'rh.slide_id',
+                    'overallSimilarity' => new Expression('MAX(rh.overall_similarity)'),
+                ])
+                ->from(['rh' => 'retelling_history'])
+                ->where([
+                    'story_id' => $id,
+                    'user_id' => Yii::$app->user->getId(),
+                ])
+                ->andWhere('rh.overall_similarity >= ' . SpeakSlideText::SPEAK_SLIDE_TEXT_THRESHOLD)
+                ->groupBy(['rh.slide_id'])
+                ->all();
+            $completedRetelling = array_map(static function (array $item): int {
+                return (int) $item['slideId'];
+            }, $ids);
+
+            foreach ($model->storySlides as $slide) {
+                if ($slide->settings === null) {
+                    continue;
+                }
+                $settings = SlideSettingsPayload::fromPayload($slide->settings);
+                if ($settings->isSpeakSlideText()) {
+                    $speakTextSlides[] = [
+                        'slideId' => $slide->id,
+                        'passed' => in_array($slide->id, $completedRetelling, true),
+                    ];
+                }
+            }
         }
 
         return $this->renderAjax('_player', [
@@ -444,8 +479,9 @@ class StoryController extends Controller
             'audioTrackPath' => $audioTrackPath,
             'playlistID' => Yii::$app->request->get('list'),
             'saveStat' => $this->countersService->needUpdateCounters(),
-            'completedRetelling' => $completedRetelling,
+            'completedRetelling' => [], // $completedRetelling,
             'contentMentalMaps' => $contentMentalMaps,
+            'speakTextSlides' => $speakTextSlides,
             'userId' => $user->getId(),
         ]);
     }

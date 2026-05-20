@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace modules\edu\controllers;
 
+use backend\SlideEditor\SlideSettings\SlideSettingsPayload;
 use common\rbac\UserRoles;
+use common\widgets\Reveal\Plugins\SpeakSlideText;
 use DateTimeImmutable;
 use frontend\MentalMap\Content\ContentMentalMapsFetcher;
 use modules\edu\components\TopicAccessManager;
@@ -18,6 +20,7 @@ use modules\edu\StoryContent\StoryContentService;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\Exception;
+use yii\db\Expression;
 use yii\db\Query;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
@@ -178,6 +181,37 @@ class StoryController extends Controller
             $user->getId(),
         );
 
+        $ids = (new Query())
+            ->select([
+                'slideId' => 'rh.slide_id',
+                'overallSimilarity' => new Expression('MAX(rh.overall_similarity)'),
+            ])
+            ->from(['rh' => 'retelling_history'])
+            ->where([
+                'story_id' => $id,
+                'user_id' => Yii::$app->user->getId(),
+            ])
+            ->andWhere('rh.overall_similarity >= ' . SpeakSlideText::SPEAK_SLIDE_TEXT_THRESHOLD)
+            ->groupBy(['rh.slide_id'])
+            ->all();
+        $completedRetelling = array_map(static function (array $item): int {
+            return (int) $item['slideId'];
+        }, $ids);
+
+        $speakTextSlides = [];
+        foreach ($story->storySlides as $slide) {
+            if ($slide->settings === null) {
+                continue;
+            }
+            $settings = SlideSettingsPayload::fromPayload($slide->settings);
+            if ($settings->isSpeakSlideText()) {
+                $speakTextSlides[] = [
+                    'slideId' => $slide->id,
+                    'passed' => in_array($slide->id, $completedRetelling, true),
+                ];
+            }
+        }
+
         return $this->render('view', [
             'story' => $story,
             'programId' => $program_id,
@@ -188,6 +222,7 @@ class StoryController extends Controller
             'requiredStorySession' => $requiredStorySession,
             'requiredStoryStat' => $requiredStoryStat,
             'requiredStoryIsDone' => $requiredStoryIsDone,
+            'speakTextSlides' => $speakTextSlides,
         ]);
     }
 }

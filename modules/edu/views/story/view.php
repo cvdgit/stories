@@ -26,6 +26,7 @@ use yii\web\View;
  * @var RequiredStorySession|null $requiredStorySession
  * @var array $requiredStoryStat
  * @var bool $requiredStoryIsDone
+ * @var array $speakTextSlides
  */
 
 $storyId = $story->id;
@@ -89,6 +90,12 @@ $config = [
     'table-of-contents' => [
         'storyId' => $storyId,
         'userId' => Yii::$app->user->id,
+    ],
+    'speak-slide-text' => [
+        'storyId' => $storyId,
+        'userId' => Yii::$app->user->id,
+        'speakTextSlides' => $speakTextSlides,
+        'threshold' => \common\widgets\Reveal\Plugins\SpeakSlideText::SPEAK_SLIDE_TEXT_THRESHOLD,
     ],
 ];
 

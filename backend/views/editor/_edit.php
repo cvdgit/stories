@@ -1004,10 +1004,9 @@ $js = <<< JS
         showCreateBlockModal(type);
     });
 
-    const slideSourceModal = new RemoteModal({
-        id: 'slide-source-modal',
-        title: 'Разметка слайда',
-        dialogClassName: 'modal-lg'
+    const slideSettingsModal = new RemoteModal({
+        id: 'slide-settings-modal',
+        title: 'Настройки слайда'
     });
 
     $('.slide-menu').on('click', '[data-slide-action]', function(e) {
@@ -1038,15 +1037,14 @@ $js = <<< JS
                 $('#neo-relation-modal').modal('show');
                 break;
             case 'source':
-                slideSourceModal.show({
-                    url: '/admin/index.php?r=slide/source&id=' + StoryEditor.getCurrentSlideID(),
-                    callback: function() {
-                        attachBeforeSubmit($(this).find('form')[0], function(form) {
-                            sendForm($(form).attr('action'), $(form).attr('method'), new FormData(form))
-                                .done(response => {
-                                    StoryEditor.loadSlide(StoryEditor.getCurrentSlideID());
-                                    slideSourceModal.hide();
-                                });
+                slideSettingsModal.show({
+                    url: '/admin/index.php?r=editor/slide-settings/form&id=' + StoryEditor.getCurrentSlideID(),
+                    callback: function(htmlResponse) {
+                        attachBeforeSubmit($(htmlResponse).find('form')[0], async (form) => {
+                            const response = await sendForm($(form).attr('action'), $(form).attr('method'), new FormData(form));
+                            console.log(response);
+                            //StoryEditor.loadSlide(StoryEditor.getCurrentSlideID());
+                            slideSettingsModal.hide();
                         });
                     }
                 });

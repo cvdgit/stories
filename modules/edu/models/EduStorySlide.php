@@ -16,6 +16,7 @@ use yii\db\ActiveRecord;
  * @property int $updated_at
  * @property int $kind
  * @property int $link_slide_id
+ * @property array|null $settings
  */
 class EduStorySlide extends ActiveRecord
 {
