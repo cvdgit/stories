@@ -8,6 +8,8 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
 use frontend\MentalMap\MentalMap;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 use yii\db\Expression;
 use yii\db\Query;
 
@@ -18,11 +20,18 @@ class MentalMapTreeHistoryFetcher
         int $userId,
         array $treeData,
         int $threshold,
-        bool $repetitionMode = false
+        bool $repetitionMode = false,
+        bool $presentationMode = false
     ): array {
         $list = $this->flatten($treeData);
         if (!$repetitionMode) {
-            $list = $this->createMentalMapTreeHistory($list, $mentalMapId, $userId, $threshold);
+            $list = $this->createMentalMapTreeHistory(
+                $list,
+                $mentalMapId,
+                $userId,
+                $threshold,
+                $presentationMode,
+            );
         }
         return array_map(static function (array $item): array {
             return [
@@ -39,44 +48,16 @@ class MentalMapTreeHistoryFetcher
         }, $list);
     }
 
-    /**
-     * @throws Exception
-     */
     private function createMentalMapTreeHistory(
         array $nodeList,
         string $mentalMapId,
         int $userId,
-        int $threshold
+        int $threshold,
+        bool $presentationMode = false
     ): array {
-        $history = array_map(static function (array $node): array {
-            return [
-                'id' => $node['id'],
-                'done' => false,
-                'all' => 0,
-                'allTextClosed' => 0,
-                'allTextClosedPrev' => 0,
-                'hiding' => 0,
-                'hidingPrev' => 0,
-                'target' => 0,
-                'seconds' => 0,
-            ];
+        $history = array_map(static function (array $node) {
+            return new HistoryItem(Uuid::fromString($node['id']));
         }, $nodeList);
-
-        /*$oldRows = (new Query())
-            ->select([
-                'id' => 'h.image_fragment_id',
-                'all' => 'MAX(h.overall_similarity)',
-                'hiding' => 'MAX(h.text_hiding_percentage)',
-                'target' => 'MAX(h.text_target_percentage)',
-            ])
-            ->from(['h' => 'mental_map_history'])
-            ->where([
-                'h.mental_map_id' => $mentalMapId,
-                'h.user_id' => $userId,
-            ])
-            ->groupBy('h.image_fragment_id')
-            ->indexBy('id')
-            ->all();*/
 
         $today = (new DateTimeImmutable('now', new DateTimeZone('Europe/Moscow')))
                 ->setTime(0, 0)
@@ -97,26 +78,60 @@ class MentalMapTreeHistoryFetcher
             ->andWhere('t.user_id = h.user_id')
             ->andWhere(['<=', new Expression('t.created_at'), new Expression($today)]);
 
-        $historyRows = (new Query())
-            ->select([
-                'id' => 'h.image_fragment_id',
-                'all' => 'h.overall_similarity',
-                'allTextClosed' => 'h.all_hiding_percentage',
-                'allTextClosedPrev' => $allBeforeQuery,
-                'hiding' => 'h.text_hiding_percentage',
-                'hidingPrev' => $hidingBeforeQuery,
-                'target' => 'h.text_target_percentage',
-                'all_words' => 'h.all_important_words_included',
-                'seconds' => 'h.seconds',
-            ])
-            ->from(['h' => 'mental_map_history'])
-            ->where([
-                'h.mental_map_id' => $mentalMapId,
-                'h.user_id' => $userId,
-            ])
-            ->andWhere("h.overall_similarity >= IFNULL(h.threshold, $threshold)")
-            ->orderBy(['hiding' => SORT_DESC])
-            ->all();
+        if ($presentationMode === false) {
+            $query = (new Query())
+                ->select([
+                    'id' => 'h.image_fragment_id',
+                    'all' => 'h.overall_similarity',
+                    'allTextClosed' => 'h.all_hiding_percentage',
+                    'allTextClosedPrev' => $allBeforeQuery,
+                    'hiding' => 'h.text_hiding_percentage',
+                    'hidingPrev' => $hidingBeforeQuery,
+                    'target' => 'h.text_target_percentage',
+                    'all_words' => 'h.all_important_words_included',
+                    'seconds' => 'h.seconds',
+                ])
+                ->from(['h' => 'mental_map_history'])
+                ->where([
+                    'h.mental_map_id' => $mentalMapId,
+                    'h.user_id' => $userId,
+                ])
+                ->andWhere("h.overall_similarity >= IFNULL(h.threshold, $threshold)")
+                ->andWhere('h.all_hiding_percentage = 0')
+                ->orderBy(['hiding' => SORT_DESC]);
+        } else {
+            $query = (new Query())
+                ->select([
+                    'id' => 'h.image_fragment_id',
+                    //'all' => 'MAX(h.overall_similarity)',
+                    'allTextClosed' => 'MAX(h.all_hiding_percentage)',
+                    'allTextClosedPrev' => $allBeforeQuery,
+                ])
+                ->from(['h' => 'mental_map_history'])
+                ->where([
+                    'h.mental_map_id' => $mentalMapId,
+                    'h.user_id' => $userId,
+                ])
+                ->groupBy(['h.image_fragment_id'])
+                ->indexBy('id');
+            $rows = $query->all();
+            return array_map(static function (HistoryItem $item) use ($rows) {
+                if (isset($rows[$item->getId()->toString()])) {
+                    $row = $rows[$item->getId()->toString()];
+                    $all = (int) ($row['allTextClosed'] ?? 0);
+                    return (new HistoryItem(
+                        $item->getId(),
+                        $all >= 100,
+                        0,
+                        $all,
+                        (int) ($row['allTextClosedPrev'] ?? 0)
+                    ))->toArray();
+                }
+                return $item->toArray();
+            }, $history);
+        }
+
+        $historyRows = $query->all();
 
         $historyRowsByFragmentId = [];
         foreach ($historyRows as $historyRow) {
@@ -129,29 +144,30 @@ class MentalMapTreeHistoryFetcher
 
         $rows = $this->filterUserHistoryGroupByCorrect($historyRowsByFragmentId);
 
-        return array_map(static function (array $item) use ($rows): array {
-            if (isset($rows[$item['id']])) {
-                $row = $rows[$item['id']];
-                $all = isset($row['all']) ? (int) $row['all'] : 0;
-                $item['done'] = $row['done'];
-                $item['all'] = $all;
-                $item['allTextClosed'] = (int) $rows[$item['id']]['allTextClosed'];
-                $item['allTextClosedPrev'] = (int) $rows[$item['id']]['allTextClosedPrev'];
-                $item['hidingPrev'] = (int) $rows[$item['id']]['hidingPrev'];
-                $item['seconds'] = (int) $rows[$item['id']]['seconds'];
-                $item['hiding'] = isset($row['hiding']) ? (int) $row['hiding'] : 0;
-                $item['target'] = isset($row['target']) ? (int) $row['target'] : 0;
+        return array_map(static function (HistoryItem $item) use ($rows) {
+            if (isset($rows[$item->getId()->toString()])) {
+                $row = $rows[$item->getId()->toString()];
+                return (new HistoryItem(
+                    $item->getId(),
+                    $row['done'],
+                    (int) ($row['all'] ?? 0),
+                    (int) ($row['allTextClosed'] ?? 0),
+                    (int) ($row['allTextClosedPrev'] ?? 0),
+                    (int) ($row['hiding'] ?? 0),
+                    (int) ($row['hidingPrev'] ?? 0),
+                    (int) ($row['seconds'] ?? 0),
+                    (int) ($row['target'] ?? 0),
+                ))->toArray();
             }
-            return $item;
+            return $item->toArray();
         }, $history);
     }
 
-    public function filterUserHistoryGroupByCorrect(array $historyRowsByFragmentId): array
+    private function filterUserHistoryGroupByCorrect(array $historyRowsByFragmentId): array
     {
         $rows = [];
         foreach ($historyRowsByFragmentId as $fragmentId => $rowsGroup) {
-
-            $allWordsDoneItems = array_values(array_filter($rowsGroup, static function(array $groupItem): bool {
+            $allWordsDoneItems = array_values(array_filter($rowsGroup, static function (array $groupItem): bool {
                 return $groupItem['all_words'] === '1';
             }));
             if (count($allWordsDoneItems) > 0) {
@@ -159,7 +175,7 @@ class MentalMapTreeHistoryFetcher
                 continue;
             }
 
-            $allWordsFailItems = array_filter($rowsGroup, static function(array $groupItem): bool {
+            $allWordsFailItems = array_filter($rowsGroup, static function (array $groupItem): bool {
                 return $groupItem['all_words'] === '-1';
             });
             if (count($allWordsFailItems) > 0) {

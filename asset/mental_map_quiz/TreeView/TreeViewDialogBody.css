@@ -5,6 +5,10 @@
   width: 100%;
 }
 
+.tree-dialog-body .fragment-item-done {
+  border: 0 none !important;
+}
+
 .tree-dialog-body .node-title {
   font-size: 20px;
   line-height: 34px;

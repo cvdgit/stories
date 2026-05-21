@@ -23,6 +23,7 @@ class MentalMapHistoryForm extends Model
     public $location;
     public $seconds;
     public $all_hiding_percentage;
+    public $presentationMode;
 
     public function rules(): array
     {
@@ -42,7 +43,7 @@ class MentalMapHistoryForm extends Model
                 ],
                 'integer',
             ],
-            [['repetition_mode', 'all_important_words_included'], 'boolean'],
+            [['repetition_mode', 'all_important_words_included', 'presentationMode'], 'boolean'],
             [['content', 'payload'], 'safe'],
             ['location', 'string', 'max' => 10],
         ];

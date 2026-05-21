@@ -725,7 +725,8 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
       async (payload) => {
         return await saveUserResult({
           ...saveHistoryParams,
-          ...payload
+          ...payload,
+          presentationMode: true
         }).then(response => {
           if (response.success) {
             if (deck) {
@@ -758,8 +759,22 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
     if (treeView) {
 
       let treePresentationMode = false;
-      const treePresentationModeHandler = ({target}) => {
+      const savedHistory = [];
+      const treePresentationModeHandler = async ({target}) => {
         treePresentationMode = target.checked;
+
+        if (target.checked) {
+
+          savedHistory.length = 0;
+          history.map(h => savedHistory.push(h));
+
+          const presentationHistory = await window.Api.get(`/mental-map/presentation-tree-history?id=${mentalMapId}`);
+          history.length = 0;
+          presentationHistory.history.map(h => history.push(h));
+        } else {
+          history.length = 0;
+          savedHistory.map(h => history.push(h));
+        }
 
         const elements = this.element.querySelectorAll('.tree-row');
         elements.forEach(elem => {

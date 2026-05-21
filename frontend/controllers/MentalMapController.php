@@ -250,6 +250,8 @@ class MentalMapController extends Controller
                         $user->getId(),
                         $mentalMap->getTreeData(),
                         $threshold,
+                        $form->repetition_mode,
+                        $form->presentationMode ?? false
                     );
                 } else {
                     $history = (new MentalMapHistoryFetcher())->fetch(
@@ -498,5 +500,27 @@ class MentalMapController extends Controller
             $row['date'] = SmartDate::dateSmart($row['date'], true);
             return $row;
         }, $rows);
+    }
+
+    public function actionPresentationTreeHistory(string $id, Response $response, WebUser $user): array
+    {
+        $response->format = Response::FORMAT_JSON;
+
+        $mentalMap = MentalMap::findOne($id);
+        if ($mentalMap === null) {
+            return ['success' => false, 'message' => 'Mental Map not found'];
+        }
+
+        return [
+            'success' => true,
+            'history' => (new MentalMapTreeHistoryFetcher())->fetch(
+                $mentalMap->uuid,
+                $user->getId(),
+                $mentalMap->getTreeData(),
+                MentalMapThreshold::getThreshold(Yii::$app->params, $mentalMap->payload),
+                false,
+                true
+            ),
+        ];
     }
 }
