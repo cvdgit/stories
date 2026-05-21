@@ -192,7 +192,6 @@ export default function TreeViewDialogBody({tree, voiceResponse, history, itemCl
       return body
     },
     init() {
-
       const list = flattenTree(tree);
       list.map(node => {
 
@@ -204,6 +203,11 @@ export default function TreeViewDialogBody({tree, voiceResponse, history, itemCl
         }), historyItem.done);
 
         row.querySelector('.node-title').addEventListener('click', e => {
+
+          body.querySelectorAll('.node-row')
+            .forEach(elem => elem.classList.remove('node-active'));
+          row.classList.add('node-active');
+
           itemClickHandler({
             id: node.id,
             text: node.description,
@@ -228,64 +232,6 @@ export default function TreeViewDialogBody({tree, voiceResponse, history, itemCl
           )
         );
       });
-
-      /*body.appendChild(
-        buildTree(tree, (node) => {
-          const historyItem = history.find(({id}) => id === node.id);
-          const row = createRow(node, MapImageStatus.render({
-            hiding: historyItem.hiding || 0,
-            seconds: historyItem.seconds || 0,
-            hidingPrev: historyItem.hidingPrev || 0,
-          }), historyItem.done);
-
-          row.querySelector('.node-title').addEventListener('click', e => {
-            itemClickHandler({
-              id: node.id,
-              text: node.description,
-              description: node.description
-            });
-          });
-
-          const stat = row.querySelector('.map-user-status-hiding');
-          if (stat) {
-            stat.addEventListener('click', async () => {
-              console.log(await getHistoryLog(node.id));
-            });
-          }
-
-          return row;
-        })
-      );*/
-
-      /*const list = flatten(tree);
-      list.map(
-        node => {
-
-          const historyItem = history.find(({id}) => id === node.id);
-          const row = createRow(node, MapImageStatus.render({
-            hiding: historyItem.hiding || 0,
-            seconds: historyItem.seconds || 0,
-            hidingPrev: historyItem.hidingPrev || 0,
-          }), historyItem.done);
-
-          row.querySelector('.node-title').addEventListener('click', e => {
-            itemClickHandler({
-              id: node.id,
-              text: node.description,
-              description: node.description
-            });
-          });
-
-          const stat = row.querySelector('.map-user-status-hiding');
-          if (stat) {
-            stat.addEventListener('click', async () => {
-              console.log(await getHistoryLog(node.id));
-            });
-          }
-
-          body.appendChild(row);
-        }
-      );*/
     },
     restart() {
       body.remove()

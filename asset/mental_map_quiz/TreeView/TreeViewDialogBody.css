@@ -5,6 +5,11 @@
   width: 100%;
 }
 
+.tree-dialog-body .node-row.node-active .node-body,
+.tree-dialog-body .node-row.node-active .node-status {
+  background-color: #dee2e6;
+}
+
 .tree-dialog-body .fragment-item-done {
   border: 0 none !important;
 }
@@ -21,23 +26,29 @@
 
 .tree-dialog-body .map-user-status {
   pointer-events: all;
-  font-size: 18px;
+  font-size: 15px;
   line-height: 22px;
   background-color: unset;
   justify-content: right;
   margin-top: 0;
+  width: 100%;
 }
 
 .tree-dialog-body .node-status {
-  width: auto;
-  height: auto;
+  width: 100px;
+  height: 100%;
   left: unset;
   display: flex;
   justify-content: space-between;
   position: relative;
+  padding: 0 10px 0 0;
+  background-color: #faf9f9;
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
 }
 
-.tree-dialog-body .node-row:hover {
+.tree-dialog-body .node-row:hover .node-body,
+.tree-dialog-body .node-row:hover .node-status {
   background-color: #eee;
 }
 
@@ -49,12 +60,17 @@
   position: relative;
   display: flex;
   flex-direction: row;
-  gap: 10px;
   margin-bottom: 0;
+  height: 100%;
+  padding: 4px 0;
 }
 
 .tree-dialog-body .node-body {
   flex: 1;
+  background-color: #faf9f9;
+  height: 100%;
+  border-bottom-right-radius: 10px;
+  border-top-right-radius: 10px;
 }
 
 
