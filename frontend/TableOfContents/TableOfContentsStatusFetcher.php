@@ -39,7 +39,7 @@ class TableOfContentsStatusFetcher
      * @throws NotFoundHttpException
      * @throws InvalidConfigException
      */
-    public function fetch(int $storyId, int $userId, int $studentId): array
+    public function fetch(int $storyId, int $userId, int $studentId, bool $isEducation): array
     {
         $slideContent = (new StoryTestsFetcher())->fetch($storyId);
 
@@ -70,11 +70,19 @@ class TableOfContentsStatusFetcher
                     PHP_ROUND_HALF_UP,
                 );
             } else {
-                $progress = $this->slideViewProgress(
-                    $storyId,
-                    $slide->getSlideId(),
-                    $userId,
-                );
+                if ($isEducation) {
+                    $progress = $this->slideViewProgressEducation(
+                        $storyId,
+                        $slide->getSlideId(),
+                        $studentId,
+                    );
+                } else {
+                    $progress = $this->slideViewProgress(
+                        $storyId,
+                        $slide->getSlideId(),
+                        $userId,
+                    );
+                }
             }
             $history[] = [
                 'type' => 'slide',
@@ -164,6 +172,20 @@ class TableOfContentsStatusFetcher
                 'story_id' => $storyId,
                 'slide_id' => $slideId,
                 'user_id' => $userId,
+            ])
+            ->all();
+        return count($statRows) > 0 ? 100 : 0;
+    }
+
+    private function slideViewProgressEducation(int $storyId, int $slideId, int $studentId): int
+    {
+        $statRows = (new Query())
+            ->select('*')
+            ->from(['t' => '{{%story_student_stat}}'])
+            ->where([
+                'story_id' => $storyId,
+                'slide_id' => $slideId,
+                'student_id' => $studentId,
             ])
             ->all();
         return count($statRows) > 0 ? 100 : 0;

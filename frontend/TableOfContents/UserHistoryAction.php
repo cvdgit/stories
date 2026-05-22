@@ -10,6 +10,7 @@ use yii\base\Action;
 use yii\base\InvalidConfigException;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Request;
 use yii\web\Response;
 use yii\web\User as WebUser;
 
@@ -18,7 +19,7 @@ class UserHistoryAction extends Action
     /**
      * @throws InvalidConfigException|NotFoundHttpException|BadRequestHttpException
      */
-    public function run(int $storyId, int $userId, Response $response, WebUser $user): array
+    public function run(int $storyId, int $userId, Request $request, Response $response, WebUser $user): array
     {
         $response->format = Response::FORMAT_JSON;
 
@@ -27,10 +28,19 @@ class UserHistoryAction extends Action
             throw new BadRequestHttpException('Student not found');
         }
 
-        $data = (new TableOfContentsStatusFetcher(new SpeechTrainerContentsFetcher()))->fetch(
+        $isEducation = false;
+        if ($request->referrer !== null) {
+            $path = parse_url($request->referrer, PHP_URL_PATH);
+            $isEducation = preg_match('#^/edu/#', $path) === 1;
+        }
+
+        $data = (new TableOfContentsStatusFetcher(
+            new SpeechTrainerContentsFetcher()
+        ))->fetch(
             $storyId,
             $user->getId(),
             $student->id,
+            $isEducation
         );
         return [
             'success' => true,
