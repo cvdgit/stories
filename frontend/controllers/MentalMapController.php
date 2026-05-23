@@ -163,6 +163,13 @@ class MentalMapController extends Controller
 
         $payload['mapTypeIsMentalMapQuestions'] = $mentalMap->mapTypeIsMentalMapQuestions();
 
+        $presentationPromptEdit = '';
+        if ($user->can(UserRoles::ROLE_ADMIN)) {
+            $presentationPromptEdit = Yii::$app->urlManagerBackend->createAbsoluteUrl(
+                ['/llm-prompt/update-form', 'id' => Yii::$app->params['mental-map.tree.presentation.prompt.id']],
+            );
+        }
+
         return [
             'success' => true,
             'mentalMap' => $payload,
@@ -171,6 +178,7 @@ class MentalMapController extends Controller
             'threshold' => MentalMapThreshold::getThreshold(Yii::$app->params, $mentalMap->payload),
             'promptId' => $mentalMap->getSettingsPromptId(),
             'userProgress' => $userProgress,
+            'presentationPromptEdit' => $presentationPromptEdit,
         ];
     }
 

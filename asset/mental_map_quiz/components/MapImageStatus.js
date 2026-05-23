@@ -46,7 +46,7 @@ MapImageStatus.render = function ({hiding, seconds, hidingPrev}) {
   const element = document.createElement('div');
   element.classList.add('map-user-status');
   element.innerHTML = `
-<div>
+<div class="map-user-status-hiding-wrap">
 <span class="map-user-status-hiding" data-value="${hiding}">${hidingLabel}</span>
 <span class="map-user-status-hiding-add">${hidingAddLabel}</span>
 </div>
@@ -59,7 +59,7 @@ MapImageStatus.render = function ({hiding, seconds, hidingPrev}) {
  * @param {HTMLElement} container
  * @param {Props} param1
  */
-MapImageStatus.update = function (container, {hiding, seconds, hidingPrev}) {
+MapImageStatus.update = function (container, {hiding, seconds, hidingPrev, statClickHandler}) {
   const hidingElem = container.querySelector('.map-user-status-hiding');
   if (hidingElem) {
     hidingElem.innerHTML = '';
@@ -68,6 +68,12 @@ MapImageStatus.update = function (container, {hiding, seconds, hidingPrev}) {
     if (Number(hiding) > currentHiding) {
       hidingElem.setAttribute('data-value', hiding);
       hidingElem.innerHTML = hiding + '%';
+    }
+
+    $(container.querySelector('.map-user-status-hiding-wrap')).off('click');
+    if (hidingElem.innerHTML !== '' && typeof statClickHandler === 'function') {
+      container.classList.add('map-user-status-stat')
+      $(container.querySelector('.map-user-status-hiding-wrap')).on('click', statClickHandler);
     }
   }
   const hidingAddElem = container.querySelector('.map-user-status-hiding-add');

@@ -1,8 +1,11 @@
 import RecordingPanel from "./RecordingPanel";
 import {userResponseChecker} from "../lib/userResponseProcessChain";
 import MapImageStatus from "../components/MapImageStatus";
+import {stripTags} from "../common";
+import tippy from "tippy.js";
+import 'tippy.js/dist/tippy.css';
 
-function PresentationItemHandler(container, voiceResponse, {threshold, promptId}, saveUserHistoryHandler, history) {
+function PresentationItemHandler(container, voiceResponse, {threshold, promptId, presentationPromptEdit}, saveUserHistoryHandler, history) {
 
   let isRecording = false;
 
@@ -77,13 +80,57 @@ function PresentationItemHandler(container, voiceResponse, {threshold, promptId}
           historyItem.seconds = responseHistoryItem.seconds;
           historyItem.allTextClosed = responseHistoryItem.allTextClosed;
           historyItem.allTextClosedPrev = responseHistoryItem.allTextClosedPrev;
+          historyItem.result = '';
 
           const imgElem = container.querySelector(`[data-img-id='${image.id}']`);
           if (imgElem) {
+            console.log('MapImageStatus.update')
             MapImageStatus.update(imgElem.querySelector('.map-user-status'), {
               hiding: historyItem.allTextClosed,
               seconds: historyItem.seconds,
               hidingPrev: historyItem.allTextClosedPrev,
+              statClickHandler: () => {
+
+                const tip = document.createElement('div');
+                tip.innerHTML = '<div class="tip-content"><div class="tip-content-header"><b>Результат:</b></div><div class="tip-content-body"><div style="display: flex; flex-direction: row; gap: 10px; align-items: center"><img width="30px" src="/img/loading.gif" alt="loading" /> запрос...</div></div></div>';
+
+                if (historyItem.result) {
+                  tip.innerHTML = `
+<div class="tip-content">
+<div class="tip-content-header"><b>Результат:</b> ${presentationPromptEdit ? `<a target="_blank" href="${presentationPromptEdit}">Edit prompt</a>` : ''}</div>
+<div class="tip-content-body">${historyItem.result}</div>
+</div>
+`;
+                } else {
+                  window.sendStreamMessage(
+                    `/admin/index.php?r=gpt/mental-map/fragment-result`,
+                    {
+                      text: stripTags(image.text).trim(),
+                      userResponse: json.user_response
+                    },
+                    (message) => {
+                      instance.setContent(`<div class="tip-content"><div class="tip-content-header"><b>Результат:</b> ${presentationPromptEdit ? `<a target="_blank" href="${presentationPromptEdit}">Edit prompt</a>` : ''}</div><div class="tip-content-body">${message}</div></div>`);
+                    },
+                    (message) => {
+                      historyItem.result = message;
+                    }
+                  );
+                }
+
+                const instance = tippy(
+                  imgElem,
+                  {
+                    trigger: 'manual',
+                    content: tip,
+                    allowHTML: true,
+                    interactive: true,
+                    appendTo: document.body,
+                    maxWidth: 'none',
+                  }
+                );
+
+                instance.show();
+              }
             });
           }
 

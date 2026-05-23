@@ -215,12 +215,12 @@ export default function TreeViewDialogBody({tree, voiceResponse, history, itemCl
           });
         });
 
-        const stat = row.querySelector('.map-user-status-hiding');
+        /*const stat = row.querySelector('.map-user-status-hiding');
         if (stat) {
           stat.addEventListener('click', async () => {
             console.log(await getHistoryLog(node.id));
           });
-        }
+        }*/
 
         body.appendChild(
           renderRow(

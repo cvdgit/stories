@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace backend\modules\gpt\controllers;
 
+use backend\modules\gpt\Prompts\LlmPrompt;
+use Yii;
+use yii\base\ExitException;
 use yii\helpers\Json;
 use yii\web\Request;
 
@@ -32,5 +35,30 @@ TEXT;
 
         $fields = $this->createFieldsPayload($content);
         $this->sendStream('text-create-fragments', Json::encode($fields));
+    }
+
+    /**
+     * @throws ExitException
+     */
+    public function actionFragmentResult(Request $request): void
+    {
+        $payload = Json::decode($request->rawBody);
+        $text = $payload['text'];
+        $userResponse = $payload['userResponse'];
+
+        $prompt = LlmPrompt::findByKey('mental-map-tree-presentation-fragment');
+        if ($prompt === null) {
+            $this->flushError('Промт не найден');
+            Yii::$app->end();
+        }
+
+        $content = str_replace(
+            ['{TEXT}', '{USER_RESPONSE}'],
+            [$text, $userResponse],
+            $prompt->prompt
+        );
+
+        $fields = $this->createFieldsPayload($content);
+        $this->sendStream('mental-map-presentation-result', Json::encode($fields));
     }
 }

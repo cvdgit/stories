@@ -691,7 +691,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
       return
     }
 
-    const {mentalMap: json, history, rewritePrompt, threshold, userProgress} = responseJson;
+    const {mentalMap: json, history, rewritePrompt, threshold, userProgress, presentationPromptEdit} = responseJson;
     mentalMapUserProgress = userProgress;
     mentalMapId = json.id;
     mentalMapHistory = history;
@@ -721,7 +721,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
           return (json.settings || {}).recognitionLang || 'ru-RU';
         }
       })),
-      {promptId: settings?.promptId, threshold},
+      {promptId: settings?.promptId, threshold, presentationPromptEdit},
       async (payload) => {
         return await saveUserResult({
           ...saveHistoryParams,
@@ -737,18 +737,6 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
             }
           }
 
-          /*if (historyIsDone(history)) {
-            const content = createFinishContent(
-              history,
-              texts,
-              mapQuestions.typeIsMentalMapQuestions(),
-              () => restartHandler(mentalMapId)
-            );
-            $(this.element).append(content)
-            if (imageFirst) {
-              element.parentElement.removeEventListener('wheel', zoom.zoomWithWheel)
-            }
-          }*/
           return response;
         })
       },

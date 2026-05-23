@@ -2,7 +2,7 @@
  * @param {VoiceResponse} voiceResponse
  * @param {() => void} recordingStartCallback
  * @param {({HTMLElement}, {Boolean}) => void} recordingStopCallback
- * @param {() => bool|null} beforeRecordingStartHandler
+ * @param {(() => bool)|null} beforeRecordingStartHandler
  * @constructor
  */
 export default function PresentationVoiceControl(
