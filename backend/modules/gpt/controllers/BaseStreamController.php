@@ -87,4 +87,22 @@ abstract class BaseStreamController extends Controller
             Yii::$app->errorHandler->logException($ex);
         }
     }
+
+    public function flushError(string $text): void
+    {
+        echo "event: error\n";
+        $ops = [
+            "ops" => [
+                [
+                    "op" => "replace",
+                    "path" => "",
+                    "value" => [
+                        "error_text" => $text,
+                    ],
+                ],
+            ],
+        ];
+        echo 'data: ' . Json::encode($ops) . "\n\n";
+        flush();
+    }
 }
