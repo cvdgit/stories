@@ -28,14 +28,14 @@ $this->title = "GPT feedback";
                 'attribute' => 'input',
                 'format' => 'html',
                 'value' => static function(array $row) {
-                    return "<pre style='white-space: pre-line;'>{$row['input']}</pre>";
+                    return '<pre>' . htmlentities($row['input']) . '</pre>';
                 },
             ],
             [
                 'attribute' => 'output',
                 'format' => 'html',
                 'value' => static function(array $row) {
-                    return "<pre style='white-space: pre-line;'>{$row['output']}</pre>";
+                    return '<pre>' . htmlentities($row['output']) . '</pre>';
                 },
             ],
             [

@@ -721,3 +721,8 @@ body {
   width: 100%;
   display: flex;
 }
+
+pre {
+  word-break: break-word !important;
+  white-space: pre-line !important;
+}
