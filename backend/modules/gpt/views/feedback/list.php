@@ -24,8 +24,20 @@ $this->title = "GPT feedback";
         'filterModel' => $filterModel,
         "columns" => [
             'target',
-            'input',
-            'output',
+            [
+                'attribute' => 'input',
+                'format' => 'html',
+                'value' => static function(array $row) {
+                    return "<pre style='white-space: pre-line;'>{$row['input']}</pre>";
+                },
+            ],
+            [
+                'attribute' => 'output',
+                'format' => 'html',
+                'value' => static function(array $row) {
+                    return "<pre style='white-space: pre-line;'>{$row['output']}</pre>";
+                },
+            ],
             [
                 'attribute' => 'score',
                 'value' => static function (array $model): string {
