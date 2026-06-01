@@ -14,6 +14,7 @@ import TreeViewDialogBody from "./TreeViewDialogBody";
  * @param {string|null} infoText
  * @param tree
  * @param history
+ * @param presentationHistory
  * @param {{story_id: number|null, slide_id: number|null, mental_map_id: string, threshold: number}} params
  * @param {Settings} settings
  * @param onMentalMapChange
@@ -21,7 +22,7 @@ import TreeViewDialogBody from "./TreeViewDialogBody";
  * @returns {HTMLDivElement}
  * @constructor
  */
-function TreeView({id, name, infoText, tree, history, params, settings, onMentalMapChange, itemClickHandler, treePresentationModeHandler}, voiceResponse) {
+function TreeView({id, name, infoText, tree, history, presentationHistory, params, settings, onMentalMapChange, itemClickHandler, treePresentationModeHandler}, voiceResponse) {
 
   const wrap = document.createElement('div');
   wrap.style.display = 'flex'
@@ -92,15 +93,16 @@ function TreeView({id, name, infoText, tree, history, params, settings, onMental
       tree,
       voiceResponse,
       history,
+      presentationHistory,
       itemClickHandler
     });
 
-    const presentationElement = document.createElement('label');
+    /*const presentationElement = document.createElement('label');
     presentationElement.innerHTML = `Режим презентации<input type="checkbox">`;
     presentationElement
       .querySelector('input')
       .addEventListener('change', treePresentationModeHandler);
-    header.querySelector('.mental-map-fast-wrap').appendChild(presentationElement);
+    header.querySelector('.mental-map-fast-wrap').appendChild(presentationElement);*/
 
   } else {
     body = TreeViewBody(

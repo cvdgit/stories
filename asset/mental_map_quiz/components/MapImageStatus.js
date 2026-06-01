@@ -70,11 +70,11 @@ MapImageStatus.update = function (container, {hiding, seconds, hidingPrev, statC
       hidingElem.innerHTML = hiding + '%';
     }
 
-    $(container.querySelector('.map-user-status-hiding-wrap')).off('click');
+    /*$(container.querySelector('.map-user-status-hiding-wrap')).off('click');
     if (hidingElem.innerHTML !== '' && typeof statClickHandler === 'function') {
       container.classList.add('map-user-status-stat')
       $(container.querySelector('.map-user-status-hiding-wrap')).on('click', statClickHandler);
-    }
+    }*/
   }
   const hidingAddElem = container.querySelector('.map-user-status-hiding-add');
   if (hidingAddElem) {
@@ -96,6 +96,76 @@ MapImageStatus.update = function (container, {hiding, seconds, hidingPrev, statC
       secondsElem.innerHTML = formatTime(seconds);
     }
   }
+}
+
+MapImageStatus.updateAllClosedValue = function(container, {hiding, hidingPrev}) {
+  const allElem = container.querySelector('.map-user-status-all');
+  if (allElem) {
+    allElem.innerHTML = '';
+    allElem.setAttribute('data-value', '');
+    const currentHiding = Number(allElem.getAttribute('data-value'));
+    if (Number(hiding) > currentHiding) {
+      allElem.setAttribute('data-value', hiding);
+      allElem.innerHTML = hiding + '%';
+    }
+  }
+  const allAddElem = container.querySelector('.map-user-status-all-add');
+  if (allAddElem) {
+    allAddElem.innerHTML = '';
+    let hidingAddLabel = '';
+    const hidingAdd = hiding - Number(hidingPrev);
+    if (hidingAdd > 0) {
+      hidingAddLabel = `+${hidingAdd}%`;
+    }
+    allAddElem.innerHTML = hidingAddLabel;
+  }
+}
+
+MapImageStatus.renderDialog = function({hiding, hidingPrev, hidingClickHandler}, {all, allPrev, allClickHandler}) {
+
+  let hidingLabel = '0%';
+  hiding = Number(hiding);
+  if (hiding > 0) {
+    hidingLabel = `${hiding}%`;
+  }
+
+  let hidingAddLabel = '';
+  const hidingAdd = hiding - Number(hidingPrev);
+  if (hidingAdd > 0) {
+    hidingAddLabel = `+${hidingAdd}%`;
+  }
+
+  let allLabel = '0%';
+  all = Number(all);
+  if (all > 0) {
+    allLabel = `${all}%`;
+  }
+
+  let allAddLabel = '';
+  const allAdd = all - Number(allPrev);
+  if (allAdd > 0) {
+    allAddLabel = `+${allAdd}%`;
+  }
+
+  const element = document.createElement('div');
+  element.classList.add('map-user-status');
+  element.innerHTML = `
+<div class="map-user-status-hiding-wrap" data-toggle="tooltip" title="Проговорить текст и диалогом">
+<span class="map-user-status-hiding" data-value="${hiding}">${hidingLabel}</span>
+<span class="map-user-status-hiding-add">${hidingAddLabel}</span>
+</div>
+<div class="map-user-status-all-wrap" data-toggle="tooltip" title="Проговорить в режиме презентации">
+<span class="map-user-status-all" data-value="${all}">${allLabel}</span>
+<span class="map-user-status-all-add">${allAddLabel}</span>
+</div>
+`;
+
+  element.querySelector('.map-user-status-hiding-wrap')
+    .addEventListener('click', hidingClickHandler)
+  element.querySelector('.map-user-status-all-wrap')
+    .addEventListener('click', allClickHandler)
+
+  return element;
 }
 
 export default MapImageStatus;

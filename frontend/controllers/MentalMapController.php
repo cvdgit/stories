@@ -519,16 +519,13 @@ class MentalMapController extends Controller
             return ['success' => false, 'message' => 'Mental Map not found'];
         }
 
-        return [
-            'success' => true,
-            'history' => (new MentalMapTreeHistoryFetcher())->fetch(
-                $mentalMap->uuid,
-                $user->getId(),
-                $mentalMap->getTreeData(),
-                MentalMapThreshold::getThreshold(Yii::$app->params, $mentalMap->payload),
-                false,
-                true
-            ),
-        ];
+        return (new MentalMapTreeHistoryFetcher())->fetch(
+            $mentalMap->uuid,
+            $user->getId(),
+            $mentalMap->getTreeData(),
+            MentalMapThreshold::getThreshold(Yii::$app->params, $mentalMap->payload),
+            false,
+            true,
+        );
     }
 }

@@ -758,7 +758,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
 
           const presentationHistory = await window.Api.get(`/mental-map/presentation-tree-history?id=${mentalMapId}`);
           history.length = 0;
-          presentationHistory.history.map(h => history.push(h));
+          presentationHistory.map(h => history.push(h));
         } else {
           history.length = 0;
           savedHistory.map(h => history.push(h));
@@ -788,12 +788,18 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         .flatten(json.treeData)
         .map(image => createWordItem(image.description || '', image.id));
 
+      let presentationHistory
+      if (settings.treeDialog) {
+        presentationHistory = await window.Api.get(`/mental-map/presentation-tree-history?id=${mentalMapId}`)
+      }
+
       treeViewInstance = new TreeView({
         id: json.id,
         name: json.name,
         tree: json.treeData,
         infoText: json.infoText,
         history,
+        presentationHistory,
         params: saveHistoryParams,
         settings: json.settings || {},
         onMentalMapChange: progress => {
@@ -808,24 +814,25 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         deck,
         itemClickHandler: (item) => {
 
+          const {isPresentation} = item
+
           const image = {
             ...item,
             textState: 'show',
           };
 
-          const historyItem = history.find(h => h.id === item.id);
-
-          if (treePresentationMode) {
+          if (isPresentation) {
             if (presentationHandler.isRecording()) {
               return;
             }
             this.element.querySelector('.mental-map-container')
               .appendChild(
-                presentationHandler.handle(image)
+                presentationHandler.handle(image, presentationHistory.find(i => i.id === image.id))
               );
             return;
           }
 
+          const historyItem = history.find(h => h.id === item.id);
           mapImageClickHandler({
             image,
             texts: treeTexts,

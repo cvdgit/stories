@@ -165,7 +165,17 @@ async function getHistoryLog(id) {
   return await window.Api.get(`/mental-map/item-log?id=${id}`);
 }
 
-export default function TreeViewDialogBody({tree, voiceResponse, history, itemClickHandler, params, onEndHandler, isPlanTreeView, settingsPromptId}) {
+export default function TreeViewDialogBody({
+                                             tree,
+                                             voiceResponse,
+                                             history,
+                                             presentationHistory,
+                                             itemClickHandler,
+                                             params,
+                                             onEndHandler,
+                                             isPlanTreeView,
+                                             settingsPromptId
+                                           }) {
 
   function init() {
     const body = document.createElement('div');
@@ -196,11 +206,34 @@ export default function TreeViewDialogBody({tree, voiceResponse, history, itemCl
       list.map(node => {
 
         const historyItem = history.find(({id}) => id === node.id);
-        const row = createRow(node, MapImageStatus.render({
-          hiding: historyItem.hiding || 0,
-          seconds: historyItem.seconds || 0,
-          hidingPrev: historyItem.hidingPrev || 0,
-        }), historyItem.done);
+        const presentationHistoryItem = presentationHistory.find(({id}) => id === node.id);
+        console.log(presentationHistoryItem)
+        const row = createRow(
+          node,
+          MapImageStatus.renderDialog(
+            {
+              hiding: historyItem.hiding || 0,
+              hidingPrev: historyItem.hidingPrev || 0,
+              hidingClickHandler: () => itemClickHandler({
+                isPresentation: false,
+                id: node.id,
+                text: node.description,
+                description: node.description
+              })
+            },
+            {
+              all: presentationHistoryItem.allTextClosed,
+              allPrev: presentationHistoryItem.allTextClosedPrev,
+              allClickHandler: () => itemClickHandler({
+                isPresentation: true,
+                id: node.id,
+                text: node.description,
+                description: node.description
+              })
+            }
+          ),
+          historyItem.done
+        );
 
         row.querySelector('.node-title').addEventListener('click', e => {
 
@@ -208,19 +241,12 @@ export default function TreeViewDialogBody({tree, voiceResponse, history, itemCl
             .forEach(elem => elem.classList.remove('node-active'));
           row.classList.add('node-active');
 
-          itemClickHandler({
+          /*itemClickHandler({
             id: node.id,
             text: node.description,
             description: node.description
-          });
+          });*/
         });
-
-        /*const stat = row.querySelector('.map-user-status-hiding');
-        if (stat) {
-          stat.addEventListener('click', async () => {
-            console.log(await getHistoryLog(node.id));
-          });
-        }*/
 
         body.appendChild(
           renderRow(

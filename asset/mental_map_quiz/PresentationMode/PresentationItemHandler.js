@@ -13,7 +13,7 @@ function PresentationItemHandler(container, voiceResponse, {threshold, promptId,
     isRecording() {
       return isRecording;
     },
-    handle(image) {
+    handle(image, historyItem) {
       if (isRecording) {
         return;
       }
@@ -50,7 +50,10 @@ function PresentationItemHandler(container, voiceResponse, {threshold, promptId,
 
           const done = val >= threshold && importantWordsPassed;
 
-          const historyItem = history.find(h => h.id === image.id);
+          if (!historyItem) {
+            historyItem = history.find(h => h.id === image.id);
+          }
+
           if (historyItem) {
             historyItem.done = done;
             historyItem.all = Number(json.similarity_percentage);
@@ -84,12 +87,11 @@ function PresentationItemHandler(container, voiceResponse, {threshold, promptId,
 
           const imgElem = container.querySelector(`[data-img-id='${image.id}']`);
           if (imgElem) {
-            console.log('MapImageStatus.update')
-            MapImageStatus.update(imgElem.querySelector('.map-user-status'), {
+            MapImageStatus.updateAllClosedValue(imgElem.querySelector('.map-user-status'), {
               hiding: historyItem.allTextClosed,
               seconds: historyItem.seconds,
               hidingPrev: historyItem.allTextClosedPrev,
-              statClickHandler: () => {
+              /*statClickHandler: () => {
 
                 const tip = document.createElement('div');
                 tip.innerHTML = '<div class="tip-content"><div class="tip-content-header"><b>Результат:</b></div><div class="tip-content-body"><div style="display: flex; flex-direction: row; gap: 10px; align-items: center"><img width="30px" src="/img/loading.gif" alt="loading" /> запрос...</div></div></div>';
@@ -130,7 +132,7 @@ function PresentationItemHandler(container, voiceResponse, {threshold, promptId,
                 );
 
                 instance.show();
-              }
+              }*/
             });
           }
 

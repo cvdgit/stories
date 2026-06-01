@@ -456,6 +456,7 @@
 }
 
 .map-user-status-hiding,
+.map-user-status-all,
 .map-user-status-time {
   padding: 4px;
   font-weight: 600;
@@ -465,6 +466,7 @@
   font-size: 20px;
 }
 
-.map-user-status-hiding-add {
+.map-user-status-hiding-add,
+.map-user-status-all-add {
   color: #198754;
 }
