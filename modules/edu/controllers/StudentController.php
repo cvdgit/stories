@@ -156,13 +156,13 @@ class StudentController extends Controller
             'query' => EduClassProgram::find()->where(['in', 'id', $classProgramIds]),
         ]);
 
-        //$repetitionDataProvider = $this->repetitionApi->getRepetitionDataProvider($student->id);
+        $repetitionDataProvider = $this->repetitionApi->getRepetitionDataProvider($student->id);
 
         return $this->render('index', [
             'student' => $student,
             'studentToolbarWidget' => $this->renderStudentToolbarWidget($student, $studentClass),
             'dataProvider' => $dataProvider,
-            //'repetitionDataProvider' => $repetitionDataProvider,
+            'repetitionDataProvider' => $repetitionDataProvider,
             'classBookId' => $studentClassBookId,
             'requiredStoriesWidgetConfig' => [
                 'studentId' => $student->id,

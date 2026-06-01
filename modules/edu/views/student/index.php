@@ -33,13 +33,13 @@ $this->title = $student->name;
 
     <div>
         <div style="margin-bottom: 40px">
-            <?php /*= ListView::widget([
+            <?= ListView::widget([
                 'dataProvider' => $repetitionDataProvider,
                 'summary' => false,
                 'itemView' => '_repetition_item',
                 'itemOptions' => ['tag' => false],
                 'layout' => "{summary}\n<div class=\"row\">{items}</div>",
-            ])*/ ?>
+            ]) ?>
         </div>
     </div>
 
