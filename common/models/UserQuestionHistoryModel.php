@@ -12,6 +12,7 @@ use yii\db\Query;
 class UserQuestionHistoryModel extends Model
 {
     public const LOCATION_EDUCATION = 'education';
+    public const LOCATION_WIKIDS = 'wikids';
 
     public $source;
     public $student_id;

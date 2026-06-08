@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace frontend\Training\FetchMentalMapHistoryTargetWords;
 
 use common\components\MentalMapThreshold;
-use common\models\UserQuestionHistoryModel;
 use DateTimeInterface;
 use phpQuery;
 use yii\db\Expression;
@@ -13,8 +12,12 @@ use yii\db\Query;
 
 class MentalMapHistoryTargetWordsFetcher
 {
-    public function fetch(int $userId, DateTimeInterface $beginDate, DateTimeInterface $endDate): array
-    {
+    public function fetch(
+        int $userId,
+        DateTimeInterface $beginDate,
+        DateTimeInterface $endDate,
+        string $location
+    ): array {
         $weekStartDate = $beginDate->format('Y-m-d');
         $betweenBegin = new Expression("UNIX_TIMESTAMP('$weekStartDate 00:00:00')");
         $weekEndDate = $endDate->format('Y-m-d');
@@ -34,12 +37,10 @@ class MentalMapHistoryTargetWordsFetcher
             ])
             ->andWhere(['>=', 'h.overall_similarity', MentalMapThreshold::DEFAULT_THRESHOLD])
             ->andWhere(['between', new Expression('h.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd])
-            ->andWhere("(h.location IS NULL OR h.location = '" . UserQuestionHistoryModel::LOCATION_EDUCATION . "')")
+            ->andWhere("(h.location IS NULL OR h.location = '" . $location . "')")
             ->orderBy(['h.created_at' => SORT_ASC]);
 
-        $rows = $query->all();
-
-        $rows = array_map(function(array $row): array {
+        return array_map(function (array $row): array {
             $content = $row['historyContent'];
             $questionCount = 0;
             if (!empty($content)) {
@@ -51,30 +52,7 @@ class MentalMapHistoryTargetWordsFetcher
                 'question_count' => $questionCount,
                 'target_date' => $row['historyDate'],
             ];
-        }, $rows);
-
-
-        /*$processedData = [];
-        foreach ($rows as $row) {
-            $date = $row['historyDate'];
-            if (!isset($processedData[$date])) {
-                $processedData[$date] = [
-                    'story_id' => $row['storyId'],
-                    'story_title' => $row['storyTitle'],
-                    'question_count' => 0,
-                    'target_date' => $date,
-                ];
-            }
-
-            $content = $row['historyContent'];
-            if (empty($content)) {
-                continue;
-            }
-
-            $processedData[$date]['question_count'] += $this->calcTargetFromContent($content);
-        }*/
-
-        return $rows;
+        }, $query->all());
     }
 
     private function calcTargetFromContent(string $content): int

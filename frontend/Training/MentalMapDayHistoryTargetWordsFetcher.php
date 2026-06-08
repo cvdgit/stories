@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace frontend\Training;
 
 use common\components\MentalMapThreshold;
-use common\models\UserQuestionHistoryModel;
 use DateTimeInterface;
 use phpQuery;
 use yii\db\Expression;
@@ -13,8 +12,13 @@ use yii\db\Query;
 
 final class MentalMapDayHistoryTargetWordsFetcher
 {
-    public function fetch(int $userId, DateTimeInterface $beginDate, DateTimeInterface $endDate, int $hours): array
-    {
+    public function fetch(
+        int $userId,
+        DateTimeInterface $beginDate,
+        DateTimeInterface $endDate,
+        int $hours,
+        string $location
+    ): array {
         $startDate = $beginDate->format('Y-m-d H:i:s');
         $betweenBegin = new Expression("UNIX_TIMESTAMP('$startDate')");
         $finishDate = $endDate->format('Y-m-d H:i:s');
@@ -26,7 +30,6 @@ final class MentalMapDayHistoryTargetWordsFetcher
         $query = (new Query())
             ->select([
                 'storyId' => 'h.story_id',
-                // 'itemIds' => "GROUP_CONCAT(h.id SEPARATOR ',')",
                 'itemId' => 'h.id',
                 'itemContent' => 'h.content',
                 'storyTitle' => 's.title',
@@ -40,12 +43,7 @@ final class MentalMapDayHistoryTargetWordsFetcher
             ])
             ->andWhere(['between', new Expression('h.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd])
             ->andWhere(['>=', 'h.overall_similarity', MentalMapThreshold::DEFAULT_THRESHOLD])
-            ->andWhere("(h.location IS NULL OR h.location = '" . UserQuestionHistoryModel::LOCATION_EDUCATION . "')")
-            /*->groupBy([
-                'h.story_id',
-                $hourExpression,
-                $minuteExpression
-            ])*/
+            ->andWhere("(h.location IS NULL OR h.location = '" . $location . "')")
             ->orderBy([
                 'story_id' => SORT_ASC,
                 'hour' => SORT_ASC,
@@ -70,32 +68,6 @@ final class MentalMapDayHistoryTargetWordsFetcher
             }
             $processedData[$key] = $item;
         }
-
-        /*foreach ($rows as $row) {
-
-            $item = [
-                'story_id' => $row['storyId'],
-                'story_title' => $row['storyTitle'],
-                'hour' => $row['hour'],
-                'minute_div' => $row['minute_div'],
-                'question_count' => 0,
-            ];
-
-            $itemIds = explode(',', $row['itemIds']);
-            $contents = (new Query())
-                ->select(['content' => 'h.content'])
-                ->from(['h' => 'mental_map_history'])
-                ->where(['in', 'h.id', $itemIds])
-                ->all();
-
-            $questionCount = 0;
-            foreach ($contents as $content) {
-                $questionCount += $this->calcTargetFromContent($content['content']);
-            }
-
-            $item['question_count'] = $questionCount;
-            $processedData[] = $item;
-        }*/
 
         return $processedData;
     }

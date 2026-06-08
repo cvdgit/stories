@@ -18,6 +18,7 @@ use frontend\components\learning\widget\HistoryWidget;
  * @var int $studentId
  * @var string $prevUrl
  * @var string $nextUrl
+ * @var bool $canAdmin
  */
 
 $this->registerJs($this->renderFile('@frontend/views/training/day.js'));
@@ -40,28 +41,36 @@ $this->registerJs($this->renderFile('@frontend/views/training/day.js'));
                     'action' => ['index', 'student_id' => $studentId],
                     'id' => 'history-filter-form',
                     'method' => 'get',
-                    'options' => ['style' => 'display: flex; margin-right: 3rem'],
+                    'options' => ['style' => 'display: flex; flex-direction: column; width: 100%'],
                 ],
             ) ?>
-            <div style="flex: 1; margin-right: 3rem">
-                <?= $form->field($filterModel, 'date')->widget(DatePicker::class, [
-                    'language' => 'ru',
-                    'clientOptions' => [
-                        'autoclose' => true,
-                        'format' => 'dd.mm.yyyy',
-                    ],
-                    'options' => [
-                        'autocomplete' => 'off',
-                        'name' => 'date',
-                    ],
-                    'clientEvents' => [
-                        'changeDate' => new JsExpression('function() { $("#history-filter-form").submit(); }'),
-                    ],
-                ])->label(false) ?>
+            <div style="display: flex; flex-direction: row; gap: 20px">
+                <div style="flex: 1">
+                    <?= $form->field($filterModel, 'date')->widget(DatePicker::class, [
+                        'language' => 'ru',
+                        'clientOptions' => [
+                            'autoclose' => true,
+                            'format' => 'dd.mm.yyyy',
+                        ],
+                        'options' => [
+                            'autocomplete' => 'off',
+                            'name' => 'date',
+                        ],
+                        'clientEvents' => [
+                            'changeDate' => new JsExpression('function() { $("#history-filter-form").submit(); }'),
+                        ],
+                    ])->label(false) ?>
+                </div>
+                <div>
+                    <?= $form->field($filterModel, 'hours')->dropDownList($filterModel->getHoursDropdown(), ['name' => 'hours'])->label(false) ?>
+                </div>
             </div>
+            <?php if ($canAdmin): ?>
             <div>
-                <?= $form->field($filterModel, 'hours')->dropDownList($filterModel->getHoursDropdown(), ['name' => 'hours'])->label(false) ?>
+                <?= $form->field($filterModel, 'stat')
+                    ->dropDownList($filterModel->getStatItems(), ['name' => 'stat', 'style' => 'max-width: 250px']) ?>
             </div>
+            <?php endif ?>
             <?php
             ActiveForm::end() ?>
         </div>

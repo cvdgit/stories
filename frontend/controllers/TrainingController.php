@@ -7,7 +7,9 @@ namespace frontend\controllers;
 use common\helpers\SmartDate;
 use common\models\Story;
 use common\models\User;
+use common\models\UserQuestionHistoryModel;
 use common\models\UserStudent;
+use common\rbac\UserRoles;
 use DateTimeImmutable;
 use DateTimeInterface;
 use frontend\components\learning\form\HistoryFilterForm;
@@ -82,7 +84,15 @@ class TrainingController extends UserController
             $filterForm->initDates();
         }
 
-        $rows = $filterForm->search($studentId);
+        $location = UserQuestionHistoryModel::LOCATION_EDUCATION;
+        if ($user->can(UserRoles::ROLE_ADMIN) && $filterForm->isWikidsStat()) {
+            $location = UserQuestionHistoryModel::LOCATION_WIKIDS;
+        }
+
+        $rows = $filterForm->search(
+            $studentId,
+            $location
+        );
         $stories = [];
         foreach ($rows as $row) {
             $storyId = $row['story_id'];
@@ -103,7 +113,13 @@ class TrainingController extends UserController
         $beginDate = (new DateTimeImmutable($targetDate))->setTime(0, 0);
         $endDate = (new DateTimeImmutable($targetDate))->setTime(23, 59, 59);
         $mentalMapHistoryRows = (new MentalMapDayHistoryTargetWordsFetcher())
-            ->fetch($targetStudent->user_id, $beginDate, $endDate, (int) $filterForm->hours);
+            ->fetch(
+                $targetStudent->user_id,
+                $beginDate,
+                $endDate,
+                (int) $filterForm->hours,
+                $location
+            );
         foreach ($mentalMapHistoryRows as $row) {
             $storyId = $row['story_id'];
             if (!isset($stories[$storyId])) {
@@ -245,8 +261,9 @@ class TrainingController extends UserController
                 return Url::to(array_merge(['index', 'student_id' => $student->id], [
                     'date' => $filterForm->date,
                     'hours' => $filterForm->hours,
+                    'stat' => $filterForm->stat,
                 ]));
-            },),
+            }),
             'view' => 'day',
             'viewParams' => [
                 'studentId' => $studentId,
@@ -257,13 +274,14 @@ class TrainingController extends UserController
                 'prevUrl' => Url::to(array_merge(
                     ['index', 'student_id' => $studentId],
                     $filterForm->getPrevDate(),
-                    ['hours' => $filterForm->hours],
+                    ['hours' => $filterForm->hours, 'stat' => $filterForm->stat],
                 )),
                 'nextUrl' => Url::to(array_merge(
                     ['index', 'student_id' => $studentId],
                     $filterForm->getNextDate(),
-                    ['hours' => $filterForm->hours],
+                    ['hours' => $filterForm->hours, 'stat' => $filterForm->stat],
                 )),
+                'canAdmin' => $user->can(UserRoles::ROLE_ADMIN),
             ],
         ]);
     }
@@ -286,7 +304,12 @@ class TrainingController extends UserController
             $filterForm->initDates();
         }
 
-        $rows = $filterForm->search($studentId);
+        $location = UserQuestionHistoryModel::LOCATION_EDUCATION;
+        if ($user->can(UserRoles::ROLE_ADMIN) && $filterForm->isWikidsStat()) {
+            $location = UserQuestionHistoryModel::LOCATION_WIKIDS;
+        }
+
+        $rows = $filterForm->search($studentId, $location);
 
         $stories = [];
         foreach ($rows as $row) {
@@ -307,6 +330,7 @@ class TrainingController extends UserController
             $targetStudent->user_id,
             $filterForm->getWeekStartDate(),
             $filterForm->getWeekEndDate(),
+            $location
         );
 
         foreach ($mentalMapHistoryRows as $row) {
@@ -406,6 +430,7 @@ class TrainingController extends UserController
                     return Url::to(array_merge(['week', 'student_id' => $student->id], [
                         'year' => $filterForm->year,
                         'week' => $filterForm->week,
+                        'stat' => $filterForm->stat,
                     ]));
                 },
             ),
@@ -415,8 +440,9 @@ class TrainingController extends UserController
                 'columns' => $columns,
                 'models' => $models,
                 'studentId' => $studentId,
-                'prevUrl' => Url::to(array_merge(['week', 'student_id' => $studentId], $filterForm->getPrevWeek())),
-                'nextUrl' => Url::to(array_merge(['week', 'student_id' => $studentId], $filterForm->getNextWeek())),
+                'prevUrl' => Url::to(array_merge(['week', 'student_id' => $studentId, 'stat' => $filterForm->stat], $filterForm->getPrevWeek())),
+                'nextUrl' => Url::to(array_merge(['week', 'student_id' => $studentId, 'stat' => $filterForm->stat], $filterForm->getNextWeek())),
+                'canAdmin' => $user->can(UserRoles::ROLE_ADMIN),
             ],
         ]);
     }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace frontend\components\learning\form;
 
-use common\models\UserQuestionHistoryModel;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Yii;
@@ -16,6 +15,7 @@ class WeekFilterForm extends Model
 {
     public $year;
     public $week;
+    public $stat;
 
     /** @var DateTimeInterface */
     private $weekStartDate;
@@ -33,6 +33,7 @@ class WeekFilterForm extends Model
     {
         $this->week = (int) date('W');
         $this->year = (int) date('Y');
+        $this->stat = FilterStat::STAT_EDU;
     }
 
     public function rules(): array
@@ -42,10 +43,18 @@ class WeekFilterForm extends Model
             [['year', 'week'], 'integer'],
             ['year', 'default', 'value' => (int) date('W')],
             ['week', 'default', 'value' => (int) date('Y')],
+            ['stat', 'in', 'range' => array_keys($this->getStatItems())],
         ];
     }
 
-    public function search(int $studentId): array
+    public function attributeLabels(): array
+    {
+        return [
+            'stat' => 'Показывать статистику',
+        ];
+    }
+
+    public function search(int $studentId, string $location): array
     {
         $this->weekStartDate = new DateTimeImmutable();
         $this->weekStartDate = $this->weekStartDate->setISODate((int) $this->year, (int) $this->week);
@@ -61,7 +70,7 @@ class WeekFilterForm extends Model
         $historyQuery->innerJoin(['t2' => 'story_story_test'], 't.test_id = t2.test_id');
         $historyQuery->innerJoin(['q' => 'story_test_question'], 't.entity_id = q.id');
         $historyQuery->where(['t.student_id' => $studentId, 't.correct_answer' => 1]);
-        $historyQuery->andWhere("(t.location IS NULL OR t.location = '" . UserQuestionHistoryModel::LOCATION_EDUCATION . "')");
+        $historyQuery->andWhere("(t.location IS NULL OR t.location = '" . $location . "')");
 
         $weekStartDate = $this->weekStartDate->format('Y-m-d');
         $betweenBegin = new Expression("UNIX_TIMESTAMP('$weekStartDate 00:00:00')");
@@ -144,5 +153,15 @@ class WeekFilterForm extends Model
             $week = 1;
         }
         return ['year' => $year, 'week' => $week];
+    }
+
+    public function getStatItems(): array
+    {
+        return FilterStat::getStatItems();
+    }
+
+    public function isWikidsStat(): bool
+    {
+        return $this->stat === FilterStat::STAT_WIKIDS;
     }
 }

@@ -16,6 +16,7 @@ use yii\widgets\ActiveForm;
  * @var int $studentId
  * @var string $prevUrl
  * @var string $nextUrl
+ * @var bool $canAdmin
  */
 
 $this->registerJs($this->renderFile('@frontend/views/training/week.js'));
@@ -36,9 +37,19 @@ $this->registerJs($this->renderFile('@frontend/views/training/week.js'));
                 <p style="margin: 0; line-height: 33px"><?= $filterModel->getWeekDatesText() ?></p>
             </div>
             <?php
-            $form = ActiveForm::begin(['id' => 'week-filter-form', 'method' => 'GET']) ?>
-            <?= $form->field($filterModel, 'year')->hiddenInput()->label(false) ?>
-            <?= $form->field($filterModel, 'week')->hiddenInput()->label(false) ?>
+            $form = ActiveForm::begin([
+                'action' => ['week', 'student_id' => $studentId],
+                'id' => 'week-filter-form',
+                'method' => 'GET'
+            ]) ?>
+            <?= $form->field($filterModel, 'year')->hiddenInput(['name' => 'year'])->label(false) ?>
+            <?= $form->field($filterModel, 'week')->hiddenInput(['name' => 'week'])->label(false) ?>
+            <?php if ($canAdmin): ?>
+                <div>
+                    <?= $form->field($filterModel, 'stat')
+                        ->dropDownList($filterModel->getStatItems(), ['name' => 'stat', 'style' => 'max-width: 250px']) ?>
+                </div>
+            <?php endif ?>
             <?php
             ActiveForm::end() ?>
         </div>

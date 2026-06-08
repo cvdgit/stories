@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace frontend\components\learning\form;
 
-use common\models\UserQuestionHistoryModel;
 use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
-use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\db\Expression;
@@ -19,6 +17,7 @@ class HistoryFilterForm extends Model
 {
     public $date;
     public $hours;
+    public $stat;
 
     /** @var DateTimeInterface */
     private $targetDate;
@@ -33,6 +32,7 @@ class HistoryFilterForm extends Model
     {
         $this->date = date('d.m.Y');
         $this->hours = 60;
+        $this->stat = FilterStat::STAT_EDU;
     }
 
     public function rules(): array
@@ -42,6 +42,14 @@ class HistoryFilterForm extends Model
             [['date'], 'date', 'format' => 'd.m.yyyy'],
             ['hours', 'integer'],
             ['hours', 'in', 'range' => array_keys($this->getHoursDropdown())],
+            ['stat', 'in', 'range' => array_keys($this->getStatItems())],
+        ];
+    }
+
+    public function attributeLabels(): array
+    {
+        return [
+            'stat' => 'Показывать статистику',
         ];
     }
 
@@ -49,7 +57,7 @@ class HistoryFilterForm extends Model
      * @throws InvalidConfigException
      * @throws Exception
      */
-    public function search(int $studentId): array
+    public function search(int $studentId, string $location): array
     {
         $this->targetDate = new DateTimeImmutable($this->date);
 
@@ -66,7 +74,9 @@ class HistoryFilterForm extends Model
         $historyQuery->innerJoin(['t2' => 'story_story_test'], 't.test_id = t2.test_id');
         $historyQuery->innerJoin(['q' => 'story_test_question'], 't.entity_id = q.id');
         $historyQuery->where(['t.student_id' => $studentId, 't.correct_answer' => 1]);
-        $historyQuery->andWhere("(t.location IS NULL OR t.location = '" . UserQuestionHistoryModel::LOCATION_EDUCATION . "')");
+        $historyQuery->andWhere(
+            "(t.location IS NULL OR t.location = '" . $location . "')",
+        );
 
         $betweenBegin = new Expression("UNIX_TIMESTAMP('{$this->targetDate->format('Y-m-d')} 00:00:00')");
         $betweenEnd = new Expression("UNIX_TIMESTAMP('{$this->targetDate->format('Y-m-d')} 23:59:59')");
@@ -129,5 +139,15 @@ class HistoryFilterForm extends Model
     {
         $nextDate = $this->targetDate->add(DateInterval::createFromDateString('+1 day'));
         return ['date' => $nextDate->format('d.m.Y')];
+    }
+
+    public function getStatItems(): array
+    {
+        return FilterStat::getStatItems();
+    }
+
+    public function isWikidsStat(): bool
+    {
+        return $this->stat === FilterStat::STAT_WIKIDS;
     }
 }
