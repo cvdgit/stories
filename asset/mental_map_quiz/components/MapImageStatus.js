@@ -62,8 +62,8 @@ MapImageStatus.render = function ({hiding, seconds, hidingPrev}) {
 MapImageStatus.update = function (container, {hiding, seconds, hidingPrev, statClickHandler}) {
   const hidingElem = container.querySelector('.map-user-status-hiding');
   if (hidingElem) {
-    hidingElem.innerHTML = '';
-    hidingElem.setAttribute('data-value', '');
+    //hidingElem.innerHTML = '';
+    //hidingElem.setAttribute('data-value', '');
     const currentHiding = Number(hidingElem.getAttribute('data-value'));
     if (Number(hiding) > currentHiding) {
       hidingElem.setAttribute('data-value', hiding);
@@ -78,8 +78,8 @@ MapImageStatus.update = function (container, {hiding, seconds, hidingPrev, statC
   }
   const hidingAddElem = container.querySelector('.map-user-status-hiding-add');
   if (hidingAddElem) {
-    hidingAddElem.innerHTML = '';
-      let hidingAddLabel = '';
+    //hidingAddElem.innerHTML = '';
+    let hidingAddLabel = '';
     const hidingAdd = hiding - Number(hidingPrev);
     if (hidingAdd > 0) {
       hidingAddLabel = `+${hidingAdd}%`;
