@@ -1,4 +1,5 @@
 import PresentationVoiceControl from "./PresentationVoiceControl";
+import {createNotify} from "../components/utils";
 
 /**
  * @param {VoiceResponse} voiceResponse
@@ -30,6 +31,13 @@ function RecordingPanel(voiceResponse, processUserResponse, onStartCallback) {
   function blurHandler() {
     voiceControl.stop(true);
   }
+
+  voiceResponse.onError(e => {
+    document.querySelector('.mental-map').appendChild(
+      createNotify(`${e.args.error} error`)
+    )
+    blurHandler()
+  })
 
   const voiceControl = new PresentationVoiceControl(
     voiceResponse,

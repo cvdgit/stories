@@ -207,7 +207,7 @@ export default function TreeViewDialogBody({
 
         const historyItem = history.find(({id}) => id === node.id);
         const presentationHistoryItem = presentationHistory.find(({id}) => id === node.id);
-        console.log(presentationHistoryItem)
+
         const row = createRow(
           node,
           MapImageStatus.renderDialog(

@@ -25,6 +25,7 @@ import startRecording from "./itemClickHandlers/startRecording";
 import createRetellingContent from "./itemClickHandlers/createRetellingContent";
 import startRetelling from "./itemClickHandlers/startRetelling";
 import saveUserResult from "./itemClickHandlers/saveUserResult";
+import {createNotify} from "./components/utils";
 
 /**
  * @param {HTMLElement} element
@@ -59,6 +60,14 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
     if (interimSpan) {
       interimSpan.innerHTML = args.args?.interim
     }
+  })
+
+  voiceResponse.onError(e => {
+    blurHandler()
+    element.appendChild(
+      createNotify(`${e.args.error} error`)
+    )
+    console.log('error', e)
   })
 
   const container = document.createElement('div')

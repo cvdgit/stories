@@ -261,6 +261,8 @@
   color: #fff;
   background-color: rgba(13, 110, 253, 1);
   font-size: 24px;
+
+  z-index: 999;
 }
 
 .mental-map-notify-text {
