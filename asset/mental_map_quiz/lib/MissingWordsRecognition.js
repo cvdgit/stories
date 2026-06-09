@@ -60,7 +60,7 @@ export default function MissingWordsRecognition(config) {
         const result = editInterim(event.results[i][0].transcript)
         finalTranscript += result;
       } else {
-        interimTranscript += event.results[i][0].transcript;
+        interimTranscript += event.results[i][0]?.transcript;
       }
     }
 
