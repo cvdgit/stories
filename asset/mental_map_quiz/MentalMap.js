@@ -26,6 +26,8 @@ import createRetellingContent from "./itemClickHandlers/createRetellingContent";
 import startRetelling from "./itemClickHandlers/startRetelling";
 import saveUserResult from "./itemClickHandlers/saveUserResult";
 import {createNotify} from "./components/utils";
+import MentalMapProgress from "./TreeView/Progress";
+import calcMapProgress from "./TreeView/Progress/calcMapProgress";
 
 /**
  * @param {HTMLElement} element
@@ -222,7 +224,8 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
                                   fastMode,
                                   hideFragmentText,
                                   settingsPromptId,
-                                  detailParams
+                                  detailParams,
+                                  onHistoryChangeHandler
                                 }) {
 
     const text = texts.find(t => t.id === image.id);
@@ -435,15 +438,32 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
           }
         }
 
-        const {history: responseHistoryItem} = historyResponse;
-        historyItem.all = responseHistoryItem.all; // Number(json.overall_similarity);
-        historyItem.hiding = responseHistoryItem.hiding; // textHidingPercentage;
-        historyItem.target = responseHistoryItem.target; // textTargetPercentage;
-        historyItem.done = responseHistoryItem.done; // Number(json.overall_similarity) >= threshold;
-        historyItem.seconds = responseHistoryItem.seconds; // timer.getTimerSeconds();
+        const {
+          history: {
+            all,
+            hiding,
+            target,
+            done,
+            seconds,
+            hiddenWords,
+            words
+          }
+        } = historyResponse
+
+        historyItem.all = all; // Number(json.overall_similarity);
+        historyItem.hiding = hiding; // textHidingPercentage;
+        historyItem.target = target; // textTargetPercentage;
+        historyItem.done = done; // Number(json.overall_similarity) >= threshold;
+        historyItem.seconds = seconds; // timer.getTimerSeconds();
+        historyItem.hiddenWords = hiddenWords
+        historyItem.words = words
 
         wrapper.querySelector('.image-item > .result-item').remove()
         wrapper.querySelector('.image-item').appendChild(FragmentResultElement(historyItem))
+
+        if (typeof onHistoryChangeHandler === 'function') {
+          onHistoryChangeHandler(historyItem)
+        }
 
         if (fastMode) {
           if (historyItem.done) {
@@ -802,6 +822,10 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         presentationHistory = await window.Api.get(`/mental-map/presentation-tree-history?id=${mentalMapId}`)
       }
 
+      const mapProgress = MentalMapProgress(
+        calcMapProgress(history)
+      )
+
       treeViewInstance = new TreeView({
         id: json.id,
         name: json.name,
@@ -866,11 +890,18 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
             },
             fastMode: true,
             hideFragmentText: false,
-            settingsPromptId: json.settings?.promptId
+            settingsPromptId: json.settings?.promptId,
+            onHistoryChangeHandler: () => {
+              console.log('mapProgress.setProgress', calcMapProgress(history))
+              mapProgress.setProgress(
+                calcMapProgress(history)
+              )
+            }
           });
 
         },
-        treePresentationModeHandler
+        treePresentationModeHandler,
+        mapProgress
       }, new VoiceResponse(new MissingWordsRecognition({
         getRecordingLang() {
           return (json.settings || {}).recognitionLang || 'ru-RU';

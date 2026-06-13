@@ -44,6 +44,14 @@ class HistoryItem
      * @var int
      */
     private $target;
+    /**
+     * @var int
+     */
+    private $hiddenWords;
+    /**
+     * @var int
+     */
+    private $words;
 
     public function __construct(
         UuidInterface $id,
@@ -54,7 +62,9 @@ class HistoryItem
         int $hiding = 0,
         int $hidingPrev = 0,
         int $seconds = 0,
-        int $target = 0
+        int $target = 0,
+        int $hiddenWords = 0,
+        int $words = 0
     ) {
         $this->id = $id;
         $this->done = $done;
@@ -65,6 +75,8 @@ class HistoryItem
         $this->hidingPrev = $hidingPrev;
         $this->seconds = $seconds;
         $this->target = $target;
+        $this->hiddenWords = $hiddenWords;
+        $this->words = $words;
     }
 
     public function toArray(): array
@@ -79,11 +91,23 @@ class HistoryItem
             'hidingPrev' => $this->hidingPrev,
             'target' => $this->target,
             'seconds' => $this->seconds,
+            'hiddenWords' => $this->hiddenWords,
+            'words' => $this->words,
         ];
     }
 
     public function getId(): UuidInterface
     {
         return $this->id;
+    }
+
+    public function setWords(int $words): void
+    {
+        $this->words = $words;
+    }
+
+    public function getWords(): int
+    {
+        return $this->words;
     }
 }

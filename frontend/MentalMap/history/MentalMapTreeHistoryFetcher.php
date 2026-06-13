@@ -44,6 +44,8 @@ class MentalMapTreeHistoryFetcher
                 'done' => $item['done'] ?? false,
                 'seconds' => isset($item['seconds']) ? (int) $item['seconds'] : 0,
                 'hidingPrev' => $item['hidingPrev'],
+                'hiddenWords' => $item['hiddenWords'] ?? 0,
+                'words' => $item['words'] ?? 0,
             ];
         }, $list);
     }
@@ -55,8 +57,11 @@ class MentalMapTreeHistoryFetcher
         int $threshold,
         bool $presentationMode = false
     ): array {
-        $history = array_map(static function (array $node) {
-            return new HistoryItem(Uuid::fromString($node['id']));
+        $history = array_map(function (array $node) {
+            $item = new HistoryItem(Uuid::fromString($node['id']));
+            $text = $node['description'] ?? $node['title'];
+            $item->setWords($this->countWords($text));
+            return $item;
         }, $nodeList);
 
         $today = (new DateTimeImmutable('now', new DateTimeZone('Europe/Moscow')))
@@ -90,6 +95,7 @@ class MentalMapTreeHistoryFetcher
                     'target' => 'h.text_target_percentage',
                     'all_words' => 'h.all_important_words_included',
                     'seconds' => 'h.seconds',
+                    'content' => 'h.content',
                 ])
                 ->from(['h' => 'mental_map_history'])
                 ->where([
@@ -144,9 +150,10 @@ class MentalMapTreeHistoryFetcher
 
         $rows = $this->filterUserHistoryGroupByCorrect($historyRowsByFragmentId);
 
-        return array_map(static function (HistoryItem $item) use ($rows) {
+        return array_map(function (HistoryItem $item) use ($rows) {
             if (isset($rows[$item->getId()->toString()])) {
                 $row = $rows[$item->getId()->toString()];
+                $hiddenWords = $this->calcHiddenWordsFromContent($row['content']);
                 return (new HistoryItem(
                     $item->getId(),
                     $row['done'],
@@ -157,6 +164,8 @@ class MentalMapTreeHistoryFetcher
                     (int) ($row['hidingPrev'] ?? 0),
                     (int) ($row['seconds'] ?? 0),
                     (int) ($row['target'] ?? 0),
+                    $hiddenWords,
+                    $item->getWords(),
                 ))->toArray();
             }
             return $item->toArray();
@@ -199,5 +208,20 @@ class MentalMapTreeHistoryFetcher
             $flatArray[] = $node;
         }
         return $flatArray;
+    }
+
+    private function calcHiddenWordsFromContent(string $content): int
+    {
+        $document = \phpQuery::newDocumentHTML($content);
+        return $document->find('.text-item-word.selected')->length;
+    }
+
+    private function countWords(string $text): int
+    {
+        if ($text === '') {
+            return 0;
+        }
+        preg_match_all('/[\p{L}\p{N}]+(?:[-\'][\p{L}\p{N}]+)*/u', $text, $matches);
+        return count($matches[0]);
     }
 }

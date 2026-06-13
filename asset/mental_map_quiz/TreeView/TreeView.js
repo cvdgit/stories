@@ -22,7 +22,7 @@ import TreeViewDialogBody from "./TreeViewDialogBody";
  * @returns {HTMLDivElement}
  * @constructor
  */
-function TreeView({id, name, infoText, tree, history, presentationHistory, params, settings, onMentalMapChange, itemClickHandler, treePresentationModeHandler}, voiceResponse) {
+function TreeView({id, name, infoText, tree, history, presentationHistory, params, settings, onMentalMapChange, itemClickHandler, treePresentationModeHandler, mapProgress}, voiceResponse) {
 
   const wrap = document.createElement('div');
   wrap.style.display = 'flex'
@@ -68,6 +68,10 @@ function TreeView({id, name, infoText, tree, history, presentationHistory, param
   }
 
   wrap.appendChild(header)
+
+  if (mapProgress && settings.treeDialog) {
+    wrap.appendChild(mapProgress.render())
+  }
 
   if (infoText) {
     const infoTextElement = document.createElement('div');
