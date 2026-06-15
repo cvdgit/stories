@@ -33,6 +33,7 @@
   justify-content: right;
   margin-top: 0;
   width: 100%;
+  gap: 2px;
 }
 
 .tree-dialog-body .node-status {
@@ -221,6 +222,14 @@
   padding: 4px;
   border-radius: 4px;
   cursor: pointer;
+}
+
+.map-user-status-hiding-wrap {
+  background-color: #cfe2ff;
+}
+
+.map-user-status-all-wrap {
+  background-color: #d1e7dd;
 }
 
 .map-user-status-hiding-wrap:hover,

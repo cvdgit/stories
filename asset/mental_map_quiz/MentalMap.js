@@ -28,6 +28,7 @@ import saveUserResult from "./itemClickHandlers/saveUserResult";
 import {createNotify} from "./components/utils";
 import MentalMapProgress from "./TreeView/Progress";
 import calcMapProgress from "./TreeView/Progress/calcMapProgress";
+import calcAllMapProgress from "./TreeView/Progress/calcAllMapProgress";
 
 /**
  * @param {HTMLElement} element
@@ -822,8 +823,12 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         presentationHistory = await window.Api.get(`/mental-map/presentation-tree-history?id=${mentalMapId}`)
       }
 
-      const mapProgress = MentalMapProgress(
+      const mapProgress = new MentalMapProgress(
         calcMapProgress(history)
+      )
+
+      const allMapProgress = new MentalMapProgress(
+        calcAllMapProgress(presentationHistory)
       )
 
       treeViewInstance = new TreeView({
@@ -860,7 +865,15 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
             }
             this.element.querySelector('.mental-map-container')
               .appendChild(
-                presentationHandler.handle(image, presentationHistory.find(i => i.id === image.id))
+                presentationHandler.handle(
+                  image,
+                  presentationHistory.find(i => i.id === image.id),
+                  () => {
+                    allMapProgress.setProgress(
+                      calcAllMapProgress(presentationHistory)
+                    )
+                  }
+                )
               );
             return;
           }
@@ -900,7 +913,8 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
 
         },
         treePresentationModeHandler,
-        mapProgress
+        hiddenMapProgress: mapProgress,
+        allMapProgress
       }, new VoiceResponse(new MissingWordsRecognition({
         getRecordingLang() {
           return (json.settings || {}).recognitionLang || 'ru-RU';

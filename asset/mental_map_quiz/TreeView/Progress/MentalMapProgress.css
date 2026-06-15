@@ -1,9 +1,7 @@
 .progress-wrap {
   position: relative;
-  height: 4px;
+  height: 10px;
   z-index: 200;
-  margin-bottom: 10px;
-  margin-inline: 40px;
 }
 
 .map-progress {
@@ -20,6 +18,7 @@
   position: relative;
   width: 100%;
   min-height: 2px;
+  height: 10px;
   padding: .3rem 0;
   overflow: hidden;
   background-color: #faf9f9;
@@ -30,8 +29,12 @@
   width: 100%;
   left: -100%;
   top: 0;
-  height: 4px;
-  background: #285f9f;
+  height: 10px;
+  background: rgba(13,110,253);
   transition-duration: .3s;
   transition-property: transform
+}
+
+.all-progress-wrap .progress__container-indicator {
+  background-color: rgba(25, 135, 84);
 }

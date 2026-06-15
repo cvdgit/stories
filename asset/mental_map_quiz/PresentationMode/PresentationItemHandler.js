@@ -13,7 +13,7 @@ function PresentationItemHandler(container, voiceResponse, {threshold, promptId,
     isRecording() {
       return isRecording;
     },
-    handle(image, historyItem) {
+    handle(image, historyItem, onHistoryChangeHandler) {
       if (isRecording) {
         return;
       }
@@ -84,6 +84,10 @@ function PresentationItemHandler(container, voiceResponse, {threshold, promptId,
           historyItem.allTextClosed = responseHistoryItem.allTextClosed;
           historyItem.allTextClosedPrev = responseHistoryItem.allTextClosedPrev;
           historyItem.result = '';
+
+          if (typeof onHistoryChangeHandler === 'function') {
+            onHistoryChangeHandler(historyItem)
+          }
 
           const imgElem = container.querySelector(`[data-img-id='${image.id}']`);
           if (imgElem) {

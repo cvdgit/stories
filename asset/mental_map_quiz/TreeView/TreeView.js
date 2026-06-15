@@ -22,7 +22,21 @@ import TreeViewDialogBody from "./TreeViewDialogBody";
  * @returns {HTMLDivElement}
  * @constructor
  */
-function TreeView({id, name, infoText, tree, history, presentationHistory, params, settings, onMentalMapChange, itemClickHandler, treePresentationModeHandler, mapProgress}, voiceResponse) {
+function TreeView({
+                    id,
+                    name,
+                    infoText,
+                    tree,
+                    history,
+                    presentationHistory,
+                    params,
+                    settings,
+                    onMentalMapChange,
+                    itemClickHandler,
+                    treePresentationModeHandler,
+                    hiddenMapProgress,
+                    allMapProgress
+                  }, voiceResponse) {
 
   const wrap = document.createElement('div');
   wrap.style.display = 'flex'
@@ -76,8 +90,17 @@ function TreeView({id, name, infoText, tree, history, presentationHistory, param
     wrap.appendChild(infoTextElement)
   }
 
-  if (mapProgress && settings.treeDialog) {
-    wrap.appendChild(mapProgress.render())
+  if (hiddenMapProgress && settings.treeDialog) {
+    const mapProgressWrap = document.createElement('div')
+    mapProgressWrap.className = 'map-progress-wrap'
+    mapProgressWrap.innerHTML = `<div class="hidden-progress-wrap"></div><div class="all-progress-wrap"></div>`
+    mapProgressWrap
+      .querySelector('.hidden-progress-wrap')
+      .appendChild(hiddenMapProgress.render())
+    mapProgressWrap
+      .querySelector('.all-progress-wrap')
+      .appendChild(allMapProgress.render())
+    wrap.appendChild(mapProgressWrap)
   }
 
   $(wrap).find("[data-toggle='tooltip']").tooltip({
