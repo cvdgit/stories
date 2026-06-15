@@ -828,7 +828,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
       )
 
       const allMapProgress = new MentalMapProgress(
-        calcAllMapProgress(presentationHistory)
+        calcAllMapProgress(presentationHistory || [])
       )
 
       treeViewInstance = new TreeView({
