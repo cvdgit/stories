@@ -348,3 +348,17 @@
 .gn.disabled {
   background-color: #ddd;
 }
+
+.mental-map-info-wrap {
+  font-size: 20px;
+  line-height: 34px;
+  border: 1px solid rgb(221, 221, 221);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  text-align: left;
+}
+
+.mental-map-info-wrap p {
+  margin-bottom: 0;
+}

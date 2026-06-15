@@ -69,21 +69,15 @@ function TreeView({id, name, infoText, tree, history, presentationHistory, param
 
   wrap.appendChild(header)
 
-  if (mapProgress && settings.treeDialog) {
-    wrap.appendChild(mapProgress.render())
+  if (infoText) {
+    const infoTextElement = document.createElement('div')
+    infoTextElement.className = 'mental-map-info-wrap'
+    infoTextElement.innerHTML = infoText
+    wrap.appendChild(infoTextElement)
   }
 
-  if (infoText) {
-    const infoTextElement = document.createElement('div');
-    infoTextElement.style.fontSize = '24px';
-    infoTextElement.style.lineHeight = '40px';
-    infoTextElement.style.border = '1px #ddd solid';
-    infoTextElement.style.padding = '12px';
-    infoTextElement.style.borderRadius = '8px';
-    infoTextElement.style.marginBottom = '8px';
-    infoTextElement.style.textAlign = 'left';
-    infoTextElement.innerHTML = infoText;
-    wrap.appendChild(infoTextElement);
+  if (mapProgress && settings.treeDialog) {
+    wrap.appendChild(mapProgress.render())
   }
 
   $(wrap).find("[data-toggle='tooltip']").tooltip({

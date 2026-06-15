@@ -1,7 +1,8 @@
 .progress-wrap {
   position: relative;
   height: 4px;
-  z-index: 200
+  z-index: 200;
+  margin-bottom: 10px;
 }
 
 .map-progress {
