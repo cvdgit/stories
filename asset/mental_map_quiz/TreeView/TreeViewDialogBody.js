@@ -197,6 +197,12 @@ export default function TreeViewDialogBody({
     }
   })
 
+  function setActiveRow(bodyElement, rowElement) {
+    bodyElement.querySelectorAll('.node-row')
+      .forEach(elem => elem.classList.remove('node-active'))
+    rowElement.classList.add('node-active')
+  }
+
   const API = {
     getElement() {
       return body
@@ -214,39 +220,36 @@ export default function TreeViewDialogBody({
             {
               hiding: historyItem.hiding || 0,
               hidingPrev: historyItem.hidingPrev || 0,
-              hidingClickHandler: () => itemClickHandler({
-                isPresentation: false,
-                id: node.id,
-                text: node.description,
-                description: node.description
-              })
+              hidingClickHandler: () => {
+                setActiveRow(body, row)
+                itemClickHandler({
+                  isPresentation: false,
+                  id: node.id,
+                  text: node.description,
+                  description: node.description
+                })
+              }
             },
             {
               all: presentationHistoryItem.allTextClosed,
               allPrev: presentationHistoryItem.allTextClosedPrev,
-              allClickHandler: () => itemClickHandler({
-                isPresentation: true,
-                id: node.id,
-                text: node.description,
-                description: node.description
-              })
+              allClickHandler: () => {
+                setActiveRow(body, row)
+                itemClickHandler({
+                  isPresentation: true,
+                  id: node.id,
+                  text: node.description,
+                  description: node.description
+                })
+              }
             }
           ),
           historyItem.done
         );
 
-        row.querySelector('.node-title').addEventListener('click', e => {
-
-          body.querySelectorAll('.node-row')
-            .forEach(elem => elem.classList.remove('node-active'));
-          row.classList.add('node-active');
-
-          /*itemClickHandler({
-            id: node.id,
-            text: node.description,
-            description: node.description
-          });*/
-        });
+        row
+          .querySelector('.node-title')
+          .addEventListener('click', e => setActiveRow(body, row))
 
         body.appendChild(
           renderRow(
