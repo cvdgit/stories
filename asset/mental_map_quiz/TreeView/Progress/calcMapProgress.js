@@ -10,5 +10,9 @@ export default function calcMapProgress(history) {
     return 0
   }
   percent = Math.round(hidden * 100 / total)
-  return percent
+  return {
+    percent,
+    words: total,
+    hiddenWords: hidden
+  }
 }

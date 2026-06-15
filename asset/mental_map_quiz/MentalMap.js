@@ -892,7 +892,6 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
             hideFragmentText: false,
             settingsPromptId: json.settings?.promptId,
             onHistoryChangeHandler: () => {
-              console.log('mapProgress.setProgress', calcMapProgress(history))
               mapProgress.setProgress(
                 calcMapProgress(history)
               )
