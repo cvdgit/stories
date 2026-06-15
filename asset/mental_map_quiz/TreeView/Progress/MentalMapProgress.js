@@ -4,13 +4,11 @@ import tippy from "tippy.js";
 export default function MentalMapProgress({percent, words, hiddenWords}) {
   const element = document.createElement('div')
   element.className = 'progress-wrap'
-  element.innerHTML = `<div class="progress-wrap">
-                <div class="map-progress">
+  element.innerHTML = `<div class="map-progress">
                     <div class="progress__container">
                         <div class="progress__container-indicator" style="transform: translate3d(${percent || 0}%, 0px, 0px);"></div>
                     </div>
-                </div>
-            </div>`
+                </div>`
 
   let tipContent = `Слов ${hiddenWords} из ${words} - ${percent}%`
   const tippyInstance = tippy(element, {
