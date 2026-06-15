@@ -20,7 +20,8 @@
   width: 100%;
   min-height: 2px;
   padding: .3rem 0;
-  overflow: hidden
+  overflow: hidden;
+  background-color: #faf9f9;
 }
 
 .progress__container-indicator {
