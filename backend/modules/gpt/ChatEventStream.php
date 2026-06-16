@@ -10,7 +10,7 @@ use Yii;
 use yii\db\Exception;
 use yii\helpers\Json;
 
-class ChatEventStream
+class ChatEventStream implements EventStreamInterface
 {
     /**
      * @var EventStream
@@ -23,9 +23,13 @@ class ChatEventStream
     }
 
     /**
+     * @param string $target
+     * @param string $url
+     * @param string $fieldsJson
+     * @return void
      * @throws Exception
      */
-    public function send(string $target, string $url, string $fieldsJson): void
+    public function send(string $target, string $url, $fieldsJson): void
     {
         $streamedResponse = (object) ["id" => ""];
         $errorResponse = [];

@@ -5,6 +5,14 @@ declare(strict_types=1);
 namespace backend\modules\gpt\controllers;
 
 use backend\modules\gpt\ChatEventStream;
+use backend\modules\gpt\EventStreamInterface;
+use backend\modules\gpt\OpenAiStream\LangChainStreamEmitter;
+use backend\modules\gpt\OpenAiStream\OllamaClient;
+use backend\modules\gpt\OpenAiStream\operations\AddOperation;
+use backend\modules\gpt\OpenAiStream\operations\ChainState;
+use backend\modules\gpt\OpenAiStream\operations\ReplaceOperation;
+use backend\modules\gpt\OpenAiStream\operations\StreamLogEvent;
+use backend\modules\gpt\OpenAiStream\StreamProcessor;
 use Exception;
 use frontend\GptChat\GptChatForm;
 use Ramsey\Uuid\Uuid;
@@ -24,7 +32,7 @@ class StreamController extends Controller
      */
     private $chatEventStream;
 
-    public function __construct($id, $module, ChatEventStream $chatEventStream, $config = [])
+    public function __construct($id, $module, EventStreamInterface $chatEventStream, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->chatEventStream = $chatEventStream;
@@ -36,14 +44,26 @@ class StreamController extends Controller
             $this->enableCsrfValidation = false;
         }
 
-        @ob_end_clean();
+        header('Content-Type: text/event-stream; charset=utf-8');
+        header('Cache-Control: no-cache');
+        header('Connection: keep-alive');
+        header('X-Accel-Buffering: no');
+
+        while (ob_get_level() > 0) {
+            ob_end_flush();
+        }
+
+        ob_implicit_flush(1);
+
+        //@ob_end_clean();
+
         ini_set('output_buffering', '0');
         set_time_limit(0);
 
-        header("Content-Type: text/event-stream");
-        header("Cache-Control: no-cache, must-revalidate");
-        header("X-Accel-Buffering: no");
-        header("Connection: keep-alive");
+        //header("Content-Type: text/event-stream");
+        //header("Cache-Control: no-cache, must-revalidate");
+        //header("X-Accel-Buffering: no");
+        //header("Connection: keep-alive");
 
         $response = Yii::$app->response;
         $response->format = Response::FORMAT_RAW;
@@ -365,17 +385,13 @@ class StreamController extends Controller
 
     public function actionStream(Request $request): void
     {
-        $fields = $request->post();
-
-        try {
-            $this->chatEventStream->send(
-                "conversations",
-                Yii::$app->params["gpt.api.completions.host"],
-                Json::encode($fields),
-            );
-        } catch (Exception $ex) {
-            Yii::$app->errorHandler->logException($ex);
-        }
+        $payload = json_decode($request->getRawBody(), true, 512, JSON_THROW_ON_ERROR);
+        $this->chatEventStream->send(
+            'conversations',
+            Yii::$app->params["gpt.api.completions.host"],
+            $payload['input']['messages']
+        );
+        Yii::$app->end();
     }
 
     public function actionPdf(Request $request): void
@@ -460,7 +476,7 @@ TEXT;
             $this->chatEventStream->send(
                 "retelling",
                 Yii::$app->params["gpt.api.completions.host"],
-                Json::encode($fields),
+                [$message] //Json::encode($fields),
             );
         } catch (Exception $ex) {
             Yii::$app->errorHandler->logException($ex);
@@ -638,7 +654,7 @@ TEXT;
             $this->chatEventStream->send(
                 "retelling-rewrite",
                 Yii::$app->params["gpt.api.completions.host"],
-                Json::encode($fields),
+                [$message], // Json::encode($fields),
             );
         } catch (Exception $ex) {
             Yii::$app->errorHandler->logException($ex);
@@ -887,7 +903,7 @@ TEXT;
             $this->chatEventStream->send(
                 "retelling",
                 Yii::$app->params["gpt.api.completions.host"],
-                Json::encode($fields),
+                [$message] // Json::encode($fields),
             );
         } catch (Exception $ex) {
             Yii::$app->errorHandler->logException($ex);

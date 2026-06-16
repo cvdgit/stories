@@ -29,6 +29,7 @@ return [
             ScheduleFetcherInterface::class => ScheduleFetcher::class,
             \backend\modules\repetition\RepetitionApiInterface::class => \frontend\modules\repetition\RepetitionApiProvider::class,
             \backend\Changelog\ChangelogApiInterface::class => \backend\modules\changelog\ChangelogApi::class,
+            \backend\modules\gpt\EventStreamInterface::class => \backend\modules\gpt\OllamaEventStream::class,
         ],
     ],
     'components' => [
