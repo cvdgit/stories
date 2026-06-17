@@ -20,13 +20,9 @@ use yii\helpers\Json;
 class OllamaEventStream implements EventStreamInterface
 {
     /**
-     * @param string $target
-     * @param string $url
-     * @param array $fieldsJson
-     * @return void
      * @throws Exception
      */
-    public function send(string $target, string $url, $fieldsJson): void
+    public function send(string $target, string $url, string $fieldsJson): void
     {
         $emitter = new LangChainStreamEmitter();
 
@@ -59,11 +55,14 @@ class OllamaEventStream implements EventStreamInterface
 
         $client = new OllamaClient();
 
+        $messages = Json::decode($fieldsJson);
+        $messages = $messages['input']['messages'];
+
         $client->stream(
             $url,
             [
                 'model' => 'gpt-oss:20b',
-                'messages' => $fieldsJson,
+                'messages' => $messages,
                 'stream' => true,
                 'temperature' => 0,
             ],
@@ -80,7 +79,7 @@ class OllamaEventStream implements EventStreamInterface
                 $runId,
                 $target,
                 Yii::$app->user->getId(),
-                $fieldsJson,
+                $messages,
                 $processor->getResponse()
             );
         } catch (Exception $exception) {

@@ -386,10 +386,23 @@ class StreamController extends Controller
     public function actionStream(Request $request): void
     {
         $payload = json_decode($request->getRawBody(), true, 512, JSON_THROW_ON_ERROR);
+
+        $fields = [
+            "input" => [
+                "messages" => $payload['input']['messages'],
+            ],
+            "config" => [
+                "metadata" => [
+                    "conversation_id" => Uuid::uuid4()->toString(),
+                ],
+            ],
+            "include_names" => [],
+        ];
+
         $this->chatEventStream->send(
             'conversations',
             Yii::$app->params["gpt.api.completions.host"],
-            $payload['input']['messages']
+            Json::encode($fields)
         );
         Yii::$app->end();
     }
@@ -476,7 +489,7 @@ TEXT;
             $this->chatEventStream->send(
                 "retelling",
                 Yii::$app->params["gpt.api.completions.host"],
-                [$message] //Json::encode($fields),
+                Json::encode($fields),
             );
         } catch (Exception $ex) {
             Yii::$app->errorHandler->logException($ex);
@@ -654,7 +667,7 @@ TEXT;
             $this->chatEventStream->send(
                 "retelling-rewrite",
                 Yii::$app->params["gpt.api.completions.host"],
-                [$message], // Json::encode($fields),
+                Json::encode($fields),
             );
         } catch (Exception $ex) {
             Yii::$app->errorHandler->logException($ex);
@@ -903,7 +916,7 @@ TEXT;
             $this->chatEventStream->send(
                 "retelling",
                 Yii::$app->params["gpt.api.completions.host"],
-                [$message] // Json::encode($fields),
+                Json::encode($fields),
             );
         } catch (Exception $ex) {
             Yii::$app->errorHandler->logException($ex);

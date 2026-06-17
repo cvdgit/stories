@@ -23,13 +23,9 @@ class ChatEventStream implements EventStreamInterface
     }
 
     /**
-     * @param string $target
-     * @param string $url
-     * @param string $fieldsJson
-     * @return void
      * @throws Exception
      */
-    public function send(string $target, string $url, $fieldsJson): void
+    public function send(string $target, string $url, string $fieldsJson): void
     {
         $streamedResponse = (object) ["id" => ""];
         $errorResponse = [];
