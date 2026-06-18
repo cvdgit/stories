@@ -467,7 +467,38 @@ class MentalMapController extends Controller
                 );
                 $command->execute();
             });
-            return ['success' => true];
+
+            $threshold = MentalMapThreshold::getThreshold(Yii::$app->params, $mentalMap->payload);
+            if ($mentalMap->isMentalMapAsTree()) {
+                $history = (new MentalMapTreeHistoryFetcher())->fetch(
+                    $mentalMap->uuid,
+                    $user->getId(),
+                    $mentalMap->getTreeData(),
+                    $threshold
+                );
+            } else {
+                $history = (new MentalMapHistoryFetcher())->fetch(
+                    $mentalMap->getImages(),
+                    $mentalMap->uuid,
+                    $user->getId(),
+                    $threshold
+                );
+            }
+
+            $presentationHistory = (new MentalMapTreeHistoryFetcher())->fetch(
+                $mentalMap->uuid,
+                $user->getId(),
+                $mentalMap->getTreeData(),
+                $threshold,
+                false,
+                true,
+            );
+
+            return [
+                'success' => true,
+                'history' => $history,
+                'presentationHistory' => $presentationHistory,
+            ];
         } catch (Exception $exception) {
             Yii::$app->errorHandler->logException($exception);
             return ['success' => false, 'message' => 'Reset history error'];

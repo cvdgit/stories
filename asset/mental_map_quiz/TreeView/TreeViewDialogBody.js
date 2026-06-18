@@ -264,7 +264,7 @@ export default function TreeViewDialogBody({
     },
     restart() {
       body.remove()
-      history = history.map(h => ({...h, done: false, all: 0, pending: false, repeat: false}))
+      // history = history.map(h => ({...h, done: false, all: 0, pending: false, repeat: false}))
       body = init()
       this.init()
       return body

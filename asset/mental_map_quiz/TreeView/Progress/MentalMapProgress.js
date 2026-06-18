@@ -34,6 +34,9 @@ export default function MentalMapProgress({percent, content}) {
       tippyInstance.setContent(content)
 
       element.querySelector('.progress__container-indicator').style.transform = `translate3d(${percent}%, 0px, 0px)`
+    },
+    reset() {
+      this.setProgress({percent: 0, content: '0%'})
     }
   }
 }

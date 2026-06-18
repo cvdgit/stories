@@ -869,6 +869,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
                   image,
                   presentationHistory.find(i => i.id === image.id),
                   () => {
+                    treeViewInstance.historyChangeCallback()
                     allMapProgress.setProgress(
                       calcAllMapProgress(presentationHistory)
                     )
@@ -905,6 +906,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
             hideFragmentText: false,
             settingsPromptId: json.settings?.promptId,
             onHistoryChangeHandler: () => {
+              treeViewInstance.historyChangeCallback()
               mapProgress.setProgress(
                 calcMapProgress(history)
               )
