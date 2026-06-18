@@ -108,17 +108,30 @@ class MentalMapTreeHistoryFetcher
         } else {
             $query = (new Query())
                 ->select([
-                    'id' => 'h.image_fragment_id',
-                    //'all' => 'MAX(h.overall_similarity)',
-                    'allTextClosed' => 'MAX(h.all_hiding_percentage)',
+                    'id' => 'stat.image_fragment_id',
+                    'allTextClosed' => 'MAX(stat.all_hiding_percentage)',
                     'allTextClosedPrev' => $allBeforeQuery,
                 ])
-                ->from(['h' => 'mental_map_history'])
-                ->where([
-                    'h.mental_map_id' => $mentalMapId,
-                    'h.user_id' => $userId,
+                ->from([
+                    'h' => (new Query())
+                        ->select([
+                            'image_fragment_id' => 't1.image_fragment_id',
+                            'maxCreatedAt' => 'MAX(t1.created_at)',
+                            'user_id' => 't1.user_id',
+                        ])
+                        ->from(['t1' => 'mental_map_history'])
+                        ->where([
+                            't1.mental_map_id' => $mentalMapId,
+                            't1.user_id' => $userId,
+                        ])
+                        ->andWhere('t1.all_hiding_percentage > 0')
+                        ->groupBy(['t1.image_fragment_id'])
                 ])
-                ->groupBy(['h.image_fragment_id'])
+                ->innerJoin(
+                    ['stat' => 'mental_map_history'],
+                    'stat.image_fragment_id = h.image_fragment_id AND stat.created_at = h.maxCreatedAt'
+                )
+                ->groupBy(['stat.image_fragment_id'])
                 ->indexBy('id');
             $rows = $query->all();
             return array_map(static function (HistoryItem $item) use ($rows) {

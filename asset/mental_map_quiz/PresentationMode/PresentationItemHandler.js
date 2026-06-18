@@ -4,6 +4,7 @@ import MapImageStatus from "../components/MapImageStatus";
 import {stripTags} from "../common";
 import tippy from "tippy.js";
 import 'tippy.js/dist/tippy.css';
+import {createNotify} from "../components/utils";
 
 function PresentationItemHandler(container, voiceResponse, {threshold, promptId, presentationPromptEdit}, saveUserHistoryHandler, history) {
 
@@ -32,12 +33,24 @@ function PresentationItemHandler(container, voiceResponse, {threshold, promptId,
             return;
           }
 
-          const response = await userResponseChecker(
-            image.text,
-            userResponse,
-            threshold,
-            promptId || image.promptId
-          );
+          let response
+          try {
+            response = await userResponseChecker(
+              image.text,
+              userResponse,
+              threshold,
+              promptId || image.promptId
+            )
+          } catch (ex) {
+
+            document.querySelector('.mental-map').appendChild(
+              createNotify(ex.message)
+            )
+
+            isRecording = false;
+            container.querySelector('.fragment-recording-wrap').remove();
+            return
+          }
 
           const json = window.processOutputAsJson(response);
 

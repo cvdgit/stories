@@ -24,7 +24,9 @@ async function rewriteUserResponse(text, userResponse) {
       slideTexts: stripTags(text)
     },
     (message) => rewriteUserResponse = message,
-    () => console.log('rewrite error'),
+    error => {
+      throw new Error(`Rewrite error: ${error}`)
+    },
     () => console.log('rewrite end')
   )
   return rewriteUserResponse.trim();
