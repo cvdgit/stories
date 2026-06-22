@@ -130,7 +130,7 @@ window.MicrophoneChecker = (function () {
 
 window.io = io;
 
-window.sendStreamMessage = function(url, payload, onMessage, onEndCallback) {
+window.sendStreamMessage = function(url, payload, onMessage, onEndCallback, onError) {
   let accumulatedMessage = ''
   return sendEventSourceMessage({
     url,
@@ -147,9 +147,18 @@ window.sendStreamMessage = function(url, payload, onMessage, onEndCallback) {
       onMessage(accumulatedMessage)
     },
     onError: (streamedResponse) => {
-      console.log(streamedResponse)
+      const errorText = streamedResponse.error_text || 'Ошибка'
+      if (typeof onError === 'function') {
+        onError(errorText)
+        return
+      }
+      throw new Error(errorText)
     },
-    onEnd: () => onEndCallback(accumulatedMessage)
+    onEnd: () => {
+      if (typeof onEndCallback === 'function') {
+        onEndCallback(accumulatedMessage)
+      }
+    }
   })
 }
 

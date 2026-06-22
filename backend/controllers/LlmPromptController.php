@@ -130,8 +130,8 @@ class LlmPromptController extends Controller
     }
 
     /**
-     * @throws NotFoundHttpException
-     * @throws BadRequestHttpException
+     * @throws NotFoundHttpException|BadRequestHttpException
+     * @return string|Response
      */
     public function actionUpdateForm(string $id, Request $request)
     {
@@ -150,8 +150,9 @@ class LlmPromptController extends Controller
 
     /**
      * @throws NotFoundHttpException
+     * @return string|Response
      */
-    public function actionUpdateByKeyForm(string $key, Request $request): string
+    public function actionUpdateByKeyForm(string $key, Request $request)
     {
         $llmPrompt = LlmPrompt::findByKey($key);
         if ($llmPrompt === null) {

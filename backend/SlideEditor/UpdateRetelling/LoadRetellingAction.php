@@ -9,9 +9,11 @@ use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\RetellingBlock;
 use backend\components\story\RetellingBlockContent;
 use backend\components\story\TextBlock;
+use backend\Retelling\RetellingSettings;
 use common\models\StorySlide;
 use yii\base\Action;
 use yii\db\Query;
+use yii\helpers\Json;
 use yii\web\Request;
 use yii\web\Response;
 
@@ -55,6 +57,8 @@ class LoadRetellingAction extends Action
             }
         }
 
+        $payload = Json::decode($retelling['payload'] ?? '[]');
+        $settings = $payload['settings'] ?? null;
         return [
             'success' => true,
             'retelling' => [
@@ -63,6 +67,10 @@ class LoadRetellingAction extends Action
                 'withQuestions' => $retelling['with_questions'] === '1',
                 'questions' => $retelling['questions'],
                 'required' => $content->isRequired(),
+                'settings' => $settings === null
+                    ? null
+                    : RetellingSettings::fromArray($settings),
+                'retellingSlideId' => $retelling['slide_id'],
             ],
         ];
     }

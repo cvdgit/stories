@@ -42,7 +42,11 @@ class UpdateRetellingAction extends Action
             }
             try {
 
-                $retelling->updateRetelling((int) $updateForm->with_questions, $updateForm->questions);
+                $retelling->updateRetelling(
+                    (int) $updateForm->with_questions,
+                    $updateForm->questions,
+                    (int) $updateForm->threshold
+                );
                 if (!$retelling->save()) {
                     throw new DomainException('Retelling update error');
                 }

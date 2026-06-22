@@ -4,15 +4,9 @@ declare(strict_types=1);
 
 namespace backend\modules\gpt\controllers;
 
+use backend\LlmPrompt\LlmPrompt;
 use backend\modules\gpt\ChatEventStream;
 use backend\modules\gpt\EventStreamInterface;
-use backend\modules\gpt\OpenAiStream\LangChainStreamEmitter;
-use backend\modules\gpt\OpenAiStream\OllamaClient;
-use backend\modules\gpt\OpenAiStream\operations\AddOperation;
-use backend\modules\gpt\OpenAiStream\operations\ChainState;
-use backend\modules\gpt\OpenAiStream\operations\ReplaceOperation;
-use backend\modules\gpt\OpenAiStream\operations\StreamLogEvent;
-use backend\modules\gpt\OpenAiStream\StreamProcessor;
 use Exception;
 use frontend\GptChat\GptChatForm;
 use Ramsey\Uuid\Uuid;
@@ -496,22 +490,23 @@ TEXT;
         }
     }
 
+    /**
+     * @throws ExitException
+     */
     public function actionRetellingAnswers(Request $request): void
     {
         $payload = Json::decode($request->rawBody);
         $slideTexts = $payload["slideTexts"];
 
-        $content = <<<TEXT
-            Текст:
-            ```
-            $slideTexts
-            ```
-            Задай вопрос к каждому предложению и расположи его новой строки.
-            TEXT;
+        $llmPrompt = LlmPrompt::findByKey('retelling-questions');
+        if ($llmPrompt === null) {
+            $this->flushError('Промт "retelling-questions" не найден');
+            Yii::$app->end();
+        }
 
         $message = [
             "role" => "user",
-            "content" => trim($content),
+            "content" => trim(str_replace(['{TEXT}'], [$slideTexts], $llmPrompt->prompt)),
         ];
 
         $fields = [

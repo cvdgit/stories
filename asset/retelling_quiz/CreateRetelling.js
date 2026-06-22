@@ -6,16 +6,21 @@
  */
 export default function CreateRetelling(voiceControl, retellingResponse, questionParams) {
 
-  const {withQuestions, questions} = questionParams;
+  const {
+    withQuestions,
+    questions,
+    settings
+  } = questionParams
 
   const elem = document.createElement('div');
   elem.classList.add('retelling-content');
 
+  const threshold = settings.threshold || 90
   elem.innerHTML = `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center">
     <div class="retelling-main-wrap">
         <div class="retelling-startup">
             <p style="line-height: 34px">Начните запись и перескажите текст с предыдущего слайда.</p>
-            <p style="line-height: 34px">Что бы пройти задание, точность пересказа должна быть 90% и выше.</p>
+            <p style="line-height: 34px">Что бы пройти задание, точность пересказа должна быть <b>${threshold}</b>% и выше.</p>
         </div>
         <div class="retelling-user-response">
             <div class="retelling-user-response-inner">

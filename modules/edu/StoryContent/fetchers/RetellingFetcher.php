@@ -43,7 +43,7 @@ class RetellingFetcher extends AbstractFetcher implements ContentFetcherInterfac
             ->from(['rh' => 'retelling_history'])
             ->where(['in', 'rh.slide_id', $this->retellingSlideIds])
             ->andWhere(['rh.user_id' => $student->user_id])
-            ->andWhere('rh.overall_similarity >= 90');
+            ->andWhere("rh.overall_similarity >= IFNULL(rh.threshold, $threshold)");
 
         if ($date !== null) {
             [$betweenBegin, $betweenEnd] = $this->getBetweenDates($date);

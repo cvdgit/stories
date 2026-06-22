@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace frontend\TableOfContents;
 
 use common\components\MentalMapThreshold;
+use common\components\RetellingThreshold;
 use common\models\StudentQuestionProgress;
 use frontend\MentalMap\history\MentalMapHistoryFetcher;
 use frontend\MentalMap\history\MentalMapTreeHistoryFetcher;
@@ -128,6 +129,11 @@ class TableOfContentsStatusFetcher
             if ($retelling === null) {
                 continue;
             }
+
+            $threshold = RetellingThreshold::getThreshold(
+                Yii::$app->params,
+                $retelling->getSettingsThreshold()
+            );
             $completed = (new Query())
                 ->select([
                     'overallSimilarity' => new Expression('MAX(rh.overall_similarity)'),
@@ -138,7 +144,7 @@ class TableOfContentsStatusFetcher
                     'slide_id' => $retellingItem->getSlideId(),
                     'user_id' => $userId,
                 ])
-                ->andWhere('rh.overall_similarity >= 90')
+                ->andWhere("rh.overall_similarity >= IFNULL(rh.threshold, $threshold)")
                 ->scalar();
             $progress = $completed === null ? 0 : 100;
             $history[] = [

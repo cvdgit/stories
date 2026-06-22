@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace frontend\services;
 
 use common\components\MentalMapThreshold;
+use common\components\RetellingThreshold;
 use common\models\StorySlide;
 use common\models\StoryStudentProgress;
 use common\models\UserStudent;
@@ -168,6 +169,10 @@ class StoryStatService
         foreach ($retellingItems as $item) {
             $retelling = Retelling::findOne($item->getRetellingId());
             if ($retelling !== null) {
+                $threshold = RetellingThreshold::getThreshold(
+                    Yii::$app->params,
+                    $retelling->getSettingsThreshold()
+                );
                 $completed = (new Query())
                     ->select([
                         'overallSimilarity' => new Expression('MAX(rh.overall_similarity)'),
@@ -178,7 +183,7 @@ class StoryStatService
                         'slide_id' => $item->getSlideId(),
                         'user_id' => $this->student->user_id,
                     ])
-                    ->andWhere('rh.overall_similarity >= 90')
+                    ->andWhere("rh.overall_similarity >= IFNULL(rh.threshold, $threshold)")
                     ->scalar();
                 if ($completed !== null) {
                     $doneNumber++;

@@ -11,11 +11,12 @@ class UpdateRetellingForm extends Model
     public $required;
     public $with_questions;
     public $questions;
+    public $threshold;
 
     public function rules(): array
     {
         return [
-            [['required', 'with_questions'], 'integer'],
+            [['required', 'with_questions', 'threshold'], 'integer'],
             ['questions', 'string'],
         ];
     }

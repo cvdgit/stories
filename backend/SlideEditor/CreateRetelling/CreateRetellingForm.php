@@ -13,11 +13,12 @@ class CreateRetellingForm extends Model
     public $required;
     public $with_questions;
     public $questions;
+    public $threshold;
 
     public function rules(): array
     {
         return [
-            [['story_id', 'slide_id', 'required', 'with_questions'], 'integer'],
+            [['story_id', 'slide_id', 'required', 'with_questions', 'threshold'], 'integer'],
             ['questions', 'string'],
         ];
     }

@@ -200,47 +200,6 @@ $this->registerJs($this->renderFile("@backend/views/editor/_import_slides_from_s
     </div>
 </div>
 
-<div class="modal rounded-0 fade retelling-modal-template" tabindex="-1" data-backdrop="static">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header" style="display: flex; justify-content: space-between">
-                <h5 class="modal-title" style="margin-right: auto">...</h5>
-                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-            </div>
-            <div class="modal-body d-flex">
-                <div style="display: flex; flex-direction: row; column-gap: 20px">
-                    <div style="flex: 1"></div>
-                    <div style="flex: 1">
-                        <label>
-                            Пересказ с вопросами <input class="retelling-with-questions" type="checkbox">
-                        </label>
-                        <a class="retelling-questions-generate" style="display: none" href="">Сгенерировать вопросы</a>
-                    </div>
-                </div>
-                <div style="display: flex; flex-direction: row; column-gap: 20px">
-                    <div style="flex: 1">
-                        <textarea class="textarea retelling-slide-text" readonly style="width:100%; height: 500px; overflow-y: auto"></textarea>
-                    </div>
-                    <div style="flex: 1">
-                        <div class="textarea retelling-questions" contenteditable="plaintext-only" style="height: 500px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; font-size: 14px"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer" style="position: relative">
-                <div>
-                    <label>
-                        Обязательный для прохождения <input checked class="retelling-required" type="checkbox">
-                    </label>
-                    <button type="button" class="btn btn-primary retelling-action">...</button>
-                </div>
-                <div class="retelling-loader" style="display: none; position:absolute; align-items: center; justify-content: center; left: 0; top: 0; width: 100%; height: 100%; background-color: #fff">
-                    <img src="/img/loading.gif" width="30" alt="">
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
     <div class="modal rounded-0 fade" tabindex="-1" id="mental-map-questions-modal" data-backdrop="static">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">

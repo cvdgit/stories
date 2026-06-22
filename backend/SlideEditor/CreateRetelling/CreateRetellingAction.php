@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace backend\SlideEditor\CreateRetelling;
 
+use backend\Retelling\RetellingSettings;
 use backend\services\StoryEditorService;
 use backend\services\StorySlideService;
 use common\models\Story;
@@ -95,6 +96,9 @@ class CreateRetellingAction extends Action
                         'created_by' => $user->getId(),
                         'created_at' => time(),
                         'updated_at' => time(),
+                        'payload' => [
+                            'settings' => (new RetellingSettings((int) $retellingForm->threshold))->asArray()
+                        ],
                     ]);
                     $createCommand->execute();
 

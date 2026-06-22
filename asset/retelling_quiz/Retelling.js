@@ -42,7 +42,14 @@ export default function Retelling(element, deck, params, microphoneChecker) {
       return
     }
 
-    const {withQuestions, text: slideTexts, questions} = responseJson
+    const {
+      withQuestions,
+      text: slideTexts,
+      questions,
+      settings,
+      retellingSlideId
+    } = responseJson
+
     params.completed = Boolean(responseJson?.completed)
     params.all = Number(responseJson?.all)
 
@@ -78,7 +85,7 @@ export default function Retelling(element, deck, params, microphoneChecker) {
     const content = new CreateRetelling(
       voiceControl,
       retellingResponse,
-      {withQuestions, questions}
+      {withQuestions, questions, settings}
     );
 
     const startRetelling = async () => {
@@ -145,8 +152,7 @@ export default function Retelling(element, deck, params, microphoneChecker) {
   }
 
   async function saveUserResult(payload) {
-    const response = await Api.post(`/retelling/save`, payload);
-    return await response.json();
+    return await Api.post(`/retelling/save`, payload);
   }
 
   function createFinishContent(all, texts) {
