@@ -33,4 +33,9 @@ class LlmPrompt extends ActiveRecord
         $this->key = $key;
         $this->prompt = $prompt;
     }
+
+    public static function findByKey(string $key): ?self
+    {
+        return self::findOne(['key' => $key]);
+    }
 }

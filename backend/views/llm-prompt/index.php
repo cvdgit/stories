@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use backend\LlmPrompt\LlmPrompt;
+use backend\LlmPrompt\LlmPromptListFilterModel;
 use yii\data\DataProviderInterface;
 use yii\grid\GridView;
 use yii\helpers\Url;
@@ -10,6 +12,7 @@ use yii\web\View;
 /**
  * @var View $this
  * @var DataProviderInterface $dataProvider
+ * @var LlmPromptListFilterModel $filterModel
  */
 
 $this->title = 'Промты';
@@ -28,11 +31,18 @@ $this->title = 'Промты';
     <?= GridView::widget([
         'options' => ['class' => 'table-responsive'],
         'dataProvider' => $dataProvider,
+        'filterModel' => $filterModel,
         'columns' => [
             'id',
             'name',
             'key',
-            'prompt:ntext',
+            [
+                'attribute' => 'prompt',
+                'format' => 'html',
+                'value' => static function(LlmPrompt $model) {
+                    return '<pre>' . htmlentities($model->prompt ?? '') . '</pre>';
+                },
+            ],
             'created_at:datetime',
         ],
     ]) ?>

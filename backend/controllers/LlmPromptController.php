@@ -6,11 +6,11 @@ namespace backend\controllers;
 
 use backend\LlmPrompt\CreatePromptForm;
 use backend\LlmPrompt\LlmPrompt;
+use backend\LlmPrompt\LlmPromptListFilterModel;
 use backend\LlmPrompt\UpdatePromptForm;
 use common\rbac\UserRoles;
 use Ramsey\Uuid\Uuid;
 use Yii;
-use yii\data\ActiveDataProvider;
 use yii\db\Exception;
 use yii\db\Query;
 use yii\filters\AccessControl;
@@ -38,16 +38,12 @@ class LlmPromptController extends Controller
         ];
     }
 
-    public function actionIndex(): string
+    public function actionIndex(Request $request): string
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => LlmPrompt::find(),
-            'sort' => [
-                'defaultOrder' => ['created_at' => SORT_DESC],
-            ],
-        ]);
+        $filterModel = new LlmPromptListFilterModel();
         return $this->render('index', [
-            'dataProvider' => $dataProvider,
+            'dataProvider' => $filterModel->search($request->get()),
+            'filterModel' => $filterModel,
         ]);
     }
 
@@ -142,24 +138,47 @@ class LlmPromptController extends Controller
         if (!Uuid::isValid($id)) {
             throw new BadRequestHttpException('Invalid id');
         }
-
         $llmPrompt = LlmPrompt::findOne($id);
         if ($llmPrompt === null) {
             throw new NotFoundHttpException('Prompt not found');
         }
+        return $this->updateFormHandler(
+            $llmPrompt,
+            $request->post()
+        );
+    }
 
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionUpdateByKeyForm(string $key, Request $request): string
+    {
+        $llmPrompt = LlmPrompt::findByKey($key);
+        if ($llmPrompt === null) {
+            throw new NotFoundHttpException('Prompt not found');
+        }
+        return $this->updateFormHandler(
+            $llmPrompt,
+            $request->post(),
+        );
+    }
+
+    /**
+     * @return string|Response
+     */
+    private function updateFormHandler(LlmPrompt $llmPrompt, array $postData)
+    {
         $updateForm = new UpdatePromptForm([
             'name' => $llmPrompt->name,
             'key' => $llmPrompt->key,
             'prompt' => $llmPrompt->prompt,
         ]);
-
-        if ($updateForm->load($request->post()) && $updateForm->validate()) {
+        if ($updateForm->load($postData) && $updateForm->validate()) {
             try {
                 $llmPrompt->updatePrompt(
                     $updateForm->name,
                     $updateForm->key,
-                    $updateForm->prompt
+                    $updateForm->prompt,
                 );
                 if (!$llmPrompt->save()) {
                     throw new \DomainException('Prompt save error');
