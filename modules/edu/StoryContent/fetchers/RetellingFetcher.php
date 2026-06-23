@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace modules\edu\StoryContent\fetchers;
 
+use common\components\RetellingThreshold;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DomainException;
 use modules\edu\models\EduStudent;
 use modules\edu\query\GetStoryTests\SlideRetelling;
 use modules\edu\query\GetStoryTests\StoryStatCollection;
+use Yii;
 use yii\db\Expression;
 use yii\db\Query;
 
@@ -38,13 +40,13 @@ class RetellingFetcher extends AbstractFetcher implements ContentFetcherInterfac
             throw new DomainException('Student not found');
         }
 
-        // IFNULL(rh.threshold, $threshold)
+        $threshold = RetellingThreshold::getDefaultThreshold(Yii::$app->params);
         $query = (new Query())
             ->select(['id' => new Expression('DISTINCT rh.slide_id')])
             ->from(['rh' => 'retelling_history'])
             ->where(['in', 'rh.slide_id', $this->retellingSlideIds])
             ->andWhere(['rh.user_id' => $student->user_id])
-            ->andWhere("rh.overall_similarity >= 90");
+            ->andWhere("rh.overall_similarity >= IFNULL(rh.threshold, $threshold)");
 
         if ($date !== null) {
             [$betweenBegin, $betweenEnd] = $this->getBetweenDates($date);
@@ -73,6 +75,7 @@ class RetellingFetcher extends AbstractFetcher implements ContentFetcherInterfac
             throw new DomainException('Student not found');
         }
 
+        $threshold = RetellingThreshold::getDefaultThreshold(Yii::$app->params);
         $query = (new Query())
             ->select([
                 'id' => 't.slide_id',
@@ -81,6 +84,7 @@ class RetellingFetcher extends AbstractFetcher implements ContentFetcherInterfac
             ->from(['t' => 'retelling_history'])
             ->where(['in', 't.slide_id', $this->retellingSlideIds])
             ->andWhere(['t.user_id' => $student->user_id])
+            ->andWhere("t.overall_similarity >= IFNULL(t.threshold, $threshold)")
             ->groupBy('t.slide_id');
 
         if ($date !== null) {
