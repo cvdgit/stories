@@ -38,7 +38,11 @@ class Retelling extends ActiveRecord
 
     public function getSettingsThreshold(): ?int
     {
-        $threshold = $this->getRetellingSettingsPayload()['threshold'];
+        $settings = $this->getRetellingSettingsPayload();
+        if (!isset($settings['threshold'])) {
+            return null;
+        }
+        $threshold = $settings['threshold'];
         if ($threshold !== null) {
             return (int) $threshold;
         }
