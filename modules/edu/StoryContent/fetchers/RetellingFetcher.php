@@ -38,12 +38,13 @@ class RetellingFetcher extends AbstractFetcher implements ContentFetcherInterfac
             throw new DomainException('Student not found');
         }
 
+        // IFNULL(rh.threshold, $threshold)
         $query = (new Query())
             ->select(['id' => new Expression('DISTINCT rh.slide_id')])
             ->from(['rh' => 'retelling_history'])
             ->where(['in', 'rh.slide_id', $this->retellingSlideIds])
             ->andWhere(['rh.user_id' => $student->user_id])
-            ->andWhere("rh.overall_similarity >= IFNULL(rh.threshold, $threshold)");
+            ->andWhere("rh.overall_similarity >= 90");
 
         if ($date !== null) {
             [$betweenBegin, $betweenEnd] = $this->getBetweenDates($date);
