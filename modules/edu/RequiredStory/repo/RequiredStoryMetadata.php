@@ -38,7 +38,28 @@ class RequiredStoryMetadata implements JsonSerializable
         $this->chunks = $chunks;
     }
 
-    public function getCurrentPlan(int $fact): int
+    public function getCurrentPlan(int $total, int $fact): int
+    {
+        if ($total === $fact) {
+            return 0;
+        }
+
+        $totalFromChunks = array_reduce(
+            $this->getChunks(),
+            static function (int $total, array $chunk) {
+                return $total + (int) $chunk['n'];
+            },
+            0,
+        );
+        if ($totalFromChunks === $total) {
+            return $this->calcPlanValue($fact);
+        }
+
+        $remaining = $this->total - ($total - $fact);
+        return $this->calcPlanValue($remaining);
+    }
+
+    private function calcPlanValue(int $fact): int
     {
         $plan = 0;
         foreach ($this->getChunks() as $chunk) {

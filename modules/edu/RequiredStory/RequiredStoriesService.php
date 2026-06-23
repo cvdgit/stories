@@ -124,8 +124,15 @@ class RequiredStoriesService
                 new DateTimeImmutable(),
             );
 
+            $totalContentItems = $this->storyContentService->getStoryTotalContentItems(
+                $requiredStory->getStoryId()
+            );
+
             $metadata = $requiredStory->getMetadata();
-            $planItemCount = $metadata->getCurrentPlan($collection->getTotalItems());
+            $planItemCount = $metadata->getCurrentPlan(
+                $totalContentItems,
+                $collection->getTotalItems()
+            );
 
             $access = $access && ($todayFactContentItemsCount >= $planItemCount);
         }
@@ -154,10 +161,15 @@ class RequiredStoriesService
                 $storyId,
             );
 
+            $totalContentItems = $this->storyContentService->getStoryTotalContentItems($storyId);
+
             $session = $this->requiredStorySessionRepository->create(
                 $requiredStoryId,
                 $date,
-                $metadata->getCurrentPlan($collection->getTotalItems()),
+                $metadata->getCurrentPlan(
+                    $totalContentItems,
+                    $collection->getTotalItems()
+                ),
                 $this->storyContentService->getStudentFactContentItemsCountByDate(
                     $collection,
                     $studentId,
@@ -277,7 +289,15 @@ class RequiredStoriesService
             if ($requiredStory === null) {
                 continue;
             }
-            $total += $requiredStory->getMetadata()->getCurrentPlan($collection->getTotalItems());
+
+            $totalContentItems = $this->storyContentService->getStoryTotalContentItems(
+                $requiredStory->getStoryId()
+            );
+
+            $total += $requiredStory->getMetadata()->getCurrentPlan(
+                $totalContentItems,
+                $collection->getTotalItems()
+            );
         }
         return $total;
     }

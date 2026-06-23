@@ -68,7 +68,7 @@
 
   function drawMetadata(metadata) {
     const $elem = $('<div/>')
-      .append(`<p>Всего вопросов в истории: <b style="margin-right: 10px">${metadata.total}</b> <button class="reload-meta" title="Обновить" type="button"><i class="glyphicon glyphicon-refresh"></i></button></p>`)
+      .append(`<p>Всего вопросов в истории: <b id="storyTotalContentItems" style="margin-right: 10px">${metadata.total}</b> <button class="reload-meta" title="Обновить" type="button"><i class="glyphicon glyphicon-refresh"></i></button></p>`)
       .append(`
 <p>
 Учитываются:
@@ -106,9 +106,10 @@
     const metadata = JSON.parse($container.find('.required-story-metadata').val());
     const studentFactAnswers = Number($container.find('#studentFactAnswers').text());
 
-    let total = metadata.total;
+    let total = Number($container.find('#storyTotalContentItems').text());
     if (useStudentFact) {
-      total -= studentFactAnswers;
+      total -= studentFactAnswers
+      metadata.total = total
     }
 
     metadata.chunks = splitNumber(total, Number(days)).map(n => ({n}));
