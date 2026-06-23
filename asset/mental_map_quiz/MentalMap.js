@@ -733,7 +733,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
     const hideFragmentText = Boolean(json.settings?.hideText);
     const settingsPromptId = json.settings?.promptId;
 
-    const {settings} = json;
+    const {settings = {}} = json;
 
     const saveHistoryParams = {
       story_id: params?.story_id,
