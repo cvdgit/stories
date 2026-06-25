@@ -15,6 +15,7 @@ import {v4 as uuidv4} from "uuid";
 import {CSSTransition} from "react-transition-group";
 import InfoText from "../InfoText/InfoText";
 import {useMentalMap} from "../App/App";
+import {streamFragmentTitle} from "../stream";
 
 export const PlanTreeViewContext = createContext({});
 
@@ -77,6 +78,32 @@ export default function PlanTreeView({texts}) {
       type: 'add_node',
       payload: {id: uuidv4(), title: t, description: t}
     }))
+  }
+
+  const createTreeNodesFromTextHandler = () => {
+
+    texts.map((t, i) => {
+
+      const nodeId = crypto.randomUUID()
+      dispatch({
+        type: 'add_node',
+        payload: {id: nodeId, title: '', description: t, status: 'pending'}
+      })
+
+      streamFragmentTitle(
+        t,
+        message => dispatch({
+          type: 'update_node',
+          nodeId,
+          payload: {title: message}
+        }),
+        () => dispatch({
+          type: 'update_node',
+          nodeId,
+          payload: {status: 'done'}
+        })
+      )
+    })
   }
 
   useEffect(() => {
@@ -230,8 +257,14 @@ export default function PlanTreeView({texts}) {
               Добавить
             </button>
             {state.treeData.length === 0 && (
-              <button onClick={createNodesFromTextHandler} className="button button--default button--header-done"
-                      type="button">Создать из текста</button>
+              <>
+                <button onClick={createNodesFromTextHandler} className="button button--default button--header-done"
+                        type="button">Создать из текста
+                </button>
+                <button onClick={createTreeNodesFromTextHandler} className="button button--default button--header-done"
+                        type="button">Создать из текста (план)
+                </button>
+              </>
             )}
           </div>
         </div>
