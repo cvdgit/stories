@@ -29,18 +29,33 @@ export default function App({mentalMapId}) {
     api
       .get(`/admin/index.php?r=mental-map/get&id=${mentalMapId}`)
       .then((response) => {
-        setLoading(false);
+
+        const {
+          images,
+          mentalMap,
+          schedules
+        } = response
+
+        const {
+          treeView: isTreeView = false,
+          text = ''
+        } = mentalMap
+        const {settings = {}} = mentalMap
+        const {planTreeView: isPlanTreeView = false} = settings
+
         dispatch({
           type: 'mental_map_loaded',
-          mentalMap: response.mentalMap
+          mentalMap
         })
         imagesDispatch({
           type: 'images_loaded',
-          images: response.images
+          images
         })
-        setSchedules(response.schedules)
-        setIsTreeView(Boolean(response?.mentalMap?.treeView))
-        setFormattedMapText(formatTextWithLineNumbers(response.mentalMap?.text))
+        setSchedules(schedules)
+        setIsTreeView(Boolean(isTreeView))
+        setFormattedMapText(formatTextWithLineNumbers(text))
+
+        setLoading(false);
       })
       .catch(async (error) => setError(await parseError(error)))
   }, [])
@@ -60,6 +75,7 @@ export default function App({mentalMapId}) {
                 currentTitle={state.name}
                 schedules={schedules}
                 setFormattedMapText={setFormattedMapText}
+                isTreeView={isTreeView}
               />
             </div>
             {isTreeView

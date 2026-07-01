@@ -39,7 +39,7 @@ const ItemDialog = forwardRef(function ItemDialog(props, ref) {
       setMark(markInit)
       setPromptId(currentNode.promptId || '')
     }
-  }, [JSON.stringify(currentNode)]);
+  }, [currentNode]);
 
   useEffect(() => {
     if (!currentWords.length) {
@@ -47,7 +47,7 @@ const ItemDialog = forwardRef(function ItemDialog(props, ref) {
     }
     setDescription(getTextBySelections(currentWords))
     setCurrentDescription(getTextBySelections(currentWords))
-  }, [JSON.stringify(currentWords)]);
+  }, [currentWords]);
 
   useEffect(() => {
     if (!open) {

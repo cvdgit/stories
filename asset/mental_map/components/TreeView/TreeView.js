@@ -14,10 +14,15 @@ import {CSSTransition} from "react-transition-group";
 import ItemDialog from "./ItemDialog";
 import InfoText from "../InfoText/InfoText";
 import {useMentalMap} from "../App/App";
+import TextDialog from "../Dialog/TextDialog";
 
 export const TreeContext = createContext({});
 
-let sendSaveRequest = false
+const CustomPlaceholder = () => (
+  <div style={{textAlign: 'center', padding: '20px', color: '#888'}}>
+    Нет элементов
+  </div>
+);
 
 export default function TreeView({texts}) {
   const [loading, setLoading] = useState(true)
@@ -30,6 +35,9 @@ export default function TreeView({texts}) {
   const {state: mentalMapState, dispatch: mentalMapDispatch} = useMentalMap();
   const [mapInfoText, setMapInfoText] = useState(mentalMapState?.infoText?.toString())
   const firstUpdate = useRef(true)
+  const [textDialogOpen, setTextDialogOpen] = useState(false)
+  const [allTextDialogOpen, setAllTextDialogOpen] = useState(false)
+  const [parentKeyPath, setParentKeyPath] = useState(null)
 
   const getNodeKey = ({treeIndex}) => treeIndex;
 
@@ -49,8 +57,7 @@ export default function TreeView({texts}) {
   const treeContext = {state, dispatch}
 
   useEffect(() => {
-    if (!sendSaveRequest) {
-      sendSaveRequest = true
+    if (state.save !== true) {
       return
     }
     const timeoutId = setTimeout(() => api
@@ -61,10 +68,13 @@ export default function TreeView({texts}) {
         }
       }), 500);
     return () => clearTimeout(timeoutId);
-  }, [JSON.stringify(state.treeData)]);
+  }, [state.treeData]);
 
-  const createNodesFromTextHandler = () => {
-    texts.map(t => dispatch({
+  const createNodesFromTextHandler = fragments => {
+    if (!fragments.length) {
+      return
+    }
+    fragments.map(t => dispatch({
       type: 'add_node',
       payload: {id: uuidv4(), title: t, description: t}
     }))
@@ -85,13 +95,67 @@ export default function TreeView({texts}) {
     return () => clearTimeout(timeoutId);
   }, [mapInfoText]);
 
+  const addNodesUnderParent = (nodes, parentKey) => {
+    let treeData = state.treeData
+    nodes.map(newNode => {
+      treeData = addNodeUnderParent({
+        treeData,
+        parentKey,
+        expandParent: true,
+        getNodeKey,
+        newNode,
+        addAsFirstChild: state.addAsFirstChild,
+      }).treeData
+    })
+    return treeData
+  }
+
+  const addFragmentsHandler = fragments => {
+    if (parentKeyPath !== null) {
+
+      const nodes = fragments.map(title => ({
+        id: crypto.randomUUID(),
+        title,
+        description: title
+      }))
+
+      const treeData = addNodesUnderParent(nodes, parentKeyPath)
+      dispatch({
+        type: 'update_tree',
+        treeData,
+      })
+
+      return
+    }
+
+    fragments.map(title => {
+      const nodeId = crypto.randomUUID()
+      dispatch({
+        type: 'add_node',
+        payload: {id: nodeId, title, description: title}
+      })
+    })
+  }
+
+  const addItemsFromTextHandler = () => {
+    setTextDialogOpen(true)
+  }
+
   return (
     <div className="author-layout__content">
       <TreeContext.Provider value={treeContext}>
         <div className="tree-wrap">
           <div className="tree-inner">
             <InfoText defaultText={mapInfoText} changeTextHandler={text => setMapInfoText(text)} />
+            {state.treeData.length === 0 && <div>
+              <button onClick={() => {
+                setAllTextDialogOpen(true)
+              }} className="button button--default button--header-done"
+                      type="button">Текст
+              </button>
+            </div>}
             <SortableTree
+              placeholderRenderer={CustomPlaceholder}
               treeData={state.treeData}
               rowHeight={140}
               onChange={treeData => dispatch({type: 'update_tree', treeData})}
@@ -128,24 +192,14 @@ export default function TreeView({texts}) {
                 ),
                 buttons: [
                   <button
+                    title="Добавить дочерний элемент"
                     style={{width: '30px', padding: '6px'}}
-                    onClick={() => {
-                      const treeData = addNodeUnderParent({
-                        treeData: state.treeData,
-                        parentKey: path[path.length - 1],
-                        expandParent: true,
-                        getNodeKey,
-                        newNode: {
-                          id: uuidv4(),
-                          title: '',
-                        },
-                        addAsFirstChild: state.addAsFirstChild,
-                      }).treeData
-                      dispatch({
+                    onClick={
+                      () => dispatch({
                         type: 'update_tree',
-                        treeData,
+                        treeData: addNodesUnderParent([{id: uuidv4(), title: '', description: ''}], path[path.length - 1]),
                       })
-                    }}
+                    }
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
                          stroke="currentColor" className="size-6">
@@ -153,6 +207,21 @@ export default function TreeView({texts}) {
                     </svg>
                   </button>,
                   <button
+                    style={{width: '30px', padding: '6px'}}
+                    title="Добавить дочерние элементы из текста"
+                    onClick={() => {
+                      setParentKeyPath(path[path.length - 1])
+                      setTextDialogOpen(true)
+                    }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
+                         stroke="currentColor" className="size-6">
+                      <path strokeLinecap="round" strokeLinejoin="round"
+                            d="m11.99 16.5 3.75 3.75m0 0 3.75-3.75m-3.75 3.75V3.75H4.49"/>
+                    </svg>
+                  </button>,
+                  <button
+                    title="Скопировать"
                     style={{width: '30px', padding: '6px'}}
                     onClick={() => {
 
@@ -219,10 +288,12 @@ export default function TreeView({texts}) {
               >
                 Добавить
               </button>
-              {state.treeData.length === 0 && (
-                <button onClick={createNodesFromTextHandler} className="button button--default button--header-done"
-                        type="button">Создать из текста</button>
-              )}
+              <button
+                className="button button--default button--header-done"
+                onClick={() => addItemsFromTextHandler()}
+              >
+                Добавить как текст
+              </button>
             </div>
           </div>
         </div>
@@ -251,6 +322,31 @@ export default function TreeView({texts}) {
               }}
             />
           </CSSTransition>
+
+          <TextDialog
+            open={textDialogOpen}
+            setOpen={setTextDialogOpen}
+            controls={[
+              (key, fragments) => <button key={key} onClick={() => {
+                addFragmentsHandler(fragments)
+                setTextDialogOpen(false)
+              }}
+                                          className="button button--default button--header-done">Добавить фрагменты</button>
+            ]}
+          />
+
+          <TextDialog
+            open={allTextDialogOpen}
+            setOpen={setAllTextDialogOpen}
+            text={mentalMapState.text}
+            controls={[
+              (key, fragments) => <button key={key} onClick={() => {
+                createNodesFromTextHandler(fragments)
+                setAllTextDialogOpen(false)
+              }}
+                                          className="button button--default button--header-done">Создать из текста</button>,
+            ]}
+          />
         </div>
       </TreeContext.Provider>
     </div>

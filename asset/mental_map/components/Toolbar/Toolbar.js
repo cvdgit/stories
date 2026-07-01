@@ -4,7 +4,7 @@ import SettingsDialog from "./SettingsDialog";
 import TitleChangeDialog from "./TitleChangeDialog";
 import Prompts from "./Prompts";
 
-export default function Toolbar({currentTitle, mentalMapId, schedules, setFormattedMapText}) {
+export default function Toolbar({currentTitle, mentalMapId, schedules, setFormattedMapText, isTreeView}) {
   const [textDialogOpen, setTextDialogOpen] = useState(false)
   const [settingsDialogOpen, setSettingsDialogOpen] = useState(false)
   const [titleDialogOpen, setTitleDialogOpen] = useState(false)
@@ -47,11 +47,11 @@ export default function Toolbar({currentTitle, mentalMapId, schedules, setFormat
           }} className="button button--default button--header-done"
                   type="button">Prompts
           </button>
-          <button onClick={() => {
+          {isTreeView === false && <button onClick={() => {
             setTextDialogOpen(true)
           }} className="button button--default button--header-done"
                   type="button">Текст {textFragmentCount > 0 && (<span> ({textFragmentCount})</span>)}
-          </button>
+          </button>}
           <button onClick={() => {
             setSettingsDialogOpen(true)
           }} className="button button--default button--header-done"
