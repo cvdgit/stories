@@ -31,17 +31,23 @@ class WidgetRequiredStory
      * @var RequiredStorySession|null
      */
     private $session;
+    /**
+     * @var int
+     */
+    private $priority;
 
     private function __construct(
         UuidInterface $id,
         int $storyId,
         string $storyTitle,
-        string $storyCover
+        string $storyCover,
+        int $priority
     ) {
         $this->id = $id;
         $this->storyId = $storyId;
         $this->storyTitle = $storyTitle;
         $this->storyCover = $storyCover;
+        $this->priority = $priority;
     }
 
     public static function fromArray(array $array): self
@@ -51,6 +57,7 @@ class WidgetRequiredStory
             (int) $array['storyId'],
             $array['storyTitle'],
             StoryCover::getListThumbPath($array['storyCover']),
+            (int) $array['priority'],
         );
     }
 
@@ -82,5 +89,10 @@ class WidgetRequiredStory
     public function setSession(RequiredStorySession $session): void
     {
         $this->session = $session;
+    }
+
+    public function isPriority(): bool
+    {
+        return $this->priority > 0;
     }
 }

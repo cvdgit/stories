@@ -43,6 +43,7 @@ class RequiredStoriesFetcher
                 'storyTitle' => 's.title',
                 'storyCover' => 's.cover',
                 'storyProgress' => 'p.progress',
+                'priority' => 't.priority'
             ])
             ->from(['t' => RequiredStoryModel::tableName()])
             ->innerJoin(['s' => EduStory::tableName()], 't.story_id = s.id')
@@ -53,7 +54,10 @@ class RequiredStoriesFetcher
             ->andWhere(new Expression('IFNULL(p.progress, 0) < 100'))
             ->andWhere(['t.status' => (string) RequiredStoryStatus::open()])
             ->andWhere(['<=', new Expression('t.started_at'), new Expression($queryStartDate)])
-            ->orderBy(['t.started_at' => SORT_ASC]);
+            ->orderBy([
+                't.priority' => SORT_DESC,
+                't.started_at' => SORT_ASC
+            ]);
 
         $rows = $query->all();
 

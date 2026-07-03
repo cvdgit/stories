@@ -504,3 +504,11 @@ a.lesson-item__wrap:hover .lesson-name span {
 .story-list .edu-story-item .story-item-image-overlay {
   border-radius: 16px;
 }
+
+.story-is-priority .story-image {
+}
+
+.story-is-priority-other {
+  opacity: .5;
+  pointer-events: none;
+}

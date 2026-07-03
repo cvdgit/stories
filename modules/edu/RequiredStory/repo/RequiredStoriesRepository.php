@@ -91,6 +91,7 @@ class RequiredStoriesRepository
                 'startedAt' => 't.started_at',
                 'createdAt' => 't.created_at',
                 'status' => 't.status',
+                'priority' => 't.priority',
             ])
             ->from(['t' => RequiredStoryModel::tableName()])
             ->innerJoin(['s' => EduStory::tableName()], 't.story_id = s.id')
@@ -180,6 +181,7 @@ class RequiredStoriesRepository
             'days' => $requiredStory->getDays(),
             'metadata' => $requiredStory->getMetadata(),
             'status' => (string) $requiredStory->getStatus(),
+            'priority' => $requiredStory->getPriority(),
         ];
 
         $command = Yii::$app->db->createCommand();

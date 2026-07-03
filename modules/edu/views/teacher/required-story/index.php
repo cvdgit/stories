@@ -70,6 +70,7 @@ $this->registerJs($this->renderFile('@modules/edu/views/teacher/required-story/i
 <div class="required-story-cell">Прогресс</div>
 <div class="required-story-cell">Дата начала</div>
 <div class="required-story-cell">Дата создания</div>
+<div class="required-story-cell">Приоритет</div>
 <div class="required-story-cell">Действия</div>
 </div>
 {items}

@@ -44,6 +44,10 @@ class RequiredStoryItem
      * @var int
      */
     private $studentId;
+    /**
+     * @var int
+     */
+    private $priority;
 
     public function __construct(
         UuidInterface $id,
@@ -53,7 +57,8 @@ class RequiredStoryItem
         string $studentName,
         DateTimeInterface $startedDate,
         DateTimeInterface $createdDate,
-        RequiredStoryStatus $status
+        RequiredStoryStatus $status,
+        int $priority = 0
     ) {
         $this->id = $id;
         $this->storyTitle = $storyTitle;
@@ -63,6 +68,7 @@ class RequiredStoryItem
         $this->status = $status;
         $this->storyId = $storyId;
         $this->studentId = $studentId;
+        $this->priority = $priority;
     }
 
     /**
@@ -78,7 +84,8 @@ class RequiredStoryItem
             $row['studentName'],
             (new DateTimeImmutable('@' . $row['startedAt'])),
             (new DateTimeImmutable('@' . $row['createdAt'])),
-            new RequiredStoryStatus($row['status'])
+            new RequiredStoryStatus($row['status']),
+            (int) $row['priority']
         );
     }
 
@@ -120,5 +127,10 @@ class RequiredStoryItem
     public function getStudentId(): int
     {
         return $this->studentId;
+    }
+
+    public function isPriority(): bool
+    {
+        return $this->priority > 0;
     }
 }

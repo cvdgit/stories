@@ -8,15 +8,36 @@ use yii\helpers\Url;
 
 /**
  * @var WidgetRequiredStory $model
+ * @var bool $havePriorityStories
  */
+
+$session = $model->getSession();
+
+$className = '';
+if ($session === null) {
+    if ($model->isPriority()) {
+        $className = 'story-is-priority';
+    }
+} elseif ($model->isPriority() && $session->isCompleted() !== true) {
+    $className = 'story-is-priority';
+}
+
+if ($havePriorityStories && !$model->isPriority()) {
+    $className = 'story-is-priority-other';
+}
 ?>
 <div class="col-lg-3 col-md-4 col-sm-6">
     <div class="story-item edu-story-item">
-        <a class="run-story"
+        <a class="run-story <?= $className ?>"
            href="<?= Url::toRoute(['/edu/story/view', 'id' => $model->getStoryId()]) ?>"
-           data-pjax="0" style="gap: 10px">
+           data-pjax="0"
+           style="gap: 10px"
+           title="<?= $model->isPriority() ? 'Эту историю нужно пройти в первую очередь' : '' ?>"
+           data-toggle="tooltip"
+        >
             <div class="story-item-image">
-                <div class="story-image" style="background-image: url(<?= $model->getStoryCover() ?>); background-size: contain">
+                <div class="story-image"
+                     style="background-image: url(<?= $model->getStoryCover() ?>); background-size: contain">
                     <div class="story-image__icon"></div>
                 </div>
                 <div class="story-item-image-overlay">
@@ -25,9 +46,15 @@ use yii\helpers\Url;
             </div>
             <div class="story-item-caption">
                 <h3 class="story-item-name"><?= Html::encode($model->getStoryTitle()) ?></h3>
-                <?php if ($model->getSession() !== null): ?>
-                    <p class="story-item-category" style="display: flex; font-size: 1.5rem; justify-content: center; flex-direction: row; gap: 10px; align-items: center">Ответов сегодня: <?= $model->getSession()->getFact() ?> из <?= $model->getSession()->getPlan() ?> <?= $model->getSession()->isCompleted() ? '<span class="label label-success">Выполнено</span>' : '' ?></p>
-                <?php endif ?>
+                <?php
+                if ($session !== null): ?>
+                    <p class="story-item-category"
+                       style="display: flex; font-size: 1.5rem; justify-content: center; flex-direction: row; gap: 10px; align-items: center">
+                        Ответов сегодня: <?= $session->getFact() ?> из <?= $session->getPlan(
+                        ) ?> <?= $session->isCompleted(
+                        ) ? '<span class="label label-success">Выполнено</span>' : '' ?></p>
+                <?php
+                endif ?>
             </div>
         </a>
     </div>

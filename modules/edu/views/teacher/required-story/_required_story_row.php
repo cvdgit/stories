@@ -39,6 +39,16 @@ use yii\helpers\Url;
     <?= $requiredStoryItem->getCreatedDate()->format('d.m.Y H:i:s') ?>
 </div>
 <div class="required-story-cell">
+    <input
+        data-toggle="tooltip"
+        title="Приоритетную историю ученик должен пройти в первую очередь. Пока приоритетные истории не пройдены, остальные истории будут недоступны"
+        class="required-story-priority-check"
+        data-story-id="<?= $requiredStoryItem->getId()->toString() ?>"
+        type="checkbox"
+        <?= $requiredStoryItem->isPriority() ? 'checked' : '' ?>
+    />
+</div>
+<div class="required-story-cell">
     <div style="display: flex; flex-direction: row; gap: 10px">
         <a style="padding: 4px 8px; border-radius: 4px" class="required-story-edit btn-primary"
            href="<?= Url::to(['/edu/teacher/required-story/edit', 'id' => $requiredStoryItem->getId()->toString()],

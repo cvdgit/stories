@@ -208,7 +208,15 @@
           });
         }
       });
-    });
+    })
+    .on('change', '.required-story-priority-check', async e => {
+      const {storyId} = e.target.dataset
+      const payload = {
+        storyId,
+        priority: e.target.checked
+      }
+      await window.Api.post(`/edu/teacher/required-story/set-priority`, payload)
+    })
 
   $('.required-story-create').on('click', e => {
     e.preventDefault();

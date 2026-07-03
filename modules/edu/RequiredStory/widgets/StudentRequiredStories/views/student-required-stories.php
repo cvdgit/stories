@@ -10,10 +10,11 @@ use yii\widgets\ListView;
  * @var View $this
  * @var DataProviderInterface $dataProvider
  * @var string $title
+ * @var bool $havePriorityStories
  */
 ?>
 <div class="header-block">
-    <h2 style="font-size: 32px; margin: 0; font-weight: 500; line-height: 1.2" class="h2"><?= $title ?></h2>
+    <h2 style="font-size: 32px; margin: 0 0 30px; font-weight: 500; line-height: 1.2" class="h2"><?= $title ?></h2>
 </div>
 <div class="story-list" style="margin-bottom: 40px">
     <?= ListView::widget([
@@ -21,6 +22,7 @@ use yii\widgets\ListView;
         'summary' => false,
         'itemView' => '_required_story_item',
         'itemOptions' => ['tag' => false],
+        'viewParams' => ['havePriorityStories' => $havePriorityStories],
         'layout' => "{summary}\n<div class=\"row flex-row\">{items}</div>",
     ]) ?>
 </div>

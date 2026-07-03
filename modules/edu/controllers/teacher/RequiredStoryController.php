@@ -473,7 +473,7 @@ class RequiredStoryController extends Controller
     {
         $response->format = Response::FORMAT_JSON;
         $requiredStory = $this->requiredStoriesRepository->findById(
-            Uuid::fromString($requiredStoryId)
+            Uuid::fromString($requiredStoryId),
         );
         if ($requiredStory === null) {
             return ['success' => false, 'message' => 'Required story not found'];
@@ -483,7 +483,7 @@ class RequiredStoryController extends Controller
         }
         $session = $this->requiredStorySessionRepository->find(
             $requiredStory->getId(),
-            new DateTimeImmutable($date)
+            new DateTimeImmutable($date),
         );
         if ($session === null) {
             return ['success' => false, 'message' => 'Session not found'];
@@ -494,12 +494,35 @@ class RequiredStoryController extends Controller
 
         try {
             $this->requiredStorySessionRepository->delete(
-                $session
+                $session,
             );
             return ['success' => true];
         } catch (Exception $exception) {
             Yii::$app->errorHandler->logException($exception);
             return ['success' => false, 'message' => $exception->getMessage()];
         }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function actionSetPriority(Request $request, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+        $payload = Json::decode($request->rawBody);
+        $requiredStoryId = $payload['storyId'];
+        $priority = (bool) $payload['priority'];
+
+        $requiredStory = $this->requiredStoriesRepository->findById(
+            Uuid::fromString($requiredStoryId),
+        );
+        if ($requiredStory === null) {
+            return ['success' => false, 'message' => 'Required story not found'];
+        }
+
+        $requiredStory->setPriority($priority ? 1 : 0);
+        $this->requiredStoriesRepository->update($requiredStory);
+
+        return ['success' => true];
     }
 }

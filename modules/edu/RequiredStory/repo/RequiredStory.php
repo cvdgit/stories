@@ -49,6 +49,10 @@ class RequiredStory
      * @var RequiredStoryMetadata
      */
     private $metadata;
+    /**
+     * @var int
+     */
+    private $priority;
 
     public function __construct(
         UuidInterface $id,
@@ -59,7 +63,8 @@ class RequiredStory
         DateTimeInterface $startedAt,
         int $days,
         RequiredStoryStatus $status,
-        RequiredStoryMetadata $metadata
+        RequiredStoryMetadata $metadata,
+        int $priority = 0
     ) {
         $this->id = $id;
         $this->storyId = $storyId;
@@ -70,6 +75,7 @@ class RequiredStory
         $this->days = $days;
         $this->status = $status;
         $this->metadata = $metadata;
+        $this->priority = $priority;
     }
 
     /**
@@ -87,6 +93,7 @@ class RequiredStory
             (int) $array['days'],
             new RequiredStoryStatus($array['status']),
             RequiredStoryMetadata::fromArray(Json::decode($array['metadata'])),
+            (int) $array['priority'],
         );
     }
 
@@ -158,4 +165,13 @@ class RequiredStory
             $this->status = RequiredStoryStatus::close();
         }
     }*/
+    public function getPriority(): int
+    {
+        return $this->priority;
+    }
+
+    public function setPriority(int $value): void
+    {
+        $this->priority = $value;
+    }
 }

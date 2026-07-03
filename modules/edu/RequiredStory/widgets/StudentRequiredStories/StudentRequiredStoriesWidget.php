@@ -46,9 +46,23 @@ class StudentRequiredStoriesWidget extends Widget
             );
         }
 
+        $havePriorityStories = count(
+                array_filter(
+                    $dataProvider->getModels(),
+                    static function (WidgetRequiredStory $model) {
+                        $session = $model->getSession();
+                        if ($session === null) {
+                            return $model->isPriority();
+                        }
+                        return $model->isPriority() && $session->isCompleted() === false;
+                    },
+                ),
+            ) > 0;
+
         return $this->render('student-required-stories', [
             'dataProvider' => $dataProvider,
             'title' => $title,
+            'havePriorityStories' => $havePriorityStories,
         ]);
     }
 }
