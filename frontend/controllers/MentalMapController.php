@@ -291,7 +291,8 @@ class MentalMapController extends Controller
                     }
                 }
 
-                $fragmentHistory['done'] = MentalMap::fragmentIsDone((int) $fragmentHistory['all'], $threshold);
+                // $fragmentHistory['done'] = MentalMap::fragmentIsDone((int) $fragmentHistory['all'], $threshold);
+
                 return [
                     'success' => true,
                     'history' => $fragmentHistory,

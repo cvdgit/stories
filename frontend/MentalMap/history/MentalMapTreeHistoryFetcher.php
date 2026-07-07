@@ -189,17 +189,27 @@ class MentalMapTreeHistoryFetcher
     {
         $rows = [];
         foreach ($historyRowsByFragmentId as $fragmentId => $rowsGroup) {
-            $allWordsDoneItems = array_values(array_filter($rowsGroup, static function (array $groupItem): bool {
-                return $groupItem['all_words'] === '1';
-            }));
+            $allWordsDoneItems = array_values(
+                array_filter(
+                    $rowsGroup,
+                    static function (array $groupItem): bool {
+                        return $groupItem['all_words'] === '1';
+                    },
+                ),
+            );
             if (count($allWordsDoneItems) > 0) {
                 $rows[$fragmentId] = array_merge($allWordsDoneItems[0], ['done' => true]);
                 continue;
             }
 
-            $allWordsFailItems = array_filter($rowsGroup, static function (array $groupItem): bool {
-                return $groupItem['all_words'] === '-1';
-            });
+            $allWordsFailItems = array_values(
+                array_filter(
+                    $rowsGroup,
+                    static function (array $groupItem): bool {
+                        return $groupItem['all_words'] === '-1';
+                    },
+                ),
+            );
             if (count($allWordsFailItems) > 0) {
                 $rows[$fragmentId] = array_merge($allWordsFailItems[0], ['done' => false]);
                 continue;
