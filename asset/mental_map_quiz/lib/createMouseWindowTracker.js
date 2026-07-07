@@ -20,7 +20,7 @@ export default function createMouseWindowTracker() {
     return (
       Math.abs(window.screenX) <= threshold &&
       Math.abs(window.screenY) <= threshold &&
-      Math.abs(window.outerWidth - screen.availWidth) <= threshold &&
+      Math.abs(window.innerWidth - screen.availWidth) <= threshold &&
       Math.abs(window.outerHeight - screen.availHeight) <= threshold
     );
   }
