@@ -62,8 +62,10 @@ CSS,
                 <td class="data-col"><?= SmartDate::dateSmart($imageData['created_at'], true) ?></td>
                 <td class="data-col"><?= $fragment === null ? '-' : $fragment['text'] ?? $fragment['title'] ?></td>
                 <td class="data-col user-response"><?= $imageData['content'] ?></td>
-                <td class="data-col"><?= $imageData['threshold'] ?> / <?= (int) $imageData['all_important_words_included'] === 1 ? 'Да' : 'Нет' ?></td>
-                <td class="data-col <?= MentalMap::fragmentIsDone((int) $imageData['overall_similarity'], (int) $imageData['threshold']) ? 'bg-success' : 'bg-danger' ?>"><?= $imageData['overall_similarity'] ?></td>
+                <td class="data-col"><?= $imageData['threshold'] ?></td>
+                <td class="data-col <?= MentalMap::fragmentIsDone((int) $imageData['overall_similarity'], (int) $imageData['threshold'], MentalMap::formatAllWordsIncludedValue($imageData['all_important_words_included'])) ? 'bg-success' : 'bg-danger' ?>">
+                    <?= $imageData['overall_similarity'] ?> / <?= (int) $imageData['all_important_words_included'] === 1 ? 'Да' : 'Нет' ?>
+                </td>
                 <td class="data-col"><?= $imageData['text_hiding_percentage'] ?></td>
                 <td class="data-col"><?= $imageData['text_target_percentage'] ?></td>
             </tr>

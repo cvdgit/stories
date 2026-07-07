@@ -37,9 +37,23 @@ class MentalMap extends ActiveRecord
         }, true);
     }
 
-    public static function fragmentIsDone(int $value, int $threshold): bool
+    public static function formatAllWordsIncludedValue($value): ?bool
     {
-        return $value >= $threshold;
+        if ($value === null) {
+            return null;
+        }
+        return (int) $value === 1;
+    }
+
+    public static function fragmentIsDone(int $value, int $threshold, bool $allWordsIncluded = null): bool
+    {
+        if ($value <= $threshold) {
+            return false;
+        }
+        if ($allWordsIncluded !== null) {
+            return $allWordsIncluded;
+        }
+        return true;
     }
 
     public static function calcHistoryPercent(array $history, int $threshold): int
