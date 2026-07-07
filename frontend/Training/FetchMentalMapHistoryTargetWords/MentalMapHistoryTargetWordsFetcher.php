@@ -7,6 +7,7 @@ namespace frontend\Training\FetchMentalMapHistoryTargetWords;
 use common\components\MentalMapThreshold;
 use DateTimeInterface;
 use phpQuery;
+use Yii;
 use yii\db\Expression;
 use yii\db\Query;
 
@@ -23,6 +24,7 @@ class MentalMapHistoryTargetWordsFetcher
         $weekEndDate = $endDate->format('Y-m-d');
         $betweenEnd = new Expression("UNIX_TIMESTAMP('$weekEndDate 23:59:59')");
 
+        $threshold = MentalMapThreshold::getDefaultThreshold(Yii::$app->params);
         $query = (new Query())
             ->select([
                 'storyId' => 'h.story_id',
@@ -35,9 +37,10 @@ class MentalMapHistoryTargetWordsFetcher
             ->where([
                 'h.user_id' => $userId,
             ])
-            ->andWhere(['>=', 'h.overall_similarity', MentalMapThreshold::DEFAULT_THRESHOLD])
             ->andWhere(['between', new Expression('h.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd])
+            ->andWhere("h.overall_similarity >= IFNULL(h.threshold, $threshold)")
             ->andWhere("(h.location IS NULL OR h.location = '" . $location . "')")
+            ->andWhere("(h.all_important_words_included IS NULL || h.all_important_words_included = 1)")
             ->orderBy(['h.created_at' => SORT_ASC]);
 
         return array_map(function (array $row): array {
