@@ -7,6 +7,7 @@ namespace frontend\Training;
 use common\components\MentalMapThreshold;
 use DateTimeInterface;
 use phpQuery;
+use Yii;
 use yii\db\Expression;
 use yii\db\Query;
 
@@ -27,6 +28,7 @@ final class MentalMapDayHistoryTargetWordsFetcher
         $hourExpression = new Expression("hour(FROM_UNIXTIME(h.created_at + (3 * 60 * 60)))");
         $minuteExpression = new Expression("minute(FROM_UNIXTIME(h.created_at + (3 * 60 * 60))) DIV $hours");
 
+        $threshold = MentalMapThreshold::getDefaultThreshold(Yii::$app->params);
         $query = (new Query())
             ->select([
                 'storyId' => 'h.story_id',
@@ -42,8 +44,9 @@ final class MentalMapDayHistoryTargetWordsFetcher
                 'h.user_id' => $userId,
             ])
             ->andWhere(['between', new Expression('h.created_at + (3 * 60 * 60)'), $betweenBegin, $betweenEnd])
-            ->andWhere(['>=', 'h.overall_similarity', MentalMapThreshold::DEFAULT_THRESHOLD])
+            ->andWhere("h.overall_similarity >= IFNULL(h.threshold, $threshold)")
             ->andWhere("(h.location IS NULL OR h.location = '" . $location . "')")
+            ->andWhere("(h.all_important_words_included IS NULL || h.all_important_words_included = 1)")
             ->orderBy([
                 'story_id' => SORT_ASC,
                 'hour' => SORT_ASC,
