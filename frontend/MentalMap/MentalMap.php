@@ -33,7 +33,10 @@ class MentalMap extends ActiveRecord
             return false;
         }
         return array_reduce($history, static function (bool $carry, array $item) use ($threshold): bool {
-            return $carry && self::fragmentIsDone((int) $item['all'], $threshold);
+
+            // return $carry && self::fragmentIsDone((int) $item['all'], $threshold);
+            return $carry && $item['done'];
+
         }, true);
     }
 
