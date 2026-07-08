@@ -11,7 +11,7 @@
       .closest('button')
       .parentNode
       .parentNode
-      .querySelector('pre').innerHTML
+      .querySelector('pre').innerText
 
     const body = document.createElement('div')
     body.className = 'gpt-input-run-body'
@@ -34,7 +34,13 @@
       elem.innerHTML = ''
       window.sendStreamMessage(
         `/admin/index.php?r=gpt/stream/run`,
-        {prompt},
+        {
+          prompt: e.target
+            .closest('button')
+            .parentNode
+            .parentNode
+            .querySelector('pre').innerText
+        },
         message => elem.innerHTML = message,
         () => body.querySelector('.gpt-input-run-send').removeAttribute('disabled'),
         () => body.querySelector('.gpt-input-run-send').removeAttribute('disabled')
