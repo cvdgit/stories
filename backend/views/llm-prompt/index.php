@@ -5,6 +5,7 @@ declare(strict_types=1);
 use backend\LlmPrompt\LlmPrompt;
 use backend\LlmPrompt\LlmPromptListFilterModel;
 use yii\data\DataProviderInterface;
+use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\helpers\Url;
 use yii\web\View;
@@ -44,6 +45,15 @@ $this->title = 'Промты';
                 },
             ],
             'created_at:datetime',
+            [
+                'class' => ActionColumn::class,
+                'template' => '{update}',
+                'buttons' => [
+                    'update' => static function(string $url, LlmPrompt $model) {
+                        return '<a class="btn btn-link" href="' . Url::to(['/llm-prompt/update-form', 'id' => $model->id]) . '">Изменить промт</a>';
+                    }
+                ],
+            ],
         ],
     ]) ?>
 </div>

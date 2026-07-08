@@ -13,6 +13,11 @@ use yii\web\View;
  */
 
 $this->title = 'Новый промт';
+
+$this->params['breadcrumbs'] = [
+    ['label' => 'Список промтов', 'url' => ['index']],
+    $this->title,
+];
 ?>
 <div class="row">
     <div class="col-xs-6">
