@@ -396,7 +396,7 @@ class StreamController extends Controller
         $this->chatEventStream->send(
             'conversations',
             Yii::$app->params["gpt.api.completions.host"],
-            Json::encode($fields)
+            Json::encode($fields),
         );
         Yii::$app->end();
     }
@@ -444,21 +444,21 @@ class StreamController extends Controller
         }
 
         $content = <<<TEXT
-Исходный текст:
-```
-$slideTexts
-```
-Пересказ:
-```
-$userResponse
-```
+            Исходный текст:
+            ```
+            $slideTexts
+            ```
+            Пересказ:
+            ```
+            $userResponse
+            ```
 
-$defaultPrompt
+            $defaultPrompt
 
-Ответь в формате json.
-В ответе не используй символы unicode.
-Пример: {"sentences_similarity": [{"original": "Оригинальное предложение", "rewrite": "Предложение, пересказанное пользователем", "similarity": "Процент сходства, целое число"}], "overall_similarity": "Итоговый процент сходства, целое число"}
-TEXT;
+            Ответь в формате json.
+            В ответе не используй символы unicode.
+            Пример: {"sentences_similarity": [{"original": "Оригинальное предложение", "rewrite": "Предложение, пересказанное пользователем", "similarity": "Процент сходства, целое число"}], "overall_similarity": "Итоговый процент сходства, целое число"}
+            TEXT;
 
         $message = [
             "role" => "user",
@@ -836,56 +836,56 @@ TEXT;
         }
 
         $content = <<<TEXT
-Ты занимаешься сравнением и анализом двух текстов - исходного и пересказа.
-Исходный текст:
-```
-$slideTexts
-```
-Пересказ:
-```
-$userResponse
-```
+            Ты занимаешься сравнением и анализом двух текстов - исходного и пересказа.
+            Исходный текст:
+            ```
+            $slideTexts
+            ```
+            Пересказ:
+            ```
+            $userResponse
+            ```
 
-$defaultPrompt
+            $defaultPrompt
 
-В ответе не используй символы unicode.
-Ответь в формате json
-Пример:
-{
-  "similarity_percentage": integer // Результат сравнения,
-  "user_response": string // пересказ
-}
-TEXT;
+            В ответе не используй символы unicode.
+            Ответь в формате json
+            Пример:
+            {
+              "similarity_percentage": integer // Результат сравнения,
+              "user_response": string // пересказ
+            }
+            TEXT;
 
         if ($importantWords !== '') {
             $content = <<<TEXT
-Ты занимаешься сравнением и анализом двух текстов - исходного и пересказа.
-Исходный текст:
-```
-$slideTexts
-```
-Важные слова:
-```
-$importantWords
-```
-Пересказ:
-```
-$userResponse
-```
+                Ты занимаешься сравнением и анализом двух текстов - исходного и пересказа.
+                Исходный текст:
+                ```
+                $slideTexts
+                ```
+                Важные слова:
+                ```
+                $importantWords
+                ```
+                Пересказ:
+                ```
+                $userResponse
+                ```
 
-$defaultPrompt
-Также необходимо определить все ли важные слова есть в пересказе.
+                $defaultPrompt
+                Также необходимо определить все ли важные слова есть в пересказе.
 
-В ответе не используй символы unicode.
-Ответь в формате json
-Пример:
-{
-  "similarity_percentage": integer // Результат сравнения,
-  "all_important_words_included": boolean, // true только если ВСЕ важные слова присутствуют в пересказе
-  "user_response": string, // пересказ
-  "important_words": [string] // важные слова, которые есть в пересказе
-}
-TEXT;
+                В ответе не используй символы unicode.
+                Ответь в формате json
+                Пример:
+                {
+                  "similarity_percentage": integer // Результат сравнения,
+                  "all_important_words_included": boolean, // true только если ВСЕ важные слова присутствуют в пересказе
+                  "user_response": string, // пересказ
+                  "important_words": [string] // важные слова, которые есть в пересказе
+                }
+                TEXT;
         }
 
         $message = [
@@ -910,6 +910,41 @@ TEXT;
         try {
             $this->chatEventStream->send(
                 "retelling",
+                Yii::$app->params["gpt.api.completions.host"],
+                Json::encode($fields),
+            );
+        } catch (Exception $ex) {
+            Yii::$app->errorHandler->logException($ex);
+        }
+    }
+
+    public function actionRun(Request $request, Response $response): void
+    {
+        $payload = Json::decode($request->rawBody);
+        $prompt = $payload['prompt'];
+
+        $message = [
+            "role" => "user",
+            "content" => $prompt,
+        ];
+
+        $fields = [
+            "input" => [
+                "messages" => [
+                    $message,
+                ],
+            ],
+            "config" => [
+                "metadata" => [
+                    "conversation_id" => Uuid::uuid4()->toString(),
+                ],
+            ],
+            "include_names" => [],
+        ];
+
+        try {
+            $this->chatEventStream->send(
+                "input-run",
                 Yii::$app->params["gpt.api.completions.host"],
                 Json::encode($fields),
             );
