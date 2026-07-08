@@ -17,7 +17,7 @@
     body.className = 'gpt-input-run-body'
     body.innerHTML = `
 <div style="flex: 1; display: flex; flex-direction: column; gap: 10px">
-    <pre contenteditable="plaintext-only" style="overflow-y: auto; flex: 1">${prompt}</pre>
+    <pre class="gpt-output-prompt" contenteditable="plaintext-only" style="overflow-y: auto; flex: 1">${prompt}</pre>
     <div>
         <button class="gpt-input-run-send" type="button">Отправить</button>
     </div>
@@ -35,11 +35,7 @@
       window.sendStreamMessage(
         `/admin/index.php?r=gpt/stream/run`,
         {
-          prompt: e.target
-            .closest('button')
-            .parentNode
-            .parentNode
-            .querySelector('pre').innerText
+          prompt: body.querySelector('.gpt-output-prompt').innerText
         },
         message => elem.innerHTML = message,
         () => body.querySelector('.gpt-input-run-send').removeAttribute('disabled'),
