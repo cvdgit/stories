@@ -183,12 +183,28 @@ class RequiredStoriesRepository
             'status' => (string) $requiredStory->getStatus(),
             'priority' => $requiredStory->getPriority(),
         ];
-
         $command = Yii::$app->db->createCommand();
         $command->update(
             RequiredStoryModel::tableName(),
             $columns,
-            ['id' => $requiredStory->getId()],
+            ['id' => $requiredStory->getId()->toString()],
+        );
+        $command->execute();
+    }
+
+    /**
+     * @throws \yii\db\Exception
+     */
+    public function updatePriority(UuidInterface $id, int $priority): void
+    {
+        $columns = [
+            'priority' => $priority,
+        ];
+        $command = Yii::$app->db->createCommand();
+        $command->update(
+            RequiredStoryModel::tableName(),
+            $columns,
+            ['id' => $id->toString()],
         );
         $command->execute();
     }

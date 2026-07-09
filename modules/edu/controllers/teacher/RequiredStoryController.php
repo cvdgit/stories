@@ -521,7 +521,10 @@ class RequiredStoryController extends Controller
         }
 
         $requiredStory->setPriority($priority ? 1 : 0);
-        $this->requiredStoriesRepository->update($requiredStory);
+        $this->requiredStoriesRepository->updatePriority(
+            $requiredStory->getId(),
+            $requiredStory->getPriority()
+        );
 
         return ['success' => true];
     }
