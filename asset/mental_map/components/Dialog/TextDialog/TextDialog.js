@@ -64,7 +64,7 @@ export default function TextDialog({text, open, setOpen, successCallback, contro
           >Форматировать</button></h2>
         <div style={{display: 'flex', flexDirection: 'row', gap: '20px', flex: '1', maxHeight: '100%', overflow: 'hidden'}}>
           <div style={{flex: '1'}}>
-              <textarea className="textarea" style={{minHeight: '400px'}} placeholder="Текст" onChange={(e) => {
+              <textarea className="textarea" placeholder="Текст" onChange={(e) => {
                 setMapText(e.target.value)
               }} value={mapText}/>
           </div>
