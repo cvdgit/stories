@@ -4,12 +4,16 @@ import RetellingVoiceControl from "./RetellingVoiceControl";
 import VoiceResponse from "../mental_map_quiz/lib/VoiceResponse";
 import MissingWordsRecognition from "../mental_map_quiz/lib/MissingWordsRecognition";
 import RetellingResponse from "./RetellingResponse";
+import MentalMapEvents from "../mental_map_quiz/MentalMapEvents";
+import {createNotify} from "../mental_map_quiz/components/utils";
 
 export default function Retelling(element, deck, params, microphoneChecker) {
 
   this.element = element
   params = params || {}
   params.slide_id = deck ? Number($(deck.getCurrentSlide()).attr('data-id')) : null
+
+  const strictModeTracker = window.strictModeTracker
 
   const container = document.createElement('div')
   container.classList.add('retelling-block')
@@ -24,6 +28,13 @@ export default function Retelling(element, deck, params, microphoneChecker) {
     noMicroElem.classList.add('microphone-error')
     noMicroElem.innerHTML = `<div style="padding: 20px; display: flex; flex-direction: column; row-gap: 10px; border-radius: 20px; background-color: RGBA(220, 53, 69, 1); color: white"><div>Микрофон недоступен:</div><div>${message}</div></div>`
     return noMicroElem
+  }
+
+  const createElementNotify = (text, options = {}) => {
+    element.querySelectorAll('.mental-map-notify').forEach(el => el.remove())
+    element.appendChild(
+      createNotify(text, {persist: true, autoRemove: false, ...options})
+    )
   }
 
   const run = async () => {
@@ -47,28 +58,81 @@ export default function Retelling(element, deck, params, microphoneChecker) {
       text: slideTexts,
       questions,
       settings,
-      retellingSlideId
+      retellingSlideId,
+      canChangeStrictMode = false
     } = responseJson
 
     params.completed = Boolean(responseJson?.completed)
     params.all = Number(responseJson?.all)
 
-    /*const header = document.createElement('div')
-    header.classList.add('retelling-dialog-header')
-    header.innerHTML = 'Перескажите текст с предыдущего слайда';
-    this.element.appendChild(header)*/
+    if (canChangeStrictMode) {
+      strictModeTracker.changeState(false)
+    }
+
+    strictModeTracker.on('screen', ({isFullscreenWindow}) => {
+      if (isFullscreenWindow === false) {
+        createElementNotify('Окно браузера должно быть развернуто на весь экран. Масштаб внутри вкладки должен быть 100%')
+        return
+      }
+      element.querySelectorAll('.mental-map-notify').forEach(el => el.remove())
+    })
+
+    try {
+      strictModeTracker.checkWindow()
+    } catch (ex) {
+      createElementNotify('Окно браузера должно быть развернуто на весь экран. Масштаб внутри вкладки должен быть 100%')
+    }
+
+    const events = MentalMapEvents(
+      () => {
+        try {
+          strictModeTracker.checkWindow()
+          return true
+        } catch (ex) {
+          createElementNotify('Окно браузера должно быть развернуто на весь экран. Масштаб внутри вкладки должен быть 100%')
+        }
+        return false
+      },
+      () => {
+        strictModeTracker.startRecording(() => {
+          destroy(content, voiceResponse, voiceControl)
+        })
+        const strictModeToggle = element.querySelector('.strict-mode-wrap input[type=checkbox]')
+        if (strictModeToggle) {
+          strictModeToggle.setAttribute('disabled', 'disabled')
+        }
+      },
+      () => {
+        strictModeTracker.stopRecording()
+        const strictModeToggle = element.querySelector('.strict-mode-wrap input[type=checkbox]')
+        if (strictModeToggle) {
+          strictModeToggle.removeAttribute('disabled')
+        }
+      }
+    )
 
     const body = document.createElement('div')
     body.classList.add('retelling-dialog-body')
+
+    const {
+      beforeStartRecordingEvent,
+      startRecordingEvent,
+      stopRecordingEvent
+    } = events || {}
 
     const voiceResponse = new VoiceResponse(new MissingWordsRecognition({}));
     const voiceControl = new RetellingVoiceControl(
       voiceResponse,
       () => {
+        if (beforeStartRecordingEvent() === false) {
+          return false
+        }
+        startRecordingEvent()
         content.switchRecording();
         content.resetUserInput();
       },
       () => {
+        stopRecordingEvent()
         const userResponse = content.processUserResponse();
         if (userResponse.length) {
           content.switchRetelling();
@@ -85,7 +149,25 @@ export default function Retelling(element, deck, params, microphoneChecker) {
     const content = new CreateRetelling(
       voiceControl,
       retellingResponse,
-      {withQuestions, questions, settings}
+      {withQuestions, questions, settings, canChangeStrictMode},
+      (enable) => {
+
+        try {
+          strictModeTracker.changeState(enable)
+        } catch(ex) {
+          createElementNotify('Невозможно переключить во время проговаривания', {persist: false, autoRemove: true})
+          return false
+        }
+
+        element.querySelectorAll('.mental-map-notify').forEach(el => el.remove())
+        if (enable === true) {
+          try {
+            strictModeTracker.checkWindow()
+          } catch (ex) {
+            createElementNotify('Окно браузера должно быть развернуто на весь экран. Масштаб внутри вкладки должен быть 100%')
+          }
+        }
+      },
     );
 
     const startRetelling = async () => {
@@ -121,8 +203,13 @@ export default function Retelling(element, deck, params, microphoneChecker) {
                 }
               }
             })
-          }
-      );
+          },
+        (error) => {
+          createElementNotify(error, {persist: false, autoRemove: true})
+          content.switchStartUp()
+          content.resetUserInput()
+        }
+      )
     }
 
     body.appendChild(content.render());
@@ -142,7 +229,7 @@ export default function Retelling(element, deck, params, microphoneChecker) {
       container.appendChild(createFinishContent(`${params.all}%`, slideTexts))
     } else {
       content.switchStartUp();
-      window.addEventListener('blur', () => destroy(content, voiceResponse, voiceControl));
+      //window.addEventListener('blur', () => destroy(content, voiceResponse, voiceControl));
     }
 
     loader.remove();

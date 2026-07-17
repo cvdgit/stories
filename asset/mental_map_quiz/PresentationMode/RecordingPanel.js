@@ -1,13 +1,15 @@
-import PresentationVoiceControl from "./PresentationVoiceControl";
 import {createNotify} from "../components/utils";
+import PresentationVoiceControl from "../../common/PresentationVoiceControl/PresentationVoiceControl";
 
 /**
  * @param {VoiceResponse} voiceResponse
  * @param {function(userResponse: string): Promise} processUserResponse
- * @return {HTMLDivElement}
+ * @param onStartCallback
+ * @param events
+ * @return {{render: function(): HTMLElement, abort: function(): void}|null}
  * @constructor
  */
-function RecordingPanel(voiceResponse, processUserResponse, onStartCallback) {
+function RecordingPanel(voiceResponse, processUserResponse, onStartCallback, events) {
 
   const element = document.createElement('div');
   element.classList.add('fragment-recording-wrap');
@@ -39,11 +41,19 @@ function RecordingPanel(voiceResponse, processUserResponse, onStartCallback) {
     blurHandler()
   })
 
+  const {
+    beforeStartRecordingEvent,
+    startRecordingEvent,
+    stopRecordingEvent
+  } = events || {}
+
   const voiceControl = new PresentationVoiceControl(
     voiceResponse,
     () => {
 
-      window.addEventListener('blur', blurHandler);
+      startRecordingEvent()
+
+      // window.addEventListener('blur', blurHandler);
       element.querySelector('.fragment-recording-status').innerHTML = 'Идет запись';
 
       finalSpan.innerHTML = '';
@@ -59,7 +69,8 @@ function RecordingPanel(voiceResponse, processUserResponse, onStartCallback) {
     },
     async (el, abort) => {
 
-      window.removeEventListener('blur', blurHandler);
+      // window.removeEventListener('blur', blurHandler);
+      stopRecordingEvent()
 
       if (finalSpan.innerHTML.trim().length) {
         resultSpan.innerHTML +=
@@ -74,18 +85,30 @@ function RecordingPanel(voiceResponse, processUserResponse, onStartCallback) {
       element.querySelector('.fragment-recording-recorder').style.display = 'none';
 
       processUserResponse(abort ? '' : userResponse);
-    }
+    },
+    () => beforeStartRecordingEvent()
   );
+
+  if (beforeStartRecordingEvent() === false) {
+    return null
+  }
 
   element
     .querySelector('.fragment-recording-recorder')
     .appendChild(
       voiceControl.render()
-    );
+    )
 
-  voiceControl.start();
+  voiceControl.start()
 
-  return element;
+  return {
+    render() {
+      return element
+    },
+    abort() {
+      voiceControl.stop(true)
+    }
+  }
 }
 
 export default RecordingPanel;

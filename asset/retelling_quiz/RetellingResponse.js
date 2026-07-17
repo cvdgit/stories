@@ -48,7 +48,7 @@ export default function RetellingResponse(retellingReRunHandler) {
     render() {
       return elem;
     },
-    send(userResponse, slideTexts, resultCallback) {
+    send(userResponse, slideTexts, resultCallback, errorCallback) {
       elem.classList.add('loading');
       return sendStreamMessage(
         '/admin/index.php?r=gpt/stream/retelling',
@@ -59,7 +59,8 @@ export default function RetellingResponse(retellingReRunHandler) {
           const json = processOutputAsJson(message);
           elem.querySelector('.retelling-handle-result').innerHTML = `Результат: <b>${json?.overall_similarity}%</b>`;
           resultCallback(json);
-        }
+        },
+        errorCallback
       );
     }
   }

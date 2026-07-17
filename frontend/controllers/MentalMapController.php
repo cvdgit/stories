@@ -179,6 +179,7 @@ class MentalMapController extends Controller
             'promptId' => $mentalMap->getSettingsPromptId(),
             'userProgress' => $userProgress,
             'presentationPromptEdit' => $presentationPromptEdit,
+            'canChangeStrictMode' => $user->can(UserRoles::ROLE_TEACHER),
         ];
     }
 

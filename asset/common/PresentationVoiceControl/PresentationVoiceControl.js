@@ -2,7 +2,7 @@
  * @param {VoiceResponse} voiceResponse
  * @param {() => void} recordingStartCallback
  * @param {({HTMLElement}, {Boolean}) => void} recordingStopCallback
- * @param {(() => bool)|null} beforeRecordingStartHandler
+ * @param {(() => boolean)|null} beforeRecordingStartHandler
  * @constructor
  */
 export default function PresentationVoiceControl(
@@ -26,6 +26,11 @@ export default function PresentationVoiceControl(
         </div>`
 
   const start = () => {
+console.log('start')
+    if (typeof beforeRecordingStartHandler === 'function' && beforeRecordingStartHandler() === false) {
+      return
+    }
+
     elem.querySelector('.gn').classList.add('disabled')
     voiceResponse.start(new Event('voiceResponseStart'), null, function () {
       elem.dataset.state = 'recording';
@@ -65,11 +70,6 @@ export default function PresentationVoiceControl(
 
     const state = elem.dataset.state;
     if (!state) {
-
-      if (typeof beforeRecordingStartHandler === 'function' && beforeRecordingStartHandler() === false) {
-        return;
-      }
-
       start();
       return;
     }

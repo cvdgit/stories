@@ -4,7 +4,6 @@ import sendMessage from "../lib/sendMessage";
 import {calcHiddenTextPercent, createWordItem} from "../words";
 import {processOutputAsJson, stripTags} from "../common";
 import {SimilarityChecker} from "../lib/calcSimilarity";
-import createMouseWindowTracker from "../lib/createMouseWindowTracker";
 
 const nodeStatusSuccessHtml = `
 <div class="retelling-status-show"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -108,6 +107,11 @@ function ItemWrapper(listItem, {isPlanTreeView}) {
 function processTreeNodes(list, body, history, voiceResponse, params, onEndHandler, dispatchEvent) {
 
   let showVoiceControl = false
+  const {
+    beforeStartRecordingEvent,
+    startRecordingEvent,
+    stopRecordingEvent
+  } = params.events || {}
 
   for (const listItem of list) {
     const listItemWrapper = new ItemWrapper(listItem, {isPlanTreeView: params.isPlanTreeView});
@@ -162,7 +166,7 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
     const finalSpan = voiceResponseElem.querySelector('.final_span')
     const interimSpan = voiceResponseElem.querySelector('.interim_span')
 
-    const blurHandler = function() {
+    /*const blurHandler = function() {
       if (voiceResponse.getStatus()) {
         voiceResponse.stop()
         const el = document.querySelector('.gn.recording')
@@ -170,21 +174,27 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
           $(el).data('abort', true).trigger('click')
         }
       }
-    }
+    }*/
 
-    let tracker;
+    //let tracker;
 
     const startClickHandler = targetElement => {
 
-      tracker = createMouseWindowTracker();
+      if (beforeStartRecordingEvent() !== true) {
+        return false
+      }
+
+      startRecordingEvent()
+
+      /*tracker = createMouseWindowTracker();
       tracker.on("leave", blurHandler);
 
       if (!tracker.isFullscreen()) {
         alert('Нужно развернуть окно браузера на весь экран');
         return false;
-      }
+      }*/
 
-      window.addEventListener('blur', blurHandler, false);
+      // window.addEventListener('blur', blurHandler, false);
 
       targetElement.closest('.node-row').classList.add('pending')
       historyItem.pending = true
@@ -211,11 +221,12 @@ function processTreeNodes(list, body, history, voiceResponse, params, onEndHandl
 
     const stopClickHandler = async (targetElement, abort) => {
 
-      if (tracker) {
+      /*if (tracker) {
         tracker.destroy();
-      }
+      }*/
 
-      window.removeEventListener('blur', blurHandler);
+      // window.removeEventListener('blur', blurHandler);
+      stopRecordingEvent()
 
       $(rowElement.querySelector('.gn'))
         .tooltip('hide')
@@ -420,7 +431,7 @@ function flatten(nodes, level = 0) {
   ])
 }
 
-export default function TreeViewBody(tree, voiceResponse, history, params, onEndHandler, isPlanTreeView, settingsPromptId) {
+export default function TreeViewBody(tree, voiceResponse, history, params, onEndHandler, isPlanTreeView, settingsPromptId, events) {
 
   const init = () => {
     const body = document.createElement('div')
@@ -439,6 +450,7 @@ export default function TreeViewBody(tree, voiceResponse, history, params, onEnd
 
   params.isPlanTreeView = isPlanTreeView
   params.settingsPromptId = settingsPromptId
+  params.events = events
 
   voiceResponse.onError(({args}) => {
     const row = body.querySelector('.node-row.current-row.pending')
@@ -459,7 +471,15 @@ export default function TreeViewBody(tree, voiceResponse, history, params, onEnd
     init() {
       const list = flatten(tree)
       list.map(node => body.appendChild(createRow(node, 0, isPlanTreeView)))
-      processTreeNodes(list, body, history, voiceResponse, params, onEndHandler, dispatchEvent)
+      processTreeNodes(
+        list,
+        body,
+        history,
+        voiceResponse,
+        params,
+        onEndHandler,
+        dispatchEvent
+      )
     },
     restart() {
       body.remove()

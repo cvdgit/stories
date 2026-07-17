@@ -1,14 +1,17 @@
 import RecordingPanel from "./RecordingPanel";
 import {userResponseChecker} from "../lib/userResponseProcessChain";
 import MapImageStatus from "../components/MapImageStatus";
-import {stripTags} from "../common";
-import tippy from "tippy.js";
 import 'tippy.js/dist/tippy.css';
 import {createNotify} from "../components/utils";
 
-function PresentationItemHandler(container, voiceResponse, {threshold, promptId, presentationPromptEdit}, saveUserHistoryHandler, history) {
+function PresentationItemHandler(container, voiceResponse, {
+  threshold,
+  promptId,
+  presentationPromptEdit
+}, saveUserHistoryHandler, history, events) {
 
   let isRecording = false;
+  let recordingPanel
 
   return {
     isRecording() {
@@ -19,9 +22,7 @@ function PresentationItemHandler(container, voiceResponse, {threshold, promptId,
         return;
       }
 
-      isRecording = true;
-
-      return RecordingPanel(
+      recordingPanel = RecordingPanel(
         voiceResponse,
         async userResponse => {
 
@@ -164,9 +165,21 @@ function PresentationItemHandler(container, voiceResponse, {threshold, promptId,
           container.querySelector('.fragment-recording-wrap').remove();
         },
         () => {
+          isRecording = true;
           container.querySelectorAll(`[data-img-id]`).forEach(el => el._tippy && el._tippy.disable());
-        }
-      );
+        },
+        events
+      )
+
+      if (recordingPanel !== null) {
+        return recordingPanel.render()
+      }
+    },
+    abort() {
+      isRecording = false
+      if (recordingPanel) {
+        recordingPanel.abort()
+      }
     }
   }
 }

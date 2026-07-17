@@ -2,6 +2,7 @@ import TreeViewBody from "./TreeViewBody";
 import TreeViewDialogBody from "./TreeViewDialogBody";
 import calcMapProgress from "./Progress/calcMapProgress";
 import calcAllMapProgress from "./Progress/calcAllMapProgress";
+import StrictMode from "../StrictMode";
 
 /**
  * @typedef {Object} Settings
@@ -37,7 +38,10 @@ function TreeView({
                     itemClickHandler,
                     treePresentationModeHandler,
                     hiddenMapProgress,
-                    allMapProgress
+                    allMapProgress,
+                    events,
+                    strictModeStateHandler,
+                    canChangeStrictMode
                   }, voiceResponse) {
 
   const wrap = document.createElement('div');
@@ -59,12 +63,22 @@ function TreeView({
   header.style.gap = '20px';
   header.innerHTML = `
 <h2 class="h3" style="flex: 1; text-align: left; padding-left: 20px">${name} (<span data-toggle="tooltip" title="Точность пересказа">${params.threshold}%</span>${title})</h2>
-<div class="mental-map-fast-wrap" style="position: relative; right: auto; top: auto; align-items: center; justify-content: center"><button id="clear-history" data-toggle="tooltip" title="Очистить историю" type="button" style="display: none; border: 0 none;background: none">
+<div class="mental-map-fast-wrap" style="position: relative; right: auto; top: auto; align-items: center; justify-content: center">
+<button id="clear-history" data-toggle="tooltip" title="Очистить историю" type="button" style="display: none; border: 0 none;background: none">
 <svg style="width:24px;height:24px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
   <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
 </svg>
 </button></div>
 `
+
+  header.querySelector('.mental-map-fast-wrap')
+    .prepend(
+      StrictMode({
+        canChange: canChangeStrictMode,
+        defaultValue: !canChangeStrictMode,
+        checkHandler: checked => strictModeStateHandler(checked)
+      }).render()
+    )
 
   header.querySelector('#clear-history').addEventListener('click', async () => {
     if (!confirm('Подтверждаете?')) {
@@ -102,7 +116,8 @@ function TreeView({
   function isShowPercentButton() {
     const {percent} = calcMapProgress(history)
     const {percent: allPercent} = calcAllMapProgress(presentationHistory || [])
-    return percent > 0 || allPercent > 0
+    const haveDoneFragments = history.filter(h => h.done).length > 0
+    return percent > 0 || allPercent > 0 || haveDoneFragments
   }
 
   if (isShowPercentButton()) {
@@ -142,7 +157,8 @@ function TreeView({
       voiceResponse,
       history,
       presentationHistory,
-      itemClickHandler
+      itemClickHandler,
+      events
     });
   } else {
     body = TreeViewBody(
@@ -161,7 +177,8 @@ function TreeView({
         wrap.appendChild(elem.getElement())
       },
       Boolean(settings.planTreeView),
-      settings.promptId
+      settings.promptId,
+      events
     );
   }
 
@@ -176,22 +193,24 @@ function TreeView({
 
   body.init()
 
-  const blurHandler = function() {
-    if (voiceResponse.getStatus()) {
-      voiceResponse.stop()
-      const el = document.querySelector('.gn.recording')
-      if (el) {
-        $(el).data('abort', true).trigger('click')
-      }
-    }
-  }
-
   return {
     getElement() {
       return wrap
     },
+    // Вызывается при смене слайда
     destroy() {
-      blurHandler();
+      console.log('destroy', voiceResponse.getStatus())
+      if (voiceResponse.getStatus()) {
+        voiceResponse.stop()
+        const el = document.querySelector('.gn.recording')
+        console.log('destroy stop', el)
+        if (el) {
+          $(el).data('abort', true).trigger('click')
+        }
+      }
+    },
+    abort() {
+      this.destroy()
     },
     historyChangeCallback() {
       header.querySelector('#clear-history').style.display = isShowPercentButton() ? 'block' : 'hidden'

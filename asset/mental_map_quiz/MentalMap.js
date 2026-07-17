@@ -29,6 +29,7 @@ import {createNotify} from "./components/utils";
 import MentalMapProgress from "./TreeView/Progress";
 import calcMapProgress from "./TreeView/Progress/calcMapProgress";
 import calcAllMapProgress from "./TreeView/Progress/calcAllMapProgress";
+import MentalMapEvents from "./MentalMapEvents";
 
 /**
  * @param {HTMLElement} element
@@ -80,6 +81,15 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
   loader.classList.add('content-loader-wrap')
   loader.innerHTML = `<div style="display: flex; flex-direction: row; gap: 20px; align-items: center">Загрузка ментальной карты... <img width="50" src="/img/loading.gif" alt="loading"></div>`
   this.element.appendChild(loader)
+
+  const strictModeTracker = window.strictModeTracker
+
+  const createElementNotify = (text, options = {}) => {
+    element.querySelectorAll('.mental-map-notify').forEach(el => el.remove())
+    element.appendChild(
+      createNotify(text, {persist: true, autoRemove: false, ...options})
+    )
+  }
 
   function RecordingLangStore(defaultLang) {
     let lang = defaultLang
@@ -226,8 +236,19 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
                                   hideFragmentText,
                                   settingsPromptId,
                                   detailParams,
-                                  onHistoryChangeHandler
+                                  onHistoryChangeHandler,
+                                  events
                                 }) {
+
+    const {
+      beforeStartRecordingEvent,
+      startRecordingEvent,
+      stopRecordingEvent
+    } = events || {}
+
+    if (beforeStartRecordingEvent() === false) {
+      return
+    }
 
     const text = texts.find(t => t.id === image.id);
 
@@ -258,6 +279,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
       rewritePrompt,
       itemClickHandler: (recordingWrap) => {
         if (voiceResponse.getStatus()) {
+          //window.removeEventListener('blur', blurHandler)
           voiceResponse.stop();
           timer.stop();
           const voiceLang = langStore.fromStore($(recordingWrap).find("#voice-lang option:selected").val())
@@ -267,7 +289,9 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
             voiceLang,
             stripTags(text.text),
             false,
-            threshold
+            threshold,
+            null,
+            events
           );
         }
         recordingWrap.querySelector('#hidden-text-percent').innerText = calcHiddenTextPercent(text) + '%'
@@ -308,7 +332,9 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
           voiceLang,
           stripTags(text.text),
           false,
-          threshold
+          threshold,
+          null,
+          events
         );
       },
       onWordsChanged: (args) => {
@@ -334,11 +360,15 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
 
       wrapper.querySelector('#start-recording').addEventListener('click', e => {
 
+        if (voiceResponse.getStatus() === false && beforeStartRecordingEvent() === false) {
+          return
+        }
+
         if (!canRecording(text)) {
           return
         }
 
-        window.addEventListener('blur', blurHandler, false);
+        // window.addEventListener('blur', blurHandler, false);
 
         if (voiceResponse.getStatus()) {
           timer.stop();
@@ -363,14 +393,17 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
           true,
           threshold,
           () => {
-            window.removeEventListener('blur', blurHandler);
+            //window.removeEventListener('blur', blurHandler);
             wrapper.querySelector('.content-diff').style.display = 'inline-block';
             const startRetellingElem = wrapper.querySelector('#start-retelling');
             if (fastMode && !$(wrapper.querySelector('#start-recording')).data('abort')) {
               setTimeout(() => startRetellingElem.click(), 100);
             }
-          })
+          },
+          events
+        )
       })
+
       wrapper.querySelector('#start-retelling').addEventListener('click', async () => {
 
         if (voiceResponse.getStatus()) {
@@ -721,20 +754,30 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
       return
     }
 
-    const {mentalMap: json, history, rewritePrompt, threshold, userProgress, presentationPromptEdit} = responseJson;
+    const {
+      mentalMap: json,
+      history,
+      rewritePrompt,
+      threshold,
+      userProgress,
+      presentationPromptEdit,
+      canChangeStrictMode
+    } = responseJson
+
     mentalMapUserProgress = userProgress;
     mentalMapId = json.id;
     mentalMapHistory = history;
-    const {mapTypeIsMentalMapQuestions, questions} = json;
-    const mapQuestions = new MentalMapQuestions({typeIsMentalMapQuestions: mapTypeIsMentalMapQuestions, questions});
+    const {
+      mapTypeIsMentalMapQuestions,
+      questions
+    } = json
 
+    const mapQuestions = new MentalMapQuestions({typeIsMentalMapQuestions: mapTypeIsMentalMapQuestions, questions});
     const imageFirst = Boolean(json.settings?.imageFirst);
     const hideTooltip = Boolean(json.settings?.hideTooltip);
     const hideFragmentText = Boolean(json.settings?.hideText);
     const settingsPromptId = json.settings?.promptId;
-
     const {settings = {}} = json;
-
     const saveHistoryParams = {
       story_id: params?.story_id,
       slide_id: params?.slide_id,
@@ -743,6 +786,52 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
       threshold,
       location: params.location
     };
+
+    if (canChangeStrictMode) {
+      strictModeTracker.changeState(false)
+    }
+
+    strictModeTracker.on('screen', ({isFullscreenWindow}) => {
+      if (isFullscreenWindow === false) {
+        createElementNotify('Окно браузера должно быть развернуто на весь экран. Масштаб внутри вкладки должен быть 100%')
+        return
+      }
+      element.querySelectorAll('.mental-map-notify').forEach(el => el.remove())
+    })
+
+    try {
+      strictModeTracker.checkWindow()
+    } catch (ex) {
+      createElementNotify('Окно браузера должно быть развернуто на весь экран. Масштаб внутри вкладки должен быть 100%')
+    }
+
+    const events = MentalMapEvents(
+      () => {
+        try {
+          strictModeTracker.checkWindow()
+          return true
+        } catch (ex) {
+          createElementNotify('Окно браузера должно быть развернуто на весь экран. Масштаб внутри вкладки должен быть 100%')
+        }
+        return false
+      },
+      () => {
+        strictModeTracker.startRecording(() => {
+          treeViewInstance.abort()
+        })
+        const strictModeToggle = element.querySelector('.strict-mode-wrap input[type=checkbox]')
+        if (strictModeToggle) {
+          strictModeToggle.setAttribute('disabled', 'disabled')
+        }
+      },
+      () => {
+        strictModeTracker.stopRecording()
+        const strictModeToggle = element.querySelector('.strict-mode-wrap input[type=checkbox]')
+        if (strictModeToggle) {
+          strictModeToggle.removeAttribute('disabled')
+        }
+      }
+    )
 
     const presentationHandler = new PresentationItemHandler(
       this.element,
@@ -770,7 +859,11 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
           return response;
         })
       },
-      history
+      history,
+      {
+        ...events,
+        startRecordingEvent: () => strictModeTracker.startRecording(() => presentationHandler.abort())
+      }
     );
 
     const {treeView} = json
@@ -831,6 +924,11 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         calcAllMapProgress(presentationHistory || [])
       )
 
+      const treeVoiceResponse = new VoiceResponse(new MissingWordsRecognition({
+        getRecordingLang() {
+          return (json.settings || {}).recognitionLang || 'ru-RU';
+        }
+      }))
       treeViewInstance = new TreeView({
         id: json.id,
         name: json.name,
@@ -863,19 +961,21 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
             if (presentationHandler.isRecording()) {
               return;
             }
-            this.element.querySelector('.mental-map-container')
-              .appendChild(
-                presentationHandler.handle(
-                  image,
-                  presentationHistory.find(i => i.id === image.id),
-                  () => {
-                    treeViewInstance.historyChangeCallback()
-                    allMapProgress.setProgress(
-                      calcAllMapProgress(presentationHistory)
-                    )
-                  }
+            const handleElement = presentationHandler.handle(
+              image,
+              presentationHistory.find(i => i.id === image.id),
+              () => {
+                treeViewInstance.historyChangeCallback()
+                allMapProgress.setProgress(
+                  calcAllMapProgress(presentationHistory)
                 )
-              );
+              }
+            )
+            if (!handleElement) {
+              return
+            }
+            this.element.querySelector('.mental-map-container')
+              .appendChild(handleElement);
             return;
           }
 
@@ -910,18 +1010,40 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
               mapProgress.setProgress(
                 calcMapProgress(history)
               )
+            },
+            events: {
+              ...events,
+              startRecordingEvent: () => {
+                strictModeTracker.startRecording(blurHandler)
+              }
             }
           });
 
         },
         treePresentationModeHandler,
         hiddenMapProgress: mapProgress,
-        allMapProgress
-      }, new VoiceResponse(new MissingWordsRecognition({
-        getRecordingLang() {
-          return (json.settings || {}).recognitionLang || 'ru-RU';
-        }
-      })));
+        allMapProgress,
+        events,
+        strictModeStateHandler: enable => {
+
+          try {
+            strictModeTracker.changeState(enable)
+          } catch(ex) {
+            createElementNotify('Невозможно переключить во время проговаривания', {persist: false, autoRemove: true})
+            return false
+          }
+
+          element.querySelectorAll('.mental-map-notify').forEach(el => el.remove())
+          if (enable === true) {
+            try {
+              strictModeTracker.checkWindow()
+            } catch (ex) {
+              createElementNotify('Окно браузера должно быть развернуто на весь экран. Масштаб внутри вкладки должен быть 100%')
+            }
+          }
+        },
+        canChangeStrictMode
+      }, treeVoiceResponse)
 
       loader.remove()
 
@@ -934,7 +1056,7 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         container: 'body'
       });
 
-      return treeViewInstance.destroy
+      return () => presentationHandler.isRecording() ? presentationHandler.abort : treeViewInstance.destroy
     }
 
     let fastMode = true;
@@ -1113,7 +1235,13 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
         fastMode,
         hideFragmentText,
         settingsPromptId,
-        detailParams
+        detailParams,
+        events: {
+          ...events,
+          startRecordingEvent: () => {
+            strictModeTracker.startRecording(blurHandler)
+          }
+        }
       })
     }, mapQuestions.typeIsMentalMapQuestions()))
 
@@ -1198,7 +1326,13 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
             fastMode,
             hideFragmentText,
             settingsPromptId,
-            detailParams
+            detailParams,
+            events: {
+              ...events,
+              startRecordingEvent: () => {
+                strictModeTracker.startRecording(blurHandler)
+              }
+            }
           })
         },
         mentalMapHistory,
@@ -1276,10 +1410,12 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
 
           const historyItem = history.find(h => h.id === image.id);
           if (presentationMode) {
+            const handlerElement = presentationHandler.handle(image)
+            if (handlerElement === null) {
+              return
+            }
             this.element.querySelector('.zoom-container')
-              .appendChild(
-                presentationHandler.handle(image)
-              );
+              .appendChild(handlerElement);
             return;
           }
 
@@ -1337,7 +1473,13 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
             fastMode,
             hideFragmentText,
             settingsPromptId,
-            detailParams
+            detailParams,
+            events: {
+              ...events,
+              startRecordingEvent: () => {
+                strictModeTracker.startRecording(blurHandler)
+              }
+            }
           })
         },
         mentalMapHistory,
@@ -1554,17 +1696,9 @@ export default function MentalMap(element, deck, params, microphoneChecker) {
       return mentalMapUserProgress
     },
     destroy() {
-
       if (this.destroyHandler) {
-        this.destroyHandler();
+        this.destroyHandler()();
       }
-
-      /*if (treeViewInstance) {
-        treeViewInstance.destroy()
-      }
-      if (voiceResponse.getStatus()) {
-        voiceResponse.stop()
-      }*/
     }
   }
 }

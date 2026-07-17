@@ -237,3 +237,145 @@ window.Api = (function() {
     }
   }
 })();
+
+window.strictModeTracker = (function () {
+  console.log('strictModeTracker run')
+
+  const FULLSCREEN_THRESHOLD = 8
+  const ZOOM_BORDER_THRESHOLD = 24
+  const DPR_THRESHOLD = 0.01
+
+  const listeners = {
+    leave: [],
+    enter: [],
+    screen: [],
+    screenStart: []
+  };
+
+  let enable = true
+
+  function emit(eventName, value) {
+    for (const callback of listeners[eventName]) {
+      callback(value);
+    }
+  }
+
+  function checkFullscreen() {
+    return (
+      Math.abs(window.screenX) <= FULLSCREEN_THRESHOLD &&
+      Math.abs(window.screenY) <= FULLSCREEN_THRESHOLD &&
+      Math.abs(window.innerWidth - screen.availWidth) <= FULLSCREEN_THRESHOLD &&
+      Math.abs(window.outerHeight - screen.availHeight) <= FULLSCREEN_THRESHOLD
+    )
+  }
+
+  let isMouseInsideWindow = true
+  let isFullscreenWindow
+
+  function updateFullscreenState() {
+    if (enable === false) {
+      return
+    }
+    const newState = checkFullscreen()
+    if (newState !== isFullscreenWindow) {
+      isFullscreenWindow = newState
+      emit('screen', {isFullscreenWindow});
+      emit('screenStart', {isFullscreenWindow});
+    }
+  }
+
+  function handleVisibilityChange() {
+    if (document.visibilityState !== "visible") {
+      if (isMouseInsideWindow) {
+        isMouseInsideWindow = false;
+        emit("leave");
+      }
+    }
+  }
+
+  function handleBlur() {
+    if (isMouseInsideWindow) {
+      isMouseInsideWindow = false;
+      emit("leave");
+    }
+  }
+
+  function handleMouseOut(event) {
+    if (!event.relatedTarget && !event.toElement) {
+      if (isMouseInsideWindow) {
+        isMouseInsideWindow = false;
+        emit("leave");
+      }
+    }
+  }
+
+  function handleResize() {
+    updateFullscreenState()
+  }
+
+  window.addEventListener('resize', handleResize)
+
+  let recordingIsLive = false
+
+  function stateMiddleware(handler) {
+    if (enable === false) {
+      return
+    }
+    handler()
+  }
+
+  return {
+    isFullscreenWindow,
+    checkWindow() {
+      stateMiddleware(() => {
+        const isFullscreen = checkFullscreen()
+        if (isFullscreen === false) {
+          throw new Error('no fullscreen')
+        }
+      })
+    },
+    on(eventName, callback) {
+      if (listeners[eventName]) {
+        listeners[eventName].push(callback)
+      }
+    },
+    off(eventName, callback) {
+      if (listeners[eventName]) {
+        listeners[eventName] = listeners[eventName].filter(fn => fn !== callback)
+      }
+    },
+    startRecording(abortHandler) {
+      stateMiddleware(() => {
+        recordingIsLive = true
+        document.addEventListener('mouseout', handleMouseOut)
+        document.addEventListener('visibilitychange', handleVisibilityChange)
+        window.addEventListener('blur', handleBlur)
+        if (typeof abortHandler === 'function') {
+          this.on('leave', abortHandler)
+          this.on('screenStart', ({isFullscreenWindow}) => {
+            if (isFullscreenWindow === false) {
+              abortHandler()
+            }
+          })
+        }
+      })
+    },
+    stopRecording() {
+      stateMiddleware(() => {
+        recordingIsLive = false
+        document.removeEventListener('mouseout', handleMouseOut)
+        document.removeEventListener('visibilitychange', handleVisibilityChange)
+        window.removeEventListener('blur', handleBlur)
+        isMouseInsideWindow = true
+        listeners['leave'] = []
+        listeners['screenStart'] = []
+      })
+    },
+    changeState(state) {
+      if (recordingIsLive) {
+        throw new Error('Невозможно изменить состояние во время записи')
+      }
+      enable = state
+    }
+  }
+})()

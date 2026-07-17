@@ -8,6 +8,7 @@ use backend\components\story\AbstractBlock;
 use backend\components\story\reader\HtmlSlideReader;
 use backend\components\story\TextBlock;
 use common\components\RetellingThreshold;
+use common\rbac\UserRoles;
 use DomainException;
 use Exception;
 use frontend\Retelling\Retelling;
@@ -105,6 +106,7 @@ class RetellingController extends Controller
             'questions' => $retelling->questions,
             'settings' => $retelling->getRetellingSettingsPayload(),
             'retellingSlideId' => $retelling->slide_id,
+            'canChangeStrictMode' => $user->can(UserRoles::ROLE_TEACHER),
         ];
     }
 

@@ -60,6 +60,7 @@ export default function RetellingVoiceControl(
 
   this.getElement = () => elem
   this.triggerClick = () => {
+    stopClickHandler()
     voiceResponse.stop(() => {
       elem.querySelector('.gn').classList.remove('recording');
       elem.querySelector('.pulse-ring').remove();

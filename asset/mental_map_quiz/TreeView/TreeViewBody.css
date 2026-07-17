@@ -254,20 +254,21 @@
   right: 0;
   margin-inline: auto;
 
-  width: 350px;
+  width: 650px;
   max-width: 100%;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 8px 32px 0px;
   border-radius: 10px;
   color: #fff;
   background-color: rgba(13, 110, 253, 1);
-  font-size: 24px;
 
   z-index: 999;
 }
 
 .mental-map-notify-text {
   padding: 16px;
-  color: #fff
+  color: #fff;
+  font-size: 24px;
+  line-height: 30px;
 }
 
 .mental-map-notify-button {

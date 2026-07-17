@@ -10,10 +10,20 @@ import sendMessage from "../lib/sendMessage";
  * @param {int} threshold
  * @param {(() => void) | null} stopHandler
  */
-export default function startRecording(voiceResponse, element, lang, text, makeRewrite, threshold, stopHandler = null) {
+export default function startRecording(voiceResponse, element, lang, text, makeRewrite, threshold, stopHandler = null, events) {
+
+  const {
+    startRecordingEvent,
+    stopRecordingEvent
+  } = events || {}
+
   const state = element.dataset.state
   if (!state) {
+
     $(document.getElementById("start-retelling-wrap")).hide()
+
+    startRecordingEvent()
+
     setTimeout(function () {
       voiceResponse.start(new Event('voiceResponseStart'), lang, function () {
         element.dataset.state = 'recording'
@@ -25,6 +35,7 @@ export default function startRecording(voiceResponse, element, lang, text, makeR
       });
     }, 500);
   } else {
+    stopRecordingEvent()
     voiceResponse.stop(function (args) {
 
       element.parentNode.querySelector('.pulse-ring')?.remove();
@@ -47,8 +58,11 @@ export default function startRecording(voiceResponse, element, lang, text, makeR
         $(document.getElementById("start-retelling-wrap")).show()
       }
 
+      const abort = $(element).data('abort')
+      $(element).removeData('abort')
+
       const userResponse = $resultSpan.text().trim()
-      if (userResponse.length && makeRewrite) {
+      if (userResponse.length && makeRewrite && abort !== true) {
 
         const similarityChecker = new SimilarityChecker(threshold)
         if (similarityChecker.check(text, userResponse)) {

@@ -1,15 +1,18 @@
+import StrictMode from "../mental_map_quiz/StrictMode";
+
 /**
  * @param {RetellingVoiceControl} voiceControl
  * @param {{render(): HTMLDivElement, send(*, *, *): Promise<void>}} retellingResponse
  * @param questionParams
  * @constructor
  */
-export default function CreateRetelling(voiceControl, retellingResponse, questionParams) {
+export default function CreateRetelling(voiceControl, retellingResponse, questionParams, strictModeStateHandler) {
 
   const {
     withQuestions,
     questions,
-    settings
+    settings,
+    canChangeStrictMode
   } = questionParams
 
   const elem = document.createElement('div');
@@ -35,6 +38,14 @@ export default function CreateRetelling(voiceControl, retellingResponse, questio
         <div id="retelling-area"></div>
     </div>
 </div>`;
+
+  elem.prepend(
+      StrictMode({
+        canChange: canChangeStrictMode,
+        defaultValue: !canChangeStrictMode,
+        checkHandler: checked => strictModeStateHandler(checked)
+      }).render()
+    )
 
   if (withQuestions) {
     elem.querySelector('.retelling-user-response').classList.add('retelling-two-cols')
