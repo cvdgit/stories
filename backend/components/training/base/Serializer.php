@@ -10,19 +10,25 @@ use yii\helpers\HtmlPurifier;
 class Serializer
 {
     private $historyValues;
+    /**
+     * @var bool
+     */
+    private $canChangeStrictMode;
 
-    public function __construct(array $historyValues = [])
+    public function __construct(array $historyValues = [], bool $canChangeStrictMode = false)
     {
         $this->historyValues = $historyValues;
+        $this->canChangeStrictMode = $canChangeStrictMode;
     }
 
-    public function serialize(StoryTest $test,
-                              QuestionCollection $collection,
-                              $students,
-                              int $userStarsCount,
-                              bool $fastMode = false,
-                              $stories = []): array
-    {
+    public function serialize(
+        StoryTest $test,
+        QuestionCollection $collection,
+        $students,
+        int $userStarsCount,
+        bool $fastMode = false,
+        $stories = []
+    ): array {
         return [
             0 => [
                 'storyTestQuestions' => $collection->serialize($test->isShuffleQuestions()),
@@ -55,6 +61,7 @@ class Serializer
                 'students' => $students,
                 'stories' => $stories,
                 'historyValues' => $this->historyValues,
+                'canChangeStrictMode' => filter_var($this->canChangeStrictMode, FILTER_VALIDATE_BOOLEAN),
             ],
         ];
     }

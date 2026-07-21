@@ -8,7 +8,7 @@ export function createNotify(text, options = {}) {
   const div = document.createElement('div')
   div.classList.add('mental-map-notify')
   div.innerHTML = `
-<div style="display: flex">
+<div class="mental-map-notify-card">
     <div class="mental-map-notify-text">${text}</div>
 </div>
 `

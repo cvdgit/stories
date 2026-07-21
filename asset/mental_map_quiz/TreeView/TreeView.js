@@ -76,7 +76,10 @@ function TreeView({
       StrictMode({
         canChange: canChangeStrictMode,
         defaultValue: !canChangeStrictMode,
-        checkHandler: checked => strictModeStateHandler(checked)
+        checkHandler: checked => strictModeStateHandler(checked),
+        content: `Окно браузера должно занимать всю ширину экрана.<br>
+  Масштаб внутри вкладки должен быть 100%<br>
+  Во время проговаривания нельзя уводить указатель мыши за пределы вкладки и переключаться между окнами`
       }).render()
     )
 
@@ -199,11 +202,9 @@ function TreeView({
     },
     // Вызывается при смене слайда
     destroy() {
-      console.log('destroy', voiceResponse.getStatus())
       if (voiceResponse.getStatus()) {
         voiceResponse.stop()
         const el = document.querySelector('.gn.recording')
-        console.log('destroy stop', el)
         if (el) {
           $(el).data('abort', true).trigger('click')
         }

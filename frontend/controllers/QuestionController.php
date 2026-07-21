@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace frontend\controllers;
 
 use backend\components\training\base\Serializer;
@@ -14,6 +16,7 @@ use common\models\TestWordList;
 use common\models\User;
 use common\models\UserQuestionHistoryModel;
 use common\models\UserStudent;
+use common\rbac\UserRoles;
 use Exception;
 use frontend\services\QuestionProgressService;
 use linslin\yii2\curl\Curl;
@@ -25,6 +28,7 @@ use yii\rest\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\User as WebUser;
 
 class QuestionController extends Controller
 {
@@ -125,9 +129,13 @@ class QuestionController extends Controller
      * @throws NotFoundHttpException
      * @throws HttpException
      */
-    public function actionGet(int $testId, int $studentId = null, $question_params = null, bool $fastMode = false)
-    {
-
+    public function actionGet(
+        int $testId,
+        WebUser $user,
+        int $studentId = null,
+        $question_params = null,
+        bool $fastMode = false
+    ): array {
         $test = $this->findTestModel($testId);
         $questionId = $test->question_list_id;
 
@@ -145,16 +153,25 @@ class QuestionController extends Controller
             $userStarsCount = $userQuestionHistoryModel->getUserHistoryStarsCountLocal($test->id);
         }
 
+        $canChangeStrictMode = $user->can(UserRoles::ROLE_TEACHER);
+
         if ($test->isSourceWordList()) {
             $wordListModel = $this->findWordListModel($test->word_list_id);
-            $collection = (new WordTestBuilder($test, $wordListModel->getTestWordsData($test->id, $studentId, $userHistory), $wordListModel->getTestWordsCount(), $userStars, $fastMode))->build();
-            return (new Serializer())->serialize(
+            $collection = (new WordTestBuilder(
+                $test,
+                $wordListModel->getTestWordsData($test->id, $studentId, $userHistory),
+                $wordListModel->getTestWordsCount(),
+                $userStars,
+                $fastMode,
+            ))->build();
+            return (new Serializer([], $canChangeStrictMode))->serialize(
                 $test,
                 $collection,
                 $this->getStudents($test->id),
                 $userStarsCount,
                 $fastMode,
-                $wordListModel->getLinkedStories());
+                $wordListModel->getLinkedStories(),
+            );
         }
 
         if ($test->isSourceTest()) {
@@ -183,30 +200,28 @@ class QuestionController extends Controller
                 $historyValues = array_column($prevQuery->all(), 'name');
             }
 
-            $serializer = new Serializer($historyValues);
+            $serializer = new Serializer($historyValues, $canChangeStrictMode);
             return array_merge(
                 $serializer->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount, $fastMode),
                 [
                     'debug' => [
                         'userHistory' => $userHistory,
                         //'rows' => $userQuestionHistoryModel->getUserQuestionHistoryStarsLocal($test->id)
-                    ]
-                ]
+                    ],
+                ],
             );
         }
 
         if ($test->isSourceTests()) {
-
             $questions = [];
             $questionsTotal = 0;
             foreach ($test->relatedTests as $relatedTest) {
                 $questionsTotal += $relatedTest->getQuestionDataCount();
                 $questions = array_merge($questions, $relatedTest->getQuestionData($userHistory));
             }
-
             $collection = (new TestBuilder($test, $questions, $questionsTotal, $userStars, $fastMode))
                 ->build();
-            return (new Serializer())
+            return (new Serializer([], $canChangeStrictMode))
                 ->serialize($test, $collection, $this->getStudents($test->id), $userStarsCount, $fastMode);
         }
 
@@ -223,7 +238,9 @@ class QuestionController extends Controller
 
         $postParams = [
             //'history' => Json::encode($userHistory),
-            'wrong_params' => empty($test->wrong_answers_params) ? '' : urlencode(base64_encode($test->wrong_answers_params)),
+            'wrong_params' => empty($test->wrong_answers_params) ? '' : urlencode(
+                base64_encode($test->wrong_answers_params),
+            ),
         ];
 
         $result = $curl
@@ -255,12 +272,11 @@ class QuestionController extends Controller
 
         $questions = [];
         foreach ($result as $resultItem) {
-
-            $questionID = (int)$resultItem['hash'];
+            $questionID = (int) $resultItem['hash'];
 
             $skipQuestion = false;
             foreach ($userHistory as $history) {
-                if ((int)$history['entity_id'] === $questionID) {
+                if ((int) $history['entity_id'] === $questionID) {
                     $skipQuestion = true;
                     break;
                 }
@@ -283,7 +299,7 @@ class QuestionController extends Controller
 
             $stars = 0;
             foreach ($userStars as $star) {
-                if ((int)$star['entity_id'] === $questionID) {
+                if ((int) $star['entity_id'] === $questionID) {
                     $stars = $star['stars'];
                     break;
                 }
@@ -295,7 +311,7 @@ class QuestionController extends Controller
                 'id' => $questionID,
                 'name' => $resultItem['question'],
                 'mix_answers' => 0,
-                'type' => ((int)$resultItem['correct_number'] > 1 ? 1 : 0),
+                'type' => ((int) $resultItem['correct_number'] > 1 ? 1 : 0),
                 'image' => $resultItem['question_image'],
                 'images' => $resultItem['question_images'],
                 'storyTestAnswers' => $answers,
@@ -308,7 +324,7 @@ class QuestionController extends Controller
                 'correct_number' => $resultItem['correct_number'],
                 'stars' => [
                     'total' => $repeat,
-                    'current' => (int)$stars,
+                    'current' => (int) $stars,
                 ],
                 'view' => $svg ? 'svg' : '',
                 'svg' => $svg,
@@ -320,27 +336,29 @@ class QuestionController extends Controller
             $questions[] = $question;
         }
 
-        return [0 => [
-            'storyTestQuestions' => $questions,
-            'test' => [
-                'id' => $test->id,
-                'progress' => [
-                    'total' => $numberQuestions * $repeat,
-                    'current' => (int)$userStarsCount,
+        return [
+            0 => [
+                'storyTestQuestions' => $questions,
+                'test' => [
+                    'id' => $test->id,
+                    'progress' => [
+                        'total' => $numberQuestions * $repeat,
+                        'current' => (int) $userStarsCount,
+                    ],
+                    'incorrectAnswerText' => $test->incorrect_answer_text,
+                    'showAnswerImage' => $showAnswerImage,
+                    'showAnswerText' => $showAnswerText,
+                    'showQuestionImage' => $showQuestionImage,
+                    'answerType' => 0,
+                    'source' => $test->source,
+                    'repeatQuestions' => $repeat,
                 ],
-                'incorrectAnswerText' => $test->incorrect_answer_text,
-                'showAnswerImage' => $showAnswerImage,
-                'showAnswerText' => $showAnswerText,
-                'showQuestionImage' => $showQuestionImage,
-                'answerType' => 0,
-                'source' => $test->source,
-                'repeatQuestions' => $repeat,
+                'students' => $this->getStudents($test->id),
+                'incorrectAnswerAction' => $incorrectAnswerAction,
+                'params' => $resultParams,
+                'code' => $questionCode,
             ],
-            'students' => $this->getStudents($test->id),
-            'incorrectAnswerAction' => $incorrectAnswerAction,
-            'params' => $resultParams,
-            'code' => $questionCode,
-        ]];
+        ];
     }
 
     protected function getStudents(int $testID)
@@ -393,14 +411,14 @@ class QuestionController extends Controller
             if ($userQuestionHistoryID !== null) {
                 $createdModels = $model->createUserQuestionAnswers($userQuestionHistoryID);
                 if ((count($createdModels) > 0) && $model->isSourceWordList()) {
-                    $testModel = $this->findTestModel($model->test_id);
+                    $testModel = $this->findTestModel((int) $model->test_id);
                     if ($testModel->isRememberAnswers()) {
-                        TestRememberAnswer::updateTestRememberAnswer($testModel->id, $model->student_id, $model->entity_id, $createdModels[0]->answer_entity_name);
+                        TestRememberAnswer::updateTestRememberAnswer($testModel->id, (int) $model->student_id, (int) $model->entity_id, $createdModels[0]->answer_entity_name);
                     }
                 }
 
                 try {
-                    $this->questionProgressService->saveProgress($model->student_id, $model->test_id, $model->progress, $model->question_topic_id);
+                    $this->questionProgressService->saveProgress((int) $model->student_id, (int) $model->test_id, (int) $model->progress, $model->question_topic_id);
                 } catch (Exception $exception) {
                     Yii::$app->errorHandler->logException($exception);
                 }

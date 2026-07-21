@@ -1577,7 +1577,12 @@ p.wikids-test-description {
 }
 .quiz-header-col {
   box-sizing: border-box;
-  width: 50%;
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  justify-content: end;
 }
 .quiz-settings {
   text-align: right;
@@ -1864,9 +1869,7 @@ p.wikids-test-description {
 }
 
 .student-col {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+  justify-content: start;
 }
 
 .home-icon {

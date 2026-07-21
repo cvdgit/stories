@@ -1,7 +1,7 @@
 import tippy from "tippy.js";
 import 'tippy.js/dist/tippy.css';
 
-export default function StrictMode({canChange, checkHandler, defaultValue}) {
+export default function StrictMode({canChange, checkHandler, defaultValue, content}) {
 
   const element = document.createElement('div')
   element.className = 'strict-mode-wrap'
@@ -19,9 +19,7 @@ export default function StrictMode({canChange, checkHandler, defaultValue}) {
   }
 
   tippy(element, {
-    content: `Окно браузера должно занимать всю ширину экрана.<br>
-  Масштаб внутри вкладки должен быть 100%<br>
-  Во время проговаривания нельзя уводить указатель мыши за пределы вкладки и переключаться между окнами`,
+    content,
     interactive: true,
     allowHTML: true,
     maxWidth: '40em',

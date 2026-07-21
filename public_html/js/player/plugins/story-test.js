@@ -117,6 +117,7 @@ var TestSlide = (function() {
 var Education = (function() {
 
     var readySlides = [];
+    const instances = []
 
     function getCurrentSlide() {
         return Reveal.getCurrentSlide();
@@ -158,20 +159,29 @@ var Education = (function() {
       }
     });
     test.run();
+    return test
   }
 
-    function initEducation() {
-        var currentSlideID = $(getCurrentSlide()).attr('data-id');
-        if (readySlides[currentSlideID] && !$(getCurrentSlide()).find('.new-questions').is(':empty')) {
-            return;
-        }
-        readySlides[currentSlideID] = true;
-        init();
+  function initEducation() {
+    const currentSlideID = $(getCurrentSlide()).attr('data-id');
+    if (readySlides[currentSlideID] && !$(getCurrentSlide()).find('.new-questions').is(':empty')) {
+      const instance = instances[currentSlideID]
+      if (instance) {
+        instance.resetQuiz()
+      }
+      return;
     }
+    readySlides[currentSlideID] = true
+    const instance = init()
+    if (instance) {
+      instances[currentSlideID] = instance
+    }
+  }
 
-    Reveal.addEventListener("slidechanged", function() {
-        initEducation();
-    });
+  Reveal.addEventListener('slidechanged', () => {
+    instances.map(instance => instance.destroy())
+    initEducation()
+  })
 
     Reveal.addEventListener("ready", function() {
         initEducation();

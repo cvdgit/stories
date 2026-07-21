@@ -113,21 +113,38 @@ export default function Testing() {
           }
         });
         test.run();
+        return test
       }
 
       readySlides = [];
+      const instances = []
 
       const initEducation = () => {
         const currentSlideID = $(deck.getCurrentSlide()).attr('data-id');
         if (readySlides[currentSlideID] && !$(deck.getCurrentSlide()).find('.new-questions').is(':empty')) {
-          return;
+          const instance = instances[currentSlideID]
+          if (instance) {
+            instance.resetQuiz()
+          }
+          return
         }
-        readySlides[currentSlideID] = true;
-        initTesting();
+        readySlides[currentSlideID] = true
+        const instance = initTesting()
+        if (instance) {
+          instances[currentSlideID] = instance
+        }
       }
 
-      deck.addEventListener("slidechanged", initEducation);
-      deck.addEventListener("ready", initEducation);
+      deck.addEventListener('slidechanged', () => {
+        instances.map(instance => instance.destroy())
+        initEducation()
+      })
+      deck.addEventListener('ready', ({indexh, indexv}) => {
+        if (Number(indexh) > 0 || Number(indexv) > 0) {
+          return
+        }
+        initEducation()
+      });
     },
 
     backToStory() {

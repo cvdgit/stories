@@ -309,6 +309,13 @@ window.strictModeTracker = (function () {
     }
   }
 
+  function handleMouseEnter() {
+    if (!isMouseInsideWindow) {
+      isMouseInsideWindow = true;
+      emit("enter");
+    }
+  }
+
   function handleResize() {
     updateFullscreenState()
   }
@@ -348,6 +355,7 @@ window.strictModeTracker = (function () {
       stateMiddleware(() => {
         recordingIsLive = true
         document.addEventListener('mouseout', handleMouseOut)
+        //document.addEventListener('mouseenter', handleMouseEnter)
         document.addEventListener('visibilitychange', handleVisibilityChange)
         window.addEventListener('blur', handleBlur)
         if (typeof abortHandler === 'function') {
@@ -364,6 +372,7 @@ window.strictModeTracker = (function () {
       stateMiddleware(() => {
         recordingIsLive = false
         document.removeEventListener('mouseout', handleMouseOut)
+        //document.removeEventListener('mouseenter', handleMouseEnter)
         document.removeEventListener('visibilitychange', handleVisibilityChange)
         window.removeEventListener('blur', handleBlur)
         isMouseInsideWindow = true
@@ -376,6 +385,12 @@ window.strictModeTracker = (function () {
         throw new Error('Невозможно изменить состояние во время записи')
       }
       enable = state
+    },
+    showQuestion(abortHandler) {
+      this.startRecording(abortHandler)
+    },
+    hideQuestion() {
+      this.stopRecording()
     }
   }
 })()

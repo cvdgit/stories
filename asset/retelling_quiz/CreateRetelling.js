@@ -43,7 +43,10 @@ export default function CreateRetelling(voiceControl, retellingResponse, questio
       StrictMode({
         canChange: canChangeStrictMode,
         defaultValue: !canChangeStrictMode,
-        checkHandler: checked => strictModeStateHandler(checked)
+        checkHandler: checked => strictModeStateHandler(checked),
+        content: `Окно браузера должно занимать всю ширину экрана.<br>
+  Масштаб внутри вкладки должен быть 100%<br>
+  Во время проговаривания нельзя уводить указатель мыши за пределы вкладки и переключаться между окнами`
       }).render()
     )
 

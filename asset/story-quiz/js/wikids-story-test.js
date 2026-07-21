@@ -36,40 +36,9 @@ import MathQuestion from "./MathQuestion";
 import Panzoom from "../../app/panzoom.min"
 import StepQuestion from "./StepQuestion";
 import ColumnQuestion from "./ColumnQuestion";
-
-
-var plugins = [];
-var defaults = {
-  initializeByDefault: true
-};
-var PluginManager = {
-  mount: function mount(plugin) {
-    // Set default static properties
-    for (var option in defaults) {
-      if (defaults.hasOwnProperty(option) && !(option in plugin)) {
-        plugin[option] = defaults[option];
-      }
-    }
-    plugins.forEach(function (p) {
-      if (p.pluginName === plugin.pluginName) {
-        throw "WikidsStoryTest: Cannot mount plugin ".concat(plugin.pluginName, " more than once");
-      }
-    });
-    plugins.push(plugin);
-  },
-  initializePlugins: function initializePlugins(test, el, defaults, options) {
-    plugins.forEach(function (plugin) {
-      var pluginName = plugin.pluginName;
-      //if (!test.options[pluginName] && !plugin.initializeByDefault) return;
-      if (!plugin.initializeByDefault) return;
-      var initialized = new plugin(test, el, defaults);
-      initialized.test = test;
-      //initialized.options = defaults;
-      test[pluginName] = initialized; // Add default options from plugin
-      _extends(defaults, initialized.defaults);
-    });
-  }
-};
+import {PluginManager} from "./plugins";
+import {createNotify} from "../../mental_map_quiz/components/utils";
+import StrictMode from "../../mental_map_quiz/StrictMode";
 
 var tests = [];
 
@@ -143,6 +112,8 @@ function WikidsStoryTest(el, options) {
   var questionAnswers = {};
 
   let questionList = [];
+
+  const strictModeTracker = window.strictModeTracker
 
   function reset() {
     numQuestions = 0;
@@ -287,6 +258,7 @@ function WikidsStoryTest(el, options) {
   }
 
   function run() {
+    strictModeTracker.hideQuestion()
     that.options.init()
       .done((response) => {
         init(response);
@@ -378,6 +350,8 @@ function WikidsStoryTest(el, options) {
     return questionCode === 'select_signs' || questionCode === 'common_signs';
   }
 
+  let canChangeStrictMode = false
+
   function load(data) {
 
     testData = data[0];
@@ -386,6 +360,8 @@ function WikidsStoryTest(el, options) {
 
     testParams = testData['params'] || {};
     questionCode = testData['code'];
+
+    canChangeStrictMode = testData.canChangeStrictMode
 
     if (testData['test']) {
       incorrectAnswerText = testData['test']['incorrectAnswerText'] || '';
@@ -1410,6 +1386,41 @@ function WikidsStoryTest(el, options) {
         .appendTo($row);
     }
 
+    const $headerCol = $('<div/>', {class: 'quiz-header-col'})
+
+    $headerCol.append(
+      StrictMode({
+        canChange: canChangeStrictMode,
+        defaultValue: !canChangeStrictMode,
+        checkHandler: (enable) => {
+
+          strictModeTracker.hideQuestion()
+          try {
+            strictModeTracker.changeState(enable)
+          } catch(ex) {
+            createElementNotify('Невозможно переключить во время проговаривания', {persist: false, autoRemove: true})
+            return false
+          }
+
+          if (enable === true) {
+            try {
+              strictModeTracker.checkWindow()
+            } catch (ex) {
+              createElementNotify('Окно браузера должно быть развернуто на весь экран. Масштаб внутри вкладки должен быть 100%')
+            } finally {
+              strictModeTracker.showQuestion(() => {
+                console.log('abort handler')
+                showNextQuestion(currentQuestion)
+              })
+            }
+          }
+        },
+        content: `Окно браузера должно занимать всю ширину экрана.<br>
+  Масштаб внутри вкладки должен быть 100%<br>
+  Во время прохождения теста нельзя уводить указатель мыши за пределы вкладки и переключаться между окнами`
+      }).render()
+    )
+
     if (App.userIsModerator()) {
 
       const items = [];
@@ -1431,10 +1442,10 @@ function WikidsStoryTest(el, options) {
         }
       });
 
-      $('<div/>', {class: 'quiz-header-col'})
-        .append(createSettings(items))
-        .appendTo($row);
+      $headerCol.append(createSettings(items))
     }
+
+    $headerCol.appendTo($row)
 
     $row.appendTo($header);
 
@@ -1479,6 +1490,18 @@ function WikidsStoryTest(el, options) {
     });
   }
 
+  const createElementNotify = (text, options = {}) => {
+    dom.wrapper[0].querySelectorAll('.mental-map-notify').forEach(el => el.remove())
+    dom.wrapper[0].appendChild(
+      createNotify(text, {
+        persist: true,
+        autoRemove: false,
+        backdrop: true,
+        ...options
+      })
+    )
+  }
+
   function start() {
     console.debug('WikidsStoryTest.start');
 
@@ -1500,6 +1523,25 @@ function WikidsStoryTest(el, options) {
         setTestResults('В тесте нет вопросов');
       }
       return;
+    }
+
+    // strictModeTracker.hideQuestion()
+    if (canChangeStrictMode) {
+      strictModeTracker.changeState(false)
+    }
+
+    strictModeTracker.on('screen', ({isFullscreenWindow}) => {
+      if (isFullscreenWindow === false) {
+        createElementNotify('Окно браузера должно быть развернуто на весь экран. Масштаб внутри вкладки должен быть 100%')
+        return
+      }
+      dom.wrapper[0].querySelectorAll('.mental-map-notify').forEach(el => el.remove())
+    })
+
+    try {
+      strictModeTracker.checkWindow()
+    } catch (ex) {
+      createElementNotify('Окно браузера должно быть развернуто на весь экран. Масштаб внутри вкладки должен быть 100%')
     }
 
     showNextQuestion();
@@ -2243,12 +2285,14 @@ function WikidsStoryTest(el, options) {
     }
   }
 
-  function showNextQuestion() {
+  function showNextQuestion(nextQuestionObj) {
 
     console.debug('WikidsStoryTest.showNextQuestion');
 
-    var nextQuestionObj = testQuestions.shift();
-    currentQuestion = nextQuestionObj;
+    if (!nextQuestionObj) {
+      nextQuestionObj = testQuestions.shift();
+      currentQuestion = nextQuestionObj;
+    }
 
     if (nextQuestionObj === undefined) {
       return;
@@ -2264,6 +2308,12 @@ function WikidsStoryTest(el, options) {
     dom.nextButton.off("click").on("click", nextQuestion);
 
     currentQuestionElement = $('.wikids-test-question[data-question-id=' + nextQuestionObj.id + ']', dom.questions);
+
+    strictModeTracker.hideQuestion()
+    strictModeTracker.showQuestion(() => {
+      console.log('abort handler')
+      showNextQuestion(nextQuestionObj)
+    })
 
     currentQuestionElement
       .find('input[type=checkbox],input[type=radio]')
@@ -2325,7 +2375,6 @@ function WikidsStoryTest(el, options) {
 
       dom.nextButton.off("click").on("click", function () {
         const answer = that.passTestQuestion.getUserAnswers(currentQuestion?.item_view, currentQuestion.payload);
-        console.log(answer);
         nextQuestion(answer);
       });
     }
@@ -3059,6 +3108,8 @@ function WikidsStoryTest(el, options) {
   function continueTestAction(answer) {
     console.debug('continueTestAction');
 
+    strictModeTracker.hideQuestion()
+
     dom.continueButton.hide();
 
     var isLastQuestion = (testQuestions.length === 0);
@@ -3193,8 +3244,6 @@ function WikidsStoryTest(el, options) {
     that.container.append($hintWrapper);
   }
 
-  //PluginManager.initializePlugins(this, el, {});
-
   this.getCurrentQuestionElement = function () {
     return currentQuestionElement;
   }
@@ -3244,18 +3293,29 @@ function WikidsStoryTest(el, options) {
 
   return {
     run,
-    "load": load,
-    "restore": restore,
-    "addEventListener": function (type, listener, useCapture) {
+    load,
+    restore,
+    addEventListener(type, listener, useCapture) {
       if ('addEventListener' in window) {
         dom.wrapper[0].addEventListener(type, listener, useCapture);
       }
     },
-    "getTestConfig": function () {
+    getTestConfig() {
       return testConfig;
     },
-    "isTestSlide": function () {
+    isTestSlide() {
       return ($('[data-test-id]', Reveal.getCurrentSlide()).length > 0);
+    },
+    destroy() {
+      strictModeTracker.hideQuestion()
+    },
+    resetQuiz() {
+      if (questions.length === 0) {
+        return
+      }
+      if (currentQuestion) {
+        showNextQuestion(currentQuestion)
+      }
     }
   };
 }
@@ -3277,20 +3337,22 @@ WikidsStoryTest.mount = function () {
   });
 };
 
-WikidsStoryTest.mount(RecordingAnswer);
-WikidsStoryTest.mount(SequenceQuestion);
-WikidsStoryTest.mount(MissingWords);
-WikidsStoryTest.mount(RegionQuestion);
-WikidsStoryTest.mount(VoiceResponse);
-WikidsStoryTest.mount(PassTest);
-WikidsStoryTest.mount(DragWords);
-WikidsStoryTest.mount(Poetry);
-WikidsStoryTest.mount(ImageGaps);
-WikidsStoryTest.mount(Grouping)
-WikidsStoryTest.mount(GptQuestion)
-WikidsStoryTest.mount(MathQuestion)
-WikidsStoryTest.mount(StepQuestion)
-WikidsStoryTest.mount(ColumnQuestion)
+WikidsStoryTest.mount(
+  RecordingAnswer,
+  SequenceQuestion,
+  MissingWords,
+  RegionQuestion,
+  VoiceResponse,
+  PassTest,
+  DragWords,
+  Poetry,
+  ImageGaps,
+  Grouping,
+  GptQuestion,
+  MathQuestion,
+  StepQuestion,
+  ColumnQuestion
+)
 
 WikidsStoryTest.getTests = function () {
   return tests;

@@ -252,16 +252,25 @@
   top: 0;
   left: 0;
   right: 0;
+  bottom: 0;
   margin-inline: auto;
-
-  width: 650px;
-  max-width: 100%;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 8px 32px 0px;
-  border-radius: 10px;
-  color: #fff;
-  background-color: rgba(13, 110, 253, 1);
-
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(3px);
   z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: start;
+}
+
+.mental-map-notify-card {
+  display: flex;
+  background-color: rgba(13, 110, 253, 1);
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 8px 32px 0px;
+  color: #fff;
+  border-radius: 10px;
+  width: 650px;
 }
 
 .mental-map-notify-text {
