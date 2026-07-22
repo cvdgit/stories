@@ -1410,6 +1410,9 @@ function WikidsStoryTest(el, options) {
             } finally {
               strictModeTracker.showQuestion(() => {
                 console.log('abort handler')
+                if (questionViewColumn(currentQuestion)) {
+                  ColumnQuestion.generateNewQuestion(currentQuestion)
+                }
                 showNextQuestion(currentQuestion)
               })
             }
@@ -2312,6 +2315,9 @@ function WikidsStoryTest(el, options) {
     strictModeTracker.hideQuestion()
     strictModeTracker.showQuestion(() => {
       console.log('abort handler')
+      if (questionViewColumn(nextQuestionObj)) {
+        ColumnQuestion.generateNewQuestion(nextQuestionObj)
+      }
       showNextQuestion(nextQuestionObj)
     })
 

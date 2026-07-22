@@ -1,5 +1,6 @@
 import {_extends} from "../common";
 import "./ColumnQuestion.css"
+import generateQuestion from "./generateQuestion";
 
 function ColumnQuestion(test) {
   this.element = null;
@@ -243,9 +244,11 @@ function multiplyTemplate(template, {steps, digits, firstDigit, secondDigit, sho
 }
 
 ColumnQuestion.prototype.create = function(question, container, responseHandler) {
-  const {payload} = question;
+  const {payload, name: questionTitle} = question;
 
   container.empty()
+
+  container.parent().find('.question-title').text(questionTitle)
 
   const {sign, result, steps} = payload
   const firstDigit = String(payload.firstDigit)
@@ -309,6 +312,32 @@ ColumnQuestion.prototype.create = function(question, container, responseHandler)
       })).get(),
     (userAnswer) => Number(userAnswer) === Number(result)
   ];
+}
+
+ColumnQuestion.generateNewQuestion = function(question) {
+
+  const newPayload = generateQuestion(question.payload)
+
+  question.name = `Вычисли столбиком: ${newPayload.firstDigit} ${newPayload.sign} ${newPayload.secondDigit}`
+  question.payload = newPayload
+
+  const answers = []
+  answers.push(
+    {...question.storyTestAnswers[0], name: newPayload.result}
+  )
+
+  let answerIndex = 1
+  newPayload.steps.map(step => {
+    const answer = question.storyTestAnswers[answerIndex]
+    if (answer) {
+      answers.push(
+        {...answer, name: String(step.resultInt)}
+      )
+    }
+    answerIndex++
+  })
+
+  question.storyTestAnswers = answers
 }
 
 _extends(ColumnQuestion, {
