@@ -85,11 +85,15 @@ class QuestionController extends Controller
             }
         }
 
+        $description = '';
+        if (!empty($test->description_text)) {
+            $description = HTMLPurifier::process(nl2br($test->description_text));
+        }
         return [
             'test' => [
                 'id' => $test->id,
                 'header' => $test->header,
-                'description' => HTMLPurifier::process(nl2br($test->description_text)),
+                'description' => $description,
                 'remote' => $test->isRemote(),
             ],
             'students' => $students,
