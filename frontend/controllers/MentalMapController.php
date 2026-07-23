@@ -77,12 +77,18 @@ class MentalMapController extends Controller
         ];
     }
 
+    /**
+     * @throws BadRequestHttpException
+     */
     public function actionInit(Request $request, Response $response, WebUser $user): array
     {
         $response->format = Response::FORMAT_JSON;
 
         $rawBody = Json::decode($request->rawBody);
         $id = $rawBody['id'];
+        if (empty($id)) {
+            throw new BadRequestHttpException('Bad request');
+        }
         if (!Uuid::isValid($id)) {
             return ['success' => false, 'message' => 'Id not valid'];
         }
