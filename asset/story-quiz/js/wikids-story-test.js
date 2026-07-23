@@ -39,6 +39,7 @@ import ColumnQuestion from "./ColumnQuestion";
 import {PluginManager} from "./plugins";
 import {createNotify} from "../../mental_map_quiz/components/utils";
 import StrictMode from "../../mental_map_quiz/StrictMode";
+import {generateNewColumnQuestion, saveAbortHandlerCall} from "./ColumnQuestion/ColumnQuestion";
 
 var tests = [];
 
@@ -1411,10 +1412,24 @@ function WikidsStoryTest(el, options) {
               strictModeTracker.showQuestion(() => {
                 console.log('abort handler')
                 if (questionViewColumn(currentQuestion)) {
-                  ColumnQuestion.generateNewQuestion(currentQuestion)
+
+                  const payload = {
+                    question: JSON.stringify(currentQuestion),
+                    newQuestion: null
+                  }
+                  generateNewColumnQuestion(currentQuestion)
+                  payload.newQuestion = JSON.stringify(currentQuestion)
+
+                  saveAbortHandlerCall(
+                    currentQuestion.id,
+                    payload,
+                    currentStudent.id
+                  )
+
+                  createElementNotify('Пример изменен', {persist: true, autoRemove: true, backdrop: false, timeout: 1000})
                 }
                 showNextQuestion(currentQuestion)
-              })
+              }, currentQuestion.id)
             }
           }
         },
@@ -2316,10 +2331,22 @@ function WikidsStoryTest(el, options) {
     strictModeTracker.showQuestion(() => {
       console.log('abort handler')
       if (questionViewColumn(nextQuestionObj)) {
-        ColumnQuestion.generateNewQuestion(nextQuestionObj)
+        const payload = {
+          question: JSON.stringify(nextQuestionObj),
+          newQuestion: null
+        }
+        generateNewColumnQuestion(nextQuestionObj)
+        payload.newQuestion = JSON.stringify(nextQuestionObj)
+
+        saveAbortHandlerCall(
+          nextQuestionObj.id,
+          payload,
+          currentStudent.id
+        )
+        createElementNotify('Пример изменен', {persist: true, autoRemove: true, backdrop: false, timeout: 1000})
       }
       showNextQuestion(nextQuestionObj)
-    })
+    }, nextQuestionObj.id)
 
     currentQuestionElement
       .find('input[type=checkbox],input[type=radio]')

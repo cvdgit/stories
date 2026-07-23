@@ -331,6 +331,8 @@ window.strictModeTracker = (function () {
     handler()
   }
 
+  const abortHandlersKeys = new Set()
+
   return {
     isFullscreenWindow,
     checkWindow() {
@@ -385,9 +387,20 @@ window.strictModeTracker = (function () {
         throw new Error('Невозможно изменить состояние во время записи')
       }
       enable = state
+      if (enable === false) {
+        abortHandlersKeys.clear()
+      }
     },
-    showQuestion(abortHandler) {
-      this.startRecording(abortHandler)
+    showQuestion(abortHandler, key) {
+      this.startRecording(() => {
+        if (key && abortHandlersKeys.has(key)) {
+          return
+        }
+        if (key) {
+          abortHandlersKeys.add(key)
+        }
+        abortHandler()
+      })
     },
     hideQuestion() {
       this.stopRecording()

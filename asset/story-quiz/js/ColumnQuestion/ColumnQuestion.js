@@ -314,7 +314,11 @@ ColumnQuestion.prototype.create = function(question, container, responseHandler)
   ];
 }
 
-ColumnQuestion.generateNewQuestion = function(question) {
+_extends(ColumnQuestion, {
+  pluginName: 'columnQuestion'
+});
+
+export function generateNewColumnQuestion(question) {
 
   const newPayload = generateQuestion(question.payload)
 
@@ -340,8 +344,15 @@ ColumnQuestion.generateNewQuestion = function(question) {
   question.storyTestAnswers = answers
 }
 
-_extends(ColumnQuestion, {
-  pluginName: 'columnQuestion'
-});
+export function saveAbortHandlerCall(questionId, payload, studentId) {
+  return window.Api.post(
+    `/question/abort-handler`,
+    {
+      questionId,
+      payload,
+      studentId
+    }
+  )
+}
 
 export default ColumnQuestion

@@ -18,6 +18,7 @@ use common\models\UserQuestionHistoryModel;
 use common\models\UserStudent;
 use common\rbac\UserRoles;
 use Exception;
+use frontend\Quiz\ColumnQuestion\ColumnAbortForm;
 use frontend\services\QuestionProgressService;
 use linslin\yii2\curl\Curl;
 use Yii;
@@ -28,6 +29,8 @@ use yii\rest\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Request;
+use yii\web\Response;
 use yii\web\User as WebUser;
 
 class QuestionController extends Controller
@@ -481,5 +484,40 @@ class QuestionController extends Controller
         catch (Exception $exception) {
             return ['success' => false, 'message' => $exception->getMessage()];
         }
+    }
+
+    public function actionAbortHandler(Request $request, Response $response): array
+    {
+        $response->format = Response::FORMAT_JSON;
+
+        $body = Json::decode($request->rawBody);
+        $abortForm = new ColumnAbortForm();
+        if ($abortForm->load($body, '')) {
+            if (!$abortForm->validate()) {
+                return ['success' => false, 'message' => 'Not valid'];
+            }
+            try {
+                $command = Yii::$app->db->createCommand();
+                $command->insert(
+                    'column_abort_log',
+                    [
+                        'question_id' => (int) $abortForm->questionId,
+                        'payload' => [
+                            'question' => Json::decode($body['payload']['question']),
+                            'newQuestion' => Json::decode($body['payload']['newQuestion']),
+                        ],
+                        'student_id' => (int) $abortForm->studentId,
+                        'created_at' => time(),
+                    ],
+                );
+                $command->execute();
+
+                return ['success' => true];
+            } catch (Exception $exception) {
+                Yii::$app->errorHandler->logException($exception);
+            }
+        }
+
+        return ['success' => false, $body];
     }
 }
