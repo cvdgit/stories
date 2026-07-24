@@ -31,6 +31,7 @@ class CreateColumnQuestionHandler
         $question = StoryTestQuestion::create($command->getTestId(), $command->getName(), QuestionType::COLUMN_QUESTION);
         $question->regions = Json::encode($command->getPayload());
         $question->weight = 1;
+        $question->payload = $command->getParams()->asArray();
         $this->transactionManager->wrap(static function() use ($question, $command): void {
             if (!$question->save()) {
                 throw ModelDomainException::create($question);

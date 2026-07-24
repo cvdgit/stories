@@ -1409,9 +1409,9 @@ function WikidsStoryTest(el, options) {
             } catch (ex) {
               createElementNotify('Окно браузера должно быть развернуто на весь экран. Масштаб внутри вкладки должен быть 100%')
             } finally {
-              strictModeTracker.showQuestion(() => {
+              strictModeTracker.showQuestion(firstCall => {
                 console.log('abort handler')
-                if (questionViewColumn(currentQuestion)) {
+                if (questionViewColumn(currentQuestion) && firstCall) {
 
                   const payload = {
                     question: JSON.stringify(currentQuestion),
@@ -1943,6 +1943,8 @@ function WikidsStoryTest(el, options) {
       return;
     }
 
+    quizState = ''
+
     const thisAnswer = Array.from(answer);
 
     if (typeof checkAnswersCallback === 'function') {
@@ -2303,6 +2305,8 @@ function WikidsStoryTest(el, options) {
     }
   }
 
+  let quizState
+
   function showNextQuestion(nextQuestionObj) {
 
     console.debug('WikidsStoryTest.showNextQuestion');
@@ -2316,6 +2320,8 @@ function WikidsStoryTest(el, options) {
       return;
     }
 
+    quizState = 'showQuestion'
+
     cancelSpeech();
 
     const exists = questionList.find(q => parseInt(q.id) === parseInt(currentQuestion.id));
@@ -2328,9 +2334,9 @@ function WikidsStoryTest(el, options) {
     currentQuestionElement = $('.wikids-test-question[data-question-id=' + nextQuestionObj.id + ']', dom.questions);
 
     strictModeTracker.hideQuestion()
-    strictModeTracker.showQuestion(() => {
+    strictModeTracker.showQuestion(firstCall => {
       console.log('abort handler')
-      if (questionViewColumn(nextQuestionObj)) {
+      if (questionViewColumn(nextQuestionObj) && firstCall) {
         const payload = {
           question: JSON.stringify(nextQuestionObj),
           newQuestion: null
@@ -2881,7 +2887,33 @@ function WikidsStoryTest(el, options) {
     } else if (questionViewStep(question)) {
       $elements.append(that.stepQuestion.getContent(question))
     } else if (questionViewColumn(question)) {
-      $elements.append(that.columnQuestion.getContent(question))
+
+      if (question.isCorrectAnswerDelay === true) {
+        dom.wrapper.append(
+          that.columnQuestion.createDelayPage(elem => {
+
+            elem.style.opacity = '0'
+            elem.remove()
+
+            $elements.append(
+              that.columnQuestion.getContent(question)
+            )
+
+            dom.correctAnswerPage
+              .find('.wikids-test-correct-answer-answers')
+              .empty()
+              .html($elements[0].childNodes)
+              .animate({scrollTop: 0})
+              .end()
+              .show();
+          })
+        )
+        return
+      }
+
+      $elements.append(
+        that.columnQuestion.getContent(question)
+      )
     } else if (questionViewImageGaps(question)) {
       $elements.append(that.imageGapsQuestion.getContent(question));
     } else if (questionViewDragWords(question)) {
@@ -3346,7 +3378,7 @@ function WikidsStoryTest(el, options) {
       if (questions.length === 0) {
         return
       }
-      if (currentQuestion) {
+      if (currentQuestion && quizState === 'showQuestion') {
         showNextQuestion(currentQuestion)
       }
     }

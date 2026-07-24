@@ -23,6 +23,7 @@ use yii\web\View;
     <div><?= $form->field($formModel, 'secondDigitMax')->textInput(['maxlength' => true]) ?></div>
 </div>
 <?= $form->field($formModel, 'number')->dropDownList([10 => '10', 20 => '20', 30 => '30'], ['prompt' => 'Количество вопросов']) ?>
+<?= $form->field($formModel, 'isCorrectAnswerDelay')->checkbox() ?>
 <div class="modal-footer">
     <button type="submit" class="btn btn-success">Импортировать</button>
     <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>

@@ -393,13 +393,14 @@ window.strictModeTracker = (function () {
     },
     showQuestion(abortHandler, key) {
       this.startRecording(() => {
+        let firstCall = true
         if (key && abortHandlersKeys.has(key)) {
-          return
+          firstCall = false
         }
         if (key) {
           abortHandlersKeys.add(key)
         }
-        abortHandler()
+        abortHandler(firstCall)
       })
     },
     hideQuestion() {

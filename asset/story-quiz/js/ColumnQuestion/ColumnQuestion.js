@@ -314,6 +314,24 @@ ColumnQuestion.prototype.create = function(question, container, responseHandler)
   ];
 }
 
+ColumnQuestion.prototype.createDelayPage = function(onFinishCallback) {
+  const elem = document.createElement('div')
+  elem.className = 'column-delay-wrap'
+  let timer = 40
+  elem.innerHTML = `Нужно подождать <span class="column-delay-counter" style="margin-inline: 10px">${timer}</span> сек.`
+
+  const interval = setInterval(() => {
+    timer--
+    elem.querySelector('.column-delay-counter').innerText = timer
+    if (timer <= 0) {
+      clearInterval(interval)
+      onFinishCallback(elem)
+    }
+  }, 1000)
+
+  return elem
+}
+
 _extends(ColumnQuestion, {
   pluginName: 'columnQuestion'
 });

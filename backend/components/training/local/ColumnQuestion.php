@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace backend\components\training\local;
 
+use backend\Testing\Questions\Column\ColumnQuestionParams;
 use common\models\StoryTestQuestion;
 use yii\helpers\Json;
 
@@ -22,13 +23,18 @@ class ColumnQuestion extends Question
 
     public function serialize()
     {
-        return array_merge([
+        $values = [
             'stars' => [
                 'total' => $this->starsTotal,
                 'current' => $this->makeStars($this->stars, $this),
             ],
             'view' => 'column_question',
             'payload' => Json::decode($this->question->regions),
-        ], parent::serialize());
+        ];
+        $values = array_merge(
+            ColumnQuestionParams::fromArray($this->question->getQuestionParams())->asArray(),
+            $values
+        );
+        return array_merge($values, parent::serialize());
     }
 }

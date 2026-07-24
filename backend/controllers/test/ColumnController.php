@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace backend\controllers\test;
 
 use backend\components\BaseController;
+use backend\Testing\Questions\Column\ColumnQuestionParams;
 use backend\Testing\Questions\Column\ColumnQuestionPayload;
 use backend\Testing\Questions\Column\Create\ColumnQuestionCreateForm;
 use backend\Testing\Questions\Column\Create\CreateColumnQuestionCommand;
@@ -90,9 +91,19 @@ class ColumnController extends BaseController
                 $payload = $payload->withSteps();
             }
 
+            $questionParams = new ColumnQuestionParams(
+                $createForm->getIsShowCorrectDelay()
+            );
+
             try {
                 $this->createColumnQuestionHandler->handle(
-                    new CreateColumnQuestionCommand($testing->id, $createForm->name, $createForm->result, $payload),
+                    new CreateColumnQuestionCommand(
+                        $testing->id,
+                        $createForm->name,
+                        $createForm->result,
+                        $payload,
+                        $questionParams
+                    ),
                 );
                 Yii::$app->session->setFlash('success', 'Вопрос успешно создан');
                 return [
@@ -133,6 +144,9 @@ class ColumnController extends BaseController
         $questionModel = $this->findModel(StoryTestQuestion::class, $id);
 
         $currentPayload = ColumnQuestionPayload::fromPayload(Json::decode($questionModel->regions));
+        $questionParams = ColumnQuestionParams::fromArray(
+            $questionModel->getQuestionParams()
+        );
 
         $updateForm = new ColumnQuestionUpdateForm($questionModel);
         if ($updateForm->load($request->post())) {
@@ -153,6 +167,8 @@ class ColumnController extends BaseController
             }
 
             $questionModel->regions = Json::encode($payload);
+            $questionParams = $questionParams->withShowCorrectAnswer($updateForm->getIsShowCorrectDelay());
+            $questionModel->payload = $questionParams->asArray();
 
             if ((string) $currentPayload === (string) $payload) {
                 try {
@@ -292,11 +308,16 @@ class ColumnController extends BaseController
                     continue;
                 }
 
+                $questionParams = new ColumnQuestionParams(
+                    $formModel->getIsShowCorrectDelay()
+                );
+
                 $this->createColumnQuestionHandler->handle(new CreateColumnQuestionCommand(
                     $testModel->id,
                     'Вычисли столбиком: ' . $payload->getFirstDigit() . ' ' . $payload->getSign() . ' ' . $payload->getSecondDigit(),
                     $payload->getResult(),
                     $payload,
+                    $questionParams
                 ));
             }
             return ['success' => true];

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace backend\Testing\Questions\Column\Update;
 
 use backend\Testing\Questions\Column\ColumnQuestionForm;
+use backend\Testing\Questions\Column\ColumnQuestionParams;
 use common\models\StoryTestQuestion;
 use yii\helpers\Json;
 
@@ -19,5 +20,6 @@ class ColumnQuestionUpdateForm extends ColumnQuestionForm
         $this->secondDigit = $payload['secondDigit'];
         $this->sign = $payload['sign'];
         $this->result = $payload['result'];
+        $this->isCorrectAnswerDelay = ColumnQuestionParams::fromArray($question->getQuestionParams())->isCorrectAnswerDelay();
     }
 }

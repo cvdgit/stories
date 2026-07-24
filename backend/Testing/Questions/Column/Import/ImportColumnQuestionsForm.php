@@ -14,6 +14,7 @@ class ImportColumnQuestionsForm extends Model
     public $secondDigitMax;
     public $sign;
     public $number;
+    public $isCorrectAnswerDelay;
 
     public function init(): void
     {
@@ -31,6 +32,25 @@ class ImportColumnQuestionsForm extends Model
             [['firstDigitMin', 'firstDigitMax', 'secondDigitMin', 'secondDigitMax'], 'integer', 'min' => 1],
             ['sign', 'safe'],
             ['number', 'integer'],
+            ['isCorrectAnswerDelay', 'boolean'],
         ];
+    }
+
+    public function attributeLabels(): array
+    {
+        return [
+            'firstDigitMin' => '#1 число (мин.)',
+            'firstDigitMax' => '#1 число (макс.)',
+            'secondDigitMin' => '#2 число (мин.)',
+            'secondDigitMax' => '#2 число (макс.)',
+            'sign' => 'Операции',
+            'number' => 'Количество вопросов',
+            'isCorrectAnswerDelay' => 'Задержка (40 сек.) перед показом правильного ответа после неправильного',
+        ];
+    }
+
+    public function getIsShowCorrectDelay(): bool
+    {
+        return $this->isCorrectAnswerDelay === '1';
     }
 }
