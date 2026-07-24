@@ -34,6 +34,7 @@ use yii\helpers\Json;
  * @property string $incorrect_description
  * @property int $max_prev_items
  * @property int $weight
+ * @property array $payload
  *
  * @property StoryTestAnswer[] $storyTestAnswers
  * @property StoryTestAnswer[] $storyTestAnswersWithHidden
@@ -480,5 +481,13 @@ class StoryTestQuestion extends ActiveRecord
         $newQuestion->story_test_id = $testId;
         $newQuestion->order = $order;
         return $newQuestion;
+    }
+
+    public function getQuestionParams(): array
+    {
+        if ($this->payload === null) {
+            return [];
+        }
+        return $this->payload;
     }
 }
