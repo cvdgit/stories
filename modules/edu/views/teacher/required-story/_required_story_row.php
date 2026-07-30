@@ -12,6 +12,7 @@ use yii\helpers\Url;
  */
 [$requiredStoryItem, $stat] = $model;
 ?>
+<div class="required-story-cell"><?= $requiredStoryItem->getTeacherName() ?></div>
 <div class="required-story-cell">
     <?= $requiredStoryItem->getStatus()->label() ?>
 </div>

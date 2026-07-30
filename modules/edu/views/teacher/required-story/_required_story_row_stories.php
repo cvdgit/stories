@@ -20,5 +20,4 @@ use modules\edu\RequiredStory\repo\ByStoriesItem;
     <?php endif ?>
     </div>
     <?php endfor ?>
-
 </div>

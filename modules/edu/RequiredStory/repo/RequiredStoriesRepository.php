@@ -92,10 +92,13 @@ class RequiredStoriesRepository
                 'createdAt' => 't.created_at',
                 'status' => 't.status',
                 'priority' => 't.priority',
+                'teacherName' => "COALESCE(CONCAT(p.last_name, ' ', p.first_name), u.email)"
             ])
             ->from(['t' => RequiredStoryModel::tableName()])
             ->innerJoin(['s' => EduStory::tableName()], 't.story_id = s.id')
             ->innerJoin(['student' => EduStudent::tableName()], 't.student_id = student.id')
+            ->innerJoin(['u' => 'user'], 't.created_by = u.id')
+            ->leftJoin(['p' => 'profile'], 'u.id = p.user_id')
             ->orderBy(['t.created_at' => SORT_DESC]);
 
         if ($studentId !== null) {
