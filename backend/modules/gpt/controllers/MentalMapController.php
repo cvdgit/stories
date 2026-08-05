@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace backend\modules\gpt\controllers;
 
 use backend\modules\gpt\Prompts\LlmPrompt;
+use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\base\ExitException;
 use yii\helpers\Json;
@@ -60,5 +61,30 @@ TEXT;
 
         $fields = $this->createFieldsPayload($content);
         $this->sendStream('mental-map-presentation-result', Json::encode($fields));
+    }
+
+    /**
+     * @throws \JsonException
+     */
+    public function actionChat(Request $request): void
+    {
+        $payload = json_decode($request->getRawBody(), true, 512, JSON_THROW_ON_ERROR);
+
+        $fields = [
+            "input" => [
+                "messages" => $payload['input']['messages'],
+            ],
+            "config" => [
+                "metadata" => [
+                    "conversation_id" => Uuid::uuid4()->toString(),
+                ],
+            ],
+            "include_names" => [],
+        ];
+
+        $this->sendStream(
+            'mental-map-chat',
+            Json::encode($fields)
+        );
     }
 }

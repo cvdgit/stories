@@ -3,6 +3,8 @@ import TextDialog from "./TextDialog";
 import SettingsDialog from "./SettingsDialog";
 import TitleChangeDialog from "./TitleChangeDialog";
 import Prompts from "./Prompts";
+import ChatSidebar from "../AI/ChatSidebar";
+import {useChat} from "../AI/hooks/useChat";
 
 export default function Toolbar({currentTitle, mentalMapId, schedules, setFormattedMapText, isTreeView}) {
   const [textDialogOpen, setTextDialogOpen] = useState(false)
@@ -13,6 +15,21 @@ export default function Toolbar({currentTitle, mentalMapId, schedules, setFormat
   const [promptsDialogOpen, setPromptsDialogOpen] = useState(false)
 
   const returnUrl = window.mentalMapReturnUrl || '/'
+
+  const {
+    messages,
+    draft,
+    setDraft,
+    isSidebarOpen,
+    isLoading,
+    error,
+    fileInputRef,
+    mapItems,
+    handleSubmit,
+    handleAttachFile,
+    openSidebar,
+    closeSidebar
+  } = useChat(mentalMapId);
 
   return (
     <div>
@@ -42,6 +59,10 @@ export default function Toolbar({currentTitle, mentalMapId, schedules, setFormat
           </a>
         </div>
         <div className="app-header__btn-group">
+          {isTreeView && <button onClick={openSidebar} type="button" className="button button--default button--header-done">
+            AI
+          </button>}
+
           <button onClick={() => {
             setPromptsDialogOpen(true)
           }} className="button button--default button--header-done"
@@ -80,6 +101,21 @@ export default function Toolbar({currentTitle, mentalMapId, schedules, setFormat
         setCurrentTitle={setTitle}
       />
       <Prompts promptsDialogOpen={promptsDialogOpen} setPromptsDialogOpen={setPromptsDialogOpen} />
+
+      <ChatSidebar
+        isOpen={isSidebarOpen}
+        onClose={closeSidebar}
+        messages={messages}
+        draft={draft}
+        onDraftChange={(event) => setDraft(event.target.value)}
+        onSubmit={handleSubmit}
+        onAttach={handleAttachFile}
+        onOpenFilePicker={() => fileInputRef.current?.click()}
+        fileInputRef={fileInputRef}
+        onCreateMap={openSidebar}
+        isLoading={isLoading}
+        error={error}
+      />
     </div>
   )
 }
